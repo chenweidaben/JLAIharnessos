@@ -226,8 +226,16 @@ export const authRoutes: RouteDef[] = [
     handle: async (c: Ctx) => {
       const user = requireUser(c);
       if (!user) return unauthorized();
-      const body = await c.body<{ token?: string }>();
-      const disabled = await mfaService.disable(user.id, (body.token ?? '').trim());
+      // 同时兼容 body 与 query 传参（部分 HTTP 客户端 DELETE 不带请求体）
+      let token = '';
+      try {
+        const body = await c.body<{ token?: string }>();
+        token = body.token ?? '';
+      } catch {
+        token = '';
+      }
+      if (!token) token = new URL(c.req.url).searchParams.get('token') ?? '';
+      const disabled = await mfaService.disable(user.id, token.trim());
       if (!disabled) return json(fail(ErrorCode.BAD_REQUEST, '动态码/备份码校验失败，无法停用 MFA'), 400);
       return json(ok({ disabled: true }));
     },

@@ -4,7 +4,7 @@
  *
  * 个人中心：基本信息 / 修改密码 / 偏好设置 / 安全设置 / 我的数据 / 账号注销
  */
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import {
   App as AntdApp,
   Avatar,
@@ -35,6 +35,7 @@ import {
 } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
+import MfaSettings from '@/pages/profile/MfaSettings';
 import { useAuthStore } from '@/store/authStore';
 import type { LoginDevice, UserPreferences } from '@/types/auth';
 
@@ -90,7 +91,6 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false);
   const [pref, setPref] = useState<UserPreferences>(DEFAULT_PREF);
-  const [twoFa, setTwoFa] = useState(true);
   const [devices, setDevices] = useState<LoginDevice[]>(DEVICES);
   const [profileForm] = Form.useForm();
 
@@ -367,12 +367,6 @@ export default function ProfilePage() {
   const security = (
     <Card title="安全设置" style={{ marginBottom: 16 }}>
       <Descriptions column={1} bordered size="small">
-        <Descriptions.Item label="双因素认证（2FA）">
-          <Tag color={twoFa ? 'success' : 'default'}>{twoFa ? '已开启' : '未开启'}</Tag>
-          <Button size="small" style={{ marginLeft: 12 }} onClick={() => setTwoFa(!twoFa)}>
-            {twoFa ? '关闭 2FA' : '开启 2FA'}
-          </Button>
-        </Descriptions.Item>
         <Descriptions.Item label="API 密钥">
           <code style={{ background: '#f5f7fa', padding: '2px 6px', borderRadius: 4 }}>
             sk-live-••••••••4f2a
@@ -460,7 +454,7 @@ export default function ProfilePage() {
           { key: 'basic', label: '基本信息', children: basicInfo },
           { key: 'pwd', label: '修改密码', children: changePwd },
           { key: 'pref', label: '偏好设置', children: preferences },
-          { key: 'sec', label: '安全设置', children: security },
+          { key: 'sec', label: '安全设置', children: <Fragment><MfaSettings />{security}</Fragment> },
           { key: 'data', label: '我的数据', children: myData },
           { key: 'danger', label: '账号注销', children: danger },
         ]}
