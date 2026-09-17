@@ -273,6 +273,77 @@ services:
         max-file: "5"
 
   # --------------------------------------------------------------------------
+  # Alertmanager：0.25C/64M 保底、0.5C/256M 上限；只读根，状态写挂载卷。
+  # --------------------------------------------------------------------------
+  alertmanager:
+    cpus: 0.5
+    mem_reservation: 64M
+    mem_limit: 256M
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  # --------------------------------------------------------------------------
+  # postgres-exporter / redis-exporter：无状态、极轻量，只读根 + 最小权限。
+  # --------------------------------------------------------------------------
+  postgres-exporter:
+    cpus: 0.5
+    mem_reservation: 64M
+    mem_limit: 256M
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+
+  redis-exporter:
+    cpus: 0.25
+    mem_reservation: 32M
+    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+        reservations:
+          cpus: "0.05"
+          memory: 32M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+
+  # --------------------------------------------------------------------------
   # Elasticsearch：生产堆内存提高到 1g（不超过容器内存 50%，留 Lucene 文件缓存）。
   # --------------------------------------------------------------------------
   elasticsearch:

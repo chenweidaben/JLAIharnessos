@@ -343,6 +343,83 @@ services:
         max-file: "3"
 
   # ==========================================================================
+  # Alertmanager（告警分发、分组、抑制与静默；通知渠道见挂载配置）
+  # ==========================================================================
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    volumes:
+      - ./deploy/observability/alertmanager:/etc/alertmanager:ro
+      - alertmanager-data:/alertmanager
+    networks:
+      - monitoring
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${ALERTMANAGER_PORT:-9093}:9093"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9093/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  # ==========================================================================
+  # postgres-exporter（PostgreSQL 指标，:9187/metrics）
+  #   安全建议：生产环境创建只读监控角色（pg_monitor）并替换 DATA_SOURCE_NAME，
+  #   口令含特殊字符时需做 URL 编码，或改用 docker secret/连接服务。
+  # ==========================================================================
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
+    environment:
+      TZ: Asia/Shanghai
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+    networks:
+      - backend
+      - monitoring
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PG_EXPORTER_PORT:-9187}:9187"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==========================================================================
+  # redis-exporter（Redis 指标，:9121/metrics）
+  # ==========================================================================
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.66.0
+    environment:
+      TZ: Asia/Shanghai
+      REDIS_ADDR: "redis://redis:6379"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - backend
+      - monitoring
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${REDIS_EXPORTER_PORT:-9121}:9121"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==========================================================================
   # Elasticsearch（单节点日志存储；开启安全认证，锁定内存）
   # ==========================================================================
   elasticsearch:
@@ -477,6 +554,8 @@ volumes:
     name: jianlan-prometheus-data
   grafana-data:
     name: jianlan-grafana-data
+  alertmanager-data:
+    name: jianlan-alertmanager-data
   jaeger-badger:
     name: jianlan-jaeger-badger
 

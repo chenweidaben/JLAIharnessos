@@ -1,0 +1,59 @@
+# ============================================================================
+# 健澜科技杠OS — Alertmanager 告警通知配置
+# ----------------------------------------------------------------------------
+# 本文件在 docker-compose 中只读挂载到 alertmanager:9093。
+# 开箱状态下接收器不配置外发渠道（告警仍在 Alertmanager UI 与日志可见），
+# 部署上线时必须按医院值班体系接入至少一种通知渠道（短信/电话/企业 IM/邮件/Webhook）。
+#
+# 常见接入（取消注释并填写，重启 alertmanager 生效）：
+#   企业微信/钉钉/飞书：通常经「告警网关/PrometheusWebhook 适配器」转换卡片格式，
+#                      在 webhook_configs.urls 填写该网关地址；
+#   邮件：配置 global.smtp_* 并在 receiver 使用 email_configs；
+#   短信/电话：通过值班平台 Webhook 触发，critical 级别建议电话+短信双通道。
+# ============================================================================
+
+global:
+  resolve_timeout: 5m
+  # SMTP（邮件通知，部署方填写）
+  # smtp_smarthost: 'smtp.your-hospital.com:587'
+  # smtp_from: 'gangos-alert@your-hospital.com'
+  # smtp_auth_username: 'gangos-alert@your-hospital.com'
+  # smtp_auth_password: '<请用 secret 注入，不要写死>'
+  # smtp_require_tls: true
+
+# 告警分组与路由
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s          # 同组首条告警等待 30s 聚合后发送
+  group_interval: 5m       # 同组新增告警的通知间隔
+  repeat_interval: 4h      # 未恢复告警重复提醒间隔
+  receiver: 'default'
+  routes:
+    # 危急（如 BFF 宕机、高错误率、智能体失败率超阈、危急值激增）走 critical 通道
+    - matchers: ['severity="critical"']
+      receiver: 'critical'
+      repeat_interval: 30m
+
+receivers:
+  # 普通告警：上线前接入值班 Webhook / 邮件
+  - name: 'default'
+    webhook_configs: []
+    # email_configs:
+    #   - to: 'ops-oncall@your-hospital.com'
+    #     send_resolved: true
+
+  # 危急告警：建议电话 + 短信 + 企业 IM 多通道，确保有人响应
+  - name: 'critical'
+    webhook_configs: []
+    # - url: 'http://alert-gateway/internal/critical'
+    #   send_resolved: true
+
+# 抑制：critical 存在时抑制同告警名的 warning，减少噪音
+inhibit_rules:
+  - source_matchers: ['severity="critical"']
+    target_matchers: ['severity="warning"']
+    equal: ['alertname']
+  # 目标宕机时抑制其下游症状告警
+  - source_matchers: ['alertname="GangosBFFDown"']
+    target_matchers: ['severity=~"warning|critical"']
+    equal: ['cluster']

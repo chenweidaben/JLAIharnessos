@@ -4,9 +4,10 @@
 # 抓取目标均使用 compose 网络内的「服务名:端口」，运行于内网 monitoring 网络，
 # 不做鉴权；生产环境通过网络策略保证 9090 与各 metrics 端口不对公网开放。
 #
-# 本批次（容器化批次）只接入「当前确实存在指标端点」的组件；BFF 指标端点、
-# nginx/postgres/redis/kafka exporter 在后续「监控化批次」以 sidecar 形式落地，
-# 对应抓取任务在文件末尾以注释模板给出，接入时取消注释即可，无需改动主结构。
+# 已接入：prometheus 自身、Jaeger、后端 BFF、PostgreSQL（postgres-exporter）、
+# Redis（redis-exporter），告警分发到 alertmanager:9093。
+# nginx/kafka exporter 待对应 sidecar 落地后在文件末尾启用。
+# 所有目标运行于内网监控网络，不做鉴权；生产以网络策略保证不对公网暴露。
 # ============================================================================
 
 # 全局抓取间隔与规则评估间隔；15s 粒度兼顾分辨率与资源占用。
@@ -47,18 +48,22 @@ scrape_configs:
         type: 'A'
         port: 8080
 
+  # PostgreSQL 指标（docker-compose 中的 postgres-exporter sidecar）。
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          component: 'database'
+
+  # Redis 指标（redis-exporter sidecar）。
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          component: 'cache'
+
   # --------------------------------------------------------------------------
-  # 以下任务在对应 exporter sidecar 就绪后启用（模板，当前保持注释，避免死目标）：
-  #
-  # PostgreSQL（部署 postgres_exporter sidecar 后启用）：
-  # - job_name: 'postgres'
-  #   static_configs:
-  #     - targets: ['postgres-exporter:9187']
-  #
-  # Redis（部署 redis_exporter sidecar 后启用）：
-  # - job_name: 'redis'
-  #   static_configs:
-  #     - targets: ['redis-exporter:9121']
+  # 以下 exporter 待对应 sidecar 落地后启用（保持注释，避免死目标）：
   #
   # 边缘网关（部署 nginx-prometheus-exporter sidecar 后启用）：
   # - job_name: 'nginx-edge'
@@ -71,8 +76,8 @@ scrape_configs:
   #     - targets: ['kafka:5556']
   # --------------------------------------------------------------------------
 
-# Alertmanager（部署 alertmanager 容器后取消注释；未配置时规则仍在 Prometheus Alerts 页可见）
-# alerting:
-#   alertmanagers:
-#     - static_configs:
-#         - targets: ['alertmanager:9093']
+# Alertmanager（docker-compose 已部署；通知渠道在 alertmanager.yml 配置）
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
