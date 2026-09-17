@@ -1,0 +1,19 @@
+# ============================================================================
+# 健澜科技杠OS — Grafana 大盘自动装配（dashboard provider）
+# 只读挂载到容器 /etc/grafana/provisioning/dashboards/，启动即导入 dashboards/ 下 JSON。
+# ============================================================================
+apiVersion: 1
+
+providers:
+  - name: gangos
+    orgId: 1
+    folderName: '健澜科技杠OS'
+    folderUid: gangos
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      # 与 docker-compose 中 grafana 服务挂载的大盘目录一致
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

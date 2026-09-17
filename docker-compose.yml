@@ -285,6 +285,7 @@ services:
       - "--web.enable-lifecycle"
     volumes:
       - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/prometheus/rules:/etc/prometheus/rules:ro
       - prometheus-data:/prometheus
     networks:
       - backend
@@ -320,6 +321,7 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
       - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       prometheus:
         condition: service_started

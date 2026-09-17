@@ -17,6 +17,7 @@ import { withErrorHandler } from './middleware/error';
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
+import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { authRoutes } from './routes/auth';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -123,10 +124,27 @@ async function handleFetch(
     return new Response('upgrade failed', { status: 426 });
   }
 
+  // Prometheus 指标端点。默认依赖内网网络策略隔离（不对公网暴露）；
+  // 配置 METRICS_TOKEN 后强制校验 Authorization: Bearer <token>。
+  if (url.pathname === '/metrics' && req.method === 'GET') {
+    const expectedToken = process.env.METRICS_TOKEN;
+    if (expectedToken) {
+      const auth = req.headers.get('authorization') ?? '';
+      if (auth !== `Bearer ${expectedToken}`) {
+        return new Response('unauthorized', { status: 401 });
+      }
+    }
+    return new Response(renderMetrics(), {
+      status: 200,
+      headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' },
+    });
+  }
+
   const ctx: Ctx = newCtx(req, {}, url.searchParams);
   attachUser(ctx);
 
   let status = 200;
+  let routeLabel = 'unmatched';
   try {
     // 限流
     const limited = rateLimit(ctx);
@@ -149,6 +167,7 @@ async function handleFetch(
       const params: Record<string, string> = {};
       r.keys.forEach((k, i) => (params[k] = decodeURIComponent(m[i + 1])));
       ctx.params = params;
+      routeLabel = r.def.path;
 
       if (r.def.auth) {
         const denied = requireAuth(ctx);
@@ -172,6 +191,12 @@ async function handleFetch(
     );
   } finally {
     logRequest(ctx, status, startedAt);
+    recordHttpRequest({
+      method: req.method,
+      route: routeLabel,
+      code: status,
+      durationSeconds: (Date.now() - startedAt) / 1000,
+    });
   }
 }
 
@@ -189,6 +214,7 @@ const server = Bun.serve({
   websocket: {
     open(ws) {
       chatClients.add(ws);
+      metrics.wsConnections.inc();
     },
     message(ws: Bun.ServerWebSocket<unknown>, raw: string | Buffer) {
       let parsed: { action?: string; conversationId?: string } = {};
@@ -229,26 +255,52 @@ const server = Bun.serve({
     },
     close(ws) {
       chatClients.delete(ws);
+      metrics.wsConnections.dec();
     },
   },
 });
 
-// 启动后周期性推送一条告警（演示）
-setInterval(() => {
-  broadcast('alert.critical_value', {
-    id: `al_${Date.now()}`,
-    ruleName: '肌钙蛋白危急值',
-    severity: 'critical',
-    message: '检测到新的危急值',
-    level: 'critical',
-    createdAt: new Date().toISOString(),
-    acknowledged: false,
-  });
-}, 30_000);
+// 演示用：非生产环境周期性推送一条模拟危急值告警（生产环境严禁推送假告警）
+const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
+const demoAlertTimer = isProduction
+  ? null
+  : setInterval(() => {
+      broadcast('alert.critical_value', {
+        id: `al_${Date.now()}`,
+        ruleName: '肌钙蛋白危急值',
+        severity: 'critical',
+        message: '检测到新的危急值',
+        level: 'critical',
+        createdAt: new Date().toISOString(),
+        acknowledged: false,
+      });
+    }, 30_000);
 
 // eslint-disable-next-line no-console
 console.log(
   `[jianlan-bff] listening on http://0.0.0.0:${port}  (WebSocket /ws/chat [auth required])`,
 );
+
+// 优雅停机：停止接收新连接、关闭演示定时器与 WS，再退出，便于滚动发布与 K8s 终止
+let shuttingDown = false;
+function shutdown(signal: string): void {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  // eslint-disable-next-line no-console
+  console.log(`[jianlan-bff] 收到 ${signal}，开始优雅停机…`);
+  if (demoAlertTimer) clearInterval(demoAlertTimer);
+  for (const ws of chatClients) {
+    try {
+      ws.close(1001, 'server shutting down');
+    } catch {
+      /* already closed */
+    }
+  }
+  void server.stop(false);
+  // 给在途同步响应一个极短收尾窗口后退出
+  setTimeout(() => process.exit(0), 300);
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 export { broadcast, ok, server };

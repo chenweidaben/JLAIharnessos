@@ -1,0 +1,130 @@
+# ============================================================================
+# 健澜科技杠OS — Prometheus 告警规则
+# 指标来源：BFF /metrics（gangos_ 前缀）。exporter（PG/Redis/Kafka/Nginx）
+# 接入后可在本文件追加对应规则。阈值为基线建议，生产请按科室 SLO 调整。
+# 挂载：docker-compose 将本目录只读挂载到 /etc/prometheus/rules（见 prometheus.yml）。
+# ============================================================================
+
+groups:
+  # ---- 可用性 -------------------------------------------------------------
+  - name: gangos-availability
+    rules:
+      - alert: GangosBFFDown
+        expr: absent(up{job="bff"}) or up{job="bff"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: bff
+        annotations:
+          summary: 'BFF 实例不可达（{{ $labels.instance }}）'
+          description: 'Prometheus 连续 2 分钟无法抓取 BFF /metrics，请检查 Pod/容器、网络与发布状态。'
+
+      - alert: GangosBFFRestarted
+        expr: resets(gangos_up[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          component: bff
+        annotations:
+          summary: 'BFF 近 1 小时发生重启'
+          description: '进程 up 序列出现重置，可能为崩溃或滚动发布；请结合错误日志与告警确认。'
+
+  # ---- HTTP 错误与时延（RED） ----------------------------------------------
+  - name: gangos-http-red
+    rules:
+      - alert: GangosHighErrorRate
+        expr: |
+          (
+            sum(rate(gangos_http_requests_total{job="bff",code=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(gangos_http_requests_total{job="bff"}[5m])), 1e-9)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: bff
+        annotations:
+          summary: 'BFF 5xx 错误率超过 5%'
+          description: '近 5 分钟服务端错误率 {{ $value | humanizePercentage }}，超过 SLO，需排查后端依赖与异常。'
+
+      - alert: GangosHighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job="bff"}[5m]))
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: bff
+        annotations:
+          summary: 'BFF P95 时延超过 1s'
+          description: '近 5 分钟 P95={{ $value }}s，关注 HIS/LIS 聚合接口、数据库与缓存。'
+
+      - alert: GangosRateLimited
+        expr: sum(rate(gangos_http_requests_total{job="bff",code="429"}[5m])) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: edge
+        annotations:
+          summary: '持续触发限流（429）'
+          description: '近 10 分钟持续有请求被限流，确认是否异常调用方或需要调整配额。'
+
+  # ---- 智能体与工具 --------------------------------------------------------
+  - name: gangos-agents-tools
+    rules:
+      - alert: GangosAgentFailureRate
+        expr: |
+          (
+            sum(rate(gangos_agent_runs_total{status="failed"}[10m]))
+            /
+            clamp_min(sum(rate(gangos_agent_runs_total[10m])), 1e-9)
+          ) > 0.1
+        for: 10m
+        labels:
+          severity: critical
+          component: orchestrator
+        annotations:
+          summary: '智能体运行失败率超过 10%'
+          description: '近 10 分钟失败率 {{ $value | humanizePercentage }}，检查编排依赖、LLM/RAG/工具与人工任务超时。'
+
+      - alert: GangosAgentRunTooLong
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(gangos_agent_run_duration_seconds_bucket[10m]))
+          ) > 30
+        for: 10m
+        labels:
+          severity: warning
+          component: orchestrator
+        annotations:
+          summary: '智能体 P95 运行时长超过 30s'
+          description: '可能存在人工任务堆积、外部依赖变慢或循环上限过大。'
+
+      - alert: GangosToolFailureRate
+        expr: |
+          (
+            sum(rate(gangos_tool_calls_total{result!="success"}[10m]))
+            /
+            clamp_min(sum(rate(gangos_tool_calls_total[10m])), 1e-9)
+          ) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: medical-tools
+        annotations:
+          summary: '医疗工具失败率超过 10%'
+          description: '工具适配器（HIS/EMR/LIS/PACS）可能异常，结合熔断器与集成监控排查。'
+
+  # ---- 临床安全（信息级，提醒值班关注） --------------------------------------
+  - name: gangos-clinical-safety
+    rules:
+      - alert: GangosCriticalValueBurst
+        expr: sum(increase(gangos_cds_alerts_total{severity="critical"}[15m])) > 20
+        for: 0m
+        labels:
+          severity: warning
+          component: cds
+        annotations:
+          summary: '15 分钟内危急值提醒激增（{{ $value }}）'
+          description: '确认是否为真实临床高峰或规则/数据异常；危急值必须闭环处置。'

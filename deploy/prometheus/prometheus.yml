@@ -37,19 +37,18 @@ scrape_configs:
         labels:
           component: 'tracing'
 
+  # 后端 BFF（Bun）业务与运行时指标，零依赖 /metrics 端点（见 src/bff/observability）。
+  - job_name: 'bff'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    dns_sd_configs:
+      - names: ['app']
+        refresh_interval: 30s
+        type: 'A'
+        port: 8080
+
   # --------------------------------------------------------------------------
-  # 以下任务在「监控化批次」组件就绪后启用（模板，当前保持注释，避免出现死目标）：
-  #
-  # 后端 BFF（Bun）业务指标，需先在 BFF 落地 /metrics 端点：
-  #
-  # - job_name: 'bff'
-  #   metrics_path: '/metrics'
-  #   scrape_interval: 10s
-  #   dns_sd_configs:
-  #     - names: ['app']
-  #       refresh_interval: 30s
-  #       type: 'A'
-  #       port: 8080
+  # 以下任务在对应 exporter sidecar 就绪后启用（模板，当前保持注释，避免死目标）：
   #
   # PostgreSQL（部署 postgres_exporter sidecar 后启用）：
   # - job_name: 'postgres'
@@ -71,3 +70,9 @@ scrape_configs:
   #   static_configs:
   #     - targets: ['kafka:5556']
   # --------------------------------------------------------------------------
+
+# Alertmanager（部署 alertmanager 容器后取消注释；未配置时规则仍在 Prometheus Alerts 页可见）
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']

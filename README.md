@@ -282,8 +282,8 @@ cd web && npm run build # 前端生产构建
 
 - **三种部署模式**：单机试用、院内私有化（推荐）、云原生高可用；
 - Docker Compose 含 app/web/postgres/redis/kafka/nginx/prometheus/grafana/elasticsearch/kibana/jaeger；
-- 安全：SCRAM、TLS、JWT 验签、CSP/CSRF、审计哈希链、WAL 归档 PITR、Redis 危险命令禁用；
-- 运维：指标（P50/P95/P99）、健康探针、Grafana 大盘、告警、备份恢复、故障排查 SOP。
+- 安全：SCRAM、TLS、JWT 验签、**TOTP 多因素认证（MFA，RFC 6238 + 一次性备份码 + 重放保护）**、CSP/CSRF、审计哈希链、WAL 归档 PITR、Redis 危险命令禁用；
+- 运维：BFF 内置 `/metrics`（Prometheus，零依赖）、预置 Grafana 总览大盘与 9 条告警规则、健康/就绪探针与优雅停机、k6 压测脚本、自动备份/恢复脚本、备份恢复与容灾演练 SOP、上线验收清单。
 
 详见 [部署文档](docs/deployment/) 与 [运维手册](docs/operations/)。
 
@@ -298,7 +298,8 @@ cd web && npm run build # 前端生产构建
 - [x] 语音电子病历、PostgreSQL/Redis 生产基座、Web 工作台
 - [ ] 更多厂商 HIS 真实联调与认证适配器市场
 - [ ] 智能体包注册中心 / 一键安装（对标应用商店）
-- [ ] MFA / 国密算法 / 电子病历分级与等保三级测评加固
+- [x] TOTP 多因素认证（MFA）、生产可观测（/metrics + Grafana 大盘 + 告警 + k6）
+- [ ] 国密算法（SM2/SM3/SM4）/ KMS、MFA 多副本共享存储、电子病历分级与等保三级测评加固
 - [ ] 多模态（影像/语音/文书）智能体与联邦知识协作
 - [ ] 国际化（英文界面与海外标准术语）
 

@@ -53,6 +53,7 @@ export default tseslint.config(
       '**/*.d.ts',
       '**/*.js',
       'scripts/**',
+      'examples/**',
       'design/**',
       'docs/**',
       '.venv/**',

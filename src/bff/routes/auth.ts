@@ -9,9 +9,26 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { InMemoryMfaStore, MfaService } from '@/security/mfa/index.js';
+
 import { signJwt } from '../middleware/auth';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+
+/**
+ * MFA 服务（进程内存储）。生产环境应注入基于 PostgreSQL/Redis 的 IMfaStore，
+ * 并对 TOTP 密钥加密落库；多副本部署时必须使用共享存储以保证二次校验一致。
+ */
+const mfaService = new MfaService(new InMemoryMfaStore());
+
+/** 路由已声明 auth:true，此处做类型收窄并兜底未认证 */
+function requireUser(c: Ctx): NonNullable<Ctx['user']> | null {
+  return c.user ?? null;
+}
+
+function unauthorized(): Response {
+  return json(fail(ErrorCode.UNAUTHORIZED, '未认证或登录已过期'), 401);
+}
 
 /**
  * 与前端 web/src/types/user.ts 对齐的登录用户视图。
@@ -132,6 +149,84 @@ export const authRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/auth/permissions',
     handle: () => json(ok([{ id: 'p1', code: 'system:admin', name: '系统管理', type: 'api' }])),
+    auth: true,
+  },
+
+  // ---- 多因素认证（MFA / TOTP）------------------------------------------
+  {
+    method: 'GET',
+    path: '/api/v1/auth/mfa/status',
+    handle: (c: Ctx) => {
+      const user = requireUser(c);
+      if (!user) return unauthorized();
+      return json(
+        ok({
+          enabled: mfaService.isEnabled(user.id),
+          remainingBackupCodes: mfaService.remainingBackupCodes(user.id),
+        }),
+      );
+    },
+    auth: true,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/auth/mfa/enroll',
+    handle: async (c: Ctx) => {
+      const user = requireUser(c);
+      if (!user) return unauthorized();
+      const result = mfaService.beginEnroll(user.id, { accountName: user.name || user.id });
+      if (!result.ok) {
+        return json(fail(ErrorCode.BAD_REQUEST, `MFA 绑定发起失败: ${result.error}`), 400);
+      }
+      return json(ok({ secret: result.secret, otpauthUri: result.otpauthUri }));
+    },
+    auth: true,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/auth/mfa/confirm',
+    handle: async (c: Ctx) => {
+      const user = requireUser(c);
+      if (!user) return unauthorized();
+      const body = await c.body<{ token?: string }>();
+      const result = mfaService.confirmEnroll(user.id, (body.token ?? '').trim());
+      if (!result.ok) {
+        return json(fail(ErrorCode.BAD_REQUEST, `动态码校验失败: ${result.error}`), 400);
+      }
+      return json(ok({ backupCodes: result.backupCodes }));
+    },
+    auth: true,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/auth/mfa/verify',
+    handle: async (c: Ctx) => {
+      const user = requireUser(c);
+      if (!user) return unauthorized();
+      const body = await c.body<{ token?: string }>();
+      const result = mfaService.verify(user.id, (body.token ?? '').trim());
+      if (!result.ok) {
+        const status = result.error === 'NOT_ENABLED' ? 400 : 401;
+        return json(
+          fail(status === 401 ? ErrorCode.UNAUTHORIZED : ErrorCode.BAD_REQUEST, result.error),
+          status,
+        );
+      }
+      return json(ok({ method: result.method }));
+    },
+    auth: true,
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/auth/mfa',
+    handle: async (c: Ctx) => {
+      const user = requireUser(c);
+      if (!user) return unauthorized();
+      const body = await c.body<{ token?: string }>();
+      const disabled = mfaService.disable(user.id, (body.token ?? '').trim());
+      if (!disabled) return json(fail(ErrorCode.BAD_REQUEST, '动态码/备份码校验失败，无法停用 MFA'), 400);
+      return json(ok({ disabled: true }));
+    },
     auth: true,
   },
 ];

@@ -11,10 +11,22 @@
 - 前端离线状态指示器（`useOnlineStatus` + `OfflineIndicator`）：断网顶部红色横幅，恢复后自动提示。
 - HTTP 请求超时可配置：默认 30s，支持 `VITE_API_TIMEOUT_MS` 覆盖。
 - HTTP 请求指数退避重试：仅幂等 GET，5xx/网络错误/超时，最多 2 次，离线不重试。
+- BFF 内置 Prometheus 指标端点 `/metrics`（零依赖，可选 `METRICS_TOKEN`）：HTTP RED、WebSocket、
+  智能体/工具/CDS/人工任务指标（`gangos_` 前缀），并支持 SIGTERM/SIGINT 优雅停机。
+- 预置 Prometheus 告警规则 9 条（`deploy/prometheus/rules/gangos.yml`）与 Grafana 平台总览大盘
+  （19 面板，自动装配），docker-compose 已挂载。
+- k6 压测脚本（冒烟/常规/压力，`scripts/perf/k6/`）。
+- TOTP 多因素认证（RFC 6238，±1 步时钟容忍、重放保护、一次性备份码），BFF 5 个 `/auth/mfa/*` 接口。
+- PostgreSQL 备份/恢复脚本（`deploy/postgres/backup.sh`、`restore.sh`，含校验与保留期）。
+- 《生产上线验收清单》《容灾与恢复演练手册》。
+
+### 变更
+- 演示危急值假告警改为仅非生产环境推送，生产环境不再制造假告警。
 
 ### 修复
 - BFF 认证中间件修复"任意非空 token 即 admin"的 P0 漏洞：JWT 验签失败一律拒绝，演示 token 仅非生产环境可用。
 - BFF 500 错误不再向客户端泄露堆栈/SQL/文件路径，统一返回通用文案 + traceId。
+- 修复指标 Histogram 桶计数被重复累加的问题。
 
 ---
 
