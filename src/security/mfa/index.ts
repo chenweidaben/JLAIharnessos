@@ -6,4 +6,5 @@
 
 export * from './backupCodes.js';
 export * from './MfaService.js';
+export * from './PgMfaStore.js';
 export * from './totp.js';

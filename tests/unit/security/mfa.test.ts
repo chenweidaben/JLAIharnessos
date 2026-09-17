@@ -100,60 +100,60 @@ describe('MfaService 完整生命周期', () => {
     return new MfaService(new InMemoryMfaStore());
   }
 
-  it('绑定→确认→校验→重放拒绝→备份码一次性→停用', () => {
+  it('绑定→确认→校验→重放拒绝→备份码一次性→停用', async () => {
     const svc = fresh();
     const userId = 'u_1001';
 
     // 未启用
-    expect(svc.isEnabled(userId)).toBe(false);
-    expect(svc.verify(userId, '000000').ok).toBe(false);
+    expect(await svc.isEnabled(userId)).toBe(false);
+    expect((await svc.verify(userId, '000000')).ok).toBe(false);
 
     // begin
-    const begin = svc.beginEnroll(userId, { accountName: 'doctor_chen' });
+    const begin = await svc.beginEnroll(userId, { accountName: 'doctor_chen' });
     expect(begin.ok).toBe(true);
     expect(begin.secret).toBeTruthy();
     expect(begin.otpauthUri).toContain('otpauth://totp/');
     // 已存在待确认绑定时再次 begin 被拒绝
-    expect(svc.beginEnroll(userId).ok).toBe(false);
+    expect((await svc.beginEnroll(userId)).ok).toBe(false);
 
     // 错误动态码不能确认
-    const wrong = svc.confirmEnroll(userId, '000000');
+    const wrong = await svc.confirmEnroll(userId, '000000');
     expect(wrong.ok).toBe(false);
 
     // 正确动态码确认
     const secret = begin.secret;
     if (!secret) throw new Error('enroll 未返回 secret');
-    const confirm = svc.confirmEnroll(userId, totp(secret));
+    const confirm = await svc.confirmEnroll(userId, totp(secret));
     expect(confirm.ok).toBe(true);
     expect(confirm.backupCodes).toHaveLength(10);
     const backupCodes = confirm.backupCodes;
     if (!backupCodes) throw new Error('confirm 未返回备份码');
-    expect(svc.isEnabled(userId)).toBe(true);
+    expect(await svc.isEnabled(userId)).toBe(true);
 
     // 已启用不能重复绑定
-    expect(svc.beginEnroll(userId).error).toBe('ALREADY_ENABLED');
+    expect((await svc.beginEnroll(userId)).error).toBe('ALREADY_ENABLED');
 
     // 同一 TOTP 口令重放被拒（confirm 已消耗当前步）
-    const replay = svc.verify(userId, totp(secret));
+    const replay = await svc.verify(userId, totp(secret));
     expect(replay.ok).toBe(false);
     if (!replay.ok) expect(replay.error).toBe('TOKEN_REPLAYED');
 
     // 备份码可用且一次性
     const backup = backupCodes[0];
-    const useBackup = svc.verify(userId, backup);
+    const useBackup = await svc.verify(userId, backup);
     expect(useBackup).toEqual({ ok: true, method: 'backup' });
-    const reuseBackup = svc.verify(userId, backup);
+    const reuseBackup = await svc.verify(userId, backup);
     expect(reuseBackup.ok).toBe(false);
-    expect(svc.remainingBackupCodes(userId)).toBe(9);
+    expect(await svc.remainingBackupCodes(userId)).toBe(9);
 
     // 错误口令
-    expect(svc.verify(userId, '999999').ok).toBe(false);
+    expect((await svc.verify(userId, '999999')).ok).toBe(false);
 
     // 停用需验证：错误口令不能停用
-    expect(svc.disable(userId, '999999')).toBe(false);
-    expect(svc.isEnabled(userId)).toBe(true);
+    expect(await svc.disable(userId, '999999')).toBe(false);
+    expect(await svc.isEnabled(userId)).toBe(true);
     // 用另一备份码停用
-    expect(svc.disable(userId, backupCodes[1])).toBe(true);
-    expect(svc.isEnabled(userId)).toBe(false);
+    expect(await svc.disable(userId, backupCodes[1])).toBe(true);
+    expect(await svc.isEnabled(userId)).toBe(false);
   });
 });

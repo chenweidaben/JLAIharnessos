@@ -16,8 +16,13 @@ import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 
 /**
- * MFA 服务（进程内存储）。生产环境应注入基于 PostgreSQL/Redis 的 IMfaStore，
- * 并对 TOTP 密钥加密落库；多副本部署时必须使用共享存储以保证二次校验一致。
+ * MFA 服务。默认使用进程内存储（适合单机试用/演示）。
+ *
+ * 多副本/生产部署必须切换为共享存储，否则各副本二次校验状态不一致：
+ *   import { PgMfaStore, createEncryptionServiceCipher } from '@/security/mfa/index.js';
+ *   const store = new PgMfaStore(pool, createEncryptionServiceCipher(new EncryptionService()));
+ *   const mfaService = new MfaService(store);   // 表：iam.mfa_factors（15-iam-mfa.sql）
+ * 详见 SECURITY.md 与《安全合规设计》。
  */
 const mfaService = new MfaService(new InMemoryMfaStore());
 
@@ -156,15 +161,14 @@ export const authRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/auth/mfa/status',
-    handle: (c: Ctx) => {
+    handle: async (c: Ctx) => {
       const user = requireUser(c);
       if (!user) return unauthorized();
-      return json(
-        ok({
-          enabled: mfaService.isEnabled(user.id),
-          remainingBackupCodes: mfaService.remainingBackupCodes(user.id),
-        }),
-      );
+      const [enabled, remainingBackupCodes] = await Promise.all([
+        mfaService.isEnabled(user.id),
+        mfaService.remainingBackupCodes(user.id),
+      ]);
+      return json(ok({ enabled, remainingBackupCodes }));
     },
     auth: true,
   },
@@ -174,7 +178,7 @@ export const authRoutes: RouteDef[] = [
     handle: async (c: Ctx) => {
       const user = requireUser(c);
       if (!user) return unauthorized();
-      const result = mfaService.beginEnroll(user.id, { accountName: user.name || user.id });
+      const result = await mfaService.beginEnroll(user.id, { accountName: user.name || user.id });
       if (!result.ok) {
         return json(fail(ErrorCode.BAD_REQUEST, `MFA 绑定发起失败: ${result.error}`), 400);
       }
@@ -189,7 +193,7 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const body = await c.body<{ token?: string }>();
-      const result = mfaService.confirmEnroll(user.id, (body.token ?? '').trim());
+      const result = await mfaService.confirmEnroll(user.id, (body.token ?? '').trim());
       if (!result.ok) {
         return json(fail(ErrorCode.BAD_REQUEST, `动态码校验失败: ${result.error}`), 400);
       }
@@ -204,7 +208,7 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const body = await c.body<{ token?: string }>();
-      const result = mfaService.verify(user.id, (body.token ?? '').trim());
+      const result = await mfaService.verify(user.id, (body.token ?? '').trim());
       if (!result.ok) {
         const status = result.error === 'NOT_ENABLED' ? 400 : 401;
         return json(
@@ -223,7 +227,7 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const body = await c.body<{ token?: string }>();
-      const disabled = mfaService.disable(user.id, (body.token ?? '').trim());
+      const disabled = await mfaService.disable(user.id, (body.token ?? '').trim());
       if (!disabled) return json(fail(ErrorCode.BAD_REQUEST, '动态码/备份码校验失败，无法停用 MFA'), 400);
       return json(ok({ disabled: true }));
     },

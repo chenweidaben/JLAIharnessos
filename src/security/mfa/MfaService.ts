@@ -34,20 +34,20 @@ export interface MfaEnrollment {
 }
 
 export interface IMfaStore {
-  get(userId: string): MfaEnrollment | undefined;
-  put(enrollment: MfaEnrollment): void;
-  delete(userId: string): void;
+  get(userId: string): Promise<MfaEnrollment | undefined>;
+  put(enrollment: MfaEnrollment): Promise<void>;
+  delete(userId: string): Promise<void>;
 }
 
 export class InMemoryMfaStore implements IMfaStore {
   private readonly map = new Map<string, MfaEnrollment>();
-  get(userId: string): MfaEnrollment | undefined {
+  async get(userId: string): Promise<MfaEnrollment | undefined> {
     return this.map.get(userId);
   }
-  put(enrollment: MfaEnrollment): void {
+  async put(enrollment: MfaEnrollment): Promise<void> {
     this.map.set(enrollment.userId, enrollment);
   }
-  delete(userId: string): void {
+  async delete(userId: string): Promise<void> {
     this.map.delete(userId);
   }
 }
@@ -82,22 +82,22 @@ export class MfaService {
     this.period = options.period ?? 30;
   }
 
-  isEnabled(userId: string): boolean {
-    return this.store.get(userId)?.enabled === true;
+  async isEnabled(userId: string): Promise<boolean> {
+    return (await this.store.get(userId))?.enabled === true;
   }
 
   /** 第一步：生成密钥与 otpauth URI（尚未启用，需 confirmEnroll 确认） */
-  beginEnroll(
+  async beginEnroll(
     userId: string,
     params: { accountName: string; issuer?: string } = { accountName: userId },
-  ): BeginEnrollResult {
-    const existing = this.store.get(userId);
+  ): Promise<BeginEnrollResult> {
+    const existing = await this.store.get(userId);
     if (existing?.enabled) return { ok: false, error: 'ALREADY_ENABLED' };
     if (existing) return { ok: false, error: 'PENDING_EXISTS' };
 
     const issuer = params.issuer ?? DEFAULT_ISSUER;
     const secret = generateSecret();
-    this.store.put({
+    await this.store.put({
       userId,
       secret,
       enabled: false,
@@ -114,8 +114,8 @@ export class MfaService {
   }
 
   /** 第二步：用验证器生成的首组动态码确认绑定，成功后启用并签发备份码 */
-  confirmEnroll(userId: string, token: string): ConfirmEnrollResult {
-    const enrollment = this.store.get(userId);
+  async confirmEnroll(userId: string, token: string): Promise<ConfirmEnrollResult> {
+    const enrollment = await this.store.get(userId);
     if (!enrollment) return { ok: false, error: 'NO_PENDING_ENROLLMENT' };
     if (enrollment.enabled) return { ok: false, error: 'ALREADY_ENABLED' };
 
@@ -124,7 +124,7 @@ export class MfaService {
 
     const plainCodes = generateBackupCodes(10);
     const now = Date.now();
-    this.store.put({
+    await this.store.put({
       ...enrollment,
       enabled: true,
       confirmedAt: now,
@@ -135,8 +135,8 @@ export class MfaService {
   }
 
   /** 校验登录第二步或敏感操作的动态码 / 备份码 */
-  verify(userId: string, token: string): VerifyResult {
-    const enrollment = this.store.get(userId);
+  async verify(userId: string, token: string): Promise<VerifyResult> {
+    const enrollment = await this.store.get(userId);
     if (!enrollment?.enabled) return { ok: false, error: 'NOT_ENABLED' };
 
     // 1) TOTP（含重放保护）
@@ -150,7 +150,7 @@ export class MfaService {
       ) {
         return { ok: false, error: 'TOKEN_REPLAYED' };
       }
-      this.store.put({ ...enrollment, lastUsedCounter: absoluteCounter });
+      await this.store.put({ ...enrollment, lastUsedCounter: absoluteCounter });
       return { ok: true, method: 'totp' };
     }
 
@@ -159,7 +159,7 @@ export class MfaService {
     if (idx >= 0) {
       const remaining = enrollment.backupHashes.slice();
       remaining.splice(idx, 1);
-      this.store.put({ ...enrollment, backupHashes: remaining });
+      await this.store.put({ ...enrollment, backupHashes: remaining });
       return { ok: true, method: 'backup' };
     }
 
@@ -167,15 +167,15 @@ export class MfaService {
   }
 
   /** 停用 MFA（需再次验证动态码/备份码，防止他人关闭二次认证） */
-  disable(userId: string, token: string): boolean {
-    const result = this.verify(userId, token);
+  async disable(userId: string, token: string): Promise<boolean> {
+    const result = await this.verify(userId, token);
     if (!result.ok) return false;
-    this.store.delete(userId);
+    await this.store.delete(userId);
     return true;
   }
 
   /** 查询剩余可用备份码数量（不暴露明文） */
-  remainingBackupCodes(userId: string): number {
-    return this.store.get(userId)?.backupHashes.length ?? 0;
+  async remainingBackupCodes(userId: string): Promise<number> {
+    return (await this.store.get(userId))?.backupHashes.length ?? 0;
   }
 }
