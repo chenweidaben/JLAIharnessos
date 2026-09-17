@@ -8,6 +8,8 @@
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
 
+import { recordToolCall } from '@/core/observability/metrics.js';
+
 import type {
   MedicalToolContext,
   MedicalToolRegistry,
@@ -53,7 +55,16 @@ export class MedicalToolInvoker implements IToolInvoker {
 
   async invoke(input: ToolInvokeInput): Promise<ToolResult<unknown>> {
     const tool = this.registry.get(input.toolName);
+    const emit = (result: 'success' | 'error' | 'denied'): void => {
+      recordToolCall({
+        tool: input.toolName,
+        category: tool?.category ?? 'unknown',
+        risk: tool?.riskLevel ?? (input.riskLevel ?? 'unknown'),
+        result,
+      });
+    };
     if (!tool) {
+      emit('error');
       return {
         success: false,
         error: { code: 'TOOL_NOT_FOUND', message: `医疗工具不存在: ${input.toolName}` },
@@ -74,6 +85,7 @@ export class MedicalToolInvoker implements IToolInvoker {
           { toolName: tool.name, input: input.input },
         );
         if (!ok) {
+          emit('denied');
           return {
             success: false,
             error: { code: 'CONFIRMATION_DENIED', message: '双人复核未通过，操作已拦截' },
@@ -85,6 +97,7 @@ export class MedicalToolInvoker implements IToolInvoker {
           { toolName: tool.name, input: input.input },
         );
         if (!ok) {
+          emit('denied');
           return {
             success: false,
             error: { code: 'CONFIRMATION_DENIED', message: '用户取消了操作确认' },
@@ -93,8 +106,11 @@ export class MedicalToolInvoker implements IToolInvoker {
       }
 
       // 执行（工具内部/框架负责权限、校验、审计）
-      return await tool.execute(input.input, ctx);
+      const r = await tool.execute(input.input, ctx);
+      emit(r.success ? 'success' : 'error');
+      return r;
     } catch (e) {
+      emit('error');
       return {
         success: false,
         error: {

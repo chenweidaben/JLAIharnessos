@@ -10,14 +10,16 @@
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
 
+import { recordAgentRun } from '@/core/observability/metrics.js';
+
 import type { AgentDefinition } from '../dsl/types.js';
+import type { WorkflowEngine } from '../engine/engine.js';
 import type {
   ISubAgentInvoker,
   SubAgentRequest,
   SubAgentResponse,
   WorkflowRuntime,
 } from '../engine/runtime.js';
-import type { WorkflowEngine } from '../engine/engine.js';
 import type { AgentRegistry } from './AgentRegistry.js';
 
 /** 调用器构造参数 */
@@ -123,15 +125,24 @@ export class AgentInvoker implements ISubAgentInvoker {
     if (!workflow) return { output: { error: `入口工作流不存在: ${agent.entryWorkflow}` } };
 
     const prompts = this.deps.registry.getPrompts(agent.id);
+    const trigger = options.trigger ?? 'api';
+    const startedAt = performance.now();
     const instance = this.deps.engine.run(workflow, {
       input,
       patient: this.deps.patient,
       user: this.deps.user,
       timeoutMs: options.timeoutMs,
-      trigger: { type: options.trigger ?? 'api' },
+      trigger: { type: trigger },
       runtimeOverride: { promptLoader: (ref: string) => prompts[ref] ?? ref },
     });
     const result = await instance.result;
+    const failed = !result.success || Boolean((result.output as { error?: string })?.error);
+    recordAgentRun({
+      agent: agent.id,
+      status: failed ? 'failed' : 'completed',
+      trigger,
+      durationSeconds: (performance.now() - startedAt) / 1000,
+    });
     return {
       output: result.success ? result.output : { error: result.error, state: result.state },
       tokens: result.summary.tokens,

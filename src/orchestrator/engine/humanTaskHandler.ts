@@ -10,6 +10,8 @@
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
 
+import { recordHumanTask } from '@/core/observability/metrics.js';
+
 import type {
   HumanResolution,
   IHumanTaskHandler,
@@ -66,6 +68,7 @@ export class InMemoryHumanTaskHandler implements IHumanTaskHandler {
         const e = this.pending.get(task.taskId);
         if (e) {
           this.pending.delete(task.taskId);
+          recordHumanTask('expired');
           e.reject(new HumanTaskTimeoutError(task.taskId));
         }
       }, task.timeoutMs);
@@ -90,6 +93,7 @@ export class InMemoryHumanTaskHandler implements IHumanTaskHandler {
     if (entry.timer) clearTimeout(entry.timer);
     this.pending.delete(taskId);
     entry.resolve({ ...resolution, taskId });
+    recordHumanTask(resolution.approved === false ? 'rejected' : 'approved');
     this.listeners.forEach((l) => l({ type: 'resolved', taskId }));
   }
 
@@ -99,6 +103,7 @@ export class InMemoryHumanTaskHandler implements IHumanTaskHandler {
     if (!entry) return;
     if (entry.timer) clearTimeout(entry.timer);
     this.pending.delete(taskId);
+    recordHumanTask('cancelled');
     entry.reject(new HumanTaskCancelledError(taskId));
   }
 

@@ -13,6 +13,8 @@
  * 免责声明：所有 CDS 结果仅供参考，最终决策须由执业医师确认。
  */
 
+import { recordCdsAlert } from '@/core/observability/metrics.js';
+
 import { ActionExecutor } from './ActionExecutor.js';
 import type {
   AlertLevel,
@@ -141,6 +143,11 @@ export class CDSEngine {
       if (acc === null) return h.level;
       return LEVEL_ORDER[h.level] > LEVEL_ORDER[acc] ? h.level : acc;
     }, null);
+
+    // 5. 可观测埋点：每条实际生效的提醒计数一次（测试态/被互斥抑制的不计）
+    for (const h of hits) {
+      recordCdsAlert({ kind: String(h.actionType), severity: String(h.level) });
+    }
 
     return {
       passed,
