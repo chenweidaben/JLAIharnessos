@@ -1,0 +1,165 @@
+# 健澜科技杠OS - 智能编码与DRG/DIP分组智能体
+# 版权所有 (c) 2026 健澜科技
+id: medical-coder
+name: 智能编码与DRG/DIP分组智能体
+nameEn: Medical Coder
+version: 1.0.0
+category: 病案与医保
+tags:
+  - ICD编码
+  - DRG
+  - DIP
+  - 病案首页
+  - 医保
+description: >-
+  基于出院病历自动推荐 ICD-10 诊断编码、ICD-9-CM-3 手术操作编码，进行 DRG/DIP 分组预测、
+  歧义与高套风险提示，低置信或歧义编码由病案编码员人工确认，提升编码效率与医保合规。
+allowedRoles:
+  - admin
+riskLevel: medium
+tools:
+  - get_medical_record
+  - drg_dip_analysis
+knowledgeBases:
+  - icd-coding
+  - drg-dip
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.0
+systemPrompt: prompts/system.md
+entryWorkflow: coding-main
+disclaimer: 编码与分组为 AI 推荐，最终编码以持证病案编码员审核确认为准，需符合医保监管要求。
+
+workflows:
+  - meta:
+      id: coding-main
+      name: 智能编码主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 90000
+      workflowTimeoutMs: 300000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: fetch_record
+        type: tool
+        name: 获取出院病历
+        config:
+          toolName: get_medical_record
+          inputMapping:
+            recordId: input.recordId
+
+      - id: icd_lookup
+        type: rag
+        name: 检索ICD术语库
+        config:
+          knowledgeBases: [icd-coding]
+          query: nodes.fetch_record.output.diagnosisText
+          topK: 8
+          scoreThreshold: 0.2
+          strategy: hybrid
+
+      - id: code
+        type: llm
+        name: 推荐诊断与手术编码
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            出院诊断与手术：${nodes.fetch_record.output.diagnosisText}
+            病历摘要：${nodes.fetch_record.output.summary}
+            ICD候选术语：${nodes.icd_lookup.output.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              diagnosisCodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code: { type: string }
+                    name: { type: string }
+                    principal: { type: boolean }
+                    confidence: { type: number }
+              procedureCodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code: { type: string }
+                    name: { type: string }
+                    confidence: { type: number }
+              ambiguous: { type: array, items: { type: string } }
+              needsReview: { type: boolean }
+
+      - id: drg
+        type: tool
+        name: DRG/DIP分组分析
+        config:
+          toolName: drg_dip_analysis
+          inputMapping:
+            diagnosisCodes: nodes.code.output.json.diagnosisCodes
+            procedureCodes: nodes.code.output.json.procedureCodes
+            recordId: input.recordId
+
+      - id: review_gate
+        type: condition
+        name: 是否需要人工编码审核
+        config:
+          mode: if-else
+          branches:
+            - { name: review, when: "nodes.code.output.json.needsReview == true || nodes.drg.output.flags.upcodingRisk == true" }
+          defaultPort: auto
+
+      - id: coder_review
+        type: human
+        name: 病案编码员审核
+        config:
+          title: 编码歧义/高套风险，请编码员审核
+          instructions: 存在低置信、歧义诊断或高套风险，请核对并确认最终编码与分组。
+          assigneeRoles: [admin]
+          formSchema:
+            confirmed: { type: boolean, required: true }
+            finalDiagnosisCodes: { type: string }
+            finalProcedureCodes: { type: string }
+            finalDrg: { type: string }
+          timeoutMs: 172800000
+
+      - id: finalize_review
+        type: code
+        config:
+          assignments:
+            status: '"reviewed"'
+            review: nodes.coder_review.output.formData
+
+      - id: finalize_auto
+        type: code
+        config:
+          assignments:
+            status: '"auto_suggested"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            review: vars.review
+            diagnosisCodes: nodes.code.output.json.diagnosisCodes
+            procedureCodes: nodes.code.output.json.procedureCodes
+            ambiguous: nodes.code.output.json.ambiguous
+            drg: nodes.drg.output
+
+    edges:
+      - { id: e1, source: start, target: fetch_record }
+      - { id: e2, source: fetch_record, target: icd_lookup }
+      - { id: e3, source: icd_lookup, target: code }
+      - { id: e4, source: code, target: drg }
+      - { id: e5, source: drg, target: review_gate }
+      - { id: e6, source: review_gate, target: coder_review, sourcePort: review }
+      - { id: e7, source: coder_review, target: finalize_review }
+      - { id: e8, source: finalize_review, target: end }
+      - { id: e9, source: review_gate, target: finalize_auto, sourcePort: auto }
+      - { id: e10, source: finalize_auto, target: end }

@@ -1,0 +1,7 @@
+# 健澜科技数智医院智能体 - 浏览器兼容目标
+# 最后 2 个主流浏览器版本 + Firefox ESR，排除已停止维护的浏览器
+> 0.5%
+last 2 versions
+Firefox ESR
+not dead
+not op_mini all

@@ -1,0 +1,4 @@
+﻿src/store/authStore.ts(130,79): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.
+tests/unit/store/qualityStore.test.ts(43,7): error TS2322: Type 'string' is not assignable to type 'DefectLocation'.
+tests/unit/store/qualityStore.test.ts(62,7): error TS2322: Type 'string' is not assignable to type 'DefectLocation'.

@@ -1,0 +1,199 @@
+# 健澜科技杠OS - 智能诊断辅助智能体
+# 版权所有 (c) 2026 健澜科技
+id: diagnosis-assistant
+name: 智能诊断辅助智能体
+nameEn: Diagnosis Assistant
+version: 1.0.0
+category: 临床决策
+tags:
+  - 鉴别诊断
+  - CDS
+  - 危急值
+  - 诊疗建议
+description: >-
+  汇聚病史、检验、影像与权威指南，并行运行临床决策支持与知识检索，给出鉴别诊断、
+  建议补充检查与治疗方向；对危急值/急危重症进行强制提醒与人工确认。辅助而非替代医生决策。
+allowedRoles:
+  - doctor
+  - nurse
+riskLevel: medium
+tools:
+  - get_patient_history
+  - get_lab_result
+  - get_image_report
+  - diagnosis_suggestion
+  - critical_value_alert
+knowledgeBases:
+  - clinical-guidelines
+  - differential-diagnosis
+model:
+  provider: anthropic
+  model: opus
+  temperature: 0.1
+systemPrompt: prompts/system.md
+entryWorkflow: diagnosis-main
+disclaimer: >-
+  诊断建议由 AI 基于资料生成，仅供临床参考，不能替代医生面诊与独立判断；
+  最终诊断与治疗方案由执业医师决定。
+
+workflows:
+  - meta:
+      id: diagnosis-main
+      name: 诊断辅助主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: fetch_history
+        type: tool
+        name: 既往史
+        config:
+          toolName: get_patient_history
+          inputMapping: { patientId: input.patientId }
+
+      - id: fetch_labs
+        type: tool
+        name: 检验结果
+        config:
+          toolName: get_lab_result
+          inputMapping: { patientId: input.patientId, days: 30 }
+
+      - id: fetch_images
+        type: tool
+        name: 影像报告
+        config:
+          toolName: get_image_report
+          inputMapping: { patientId: input.patientId, days: 30 }
+        errorHandling: { continueOnError: true }
+
+      - id: gather
+        type: parallel
+        name: 并行CDS与知识检索
+        config:
+          mode: all
+          concurrency: 2
+          branches:
+            - { name: cds, entryNode: br_cds }
+            - { name: kb, entryNode: br_kb }
+
+      # 并行分支子路径（末端无出边）
+      - id: br_cds
+        type: tool
+        name: CDS诊断建议
+        config:
+          toolName: diagnosis_suggestion
+          inputMapping:
+            chiefComplaint: input.chiefComplaint
+            history: nodes.fetch_history.output
+            labs: nodes.fetch_labs.output
+            images: nodes.fetch_images.output
+      - id: br_kb
+        type: rag
+        name: 指南与鉴别诊断检索
+        config:
+          knowledgeBases: [clinical-guidelines, differential-diagnosis]
+          query: input.chiefComplaint
+          topK: 6
+          scoreThreshold: 0.3
+          strategy: hybrid
+
+      - id: critical_check
+        type: tool
+        name: 危急值识别
+        config:
+          toolName: critical_value_alert
+          inputMapping:
+            labs: nodes.fetch_labs.output
+            patientId: input.patientId
+
+      - id: synthesize
+        type: llm
+        name: 综合鉴别诊断
+        config:
+          model: opus
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            主诉：${input.chiefComplaint}
+            既往史：${nodes.fetch_history.output}
+            检验：${nodes.fetch_labs.output}
+            影像：${nodes.fetch_images.output}
+            CDS建议：${nodes.gather.output.branches.cds}
+            指南证据：${nodes.gather.output.branches.kb.context}
+            危急值：${nodes.critical_check.output}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              differentialDiagnosis:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    diagnosis: { type: string }
+                    probability: { type: string }
+                    rationale: { type: string }
+              recommendedExams: { type: array, items: { type: string } }
+              treatmentDirection: { type: string }
+              redFlags: { type: array, items: { type: string } }
+              isEmergency: { type: boolean }
+
+      - id: emergency_gate
+        type: condition
+        name: 是否急危重
+        config:
+          mode: if-else
+          branches:
+            - { name: emergency, when: nodes.synthesize.output.json.isEmergency == true }
+          defaultPort: routine
+
+      - id: emergency_confirm
+        type: human
+        name: 危急值/急危重提醒确认
+        config:
+          title: 检出急危重/危急值，请立即处置确认
+          instructions: 系统识别到急危重信号或危急值，请立即评估并确认处置。
+          assigneeRoles: [doctor, nurse]
+          formSchema:
+            acknowledged: { type: boolean, required: true }
+            action: { type: string }
+          timeoutMs: 600000
+
+      - id: finalize_emergency
+        type: code
+        config:
+          assignments:
+            urgency: '"emergency"'
+            acknowledged: nodes.emergency_confirm.output.formData.acknowledged
+
+      - id: finalize_routine
+        type: code
+        config:
+          assignments:
+            urgency: '"routine"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            urgency: vars.urgency
+            acknowledged: vars.acknowledged
+            criticalAlerts: nodes.critical_check.output
+            analysis: nodes.synthesize.output.json
+
+    edges:
+      - { id: e1, source: start, target: fetch_history }
+      - { id: e2, source: fetch_history, target: fetch_labs }
+      - { id: e3, source: fetch_labs, target: fetch_images }
+      - { id: e4, source: fetch_images, target: gather }
+      - { id: e5, source: gather, target: critical_check }
+      - { id: e6, source: critical_check, target: synthesize }
+      - { id: e7, source: synthesize, target: emergency_gate }
+      - { id: e8, source: emergency_gate, target: emergency_confirm, sourcePort: emergency }
+      - { id: e9, source: emergency_confirm, target: finalize_emergency }
+      - { id: e10, source: finalize_emergency, target: end }
+      - { id: e11, source: emergency_gate, target: finalize_routine, sourcePort: routine }
+      - { id: e12, source: finalize_routine, target: end }

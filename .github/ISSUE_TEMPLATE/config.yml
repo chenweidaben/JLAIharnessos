@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞报告（请勿公开提 Issue）
+    url: https://github.com/jianlan-tech/gang-os/security/advisories/new
+    about: 安全漏洞请通过私有安全通告/邮件（见 SECURITY.md）报告，我们将按 SLA 响应。
+  - name: 数据与第三方许可证问题
+    url: https://github.com/jianlan-tech/gang-os/blob/main/DATA_LICENSES.md
+    about: 医学知识库、术语集、语料的许可与获取方式请先查阅 DATA_LICENSES.md。
+  - name: 文档与部署
+    url: https://github.com/jianlan-tech/gang-os#-文档
+    about: 架构、快速开始、部署与运维请查阅仓库文档。

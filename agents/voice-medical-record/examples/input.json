@@ -1,0 +1,8 @@
+{
+  "_comment": "虚拟示例。audioRef 指向平台对象存储中的录音（演示用 Mock 夹具）。",
+  "patientId": "MOCK-P-0002",
+  "audioRef": "mock://ward-round/2026-09-17/P-0002.wav",
+  "audioFormat": "wav",
+  "department": "心内科",
+  "hotwords": ["阿托伐他汀", "氯吡格雷", "冠脉造影"]
+}

@@ -1,0 +1,26 @@
+# 健澜科技数智医院智能体 - Prettier 忽略清单
+
+node_modules/
+dist/
+build/
+coverage/
+.venv/
+.vscode/
+.idea/
+logs/
+*.log
+*.tsbuildinfo
+package-lock.json
+bun.lockb
+
+# 自动生成与不参与格式化的目录
+design/
+docs/
+scripts/
+
+# Markdown 内已有手工排版，避免被 Prettier 重排破坏中文换行
+**/*.md
+
+# YAML / JSON 配置由 CI 统一校验，不本地强制格式化
+**/*.yml
+**/*.yaml

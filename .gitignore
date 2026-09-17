@@ -1,0 +1,85 @@
+# 健澜科技杠OS (Jianlan Gang-OS) - Git 忽略清单
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+
+# 依赖
+node_modules/
+.pnp/
+.pnp.js
+
+# 构建产物
+dist/
+build/
+out/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# 环境变量与密钥（严禁提交真实密钥）
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+
+# 测试与覆盖率
+coverage/
+*.lcov
+.nyc_output/
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+
+# 运行时数据
+data/
+runtime/
+tmp/
+*.pid
+*.seed
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 包管理器 lock 策略：
+#   后端用 bun，提交根 bun.lock；web 用 npm，提交 web/package-lock.json。
+#   忽略其余位置误生成的 npm lock 与 web 下的 bun lock，避免双包管理器混乱。
+package-lock.json
+!web/package-lock.json
+web/bun.lock
+bun.lockb
+pnpm-lock.yaml
+
+# 原始/大体积知识数据与压缩包（开放数据由下载器按需获取，见 DATA_LICENSES.md）
+*.tar.gz
+*.tgz
+*.zip
+data/knowledge/raw/
+
+# Python 临时产物（scripts/ 下的解析脚本）
+__pycache__/
+*.pyc
+.venv/
+
+# CI / 本地报告
+test-results/
+playwright-report/
+
+# 第三方产品资料（外部产品截图/文档，版权原因不随开源发布，本地保留）
+docs/requirements/images/
+
+# 调试 / 导出用临时截图
+*_debug.png
+web/outpatient_debug.png

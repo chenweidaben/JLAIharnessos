@@ -1,0 +1,842 @@
+﻿
+Running 32 tests using 8 workers
+
+  ok  2 [chromium] › tests\e2e\chat.spec.ts:14:3 › AI 对话 › 对话页面加载 (17.6s)
+  ok  4 [chromium] › tests\e2e\dashboard.spec.ts:14:3 › 工作台仪表盘 › 工作台页面加载 (31.2s)
+  x   8 [chromium] › tests\e2e\dashboard.spec.ts:29:3 › 工作台仪表盘 › 快捷入口可点击 (37.8s)
+  x   7 [chromium] › tests\e2e\emergency.spec.ts:14:3 › 急诊分诊 › 分诊台加载 (38.8s)
+  x   6 [chromium] › tests\e2e\dashboard.spec.ts:19:3 › 工作台仪表盘 › 数据卡片渲染 (38.4s)
+  x   5 [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 (38.4s)
+  x   3 [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 (39.5s)
+  x   9 [chromium] › tests\e2e\emergency.spec.ts:19:3 › 急诊分诊 › 四级分诊筛选可见 (31.3s)
+  x   1 [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 (39.8s)
+  x  10 [chromium] › tests\e2e\emergency.spec.ts:24:3 › 急诊分诊 › 绿色通道入口 (19.7s)
+  ok 12 [chromium] › tests\e2e\login.spec.ts:14:3 › 登录流程 › 登录页面加载 (11.6s)
+  ok 13 [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 (38.9s)
+  ok 14 [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 (41.8s)
+  ok 21 [chromium] › tests\e2e\patient360.spec.ts:19:3 › 患者360视图 › 患者搜索 (10.5s)
+  ok 20 [chromium] › tests\e2e\patient360.spec.ts:14:3 › 患者360视图 › 患者列表加载 (14.1s)
+  ok 23 [chromium] › tests\e2e\patient360.spec.ts:37:3 › 患者360视图 › Tab 切换 (6.0s)
+  ok 22 [chromium] › tests\e2e\patient360.spec.ts:28:3 › 患者360视图 › 进入患者详情 (6.2s)
+  x  18 [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 (37.1s)
+  x  19 [chromium] › tests\e2e\outpatient.spec.ts:27:3 › 门诊问诊 › 诊断面板可见 (31.1s)
+  x  15 [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 (38.3s)
+  x  11 [chromium] › tests\e2e\emergency.spec.ts:30:3 › 急诊分诊 › 抢救室查看 (43.1s)
+  x  17 [chromium] › tests\e2e\outpatient.spec.ts:19:3 › 门诊问诊 › 叫号功能 (38.3s)
+  x  16 [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 (38.4s)
+  x  25 [chromium] › tests\e2e\quality.spec.ts:19:3 › 质控管理 › 质控任务列表 (8.0s)
+  ok 26 [chromium] › tests\e2e\quality.spec.ts:24:3 › 质控管理 › 进入病历批阅 (6.2s)
+  x  24 [chromium] › tests\e2e\quality.spec.ts:14:3 › 质控管理 › 质控工作台加载 (7.1s)
+  x  27 [chromium] › tests\e2e\quality.spec.ts:33:3 › 质控管理 › 规则配置页 (19.3s)
+  x  30 [chromium] › tests\e2e\system.spec.ts:24:3 › 系统管理 › 权限管理页 (26.4s)
+  x  32 [chromium] › tests\e2e\system.spec.ts:34:3 › 系统管理 › 登录日志页 (20.7s)
+  x  28 [chromium] › tests\e2e\system.spec.ts:14:3 › 系统管理 › 用户管理页加载 (16.7s)
+  x  29 [chromium] › tests\e2e\system.spec.ts:19:3 › 系统管理 › 角色管理页 (21.3s)
+  x  31 [chromium] › tests\e2e\system.spec.ts:29:3 › 系统管理 › 操作审计页 (24.5s)
+
+
+  1) [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 ───────────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.ant-message, [class*="message"], [class*="chat"]').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.ant-message, [class*="message"], [class*="chat"]').first() with timeout 10000ms
+      - waiting for locator('.ant-message, [class*="message"], [class*="chat"]').first()
+
+
+      28 |     }
+      29 |     // 等待 AI 回复出现
+    > 30 |     await expect(page.locator('.ant-message, [class*="message"], [class*="chat"]').first()).toBeVisible({ timeout: 10_000 });
+         |                                                                                             ^
+      31 |   });
+      32 |
+      33 |   test('对话历史列表可见', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:30:93
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-发送消息-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-发送消息-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 ───────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=对话, text=会话, .ant-menu').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=对话, text=会话, .ant-menu').first() with timeout 5000ms
+      - waiting for locator('text=对话, text=会话, .ant-menu').first()
+
+
+      33 |   test('对话历史列表可见', async ({ page }) => {
+      34 |     await page.goto('/agent');
+    > 35 |     await expect(page.locator('text=对话, text=会话, .ant-menu').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                       ^
+      36 |   });
+      37 | });
+      38 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:35:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-对话历史列表可见-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-对话历史列表可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\e2e\dashboard.spec.ts:19:3 › 工作台仪表盘 › 数据卡片渲染 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('工作台仪表盘', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\dashboard.spec.ts:10:8
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-数据卡片渲染-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-数据卡片渲染-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\dashboard-工作台仪表盘-数据卡片渲染-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-数据卡片渲染-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\dashboard-工作台仪表盘-数据卡片渲染-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 ───────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=待办, text=Todo, .ant-list').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=待办, text=Todo, .ant-list').first() with timeout 5000ms
+      - waiting for locator('text=待办, text=Todo, .ant-list').first()
+
+
+      24 |   test('待办列表存在', async ({ page }) => {
+      25 |     const todo = page.locator('text=待办, text=Todo, .ant-list').first();
+    > 26 |     await expect(todo).toBeVisible({ timeout: 5_000 });
+         |                        ^
+      27 |   });
+      28 |
+      29 |   test('快捷入口可点击', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\dashboard.spec.ts:26:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\dashboard-工作台仪表盘-待办列表存在-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\dashboard-工作台仪表盘-待办列表存在-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests\e2e\dashboard.spec.ts:29:3 › 工作台仪表盘 › 快捷入口可点击 ──────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('工作台仪表盘', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\dashboard.spec.ts:10:8
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-快捷入口可点击-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-快捷入口可点击-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\dashboard-工作台仪表盘-快捷入口可点击-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-快捷入口可点击-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\dashboard-工作台仪表盘-快捷入口可点击-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests\e2e\emergency.spec.ts:14:3 › 急诊分诊 › 分诊台加载 ──────────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('急诊分诊', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\emergency.spec.ts:10:8
+
+    attachment #1: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-分诊台加载-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-分诊台加载-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\emergency-急诊分诊-分诊台加载-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-分诊台加载-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\emergency-急诊分诊-分诊台加载-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests\e2e\emergency.spec.ts:19:3 › 急诊分诊 › 四级分诊筛选可见 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=Ⅰ级, text=Ⅱ级, text=Ⅲ级, text=Ⅳ级, .ant-tag').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=Ⅰ级, text=Ⅱ级, text=Ⅲ级, text=Ⅳ级, .ant-tag').first() with timeout 5000ms
+      - waiting for locator('text=Ⅰ级, text=Ⅱ级, text=Ⅲ级, text=Ⅳ级, .ant-tag').first()
+
+
+      19 |   test('四级分诊筛选可见', async ({ page }) => {
+      20 |     await page.goto('/emergency');
+    > 21 |     await expect(page.locator('text=Ⅰ级, text=Ⅱ级, text=Ⅲ级, text=Ⅳ级, .ant-tag').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                                        ^
+      22 |   });
+      23 |
+      24 |   test('绿色通道入口', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\emergency.spec.ts:21:88
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-四级分诊筛选可见-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-四级分诊筛选可见-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\emergency-急诊分诊-四级分诊筛选可见-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-四级分诊筛选可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\emergency-急诊分诊-四级分诊筛选可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests\e2e\emergency.spec.ts:24:3 › 急诊分诊 › 绿色通道入口 ─────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: button:has-text("绿色通道"), text=绿色通道 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector "button:has-text("绿色通道"), text=绿色通道". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" button:has-text("绿色通道"), text=绿色通道 >> nth=0 with timeout 5000ms
+      - waiting for button:has-text("绿色通道"), text=绿色通道 >> nth=0
+
+
+      25 |     await page.goto('/emergency');
+      26 |     const gcBtn = page.locator('button:has-text("绿色通道"), text=绿色通道').first();
+    > 27 |     await expect(gcBtn).toBeVisible({ timeout: 5_000 });
+         |                         ^
+      28 |   });
+      29 |
+      30 |   test('抢救室查看', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\emergency.spec.ts:27:25
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-绿色通道入口-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-绿色通道入口-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\emergency-急诊分诊-绿色通道入口-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-绿色通道入口-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\emergency-急诊分诊-绿色通道入口-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests\e2e\emergency.spec.ts:30:3 › 急诊分诊 › 抢救室查看 ──────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=抢救室, text=留观').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=抢救室, text=留观').first() with timeout 5000ms
+      - waiting for locator('text=抢救室, text=留观').first()
+
+
+      30 |   test('抢救室查看', async ({ page }) => {
+      31 |     await page.goto('/emergency');
+    > 32 |     await expect(page.locator('text=抢救室, text=留观').first()).toBeVisible({ timeout: 5_000 });
+         |                                                             ^
+      33 |   });
+      34 | });
+      35 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\emergency.spec.ts:32:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-抢救室查看-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-抢救室查看-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\emergency-急诊分诊-抢救室查看-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\emergency-急诊分诊-抢救室查看-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\emergency-急诊分诊-抢救室查看-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 ────────────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('登录流程', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await page.goto('/login');
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\login.spec.ts:10:8
+
+    Error Context: test-results\login-登录流程-忘记密码跳转-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\login-登录流程-忘记密码跳转-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\login-登录流程-忘记密码跳转-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 ────────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('登录流程', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await page.goto('/login');
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\login.spec.ts:10:8
+
+    Error Context: test-results\login-登录流程-SSO-登录入口可见-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\login-登录流程-SSO-登录入口可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\login-登录流程-SSO-登录入口可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('门诊问诊', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:10:8
+
+    Error Context: test-results\outpatient-门诊问诊-候诊队列加载-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-候诊队列加载-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests\e2e\outpatient.spec.ts:19:3 › 门诊问诊 › 叫号功能 ─────────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('门诊问诊', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:10:8
+
+    Error Context: test-results\outpatient-门诊问诊-叫号功能-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-叫号功能-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-叫号功能-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests\e2e\outpatient.spec.ts:27:3 › 门诊问诊 › 诊断面板可见 ───────────────────────────────
+
+    Test timeout of 30000ms exceeded while running "beforeEach" hook.
+
+       8 |
+       9 | test.describe('门诊问诊', () => {
+    > 10 |   test.beforeEach(async ({ page }) => {
+         |        ^
+      11 |     await loginAsAdmin(page);
+      12 |   });
+      13 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:10:8
+
+    Error Context: test-results\outpatient-门诊问诊-诊断面板可见-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests\e2e\quality.spec.ts:14:3 › 质控管理 › 质控工作台加载 ─────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: [class*="quality"], text=质控, .ant-table >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector "[class*="quality"], text=质控, .ant-table". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" [class*="quality"], text=质控, .ant-table >> nth=0 with timeout 10000ms
+      - waiting for [class*="quality"], text=质控, .ant-table >> nth=0
+
+
+      14 |   test('质控工作台加载', async ({ page }) => {
+      15 |     await page.goto('/quality');
+    > 16 |     await expect(page.locator('[class*="quality"], text=质控, .ant-table').first()).toBeVisible({ timeout: 10_000 });
+         |                                                                                   ^
+      17 |   });
+      18 |
+      19 |   test('质控任务列表', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\quality.spec.ts:16:83
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控工作台加载-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控工作台加载-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\quality-质控管理-质控工作台加载-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控工作台加载-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\quality-质控管理-质控工作台加载-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests\e2e\quality.spec.ts:19:3 › 质控管理 › 质控任务列表 ──────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: .ant-table, .ant-list, text=待评 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector ".ant-table, .ant-list, text=待评". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" .ant-table, .ant-list, text=待评 >> nth=0 with timeout 5000ms
+      - waiting for .ant-table, .ant-list, text=待评 >> nth=0
+
+
+      19 |   test('质控任务列表', async ({ page }) => {
+      20 |     await page.goto('/quality');
+    > 21 |     await expect(page.locator('.ant-table, .ant-list, text=待评').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                          ^
+      22 |   });
+      23 |
+      24 |   test('进入病历批阅', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\quality.spec.ts:21:74
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控任务列表-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控任务列表-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\quality-质控管理-质控任务列表-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\quality-质控管理-质控任务列表-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\quality-质控管理-质控任务列表-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests\e2e\quality.spec.ts:33:3 › 质控管理 › 规则配置页 ───────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=规则, text=质控规则, .ant-switch').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=规则, text=质控规则, .ant-switch').first() with timeout 5000ms
+      - waiting for locator('text=规则, text=质控规则, .ant-switch').first()
+
+
+      33 |   test('规则配置页', async ({ page }) => {
+      34 |     await page.goto('/quality/rules');
+    > 35 |     await expect(page.locator('text=规则, text=质控规则, .ant-switch').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                           ^
+      36 |   });
+      37 | });
+      38 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\quality.spec.ts:35:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\quality-质控管理-规则配置页-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\quality-质控管理-规则配置页-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\quality-质控管理-规则配置页-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\quality-质控管理-规则配置页-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\quality-质控管理-规则配置页-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium] › tests\e2e\system.spec.ts:14:3 › 系统管理 › 用户管理页加载 ──────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: .ant-table, text=用户管理 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector ".ant-table, text=用户管理". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" .ant-table, text=用户管理 >> nth=0 with timeout 10000ms
+      - waiting for .ant-table, text=用户管理 >> nth=0
+
+
+      14 |   test('用户管理页加载', async ({ page }) => {
+      15 |     await page.goto('/system/users');
+    > 16 |     await expect(page.locator('.ant-table, text=用户管理').first()).toBeVisible({ timeout: 10_000 });
+         |                                                                 ^
+      17 |   });
+      18 |
+      19 |   test('角色管理页', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\system.spec.ts:16:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\system-系统管理-用户管理页加载-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\system-系统管理-用户管理页加载-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\system-系统管理-用户管理页加载-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\system-系统管理-用户管理页加载-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\system-系统管理-用户管理页加载-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium] › tests\e2e\system.spec.ts:19:3 › 系统管理 › 角色管理页 ────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: .ant-table, text=角色 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector ".ant-table, text=角色". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" .ant-table, text=角色 >> nth=0 with timeout 5000ms
+      - waiting for .ant-table, text=角色 >> nth=0
+
+
+      19 |   test('角色管理页', async ({ page }) => {
+      20 |     await page.goto('/system/roles');
+    > 21 |     await expect(page.locator('.ant-table, text=角色').first()).toBeVisible({ timeout: 5_000 });
+         |                                                               ^
+      22 |   });
+      23 |
+      24 |   test('权限管理页', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\system.spec.ts:21:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\system-系统管理-角色管理页-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\system-系统管理-角色管理页-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\system-系统管理-角色管理页-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\system-系统管理-角色管理页-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\system-系统管理-角色管理页-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium] › tests\e2e\system.spec.ts:24:3 › 系统管理 › 权限管理页 ────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=权限, .ant-tree, .ant-table').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=权限, .ant-tree, .ant-table').first() with timeout 5000ms
+      - waiting for locator('text=权限, .ant-tree, .ant-table').first()
+
+
+      24 |   test('权限管理页', async ({ page }) => {
+      25 |     await page.goto('/system/permissions');
+    > 26 |     await expect(page.locator('text=权限, .ant-tree, .ant-table').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                          ^
+      27 |   });
+      28 |
+      29 |   test('操作审计页', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\system.spec.ts:26:74
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\system-系统管理-权限管理页-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\system-系统管理-权限管理页-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\system-系统管理-权限管理页-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\system-系统管理-权限管理页-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\system-系统管理-权限管理页-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [chromium] › tests\e2e\system.spec.ts:29:3 › 系统管理 › 操作审计页 ────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: .ant-table, text=审计 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector ".ant-table, text=审计". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" .ant-table, text=审计 >> nth=0 with timeout 5000ms
+      - waiting for .ant-table, text=审计 >> nth=0
+
+
+      29 |   test('操作审计页', async ({ page }) => {
+      30 |     await page.goto('/system/audit-logs');
+    > 31 |     await expect(page.locator('.ant-table, text=审计').first()).toBeVisible({ timeout: 5_000 });
+         |                                                               ^
+      32 |   });
+      33 |
+      34 |   test('登录日志页', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\system.spec.ts:31:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\system-系统管理-操作审计页-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\system-系统管理-操作审计页-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\system-系统管理-操作审计页-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\system-系统管理-操作审计页-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\system-系统管理-操作审计页-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [chromium] › tests\e2e\system.spec.ts:34:3 › 系统管理 › 登录日志页 ────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: .ant-table, text=登录日志 >> nth=0
+    Expected: visible
+    Error: Unexpected token "=" while parsing css selector ".ant-table, text=登录日志". Did you mean to CSS.escape it?
+
+    Call log:
+      - Expect "toBeVisible" .ant-table, text=登录日志 >> nth=0 with timeout 5000ms
+      - waiting for .ant-table, text=登录日志 >> nth=0
+
+
+      34 |   test('登录日志页', async ({ page }) => {
+      35 |     await page.goto('/system/login-logs');
+    > 36 |     await expect(page.locator('.ant-table, text=登录日志').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                 ^
+      37 |   });
+      38 | });
+      39 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\system.spec.ts:36:65
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\system-系统管理-登录日志页-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\system-系统管理-登录日志页-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\system-系统管理-登录日志页-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\system-系统管理-登录日志页-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\system-系统管理-登录日志页-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22 failed
+    [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 ────────────────────────────────────────
+    [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 ────────────────────────────────────
+    [chromium] › tests\e2e\dashboard.spec.ts:19:3 › 工作台仪表盘 › 数据卡片渲染 ────────────────────────────────
+    [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 ────────────────────────────────
+    [chromium] › tests\e2e\dashboard.spec.ts:29:3 › 工作台仪表盘 › 快捷入口可点击 ───────────────────────────────
+    [chromium] › tests\e2e\emergency.spec.ts:14:3 › 急诊分诊 › 分诊台加载 ───────────────────────────────────
+    [chromium] › tests\e2e\emergency.spec.ts:19:3 › 急诊分诊 › 四级分诊筛选可见 ────────────────────────────────
+    [chromium] › tests\e2e\emergency.spec.ts:24:3 › 急诊分诊 › 绿色通道入口 ──────────────────────────────────
+    [chromium] › tests\e2e\emergency.spec.ts:30:3 › 急诊分诊 › 抢救室查看 ───────────────────────────────────
+    [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 ──────────────────────────────────────
+    [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 ──────────────────────────────────
+    [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 ─────────────────────────────────
+    [chromium] › tests\e2e\outpatient.spec.ts:19:3 › 门诊问诊 › 叫号功能 ───────────────────────────────────
+    [chromium] › tests\e2e\outpatient.spec.ts:27:3 › 门诊问诊 › 诊断面板可见 ─────────────────────────────────
+    [chromium] › tests\e2e\quality.spec.ts:14:3 › 质控管理 › 质控工作台加载 ───────────────────────────────────
+    [chromium] › tests\e2e\quality.spec.ts:19:3 › 质控管理 › 质控任务列表 ────────────────────────────────────
+    [chromium] › tests\e2e\quality.spec.ts:33:3 › 质控管理 › 规则配置页 ─────────────────────────────────────
+    [chromium] › tests\e2e\system.spec.ts:14:3 › 系统管理 › 用户管理页加载 ────────────────────────────────────
+    [chromium] › tests\e2e\system.spec.ts:19:3 › 系统管理 › 角色管理页 ──────────────────────────────────────
+    [chromium] › tests\e2e\system.spec.ts:24:3 › 系统管理 › 权限管理页 ──────────────────────────────────────
+    [chromium] › tests\e2e\system.spec.ts:29:3 › 系统管理 › 操作审计页 ──────────────────────────────────────
+    [chromium] › tests\e2e\system.spec.ts:34:3 › 系统管理 › 登录日志页 ──────────────────────────────────────
+  10 passed (2.9m)

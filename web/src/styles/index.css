@@ -1,0 +1,53 @@
+/**
+ * 健澜科技数智医院智能体
+ * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ *
+ * 全局样式入口：Tailwind 指令 + 设计令牌 + 全局覆盖
+ */
+@import './variables.css';
+@import './animations.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  background-color: var(--jl-bg);
+  color: var(--jl-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c8d0da;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@layer components {
+  .jl-card {
+    @apply rounded-jl bg-white shadow-card transition-shadow hover:shadow-card-hover;
+  }
+  .jl-label {
+    @apply text-xs text-ink-secondary;
+  }
+  .jl-badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs;
+  }
+}

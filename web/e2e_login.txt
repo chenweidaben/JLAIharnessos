@@ -1,0 +1,86 @@
+﻿
+Running 5 tests using 5 workers
+
+  ok 4 [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 (13.6s)
+  ok 5 [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 (13.8s)
+  ok 2 [chromium] › tests\e2e\login.spec.ts:14:3 › 登录流程 › 登录页面加载 (16.6s)
+  x  1 [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 (30.6s)
+  x  3 [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 (30.4s)
+
+
+  1) [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 ───────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[name="username"], input[placeholder*="账号"]')
+
+
+      18 |
+      19 |   test('账号密码登录成功', async ({ page }) => {
+    > 20 |     await page.fill('input[name="username"], input[placeholder*="账号"]', 'admin');
+         |                ^
+      21 |     await page.fill('input[type="password"]', 'Admin@123456');
+      22 |     const captcha = page.locator('input[placeholder*="验证码"]').first();
+      23 |     if (await captcha.isVisible()) await captcha.fill('ABCD');
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\login.spec.ts:20:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\login-登录流程-账号密码登录成功-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\login-登录流程-账号密码登录成功-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\login-登录流程-账号密码登录成功-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\login-登录流程-账号密码登录成功-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\login-登录流程-账号密码登录成功-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 ───────────────────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for locator('input[name="username"], input[placeholder*="账号"]')
+
+
+      28 |
+      29 |   test('登录失败错误提示', async ({ page }) => {
+    > 30 |     await page.fill('input[name="username"], input[placeholder*="账号"]', 'ghost_user');
+         |                ^
+      31 |     await page.fill('input[type="password"]', 'wrong');
+      32 |     const captcha = page.locator('input[placeholder*="验证码"]').first();
+      33 |     if (await captcha.isVisible()) await captcha.fill('ABCD');
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\login.spec.ts:30:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\login-登录流程-登录失败错误提示-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\login-登录流程-登录失败错误提示-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\login-登录流程-登录失败错误提示-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\login-登录流程-登录失败错误提示-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\login-登录流程-登录失败错误提示-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 ────────────────────────────────────
+    [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 ────────────────────────────────────
+  3 passed (1.1m)

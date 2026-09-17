@@ -1,0 +1,10 @@
+﻿
+Running 5 tests using 5 workers
+
+  ok 1 [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 (16.9s)
+  ok 2 [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 (17.4s)
+  ok 4 [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 (17.2s)
+  ok 3 [chromium] › tests\e2e\login.spec.ts:14:3 › 登录流程 › 登录页面加载 (17.5s)
+  ok 5 [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 (16.9s)
+
+  5 passed (31.4s)

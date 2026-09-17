@@ -1,0 +1,100 @@
+{
+  "manifestVersion": "1.0.0",
+  "catalog": "jianlan-medical-agent-marketplace",
+  "name": "健澜科技杠OS · 官方刚需智能体清单",
+  "description": "医疗智能体操作系统内置的十大刚需智能体，全部以声明式 AgentPackage（agent.yaml + prompts）分发，可在低代码画布中查看、克隆与二次编辑。",
+  "vendor": "健澜科技",
+  "license": "Apache-2.0",
+  "agents": [
+    {
+      "id": "medical-record-writer",
+      "name": "AI电子病历生成智能体",
+      "category": "电子病历",
+      "riskLevel": "medium",
+      "version": "1.0.0",
+      "summary": "基于主诉、病史、检验检查与临床指南生成结构化病历，自动质控并经医生审核归档。",
+      "humanInLoop": true
+    },
+    {
+      "id": "medical-record-qc",
+      "name": "AI病历质控智能体",
+      "category": "医疗质控",
+      "riskLevel": "low",
+      "version": "1.0.0",
+      "summary": "批量内涵质控、病案首页质控与核心制度检查，生成质控报告与整改清单。",
+      "humanInLoop": true
+    },
+    {
+      "id": "voice-medical-record",
+      "name": "语音电子病历智能体",
+      "category": "电子病历",
+      "riskLevel": "medium",
+      "version": "1.0.0",
+      "summary": "口述生成病历，ASR 医疗术语规范化，剂量/频次强制核对，医生签名后归档。",
+      "humanInLoop": true
+    },
+    {
+      "id": "diagnosis-assistant",
+      "name": "智能诊断辅助智能体",
+      "category": "临床决策",
+      "riskLevel": "medium",
+      "version": "1.0.0",
+      "summary": "并行 CDS 与指南检索，给出鉴别诊断、补充检查与治疗方向，急危重强制提醒。",
+      "humanInLoop": true
+    },
+    {
+      "id": "prescription-review",
+      "name": "智能处方审核智能体",
+      "category": "合理用药",
+      "riskLevel": "high",
+      "version": "1.0.0",
+      "summary": "相互作用、配伍禁忌、剂量疗程、过敏史、特殊人群六维前置审核，分级拦截。",
+      "humanInLoop": true
+    },
+    {
+      "id": "lab-imaging-interpreter",
+      "name": "检验检查报告智能解读",
+      "category": "报告解读",
+      "riskLevel": "low",
+      "version": "1.0.0",
+      "summary": "检验影像异常标注、临床意义解读、复查建议，医生/患者双版本，危急值强制提醒。",
+      "humanInLoop": true
+    },
+    {
+      "id": "medical-coder",
+      "name": "智能编码与DRG/DIP分组智能体",
+      "category": "病案与医保",
+      "riskLevel": "medium",
+      "version": "1.0.0",
+      "summary": "推荐 ICD-10/ICD-9-CM-3 编码，预测 DRG/DIP 分组，识别歧义与高套风险。",
+      "humanInLoop": true
+    },
+    {
+      "id": "follow-up",
+      "name": "智能随访智能体",
+      "category": "诊后管理",
+      "riskLevel": "medium",
+      "version": "1.0.0",
+      "summary": "按病种批量生成个体化随访问卷并下发，回收识别红旗症状，异常医护复核。",
+      "humanInLoop": true
+    },
+    {
+      "id": "triage-preconsult",
+      "name": "智能导诊预问诊智能体",
+      "category": "诊前服务",
+      "riskLevel": "low",
+      "version": "1.0.0",
+      "summary": "就诊前结构化预问诊、推荐科室与分诊级别，急危重引导急诊绿色通道。",
+      "humanInLoop": true
+    },
+    {
+      "id": "medical-affairs-report",
+      "name": "医务统计与管理报表智能体",
+      "category": "运营管理",
+      "riskLevel": "low",
+      "version": "1.0.0",
+      "summary": "并行汇聚质量、运营、DRG、核心制度数据，生成院科两级管理报表与改进建议。",
+      "humanInLoop": true
+    }
+  ]
+}

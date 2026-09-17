@@ -1,0 +1,2 @@
+﻿tests/unit/store/qualityStore.test.ts(39,7): error TS2353: Object literal may only specify known properties, and 'ruleId' does not exist in type 'QualityDefect'.
+tests/unit/store/qualityStore.test.ts(58,7): error TS2353: Object literal may only specify known properties, and 'ruleId' does not exist in type 'QualityDefect'.

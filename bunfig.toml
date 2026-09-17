@@ -1,0 +1,13 @@
+# 健澜科技数智医院智能体 - Bun 运行时配置
+# Copyright (c) 2024-2026 健澜科技. All rights reserved.
+#
+# 本文件由健澜科技数智医院智能体项目组维护。
+# 未经书面许可不得修改、复制或分发。
+
+[test]
+# 排除前端 web/ 目录下的测试文件（前端测试由 web/ 目录独立工具链运行）
+pathIgnorePatterns = ["web/**"]
+
+[run]
+# 生产环境剥离源maps
+# sourcemap = "none"

@@ -1,0 +1,446 @@
+﻿
+Running 19 tests using 2 workers
+
+  ok  1 [chromium] › tests\e2e\chat.spec.ts:14:3 › AI 对话 › 对话页面加载 (6.5s)
+  x   3 [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 (9.4s)
+  x   2 [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 (17.0s)
+  x   4 [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 (retry #1) (11.4s)
+  ok  6 [chromium] › tests\e2e\dashboard.spec.ts:14:3 › 工作台仪表盘 › 工作台页面加载 (4.6s)
+  x   5 [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 (retry #1) (17.6s)
+  ok  7 [chromium] › tests\e2e\dashboard.spec.ts:19:3 › 工作台仪表盘 › 数据卡片渲染 (5.8s)
+  ok  9 [chromium] › tests\e2e\dashboard.spec.ts:29:3 › 工作台仪表盘 › 快捷入口可点击 (5.1s)
+  ok 10 [chromium] › tests\e2e\login.spec.ts:14:3 › 登录流程 › 登录页面加载 (4.6s)
+  ok 11 [chromium] › tests\e2e\login.spec.ts:19:3 › 登录流程 › 账号密码登录成功 (3.8s)
+  ok 12 [chromium] › tests\e2e\login.spec.ts:29:3 › 登录流程 › 登录失败错误提示 (3.5s)
+  x   8 [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 (10.6s)
+  ok 13 [chromium] › tests\e2e\login.spec.ts:38:3 › 登录流程 › 忘记密码跳转 (1.6s)
+  ok 15 [chromium] › tests\e2e\login.spec.ts:46:3 › 登录流程 › SSO 登录入口可见 (3.8s)
+  x  14 [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 (retry #1) (11.3s)
+  ok 17 [chromium] › tests\e2e\outpatient.spec.ts:22:3 › 门诊问诊 › 叫号功能 (4.3s)
+  x  16 [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 (15.9s)
+  x  18 [chromium] › tests\e2e\outpatient.spec.ts:30:3 › 门诊问诊 › 诊断面板可见 (14.0s)
+  x  19 [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 (retry #1) (15.6s)
+  ok 21 [chromium] › tests\e2e\patient360.spec.ts:14:3 › 患者360视图 › 患者列表加载 (4.5s)
+  x  20 [chromium] › tests\e2e\outpatient.spec.ts:30:3 › 门诊问诊 › 诊断面板可见 (retry #1) (12.7s)
+  ok 22 [chromium] › tests\e2e\patient360.spec.ts:19:3 › 患者360视图 › 患者搜索 (3.5s)
+  ok 24 [chromium] › tests\e2e\patient360.spec.ts:37:3 › 患者360视图 › Tab 切换 (3.5s)
+  ok 23 [chromium] › tests\e2e\patient360.spec.ts:28:3 › 患者360视图 › 进入患者详情 (5.2s)
+
+
+  1) [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 ───────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.ant-message, [class*="message"], [class*="chat"]').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.ant-message, [class*="message"], [class*="chat"]').first() with timeout 10000ms
+      - waiting for locator('.ant-message, [class*="message"], [class*="chat"]').first()
+
+
+      28 |     }
+      29 |     // 等待 AI 回复出现
+    > 30 |     await expect(page.locator('.ant-message, [class*="message"], [class*="chat"]').first()).toBeVisible({ timeout: 10_000 });
+         |                                                                                             ^
+      31 |   });
+      32 |
+      33 |   test('对话历史列表可见', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:30:93
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-发送消息-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-发送消息-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.ant-message, [class*="message"], [class*="chat"]').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.ant-message, [class*="message"], [class*="chat"]').first() with timeout 10000ms
+      - waiting for locator('.ant-message, [class*="message"], [class*="chat"]').first()
+
+
+      28 |     }
+      29 |     // 等待 AI 回复出现
+    > 30 |     await expect(page.locator('.ant-message, [class*="message"], [class*="chat"]').first()).toBeVisible({ timeout: 10_000 });
+         |                                                                                             ^
+      31 |   });
+      32 |
+      33 |   test('对话历史列表可见', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:30:93
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium-retry1\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-发送消息-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-发送消息-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-发送消息-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 ───────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=对话, text=会话, .ant-menu').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=对话, text=会话, .ant-menu').first() with timeout 5000ms
+      - waiting for locator('text=对话, text=会话, .ant-menu').first()
+
+
+      33 |   test('对话历史列表可见', async ({ page }) => {
+      34 |     await page.goto('/agent');
+    > 35 |     await expect(page.locator('text=对话, text=会话, .ant-menu').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                       ^
+      36 |   });
+      37 | });
+      38 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:35:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-对话历史列表可见-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-对话历史列表可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=对话, text=会话, .ant-menu').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=对话, text=会话, .ant-menu').first() with timeout 5000ms
+      - waiting for locator('text=对话, text=会话, .ant-menu').first()
+
+
+      33 |   test('对话历史列表可见', async ({ page }) => {
+      34 |     await page.goto('/agent');
+    > 35 |     await expect(page.locator('text=对话, text=会话, .ant-menu').first()).toBeVisible({ timeout: 5_000 });
+         |                                                                       ^
+      36 |   });
+      37 | });
+      38 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\chat.spec.ts:35:71
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium-retry1\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\chat-AI-对话-对话历史列表可见-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\chat-AI-对话-对话历史列表可见-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\chat-AI-对话-对话历史列表可见-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 ───────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=待办, text=Todo, .ant-list').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=待办, text=Todo, .ant-list').first() with timeout 5000ms
+      - waiting for locator('text=待办, text=Todo, .ant-list').first()
+
+
+      24 |   test('待办列表存在', async ({ page }) => {
+      25 |     const todo = page.locator('text=待办, text=Todo, .ant-list').first();
+    > 26 |     await expect(todo).toBeVisible({ timeout: 5_000 });
+         |                        ^
+      27 |   });
+      28 |
+      29 |   test('快捷入口可点击', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\dashboard.spec.ts:26:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\dashboard-工作台仪表盘-待办列表存在-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\dashboard-工作台仪表盘-待办列表存在-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=待办, text=Todo, .ant-list').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=待办, text=Todo, .ant-list').first() with timeout 5000ms
+      - waiting for locator('text=待办, text=Todo, .ant-list').first()
+
+
+      24 |   test('待办列表存在', async ({ page }) => {
+      25 |     const todo = page.locator('text=待办, text=Todo, .ant-list').first();
+    > 26 |     await expect(todo).toBeVisible({ timeout: 5_000 });
+         |                        ^
+      27 |   });
+      28 |
+      29 |   test('快捷入口可点击', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\dashboard.spec.ts:26:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium-retry1\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\dashboard-工作台仪表盘-待办列表存在-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\dashboard-工作台仪表盘-待办列表存在-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\dashboard-工作台仪表盘-待办列表存在-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 ────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first() with timeout 10000ms
+      - waiting for locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first()
+
+
+      17 |     await expect(
+      18 |       page.locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first(),
+    > 19 |     ).toBeVisible({ timeout: 10_000 });
+         |       ^
+      20 |   });
+      21 |
+      22 |   test('叫号功能', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:19:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\outpatient-门诊问诊-候诊队列加载-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-候诊队列加载-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first() with timeout 10000ms
+      - waiting for locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first()
+
+
+      17 |     await expect(
+      18 |       page.locator('text=候诊, text=待诊, .ant-tabs, .ant-list').first(),
+    > 19 |     ).toBeVisible({ timeout: 10_000 });
+         |       ^
+      20 |   });
+      21 |
+      22 |   test('叫号功能', async ({ page }) => {
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:19:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium-retry1\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\outpatient-门诊问诊-候诊队列加载-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-候诊队列加载-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-候诊队列加载-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests\e2e\outpatient.spec.ts:30:3 › 门诊问诊 › 诊断面板可见 ────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=诊断, text=处方, .ant-tabs-tab').first()
+    Expected: visible
+    Timeout: 8000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=诊断, text=处方, .ant-tabs-tab').first() with timeout 8000ms
+      - waiting for locator('text=诊断, text=处方, .ant-tabs-tab').first()
+
+
+      38 |     await expect(
+      39 |       page.locator('text=诊断, text=处方, .ant-tabs-tab').first(),
+    > 40 |     ).toBeVisible({ timeout: 8_000 });
+         |       ^
+      41 |   });
+      42 | });
+      43 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:40:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\outpatient-门诊问诊-诊断面板可见-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=诊断, text=处方, .ant-tabs-tab').first()
+    Expected: visible
+    Timeout: 8000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=诊断, text=处方, .ant-tabs-tab').first() with timeout 8000ms
+      - waiting for locator('text=诊断, text=处方, .ant-tabs-tab').first()
+
+
+      38 |     await expect(
+      39 |       page.locator('text=诊断, text=处方, .ant-tabs-tab').first(),
+    > 40 |     ).toBeVisible({ timeout: 8_000 });
+         |       ^
+      41 |   });
+      42 | });
+      43 |
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:40:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium-retry1\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\outpatient-门诊问诊-诊断面板可见-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-诊断面板可见-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    [chromium] › tests\e2e\chat.spec.ts:19:3 › AI 对话 › 发送消息 ────────────────────────────────────────
+    [chromium] › tests\e2e\chat.spec.ts:33:3 › AI 对话 › 对话历史列表可见 ────────────────────────────────────
+    [chromium] › tests\e2e\dashboard.spec.ts:24:3 › 工作台仪表盘 › 待办列表存在 ────────────────────────────────
+    [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 ─────────────────────────────────
+    [chromium] › tests\e2e\outpatient.spec.ts:30:3 › 门诊问诊 › 诊断面板可见 ─────────────────────────────────
+  14 passed (2.2m)

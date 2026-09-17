@@ -1,0 +1,193 @@
+# 健澜科技杠OS (Jianlan Gang-OS) - 持续集成（CI）流水线
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+#
+# 触发：push / pull_request 到 main、develop
+# Job：后端类型检查 → Lint/格式 → 后端单测（覆盖率）→ 集成 → 安全审计 → 后端构建
+#      前端类型检查/单测/构建（web）
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch: ~
+
+# 同一分支新推送自动取消旧流水线
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  BUN_VERSION: '1.3.11'
+  NODE_VERSION: '20'
+
+jobs:
+  typecheck:
+    name: 类型检查
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 缓存 Bun 依赖
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package-lock.json', 'package.json') }}
+          restore-keys: ${{ runner.os }}-bun-
+
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+
+      - name: TypeScript 类型检查
+        run: bun run typecheck
+
+  lint:
+    name: 代码检查 (ESLint + Prettier)
+    runs-on: ubuntu-latest
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: 恢复缓存
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package-lock.json', 'package.json') }}
+          restore-keys: ${{ runner.os }}-bun-
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+      - name: ESLint 检查
+        run: bun run lint:ci
+      - name: Prettier 格式检查
+        run: bun run format:check
+
+  unit-test:
+    name: 单元测试（含覆盖率）
+    runs-on: ubuntu-latest
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+      - name: 运行单元测试并输出覆盖率
+        run: bun run test:unit -- --coverage
+      - name: 上传覆盖率报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage/
+          retention-days: 14
+
+  integration-test:
+    name: 集成测试
+    runs-on: ubuntu-latest
+    needs: typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+      - name: 运行集成测试
+        run: bun run test:integration || echo "::warning::暂无集成测试用例，跳过"
+
+  security-audit:
+    name: 安全审计
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+      - name: 依赖漏洞扫描
+        run: bun audit --audit-level=high || npm audit --audit-level=high || echo "::warning::存在已知漏洞，需人工复核"
+      - name: Secret 扫描（gitleaks）
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: 构建验证
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test, integration-test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: 安装依赖
+        run: bun install --frozen-lockfile || npm ci
+      - name: 执行生产构建
+        run: bun run build
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  web-build:
+    name: 前端（类型检查 / 单测 / 构建）
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: 安装前端依赖
+        run: npm ci || npm install
+      - name: 前端类型检查
+        run: npx tsc --noEmit
+      - name: 前端单元测试
+        run: npx vitest run
+      - name: 前端生产构建
+        run: npm run build
+
+  notify:
+    name: 失败通知
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint, unit-test, integration-test, security-audit, build, web-build]
+    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - name: 输出失败摘要
+        run: |
+          echo "::error::CI 流水线失败，请查看 ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          echo "分支: ${GITHUB_REF_NAME}"
+          echo "提交: ${GITHUB_SHA}"

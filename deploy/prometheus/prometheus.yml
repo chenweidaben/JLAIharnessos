@@ -1,0 +1,73 @@
+# ============================================================================
+# 健澜科技杠OS — Prometheus 抓取配置（compose 中只读挂载到容器）
+# ----------------------------------------------------------------------------
+# 抓取目标均使用 compose 网络内的「服务名:端口」，运行于内网 monitoring 网络，
+# 不做鉴权；生产环境通过网络策略保证 9090 与各 metrics 端口不对公网开放。
+#
+# 本批次（容器化批次）只接入「当前确实存在指标端点」的组件；BFF 指标端点、
+# nginx/postgres/redis/kafka exporter 在后续「监控化批次」以 sidecar 形式落地，
+# 对应抓取任务在文件末尾以注释模板给出，接入时取消注释即可，无需改动主结构。
+# ============================================================================
+
+# 全局抓取间隔与规则评估间隔；15s 粒度兼顾分辨率与资源占用。
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'jianlan-gangos'
+    env: 'production'
+
+# 告警/记录规则目录（由监控化批次挂载 rules 文件，目录为空时 Prometheus 正常启动）。
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  # Prometheus 自身运行指标（抓取队列、时序数、TSDB 内存等）。
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+        labels:
+          component: 'prometheus'
+
+  # Jaeger all-in-one 自身指标（采集队列、span 速率、Go 运行时），默认 /metrics。
+  - job_name: 'jaeger'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['jaeger:14269']
+        labels:
+          component: 'tracing'
+
+  # --------------------------------------------------------------------------
+  # 以下任务在「监控化批次」组件就绪后启用（模板，当前保持注释，避免出现死目标）：
+  #
+  # 后端 BFF（Bun）业务指标，需先在 BFF 落地 /metrics 端点：
+  #
+  # - job_name: 'bff'
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 10s
+  #   dns_sd_configs:
+  #     - names: ['app']
+  #       refresh_interval: 30s
+  #       type: 'A'
+  #       port: 8080
+  #
+  # PostgreSQL（部署 postgres_exporter sidecar 后启用）：
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #
+  # Redis（部署 redis_exporter sidecar 后启用）：
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #
+  # 边缘网关（部署 nginx-prometheus-exporter sidecar 后启用）：
+  # - job_name: 'nginx-edge'
+  #   static_configs:
+  #     - targets: ['nginx-exporter:9113']
+  #
+  # Kafka（JMX exporter 随 broker 暴露 5556 后启用）：
+  # - job_name: 'kafka'
+  #   static_configs:
+  #     - targets: ['kafka:5556']
+  # --------------------------------------------------------------------------

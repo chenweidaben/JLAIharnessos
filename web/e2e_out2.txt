@@ -1,0 +1,48 @@
+﻿
+Running 3 tests using 1 worker
+
+  ok 1 [chromium] › tests\e2e\outpatient.spec.ts:14:3 › 门诊问诊 › 候诊队列加载 (4.6s)
+  ok 2 [chromium] › tests\e2e\outpatient.spec.ts:20:3 › 门诊问诊 › 叫号功能 (3.8s)
+  x  3 [chromium] › tests\e2e\outpatient.spec.ts:28:3 › 门诊问诊 › 诊断面板可见 (4.3s)
+
+
+  1) [chromium] › tests\e2e\outpatient.spec.ts:28:3 › 门诊问诊 › 诊断面板可见 ────────────────────────────────
+
+    Error: locator.isVisible: Error: strict mode violation: getByText('呼叫下一位') resolved to 2 elements:
+        1) <span>呼叫下一位</span> aka getByRole('button', { name: 'customer-service 呼叫下一位' })
+        2) <div class="mt-3 text-ink-secondary">请从左侧候诊队列选择患者，或点击"呼叫下一位"</div> aka getByText('请从左侧候诊队列选择患者，或点击"呼叫下一位"')
+
+    Call log:
+        - checking visibility of getByText('呼叫下一位')
+
+
+      31 |     // 呼叫下一位患者，进入问诊工作台（中间区出现 诊断/处方 Tab）
+      32 |     const callNext = page.getByText('呼叫下一位');
+    > 33 |     if (await callNext.isVisible()) {
+         |                        ^
+      34 |       await callNext.click();
+      35 |     }
+      36 |     await expect(page.locator('.ant-tabs-tab').first()).toBeVisible({ timeout: 8_000 });
+        at C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\tests\e2e\outpatient.spec.ts:33:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\outpatient-门诊问诊-诊断面板可见-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\outpatient-门诊问诊-诊断面板可见-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests\e2e\outpatient.spec.ts:28:3 › 门诊问诊 › 诊断面板可见 ─────────────────────────────────
+  2 passed (20.4s)

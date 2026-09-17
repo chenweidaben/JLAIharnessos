@@ -1,0 +1,12 @@
+{
+  "_comment": "虚拟示例，非真实病历。",
+  "department": "内分泌科",
+  "timeRange": { "from": "2026-09-01", "to": "2026-09-17" },
+  "recordIds": ["MOCK-MR-1001", "MOCK-MR-1002", "MOCK-MR-1003"],
+  "frontPage": {
+    "patientId": "MOCK-P-0001",
+    "mainDiagnosis": "2型糖尿病",
+    "admissionDate": "2026-09-01",
+    "dischargeDate": "2026-09-10"
+  }
+}

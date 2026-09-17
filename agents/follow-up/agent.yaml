@@ -1,0 +1,177 @@
+# 健澜科技杠OS - 智能随访智能体
+# 版权所有 (c) 2026 健澜科技
+id: follow-up
+name: 智能随访智能体
+nameEn: Intelligent Follow-up
+version: 1.0.0
+category: 诊后管理
+tags:
+  - 随访
+  - 慢病管理
+  - 患者服务
+  - 康复
+description: >-
+  按病种随访方案为出院/慢病患者批量生成个体化随访问卷并下发，回收答案后识别异常与红旗症状，
+  异常患者自动预警并交由医护复核，形成院外连续健康管理闭环。
+allowedRoles:
+  - doctor
+  - nurse
+riskLevel: medium
+tools:
+  - get_patient_history
+  - follow_up_management
+  - visit_reminder
+knowledgeBases:
+  - follow-up-protocols
+  - clinical-guidelines
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.3
+systemPrompt: prompts/system.md
+entryWorkflow: followup-main
+disclaimer: 随访内容为健康管理辅助，不替代面诊，出现红旗症状应立即就医。
+
+workflows:
+  - meta:
+      id: followup-main
+      name: 批量智能随访主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 120000
+      workflowTimeoutMs: 900000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: loop_patients
+        type: loop
+        name: 逐患者生成并下发随访
+        config:
+          mode: foreach
+          collection: input.patientIds
+          itemVariable: patientId
+          indexVariable: idx
+          bodyEntry: fu_history
+          maxIterations: 1000
+
+      # —— 循环体子路径 ——
+      - id: fu_history
+        type: tool
+        name: 出院/病史
+        config:
+          toolName: get_patient_history
+          inputMapping: { patientId: patientId }
+      - id: fu_protocol
+        type: rag
+        name: 随访方案检索
+        config:
+          knowledgeBases: [follow-up-protocols]
+          query: input.disease
+          topK: 3
+          scoreThreshold: 0.2
+          strategy: hybrid
+      - id: fu_questionnaire
+        type: llm
+        name: 个体化随访问卷
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            病种：${input.disease}
+            患者病史/出院情况：${nodes.fu_history.output}
+            随访方案：${nodes.fu_protocol.output.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              questions: { type: array, items: { type: object } }
+              redFlags: { type: array, items: { type: string } }
+              followUpDays: { type: number }
+      - id: fu_dispatch
+        type: tool
+        name: 下发随访任务
+        config:
+          toolName: follow_up_management
+          inputMapping:
+            patientId: patientId
+            disease: input.disease
+            questionnaire: nodes.fu_questionnaire.output.json
+            channel: input.channel
+
+      # —— 汇总 ——
+      - id: summarize
+        type: llm
+        name: 汇总随访异常
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            以下是本次批量随访的下发结果：${nodes.loop_patients.output.bodyOutputs}
+            请汇总成功/失败数量与需要关注的异常（如回收答案中有红旗症状）。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              total: { type: number }
+              dispatched: { type: number }
+              hasAbnormal: { type: boolean }
+              abnormalPatients: { type: array, items: { type: object } }
+              summary: { type: string }
+
+      - id: abnormal_gate
+        type: condition
+        name: 是否存在异常
+        config:
+          mode: if-else
+          branches:
+            - { name: abnormal, when: nodes.summarize.output.json.hasAbnormal == true }
+          defaultPort: normal
+
+      - id: nurse_review
+        type: human
+        name: 医护异常复核
+        config:
+          title: 随访发现异常/红旗症状，请复核
+          instructions: 部分随访患者出现异常或红旗症状，请复核并安排复诊/转诊。
+          assigneeRoles: [doctor, nurse]
+          formSchema:
+            handled: { type: boolean, required: true }
+            plan: { type: string }
+          timeoutMs: 86400000
+
+      - id: finalize_abnormal
+        type: code
+        config:
+          assignments:
+            status: '"abnormal_reviewed"'
+            review: nodes.nurse_review.output.formData
+
+      - id: finalize_normal
+        type: code
+        config:
+          assignments:
+            status: '"dispatched"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            review: vars.review
+            summary: nodes.summarize.output.json
+            details: nodes.loop_patients.output.bodyOutputs
+
+    edges:
+      - { id: e1, source: start, target: loop_patients }
+      - { id: e2, source: loop_patients, target: summarize }
+      - { id: e3, source: summarize, target: abnormal_gate }
+      - { id: e4, source: abnormal_gate, target: nurse_review, sourcePort: abnormal }
+      - { id: e5, source: nurse_review, target: finalize_abnormal }
+      - { id: e6, source: finalize_abnormal, target: end }
+      - { id: e7, source: abnormal_gate, target: finalize_normal, sourcePort: normal }
+      - { id: e8, source: finalize_normal, target: end }
+      # 循环体
+      - { id: b1, source: fu_history, target: fu_protocol }
+      - { id: b2, source: fu_protocol, target: fu_questionnaire }
+      - { id: b3, source: fu_questionnaire, target: fu_dispatch }

@@ -1,0 +1,59 @@
+/**
+ * 健澜科技数智医院智能体
+ * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ *
+ * 动画关键帧
+ */
+@keyframes jl-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes jl-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes jl-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.jl-animate-fade-in {
+  animation: jl-fade-in 0.3s ease-in-out;
+}
+
+.jl-animate-slide-up {
+  animation: jl-slide-up 0.3s ease-out;
+}
+
+.jl-blink {
+  animation: jl-blink 1.2s ease-in-out infinite;
+}
+
+/* 无障碍：用户偏好减少动态时，关闭所有动画与过渡 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

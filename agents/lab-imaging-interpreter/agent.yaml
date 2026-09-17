@@ -1,0 +1,177 @@
+# 健澜科技杠OS - 检验检查报告智能解读智能体
+# 版权所有 (c) 2026 健澜科技
+id: lab-imaging-interpreter
+name: 检验检查报告智能解读
+nameEn: Lab & Imaging Interpreter
+version: 1.0.0
+category: 报告解读
+tags:
+  - 检验报告
+  - 影像报告
+  - 危急值
+  - 患者教育
+description: >-
+  汇聚检验与影像报告，自动标注异常项、结合权威参考解读临床意义、给出复查与就诊建议，
+  对危急值强制提醒并人工确认；可面向医生与患者生成不同详略程度的解读。
+allowedRoles:
+  - doctor
+  - nurse
+  - patient
+riskLevel: low
+tools:
+  - get_lab_result
+  - get_image_report
+  - view_dicom
+  - critical_value_alert
+  - search_medical_knowledge
+knowledgeBases:
+  - lab-reference
+  - clinical-guidelines
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: interpret-main
+disclaimer: 报告解读为科普与辅助参考，不能替代医生诊断，异常结果请及时就医。
+
+workflows:
+  - meta:
+      id: interpret-main
+      name: 报告解读主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: fetch_reports
+        type: parallel
+        name: 并行获取检验与影像
+        config:
+          mode: all
+          concurrency: 2
+          branches:
+            - { name: labs, entryNode: br_labs }
+            - { name: images, entryNode: br_images }
+      - id: br_labs
+        type: tool
+        name: 检验结果
+        config:
+          toolName: get_lab_result
+          inputMapping: { patientId: input.patientId, days: input.days }
+      - id: br_images
+        type: tool
+        name: 影像报告
+        config:
+          toolName: get_image_report
+          inputMapping: { patientId: input.patientId, days: input.days }
+
+      - id: critical
+        type: tool
+        name: 危急值识别
+        config:
+          toolName: critical_value_alert
+          inputMapping:
+            labs: nodes.fetch_reports.output.branches.labs
+            patientId: input.patientId
+
+      - id: kb
+        type: rag
+        name: 检索检验参考与指南
+        config:
+          knowledgeBases: [lab-reference, clinical-guidelines]
+          query: input.focus
+          topK: 5
+          scoreThreshold: 0.25
+          strategy: hybrid
+
+      - id: interpret
+        type: llm
+        name: 生成解读
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            受众：${input.audience}
+            检验报告：${nodes.fetch_reports.output.branches.labs}
+            影像报告：${nodes.fetch_reports.output.branches.images}
+            危急值：${nodes.critical.output}
+            参考依据：${nodes.kb.output.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              abnormalFindings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item: { type: string }
+                    value: { type: string }
+                    reference: { type: string }
+                    direction: { type: string }
+                    meaning: { type: string }
+              imagingSummary: { type: string }
+              overallInterpretation: { type: string }
+              recommendations: { type: array, items: { type: string } }
+              followUp: { type: string }
+              isCritical: { type: boolean }
+              patientFriendlySummary: { type: string }
+
+      - id: critical_gate
+        type: condition
+        name: 是否含危急值
+        config:
+          mode: if-else
+          branches:
+            - { name: critical, when: nodes.interpret.output.json.isCritical == true }
+          defaultPort: normal
+
+      - id: critical_confirm
+        type: human
+        name: 危急值处置确认
+        config:
+          title: 报告解读检出危急值，请确认处置
+          instructions: 检出危急值，请立即通知主管医生/患者并确认处置。
+          assigneeRoles: [doctor, nurse]
+          formSchema:
+            acknowledged: { type: boolean, required: true }
+            notified: { type: boolean }
+          timeoutMs: 600000
+
+      - id: finalize_critical
+        type: code
+        config:
+          assignments:
+            urgency: '"critical"'
+            acknowledged: nodes.critical_confirm.output.formData.acknowledged
+
+      - id: finalize_normal
+        type: code
+        config:
+          assignments:
+            urgency: '"normal"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            urgency: vars.urgency
+            acknowledged: vars.acknowledged
+            criticalAlerts: nodes.critical.output
+            interpretation: nodes.interpret.output.json
+
+    edges:
+      - { id: e1, source: start, target: fetch_reports }
+      - { id: e2, source: fetch_reports, target: critical }
+      - { id: e3, source: critical, target: kb }
+      - { id: e4, source: kb, target: interpret }
+      - { id: e5, source: interpret, target: critical_gate }
+      - { id: e6, source: critical_gate, target: critical_confirm, sourcePort: critical }
+      - { id: e7, source: critical_confirm, target: finalize_critical }
+      - { id: e8, source: finalize_critical, target: end }
+      - { id: e9, source: critical_gate, target: finalize_normal, sourcePort: normal }
+      - { id: e10, source: finalize_normal, target: end }

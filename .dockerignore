@@ -1,0 +1,102 @@
+# ============================================================================
+# 健澜科技杠OS — 后端构建上下文忽略清单（仓库根目录）
+# ----------------------------------------------------------------------------
+# 作用：`docker build -f Dockerfile.backend .` 时，Docker 先把「构建上下文」
+#       整体发送给守护进程。该文件用于把与后端镜像构建无关的文件排除在外，
+#       从而：① 缩小上下文、加快构建；② 避免本地机密/缓存误入镜像层；
+#       ③ 防止宿主机 node_modules 等覆盖镜像内安装结果，保证可复现构建。
+# 规则语法与 .gitignore 兼容；! 开头表示“例外、重新包含”。
+# ============================================================================
+
+# ---------- 版本控制与 CI 元数据（镜像内绝不需要）----------
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab
+.svn
+.hg
+
+# ---------- 依赖目录（镜像内通过 bun install 重新安装，必须排除）----------
+# 否则宿主机的原生模块/平台二进制会污染 Linux 镜像，导致运行时崩溃。
+node_modules
+**/node_modules
+.pnp.*
+.yarn
+
+# ---------- 构建产物与覆盖率（镜像内重新构建，旧产物无意义）----------
+dist
+build
+coverage
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+web/dist
+web/build
+web/coverage
+web/test-results
+
+# ---------- 测试与质量工件（运行镜像不含测试，缩小体积与攻击面）----------
+tests
+**/*.test.ts
+**/*.spec.ts
+web/tests
+web/playwright-report
+web/test-results
+__tests__
+
+# ---------- 文档与设计稿（运行时不需要，避免无谓增大上下文）----------
+docs
+**/*.md
+!package.json
+design
+examples
+reports
+verification-report
+
+# ---------- 本地环境与机密（严禁进入镜像，防止密钥泄漏）----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets
+deploy/certs
+deploy/**/*.key
+deploy/**/*.crt
+
+# ---------- 运行期数据与日志（绝不打包进镜像）----------
+logs
+*.log
+data
+data/**
+vectors
+uploads
+tmp
+temp
+
+# ---------- 编辑器 / 操作系统杂项文件 ----------
+.vscode
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---------- 容器自身文件（避免递归上下文）----------
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# ---------- 前端整目录（后端镜像不需要 web 源码，单独由 web/Dockerfile 构建）----------
+web
+
+# ---------- 本地脚本产生的临时输出 / 截图 / 调试文本 ----------
+*.png
+*.jpg
+!docs/**
+**/_out.txt
+**/out*.txt
+**/*_out*.txt
+bunfig.prod.toml

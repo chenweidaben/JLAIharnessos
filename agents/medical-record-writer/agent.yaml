@@ -1,0 +1,215 @@
+# 健澜科技杠OS - AI电子病历生成智能体
+# 版权所有 (c) 2026 健澜科技
+id: medical-record-writer
+name: AI电子病历生成智能体
+nameEn: Medical Record Writer
+version: 1.0.0
+category: 电子病历
+tags:
+  - 病历生成
+  - 大模型
+  - 质控
+  - 医生工作台
+description: >-
+  基于患者主诉、既往史、检验检查结果与权威临床知识，自动生成结构化门诊/住院病历，
+  经内置质控规则校验与执业医师人工审核确认后归档。医生从"打字员"回归"诊疗者"。
+allowedRoles:
+  - doctor
+  - researcher
+riskLevel: medium
+tools:
+  - get_patient_history
+  - get_lab_result
+  - get_image_report
+  - search_medical_knowledge
+  - medical_record_quality_check
+  - sync_to_his
+knowledgeBases:
+  - clinical-guidelines
+  - medical-record-standards
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: medical-record-writer-main
+disclaimer: >-
+  本病历由 AI 辅助生成，仅供临床参考，必须经执业医师审核、修改并电子签名确认后，
+  方可作为正式医疗文书。AI 不承担诊疗责任。
+
+workflows:
+  - meta:
+      id: medical-record-writer-main
+      name: 病历生成-质控-审核-归档主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - id: start
+        type: start
+        name: 开始
+        config: {}
+
+      - id: fetch_history
+        type: tool
+        name: 调取既往病史
+        config:
+          toolName: get_patient_history
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: fetch_labs
+        type: tool
+        name: 调取检验结果
+        config:
+          toolName: get_lab_result
+          inputMapping:
+            patientId: input.patientId
+            days: 30
+
+      - id: fetch_images
+        type: tool
+        name: 调取影像报告
+        config:
+          toolName: get_image_report
+          inputMapping:
+            patientId: input.patientId
+            days: 30
+        errorHandling:
+          retry:
+            maxAttempts: 2
+            initialDelayMs: 200
+            retryableErrorCodes:
+              - TIMEOUT
+              - UPSTREAM_UNAVAILABLE
+          continueOnError: true
+
+      - id: retrieve_knowledge
+        type: rag
+        name: 检索临床指南与病历规范
+        config:
+          knowledgeBases:
+            - clinical-guidelines
+            - medical-record-standards
+          query: input.chiefComplaint
+          topK: 5
+          scoreThreshold: 0.35
+          strategy: hybrid
+          outputVariable: evidence
+
+      - id: generate_record
+        type: llm
+        name: 生成结构化病历
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            请根据以下资料生成结构化病历（JSON）。
+            【主诉】${input.chiefComplaint}
+            【现病史补充】${input.presentIllnessNotes}
+            【既往史】${nodes.fetch_history.output}
+            【近期检验】${nodes.fetch_labs.output}
+            【影像报告】${nodes.fetch_images.output}
+            【权威参考】${nodes.retrieve_knowledge.output.context}
+            仅依据所给资料生成，资料不足处留空并标记"需补充"，严禁臆造。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              chiefComplaint: { type: string }
+              presentIllness: { type: string }
+              pastHistory: { type: string }
+              physicalExam: { type: string }
+              auxiliaryExam: { type: string }
+              preliminaryDiagnosis: { type: array, items: { type: string } }
+              treatmentPlan: { type: string }
+              gaps: { type: array, items: { type: string } }
+
+      - id: quality_check
+        type: tool
+        name: 病历质控
+        config:
+          toolName: medical_record_quality_check
+          inputMapping:
+            record: nodes.generate_record.output.json
+
+      - id: gate
+        type: condition
+        name: 质控是否通过
+        config:
+          mode: if-else
+          branches:
+            - name: pass
+              when: nodes.quality_check.output.passed == true
+          defaultPort: revise
+
+      - id: doctor_review
+        type: human
+        name: 执业医师审核签名
+        config:
+          title: 病历审核与电子签名
+          instructions: 请核对 AI 生成病历的主诉、诊断与治疗计划，修改后确认归档。
+          assigneeRoles:
+            - doctor
+          formSchema:
+            approved: { type: boolean, required: true }
+            editedRecord: { type: string }
+            comment: { type: string }
+          timeoutMs: 86400000
+
+      - id: archive
+        type: tool
+        name: 归档至HIS/EMR
+        config:
+          toolName: sync_to_his
+          inputMapping:
+            patientId: input.patientId
+            record: nodes.doctor_review.output.editedRecord
+            source: '"medical-record-writer"'
+
+      - id: mark_done
+        type: code
+        name: 标记完成
+        config:
+          assignments:
+            status: '"completed"'
+            recordId: nodes.archive.output.id
+            qualityScore: nodes.quality_check.output.score
+
+      - id: mark_revise
+        type: code
+        name: 退回补充
+        config:
+          assignments:
+            status: '"needs_revision"'
+            issues: nodes.quality_check.output.issues
+            gaps: nodes.generate_record.output.json.gaps
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            recordId: vars.recordId
+            qualityScore: vars.qualityScore
+            issues: vars.issues
+            gaps: vars.gaps
+            draft: nodes.generate_record.output.json
+
+    edges:
+      - { id: e1, source: start, target: fetch_history }
+      - { id: e2, source: fetch_history, target: fetch_labs }
+      - { id: e3, source: fetch_labs, target: fetch_images }
+      - { id: e4, source: fetch_images, target: retrieve_knowledge }
+      - { id: e5, source: retrieve_knowledge, target: generate_record }
+      - { id: e6, source: generate_record, target: quality_check }
+      - { id: e7, source: quality_check, target: gate }
+      - { id: e8, source: gate, target: doctor_review, sourcePort: pass }
+      - { id: e9, source: doctor_review, target: archive }
+      - { id: e10, source: archive, target: mark_done }
+      - { id: e11, source: mark_done, target: end }
+      - { id: e12, source: gate, target: mark_revise, sourcePort: revise }
+      - { id: e13, source: mark_revise, target: end }

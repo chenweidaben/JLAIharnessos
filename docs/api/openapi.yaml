@@ -1,0 +1,242 @@
+# 健澜科技数智医院智能体 - OpenAPI 3.0 接口规范
+# Copyright (c) 2026 杭州健澜科技有限公司
+#
+# 渲染：将本文件导入 Swagger UI / Redoc / Apifox 即可在线浏览与调试。
+# 约定：
+#   - 所有业务接口挂在 /api/v1 下（RESTful + 版本管理）
+#   - 统一响应信封 ApiResponse<T>：{ code, message, data, timestamp, traceId? }
+#   - code=0 成功，非 0 见 ErrorCodes
+#   - 鉴权：Bearer JWT；WS 通过 ?token= 透传
+
+openapi: 3.0.3
+info:
+  title: 健澜科技数智医院智能体 BFF API
+  version: 1.0.0
+  description: |
+    前后端分离的 BFF（Backend for Frontend）接口。
+    前端在 Mock 模式下无需本服务即可完整演示；接入真实环境时启动 `bun run bff`。
+  contact:
+    name: 健澜科技
+    email: dev@jianlan.tech
+servers:
+  - url: http://localhost:8080/api/v1
+    description: 本地 BFF
+  - url: https://api.jianlan.tech/api/v1
+    description: 生产
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+  - name: Patient
+  - name: Chat
+  - name: MedicalTools
+  - name: Knowledge
+  - name: CDS
+  - name: Quality
+  - name: Operation
+  - name: System
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 登录
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/LoginResponse' }
+
+  /auth/userinfo:
+    get:
+      tags: [Auth]
+      summary: 当前登录用户
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/UserInfo' }
+
+  /patients:
+    get:
+      tags: [Patient]
+      summary: 患者列表（分页）
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: pageSize, in: query, schema: { type: integer, default: 20 } }
+        - { name: keyword, in: query, schema: { type: string } }
+        - { name: department, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PageResultPatientSummary'
+
+  /patients/{id}/360:
+    get:
+      tags: [Patient]
+      summary: 患者360全景（BFF 聚合）
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/Patient360Data' }
+
+  /chat/conversations/{id}/messages:
+    post:
+      tags: [Chat]
+      summary: 发送消息（同步首包，流式经 WS 推送）
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content: { type: string }
+                stream: { type: boolean, default: true }
+      responses:
+        '200': { description: 成功 }
+
+  /medical/{toolName}:
+    post:
+      tags: [MedicalTools]
+      summary: 调用医疗工具（统一入口，36个工具）
+      parameters:
+        - { name: toolName, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '200': { description: 工具执行结果 }
+
+  /operation/dashboard:
+    get:
+      tags: [Operation]
+      summary: 仪表盘统计
+      responses:
+        '200': { description: 成功 }
+
+  /system/health:
+    get:
+      tags: [System]
+      summary: 健康检查
+      security: []
+      responses:
+        '200': { description: 成功 }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code: { type: integer, example: 0 }
+        message: { type: string, example: ok }
+        timestamp: { type: string, format: date-time }
+        traceId: { type: string }
+      required: [code, message, data, timestamp]
+    PageResult:
+      type: object
+      properties:
+        list: { type: array, items: {} }
+        total: { type: integer }
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalPages: { type: integer }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+    LoginResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer, example: 7200 }
+        tokenType: { type: string, example: Bearer }
+        user: { $ref: '#/components/schemas/UserInfo' }
+    UserInfo:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        name: { type: string }
+        department: { type: string }
+        isAdmin: { type: boolean }
+        permissionCodes: { type: array, items: { type: string } }
+    PatientSummary:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        gender: { type: string, enum: [男, 女] }
+        age: { type: integer }
+        mrn: { type: string }
+        department: { type: string }
+        diagnosis: { type: string }
+        status: { type: string }
+    PageResultPatientSummary:
+      allOf:
+        - $ref: '#/components/schemas/PageResult'
+        - type: object
+          properties:
+            list:
+              type: array
+              items: { $ref: '#/components/schemas/PatientSummary' }
+    Patient360Data:
+      type: object
+      properties:
+        patient: { $ref: '#/components/schemas/PatientSummary' }
+        encounters: { type: array, items: {} }
+        vitalSigns: { type: array, items: {} }
+        labResults: { type: array, items: {} }
+        imagingReports: { type: array, items: {} }
+        orders: { type: array, items: {} }
+        prescriptions: { type: array, items: {} }
+        medicalRecords: { type: array, items: {} }
+        billing: { type: object }

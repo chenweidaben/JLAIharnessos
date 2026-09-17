@@ -1,0 +1,24 @@
+﻿src/monitoring/index.ts(71,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/services/request.ts(94,60): error TS2353: Object literal may only specify known properties, and 'options' does not exist in type 'AxiosRequestConfig<any, any>'.
+src/services/request.ts(100,59): error TS2353: Object literal may only specify known properties, and 'options' does not exist in type 'AxiosRequestConfig<any, any>'.
+src/services/request.ts(106,58): error TS2353: Object literal may only specify known properties, and 'options' does not exist in type 'AxiosRequestConfig<any, any>'.
+src/services/request.ts(112,63): error TS2353: Object literal may only specify known properties, and 'options' does not exist in type 'AxiosRequestConfig<any, any>'.
+tests/fixtures/factories.ts(99,5): error TS1117: An object literal cannot have multiple properties with the same name.
+tests/setup.ts(65,3): error TS2578: Unused '@ts-expect-error' directive.
+tests/unit/store/authStore.test.ts(28,41): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(38,37): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(44,37): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(51,41): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(63,41): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(72,41): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/authStore.test.ts(81,41): error TS2345: Argument of type '{ username: string; password: string; captcha: string; }' is not assignable to parameter of type 'LoginRequest'.
+  Property 'rememberMe' is missing in type '{ username: string; password: string; captcha: string; }' but required in type 'LoginRequest'.
+tests/unit/store/qualityStore.test.ts(43,7): error TS2322: Type 'string' is not assignable to type 'DefectLocation'.
+tests/unit/store/qualityStore.test.ts(62,7): error TS2322: Type 'string' is not assignable to type 'DefectLocation'.

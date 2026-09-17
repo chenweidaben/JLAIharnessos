@@ -1,0 +1,355 @@
+# ============================================================================
+# 健澜科技杠OS — 生产环境 Compose 覆盖文件
+# ----------------------------------------------------------------------------
+# 本文件不单独使用，必须与基础文件叠加（合并规则遵循 Compose Merge Spec）：
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# 相对基础文件，本覆盖提供：
+#   1. CPU/内存的 reservations（保底）与 limits（上限），按 8C16G 主机档位给出，
+#      同时给出 swarm 的 deploy.resources 与 compose up 实际生效的 cpus/mem_*；
+#   2. json-file 日志轮转（max-size/max-file），防止日志打满磁盘；
+#   3. 安全加固：no-new-privileges、cap_drop、只读根文件系统 + tmpfs；
+#   4. TLS 正式证书只读挂载、ACME 续期挑战卷；
+#   5. 监控增强：Prometheus 留存 30 天、ES 堆 1g、Jaeger 采样率降到 10%；
+#   6. 多副本扩容提示（边缘网关 upstream 已按 least_conn 支持多 app 副本）。
+#
+# 资源档位参考（单台宿主机总预算建议 ≤70% 分配给容器，留余量给系统）：
+#   4C8G ：app×1、ES 堆 512m、Prom 留存 15d，可关闭 kibana 常驻；
+#   8C16G：app×2、本文件默认值；
+#   16C32G：app×3、ES 堆 2g、Prom 留存 30d+、Kafka 三节点（另用集群编排）。
+# ============================================================================
+
+name: jianlan-gangos
+
+services:
+  # --------------------------------------------------------------------------
+  # 后端 BFF：单副本 1C/768M 保底、2C/2G 上限；丢弃全部 Linux capability。
+  # --------------------------------------------------------------------------
+  app:
+    environment:
+      APP_ENV: prod
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # 生产链路采样率 10%（在应用 OTel SDK 侧读取；Jaeger 端同步配置）。
+      OTEL_TRACES_SAMPLER_ARG: "0.1"
+    cpus: 2.0
+    mem_reservation: 768M
+    mem_limit: 2G
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 768M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service,env"
+        tag: "{{.Name}}"
+    # 多副本提示（二选一）：
+    #   a) 单机 compose：docker compose -f docker-compose.yml -f docker-compose.prod.yml
+    #        up -d --scale app=3
+    #      注意：基础文件为便于调试把 8080 绑定到了宿主机回环，扩容 ≥2 前需删除
+    #      app.ports 中的 "127.0.0.1:8080:8080"（流量全部经 nginx，本就无需该映射），
+    #      扩容后执行 docker exec ... nginx -s reload 让网关重新解析全部副本 IP；
+    #   b) swarm/k8s：使用下面的 deploy.replicas（compose up 不消费该字段）。
+    # deploy:
+    #   replicas: 3
+    #   update_config:
+    #     parallelism: 1
+    #     order: start-first
+    #   restart_policy:
+    #     condition: any
+
+  # --------------------------------------------------------------------------
+  # 前端静态站点：资源占用很小；只读根文件系统，写入仅限 tmpfs /tmp。
+  # --------------------------------------------------------------------------
+  web:
+    cpus: 0.5
+    mem_reservation: 64M
+    mem_limit: 256M
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    # 前端无状态，可直接扩容：--scale web=2（边缘 upstream 已预留 web-2 注释位）。
+    # deploy:
+    #   replicas: 2
+
+  # --------------------------------------------------------------------------
+  # PostgreSQL：2C/2G 保底、4C/4G 上限（8C16G 档约 25% 内存给 OS 与页缓存）。
+  # 官方入口需要 root 阶段初始化（chown/gosu），不做 cap_drop，仅禁止提权。
+  # --------------------------------------------------------------------------
+  postgres:
+    cpus: 4.0
+    mem_reservation: 2G
+    mem_limit: 4G
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+        reservations:
+          cpus: "2.0"
+          memory: 2G
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+    # 生产备份由 scripts/db/backup.sh 按计划任务执行（全量 30 天 + WAL 7 天）。
+
+  # --------------------------------------------------------------------------
+  # Redis：0.5C/256M 保底、1C/1G 上限。
+  # --------------------------------------------------------------------------
+  redis:
+    cpus: 1.0
+    mem_reservation: 256M
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # Kafka：1C/1G 保底、2C/2G 上限。
+  # --------------------------------------------------------------------------
+  kafka:
+    cpus: 2.0
+    mem_reservation: 1G
+    mem_limit: 2G
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # 边缘网关：1C/128M 保底、2C/512M 上限；只读根文件系统 + 全量丢弃 capability；
+  # 正式 TLS 证书只读挂载（必填），ACME 挑战使用独立命名卷。
+  # --------------------------------------------------------------------------
+  nginx:
+    cpus: 2.0
+    mem_reservation: 128M
+    mem_limit: 512M
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 512M
+        reservations:
+          cpus: "1.0"
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    volumes:
+      # 正式证书目录（含 tls.crt/tls.key），由运维通过 Secret 管理并只读挂载；
+      # TLS_CERT_DIR 未设置时直接报错，防止生产环境误用自签开发证书。
+      - type: bind
+        source: ${TLS_CERT_DIR:?生产部署必须在 .env 中设置 TLS_CERT_DIR（正式证书目录）}
+        target: /etc/nginx/certs
+        read_only: true
+        bind:
+          create_host_path: false
+      # ACME HTTP-01 挑战目录（certbot 写入，nginx 只读）。
+      - certbot-www:/var/www/certbot:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  # --------------------------------------------------------------------------
+  # Prometheus：留存延长到 30 天；1C/1G 保底、2C/2G 上限；只读根 + tmpfs。
+  # --------------------------------------------------------------------------
+  prometheus:
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--storage.tsdb.retention.size=8GB"
+      - "--web.enable-lifecycle"
+    cpus: 2.0
+    mem_reservation: 1G
+    mem_limit: 2G
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # Grafana：只读根 + tmpfs；0.5C/128M 保底、1C/512M 上限。
+  # --------------------------------------------------------------------------
+  grafana:
+    cpus: 1.0
+    mem_reservation: 128M
+    mem_limit: 512M
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # Elasticsearch：生产堆内存提高到 1g（不超过容器内存 50%，留 Lucene 文件缓存）。
+  # --------------------------------------------------------------------------
+  elasticsearch:
+    cpus: 2.0
+    mem_reservation: 1536M
+    mem_limit: 3G
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3G
+        reservations:
+          cpus: "1.0"
+          memory: 1536M
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # Kibana：0.5C/256M 保底、1C/1G 上限。
+  # --------------------------------------------------------------------------
+  kibana:
+    cpus: 1.0
+    mem_reservation: 256M
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
+  # Jaeger：生产采样率降到 10%（badger 持久化保留）；0.5C/256M 保底、1C/1G 上限。
+  # --------------------------------------------------------------------------
+  jaeger:
+    cpus: 1.0
+    mem_reservation: 256M
+    mem_limit: 1G
+    environment:
+      SAMPLING_TYPES: probabilistic
+      SAMPLING_PARAM: "0.1"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+# ----------------------------------------------------------------------------
+# 生产覆盖新增的命名卷：ACME 挑战目录（certbot 侧写入）。
+# 其余卷在基础文件中声明，compose 合并后共同生效。
+# ----------------------------------------------------------------------------
+volumes:
+  certbot-www:
+    name: jianlan-certbot-www

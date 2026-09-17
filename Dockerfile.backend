@@ -1,0 +1,144 @@
+# ============================================================================
+# 健澜科技杠OS（数智医院智能体）— 后端 BFF 服务镜像
+# ----------------------------------------------------------------------------
+# 本 Dockerfile 采用「多阶段构建」，共两个阶段：
+#
+#   阶段一 builder（构建阶段）
+#     1. 仅先复制依赖清单（package.json / bun.lock / bunfig.toml），安装全部依赖；
+#     2. 再复制源代码，执行 TypeScript 类型检查（tsc --noEmit）；
+#     3. 执行 bun run build，把 BFF 入口打包到 dist/server.js。
+#
+#   阶段二 runtime（运行阶段）
+#     1. 基于精简的 debian-slim 变体（oven/bun:1.4.2-slim），只安装生产依赖；
+#     2. 创建非 root 用户 bunapp(uid=10001) 运行服务，满足最小权限原则；
+#     3. 内建 HEALTHCHECK，使用 Bun 自带 fetch 探测 /health，无需 curl；
+#     4. 通过 .dockerignore 排除 node_modules / tests / docs / .git，缩小上下文。
+#
+# 为什么不直接用一个阶段？
+#   - 构建阶段需要 tsc / 类型声明 / 构建脚本等 devDependencies，体积大、攻击面大；
+#   - 运行阶段只保留生产依赖与编译产物，镜像更小、CVE 暴露面更小、启动更快。
+#
+# 层缓存优化要点：
+#   把「依赖清单复制 + bun install」放在「源代码复制」之前。只要依赖清单没变，
+#   即使业务代码频繁变更，Docker 也能复用安装依赖这一昂贵层，显著加快构建。
+#
+# 构建命令（在仓库根目录执行，注意最后的构建上下文 "." 不能省略）：
+#   docker build -f Dockerfile.backend \
+#     -t registry.jianlan.tech/jianlan/backend:0.1.0 .
+#
+# 运行示例（端口、密钥、连接串全部由环境变量注入，镜像内不写死任何机密）：
+#   docker run --rm -p 8080:8080 \
+#     --env-file .env.production \
+#     registry.jianlan.tech/jianlan/backend:0.1.0
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 阶段一：builder
+# 固定大版本+具体版本号 1.4.2（与 package.json#engines.bun、本地开发版本对齐），
+# 严禁使用 latest / 1 这类浮动 tag，保证构建可复现、供应链可追溯。
+# oven/bun:1.4.2 默认基于 Debian，自带完整构建工具链，适合作为编译阶段。
+# ----------------------------------------------------------------------------
+FROM oven/bun:1.4.2 AS builder
+
+# 以下元数据遵循 OCI image spec 约定，便于镜像仓库展示与合规审计。
+LABEL org.opencontainers.image.title="jianlan-gangos-backend" \
+      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）后端 BFF 服务" \
+      org.opencontainers.image.vendor="健澜科技" \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.source="https://git.jianlan.tech/medical/jianlan-medical-agent"
+
+# 容器内统一工作目录；后续所有相对路径都基于该目录。
+WORKDIR /app
+
+# 仅复制依赖清单与 Bun 配置（这一步是层缓存的关键）：
+#   - package.json：声明依赖与脚本
+#   - bun.lock    ：锁定依赖版本树，保证可复现安装
+#   - bunfig.toml ：Bun 的安装/测试/运行配置
+# 使用 COPY ... ./ 让目标目录明确；通配符在文件缺失时会失败，这里三个文件都应存在。
+COPY package.json bun.lock bunfig.toml ./
+
+# 安装「全部」依赖（含 devDependencies）：
+#   类型检查与构建需要 typescript 等开发依赖，因此构建阶段不能加 --production。
+#   --frozen-lockfile 要求 lockfile 与 package.json 严格一致，不一致直接失败，
+#   防止 CI/CD 中意外升级依赖造成「本地能跑、线上挂掉」。
+RUN bun install --frozen-lockfile
+
+# 依赖层就绪后，再复制完整源代码与构建配置。
+# 业务代码变化只会让本层及之后的层失效，前面昂贵的依赖安装层保持缓存命中。
+COPY tsconfig.json ./
+COPY build.ts ./
+COPY src ./src
+
+# 严格类型检查：把类型错误挡在镜像构建期，而不是让带病镜像上线。
+# tsc --noEmit 只做检查不产出文件，类型零错误才允许进入下一步。
+RUN bun run typecheck
+
+# 执行构建：通过 build.ts 调用 Bun.build，把 src/bff/server.ts 打包为 dist/server.js。
+# 同时会产出 dist/cli.js（命令行入口），运行阶段只使用 server.js，cli.js 一并保留无害。
+RUN bun run build
+
+# ----------------------------------------------------------------------------
+# 阶段二：runtime（运行时镜像，尽量小且默认安全）
+# 使用 oven/bun:1.4.2-slim（Debian slim 变体 + bun），相比完整镜像去掉了大量
+# 编译/调试工具。保留 debian-slim 而非 distroless 的原因：
+#   1) 需要 bun 运行时直接执行 dist/server.js；
+#   2) 便于在排障时使用最小化 shell，且 HEALTHCHECK 用 bun 实现，不额外装 curl；
+#   3) 如需极致精简，可在安全评审后切换到 distroless + 复制 bun 二进制的方案。
+# ----------------------------------------------------------------------------
+FROM oven/bun:1.4.2-slim AS runtime
+
+LABEL org.opencontainers.image.title="jianlan-gangos-backend" \
+      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）后端 BFF 服务（运行时）" \
+      org.opencontainers.image.vendor="健澜科技" \
+      org.opencontainers.image.version="0.1.0"
+
+WORKDIR /app
+
+# 设置运行期环境默认值：
+#   NODE_ENV/BUN_ENV=production 让框架与依赖进入生产模式（关闭调试特性）；
+#   HTTP_PORT=8080 与 src/bff/server.ts 默认端口一致，可被 K8s/Compose 覆盖。
+# 注意：这里只放「非机密」默认值，数据库口令、JWT 密钥等一律由运行时环境注入。
+ENV NODE_ENV=production \
+    BUN_ENV=production \
+    APP_ENV=prod \
+    HTTP_PORT=8080 \
+    LOG_LEVEL=info
+
+# 创建专用的非 root 运行用户与用户组。
+#   -S/--system      创建系统用户/组（不设置登录密码、不创建 home 目录外的杂项）；
+#   -u/--uid 固定 10001，避免宿主机挂载卷时因 uid 漂移导致权限不一致；
+#   -H/--no-create-home 不创建 home，减小镜像、明确该账号仅用于跑服务。
+RUN groupadd --system --gid 10001 bunapp \
+ && useradd  --system --uid 10001 --gid bunapp --no-create-home --shell /usr/sbin/nologin bunapp
+
+# 运行阶段再次只复制依赖清单，单独安装「生产依赖」，确保运行镜像不含 tsc/eslint 等。
+COPY package.json bun.lock bunfig.toml ./
+RUN bun install --frozen-lockfile --production \
+ && bun pm cache rm 2>/dev/null || true
+
+# 从构建阶段复制编译产物（dist/server.js 为 BFF 服务入口）。--chown 直接归属非 root 用户。
+COPY --from=builder --chown=bunapp:bunapp /app/dist ./dist
+
+# 复制容器健康检查探针脚本（Bun 实现，不依赖 curl）。
+COPY --chown=bunapp:bunapp scripts/docker/healthcheck.ts ./scripts/docker/healthcheck.ts
+
+# 创建日志与数据目录并归属非 root 用户；容器内默认不允许写其它位置（最小权限）。
+RUN mkdir -p /app/logs /app/data && chown -R bunapp:bunapp /app/logs /app/data
+
+# 此后所有指令以及容器运行身份都切换为非 root 用户。
+USER bunapp
+
+# 声明服务端口（仅文档化作用，真正发布仍由 Compose/K8s 决定）。
+EXPOSE 8080
+
+# 容器健康检查：
+#   --interval=30s 每 30 秒探测一次；
+#   --timeout=5s   单次探测超过 5 秒视为失败（探针内部还有 3 秒 fetch 超时兜底）；
+#   --start-period=40s 给 JVM 式冷启动/依赖预热留宽限，该期间失败不计入重试；
+#   --retries=3    连续 3 次失败才标记 unhealthy，避免网络抖动造成误判。
+# 这里探测存活端点 /health；就绪端点 /ready 由编排系统（K8s readinessProbe）使用。
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD ["bun", "scripts/docker/healthcheck.ts", "liveness"]
+
+# 使用 exec 形式（JSON 数组）启动，使 bun 成为 PID 1，能正确接收 SIGTERM 优雅退出。
+CMD ["bun", "dist/server.js"]

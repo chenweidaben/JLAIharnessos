@@ -1,0 +1,93 @@
+﻿
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/lenovo/Doubao/chats/2026-09-14/new-chat-1/web[39m
+
+ [32m✓[39m tests/unit/utils/validate.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m tests/unit/store/chatStore.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/auth.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/storage.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 13[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/desensitize.test.ts [2m([22m[2m12 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/store/patientStore.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/format.test.ts [2m([22m[2m23 tests[22m[2m)[22m[90m 52[2mms[22m[39m
+ [32m✓[39m tests/unit/utils/download.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/store/dashboardStore.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 836[2mms[22m[39m
+   [33m[2m✓[22m[39m dashboardStore 异步加载[2m > [22mfetchDashboardData 设置 loading [33m608[2mms[22m[39m
+ [32m✓[39m tests/unit/store/qualityStore.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1707[2mms[22m[39m
+   [33m[2m✓[22m[39m qualityStore 评分计算[2m > [22maddDefect 后 recalcScore 自动扣分 [33m549[2mms[22m[39m
+   [33m[2m✓[22m[39m qualityStore 评分计算[2m > [22mremoveDefect 后分数恢复 [33m1150[2mms[22m[39m
+ [32m✓[39m tests/unit/store/authStore.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 3992[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 登录[2m > [22madmin 账号登录成功 [33m462[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 登录[2m > [22m验证码为空时抛出 CAPTCHA 错误 [33m611[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 登录[2m > [22m不存在的账号抛出 NOT_FOUND [33m488[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 登出[2m > [22m登出后清空状态 [33m550[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 权限判定[2m > [22madmin 拥有通配权限 * [33m453[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 权限判定[2m > [22mhasRole 支持单角色和数组 [33m709[2mms[22m[39m
+   [33m[2m✓[22m[39m authStore 用户信息[2m > [22mupdateProfile 局部更新用户信息 [33m707[2mms[22m[39m
+ [32m✓[39m tests/unit/hooks/useAlert.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 52[2mms[22m[39m
+ [32m✓[39m tests/unit/hooks/useChatStream.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 65[2mms[22m[39m
+node.exe : [90mstderr[2m | tests/components/medical/LabResultItem.test.tsx[2m > [22m[2mLabResultRow[2m > [22m[2
+m渲染项目名称和参考区间
+所在位置 行:1 字符: 1
++ & "C:\Users\lenovo\AppData\Local\Doubao\User Data\sandbox_runtime\bas ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90mstderr[2m...[2m渲染项目名称和参考区间:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/medical/LabResultItem.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[90m 275[2mms[22m[39m
+[90mstderr[2m | tests/components/medical/AlertBanner.test.tsx[2m > [22m[2mAlertBanner[2m > [22m[2m渲染标题和内容
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/medical/AlertBanner.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[90m 231[2mms[22m[39m
+[90mstderr[2m | tests/components/common/EmptyState.test.tsx[2m > [22m[2mEmptyState[2m > [22m[2m默认显示"暂无数据"
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/common/EmptyState.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[90m 167[2mms[22m[39m
+[90mstderr[2m | tests/components/common/StatusBadge.test.tsx[2m > [22m[2mStatusBadge[2m > [22m[2m渲染危急状态
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/common/StatusBadge.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[90m 221[2mms[22m[39m
+[90mstderr[2m | tests/components/common/PageContainer.test.tsx[2m > [22m[2mPageContainer[2m > [22m[2m渲染标题
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/common/PageContainer.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[90m 186[2mms[22m[39m
+[90mstderr[2m | tests/components/common/StatCard.test.tsx[2m > [22m[2mStatCard[2m > [22m[2m渲染标题和数值
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition
+` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactroute
+r.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `
+v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/futur
+e#v7_relativesplatpath.
+
+ [32m✓[39m tests/components/common/StatCard.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[90m 174[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m19 passed[39m[22m[90m (19)[39m
+[2m      Tests [22m [1m[32m157 passed[39m[22m[90m (157)[39m
+[2m   Start at [22m 19:46:34
+[2m   Duration [22m 14.05s[2m (transform 1.10s, setup 20.18s, collect 43.65s, tests 8.04s, environment 42.49s, prepare 9.59s)[22m
+

@@ -1,0 +1,38 @@
+# ============================================================================
+# 健澜科技杠OS — Grafana 数据源自动装配（provisioning）
+# ----------------------------------------------------------------------------
+# 该文件只读挂载到容器 /etc/grafana/provisioning/datasources/，
+# Grafana 首次启动即自动创建数据源，无需人工在界面配置。
+# 数据源地址使用 compose 网络内服务名（grafana 与 prometheus 同属 monitoring 网络）。
+# ============================================================================
+apiVersion: 1
+
+# 数据源清单。删除本文件或删除对应条目后重启，Grafana 不会自动删除已建数据源
+# （provisioning 数据源受 Grafana 生命周期保护），变更走版本库评审。
+datasources:
+  # 主指标数据源：Prometheus。
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    uid: jianlan-prometheus
+    # Grafana → Prometheus 走内网服务名:9090。
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      # 15s 抓取间隔对应推荐时间区间粒度。
+      timeInterval: '15s'
+      httpMethod: POST
+      manageAlerts: false
+
+  # 链路追踪数据源：Jaeger（查询/UI 服务 16686）。
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    uid: jianlan-jaeger
+    url: http://jaeger:16686
+    editable: false
+    jsonData:
+      # 与 Prometheus 数据源联动，支持指标跳链路。
+      tracesToMetrics:
+        datasourceUid: jianlan-prometheus

@@ -1,0 +1,193 @@
+# 健澜科技杠OS - 智能处方审核智能体
+# 版权所有 (c) 2026 健澜科技
+id: prescription-review
+name: 智能处方审核智能体
+nameEn: Prescription Review
+version: 1.0.0
+category: 合理用药
+tags:
+  - 处方审核
+  - 合理用药
+  - 药物相互作用
+  - 药师
+description: >-
+  处方开具后自动进行前置审核：药物相互作用、配伍禁忌、剂量疗程、过敏史、特殊人群与
+  适应症核查，按风险分级；严重问题拦截并强制药师复核，保障用药安全。
+allowedRoles:
+  - pharmacist
+  - doctor
+riskLevel: high
+tools:
+  - get_prescription_list
+  - prescription_audit
+  - drug_interaction_check
+  - get_drug_information
+  - get_patient_history
+knowledgeBases:
+  - drug-instructions
+  - clinical-guidelines
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.0
+systemPrompt: prompts/system.md
+entryWorkflow: prescription-review-main
+disclaimer: 处方审核结论为辅助，最终用药决定由医师与药师负责，严重风险须人工复核。
+
+workflows:
+  - meta:
+      id: prescription-review-main
+      name: 处方前置审核主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: fetch_rx
+        type: tool
+        name: 获取待审处方
+        config:
+          toolName: get_prescription_list
+          inputMapping:
+            patientId: input.patientId
+            status: '"pending_review"'
+
+      - id: fetch_history
+        type: tool
+        name: 获取病史与过敏史
+        config:
+          toolName: get_patient_history
+          inputMapping: { patientId: input.patientId }
+
+      - id: checks
+        type: parallel
+        name: 并行三类用药审核
+        config:
+          mode: all
+          concurrency: 3
+          branches:
+            - { name: audit, entryNode: br_audit }
+            - { name: interaction, entryNode: br_interaction }
+            - { name: info, entryNode: br_info }
+
+      - id: br_audit
+        type: tool
+        name: 规则审核（剂量/疗程/配伍/特殊人群）
+        config:
+          toolName: prescription_audit
+          inputMapping:
+            prescriptions: nodes.fetch_rx.output
+            history: nodes.fetch_history.output
+
+      - id: br_interaction
+        type: tool
+        name: 药物相互作用审查
+        config:
+          toolName: drug_interaction_check
+          inputMapping:
+            prescriptions: nodes.fetch_rx.output
+
+      - id: br_info
+        type: rag
+        name: 说明书与用药指南核查
+        config:
+          knowledgeBases: [drug-instructions, clinical-guidelines]
+          query: nodes.fetch_rx.output
+          topK: 6
+          scoreThreshold: 0.25
+          strategy: hybrid
+
+      - id: adjudicate
+        type: llm
+        name: 综合审核裁决
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            待审处方：${nodes.fetch_rx.output}
+            患者病史/过敏史：${nodes.fetch_history.output}
+            规则审核：${nodes.checks.output.branches.audit}
+            相互作用：${nodes.checks.output.branches.interaction}
+            说明书/指南：${nodes.checks.output.branches.info.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              passed: { type: boolean }
+              riskLevel: { type: string, enum: [pass, warn, reject] }
+              problems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    severity: { type: string, enum: [严重, 一般, 提示] }
+                    type: { type: string }
+                    drug: { type: string }
+                    description: { type: string }
+                    suggestion: { type: string }
+              counsel: { type: string }
+
+      - id: risk_gate
+        type: condition
+        name: 风险分级路由
+        config:
+          mode: if-else
+          branches:
+            - { name: reject, when: "nodes.adjudicate.output.json.riskLevel == 'reject'" }
+            - { name: warn, when: "nodes.adjudicate.output.json.riskLevel == 'warn'" }
+          defaultPort: pass
+
+      - id: pharmacist_double_check
+        type: human
+        name: 药师复核（严重/警示）
+        config:
+          title: 处方风险，请药师复核
+          instructions: 审核发现用药风险，请药师复核并决定通过、退回或要求医师修改。
+          assigneeRoles: [pharmacist]
+          formSchema:
+            decision: { type: string, required: true }
+            comment: { type: string }
+          timeoutMs: 3600000
+
+      - id: mark_reject
+        type: code
+        config:
+          assignments:
+            finalDecision: nodes.pharmacist_double_check.output.formData.decision
+            reviewed: true
+            riskLevel: nodes.adjudicate.output.json.riskLevel
+
+      - id: mark_pass
+        type: code
+        config:
+          assignments:
+            finalDecision: '"auto_passed"'
+            reviewed: false
+            riskLevel: '"pass"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            finalDecision: vars.finalDecision
+            reviewed: vars.reviewed
+            riskLevel: vars.riskLevel
+            adjudication: nodes.adjudicate.output.json
+            ruleAudit: nodes.checks.output.branches.audit
+            interactions: nodes.checks.output.branches.interaction
+
+    edges:
+      - { id: e1, source: start, target: fetch_rx }
+      - { id: e2, source: fetch_rx, target: fetch_history }
+      - { id: e3, source: fetch_history, target: checks }
+      - { id: e4, source: checks, target: adjudicate }
+      - { id: e5, source: adjudicate, target: risk_gate }
+      - { id: e6, source: risk_gate, target: pharmacist_double_check, sourcePort: reject }
+      - { id: e7, source: risk_gate, target: pharmacist_double_check, sourcePort: warn }
+      - { id: e8, source: pharmacist_double_check, target: mark_reject }
+      - { id: e9, source: mark_reject, target: end }
+      - { id: e10, source: risk_gate, target: mark_pass, sourcePort: pass }
+      - { id: e11, source: mark_pass, target: end }

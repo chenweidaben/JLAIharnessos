@@ -1,0 +1,180 @@
+# 健澜科技杠OS - 医务统计与管理报表智能体
+# 版权所有 (c) 2026 健澜科技
+id: medical-affairs-report
+name: 医务统计与管理报表智能体
+nameEn: Medical Affairs Reporting
+version: 1.0.0
+category: 运营管理
+tags:
+  - 医务报表
+  - 质量管理
+  - 运营分析
+  - DRG
+  - 管理驾驶舱
+description: >-
+  汇聚医疗质量、科室运营、DRG/DIP 与核心制度数据，自动生成院/科两级管理报表，
+  提炼关键指标、异常风险与改进建议，重大风险提交管理者复核，支撑精细化管理与等级评审。
+allowedRoles:
+  - admin
+riskLevel: low
+tools:
+  - medical_quality_indicators
+  - department_operation_analysis
+  - drg_dip_analysis
+  - core_system_check
+knowledgeBases:
+  - management-standards
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: report-main
+disclaimer: 报表数据来源于院内系统统计，分析结论供管理参考，以正式统计口径为准。
+
+workflows:
+  - meta:
+      id: report-main
+      name: 管理报表生成主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 120000
+      workflowTimeoutMs: 600000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: gather
+        type: parallel
+        name: 并行采集四类管理数据
+        config:
+          mode: all
+          concurrency: 4
+          branches:
+            - { name: quality, entryNode: br_quality }
+            - { name: operation, entryNode: br_operation }
+            - { name: drg, entryNode: br_drg }
+            - { name: core, entryNode: br_core }
+
+      - id: br_quality
+        type: tool
+        name: 医疗质量指标
+        config:
+          toolName: medical_quality_indicators
+          inputMapping: { department: input.department, timeRange: input.timeRange }
+      - id: br_operation
+        type: tool
+        name: 科室运营分析
+        config:
+          toolName: department_operation_analysis
+          inputMapping: { department: input.department, timeRange: input.timeRange }
+      - id: br_drg
+        type: tool
+        name: DRG/DIP分析
+        config:
+          toolName: drg_dip_analysis
+          inputMapping: { department: input.department, timeRange: input.timeRange }
+      - id: br_core
+        type: tool
+        name: 核心制度落实
+        config:
+          toolName: core_system_check
+          inputMapping: { department: input.department, timeRange: input.timeRange }
+
+      - id: standards
+        type: rag
+        name: 管理标准与评审要求
+        config:
+          knowledgeBases: [management-standards]
+          query: input.reportType
+          topK: 4
+          scoreThreshold: 0.2
+          strategy: hybrid
+
+      - id: compose
+        type: llm
+        name: 生成管理报表
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            报表类型：${input.reportType}
+            科室/范围：${input.department}
+            周期：${input.timeRange}
+            医疗质量指标：${nodes.gather.output.branches.quality}
+            科室运营：${nodes.gather.output.branches.operation}
+            DRG/DIP：${nodes.gather.output.branches.drg}
+            核心制度：${nodes.gather.output.branches.core}
+            管理标准：${nodes.standards.output.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              kpis: { type: array, items: { type: object } }
+              highlights: { type: array, items: { type: string } }
+              risks:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    level: { type: string, enum: [高, 中, 低] }
+                    title: { type: string }
+                    detail: { type: string }
+              recommendations: { type: array, items: { type: object } }
+              narrative: { type: string }
+              hasMajorRisk: { type: boolean }
+
+      - id: risk_gate
+        type: condition
+        name: 是否存在重大风险
+        config:
+          mode: if-else
+          branches:
+            - { name: major, when: nodes.compose.output.json.hasMajorRisk == true }
+          defaultPort: normal
+
+      - id: manager_review
+        type: human
+        name: 管理者复核重大风险
+        config:
+          title: 管理报表检出重大风险，请复核
+          instructions: 报表识别出重大质量/运营风险，请管理者复核并确认整改责任。
+          assigneeRoles: [admin]
+          formSchema:
+            acknowledged: { type: boolean, required: true }
+            owner: { type: string }
+            dueDate: { type: string }
+          timeoutMs: 259200000
+
+      - id: finalize_major
+        type: code
+        config:
+          assignments:
+            status: '"major_risk_reviewed"'
+            review: nodes.manager_review.output.formData
+
+      - id: finalize_normal
+        type: code
+        config:
+          assignments:
+            status: '"generated"'
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            review: vars.review
+            report: nodes.compose.output.json
+            sources: nodes.gather.output.branches
+
+    edges:
+      - { id: e1, source: start, target: gather }
+      - { id: e2, source: gather, target: standards }
+      - { id: e3, source: standards, target: compose }
+      - { id: e4, source: compose, target: risk_gate }
+      - { id: e5, source: risk_gate, target: manager_review, sourcePort: major }
+      - { id: e6, source: manager_review, target: finalize_major }
+      - { id: e7, source: finalize_major, target: end }
+      - { id: e8, source: risk_gate, target: finalize_normal, sourcePort: normal }
+      - { id: e9, source: finalize_normal, target: end }

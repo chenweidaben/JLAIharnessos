@@ -1,0 +1,31 @@
+/**
+ * 健澜科技数智医院智能体
+ * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ *
+ * 设计令牌（CSS 变量）
+ */
+:root {
+  --jl-primary: #0a4d8c;
+  --jl-primary-dark: #073a6b;
+  --jl-primary-light: #1a6bb8;
+  --jl-blue: #1890ff;
+  --jl-cyan: #13c2c2;
+
+  --jl-success: #52c41a;
+  --jl-warning: #faad14;
+  --jl-danger: #f5222d;
+
+  --jl-bg: #f5f7fa;
+  --jl-border: #e8ecf1;
+  --jl-text-secondary: #8c8c8c;
+  --jl-text-primary: #262626;
+
+  --jl-critical: #f5222d;
+  --jl-abnormal: #fa8c16;
+  --jl-normal: #52c41a;
+  --jl-pending: #1890ff;
+
+  --jl-header-height: 56px;
+  --jl-sidebar-width: 220px;
+  --jl-radius: 8px;
+}

@@ -1,0 +1,7 @@
+{
+  "_comment": "虚拟患者示例，非真实个人。演示 AI 病历生成智能体的入参。",
+  "patientId": "MOCK-P-0001",
+  "visitId": "MOCK-V-20260917-01",
+  "chiefComplaint": "口干、多饮、多尿伴乏力1月余",
+  "presentIllnessNotes": "患者1月前无明显诱因出现口干多饮，每日饮水约3000ml，尿量增多，夜尿2-3次，伴体重下降约2kg，无发热、无腹痛。"
+}

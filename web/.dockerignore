@@ -1,0 +1,80 @@
+# ============================================================================
+# 健澜科技杠OS — 前端（web/）构建上下文忽略清单
+# ----------------------------------------------------------------------------
+# 该文件位于 web/ 目录，当前端镜像以 web/ 为构建上下文时生效：
+#   docker build -f web/Dockerfile.frontend -t .../web:0.1.0 web
+# 目标：让发送给 Docker 的上下文只包含“构建前端所必需”的源码与配置，
+#       排除 node_modules / 构建产物 / E2E 测试 / 截图与调试文本，加快构建并防泄密。
+# ============================================================================
+
+# ---------- 依赖目录（容器内通过 npm ci 依据 lock 文件全新安装）----------
+node_modules
+**/node_modules
+
+# ---------- 构建产物与各类测试/覆盖率输出（容器内重新构建）----------
+dist
+build
+coverage
+test-results
+playwright-report
+html-report
+
+# ---------- 单元测试与端到端测试（运行镜像只包含静态产物，不含测试）----------
+tests
+e2e
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/__tests__
+**/__mocks__
+playwright.config.ts
+
+# ---------- 文档与设计稿（Nginx 运行时不需要）----------
+docs
+*.md
+!README.md
+design
+
+# ---------- 本地环境文件与机密（严禁进入镜像）----------
+.env
+.env.*
+!.env.production
+*.pem
+*.key
+*.crt
+
+# ---------- 调试输出 / 截图 / 临时文本（历史排障遗留，一律不打包）----------
+*.png
+*.jpg
+*.jpeg
+out*.txt
+**/out*.txt
+**/*_out*.txt
+e2e_*.txt
+tsc_*.txt
+eslint_*.txt
+vitest_*.txt
+coverage_*.txt
+build_out.txt
+pw_install*.txt
+
+# ---------- 缓存与日志 ----------
+.cache
+.vite
+*.log
+npm-debug.log*
+
+# ---------- 版本控制 / 编辑器 / 系统杂项 ----------
+.git
+.gitignore
+.husky
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.swp
+
+# ---------- 容器自身文件 ----------
+Dockerfile*
+.dockerignore

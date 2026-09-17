@@ -1,0 +1,38 @@
+# ============================================================================
+# 健澜科技杠OS — Jaeger all-in-one 可观测链路镜像（健康检查增强包装）
+# ----------------------------------------------------------------------------
+# 背景：官方 jaegertracing/all-in-one 镜像基于 scratch 构建，仅含单个静态二进制，
+#       没有 shell/curl/wget，Docker 原生 HEALTHCHECK 无法执行任何探测命令。
+# 方案：多阶段从 busybox:1.36 复制静态编译的 /bin/busybox 到官方镜像，
+#       HEALTHCHECK 通过 busybox wget 探测 Jaeger UI/查询端口 16686。
+#       busybox 为静态链接（uclibc），在 scratch 上可直接运行，不引入 libc 依赖。
+#
+# 构建（上下文为 deploy/observability/）：
+#   docker build -f deploy/observability/Dockerfile.jaeger \
+#     -t registry.jianlan.tech/jianlan/jaeger-all-in-one:1.60.0 \
+#     deploy/observability
+#
+# 安全说明：
+#   - busybox 仅用于容器内本机回环健康探测，不暴露任何额外服务/端口；
+#   - 业务进程仍为官方 Jaeger 二进制，运行用户沿用官方镜像设置（非 root）；
+#   - 升级 Jaeger 版本时只需调整 FROM 版本号并重新验证健康端点。
+# ============================================================================
+
+# 固定版本的 busybox（静态），仅作为工具来源，不参与最终运行时的其他内容。
+FROM busybox:1.36.1-uclibc AS tools
+
+# 固定具体补丁版本的官方 Jaeger all-in-one，严禁浮动 tag。
+FROM jaegertracing/all-in-one:1.60.0
+
+LABEL org.opencontainers.image.title="jianlan-gangos-jaeger" \
+      org.opencontainers.image.description="健澜科技杠OS 分布式链路追踪（Jaeger all-in-one，含健康检查）" \
+      org.opencontainers.image.vendor="健澜科技" \
+      org.opencontainers.image.version="1.60.0"
+
+# 复制静态 busybox（含 wget applet），用于执行 HEALTHCHECK。
+COPY --from=tools /bin/busybox /bin/busybox
+
+# Jaeger 查询/UI 端口 16686 的根路径返回 SPA 页面（HTTP 200），可作为存活判据。
+# -q 安静、-O- 输出到 stdout（再丢弃）；非 2xx/连接失败时 busybox wget 退出码非 0。
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD ["/bin/busybox", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:16686/"]

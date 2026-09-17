@@ -1,0 +1,27 @@
+# 健澜科技数智医院智能体 - ESLint 忽略清单
+# 说明：ESLint 9 flat config 已在 eslint.config.js 内通过 ignores 配置生效，
+# 本文件用于兼容旧版编辑器插件与 CI 调用，内容保持一致。
+
+node_modules/
+dist/
+build/
+coverage/
+.next/
+.venv/
+.vscode/
+.idea/
+logs/
+*.log
+*.tsbuildinfo
+
+# 自动生成与第三方代码
+design/
+docs/
+scripts/
+**/*.d.ts
+
+# 医疗 mock 数据（含脱敏样例，允许硬编码占位）
+src/medical-tools/mockData.ts
+
+# 构建脚本
+build.ts

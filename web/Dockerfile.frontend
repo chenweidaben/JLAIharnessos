@@ -1,0 +1,120 @@
+# ============================================================================
+# 健澜科技杠OS（数智医院智能体）— 前端 Web（React 19 + Vite）镜像
+# ----------------------------------------------------------------------------
+# 多阶段构建，共两个阶段：
+#
+#   阶段一 builder（node:22-alpine）
+#     1. 仅先复制 package.json / package-lock.json，执行 npm ci 冻结安装；
+#     2. 复制完整前端源码，执行 npm run build（tsc --noEmit 类型检查 + vite build）；
+#     3. 产物位于容器内 /app/dist（即本地的 web/dist，纯静态文件）。
+#
+#   阶段二 runtime（nginx:1.28-alpine）
+#     1. 仅复制 dist 静态产物与定制 nginx.conf，不含 node_modules / 源码 / 测试；
+#     2. 以非 root 用户 nginx(uid=101) 运行，监听非特权端口 8080；
+#     3. 内建 HEALTHCHECK，使用 alpine 自带 busybox wget 探测 /healthz，无需额外安装。
+#
+# 构建上下文为 web/ 目录（注意上下文路径是 web，不是仓库根）：
+#   docker build -f web/Dockerfile.frontend \
+#     -t registry.jianlan.tech/jianlan/web:0.1.0 web
+#
+# 运行示例（前端容器不直接对外，由边缘网关 deploy/nginx 统一接入）：
+#   docker run --rm -p 8080:8080 registry.jianlan.tech/jianlan/web:0.1.0
+#
+# 层缓存要点：依赖清单（package.json + lock）复制与 npm ci 先于源码复制，
+#             业务代码频繁变更不会使昂贵的依赖安装层缓存失效。
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# 阶段一：builder
+# 固定大版本与具体补丁号 node:22.14.0-alpine3.21，严禁 latest / 22 这类浮动 tag，
+# 保证构建可复现、供应链可追溯；alpine 变体体积小，足以完成 npm 构建。
+# ----------------------------------------------------------------------------
+FROM node:22.14.0-alpine3.21 AS builder
+
+# OCI 镜像元数据，便于镜像仓库展示与合规审计。
+LABEL org.opencontainers.image.title="jianlan-gangos-web" \
+      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）前端 Web" \
+      org.opencontainers.image.vendor="健澜科技" \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.source="https://git.jianlan.tech/medical/jianlan-medical-agent"
+
+WORKDIR /app
+
+# 构建期环境：
+#   HUSKY=0       关闭 husky prepare 钩子（镜像内没有 .git，也不允许提交钩子）；
+#   CI=true       让构建工具进入严格的持续集成模式，警告不被静默忽略；
+#   NODE_ENV      Vite 仅以此区分 .env.* 文件加载，构建期仍需要 devDependencies。
+ENV HUSKY=0 \
+    CI=true \
+    NODE_ENV=production
+
+# 仅复制依赖清单（层缓存关键）。web/ 同时存在 bun.lock 与 package-lock.json，
+# 本镜像统一使用 npm ci（任务约定），严格按 package-lock.json 还原依赖树。
+COPY package.json package-lock.json ./
+
+# npm ci：依据 lock 文件全新安装（不修改 lock），失败/不一致直接报错；
+# --no-audit/--no-fund 关闭与构建无关的审计提示与资助横幅，加快构建。
+RUN npm ci --no-audit --no-fund
+
+# 依赖层就绪后再复制完整源码与构建配置（.dockerignore 已排除 node_modules/dist 等）。
+COPY . .
+
+# Vite 构建期变量（ARG 仅构建期可见，不会留在运行镜像）：
+#   前端与后端同源部署（经边缘网关 /api、/ws 反代），默认使用相对路径，
+#   这样镜像可在任意域名下直接运行；如后端独立域名，可在 docker build 时覆盖。
+ARG VITE_API_BASE_URL=/api/v1
+ARG VITE_WS_URL=/ws
+ARG VITE_APP_ENV=production
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} \
+    VITE_WS_URL=${VITE_WS_URL} \
+    VITE_APP_ENV=${VITE_APP_ENV}
+
+# 先做 TypeScript 严格类型检查（package.json 的 build 脚本内含 tsc --noEmit），
+# 再执行 vite build 产出 /app/dist；类型错误直接阻断镜像构建。
+RUN npm run build
+
+# ----------------------------------------------------------------------------
+# 阶段二：runtime
+# 固定 nginx 1.28 稳定分支的具体补丁号与 alpine 基线，禁止浮动 tag。
+# alpine 仅数 MB，自带 busybox（提供 wget，供 HEALTHCHECK 使用）。
+# ----------------------------------------------------------------------------
+FROM nginx:1.28.0-alpine3.21 AS runtime
+
+LABEL org.opencontainers.image.title="jianlan-gangos-web" \
+      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）前端 Web（运行时）" \
+      org.opencontainers.image.vendor="健澜科技" \
+      org.opencontainers.image.version="0.1.0"
+
+# 运行期环境：生产模式、中文时区（日志时间与国内运维对齐）。
+ENV NGINX_ENTRYPOINT_QUIET_LOGS=1 \
+    TZ=Asia/Shanghai
+
+# 用定制的完整 nginx.conf 覆盖官方默认配置（含 gzip/缓存/SPA/安全头/反代/JSON 日志）。
+# 该配置把 pid 与各类临时目录放到 /tmp，并监听 8080，正是为非 root 运行做的适配。
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# 仅从构建阶段复制静态产物到 nginx 默认站点目录，归属设为 nginx 用户组。
+COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
+
+# 删除官方默认站点配置（我们的 nginx.conf 是完整配置，不再 include conf.d），
+# 避免 default.conf 与本配置的 server 段冲突。
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+# 此后以非 root 用户身份运行（官方镜像内置 nginx 用户，uid/gid 固定为 101）。
+# 固定 uid 便于节点侧基于 uid 的审计与网络策略编排。
+USER 101
+
+# 仅文档化声明容器服务端口；实际发布由 Compose/K8s 决定。
+EXPOSE 8080
+
+# 健康检查：busybox wget 本机回环探测专用健康端点 /healthz：
+#   --interval=30s 每 30 秒探测；--timeout=5s 单次超时；
+#   --start-period=10s 静态站点启动极快，给 10 秒宽限即可；
+#   --retries=3    连续 3 次失败才标记 unhealthy，避免抖动误判。
+# wget 返回非 0（连接失败/非 2xx）即视为不健康；-q 安静、-O- 输出到 stdout。
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+
+# 以前台方式运行 nginx（容器 PID 1 需要进程不退出）；
+# 使用 JSON exec 形式，nginx master 直接为 PID 1，可正确接收 SIGTERM 优雅退出。
+CMD ["nginx", "-g", "daemon off;"]

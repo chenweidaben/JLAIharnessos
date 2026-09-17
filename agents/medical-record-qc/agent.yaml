@@ -1,0 +1,173 @@
+# 健澜科技杠OS - AI病历质控智能体
+# 版权所有 (c) 2026 健澜科技
+id: medical-record-qc
+name: AI病历质控智能体
+nameEn: Medical Record Quality Control
+version: 1.0.0
+category: 医疗质控
+tags:
+  - 病历质控
+  - 病案首页
+  - 核心制度
+  - 等级评审
+description: >-
+  对在院、出院病历进行批量内涵质控、病案首页质控与核心制度落实检查，自动分级缺陷、
+  生成质控报告与整改清单，支撑电子病历分级评价与医院等级评审。
+allowedRoles:
+  - doctor
+  - admin
+riskLevel: low
+tools:
+  - medical_record_quality_check
+  - medical_record_front_page_check
+  - core_system_check
+  - get_medical_record
+knowledgeBases:
+  - medical-record-standards
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.1
+systemPrompt: prompts/system.md
+entryWorkflow: qc-main
+disclaimer: 质控结果为辅助意见，缺陷认定与整改以质控科/病案室最终判定为准。
+
+workflows:
+  - meta:
+      id: qc-main
+      name: 批量病历质控主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 120000
+      workflowTimeoutMs: 600000
+    nodes:
+      - id: start
+        type: start
+        name: 开始
+        config: {}
+
+      - id: loop_records
+        type: loop
+        name: 逐份内涵质控
+        config:
+          mode: foreach
+          collection: input.recordIds
+          itemVariable: recordId
+          indexVariable: idx
+          bodyEntry: qc_one_tool
+          maxIterations: 500
+
+      # —— foreach 循环体（子路径，末端无出边） ——
+      - id: qc_one_tool
+        type: tool
+        name: 单份病历内涵质控
+        config:
+          toolName: medical_record_quality_check
+          inputMapping:
+            recordId: recordId
+      - id: qc_one_assemble
+        type: code
+        name: 汇总结论
+        config:
+          assignments:
+            recordId: recordId
+            result: nodes.qc_one_tool.output
+
+      # —— 主流程继续 ——
+      - id: core_check
+        type: tool
+        name: 核心制度落实检查
+        config:
+          toolName: core_system_check
+          inputMapping:
+            department: input.department
+            timeRange: input.timeRange
+
+      - id: front_check
+        type: tool
+        name: 病案首页质控
+        config:
+          toolName: medical_record_front_page_check
+          inputMapping:
+            frontPageData: input.frontPage
+        errorHandling:
+          continueOnError: true
+
+      - id: build_report
+        type: llm
+        name: 生成质控报告
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            请基于以下质控结果生成结构化质控报告（JSON）。
+            【逐份内涵质控】${nodes.loop_records.output.bodyOutputs}
+            【核心制度检查】${nodes.core_check.output}
+            【病案首页质控】${nodes.front_check.output}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              totalChecked: { type: number }
+              passCount: { type: number }
+              passRate: { type: number }
+              hasCritical: { type: boolean }
+              criticalIssues: { type: array, items: { type: object } }
+              commonIssues: { type: array, items: { type: string } }
+              rectification: { type: array, items: { type: object } }
+
+      - id: gate
+        type: condition
+        name: 是否存在严重缺陷
+        config:
+          mode: if-else
+          branches:
+            - name: critical
+              when: nodes.build_report.output.json.hasCritical == true
+          defaultPort: clean
+
+      - id: qc_review
+        type: human
+        name: 质控科复核
+        config:
+          title: 严重缺陷病历质控复核
+          instructions: 存在严重缺陷，请复核并确认整改责任科室与期限。
+          assigneeRoles:
+            - admin
+          formSchema:
+            confirmed: { type: boolean, required: true }
+            assigneeDept: { type: string }
+            dueDate: { type: string }
+          timeoutMs: 172800000
+
+      - id: finalize
+        type: code
+        name: 整理结论
+        config:
+          assignments:
+            status: '"completed"'
+            report: nodes.build_report.output.json
+            review: nodes.qc_review.output
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            report: nodes.build_report.output.json
+            perRecord: nodes.loop_records.output.bodyOutputs
+            review: vars.review
+
+    edges:
+      - { id: e1, source: start, target: loop_records }
+      - { id: e2, source: loop_records, target: core_check }
+      - { id: e3, source: core_check, target: front_check }
+      - { id: e4, source: front_check, target: build_report }
+      - { id: e5, source: build_report, target: gate }
+      - { id: e6, source: gate, target: qc_review, sourcePort: critical }
+      - { id: e7, source: qc_review, target: finalize }
+      - { id: e8, source: finalize, target: end }
+      - { id: e9, source: gate, target: end, sourcePort: clean }
+      # 循环体内部边
+      - { id: b1, source: qc_one_tool, target: qc_one_assemble }

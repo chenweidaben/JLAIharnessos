@@ -1,0 +1,179 @@
+# 健澜科技杠OS - 语音电子病历智能体
+# 版权所有 (c) 2026 健澜科技
+id: voice-medical-record
+name: 语音电子病历智能体
+nameEn: Voice Medical Record
+version: 1.0.0
+category: 电子病历
+tags:
+  - 语音录入
+  - ASR
+  - 病历生成
+  - 医生工作台
+description: >-
+  医生通过自然语言口述即可生成结构化病历。ASR 转写后进行医疗术语规范化，
+  对用药剂量、频次等安全关键信息强制标注并由医生逐项核对，再生成病历、质控归档。
+allowedRoles:
+  - doctor
+riskLevel: medium
+tools:
+  - transcribe_voice
+  - medical_record_quality_check
+  - sync_to_his
+knowledgeBases:
+  - clinical-guidelines
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: voice-record-main
+disclaimer: >-
+  语音转写与病历内容必须经医生核对（尤其用药剂量与频次）并电子签名后生效，
+  AI 不对语音识别误差导致的内容错误承担责任。
+
+workflows:
+  - meta:
+      id: voice-record-main
+      name: 语音病历主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - id: start
+        type: start
+        name: 开始
+        config: {}
+
+      - id: transcribe
+        type: tool
+        name: 语音转写与规范化
+        config:
+          toolName: transcribe_voice
+          inputMapping:
+            audioRef: input.audioRef
+            audioFormat: input.audioFormat
+            speakerDiarization: true
+            hotwords: input.hotwords
+            context:
+              patientId: input.patientId
+              department: input.department
+
+      - id: retrieve
+        type: rag
+        name: 检索临床知识
+        config:
+          knowledgeBases:
+            - clinical-guidelines
+          query: nodes.transcribe.output.text
+          topK: 4
+          scoreThreshold: 0.3
+          strategy: hybrid
+          outputVariable: evidence
+
+      - id: generate
+        type: llm
+        name: 生成结构化病历
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            请根据医生口述转写生成结构化病历（JSON）。
+            【口述转写（书面规范化后）】${nodes.transcribe.output.text}
+            【用药剂量/频次提及（必须原样保留并提示核对，不得自行改数）】${nodes.transcribe.output.medicationMentions}
+            【术语纠正】${nodes.transcribe.output.corrections}
+            【权威参考】${nodes.retrieve.output.context}
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              chiefComplaint: { type: string }
+              presentIllness: { type: string }
+              preliminaryDiagnosis: { type: array, items: { type: string } }
+              medications: { type: array, items: { type: object } }
+              needsVerification: { type: array, items: { type: string } }
+
+      - id: doctor_verify
+        type: human
+        name: 医生核对与电子签名
+        config:
+          title: 语音病历核对（重点核对用药剂量/频次）
+          instructions: >-
+            系统已从口述中识别出用药剂量/频次等关键信息，请对照原始录音逐项核对，
+            确认无误并补充修改后电子签名。低置信片段与剂量提示见病历草稿。
+          assigneeRoles:
+            - doctor
+          formSchema:
+            approved: { type: boolean, required: true }
+            editedRecord: { type: string }
+          timeoutMs: 86400000
+
+      - id: quality_check
+        type: tool
+        name: 病历质控
+        config:
+          toolName: medical_record_quality_check
+          inputMapping:
+            recordContent: nodes.doctor_verify.output.formData.editedRecord
+
+      - id: gate
+        type: condition
+        name: 质控是否通过
+        config:
+          mode: if-else
+          branches:
+            - name: pass
+              when: nodes.quality_check.output.passed == true
+          defaultPort: revise
+
+      - id: archive
+        type: tool
+        name: 归档至HIS
+        config:
+          toolName: sync_to_his
+          inputMapping:
+            patientId: input.patientId
+            record: nodes.doctor_verify.output.formData.editedRecord
+            source: '"voice-medical-record"'
+
+      - id: done
+        type: code
+        name: 完成
+        config:
+          assignments:
+            status: '"completed"'
+            recordId: nodes.archive.output.id
+
+      - id: revise
+        type: code
+        name: 退回
+        config:
+          assignments:
+            status: '"needs_revision"'
+            issues: nodes.quality_check.output.issues
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            recordId: vars.recordId
+            issues: vars.issues
+            transcript: nodes.transcribe.output.text
+            medicationMentions: nodes.transcribe.output.medicationMentions
+            draft: nodes.generate.output.json
+
+    edges:
+      - { id: e1, source: start, target: transcribe }
+      - { id: e2, source: transcribe, target: retrieve }
+      - { id: e3, source: retrieve, target: generate }
+      - { id: e4, source: generate, target: doctor_verify }
+      - { id: e5, source: doctor_verify, target: quality_check }
+      - { id: e6, source: quality_check, target: gate }
+      - { id: e7, source: gate, target: archive, sourcePort: pass }
+      - { id: e8, source: archive, target: done }
+      - { id: e9, source: done, target: end }
+      - { id: e10, source: gate, target: revise, sourcePort: revise }
+      - { id: e11, source: revise, target: end }

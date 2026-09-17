@@ -1,0 +1,168 @@
+# 健澜科技杠OS - 智能导诊预问诊智能体
+# 版权所有 (c) 2026 健澜科技
+id: triage-preconsult
+name: 智能导诊预问诊智能体
+nameEn: Triage & Pre-consultation
+version: 1.0.0
+category: 诊前服务
+tags:
+  - 智能导诊
+  - 预问诊
+  - 分诊
+  - 患者服务
+description: >-
+  患者就诊前通过自然语言对话完成预问诊，结构化采集主诉、现病史与伴随症状，智能推荐科室与
+  分诊级别，识别急危重并引导急诊/绿色通道；生成预问诊摘要供接诊医生快速了解病情。
+allowedRoles:
+  - patient
+  - nurse
+  - doctor
+riskLevel: low
+tools:
+  - appointment_registration
+  - get_patient_detail
+knowledgeBases:
+  - triage-departments
+  - clinical-guidelines
+model:
+  provider: anthropic
+  model: sonnet
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: triage-main
+disclaimer: 导诊推荐仅供参考，急危重患者请立即前往急诊或拨打急救电话。
+
+workflows:
+  - meta:
+      id: triage-main
+      name: 导诊预问诊主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    nodes:
+      - { id: start, type: start, name: 开始, config: {} }
+
+      - id: collect
+        type: llm
+        name: 结构化预问诊采集
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            患者自述：${input.complaint}
+            年龄/性别：${input.demographics}
+            请结构化采集并判断，信息不足时列出需要追问的问题。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              chiefComplaint: { type: string }
+              presentIllness: { type: string }
+              associatedSymptoms: { type: array, items: { type: string } }
+              duration: { type: string }
+              suggestedDepartments: { type: array, items: { type: string } }
+              triageLevel: { type: string }
+              isEmergency: { type: boolean }
+              redFlags: { type: array, items: { type: string } }
+              followUpQuestions: { type: array, items: { type: string } }
+
+      - id: dept_kb
+        type: rag
+        name: 科室-症状映射检索
+        config:
+          knowledgeBases: [triage-departments, clinical-guidelines]
+          query: nodes.collect.output.json.chiefComplaint
+          topK: 5
+          scoreThreshold: 0.2
+          strategy: hybrid
+
+      - id: refine
+        type: llm
+        name: 确定科室与分诊级别
+        config:
+          model: sonnet
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            初步采集：${nodes.collect.output.json}
+            科室映射依据：${nodes.dept_kb.output.context}
+            请确定唯一首选科室、备选科室、分诊级别与是否急诊。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              primaryDepartment: { type: string }
+              alternativeDepartments: { type: array, items: { type: string } }
+              triageLevel: { type: string, enum: [急诊, 加急, 普通] }
+              isEmergency: { type: boolean }
+              reason: { type: string }
+              preConsultSummary: { type: string }
+
+      - id: emergency_gate
+        type: condition
+        name: 是否急诊
+        config:
+          mode: if-else
+          branches:
+            - { name: emergency, when: nodes.refine.output.json.isEmergency == true }
+          defaultPort: routine
+
+      - id: emergency_route
+        type: human
+        name: 导诊护士急诊确认
+        config:
+          title: 检出急危重，请导诊护士引导急诊/绿色通道
+          instructions: 患者存在急危重信号，请立即引导急诊并确认。
+          assigneeRoles: [nurse]
+          formSchema:
+            greenChannel: { type: boolean }
+            handledBy: { type: string }
+          timeoutMs: 300000
+
+      - id: book_emergency
+        type: code
+        config:
+          assignments:
+            route: '"emergency"'
+            greenChannel: nodes.emergency_route.output.formData.greenChannel
+
+      - id: book_routine
+        type: tool
+        name: 预约挂号
+        config:
+          toolName: appointment_registration
+          inputMapping:
+            patientId: input.patientId
+            department: nodes.refine.output.json.primaryDepartment
+            reason: nodes.refine.output.json.preConsultSummary
+        errorHandling: { continueOnError: true }
+
+      - id: book_routine_done
+        type: code
+        config:
+          assignments:
+            route: '"routine"'
+            appointment: nodes.book_routine.output
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            route: vars.route
+            greenChannel: vars.greenChannel
+            appointment: vars.appointment
+            triage: nodes.refine.output.json
+            intake: nodes.collect.output.json
+
+    edges:
+      - { id: e1, source: start, target: collect }
+      - { id: e2, source: collect, target: dept_kb }
+      - { id: e3, source: dept_kb, target: refine }
+      - { id: e4, source: refine, target: emergency_gate }
+      - { id: e5, source: emergency_gate, target: emergency_route, sourcePort: emergency }
+      - { id: e6, source: emergency_route, target: book_emergency }
+      - { id: e7, source: book_emergency, target: end }
+      - { id: e8, source: emergency_gate, target: book_routine, sourcePort: routine }
+      - { id: e9, source: book_routine, target: book_routine_done }
+      - { id: e10, source: book_routine_done, target: end }

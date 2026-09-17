@@ -1,0 +1,18 @@
+健澜科技杠OS / Jianlan Gang-OS
+Copyright 2026 杭州健澜科技有限公司 (Hangzhou Jianlan Technology Co., Ltd.)
+
+本产品基于 Apache License 2.0 开源，许可全文见 LICENSE 文件。
+
+本产品在设计上参考了开源 AI 编程助手的 Agent 引擎架构思想，并使用了大量开源
+第三方组件；这些组件的版权归各自权利人所有，许可证清单与全文索引见
+THIRD_PARTY_LICENSES.md。
+
+本产品包含的示例医学知识（scripts/knowledge/seed-data/）仅为教学、演示与冷启动
+用途的精炼参考，可能存在滞后或不全，不构成诊疗依据；外部权威医学知识库的版权与
+许可独立于本产品，使用前请阅读 DATA_LICENSES.md。
+
+本产品的所有示例患者均为虚构数据。任何输出均为临床辅助建议，不能替代执业医师的
+诊断与决策。
+
+商标：“健澜科技”及相关标识为杭州健澜科技有限公司的商标；第三方商标归其各自
+权利人所有。

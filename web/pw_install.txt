@@ -1,0 +1,2 @@
+﻿Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243)[2m from https://cdn.playwright.dev/builds/cft/153.0.8010.12/win64/chrome-win64.zip[22m
+|                                                                                |   0% of 195.6 MiB

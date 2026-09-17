@@ -1,0 +1,39 @@
+# 健澜科技数智医院智能体 - Git 属性
+# Copyright (c) 2026 健澜科技. All rights reserved.
+
+# 统一行尾：跨平台（Windows / macOS / Linux）自动规范化为 LF
+* text=auto eol=lf
+
+# 显式声明文本文件
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.sh      text eol=lf
+*.ps1     text eol=crlf
+*.html    text eol=lf
+*.css     text eol=lf
+
+# Windows 批处理 / 脚本保留 CRLF
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+# 二进制文件（不做行尾转换，不做 diff）
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.pdf     binary
+*.zip     binary
+*.tar     binary
+*.gz      binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+*.eot     binary
+bun.lockb binary
