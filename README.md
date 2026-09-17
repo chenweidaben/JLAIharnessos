@@ -1,9 +1,9 @@
 <div align="center">
 
-# 健澜科技杠OS · Jianlan Gang-OS
+# 健澜科技杠OS · JLAIharnessos
 
-### 开源 · 免费 · 工业级的医疗智能体操作系统
-#### 让医疗 AI 更简单、更落地 —— 做「医疗 AI 时代的安卓」
+### 杭州健澜科技 · 新一代数智医院工业级智能体操作系统
+#### 开源 · 免费 · 工业级的医疗智能体操作系统 —— 让医疗 AI 更简单、更落地，做「医疗 AI 时代的安卓」
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
@@ -315,6 +315,35 @@ cd web && npm run build # 前端生产构建
 - 请遵守 [贡献者公约](CODE_OF_CONDUCT.md)。
 
 > 健澜科技希望与全国医院信息科、医疗 IT 厂商、高校与独立开发者一道，把这个免费开源的工业级医疗智能体操作系统，打磨成**医疗 AI 的安卓系统**。
+
+---
+
+## 贡献者墙 · Contributors Wall
+
+> 每一行代码、每一条规则、每一份文档，都在让医疗 AI 离临床更近一步。感谢所有为 JLAIharnessos 贡献力量的人。
+
+### 核心团队 · Core Team
+
+| 角色 | 团队 |
+|------|------|
+| 产品与架构 | 健澜科技 · 医疗 AI 产品组 |
+| 智能体编排内核 | 健澜科技 · 引擎研发组 |
+| 医疗工具与 CDS | 健澜科技 · 临床智能组 |
+| 知识中台与集成 | 健澜科技 · 数据平台组 |
+| 安全合规与运维 | 健澜科技 · 基础架构组 |
+| Web 工作台与低代码 | 健澜科技 · 前端体验组 |
+
+### 社区贡献者 · Community Contributors
+
+<!-- 贡献者头像将由 GitHub Actions 自动更新；手动添加请按以下格式 -->
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+
+| <a href="https://github.com/chenweidaben"><img src="https://github.com/chenweidaben.png" width="80" height="80" alt="chenweidaben"/></a><br/><sub><b>chenweidaben</b></sub><br/><sub>项目发起人 · 架构 · 医疗 AI</sub> |
+|:---:|
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+> **成为贡献者**：提交一个 PR、修复一个 Bug、补充一条 CDS 规则、写一份智能体模板、翻译一段文档——你的名字将永远留在这里。详见 [贡献指南](CONTRIBUTING.md)。
 
 ---
 

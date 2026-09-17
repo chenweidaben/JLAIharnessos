@@ -1,9 +1,9 @@
 <div align="center">
 
-# Jianlan Gang-OS
+# Jianlan Gang-OS · JLAIharnessos
 
-### The open-source, free, industrial-grade **Agent Operating System for Healthcare**
-#### Making medical AI simpler and more deployable — the "Android of Healthcare AI"
+### Hangzhou Jianlan Technology · Next-Generation Industrial-Grade Agent OS for Digital Hospitals
+#### The open-source, free, industrial-grade **Agent Operating System for Healthcare** — Making medical AI simpler and more deployable, the "Android of Healthcare AI"
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
@@ -204,6 +204,34 @@ We strictly separate **open-source code** from **data licensing**: credentialed 
 Read [CONTRIBUTING.md](CONTRIBUTING.md); ensure `bun run typecheck && bun test` passes and add tests. Report vulnerabilities privately per [SECURITY.md](SECURITY.md), and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Together, let's build the **Android of healthcare AI**.
+
+---
+
+## Contributors Wall
+
+> Every line of code, every rule, every document brings medical AI one step closer to the clinic. Thank you to everyone who contributes to JLAIharnessos.
+
+### Core Team
+
+| Role | Team |
+|------|------|
+| Product & Architecture | Jianlan Tech · Medical AI Product |
+| Agent Orchestration Kernel | Jianlan Tech · Engine R&D |
+| Medical Tools & CDS | Jianlan Tech · Clinical Intelligence |
+| Knowledge Platform & Integration | Jianlan Tech · Data Platform |
+| Security, Compliance & Ops | Jianlan Tech · Infrastructure |
+| Web Console & Low-Code | Jianlan Tech · Frontend Experience |
+
+### Community Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START -->
+
+| <a href="https://github.com/chenweidaben"><img src="https://github.com/chenweidaben.png" width="80" height="80" alt="chenweidaben"/></a><br/><sub><b>chenweidaben</b></sub><br/><sub>Founder · Architecture · Medical AI</sub> |
+|:---:|
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+> **Become a contributor**: submit a PR, fix a bug, add a CDS rule, write an agent template, translate a document — your name will be here forever. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
