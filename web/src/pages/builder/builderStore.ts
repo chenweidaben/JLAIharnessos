@@ -37,6 +37,8 @@ interface BuilderState {
   edges: BuilderEdge[];
   meta: AgentMeta;
   selectedNodeId: string | null;
+  /** 节点库点选的待放置类型：选中后双击画布空白处即可放置（拖拽之外的第二条建模路径） */
+  paletteType: NodeType | null;
   validation: ValidationResult;
   dirty: boolean;
   past: Snapshot[];
@@ -51,6 +53,7 @@ interface BuilderState {
   removeNode: (id: string) => void;
   duplicateNode: (id: string) => void;
   selectNode: (id: string | null) => void;
+  setPaletteType: (type: NodeType | null) => void;
   updateMeta: (patch: Partial<AgentMeta>) => void;
   validate: () => ValidationResult;
   loadPackage: (pkg: AgentPackageJson) => void;
@@ -101,6 +104,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
     edges: initial.edges,
     meta: defaultAgentMeta(),
     selectedNodeId: null,
+    paletteType: null,
     validation: { valid: false, issues: [] },
     dirty: false,
     past: [],
@@ -204,6 +208,8 @@ export const useBuilderStore = create<BuilderState>((set, get) => {
     },
 
     selectNode: (id) => set({ selectedNodeId: id }),
+
+    setPaletteType: (type) => set({ paletteType: type }),
 
     updateMeta: (patch) => {
       set((s) => {

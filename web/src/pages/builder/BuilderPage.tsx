@@ -115,6 +115,34 @@ function Canvas() {
     [screenToFlowPosition, addNode],
   );
 
+  // 双击画布空白处放置节点：类型取节点库点选的 paletteType，未选时默认添加「大模型」。
+  // 用 wrapper 上的原生 capture 监听（早于 React Flow pane 的双击缩放，且不受其内部
+  // stopPropagation 影响）；命中空白底板后阻止默认缩放，改为放置节点。
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const handler = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      // 节点位于与 pane 平级的 viewport 层，控件/小地图在 panel 层；
+      // target 落在 pane 且不属于这些元素，即代表双击的是空白底板。
+      if (!target.closest('.react-flow__pane')) return;
+      if (target.closest('.react-flow__node, .react-flow__controls, .react-flow__minimap, .react-flow__panel')) {
+        return;
+      }
+      event.stopPropagation();
+      event.preventDefault();
+      const chosen = useBuilderStore.getState().paletteType ?? 'llm';
+      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      addNode(chosen, position);
+      if (!useBuilderStore.getState().paletteType) {
+        message.info('未在左侧点选节点类型，已默认添加「大模型」节点');
+      }
+    };
+    el.addEventListener('dblclick', handler, true);
+    return () => el.removeEventListener('dblclick', handler, true);
+  }, [screenToFlowPosition, addNode]);
+
   const errorCount = validation.issues.filter((i) => i.severity === 'error').length;
   const warnCount = validation.issues.filter((i) => i.severity === 'warning').length;
 
@@ -194,7 +222,12 @@ function Canvas() {
         <div style={{ width: 232, background: '#fff', borderRight: '1px solid #e8edf3' }}>
           <NodePalette />
         </div>
-        <div ref={wrapperRef} style={{ flex: 1, position: 'relative' }} onDrop={onDrop} onDragOver={onDragOver}>
+        <div
+          ref={wrapperRef}
+          style={{ flex: 1, position: 'relative' }}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+        >
           <ReactFlow
             nodes={nodes}
             edges={edges}
