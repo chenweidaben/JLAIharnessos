@@ -153,6 +153,13 @@ export const useOperationStore = create<OperationState>()((set) => ({
 }));
 
 // ============ Selectors ============
+/**
+ * WARNING: returns a NEW object on every call. Never use it inline as
+ * `useStore(s => selectBedStats(s))` -- useSyncExternalStore requires a stable
+ * snapshot, otherwise it triggers an infinite re-render loop (Maximum update depth).
+ * Subscribe to the stable s.overview and compute inside useMemo, or wrap with
+ * zustand's useShallow.
+ */
 export const selectBedStats = (s: OperationState) => {
   const beds = s.overview.bedUsage.beds;
   return {

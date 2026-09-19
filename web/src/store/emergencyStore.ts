@@ -191,6 +191,13 @@ export const useEmergencyStore = create<EmergencyStore>((set, get) => ({
 }));
 
 /** 选择器：候诊中（待分诊+已分诊待诊）队列 */
+/**
+ * WARNING: returns a NEW array on every call. Never use it inline as
+ * `useStore(s => selectWaitingQueue(s))` -- useSyncExternalStore requires a stable
+ * snapshot, otherwise it triggers an infinite re-render loop (Maximum update depth).
+ * Subscribe to the stable s.triageQueue and filter inside useMemo, or wrap the
+ * selector with zustand's useShallow.
+ */
 export const selectWaitingQueue = (s: EmergencyStore): TriagePatient[] =>
   s.triageQueue.filter((p) => p.status === 'waiting_triage' || p.status === 'triaged');
 
