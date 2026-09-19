@@ -4,11 +4,11 @@
  *
  * 查房详情 - /ward/round/:patientId
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Descriptions, Layout, Result, Spin, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, HeartOutlined } from '@ant-design/icons';
-import { useWardStore, selectAssessmentsByPatient, selectOrdersByPatient } from '@/store/wardStore';
+import { useWardStore } from '@/store/wardStore';
 import { orderTemplates } from '@/mock/wardMock';
 import type { RoundRecord as RoundRecordType } from '@/types/ward';
 import RoundRecord from '@/components/ward/RoundRecord';
@@ -38,8 +38,19 @@ export default function RoundDetail() {
   const [tab, setTab] = useState('record');
 
   const roundPatient = roundList.find((r) => r.patient.id === patientId) ?? null;
-  const orders = useWardStore((s) => selectOrdersByPatient(s, patientId));
-  const assessments = useWardStore((s) => selectAssessmentsByPatient(s, patientId));
+  // 订阅 store 中的稳定数组引用，再用 useMemo 过滤。
+  // 不能直接 useStore(s => s.x.filter(...))：filter 每次返回新数组，
+  // 在 useSyncExternalStore 下 snapshot 引用不稳定会触发无限重渲染。
+  const allOrders = useWardStore((s) => s.allOrders);
+  const allAssessments = useWardStore((s) => s.assessments);
+  const orders = useMemo(
+    () => allOrders.filter((o) => o.patientId === patientId),
+    [allOrders, patientId],
+  );
+  const assessments = useMemo(
+    () => allAssessments.filter((a) => a.patientId === patientId),
+    [allAssessments, patientId],
+  );
 
   useEffect(() => {
     void fetchRoundList();
