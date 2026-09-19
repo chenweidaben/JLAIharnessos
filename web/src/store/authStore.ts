@@ -20,8 +20,9 @@ import type {
   LoginResponse,
   MenuItem,
   PersistedAuthPayload,
+  PersistedIdentity,
 } from '@/types/auth';
-import { currentMenus, currentUser, mockAccountLogin, LoginError } from '@/mock/authMock';
+import { currentMenus, mockAccountLogin, LoginError } from '@/mock/authMock';
 
 const STORE_KEY = 'auth_session_v2';
 const DEFAULT_EXPIRE = 2 * 60 * 60 * 1000; // 2h
@@ -132,12 +133,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const refreshExpiresAt = now + (req.rememberMe ? REMEMBER_EXPIRE : ttl);
       const accessToken = `jt-${now}-${Math.random().toString(36).slice(2)}`;
       const refreshToken = `jr-${now}-${Math.random().toString(36).slice(2)}`;
+      // 随 Token 持久化登录者本人身份快照，刷新后据其恢复，杜绝越权回退超管
+      const identity: PersistedIdentity = {
+        user: res.user,
+        roles: res.user.roleCodes,
+        permissions: res.permissions,
+      };
       persist({
         accessToken,
         refreshToken,
         accessExpiresAt,
         refreshExpiresAt,
         rememberMe: req.rememberMe ?? false,
+        identity,
       });
       // 桥接既有 useUserStore / tokenStorage，使旧路由守卫与顶栏用户菜单同步
       tokenStorage.set({ accessToken, refreshToken, expiresIn: Math.floor(ttl / 1000) });
@@ -210,12 +218,15 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     const now = Date.now();
     const accessToken = `jt-${now}-${Math.random().toString(36).slice(2)}`;
     set({ accessToken, accessExpiresAt: now + DEFAULT_EXPIRE });
+    const cur = get();
     persist({
       accessToken,
       refreshToken,
       accessExpiresAt: now + DEFAULT_EXPIRE,
       refreshExpiresAt,
       rememberMe: true,
+      // 刷新 Token 时保留原登录者身份，避免覆盖为无身份会话
+      identity: cur.user ? { user: cur.user, roles: cur.roles, permissions: cur.permissions } : undefined,
     });
     return true;
   },
@@ -224,14 +235,11 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   fetchUserInfo: async () => {
     const { user } = get();
     if (user) return user;
+    // 安全：无会话用户时不得静默回填内置超管身份，调用方必须先走登录流程
     await new Promise((r) => setTimeout(r, 120));
-    set({
-      user: currentUser,
-      permissions: currentUser.permissions,
-      roles: currentUser.roleCodes,
-      menus: currentMenus,
-    });
-    return currentUser;
+    const fresh = get().user;
+    if (fresh) return fresh;
+    throw new Error('登录已失效，请重新登录');
   },
 
   updateProfile: (patch) => {
@@ -266,6 +274,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       tokenStorage.clear();
       return false;
     }
+    // 安全红线：必须存在登录者本人身份快照。缺失（旧会话或被篡改）时严禁回退为内置超管，
+    // 直接清除会话并要求重新登录，防止低权限账号刷新页面后越权获得管理员权限。
+    const identity = saved.identity;
+    if (
+      !identity ||
+      !identity.user ||
+      !Array.isArray(identity.roles) ||
+      !Array.isArray(identity.permissions)
+    ) {
+      persist(null);
+      tokenStorage.clear();
+      return false;
+    }
     // access token 可能已过期但 refresh 仍有效：标记为已认证，由路由守卫按需刷新
     tokenStorage.set({
       accessToken: saved.accessToken,
@@ -273,16 +294,16 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       expiresIn: Math.max(0, Math.floor((saved.refreshExpiresAt - Date.now()) / 1000)),
     });
     useUserStore.getState().setUser({
-      id: currentUser.id,
-      username: currentUser.username,
-      realName: currentUser.realName,
-      gender: currentUser.gender,
-      avatar: currentUser.avatar,
-      deptCode: currentUser.deptCode,
-      deptName: currentUser.deptName,
-      title: currentUser.title,
-      roles: currentUser.roleCodes as ('admin' | 'doctor' | 'nurse' | 'viewer')[],
-      permissions: currentUser.permissions,
+      id: identity.user.id,
+      username: identity.user.username,
+      realName: identity.user.realName,
+      gender: identity.user.gender,
+      avatar: identity.user.avatar,
+      deptCode: identity.user.deptCode,
+      deptName: identity.user.deptName,
+      title: identity.user.title,
+      roles: identity.roles as ('admin' | 'doctor' | 'nurse' | 'viewer')[],
+      permissions: identity.permissions,
     });
     set({
       accessToken: saved.accessToken,
@@ -290,9 +311,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       accessExpiresAt: saved.accessExpiresAt,
       refreshExpiresAt: saved.refreshExpiresAt,
       isAuthenticated: isTokenValid(saved.accessExpiresAt) || isTokenValid(saved.refreshExpiresAt),
-      user: currentUser,
-      permissions: currentUser.permissions,
-      roles: currentUser.roleCodes,
+      user: identity.user,
+      permissions: identity.permissions,
+      roles: identity.roles,
       menus: currentMenus,
     });
     return true;

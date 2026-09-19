@@ -125,6 +125,17 @@ export interface RefreshToken {
   expiresAt: number;
 }
 
+/**
+ * 持久化到本地的身份快照。
+ * 医疗合规：刷新页面必须恢复“登录者本人”的角色与权限，严禁回退为内置超管，
+ * 否则任何低权限账号刷新后即越权。故随 Token 一并持久化身份快照，恢复时以其为准。
+ */
+export interface PersistedIdentity {
+  user: AuthUser;
+  roles: string[];
+  permissions: string[];
+}
+
 /** 持久化到本地的加密载荷 */
 export interface PersistedAuthPayload {
   accessToken: string;
@@ -132,6 +143,8 @@ export interface PersistedAuthPayload {
   accessExpiresAt: number;
   refreshExpiresAt: number;
   rememberMe: boolean;
+  /** 登录者身份快照；缺失时视为不可信旧会话，恢复流程应要求重新登录（不得回退超管） */
+  identity?: PersistedIdentity;
 }
 
 export interface LoginRequest {
