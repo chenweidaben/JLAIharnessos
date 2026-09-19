@@ -10,6 +10,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { stringify as stringifyYaml } from 'yaml';
 import { z } from 'zod';
 
 import { requireRole } from '../middleware/auth';
@@ -94,6 +95,16 @@ const manifestInput = z.object({
   content: z.string().optional(),
 });
 
+/**
+ * 把技能清单 + 正文序列化为完整 SKILL.md 全文（YAML frontmatter + Markdown 正文）。
+ * 工作室「所见即所改、所改即可校验」：GET 返回的全文必须能被 /validate 直接解析通过，
+ * 不能只回传部分 frontmatter 字段（否则 roles 等必填项缺失会导致内置技能自检失败）。
+ */
+function skillToMarkdown(manifest: SkillManifest, body: string): string {
+  const fm = stringifyYaml(manifest, { lineWidth: -1 }).trimEnd();
+  return `---\n${fm}\n---\n\n${body ?? ''}`;
+}
+
 // ============================================================================
 // 路由
 // ============================================================================
@@ -120,7 +131,14 @@ async function getSkill(c: Ctx): Promise<Response> {
   if (!skill) {
     return json(fail(ErrorCode.NOT_FOUND, `技能不存在：${c.params.id}`, c.traceId), 404);
   }
-  return json(ok({ ...skill.manifest, body: skill.body, filePath: skill.filePath }));
+  // body 返回完整 SKILL.md 全文（含完整 frontmatter），保证工作室打开即可通过校验
+  return json(
+    ok({
+      ...skill.manifest,
+      body: skillToMarkdown(skill.manifest, skill.body),
+      filePath: skill.filePath,
+    }),
+  );
 }
 
 async function validateSkill(c: Ctx): Promise<Response> {

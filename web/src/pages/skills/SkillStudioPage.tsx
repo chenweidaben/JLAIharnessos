@@ -59,7 +59,17 @@ export default function SkillStudioPage() {
     setRunResult('');
     setValid(null);
     get<{ body: string }>(`/skills/${id}`)
-      .then((d) => setContent(d.body ? `---\n${toFrontmatter(d)}\n---\n\n${d.body}` : ''))
+      .then((d) =>
+        // 后端返回完整 SKILL.md 全文（以 --- 开头）时直接使用，保证打开即可通过校验；
+        // 仅在旧后端只回正文时，才用 toFrontmatter 在前端兜底拼装。
+        setContent(
+          d.body
+            ? d.body.startsWith('---')
+              ? d.body
+              : `---\n${toFrontmatter(d)}\n---\n\n${d.body}`
+            : '',
+        ),
+      )
       .catch(() => setContent(''));
   };
 
@@ -123,7 +133,7 @@ export default function SkillStudioPage() {
     >
       <Row gutter={16}>
         <Col xs={24} md={8}>
-          <Card size="small" title="技能列表">
+          <Card size="small" title="技能列表" className="skill-studio-list">
             <List
               size="small"
               dataSource={list}
