@@ -32,7 +32,7 @@ useAuthStore.getState().restoreSession();
 createRoot(container).render(
   <StrictMode>
     <ConfigProvider locale={zhCN} theme={jlTheme}>
-      <AntdApp>
+      <AntdApp notification={{ maxCount: 5, placement: 'topRight' }}>
         <BrowserRouter>
           <App />
         </BrowserRouter>

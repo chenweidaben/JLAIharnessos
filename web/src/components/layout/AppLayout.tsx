@@ -9,6 +9,7 @@ import { Outlet } from 'react-router-dom';
 
 import SideMenu from './SideMenu';
 import TopHeader from './TopHeader';
+import RealtimeAlertBridge from './RealtimeAlertBridge';
 import OfflineIndicator from '@/components/common/OfflineIndicator';
 import { useAppStore } from '@/store/appStore';
 
@@ -45,6 +46,8 @@ export default function AppLayout() {
         <Header style={{ padding: 0, background: '#fff', height: 56, lineHeight: 'normal' }}>
           <TopHeader />
         </Header>
+        {/* 实时危急值告警：WS 推送 → 通知中心 + 强提醒 */}
+        <RealtimeAlertBridge />
         <Content
           style={{
             margin: 16,

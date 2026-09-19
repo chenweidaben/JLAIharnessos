@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store/appStore';
 import { useUserStore } from '@/store/userStore';
 import { useAuthStore } from '@/store/authStore';
+import { useDashboardStore, selectUnreadCount } from '@/store/dashboardStore';
 import { logoutApi } from '@/services/api/auth';
 import { clickableProps } from '@/utils/a11y';
 
@@ -29,6 +30,7 @@ export default function TopHeader() {
   const navigate = useNavigate();
   const { collapsed, toggleCollapsed, theme, setTheme } = useAppStore();
   const { user } = useUserStore();
+  const unreadCount = useDashboardStore(selectUnreadCount);
 
   const handleLogout = async () => {
     await logoutApi();
@@ -70,8 +72,11 @@ export default function TopHeader() {
           allowClear
         />
         <Tooltip title="通知中心">
-          <Badge count={3} size="small">
-            <BellOutlined className="cursor-pointer text-base text-ink-secondary" />
+          <Badge count={unreadCount} size="small">
+            <BellOutlined
+              className="cursor-pointer text-base text-ink-secondary"
+              {...clickableProps(() => navigate('/alerts'))}
+            />
           </Badge>
         </Tooltip>
         <Tooltip title="全屏">

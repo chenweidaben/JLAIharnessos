@@ -24,6 +24,8 @@ interface DashboardState {
   markTodoIgnored: (id: string) => void;
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
+  /** 接收 WebSocket 实时推送的通知（危急值/药物预警等），按 id 去重后插入头部 */
+  addNotification: (n: DashboardData['notifications'][number]) => void;
   resetPushCount: () => void;
 }
 
@@ -98,6 +100,18 @@ export const useDashboardStore = create<DashboardState>()((set) => ({
         notifications: state.data.notifications.map((n) => ({ ...n, read: true })),
       },
     }));
+  },
+
+  addNotification: (n) => {
+    set((state) => {
+      // 按 id 去重，避免重连/重复推送产生重复条目
+      if (state.data.notifications.some((x) => x.id === n.id)) return state;
+      const next = [n, ...state.data.notifications].slice(0, 100);
+      return {
+        pushCount: state.pushCount + 1,
+        data: { ...state.data, notifications: next },
+      };
+    });
   },
 
   resetPushCount: () => set({ pushCount: 0 }),

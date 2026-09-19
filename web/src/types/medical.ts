@@ -70,6 +70,8 @@ export interface Alert {
   title: string;
   content: string;
   patientId: ID;
+  /** patient display name (may be masked), from realtime push */
+  patientName?: string;
   createdAt: string;
   acknowledged: boolean;
 }

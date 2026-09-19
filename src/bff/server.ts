@@ -81,7 +81,7 @@ const compiled: Compiled[] = allRoutes.map((def) => {
 const chatClients = new Set<Bun.ServerWebSocket<unknown>>();
 
 function broadcast(event: string, payload: unknown): void {
-  const frame = JSON.stringify({ event, ts: Date.now(), payload });
+  const frame = JSON.stringify({ event, timestamp: Date.now(), payload });
   for (const ws of chatClients) {
     try {
       ws.send(frame);
@@ -231,40 +231,58 @@ const server = Bun.serve({
       metrics.wsConnections.inc();
     },
     message(ws: Bun.ServerWebSocket<unknown>, raw: string | Buffer) {
-      let parsed: { action?: string; conversationId?: string } = {};
+      let parsed: {
+        event?: string;
+        action?: string;
+        conversationId?: string;
+        payload?: { conversationId?: string };
+      } = {};
       try {
-        parsed = JSON.parse(String(raw)) as { action?: string; conversationId?: string };
+        parsed = JSON.parse(String(raw)) as typeof parsed;
       } catch {
         /* ignore */
       }
-      if (parsed.action === 'start_stream') {
-        // 模拟流式增量推送
-        const conv = parsed.conversationId ?? 'demo';
-        const parts = ['正在调阅数据……', '已获取检验结果。', '综合判断：', '建议维持当前方案。'];
+      // 兼容前端事件帧（event）与早期 action 帧；会话 id 可能在顶层或 payload 内
+      const kind = parsed.event ?? parsed.action;
+      const conv = parsed.conversationId ?? parsed.payload?.conversationId ?? 'demo';
+
+      if (kind === 'heartbeat' || kind === 'ping') {
+        ws.send(
+          JSON.stringify({ event: 'heartbeat', timestamp: Date.now(), payload: { ok: true } }),
+        );
+        return;
+      }
+
+      if (kind === 'agent:start' || kind === 'start_stream') {
+        // 流式增量推送（演示为确定性文本；生产由 MedicalAgentLoop + LLM 驱动）
+        const messageId = `msg_${Date.now()}`;
+        const parts = [
+          '正在调阅患者数据……',
+          '已获取最新检验与医嘱。',
+          '综合判断：',
+          '建议结合临床评估，必要时按危急值流程处置。',
+        ];
         parts.forEach((delta, i) => {
           setTimeout(() => {
+            const done = i === parts.length - 1;
             ws.send(
               JSON.stringify({
-                event: 'chat.stream',
-                ts: Date.now(),
-                payload: {
-                  type:
-                    i === 0
-                      ? 'message_start'
-                      : i === parts.length - 1
-                        ? 'message_end'
-                        : 'content_delta',
-                  conversationId: conv,
-                  delta,
-                },
+                event: 'agent:delta',
+                timestamp: Date.now(),
+                payload: { conversationId: conv, messageId, delta, done },
               }),
             );
+            if (done) {
+              ws.send(
+                JSON.stringify({
+                  event: 'agent:done',
+                  timestamp: Date.now(),
+                  payload: { conversationId: conv, messageId },
+                }),
+              );
+            }
           }, i * 300);
         });
-      } else if (parsed.action === 'ping') {
-        ws.send(
-          JSON.stringify({ event: 'system.status', ts: Date.now(), payload: { pong: true } }),
-        );
       }
     },
     close(ws) {
@@ -279,12 +297,17 @@ const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
 const demoAlertTimer = isProduction
   ? null
   : setInterval(() => {
-      broadcast('alert.critical_value', {
+      // 事件名与前端 useAlert 订阅的 critical:alert 通道保持一致；
+      // payload 对齐前端 Alert 契约（type/level/title/content/patientId）
+      broadcast('critical:alert', {
         id: `al_${Date.now()}`,
-        ruleName: '肌钙蛋白危急值',
-        severity: 'critical',
-        message: '检测到新的危急值',
+        type: 'critical-value',
         level: 'critical',
+        title: '肌钙蛋白危急值',
+        content:
+          '李**（P100086）cTnI 升高达危急值，请立即复核并按危急值流程处置（10 分钟内处置 + 双人复核 + 系统登记）',
+        patientId: 'P100086',
+        patientName: '李**',
         createdAt: new Date().toISOString(),
         acknowledged: false,
       });
