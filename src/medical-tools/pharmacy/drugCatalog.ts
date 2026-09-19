@@ -7,6 +7,9 @@
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
 
+// 相对日期工具复用：处方开立/审核时间相对今天动态生成，避免 time-bomb 硬编码
+import { mockDateTime } from '../patient-service/patientServiceData.js';
+
 // ============================================================================
 // 药品说明书目录
 // ============================================================================
@@ -706,8 +709,8 @@ export const SEED_PRESCRIPTIONS: MockPrescription[] = [
     pharmacist: '药师-赵',
     totalFee: 28.5,
     safetyCheckSummary: '无严重风险；阿司匹林与氯吡格雷双联抗血小板为已知治疗方案',
-    createdAt: '2026-09-12T10:20:00',
-    auditedAt: '2026-09-12T10:45:00',
+    createdAt: mockDateTime(-7, 10, 20),
+    auditedAt: mockDateTime(-7, 10, 45),
     auditComment: '审核通过，用药合理',
   },
   {
@@ -742,7 +745,7 @@ export const SEED_PRESCRIPTIONS: MockPrescription[] = [
     pharmacist: null,
     totalFee: 25.5,
     safetyCheckSummary: '磺胺过敏已记录，未使用磺胺类药物；左氧氟沙星肾功能需评估',
-    createdAt: '2026-09-13T09:10:00',
+    createdAt: mockDateTime(-6, 9, 10),
     auditedAt: null,
     auditComment: null,
   },
@@ -769,8 +772,8 @@ export const SEED_PRESCRIPTIONS: MockPrescription[] = [
     pharmacist: '药师-钱',
     totalFee: 16.8,
     safetyCheckSummary: '无严重风险',
-    createdAt: '2026-09-11T15:00:00',
-    auditedAt: '2026-09-11T15:20:00',
+    createdAt: mockDateTime(-8, 15, 0),
+    auditedAt: mockDateTime(-8, 15, 20),
     auditComment: '审核通过',
   },
 ];

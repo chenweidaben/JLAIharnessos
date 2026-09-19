@@ -71,6 +71,13 @@ const OperationEquipment = lazy(() => import('@/pages/operation/equipment'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
+// 技能体系（jlmedaios SKILLS）：技能市场 + 技能工作室
+const SkillMarket = lazy(() =>
+  import('@/pages/skills').then((m) => ({ default: m.SkillMarketPage })),
+);
+const SkillStudio = lazy(() =>
+  import('@/pages/skills').then((m) => ({ default: m.SkillStudioPage })),
+);
 
 function PageLoading() {
   return (
@@ -112,6 +119,9 @@ export default function AppRoutes() {
           <Route path="patients/:id" element={<PatientDetail />} />
           <Route path="agent" element={<AgentChat />} />
           <Route path="builder/market" element={<BuilderMarket />} />
+          {/* 技能体系：技能市场（浏览）与技能工作室（低代码编排） */}
+          <Route path="skills/market" element={<SkillMarket />} />
+          <Route path="skills/studio" element={<SkillStudio />} />
           <Route path="alerts" element={<Alerts />} />
           <Route path="emergency" element={<Emergency />} />
           <Route path="emergency/triage/:patientId" element={<EmergencyTriage />} />

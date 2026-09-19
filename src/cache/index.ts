@@ -18,7 +18,7 @@ export { DistributedLock, LockAcquireError } from './DistributedLock.js';
 export type { AcquireOptions, LockLease, WithLockOptions } from './DistributedLock.js';
 
 export { RateLimiter } from './RateLimiter.js';
-export type { RateLimitResult, RateLimitRule } from './RateLimiter.js';
+export type { RateLimitResult, RateLimitRule, TokenBucketRule } from './RateLimiter.js';
 
 export { SessionStore } from './SessionStore.js';
 export type { SessionPayload } from './SessionStore.js';

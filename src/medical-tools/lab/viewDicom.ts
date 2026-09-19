@@ -14,6 +14,7 @@ import { buildMedicalTool } from '../framework.js';
 import { getPACSAdapter } from '../integration/adapterBridge.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
+import { mockDate } from '../patient-service/patientServiceData.js';
 
 // ============================================================================
 // 内置 DICOM Study 元数据（胸部CT肺结节 / 头颅MRI脑梗死）
@@ -50,7 +51,7 @@ const MOCK_DICOM_STUDIES: DicomStudyMeta[] = [
   {
     studyInstanceUid: '1.2.840.113619.2.55.3.604688119.443.1402723142.198',
     patientId: 'P2026090002',
-    studyDate: '2026-09-10',
+    studyDate: mockDate(-9),
     studyDescription: '胸部高分辨率CT平扫',
     modality: 'CT',
     bodyPart: '胸部',
@@ -82,7 +83,7 @@ const MOCK_DICOM_STUDIES: DicomStudyMeta[] = [
   {
     studyInstanceUid: '1.2.840.113619.2.55.3.604688119.443.1402723142.301',
     patientId: 'P2026090005',
-    studyDate: '2026-09-14',
+    studyDate: mockDate(-5),
     studyDescription: '头颅MRI平扫+DWI',
     modality: 'MRI',
     bodyPart: '头颅',

@@ -17,14 +17,18 @@ import { withErrorHandler } from './middleware/error';
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
+import { tenantContextMiddleware } from './middleware/tenant';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { authRoutes } from './routes/auth';
+import { permissionAdminRoutes } from './routes/admin/permissions';
+import { tenantAdminRoutes } from './routes/admin/tenants';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
+import { skillRoutes } from './routes/skills';
 import { systemRoutes } from './routes/system';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -41,6 +45,9 @@ const allRoutes: RouteDef[] = [
   ...qualityRoutes,
   ...operationRoutes,
   ...systemRoutes,
+  ...permissionAdminRoutes,
+  ...skillRoutes,
+  ...tenantAdminRoutes,
 ];
 
 interface Compiled {
@@ -158,6 +165,13 @@ async function handleFetch(
     if (csrfDenied) {
       status = 403;
       return withSecurityHeaders(csrfDenied);
+    }
+
+    // 多租户/院区上下文解析（无显式租户头时回退默认租户；未知/停用/越权院区短路 403）
+    const tenantDenied = tenantContextMiddleware(ctx);
+    if (tenantDenied) {
+      status = 403;
+      return withSecurityHeaders(tenantDenied);
     }
 
     for (const r of compiled) {

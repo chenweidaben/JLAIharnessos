@@ -62,4 +62,84 @@ export class RateLimiter {
   async reset(scope: string, identity: string): Promise<void> {
     await this.cache.del(cacheKey('ratelimit', scope, identity));
   }
+
+  // ------------------------------------------------------------------
+  // 以下为第二阶段（jlmedaios 高并发）新增的"加法"能力，向后兼容，
+  // 不改动上方既有固定窗口方法与导出签名。
+  // ------------------------------------------------------------------
+
+  /**
+   * 滑动窗口限流（精确，适合登录失败锁定等敏感场景）。
+   * 记录最近 windowMs 内的请求时间戳，剔除过期后计数。
+   * 注：基于 get/set 的非严格原子操作，适合单机/低并发精度要求场景；
+   *     跨实例强一致场景请用固定窗口 incrAndExpire。
+   */
+  async slidingWindowConsume(
+    scope: string,
+    identity: string,
+    rule: RateLimitRule,
+  ): Promise<RateLimitResult> {
+    const key = cacheKey('ratelimit', 'sliding', scope, identity);
+    const now = Date.now();
+    const cutoff = now - rule.windowMs;
+    const raw = await this.cache.get<number[]>(key);
+    const hits = (raw ?? []).filter((t) => t >= cutoff);
+    hits.push(now);
+    // 窗口结束前持续有效；多写一次保证 TTL
+    await this.cache.set(key, hits, rule.windowMs);
+    const count = hits.length;
+    const allowed = count <= rule.limit;
+    return {
+      allowed,
+      count,
+      remaining: Math.max(0, rule.limit - count),
+      resetMs: rule.windowMs,
+      limit: rule.limit,
+    };
+  }
+
+  /**
+   * 令牌桶限流（允许突发，适合查询/检索类接口平滑限流）。
+   * 惰性按时间补充令牌；桶内无令牌时拒绝。
+   */
+  async tokenBucketConsume(
+    scope: string,
+    identity: string,
+    rule: TokenBucketRule,
+  ): Promise<RateLimitResult> {
+    const key = cacheKey('ratelimit', 'bucket', scope, identity);
+    const now = Date.now();
+    const raw = await this.cache.get<{ tokens: number; lastRefill: number }>(key);
+    const state = raw ?? { tokens: rule.capacity, lastRefill: now };
+    const elapsed = now - state.lastRefill;
+    const refill = (elapsed / rule.windowMs) * rule.refillTokensPerWindow;
+    state.tokens = Math.min(rule.capacity, state.tokens + refill);
+    state.lastRefill = now;
+
+    let allowed = false;
+    if (state.tokens >= 1) {
+      state.tokens -= 1;
+      allowed = true;
+    }
+    await this.cache.set(key, state, rule.windowMs * 10);
+
+    const used = Math.round(rule.capacity - state.tokens);
+    return {
+      allowed,
+      count: used,
+      remaining: Math.max(0, Math.floor(state.tokens)),
+      resetMs: rule.windowMs,
+      limit: rule.capacity,
+    };
+  }
+}
+
+/** 令牌桶限流规则：容量 = 允许的最大突发；refillTokensPerWindow = 每个 windowMs 补充数 */
+export interface TokenBucketRule {
+  /** 桶容量（允许的最大突发请求数） */
+  capacity: number;
+  /** 每个窗口补充的令牌数 */
+  refillTokensPerWindow: number;
+  /** 补充周期（毫秒） */
+  windowMs: number;
 }

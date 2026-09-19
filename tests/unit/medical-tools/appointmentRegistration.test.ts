@@ -3,20 +3,24 @@
  * Copyright (c) 2026 健澜科技. All rights reserved.
  *
  * 单元测试 - 预约挂号 appointment_registration
+ *
+ * 说明：号源日期相对今天动态生成（见 patientServiceData.mockDate），
+ * 测试一律使用 mockDate(0)（今天，王主任/陈医生排班日），避免硬编码日期随时间失效。
  */
 
 import { describe, it, expect } from 'bun:test';
 import { appointmentRegistrationTool } from '@medical/patient-service/appointmentRegistration';
+import { mockDate } from '@medical/patient-service/patientServiceData';
 import { createMedicalToolContext } from './helpers';
 
 describe('appointment_registration', () => {
-  it('可成功预约心血管内科2026-09-18号源（自动选最早余号时段）', async () => {
+  it('可成功预约心血管内科今日号源（自动选最早余号时段）', async () => {
     const ctx = createMedicalToolContext();
     const result = await appointmentRegistrationTool.execute(
       {
         patientId: 'P2026090001',
         department: '心血管内科',
-        date: '2026-09-18',
+        date: mockDate(0),
         visitType: '复诊',
       },
       ctx,
@@ -31,14 +35,14 @@ describe('appointment_registration', () => {
   });
 
   it('指定已约满时段返回 SLOT_FULL', async () => {
-    // 陈医生(D0002) 呼吸内科 2026-09-18 AM1 为 15/15 已满
+    // 陈医生(D0002) 呼吸内科 今日 AM1 为 15/15 已满
     const ctx = createMedicalToolContext();
     const result = await appointmentRegistrationTool.execute(
       {
         patientId: 'P2026090002',
         department: '呼吸内科',
         doctorId: 'D0002',
-        date: '2026-09-18',
+        date: mockDate(0),
         timeSlot: '08:00-09:00',
       },
       ctx,
@@ -53,7 +57,7 @@ describe('appointment_registration', () => {
       {
         patientId: 'P2026090001',
         department: '骨科',
-        date: '2026-09-18',
+        date: mockDate(0),
       },
       ctx,
     );
@@ -67,7 +71,7 @@ describe('appointment_registration', () => {
       {
         patientId: 'P_NOT_EXIST',
         department: '心血管内科',
-        date: '2026-09-18',
+        date: mockDate(0),
       },
       ctx,
     );
