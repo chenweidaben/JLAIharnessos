@@ -48,7 +48,7 @@ export default function SkillStudioPage() {
   const [runResult, setRunResult] = useState<string>('');
 
   const load = () => {
-    get<{ items: SkillItem[] }>('/api/v1/skills')
+    get<{ items: SkillItem[] }>('/skills')
       .then((d) => setList(d.items ?? []))
       .catch(() => undefined);
   };
@@ -58,7 +58,7 @@ export default function SkillStudioPage() {
     setActive(id);
     setRunResult('');
     setValid(null);
-    get<{ body: string }>(`/api/v1/skills/${id}`)
+    get<{ body: string }>(`/skills/${id}`)
       .then((d) => setContent(d.body ? `---\n${toFrontmatter(d)}\n---\n\n${d.body}` : ''))
       .catch(() => setContent(''));
   };
@@ -80,7 +80,7 @@ export default function SkillStudioPage() {
   const validate = async () => {
     try {
       const r = await post<{ valid: boolean; error?: string; dependencyIssues?: unknown[] }>(
-        '/api/v1/skills/validate',
+        '/skills/validate',
         { content },
       );
       if (r.valid) {
@@ -100,7 +100,7 @@ export default function SkillStudioPage() {
     if (!active) return;
     try {
       const r = await post<{ status: string; reason?: string }>(
-        `/api/v1/skills/dry-run/${active}`,
+        `/skills/dry-run/${active}`,
         { inputs: { patientId: 'demo-patient' } },
       );
       setRunResult(`试运行结果：${r.status}${r.reason ? `（${r.reason}）` : ''}`);
@@ -111,7 +111,7 @@ export default function SkillStudioPage() {
   };
 
   const toggle = async (id: string, enabled: boolean) => {
-    await put(`/api/v1/skills/${id}/enabled`, { enabled });
+    await put(`/skills/${id}/enabled`, { enabled });
     message.success(enabled ? '已启用' : '已停用');
     load();
   };

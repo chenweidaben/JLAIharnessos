@@ -14,6 +14,7 @@ import 'dayjs/locale/zh-cn';
 
 import App from './App';
 import { jlTheme } from './styles/antd-theme';
+import { useAuthStore } from './store/authStore';
 import './styles/index.css';
 
 dayjs.locale('zh-cn');
@@ -22,6 +23,11 @@ const container = document.getElementById('root');
 if (!container) {
   throw new Error('未找到 #root 挂载节点');
 }
+
+// 在首次渲染前「同步」恢复本地登录态（localStorage 读取与 restoreSession 均为同步）。
+// 否则路由守卫 RequireAuth/RequirePermission 在首帧渲染阶段读到未登录态，会在
+// useEffect 恢复会话之前就重定向到 /login（整页刷新 / 直接打开深链时的时序竞争）。
+useAuthStore.getState().restoreSession();
 
 createRoot(container).render(
   <StrictMode>

@@ -47,7 +47,7 @@ export default function SkillMarketPage() {
 
   useEffect(() => {
     setLoading(true);
-    get<{ total: number; items: SkillItem[] }>('/api/v1/skills')
+    get<{ total: number; items: SkillItem[] }>('/skills')
       .then((d) => setItems(d.items ?? []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));

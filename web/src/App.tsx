@@ -11,10 +11,17 @@ import { useNavigate } from 'react-router-dom';
 import AppRoutes from '@/router';
 import { ErrorBoundary } from '@/components/common';
 import { setupRequestHandlers } from '@/services/request';
+import { useAuthStore } from '@/store/authStore';
 
 export default function App() {
   const { message } = AntdApp.useApp();
   const navigate = useNavigate();
+
+  // 启动时从 localStorage 恢复登录态，保证整页刷新 / 直接访问深链后不丢会话、
+  // 顶栏用户与请求 Token 同步（restoreSession 幂等，StrictMode 双调用无副作用）
+  useEffect(() => {
+    useAuthStore.getState().restoreSession();
+  }, []);
 
   useEffect(() => {
     setupRequestHandlers({

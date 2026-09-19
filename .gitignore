@@ -83,3 +83,7 @@ docs/requirements/images/
 # 调试 / 导出用临时截图
 *_debug.png
 web/outpatient_debug.png
+
+# 运行日志与E2E产物（不入库）
+artifacts/*.log
+*.log
