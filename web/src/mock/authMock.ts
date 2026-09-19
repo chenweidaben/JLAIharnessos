@@ -763,13 +763,27 @@ export const ssoProviders: SsoProvider[] = [
   },
 ];
 
+/**
+ * 图形验证码会话存储：captchaId -> 验证码明文。
+ * 演示环境同样做真实校验（一次性、大小写不敏感），避免验证码沦为摆设；
+ * 生产环境由后端签发并在服务端校验，此 Map 仅用于本地 Mock。
+ */
+const captchaStore = new Map<string, string>();
+
 export async function fetchCaptcha(): Promise<Captcha> {
   await delay(120, 260);
   const chars = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const captchaId = `cap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  captchaStore.set(captchaId, chars);
+  // 仅保留最近 20 个验证码，防止内存无限增长
+  if (captchaStore.size > 20) {
+    const oldest = captchaStore.keys().next().value;
+    if (oldest) captchaStore.delete(oldest);
+  }
   // 用 data URI 模拟图形验证码（彩色噪点文字）
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='44'><rect width='120' height='44' fill='#eef4fb'/><text x='18' y='30' font-family='monospace' font-size='24' fill='#0A4D8C' letter-spacing='6'>${chars}</text></svg>`;
   return {
-    captchaId: `cap_${Date.now()}`,
+    captchaId,
     image: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`,
   };
 }
@@ -797,15 +811,33 @@ export class LoginError extends Error {
   }
 }
 
-/** 账号密码登录：admin / any 6+ 位密码可成功；其余账号需命中列表 */
+/** SSO / 扫码等内部模拟登录使用的直通令牌，不走图形验证码校验 */
+const CAPTCHA_BYPASS_TOKENS = new Set(['SSOOK', 'QROK']);
+
+/**
+ * 账号密码登录：admin / any 6+ 位密码可成功；其余账号需命中列表。
+ * 图形验证码：携带 captchaId 时与签发的验证码严格比对（一次性、大小写不敏感）。
+ */
 export async function mockAccountLogin(
   username: string,
   _password: string,
   captcha: string,
+  captchaId?: string,
 ): Promise<{ user: AuthUser; permissions: string[]; menus: MenuItem[] }> {
   await delay(400, 800);
-  if (!captcha || captcha.trim().length < 4) {
-    throw new LoginError('CAPTCHA', '验证码错误，请重新输入');
+  const code = (captcha || '').trim().toUpperCase();
+  if (!CAPTCHA_BYPASS_TOKENS.has(code)) {
+    if (code.length < 4) {
+      throw new LoginError('CAPTCHA', '验证码错误，请重新输入');
+    }
+    if (captchaId) {
+      // 一次性校验：无论对错，取出后立即删除，防止验证码重放
+      const expected = captchaStore.get(captchaId);
+      captchaStore.delete(captchaId);
+      if (!expected || expected !== code) {
+        throw new LoginError('CAPTCHA', '验证码错误，请重新输入');
+      }
+    }
   }
   if (username === 'admin') {
     return { user: currentUser, permissions: currentUser.permissions, menus: currentMenus };

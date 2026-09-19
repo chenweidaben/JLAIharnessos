@@ -43,6 +43,9 @@ export default function LoginPage() {
   const login = useAuthStore((s) => s.login);
   const [form] = Form.useForm<AccountForm>();
   const [submitting, setSubmitting] = useState(false);
+  // 当前登录方式 Tab。二维码自动轮询仅在用户主动切到二维码 Tab 时启动，
+  // 避免登录页一挂载就在后台模拟扫码并自动登录（否则退出/未登录拦截会被绕过）。
+  const [activeTab, setActiveTab] = useState('account');
 
   const [captcha, setCaptcha] = useState<Captcha>({ captchaId: '', image: '' });
   const refreshCaptcha = useCallback(async () => {
@@ -60,6 +63,7 @@ export default function LoginPage() {
         username: values.username,
         password: values.password,
         captcha: values.captcha,
+        captchaId: captcha.captchaId,
         rememberMe: values.rememberMe,
       });
       message.success(`欢迎回来，${values.username}`);
@@ -106,12 +110,13 @@ export default function LoginPage() {
     setQrPolling(true);
   }, []);
 
+  // 仅在用户主动切换到二维码 Tab 时才发起会话与轮询（账号密码/SSO Tab 不触发）
   useEffect(() => {
-    startQr();
-  }, [startQr]);
+    if (activeTab === 'qrcode') void startQr();
+  }, [activeTab, startQr]);
 
   useEffect(() => {
-    if (!qr || !qrPolling) return undefined;
+    if (activeTab !== 'qrcode' || !qr || !qrPolling) return undefined;
     const t = window.setInterval(async () => {
       const remain = qr.expiresAt - Date.now();
       if (remain <= 0) {
@@ -139,7 +144,7 @@ export default function LoginPage() {
       });
     }, 2500);
     return () => window.clearInterval(t);
-  }, [qr, qrPolling, message, navigate]);
+  }, [qr, qrPolling, activeTab, message, navigate]);
 
   const qrStatusText: Record<
     QrCodeStatus,
@@ -391,9 +396,9 @@ export default function LoginPage() {
           <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
             请使用工号或统一身份认证登录
           </Typography.Text>
-          <Tabs items={items} centered />
+          <Tabs items={items} centered activeKey={activeTab} onChange={setActiveTab} />
           <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: '#8c8c8c' }}>
-            演示账号：admin / 任意 6 位以上密码，验证码任意 4 位
+            演示账号：admin / 任意 6 位以上密码；验证码请按右侧图形输入（不区分大小写）
           </div>
         </div>
       </div>

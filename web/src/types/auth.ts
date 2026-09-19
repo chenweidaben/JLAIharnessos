@@ -138,6 +138,8 @@ export interface LoginRequest {
   username: string;
   password: string;
   captcha: string;
+  /** 图形验证码会话 ID（与图形验证码配对，服务端据此校验内容） */
+  captchaId?: string;
   /** 记住我：缺省为 false（仅会话期有效） */
   rememberMe?: boolean;
 }

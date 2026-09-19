@@ -120,7 +120,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   login: async (req: LoginRequest) => {
     set({ loading: true });
     try {
-      const res = await mockAccountLogin(req.username, req.password, req.captcha);
+      const res = await mockAccountLogin(
+        req.username,
+        req.password,
+        req.captcha,
+        req.captchaId,
+      );
       const now = Date.now();
       const ttl = req.rememberMe ? REMEMBER_EXPIRE : DEFAULT_EXPIRE;
       const accessExpiresAt = now + ttl;
