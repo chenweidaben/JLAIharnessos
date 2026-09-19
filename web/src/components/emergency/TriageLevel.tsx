@@ -14,6 +14,7 @@ import {
   Divider,
   Input,
   InputNumber,
+  message,
   Row,
   Segmented,
   Slider,
@@ -128,6 +129,11 @@ export default function TriageLevel({ patient }: { patient: TriagePatient }) {
 
   const handleSave = async () => {
     if (!triageRecord) return;
+    // 医疗合规：分诊记录必须有责任护士签名确认，禁止空签名提交
+    if (!nurseName.trim()) {
+      message.warning('请填写分诊护士签名后再提交，分诊记录须责任护士签名确认');
+      return;
+    }
     await saveTriage({
       ...triageRecord,
       chiefComplaint: complaint,
@@ -383,8 +389,15 @@ export default function TriageLevel({ patient }: { patient: TriagePatient }) {
               </div>
 
               <div>
-                <div className="text-xs text-ink-secondary">分诊护士签名</div>
-                <Input value={nurseName} onChange={(e) => setNurseName(e.target.value)} />
+                <div className="mb-1 text-xs text-ink-secondary">
+                  <span className="text-red-500">*</span> 分诊护士签名
+                </div>
+                <Input
+                  value={nurseName}
+                  onChange={(e) => setNurseName(e.target.value)}
+                  placeholder="必填，责任护士签名"
+                  maxLength={20}
+                />
               </div>
 
               <Divider style={{ margin: '12px 0' }} />

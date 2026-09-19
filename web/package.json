@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@xyflow/react": "^12.11.6",
     "antd": "^5.22.2",
     "axios": "^1.7.9",

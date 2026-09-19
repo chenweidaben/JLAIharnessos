@@ -4,6 +4,9 @@
  *
  * 应用入口：Provider 嵌套 BrowserRouter + ConfigProvider + AntdApp
  */
+// antd v5 官方 React 19 兼容补丁：必须在 react/react-dom/antd 被使用前最先引入，
+// 修复 React 19 下静态 message/notification/modal 无法创建 holder（提示不弹出）等兼容问题。
+import '@ant-design/v5-patch-for-react-19';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
