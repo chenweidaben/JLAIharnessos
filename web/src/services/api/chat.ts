@@ -7,6 +7,7 @@
 import { get, post } from '../request';
 import { delay, uid } from '@/mock/utils';
 import { env } from '@/utils/config';
+import { generateMedicalReply } from '@/mock/medicalReplyEngine';
 import type { Conversation, ChatMessage } from '@/types/chat';
 
 export async function fetchConversations(): Promise<Conversation[]> {
@@ -29,7 +30,7 @@ export async function fetchConversations(): Promise<Conversation[]> {
       },
     ];
   }
-  return get<Conversation[]>('/conversations');
+  return get<Conversation[]>('/chat/conversations');
 }
 
 export async function sendChatMessage(
@@ -37,16 +38,17 @@ export async function sendChatMessage(
   content: string,
 ): Promise<ChatMessage> {
   if (env.mockEnabled) {
-    await delay(400, 900);
+    // 模拟真实推理耗时，让流式/加载态可感知
+    await delay(500, 1100);
     return {
       id: uid('msg_'),
       conversationId,
       role: 'assistant',
-      content: `已收到您的问题：「${content}」。基于患者当前检验与医嘱，建议优先关注血钾异常与抗感染方案调整。`,
+      content: generateMedicalReply(content),
       status: 'done',
-      toolName: 'lab-interpretation',
+      toolName: 'cds-assistant',
       createdAt: new Date().toISOString(),
     };
   }
-  return post<ChatMessage>(`/conversations/${conversationId}/messages`, { content });
+  return post<ChatMessage>(`/chat/conversations/${conversationId}/messages`, { content });
 }

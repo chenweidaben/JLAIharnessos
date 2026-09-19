@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Input } from 'antd';
 import { RobotOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
 
-import { PageContainer, EmptyState } from '@/components/common';
+import { PageContainer, EmptyState, MarkdownLite } from '@/components/common';
 import { usePageTitle } from '@/hooks';
 import { chatApi } from '@/services';
 import { useChatStore } from '@/store/chatStore';
@@ -74,8 +74,12 @@ export default function AgentChat() {
                 <span className="mt-0.5">
                   {m.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
                 </span>
-                <div>
-                  <div className="text-sm">{m.content}</div>
+                <div className="min-w-0">
+                  {m.role === 'assistant' ? (
+                    <MarkdownLite text={m.content} />
+                  ) : (
+                    <div className="text-sm whitespace-pre-wrap break-words">{m.content}</div>
+                  )}
                   <div
                     className={`mt-1 text-xs ${m.role === 'user' ? 'text-white/70' : 'text-ink-secondary'}`}
                   >
