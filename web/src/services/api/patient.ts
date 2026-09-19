@@ -6,6 +6,7 @@
  */
 import { get } from '../request';
 import { mockPatients, mockVitalSigns, mockAlerts } from '@/mock/patients';
+import { buildEncounters, buildLabReports, buildOrders, buildDocuments, buildImagings } from '@/mock/patient360';
 import { delay } from '@/mock/utils';
 import { env } from '@/utils/config';
 import type { Patient, Patient360 } from '@/types/patient';
@@ -25,9 +26,13 @@ export async function fetchPatient360(patientId: string): Promise<Patient360> {
     const patient = mockPatients.find((p) => p.id === patientId) ?? mockPatients[0];
     return {
       patient,
-      encounters: [],
+      encounters: buildEncounters(patient),
       vitalSigns: mockVitalSigns(patient.id),
       alertCount: mockAlerts.filter((a) => a.patientId === patient.id && !a.acknowledged).length,
+      labReports: buildLabReports(patient),
+      orders: buildOrders(patient),
+      documents: buildDocuments(patient),
+      imagings: buildImagings(patient),
     };
   }
   return get<Patient360>(`/patients/${patientId}/360`);

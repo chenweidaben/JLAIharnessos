@@ -81,3 +81,13 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+/* 患者360：已停止/作废医嘱行置灰 */
+.jl-row-muted > td {
+  color: rgba(0, 0, 0, 0.38);
+  background-color: #fafafa;
+}
+.jl-row-muted > td:first-child {
+  text-decoration: line-through;
+  text-decoration-color: rgba(0, 0, 0, 0.25);
+}

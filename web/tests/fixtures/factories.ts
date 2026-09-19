@@ -94,6 +94,10 @@ export function createPatient360(overrides?: Partial<Patient360>): Patient360 {
     encounters: [createEncounter()],
     vitalSigns: [createVitalSign()],
     alertCount: 0,
+    labReports: [],
+    orders: [],
+    documents: [],
+    imagings: [],
     ...overrides,
     patient,
   };
