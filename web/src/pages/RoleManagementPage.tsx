@@ -152,14 +152,26 @@ export default function RoleManagementPage() {
   const columns: ColumnsType<Role> = [
     {
       title: '角色',
+      dataIndex: 'name',
+      width: 176,
       render: (_, r) => (
-        <div>
-          <div style={{ fontWeight: 600 }}>{r.name}</div>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>{r.code}</div>
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            title={r.name}
+          >
+            {r.name}
+          </div>
+          <div
+            style={{ fontSize: 12, color: '#8c8c8c', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            title={r.code}
+          >
+            {r.code}
+          </div>
         </div>
       ),
     },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    { title: '描述', dataIndex: 'description', width: 220, ellipsis: true },
     {
       title: '等级',
       dataIndex: 'level',
@@ -231,6 +243,7 @@ export default function RoleManagementPage() {
         columns={columns}
         dataSource={list}
         pagination={false}
+        scroll={{ x: 1280 }}
       />
 
       {/* 新增/编辑角色 */}
