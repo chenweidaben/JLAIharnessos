@@ -75,7 +75,26 @@
 - 免费注册：LOINC、RxNorm、CMeKG、HiTA 等；
 - 持证认证、**禁止随本项目再分发**：SNOMED CT、UMLS、MIMIC、eICU、DrugBank 商业版等。
 
-## 五、合规建议
+## 五、AI 影像辅诊（DAMO-RADAR 融合，services/radar-inference/）
+
+> ⚠️ **代码与权重许可相互独立**：下列上游代码随仓库 vendor，权重**严禁入库**且为**非商业**许可，商用前须单独取得授权。
+
+| 组件 | 用途 | 许可证 | 版权 / 链接 |
+|------|------|--------|-------------|
+| [damo-radar](https://github.com/alibaba-damo-academy/damo-radar) | 腹部增强 CT 视觉-语言基础模型（代码 vendor 于 `services/radar-inference/vendor/damo-radar/`） | **Apache-2.0** | Copyright Alibaba DAMO Academy；保留其 `LICENSE` / `THIRD_PARTY_LICENSES.md` |
+| [LAVIS](https://github.com/salesforce/LAVIS) | 多模态基础模型推理框架 | BSD-3-Clause | Salesforce |
+| [nnU-Net](https://github.com/MIC-DKFZ/nnUNet) | 医学图像分割自适应框架 | Apache-2.0 | German Cancer Research Center (DKFZ) |
+| [MONAI](https://github.com/Project-MONAI/MONAI) | 医学影像深度学习框架 | Apache-2.0 | MONAI Consortium |
+| [3D-ResNets-PyTorch](https://github.com/kenshohara/3D-ResNets-PyTorch) | 3D 残差网络骨干（视频/体积影像） | MIT | Kensho Hara |
+
+**模型权重（数据，非代码）：** `checkpoint_radar_pretrain.pth`（约 5 GB，HuggingFace `radar-generalist/RADAR`）采用 **CC BY-NC-SA 4.0（署名-非商业性使用-相同方式共享）**。
+- **非商业**：不得用于商业目的；
+- **严禁入库**：由部署方经 `services/radar-inference/download_weights.sh` 自行下载并挂载 `./models/radar:/models`；
+- **相同方式共享**：基于权重的衍生须以相同许可开放；商用前务必向上游权利人取得授权。
+
+本服务定位为**第二阅片/辅助决策**，任何输出须经放射科医师复核签名后方可进入报告。
+
+## 六、合规建议
 
 1. 商业发行前，用 `bun run security:audit` 与 `npm audit` 检查依赖漏洞与许可；
 2. 对 SSPL/RSAL/AGPL/Elastic License 组件，结合交付形态（私有化/SaaS/转售）做法务评估，必要时切换到开源替代；

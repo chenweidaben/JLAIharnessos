@@ -61,6 +61,10 @@ services:
       # OpenTelemetry：将链路数据以 OTLP/gRPC?http 发送到 jaeger collector。
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
       OTEL_SERVICE_NAME: jianlan-bff
+      # AI 影像辅诊（DAMO-RADAR）：推理服务地址与内部鉴权 token。
+      # radar-inference 未随 profile 启动时，BFF 自动降级为内置确定性 mock（前端不白屏）。
+      RADAR_INFERENCE_URL: http://radar-inference:8090
+      RADAR_INTERNAL_TOKEN: ${RADAR_INTERNAL_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -118,6 +122,68 @@ services:
       driver: json-file
       options:
         max-size: "20m"
+        max-file: "3"
+
+  # ==========================================================================
+  # AI 影像辅诊推理服务（DAMO-RADAR 腹部增强 CT 视觉-语言模型，FastAPI:8090）
+  #   - 定位：第二阅片 / 辅助决策，最终诊断须由放射科医师复核签名，绝不自动诊断。
+  #   - 双模式：demo（CPU，无权重，加载预计算 CSV，确定性）/ production（真实推理，
+  #     需约 5GB 权重 + CUDA GPU）。启动自动检测权重，缺失即自动降级 demo。
+  #   - profiles：
+  #       demo -> CPU 无权重：docker compose --profile demo up radar-inference
+  #       gpu  -> 先 bash services/radar-inference/download_weights.sh 拉权重到 ./models/radar/，
+  #               再取消下方 deploy.resources.reservations.devices 段注释后：
+  #               docker compose --profile gpu up radar-inference
+  #   - 权重 checkpoint_radar_pretrain.pth（CC BY-NC-SA 4.0 非商业）严禁入库，由部署方自行下载。
+  # ==========================================================================
+  radar-inference:
+    image: registry.jianlan.tech/jianlan/radar-inference:${APP_VERSION:-0.1.0}
+    build:
+      context: services/radar-inference
+      dockerfile: Dockerfile
+    profiles:
+      - demo
+      - gpu
+    environment:
+      RADAR_HOST: 0.0.0.0
+      RADAR_PORT: "8090"
+      # 内部鉴权 token（与 BFF 共享同一 secret；未配置时服务仅允许回环调用）。
+      RADAR_INTERNAL_TOKEN: ${RADAR_INTERNAL_TOKEN:?请在 .env 中设置 RADAR_INTERNAL_TOKEN}
+      # 阳性/分级阈值与并发（可按院内调参，默认见 services/radar-inference/README）。
+      RADAR_POSITIVE_THRESHOLD: ${RADAR_POSITIVE_THRESHOLD:-0.5}
+      RADAR_MAJOR_THRESHOLD: ${RADAR_MAJOR_THRESHOLD:-0.6}
+      RADAR_MAX_CONCURRENCY: ${RADAR_MAX_CONCURRENCY:-2}
+      # 权重卷挂载于 /models（见下方 volumes），显式指向容器内权重文件。
+      RADAR_WEIGHT_PATH: /models/checkpoint_radar_pretrain.pth
+      TZ: Asia/Shanghai
+    # gpu profile 生产推理：取消下方注释以申请 NVIDIA GPU（需 nvidia-container-runtime）。
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    expose:
+      - "8090"
+    volumes:
+      # 权重卷（约 5GB，.gitignore，严禁入库；缺失权重时服务自动以 demo 模式启动）。
+      - ./models/radar:/models
+      # 运行时作业/产物目录（job 状态、临时缓存），宿主持久化，勿入库。
+      - ./services/radar-inference/data:/service/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health/live', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
         max-file: "3"
 
   # ==========================================================================

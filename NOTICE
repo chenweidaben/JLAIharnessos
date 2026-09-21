@@ -16,3 +16,23 @@ THIRD_PARTY_LICENSES.md。
 
 商标：“健澜科技”及相关标识为杭州健澜科技有限公司的商标；第三方商标归其各自
 权利人所有。
+
+================================================================================
+DAMO-RADAR 融合声明（services/radar-inference/）
+================================================================================
+本产品的 AI 影像辅诊能力基于上游开源项目 alibaba-damo-academy/damo-radar
+（腹部增强 CT 视觉-语言模型，论文：Zhang et al., Science 393(6817):eaec6129, 2026,
+DOI 10.1126/science.aec6129）进行融合封装。
+
+- 上游代码：Apache License 2.0，Copyright Alibaba DAMO Academy；本产品在其之上
+  新增了 FastAPI 推理服务封装、双模式（demo/production）降级、内部鉴权、日志脱敏
+  与并发限流等适配代码，上游原始 LICENSE 与 THIRD_PARTY_LICENSES.md 随 vendor 目录
+  （services/radar-inference/vendor/damo-radar/）一并保留。
+- 模型权重：checkpoint_radar_pretrain.pth（约 5GB）采用 CC BY-NC-SA 4.0（非商业），
+  不随本产品分发，严禁入库；由部署方自行下载并遵守其非商业、相同方式共享条款。
+- 本能力定位为第二阅片/辅助决策，不构成自动诊断；任何输出须经放射科医师复核签名。
+
+另致谢本融合所依赖的 LAVIS（BSD-3-Clause）、nnU-Net（Apache-2.0）、
+MONAI（Apache-2.0）、3D-ResNets-PyTorch（MIT）等开源项目，详见
+THIRD_PARTY_LICENSES.md。
+

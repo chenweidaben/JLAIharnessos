@@ -73,6 +73,18 @@ __pycache__/
 *.pyc
 .venv/
 
+# ---------- DAMO-RADAR 推理服务（运行时产物 / 权重，严禁入库） ----------
+# 约 5GB 模型权重（CC BY-NC-SA 4.0 非商业），由部署方自行下载，见 DATA_LICENSES.md
+services/radar-inference/models/
+services/radar-inference/.venv/
+services/radar-inference/__pycache__/
+services/radar-inference/data/
+**/__pycache__/
+.pytest_cache/
+# 根级权重卷与 BFF 运行时 AI 作业持久化（运行时产物，勿入库）
+models/
+data/imaging-ai-jobs.json
+
 # CI / 本地报告
 test-results/
 playwright-report/

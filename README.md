@@ -11,6 +11,9 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Tests](https://img.shields.io/badge/tests-1100%2B-success.svg)](#-测试与质量)
 [![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/technical/04-安全合规与系统集成设计.md)
+[![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
+[![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
+[![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-影像辅诊damo-radar-融合)
 
 **医院信息科自己就能搭智能体的操作系统：AI 病历生成、AI 病历质控、语音电子病历、智能处方审核、临床决策支持…… 拖拽即用，私有化部署，数据不出院。**
 
@@ -157,6 +160,54 @@ cd web && npx vitest run   # 前端单元测试
 ```
 
 > 完整容器化、云原生（K8s/Helm）、生产配置见 [部署文档](docs/deployment/)。
+
+---
+
+## AI 影像辅诊（DAMO-RADAR 融合）
+
+平台已融合达摩院 **DAMO-RADAR**——腹部增强 CT 视觉-语言基础模型（Science 393(6817):eaec6129, 2026），作为**第二阅片/辅助决策**能力嵌入影像工作站。
+
+| 能力 | 说明 |
+|------|------|
+| 🫀 **18 器官 / 146 发现** | 一次 CT 扫描覆盖主动脉、肝、胃、胰、肾、肺等 18 个解剖结构，输出 146 项临床发现的概率（0~1） |
+| 🎯 **第二阅片定位** | 阳性发现自动定位、critical（恶性肿瘤/急重症）红色警示并触达危急值通道；**最终诊断须放射科医师复核签名**，不自动诊断 |
+| 🧪 **双模式 demo / production** | `demo`（CPU，无权重，加载预计算结果，确定性可演示）与 `production`（真实推理，需约 5GB 权重 + CUDA GPU）；启动自动检测权重、缺失自动降级 |
+| 🛡️ **降级不白屏** | 推理服务不可用时 BFF/前端自动切换为与 Python demo 同源的确定性 mock，并显示「演示数据」水印 |
+
+**快速启动（demo / CPU，零权重即可体验）：**
+
+```bash
+cp .env.compose.example .env        # 填入 RADAR_INTERNAL_TOKEN 等密钥
+docker compose --profile demo up -d radar-inference
+# 就绪探针：curl http://127.0.0.1:8090/health/ready  （mode=demo 即正常）
+```
+
+**生产真实推理（可选）：** 权重 `checkpoint_radar_pretrain.pth`（约 5GB，**CC BY-NC-SA 4.0 非商业**）严禁入库，由部署方自行拉取并挂载：
+
+```bash
+bash services/radar-inference/download_weights.sh   # 下载到 ./models/radar/
+# 在 docker-compose.yml 中取消 gpu profile 的 deploy.resources.reservations.devices 注释后：
+docker compose --profile gpu up -d radar-inference
+```
+
+> 详见 [`services/radar-inference/README.md`](services/radar-inference/README.md) 与契约 [`docs/RADAR_FUSION_CONTRACT.md`](docs/RADAR_FUSION_CONTRACT.md)。
+
+**引用（BibTeX）：**
+
+```bibtex
+@article{zhang2026damo_radar,
+  author  = {Zhang, Qi and others},
+  title   = {An expert-level generalist AI for abdominal CT diagnosis},
+  journal = {Science},
+  volume  = {393},
+  number  = {6817},
+  pages   = {eaec6129},
+  year    = {2026},
+  doi     = {10.1126/science.aec6129}
+}
+```
+
+**来源致谢：** 本融合站在以下开源项目之上——[damo-radar](https://github.com/alibaba-damo-academy/damo-radar)（Apache-2.0，代码 vendor 于 `services/radar-inference/vendor/damo-radar/`）、[LAVIS](https://github.com/salesforce/LAVIS)（BSD-3-Clause）、[nnU-Net](https://github.com/MIC-DKFZ/nnUNet)（Apache-2.0）、[MONAI](https://github.com/Project-MONAI/MONAI)（Apache-2.0）、[3D-ResNets-PyTorch](https://github.com/kenshohara/3D-ResNets-PyTorch)（MIT）。模型权重为 CC BY-NC-SA 4.0 非商业，商用前须另行取得授权。
 
 ---
 

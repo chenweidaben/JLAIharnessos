@@ -100,6 +100,31 @@ services:
     #   replicas: 2
 
   # --------------------------------------------------------------------------
+  # RADAR 推理服务：demo(CPU) 模式约 1C/2G 保底、2C/4G 上限。
+  # GPU 生产推理需在基础文件取消 deploy.resources.reservations.devices 注释，
+  # 并另按 GPU 机型调大 memory 预留（模型权重约 5GB）。
+  # --------------------------------------------------------------------------
+  radar-inference:
+    cpus: 2.0
+    mem_reservation: 2G
+    mem_limit: 4G
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 2G
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # --------------------------------------------------------------------------
   # PostgreSQL：2C/2G 保底、4C/4G 上限（8C16G 档约 25% 内存给 OS 与页缓存）。
   # 官方入口需要 root 阶段初始化（chown/gosu），不做 cap_drop，仅禁止提权。
   # --------------------------------------------------------------------------

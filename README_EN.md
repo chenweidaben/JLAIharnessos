@@ -10,6 +10,9 @@
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Tests](https://img.shields.io/badge/tests-1100%2B-success.svg)]
+[![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
+[![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
+[![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-imaging-assist-damo-radar-fusion)
 
 **Let a hospital IT department build its own clinical agents — AI medical record writing, record quality control, voice medical records, prescription review, clinical decision support — drag-and-drop, on-premise, with data never leaving the hospital.**
 
@@ -120,6 +123,54 @@ bun run typecheck && bun test
 ```
 
 See [deployment docs](docs/deployment/) for containerized and cloud-native (K8s/Helm) setups.
+
+---
+
+## AI Imaging Assist (DAMO-RADAR Fusion)
+
+We fused Alibaba DAMO Academy's **DAMO-RADAR**—a visual-language foundation model for contrast-enhanced abdominal CT (Science 393(6817):eaec6129, 2026)—into the imaging workstation as a **second-reader / decision-support** capability.
+
+| Capability | Description |
+|------|------|
+| 🫀 **18 organs / 146 findings** | A single CT scan covers 18 anatomical structures (aorta, liver, stomach, pancreas, kidneys, lungs, …) and outputs probabilities (0–1) for 146 clinical findings |
+| 🎯 **Second-reader positioning** | Automatic localization of positive findings; critical (malignant tumors / acute events) are flagged in red and routed to the critical-value channel. **Final diagnosis requires radiologist review-and-signature**—no auto-diagnosis |
+| 🧪 **Dual demo / production mode** | `demo` (CPU, no weights, deterministic pre-computed results) and `production` (real inference, needs ~5 GB weights + CUDA GPU); weights are auto-detected and the service degrades automatically when absent |
+| 🛡️ **Degrade without blank screens** | When the inference service is unavailable, the BFF/frontend fall back to deterministic mock data sourced identically to the Python demo, with a "demo data" watermark |
+
+**Quick start (demo / CPU, zero weights):**
+
+```bash
+cp .env.compose.example .env        # set RADAR_INTERNAL_TOKEN and other secrets
+docker compose --profile demo up -d radar-inference
+# readiness probe: curl http://127.0.0.1:8090/health/ready  (mode=demo is healthy)
+```
+
+**Real production inference (optional):** the weights `checkpoint_radar_pretrain.pth` (~5 GB, **CC BY-NC-SA 4.0, non-commercial**) are never committed; deployers download and mount them:
+
+```bash
+bash services/radar-inference/download_weights.sh   # downloads to ./models/radar/
+# uncomment the gpu profile's deploy.resources.reservations.devices block in docker-compose.yml, then:
+docker compose --profile gpu up -d radar-inference
+```
+
+> See [`services/radar-inference/README.md`](services/radar-inference/README.md) and the contract [`docs/RADAR_FUSION_CONTRACT.md`](docs/RADAR_FUSION_CONTRACT.md).
+
+**Citation (BibTeX):**
+
+```bibtex
+@article{zhang2026damo_radar,
+  author  = {Zhang, Qi and others},
+  title   = {An expert-level generalist AI for abdominal CT diagnosis},
+  journal = {Science},
+  volume  = {393},
+  number  = {6817},
+  pages   = {eaec6129},
+  year    = {2026},
+  doi     = {10.1126/science.aec6129}
+}
+```
+
+**Acknowledgements:** this fusion stands on the shoulders of [damo-radar](https://github.com/alibaba-damo-academy/damo-radar) (Apache-2.0; code vendored under `services/radar-inference/vendor/damo-radar/`), [LAVIS](https://github.com/salesforce/LAVIS) (BSD-3-Clause), [nnU-Net](https://github.com/MIC-DKFZ/nnUNet) (Apache-2.0), [MONAI](https://github.com/Project-MONAI/MONAI) (Apache-2.0), and [3D-ResNets-PyTorch](https://github.com/kenshohara/3D-ResNets-PyTorch) (MIT). Model weights are CC BY-NC-SA 4.0 (non-commercial); commercial use requires separate authorization.
 
 ---
 

@@ -30,6 +30,29 @@
 
 ---
 
+## [0.2.0-radar] - 2026-09-21
+
+### 概述
+工业级超融合接入达摩院 **DAMO-RADAR**（腹部增强 CT 视觉-语言大模型，Science 393(6817):eaec6129, 2026）。以独立 Python FastAPI 推理微服务 + BFF 适配器 + 前端报告页的方式接入，定位**第二阅片/辅助决策**，强制放射科医师复核签名闭环。技术栈异构不硬糅，无权重/GPU 自动降级 demo。
+
+### 新增
+- **推理微服务** `services/radar-inference/`（FastAPI，端口 8090）：`demo`/`production` 双模式，无权重自动加载预计算 CSV 降级；内部 token 鉴权、并发信号量限流、作业超时、日志脱敏。
+- **BFF 集成**：适配器 `src/integration/adapters/radar/` + 路由 `src/bff/routes/imaging.ts`（`/api/v1/imaging/ai/*`）；catalog/jobs/review/历史报告端点；推理服务不可用时回退内置静态 catalog 与确定性 mock，前端不白屏。
+- **前端**：`web/src/pages/imaging/AiReportPage.tsx` 与 `web/src/components/imagingAi/`——18 器官导航（阳性数徽标）、146 发现列表（critical/major/minor 分级配色）、医师复核签名闭环、critical 危急值推送、降级「演示数据」水印。
+- **权限点**：`imaging:view` / `imaging:ai:analyze` / `imaging:ai:review`，复用既有 RBAC。
+- **配置项**：`RADAR_INFERENCE_URL`、`RADAR_INTERNAL_TOKEN`、`RADAR_POSITIVE_THRESHOLD`、`RADAR_MAX_CONCURRENCY`（及 major 阈值/critical 集合/作业超时/权重路径等可覆盖项）。
+- **容器**：docker-compose profile `demo`（CPU，无权重）与 `gpu`（挂载 `./models/radar:/models`）；权重约 5 GB，`download_weights.sh` 默认走 `hf-mirror.com` 镜像，**严禁入库**。
+- **双语技术文档**：融合架构白皮书、融合集成说明、部署安装手册、许可与合规声明、训练微调评估复现指南（CN/EN 各一份）。
+
+### 合规
+- 上游代码 Apache-2.0（vendor 于 `services/radar-inference/vendor/damo-radar/`，保留 LICENSE/THIRD_PARTY_LICENSES.md）；**权重 CC BY-NC-SA 4.0（非商业）**，商用须另行授权。
+- 定位第二阅片，所有 AI 输出须经放射科医师复核签名后方可进入报告；PACS 脱敏、审计哈希链、数据不出院。
+
+### 测试
+- 融合后全量回归实测：`bun test` **1184** 通过、`vitest` **201** 通过、`pytest` **19** 通过、`tsc` **0** 错误。
+
+---
+
 ## [0.1.0] - 2026-09-16
 
 ### 概述
