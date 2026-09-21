@@ -48,7 +48,7 @@ export interface Ctx {
   /** 解析后的 JSON body（按需调用） */
   body: <T = unknown>() => Promise<T>;
   /** 认证后注入的用户（未登录为 null） */
-  user: { id: string; name: string; roles: string[] } | null;
+  user: { id: string; name: string; roles: string[]; permissions?: string[] } | null;
   traceId: string;
 }
 

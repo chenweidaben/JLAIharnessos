@@ -127,6 +127,7 @@ export function attachUser(c: Ctx): void {
         id: payload.sub,
         name: payload.name,
         roles: payload.roles ?? [],
+        permissions: payload.permissions,
       };
       return;
     }
@@ -185,6 +186,27 @@ export function requireRoleGuard(
     if (denied) return denied;
     return handle(c);
   };
+}
+
+/**
+ * 业务权限码守卫（如 imaging:view / imaging:ai:analyze / imaging:ai:review）。
+ *
+ * 与现有 requireRole 同风格：
+ *  - 未登录 → 401
+ *  - 超级管理员（roles 含 'admin'）一律放行
+ *  - 用户显式权限码（JWT permissions 数组）包含该码 → 放行
+ *  - 否则 → 403
+ */
+export function requirePermissionCode(c: Ctx, code: string): Response | null {
+  if (!c.user) {
+    return json(fail(ErrorCode.UNAUTHORIZED, '未登录或登录已过期', c.traceId), 401);
+  }
+  if (c.user.roles.includes('admin')) return null;
+  if (c.user.permissions && c.user.permissions.includes(code)) return null;
+  return json(
+    fail<ApiResponse>(ErrorCode.FORBIDDEN, `权限不足：需要 ${code}`, c.traceId),
+    403,
+  );
 }
 
 export function newCtx(req: Request, params: Record<string, string>, query: URLSearchParams): Ctx {

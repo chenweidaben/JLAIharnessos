@@ -19,11 +19,13 @@ import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
+import { setCriticalAlertSink } from './alertBus';
 import { authRoutes } from './routes/auth';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
+import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
 import { patientRoutes } from './routes/patient';
@@ -48,6 +50,7 @@ const allRoutes: RouteDef[] = [
   ...permissionAdminRoutes,
   ...skillRoutes,
   ...tenantAdminRoutes,
+  ...imagingRoutes,
 ];
 
 interface Compiled {
@@ -90,6 +93,9 @@ function broadcast(event: string, payload: unknown): void {
     }
   }
 }
+
+// 影像 AI（DAMO-RADAR）critical 发现复用同一 /ws/chat critical:alert 通道推送危急值
+setCriticalAlertSink(broadcast);
 
 /** 校验 WebSocket 升级请求的 Token（query 参数 ?token= 或 Sec-WebSocket-Protocol） */
 function wsAuthorized(req: Request): boolean {
