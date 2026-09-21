@@ -43,6 +43,12 @@ interface NavItem {
 const navItems: NavItem[] = [
   { key: '/dashboard', icon: <DashboardOutlined />, label: '工作台', perm: 'dashboard:view' },
   { key: '/patients', icon: <TeamOutlined />, label: '患者管理', perm: 'patient:view' },
+  {
+    key: '/imaging/ai/report',
+    icon: <RobotOutlined />,
+    label: 'AI 辅诊',
+    perm: 'imaging:view',
+  },
   { key: '/outpatient', icon: <ScheduleOutlined />, label: '门诊问诊', perm: 'emr:view' },
   {
     key: '/ward',

@@ -22,12 +22,13 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, RobotOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 import { PageContainer } from '@/components/common';
 import { PatientInfoCard, VitalSignsPanel, AlertBanner } from '@/components/medical';
+import { ImagingAiReport } from '@/components/imagingAi';
 import { LineChart } from '@/components/charts';
 import { usePageTitle } from '@/hooks';
 import { fetchPatient360, fetchAlerts } from '@/services/api/patient';
@@ -364,6 +365,19 @@ export default function PatientDetail() {
                       }))}
                     />
                   )}
+                </Card>
+
+                {/* AI 辅诊（DAMO-RADAR）：复用独立报告组件，内嵌于影像 tab */}
+                <Card
+                  size="small"
+                  title="AI 辅诊报告（DAMO-RADAR）"
+                  extra={
+                    <Tag color="orange" icon={<RobotOutlined />}>
+                      第二阅片 · 需医师复核
+                    </Tag>
+                  }
+                >
+                  <ImagingAiReport embedded studyUid={`STUDY-${view.patient.id}`} />
                 </Card>
               </div>
             ),

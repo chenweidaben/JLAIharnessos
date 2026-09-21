@@ -78,6 +78,8 @@ const SkillMarket = lazy(() =>
 const SkillStudio = lazy(() =>
   import('@/pages/skills').then((m) => ({ default: m.SkillStudioPage })),
 );
+// 影像 AI 辅诊（DAMO-RADAR）
+const ImagingAiReportPage = lazy(() => import('@/pages/imaging/AiReportPage'));
 
 function PageLoading() {
   return (
@@ -117,6 +119,15 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="patients" element={<PatientList />} />
           <Route path="patients/:id" element={<PatientDetail />} />
+          {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
+          <Route
+            path="imaging/ai/report/:studyUid?"
+            element={
+              <RequirePermission permission="imaging:view">
+                <ImagingAiReportPage />
+              </RequirePermission>
+            }
+          />
           <Route path="agent" element={<AgentChat />} />
           <Route path="builder/market" element={<BuilderMarket />} />
           {/* 技能体系：技能市场（浏览）与技能工作室（低代码编排） */}
