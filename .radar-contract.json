@@ -1,0 +1,1049 @@
+{
+  "source": "damo-radar results/RADAR_infer_results_demo.csv header",
+  "organ_count": 18,
+  "finding_count": 146,
+  "organs": [
+    "主动脉",
+    "十二指肠",
+    "大肠",
+    "小肠",
+    "心脏",
+    "肋骨",
+    "肝",
+    "肺",
+    "肾",
+    "肾上腺",
+    "胃",
+    "胆囊",
+    "胰腺",
+    "脾",
+    "膀胱",
+    "门静脉",
+    "食管",
+    "骶骨"
+  ],
+  "findings": [
+    {
+      "key": "主动脉_主动脉夹层",
+      "organ_zh": "主动脉",
+      "name_zh": "主动脉夹层",
+      "name_en": "Aorta_Aortic dissection",
+      "demo_prob": 0.37641215324401855
+    },
+    {
+      "key": "主动脉_主动脉瘤",
+      "organ_zh": "主动脉",
+      "name_zh": "主动脉瘤",
+      "name_en": "Aorta_Aortic aneurysm",
+      "demo_prob": 0.2058383822441101
+    },
+    {
+      "key": "主动脉_粥样硬化",
+      "organ_zh": "主动脉",
+      "name_zh": "粥样硬化",
+      "name_en": "Aorta_Atherosclerosis",
+      "demo_prob": 0.5783803462982178
+    },
+    {
+      "key": "主动脉_钙化",
+      "organ_zh": "主动脉",
+      "name_zh": "钙化",
+      "name_en": "Aorta_Calcification",
+      "demo_prob": 0.6973209381103516
+    },
+    {
+      "key": "十二指肠_占位",
+      "organ_zh": "十二指肠",
+      "name_zh": "占位",
+      "name_en": "Duodenum_Mass",
+      "demo_prob": 0.022073574364185333
+    },
+    {
+      "key": "十二指肠_囊袋状突出影",
+      "organ_zh": "十二指肠",
+      "name_zh": "囊袋状突出影",
+      "name_en": "Duodenum_Saccular outpouching",
+      "demo_prob": 0.07408909499645233
+    },
+    {
+      "key": "十二指肠_憩室",
+      "organ_zh": "十二指肠",
+      "name_zh": "憩室",
+      "name_en": "Duodenum_Diverticulum",
+      "demo_prob": 0.07177671790122986
+    },
+    {
+      "key": "十二指肠_梗阻",
+      "organ_zh": "十二指肠",
+      "name_zh": "梗阻",
+      "name_en": "Duodenum_Obstruction",
+      "demo_prob": 0.012811549007892609
+    },
+    {
+      "key": "十二指肠_溃疡",
+      "organ_zh": "十二指肠",
+      "name_zh": "溃疡",
+      "name_en": "Duodenum_Ulcer",
+      "demo_prob": 0.07568199187517166
+    },
+    {
+      "key": "大肠_克罗恩病",
+      "organ_zh": "大肠",
+      "name_zh": "克罗恩病",
+      "name_en": "Large bowel_Crohn's disease",
+      "demo_prob": 0.006310904398560524
+    },
+    {
+      "key": "大肠_大肠（壁）钙化",
+      "organ_zh": "大肠",
+      "name_zh": "大肠（壁）钙化",
+      "name_en": "Large bowel_Mural calcification",
+      "demo_prob": 0.15269163250923157
+    },
+    {
+      "key": "大肠_急慢性（结）肠炎",
+      "organ_zh": "大肠",
+      "name_zh": "急慢性（结）肠炎",
+      "name_en": "Large bowel_Colitis",
+      "demo_prob": 0.029516540467739105
+    },
+    {
+      "key": "大肠_浆膜面毛糙",
+      "organ_zh": "大肠",
+      "name_zh": "浆膜面毛糙",
+      "name_en": "Large bowel_Serosal surface irregularity",
+      "demo_prob": 0.0019227808807045221
+    },
+    {
+      "key": "大肠_溃疡性结肠炎",
+      "organ_zh": "大肠",
+      "name_zh": "溃疡性结肠炎",
+      "name_en": "Large bowel_Ulcerative colitis",
+      "demo_prob": 0.014653772115707397
+    },
+    {
+      "key": "大肠_直肠癌",
+      "organ_zh": "大肠",
+      "name_zh": "直肠癌",
+      "name_en": "Large bowel_Rectal cancer",
+      "demo_prob": 0.00160702143330127
+    },
+    {
+      "key": "大肠_积液积气",
+      "organ_zh": "大肠",
+      "name_zh": "积液积气",
+      "name_en": "Large bowel_Gas and fluid accumulation",
+      "demo_prob": 0.0169672928750515
+    },
+    {
+      "key": "大肠_结肠癌",
+      "organ_zh": "大肠",
+      "name_zh": "结肠癌",
+      "name_en": "Large bowel_Colon cancer",
+      "demo_prob": 0.0018822494894266129
+    },
+    {
+      "key": "大肠_肠壁毛糙",
+      "organ_zh": "大肠",
+      "name_zh": "肠壁毛糙",
+      "name_en": "Large bowel_Wall irregularity",
+      "demo_prob": 0.002078835852444172
+    },
+    {
+      "key": "大肠_肠壁水肿",
+      "organ_zh": "大肠",
+      "name_zh": "肠壁水肿",
+      "name_en": "Large bowel_Wall edema",
+      "demo_prob": 0.06894568353891373
+    },
+    {
+      "key": "大肠_肠套叠",
+      "organ_zh": "大肠",
+      "name_zh": "肠套叠",
+      "name_en": "Large bowel_Intussusception",
+      "demo_prob": 0.005367637611925602
+    },
+    {
+      "key": "大肠_肠憩室",
+      "organ_zh": "大肠",
+      "name_zh": "肠憩室",
+      "name_en": "Large bowel_Diverticulum",
+      "demo_prob": 0.1379714012145996
+    },
+    {
+      "key": "大肠_肠梗阻",
+      "organ_zh": "大肠",
+      "name_zh": "肠梗阻",
+      "name_en": "Large bowel_Obstruction",
+      "demo_prob": 0.0018526290077716112
+    },
+    {
+      "key": "大肠_肠穿孔",
+      "organ_zh": "大肠",
+      "name_zh": "肠穿孔",
+      "name_en": "Large bowel_Perforation",
+      "demo_prob": 0.009054429829120636
+    },
+    {
+      "key": "大肠_肠道扩张",
+      "organ_zh": "大肠",
+      "name_zh": "肠道扩张",
+      "name_en": "Large bowel_Dilatation",
+      "demo_prob": 0.010905351489782333
+    },
+    {
+      "key": "大肠_脂肪间隙模糊",
+      "organ_zh": "大肠",
+      "name_zh": "脂肪间隙模糊",
+      "name_en": "Large bowel_Blurring of fat planes",
+      "demo_prob": 0.005161745473742485
+    },
+    {
+      "key": "大肠_阑尾炎",
+      "organ_zh": "大肠",
+      "name_zh": "阑尾炎",
+      "name_en": "Large bowel_Appendicitis",
+      "demo_prob": 0.02200629562139511
+    },
+    {
+      "key": "大肠_阑尾粪石",
+      "organ_zh": "大肠",
+      "name_zh": "阑尾粪石",
+      "name_en": "Large bowel_Appendicolith",
+      "demo_prob": 0.07029331475496292
+    },
+    {
+      "key": "小肠_克罗恩病",
+      "organ_zh": "小肠",
+      "name_zh": "克罗恩病",
+      "name_en": "Small bowel_Crohn's disease",
+      "demo_prob": 0.021085407584905624
+    },
+    {
+      "key": "小肠_套叠",
+      "organ_zh": "小肠",
+      "name_zh": "套叠",
+      "name_en": "Small bowel_Intussusception",
+      "demo_prob": 0.025489358231425285
+    },
+    {
+      "key": "小肠_扭转",
+      "organ_zh": "小肠",
+      "name_zh": "扭转",
+      "name_en": "Small bowel_Volvulus",
+      "demo_prob": 0.018309738487005234
+    },
+    {
+      "key": "小肠_梗阻",
+      "organ_zh": "小肠",
+      "name_zh": "梗阻",
+      "name_en": "Small bowel_Obstruction",
+      "demo_prob": 0.007077992893755436
+    },
+    {
+      "key": "小肠_淋巴瘤",
+      "organ_zh": "小肠",
+      "name_zh": "淋巴瘤",
+      "name_en": "Small bowel_Lymphoma",
+      "demo_prob": 0.027061620727181435
+    },
+    {
+      "key": "小肠_积气积液",
+      "organ_zh": "小肠",
+      "name_zh": "积气积液",
+      "name_en": "Small bowel_Gas and fluid accumulation",
+      "demo_prob": 0.04180186986923218
+    },
+    {
+      "key": "小肠_系膜指膜炎",
+      "organ_zh": "小肠",
+      "name_zh": "系膜指膜炎",
+      "name_en": "Small bowel_Mesenteric panniculitis",
+      "demo_prob": 0.3187982738018036
+    },
+    {
+      "key": "小肠_系膜淋巴结肿大",
+      "organ_zh": "小肠",
+      "name_zh": "系膜淋巴结肿大",
+      "name_en": "Small bowel_Mesenteric lymphadenopathy",
+      "demo_prob": 0.06973597407341003
+    },
+    {
+      "key": "小肠_肠壁增厚",
+      "organ_zh": "小肠",
+      "name_zh": "肠壁增厚",
+      "name_en": "Small bowel_Wall thickening",
+      "demo_prob": 0.049689099192619324
+    },
+    {
+      "key": "小肠_肠管扩张",
+      "organ_zh": "小肠",
+      "name_zh": "肠管扩张",
+      "name_en": "Small bowel_Dilatation",
+      "demo_prob": 0.025513794273138046
+    },
+    {
+      "key": "小肠_脂肪瘤",
+      "organ_zh": "小肠",
+      "name_zh": "脂肪瘤",
+      "name_en": "Small bowel_Lipoma",
+      "demo_prob": 0.14787429571151733
+    },
+    {
+      "key": "小肠_间质瘤（胃肠间质瘤-gist）",
+      "organ_zh": "小肠",
+      "name_zh": "间质瘤（胃肠间质瘤-gist）",
+      "name_en": "Small bowel_Gastrointestinal stromal tumor",
+      "demo_prob": 0.022007174789905548
+    },
+    {
+      "key": "小肠_（急慢性）小肠炎",
+      "organ_zh": "小肠",
+      "name_zh": "（急慢性）小肠炎",
+      "name_en": "Small bowel_Enteritis",
+      "demo_prob": 0.05266764387488365
+    },
+    {
+      "key": "心脏_心包积液",
+      "organ_zh": "心脏",
+      "name_zh": "心包积液",
+      "name_en": "Heart_Pericardial effusion",
+      "demo_prob": 0.3615931570529938
+    },
+    {
+      "key": "心脏_心影（脏）增大",
+      "organ_zh": "心脏",
+      "name_zh": "心影（脏）增大",
+      "name_en": "Heart_Cardiomegaly",
+      "demo_prob": 0.8334035873413086
+    },
+    {
+      "key": "肋骨_转移瘤（乳腺癌 骨转移）",
+      "organ_zh": "肋骨",
+      "name_zh": "转移瘤（乳腺癌 骨转移）",
+      "name_en": "Rib_Metastasis",
+      "demo_prob": 0.03681064769625664
+    },
+    {
+      "key": "肋骨_骨折",
+      "organ_zh": "肋骨",
+      "name_zh": "骨折",
+      "name_en": "Rib_Fracture",
+      "demo_prob": 0.3890492022037506
+    },
+    {
+      "key": "肋骨_骨质破坏",
+      "organ_zh": "肋骨",
+      "name_zh": "骨质破坏",
+      "name_en": "Rib_Bone destruction",
+      "demo_prob": 0.05110297352075577
+    },
+    {
+      "key": "肝_低密度影",
+      "organ_zh": "肝",
+      "name_zh": "低密度影",
+      "name_en": "Liver_Hypoattenuating lesion",
+      "demo_prob": 0.0016249687178060412
+    },
+    {
+      "key": "肝_格林森鞘积液",
+      "organ_zh": "肝",
+      "name_zh": "格林森鞘积液",
+      "name_en": "Liver_Periportal edema",
+      "demo_prob": 0.0007268912740983069
+    },
+    {
+      "key": "肝_比例失调",
+      "organ_zh": "肝",
+      "name_zh": "比例失调",
+      "name_en": "Liver_Lobar volume disproportion",
+      "demo_prob": 0.0002963795268442482
+    },
+    {
+      "key": "肝_波浪状改变",
+      "organ_zh": "肝",
+      "name_zh": "波浪状改变",
+      "name_en": "Liver_Undulating contour",
+      "demo_prob": 5.492524360306561e-05
+    },
+    {
+      "key": "肝_硬化",
+      "organ_zh": "肝",
+      "name_zh": "硬化",
+      "name_en": "Liver_Cirrhosis",
+      "demo_prob": 8.635336416773498e-05
+    },
+    {
+      "key": "肝_结节状强化",
+      "organ_zh": "肝",
+      "name_zh": "结节状强化",
+      "name_en": "Liver_Nodular enhancement",
+      "demo_prob": 0.0006995891453698277
+    },
+    {
+      "key": "肝_肝内胆管扩张",
+      "organ_zh": "肝",
+      "name_zh": "肝内胆管扩张",
+      "name_en": "Liver_Intrahepatic bile duct dilatation",
+      "demo_prob": 0.00048535337555222213
+    },
+    {
+      "key": "肝_肝内胆管结石",
+      "organ_zh": "肝",
+      "name_zh": "肝内胆管结石",
+      "name_en": "Liver_Hepatolithiasis",
+      "demo_prob": 7.278350676642731e-05
+    },
+    {
+      "key": "肝_肝内钙化灶",
+      "organ_zh": "肝",
+      "name_zh": "肝内钙化灶",
+      "name_en": "Liver_Intrahepatic calcification",
+      "demo_prob": 0.0022391013335436583
+    },
+    {
+      "key": "肝_肝囊肿",
+      "organ_zh": "肝",
+      "name_zh": "肝囊肿",
+      "name_en": "Liver_Cyst",
+      "demo_prob": 0.0012421889696270227
+    },
+    {
+      "key": "肝_肝细胞癌",
+      "organ_zh": "肝",
+      "name_zh": "肝细胞癌",
+      "name_en": "Liver_Hepatocellular carcinoma",
+      "demo_prob": 7.77132390794577e-06
+    },
+    {
+      "key": "肝_肝胆管内高密度影",
+      "organ_zh": "肝",
+      "name_zh": "肝胆管内高密度影",
+      "name_en": "Liver_Hyperattenuating lesion in intrahepatic bile ducts",
+      "demo_prob": 6.007210322422907e-05
+    },
+    {
+      "key": "肝_肝血管瘤",
+      "organ_zh": "肝",
+      "name_zh": "肝血管瘤",
+      "name_en": "Liver_Hemangioma",
+      "demo_prob": 0.0025454037822782993
+    },
+    {
+      "key": "肝_胆管癌",
+      "organ_zh": "肝",
+      "name_zh": "胆管癌",
+      "name_en": "Liver_Intrahepatic cholangiocarcinoma",
+      "demo_prob": 1.0419533282401972e-05
+    },
+    {
+      "key": "肝_脂肪肝",
+      "organ_zh": "肝",
+      "name_zh": "脂肪肝",
+      "name_en": "Liver_Steatotic liver disease",
+      "demo_prob": 0.010936073958873749
+    },
+    {
+      "key": "肝_脓肿",
+      "organ_zh": "肝",
+      "name_zh": "脓肿",
+      "name_en": "Liver_Abscess",
+      "demo_prob": 0.0003771198680624366
+    },
+    {
+      "key": "肝_转移瘤",
+      "organ_zh": "肝",
+      "name_zh": "转移瘤",
+      "name_en": "Liver_Metastasis",
+      "demo_prob": 0.00020302394113969058
+    },
+    {
+      "key": "肝_边缘不规则",
+      "organ_zh": "肝",
+      "name_zh": "边缘不规则",
+      "name_en": "Liver_Irregular margin",
+      "demo_prob": 7.499976345570758e-05
+    },
+    {
+      "key": "肺_斑片影",
+      "organ_zh": "肺",
+      "name_zh": "斑片影",
+      "name_en": "Lung_Patchy opacity",
+      "demo_prob": 0.05662648007273674
+    },
+    {
+      "key": "肺_气胸",
+      "organ_zh": "肺",
+      "name_zh": "气胸",
+      "name_en": "Lung_Pneumothorax",
+      "demo_prob": 0.04852936044335365
+    },
+    {
+      "key": "肺_结节",
+      "organ_zh": "肺",
+      "name_zh": "结节",
+      "name_en": "Lung_Nodule",
+      "demo_prob": 0.0320795439183712
+    },
+    {
+      "key": "肺_肺占位",
+      "organ_zh": "肺",
+      "name_zh": "肺占位",
+      "name_en": "Lung_Mass",
+      "demo_prob": 0.024528928101062775
+    },
+    {
+      "key": "肺_肺萎陷",
+      "organ_zh": "肺",
+      "name_zh": "肺萎陷",
+      "name_en": "Lung_Pulmonary collapse",
+      "demo_prob": 0.021796083077788353
+    },
+    {
+      "key": "肺_胸腔积液",
+      "organ_zh": "肺",
+      "name_zh": "胸腔积液",
+      "name_en": "Lung_Pleural effusion",
+      "demo_prob": 0.022446341812610626
+    },
+    {
+      "key": "肺_膨胀不全",
+      "organ_zh": "肺",
+      "name_zh": "膨胀不全",
+      "name_en": "Lung_Atelectasis",
+      "demo_prob": 0.021751850843429565
+    },
+    {
+      "key": "肺_转移瘤",
+      "organ_zh": "肺",
+      "name_zh": "转移瘤",
+      "name_en": "Lung_Metastasis",
+      "demo_prob": 0.010947809554636478
+    },
+    {
+      "key": "肺_钙化灶",
+      "organ_zh": "肺",
+      "name_zh": "钙化灶",
+      "name_en": "Lung_Calcification",
+      "demo_prob": 0.03088272362947464
+    },
+    {
+      "key": "肺_高密度影",
+      "organ_zh": "肺",
+      "name_zh": "高密度影",
+      "name_en": "Lung_Hyperattenuating opacity",
+      "demo_prob": 0.04458601772785187
+    },
+    {
+      "key": "肾_低密度影",
+      "organ_zh": "肾",
+      "name_zh": "低密度影",
+      "name_en": "Kidney_Hypoattenuating lesion",
+      "demo_prob": 0.08785559237003326
+    },
+    {
+      "key": "肾_囊肿",
+      "organ_zh": "肾",
+      "name_zh": "囊肿",
+      "name_en": "Kidney_Cyst",
+      "demo_prob": 0.09794388711452484
+    },
+    {
+      "key": "肾_多囊肾",
+      "organ_zh": "肾",
+      "name_zh": "多囊肾",
+      "name_en": "Kidney_Polycystic kidney disease",
+      "demo_prob": 0.0004482859221752733
+    },
+    {
+      "key": "肾_实质变薄",
+      "organ_zh": "肾",
+      "name_zh": "实质变薄",
+      "name_en": "Kidney_Parenchymal thinning",
+      "demo_prob": 0.004691672045737505
+    },
+    {
+      "key": "肾_无强化囊性灶",
+      "organ_zh": "肾",
+      "name_zh": "无强化囊性灶",
+      "name_en": "Kidney_Nonenhancing cystic lesion",
+      "demo_prob": 0.06735032051801682
+    },
+    {
+      "key": "肾_肾动脉瘤",
+      "organ_zh": "肾",
+      "name_zh": "肾动脉瘤",
+      "name_en": "Kidney_Renal artery aneurysm",
+      "demo_prob": 0.1298467218875885
+    },
+    {
+      "key": "肾_肾盂扩张",
+      "organ_zh": "肾",
+      "name_zh": "肾盂扩张",
+      "name_en": "Kidney_Renal pelvic dilatation",
+      "demo_prob": 0.27091947197914124
+    },
+    {
+      "key": "肾_肾盂癌",
+      "organ_zh": "肾",
+      "name_zh": "肾盂癌",
+      "name_en": "Kidney_Renal pelvic cancer",
+      "demo_prob": 0.034703489392995834
+    },
+    {
+      "key": "肾_肾盂积水",
+      "organ_zh": "肾",
+      "name_zh": "肾盂积水",
+      "name_en": "Kidney_Hydronephrosis",
+      "demo_prob": 0.20213663578033447
+    },
+    {
+      "key": "肾_肾细胞癌（透明细胞癌）",
+      "organ_zh": "肾",
+      "name_zh": "肾细胞癌（透明细胞癌）",
+      "name_en": "Kidney_Renal cell carcinoma",
+      "demo_prob": 0.011229487136006355
+    },
+    {
+      "key": "肾_肾萎缩",
+      "organ_zh": "肾",
+      "name_zh": "肾萎缩",
+      "name_en": "Kidney_Atrophy",
+      "demo_prob": 0.006276356056332588
+    },
+    {
+      "key": "肾_肾血管平滑肌脂肪瘤",
+      "organ_zh": "肾",
+      "name_zh": "肾血管平滑肌脂肪瘤",
+      "name_en": "Kidney_Angiomyolipoma",
+      "demo_prob": 0.03131343796849251
+    },
+    {
+      "key": "肾_肾（盂）结石",
+      "organ_zh": "肾",
+      "name_zh": "肾（盂）结石",
+      "name_en": "Kidney_Nephrolithiasis",
+      "demo_prob": 0.011184885166585445
+    },
+    {
+      "key": "肾_高密度影",
+      "organ_zh": "肾",
+      "name_zh": "高密度影",
+      "name_en": "Kidney_Hyperattenuating lesion",
+      "demo_prob": 0.017919408157467842
+    },
+    {
+      "key": "肾上腺_增生",
+      "organ_zh": "肾上腺",
+      "name_zh": "增生",
+      "name_en": "Adrenal gland_Hyperplasia",
+      "demo_prob": 0.2171335220336914
+    },
+    {
+      "key": "肾上腺_结节",
+      "organ_zh": "肾上腺",
+      "name_zh": "结节",
+      "name_en": "Adrenal gland_Nodule",
+      "demo_prob": 0.09553750604391098
+    },
+    {
+      "key": "肾上腺_脂肪瘤",
+      "organ_zh": "肾上腺",
+      "name_zh": "脂肪瘤",
+      "name_en": "Adrenal gland_Lipoma",
+      "demo_prob": 0.40758299827575684
+    },
+    {
+      "key": "肾上腺_腺瘤",
+      "organ_zh": "肾上腺",
+      "name_zh": "腺瘤",
+      "name_en": "Adrenal gland_Adenoma",
+      "demo_prob": 0.05685568228363991
+    },
+    {
+      "key": "肾上腺_转移瘤",
+      "organ_zh": "肾上腺",
+      "name_zh": "转移瘤",
+      "name_en": "Adrenal gland_Metastasis",
+      "demo_prob": 0.01353213656693697
+    },
+    {
+      "key": "肾上腺_钙化",
+      "organ_zh": "肾上腺",
+      "name_zh": "钙化",
+      "name_en": "Adrenal gland_Calcification",
+      "demo_prob": 0.03295058757066727
+    },
+    {
+      "key": "胃_壁水肿",
+      "organ_zh": "胃",
+      "name_zh": "壁水肿",
+      "name_en": "Stomach_Wall edema",
+      "demo_prob": 0.1594933271408081
+    },
+    {
+      "key": "胃_扩张",
+      "organ_zh": "胃",
+      "name_zh": "扩张",
+      "name_en": "Stomach_Dilatation",
+      "demo_prob": 0.05848156288266182
+    },
+    {
+      "key": "胃_胃底静脉曲张",
+      "organ_zh": "胃",
+      "name_zh": "胃底静脉曲张",
+      "name_en": "Stomach_Gastric fundal varices",
+      "demo_prob": 0.016124790534377098
+    },
+    {
+      "key": "胃_胃溃疡",
+      "organ_zh": "胃",
+      "name_zh": "胃溃疡",
+      "name_en": "Stomach_Ulcer",
+      "demo_prob": 0.03886738419532776
+    },
+    {
+      "key": "胃_胃癌",
+      "organ_zh": "胃",
+      "name_zh": "胃癌",
+      "name_en": "Stomach_Gastric cancer",
+      "demo_prob": 0.011447980999946594
+    },
+    {
+      "key": "胃_间质瘤（gist）",
+      "organ_zh": "胃",
+      "name_zh": "间质瘤（gist）",
+      "name_en": "Stomach_Gastrointestinal stromal tumor (GIST)",
+      "demo_prob": 0.02822682447731495
+    },
+    {
+      "key": "胆囊_结石",
+      "organ_zh": "胆囊",
+      "name_zh": "结石",
+      "name_en": "Gallbladder_Cholecystolithiasis",
+      "demo_prob": 0.005065460689365864
+    },
+    {
+      "key": "胆囊_结节状致密影",
+      "organ_zh": "胆囊",
+      "name_zh": "结节状致密影",
+      "name_en": "Gallbladder_Nodular stone-like hyperattenuating lesion",
+      "demo_prob": 0.004533225670456886
+    },
+    {
+      "key": "胆囊_胆囊增大",
+      "organ_zh": "胆囊",
+      "name_zh": "胆囊增大",
+      "name_en": "Gallbladder_Distention",
+      "demo_prob": 0.00862972903996706
+    },
+    {
+      "key": "胆囊_胆囊炎",
+      "organ_zh": "胆囊",
+      "name_zh": "胆囊炎",
+      "name_en": "Gallbladder_Cholecystitis",
+      "demo_prob": 0.004589256830513477
+    },
+    {
+      "key": "胆囊_胆囊癌",
+      "organ_zh": "胆囊",
+      "name_zh": "胆囊癌",
+      "name_en": "Gallbladder_Gallbladder cancer",
+      "demo_prob": 0.00013571734598372132
+    },
+    {
+      "key": "胆囊_胆囊腺肌症",
+      "organ_zh": "胆囊",
+      "name_zh": "胆囊腺肌症",
+      "name_en": "Gallbladder_Adenomyomatosis",
+      "demo_prob": 0.017837056890130043
+    },
+    {
+      "key": "胆囊_胆管壁增厚",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管壁增厚",
+      "name_en": "Gallbladder_Extrahepatic bile duct wall thickening",
+      "demo_prob": 0.0013283860171213746
+    },
+    {
+      "key": "胆囊_胆管扩张",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管扩张",
+      "name_en": "Gallbladder_Extrahepatic bile duct dilatation",
+      "demo_prob": 0.001863974961452186
+    },
+    {
+      "key": "胆囊_胆管炎",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管炎",
+      "name_en": "Gallbladder_Cholangitis",
+      "demo_prob": 0.0011429599253460765
+    },
+    {
+      "key": "胆囊_胆管癌",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管癌",
+      "name_en": "Gallbladder_Cholangiocarcinoma",
+      "demo_prob": 0.00025256717344745994
+    },
+    {
+      "key": "胆囊_胆管积气",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管积气",
+      "name_en": "Gallbladder_Pneumobilia",
+      "demo_prob": 0.0007253882940858603
+    },
+    {
+      "key": "胆囊_胆管结石",
+      "organ_zh": "胆囊",
+      "name_zh": "胆管结石",
+      "name_en": "Gallbladder_Extrahepatic bile duct stone",
+      "demo_prob": 0.0009940493619069457
+    },
+    {
+      "key": "胆囊_高密度影",
+      "organ_zh": "胆囊",
+      "name_zh": "高密度影",
+      "name_en": "Gallbladder_Hyperattenuating lesion",
+      "demo_prob": 0.006683739367872477
+    },
+    {
+      "key": "胆囊_黄色肉芽肿",
+      "organ_zh": "胆囊",
+      "name_zh": "黄色肉芽肿",
+      "name_en": "Gallbladder_Xanthogranuloma",
+      "demo_prob": 5.6429656979162246e-05
+    },
+    {
+      "key": "胰腺_低密度影",
+      "organ_zh": "胰腺",
+      "name_zh": "低密度影",
+      "name_en": "Pancreas_Low-density lesion",
+      "demo_prob": 0.007235853001475334
+    },
+    {
+      "key": "胰腺_囊肿",
+      "organ_zh": "胰腺",
+      "name_zh": "囊肿",
+      "name_en": "Pancreas_Cyst",
+      "demo_prob": 0.014210042543709278
+    },
+    {
+      "key": "胰腺_围脂肪间隙模糊",
+      "organ_zh": "胰腺",
+      "name_zh": "围脂肪间隙模糊",
+      "name_en": "Pancreas_Blurring of peripancreatic fat planes",
+      "demo_prob": 0.003264014609158039
+    },
+    {
+      "key": "胰腺_肿瘤或胰腺癌",
+      "organ_zh": "胰腺",
+      "name_zh": "肿瘤或胰腺癌",
+      "name_en": "Pancreas_Pancreatic cancer",
+      "demo_prob": 0.0008452783804386854
+    },
+    {
+      "key": "胰腺_胰周假性囊肿",
+      "organ_zh": "胰腺",
+      "name_zh": "胰周假性囊肿",
+      "name_en": "Pancreas_Peripancreatic pseudocyst",
+      "demo_prob": 0.00041045036050491035
+    },
+    {
+      "key": "胰腺_胰管扩张",
+      "organ_zh": "胰腺",
+      "name_zh": "胰管扩张",
+      "name_en": "Pancreas_Pancreatic duct dilatation",
+      "demo_prob": 0.0056141396053135395
+    },
+    {
+      "key": "胰腺_胰管结石",
+      "organ_zh": "胰腺",
+      "name_zh": "胰管结石",
+      "name_en": "Pancreas_Pancreatic duct calculus",
+      "demo_prob": 0.0004291131626814604
+    },
+    {
+      "key": "胰腺_胰腺炎",
+      "organ_zh": "胰腺",
+      "name_zh": "胰腺炎",
+      "name_en": "Pancreas_Pancreatitis",
+      "demo_prob": 0.004019881132990122
+    },
+    {
+      "key": "胰腺_胰腺饱满",
+      "organ_zh": "胰腺",
+      "name_zh": "胰腺饱满",
+      "name_en": "Pancreas_Enlargement",
+      "demo_prob": 0.004561380483210087
+    },
+    {
+      "key": "胰腺_萎缩",
+      "organ_zh": "胰腺",
+      "name_zh": "萎缩",
+      "name_en": "Pancreas_Atrophy",
+      "demo_prob": 0.0044769831001758575
+    },
+    {
+      "key": "脾_低密度灶",
+      "organ_zh": "脾",
+      "name_zh": "低密度灶",
+      "name_en": "Spleen_Hypoattenuating lesion",
+      "demo_prob": 0.01140413898974657
+    },
+    {
+      "key": "脾_副脾",
+      "organ_zh": "脾",
+      "name_zh": "副脾",
+      "name_en": "Spleen_Accessory spleen",
+      "demo_prob": 0.007828145287930965
+    },
+    {
+      "key": "脾_囊肿",
+      "organ_zh": "脾",
+      "name_zh": "囊肿",
+      "name_en": "Spleen_Cyst",
+      "demo_prob": 0.012520178221166134
+    },
+    {
+      "key": "脾_梗死",
+      "organ_zh": "脾",
+      "name_zh": "梗死",
+      "name_en": "Spleen_Infarction",
+      "demo_prob": 0.002783197909593582
+    },
+    {
+      "key": "脾_片状低密度区",
+      "organ_zh": "脾",
+      "name_zh": "片状低密度区",
+      "name_en": "Spleen_Patchy hypoattenuating lesion",
+      "demo_prob": 0.010848438367247581
+    },
+    {
+      "key": "脾_脾大",
+      "organ_zh": "脾",
+      "name_zh": "脾大",
+      "name_en": "Spleen_Splenomegaly",
+      "demo_prob": 0.008493768982589245
+    },
+    {
+      "key": "脾_脾脏淋巴瘤",
+      "organ_zh": "脾",
+      "name_zh": "脾脏淋巴瘤",
+      "name_en": "Spleen_Lymphoma",
+      "demo_prob": 0.001291184569709003
+    },
+    {
+      "key": "脾_钙化",
+      "organ_zh": "脾",
+      "name_zh": "钙化",
+      "name_en": "Spleen_Calcification",
+      "demo_prob": 0.025722505524754524
+    },
+    {
+      "key": "膀胱_憩室",
+      "organ_zh": "膀胱",
+      "name_zh": "憩室",
+      "name_en": "Bladder_Diverticulum",
+      "demo_prob": 0.011400004848837852
+    },
+    {
+      "key": "膀胱_结石",
+      "organ_zh": "膀胱",
+      "name_zh": "结石",
+      "name_en": "Bladder_Stone",
+      "demo_prob": 0.018491605296730995
+    },
+    {
+      "key": "膀胱_膀胱壁毛糙",
+      "organ_zh": "膀胱",
+      "name_zh": "膀胱壁毛糙",
+      "name_en": "Bladder_Wall irregularity",
+      "demo_prob": 0.013123233802616596
+    },
+    {
+      "key": "膀胱_膀胱炎",
+      "organ_zh": "膀胱",
+      "name_zh": "膀胱炎",
+      "name_en": "Bladder_Cystitis",
+      "demo_prob": 0.0027258172631263733
+    },
+    {
+      "key": "膀胱_膀胱癌",
+      "organ_zh": "膀胱",
+      "name_zh": "膀胱癌",
+      "name_en": "Bladder_Bladder cancer",
+      "demo_prob": 0.003620677161961794
+    },
+    {
+      "key": "膀胱_软组织密度影",
+      "organ_zh": "膀胱",
+      "name_zh": "软组织密度影",
+      "name_en": "Bladder_Soft-tissue attenuation lesion",
+      "demo_prob": 0.003923371434211731
+    },
+    {
+      "key": "门静脉_增宽",
+      "organ_zh": "门静脉",
+      "name_zh": "增宽",
+      "name_en": "Portal vein_Dilatation",
+      "demo_prob": 0.0054723722860217094
+    },
+    {
+      "key": "门静脉_栓塞",
+      "organ_zh": "门静脉",
+      "name_zh": "栓塞",
+      "name_en": "Portal vein_Thrombosis",
+      "demo_prob": 0.0019014213467016816
+    },
+    {
+      "key": "门静脉_高压",
+      "organ_zh": "门静脉",
+      "name_zh": "高压",
+      "name_en": "Portal vein_Hypertension",
+      "demo_prob": 0.002229975303635001
+    },
+    {
+      "key": "食管_增粗迂曲血管影",
+      "organ_zh": "食管",
+      "name_zh": "增粗迂曲血管影",
+      "name_en": "Esophagus_Dilated and tortuous tubular opacities",
+      "demo_prob": 0.008537441492080688
+    },
+    {
+      "key": "食管_管壁增厚",
+      "organ_zh": "食管",
+      "name_zh": "管壁增厚",
+      "name_en": "Esophagus_Wall thickening",
+      "demo_prob": 0.021217960864305496
+    },
+    {
+      "key": "食管_裂孔疝",
+      "organ_zh": "食管",
+      "name_zh": "裂孔疝",
+      "name_en": "Esophagus_Hiatal hernia",
+      "demo_prob": 0.10012251883745193
+    },
+    {
+      "key": "食管_静脉扩张迂曲",
+      "organ_zh": "食管",
+      "name_zh": "静脉扩张迂曲",
+      "name_en": "Esophagus_Dilated and tortuous veins",
+      "demo_prob": 0.00778275215998292
+    },
+    {
+      "key": "食管_静脉曲张",
+      "organ_zh": "食管",
+      "name_zh": "静脉曲张",
+      "name_en": "Esophagus_Varices",
+      "demo_prob": 0.006995936390012503
+    },
+    {
+      "key": "骶骨_骨炎",
+      "organ_zh": "骶骨",
+      "name_zh": "骨炎",
+      "name_en": "Sacrum_Osteitis",
+      "demo_prob": 0.0059172590263187885
+    }
+  ]
+}

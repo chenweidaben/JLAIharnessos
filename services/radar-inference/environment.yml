@@ -1,0 +1,27 @@
+# Conda environment for RADAR-Fusion inference service.
+# Demo/CPU base. Production GPU stack is documented below (commented).
+name: radar-inference
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - fastapi>=0.110
+      - "uvicorn[standard]>=0.29"
+      - pydantic>=2.6
+      - pandas>=2.0
+      - numpy>=1.26
+      - python-multipart>=0.0.9
+      - httpx>=0.27
+      - pytest>=8.0
+  # --- production (GPU) extras, uncomment when running the real model ---
+  # - pytorch::pytorch>=2.1
+  # - pytorch::pytorch-cuda=12.1
+  # - conda-forge::simpleitk>=2.3
+  # - pip:
+  #     - monai>=1.3
+  #     - nibabel>=5.1
+  #     - huggingface_hub>=0.23
+  #     - transformers>=4.40

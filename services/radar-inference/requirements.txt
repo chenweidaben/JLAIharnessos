@@ -1,0 +1,10 @@
+# RADAR-Fusion inference service — minimal (demo / CPU) dependencies.
+# Production (real model) deps are in requirements-prod.txt and are OPTIONAL.
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+pandas>=2.0
+numpy>=1.26
+python-multipart>=0.0.9
+httpx>=0.27
+pytest>=8.0
