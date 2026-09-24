@@ -28,6 +28,22 @@ export interface VisitCreateInput {
 
 const SELECT_COLS = `id, patient_id, visit_no, visit_type, department, ward, bed_no, attending_doctor_id, chief_complaint, consultation_detail, status, triage_level, admit_at, discharge_at, drg_group, dip_group, total_fee, created_at, updated_at`;
 
+/** 规范化问诊明细：历史数据可能被双重编码为字符串，此处解析回对象 */
+function normalizeConsultationDetail(v: unknown): Record<string, unknown> | null {
+  if (v == null) return null;
+  if (typeof v === 'string') {
+    const trimmed = v.trim();
+    if (!trimmed) return null;
+    try {
+      const parsed: unknown = JSON.parse(trimmed);
+      return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  }
+  return typeof v === 'object' ? (v as Record<string, unknown>) : null;
+}
+
 function mapRow(row: Record<string, unknown>): Visit {
   return {
     id: String(row.id), patientId: String(row.patient_id), visitNo: String(row.visit_no),
@@ -35,7 +51,7 @@ function mapRow(row: Record<string, unknown>): Visit {
     ward: row.ward ? String(row.ward) : null, bedNo: row.bed_no ? String(row.bed_no) : null,
     attendingDoctorId: row.attending_doctor_id ? String(row.attending_doctor_id) : null,
     chiefComplaint: row.chief_complaint ? String(row.chief_complaint) : null,
-    consultationDetail: (row.consultation_detail as Record<string, unknown>) ?? null,
+    consultationDetail: normalizeConsultationDetail(row.consultation_detail),
     status: row.status as VisitStatus, triageLevel: row.triage_level ? String(row.triage_level) : null,
     admitAt: row.admit_at ? String(row.admit_at) : null,
     dischargeAt: row.discharge_at ? String(row.discharge_at) : null,
@@ -101,7 +117,7 @@ export async function updateVisitConsultation(
   const rows = await db`
     UPDATE clinical.visits
     SET chief_complaint = COALESCE(${input.chiefComplaint ?? null}, chief_complaint),
-        consultation_detail = COALESCE(${input.detail ? db.json(JSON.stringify(input.detail)) : null}, consultation_detail),
+        consultation_detail = COALESCE(${input.detail ? db.json(input.detail as unknown as Parameters<Sql['json']>[0]) : null}, consultation_detail),
         updated_at = now()
     WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
