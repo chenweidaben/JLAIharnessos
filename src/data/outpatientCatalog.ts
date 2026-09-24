@@ -103,6 +103,8 @@ export const ICD_CATALOG: IcdDiagnosis[] = [
   { code: 'I25.100', name: '冠状动脉粥样硬化性心脏病', category: '循环系统' },
   { code: 'I25.200', name: '陈旧性心肌梗死', category: '循环系统' },
   { code: 'I44.200', name: '房室传导阻滞', category: '循环系统' },
+  { code: 'I47.100', name: '阵发性室上性心动过速', category: '循环系统' },
+  { code: 'I47.200', name: '室性心动过速', category: '循环系统' },
   { code: 'I48.x00', name: '心房颤动', category: '循环系统' },
   { code: 'I49.900', name: '心律失常', category: '循环系统' },
   { code: 'I50.900', name: '心力衰竭', category: '循环系统' },
