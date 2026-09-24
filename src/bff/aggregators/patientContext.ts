@@ -34,20 +34,45 @@ function truncate(s: string, n: number): string {
 function presentIllnessText(pi: unknown): string {
   const o = asRecord(pi);
   const parts: string[] = [];
-  const labelMap: Array<[string, string]> = [
-    ['onsetTime', '起病时间'],
-    ['trigger', '诱因'],
-    ['mainSymptom', '主要症状'],
-    ['symptomDetail', '症状特点'],
-    ['accompanySymptom', '伴随症状'],
-    ['aggravating', '加重因素'],
-    ['relieving', '缓解因素'],
-    ['evolution', '演变过程'],
-    ['preTreatment', '院外处理'],
-    ['generalCondition', '一般情况'],
+  // 每项：[标签, 候选键列表]（首选对齐门诊表单 ConsultationForm 实际落库键，别名用于兼容历史数据）
+  const labelMap: Array<[string, string[]]> = [
+    ['起病时间', ['onsetTime']],
+    ['诱因', ['trigger']],
+    ['主要症状', ['mainSymptom', 'symptomDetail']],
+    ['伴随症状', ['accompanying', 'accompanySymptom']],
+    ['加重因素', ['aggravating']],
+    ['缓解因素', ['relieving']],
+    ['演变过程', ['evolution']],
+    ['诊疗经过', ['treatmentProcess', 'preTreatment']],
+    ['一般情况', ['generalCondition']],
   ];
-  for (const [key, label] of labelMap) {
-    const v = str(o[key]);
+  for (const [label, keys] of labelMap) {
+    let v = '';
+    for (const key of keys) {
+      v = str(o[key]);
+      if (v) break;
+    }
+    if (v) parts.push(`${label}：${v}`);
+  }
+  return parts.join('；');
+}
+
+/** 将结构化既往史对象拼成可读短句（对齐门诊表单 pastHistory 键） */
+function pastHistoryText(ph: unknown): string {
+  const o = asRecord(ph);
+  const parts: string[] = [];
+  const labelMap: Array<[string, string[]]> = [
+    ['既往疾病', ['diseases', 'disease']],
+    ['手术史', ['surgery']],
+    ['外伤/输血史', ['traumaTransfusion', 'trauma']],
+    ['过敏史', ['allergy']],
+  ];
+  for (const [label, keys] of labelMap) {
+    let v = '';
+    for (const key of keys) {
+      v = str(o[key]);
+      if (v) break;
+    }
     if (v) parts.push(`${label}：${v}`);
   }
   return parts.join('；');
@@ -97,6 +122,8 @@ export async function buildPatientContextBlock(
   if (chief) lines.push(`- 主诉：${truncate(chief, 120)}`);
   const pi = presentIllnessText(consultation.presentIllness);
   if (pi) lines.push(`- 现病史：${truncate(pi, 300)}`);
+  const ph = pastHistoryText(consultation.pastHistory);
+  if (ph) lines.push(`- 既往史：${truncate(ph, 240)}`);
 
   // 诊断
   const diagText = asList(b.diagnoses)
