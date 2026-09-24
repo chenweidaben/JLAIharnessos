@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useOutpatientStore } from '@/store/outpatientStore';
 import { env } from '@/utils/config';
+import '@/styles/outpatient-workbench.css';
 import WaitingQueue from '@/components/outpatient/WaitingQueue';
 import ConsultationForm from '@/components/outpatient/ConsultationForm';
 import DiagnosisPanel from '@/components/outpatient/DiagnosisPanel';
@@ -36,7 +37,7 @@ import ReferralPanel from '@/components/outpatient/ReferralPanel';
 import OutpatientStats from '@/components/outpatient/OutpatientStats';
 import PatientSummaryPanel from '@/components/outpatient/PatientSummaryPanel';
 
-const { Header, Sider, Content } = Layout;
+const { Header } = Layout;
 const { Text } = Typography;
 
 const MIDDLE_TABS = [
@@ -82,9 +83,9 @@ export const OutpatientPage: React.FC = () => {
   };
 
   return (
-    <Layout className="h-screen">
+    <Layout className="outpatient-workbench">
       <Header
-        className="!px-4 flex items-center justify-between"
+        className="!px-4 flex items-center justify-between shrink-0"
         style={{ background: '#0A4D8C', color: '#fff', height: 56, lineHeight: '56px' }}
       >
         <Space size="large">
@@ -132,19 +133,15 @@ export const OutpatientPage: React.FC = () => {
         <Alert type="info" showIcon banner message="正在从医院信息系统加载…" />
       )}
 
-      <Layout>
-        <Sider
-          width={320}
-          theme="light"
-          className="!bg-ink-bg border-r border-ink-border overflow-auto"
-        >
-          <div className="p-2 space-y-2">
+      <div className="outpatient-workbench__body">
+        <aside className="outpatient-col outpatient-col--left">
+          <div className="outpatient-col__inner p-2 space-y-2">
             <WaitingQueue onSelect={handleSelect} />
             <OutpatientStats />
           </div>
-        </Sider>
+        </aside>
 
-        <Content className="overflow-auto p-3 bg-ink-bg">
+        <main className="outpatient-col outpatient-col--center p-3">
           {!currentPatient ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
@@ -155,7 +152,7 @@ export const OutpatientPage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div>
+            <div className="min-w-0">
               <div className="mb-2 flex items-center justify-between">
                 <Space>
                   <span className="font-semibold">当前就诊：{currentPatient.nameMasked}</span>
@@ -166,11 +163,12 @@ export const OutpatientPage: React.FC = () => {
                 </Text>
               </div>
               <Tabs
+                className="min-w-0"
                 activeKey={activeTab}
                 onChange={setActiveTab}
                 items={MIDDLE_TABS.map((t) => ({ key: t.key, label: t.label }))}
               />
-              <div className="bg-white rounded p-3">
+              <div className="bg-white rounded p-3 min-w-0">
                 {activeTab === 'consult' && <ConsultationForm />}
                 {activeTab === 'diagnosis' && <DiagnosisPanel />}
                 {activeTab === 'prescription' && <PrescriptionPanel />}
@@ -180,19 +178,15 @@ export const OutpatientPage: React.FC = () => {
               </div>
             </div>
           )}
-        </Content>
+        </main>
 
-        <Sider
-          width={340}
-          theme="light"
-          className="!bg-ink-bg border-l border-ink-border overflow-auto"
-        >
-          <div className="p-2 space-y-2">
+        <aside className="outpatient-col outpatient-col--right">
+          <div className="outpatient-col__inner p-2 space-y-2">
             <PatientSummaryPanel />
             <AIAssistant />
           </div>
-        </Sider>
-      </Layout>
+        </aside>
+      </div>
     </Layout>
   );
 };

@@ -1,0 +1,107 @@
+/**
+ * 健澜科技 jlmedaios - 门诊工作台响应式布局
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ *
+ * 三栏（候诊队列 / 诊疗工作区 / 患者360+AI）随容器弹性伸缩：
+ *  - 中间诊疗区 min-width:0，可正常收缩，内容内部滚动，不顶破整体布局；
+ *  - 两侧栏使用弹性百分比 + 最小/最大宽度约束，避免固定像素在 1272px 下挤压；
+ *  - 工作台 Tabs 由 antd 在空间不足时出现滚动箭头，不产生横向溢出；
+ *  - 候诊卡片宽度 100%，不遮挡、不溢出。
+ */
+
+.outpatient-workbench {
+  display: flex;
+  flex-direction: column;
+  /* 页面嵌入 AppLayout 内容盒：视口高 - 顶栏56 - 内容盒外边距(16*2) - 内容盒内边距(16*2) */
+  height: calc(100vh - 120px);
+  min-height: 520px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.outpatient-workbench__body {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+}
+
+.outpatient-col {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+
+/* 左：候诊队列 + 统计 */
+.outpatient-col--left {
+  flex: 0 1 24%;
+  min-width: 256px;
+  max-width: 340px;
+  background: #fff;
+  border-right: 1px solid #e8ecf1;
+}
+
+/* 中：诊疗工作区（关键：可收缩，内部滚动） */
+.outpatient-col--center {
+  flex: 1 1 0%;
+  min-width: 0;
+  background: #f5f7fa;
+}
+
+/* 右：患者 360 + AI 助手 */
+.outpatient-col--right {
+  flex: 0 1 26%;
+  min-width: 272px;
+  max-width: 380px;
+  background: #fff;
+  border-left: 1px solid #e8ecf1;
+}
+
+/* 卡片/内容不溢出、不遮挡 */
+.outpatient-col .ant-card {
+  width: 100%;
+}
+.outpatient-col [class*='space-y'],
+.outpatient-col .outpatient-col__inner {
+  min-width: 0;
+}
+
+/* 候诊队列行：文本区可收缩省略，不把列宽顶开 */
+.outpatient-col--left .ant-card .ant-card-body {
+  min-width: 0;
+}
+
+/* 工作台 Tabs：nav 可收缩，空间不足由 antd 出现滚动箭头，不产生页面级横向溢出 */
+.outpatient-col--center .ant-tabs,
+.outpatient-col--center .ant-tabs-nav,
+.outpatient-col--center .ant-tabs-nav-wrap {
+  min-width: 0;
+}
+/* 紧凑间距：适度收窄标签内边距；antd v5 相邻标签默认左外边距 32px，收窄以在中等
+   宽度下多展示标签；空间仍不足时由 antd 的“更多(⋯)”收纳，绝不顶破布局。 */
+.outpatient-col--center .ant-tabs-tab {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.outpatient-col--center .ant-tabs-tab + .ant-tabs-tab {
+  margin-left: 12px !important;
+}
+.outpatient-col--center .ant-tabs-nav-list {
+  gap: 0;
+}
+
+/* 极端窄容器兜底：三栏保留各自最小宽度并允许横向滚动（正常桌面分辨率不触发） */
+@media (max-width: 1000px) {
+  .outpatient-workbench__body {
+    overflow-x: auto;
+  }
+  .outpatient-col--left {
+    flex: 0 0 256px;
+  }
+  .outpatient-col--center {
+    flex: 0 0 420px;
+  }
+  .outpatient-col--right {
+    flex: 0 0 272px;
+  }
+}
