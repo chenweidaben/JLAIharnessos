@@ -143,9 +143,14 @@ export const ConsultationForm: React.FC = () => {
             type="primary"
             ghost
             icon={<SaveOutlined />}
-            onClick={() => {
-              saveConsultation({ ...draft });
-              message.success('问诊记录已保存');
+            onClick={async () => {
+              const ok = await saveConsultation({ ...draft });
+              if (ok) {
+                setSavedTip(`已保存 ${new Date().toLocaleTimeString('zh-CN')}`);
+                message.success('问诊记录已保存');
+              } else {
+                message.error('问诊记录保存失败，请检查后端连接后重试');
+              }
             }}
           >
             保存
