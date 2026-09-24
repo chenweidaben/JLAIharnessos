@@ -15,6 +15,7 @@ import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } f
 
 import { ApiErrorCode, type ApiResponse, type RequestOptions } from '@/types/api';
 import { tokenStorage } from '@/utils/auth';
+import { getCsrfToken } from '@/utils/cookie';
 import { env } from '@/utils/config';
 
 /** HTTP 状态码（与业务错误码分离） */
@@ -72,6 +73,12 @@ instance.interceptors.request.use((config) => {
   const token = tokenStorage.getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  // 双重提交 Cookie：状态变更请求需回传 X-CSRF-Token，与服务端 csrf-token Cookie 一致。
+  // GET/HEAD/OPTIONS 服务端不校验，此处统一注入（存在时）也无副作用。
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    config.headers['X-CSRF-Token'] = csrfToken;
   }
   return config;
 });

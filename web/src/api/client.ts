@@ -15,6 +15,7 @@
  */
 import { API_BASE_URL, API_TIMEOUT_MS } from '@/config';
 import { tokenStorage } from '@/utils/auth';
+import { getCsrfToken } from '@/utils/cookie';
 
 /** 统一响应信封 */
 export interface ApiResponse<T = unknown> {
@@ -98,8 +99,11 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   const token = tokenStorage.getAccessToken();
+  const csrfToken = getCsrfToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
+  // 双重提交 Cookie：状态变更请求回传 X-CSRF-Token（GET 服务端不校验，注入无副作用）
+  if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
 
   try {
     const res = await fetch(buildUrl(path, query), {

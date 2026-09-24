@@ -11,6 +11,7 @@
  */
 import { get, post } from '../request';
 import { tokenStorage } from '@/utils/auth';
+import { getCsrfToken } from '@/utils/cookie';
 import { env } from '@/utils/config';
 
 /** 会话消息视图（对齐后端 ConversationMessage） */
@@ -95,6 +96,7 @@ export async function streamAiMessage(
 ): Promise<void> {
   const base = env.apiBaseUrl;
   const token = tokenStorage.getAccessToken();
+  const csrfToken = getCsrfToken();
   let response: Response;
   try {
     response = await fetch(`${base}/chat/conversations/${conversationId}/messages`, {
@@ -103,6 +105,7 @@ export async function streamAiMessage(
         'Content-Type': 'application/json',
         Accept: 'text/event-stream',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
       },
       body: JSON.stringify({ content }),
       signal,
