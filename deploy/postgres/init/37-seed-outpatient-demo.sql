@@ -63,7 +63,12 @@ SELECT p.id,
          WHEN 'PAT-DEMO-004' THEN '头晕、头痛半月'
          WHEN 'PAT-DEMO-005' THEN '胸痛再发 2 小时'
          WHEN 'PAT-DEMO-006' THEN '阵发性心悸 1 月' END,
-       now() - (SUBSTRING(p.mrn FROM '[0-9]+')::int * INTERVAL '6 minutes')
+       -- 到达时间按号次回退 6 分钟，形成不同候诊时长；
+       -- GREATEST 钳制到当日 00:00，避免刚过午夜执行时回退到前一天导致当日队列为空。
+       GREATEST(
+         now() - (SUBSTRING(p.mrn FROM '[0-9]+')::int * INTERVAL '6 minutes'),
+         CURRENT_DATE::timestamptz
+       )
 FROM clinical.patients p
 WHERE p.mrn LIKE 'PAT-DEMO-%'
   AND NOT EXISTS (
