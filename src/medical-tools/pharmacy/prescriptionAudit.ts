@@ -11,6 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
+import { clinicalData, isDemoMode, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 import { PRESCRIPTION_STORE } from './drugCatalog.js';
@@ -71,28 +72,6 @@ async function executePrescriptionAudit(
     };
   }
 
-  const record = PRESCRIPTION_STORE.find((r) => r.prescriptionId === parsed.prescriptionId);
-  if (!record) {
-    return {
-      success: false,
-      error: {
-        code: 'PRESCRIPTION_NOT_FOUND',
-        message: `处方 ${parsed.prescriptionId} 不存在`,
-      },
-    };
-  }
-
-  if (record.status !== '待审核') {
-    return {
-      success: false,
-      error: {
-        code: 'INVALID_STATUS',
-        message: `处方当前状态为"${record.status}"，仅"待审核"处方可审核`,
-        details: { prescriptionId: record.prescriptionId, status: record.status },
-      },
-    };
-  }
-
   // 驳回/退回要求填写审核意见
   if (parsed.action !== 'approve' && !parsed.auditComment?.trim()) {
     return {
@@ -104,9 +83,7 @@ async function executePrescriptionAudit(
     };
   }
 
-  const previousStatus = record.status;
-  const auditedAt = new Date().toISOString();
-
+  // 状态流转结果（中文，与对外契约一致）
   let currentStatus: '已审核' | '已驳回' | '已退回';
   let message: string;
   switch (parsed.action) {
@@ -124,20 +101,77 @@ async function executePrescriptionAudit(
       break;
   }
 
-  record.status = currentStatus;
-  record.pharmacist = context.medicalUser.name;
-  record.auditedAt = auditedAt;
-  record.auditComment = parsed.auditComment ?? null;
+  const auditedAt = new Date().toISOString();
+  let previousStatus: string;
+
+  if (isDemoMode()) {
+    // 演示模式：在内存处方存储上做状态流转
+    const record = PRESCRIPTION_STORE.find((r) => r.prescriptionId === parsed.prescriptionId);
+    if (!record) {
+      return {
+        success: false,
+        error: {
+          code: 'PRESCRIPTION_NOT_FOUND',
+          message: `处方 ${parsed.prescriptionId} 不存在`,
+        },
+      };
+    }
+    if (record.status !== '待审核') {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_STATUS',
+          message: `处方当前状态为"${record.status}"，仅"待审核"处方可审核`,
+          details: { prescriptionId: record.prescriptionId, status: record.status },
+        },
+      };
+    }
+    previousStatus = record.status;
+    record.status = currentStatus;
+    record.pharmacist = context.medicalUser.name;
+    record.auditedAt = auditedAt;
+    record.auditComment = parsed.auditComment ?? null;
+  } else {
+    // 真实模式：先取处方校验状态，再调 prescriptionRepo.auditPrescription（同事务改状态+写审核记录）
+    const record = await clinicalData.getPrescriptionById(parsed.prescriptionId);
+    if (!record) {
+      return {
+        success: false,
+        error: {
+          code: 'PRESCRIPTION_NOT_FOUND',
+          message: `处方 ${parsed.prescriptionId} 不存在`,
+        },
+      };
+    }
+    if (record.status !== 'pending_review') {
+      return {
+        success: false,
+        error: {
+          code: 'INVALID_STATUS',
+          message: `处方当前状态为"${record.status}"，仅"pending_review"处方可审核`,
+          details: { prescriptionId: record.id, status: record.status },
+        },
+      };
+    }
+    previousStatus = '待审核';
+    const decision: 'approved' | 'rejected' = parsed.action === 'approve' ? 'approved' : 'rejected';
+    await clinicalData.auditPrescription(
+      parsed.prescriptionId,
+      decision,
+      context.medicalUser.userId,
+      { comment: parsed.auditComment ?? '', reviewer: context.medicalUser.name },
+    );
+  }
 
   return {
     success: true,
     data: {
       success: true,
-      prescriptionId: record.prescriptionId,
+      prescriptionId: parsed.prescriptionId,
       previousStatus,
       currentStatus,
       action: parsed.action,
-      auditComment: record.auditComment,
+      auditComment: parsed.auditComment ?? null,
       auditedBy: context.medicalUser.name,
       auditedAt,
       message,

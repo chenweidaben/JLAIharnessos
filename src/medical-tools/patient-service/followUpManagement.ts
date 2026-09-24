@@ -124,6 +124,7 @@ async function executeFollowUpManagement(
         patientId: parsed.patientId,
         total: 1,
         followUps: [record],
+        _demoMode: true,
       },
     };
   }
@@ -146,6 +147,7 @@ async function executeFollowUpManagement(
       patientId: parsed.patientId,
       total: results.length,
       followUps: results,
+      _demoMode: true,
     },
   };
 }

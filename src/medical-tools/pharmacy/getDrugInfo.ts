@@ -11,6 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
+import { clinicalData, isDemoMode, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 import { DRUG_CATALOG, type DrugInfo, findDrugInfo } from './drugCatalog.js';
@@ -100,6 +101,15 @@ async function executeGetDrugInfo(
         ? '通用名(模糊)'
         : '别名';
 
+  // 真实模式：经 drugRepo 核对该药品是否在本院药品目录（formulary）中
+  let formularyNote = '';
+  if (!isDemoMode()) {
+    const dbDrugs = await clinicalData.searchDrugs(parsed.drugName, 5);
+    if (dbDrugs.length === 0) {
+      formularyNote = '注意：该药品未在本院现行药品目录（drugRepo）中，仅供说明书参考。';
+    }
+  }
+
   const base = {
     success: true,
     drugName: drug.genericName,
@@ -109,7 +119,8 @@ async function executeGetDrugInfo(
     insurance: drug.insurance,
     infoType: parsed.infoType,
     matchedBy,
-    notice: '本信息来源于内置药品说明书（Mock），仅供临床参考，实际用药请以现行说明书和医嘱为准。',
+    notice: `本信息来源于药品说明书库，仅供临床参考，实际用药请以现行说明书和医嘱为准。${formularyNote}`,
+    _source: sourceTag(),
   };
 
   // 按 infoType 裁剪返回

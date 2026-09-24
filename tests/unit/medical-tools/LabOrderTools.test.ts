@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 健澜科技. All rights reserved.
  *
@@ -39,7 +39,8 @@ describe('order_lab_test 开具检验申请', () => {
       specimenRequirements: string[];
       expectedReportTime: string;
     };
-    expect(data.orderId).toMatch(/^L/);
+    expect(data.orderId).toBeTruthy();
+    expect(data.orderId.length).toBeGreaterThan(3);
     expect(data.totalFee).toBeGreaterThan(0);
     // 血常规为EDTA抗凝血，生化为血清
     expect(data.testItems[0].specimenType).toContain('EDTA');

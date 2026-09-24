@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_MEDICAL_RECORDS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -66,11 +66,9 @@ async function executeGetMedicalRecord(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetMedicalRecordInput.parse(input);
 
-  let results = MOCK_MEDICAL_RECORDS.filter((r) => r.patientId === parsed.patientId);
-
-  if (parsed.encounterId) {
-    results = results.filter((r) => r.encounterId === parsed.encounterId);
-  }
+  // 数据源：演示模式走 MOCK_MEDICAL_RECORDS+内存新建；真实模式走 medicalRecordRepo。
+  // patientId/encounterId 已在数据层过滤，此处仅做文书类型/时间维度筛选。
+  let results = (await clinicalData.getMedicalRecords(parsed.patientId, parsed.encounterId)).slice();
 
   if (parsed.recordType) {
     results = results.filter((r) => r.recordType.includes(parsed.recordType!));
@@ -104,6 +102,7 @@ async function executeGetMedicalRecord(
         confirmedBy: r.confirmedBy,
         qcScore: r.qcScore,
       })),
+      _source: sourceTag(),
     },
   };
 }

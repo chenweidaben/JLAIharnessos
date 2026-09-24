@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_ORDERS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -71,11 +71,9 @@ async function executeGetOrderList(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetOrderListInput.parse(input);
 
-  let results = MOCK_ORDERS.filter((o) => o.patientId === parsed.patientId);
-
-  if (parsed.encounterId) {
-    results = results.filter((o) => o.encounterId === parsed.encounterId);
-  }
+  // 数据源：演示模式走 MOCK_ORDERS+内存新建；真实模式走 orderRepo。
+  // encounterId 已在数据层过滤，此处仅做状态/类型/时间维度筛选。
+  let results = (await clinicalData.getOrders(parsed.patientId, parsed.encounterId)).slice();
 
   if (parsed.status && parsed.status !== '全部') {
     results = results.filter((o) => o.status === parsed.status);
@@ -114,6 +112,7 @@ async function executeGetOrderList(
         executedBy: o.executedBy,
         clinicalIndication: o.clinicalIndication,
       })),
+      _source: sourceTag(),
     },
   };
 }

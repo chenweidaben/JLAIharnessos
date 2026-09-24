@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_LAB_REPORTS, MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -88,16 +88,14 @@ const OrderImagingExamOutput = z.object({
 // ============================================================================
 
 /**
- * 评估患者肾功能（基于最近肌酐）
+ * 评估患者肾功能（基于最近肌酐）。演示/真实均经数据层取检验报告。
  *
  * @param patientId - 患者ID
  * @returns 肌酐值与评估结论
  */
-function assessRenalFunction(patientId: string): { creatinine: number | null; conclusion: string } {
-  // 查找最近的生化报告中的肌酐
-  const biochem = MOCK_LAB_REPORTS.find(
-    (r) => r.patientId === patientId && /生化|急诊生化/.test(r.testName),
-  );
+async function assessRenalFunction(patientId: string): Promise<{ creatinine: number | null; conclusion: string }> {
+  const reports = await clinicalData.getLabReports(patientId);
+  const biochem = reports.find((r) => /生化|急诊生化/.test(r.testName));
   if (!biochem) {
     return { creatinine: null, conclusion: '无近期肾功能数据，增强检查前需补查肌酐/eGFR' };
   }
@@ -132,7 +130,7 @@ async function executeOrderImagingExam(
 ): Promise<ToolResult<unknown>> {
   const parsed = OrderImagingExamInput.parse(input);
 
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  const patient = await clinicalData.getPatient(parsed.patientId);
   if (!patient) {
     return {
       success: false,
@@ -195,7 +193,7 @@ async function executeOrderImagingExam(
     }
 
     // 肾功能检查（增强CT尤其重要）
-    const renal = assessRenalFunction(parsed.patientId);
+    const renal = await assessRenalFunction(parsed.patientId);
     renalFunction.push(renal.conclusion);
 
     // 二甲双胍 + 碘造影剂提示
@@ -227,11 +225,35 @@ async function executeOrderImagingExam(
     scheduled.setDate(scheduled.getDate() + 1);
   }
 
-  // 严重造影剂过敏 → 阻止开具增强
+  // 严重造影剂过敏 → 阻止开具增强，不落库
   const severeContrastAllergy = contrastAllergy.some((m) => m.includes('严禁'));
   const blocked = severeContrastAllergy;
 
-  const orderId = `X${Date.now().toString().slice(-10)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+  // 落库为 imaging 类医嘱（被阻止时不落库）
+  let orderId = '';
+  if (!blocked) {
+    const PRIORITY_TO_DB: Record<string, 'routine' | 'urgent' | 'stat'> = {
+      常规: 'routine',
+      紧急: 'urgent',
+      立即: 'stat',
+    };
+    const created = await clinicalData.createOrder({
+      visitId: parsed.encounterId,
+      orderType: 'imaging',
+      content: `${examName}（${parsed.examBodyPart}）`,
+      detail: {
+        examType: parsed.examType,
+        examBodyPart: parsed.examBodyPart,
+        contrast: parsed.contrast,
+        clinicalQuestion: parsed.clinicalQuestion,
+        examRoom,
+        totalFee,
+      },
+      priority: PRIORITY_TO_DB[parsed.urgency] ?? 'routine',
+      doctorId: context.medicalUser.userId,
+    });
+    orderId = created?.id ?? '';
+  }
 
   const requirements: string[] = [
     `检查部位：${parsed.examBodyPart}`,
@@ -260,6 +282,7 @@ async function executeOrderImagingExam(
         warnings,
       },
       orderedBy: context.medicalUser.name,
+      _source: sourceTag(),
     },
   };
 }

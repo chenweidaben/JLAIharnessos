@@ -36,6 +36,7 @@ bun-debug.log*
 
 # 运行时数据
 data/
+!src/data/
 runtime/
 tmp/
 *.pid

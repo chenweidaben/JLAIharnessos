@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_ORDERS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -64,8 +64,8 @@ async function executeCancelOrder(
 ): Promise<ToolResult<unknown>> {
   const parsed = CancelOrderInput.parse(input);
 
-  // 查找医嘱
-  const order = MOCK_ORDERS.find((o) => o.orderId === parsed.orderId);
+  // 查找医嘱（演示模式在内存医嘱中查，真实模式走 orderRepo）
+  const order = await clinicalData.findOrderDto(parsed.orderId);
   if (!order) {
     return {
       success: false,
@@ -115,6 +115,12 @@ async function executeCancelOrder(
   const resultingStatus =
     parsed.cancelType === '取消' ? '已取消' : parsed.cancelType === '停止' ? '已停止' : '已更改';
 
+  // 真实模式：将取消落库（orderRepo.cancelOrder，事务内记录取消原因与时间）。
+  // 需上级审核时不直接改库状态，待上级确认；演示模式无持久化。
+  if (!needsSupervisor) {
+    await clinicalData.cancelOrder(parsed.orderId, parsed.reason);
+  }
+
   return {
     success: true,
     data: {
@@ -133,6 +139,7 @@ async function executeCancelOrder(
           ? `该医嘱优先级为「${order.priority}」，停止/取消需主任医师审核确认后生效`
           : `医嘱${parsed.cancelType}成功，操作已记录并同步HIS`,
       },
+      _source: sourceTag(),
     },
   };
 }

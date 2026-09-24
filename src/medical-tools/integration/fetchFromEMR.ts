@@ -189,6 +189,7 @@ async function executeFetchFromEMR(
         summary: summarizeRecord(r.content),
       })),
       source,
+      _demoMode: true,
     },
   };
 }

@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool, maskName } from '../framework.js';
-import { MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -86,8 +86,11 @@ async function executeQueryPatient(
 ): Promise<ToolResult<unknown>> {
   const parsed = QueryPatientInput.parse(input);
 
+  // 数据源：演示模式走 mockData，真实模式走 patientRepo（字段已在数据层映射对齐）
+  const allPatients = await clinicalData.searchPatients();
+
   // 多条件过滤
-  const results = MOCK_PATIENTS.filter((p) => {
+  const results = allPatients.filter((p) => {
     if (parsed.patientId && p.patientId !== parsed.patientId) return false;
     if (parsed.name && !p.name.includes(parsed.name)) return false;
     if (parsed.idCard && p.idCard !== parsed.idCard) return false;
@@ -125,6 +128,7 @@ async function executeQueryPatient(
       page: parsed.page,
       pageSize: parsed.pageSize,
       data: desensitized,
+      _source: sourceTag(),
     },
   };
 }

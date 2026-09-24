@@ -12,6 +12,7 @@ import { MOCK_DRUG_LABELS } from '@knowledge/mock/mockKnowledgeBase';
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
+import { clinicalData, isDemoMode } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -101,6 +102,16 @@ async function executeGetDrugInformation(
   }
 
   const d = hit.data;
+
+  // 真实模式：经 drugRepo 核对是否在本院药品目录
+  let formularyNote = '';
+  if (!isDemoMode()) {
+    const dbDrugs = await clinicalData.searchDrugs(parsed.drugName, 5);
+    if (dbDrugs.length === 0) {
+      formularyNote = '注意：该药品未在本院现行药品目录（drugRepo）中，仅供说明书参考。';
+    }
+  }
+
   const want = parsed.infoType;
   const allSections = {
     适应症: d.indications,
@@ -130,7 +141,7 @@ async function executeGetDrugInformation(
       tradeName: d.tradeName,
       sections,
       found: true,
-      note: '本信息为 Mock 说明书内容，仅供开发演示，临床用药以最新版正式说明书及医嘱为准。',
+      note: `说明书内容仅供临床参考，临床用药以最新版正式说明书及医嘱为准。${formularyNote}`,
       queriedAt: new Date().toISOString(),
     },
   };

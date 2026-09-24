@@ -176,6 +176,7 @@ async function executeAppointmentRegistration(
       queueNo,
       registeredAt,
       notice: `请于就诊日提前15分钟到${parsed.department}分诊台报到，携带就诊卡/医保卡。操作人：${context.medicalUser.name}`,
+      _demoMode: true,
     },
   };
 }

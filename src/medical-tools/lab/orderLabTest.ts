@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -165,8 +165,8 @@ async function executeOrderLabTest(
 ): Promise<ToolResult<unknown>> {
   const parsed = OrderLabTestInput.parse(input);
 
-  // 患者校验
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  // 患者校验（演示模式走 mockData，真实模式走 patientRepo）
+  const patient = await clinicalData.getPatient(parsed.patientId);
   if (!patient) {
     return {
       success: false,
@@ -239,7 +239,32 @@ async function executeOrderLabTest(
     warnings.push('患者为急诊/立即优先级，检验科将优先处理并电话报告危急值');
   }
 
-  const orderId = `L${Date.now().toString().slice(-10)}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+  // 落库为检验类医嘱（演示模式写内存，真实模式走 orderRepo.createOrder, orderType=lab）
+  const PRIORITY_TO_DB: Record<string, 'routine' | 'urgent' | 'stat'> = {
+    常规: 'routine',
+    紧急: 'urgent',
+    立即: 'stat',
+  };
+  const created = await clinicalData.createOrder({
+    visitId: parsed.encounterId,
+    orderType: 'lab',
+    content: items.map((i) => i.testName).join('、'),
+    detail: {
+      testCodes: parsed.testItems.map((i) => i.testCode),
+      specimenRequirements,
+      totalFee,
+      clinicalDiagnosis: parsed.clinicalDiagnosis ?? null,
+    },
+    priority: PRIORITY_TO_DB[parsed.priority] ?? 'routine',
+    doctorId: context.medicalUser.userId,
+  });
+  if (!created) {
+    return {
+      success: false,
+      error: { code: 'ORDER_CREATE_FAILED', message: '检验医嘱落库失败' },
+    };
+  }
+  const orderId = created.id;
   const now = new Date();
   const collectionTime = now.toISOString();
   const expectedReportTime = calcExpectedReportTime(parsed.priority, maxReportHour);
@@ -260,6 +285,7 @@ async function executeOrderLabTest(
         warnings,
       },
       orderedBy: context.medicalUser.name,
+      _source: sourceTag(),
     },
   };
 }

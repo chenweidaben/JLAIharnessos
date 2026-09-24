@@ -161,6 +161,7 @@ async function executeVisitReminder(
       daysAhead: parsed.daysAhead,
       total: reminders.length,
       reminders,
+      _demoMode: true,
     },
   };
 }

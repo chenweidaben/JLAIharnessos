@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_LAB_REPORTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -88,11 +88,9 @@ async function executeGetLabResult(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetLabResultInput.parse(input);
 
-  let results = MOCK_LAB_REPORTS.filter((r) => r.patientId === parsed.patientId);
-
-  if (parsed.encounterId) {
-    results = results.filter((r) => r.encounterId === parsed.encounterId);
-  }
+  // 数据源：演示模式走 MOCK_LAB_REPORTS；真实模式走 labResultRepo（已聚合成报告 DTO）。
+  // patientId/encounterId 已在数据层过滤，此处仅做类型/时间/项目维度筛选。
+  let results = (await clinicalData.getLabReports(parsed.patientId, parsed.encounterId)).slice();
 
   if (parsed.testType) {
     const kw = parsed.testType.toLowerCase();
@@ -162,6 +160,7 @@ async function executeGetLabResult(
         reportNotes: r.reportNotes,
       })),
       criticalValues,
+      _source: sourceTag(),
     },
   };
 }

@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool, maskAddress, maskIdCard, maskPhone } from '../framework.js';
-import { MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -93,7 +93,7 @@ async function executeGetPatientDetail(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetPatientDetailInput.parse(input);
 
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  const patient = await clinicalData.getPatient(parsed.patientId);
 
   if (!patient) {
     return {
@@ -116,14 +116,15 @@ async function executeGetPatientDetail(
         gender: patient.gender,
         age: patient.age,
         birthDate: patient.birthDate,
-        idCardMasked: maskIdCard(patient.idCard),
-        phoneMasked: maskPhone(patient.phone),
-        addressMasked: maskAddress(patient.address),
+        idCardMasked: patient.idCard ? maskIdCard(patient.idCard) : null,
+        phoneMasked: patient.phone ? maskPhone(patient.phone) : null,
+        addressMasked: patient.address ? maskAddress(patient.address) : null,
         bloodType: patient.bloodType,
         allergies: parsed.includeAllergies ? patient.allergies : [],
         pastHistory: parsed.includeHistory ? patient.pastHistory : [],
         currentMedications: parsed.includeMedications ? patient.currentMedications : [],
         latestVitals: patient.latestVitals,
+        _source: sourceTag(),
       },
     },
   };

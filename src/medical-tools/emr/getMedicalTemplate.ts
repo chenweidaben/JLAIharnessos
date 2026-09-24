@@ -109,6 +109,7 @@ async function executeGetMedicalTemplate(
         version: t.version,
         updatedAt: t.updatedAt,
       })),
+      _demoMode: true,
     },
   };
 }

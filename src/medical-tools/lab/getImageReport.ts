@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_IMAGE_REPORTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -71,11 +71,9 @@ async function executeGetImageReport(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetImageReportInput.parse(input);
 
-  let results = MOCK_IMAGE_REPORTS.filter((r) => r.patientId === parsed.patientId);
-
-  if (parsed.encounterId) {
-    results = results.filter((r) => r.encounterId === parsed.encounterId);
-  }
+  // 数据源：演示模式走 MOCK_IMAGE_REPORTS；真实模式按 imaging 医嘱生成报告壳。
+  // patientId/encounterId 已在数据层过滤。
+  let results = (await clinicalData.getImageReports(parsed.patientId, parsed.encounterId)).slice();
 
   if (parsed.examType && parsed.examType !== '全部') {
     results = results.filter((r) => r.examType === parsed.examType);
@@ -111,6 +109,7 @@ async function executeGetImageReport(
         dicomRef: r.dicomRef,
         keyFindings: r.keyFindings,
       })),
+      _source: sourceTag(),
     },
   };
 }

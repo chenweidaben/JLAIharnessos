@@ -163,6 +163,7 @@ async function executeSyncToHIS(
       syncTime: now,
       validation,
       source,
+      _demoMode: true,
     },
   };
 }

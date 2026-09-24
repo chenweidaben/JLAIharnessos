@@ -11,9 +11,9 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
-import { PRESCRIPTION_STORE } from './drugCatalog.js';
 
 // ============================================================================
 // 输入/输出 Schema
@@ -79,11 +79,9 @@ async function executeGetPrescriptionList(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetPrescriptionListInput.parse(input);
 
-  let results = PRESCRIPTION_STORE.filter((r) => r.patientId === parsed.patientId);
-
-  if (parsed.encounterId) {
-    results = results.filter((r) => r.encounterId === parsed.encounterId);
-  }
+  // 数据源：演示模式读 PRESCRIPTION_STORE，真实模式走 prescriptionRepo。
+  // patientId/encounterId 已在数据层过滤，此处仅做状态/时间维度筛选。
+  let results = (await clinicalData.getPrescriptions(parsed.patientId, parsed.encounterId)).slice();
 
   if (parsed.status && parsed.status !== '全部') {
     results = results.filter((r) => r.status === parsed.status);
@@ -117,6 +115,7 @@ async function executeGetPrescriptionList(
         createdAt: r.createdAt,
         auditedAt: r.auditedAt,
       })),
+      _source: sourceTag(),
     },
   };
 }

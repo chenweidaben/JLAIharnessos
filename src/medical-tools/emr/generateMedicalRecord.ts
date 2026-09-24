@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_MEDICAL_TEMPLATES, MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -74,7 +74,8 @@ async function executeGenerateMedicalRecord(
 ): Promise<ToolResult<unknown>> {
   const parsed = GenerateMedicalRecordInput.parse(input);
 
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  // 患者档案（演示模式走 mockData，真实模式走 patientRepo）
+  const patient = await clinicalData.getPatient(parsed.patientId);
   if (!patient) {
     return {
       success: false,
@@ -84,11 +85,6 @@ async function executeGenerateMedicalRecord(
       },
     };
   }
-
-  // 查找模板
-  const template = parsed.templateId
-    ? MOCK_MEDICAL_TEMPLATES.find((t) => t.templateId === parsed.templateId)
-    : MOCK_MEDICAL_TEMPLATES.find((t) => t.recordType.includes(parsed.recordType));
 
   // 组织问诊要点
   const pointsByCategory = new Map<string, string[]>();
@@ -243,7 +239,46 @@ async function executeGenerateMedicalRecord(
   }
   qualityTips.push('AI生成内容仅供参考，所有诊断和治疗决策需由执业医师确认');
 
-  const draftId = `DRAFT-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  // 文书类型中文 → DB 枚举
+  const RECORD_TYPE_TO_DB: Record<string, 'outpatient' | 'admission' | 'progress' | 'operative' | 'discharge' | 'front_page'> = {
+    门诊病历: 'outpatient',
+    入院记录: 'admission',
+    病程记录: 'progress',
+    手术记录: 'operative',
+    出院小结: 'discharge',
+    出院记录: 'discharge',
+    病历首页: 'front_page',
+  };
+  const dbRecordType = RECORD_TYPE_TO_DB[parsed.recordType] ?? 'outpatient';
+
+  // 真实模式需 visit_id。未显式传 encounterId 时，取该患者最近一次就诊。
+  let visitId = parsed.encounterId ?? '';
+  if (!visitId) {
+    const visits = await clinicalData.getVisitsByPatient(parsed.patientId);
+    visitId = visits[0]?.encounterId ?? '';
+  }
+  if (!visitId) {
+    return {
+      success: false,
+      error: {
+        code: 'ENCOUNTER_REQUIRED',
+        message: '生成病历需要就诊ID（encounterId），且该患者须存在就诊记录',
+      },
+    };
+  }
+
+  // 落库：演示模式写内存病历存储，真实模式走 medicalRecordRepo.createMedicalRecord（草稿态）
+  const created = await clinicalData.createMedicalRecord({
+    visitId,
+    recordType: dbRecordType,
+    title: parsed.recordType,
+    content: { sections: pointsByCategory },
+    plainText: content,
+    authorId: null,
+    aiGenerated: true,
+    aiModel: 'jlmedaios-emr-1.0',
+  });
+  const draftId = created.id;
 
   return {
     success: true,
@@ -256,6 +291,7 @@ async function executeGenerateMedicalRecord(
       qualityTips,
       confidence: missingInfo.length === 0 ? 0.9 : 0.7,
       generatedAt: now,
+      _source: sourceTag(),
     },
   };
 }

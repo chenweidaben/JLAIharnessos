@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_DRUG_INTERACTIONS, MOCK_ORDERS, MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -50,27 +50,21 @@ const OrderAuditOutput = z.object({
 /**
  * 执行自动CDS检查
  *
- * @param order - 待审核医嘱
+ * @param order - 待审核医嘱 DTO
+ * @param patient - 患者档案 DTO
  * @returns CDS检查结果
  */
-function runCdsCheck(orderId: string): {
+async function runCdsCheck(
+  order: { orderType: string; itemName: string },
+  patient: NonNullable<Awaited<ReturnType<typeof clinicalData.getPatient>>>,
+): Promise<{
   drugInteractions: string[];
   dosageAlerts: string[];
   contraindications: string[];
-} {
+}> {
   const drugInteractions: string[] = [];
   const dosageAlerts: string[] = [];
   const contraindications: string[] = [];
-
-  const order = MOCK_ORDERS.find((o) => o.orderId === orderId);
-  if (!order) {
-    return { drugInteractions, dosageAlerts, contraindications };
-  }
-
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === order.patientId);
-  if (!patient) {
-    return { drugInteractions, dosageAlerts, contraindications };
-  }
 
   // 仅药品医嘱做CDS
   if (order.orderType !== '药品') {
@@ -94,7 +88,7 @@ function runCdsCheck(orderId: string): {
 
   // 药物相互作用检查（与当前在用药）
   const currentDrugs = patient.currentMedications.map((m) => m.drugName);
-  for (const interaction of MOCK_DRUG_INTERACTIONS) {
+  for (const interaction of clinicalData.getDrugInteractionRules()) {
     const involvesA = drugName.includes(interaction.drugA);
     const involvesB = drugName.includes(interaction.drugB);
     const paired =
@@ -134,7 +128,7 @@ async function executeOrderAudit(
 ): Promise<ToolResult<unknown>> {
   const parsed = OrderAuditInput.parse(input);
 
-  const order = MOCK_ORDERS.find((o) => o.orderId === parsed.orderId);
+  const order = await clinicalData.findOrderDto(parsed.orderId);
   if (!order) {
     return {
       success: false,
@@ -145,8 +139,11 @@ async function executeOrderAudit(
     };
   }
 
-  // 自动CDS检查
-  const cds = runCdsCheck(parsed.orderId);
+  // 自动CDS检查（患者档案从数据层取，演示/真实一致）
+  const patient = await clinicalData.getPatient(order.patientId);
+  const cds = patient
+    ? await runCdsCheck(order, patient)
+    : { drugInteractions: [], dosageAlerts: [], contraindications: [] };
   const hasBlocker = cds.contraindications.length > 0;
 
   const auditResultMap = {
@@ -165,6 +162,12 @@ async function executeOrderAudit(
   const effectiveResult =
     hasBlocker && parsed.action === 'approve' ? '已驳回' : auditResultMap[parsed.action];
 
+  // 真实模式：将审核结果落库（orderRepo.updateOrderStatus）。
+  // approve→audited，reject→cancelled，return→回到 active 待修改。
+  const dbStatus: 'audited' | 'cancelled' | 'active' =
+    parsed.action === 'approve' ? 'audited' : parsed.action === 'reject' ? 'cancelled' : 'active';
+  await clinicalData.updateOrderStatus(parsed.orderId, dbStatus);
+
   return {
     success: true,
     data: {
@@ -181,6 +184,7 @@ async function executeOrderAudit(
           : `医嘱${auditResultMap[parsed.action]}，请按意见处理`),
       cdsCheck: cds,
       auditStatus,
+      _source: sourceTag(),
     },
   };
 }

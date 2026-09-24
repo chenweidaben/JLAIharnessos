@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_DRUG_INTERACTIONS, MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -81,8 +81,8 @@ async function executeDrugInteractionCheck(
 
   const drugNames = parsed.drugs.map((d) => d.drugName);
 
-  // 匹配已知相互作用
-  const interactions = MOCK_DRUG_INTERACTIONS.filter((interaction) => {
+  // 匹配已知相互作用（规则表经数据层出口，演示/真实一致）
+  const interactions = clinicalData.getDrugInteractionRules().filter((interaction) => {
     const aMatch = drugNames.some(
       (name) => name.includes(interaction.drugA) || interaction.drugA.includes(name),
     );
@@ -105,7 +105,7 @@ async function executeDrugInteractionCheck(
     | undefined;
 
   if (parsed.patientId) {
-    const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+    const patient = await clinicalData.getPatient(parsed.patientId);
     if (patient) {
       const warnings: string[] = [];
       const allergies = patient.allergies.map((a) => a.allergen);
@@ -169,6 +169,7 @@ async function executeDrugInteractionCheck(
       interactions,
       patientFactors,
       checkedAt: new Date().toISOString(),
+      _source: sourceTag(),
     },
   };
 }

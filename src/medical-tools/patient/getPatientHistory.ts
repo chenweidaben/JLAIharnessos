@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_VISITS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -68,7 +68,7 @@ async function executeGetPatientHistory(
 ): Promise<ToolResult<unknown>> {
   const parsed = GetPatientHistoryInput.parse(input);
 
-  let results = MOCK_VISITS.filter((v) => v.patientId === parsed.patientId);
+  let results = (await clinicalData.getVisitsByPatient(parsed.patientId)).slice();
 
   // 按就诊类型筛选
   if (parsed.visitType && parsed.visitType !== '全部') {
@@ -105,6 +105,7 @@ async function executeGetPatientHistory(
         dischargeSummary: v.dischargeSummary,
         hasRecords: v.hasRecords,
       })),
+      _source: sourceTag(),
     },
   };
 }

@@ -11,14 +11,12 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_DRUG_INTERACTIONS, MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 import {
   estimateDrugFee,
   findDrugInfo,
-  type MockPrescription,
-  PRESCRIPTION_STORE,
   type PrescriptionItem,
 } from './drugCatalog.js';
 
@@ -92,7 +90,7 @@ interface SafetyResult {
  * @returns 安全检查结果
  */
 function runSafetyCheck(
-  patient: (typeof MOCK_PATIENTS)[number],
+  patient: NonNullable<Awaited<ReturnType<typeof clinicalData.getPatient>>>,
   drugs: PrescriptionItem[],
 ): SafetyResult {
   const allergyAlerts: string[] = [];
@@ -124,7 +122,7 @@ function runSafetyCheck(
 
   // ---- 2. 药物相互作用检查（本次处方 × 当前用药）----
   const allNames = [...prescribedNames, ...currentNames];
-  for (const interaction of MOCK_DRUG_INTERACTIONS) {
+  for (const interaction of clinicalData.getDrugInteractionRules()) {
     // 跳过非药品相互作用（含钙溶液、碘造影剂）
     if (interaction.drugB === '含钙溶液' || interaction.drugB === '碘造影剂') {
       continue;
@@ -198,8 +196,8 @@ async function executeCreatePrescription(
 ): Promise<ToolResult<unknown>> {
   const parsed = CreatePrescriptionInput.parse(input);
 
-  // 校验患者存在
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  // 校验患者存在（演示模式走 mockData，真实模式走 patientRepo）
+  const patient = await clinicalData.getPatient(parsed.patientId);
   if (!patient) {
     return {
       success: false,
@@ -263,31 +261,38 @@ async function executeCreatePrescription(
   }
   totalFee = Math.round(totalFee * 100) / 100;
 
-  // 生成处方ID并落库（内存）
-  const prescriptionId = `RX${Date.now().toString().slice(-10)}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
-  const now = new Date().toISOString();
-
-  const record: MockPrescription = {
-    prescriptionId,
-    patientId: parsed.patientId,
-    encounterId: parsed.encounterId,
-    prescriptionType: parsed.prescriptionType,
-    status: '待审核',
-    items,
-    diagnosis: parsed.diagnosis ?? patient.currentDiagnosis,
-    doctorId: parsed.doctorId ?? context.medicalUser.userId,
-    doctorName: context.medicalUser.name,
-    pharmacist: null,
-    totalFee,
-    safetyCheckSummary:
-      safety.drugInteractions.length > 0
-        ? `存在${safety.drugInteractions.length}条药物相互作用提示，需药师重点关注`
-        : '无严重风险提示',
-    createdAt: now,
-    auditedAt: null,
-    auditComment: null,
+  // 解析剂量数值与单位（如 "100mg" -> 100, "mg"），用于落库 prescription_items
+  const parseDosage = (s: string): { dosage: number | null; dosageUnit: string | null } => {
+    const m = /^([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Zμμg/ml/]*)?/.exec(s.trim());
+    if (!m) return { dosage: null, dosageUnit: null };
+    return { dosage: Number(m[1]), dosageUnit: m[2] ? m[2] : null };
   };
-  PRESCRIPTION_STORE.push(record);
+
+  // 落库：演示模式写内存处方存储，真实模式走 prescriptionRepo（处方头+明细同事务写入）
+  const created = await clinicalData.createPrescription({
+    visitId: parsed.encounterId,
+    prescriberId: parsed.doctorId ?? context.medicalUser.userId,
+    counsel: parsed.diagnosis ?? patient.currentDiagnosis,
+    items: items.map((d) => {
+      const { dosage, dosageUnit } = parseDosage(d.dosage);
+      return {
+        drugCode: null,
+        drugName: d.drugName,
+        specification: d.specification,
+        dosage,
+        dosageUnit,
+        frequency: d.frequency,
+        route: d.usage,
+        daysSupply: d.days,
+        quantity: d.quantity,
+        quantityUnit: '片',
+        skinTest: false,
+        remark: d.usage,
+      };
+    }),
+  });
+  const prescriptionId = created.id;
+  const now = new Date().toISOString();
 
   return {
     success: true,
@@ -313,6 +318,7 @@ async function executeCreatePrescription(
       requiresCASignature: true,
       createdAt: now,
       createdBy: context.medicalUser.name,
+      _source: sourceTag(),
     },
   };
 }

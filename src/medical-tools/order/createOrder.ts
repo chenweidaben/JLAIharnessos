@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { MOCK_PATIENTS } from '../mockData.js';
+import { clinicalData, sourceTag } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 
@@ -78,8 +78,8 @@ async function executeCreateOrder(
 ): Promise<ToolResult<unknown>> {
   const parsed = CreateOrderInput.parse(input);
 
-  // 校验患者存在
-  const patient = MOCK_PATIENTS.find((p) => p.patientId === parsed.patientId);
+  // 校验患者存在（演示模式走 mockData，真实模式走 patientRepo）
+  const patient = await clinicalData.getPatient(parsed.patientId);
   if (!patient) {
     return {
       success: false,
@@ -159,8 +159,43 @@ async function executeCreateOrder(
     };
   }
 
-  // 生成医嘱ID
-  const orderId = `O${Date.now().toString().slice(-10)}${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+  // 落库：演示模式写内存医嘱存储，真实模式写 orderRepo（事务内写入）
+  const ORDER_TYPE_TO_DB: Record<string, 'drug' | 'lab' | 'imaging' | 'treatment' | 'nursing' | 'other'> = {
+    药品: 'drug',
+    检验: 'lab',
+    检查: 'imaging',
+    治疗: 'treatment',
+    护理: 'nursing',
+    手术: 'treatment',
+    输血: 'drug',
+    其他: 'other',
+  };
+  const PRIORITY_TO_DB: Record<string, 'routine' | 'urgent' | 'stat'> = {
+    普通: 'routine',
+    急: 'urgent',
+    即刻: 'stat',
+  };
+
+  const created = await clinicalData.createOrder({
+    visitId: parsed.encounterId,
+    orderType: ORDER_TYPE_TO_DB[parsed.orderType] ?? 'other',
+    content: parsed.orderContent,
+    detail: {
+      dosage: parsed.dosage ?? null,
+      frequency: parsed.frequency ?? null,
+      duration: parsed.duration ?? null,
+      clinicalIndication: parsed.clinicalIndication,
+    },
+    priority: PRIORITY_TO_DB[parsed.priority] ?? 'routine',
+    doctorId: context.medicalUser.userId,
+  });
+  if (!created) {
+    return {
+      success: false,
+      error: { code: 'ORDER_CREATE_FAILED', message: '医嘱创建失败' },
+    };
+  }
+  const orderId = created.id;
   const now = new Date().toISOString();
 
   return {
@@ -181,6 +216,7 @@ async function executeCreateOrder(
       requiresDoubleConfirm: true,
       createdAt: now,
       createdBy: context.medicalUser.name,
+      _source: sourceTag(),
     },
   };
 }
