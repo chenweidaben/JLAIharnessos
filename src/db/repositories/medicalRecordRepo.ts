@@ -82,3 +82,20 @@ export async function updateMedicalRecordStatus(
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
+
+/** 更新病历正文内容（草稿保存），版本号 +1 */
+export async function updateMedicalRecordContent(
+  id: string,
+  input: { content: Record<string, unknown>; plainText?: string | null },
+  sql?: Sql,
+): Promise<MedicalRecord | null> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    UPDATE clinical.medical_records
+    SET content = ${db.json(toJson(input.content))},
+        plain_text = ${input.plainText ?? null},
+        version = version + 1, updated_at = now()
+    WHERE id = ${id} AND deleted_at IS NULL RETURNING ${db.unsafe(SELECT_COLS)}
+  `;
+  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+}

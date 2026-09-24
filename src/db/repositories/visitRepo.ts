@@ -14,6 +14,7 @@ export interface Visit {
   id: string; patientId: string; visitNo: string; visitType: VisitType;
   department: string; ward: string | null; bedNo: string | null;
   attendingDoctorId: string | null; chiefComplaint: string | null;
+  consultationDetail: Record<string, unknown> | null;
   status: VisitStatus; triageLevel: string | null; admitAt: string | null;
   dischargeAt: string | null; drgGroup: string | null; dipGroup: string | null;
   totalFee: number | null; createdAt: string; updatedAt: string;
@@ -25,7 +26,7 @@ export interface VisitCreateInput {
   chiefComplaint?: string | null; triageLevel?: string | null;
 }
 
-const SELECT_COLS = `id, patient_id, visit_no, visit_type, department, ward, bed_no, attending_doctor_id, chief_complaint, status, triage_level, admit_at, discharge_at, drg_group, dip_group, total_fee, created_at, updated_at`;
+const SELECT_COLS = `id, patient_id, visit_no, visit_type, department, ward, bed_no, attending_doctor_id, chief_complaint, consultation_detail, status, triage_level, admit_at, discharge_at, drg_group, dip_group, total_fee, created_at, updated_at`;
 
 function mapRow(row: Record<string, unknown>): Visit {
   return {
@@ -34,6 +35,7 @@ function mapRow(row: Record<string, unknown>): Visit {
     ward: row.ward ? String(row.ward) : null, bedNo: row.bed_no ? String(row.bed_no) : null,
     attendingDoctorId: row.attending_doctor_id ? String(row.attending_doctor_id) : null,
     chiefComplaint: row.chief_complaint ? String(row.chief_complaint) : null,
+    consultationDetail: (row.consultation_detail as Record<string, unknown>) ?? null,
     status: row.status as VisitStatus, triageLevel: row.triage_level ? String(row.triage_level) : null,
     admitAt: row.admit_at ? String(row.admit_at) : null,
     dischargeAt: row.discharge_at ? String(row.discharge_at) : null,
@@ -84,6 +86,23 @@ export async function updateVisitStatus(id: string, status: VisitStatus, sql?: S
   const dischargeAt = status === 'discharged' ? new Date().toISOString() : null;
   const rows = await db`
     UPDATE clinical.visits SET status = ${status}, discharge_at = COALESCE(discharge_at, ${dischargeAt ?? null}), updated_at = now()
+    WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
+  `;
+  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+}
+
+/** 更新主诉与结构化问诊明细 */
+export async function updateVisitConsultation(
+  id: string,
+  input: { chiefComplaint?: string | null; detail?: Record<string, unknown> },
+  sql?: Sql,
+): Promise<Visit | null> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    UPDATE clinical.visits
+    SET chief_complaint = COALESCE(${input.chiefComplaint ?? null}, chief_complaint),
+        consultation_detail = COALESCE(${input.detail ? db.json(JSON.stringify(input.detail)) : null}, consultation_detail),
+        updated_at = now()
     WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;

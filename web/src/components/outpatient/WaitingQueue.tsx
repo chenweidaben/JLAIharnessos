@@ -53,13 +53,23 @@ const TABS: Array<{ key: TabKey; label: string }> = [
 export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
   const queue = useOutpatientStore((s) => s.queue);
   const currentEncounterId = useOutpatientStore((s) => s.currentEncounterId);
-  const callNext = useOutpatientStore((s) => s.callNext);
-  const markStatus = useOutpatientStore((s) => s.markStatus);
+  const markQueueStatus = useOutpatientStore((s) => s.markQueueStatus);
   const fetchWaitingQueue = useOutpatientStore((s) => s.fetchWaitingQueue);
   const loading = useOutpatientStore((s) => s.loading);
   const stats = useOutpatientStore((s) => s.stats);
   const [kw, setKw] = useState('');
   const [tab, setTab] = useState<TabKey>('waiting');
+
+  /** 呼叫下一位候诊患者 */
+  const callNextLocal = (): void => {
+    const next = queue.find((q) => q.status === 'waiting');
+    if (next) {
+      onSelect(next.encounterId);
+      message.success(`已叫号 ${next.patient.nameMasked}（${next.queueNo}号）`);
+    } else {
+      message.info('当前没有待诊患者');
+    }
+  };
 
   const counts = useMemo(() => {
     const c: Record<QueueStatus, number> = {
@@ -89,7 +99,9 @@ export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
       <div
         key={item.encounterId}
         {...clickableProps(() => {
-          if (item.status === 'waiting') onSelect(item.encounterId);
+          if (item.status === 'waiting' || item.status === 'in_consult') {
+            onSelect(item.encounterId);
+          }
         })}
         className={`px-3 py-2.5 border-b border-ink-border cursor-pointer transition-colors hover:bg-blue-50 border-l-4 ${
           isCurrent ? 'bg-blue-50' : 'border-l-transparent'
@@ -144,7 +156,7 @@ export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
                 <Popconfirm
                   title="确认过号？"
                   onConfirm={() => {
-                    markStatus(item.encounterId, 'passed');
+                    markQueueStatus(item.encounterId, 'passed');
                     message.info('已置为过号');
                   }}
                 >
@@ -155,7 +167,7 @@ export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
                 <Popconfirm
                   title="确认停诊？"
                   onConfirm={() => {
-                    markStatus(item.encounterId, 'stopped');
+                    markQueueStatus(item.encounterId, 'stopped');
                     message.info('已停诊');
                   }}
                 >
@@ -196,20 +208,20 @@ export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
     >
       {/* 统计 */}
       <div className="grid grid-cols-4 gap-2 p-3 bg-gray-50 border-b border-ink-border">
-        <Statistic title="今日挂号" value={stats.todayRegistered} valueStyle={{ fontSize: 18 }} />
+        <Statistic title="今日挂号" value={stats?.todayRegistered ?? 0} valueStyle={{ fontSize: 18 }} />
         <Statistic
           title="已诊"
-          value={stats.todayVisited}
+          value={stats?.todayVisited ?? 0}
           valueStyle={{ fontSize: 18, color: '#52C41A' }}
         />
         <Statistic
           title="待诊"
-          value={stats.todayWaiting}
+          value={stats?.todayWaiting ?? 0}
           valueStyle={{ fontSize: 18, color: '#0A4D8C' }}
         />
         <Statistic
           title="平均等待"
-          value={`${stats.avgWaitMinutes}分`}
+          value={`${stats?.avgWaitMinutes ?? 0}分`}
           valueStyle={{ fontSize: 18, color: '#FA8C16' }}
         />
       </div>
@@ -221,10 +233,7 @@ export const WaitingQueue: React.FC<Props> = ({ onSelect }) => {
           block
           size="large"
           icon={<CustomerServiceOutlined />}
-          onClick={() => {
-            callNext();
-            message.success('已呼叫下一位患者，请患者进入诊室');
-          }}
+          onClick={() => callNextLocal()}
           style={{ background: '#0A4D8C' }}
         >
           呼叫下一位

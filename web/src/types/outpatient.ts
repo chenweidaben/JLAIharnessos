@@ -199,6 +199,14 @@ export interface IcdDiagnosis {
   category: string; // 类目（章节/大类）
 }
 
+/** 诊断目录项（ICD 检索结果，后端 /catalog/diagnoses） */
+export interface DiagnosisCatalog {
+  code: string;
+  name: string;
+  pinyin: string;
+  category: string;
+}
+
 /** 诊断项 */
 export interface DiagnosisItem {
   id: string;
@@ -260,6 +268,8 @@ export interface Prescription {
   warnings: PrescriptionWarning[];
   totalFee: number;
   signed: boolean;
+  /** 处方流转状态：pending_review / approved / rejected / dispensed 等 */
+  status?: string;
   createdAt: string;
 }
 
@@ -286,6 +296,27 @@ export interface PrescriptionTemplate {
     days: number;
     instruction: string;
   }>;
+}
+
+/** BFF 处方模板行视图 */
+export interface RxTemplateLineView {
+  drugId: string;
+  dose: number;
+  doseUnit: string;
+  frequency: DrugFrequency;
+  route: DrugRoute;
+  days: number;
+  instruction: string;
+  quantity: number;
+}
+
+/** BFF 处方模板视图（/catalog/templates/prescription 返回） */
+export interface RxTemplateView {
+  id: string;
+  name: string;
+  diagnosis: string;
+  lines: RxTemplateLineView[];
+  counsel: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -335,6 +366,31 @@ export interface TreatmentItem {
   price: number;
   durationMin: number;
   note?: string;
+}
+
+/* ----------------------- BFF 目录 DTO（/catalog/*） ----------------------- */
+
+/** 检验/检查目录项（后端按统一形态返回，多余字段以索引签名承载） */
+export interface ExamCatalogItem {
+  id: string;
+  name: string;
+  category: '检验' | '检查';
+  price: number;
+  /** 检验：标本类型；检查：模态（CT/MRI…） */
+  sampleType?: string;
+  bodyPart?: string;
+  contrast?: boolean;
+  clinicalSignificance?: string;
+  [key: string]: unknown;
+}
+
+/** 治疗目录项（BFF 返回） */
+export interface TreatmentCatalogItem {
+  id: string;
+  name: string;
+  category: '治疗';
+  price: number;
+  description?: string;
 }
 
 /** 申请单项 */
@@ -393,6 +449,19 @@ export interface MedicalRecordTemplate {
   content: Partial<RecordContent>;
 }
 
+/** 病历模板章节（BFF /catalog/templates/record 返回） */
+export interface RecordTemplateSection {
+  title: string;
+  template: string;
+}
+
+/** 病历模板 DTO（BFF 返回） */
+export interface RecordTemplate {
+  id: string;
+  name: string;
+  sections: Record<string, RecordTemplateSection>;
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                AI 辅助                                     */
 /* -------------------------------------------------------------------------- */
@@ -421,6 +490,14 @@ export interface AIChatMessage {
   content: string;
   suggestions?: Array<{ label: string; action?: string }>;
   time: string;
+}
+
+/** AI 工具调用过程（SSE agent:tool 事件，供前端透明展示） */
+export interface AiToolProcess {
+  callId: string;
+  toolName: string;
+  status: 'running' | 'success' | 'error';
+  summary?: string;
 }
 
 /* -------------------------------------------------------------------------- */

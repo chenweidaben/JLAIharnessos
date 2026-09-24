@@ -37,10 +37,18 @@ export const chatRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/chat/conversations',
     handle: async (c: Ctx) => {
-      const body = await c.body<{ title?: string }>();
+      const body = await c.body<{
+        title?: string;
+        patientId?: string;
+        encounterId?: string;
+      }>();
+      const metadata: Record<string, unknown> = {};
+      if (body.encounterId) metadata.encounterId = body.encounterId;
       const conv = await createConversation({
         userId: c.user?.id ?? null,
-        title: body.title?.trim() || '新对话',
+        patientId: body.patientId || null,
+        title: body.title?.trim() || '门诊对话',
+        metadata,
       });
       return json(ok(conv, 'ok', c.traceId));
     },
@@ -65,16 +73,20 @@ export const chatRoutes: RouteDef[] = [
         return json(fail(ErrorCode.BAD_REQUEST, '消息内容不能为空', c.traceId), 400);
       }
 
+      // 从会话元数据恢复就诊关联，驱动真实患者上下文注入
+      const encounterId = (conv.metadata?.encounterId as string | undefined) ?? null;
+
       // SSE 流式：Accept: text/event-stream 时实时推送增量
       const accept = c.req.headers.get('Accept') ?? '';
       if (accept.includes('text/event-stream')) {
-        return streamResponse(c, conversationId, content);
+        return streamResponse(c, conversationId, content, encounterId);
       }
 
       // 非流式：等待整轮完成后返回完整结果
       const result = await runChatTurn(conversationId, content, {
         userId: c.user?.id,
         userName: c.user?.name,
+        encounterId,
       });
       if (result.error) {
         return json(
@@ -114,7 +126,12 @@ export const chatRoutes: RouteDef[] = [
  *   data: {"type":"done","message":{...},"toolCalls":[...]}
  *   data: [DONE]
  */
-function streamResponse(c: Ctx, conversationId: string, content: string): Response {
+function streamResponse(
+  c: Ctx,
+  conversationId: string,
+  content: string,
+  encounterId: string | null,
+): Response {
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -125,6 +142,7 @@ function streamResponse(c: Ctx, conversationId: string, content: string): Respon
         const result = await runChatTurn(conversationId, content, {
           userId: c.user?.id,
           userName: c.user?.name,
+          encounterId,
           onDelta: (text) => send({ type: 'delta', text }),
           onToolEvent: (ev) => send({ type: 'tool', ...ev }),
         });

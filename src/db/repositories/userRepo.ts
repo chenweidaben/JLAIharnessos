@@ -46,3 +46,23 @@ export async function listUsersByDepartment(department: string, limit = 100, sql
   const rows = await dynamicSelect<Record<string, unknown>>(db, SELECT_COLS, 'iam.users', qb, 'name', limit);
   return rows.map(mapRow);
 }
+
+export interface UserRoleLink {
+  roleCode: string;
+  dataScope: 'self' | 'department' | 'hospital';
+  scopeValue: string | null;
+}
+
+/** 用户的角色链接与数据范围（iam.user_roles） */
+export async function getUserRoleLinks(userId: string, sql?: Sql): Promise<UserRoleLink[]> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT role_code, data_scope, scope_value
+    FROM iam.user_roles WHERE user_id = ${userId}
+  `;
+  return (rows as Record<string, unknown>[]).map((r) => ({
+    roleCode: String(r.role_code),
+    dataScope: String(r.data_scope) as UserRoleLink['dataScope'],
+    scopeValue: r.scope_value ? String(r.scope_value) : null,
+  }));
+}

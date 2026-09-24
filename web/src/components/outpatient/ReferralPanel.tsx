@@ -72,7 +72,9 @@ export const ReferralPanel: React.FC = () => {
                 type="primary"
                 style={{ background: '#0A4D8C' }}
                 block
-                onClick={() => message.success('转诊申请已提交')}
+                onClick={() =>
+                  message.info('转诊工作流正在与院内流程引擎对接（二期），当前为表单界面，暂未提交。')
+                }
               >
                 提交转诊
               </Button>
@@ -125,7 +127,9 @@ export const ReferralPanel: React.FC = () => {
                 type="primary"
                 style={{ background: '#0A4D8C' }}
                 block
-                onClick={() => message.success('会诊申请已发送')}
+                onClick={() =>
+                  message.info('会诊工作流正在与院内流程引擎对接（二期），当前为表单界面，暂未发送。')
+                }
               >
                 发送会诊
               </Button>
@@ -133,7 +137,7 @@ export const ReferralPanel: React.FC = () => {
           ),
         },
       ]}
-      tabBarExtraContent={<Tag color="blue">今日已发起 2 例</Tag>}
+      tabBarExtraContent={<Tag color="default">二期对接</Tag>}
     />
   );
 };

@@ -162,6 +162,13 @@ export function put<T>(url: string, data?: unknown, options?: RequestOptions): P
     .then((res) => res.data.data);
 }
 
+export function patch<T>(url: string, data?: unknown, options?: RequestOptions): Promise<T> {
+  const config: RequestConfig = { url, method: 'patch', data, options, signal: options?.signal };
+  return instance
+    .request<ApiResponse<T>>(config as AxiosRequestConfig)
+    .then((res) => res.data.data);
+}
+
 export function del<T>(url: string, params?: unknown, options?: RequestOptions): Promise<T> {
   const config: RequestConfig = { url, method: 'delete', params, options, signal: options?.signal };
   return instance

@@ -19,7 +19,7 @@ import {
   Typography,
   message,
 } from 'antd';
-import { RobotOutlined, SaveOutlined, PlusOutlined, HeartOutlined } from '@ant-design/icons';
+import { SaveOutlined, PlusOutlined, HeartOutlined } from '@ant-design/icons';
 import type { ConsultationRecord, PresentIllness, VitalSigns } from '@/types/outpatient';
 import { useOutpatientStore } from '@/store/outpatientStore';
 
@@ -45,7 +45,6 @@ export const ConsultationForm: React.FC = () => {
   const consultation = useOutpatientStore((s) => s.consultation);
   const currentPatient = useOutpatientStore((s) => s.currentPatient);
   const saveConsultation = useOutpatientStore((s) => s.saveConsultation);
-  const addAuxExam = useOutpatientStore((s) => s.addAuxExam);
   const [savedTip, setSavedTip] = useState<string>('');
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -87,29 +86,28 @@ export const ConsultationForm: React.FC = () => {
         : d,
     );
 
-  /** AI 辅助：根据主诉生成现病史 */
-  const aiFillHistory = () => {
-    const cc = draft.chiefComplaint || '不适';
+  /** 本地新增一条辅助检查记录（随问诊一并持久化） */
+  const addAuxExamLocal = (): void => {
     setDraft((d) =>
       d
         ? {
             ...d,
-            presentIllness: {
-              onsetTime: '【AI】数日前',
-              trigger: '【AI】活动/情绪激动后',
-              mainSymptom: `【AI】患者诉${cc}，呈持续性/阵发性`,
-              accompanying: '【AI】伴乏力、出汗，无放射痛',
-              treatmentProcess: '【AI】未自行特殊处理，为求进一步诊治来院',
-              generalCondition: '【AI】精神欠佳，饮食睡眠可，二便正常',
-            },
+            auxiliaryExams: [
+              ...d.auxiliaryExams,
+              {
+                id: `AX${Date.now()}`,
+                name: '新增加检查',
+                date: new Date().toLocaleString('zh-CN'),
+                conclusion: '',
+              },
+            ],
           }
         : d,
     );
-    message.success('AI 已根据主诉生成现病史草稿，请核对修改');
   };
 
   /** 一键填充生命体征 */
-  const fillVitalsFromPatient = () => {
+  const fillVitalsFromPatient = (): void => {
     if (!currentPatient?.vitalSigns) {
       message.warning('患者无生命体征记录');
       return;
@@ -122,7 +120,7 @@ export const ConsultationForm: React.FC = () => {
           }
         : d,
     );
-    message.success('已从患者 360 摘要填充生命体征');
+    message.success('已从患者摘要填充生命体征');
   };
 
   const v = draft.physicalExam.vital ?? {};
@@ -132,9 +130,6 @@ export const ConsultationForm: React.FC = () => {
       {/* 顶部操作条 */}
       <div className="flex items-center justify-between">
         <Space>
-          <Button size="small" icon={<RobotOutlined />} onClick={aiFillHistory}>
-            AI 生成现病史
-          </Button>
           <Button size="small" icon={<HeartOutlined />} onClick={fillVitalsFromPatient}>
             带入生命体征
           </Button>
@@ -445,12 +440,7 @@ export const ConsultationForm: React.FC = () => {
             type="dashed"
             icon={<PlusOutlined />}
             onClick={() => {
-              addAuxExam({
-                id: `AX${Date.now()}`,
-                name: '新增加检查',
-                date: new Date().toLocaleString('zh-CN'),
-                conclusion: '',
-              });
+              addAuxExamLocal();
               message.info('已新增辅助检查记录，请编辑结论');
             }}
           >

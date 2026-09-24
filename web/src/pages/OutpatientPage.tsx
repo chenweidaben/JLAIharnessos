@@ -1,12 +1,21 @@
 /**
- * 健澜科技数智医院智能体
- * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ * 健澜科技 jlmedaios - 门诊工作台主页面
  *
- * 门诊工作台主页面：左候诊队列 + 中间问诊区 + 右患者360/AI 辅助。
- * 顶部展示科室、医生、号源、叫号状态。
+ * 布局：左候诊队列 + 统计；中问诊/诊断/处方/检查/病历/转诊；右患者 360 + AI 助手。
+ * 真实模式直连 BFF；连不上后端时顶部明确报错，不静默使用假数据。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import React, { useEffect } from 'react';
-import { Badge, Button, Layout, Space, Tabs, Tag, Typography, message } from 'antd';
+import {
+  Alert,
+  Button,
+  Layout,
+  Space,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
 import {
   AudioOutlined,
   CheckCircleOutlined,
@@ -15,6 +24,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useOutpatientStore } from '@/store/outpatientStore';
+import { env } from '@/utils/config';
 import WaitingQueue from '@/components/outpatient/WaitingQueue';
 import ConsultationForm from '@/components/outpatient/ConsultationForm';
 import DiagnosisPanel from '@/components/outpatient/DiagnosisPanel';
@@ -41,60 +51,58 @@ const MIDDLE_TABS = [
 export const OutpatientPage: React.FC = () => {
   const navigate = useNavigate();
   const doctor = useOutpatientStore((s) => s.doctor);
+  const queue = useOutpatientStore((s) => s.queue);
+  const loading = useOutpatientStore((s) => s.loading);
+  const error = useOutpatientStore((s) => s.error);
   const fetchWaitingQueue = useOutpatientStore((s) => s.fetchWaitingQueue);
+  const syncDoctorFromAuth = useOutpatientStore((s) => s.syncDoctorFromAuth);
   const currentPatient = useOutpatientStore((s) => s.currentPatient);
   const currentEncounterId = useOutpatientStore((s) => s.currentEncounterId);
   const startConsultation = useOutpatientStore((s) => s.startConsultation);
-  const finishConsultation = useOutpatientStore((s) => s.finishConsultation);
+  const finishEncounter = useOutpatientStore((s) => s.finishEncounter);
   const activeTab = useOutpatientStore((s) => s.activeTab);
   const setActiveTab = useOutpatientStore((s) => s.setActiveTab);
 
   useEffect(() => {
+    syncDoctorFromAuth();
     void fetchWaitingQueue();
-  }, [fetchWaitingQueue]);
+  }, [fetchWaitingQueue, syncDoctorFromAuth]);
 
-  const handleSelect = (encounterId: string) => {
-    startConsultation(encounterId);
+  const handleSelect = (encounterId: string): void => {
+    void startConsultation(encounterId);
     setActiveTab('consult');
+  };
+
+  /** 叫号：选中队列中第一位候诊患者 */
+  const callNext = (): void => {
+    const next = queue.find((q) => q.status === 'waiting');
+    if (next) {
+      handleSelect(next.encounterId);
+    }
   };
 
   return (
     <Layout className="h-screen">
-      {/* 顶部栏 */}
       <Header
         className="!px-4 flex items-center justify-between"
         style={{ background: '#0A4D8C', color: '#fff', height: 56, lineHeight: '56px' }}
       >
         <Space size="large">
-          <span className="font-bold text-base">健澜科技数智医院智能体 · 门诊工作台</span>
-          <Tag color="blue-inverse">{doctor.deptName}</Tag>
-          <span>{doctor.room}</span>
+          <span className="font-bold text-base">健澜科技 jlmedaios · 门诊工作台</span>
+          {doctor?.deptName && <Tag color="blue-inverse">{doctor.deptName}</Tag>}
         </Space>
         <Space size="middle">
           <Text style={{ color: 'rgba(255,255,255,0.85)' }}>
-            {doctor.doctorName} · {doctor.title}
+            {doctor ? `${doctor.doctorName} · ${doctor.title}` : ''}
           </Text>
-          <Badge count={`${doctor.calledQuota}/${doctor.todayQuota}`} overflowCount={9999}>
-            <Tag color="cyan-inverse">今日号源</Tag>
-          </Badge>
-          <Button
-            size="small"
-            icon={<AudioOutlined />}
-            onClick={() => {
-              useOutpatientStore.getState().callNext();
-              message.success('已叫下一位');
-            }}
-          >
+          <Button size="small" icon={<AudioOutlined />} onClick={callNext}>
             叫号
           </Button>
           <Button
             size="small"
             icon={<CheckCircleOutlined />}
             disabled={!currentEncounterId}
-            onClick={() => {
-              finishConsultation();
-              message.success('本次就诊完成，已自动叫下一位');
-            }}
+            onClick={() => void finishEncounter()}
           >
             完成就诊
           </Button>
@@ -104,8 +112,27 @@ export const OutpatientPage: React.FC = () => {
         </Space>
       </Header>
 
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          banner
+          message={`后端服务或数据库连接异常：${error}`}
+        />
+      )}
+      {env.mockEnabled && (
+        <Alert
+          type="warning"
+          showIcon
+          banner
+          message="演示模式（DEMO_MODE）：当前数据可能为本地演示数据，非真实生产链路。"
+        />
+      )}
+      {loading && !error && (
+        <Alert type="info" showIcon banner message="正在从医院信息系统加载…" />
+      )}
+
       <Layout>
-        {/* 左：候诊队列 */}
         <Sider
           width={320}
           theme="light"
@@ -117,14 +144,13 @@ export const OutpatientPage: React.FC = () => {
           </div>
         </Sider>
 
-        {/* 中：问诊区 */}
         <Content className="overflow-auto p-3 bg-ink-bg">
           {!currentPatient ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <RobotOutlined style={{ fontSize: 48, color: '#0A4D8C' }} />
                 <div className="mt-3 text-ink-secondary">
-                  请从左侧候诊队列选择患者，或点击"呼叫下一位"
+                  请从左侧候诊队列选择患者，或点击“叫号”
                 </div>
               </div>
             </div>
@@ -156,7 +182,6 @@ export const OutpatientPage: React.FC = () => {
           )}
         </Content>
 
-        {/* 右：患者360 + AI */}
         <Sider
           width={340}
           theme="light"

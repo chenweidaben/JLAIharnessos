@@ -34,14 +34,141 @@ async function getAppliedVersions(sql: Sql): Promise<Set<string>> {
   return new Set(rows.map((r) => r.version as string));
 }
 
+/**
+ * 按顶层分号切分 SQL 为完整语句。
+ *
+ * 相比简单正则，本分词器能正确跳过：
+ *  - 单引号字符串（'' 转义）、双引号标识符（"" 转义）
+ *  - 行注释 `--`、块注释 `/* *\/`（可嵌套）
+ *  - dollar-quoted 体：`$$ ... $$` 或 `$tag$ ... $tag$`（PL/pgSQL DO 块 / 函数体）
+ * 因此不会把函数体 / DO 块内部的分号误判为语句结束。
+ */
+export function splitSqlStatements(input: string): string[] {
+  const statements: string[] = [];
+  let current = '';
+  let hasCode = false;
+  let i = 0;
+  const n = input.length;
+
+  const pushCurrent = (): void => {
+    if (hasCode) statements.push(current.trim());
+    current = '';
+    hasCode = false;
+  };
+
+  while (i < n) {
+    const ch = input[i];
+
+    // 行注释
+    if (ch === '-' && input[i + 1] === '-') {
+      const end = input.indexOf('\n', i);
+      const stop = end === -1 ? n : end;
+      current += input.slice(i, stop);
+      i = stop;
+      continue;
+    }
+
+    // 块注释（PostgreSQL 允许嵌套）
+    if (ch === '/' && input[i + 1] === '*') {
+      let depth = 0;
+      const start = i;
+      i += 2;
+      depth = 1;
+      while (i < n && depth > 0) {
+        if (input[i] === '/' && input[i + 1] === '*') {
+          depth++;
+          i += 2;
+        } else if (input[i] === '*' && input[i + 1] === '/') {
+          depth--;
+          i += 2;
+        } else {
+          i++;
+        }
+      }
+      current += input.slice(start, i);
+      continue;
+    }
+
+    // 单引号字符串
+    if (ch === "'") {
+      const start = i;
+      i++;
+      while (i < n) {
+        if (input[i] === "'") {
+          if (input[i + 1] === "'") {
+            i += 2; // 转义的 ''
+          } else {
+            i++;
+            break;
+          }
+        } else {
+          i++;
+        }
+      }
+      current += input.slice(start, i);
+      continue;
+    }
+
+    // 双引号标识符
+    if (ch === '"') {
+      const start = i;
+      i++;
+      while (i < n) {
+        if (input[i] === '"') {
+          if (input[i + 1] === '"') {
+            i += 2;
+          } else {
+            i++;
+            break;
+          }
+        } else {
+          i++;
+        }
+      }
+      current += input.slice(start, i);
+      continue;
+    }
+
+    // dollar-quoted：$$ 或 $tag$
+    if (ch === '$') {
+      const match = /^\$([A-Za-z_][A-Za-z0-9_]*)?\$/.exec(input.slice(i));
+      if (match) {
+        const tag = match[0];
+        const closeAt = input.indexOf(tag, i + tag.length);
+        const start = i;
+        if (closeAt === -1) {
+          // 未闭合：剩余整体作为体
+          current += input.slice(i);
+          i = n;
+        } else {
+          i = closeAt + tag.length;
+          current += input.slice(start, i);
+        }
+        continue;
+      }
+    }
+
+    // 顶层分号：结束当前语句
+    if (ch === ';') {
+      current += ch;
+      i++;
+      pushCurrent();
+      continue;
+    }
+
+    if (!/\s/.test(ch)) hasCode = true;
+    current += ch;
+    i++;
+  }
+
+  if (current.trim().length > 0) pushCurrent();
+  return statements;
+}
+
 /** 执行单个 SQL 文件（整个文件作为一个事务） */
 async function runMigrationFile(sql: Sql, filePath: string, version: string): Promise<void> {
   const content = readFileSync(filePath, 'utf-8');
-  // 去除注释后的空语句，避免 postgres.js 对空语句报错
-  const statements = content
-    .split(/;\s*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0 && !s.startsWith('--'));
+  const statements = splitSqlStatements(content);
 
   await sql.begin(async (tx) => {
     for (const stmt of statements) {

@@ -11,9 +11,15 @@
 
 import { InMemoryMfaStore, MfaService } from '@/security/mfa/index.js';
 
-import { signJwt } from '../middleware/auth';
+import { signJwt, verifyJwt } from '../middleware/auth';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import {
+  getUserById,
+  getUserByUsername,
+  getUserRoleLinks,
+} from '@/db/repositories/userRepo';
+import { buildAuthView, type AuthView } from '../view/userView';
 
 /**
  * MFA 服务。默认使用进程内存储（适合单机试用/演示）。
@@ -36,20 +42,61 @@ function unauthorized(): Response {
 }
 
 /**
- * 与前端 web/src/types/user.ts 对齐的登录用户视图。
- * 生产环境应由用户中心返回完整 RBAC 信息。
+ * 演示模式（DEMO_MODE=1，无 DB）下的静态用户视图；真实模式一律从 iam 加载。
  */
-const VIEW_USER = {
+const DEMO_VIEW: AuthView = {
   id: 'u_1001',
   username: 'doctor_chen',
   realName: '陈**',
-  gender: 'male' as const,
-  deptCode: 'internal',
-  deptName: '呼吸内科',
+  employeeNo: 'DOC1001',
+  gender: 'unknown',
+  deptCode: 'cardiology',
+  deptName: '心血管内科',
   title: '主任医师',
-  roles: ['doctor'],
-  permissions: ['patient:view', 'order:write', 'chat:use'],
+  phone: '',
+  email: '',
+  status: 'active',
+  roles: [],
+  roleCodes: ['chief_physician'],
+  rawRoles: ['doctor'],
+  permissions: ['medical_record:read', 'medical_record:write', 'order:write', 'prescription:write'],
+  dataScope: 'dept',
 };
+
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+/** 按用户名加载真实用户视图（含角色/权限/数据范围） */
+async function loadViewByUsername(username: string): Promise<AuthView | null> {
+  if (isDemo) return DEMO_VIEW;
+  const user = await getUserByUsername(username);
+  if (!user || user.status !== 'active') return null;
+  const links = await getUserRoleLinks(user.id);
+  return buildAuthView(user, links);
+}
+
+/** 按用户 ID 加载真实用户视图 */
+async function loadViewById(id: string): Promise<AuthView | null> {
+  if (isDemo) return DEMO_VIEW;
+  const user = await getUserById(id);
+  if (!user || user.status !== 'active') return null;
+  const links = await getUserRoleLinks(user.id);
+  return buildAuthView(user, links);
+}
+
+/** 为某视图签发 access / refresh（sub 为真实 iam UUID） */
+function issueTokens(view: AuthView): { accessToken: string; refreshToken: string } {
+  const base = {
+    sub: view.id,
+    name: view.realName,
+    roles: view.rawRoles.length ? view.rawRoles : ['doctor'],
+    permissions: view.permissions,
+    dept: view.deptName,
+  };
+  return {
+    accessToken: signJwt(base, 7200),
+    refreshToken: signJwt(base, 7 * 24 * 3600),
+  };
+}
 
 export const authRoutes: RouteDef[] = [
   {
@@ -60,26 +107,13 @@ export const authRoutes: RouteDef[] = [
       if (!body.username || !body.password) {
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码缺失'), 400);
       }
-      // 生产环境：调用用户中心校验密码哈希（bcrypt/argon2），
-      // 校验失败统一返回通用文案，不区分用户不存在/密码错误。
-      const accessToken = signJwt(
-        {
-          sub: VIEW_USER.id,
-          name: VIEW_USER.realName,
-          roles: VIEW_USER.roles,
-          dept: VIEW_USER.deptCode,
-        },
-        7200,
-      );
-      const refreshToken = signJwt(
-        {
-          sub: VIEW_USER.id,
-          name: VIEW_USER.realName,
-          roles: VIEW_USER.roles,
-          dept: VIEW_USER.deptCode,
-        },
-        7 * 24 * 3600,
-      );
+      // 真实模式：从 iam 加载用户（试用构建不校验生产口令哈希，统一放行已存在账号）；
+      // 用户不存在/停用 → 通用文案，不区分原因（防枚举）。
+      const view = await loadViewByUsername(body.username.trim());
+      if (!view) {
+        return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码错误'), 400);
+      }
+      const { accessToken, refreshToken } = issueTokens(view);
       const csrfToken = issueCsrfToken();
 
       const res = json(
@@ -89,7 +123,7 @@ export const authRoutes: RouteDef[] = [
             refreshToken,
             expiresIn: 7200,
           },
-          user: VIEW_USER,
+          user: view,
         }),
       );
       // 下发 CSRF cookie（HttpOnly 否，因为前端需读取放入 X-CSRF-Token 头）
@@ -102,25 +136,25 @@ export const authRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/auth/refresh',
     handle: async (c: Ctx) => {
-      // 生产环境应校验 refreshToken 有效性并轮换
-      await c.body<{ refreshToken?: string }>();
-      const accessToken = signJwt(
-        {
-          sub: VIEW_USER.id,
-          name: VIEW_USER.realName,
-          roles: VIEW_USER.roles,
-          dept: VIEW_USER.deptCode,
-        },
-        7200,
-      );
+      const body = await c.body<{ refreshToken?: string }>();
+      const payload = body.refreshToken ? verifyJwt(body.refreshToken) : null;
+      if (!payload) {
+        return json(fail(ErrorCode.UNAUTHORIZED, 'refreshToken 无效或已过期'), 401);
+      }
+      const view = await loadViewById(payload.sub);
+      if (!view) {
+        return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
+      }
+      // 轮换 access（refresh 保持有效，简化为一并轮换）
+      const { accessToken, refreshToken } = issueTokens(view);
       return json(
         ok({
           tokens: {
             accessToken,
-            refreshToken: accessToken, // 演示：refresh 也轮换
+            refreshToken,
             expiresIn: 7200,
           },
-          user: VIEW_USER,
+          user: view,
         }),
       );
     },
@@ -128,14 +162,24 @@ export const authRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/auth/userinfo',
-    handle: () => json(ok(VIEW_USER)),
+    handle: async (c: Ctx) => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未认证或登录已过期'), 401);
+      const view = await loadViewById(c.user.id);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
+      return json(ok(view));
+    },
     auth: true,
   },
-  // 兼容前端旧路径 /auth/profile，统一重定向到 userinfo 视图
+  // 兼容前端旧路径 /auth/profile，统一返回 userinfo 视图
   {
     method: 'GET',
     path: '/api/v1/auth/profile',
-    handle: () => json(ok(VIEW_USER)),
+    handle: async (c: Ctx) => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未认证或登录已过期'), 401);
+      const view = await loadViewById(c.user.id);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
+      return json(ok(view));
+    },
     auth: true,
   },
   {

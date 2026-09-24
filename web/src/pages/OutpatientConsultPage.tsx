@@ -25,13 +25,15 @@ export const OutpatientConsultPage: React.FC = () => {
   const { encounterId } = useParams<{ encounterId: string }>();
   const navigate = useNavigate();
   const startConsultation = useOutpatientStore((s) => s.startConsultation);
+  const syncDoctorFromAuth = useOutpatientStore((s) => s.syncDoctorFromAuth);
   const currentPatient = useOutpatientStore((s) => s.currentPatient);
   const doctor = useOutpatientStore((s) => s.doctor);
-  const finishConsultation = useOutpatientStore((s) => s.finishConsultation);
+  const finishEncounter = useOutpatientStore((s) => s.finishEncounter);
 
   useEffect(() => {
-    if (encounterId) startConsultation(encounterId);
-  }, [encounterId, startConsultation]);
+    syncDoctorFromAuth();
+    if (encounterId) void startConsultation(encounterId);
+  }, [encounterId, startConsultation, syncDoctorFromAuth]);
 
   return (
     <Layout className="h-screen">
@@ -44,7 +46,7 @@ export const OutpatientConsultPage: React.FC = () => {
             返回工作台
           </Button>
           <span className="font-bold">门诊问诊</span>
-          <Tag color="blue-inverse">{doctor.deptName}</Tag>
+          {doctor?.deptName && <Tag color="blue-inverse">{doctor.deptName}</Tag>}
           <Text style={{ color: 'rgba(255,255,255,0.85)' }}>诊号 {encounterId}</Text>
         </Space>
         <Button
@@ -53,8 +55,8 @@ export const OutpatientConsultPage: React.FC = () => {
           ghost
           icon={<CheckCircleOutlined />}
           disabled={!currentPatient}
-          onClick={() => {
-            finishConsultation();
+          onClick={async () => {
+            await finishEncounter();
             message.success('就诊完成');
             navigate('/outpatient');
           }}

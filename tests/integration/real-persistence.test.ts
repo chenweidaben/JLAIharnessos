@@ -11,7 +11,7 @@
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { closeDb, getDb, verifyDbConnection, withTx } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection, withTx } from '../../src/db/pool.js';
 import * as patientRepo from '../../src/db/repositories/patientRepo.js';
 import * as visitRepo from '../../src/db/repositories/visitRepo.js';
 import * as orderRepo from '../../src/db/repositories/orderRepo.js';
@@ -45,7 +45,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (dbAvailable) {
-    await closeDb();
+    // 不能调用生产语义的 closeDb()：它会把模块级 _shuttingDown 永久置真，
+    // bun test 同进程内后续测试文件再取连接会全部失败（测试隔离缺陷）。
+    // closeDbForTest 结束物理连接的同时重置关闭标志，不泄漏全局状态。
+    await closeDbForTest();
   }
 });
 

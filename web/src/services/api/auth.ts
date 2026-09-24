@@ -8,14 +8,39 @@ import { post, get, del } from '../request';
 import { mockLogin } from '@/mock/users';
 import { delay } from '@/mock/utils';
 import { env } from '@/utils/config';
-import type { LoginRequest, LoginResponse, UserInfo } from '@/types/user';
+import type { LoginRequest, UserInfo } from '@/types/user';
+import type { AuthLoginApiResponse, AuthViewLike } from '../authMapper';
 
-export async function loginApi(payload: LoginRequest): Promise<LoginResponse> {
+export async function loginApi(payload: LoginRequest): Promise<AuthLoginApiResponse> {
   if (env.mockEnabled) {
     await delay(300, 600);
-    return mockLogin(payload.username);
+    const mock = mockLogin(payload.username);
+    // 演示态 UserInfo 为窄口径，补齐 AuthViewLike 缺省字段
+    const user: AuthViewLike = {
+      id: String(mock.user.id),
+      username: mock.user.username,
+      realName: mock.user.realName,
+      employeeNo: `EMP${String(mock.user.id).slice(0, 8)}`,
+      gender: mock.user.gender,
+      deptCode: mock.user.deptCode,
+      deptName: mock.user.deptName,
+      title: mock.user.title,
+      phone: '',
+      email: '',
+      status: 'active',
+      roles: [],
+      roleCodes: [],
+      permissions: mock.user.permissions,
+      dataScope: 'dept',
+    };
+    return { tokens: mock.tokens, user };
   }
-  return post<LoginResponse>('/auth/login', payload);
+  return post<AuthLoginApiResponse>('/auth/login', payload);
+}
+
+/** 使用 refreshToken 轮换令牌（后端 /auth/refresh 返回与登录一致的结构） */
+export async function refreshApi(refreshToken: string): Promise<AuthLoginApiResponse> {
+  return post<AuthLoginApiResponse>('/auth/refresh', { refreshToken });
 }
 
 export async function fetchProfile(): Promise<UserInfo> {

@@ -28,6 +28,16 @@ export type DataScope = 'all' | 'dept' | 'group' | 'self';
 /** 登录方式 */
 export type LoginMethod = 'password' | 'sso' | 'qrcode';
 
+/** 登录失败错误（携带稳定错误码，供登录页区分提示与刷新验证码） */
+export class LoginError extends Error {
+  code: 'BAD_CREDENTIALS' | 'CAPTCHA' | 'LOCKED' | 'NOT_FOUND';
+  constructor(code: LoginError['code'], message: string) {
+    super(message);
+    this.name = 'LoginError';
+    this.code = code;
+  }
+}
+
 /** 操作审计类型 */
 export type AuditAction =
   | 'login'
@@ -150,7 +160,8 @@ export interface PersistedAuthPayload {
 export interface LoginRequest {
   username: string;
   password: string;
-  captcha: string;
+  /** 图形验证码内容（启用验证码 / 存在 captchaId 时必填） */
+  captcha?: string;
   /** 图形验证码会话 ID（与图形验证码配对，服务端据此校验内容） */
   captchaId?: string;
   /** 记住我：缺省为 false（仅会话期有效） */

@@ -8,25 +8,25 @@ import { Button, Card, Form, Input, message } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-import { loginApi } from '@/services/api/auth';
-import { tokenStorage } from '@/utils/auth';
-import { useUserStore } from '@/store/userStore';
+import { useAuthStore } from '@/store/authStore';
+import { LoginError } from '@/types/auth';
 import type { LoginRequest } from '@/types/user';
 
 export default function Login() {
   const navigate = useNavigate();
-  const setUser = useUserStore((s) => s.setUser);
+  const login = useAuthStore((s) => s.login);
   const [form] = Form.useForm<LoginRequest>();
 
   const onFinish = async (values: LoginRequest) => {
     try {
-      const res = await loginApi(values);
-      tokenStorage.set(res.tokens);
-      setUser(res.user);
-      message.success(`欢迎，${res.user.realName}`);
+      await login({
+        username: values.username,
+        password: values.password,
+      });
+      message.success('登录成功');
       navigate('/dashboard', { replace: true });
-    } catch {
-      message.error('登录失败，请检查账号');
+    } catch (e) {
+      message.error(e instanceof LoginError ? e.message : '登录失败，请检查账号');
     }
   };
 

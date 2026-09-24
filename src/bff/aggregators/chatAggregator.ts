@@ -22,6 +22,7 @@ import {
   type ConversationMessage,
   getRecentMessages,
 } from '@/db/repositories/conversationRepo';
+import { buildPatientContextBlock } from './patientContext';
 import {
   createRegistryWithFirstBatch,
 } from '@/medical-tools/registry';
@@ -70,6 +71,8 @@ export interface ChatTurnResult {
 export interface RunChatTurnOptions {
   userId?: string;
   userName?: string;
+  /** 关联门诊就诊 ID：存在时从真实库读取患者快照注入系统提示 */
+  encounterId?: string | null;
   /** 流式文本增量回调（REST SSE / WS agent:delta 共用） */
   onDelta?: (chunk: string) => void;
   /** 工具调用生命周期回调（供 WS 推送 agent:tool 事件） */
@@ -474,8 +477,13 @@ export async function runChatTurn(
   try {
     // 1) 读历史（在落库新用户消息之前读，避免自我重复）
     const history = await getRecentMessages(conversationId, MAX_HISTORY_MESSAGES);
+    // 1.1) 真实患者上下文（来自当前就诊快照）；读取不到则不附加，绝不编造
+    const patientContext = await buildPatientContextBlock(opts.encounterId);
+    const systemContent = patientContext
+      ? `${SYSTEM_PROMPT}\n${patientContext}`
+      : SYSTEM_PROMPT;
     const baseMessages: OpenAiMessage[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: systemContent },
       ...historyToOpenAi(history),
     ];
 

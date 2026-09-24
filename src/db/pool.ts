@@ -97,3 +97,19 @@ export function _resetDbForTest(): void {
   _sql = null;
   _shuttingDown = false;
 }
+
+/**
+ * 测试专用：优雅关闭当前连接池，但不泄漏"系统正在关闭"的全局状态。
+ *
+ * 背景：bun test 默认在同一进程内顺序执行多个测试文件。若测试在 afterAll
+ * 调用生产语义的 closeDb()，模块级 _shuttingDown 会被永久置真，导致同进程
+ * 后续所有打库测试报"系统正在关闭，拒绝新建连接"。本函数结束物理连接
+ * （避免句柄泄漏/进程悬挂），同时重置关闭标志，使后续测试可重新建池。
+ */
+export async function closeDbForTest(): Promise<void> {
+  if (_sql) {
+    await _sql.end({ timeout: 5 });
+    _sql = null;
+  }
+  _shuttingDown = false;
+}

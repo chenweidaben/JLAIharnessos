@@ -7,6 +7,8 @@
 [test]
 # 排除前端 web/ 目录下的测试文件（前端测试由 web/ 目录独立工具链运行）
 pathIgnorePatterns = ["web/**"]
+# 测试环境预加载：默认确定性演示模式，隔离外部数据库状态（详见 tests/support/testEnv.ts）
+preload = ["./tests/support/testEnv.ts"]
 
 [run]
 # 生产环境剥离源maps

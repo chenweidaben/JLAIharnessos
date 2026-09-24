@@ -1,29 +1,59 @@
 /**
- * 健澜科技数智医院智能体
- * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ * 健澜科技 jlmedaios - 门诊病历书写面板（真实接口 + 真实 LLM）
  *
- * 门诊病历书写：结构化自动带出、AI 生成、质控检查、电子签名、打印。
+ * - 结构化内容由问诊/诊断/医嘱/处方自动带出（真实数据，非 mock）；
+ * - “AI 生成病历”调用真实大模型，产物为 AI 草稿，必须医师核对；
+ * - 存草稿 / 签名提交均真实落 clinical.medical_records，签名后不可在界面修改。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Card, Descriptions, Modal, Segmented, Space, Tag, message } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Card,
+  Descriptions,
+  Modal,
+  Select,
+  Space,
+  Spin,
+  Tag,
+} from 'antd';
 import {
   PrinterOutlined,
   RobotOutlined,
   SafetyCertificateOutlined,
   SaveOutlined,
   AuditOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
-import type { RecordContent, RecordQualityIssue } from '@/types/outpatient';
+import type {
+  RecordContent,
+  RecordQualityIssue,
+  RecordTemplate,
+} from '@/types/outpatient';
 import { useOutpatientStore } from '@/store/outpatientStore';
-import { mockRecordTemplates } from '@/mock/outpatientMock';
+import {
+  fetchRecordTemplates,
+  generateAiRecordApi,
+} from '@/services/api/outpatient';
 
-/** 质控：检查必填/逻辑 */
+const EMPTY_CONTENT: RecordContent = {
+  chiefComplaint: '',
+  presentIllness: '',
+  pastHistory: '',
+  physicalExam: '',
+  auxiliaryExam: '',
+  diagnosis: '',
+  treatment: '',
+  healthEducation: '',
+};
+
+/** 前端病历质控：必填与完整性提示 */
 function qualityCheck(content: RecordContent): RecordQualityIssue[] {
   const issues: RecordQualityIssue[] = [];
   if (!content.chiefComplaint.trim())
     issues.push({ level: 'danger', field: 'chiefComplaint', message: '主诉不能为空' });
-  if (content.chiefComplaint.length > 20)
-    issues.push({ level: 'warning', field: 'chiefComplaint', message: '主诉超过 20 字，建议精简' });
   if (!content.presentIllness.trim())
     issues.push({ level: 'danger', field: 'presentIllness', message: '现病史不能为空' });
   if (!content.physicalExam.trim())
@@ -32,12 +62,8 @@ function qualityCheck(content: RecordContent): RecordQualityIssue[] {
     issues.push({ level: 'danger', field: 'diagnosis', message: '诊断不能为空' });
   if (!content.treatment.trim())
     issues.push({ level: 'warning', field: 'treatment', message: '处理意见为空' });
-  if (content.presentIllness.includes('【AI】') && content.presentIllness.length < 30)
-    issues.push({
-      level: 'info',
-      field: 'presentIllness',
-      message: '现病史为 AI 草稿，建议人工核对补充',
-    });
+  if (!content.pastHistory.trim())
+    issues.push({ level: 'info', field: 'pastHistory', message: '既往史未记录' });
   return issues;
 }
 
@@ -47,112 +73,171 @@ export const MedicalRecordPanel: React.FC = () => {
   const prescriptions = useOutpatientStore((s) => s.prescriptions);
   const orders = useOutpatientStore((s) => s.orders);
   const doctor = useOutpatientStore((s) => s.doctor);
+  const medicalRecord = useOutpatientStore((s) => s.medicalRecord);
+  const currentEncounterId = useOutpatientStore((s) => s.currentEncounterId);
+  const saveRecordAction = useOutpatientStore((s) => s.saveRecord);
 
-  const [content, setContent] = useState<RecordContent>({
-    chiefComplaint: '',
-    presentIllness: '',
-    pastHistory: '',
-    physicalExam: '',
-    auxiliaryExam: '',
-    diagnosis: '',
-    treatment: '',
-    healthEducation: '',
-  });
-  const [signed, setSigned] = useState(false);
+  const [content, setContent] = useState<RecordContent>(EMPTY_CONTENT);
   const [sigModal, setSigModal] = useState(false);
-  const [scope, setScope] = useState<'personal' | 'dept' | 'common'>('dept');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiNote, setAiNote] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<RecordTemplate[]>([]);
 
-  /** 自动从问诊/诊断/处方/申请带出 */
-  useEffect(() => {
-    if (!consultation) return;
+  /** 依据真实就诊数据组装病历内容 */
+  const buildFromEncounter = useCallback((): RecordContent => {
     const ci = consultation;
-    setContent({
-      chiefComplaint: ci.chiefComplaint,
+    if (!ci) return EMPTY_CONTENT;
+    const pi = ci.presentIllness ?? {};
+    const ph = ci.pastHistory ?? {};
+    const pe = ci.physicalExam ?? {};
+    const v = pe.vital;
+    return {
+      chiefComplaint: ci.chiefComplaint ?? '',
       presentIllness: [
-        `患者于${ci.presentIllness.onsetTime ?? ''}出现${ci.presentIllness.mainSymptom ?? ''}，`,
-        `诱因：${ci.presentIllness.trigger ?? '未明'}。`,
-        `伴随症状：${ci.presentIllness.accompanying ?? '无'}。`,
-        `诊疗经过：${ci.presentIllness.treatmentProcess ?? '未特殊处理'}。`,
-        `一般情况：${ci.presentIllness.generalCondition ?? '可'}。`,
+        pi.mainSymptom ? `患者诉${pi.mainSymptom}` : '',
+        pi.onsetTime ? `，起病于${pi.onsetTime}` : '',
+        pi.trigger ? `，诱因：${pi.trigger}` : '',
+        pi.accompanying ? `，伴${pi.accompanying}` : '',
+        pi.treatmentProcess ? `。诊疗经过：${pi.treatmentProcess}` : '',
+        pi.generalCondition ? `。一般情况：${pi.generalCondition}` : '',
+        '。',
       ].join(''),
-      pastHistory: `${ci.pastHistory.diseases ?? ''}；手术史：${ci.pastHistory.surgery ?? '否认'}；过敏史：${ci.pastHistory.allergy ?? '否认'}。`,
+      pastHistory: [
+        ph.diseases ? `既往疾病：${ph.diseases}` : '',
+        ph.surgery ? `；手术史：${ph.surgery}` : '',
+        ph.allergy ? `；过敏史：${ph.allergy}` : '',
+      ].join(''),
       physicalExam: [
-        `T ${ci.physicalExam.vital?.temperature ?? '-'}℃ P ${ci.physicalExam.vital?.pulse ?? '-'}次/分 R ${ci.physicalExam.vital?.respiration ?? '-'}次/分 BP ${ci.physicalExam.vital?.systolic ?? '-'}/${ci.physicalExam.vital?.diastolic ?? '-'}mmHg。`,
-        ci.physicalExam.general ?? '',
-        ci.physicalExam.chest ?? '',
-        ci.physicalExam.abdomen ?? '',
+        v
+          ? `T ${v.temperature ?? '-'}℃ P ${v.pulse ?? '-'}次/分 R ${v.respiration ?? '-'}次/分 BP ${v.systolic ?? '-'}/${v.diastolic ?? '-'}mmHg。`
+          : '',
+        pe.general ?? '',
+        pe.chest ?? '',
+        pe.abdomen ?? '',
       ]
         .filter(Boolean)
         .join(' '),
       auxiliaryExam: ci.auxiliaryExams
-        .map((a) => `${a.name}（${a.date}）：${a.conclusion}`)
+        .map((a) => `${a.name}：${a.conclusion}`)
         .join('；'),
-      diagnosis: diagnoses.map((d) => `${d.name}（${d.code}）`).join('；'),
+      diagnosis: diagnoses
+        .map((d) => (d.code ? `${d.name}（${d.code}）` : d.name))
+        .join('；'),
       treatment: [
-        prescriptions[0]?.lines.length
+        prescriptions[0]
           ? `处方：${prescriptions[0].lines.map((l) => l.drug.genericName).join('、')}`
           : '',
         orders.length ? `检查检验：${orders.map((o) => o.name).join('、')}` : '',
-        '复诊建议：2 周后心内科门诊随访。',
       ]
         .filter(Boolean)
         .join('；'),
-      healthEducation: '低盐低脂糖尿病饮食，戒烟限酒，规律作息，按时服药，监测血压心率，不适随诊。',
-    });
+      healthEducation: '规律作息、合理膳食、按时服药，监测症状变化，定期门诊复诊，不适随诊。',
+    };
   }, [consultation, diagnoses, prescriptions, orders]);
+
+  // 就诊切换：载入已存病历，否则自动带出
+  useEffect(() => {
+    setAiError(null);
+    setAiNote(null);
+    if (!currentEncounterId) {
+      setContent(EMPTY_CONTENT);
+      return;
+    }
+    if (medicalRecord?.content) {
+      setContent({ ...EMPTY_CONTENT, ...medicalRecord.content });
+    } else {
+      setContent(buildFromEncounter());
+    }
+    // 仅在就诊切换 / 已存病历首次到达时执行，避免打断录入
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentEncounterId, medicalRecord?.recordId]);
+
+  // 病历模板
+  useEffect(() => {
+    let alive = true;
+    fetchRecordTemplates()
+      .then((list) => {
+        if (alive) setTemplates(list);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const issues = useMemo(() => qualityCheck(content), [content]);
   const dangerCount = issues.filter((i) => i.level === 'danger').length;
+  const signed = medicalRecord?.signed === true;
 
-  const set = (k: keyof RecordContent, v: string) => setContent((c) => ({ ...c, [k]: v }));
-
-  const aiGenerate = () => {
-    setContent((c) => ({
-      ...c,
-      presentIllness:
-        c.presentIllness ||
-        '患者诉反复胸闷心悸 1 周，加重 1 天，活动后明显，休息稍缓解。伴出汗乏力，无放射痛。为求进一步诊治来院。',
-      treatment:
-        c.treatment || '完善心电图、心肌酶谱；抗血小板、调脂、控制心率治疗；必要时住院造影。',
-      healthEducation:
-        c.healthEducation || '低盐低脂糖尿病饮食，戒烟限酒，按时服药，监测血压，2 周后复诊。',
-    }));
-    message.success('AI 已生成完整门诊病历，请人工核对后签名');
+  const set = (k: keyof RecordContent, v: string): void => {
+    if (signed) return;
+    setContent((c) => ({ ...c, [k]: v }));
   };
 
-  const applyTemplate = (tplId: string) => {
-    const tpl = mockRecordTemplates.find((t) => t.templateId === tplId);
+  /** AI 生成病历（真实 LLM） */
+  const aiGenerate = async (): Promise<void> => {
+    if (!currentEncounterId || aiLoading) return;
+    setAiLoading(true);
+    setAiError(null);
+    setAiNote(null);
+    try {
+      const draft = await generateAiRecordApi(currentEncounterId);
+      setContent((c) => {
+        const merged = { ...c };
+        for (const key of Object.keys(EMPTY_CONTENT) as (keyof RecordContent)[]) {
+          const val = draft[key];
+          if (typeof val === 'string' && val.trim()) merged[key] = val.trim();
+        }
+        return merged;
+      });
+      setAiNote('AI 已生成病历草稿，请逐段核对、修改后再签名（AI 辅助，医师负责）。');
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : 'AI 病历生成失败');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  /** 套用病历模板 */
+  const applyTemplate = (templateId: string): void => {
+    const tpl = templates.find((t) => t.id === templateId);
     if (!tpl) return;
-    setContent((c) => ({ ...c, ...tpl.content }));
-    message.success(`已套用模板：${tpl.name}`);
+    setContent((c) => {
+      const merged = { ...c };
+      for (const [key, sec] of Object.entries(tpl.sections)) {
+        if (key in merged && sec.template) {
+          merged[key as keyof RecordContent] = sec.template;
+        }
+      }
+      return merged;
+    });
   };
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <Space>
-          <Segmented
+          <Select
             size="small"
-            value={scope}
-            onChange={(v) => setScope(v as typeof scope)}
-            options={[
-              { value: 'personal', label: '个人模板' },
-              { value: 'dept', label: '科室模板' },
-              { value: 'common', label: '通用模板' },
-            ]}
+            style={{ width: 200 }}
+            placeholder="选择病历模板"
+            onChange={applyTemplate}
+            options={templates.map((t) => ({ value: t.id, label: t.name }))}
           />
-          <Button size="small" onClick={() => applyTemplate(mockRecordTemplates[0].templateId)}>
-            套用模板
+          <Button size="small" icon={<SyncOutlined />} onClick={() => setContent(buildFromEncounter())}>
+            重新带出
           </Button>
         </Space>
         <Space>
-          <Button size="small" icon={<RobotOutlined />} onClick={aiGenerate}>
+          <Button size="small" icon={<RobotOutlined />} loading={aiLoading} onClick={() => void aiGenerate()}>
             AI 生成病历
           </Button>
           <Button
             size="small"
             icon={<SaveOutlined />}
-            onClick={() => message.success('病历草稿已保存')}
+            disabled={signed}
+            onClick={() => void saveRecordAction(content, false)}
           >
             存草稿
           </Button>
@@ -172,14 +257,33 @@ export const MedicalRecordPanel: React.FC = () => {
         </Space>
       </div>
 
+      {aiLoading && (
+        <div className="py-4 text-center">
+          <Spin tip="AI 正在依据真实病历生成…" />
+        </div>
+      )}
+      {aiNote && <Alert type="info" showIcon message={aiNote} />}
+      {aiError && (
+        <Alert
+          type="error"
+          showIcon
+          message="AI 病历生成失败"
+          description={aiError}
+        />
+      )}
+
       {/* 质控 */}
       <Alert
-        type={dangerCount > 0 ? 'error' : 'success'}
+        type={signed ? 'success' : dangerCount > 0 ? 'error' : 'success'}
         showIcon
         icon={<AuditOutlined />}
-        message={`病历质控：${issues.length} 项提示，${dangerCount} 项必须修改`}
+        message={
+          signed
+            ? '病历已签名归档'
+            : `病历质控：${issues.length} 项提示，${dangerCount} 项必须修改`
+        }
         description={
-          issues.length > 0 ? (
+          !signed && issues.length > 0 ? (
             <ul className="list-disc pl-5 text-xs">
               {issues.map((it, idx) => (
                 <li
@@ -197,82 +301,35 @@ export const MedicalRecordPanel: React.FC = () => {
                 </li>
               ))}
             </ul>
-          ) : (
-            <span className="text-xs">病历完整规范，可签名提交。</span>
-          )
+          ) : undefined
         }
       />
 
-      <Card
-        size="small"
-        title={<span className="text-sm font-semibold">门诊病历</span>}
-        id="print-area"
-      >
+      <Card size="small" title={<span className="text-sm font-semibold">门诊病历</span>} id="print-area">
         <Descriptions size="small" column={2} bordered className="mb-3">
-          <Descriptions.Item label="科室">{doctor.deptName}</Descriptions.Item>
+          <Descriptions.Item label="科室">{doctor?.deptName}</Descriptions.Item>
           <Descriptions.Item label="医师">
-            {doctor.doctorName}（{doctor.title}）
+            {doctor?.doctorName}
+            {doctor?.title ? `（${doctor.title}）` : ''}
           </Descriptions.Item>
           <Descriptions.Item label="日期">
             {new Date().toLocaleDateString('zh-CN')}
           </Descriptions.Item>
-          <Descriptions.Item label="病历完成度">
-            <Tag color={dangerCount === 0 ? 'success' : 'warning'}>
-              {dangerCount === 0 ? '完整' : '待完善'}
+          <Descriptions.Item label="状态">
+            <Tag color={signed ? 'success' : 'warning'}>
+              {signed ? '已签名' : medicalRecord ? '草稿' : '未保存'}
             </Tag>
           </Descriptions.Item>
         </Descriptions>
 
-        <RecordField
-          label="主诉"
-          value={content.chiefComplaint}
-          onChange={(v) => set('chiefComplaint', v)}
-          required
-        />
-        <RecordField
-          label="现病史"
-          value={content.presentIllness}
-          onChange={(v) => set('presentIllness', v)}
-          rows={4}
-          required
-        />
-        <RecordField
-          label="既往史"
-          value={content.pastHistory}
-          onChange={(v) => set('pastHistory', v)}
-          rows={3}
-        />
-        <RecordField
-          label="体格检查"
-          value={content.physicalExam}
-          onChange={(v) => set('physicalExam', v)}
-          rows={3}
-        />
-        <RecordField
-          label="辅助检查"
-          value={content.auxiliaryExam}
-          onChange={(v) => set('auxiliaryExam', v)}
-          rows={2}
-        />
-        <RecordField
-          label="诊断"
-          value={content.diagnosis}
-          onChange={(v) => set('diagnosis', v)}
-          rows={2}
-          required
-        />
-        <RecordField
-          label="处理意见"
-          value={content.treatment}
-          onChange={(v) => set('treatment', v)}
-          rows={3}
-        />
-        <RecordField
-          label="健康宣教"
-          value={content.healthEducation}
-          onChange={(v) => set('healthEducation', v)}
-          rows={2}
-        />
+        <RecordField label="主诉" value={content.chiefComplaint} onChange={(v) => set('chiefComplaint', v)} required />
+        <RecordField label="现病史" value={content.presentIllness} onChange={(v) => set('presentIllness', v)} rows={4} required />
+        <RecordField label="既往史" value={content.pastHistory} onChange={(v) => set('pastHistory', v)} rows={3} />
+        <RecordField label="体格检查" value={content.physicalExam} onChange={(v) => set('physicalExam', v)} rows={3} />
+        <RecordField label="辅助检查" value={content.auxiliaryExam} onChange={(v) => set('auxiliaryExam', v)} rows={2} />
+        <RecordField label="诊断" value={content.diagnosis} onChange={(v) => set('diagnosis', v)} rows={2} required />
+        <RecordField label="处理意见" value={content.treatment} onChange={(v) => set('treatment', v)} rows={3} />
+        <RecordField label="健康宣教" value={content.healthEducation} onChange={(v) => set('healthEducation', v)} rows={2} />
       </Card>
 
       <Modal
@@ -280,13 +337,16 @@ export const MedicalRecordPanel: React.FC = () => {
         title="电子签名确认"
         onCancel={() => setSigModal(false)}
         onOk={() => {
-          setSigned(true);
+          void saveRecordAction(content, true);
           setSigModal(false);
-          message.success('病历已签名归档');
         }}
         okText="确认签名归档"
+        okButtonProps={{ icon: <SafetyCertificateOutlined /> }}
       >
-        <p className="text-sm">病历质控已通过，签名后将归档至患者健康档案，不可修改。</p>
+        <p className="text-sm">病历质控已通过，签名后将归档至患者健康档案，界面不可再修改。</p>
+        <p className="text-xs text-ink-secondary">
+          签名即表示医师已审核病历内容并对其真实性、完整性负责（AI 辅助，医师复核签名）。
+        </p>
       </Modal>
     </div>
   );

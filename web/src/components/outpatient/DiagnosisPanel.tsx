@@ -1,10 +1,13 @@
 /**
- * 健澜科技数智医院智能体
- * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ * 健澜科技 jlmedaios - 诊断辅助面板（真实接口）
  *
- * 诊断辅助面板：ICD-10 搜索、鉴别诊断、CDS 提醒、历史诊断、常见诊断快捷。
+ * ICD-10 搜索、常见诊断快捷、诊断列表（确认/移除）、临床决策支持（CDS）。
+ * 诊断与 CDS 均来自 BFF 真实计算与持久化；AI 鉴别诊断统一由“AI 助手”页提供，
+ * 本面板不再内置写死的鉴别结论。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -13,58 +16,90 @@ import {
   Input,
   List,
   Space,
-  Switch,
+  Spin,
   Tag,
   Tooltip,
-  message,
 } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   PlusOutlined,
   SearchOutlined,
-  RobotOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import type { DiagnosisItem, IcdDiagnosis } from '@/types/outpatient';
+import type {
+  DiagnosisCatalog,
+  DiagnosisItem,
+  PrescriptionWarning,
+} from '@/types/outpatient';
 import { useOutpatientStore } from '@/store/outpatientStore';
 import {
-  mockAIDifferentials,
-  mockCDSReminders,
-  mockCommonDiagnoses,
-  mockIcdCatalog,
-} from '@/mock/outpatientMock';
-import { severityColor } from './constants';
+  fetchDiagnosisCatalog,
+  searchDiagnosisCatalog,
+} from '@/services/api/outpatient';
 
 export const DiagnosisPanel: React.FC = () => {
   const diagnoses = useOutpatientStore((s) => s.diagnoses);
   const addDiagnosis = useOutpatientStore((s) => s.addDiagnosis);
   const removeDiagnosis = useOutpatientStore((s) => s.removeDiagnosis);
   const confirmDiagnosis = useOutpatientStore((s) => s.confirmDiagnosis);
-  const [kw, setKw] = useState('');
-  const [showDifferential, setShowDifferential] = useState(true);
+  const cdsReminders = useOutpatientStore((s) => s.cdsReminders);
 
-  const icdResults = useMemo(() => {
+  const [kw, setKw] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<DiagnosisCatalog[]>([]);
+  const [common, setCommon] = useState<DiagnosisCatalog[]>([]);
+
+  // 加载常见诊断快捷
+  useEffect(() => {
+    let alive = true;
+    fetchDiagnosisCatalog()
+      .then((data) => {
+        if (alive) setCommon(data.common ?? []);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // 关键字 ICD 搜索（服务端，带防抖）
+  useEffect(() => {
     const k = kw.trim();
-    if (!k) return [];
-    return mockIcdCatalog
-      .filter((d) => d.name.includes(k) || d.code.toLowerCase().includes(k.toLowerCase()))
-      .slice(0, 10);
+    if (!k) {
+      setResults([]);
+      return undefined;
+    }
+    let alive = true;
+    setSearching(true);
+    const timer = setTimeout(() => {
+      searchDiagnosisCatalog(k)
+        .then((list) => {
+          if (alive) setResults(list);
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          if (alive) setSearching(false);
+        });
+    }, 250);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
   }, [kw]);
 
-  const addDiagnosisByIcd = (icd: IcdDiagnosis, kind: DiagnosisItem['kind'] = 'primary') => {
-    addDiagnosis({
-      id: `DG${Date.now()}`,
-      code: icd.code,
-      name: icd.name,
-      kind,
-      confirmed: false,
-    });
-    message.success(`已添加诊断：${icd.name}`);
+  const addByCatalog = (
+    item: DiagnosisCatalog,
+    kind: DiagnosisItem['kind'] = 'primary',
+  ): void => {
+    addDiagnosis({ code: item.code, name: item.name, kind });
   };
 
-  const primary = diagnoses.filter((d) => d.kind === 'primary');
-  const secondary = diagnoses.filter((d) => d.kind === 'secondary');
+  const primary = useMemo(() => diagnoses.filter((d) => d.kind === 'primary'), [diagnoses]);
+  const secondary = useMemo(
+    () => diagnoses.filter((d) => d.kind === 'secondary'),
+    [diagnoses],
+  );
 
   return (
     <div className="space-y-3">
@@ -77,68 +112,80 @@ export const DiagnosisPanel: React.FC = () => {
           onChange={(e) => setKw(e.target.value)}
           allowClear
         />
-        {kw && icdResults.length > 0 && (
-          <List
-            size="small"
-            className="mt-2 border border-ink-border rounded"
-            dataSource={icdResults}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="add"
-                    size="small"
-                    type="link"
-                    onClick={() => addDiagnosisByIcd(item)}
+        {kw.trim() && (
+          <div className="mt-2">
+            {searching ? (
+              <div className="py-4 text-center">
+                <Spin size="small" />
+              </div>
+            ) : results.length > 0 ? (
+              <List
+                size="small"
+                className="border border-ink-border rounded"
+                dataSource={results}
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[
+                      <Button
+                        key="add"
+                        size="small"
+                        type="link"
+                        onClick={() => addByCatalog(item)}
+                      >
+                        主诊断
+                      </Button>,
+                      <Button
+                        key="sub"
+                        size="small"
+                        type="link"
+                        onClick={() => addByCatalog(item, 'secondary')}
+                      >
+                        次诊断
+                      </Button>,
+                    ]}
                   >
-                    主诊断
-                  </Button>,
-                  <Button
-                    key="sub"
-                    size="small"
-                    type="link"
-                    onClick={() => addDiagnosisByIcd(item, 'secondary')}
-                  >
-                    次诊断
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  title={<span>{item.name}</span>}
-                  description={
-                    <Space size={4}>
-                      <Tag>{item.code}</Tag>
-                      <span className="text-xs text-ink-secondary">{item.category}</span>
-                    </Space>
-                  }
-                />
-              </List.Item>
+                    <List.Item.Meta
+                      title={<span>{item.name}</span>}
+                      description={
+                        <Space size={4}>
+                          <Tag>{item.code}</Tag>
+                          <span className="text-xs text-ink-secondary">{item.category}</span>
+                        </Space>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="未匹配到 ICD 编码"
+              />
             )}
-          />
-        )}
-        {kw && icdResults.length === 0 && (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="未匹配到 ICD 编码" />
+          </div>
         )}
       </Card>
 
       {/* 常见诊断快捷 */}
-      <Card
-        size="small"
-        title={<span className="text-sm font-semibold">本科室常见诊断 Top10</span>}
-      >
-        <div className="flex flex-wrap gap-1.5">
-          {mockCommonDiagnoses.map((d) => (
-            <Tag
-              key={d.code}
-              color="geekblue"
-              className="cursor-pointer"
-              onClick={() => addDiagnosisByIcd(d)}
-            >
-              <PlusOutlined /> {d.name}
-            </Tag>
-          ))}
-        </div>
-      </Card>
+      {common.length > 0 && (
+        <Card
+          size="small"
+          title={<span className="text-sm font-semibold">本科室常见诊断</span>}
+        >
+          <div className="flex flex-wrap gap-1.5">
+            {common.map((d) => (
+              <Tag
+                key={d.code}
+                color="geekblue"
+                className="cursor-pointer"
+                onClick={() => addByCatalog(d)}
+              >
+                <PlusOutlined /> {d.name}
+              </Tag>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* 已开诊断 */}
       <Card
@@ -149,8 +196,9 @@ export const DiagnosisPanel: React.FC = () => {
             size="small"
             type="primary"
             onClick={() => {
-              diagnoses.forEach((d) => confirmDiagnosis(d.id));
-              message.success('诊断已确认，进入处置环节');
+              diagnoses
+                .filter((d) => !d.confirmed)
+                .forEach((d) => confirmDiagnosis(d.id, true));
             }}
           >
             全部确认
@@ -188,96 +236,35 @@ export const DiagnosisPanel: React.FC = () => {
         )}
       </Card>
 
-      {/* 鉴别诊断 */}
+      {/* CDS 提醒（真实计算） */}
       <Card
         size="small"
-        title={
-          <Space>
-            <span className="text-sm font-semibold">AI 鉴别诊断建议</span>
-            <Switch size="small" checked={showDifferential} onChange={setShowDifferential} />
-          </Space>
-        }
+        title={<span className="text-sm font-semibold">临床决策支持（CDS）</span>}
       >
-        {showDifferential &&
-          mockAIDifferentials.map((df, idx) => (
-            <div
-              key={idx}
-              className="mb-3 p-2 rounded bg-blue-50/50 border-l-2"
-              style={{
-                borderLeftColor:
-                  severityColor[
-                    df.likelihood === 'high'
-                      ? 'danger'
-                      : df.likelihood === 'medium'
-                        ? 'warning'
-                        : 'info'
-                  ],
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <Space>
-                  <RobotOutlined style={{ color: '#0A4D8C' }} />
-                  <span className="font-medium text-sm">{df.name}</span>
-                  {df.code && <Tag>{df.code}</Tag>}
-                  <Tag
-                    color={
-                      df.likelihood === 'high'
-                        ? 'red'
-                        : df.likelihood === 'medium'
-                          ? 'orange'
-                          : 'default'
-                    }
-                  >
-                    {df.likelihood === 'high'
-                      ? '高度可疑'
-                      : df.likelihood === 'medium'
-                        ? '中度可疑'
-                        : '低度可疑'}
-                  </Tag>
-                </Space>
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() =>
-                    addDiagnosisByIcd({
-                      code: df.code ?? '',
-                      name: df.name,
-                      category: '',
-                    } as IcdDiagnosis)
-                  }
-                >
-                  采纳
-                </Button>
-              </div>
-              <div className="mt-1 text-xs">
-                <div className="text-medical-normal">支持点：{df.supports.join('；')}</div>
-                <div className="text-medical-critical mt-0.5">不支持：{df.opposes.join('；')}</div>
-              </div>
-            </div>
-          ))}
-      </Card>
-
-      {/* CDS 提醒 */}
-      <Card size="small" title={<span className="text-sm font-semibold">临床决策支持（CDS）</span>}>
-        <Space direction="vertical" className="w-full">
-          {mockCDSReminders.map((r, idx) => (
-            <Alert
-              key={idx}
-              type={
-                r.level === 'danger'
-                  ? 'error'
-                  : r.level === 'warning'
-                    ? 'warning'
-                    : r.level === 'success'
-                      ? 'success'
+        {cdsReminders.length === 0 ? (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="当前无 CDS 提醒"
+          />
+        ) : (
+          <Space direction="vertical" className="w-full">
+            {cdsReminders.map((r: PrescriptionWarning, idx) => (
+              <Alert
+                key={idx}
+                type={
+                  r.level === 'danger'
+                    ? 'error'
+                    : r.level === 'warning'
+                      ? 'warning'
                       : 'info'
-              }
-              showIcon
-              message={<span className="text-sm">{r.title}</span>}
-              description={<span className="text-xs">{r.detail}</span>}
-            />
-          ))}
-        </Space>
+                }
+                showIcon
+                message={<span className="text-sm">{r.title}</span>}
+                description={<span className="text-xs">{r.detail}</span>}
+              />
+            ))}
+          </Space>
+        )}
       </Card>
     </div>
   );
@@ -286,7 +273,7 @@ export const DiagnosisPanel: React.FC = () => {
 const DiagnosisRow: React.FC<{
   item: DiagnosisItem;
   onRemove: (id: string) => void;
-  onConfirm: (id: string) => void;
+  onConfirm: (id: string, confirmed: boolean) => void;
 }> = ({ item, onRemove, onConfirm }) => (
   <div className="flex items-center justify-between p-2 mb-1 bg-gray-50 rounded">
     <Space size={4}>
@@ -296,7 +283,7 @@ const DiagnosisRow: React.FC<{
         <StopOutlined style={{ color: '#FAAD14' }} />
       )}
       <span className="text-sm font-medium">{item.name}</span>
-      <Tag>{item.code}</Tag>
+      {item.code && <Tag>{item.code}</Tag>}
       {item.note && <span className="text-xs text-ink-secondary">{item.note}</span>}
     </Space>
     <Space size={0}>
@@ -306,7 +293,7 @@ const DiagnosisRow: React.FC<{
             size="small"
             type="text"
             icon={<CheckCircleOutlined />}
-            onClick={() => onConfirm(item.id)}
+            onClick={() => onConfirm(item.id, true)}
           />
         </Tooltip>
       )}

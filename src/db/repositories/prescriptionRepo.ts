@@ -26,6 +26,7 @@ export interface Prescription {
 
 export interface PrescriptionCreateInput {
   visitId: string; prescriberId?: string | null; items: PrescriptionItem[]; counsel?: string | null;
+  riskLevel?: string | null; auditResult?: Record<string, unknown>;
 }
 
 const RX_COLS = `id, visit_id, rx_no, prescriber_id, status, reviewer_id, review_level, risk_level, audit_result, counsel, total_fee, created_at, updated_at`;
@@ -70,8 +71,10 @@ function generateRxNo(): string {
 export async function createPrescription(input: PrescriptionCreateInput, sql?: Sql): Promise<Prescription> {
   return withTx(async (tx) => {
     const rxRows = await tx`
-      INSERT INTO clinical.prescriptions (visit_id, rx_no, prescriber_id, status, counsel)
-      VALUES (${input.visitId}, ${generateRxNo()}, ${input.prescriberId ?? null}, 'pending_review', ${input.counsel ?? null})
+      INSERT INTO clinical.prescriptions (visit_id, rx_no, prescriber_id, status, counsel, risk_level, audit_result)
+      VALUES (${input.visitId}, ${generateRxNo()}, ${input.prescriberId ?? null}, 'pending_review',
+        ${input.counsel ?? null}, ${input.riskLevel ?? null},
+        ${tx.json(toJson(input.auditResult ?? {}))})
       RETURNING ${tx.unsafe(RX_COLS)}
     `;
     const rx = mapRxRow(rxRows[0] as Record<string, unknown>);

@@ -25,7 +25,11 @@ import type {
   SsoProvider,
   UserStatus,
 } from '@/types/auth';
+import { LoginError } from '@/types/auth';
 import { delay } from './utils';
+
+/** 重导出登录错误，兼容既有 `import { LoginError } from '@/mock/authMock'` 引用 */
+export { LoginError };
 
 /* ================================================================== */
 /* 权限树：10 大模块 × 50+ 权限点（菜单→功能→操作 三级）                */
@@ -802,14 +806,6 @@ export async function fetchQrCode(): Promise<QrCodeSession> {
 /* ================================================================== */
 /* 登录 / 重置密码 Mock 服务                                            */
 /* ================================================================== */
-
-export class LoginError extends Error {
-  code: 'BAD_CREDENTIALS' | 'CAPTCHA' | 'LOCKED' | 'NOT_FOUND';
-  constructor(code: LoginError['code'], message: string) {
-    super(message);
-    this.code = code;
-  }
-}
 
 /** SSO / 扫码等内部模拟登录使用的直通令牌，不走图形验证码校验 */
 const CAPTCHA_BYPASS_TOKENS = new Set(['SSOOK', 'QROK']);
