@@ -18,8 +18,14 @@ import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
+import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
+import { autoMigrate, closeDb, verifyDbConnection } from '@/db';
+import {
+  createConversation,
+  getConversationById,
+} from '@/db/repositories/conversationRepo';
 import { authRoutes } from './routes/auth';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
@@ -115,6 +121,72 @@ function wsAuthorized(req: Request): boolean {
     return true;
   }
   return false;
+}
+
+/** 前端经 /ws/chat 下发的帧（兼容 event / action、顶层 / payload 两种位置） */
+interface IncomingFrame {
+  event?: string;
+  action?: string;
+  conversationId?: string;
+  content?: string;
+  payload?: { conversationId?: string; content?: string };
+}
+
+/**
+ * agent:start 处理：会话不存在则创建，调用 chatAggregator.runChatTurn 跑真实 LLM，
+ * 流式增量经 agent:delta 推送，结束推 agent:done（失败推 agent:error）。
+ * 所有消息在 runChatTurn 内部落库。
+ */
+async function handleAgentStart(
+  ws: Bun.ServerWebSocket<unknown>,
+  frame: IncomingFrame,
+): Promise<void> {
+  const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  let conversationId = frame.conversationId ?? frame.payload?.conversationId ?? '';
+  // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问候，避免空消息报错
+  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜数智医院智能体可以为我提供哪些临床辅助能力。';
+
+  const send = (event: string, payload: unknown): void => {
+    try {
+      ws.send(JSON.stringify({ event, timestamp: Date.now(), payload }));
+    } catch {
+      /* ws 已关闭 */
+    }
+  };
+
+  try {
+    // 会话不存在则先创建
+    let conv = conversationId ? await getConversationById(conversationId) : null;
+    if (!conv) {
+      conv = await createConversation({ userId: 'ws-user', title: 'WebSocket 会话' });
+      conversationId = conv.id;
+      send('agent:conversation', { conversationId });
+    }
+
+    const result = await runChatTurn(conversationId, content, {
+      onDelta: (delta) =>
+        send('agent:delta', { conversationId, messageId, delta, done: false }),
+      onToolEvent: (ev) => send('agent:tool', { conversationId, messageId, ...ev }),
+    });
+
+    if (result.error) {
+      send('agent:error', {
+        conversationId,
+        messageId,
+        code: result.error.code,
+        message: result.error.message,
+      });
+    }
+    send('agent:done', { conversationId, messageId });
+  } catch (e) {
+    send('agent:error', {
+      conversationId,
+      messageId,
+      code: 'AGENT_FAILED',
+      message: e instanceof Error ? e.message : String(e),
+    });
+    send('agent:done', { conversationId, messageId });
+  }
 }
 
 // ============================================================================
@@ -221,10 +293,40 @@ async function handleFetch(
 }
 
 // ============================================================================
+// 数据库初始化（真实模式：连接 + 自动迁移；演示模式：跳过并明确告警）
+// ============================================================================
+
+const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+async function initDatabase(): Promise<void> {
+  if (isDemoMode) {
+    console.warn('[db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）');
+    return;
+  }
+  try {
+    await verifyDbConnection(5, 2000);
+    console.log('[db] PostgreSQL 连接成功');
+    await autoMigrate();
+    console.log('[db] 数据库迁移完成');
+  } catch (err) {
+    console.error('[db] 数据库初始化失败，服务无法启动：', String(err));
+    console.error('[db] 如需无 DB 演示，请设置 DEMO_MODE=1');
+    process.exit(1);
+  }
+}
+
+// ============================================================================
 // 启动
 // ============================================================================
 
 const port = Number(process.env.HTTP_PORT ?? 8080);
+
+void initDatabase().then(() => {
+  // eslint-disable-next-line no-console
+  console.log(
+    `[jianlan-bff] listening on http://0.0.0.0:${port}  (WebSocket /ws/chat [auth required])`,
+  );
+});
 
 const server = Bun.serve({
   port,
@@ -237,20 +339,14 @@ const server = Bun.serve({
       metrics.wsConnections.inc();
     },
     message(ws: Bun.ServerWebSocket<unknown>, raw: string | Buffer) {
-      let parsed: {
-        event?: string;
-        action?: string;
-        conversationId?: string;
-        payload?: { conversationId?: string };
-      } = {};
+      let parsed: IncomingFrame = {};
       try {
-        parsed = JSON.parse(String(raw)) as typeof parsed;
+        parsed = JSON.parse(String(raw)) as IncomingFrame;
       } catch {
         /* ignore */
       }
-      // 兼容前端事件帧（event）与早期 action 帧；会话 id 可能在顶层或 payload 内
+      // 兼容前端事件帧（event）与早期 action 帧
       const kind = parsed.event ?? parsed.action;
-      const conv = parsed.conversationId ?? parsed.payload?.conversationId ?? 'demo';
 
       if (kind === 'heartbeat' || kind === 'ping') {
         ws.send(
@@ -260,35 +356,8 @@ const server = Bun.serve({
       }
 
       if (kind === 'agent:start' || kind === 'start_stream') {
-        // 流式增量推送（演示为确定性文本；生产由 MedicalAgentLoop + LLM 驱动）
-        const messageId = `msg_${Date.now()}`;
-        const parts = [
-          '正在调阅患者数据……',
-          '已获取最新检验与医嘱。',
-          '综合判断：',
-          '建议结合临床评估，必要时按危急值流程处置。',
-        ];
-        parts.forEach((delta, i) => {
-          setTimeout(() => {
-            const done = i === parts.length - 1;
-            ws.send(
-              JSON.stringify({
-                event: 'agent:delta',
-                timestamp: Date.now(),
-                payload: { conversationId: conv, messageId, delta, done },
-              }),
-            );
-            if (done) {
-              ws.send(
-                JSON.stringify({
-                  event: 'agent:done',
-                  timestamp: Date.now(),
-                  payload: { conversationId: conv, messageId },
-                }),
-              );
-            }
-          }, i * 300);
-        });
+        // 真实 LLM 流式：会话不存在则创建，runChatTurn 内部落库并回调推送
+        void handleAgentStart(ws, parsed);
       }
     },
     close(ws) {
@@ -298,9 +367,9 @@ const server = Bun.serve({
   },
 });
 
-// 演示用：非生产环境周期性推送一条模拟危急值告警（生产环境严禁推送假告警）
+// 演示用：非生产环境且非 DEMO_MODE 周期性推送模拟危急值告警
 const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
-const demoAlertTimer = isProduction
+const demoAlertTimer = isProduction || isDemoMode
   ? null
   : setInterval(() => {
       // 事件名与前端 useAlert 订阅的 critical:alert 通道保持一致；
@@ -319,12 +388,7 @@ const demoAlertTimer = isProduction
       });
     }, 30_000);
 
-// eslint-disable-next-line no-console
-console.log(
-  `[jianlan-bff] listening on http://0.0.0.0:${port}  (WebSocket /ws/chat [auth required])`,
-);
-
-// 优雅停机：停止接收新连接、关闭演示定时器与 WS，再退出，便于滚动发布与 K8s 终止
+// 优雅停机：停止接收新连接、关闭演示定时器与 WS、关闭 DB 连接池，再退出
 let shuttingDown = false;
 function shutdown(signal: string): void {
   if (shuttingDown) return;
@@ -340,8 +404,9 @@ function shutdown(signal: string): void {
     }
   }
   void server.stop(false);
+  void closeDb().catch(() => { /* ignore */ });
   // 给在途同步响应一个极短收尾窗口后退出
-  setTimeout(() => process.exit(0), 300);
+  setTimeout(() => process.exit(0), 500);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
