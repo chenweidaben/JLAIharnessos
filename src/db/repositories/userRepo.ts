@@ -30,13 +30,13 @@ function mapRow(row: Record<string, unknown>): User {
 
 export async function getUserById(id: string, sql?: Sql): Promise<User | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM iam.users WHERE id = ${id} AND deleted_at IS NULL`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE id = ${id} AND deleted_at IS NULL`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
 export async function getUserByUsername(username: string, sql?: Sql): Promise<User | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM iam.users WHERE username = ${username} AND deleted_at IS NULL`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE username = ${username} AND deleted_at IS NULL`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 

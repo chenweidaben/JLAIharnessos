@@ -21,7 +21,7 @@ let _sql: Sql | null = null;
 let _shuttingDown = false;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildOptions(): postgres.Options<any> {
+function createClient(): Sql {
   const url = process.env.DATABASE_URL;
   const max = Number(process.env.PG_POOL_MAX ?? 20);
   const idleTimeout = Number(process.env.PG_IDLE_TIMEOUT_MS ?? 30_000);
@@ -36,23 +36,25 @@ function buildOptions(): postgres.Options<any> {
     transform: { undefined: null },
   };
 
+  // 关键：连接串必须作为 postgres() 的第一个位置参数传入；
+  // 若把 url 放进 options 对象，postgres.js 会忽略它，退连默认 localhost:5432。
   if (url) {
-    return { ...base, url } as postgres.Options<Record<string, postgres.PostgresType<any>>>;
+    return postgres(url, base);
   }
-  return {
+  return postgres({
     ...base,
     host: process.env.PGHOST ?? 'localhost',
     port: Number(process.env.PGPORT ?? 5432),
     database: process.env.PGDATABASE ?? 'jlmedaios',
     username: process.env.PGUSER ?? 'postgres',
     password: process.env.PGPASSWORD ?? 'postgres',
-  };
+  });
 }
 
 export function getDb(): Sql {
   if (_sql) return _sql;
   if (_shuttingDown) throw new Error('[db] 系统正在关闭，拒绝新建数据库连接');
-  _sql = postgres(buildOptions());
+  _sql = createClient();
   return _sql;
 }
 

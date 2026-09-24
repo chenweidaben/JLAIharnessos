@@ -71,20 +71,20 @@ export async function createConversation(input: {
     INSERT INTO agent.conversations (conversation_no, user_id, patient_id, title, metadata)
     VALUES (${generateNo('c')}, ${input.userId ?? null}, ${input.patientId ?? null},
       ${input.title ?? '新对话'}, ${db.json(toJson(input.metadata ?? {}))})
-    RETURNING ${db(CONV_COLS)}
+    RETURNING ${db.unsafe(CONV_COLS)}
   `;
   return mapConvRow(rows[0] as Record<string, unknown>);
 }
 
 export async function getConversationById(id: string, sql?: Sql): Promise<Conversation | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(CONV_COLS)} FROM agent.conversations WHERE id = ${id} AND status != 'deleted'`;
+  const rows = await db`SELECT ${db.unsafe(CONV_COLS)} FROM agent.conversations WHERE id = ${id} AND status != 'deleted'`;
   return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
 }
 
 export async function getConversationByNo(no: string, sql?: Sql): Promise<Conversation | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(CONV_COLS)} FROM agent.conversations WHERE conversation_no = ${no} AND status != 'deleted'`;
+  const rows = await db`SELECT ${db.unsafe(CONV_COLS)} FROM agent.conversations WHERE conversation_no = ${no} AND status != 'deleted'`;
   return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
 }
 
@@ -102,7 +102,7 @@ export async function updateConversationTitle(id: string, title: string, sql?: S
   const db = sql ?? getDb();
   const rows = await db`
     UPDATE agent.conversations SET title = ${title}, updated_at = now()
-    WHERE id = ${id} AND status != 'deleted' RETURNING ${db(CONV_COLS)}
+    WHERE id = ${id} AND status != 'deleted' RETURNING ${db.unsafe(CONV_COLS)}
   `;
   return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
 }
@@ -116,7 +116,7 @@ export async function appendMessage(
       VALUES (${conversationId}, ${generateNo('msg')}, ${input.role}, ${input.content ?? null},
         ${tx.json(toJson(input.toolCalls ?? []))}, ${input.toolCallId ?? null}, ${input.toolName ?? null},
         ${input.tokensIn ?? 0}, ${input.tokensOut ?? 0}, ${input.latencyMs ?? null}, ${input.error ?? null})
-      RETURNING ${tx(MSG_COLS)}
+      RETURNING ${tx.unsafe(MSG_COLS)}
     `;
     await tx`UPDATE agent.conversations SET message_count = message_count + 1, last_message_at = now(), updated_at = now() WHERE id = ${conversationId}`;
     return mapMsgRow(msgRows[0] as Record<string, unknown>);
@@ -138,7 +138,7 @@ export async function getRecentMessages(
 ): Promise<ConversationMessage[]> {
   const db = sql ?? getDb();
   const rows = await db`
-    SELECT ${db(MSG_COLS)} FROM agent.conversation_messages
+    SELECT ${db.unsafe(MSG_COLS)} FROM agent.conversation_messages
     WHERE conversation_id = ${conversationId} ORDER BY created_at DESC LIMIT ${limit}
   `;
   return (rows as Record<string, unknown>[]).map(mapMsgRow).reverse();

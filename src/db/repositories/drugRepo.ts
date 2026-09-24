@@ -41,14 +41,14 @@ function mapRow(row: Record<string, unknown>): Drug {
 
 export async function getDrugByCode(drugCode: string, sql?: Sql): Promise<Drug | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM clinical.drug_catalog WHERE drug_code = ${drugCode} AND status = 'active'`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog WHERE drug_code = ${drugCode} AND status = 'active'`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
 export async function searchDrugs(keyword: string, limit = 20, sql?: Sql): Promise<Drug[]> {
   const db = sql ?? getDb();
   const rows = await db`
-    SELECT ${db(SELECT_COLS)} FROM clinical.drug_catalog
+    SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog
     WHERE status = 'active' AND (generic_name ILIKE ${'%' + keyword + '%'} OR brand_name ILIKE ${'%' + keyword + '%'} OR drug_code ILIKE ${'%' + keyword + '%'})
     ORDER BY generic_name LIMIT ${limit}
   `;
@@ -57,7 +57,7 @@ export async function searchDrugs(keyword: string, limit = 20, sql?: Sql): Promi
 
 export async function listDrugs(limit = 100, offset = 0, sql?: Sql): Promise<Drug[]> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM clinical.drug_catalog WHERE status = 'active' ORDER BY generic_name LIMIT ${limit} OFFSET ${offset}`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog WHERE status = 'active' ORDER BY generic_name LIMIT ${limit} OFFSET ${offset}`;
   return (rows as Record<string, unknown>[]).map(mapRow);
 }
 
@@ -70,7 +70,7 @@ export async function createDrug(input: Omit<Drug, 'id' | 'createdAt' | 'updated
       ${input.manufacturer ?? null}, ${input.category ?? null}, ${input.pregnancyCat ?? null},
       ${input.controlled}, ${db.json(toJson(input.ingredients))}, ${input.contraindications ?? null},
       ${input.adverseReactions ?? null}, ${db.json(toJson(input.interactions))}, ${input.status})
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }

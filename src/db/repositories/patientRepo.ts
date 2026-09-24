@@ -81,7 +81,7 @@ export async function createPatient(input: PatientCreateInput, sql?: Sql): Promi
       ${db.json(toJson(input.allergies ?? []))}, ${db.json(toJson(input.pastHistory ?? []))},
       ${db.json(toJson(input.tags ?? []))}, ${input.dataLevel ?? 3}
     )
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }
@@ -89,7 +89,7 @@ export async function createPatient(input: PatientCreateInput, sql?: Sql): Promi
 export async function getPatientById(id: string, sql?: Sql): Promise<Patient | null> {
   const db = sql ?? getDb();
   const rows = await db`
-    SELECT ${db(SELECT_COLS)} FROM clinical.patients
+    SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
     WHERE id = ${id} AND deleted_at IS NULL
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
@@ -98,7 +98,7 @@ export async function getPatientById(id: string, sql?: Sql): Promise<Patient | n
 export async function getPatientByMrn(mrn: string, sql?: Sql): Promise<Patient | null> {
   const db = sql ?? getDb();
   const rows = await db`
-    SELECT ${db(SELECT_COLS)} FROM clinical.patients
+    SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
     WHERE mrn = ${mrn} AND deleted_at IS NULL
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;

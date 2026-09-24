@@ -72,7 +72,7 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: S
     const rxRows = await tx`
       INSERT INTO clinical.prescriptions (visit_id, rx_no, prescriber_id, status, counsel)
       VALUES (${input.visitId}, ${generateRxNo()}, ${input.prescriberId ?? null}, 'pending_review', ${input.counsel ?? null})
-      RETURNING ${tx(RX_COLS)}
+      RETURNING ${tx.unsafe(RX_COLS)}
     `;
     const rx = mapRxRow(rxRows[0] as Record<string, unknown>);
     const items: PrescriptionItem[] = [];
@@ -80,7 +80,7 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: S
       const itemRows = await tx`
         INSERT INTO clinical.prescription_items (prescription_id, drug_code, drug_name, specification, dosage, dosage_unit, frequency, route, days_supply, quantity, quantity_unit, skin_test, remark)
         VALUES (${rx.id}, ${item.drugCode ?? null}, ${item.drugName}, ${item.specification ?? null}, ${item.dosage ?? null}, ${item.dosageUnit ?? null}, ${item.frequency ?? null}, ${item.route ?? null}, ${item.daysSupply ?? null}, ${item.quantity ?? null}, ${item.quantityUnit ?? null}, ${item.skinTest}, ${item.remark ?? null})
-        RETURNING ${tx(ITEM_COLS)}
+        RETURNING ${tx.unsafe(ITEM_COLS)}
       `;
       items.push(mapItemRow(itemRows[0] as Record<string, unknown>));
     }
@@ -90,10 +90,10 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: S
 
 export async function getPrescriptionById(id: string, sql?: Sql): Promise<Prescription | null> {
   const db = sql ?? getDb();
-  const rxRows = await db`SELECT ${db(RX_COLS)} FROM clinical.prescriptions WHERE id = ${id}`;
+  const rxRows = await db`SELECT ${db.unsafe(RX_COLS)} FROM clinical.prescriptions WHERE id = ${id}`;
   if (rxRows.length === 0) return null;
   const rx = mapRxRow(rxRows[0] as Record<string, unknown>);
-  const itemRows = await db`SELECT ${db(ITEM_COLS)} FROM clinical.prescription_items WHERE prescription_id = ${id} ORDER BY created_at`;
+  const itemRows = await db`SELECT ${db.unsafe(ITEM_COLS)} FROM clinical.prescription_items WHERE prescription_id = ${id} ORDER BY created_at`;
   return { ...rx, items: (itemRows as Record<string, unknown>[]).map(mapItemRow) };
 }
 
@@ -107,7 +107,7 @@ export async function getPrescriptionsByVisit(
   const result: Prescription[] = [];
   for (const row of rxRows) {
     const rx = mapRxRow(row);
-    const itemRows = await db`SELECT ${db(ITEM_COLS)} FROM clinical.prescription_items WHERE prescription_id = ${rx.id} ORDER BY created_at`;
+    const itemRows = await db`SELECT ${db.unsafe(ITEM_COLS)} FROM clinical.prescription_items WHERE prescription_id = ${rx.id} ORDER BY created_at`;
     result.push({ ...rx, items: (itemRows as Record<string, unknown>[]).map(mapItemRow) });
   }
   return result;
@@ -121,7 +121,7 @@ export async function auditPrescription(
   const rows = await db`
     UPDATE clinical.prescriptions SET status = ${decision}, reviewer_id = ${reviewerId},
       audit_result = ${db.json(toJson(auditResult))}, updated_at = now()
-    WHERE id = ${id} AND status = 'pending_review' RETURNING ${db(RX_COLS)}
+    WHERE id = ${id} AND status = 'pending_review' RETURNING ${db.unsafe(RX_COLS)}
   `;
   if (rows.length === 0) return null;
   return getPrescriptionById(id, sql);
@@ -131,7 +131,7 @@ export async function dispensePrescription(id: string, sql?: Sql): Promise<Presc
   const db = sql ?? getDb();
   const rows = await db`
     UPDATE clinical.prescriptions SET status = 'dispensed', updated_at = now()
-    WHERE id = ${id} AND status = 'approved' RETURNING ${db(RX_COLS)}
+    WHERE id = ${id} AND status = 'approved' RETURNING ${db.unsafe(RX_COLS)}
   `;
   if (rows.length === 0) return null;
   return getPrescriptionById(id, sql);

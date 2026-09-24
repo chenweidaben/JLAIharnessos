@@ -58,14 +58,14 @@ export async function createVisit(input: VisitCreateInput, sql?: Sql): Promise<V
     VALUES (${input.patientId}, ${generateVisitNo(input.visitType)}, ${input.visitType}, ${input.department},
       ${input.ward ?? null}, ${input.bedNo ?? null}, ${input.attendingDoctorId ?? null},
       ${input.chiefComplaint ?? null}, ${input.triageLevel ?? null}, ${new Date().toISOString()})
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }
 
 export async function getVisitById(id: string, sql?: Sql): Promise<Visit | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM clinical.visits WHERE id = ${id}`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.visits WHERE id = ${id}`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
@@ -84,7 +84,7 @@ export async function updateVisitStatus(id: string, status: VisitStatus, sql?: S
   const dischargeAt = status === 'discharged' ? new Date().toISOString() : null;
   const rows = await db`
     UPDATE clinical.visits SET status = ${status}, discharge_at = COALESCE(discharge_at, ${dischargeAt ?? null}), updated_at = now()
-    WHERE id = ${id} RETURNING ${db(SELECT_COLS)}
+    WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }

@@ -21,15 +21,25 @@ import * as labResultRepo from '../../src/db/repositories/labResultRepo.js';
 import * as conversationRepo from '../../src/db/repositories/conversationRepo.js';
 
 let dbAvailable = false;
+// 测试用真实医生/药师用户（外键 signed_by / reviewer_id / author_id 必须指向 iam.users）
+let doctorId = '';
+let pharmacistId = '';
 
 beforeAll(async () => {
   try {
     await verifyDbConnection(2, 1000);
     dbAvailable = true;
+    // 创建测试医生与药师，拿到真实 uuid 贯穿全流程（验证外键完整性）
+    const sql = getDb();
+    const ts = Date.now();
+    const dr = await sql`INSERT INTO iam.users (username, name, role) VALUES (${`TEST_DOC_${ts}`}, '测试医生', 'doctor') RETURNING id`;
+    const ph = await sql`INSERT INTO iam.users (username, name, role) VALUES (${`TEST_PHAR_${ts}`}, '测试药师', 'pharmacist') RETURNING id`;
+    doctorId = String(dr[0].id);
+    pharmacistId = String(ph[0].id);
     console.log('[test] PostgreSQL 可用，执行真实链路集成测试');
-  } catch {
+  } catch (e) {
     dbAvailable = false;
-    console.log('[test] PostgreSQL 不可用，跳过真实链路集成测试（设置 DATABASE_URL 后可运行）');
+    console.log('[test] PostgreSQL 不可用，跳过真实链路集成测试（设置 DATABASE_URL 后可运行）', String(e));
   }
 });
 
@@ -159,7 +169,7 @@ describe('真实持久化 - 处方与审核', () => {
 
     // 3. 药师审核通过
     const approved = await prescriptionRepo.auditPrescription(
-      rx.id, 'approved', 'reviewer-001', { riskLevel: 'pass', comments: '用药合理' },
+      rx.id, 'approved', pharmacistId, { riskLevel: 'pass', comments: '用药合理' },
     );
     expect(approved?.status).toBe('approved');
 
@@ -199,7 +209,7 @@ describe('真实持久化 - 病历文书', () => {
     expect(fetched).not.toBeNull();
     expect(fetched?.title).toBe('门诊病历');
 
-    const signed = await medicalRecordRepo.updateMedicalRecordStatus(record.id, 'signed', 'doctor-001');
+    const signed = await medicalRecordRepo.updateMedicalRecordStatus(record.id, 'signed', doctorId);
     expect(signed?.status).toBe('signed');
 
     const visitRecords = await medicalRecordRepo.getMedicalRecordsByVisit(visit.id);

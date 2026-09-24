@@ -53,7 +53,7 @@ export async function createLabResult(input: LabResultCreateInput, sql?: Sql): P
       ${input.itemName}, ${input.itemCode ?? null}, ${input.specimen ?? null}, ${input.value ?? null},
       ${input.numericValue ?? null}, ${input.unit ?? null}, ${input.refLow ?? null}, ${input.refHigh ?? null},
       ${input.abnormalFlag ?? null}, ${input.isCritical ?? false}, ${input.resultTime ?? new Date().toISOString()})
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }

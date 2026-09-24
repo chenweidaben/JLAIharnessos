@@ -52,14 +52,14 @@ export async function createOrder(input: OrderCreateInput, sql?: Sql): Promise<O
     VALUES (${input.visitId}, ${generateOrderNo()}, ${input.orderType}, ${input.content},
       ${db.json(toJson(input.detail ?? {}))}, ${input.priority ?? 'routine'},
       ${input.doctorId ?? null}, ${input.startAt ?? new Date().toISOString()})
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }
 
 export async function getOrderById(id: string, sql?: Sql): Promise<Order | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM clinical.orders WHERE id = ${id}`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.orders WHERE id = ${id}`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
@@ -82,8 +82,10 @@ export async function getOrdersByPatient(
   const extra: unknown[] = [];
   let suffix = '';
   if (options?.limit !== undefined) { extra.push(options.limit); suffix += ` LIMIT $${qb.getParams(extra).length}`; }
+  // JOIN 后 orders/visits 均有 status/created_at 等同名列，必须逐列加 o. 前缀避免歧义
+  const colsAliased = SELECT_COLS.split(',').map((c) => 'o.' + c.trim()).join(', ');
   const rows = await db.unsafe(
-    `SELECT o.${SELECT_COLS} FROM clinical.orders o JOIN clinical.visits v ON v.id = o.visit_id ${qb.toClause()} ORDER BY o.created_at DESC${suffix}`,
+    `SELECT ${colsAliased} FROM clinical.orders o JOIN clinical.visits v ON v.id = o.visit_id ${qb.toClause()} ORDER BY o.created_at DESC${suffix}`,
     qb.getParams(extra),
   );
   return (rows as Record<string, unknown>[]).map(mapRow);
@@ -94,7 +96,7 @@ export async function updateOrderStatus(id: string, status: OrderStatus, sql?: S
   const stopAt = status === 'cancelled' || status === 'executed' ? new Date().toISOString() : null;
   const rows = await db`
     UPDATE clinical.orders SET status = ${status}, stop_at = COALESCE(stop_at, ${stopAt ?? null}), updated_at = now()
-    WHERE id = ${id} RETURNING ${db(SELECT_COLS)}
+    WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
@@ -106,7 +108,7 @@ export async function cancelOrder(id: string, reason: string, sql?: Sql): Promis
     const detail = { ...current.detail, cancelReason: reason, cancelledAt: new Date().toISOString() };
     const rows = await tx`
       UPDATE clinical.orders SET status = 'cancelled', detail = ${tx.json(toJson(detail))}, stop_at = now(), updated_at = now()
-      WHERE id = ${id} RETURNING ${tx(SELECT_COLS)}
+      WHERE id = ${id} RETURNING ${tx.unsafe(SELECT_COLS)}
     `;
     return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
   });

@@ -48,14 +48,14 @@ export async function createMedicalRecord(input: MedicalRecordCreateInput, sql?:
     INSERT INTO clinical.medical_records (visit_id, record_type, title, content, plain_text, author_id, ai_generated, ai_model)
     VALUES (${input.visitId}, ${input.recordType}, ${input.title}, ${db.json(toJson(input.content))},
       ${input.plainText ?? null}, ${input.authorId ?? null}, ${input.aiGenerated ?? false}, ${input.aiModel ?? null})
-    RETURNING ${db(SELECT_COLS)}
+    RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return mapRow(rows[0] as Record<string, unknown>);
 }
 
 export async function getMedicalRecordById(id: string, sql?: Sql): Promise<MedicalRecord | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db(SELECT_COLS)} FROM clinical.medical_records WHERE id = ${id} AND deleted_at IS NULL`;
+  const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.medical_records WHERE id = ${id} AND deleted_at IS NULL`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
@@ -78,7 +78,7 @@ export async function updateMedicalRecordStatus(
     UPDATE clinical.medical_records SET status = ${status},
       signed_at = COALESCE(signed_at, ${signedAt ?? null}),
       signed_by = COALESCE(signed_by, ${signedBy ?? null}), updated_at = now()
-    WHERE id = ${id} AND deleted_at IS NULL RETURNING ${db(SELECT_COLS)}
+    WHERE id = ${id} AND deleted_at IS NULL RETURNING ${db.unsafe(SELECT_COLS)}
   `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
