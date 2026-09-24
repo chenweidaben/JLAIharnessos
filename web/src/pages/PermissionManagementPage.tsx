@@ -22,6 +22,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
+// TODO(P2): 接入真实 API（/system/permissions）后移除本地 mock
 import { flatPermissions, permissionTree, roles } from '@/mock/authMock';
 import type { PermissionNode, PermissionType } from '@/types/auth';
 

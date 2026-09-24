@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { EmptyState, PageContainer, StatusBadge } from '@/components/common';
 import { usePageTitle } from '@/hooks';
-import { fetchPatients } from '@/services/api/patient';
+import { listPatients } from '@/api/patient';
 import { usePatientStore } from '@/store/patientStore';
 import type { Patient } from '@/types/patient';
 
@@ -25,7 +25,7 @@ export default function PatientList() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    fetchPatients()
+    listPatients()
       .then((list) => {
         if (alive) setPatientList(list);
       })

@@ -24,6 +24,7 @@ import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
 import BaseChart from '@/components/charts/BaseChart';
+// TODO(P2): 接入真实 API（GET /system/audit-logs）后移除本地 mock
 import { auditLogs } from '@/mock/authMock';
 import type { AuditAction, AuditLog, OperateResult } from '@/types/auth';
 

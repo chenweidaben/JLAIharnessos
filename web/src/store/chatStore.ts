@@ -15,7 +15,9 @@ interface ChatState {
   streaming: boolean;
   setConversations: (list: Conversation[]) => void;
   selectConversation: (id: string) => void;
+  setMessages: (list: ChatMessage[]) => void;
   appendMessage: (msg: ChatMessage) => void;
+  upsertMessage: (msg: ChatMessage) => void;
   updateStreaming: (messageId: string, delta: string) => void;
   finishStreaming: (messageId: string) => void;
   setStreaming: (v: boolean) => void;
@@ -31,7 +33,18 @@ export const useChatStore = create<ChatState>()((set) => ({
   setConversations: (list) => set({ conversations: list }),
   selectConversation: (id) => set({ currentConversationId: id }),
 
+  setMessages: (list) => set({ messages: list }),
+
   appendMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
+
+  upsertMessage: (msg) =>
+    set((state) => {
+      const idx = state.messages.findIndex((m) => m.id === msg.id);
+      if (idx === -1) return { messages: [...state.messages, msg] };
+      const next = state.messages.slice();
+      next[idx] = { ...next[idx], ...msg };
+      return { messages: next };
+    }),
 
   updateStreaming: (messageId, delta) =>
     set((state) => ({

@@ -31,6 +31,7 @@ import {
 } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
+// TODO(P2): 接入真实 API（/system/users、/system/roles）后移除本地 mock
 import { manageUsers, roles } from '@/mock/authMock';
 import type { DataScope, ManageUser, RoleCode, UserStatus } from '@/types/auth';
 

@@ -31,7 +31,8 @@ import { PatientInfoCard, VitalSignsPanel, AlertBanner } from '@/components/medi
 import { ImagingAiReport } from '@/components/imagingAi';
 import { LineChart } from '@/components/charts';
 import { usePageTitle } from '@/hooks';
-import { fetchPatient360, fetchAlerts } from '@/services/api/patient';
+import { getPatientHistory } from '@/api/patient';
+import { fetchAlerts } from '@/services/api/patient';
 import { usePatientStore } from '@/store/patientStore';
 import type { Alert } from '@/types/medical';
 import type {
@@ -127,19 +128,49 @@ export default function PatientDetail() {
 
   const { patient360, setPatient360, currentPatient } = usePatientStore();
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    fetchPatient360(id).then(setPatient360);
-    fetchAlerts().then((list) => setAlerts(list.filter((a) => a.patientId === id && !a.acknowledged)));
+    let alive = true;
+    setLoading(true);
+    setError(null);
+    getPatientHistory(id)
+      .then((data) => {
+        if (alive) setPatient360(data);
+      })
+      .catch((e) => {
+        if (alive) setError(e instanceof Error ? e.message : '患者360 数据加载失败');
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+    fetchAlerts()
+      .then((list) => {
+        if (alive) setAlerts(list.filter((a) => a.patientId === id && !a.acknowledged));
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
   }, [id, setPatient360]);
 
   const view = useMemo(() => patient360, [patient360]);
 
-  if (!view || !currentPatient) {
+  if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Spin size="large" />
+        <Spin size="large" tip="加载患者360…" />
+      </div>
+    );
+  }
+
+  if (error || !view || !currentPatient) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center gap-3">
+        <Empty description={error ?? '暂无患者数据'} />
+        <Button onClick={() => window.location.reload()}>重试</Button>
       </div>
     );
   }

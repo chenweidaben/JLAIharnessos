@@ -44,3 +44,20 @@ export interface RequestOptions {
   retry?: number;
   skipAuthRefresh?: boolean;
 }
+
+/* ------------------------------------------------------------------
+ * 领域模型类型汇总（与后端 src/db/repositories 对齐）。
+ * 各模型仍在所属领域文件维护（避免重复定义导致漂移），此处统一再导出，
+ * 供 @/api 层与页面以 `import type { ... } from '@/types/api'` 消费。
+ * ------------------------------------------------------------------ */
+import type { Conversation as ChatConversation, ChatMessage } from './chat';
+import type { Patient, Patient360 } from './patient';
+import type {
+  MedicalOrder,
+  Prescription as MedicalPrescription,
+  LabReport as MedicalLabReport,
+} from './medical';
+
+export type { ChatConversation as Conversation, ChatMessage as Message };
+export type { Patient, Patient360 };
+export type { MedicalOrder as Order, MedicalPrescription as Prescription, MedicalLabReport as LabReport };

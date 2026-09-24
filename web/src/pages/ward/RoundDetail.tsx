@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Descriptions, Layout, Result, Spin, Tabs, Tag, Typography } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, HeartOutlined } from '@ant-design/icons';
 import { useWardStore } from '@/store/wardStore';
+// TODO(P2): 接入真实 API（医嘱模板 /medical/order_templates）后移除本地 mock
 import { orderTemplates } from '@/mock/wardMock';
 import type { RoundRecord as RoundRecordType } from '@/types/ward';
 import RoundRecord from '@/components/ward/RoundRecord';

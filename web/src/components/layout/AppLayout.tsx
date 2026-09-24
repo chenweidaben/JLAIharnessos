@@ -11,6 +11,7 @@ import SideMenu from './SideMenu';
 import TopHeader from './TopHeader';
 import RealtimeAlertBridge from './RealtimeAlertBridge';
 import OfflineIndicator from '@/components/common/OfflineIndicator';
+import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { useAppStore } from '@/store/appStore';
 
 const { Sider, Header, Content } = Layout;
@@ -58,6 +59,7 @@ export default function AppLayout() {
             overflow: 'auto',
           }}
         >
+          <DemoModeBanner />
           <OfflineIndicator />
           <Outlet />
         </Content>

@@ -9,6 +9,7 @@ import { App as AntdApp, Button, Form, Input, Progress, Result, Steps, Typograph
 import { LockOutlined, MailOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 
+// TODO(P2): 接入真实 API（/auth/sms、/auth/reset-password）后移除本地 mock
 import { mockResetPassword, mockSendSms } from '@/mock/authMock';
 
 interface IdentityForm {

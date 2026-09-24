@@ -24,6 +24,7 @@ import { DownloadOutlined, LogoutOutlined, SearchOutlined } from '@ant-design/ic
 
 import PageContainer from '@/components/common/PageContainer';
 import BaseChart from '@/components/charts/BaseChart';
+// TODO(P2): 接入真实 API（GET /system/login-logs）后移除本地 mock
 import { loginLogs } from '@/mock/authMock';
 import type { LoginLog, LoginMethod, LoginResult } from '@/types/auth';
 

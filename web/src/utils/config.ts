@@ -9,5 +9,8 @@ export const env = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
   wsUrl: import.meta.env.VITE_WS_URL ?? 'ws://127.0.0.1:5173/ws/chat',
   appEnv: import.meta.env.VITE_APP_ENV ?? 'development',
-  mockEnabled: import.meta.env.VITE_MOCK_ENABLED === 'true',
+  // 演示模式：VITE_DEMO_MODE=1 或兼容旧开关 VITE_MOCK_ENABLED=true 均视为开启。
+  // 默认（0 / 未设置）= 真实模式，直连 BFF，不返回假数据。
+  mockEnabled:
+    import.meta.env.VITE_DEMO_MODE === '1' || import.meta.env.VITE_MOCK_ENABLED === 'true',
 };
