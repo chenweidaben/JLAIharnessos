@@ -7,8 +7,56 @@
 
 ## [Unreleased]
 
+### 概述
+**v0.3.0 真实化改造**：系统从"演示骨架（mock 壳）"升级为"数据真落库、LLM 真闭环、链路真贯通"的工业级系统。引入 PostgreSQL 作为业务主库，医疗工具从内存 mock 改为真实 Repository 读写，对话层接入 DeepSeek 流式 LLM 并持久化，前端去除硬编码 mock。
+
 ### 新增
+- **PostgreSQL 持久化层**（`src/db/`）：连接池（postgres.js）、轻量 SQL 迁移执行器（启动自动迁移）、10 个 Repository（患者/就诊/医嘱/处方/病历/检验/药品/对话/消息/审计/用户），支持事务、参数化查询、优雅关闭。
+- **对话会话与消息表**（`deploy/postgres/init/60-chat.sql`）：`agent.conversations` + `agent.conversation_messages`，支撑多轮对话持久化、工具调用记录、Token 用量统计。
+- **药品目录与库存表**（`deploy/postgres/init/25-drug-catalog.sql`）：`clinical.drug_catalog` + `clinical.drug_inventory`。
+- **种子数据脚本**（`scripts/db/seed.ts`）：一键写入演示用户/患者/就诊/医嘱/处方/检验/药品。
+- **真实链路集成测试**（`tests/integration/real-persistence.test.ts`）：患者 CRUD、医嘱状态流转、处方审核发药、病历签署、检验危急值、对话消息持久化、事务一致性，无 DB 自动跳过。
+- **DEMO_MODE 开关**：`DEMO_MODE=1` 时跳过 DB 连接使用内存演示数据（明确水印），默认连真实 Postgres。
+- **前端 API 客户端层**（`web/src/api/`）：统一 fetch 封装、对话/患者/医疗 API 模块、WebSocket 流式客户端。
+- **前端演示模式水印**：`VITE_DEMO_MODE=1` 时顶部显示"演示模式 - 数据不持久化"横幅。
 - 前端离线状态指示器（`useOnlineStatus` + `OfflineIndicator`）：断网顶部红色横幅，恢复后自动提示。
+- HTTP 请求超时可配置：默认 30s，支持 `VITE_API_TIMEOUT_MS` 覆盖。
+- HTTP 请求指数退避重试：仅幂等 GET，5xx/网络错误/超时，最多 2 次，离线不重试。
+- BFF 内置 Prometheus 指标端点 `/metrics`（零依赖，可选 `METRICS_TOKEN`）：HTTP RED、WebSocket、智能体/工具/CDS/人工任务指标（`gangos_` 前缀），并支持 SIGTERM/SIGINT 优雅停机。
+- 预置 Prometheus 告警规则 9 条与 Grafana 平台总览大盘（19 面板，自动装配）。
+- k6 压测脚本（冒烟/常规/压力，`scripts/perf/k6/`）。
+- TOTP 多因素认证（RFC 6238），BFF 5 个 `/auth/mfa/*` 接口。
+- PostgreSQL 备份/恢复脚本（`deploy/postgres/backup.sh`、`restore.sh`）。
+- 《生产上线验收清单》《容灾与恢复演练手册》。
+
+### 变更
+- **医疗工具真实化**：P0 共 15 个工具从 `MOCK_*` 内存数据改为走 `src/data/clinicalData.ts` 门面层 → Repository 真实读写；P1 影像/CDS 工具基于真实数据；P2 运营/质控工具保留 mock 但标注 `_demoMode: true`。
+- **对话层真闭环**：`chat.ts` 从假返回改为 conversationRepo 真实 CRUD；`chatAggregator.ts` 改为 DeepSeek 流式调用 + 消息落库 + 单轮工具调用；WebSocket 改为真实 LLM 流式推送。
+- **BFF 启动初始化**：启动时执行 DB 连接校验 + 自动迁移，连不上 DB 明确报错；优雅停机时关闭连接池。
+- **前端 AI 问诊页**：从硬编码改为真实会话列表/历史加载/流式逐字渲染。
+- **前端患者页**：从 mock 改为真实 API 调用，补齐 loading/错误态。
+- 演示危急值假告警改为仅非生产环境推送。
+
+### 修复
+- BFF 认证中间件修复"任意非空 token 即 admin"的 P0 漏洞。
+- BFF 500 错误不再向客户端泄露堆栈/SQL/文件路径。
+- 修复指标 Histogram 桶计数被重复累加的问题。
+- 修复 `clinicalData.ts` 中 `counsel` 字段严格模式错误。
+- 修复 `createOrder.ts` 中创建结果未判空的潜在运行时错误。
+- 修复 `LabOrderTools.test.ts` 中 orderId 前缀断言。
+
+### 安全
+- 所有 SQL 查询参数化，防注入；写操作事务化，可回滚。
+- 患者敏感字段不存明文，真实模式下不编造缺失数据。
+- 无 LLM Key 时明确返回 `LLM_NOT_CONFIGURED`，不用写死回复冒充 AI。
+- 演示模式数据明确标注 `_source: 'demo'`，真实模式标注 `_source: 'database'`。
+
+### 已知限制
+- 完整 `MedicalAgentLoop` 已存在但对话层当前采用简化直连 DeepSeek 方案，事件契约同构可平滑替换。
+- 真实 HIS/LIS/PACS 院内系统对接仍需部署适配器。
+- 前端仪表盘/急诊/住院/运营/质控等页面仍使用 mock 数据（P2）。
+
+---（`useOnlineStatus` + `OfflineIndicator`）：断网顶部红色横幅，恢复后自动提示。
 - HTTP 请求超时可配置：默认 30s，支持 `VITE_API_TIMEOUT_MS` 覆盖。
 - HTTP 请求指数退避重试：仅幂等 GET，5xx/网络错误/超时，最多 2 次，离线不重试。
 - BFF 内置 Prometheus 指标端点 `/metrics`（零依赖，可选 `METRICS_TOKEN`）：HTTP RED、WebSocket、
