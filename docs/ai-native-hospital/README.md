@@ -16,8 +16,8 @@ This directory holds Phase-1 open-source research and top-level design for hospi
 
 ## 阅读建议 / How to Read
 
-1. 先读 **00 调研报告**：了解 Medplum、OpenMRS O3、Bahmni、EHRbase、HAPI FHIR 等开源项目与许可证边界；
-   Start with **00 Research** — Medplum, OpenMRS O3, Bahmni, EHRbase, HAPI FHIR and license boundaries.
+1. 先读 **00 调研报告**：覆盖 OpenMRS、Bahmni、OpenEMR、HospitalRun、GNU Health、Open Hospital、Medplum、Aidbox、HAPI FHIR、EHRbase、LinuxForHealth/IPF，以及服务网格/Kafka/可观测性/多租户四类云原生范式与许可证边界；
+   Start with **00 Research** — OpenMRS, Bahmni, OpenEMR, HospitalRun, GNU Health, Open Hospital, Medplum, Aidbox, HAPI FHIR, EHRbase, LinuxForHealth/IPF, plus service mesh/Kafka/observability/multi-tenancy and license boundaries.
 2. 再读 **01 顶层设计**：六层架构、HIS+EMR 一体化微服务、AI 原生中台、双标准、数据平台、安全合规；
    Then **01 Top-Level Design** — six layers, unified HIS+EMR microservices, AI-native middle platform, dual standards, data platform, security.
 3. 最后读 **02 路线图**：M0–M6 里程碑、迁移手法、验收门（DoD）与回滚。
