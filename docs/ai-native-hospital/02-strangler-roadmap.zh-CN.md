@@ -37,6 +37,36 @@
 
 ---
 
+## 2.5 现状盘点：已真实具备 / 仍 mock 待二期 / 已知观察项
+
+### 2.5.1 已真实具备（阶段 0，禁止回退为 mock）
+
+- **统一数据门面 `src/data/clinicalData.ts`**：真实模式走 `src/db/repositories`，演示模式走内存；DB 连接/查询故障直接抛错，绝不静默返回空数组冒充"无数据"。
+- **对话聚合 `src/bff/aggregators/chatAggregator.ts`**：真实 DeepSeek 流式（OpenAI 兼容、stream:true）+ 用户/助手/工具消息落库 + ReAct 单轮工具调用闭环。
+- **门诊全链路**：`outpatientAggregator` + `routes/outpatient` + `view/userView` + `data/outpatientCatalog`（挂号/候诊/问诊/诊断/医嘱/处方/药师审核/AI 病历），真落 PostgreSQL、重启不丢。
+- **真实 JWT 认证**：登录签发 HS256，`sub` = iam 用户 UUID；验签并校验 exp/nbf/iss；时序安全签名比对。
+- **19 个核心医疗工具（均走 clinicalData 门面）**：query_patient、get_patient_detail、get_patient_history、get_medical_record、generate_medical_record、get_order_list、create_order、cancel_order、order_audit、get_lab_result、get_image_report、order_lab_test、order_imaging_exam、create_prescription、prescription_audit、get_prescription_list、get_drug_info、get_drug_information、drug_interaction_check。
+- **DAMO-RADAR 影像服务 `services/radar-inference`**：FastAPI（8090），demo/production 双模式、缺权重自动降级；定位第二阅片，结果须放射科医师复核签名；权重 CC BY-NC-SA（非商业）、不入库。
+- **韧性层 `src/resilience`**：RateLimiter、CircuitBreaker、Bulkhead、ConcurrencyLimiter、AsyncQueue。
+
+### 2.5.2 仍 mock / 待二期（不以 mock 冒充真实能力）
+
+| 能力 | 当前状态 | 计划里程碑 |
+|---|---|---|
+| 住院 ward | 前端/部分逻辑 mock（并行工作已开始建 inpatient 表与聚合，**未完成并验收前仍按 mock 标注**） | M1 |
+| 急诊 emergency | 前端 mock（emergencyMock） | M1 |
+| 质控 / 运营 / 系统管理前端 | 部分 mock / 静态数据（qualityMock、operationMock、systemMock） | M2 / M3 / M4 |
+| 预约 / 随访 / 提醒 | 工具与界面为 mock / 占位 | 二期（M4 / M5，需院方流程） |
+| HIS/EMR/LIS/PACS 真实对接 | 显式 Mock（`INTEGRATION_USE_MOCK`），需院方联调 | M6 |
+| MFA | 自助 enroll 接口存在但默认 InMemory 存储、登录未强制、未持久化 | M6（切换 PgMfaStore + 登录强制） |
+
+### 2.5.3 已知观察项（未修复前持续跟踪）
+
+1. **RealtimeAlertBridge 危急值通知重复堆叠（未修）**：同一危急值在前端可能重复堆叠显示。根因方向：`critical:alert` 缺少幂等键、前端未按告警唯一键合并。处置：迁移到事件总线时引入唯一事件 ID（tenant + encounter + result + rule 的哈希），消费端按 ID 幂等、前端按 ID 去重；**修复前在 M1 危急值闭环验收中列为必测项**。
+2. **startConsultation 的 `in_consult` 仅存 zustand**：刷新页面后队列显示回退为"待诊"，但临床产物（问诊/诊断/医嘱/处方/病历）已持久化、不丢失。处置方向：把"就诊中"状态落到 visits 表（服务端状态机），前端从服务端恢复；修复前明示"队列显示态与临床数据分离"，M1 一并整改。
+
+---
+
 ## 3. 里程碑总览
 
 ```

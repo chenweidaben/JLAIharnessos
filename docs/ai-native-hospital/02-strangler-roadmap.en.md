@@ -37,6 +37,36 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 
 ---
 
+## 2.5 Status Inventory: Really Available / Still Mocked (Phase 2) / Known Observation Items
+
+### 2.5.1 Really available (Stage 0 — must not regress to mock)
+
+- **Unified data facade `src/data/clinicalData.ts`**: real mode goes through `src/db/repositories`, demo mode through in-memory data; DB connection/query failures throw directly — it never silently returns an empty array to fake "no data."
+- **Chat aggregator `src/bff/aggregators/chatAggregator.ts`**: real DeepSeek streaming (OpenAI-compatible, stream:true) + user/assistant/tool messages persisted + a ReAct single-round tool-call closed loop.
+- **Outpatient full chain**: `outpatientAggregator` + `routes/outpatient` + `view/userView` + `data/outpatientCatalog` (registration/queue/consultation/diagnosis/orders/prescription/pharmacist review/AI record), truly persisted to PostgreSQL and retained across restart.
+- **Real JWT authentication**: login signs HS256 with `sub` = the iam user UUID; signature verification with exp/nbf/iss checks; timing-safe signature comparison.
+- **19 core medical tools (all via the clinicalData facade)**: query_patient, get_patient_detail, get_patient_history, get_medical_record, generate_medical_record, get_order_list, create_order, cancel_order, order_audit, get_lab_result, get_image_report, order_lab_test, order_imaging_exam, create_prescription, prescription_audit, get_prescription_list, get_drug_info, get_drug_information, drug_interaction_check.
+- **DAMO-RADAR imaging service `services/radar-inference`**: FastAPI (8090), dual demo/production mode with automatic degradation when weights are absent; positioned as a second reader with results requiring a radiologist's review-and-signature; weights under CC BY-NC-SA (non-commercial), not committed.
+- **Resilience layer `src/resilience`**: RateLimiter, CircuitBreaker, Bulkhead, ConcurrencyLimiter, AsyncQueue.
+
+### 2.5.2 Still mocked / Phase 2 (mocks must not be passed off as real)
+
+| Capability | Current status | Planned milestone |
+|---|---|---|
+| Inpatient ward | Frontend / some logic mocked (parallel work has begun on inpatient tables and aggregators; **still marked mock until completed and accepted**) | M1 |
+| Emergency | Frontend mocked (emergencyMock) | M1 |
+| Quality / operations / system-management frontend | Partly mock / static data (qualityMock, operationMock, systemMock) | M2 / M3 / M4 |
+| Appointment / follow-up / reminders | Tools and UI are mock / placeholders | Phase 2 (M4 / M5, requires hospital processes) |
+| Real HIS/EMR/LIS/PACS integration | Explicit mock (`INTEGRATION_USE_MOCK`), requires hospital joint testing | M6 |
+| MFA | Self-service enroll endpoints exist but default to an in-memory store; login does not enforce it and it is not persisted | M6 (switch to PgMfaStore + enforce at login) |
+
+### 2.5.3 Known observation items (tracked until fixed)
+
+1. **RealtimeAlertBridge duplicate stacking of critical-value notifications (not fixed)**: the same critical value may be displayed as repeated stacked notifications on the frontend. Likely root cause: `critical:alert` lacks an idempotency key and the frontend does not merge by a unique alert key. Handling: when migrating to the event bus, introduce a unique event ID (hash of tenant + encounter + result + rule), with consumers idempotent by ID and the frontend de-duplicating by ID; **until fixed, this is a mandatory test in the M1 critical-value closed-loop acceptance**.
+2. **startConsultation's `in_consult` is stored only in zustand**: after a page refresh the queue display falls back to "waiting," but the clinical artifacts (consultation/diagnosis/orders/prescription/record) are persisted and not lost. Direction: persist the "in consultation" state to the visits table (a server-side state machine) and have the frontend recover from the server; until fixed, state explicitly that "the queue display state is separate from clinical data," and rectify in M1.
+
+---
+
 ## 3. Milestone Overview
 
 ```
