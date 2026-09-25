@@ -26,3 +26,29 @@ export type ImagingPermissionCode =
 
 /** 全部已登记的影像 AI 权限码（便于种子/自检遍历） */
 export const ALL_IMAGING_PERMISSION_CODES: readonly string[] = Object.values(IMAGING_PERMISSIONS);
+
+/* ===========================================================================
+ * 住院 ADT 权限码（M1-A）
+ *  - inpatient:view       查看床位图/在院列表/患者摘要
+ *  - inpatient:admit      入院登记 + 床位分配
+ *  - inpatient:manage     换床 / 转科
+ *  - inpatient:discharge  出院并释放床位（须医师，护士不可）
+ *  - inpatient:bed:manage 床位状态维护（空闲/维护/隔离）
+ *
+ * 重要：这些权限仅授予“真实登录的医护/管理员”，绝不授予 Agent 服务账号，
+ *       AI 只能辅助、不得直接产生在院事务。
+ * ========================================================================= */
+export const INPATIENT_PERMISSIONS = {
+  VIEW: 'inpatient:view',
+  ADMIT: 'inpatient:admit',
+  MANAGE: 'inpatient:manage',
+  DISCHARGE: 'inpatient:discharge',
+  BED_MANAGE: 'inpatient:bed:manage',
+} as const;
+
+export type InpatientPermissionCode =
+  (typeof INPATIENT_PERMISSIONS)[keyof typeof INPATIENT_PERMISSIONS];
+
+/** 全部已登记的住院权限码（便于种子/自检遍历） */
+export const ALL_INPATIENT_PERMISSION_CODES: readonly string[] =
+  Object.values(INPATIENT_PERMISSIONS);

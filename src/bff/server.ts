@@ -35,6 +35,7 @@ import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
 import { outpatientRoutes } from './routes/outpatient';
+import { inpatientRoutes } from './routes/inpatient';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -54,6 +55,7 @@ const allRoutes: RouteDef[] = [
   ...qualityRoutes,
   ...operationRoutes,
   ...outpatientRoutes,
+  ...inpatientRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,

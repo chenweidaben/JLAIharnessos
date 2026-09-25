@@ -6,7 +6,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { getDb, type Sql } from '../pool.js';
+import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
 
 export interface Patient {
@@ -68,7 +68,7 @@ function mapRow(row: Record<string, unknown>): Patient {
   };
 }
 
-export async function createPatient(input: PatientCreateInput, sql?: Sql): Promise<Patient> {
+export async function createPatient(input: PatientCreateInput, sql?: DbExecutor): Promise<Patient> {
   const db = sql ?? getDb();
   const rows = await db`
     INSERT INTO clinical.patients (
@@ -95,7 +95,7 @@ export async function getPatientById(id: string, sql?: Sql): Promise<Patient | n
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
-export async function getPatientByMrn(mrn: string, sql?: Sql): Promise<Patient | null> {
+export async function getPatientByMrn(mrn: string, sql?: DbExecutor): Promise<Patient | null> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients

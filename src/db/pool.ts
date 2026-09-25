@@ -16,6 +16,13 @@ import postgres from 'postgres';
 export type Sql = postgres.Sql<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type TransactionSql = postgres.TransactionSql<any>;
+/**
+ * 事务/连接池通用执行器（postgres.ISql：模板查询 + unsafe + json）。
+ * Sql 与 TransactionSql 均兼容该类型，便于 Repository 在事务内外复用，
+ * 同时保证事务句柄（TransactionSql）可类型安全地传入。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DbExecutor = postgres.ISql<any>;
 
 let _sql: Sql | null = null;
 let _shuttingDown = false;

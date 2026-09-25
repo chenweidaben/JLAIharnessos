@@ -9,7 +9,12 @@
  */
 
 import { requireRole } from '../middleware/auth';
-import { type Ctx, json, ok, type RouteDef } from '../types';
+import { type Ctx, ErrorCode, json, ok, fail, type RouteDef } from '../types';
+import { getDb } from '../../db/pool';
+
+function demoModeEnabled(): boolean {
+  return process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+}
 
 export const systemRoutes: RouteDef[] = [
   {
@@ -49,13 +54,41 @@ export const systemRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/system/health',
-    handle: () => json(ok({ status: 'healthy', version: '0.1.0', uptimeSeconds: 0, checks: [] })),
+    handle: async () => {
+      if (demoModeEnabled()) {
+        return json(
+          ok({ status: 'demo', version: '0.1.0', demoMode: true, db: 'skipped', checks: [] }),
+        );
+      }
+      try {
+        await getDb()`SELECT 1`;
+        return json(
+          ok({ status: 'healthy', version: '0.1.0', demoMode: false, db: 'up', checks: [] }),
+        );
+      } catch {
+        return json(fail(ErrorCode.SERVICE_UNAVAILABLE, '数据库不可用'), 503);
+      }
+    },
   },
   // K8s/负载均衡就绪探针（公开，不泄露敏感信息）
+  // 报告演示模式与真实数据库连通性，供前端决定是否显示 DEMO 水印 / 阻断写操作。
   {
     method: 'GET',
     path: '/ready',
-    handle: () => json(ok({ status: 'ready' })),
+    handle: async () => {
+      if (demoModeEnabled()) {
+        return json(ok({ status: 'demo', demoMode: true, db: 'skipped' }));
+      }
+      try {
+        await getDb()`SELECT 1`;
+        return json(ok({ status: 'ready', demoMode: false, db: 'up' }));
+      } catch {
+        return json(
+          fail(ErrorCode.SERVICE_UNAVAILABLE, '数据库不可用'),
+          503,
+        );
+      }
+    },
   },
   {
     method: 'GET',
