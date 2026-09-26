@@ -84,6 +84,14 @@ export default function NursingStation() {
     }
   }, [selectedVisitId, fetchNursingRecords, fetchNursingTasks]);
 
+  // 弹窗 onOk 统一兜底：表单校验错误已内联展示则吞掉，其余异常显式提示，杜绝未处理 Promise 拒绝
+  const guard = (fn: () => Promise<void>) => () => {
+    void fn().catch((e: unknown) => {
+      if (e !== null && typeof e === 'object' && 'errorFields' in e) return;
+      message.error(e instanceof Error ? e.message : '操作失败，请重试');
+    });
+  };
+
   const openRecord = () => {
     recordForm.resetFields();
     recordForm.setFieldsValue({ shift: 'day', nursingLevel: 'level2', aiAssisted: false });
@@ -341,7 +349,7 @@ export default function NursingStation() {
         title="新建护理记录"
         width={920}
         confirmLoading={acting}
-        onOk={handleRecord}
+        onOk={guard(handleRecord)}
         onCancel={() => setRecordOpen(false)}
         okText="保存草稿"
       >
@@ -417,7 +425,7 @@ export default function NursingStation() {
         open={taskOpen}
         title="新建护理任务"
         confirmLoading={acting}
-        onOk={handleTask}
+        onOk={guard(handleTask)}
         onCancel={() => setTaskOpen(false)}
         okText="创建任务"
       >
@@ -453,7 +461,7 @@ export default function NursingStation() {
         open={!!executing}
         title="执行护理任务"
         confirmLoading={acting}
-        onOk={handleExecute}
+        onOk={guard(handleExecute)}
         onCancel={() => setExecuting(null)}
         okText="确认执行"
       >

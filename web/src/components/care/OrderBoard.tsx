@@ -74,6 +74,14 @@ export default function OrderBoard() {
     if (selectedVisitId) void fetchOrders(selectedVisitId);
   }, [selectedVisitId, fetchOrders]);
 
+  // 弹窗 onOk 统一兜底：表单校验错误已内联展示则吞掉，其余异常显式提示，杜绝未处理 Promise 拒绝
+  const guard = (fn: () => Promise<void>) => () => {
+    void fn().catch((e: unknown) => {
+      if (e !== null && typeof e === 'object' && 'errorFields' in e) return;
+      message.error(e instanceof Error ? e.message : '操作失败，请重试');
+    });
+  };
+
   const openCreate = () => {
     createForm.resetFields();
     createForm.setFieldsValue({
@@ -294,7 +302,7 @@ export default function OrderBoard() {
         title="开具在院医嘱"
         width={760}
         confirmLoading={acting}
-        onOk={handleCreate}
+        onOk={guard(handleCreate)}
         onCancel={() => setCreateOpen(false)}
         okText="提交审核"
       >
@@ -353,7 +361,7 @@ export default function OrderBoard() {
         open={!!rejecting}
         title="驳回医嘱"
         confirmLoading={acting}
-        onOk={handleReject}
+        onOk={guard(handleReject)}
         onCancel={() => setRejecting(null)}
         okText="确认驳回"
         okButtonProps={{ danger: true }}
@@ -374,7 +382,7 @@ export default function OrderBoard() {
         title="执行 / 双人核对医嘱"
         width={680}
         confirmLoading={acting}
-        onOk={handleAdminister}
+        onOk={guard(handleAdminister)}
         onCancel={() => setAdministering(null)}
         okText="保存执行记录"
       >
