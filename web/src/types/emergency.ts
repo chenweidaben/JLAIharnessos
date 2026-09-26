@@ -2,344 +2,399 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 急诊分诊场景 - 类型定义
+ * 急诊核心事务类型（M1-B1）—— 与真实 BFF（src/bff/routes/emergency.ts）
+ * 返回的 DTO 结构一一对应，无 mock 视图模型。
+ *
  * 依据：急诊预检分诊专家共识（2018）四级分诊标准；
- *       胸痛中心（D-to-B<90min）、卒中中心（D-to-CT<25min / D-to-N<60min）建设标准
+ *       胸痛中心（D-to-B≤90min）、卒中中心（D-to-CT≤25min / D-to-N≤60min）建设标准。
  */
-import type { Gender } from './common';
 
 // ============ 枚举与基础类型 ============
 
 /** 分诊级别：Ⅰ级濒危 / Ⅱ级危重 / Ⅲ级急症 / Ⅳ级非急症 */
 export type TriageLevel = 1 | 2 | 3 | 4;
 
-/** 分诊状态：待分诊 / 已分诊待诊 / 就诊中 / 抢救 / 留观 / 离院 */
-export type TriageStatus =
-  'waiting_triage' | 'triaged' | 'in_treatment' | 'resuscitation' | 'observation' | 'discharged';
+/** 急诊主状态（与 src/emergency/stateMachine.ts 一致） */
+export type EmergencyStatus =
+  | 'waiting_triage'
+  | 'triaged'
+  | 'in_treatment'
+  | 'resuscitation'
+  | 'observation'
+  | 'admitted'
+  | 'transferred'
+  | 'discharged'
+  | 'deceased';
 
-/** 意识状态（GCS 简化版） */
+/** 意识状态（ACVPU 简化版） */
 export type Consciousness = 'alert' | 'verbal' | 'pain' | 'unresponsive';
 
 /** 绿色通道类型 */
 export type GreenChannelType = 'chest_pain' | 'stroke' | 'trauma' | 'maternal' | 'neonatal';
 
-/** 抢救床位状态 */
-export type ResusStatus = 'resuscitating' | 'stabilized' | 'transferred_icu' | 'deceased' | 'empty';
+/** 绿色通道状态（与 BFF clinical.green_channels.status 对齐） */
+export type GreenChannelStatus = 'active' | 'completed' | 'cancelled';
 
-/** 留观患者状态 */
-export type ObsStatus = 'stable' | 'observing' | 'worsening' | 'discharged' | 'admitted';
+/** 抢救记录状态 */
+export type ResusStatus = 'resuscitating' | 'stabilized' | 'transferred_icu' | 'deceased';
 
-// ============ 生命体征 ============
-export interface Vitals {
+/** 留观状态 */
+export type ObsStatus = 'observing' | 'stable' | 'worsening' | 'discharged' | 'admitted';
+
+/** 终末转归码 */
+export type DispositionCode =
+  | 'admitted'
+  | 'surgery'
+  | 'observation'
+  | 'discharged'
+  | 'transferred'
+  | 'deceased';
+
+// ============ 生命体征 / 评分输入 ============
+
+/** 分诊生命体征（字段均可选，缺失不参与判分） */
+export interface EmergencyVitals {
   /** 体温 ℃ */
-  temperature?: number;
+  temperature?: number | null;
   /** 脉搏 次/分 */
-  pulse?: number;
+  pulse?: number | null;
   /** 呼吸 次/分 */
-  respiration?: number;
+  respiration?: number | null;
   /** 收缩压 mmHg */
-  systolic?: number;
+  systolic?: number | null;
   /** 舒张压 mmHg */
-  diastolic?: number;
+  diastolic?: number | null;
   /** 血氧饱和度 % */
-  spo2?: number;
+  spo2?: number | null;
   /** 意识状态 */
-  consciousness?: Consciousness;
-  /** 疼痛评分 NRS 0-10 */
-  painScore?: number;
-  /** 测量时间 ISO 字符串 */
-  measureTime?: string;
+  consciousness?: Consciousness | null;
+  /** 疼痛 NRS 0–10 */
+  painScore?: number | null;
+  /** 是否吸氧 */
+  supplementalO2?: boolean | null;
 }
 
-// ============ 分诊患者（候诊队列） ============
-export interface TriagePatient {
-  /** 患者ID */
-  id: string;
-  /** 姓名（已脱敏） */
-  name: string;
-  /** 性别 */
-  gender: Gender;
-  /** 年龄 */
-  age: number;
-  /** 急诊就诊号（已脱敏） */
-  visitNo: string;
-  /** 主诉 */
-  chiefComplaint: string;
-  /** 分诊级别（null 表示尚未分诊） */
-  level: TriageLevel | null;
-  /** 分诊状态 */
-  status: TriageStatus;
-  /** 生命体征 */
-  vitals: Vitals;
-  /** 到达急诊时间 */
-  arriveTime: string;
-  /** 分诊时间 */
-  triageTime?: string;
-  /** 已等待分钟数 */
-  waitingMinutes: number;
-  /** 绿色通道类型（激活后填充） */
-  greenChannelType?: GreenChannelType;
-  /** 是否激活绿色通道 */
-  greenChannelActive: boolean;
-  /** 过敏史 */
-  allergyHistory: string[];
-  /** 既往史 */
-  pastHistory: string;
-  /** 用药史 */
-  medicationHistory: string;
+/** GCS 分项 */
+export interface GcsComponents {
+  eye: number; // 1–4
+  verbal: number; // 1–5
+  motor: number; // 1–6
 }
 
-// ============ 四级分诊 ============
-/** AI 辅助分诊建议 */
-export interface AITriageAdvice {
-  /** 建议分诊级别 */
-  suggestedLevel: TriageLevel;
-  /** 需立即处理的情况 */
-  immediateActions: string[];
-  /** 鉴别诊断建议 */
-  differentialDx: string[];
-  /** 必要检查建议 */
-  suggestedExams: string[];
+/** 卒中量表入参（FAST + LAMS） */
+export interface StrokeScaleInput {
+  fastFace?: boolean | null;
+  fastArm?: boolean | null;
+  fastSpeech?: boolean | null;
+  lamsFace?: number | null;
+  lamsArm?: number | null;
+  lamsGrip?: number | null;
 }
 
-/** 分诊记录 */
-export interface TriageRecord {
-  /** 记录ID */
-  id: string;
+// ============ 分诊台队列 ============
+
+/** 分诊台队列条目（GET /emergency/queue） */
+export interface EmergencyQueueItem {
+  visitId: string;
   patientId: string;
-  /** 到达时间 */
+  triageNo: string;
+  patientName: string;
+  gender: string;
+  /** 年龄展示文本，如 “63岁” */
+  age: string;
+  chiefComplaint: string | null;
   arriveTime: string;
-  /** 分诊时间 */
-  triageTime: string;
-  /** 主诉 */
-  chiefComplaint: string;
-  /** 生命体征 */
-  vitals: Vitals;
-  /** 过敏史 */
-  allergyHistory: string[];
-  /** 既往史 */
-  pastHistory: string;
-  /** 用药史 */
-  medicationHistory: string;
-  /** 疼痛评分 NRS */
-  painScore: number;
-  /** 最终分诊级别（护士确认） */
-  level: TriageLevel;
-  /** 分诊依据 */
-  basis: string;
-  /** 分诊护士 */
-  nurseName: string;
-  /** 生命体征评分 */
-  vitalScore: number;
-  /** 主诉评分 */
-  complaintScore: number;
-  /** 综合评分 */
-  totalScore: number;
-  /** AI 建议 */
-  aiAdvice: AITriageAdvice;
-  /** 护士是否确认 */
+  triageTime: string | null;
+  level: number | null;
+  levelLabel: string | null;
+  emStatus: EmergencyStatus;
+  greenChannelActive: boolean;
+  vitals: Record<string, unknown>;
+  newsScore: number | null;
+  gcsTotal: number | null;
+  /** 已等待/已耗时（分钟） */
+  waitMinutes: number;
+  /** 响应截止时间 */
+  deadline: string | null;
+  /** 距响应截止剩余分钟（负为超时） */
+  remainingMinutes: number | null;
+  overdue: boolean;
+}
+
+// ============ 统计 / 元数据 ============
+
+/** 当日急诊统计（GET /emergency/stats） */
+export interface EmergencyStatsDto {
+  activeCount: number;
+  waitingCount: number;
+  resusCount: number;
+  obsCount: number;
+  greenChannelCount: number;
+  levelCounts: Record<number, number>;
+  dispositionCounts: Record<string, number>;
+}
+
+/** 通道类型元数据（GET /emergency/channel-types） */
+export interface ChannelTypeDto {
+  type: GreenChannelType;
+  name: string;
+  subtypes: string[];
+}
+
+// ============ 接诊 ============
+
+/** 新患者建档输入 */
+export interface NewPatientInput {
+  nameMasked: string;
+  gender?: '男' | '女' | '未知' | '未说明';
+  birthDate?: string | null;
+  mrn?: string;
+  bloodType?: string | null;
+  allergies?: Array<Record<string, unknown>>;
+  tags?: string[];
+}
+
+/** 接诊入参（POST /emergency/arrivals） */
+export interface ArrivalInput {
+  patientId?: string;
+  newPatient?: NewPatientInput;
+  chiefComplaint?: string;
+  arriveTime?: string;
+  campusId?: string;
+}
+
+/** 急诊分诊记录（clinical.emergency_triage） */
+export interface EmergencyTriageDto {
+  id: string;
+  triageNo: string;
+  visitId: string;
+  patientId: string;
+  triageNurseId: string | null;
+  arriveTime: string;
+  triageTime: string | null;
+  chiefComplaint: string | null;
+  vitals: Record<string, unknown>;
+  gcsEye: number | null;
+  gcsVerbal: number | null;
+  gcsMotor: number | null;
+  gcsTotal: number | null;
+  newsScore: number | null;
+  strokeScale: Record<string, unknown>;
+  level: number | null;
+  ruleSuggestedLevel: number | null;
+  aiSuggestedLevel: number | null;
+  aiAdvice: Record<string, unknown>;
+  vitalScore: number | null;
+  complaintScore: number | null;
+  totalScore: number | null;
+  basis: string | null;
   confirmed: boolean;
+  greenChannelActive: boolean;
+  emStatus: EmergencyStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 接诊结果 */
+export interface ArrivalResult {
+  triage: EmergencyTriageDto;
+}
+
+// ============ 分诊分级 ============
+
+/** 分诊分级提交载荷（POST /emergency/triage/:visitId） */
+export interface TriageFormPayload {
+  vitals: EmergencyVitals;
+  gcs?: GcsComponents | null;
+  stroke?: StrokeScaleInput | null;
+  chiefComplaint?: string | null;
+  cardiacArrest?: boolean | null;
+  catastrophe?: boolean | null;
+  /** 护士最终确认级别 */
+  level: TriageLevel;
+  basis?: string;
+  aiSuggestedLevel?: TriageLevel | null;
+  aiAdvice?: Record<string, unknown> | null;
+}
+
+/** 客观评分（只读展示用，字段保持宽松） */
+export interface TriageAssessmentDto {
+  news: { score: number; risk: 'low' | 'medium' | 'high'; breakdown: Record<string, number> };
+  gcs: { total: number; eye: number; verbal: number; motor: number } | null;
+  fast: { face: boolean; arm: boolean; speech: boolean; positive: boolean };
+  lams: { total: number; lvoLikelihood: 'high' | 'possible' | 'low' };
+  rule: { level: TriageLevel; objectiveReasons: string[] };
+  vitalScore: number;
+  complaintScore: number;
+  totalScore: number;
+}
+
+/** 分诊分级结果 */
+export interface TriageResult {
+  triage: EmergencyTriageDto;
+  assessment: TriageAssessmentDto;
+}
+
+/** AI 辅助分诊建议（POST /emergency/triage/:visitId/ai-advice） */
+export interface AiTriageAdviceDto {
+  source: 'deepseek' | 'rule_fallback';
+  suggestedLevel: TriageLevel;
+  advice: {
+    immediate: string;
+    workup: string;
+    differential: string;
+    risk: string;
+  };
 }
 
 // ============ 绿色通道 ============
-export interface GCTimelineNode {
-  key: string;
+
+/** 绿色通道时间节点 */
+export interface GreenChannelNodeDto {
+  id: string;
+  channelId: string;
+  nodeKey: string;
   label: string;
-  /** 实际完成时间 */
-  time?: string;
-  /** 自到达起目标分钟数 */
-  targetMinutes?: number;
-  /** 是否超时 */
+  targetMinutes: number | null;
+  actualTime: string | null;
+  sortOrder: number;
   overdue: boolean;
-  /** 是否完成 */
-  done: boolean;
 }
 
-export interface GreenChannel {
+/** 绿色通道（clinical.green_channels） */
+export interface GreenChannelDto {
   id: string;
+  channelNo: string;
+  visitId: string;
   patientId: string;
-  patientName: string;
-  /** 类型 */
   type: GreenChannelType;
-  /** 亚型（STEMI / 急性缺血性卒中 …） */
   subtype: string;
-  status: 'active' | 'completed';
-  /** 到达急诊时间 */
+  status: GreenChannelStatus;
   arriveTime: string;
-  /** 激活时间 */
   activateTime: string;
-  /** 关闭/完成时间 */
-  endTime?: string;
-  /** 时间轴节点 */
-  nodes: GCTimelineNode[];
-  /** 已通知团队 */
+  endTime: string | null;
   notifiedTeams: string[];
-  /** 入门-球囊（分钟） */
-  dbnMinutes?: number;
-  /** 入门-CT（分钟） */
-  dctMinutes?: number;
-  /** 入门-溶栓（分钟） */
-  dntMinutes?: number;
-  /** 转归 */
-  outcome?: string;
-  /** 质量评估 */
-  qualityNote?: string;
+  dbnMinutes: number | null;
+  dctMinutes: number | null;
+  dntMinutes: number | null;
+  outcome: string | null;
+  qualityNote: string | null;
+  nodes: GreenChannelNodeDto[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-// ============ 抢救室 ============
-export interface ResusDevice {
-  name: string;
-  status: 'running' | 'standby' | 'alarm';
-  detail?: string;
-}
+// ============ 抢救 ============
 
-export interface ResusBed {
-  id: string;
-  bedNo: string;
-  status: ResusStatus;
-  patient?: { id: string; name: string; gender: Gender; age: number; diagnosis: string };
-  startTime?: string;
-  durationMin?: number;
-  doctor?: string;
-  nurse?: string;
-  /** 危急值标识 */
-  criticalValue?: string;
-  devices: ResusDevice[];
-}
-
-export interface ResusTimelineEvent {
+/** 抢救时间轴事件 */
+export interface ResusEventDto {
   time: string;
-  category: 'vitals' | 'medication' | 'procedure' | 'exam' | 'consult' | 'evaluation';
+  type: string;
   content: string;
   operator?: string;
 }
 
-export interface ResusVitalPoint {
+/** 抢救用药 */
+export interface ResusMedicationDto {
+  name: string;
+  dose: string;
+  route?: string;
   time: string;
-  heartRate: number;
-  systolic: number;
-  spo2: number;
 }
 
-export interface ResusRecord {
-  bedId: string;
-  bedNo: string;
-  patientName: string;
+/** 生命体征趋势点（运行时用 pulse/systolic；历史种子行用 hr/bp_s，均如实读取） */
+export interface VitalPointDto {
+  time: string;
+  pulse?: number;
+  systolic?: number;
+  /** 历史种子行的心率键 */
+  hr?: number;
+  /** 历史种子行的收缩压键 */
+  bp_s?: number;
+  spo2?: number;
+  respiration?: number;
+}
+
+/** 抢救记录（clinical.resuscitations） */
+export interface ResuscitationDto {
+  id: string;
+  resusNo: string;
+  visitId: string;
+  patientId: string;
+  bedNo: string | null;
+  bedId: string | null;
   startTime: string;
-  endTime?: string;
-  events: ResusTimelineEvent[];
-  vitalTrend: ResusVitalPoint[];
-  medications: { drug: string; dose: string; route: string; time: string }[];
-  team: { role: string; name: string }[];
-  outcome?: string;
-  summary?: string;
+  endTime: string | null;
+  diagnosis: string | null;
+  leadDoctorId: string | null;
+  leadNurseId: string | null;
+  status: ResusStatus;
+  events: ResusEventDto[];
+  vitalTrend: VitalPointDto[];
+  medications: ResusMedicationDto[];
+  /** 抢救团队成员姓名 */
+  team: string[];
+  outcome: string | null;
+  summary: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ============ 留观 ============
-export interface ObservationPatient {
+
+/** 留观待办（新记录用 id/content；历史种子行用 task，如实兼容） */
+export interface ObsTaskDto {
+  id?: string;
+  content?: string;
+  /** 历史种子行的待办文本键 */
+  task?: string;
+  done: boolean;
+  dueTime?: string;
+}
+
+/** 留观记录（clinical.observations） */
+export interface ObservationDto {
   id: string;
-  bedNo: string;
-  name: string;
-  gender: Gender;
-  age: number;
-  diagnosis: string;
-  /** 留观开始时间 */
-  obsTime: string;
-  /** 已留观分钟数 */
-  stayMinutes: number;
-  status: ObsStatus;
-  /** 护理等级 */
-  nursingLevel: string;
-  /** 最近生命体征 */
-  vitals: Vitals;
-  /** 输液/治疗状态 */
-  ivStatus?: string;
-  /** 待处理事项 */
-  pendingTasks: string[];
-  /** 预计转归 */
-  expectedOutcome?: string;
-}
-
-// ============ 急诊统计 ============
-export interface EmergencyQualityItem {
-  name: string;
-  /** 实际值（0-1） */
-  value: number;
-  /** 目标值（0-1） */
-  target: number;
-}
-
-export interface EmergencyStats {
-  today: {
-    total: number;
-    level1: number;
-    level2: number;
-    level3: number;
-    level4: number;
-    resusCount: number;
-    resusSuccessRate: number;
-    observationCount: number;
-    dischargedToday: number;
-    admittedToday: number;
-    greenChannelCount: number;
-    avgWaitMinutes: number;
-    avgVisitMinutes: number;
-  };
-  trend7d: { date: string; count: number }[];
-  levelDistribution: { name: string; value: number }[];
-  diseaseTop10: { name: string; value: number }[];
-  /** 星期(0-6) × 小时(0-23) 就诊量热力图 */
-  heatmap: { day: string; hour: number; value: number }[];
-  waitTrend: { time: string; wait: number }[];
-  resusSuccessTrend: { month: string; rate: number }[];
-  quality: EmergencyQualityItem[];
-}
-
-// ============ 急诊病历 ============
-export interface EmergencyRecord {
-  id: string;
+  obsNo: string;
+  visitId: string;
   patientId: string;
-  patientName: string;
-  chiefComplaint: string;
-  presentIllness: string;
-  pastHistory: string;
-  allergyHistory: string;
-  personalHistory: string;
-  familyHistory: string;
-  vitals: Vitals;
-  physicalExam: string;
-  labs: string[];
-  exams: string[];
-  diagnoses: string[];
-  treatments: string[];
-  noticeGiven: boolean;
-  doctorName: string;
-  recordTime: string;
-  signed: boolean;
-  qcWarnings: string[];
+  bedNo: string | null;
+  startTime: string;
+  endTime: string | null;
+  diagnosis: string | null;
+  nursingLevel: string;
+  vitals: Record<string, unknown>;
+  ivStatus: string | null;
+  pendingTasks: ObsTaskDto[];
+  status: ObsStatus;
+  expectedOutcome: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// ============ Store 状态 ============
-export interface EmergencyState {
-  /** 分诊队列 */
-  triageQueue: TriagePatient[];
-  /** 当前分诊患者 */
-  currentPatient: TriagePatient | null;
-  /** 当前分诊记录 */
-  triageRecord: TriageRecord | null;
-  /** 分诊历史 */
-  triageHistory: TriageRecord[];
-  /** 抢救床位 */
-  resuscitationBeds: ResusBed[];
-  /** 抢救记录（按床位ID） */
-  resuscitationRecords: Record<string, ResusRecord>;
-  /** 留观患者 */
-  observationPatients: ObservationPatient[];
-  /** 绿色通道 */
-  greenChannels: GreenChannel[];
-  /** 急诊统计 */
-  emergencyStats: EmergencyStats | null;
-  /** 当前急诊病历 */
-  currentRecord: EmergencyRecord | null;
-  loading: boolean;
+// ============ 转归 ============
+
+/** 终末转归记录（clinical.emergency_dispositions） */
+export interface DispositionDto {
+  id: string;
+  visitId: string;
+  patientId: string;
+  disposition: DispositionCode;
+  destination: string | null;
+  wardId: string | null;
+  bedId: string | null;
+  remark: string | null;
+  operatorId: string | null;
+  dispositionTime: string;
+  createdAt: string;
+}
+
+// ============ 健康探针 ============
+
+/** BFF 健康探针（GET /system/health） */
+export interface EmergencyHealth {
+  status: string;
+  version?: string;
+  demoMode: boolean;
+  db: 'up' | 'down' | 'skipped';
 }

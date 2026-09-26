@@ -135,7 +135,7 @@ export default function AppRoutes() {
           <Route path="skills/studio" element={<SkillStudio />} />
           <Route path="alerts" element={<Alerts />} />
           <Route path="emergency" element={<Emergency />} />
-          <Route path="emergency/triage/:patientId" element={<EmergencyTriage />} />
+          <Route path="emergency/triage/:visitId" element={<EmergencyTriage />} />
           {/* 临床业务：门诊 / 住院 */}
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />

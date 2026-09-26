@@ -2,19 +2,42 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 急诊病历：病历模板 / AI辅助生成 / 病历质控 / 电子签名 / 打印
+ * 急诊档案（只读汇总）：把同一就诊的真实分诊 / 绿色通道 / 抢救 / 留观 / 转归
+ * 记录聚合呈现。
+ *
+ * 范围说明：M1-B1 后端未提供“独立急诊病历撰写 / AI 生成病历 / 电子签名归档”端点，
+ * 故本页不提供这些写操作，也不以假数据填充；仅做真实记录的只读汇总，可打印。
  */
-import { useState } from 'react';
-import { App as AntdApp, Button, Card, Col, Divider, Row, Tag } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  CheckCircleOutlined,
-  PrinterOutlined,
-  RobotOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
+  Alert,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Empty,
+  Row,
+  Select,
+  Space,
+  Tag,
+  Timeline,
+} from 'antd';
+import { PrinterOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 import { useEmergencyStore } from '@/store/emergencyStore';
-import { formatDateTime } from '@/utils/format';
+import {
+  DISPOSITION_META,
+  EM_STATUS_META,
+  GC_TYPE_META,
+  NURSING_LEVEL_META,
+  RESUS_EVENT_TYPE_META,
+  TRIAGE_LEVEL_META,
+} from './constants';
+
+function num(v: unknown): string {
+  return typeof v === 'number' ? String(v) : '--';
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -27,159 +50,233 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function EmergencyRecord() {
-  const { message } = AntdApp.useApp();
-  const { currentRecord, signEmergencyRecord } = useEmergencyStore();
-  const [qcChecked, setQcChecked] = useState(false);
+export default function EmergencyRecordView() {
+  const {
+    queue,
+    greenChannels,
+    resuscitations,
+    observations,
+    fetchQueue,
+    fetchGreenChannels,
+    fetchResuscitations,
+    fetchObservations,
+  } = useEmergencyStore();
 
-  if (!currentRecord) {
-    return <Card className="shadow-card">病历加载中…</Card>;
-  }
+  const [visitId, setVisitId] = useState<string>('');
 
-  const r = currentRecord;
+  useEffect(() => {
+    void fetchQueue();
+    void fetchGreenChannels();
+    void fetchResuscitations();
+    void fetchObservations();
+  }, [fetchQueue, fetchGreenChannels, fetchResuscitations, fetchObservations]);
 
-  const handleSign = async () => {
-    await signEmergencyRecord();
-    message.success('电子签名完成，病历已归档');
-  };
+  useEffect(() => {
+    if (!visitId && queue.length) setVisitId(queue[0].visitId);
+  }, [queue, visitId]);
 
-  const handleQc = () => {
-    setQcChecked(true);
-    if (r.qcWarnings.length === 0) message.success('病历质控通过，无缺陷项');
-    else message.warning(`质控发现 ${r.qcWarnings.length} 项问题`);
-  };
+  const item = useMemo(() => queue.find((q) => q.visitId === visitId), [queue, visitId]);
+  const gc = useMemo(
+    () => greenChannels.find((g) => g.visitId === visitId),
+    [greenChannels, visitId],
+  );
+  const resus = useMemo(
+    () => resuscitations.find((r) => r.visitId === visitId),
+    [resuscitations, visitId],
+  );
+  const obs = useMemo(
+    () => observations.find((o) => o.visitId === visitId),
+    [observations, visitId],
+  );
 
   return (
     <div className="space-y-4">
       <Card className="shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <span className="text-lg font-semibold text-ink-primary">急诊病历</span>
-            <span className="ml-3 text-sm text-ink-secondary">
-              {r.patientName} · 记录时间 {formatDateTime(r.recordTime)}
-            </span>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              icon={<RobotOutlined />}
-              onClick={() => message.success('AI 已根据分诊与检查结果辅助生成病历初稿')}
-            >
-              AI 辅助生成
-            </Button>
-            <Button icon={<SafetyCertificateOutlined />} onClick={handleQc}>
-              病历质控
-            </Button>
+        <Row gutter={[12, 12]} align="middle">
+          <Col flex="auto">
+            <Space>
+              <span className="text-sm text-ink-secondary">选择就诊：</span>
+              <Select
+                showSearch
+                className="min-w-[320px]"
+                value={visitId || undefined}
+                onChange={setVisitId}
+                optionFilterProp="label"
+                options={queue.map((q) => ({
+                  value: q.visitId,
+                  label: `${q.triageNo} ${q.patientName} · ${q.chiefComplaint ?? ''}`,
+                }))}
+              />
+            </Space>
+          </Col>
+          <Col>
             <Button icon={<PrinterOutlined />} onClick={() => window.print()}>
               打印
             </Button>
-            <Button
-              type="primary"
-              icon={<CheckCircleOutlined />}
-              disabled={r.signed}
-              onClick={handleSign}
-            >
-              {r.signed ? '已签名归档' : '电子签名'}
-            </Button>
-          </div>
-        </div>
+          </Col>
+        </Row>
       </Card>
 
-      {qcChecked && (
-        <Card size="small" style={{ borderLeft: '3px solid #FAAD14' }}>
-          {r.qcWarnings.length === 0 ? (
-            <span className="text-medical-normal">
-              质控通过：主诉、现病史、查体、诊断、处理、签名要素齐全。
-            </span>
-          ) : (
-            <ul className="list-disc pl-5 text-medical-critical">
-              {r.qcWarnings.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ul>
-          )}
+      <Alert
+        type="info"
+        showIcon
+        message="本页为真实急诊记录的只读汇总；独立病历撰写、AI 生成病历与电子签名归档不在 M1-B1 范围。"
+      />
+
+      {!item ? (
+        <Card className="shadow-card">
+          <Empty description="请选择就诊记录" />
+        </Card>
+      ) : (
+        <Card className="shadow-card" styles={{ body: { padding: 28 } }}>
+          <div className="mx-auto max-w-3xl space-y-4">
+            {/* 抬头 */}
+            <div>
+              <h2 className="text-center text-xl font-bold">急诊档案</h2>
+              <div className="text-center text-xs text-ink-secondary">
+                健澜科技数智医院 · 急诊科
+              </div>
+            </div>
+            <Divider style={{ margin: '8px 0' }} />
+
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Space wrap>
+                  <b className="text-jl-primary">{item.triageNo}</b>
+                  <span className="font-semibold">{item.patientName}</span>
+                  <span className="text-xs text-ink-secondary">
+                    {item.gender === 'male' ? '男' : '女'} · {item.age}
+                  </span>
+                </Space>
+              </Col>
+              <Col>
+                <Space size={4}>
+                  {item.level != null && (
+                    <Tag color={TRIAGE_LEVEL_META[(item.level as 1 | 2 | 3 | 4)]?.color}>
+                      {TRIAGE_LEVEL_META[(item.level as 1 | 2 | 3 | 4)]?.label}
+                    </Tag>
+                  )}
+                  <Tag color={EM_STATUS_META[item.emStatus].color}>
+                    {EM_STATUS_META[item.emStatus].label}
+                  </Tag>
+                </Space>
+              </Col>
+            </Row>
+
+            <Section title="主诉">{item.chiefComplaint ?? '—'}</Section>
+
+            {/* 分诊记录 */}
+            <Section title="分诊记录">
+              <div className="mb-1 text-xs text-ink-secondary">
+                T {num(item.vitals.temperature)}℃ · P {num(item.vitals.pulse)} · R{' '}
+                {num(item.vitals.respiration)} · BP {num(item.vitals.systolic)}/
+                {num(item.vitals.diastolic)} mmHg · SpO₂ {num(item.vitals.spo2)}%
+              </div>
+              <Space wrap size={4}>
+                {item.newsScore != null && <Tag>NEWS2 {item.newsScore}</Tag>}
+                {item.gcsTotal != null && <Tag>GCS {item.gcsTotal}</Tag>}
+                {Boolean(item.vitals.consciousness) && (
+                  <Tag>意识 {String(item.vitals.consciousness)}</Tag>
+                )}
+              </Space>
+              {item.vitals.basis != null && (
+                <div className="mt-1 text-xs text-ink-secondary">
+                  判定依据：{String(item.vitals.basis)}
+                </div>
+              )}
+            </Section>
+
+            {/* 绿色通道 */}
+            {gc && (
+              <Section
+                title={`绿色通道 · ${GC_TYPE_META[gc.type].label}${gc.subtype ? `（${gc.subtype}）` : ''}`}
+              >
+                <Space wrap className="mb-2">
+                  {gc.dbnMinutes != null && (
+                    <Tag color={gc.dbnMinutes <= 90 ? 'success' : 'error'}>D-B {gc.dbnMinutes}′</Tag>
+                  )}
+                  {gc.dctMinutes != null && (
+                    <Tag color={gc.dctMinutes <= 25 ? 'success' : 'error'}>D-CT {gc.dctMinutes}′</Tag>
+                  )}
+                  {gc.dntMinutes != null && (
+                    <Tag color={gc.dntMinutes <= 60 ? 'success' : 'error'}>D-N {gc.dntMinutes}′</Tag>
+                  )}
+                </Space>
+                <Timeline
+                  items={gc.nodes.map((n) => ({
+                    color: n.overdue ? 'red' : n.actualTime ? 'green' : 'gray',
+                    children: (
+                      <span className="text-xs">
+                        {n.label}：
+                        {n.actualTime ? dayjs(n.actualTime).format('HH:mm') : '未完成'}
+                      </span>
+                    ),
+                  }))}
+                />
+              </Section>
+            )}
+
+            {/* 抢救记录 */}
+            {resus && (
+              <Section title={`抢救记录 · ${resus.bedNo ?? ''}`}>
+                <div className="mb-1">{resus.diagnosis ?? '诊断待明确'}</div>
+                {resus.medications.length > 0 && (
+                  <div className="mb-1 text-xs">
+                    用药：
+                    {resus.medications
+                      .map((m) => `${m.name} ${m.dose}`)
+                      .join('；')}
+                  </div>
+                )}
+                <Timeline
+                  items={resus.events.map((e) => ({
+                    color: RESUS_EVENT_TYPE_META[e.type]?.color ?? 'gray',
+                    children: (
+                      <span className="text-xs">
+                        {dayjs(e.time).format('HH:mm')} {e.content}
+                      </span>
+                    ),
+                  }))}
+                />
+              </Section>
+            )}
+
+            {/* 留观记录 */}
+            {obs && (
+              <Section title="留观记录">
+                <Space wrap size={4}>
+                  <Tag>{NURSING_LEVEL_META[obs.nursingLevel]?.label ?? `${obs.nursingLevel}护理`}</Tag>
+                  <Tag color={obs.status === 'worsening' ? 'error' : 'default'}>
+                    {obs.status}
+                  </Tag>
+                  {obs.ivStatus && <Tag color="blue">{obs.ivStatus}</Tag>}
+                </Space>
+                {obs.pendingTasks.filter((t) => !t.done).length > 0 && (
+                  <div className="mt-1 text-xs text-ink-secondary">
+                    待办：
+                    {obs.pendingTasks
+                      .filter((t) => !t.done)
+                      .map((t) => t.content)
+                      .join('；')}
+                  </div>
+                )}
+              </Section>
+            )}
+
+            {/* 转归 */}
+            <Section title="转归">
+              <Tag color={EM_STATUS_META[item.emStatus].color}>
+                {DISPOSITION_META[item.emStatus as keyof typeof DISPOSITION_META]?.label ??
+                  EM_STATUS_META[item.emStatus].label}
+              </Tag>
+              <span className="ml-1 text-xs text-ink-secondary">
+                到达 {dayjs(item.arriveTime).format('MM-DD HH:mm')}
+                {item.triageTime && ` · 分诊 ${dayjs(item.triageTime).format('HH:mm')}`}
+              </span>
+            </Section>
+          </div>
         </Card>
       )}
-
-      {/* 病历正文（纸张式） */}
-      <Card className="shadow-card" styles={{ body: { padding: 32 } }}>
-        <div className="mx-auto max-w-3xl space-y-4 bg-white">
-          <h2 className="text-center text-xl font-bold">急诊病历</h2>
-          <div className="text-center text-xs text-ink-secondary">健澜科技数智医院 · 急诊科</div>
-          <Divider style={{ margin: '12px 0' }} />
-
-          <Section title="主诉">{r.chiefComplaint}</Section>
-          <Section title="现病史">{r.presentIllness}</Section>
-
-          <Row gutter={24}>
-            <Col span={12}>
-              <Section title="既往史">{r.pastHistory}</Section>
-            </Col>
-            <Col span={12}>
-              <Section title="过敏史">{r.allergyHistory}</Section>
-            </Col>
-          </Row>
-          <Row gutter={24}>
-            <Col span={12}>
-              <Section title="个人史">{r.personalHistory}</Section>
-            </Col>
-            <Col span={12}>
-              <Section title="家族史">{r.familyHistory}</Section>
-            </Col>
-          </Row>
-
-          <Section title="体格检查">
-            <div className="mb-1 text-xs text-ink-secondary">
-              T {r.vitals.temperature}℃ · P {r.vitals.pulse}次/分 · R {r.vitals.respiration}次/分 ·
-              BP {r.vitals.systolic}/{r.vitals.diastolic}mmHg · SpO₂ {r.vitals.spo2}%
-            </div>
-            {r.physicalExam}
-          </Section>
-
-          <Section title="辅助检查">
-            <ul className="list-disc pl-5">
-              {r.labs.map((l, i) => (
-                <li key={i}>{l}</li>
-              ))}
-              {r.exams.map((e, i) => (
-                <li key={`e${i}`}>{e}</li>
-              ))}
-            </ul>
-          </Section>
-
-          <Section title="初步诊断">
-            {r.diagnoses.map((d, i) => (
-              <Tag key={i} color="blue" className="mr-1">
-                {d}
-              </Tag>
-            ))}
-          </Section>
-
-          <Section title="处理措施">
-            <ul className="list-disc pl-5">
-              {r.treatments.map((t, i) => (
-                <li key={i}>{t}</li>
-              ))}
-            </ul>
-          </Section>
-
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-ink-secondary">病情告知：</span>
-            {r.noticeGiven ? (
-              <Tag color="success">已告知并签字</Tag>
-            ) : (
-              <Tag color="warning">待告知</Tag>
-            )}
-          </div>
-
-          <Divider style={{ margin: '12px 0' }} />
-          <div className="flex justify-end text-sm">
-            <span>
-              医师签名：<b>{r.doctorName}</b>
-              {r.signed && <CheckCircleOutlined className="ml-1 text-medical-normal" />}
-            </span>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

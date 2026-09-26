@@ -2,249 +2,324 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 抢救室管理：床位图 / 抢救时间轴 / 生命体征趋势 / 设备状态 / 抢救团队
+ * 抢救室：活动抢救床位卡 / 事件·用药 / 生命体征趋势 / 启动·结束（真实 BFF）
+ * 说明：后端无“固定床位+设备状态”模型，故仅渲染真实抢救记录，不虚构空床/设备。
  */
-import { useMemo, useState } from 'react';
-import { Badge, Card, Drawer, Empty, Tag, Timeline } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  AlertOutlined,
-  ApiOutlined,
+  App as AntdApp,
+  Button,
+  Card,
+  Col,
+  Drawer,
+  Empty,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Tag,
+  Timeline,
+} from 'antd';
+import {
+  ClockCircleOutlined,
   ExperimentOutlined,
   MedicineBoxOutlined,
+  PlusCircleOutlined,
   TeamOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
-import clsx from 'clsx';
+import dayjs from 'dayjs';
 
 import { LineChart } from '@/components/charts';
 import { useEmergencyStore } from '@/store/emergencyStore';
-import type { ResusBed } from '@/types/emergency';
-import { clickableProps } from '@/utils/a11y';
-import { RESUS_STATUS_META } from './constants';
+import type { ResuscitationDto } from '@/types/emergency';
+import { RESUS_EVENT_TYPE_META, RESUS_RECORD_STATUS_META } from './constants';
 
-const EVENT_COLOR: Record<string, string> = {
-  vitals: '#1890FF',
-  medication: '#722ED1',
-  procedure: '#F5222D',
-  exam: '#13C2C2',
-  consult: '#FAAD14',
-  evaluation: '#52C41A',
-};
-
-function BedCard({ bed, onClick }: { bed: ResusBed; onClick: () => void }) {
-  const meta = RESUS_STATUS_META[bed.status];
-  const empty = bed.status === 'empty';
-  const alarm = bed.devices.some((d) => d.status === 'alarm');
-  return (
-    <div
-      {...(!empty ? clickableProps(onClick) : {})}
-      className={clsx(
-        'cursor-pointer rounded-jl border p-3 shadow-card transition-shadow hover:shadow-card-hover',
-        empty ? 'border-dashed bg-gray-50' : 'bg-white',
-      )}
-      style={{ borderLeft: `4px solid ${meta.color}` }}
-    >
-      <div className="flex items-center justify-between">
-        <span className="font-semibold text-ink-primary">{bed.bedNo}</span>
-        <Badge color={meta.color} text={meta.label} />
-      </div>
-      {empty ? (
-        <div className="mt-4 text-center text-xs text-ink-secondary">空床</div>
-      ) : (
-        <div className="mt-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold text-ink-primary">{bed.patient?.name}</span>
-            <span className="text-xs text-ink-secondary">
-              {bed.patient?.gender === 'male' ? '男' : '女'} · {bed.patient?.age}岁
-            </span>
-          </div>
-          <div className="mt-1 truncate text-xs text-ink-secondary">{bed.patient?.diagnosis}</div>
-          {bed.durationMin != null && (
-            <div className="mt-1 text-xs">
-              已抢救 <b style={{ color: meta.color }}>{bed.durationMin}</b> 分钟
-            </div>
-          )}
-          <div className="mt-1 text-xs text-ink-secondary">
-            医师 {bed.doctor} / 护士 {bed.nurse}
-          </div>
-          {bed.criticalValue && (
-            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-medical-critical">
-              <AlertOutlined /> 危急值：{bed.criticalValue}
-            </div>
-          )}
-          <div className="mt-2 flex flex-wrap gap-1">
-            {bed.devices.map((d) => (
-              <Tag
-                key={d.name}
-                color={
-                  d.status === 'alarm' ? 'error' : d.status === 'running' ? 'processing' : 'default'
-                }
-                className="mr-0"
-              >
-                {d.name}
-              </Tag>
-            ))}
-            {alarm && (
-              <span className="animate-pulse-slow text-xs font-semibold text-medical-critical">
-                设备报警!
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+function nowLocal() {
+  return dayjs().format('YYYY-MM-DDTHH:mm');
 }
 
 export default function ResuscitationRoom() {
-  const { resuscitationBeds, resuscitationRecords } = useEmergencyStore();
-  const [activeBed, setActiveBed] = useState<ResusBed | null>(null);
+  const { message } = AntdApp.useApp();
+  const {
+    queue,
+    resuscitations,
+    acting,
+    ready,
+    fetchResuscitations,
+    fetchQueue,
+    startResuscitation,
+    addResusEvent,
+    addResusMedication,
+    completeResuscitation,
+  } = useEmergencyStore();
 
-  const record = activeBed ? resuscitationRecords[activeBed.id] : undefined;
+  const [active, setActive] = useState<ResuscitationDto | null>(null);
+
+  const [startOpen, setStartOpen] = useState(false);
+  const [startForm] = Form.useForm();
+
+  const [eventOpen, setEventOpen] = useState(false);
+  const [eventForm] = Form.useForm();
+
+  const [medOpen, setMedOpen] = useState(false);
+  const [medForm] = Form.useForm();
+
+  const [doneOpen, setDoneOpen] = useState(false);
+  const [doneForm] = Form.useForm();
+
+  useEffect(() => {
+    void fetchResuscitations();
+    void fetchQueue();
+  }, [fetchResuscitations, fetchQueue]);
+
+  /** visitId → 队列条目（取姓名/年龄/性别） */
+  const qByVisit = useMemo(() => new Map(queue.map((q) => [q.visitId, q])), [queue]);
+
+  /** 可启动抢救：已分诊/救治中/留观、非终末 */
+  const eligible = useMemo(
+    () =>
+      queue.filter((q) =>
+        ['triaged', 'in_treatment', 'observation'].includes(q.emStatus),
+      ),
+    [queue],
+  );
+
+  const openStart = () => {
+    startForm.resetFields();
+    startForm.setFieldsValue({ visitId: eligible[0]?.visitId });
+    setStartOpen(true);
+  };
+
+  const handleStart = async () => {
+    const v = await startForm.validateFields();
+    await startResuscitation(v.visitId, v.bedNo || undefined, v.diagnosis || undefined);
+    message.success('抢救已启动，抢救团队已召集');
+    setStartOpen(false);
+  };
+
+  const openEvent = () => {
+    eventForm.resetFields();
+    eventForm.setFieldsValue({ type: 'vitals', time: nowLocal() });
+    setEventOpen(true);
+  };
+
+  const handleEvent = async () => {
+    if (!active) return;
+    const v = await eventForm.validateFields();
+    await addResusEvent(active.id, {
+      time: dayjs(v.time).format('YYYY-MM-DDTHH:mm:ss'),
+      type: v.type,
+      content: v.content,
+    });
+    message.success('抢救事件已记录');
+    setEventOpen(false);
+  };
+
+  const openMed = () => {
+    medForm.resetFields();
+    medForm.setFieldsValue({ route: '静注', time: nowLocal() });
+    setMedOpen(true);
+  };
+
+  const handleMed = async () => {
+    if (!active) return;
+    const v = await medForm.validateFields();
+    await addResusMedication(active.id, {
+      name: v.name,
+      dose: v.dose,
+      route: v.route,
+      time: dayjs(v.time).format('YYYY-MM-DDTHH:mm:ss'),
+    });
+    message.success('用药已记录');
+    setMedOpen(false);
+  };
+
+  const openDone = () => {
+    doneForm.resetFields();
+    doneForm.setFieldsValue({ status: 'stabilized' });
+    setDoneOpen(true);
+  };
+
+  const handleDone = async () => {
+    if (!active) return;
+    const v = await doneForm.validateFields();
+    await completeResuscitation(active.id, {
+      status: v.status,
+      outcome: v.outcome,
+      summary: v.summary || null,
+    });
+    message.success('抢救结束，记录已归档');
+    setDoneOpen(false);
+    setActive(null);
+  };
 
   const trend = useMemo(() => {
-    if (!record) return { xData: [], series: [] as { name: string; data: number[] }[] };
+    if (!active)
+      return {
+        xData: [] as string[],
+        series: [] as { name: string; data: (number | null)[] }[],
+      };
     return {
-      xData: record.vitalTrend.map((v) => v.time),
+      xData: active.vitalTrend.map((v) => dayjs(v.time).format('HH:mm')),
       series: [
-        { name: '心率', data: record.vitalTrend.map((v) => v.heartRate) },
-        { name: '收缩压', data: record.vitalTrend.map((v) => v.systolic) },
-        { name: 'SpO₂', data: record.vitalTrend.map((v) => v.spo2) },
+        { name: '心率', data: active.vitalTrend.map((v) => v.pulse ?? v.hr ?? null) },
+        { name: '收缩压', data: active.vitalTrend.map((v) => v.systolic ?? v.bp_s ?? null) },
+        { name: 'SpO₂', data: active.vitalTrend.map((v) => v.spo2 ?? null) },
       ],
     };
-  }, [record]);
-
-  const resusCount = resuscitationBeds.filter((b) => b.status === 'resuscitating').length;
-  const emptyBeds = resuscitationBeds.filter((b) => b.status === 'empty').length;
+  }, [active]);
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Card className="shadow-card">
-          <div className="text-xs text-ink-secondary">抢救床位</div>
-          <div className="text-2xl font-semibold text-ink-primary">{resuscitationBeds.length}</div>
-        </Card>
-        <Card className="shadow-card">
-          <div className="text-xs text-ink-secondary">抢救中</div>
-          <div className="text-2xl font-semibold text-medical-critical">{resusCount}</div>
-        </Card>
-        <Card className="shadow-card">
-          <div className="text-xs text-ink-secondary">空床</div>
-          <div className="text-2xl font-semibold text-medical-normal">{emptyBeds}</div>
-        </Card>
-        <Card className="shadow-card">
-          <div className="text-xs text-ink-secondary">设备报警</div>
-          <div className="text-2xl font-semibold text-medical-critical">
-            {resuscitationBeds.reduce(
-              (n, b) => n + b.devices.filter((d) => d.status === 'alarm').length,
-              0,
-            )}
-          </div>
-        </Card>
-      </div>
+      <Row gutter={[12, 12]}>
+        <Col xs={12} md={8}>
+          <Card className="shadow-card">
+            <div className="text-xs text-ink-secondary">抢救中</div>
+            <div className="text-2xl font-semibold text-medical-critical">{resuscitations.length}</div>
+          </Card>
+        </Col>
+        <Col xs={12} md={8}>
+          <Card className="shadow-card">
+            <div className="text-xs text-ink-secondary">累计抢救事件</div>
+            <div className="text-2xl font-semibold text-ink-primary">
+              {resuscitations.reduce((n, r) => n + r.events.length, 0)}
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} md={8} className="flex items-end justify-end">
+          <Button type="primary" icon={<PlusCircleOutlined />} onClick={openStart} disabled={ready === false}>
+            启动抢救
+          </Button>
+        </Col>
+      </Row>
 
-      {resuscitationBeds.length === 0 ? (
-        <Empty description="抢救室数据加载中" />
+      {resuscitations.length === 0 ? (
+        <Empty description="当前无活动抢救记录" />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {resuscitationBeds.map((bed) => (
-            <BedCard key={bed.id} bed={bed} onClick={() => setActiveBed(bed)} />
-          ))}
-        </div>
+        <Row gutter={[12, 12]}>
+          {resuscitations.map((r) => {
+            const q = qByVisit.get(r.visitId);
+            const meta = RESUS_RECORD_STATUS_META[r.status];
+            const duration = dayjs().diff(dayjs(r.startTime), 'minute');
+            return (
+              <Col xs={24} sm={12} xl={8} key={r.id}>
+                <Card
+                  className="shadow-card cursor-pointer"
+                  style={{ borderLeft: `4px solid ${meta.color}` }}
+                  onClick={() => setActive(r)}
+                  title={
+                    <Space>
+                      <ThunderboltOutlined style={{ color: meta.color }} />
+                      <b>{r.bedNo ?? '抢救床'}</b>
+                      <Tag color={meta.color} className="mr-0">
+                        {meta.label}
+                      </Tag>
+                    </Space>
+                  }
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-bold text-ink-primary">{q?.patientName ?? '—'}</span>
+                    {q && (
+                      <span className="text-xs text-ink-secondary">
+                        {q.gender} · {q.age}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 truncate text-xs text-ink-secondary">{r.diagnosis ?? '诊断待明确'}</div>
+                  <div className="mt-1 flex items-center gap-1 text-xs">
+                    <ClockCircleOutlined /> 已抢救 <b style={{ color: meta.color }}>{duration}</b> 分钟
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1 text-xs text-ink-secondary">
+                    <span>事件 {r.events.length}</span> · <span>用药 {r.medications.length}</span>
+                  </div>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
       )}
 
       {/* 抢救记录抽屉 */}
       <Drawer
-        open={!!activeBed}
-        onClose={() => setActiveBed(null)}
-        width={640}
+        open={!!active}
+        onClose={() => setActive(null)}
+        width={660}
         title={
-          <span>
-            {activeBed?.bedNo} · 抢救记录 —— {activeBed?.patient?.name}
-          </span>
+          <Space>
+            <span>{active?.bedNo ?? '抢救床'} · 抢救记录</span>
+            {active && <Tag color={RESUS_RECORD_STATUS_META[active.status].color}>{RESUS_RECORD_STATUS_META[active.status].label}</Tag>}
+          </Space>
+        }
+        extra={
+          active?.status === 'resuscitating' ? (
+            <Space>
+              <Button size="small" onClick={openEvent}>记事件</Button>
+              <Button size="small" onClick={openMed}>记用药</Button>
+              <Button size="small" danger onClick={openDone}>结束抢救</Button>
+            </Space>
+          ) : undefined
         }
       >
-        {!record ? (
-          <Empty description="暂无抢救记录" />
-        ) : (
+        {active && (
           <div className="space-y-4">
             <div className="rounded-lg bg-jl-primary/5 p-3 text-sm">
+              <div><b>诊断：</b>{active.diagnosis ?? '—'}</div>
+              <div><b>开始：</b>{dayjs(active.startTime).format('MM-DD HH:mm')}</div>
+              {active.outcome && <div><b>转归：</b>{active.outcome}</div>}
+            </div>
+
+            {active.team.length > 0 && (
               <div>
-                <b>诊断：</b>
-                {activeBed?.patient?.diagnosis}
-              </div>
-              <div>
-                <b>开始：</b>
-                {record.startTime.slice(11, 16)}
-              </div>
-              {record.outcome && (
-                <div>
-                  <b>转归：</b>
-                  {record.outcome}
+                <div className="mb-2 flex items-center gap-1 text-sm font-semibold">
+                  <TeamOutlined /> 抢救团队
                 </div>
-              )}
-            </div>
-
-            {/* 团队 */}
-            <div>
-              <div className="mb-2 flex items-center gap-1 text-sm font-semibold">
-                <TeamOutlined /> 抢救团队
+                <div className="flex flex-wrap gap-2">
+                  {active.team.map((m, i) => (
+                    <Tag key={i} color="blue">
+                      {m}
+                    </Tag>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {record.team.map((m) => (
-                  <Tag key={m.name} color="blue">
-                    {m.role} · {m.name}
-                  </Tag>
-                ))}
-              </div>
-            </div>
+            )}
 
-            {/* 生命体征趋势 */}
-            <div>
-              <div className="mb-2 flex items-center gap-1 text-sm font-semibold">
-                <ApiOutlined /> 生命体征趋势（每5-15分钟）
+            {active.vitalTrend.length > 0 && (
+              <div>
+                <div className="mb-2 text-sm font-semibold">生命体征趋势</div>
+                <LineChart xData={trend.xData} series={trend.series} height={220} />
               </div>
-              <LineChart xData={trend.xData} series={trend.series} height={220} />
-            </div>
+            )}
 
-            {/* 用药 */}
-            {record.medications.length > 0 && (
+            {active.medications.length > 0 && (
               <div>
                 <div className="mb-2 flex items-center gap-1 text-sm font-semibold">
                   <MedicineBoxOutlined /> 用药记录
                 </div>
                 <div className="space-y-1">
-                  {record.medications.map((m, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between rounded bg-gray-50 px-3 py-1.5 text-xs"
-                    >
-                      <span className="font-semibold text-purple-600">{m.drug}</span>
-                      <span>
-                        {m.dose} · {m.route}
-                      </span>
-                      <span className="text-ink-secondary">{m.time}</span>
+                  {active.medications.map((m, i) => (
+                    <div key={i} className="flex items-center justify-between rounded bg-gray-50 px-3 py-1.5 text-xs">
+                      <span className="font-semibold text-purple-600">{m.name}</span>
+                      <span>{m.dose}{m.route ? ` · ${m.route}` : ''}</span>
+                      <span className="text-ink-secondary">{dayjs(m.time).format('HH:mm')}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* 时间轴 */}
             <div>
               <div className="mb-2 flex items-center gap-1 text-sm font-semibold">
                 <ExperimentOutlined /> 抢救时间轴
               </div>
               <Timeline
-                items={record.events.map((e) => ({
-                  color: EVENT_COLOR[e.category] ?? 'gray',
+                items={active.events.map((e) => ({
+                  color: RESUS_EVENT_TYPE_META[e.type]?.color ?? 'gray',
                   children: (
                     <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-ink-secondary">{e.time}</span>
-                        {e.operator && (
-                          <span className="text-xs text-ink-secondary">{e.operator}</span>
-                        )}
-                      </div>
+                      <div className="text-xs text-ink-secondary">{dayjs(e.time).format('HH:mm')}</div>
                       <div className="text-sm text-ink-primary">{e.content}</div>
                     </div>
                   ),
@@ -252,14 +327,94 @@ export default function ResuscitationRoom() {
               />
             </div>
 
-            {record.summary && (
-              <div className="rounded-lg bg-gray-50 p-3 text-xs text-ink-secondary">
-                {record.summary}
-              </div>
-            )}
+            {active.summary && <div className="rounded-lg bg-gray-50 p-3 text-xs text-ink-secondary">{active.summary}</div>}
           </div>
         )}
       </Drawer>
+
+      {/* 启动抢救 */}
+      <Modal open={startOpen} title="启动抢救" onOk={handleStart} confirmLoading={acting} onCancel={() => setStartOpen(false)} okText="启动并召集团队">
+        <Form form={startForm} layout="vertical" className="mt-2">
+          <Form.Item name="visitId" label="选择患者" rules={[{ required: true }]}>
+            <Select
+              options={eligible.map((q) => ({ value: q.visitId, label: `${q.triageNo} ${q.patientName} · ${q.chiefComplaint ?? ''}` }))}
+              notFoundContent="暂无可启动抢救的患者，请先完成分诊"
+            />
+          </Form.Item>
+          <Form.Item name="bedNo" label="抢救床位">
+            <Input placeholder="如：抢救1床" />
+          </Form.Item>
+          <Form.Item name="diagnosis" label="初步诊断">
+            <Input placeholder="如：心搏骤停、休克、严重创伤" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 记录事件 */}
+      <Modal open={eventOpen} title="记录抢救事件" onOk={handleEvent} confirmLoading={acting} onCancel={() => setEventOpen(false)}>
+        <Form form={eventForm} layout="vertical" className="mt-2">
+          <Form.Item name="type" label="类型" rules={[{ required: true }]}>
+            <Select options={Object.entries(RESUS_EVENT_TYPE_META).map(([k, v]) => ({ value: k, label: v.label }))} />
+          </Form.Item>
+          <Form.Item name="content" label="内容" rules={[{ required: true, message: '请输入事件内容' }]}>
+            <Input.TextArea rows={2} />
+          </Form.Item>
+          <Form.Item name="time" label="时间">
+            <Input type="datetime-local" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 记录用药 */}
+      <Modal open={medOpen} title="记录抢救用药" onOk={handleMed} confirmLoading={acting} onCancel={() => setMedOpen(false)}>
+        <Form form={medForm} layout="vertical" className="mt-2">
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item name="name" label="药品" rules={[{ required: true }]}>
+                <Input placeholder="如：肾上腺素" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="dose" label="剂量" rules={[{ required: true }]}>
+                <Input placeholder="如：1mg" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={12}>
+            <Col span={12}>
+              <Form.Item name="route" label="途径">
+                <Input placeholder="静注/静滴" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="time" label="时间">
+                <Input type="datetime-local" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      {/* 结束抢救 */}
+      <Modal open={doneOpen} title="结束抢救" onOk={handleDone} confirmLoading={acting} onCancel={() => setDoneOpen(false)} okText="结束并归档">
+        <Form form={doneForm} layout="vertical" className="mt-2">
+          <Form.Item name="status" label="结束状态" rules={[{ required: true }]}>
+            <Select
+              options={[
+                { value: 'stabilized', label: '病情稳定（转留观/专科）' },
+                { value: 'transferred_icu', label: '转 ICU' },
+                { value: 'deceased', label: '死亡' },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item name="outcome" label="转归说明" rules={[{ required: true, message: '请填写转归' }]}>
+            <Input placeholder="如：ROSC，生命体征趋稳，转留观" />
+          </Form.Item>
+          <Form.Item name="summary" label="抢救小结（可选）">
+            <Input.TextArea rows={3} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

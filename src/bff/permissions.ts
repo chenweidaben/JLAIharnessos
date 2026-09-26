@@ -46,6 +46,30 @@ export const INPATIENT_PERMISSIONS = {
   BED_MANAGE: 'inpatient:bed:manage',
 } as const;
 
+/* ===========================================================================
+ * 急诊权限码（M1-B1）
+ *  - emergency:view          查看急诊分诊台/候诊/抢救/留观队列
+ *  - emergency:triage        接诊 + 分诊分级（护士）
+ *  - emergency:green_channel 启动/记录/关闭绿色通道
+ *  - emergency:resuscitation 启动/记录/结束抢救
+ *  - emergency:observation  开始/更新/结束留观
+ *  - emergency:disposition   记录终末转归（医师）
+ *
+ * 重要：仅授予真实登录的急诊医护/管理员，绝不授予 Agent 服务账号；
+ *       AI 仅辅助评分/建议、不自主分级。
+ * ========================================================================= */
+export const EMERGENCY_PERMISSIONS = {
+  VIEW: 'emergency:view',
+  TRIAGE: 'emergency:triage',
+  GREEN_CHANNEL: 'emergency:green_channel',
+  RESUSCITATION: 'emergency:resuscitation',
+  OBSERVATION: 'emergency:observation',
+  DISPOSITION: 'emergency:disposition',
+} as const;
+
+export type EmergencyPermissionCode =
+  (typeof EMERGENCY_PERMISSIONS)[keyof typeof EMERGENCY_PERMISSIONS];
+
 export type InpatientPermissionCode =
   (typeof INPATIENT_PERMISSIONS)[keyof typeof INPATIENT_PERMISSIONS];
 

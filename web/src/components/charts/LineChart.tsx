@@ -10,7 +10,8 @@ import BaseChart from './BaseChart';
 
 interface SeriesItem {
   name: string;
-  data: number[];
+  /** 数值序列；缺失点用 null 表示（EChars connectNulls 跨缺口连线，不伪造数值） */
+  data: (number | null)[];
 }
 
 interface LineChartProps {
@@ -36,6 +37,7 @@ export default function LineChart({ xData, series, height = 320, smooth = true }
       name: s.name,
       type: 'line',
       smooth,
+      connectNulls: true,
       data: s.data,
       areaStyle: { opacity: 0.08 },
     })),
