@@ -76,3 +76,32 @@ export type InpatientPermissionCode =
 /** 全部已登记的住院权限码（便于种子/自检遍历） */
 export const ALL_INPATIENT_PERMISSION_CODES: readonly string[] =
   Object.values(INPATIENT_PERMISSIONS);
+
+/* ===========================================================================
+ * 住院在院诊疗日常权限码（M1-B2）
+ *  - ward_round:write         医生查房记录创建 / 本人签名
+ *  - ward_round:countersign   上级医师审签 / 退回查房记录（护士禁止）
+ *  - nursing:record           护士护理记录单创建 / 本人签名
+ *  - nursing:task             护理任务创建 / 执行（医师禁止执行）
+ *  - inpatient_order:write       住院医嘱开具 / 停止（医师）
+ *  - inpatient_order:review      住院医嘱审核 / 驳回（医师，护士禁止）
+ *  - inpatient_order:administer  住院医嘱执行 / 双人核对（护士）
+ *
+ * 职责分离：读统一用 inpatient:view；写按医护角色分授，且聚合器再按角色强制。
+ * ========================================================================= */
+export const INPATIENT_CARE_PERMISSIONS = {
+  ROUND_WRITE: 'ward_round:write',
+  ROUND_COUNTERSIGN: 'ward_round:countersign',
+  NURSING_RECORD: 'nursing:record',
+  NURSING_TASK: 'nursing:task',
+  ORDER_WRITE: 'inpatient_order:write',
+  ORDER_REVIEW: 'inpatient_order:review',
+  ORDER_ADMINISTER: 'inpatient_order:administer',
+} as const;
+
+export type InpatientCarePermissionCode =
+  (typeof INPATIENT_CARE_PERMISSIONS)[keyof typeof INPATIENT_CARE_PERMISSIONS];
+
+/** 全部已登记的在院诊疗日常权限码（便于自检遍历） */
+export const ALL_INPATIENT_CARE_PERMISSION_CODES: readonly string[] =
+  Object.values(INPATIENT_CARE_PERMISSIONS);

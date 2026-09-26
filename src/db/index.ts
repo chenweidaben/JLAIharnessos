@@ -18,3 +18,6 @@ export * as drugRepo from './repositories/drugRepo.js';
 export * as conversationRepo from './repositories/conversationRepo.js';
 export * as auditRepo from './repositories/auditRepo.js';
 export * as userRepo from './repositories/userRepo.js';
+export * as wardRoundRepo from './repositories/wardRoundRepo.js';
+export * as nursingRepo from './repositories/nursingRepo.js';
+export * as orderAdministrationRepo from './repositories/orderAdministrationRepo.js';

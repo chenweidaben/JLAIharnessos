@@ -215,9 +215,13 @@ export async function getWaitingQueue(dept: string | null): Promise<unknown[]> {
 
 /** 医嘱 → OrderItem */
 function mapOrder(o: Awaited<ReturnType<typeof getOrdersByVisit>>[number]) {
-  const statusMap = {
-    active: 'pending', executed: 'reported', audited: 'reported', cancelled: 'cancelled',
-  } as const;
+  // 门诊医嘱仅会出现 active/executed/audited/cancelled；其余为住院 M1-B2 新增状态，
+  // 类型上补齐（pending_review→pending；stopped/rejected→cancelled），门诊不会实际命中。
+  const statusMap: Record<string, 'pending' | 'reported' | 'cancelled'> = {
+    active: 'pending', pending_review: 'pending',
+    executed: 'reported', audited: 'reported',
+    cancelled: 'cancelled', stopped: 'cancelled', rejected: 'cancelled',
+  };
   return {
     orderId: o.id,
     kind: (['lab', 'imaging', 'treatment'].includes(o.orderType) ? o.orderType : 'lab') as 'lab' | 'imaging' | 'treatment',

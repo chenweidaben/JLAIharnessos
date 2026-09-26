@@ -7,7 +7,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import type { Sql } from '../pool.js';
+import type { DbExecutor } from '../pool.js';
 
 /** 动态查询构建器：累积 WHERE 条件与参数 */
 export class QueryBuilder {
@@ -51,7 +51,7 @@ export function toJson<T>(obj: T): any {
 
 /** 执行动态 SELECT 查询 */
 export async function dynamicSelect<T>(
-  sql: Sql,
+  sql: DbExecutor,
   columns: string,
   table: string,
   qb: QueryBuilder,

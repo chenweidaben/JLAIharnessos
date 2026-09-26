@@ -25,6 +25,9 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inpatient:discharge', 'inpatient:bed:manage',
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation', 'emergency:disposition',
+    'ward_round:write', 'ward_round:countersign',
+    'nursing:record', 'nursing:task',
+    'inpatient_order:write', 'inpatient_order:review', 'inpatient_order:administer',
   ],
   doctor: [
     'medical_record:read', 'medical_record:write',
@@ -35,6 +38,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inpatient:discharge', 'inpatient:bed:manage',
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation', 'emergency:disposition',
+    'ward_round:write', 'ward_round:countersign',
+    'inpatient_order:write', 'inpatient_order:review',
   ],
   pharmacist: [
     'prescription:review', 'prescription:write',
@@ -45,6 +50,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inpatient:view', 'inpatient:admit', 'inpatient:manage', 'inpatient:bed:manage',
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation',
+    'nursing:record', 'nursing:task', 'inpatient_order:administer',
   ],
   technician: ['lab:read', 'imaging:read', 'medical_record:write'],
   researcher: ['medical_record:read', 'lab:read', 'report:view'],
