@@ -6,7 +6,7 @@
  */
 import type { ReactElement, ReactNode } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
-import { ConfigProvider } from 'antd';
+import { App as AntdApp, ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -17,7 +17,9 @@ interface AllProvidersProps {
 function AllProviders({ children }: AllProvidersProps) {
   return (
     <ConfigProvider locale={zhCN}>
-      <MemoryRouter>{children}</MemoryRouter>
+      <AntdApp>
+        <MemoryRouter>{children}</MemoryRouter>
+      </AntdApp>
     </ConfigProvider>
   );
 }

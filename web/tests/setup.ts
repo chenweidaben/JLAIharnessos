@@ -7,6 +7,7 @@
  * - 浏览器 API Mock（localStorage / sessionStorage / matchMedia / IntersectionObserver / ResizeObserver）
  * - Ant Design 全局配置（中文 locale）
  */
+import '@ant-design/v5-patch-for-react-19';
 import '@testing-library/jest-dom/vitest';
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
@@ -40,6 +41,44 @@ if (!window.matchMedia) {
     }),
   });
 }
+
+/* ---------------- HTMLCanvasElement.getContext：antd Watermark 依赖 canvas ---------------- */
+// jsdom 不实现 canvas；Watermark 渲染时会调用 getContext('2d')，缺失会抛
+// "Not implemented: HTMLCanvasElement.prototype.getContext" 并中断渲染。
+// 提供最小 2d 上下文桩（不绘制，仅保证水印组件可挂载）。
+// jsdom 虽定义了 getContext 但调用即抛 "Not implemented"，因此无条件覆盖为最小桩。
+HTMLCanvasElement.prototype.getContext = (() =>
+  ({
+    canvas: null,
+    measureText: () => ({ width: 0 }),
+    fillText: () => {},
+    fillRect: () => {},
+    clearRect: () => {},
+    getImageData: (): { data: unknown[] } => ({ data: [] }),
+    putImageData: () => {},
+    createImageData: () => [],
+    setTransform: () => {},
+    resetTransform: () => {},
+    drawImage: () => {},
+    save: () => {},
+    restore: () => {},
+    beginPath: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    closePath: () => {},
+    stroke: () => {},
+    fill: () => {},
+    translate: () => {},
+    rotate: () => {},
+    scale: () => {},
+    arc: () => {},
+    rect: () => {},
+  })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+
+// antd Watermark 还会调用 canvas.toDataURL 生成水印背景图，jsdom 未实现会抛
+// "Not implemented: HTMLCanvasElement.prototype.toDataURL" 并使水印生成失败。
+HTMLCanvasElement.prototype.toDataURL = (() =>
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/pLvAAAAAElFTkSuQmCC') as typeof HTMLCanvasElement.prototype.toDataURL;
 
 // IntersectionObserver：虚拟列表 / 懒加载依赖
 class MockIntersectionObserver {

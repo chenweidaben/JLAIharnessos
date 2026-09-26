@@ -32,7 +32,6 @@ const EmergencyTriage = lazy(() => import('@/pages/emergency/triage-detail'));
 const OutpatientPage = lazy(() => import('@/pages/OutpatientPage'));
 const OutpatientConsultPage = lazy(() => import('@/pages/OutpatientConsultPage'));
 const WardWorkbench = lazy(() => import('@/pages/ward/WardWorkbench'));
-const RoundDetail = lazy(() => import('@/pages/ward/RoundDetail'));
 const QualityWorkbench = lazy(() => import('@/pages/quality'));
 const QualityRecordDetail = lazy(() => import('@/pages/quality/RecordDetail'));
 const QualityRulesPage = lazy(() => import('@/pages/quality/Rules'));
@@ -140,7 +139,6 @@ export default function AppRoutes() {
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />
           <Route path="ward" element={<WardWorkbench />} />
-          <Route path="ward/round/:patientId" element={<RoundDetail />} />
           <Route path="quality" element={<QualityWorkbench />} />
           <Route path="quality/record/:recordId" element={<QualityRecordDetail />} />
           <Route path="quality/rules" element={<QualityRulesPage />} />

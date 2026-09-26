@@ -147,7 +147,7 @@ export function buildIdempotencyKey(orderId: string, slot: string, actorId: stri
 /* ============================== 医生查房 =============================== */
 
 export async function createRound(
-  auth: AuthView, input: Omit<WardRoundInput, 'authorId'>,
+  auth: AuthView, input: Omit<WardRoundInput, 'authorId' | 'patientId'>,
 ): Promise<WardRound> {
   requireDoctor(auth, '创建查房记录');
   if (!input.assessment?.trim()) throw badRequest('病情评估不能为空');
@@ -268,7 +268,7 @@ async function getRoundOrNull(id: string, tx: DbExecutor): Promise<WardRound | n
 /* ============================== 护士护理 =============================== */
 
 export async function createNursingCareRecord(
-  auth: AuthView, input: Omit<NursingRecordInput, 'nurseId'>,
+  auth: AuthView, input: Omit<NursingRecordInput, 'nurseId' | 'patientId'>,
 ): Promise<NursingRecord> {
   requireNurse(auth, '创建护理记录');
   if (!input.nursingLevel) throw badRequest('护理级别不能为空');
@@ -330,7 +330,7 @@ export async function listNursingCareRecords(
 }
 
 export async function createCareTask(
-  auth: AuthView, input: Omit<NursingTaskInput, never>,
+  auth: AuthView, input: Omit<NursingTaskInput, 'patientId'>,
 ): Promise<NursingTask> {
   requireNurse(auth, '创建护理任务');
   if (!input.content?.trim()) throw badRequest('任务内容不能为空');
