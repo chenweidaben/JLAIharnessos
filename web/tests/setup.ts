@@ -65,10 +65,14 @@ if (!window.ResizeObserver) {
   window.ResizeObserver = MockResizeObserver;
 }
 
-// getComputedStyle 在 jsdom 中已实现，但 AntD 偶尔需要
-if (!window.getComputedStyle) {
-  // @ts-expect-error 测试环境注入
-  window.getComputedStyle = () => ({});
+// getComputedStyle：jsdom 已实现，但未实现“带伪元素参数”的调用
+// getComputedStyle(elt, '::xxx')；rc-table / rc-dialog 测量滚动条时会以伪元素
+// 参数调用，会在布局阶段抛错并中断渲染。统一回退为不带伪元素的计算，
+// 滚动条尺寸按 0 处理，足以在 jsdom 中完成布局。
+{
+  const _origGetComputedStyle = window.getComputedStyle.bind(window);
+  window.getComputedStyle = ((elt: Element, pseudo?: string | null) =>
+    _origGetComputedStyle(elt, pseudo ? null : pseudo)) as typeof window.getComputedStyle;
 }
 
 // scrollTo：jsdom 未实现，消息列表自动滚动依赖

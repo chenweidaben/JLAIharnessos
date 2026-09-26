@@ -1,4 +1,4 @@
-# 健澜科技数智医院智能体 - Bun 运行时配置
+# 健澜科技数智医院智能体 - Bun 运行配置
 # Copyright (c) 2024-2026 健澜科技. All rights reserved.
 #
 # 本文件由健澜科技数智医院智能体项目组维护。
@@ -7,9 +7,21 @@
 [test]
 # 排除前端 web/ 目录下的测试文件（前端测试由 web/ 目录独立工具链运行）
 pathIgnorePatterns = ["web/**"]
-# 测试环境预加载：默认确定性演示模式，隔离外部数据库状态（详见 tests/support/testEnv.ts）
+
+# 覆盖率统计口径：仅 src，排除遗留 Ink 终端 UI（src/ui）、测试与脚本自身（glob 模式）
+coverageSkipTestFiles = true
+coveragePathIgnorePatterns = [
+  "**/node_modules/**",
+  "src/ui/**",
+  "tests/**",
+  "scripts/**",
+  "**/*.test.ts",
+  "**/*.test.tsx",
+]
+
+# 测试环境预加载：默认定制演示模式，隔离外部数据库状态（详见 tests/support/testEnv.ts）
 preload = ["./tests/support/testEnv.ts"]
 
 [run]
-# 生产环境剥离源maps
+# 生产环境剥离 sourcemaps
 # sourcemap = "none"
