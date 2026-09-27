@@ -419,7 +419,7 @@ describe.skipIf(!dbAvailable)('M2-A 库存与发药 repo：批次/收货/流水/
         await insertMovement(tx, {
           drugId, warehouse, batchNo: r.inventory.batchNo, changeQty: -1,
           balanceAfter: r.inventory.quantity, reason: 'adjust', refType: 'test',
-          refId: null, actorId: pharmacist.userId,
+          refId: null, actorId: pharmacist.id,
         });
       }
       return r;
@@ -430,7 +430,7 @@ describe.skipIf(!dbAvailable)('M2-A 库存与发药 repo：批次/收货/流水/
 
     // 2) 收货 +1 补回该批次 → 库存净零
     const recv = await receiveStock({
-      drugId, warehouse, batchNo: hitBatch, qty: 1, actorId: pharmacist.userId,
+      drugId, warehouse, batchNo: hitBatch, qty: 1, actorId: pharmacist.id,
     });
     expect(recv).not.toBeNull();
     expect(recv!.quantity).toBe(afterDeductQty + 1);
@@ -444,7 +444,7 @@ describe.skipIf(!dbAvailable)('M2-A 库存与发药 repo：批次/收货/流水/
 
   it('receiveStock 对无匹配批次返回 null（不臆造库存）', async () => {
     const r = await receiveStock({
-      drugId: crypto.randomUUID(), warehouse: '中心药房', qty: 1, actorId: pharmacist.userId,
+      drugId: crypto.randomUUID(), warehouse: '中心药房', qty: 1, actorId: pharmacist.id,
     });
     expect(r).toBeNull();
   });
