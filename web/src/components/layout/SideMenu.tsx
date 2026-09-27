@@ -25,6 +25,7 @@ import {
   MedicineBoxOutlined,
   BuildOutlined,
   ShopOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -67,6 +68,7 @@ const navItems: NavItem[] = [
   },
   { key: '/emergency', icon: <HeartOutlined />, label: '急诊分诊', perm: 'emg:view' },
   { key: '/pharmacy', icon: <ShopOutlined />, label: '药房发药', perm: 'pharmacy:view' },
+  { key: '/medical-qc', icon: <AuditOutlined />, label: '病历质控', perm: 'medical_record:read' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

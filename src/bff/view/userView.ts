@@ -32,7 +32,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inventory:view', 'cds:override',
   ],
   doctor: [
-    'medical_record:read', 'medical_record:write',
+    'medical_record:read', 'medical_record:write', 'medical_record:audit',
     'order:write', 'prescription:write',
     'lab:read', 'imaging:read', 'imaging:view',
     'report:view', 'agent:build', 'agent:publish', 'knowledge:manage',
