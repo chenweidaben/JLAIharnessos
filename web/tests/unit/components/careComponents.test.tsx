@@ -217,8 +217,6 @@ const orderView = {
 const careInitial = useCareStore.getState();
 
 beforeEach(() => {
-  // 覆盖率 v8 插桩下，含大量 InputNumber/Form 的弹窗 DOM 测试耗时显著增加，统一放宽本文件运行超时（非覆盖率阈值）
-  it.setTimeout(30_000);
   useCareStore.setState({ ...careInitial });
   vi.mocked(careApi.getSystemHealth).mockResolvedValue(health);
   vi.mocked(careApi.listRounds).mockResolvedValue([draftRound, signedSuperior]);
@@ -538,7 +536,7 @@ describe('NursingStation 新建与执行闭环', () => {
     expect(p.riskAssessment!.bradenScore).toBe(16);
     expect(p.riskAssessment!.morseScore).toBe(55);
     expect(await screen.findByText('护理记录草稿已创建，请责任护士签名')).toBeInTheDocument();
-  });
+  }, 30000);
 
   it('新建护理记录：取消不保存', async () => {
     useCareStore.setState({
