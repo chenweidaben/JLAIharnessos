@@ -32,12 +32,12 @@ export function getSystemHealth(): Promise<PharmacyHealth> {
 
 /** 待发药队列（approved 处方）。 */
 export function fetchDispenseQueue(): Promise<PharmacyQueueItem[]> {
-  return get<PharmacyQueueItem[]>('/api/v1/pharmacy/queue/dispense');
+  return get<PharmacyQueueItem[]>('/pharmacy/queue/dispense');
 }
 
 /** 待审方队列（pending_review 处方）。 */
 export function fetchReviewQueue(): Promise<PharmacyQueueItem[]> {
-  return get<PharmacyQueueItem[]>('/api/v1/pharmacy/queue/review');
+  return get<PharmacyQueueItem[]>('/pharmacy/queue/review');
 }
 
 /* ----------------------------- 审方 / CDS ------------------------------ */
@@ -48,7 +48,7 @@ export function reviewPrescription(
   decision: 'approved' | 'rejected',
   comment?: string | null,
 ): Promise<PrescriptionDto> {
-  return post<PrescriptionDto>(`/api/v1/pharmacy/prescriptions/${id}/review`, {
+  return post<PrescriptionDto>(`/pharmacy/prescriptions/${id}/review`, {
     decision,
     comment: comment ?? null,
   });
@@ -56,7 +56,7 @@ export function reviewPrescription(
 
 /** 发药前 CDS 预览（过敏/相互作用/禁忌）。 */
 export function previewCds(id: string): Promise<CdsPreview> {
-  return get<CdsPreview>(`/api/v1/pharmacy/prescriptions/${id}/cds`);
+  return get<CdsPreview>(`/pharmacy/prescriptions/${id}/cds`);
 }
 
 /* -------------------------------- 发药 --------------------------------- */
@@ -67,7 +67,7 @@ export function dispense(
   payload: DispensePayload,
 ): Promise<DispenseResult> {
   return post<DispenseResult>(
-    `/api/v1/pharmacy/prescriptions/${id}/dispense`,
+    `/pharmacy/prescriptions/${id}/dispense`,
     payload,
   );
 }
@@ -76,7 +76,7 @@ export function dispense(
 
 /** 发药记录（可按处方过滤）。 */
 export function fetchDispensings(prescriptionId?: string): Promise<DispensingDto[]> {
-  return get<DispensingDto[]>('/api/v1/pharmacy/dispensings', {
+  return get<DispensingDto[]>('/pharmacy/dispensings', {
     ...(prescriptionId ? { prescriptionId } : {}),
   });
 }
@@ -88,7 +88,7 @@ export function fetchInventory(params?: {
   warehouse?: string;
   keyword?: string;
 }): Promise<InventoryDto[]> {
-  return get<InventoryDto[]>('/api/v1/pharmacy/inventory', params);
+  return get<InventoryDto[]>('/pharmacy/inventory', params);
 }
 
 /** 库存流水（可按药品/药房/原因）。 */
@@ -97,12 +97,12 @@ export function fetchMovements(params?: {
   warehouse?: string;
   reason?: string;
 }): Promise<InventoryMovementDto[]> {
-  return get<InventoryMovementDto[]>('/api/v1/pharmacy/inventory/movements', params);
+  return get<InventoryMovementDto[]>('/pharmacy/inventory/movements', params);
 }
 
 /** 按就诊查处方（定位）。 */
 export function fetchPrescriptionsByVisit(
   visitId: string,
 ): Promise<PrescriptionDto[]> {
-  return get<PrescriptionDto[]>('/api/v1/pharmacy/prescriptions', { visitId });
+  return get<PrescriptionDto[]>('/pharmacy/prescriptions', { visitId });
 }
