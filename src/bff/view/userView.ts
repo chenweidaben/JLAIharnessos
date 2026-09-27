@@ -28,6 +28,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ward_round:write', 'ward_round:countersign',
     'nursing:record', 'nursing:task',
     'inpatient_order:write', 'inpatient_order:review', 'inpatient_order:administer',
+    'pharmacy:view', 'pharmacy:review', 'pharmacy:dispense',
+    'inventory:view', 'cds:override',
   ],
   doctor: [
     'medical_record:read', 'medical_record:write',
@@ -40,10 +42,12 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'emergency:resuscitation', 'emergency:observation', 'emergency:disposition',
     'ward_round:write', 'ward_round:countersign',
     'inpatient_order:write', 'inpatient_order:review',
+    'cds:override',
   ],
   pharmacist: [
     'prescription:review', 'prescription:write',
     'medical_record:read', 'lab:read', 'report:view',
+    'pharmacy:view', 'pharmacy:review', 'pharmacy:dispense', 'inventory:view',
   ],
   nurse: [
     'medical_record:read', 'lab:read', 'order:write',
@@ -51,6 +55,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation',
     'nursing:record', 'nursing:task', 'inpatient_order:administer',
+    'inventory:view',
   ],
   technician: ['lab:read', 'imaging:read', 'medical_record:write'],
   researcher: ['medical_record:read', 'lab:read', 'report:view'],

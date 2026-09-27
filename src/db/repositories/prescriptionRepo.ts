@@ -5,7 +5,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { getDb, type Sql, withTx } from '../pool.js';
+import { getDb, type DbExecutor, withTx } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
 
 export type PrescriptionStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'dispensed' | 'cancelled';
@@ -68,7 +68,7 @@ function generateRxNo(): string {
   return `RX${ymd}${Math.floor(Math.random() * 900000) + 100000}`;
 }
 
-export async function createPrescription(input: PrescriptionCreateInput, sql?: Sql): Promise<Prescription> {
+export async function createPrescription(input: PrescriptionCreateInput, sql?: DbExecutor): Promise<Prescription> {
   return withTx(async (tx) => {
     const rxRows = await tx`
       INSERT INTO clinical.prescriptions (visit_id, rx_no, prescriber_id, status, counsel, risk_level, audit_result)
@@ -91,7 +91,7 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: S
   });
 }
 
-export async function getPrescriptionById(id: string, sql?: Sql): Promise<Prescription | null> {
+export async function getPrescriptionById(id: string, sql?: DbExecutor): Promise<Prescription | null> {
   const db = sql ?? getDb();
   const rxRows = await db`SELECT ${db.unsafe(RX_COLS)} FROM clinical.prescriptions WHERE id = ${id}`;
   if (rxRows.length === 0) return null;
@@ -101,7 +101,7 @@ export async function getPrescriptionById(id: string, sql?: Sql): Promise<Prescr
 }
 
 export async function getPrescriptionsByVisit(
-  visitId: string, options?: { status?: PrescriptionStatus; limit?: number }, sql?: Sql,
+  visitId: string, options?: { status?: PrescriptionStatus; limit?: number }, sql?: DbExecutor,
 ): Promise<Prescription[]> {
   const db = sql ?? getDb();
   const qb = new QueryBuilder().where('visit_id = ?', visitId);
@@ -118,7 +118,7 @@ export async function getPrescriptionsByVisit(
 
 export async function auditPrescription(
   id: string, decision: 'approved' | 'rejected', reviewerId: string,
-  auditResult: Record<string, unknown>, sql?: Sql,
+  auditResult: Record<string, unknown>, sql?: DbExecutor,
 ): Promise<Prescription | null> {
   const db = sql ?? getDb();
   const rows = await db`
@@ -130,7 +130,7 @@ export async function auditPrescription(
   return getPrescriptionById(id, sql);
 }
 
-export async function dispensePrescription(id: string, sql?: Sql): Promise<Prescription | null> {
+export async function dispensePrescription(id: string, sql?: DbExecutor): Promise<Prescription | null> {
   const db = sql ?? getDb();
   const rows = await db`
     UPDATE clinical.prescriptions SET status = 'dispensed', updated_at = now()

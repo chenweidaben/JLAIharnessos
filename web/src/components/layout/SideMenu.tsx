@@ -24,6 +24,7 @@ import {
   ScheduleOutlined,
   MedicineBoxOutlined,
   BuildOutlined,
+  ShopOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -65,6 +66,7 @@ const navItems: NavItem[] = [
     perm: ['ai:chat:use', 'system:config'],
   },
   { key: '/emergency', icon: <HeartOutlined />, label: '急诊分诊', perm: 'emg:view' },
+  { key: '/pharmacy', icon: <ShopOutlined />, label: '药房发药', perm: 'pharmacy:view' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

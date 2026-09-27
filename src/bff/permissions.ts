@@ -105,3 +105,29 @@ export type InpatientCarePermissionCode =
 /** 全部已登记的在院诊疗日常权限码（便于自检遍历） */
 export const ALL_INPATIENT_CARE_PERMISSION_CODES: readonly string[] =
   Object.values(INPATIENT_CARE_PERMISSIONS);
+
+/* ===========================================================================
+ * 药房调剂发药与库存联动权限码（M2-A）
+ *  - pharmacy:view       药师查看待发药/待审方队列、发药记录
+ *  - pharmacy:review     药师审方（处方 pending_review → approved/rejected）
+ *  - pharmacy:dispense   药师调剂发药（扣库存 + 流水 + 发药记录，护士/医师禁止）
+ *  - inventory:view      查看药品库存与库存流水（药师/护士）
+ *  - cds:override        医师对 CDS block 的强制复核 override（留痕签名，药师不可单方）
+ *
+ * 职责分离：发药仅药师；CDS 临床 override 决策归医师；二者分别签名、哈希链留痕。
+ * 重要：仅授予真实登录医护/管理员，绝不授予 Agent 服务账号，AI 仅辅助。
+ * ========================================================================= */
+export const PHARMACY_PERMISSIONS = {
+  VIEW: 'pharmacy:view',
+  REVIEW: 'pharmacy:review',
+  DISPENSE: 'pharmacy:dispense',
+  INVENTORY: 'inventory:view',
+  CDS_OVERRIDE: 'cds:override',
+} as const;
+
+export type PharmacyPermissionCode =
+  (typeof PHARMACY_PERMISSIONS)[keyof typeof PHARMACY_PERMISSIONS];
+
+/** 全部已登记的药房权限码（便于自检遍历） */
+export const ALL_PHARMACY_PERMISSION_CODES: readonly string[] =
+  Object.values(PHARMACY_PERMISSIONS);

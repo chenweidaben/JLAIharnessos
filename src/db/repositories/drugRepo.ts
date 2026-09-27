@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { getDb, type Sql } from '../pool.js';
+import { getDb, type DbExecutor } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
 
 export interface Drug {
@@ -39,13 +39,13 @@ function mapRow(row: Record<string, unknown>): Drug {
   };
 }
 
-export async function getDrugByCode(drugCode: string, sql?: Sql): Promise<Drug | null> {
+export async function getDrugByCode(drugCode: string, sql?: DbExecutor): Promise<Drug | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog WHERE drug_code = ${drugCode} AND status = 'active'`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
-export async function searchDrugs(keyword: string, limit = 20, sql?: Sql): Promise<Drug[]> {
+export async function searchDrugs(keyword: string, limit = 20, sql?: DbExecutor): Promise<Drug[]> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog
@@ -55,13 +55,13 @@ export async function searchDrugs(keyword: string, limit = 20, sql?: Sql): Promi
   return (rows as Record<string, unknown>[]).map(mapRow);
 }
 
-export async function listDrugs(limit = 100, offset = 0, sql?: Sql): Promise<Drug[]> {
+export async function listDrugs(limit = 100, offset = 0, sql?: DbExecutor): Promise<Drug[]> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog WHERE status = 'active' ORDER BY generic_name LIMIT ${limit} OFFSET ${offset}`;
   return (rows as Record<string, unknown>[]).map(mapRow);
 }
 
-export async function createDrug(input: Omit<Drug, 'id' | 'createdAt' | 'updatedAt'>, sql?: Sql): Promise<Drug> {
+export async function createDrug(input: Omit<Drug, 'id' | 'createdAt' | 'updatedAt'>, sql?: DbExecutor): Promise<Drug> {
   const db = sql ?? getDb();
   const rows = await db`
     INSERT INTO clinical.drug_catalog (drug_code, generic_name, brand_name, specification, dosage_form, route, unit, price, manufacturer, category, pregnancy_cat, controlled, ingredients, contraindications, adverse_reactions, interactions, status)

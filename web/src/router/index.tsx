@@ -28,6 +28,8 @@ const AgentChat = lazy(() => import('@/pages/agent'));
 const Alerts = lazy(() => import('@/pages/alerts'));
 const Emergency = lazy(() => import('@/pages/emergency'));
 const EmergencyTriage = lazy(() => import('@/pages/emergency/triage-detail'));
+// 药房调剂发药工作站（M2-A）
+const Pharmacy = lazy(() => import('@/pages/pharmacy'));
 // 临床业务：门诊 / 住院
 const OutpatientPage = lazy(() => import('@/pages/OutpatientPage'));
 const OutpatientConsultPage = lazy(() => import('@/pages/OutpatientConsultPage'));
@@ -135,6 +137,8 @@ export default function AppRoutes() {
           <Route path="alerts" element={<Alerts />} />
           <Route path="emergency" element={<Emergency />} />
           <Route path="emergency/triage/:visitId" element={<EmergencyTriage />} />
+          {/* 药房调剂发药工作站（M2-A） */}
+          <Route path="pharmacy" element={<Pharmacy />} />
           {/* 临床业务：门诊 / 住院 */}
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />
