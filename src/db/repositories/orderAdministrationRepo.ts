@@ -73,7 +73,7 @@ function generateAdminNo(): string {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   const hms = `${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}${String(d.getSeconds()).padStart(2, '0')}`;
-  return `ADM${ymd}${hms}${Math.floor(Math.random() * 900) + 100}`;
+  return `ADM${ymd}${hms}${Math.floor(Math.random() * 900000) + 100000}`;
 }
 
 /** 唯一约束冲突判定（postgres.js 错误码 23505） */
