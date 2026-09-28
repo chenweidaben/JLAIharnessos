@@ -15,5 +15,10 @@ export type {
 export { MedicalSpeechPostProcessor } from './MedicalSpeechPostProcessor.js';
 export type { PostProcessorOptions } from './MedicalSpeechPostProcessor.js';
 export { MockAsrProvider } from './providers/MockAsrProvider.js';
+export { LocalDemoAsrProvider } from './providers/LocalDemoAsrProvider.js';
+export { OpenAICompatibleAsrProvider } from './providers/OpenAICompatibleAsrProvider.js';
+export type { OpenAICompatibleAsrConfig } from './providers/OpenAICompatibleAsrProvider.js';
+export { createAsrProviderFromEnv } from './providers/createAsrProvider.js';
+export type { AsrEnv } from './providers/createAsrProvider.js';
 export { AsrService } from './AsrService.js';
 export type { VoiceToTextOutput } from './AsrService.js';

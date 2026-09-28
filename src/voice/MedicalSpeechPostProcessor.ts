@@ -85,6 +85,11 @@ export class MedicalSpeechPostProcessor {
         if (matches) removedFillerCount += matches.length;
         text = text.split(filler).join('');
       }
+      // 去填充词后规整标点：折叠重复逗号、去除首尾残留逗号（仅处理标点，不改动剂量数字）
+      text = text
+        .replace(/，\s*，+/g, '，')
+        .replace(/^[，,\s]+|[，,\s]+$/g, '')
+        .replace(/\s{2,}/g, ' ');
 
       // 2. 术语纠正
       for (const [from, to] of Object.entries(this.termCorrections)) {
@@ -120,7 +125,9 @@ export class MedicalSpeechPostProcessor {
     const text = processedTexts
       .filter(Boolean)
       .join('。')
+      .replace(/，\s*，+/g, '，')
       .replace(/。{2,}/g, '。')
+      .replace(/^[，。,\s]+|[，。,\s]+$/g, '')
       .replace(/\s{2,}/g, ' ')
       .trim();
 
