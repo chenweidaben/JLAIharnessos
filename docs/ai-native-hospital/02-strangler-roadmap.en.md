@@ -67,6 +67,35 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 
 ---
 
+## 2.6 Progress Update (through M2-C, 2026-09-29)
+
+### 2.6.1 Closed Milestones (real persistence + evidence)
+
+| Slice | Milestone | Content | Evidence |
+|---|---|---|---|
+| M0 | Outpatient | registration/queue/intake/AI record/diagnosis/orders/Rx/pharmacist review | truly in PostgreSQL, survives restart |
+| M1-A | Inpatient ADT | admit/discharge/transfer, beds/wards | psql counts, hash-chained in-transaction |
+| M1-B1 | Emergency | triage levels 1–4, green channel, resuscitation, observation | concurrency no-dup, unauthorized 403 |
+| M1-B2 | Bedside stations | rounds/nursing/order administration | state machine + dual sign |
+| M2-A | Pharmacy | dispensing, inventory linkage, health gate | concurrency no-dup, explicit DB errors |
+| M2-B | Record QC | three-level signature + return/rework/resubmit | state machine + signature chain |
+| M2-C | Voice records | dictation → review → personally signed structured record | survives restart, pluggable ASR |
+
+### 2.6.2 Current Quality Gates (real evidence)
+
+- Real DB: **61 base tables** across 5 schemas (iam 7 / clinical 30 / agent 8 / knowledge 14 / audit 2).
+- Backend **1428 tests green (120 files)**; frontend **509 tests green** (occasional timing flakiness under full load, passing in isolation); both tsc 0.
+- 38 medical tools, 43 CDS rules, 22 FHIR resources, 16 HL7 messages, 26 authoritative knowledge sources.
+
+### 2.6.3 Roadmap Adjustments per the Architecture Review (03)
+
+1. **CI/CD remediation first (P1)**: fix pipeline trigger branches (the actual default branch is master), provision PostgreSQL in CI and run the full gate so the real-DB loop is reproducible at the team level.
+2. **Advance MFA**: MFA persistence (PgMfaStore) + login enforcement moves from M6 to a standalone security slice.
+3. **Events & idempotency**: replace in-process/in-memory buses with Kafka (M5), add a unified Idempotency-Key framework; high-responsibility events such as critical values require acknowledgement loops.
+4. **Next milestone**: the first M3 slice is the **inpatient medical-record front page (v0.3.0-m3a)**; the billing/insurance slice follows, with a real Saga example built before billing/refunds.
+
+---
+
 ## 3. Milestone Overview
 
 ```

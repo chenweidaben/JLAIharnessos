@@ -13,6 +13,7 @@ This directory holds Phase-1 open-source research and top-level design for hospi
 | 0 | [开源 HIS/EMR 调研报告（中文）](./00-open-source-research.zh-CN.md) | [Open-Source HIS/EMR Research (EN)](./00-open-source-research.en.md) |
 | 1 | [面向 AI 原生医院的一体化平台顶层设计（中文）](./01-top-level-design.zh-CN.md) | [Top-Level Design for an AI-Native Integrated Hospital Platform (EN)](./01-top-level-design.en.md) |
 | 2 | [Strangler 渐进重构路线图（中文）](./02-strangler-roadmap.zh-CN.md) | [Strangler Incremental Refactoring Roadmap (EN)](./02-strangler-roadmap.en.md) |
+| 3 | [架构专家评审报告（中文）](./03-architecture-review.zh-CN.md) | [Architecture Expert Review (EN)](./03-architecture-review.en.md) |
 
 ## 阅读建议 / How to Read
 
@@ -20,8 +21,10 @@ This directory holds Phase-1 open-source research and top-level design for hospi
    Start with **00 Research** — OpenMRS, Bahmni, OpenEMR, HospitalRun, GNU Health, Open Hospital, Medplum, Aidbox, HAPI FHIR, EHRbase, LinuxForHealth/IPF, plus service mesh/Kafka/observability/multi-tenancy and license boundaries.
 2. 再读 **01 顶层设计**：六层架构、HIS+EMR 一体化微服务、AI 原生中台、双标准、数据平台、安全合规；
    Then **01 Top-Level Design** — six layers, unified HIS+EMR microservices, AI-native middle platform, dual standards, data platform, security.
-3. 最后读 **02 路线图**：M0–M6 里程碑、迁移手法、验收门（DoD）与回滚。
-   Finally **02 Roadmap** — milestones M0–M6, migration steps, DoD, rollback.
+3. 再读 **02 路线图**：M0–M6 里程碑、迁移手法、验收门（DoD）与回滚。
+   Then **02 Roadmap** — milestones M0–M6, migration steps, DoD, rollback.
+4. 最后读 **03 架构评审**：六视角问题/风险总表、优化建议与采纳、对路线图的影响。
+   Finally **03 Architecture Review** — six-perspective issue/risk table, adopted recommendations, roadmap impact.
 
 ## 核心立场 / Core Stance
 

@@ -1,25 +1,41 @@
 <div align="center">
 
-# 健澜科技杠OS · JLAIharnessos
+# jlmedaios · 健澜数智医院工业级智能体操作系统
 
-### 杭州健澜科技 · 新一代数智医院工业级智能体操作系统
-#### 开源 · 免费 · 工业级的医疗智能体操作系统 —— 让医疗 AI 更简单、更落地，做「医疗 AI 时代的安卓」
+### 杭州健澜科技 · AI 原生医院（HIS + EMR 一体化）开源底座
+#### 开源 · 免费 · 工业级 —— 让医疗 AI 更简单、更落地，做「医疗 AI 时代的安卓」
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Tests](https://img.shields.io/badge/tests-1100%2B-success.svg)](#-测试与质量)
-[![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/technical/04-安全合规与系统集成设计.md)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1428-success.svg)](#-测试与质量)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-509-success.svg)](#-测试与质量)
+[![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
 [![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-影像辅诊damo-radar-融合)
 
-**医院信息科自己就能搭智能体的操作系统：AI 病历生成、AI 病历质控、语音电子病历、智能处方审核、临床决策支持…… 拖拽即用，私有化部署，数据不出院。**
+**医院信息科自己就能搭智能体的操作系统：AI 病历生成、AI 病历质控、语音电子病历、智能处方审核、临床决策支持、危急值闭环…… 拖拽即用，私有化部署，数据不出院。**
 
-[English](README_EN.md) · [快速开始](#-快速开始) · [低代码搭建](#-5-分钟搭建一个医疗智能体) · [架构](#-系统架构) · [文档](#-文档) · [贡献](CONTRIBUTING.md) · [安全](SECURITY.md)
+[English](README_EN.md) · [快速开始](#-快速开始) · [已闭环里程碑](#-已闭环里程碑与真实证据) · [5 分钟搭建](#-5-分钟搭建一个医疗智能体) · [架构](#-系统架构) · [文档](#-文档) · [贡献](CONTRIBUTING.md) · [安全](SECURITY.md)
 
 </div>
+
+---
+
+## 项目定位
+
+**jlmedaios 是"医疗 AI 的安卓"**：一个开源、免费、工业级、可被医院信息科与全球开发者共同装配和扩展的医院智能体操作系统，面向 AI 原生医院。
+
+它不是又一个单点 AI 助手，而是把**核心业务事务系统（HIS + EMR 一体化）**与 **AI 原生能力中台（智能体编排 / 技能 / 知识 / CDS / RAG）**深度融合：
+
+- **向下**：统一临床数据、主数据与外部系统接入；
+- **向中**：以云原生微服务承载挂号、就诊、住院、急诊、医嘱、处方、病历、药事、收费、检验检查、手术麻醉、病案等核心事务；
+- **向上**：AI 中台横切每个业务环节，提供 AI 病历、AI 质控、语音病历、诊断用药辅助、危急值闭环等刚需智能体；
+- **全程**：医师复核签名、权限可配、数据可追溯、合规内建。
+
+> ⚕️ **医疗安全红线（不可逾越）**：AI 始终定位为辅助（第二阅片 / 第二意见），**所有诊断结论、医嘱、处方、病历签名等具有法律效力的写操作，必须由具备权限的医务人员确认与电子签名**；系统不做自主诊疗。连不上真库/真模型时**明确报错**，演示仅在显式 `DEMO_MODE` 下带水印存在。
 
 ---
 
@@ -27,13 +43,35 @@
 
 大模型很强，但医院用不起来：**数据敏感不能出院、HIS/LIS/PACS 系统林立、临床流程严谨容错率极低、供应商锁定严重、信息科没有可编程的智能体底座**。
 
-健澜科技以「**让医疗 AI 更简单、更落地**」的初心，把多年沉淀的医疗智能体引擎以 **Apache-2.0** 完全开源：
+健澜科技以「**让医疗 AI 更简单、更落地**」的初心，把多年沉淀的 HIS+EMR 一体化底座与医疗智能体引擎以 **Apache-2.0** 完全开源：
 
-- 🏥 **为医院**：信息科在低代码画布上即可编排自有智能体，私有化、可审计、可等保合规；
+- 🏥 **为医院**：信息科在低代码画布上编排自有智能体，私有化、可审计、可等保合规；
 - 🧩 **为开发者**：提供智能体编排内核、38 个医疗工具、知识中台、集成适配器，像装 App 一样扩展；
 - 🌏 **为生态**：以标准化的「智能体包（Agent Package）」连接医院、厂商与开源社区，共建医疗 AI 的安卓生态。
 
-> ⚕️ **医疗安全红线**：本系统输出均为**临床辅助建议**，不替代医生诊断；高风险动作（处方、医嘱、危急值）强制**人工确认 / 双人复核**，所有患者数据脱敏处理。
+---
+
+## 已闭环里程碑与真实证据
+
+项目采用 **Strangler（绞杀者）渐进式**推进，每个里程碑都坚持"真实落库、真实取证、医师签名、可回滚"，**禁止用 mock 冒充**。
+
+| 里程碑 | 切片 | 内容 | 真实证据 |
+|---|---|---|---|
+| **M0** | 门诊 | 挂号/候诊/问诊/AI 病历/诊断/医嘱/处方/药师审核 | 真落 PostgreSQL、重启不丢 |
+| **M1-A** | 住院 ADT | 入院/出院/转科、床位病区 | psql 行数、审计哈希链同事务 |
+| **M1-B1** | 急诊 | 分诊 1–4 级、绿色通道、抢救、留观 | 并发不重复、越权 403 |
+| **M1-B2** | 在院三站 | 查房/护理/医嘱执行闭环 | 状态机 + 双签 |
+| **M2-A** | 药房发药 | 调剂发药、库存联动、健康门禁 | 并发不重复、断库报错 + 水印 |
+| **M2-B** | 病历质控 | 三级签名 + 退回整改重提 | 状态机 + 签名链 |
+| **M2-C** | 语音病历 | 口述转写 → 复核 → 本人签名结构化病历 | 重启不丢、ASR 可插拔 |
+| **M3** | 收费/医保/病案 | 进行中（病案首页 → 收费/医保 DRG-DIP） | — |
+
+**四类真实取证（非演示）**：
+
+1. **真实数据库**：本地 PostgreSQL 16（端口 5433），5 schema **61 张基表**（iam 7 / clinical 30 / agent 8 / knowledge 14 / audit 2），关键写操作可查回、**重启不丢**。
+2. **真实大模型**：DeepSeek 流式对话 + ReAct 工具调用（OpenAI 兼容），会话/消息/调用链落库；模型经 `LLM_PROVIDER` 工厂可插拔。
+3. **审计哈希链**：`audit.audit_logs` 由 BEFORE INSERT 触发器自动维护 `seq/prev_hash/hash` 哈希链，业务变更与审计同事务提交，链内防篡改。
+4. **并发/故障韧性**：并发写不重复（唯一约束 + 状态机 + 行锁/advisory lock）；断库时统一错误信封 + 水印，不白屏、不静默返回空数据；越权返回 403。
 
 ---
 
@@ -44,14 +82,14 @@
 | 🧠 **智能体编排内核** | 声明式 YAML/JSON DSL + DAG 工作流引擎；12 类节点（LLM/工具/RAG/条件/循环/并行/人工/子智能体/代码/延时…）；自研**安全表达式沙箱**（无 eval）、人工挂起、取消、断点、可追溯执行记录 |
 | 🛠️ **低代码智能体工厂** | 基于 React Flow 的可视化画布：拖拽编排、实时 DAG 校验、一键导入导出 `agent.yaml`、撤销重做、智能体市场。**信息科无需写代码** |
 | 📚 **医疗知识中台** | 文档解析 → 分块 → 混合检索（向量+关键词，RRF 融合 + 重排）→ 引用溯源；术语/图谱/指南/中医多知识库；**26 个权威开放知识库合规获取工具**（见 [DATA_LICENSES.md](DATA_LICENSES.md)） |
-| 🩺 **十大刚需智能体** | AI 电子病历生成、AI 病历质控、语音电子病历、智能诊断辅助、智能处方审核、检验检查报告解读、智能编码 DRG/DIP、智能随访、导诊预问诊、医务统计报表 |
+| 🩺 **刚需智能体** | AI 电子病历生成、AI 病历质控、语音电子病历、智能诊断辅助、智能处方审核、检验检查报告解读、智能编码 DRG/DIP、智能随访、导诊预问诊、医务统计报表 |
 | 🔧 **38 个医疗工具** | 患者/病历/质控/处方药品/临床决策/检验检查/医嘱/患者服务/运营/系统集成十大类，统一风险分级与权限模型 |
 | 💊 **临床决策支持 CDS** | 43 条开箱规则（药物相互作用、检验危急值、诊疗规范），主动提醒 + 拦截确认，规则热加载 |
 | 🎙️ **语音电子病历** | ASR Provider 抽象 + 医学口语后处理（去填充词、术语规范化、剂量/频次识别，只标注不改数字） |
-| 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入五层防护、JWT 验签、安全响应头 |
-| 🔌 **全系统集成** | HIS/EMR/LIS/PACS 适配器（重试/熔断/超时）、HL7 v2.x（16 消息）、FHIR R4（22 资源）、DICOM、Kafka 事件总线、五大厂商适配骨架 |
-| 🖥️ **Web 工作台 + 终端** | React 19 + Ant Design 5：50+ 业务路由、8 个演示页、门诊/住院/急诊/质控/运营场景；同时保留 Ink 终端交互 |
-| 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（35 张表/审计哈希链/PITR）、Redis 7（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
+| 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入多层防护、JWT 验签、安全响应头、CSRF |
+| 🔌 **全系统集成** | HIS/EMR/LIS/PACS 适配器（重试/熔断/超时）、HL7 v2.x（16 消息）、FHIR R4（22 资源）、DICOM（DICOMWeb）、Kafka 事件总线（规划）、五大厂商适配骨架 |
+| 🖥️ **Web 工作台 + 终端** | React 19 + Ant Design 5：50+ 业务路由、门诊/住院/急诊/药事/质控/语音场景；同时保留 Ink 终端交互 |
+| 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（61 表/审计哈希链/PITR）、Redis（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
 
 ---
 
@@ -59,61 +97,57 @@
 
 ```mermaid
 flowchart TB
-    subgraph Access["接入层"]
+    subgraph Access["L1 接入层"]
         WEB["Web 工作台 (React19 + AntD5)"]
         CLI["终端 CLI (Ink)"]
-        API["开放 API / WebSocket"]
+        API["API 网关 / BFF / WebSocket"]
     end
 
-    subgraph Factory["低代码智能体工厂"]
-        CANVAS["可视化画布 (React Flow)"]
-        MARKET["智能体市场 / 模板"]
+    subgraph Biz["L2 核心业务事务层（HIS + EMR 一体化）"]
+        OUT["门诊"]
+        INP["住院 ADT"]
+        EM["急诊"]
+        ORD["医嘱处方"]
+        DOC["病历文书"]
+        PHA["药事"]
+        BIL["收费/病案"]
     end
 
-    subgraph Orch["智能体编排内核"]
-        DSL["DSL 校验 / 打包"]
-        ENGINE["DAG 工作流引擎"]
-        SANDBOX["安全表达式沙箱"]
-        HUMAN["人工任务 / 审批"]
-        TRIG["触发器 manual/api/event/schedule"]
-    end
-
-    subgraph Cap["能力层"]
+    subgraph AI["L3 AI 原生能力中台"]
+        ENGINE["智能体编排引擎 (DAG)"]
         TOOLS["38 医疗工具"]
         CDS["CDS 规则引擎"]
         RAG["知识中台 / RAG"]
         VOICE["语音 ASR"]
-        SUB["8 科室子智能体 / MDT 会诊"]
     end
 
-    subgraph Data["数据与集成层"]
+    subgraph Data["L4/L5 数据与集成层"]
         PG[("PostgreSQL+pgvector")]
         REDIS[("Redis")]
         KB[("知识/术语/图谱")]
         INT["HIS/EMR/LIS/PACS · HL7/FHIR/DICOM"]
     end
 
-    subgraph Sec["安全合规（贯穿全层）"]
+    subgraph Sec["L6 安全合规（贯穿全层）"]
         RBAC["RBAC+ABAC"]
         MASK["脱敏/加密"]
         AUDIT["审计哈希链"]
     end
 
-    WEB --> CANVAS --> DSL
-    CLI --> ENGINE
-    API --> TRIG
-    MARKET --> CANVAS
-    DSL --> ENGINE
-    ENGINE --> SANDBOX & HUMAN & TRIG
-    ENGINE --> TOOLS & CDS & RAG & VOICE & SUB
+    WEB --> API
+    API --> OUT & INP & EM & ORD & DOC & PHA & BIL
+    BIL -.调用.-> AI
+    AI --> TOOLS & CDS & RAG & VOICE
     TOOLS --> INT
     RAG --> KB
-    ENGINE --> PG & REDIS
-    TOOLS --> PG
-    Sec -.-> Orch & Cap & Data
+    Biz --> PG
+    AI --> PG & REDIS
+    Sec -.-> Biz & AI & Data
 ```
 
-**编排引擎是核心**：每个智能体是一个可版本化、可校验、可移植的 **Agent Package**（`agent.yaml` + 提示词 + 知识引用 + 校验和）。工作流主图恒为 DAG（循环体/并行分支走结构化子路径），保证可静态分析、可审计、不会死循环（迭代上限保护）。
+**六层视图**：L1 接入 · L2 核心业务事务（HIS+EMR 一体化微服务）· L3 AI 原生能力中台 · L4 数据平台 · L5 集成与标准（FHIR/openEHR/HL7/DICOM）· L6 平台与安全。详见[顶层设计](docs/ai-native-hospital/01-top-level-design.zh-CN.md)。
+
+**编排引擎是核心**：每个智能体是可版本化、可校验、可移植的 **Agent Package**（`agent.yaml` + 提示词 + 知识引用 + 校验和）。工作流主图恒为 DAG，可静态分析、可审计、不会死循环（迭代上限保护）。
 
 ---
 
@@ -123,43 +157,46 @@ flowchart TB
 
 - [Bun](https://bun.sh/) ≥ 1.3（后端运行时与包管理）
 - Node.js ≥ 18（前端构建）
-- 完整依赖服务（PostgreSQL/Redis/Kafka/…）可用 Docker Compose 一键拉起
+- 完整依赖服务（PostgreSQL/Redis/…）可用 Docker Compose 一键拉起；本地开发也可直连 PostgreSQL
 
 ### 1. 克隆并安装
 
 ```bash
-git clone https://github.com/jianlan-tech/gang-os.git
-cd gang-os
+git clone https://github.com/chenweidaben/JLAIharnessos.git
+cd JLAIharnessos
 bun install
 ```
 
-### 2. 一键启动依赖（PostgreSQL + Redis + Kafka + 可观测栈）
+### 2. 准备配置与数据库
 
 ```bash
-cp .env.compose.example .env      # 填入 JWT_SECRET、数据库口令等
+cp .env.example .env          # 填入 JWT_SECRET、LLM_API_KEY、DATABASE_URL 等
+# 方式 A：Docker 启动 PostgreSQL + Redis
 docker compose up -d postgres redis
-bun run db:seed                   # 导入 2000+ 条权威精炼种子（药品/ICD/检验/临床路径/中医）
+# 方式 B：使用本地 PostgreSQL（默认连接 postgres://postgres@127.0.0.1:5433/jlmedaios）
+bun run db:seed               # 导入权威精炼种子（药品/ICD/检验/临床路径/中医）
 ```
 
 ### 3. 运行后端与前端
 
 ```bash
-# 后端 BFF（REST + WebSocket）
+# 后端 BFF（REST 8080 + WebSocket /ws/chat）
 bun run bff
 
 # 前端（新终端）
-cd web && npm install && npm run dev
+cd web && bun install && bun run dev    # http://localhost:5173
 ```
 
 ### 4. 跑测试确认环境
 
 ```bash
-bun run typecheck      # 类型检查零错误
-bun test               # 后端单元测试
-cd web && npx vitest run   # 前端单元测试
+bun run typecheck                 # 后端类型检查 0 错误
+bun test                          # 后端 1428 测试
+cd web && bunx vitest run         # 前端 509 测试
+cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```
 
-> 完整容器化、云原生（K8s/Helm）、生产配置见 [部署文档](docs/deployment/)。
+> 无数据库演示：设置 `DEMO_MODE=1` 后启动 BFF，使用内存数据并显示水印（不持久化），仅用于演示。完整容器化、云原生（K8s/Helm）、生产配置见 [部署文档](docs/deployment/)。
 
 ---
 
@@ -169,45 +206,14 @@ cd web && npx vitest run   # 前端单元测试
 
 | 能力 | 说明 |
 |------|------|
-| 🫀 **18 器官 / 146 发现** | 一次 CT 扫描覆盖主动脉、肝、胃、胰、肾、肺等 18 个解剖结构，输出 146 项临床发现的概率（0~1） |
-| 🎯 **第二阅片定位** | 阳性发现自动定位、critical（恶性肿瘤/急重症）红色警示并触达危急值通道；**最终诊断须放射科医师复核签名**，不自动诊断 |
-| 🧪 **双模式 demo / production** | `demo`（CPU，无权重，加载预计算结果，确定性可演示）与 `production`（真实推理，需约 5GB 权重 + CUDA GPU）；启动自动检测权重、缺失自动降级 |
-| 🛡️ **降级不白屏** | 推理服务不可用时 BFF/前端自动切换为与 Python demo 同源的确定性 mock，并显示「演示数据」水印 |
+| 🫀 **18 器官 / 146 发现** | 一次 CT 覆盖主动脉、肝、胃、胰、肾、肺等 18 个解剖结构，输出 146 项临床发现概率（0~1） |
+| 🎯 **第二阅片定位** | 阳性发现自动定位、critical（恶性肿瘤/急重症）红色警示并触达危急值通道；**最终诊断须放射科医师复核签名** |
+| 🧪 **双模式 demo / production** | `demo`（CPU，无权重，确定性结果）与 `production`（真实推理，需约 5GB 权重 + CUDA）；缺权重自动降级 |
+| 🛡️ **降级不白屏** | 推理服务不可用时切回确定性 mock，并显示「演示数据」水印 |
 
-**快速启动（demo / CPU，零权重即可体验）：**
+> 权重 `checkpoint_radar_pretrain.pth`（约 5GB，**CC BY-NC-SA 4.0 非商业**）严禁入库，由部署方自行下载挂载。详见 [`services/radar-inference/README.md`](services/radar-inference/README.md) 与 [`docs/RADAR_FUSION_CONTRACT.md`](docs/RADAR_FUSION_CONTRACT.md)。
 
-```bash
-cp .env.compose.example .env        # 填入 RADAR_INTERNAL_TOKEN 等密钥
-docker compose --profile demo up -d radar-inference
-# 就绪探针：curl http://127.0.0.1:8090/health/ready  （mode=demo 即正常）
-```
-
-**生产真实推理（可选）：** 权重 `checkpoint_radar_pretrain.pth`（约 5GB，**CC BY-NC-SA 4.0 非商业**）严禁入库，由部署方自行拉取并挂载：
-
-```bash
-bash services/radar-inference/download_weights.sh   # 下载到 ./models/radar/
-# 在 docker-compose.yml 中取消 gpu profile 的 deploy.resources.reservations.devices 注释后：
-docker compose --profile gpu up -d radar-inference
-```
-
-> 详见 [`services/radar-inference/README.md`](services/radar-inference/README.md) 与契约 [`docs/RADAR_FUSION_CONTRACT.md`](docs/RADAR_FUSION_CONTRACT.md)。
-
-**引用（BibTeX）：**
-
-```bibtex
-@article{zhang2026damo_radar,
-  author  = {Zhang, Qi and others},
-  title   = {An expert-level generalist AI for abdominal CT diagnosis},
-  journal = {Science},
-  volume  = {393},
-  number  = {6817},
-  pages   = {eaec6129},
-  year    = {2026},
-  doi     = {10.1126/science.aec6129}
-}
-```
-
-**来源致谢：** 本融合站在以下开源项目之上——[damo-radar](https://github.com/alibaba-damo-academy/damo-radar)（Apache-2.0，代码 vendor 于 `services/radar-inference/vendor/damo-radar/`）、[LAVIS](https://github.com/salesforce/LAVIS)（BSD-3-Clause）、[nnU-Net](https://github.com/MIC-DKFZ/nnUNet)（Apache-2.0）、[MONAI](https://github.com/Project-MONAI/MONAI)（Apache-2.0）、[3D-ResNets-PyTorch](https://github.com/kenshohara/3D-ResNets-PyTorch)（MIT）。模型权重为 CC BY-NC-SA 4.0 非商业，商用前须另行取得授权。
+**引用**：[Science 393(6817):eaec6129, 2026 · doi:10.1126/science.aec6129](https://doi.org/10.1126/science.aec6129)。代码 vendor 自 [damo-radar](https://github.com/alibaba-damo-academy/damo-radar)（Apache-2.0），并站在 LAVIS、nnU-Net、MONAI 等开源项目之上。
 
 ---
 
@@ -218,7 +224,7 @@ docker compose --profile gpu up -d radar-inference
 1. 打开 Web 工作台 → 侧边栏「**智能体工厂**」；
 2. 选择内置模板（如「AI 病历质控」）或「新建空白智能体」；
 3. 从左侧拖入节点：`开始 → 检索规范(RAG) → 质控工具 → 人工审核 → 归档`；
-4. 右侧面板配置工具入参、知识库、风险等级；顶部「**校验**」实时检查 DAG 与引用；
+4. 右侧配置工具入参、知识库、风险等级；顶部「**校验**」实时检查 DAG 与引用；
 5. 「**导出**」得到可移植的 `agent.yaml`，导入生产即可发布。
 
 **方式二：直接写 Agent Package（推荐给开发者）**
@@ -248,111 +254,111 @@ agent:
         - { source: qc, target: review }
         - { source: review, target: end }
   disclaimer: 本智能体输出为临床辅助建议，最终诊疗决策由经治医师负责。
-prompts:
-  prompts/system.md: 你是严谨的病历质控专家，依据规范逐项核查并给出可追溯的问题清单。
 ```
-
-加载与运行（TypeScript）：
 
 ```ts
 import { createMockOrchestrator } from './src/orchestrator';
 const orch = createMockOrchestrator();
-await orch.loadAllAgents('./agents');          // 加载 agents/ 目录全部智能体
+await orch.loadAllAgents('./agents');
 const result = await orch.invoke('demo-record-qc', { recordText: '…' });
 ```
 
-> 十大刚需智能体的完整实现见 [`agents/`](agents/) 目录，可直接作为模板二次编辑。
+> 刚需智能体的完整实现见 [`agents/`](agents/) 目录，可直接作为模板二次编辑。
 
 ---
 
-## 医疗知识中台与权威知识库
+## 技术栈
 
-平台内置**精炼示例种子**（临床路径、药品分类、检验危急值、ICD、中医参考），并提供合规获取工具对接权威外部知识库：
-
-```bash
-bun run knowledge:list                 # 列出 26 个数据源与许可证
-bun run knowledge:fetch                # 仅下载明确开放的 MeSH/ChEMBL/TCM-MKG 等
-```
-
-- **开放直下**：MeSH、ChEMBL（CC BY-SA）、TCM-MKG（CC BY）、OpenDRG（Apache-2.0）、openFDA、PubMed OA 等；
-- **免费注册**：LOINC、RxNorm、CMeKG、HiTA 等；
-- **持证认证（绝不打包）**：SNOMED CT、UMLS、MIMIC、eICU、DrugBank 商业版——仅生成申请指引。
-
-我们严格区分「代码开源」与「数据许可」，**不盗版、不越权再分发**。完整清单与合规红线见 [DATA_LICENSES.md](DATA_LICENSES.md)。
+| 层 | 选型 |
+|---|---|
+| 业务微服务 / BFF | **TypeScript + Bun**（零额外依赖，Bun.serve） |
+| 前端 | React 19 + Vite + Ant Design 5 + Zustand + React Flow |
+| 事务数据库 | **PostgreSQL 16**（JSONB、分区、pgvector） |
+| 缓存 | Redis（会话、缓存、限流、分布式锁） |
+| 事件流 | Kafka（兼容 Redpanda，规划替换内存总线） |
+| 模型服务 | Python(FastAPI) 独立微服务（影像/AI，经契约协作） |
+| 大模型 | DeepSeek（OpenAI 兼容，经 `LLM_PROVIDER` 多供应商可插拔） |
+| 标准/互操作 | FHIR R4、openEHR（演进）、HL7 v2、DICOM |
+| 可观测/部署 | Prometheus、OpenTelemetry（接入中）、Grafana、Docker/K8s |
 
 ---
 
 ## 目录结构
 
 ```
-gang-os/
+jlmedaios/
 ├── src/
-│   ├── orchestrator/      # 智能体编排内核（DSL/DAG引擎/沙箱/人工/触发器/打包，29 文件）
+│   ├── bff/               # Bun.serve BFF（REST + WebSocket + 中间件 + 路由/聚合）
+│   ├── orchestrator/      # 智能体编排内核（DSL/DAG 引擎/沙箱/人工/触发器/打包）
 │   ├── medical-tools/     # 38 个医疗工具与注册中心
-│   ├── knowledge/         # RAG 检索引擎
+│   ├── knowledge/         # RAG 检索引擎 + CDS 规则（43 条）
 │   ├── knowledge-platform/# 知识中台（术语/图谱/租户/版本/混合检索）
 │   ├── voice/             # 语音 ASR 抽象与医学口语后处理
-│   ├── security/          # 脱敏/审计/RBAC+ABAC/加密/输入安全/等保合规
-│   ├── integration/       # HIS/EMR/LIS/PACS、HL7/FHIR/DICOM、消息总线、监控
-│   ├── cache/             # Redis 抽象/分布式锁/限流/会话/缓存旁路
-│   ├── core/              # Agent 循环、LLM 客户端、上下文压缩、会话
-│   ├── bff/               # Bun.serve BFF（REST + WebSocket + 中间件）
+│   ├── security/          # 脱敏/审计/RBAC/加密/输入安全/MFA/等保
+│   ├── integration/       # HIS/EMR/LIS/PACS、FHIR/HL7/DICOM、适配器、监控
+│   ├── resilience/        # 限流/熔断/舱壁/并发限制/异步队列
+│   ├── cache/             # Redis 抽象/分布式锁/限流/会话/缓存
+│   ├── core/              # Agent 循环、LLM 客户端、上下文、会话
+│   ├── db/                # 连接池/迁移器 + repositories 数据访问层
 │   └── ui/                # Ink 终端医疗化界面
-├── agents/                # 十大刚需智能体包（agent.yaml + prompts + 示例）
+├── agents/                # 刚需智能体包（agent.yaml + prompts + 示例）
 ├── web/                   # React19 + Vite + AntD5 工作台与低代码画布
-├── deploy/
-│   ├── postgres/          # 35 张表分层 schema + 种子 + 备份/PITR
-│   └── redis/             # 安全加固配置
-├── scripts/
-│   ├── knowledge/         # 权威知识库种子 + 合规下载器
-│   └── db/                # 种子导入 / SQL 静态校验 / 备份恢复
-├── docs/                  # 170+ 份中文文档（架构/API/部署/运维/用户/ADR）
+├── services/              # Python 独立模型服务（如 radar-inference）
+├── deploy/postgres/init/  # 61 表分层 schema + 种子（SQL 迁移）
+├── scripts/               # 知识种子/合规下载、DB 导入/校验/备份
+├── docs/                  # 架构/AI 原生医院/API/部署/运维/用户/ADR
 ├── examples/              # API / 流式 / WebSocket / 编排示例
-├── docker-compose.yml     # 11 服务一体化编排
-└── tests/                 # 后端测试
+└── tests/                # 后端测试
 ```
 
 ---
 
 ## 测试与质量
 
-- 后端 **900+**、前端 **180+** 单元测试，合计 **1100+ 用例全绿**，后端覆盖率约 **86%**；
-- TypeScript 严格模式**零类型错误**，ESLint 0 error，代码重复率 < 2%；
-- 5 个端到端医疗场景验收（门诊问诊、住院查房、急诊分诊、危急值处理、处方审核）；
-- 安全测试：Prompt 注入检测、SQL/XSS/命令注入、鉴权与安全响应头；
-- CI（GitHub Actions）：typecheck → lint → 单测+覆盖率 → 集成 → 安全审计 → 构建。
+- **后端 1428、前端 509 单元/集成测试全绿**（后端 6571 个断言）；后端覆盖率约 **86%**，覆盖率只增不减；
+- 前后端 **TypeScript 严格模式零类型错误**，ESLint 0 error；
+- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历；
+- 安全测试：Prompt 注入、SQL/XSS/命令注入、鉴权、数据范围、安全响应头；
+- CI（GitHub Actions）：typecheck → lint → 单测+覆盖率 → 集成 → 安全审计 → 构建（含前端）。
 
 ```bash
-bun run ci              # 后端全量门禁
-cd web && npm run build # 前端生产构建
+bun run ci                 # 后端全量门禁
+cd web && bun run build    # 前端生产构建
 ```
 
 ---
 
-## 部署与生产
+## 文档
 
-- **三种部署模式**：单机试用、院内私有化（推荐）、云原生高可用；
-- Docker Compose 含 app/web/postgres/redis/kafka/nginx/prometheus/grafana/elasticsearch/kibana/jaeger；
-- 安全：SCRAM、TLS、JWT 验签、**TOTP 多因素认证（MFA，RFC 6238 + 一次性备份码 + 重放保护）**、CSP/CSRF、审计哈希链、WAL 归档 PITR、Redis 危险命令禁用；
-- 运维：BFF 内置 `/metrics`（Prometheus，零依赖）、预置 Grafana 总览大盘与 9 条告警规则、健康/就绪探针与优雅停机、k6 压测脚本、自动备份/恢复脚本、备份恢复与容灾演练 SOP、上线验收清单。
-
-详见 [部署文档](docs/deployment/) 与 [运维手册](docs/operations/)。
+- **AI 原生医院系列**（[docs/ai-native-hospital/](docs/ai-native-hospital/)）：
+  - [00 开源对标调研](docs/ai-native-hospital/00-open-source-research.zh-CN.md)
+  - [01 顶层设计](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
+  - [02 Strangler 路线图](docs/ai-native-hospital/02-strangler-roadmap.zh-CN.md)
+  - [03 架构专家评审](docs/ai-native-hospital/03-architecture-review.zh-CN.md)
+- 部署、运维、API、ADR、需求、测试、用户手册等见 [docs/](docs/)。
 
 ---
 
 ## 路线图
 
+```
+M0 门诊 ✅ → M1 住院+急诊 ✅ → M2 药事/病历/质控/语音 ✅
+   → M3 收费/医保 DRG-DIP/病案首页（进行中）
+        → M4 知识中台/RAG + 低代码编排
+             → M5 多租户一院多区 + 湖仓/科研专病库
+                  → M6 云原生生产化(K8s/网格) + 等保三级/MFA/真实系统联调
+```
+
 - [x] 智能体编排内核 + 安全表达式沙箱 + 人工在环
-- [x] 低代码智能体工厂（可视化画布 + 市场 + agent.yaml 互操作）
-- [x] 十大刚需智能体 + 38 医疗工具 + CDS 规则引擎
+- [x] 低代码智能体工厂（画布 + 市场 + agent.yaml 互操作）
+- [x] 38 医疗工具 + 43 CDS 规则 + 刚需智能体
 - [x] 知识中台 + 权威知识库合规获取
-- [x] 语音电子病历、PostgreSQL/Redis 生产基座、Web 工作台
-- [ ] 更多厂商 HIS 真实联调与认证适配器市场
-- [ ] 智能体包注册中心 / 一键安装（对标应用商店）
-- [x] TOTP 多因素认证（MFA）、生产可观测（/metrics + Grafana 大盘 + 告警 + k6）
-- [ ] 国密算法（SM2/SM3/SM4）/ KMS、MFA 多副本共享存储、电子病历分级与等保三级测评加固
-- [ ] 多模态（影像/语音/文书）智能体与联邦知识协作
-- [ ] 国际化（英文界面与海外标准术语）
+- [x] 语音病历、PostgreSQL/Redis 基座、Web 工作台
+- [ ] M3 病案首页 / 收费 / 医保 DRG-DIP
+- [ ] 统一 Idempotency-Key 框架、Kafka 替换内存总线、真实压测基线
+- [ ] CI 与本地一致性整改（分支 master、CI 内置 DB 跑全量门禁）
+- [ ] MFA 持久化与登录强制、国密 SM2/SM3/SM4、等保三级测评
+- [ ] 多租户/一院多区、湖仓、EMPI、多模态与联邦协作、国际化
 
 ---
 
@@ -361,7 +367,7 @@ cd web && npm run build # 前端生产构建
 我们欢迎并珍视每一份贡献——一个工具、一条 CDS 规则、一个智能体模板、一份文档、一个 Issue。
 
 - 阅读 [贡献指南](CONTRIBUTING.md) 与 [开发规范](docs/technical/00-开发规范与代码规范.md)；
-- 提交 PR 前确保 `bun run typecheck && bun test` 通过，并补充测试；
+- 提交 PR 前确保 `bun run typecheck && bun test` 与前端 `vitest` 通过，并补充测试；
 - 安全问题**请勿公开 Issue**，按 [安全策略](SECURITY.md) 私下报告；
 - 请遵守 [贡献者公约](CODE_OF_CONDUCT.md)。
 
@@ -371,30 +377,10 @@ cd web && npm run build # 前端生产构建
 
 ## 贡献者墙 · Contributors Wall
 
-> 每一行代码、每一条规则、每一份文档，都在让医疗 AI 离临床更近一步。感谢所有为 JLAIharnessos 贡献力量的人。
-
-### 核心团队 · Core Team
-
-| 角色 | 团队 |
-|------|------|
-| 产品与架构 | 健澜科技 · 医疗 AI 产品组 |
-| 智能体编排内核 | 健澜科技 · 引擎研发组 |
-| 医疗工具与 CDS | 健澜科技 · 临床智能组 |
-| 知识中台与集成 | 健澜科技 · 数据平台组 |
-| 安全合规与运维 | 健澜科技 · 基础架构组 |
-| Web 工作台与低代码 | 健澜科技 · 前端体验组 |
-
-### 社区贡献者 · Community Contributors
-
-<!-- 贡献者头像将由 GitHub Actions 自动更新；手动添加请按以下格式 -->
-<!-- ALL-CONTRIBUTORS-LIST:START -->
-
 | <a href="https://github.com/chenweidaben"><img src="https://github.com/chenweidaben.png" width="80" height="80" alt="chenweidaben"/></a><br/><sub><b>chenweidaben</b></sub><br/><sub>项目发起人 · 架构 · 医疗 AI</sub> |
 |:---:|
 
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-> **成为贡献者**：提交一个 PR、修复一个 Bug、补充一条 CDS 规则、写一份智能体模板、翻译一段文档——你的名字将永远留在这里。详见 [贡献指南](CONTRIBUTING.md)。
+> **成为贡献者**：提交一个 PR、修复一个 Bug、补充一条 CDS 规则、写一份智能体模板、翻译一段文档——你的名字将留在这里。
 
 ---
 
@@ -402,13 +388,11 @@ cd web && npm run build # 前端生产构建
 
 - 代码以 [Apache License 2.0](LICENSE) 开源；第三方依赖许可见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)，归属声明见 [NOTICE](NOTICE)。
 - **数据许可独立于代码许可**，使用前务必阅读 [DATA_LICENSES.md](DATA_LICENSES.md)。
-- 本项目站在开源社区的肩膀上，特别感谢相关开源框架与公开医学知识资源的贡献者。
+- 特别感谢相关开源框架与公开医学知识资源的贡献者。
 
 ## 免责声明
 
-本软件为医疗**辅助决策与效率工具**，不构成医疗器械的诊断结论，不能替代执业医师的面诊与判断。
-部署与使用方须遵守所在国家/地区法律法规，自行完成数据合规、安全测评与临床验证。
-作者与贡献者不对因使用本软件造成的任何后果承担责任。
+本软件为医疗**辅助决策与效率工具**，不构成医疗器械的诊断结论，不能替代执业医师的面诊与判断。部署与使用方须遵守所在国家/地区法律法规，自行完成数据合规、安全测评与临床验证。作者与贡献者不对因使用本软件造成的任何后果承担责任。
 
 <div align="center">
 

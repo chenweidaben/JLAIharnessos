@@ -121,10 +121,12 @@ Organized as **Capability + Skill + Tool**, embedded by the orchestrator, never 
 ## 6. L4 Data Platform
 
 ### 6.1 Dual-Track Clinical Model
-- **OLTP**: PostgreSQL relational model (5 schemas, 40 tables) for high concurrency;
-- **High-fidelity (evolution)**: align to openEHR archetypes/templates—new concepts without schema changes;
-- **Exchange**: map to FHIR R4/R5;
+- **OLTP**: PostgreSQL relational model (**61 base tables** across 5 schemas, evolving per milestone) for high concurrency;
+- **High-fidelity (evolution; lands in M5, not implemented today)**: align to openEHR archetypes/templates—new concepts without schema changes; there is currently no openEHR/AQL code, and **FHIR is the only implemented standard** in this dual track;
+- **Exchange**: map to FHIR R4/R5 (22 resource types implemented);
 - bidirectional mapping ensures "capture once, use across standards."
+
+> Current boundary (verified by the architecture review): FHIR has real Builder/Parser/Client code; openEHR is a roadmap direction only and must not be presented as existing.
 
 ### 6.2 Healthcare Lakehouse
 - **lakehouse**: CDC → lake (ODS/DWD/DWS/ADS) → research/analytics;
@@ -189,6 +191,7 @@ Organized as **Capability + Skill + Tool**, embedded by the orchestrator, never 
 - **mesh/gateway**: Ingress/API gateway for TLS, routing, rate limiting; optional service mesh (mTLS, traffic, observability);
 - **observability**: unified logs (auto-masked), metrics (Prometheus), tracing (OpenTelemetry/Jaeger), alerts;
 - **delivery**: dev/test/prod separation, GitOps, IaC, CI/CD (typecheck → unit/coverage → integration → security scan → build → release);
+- **CI/local consistency (review P1 item)**: CI trigger branches must cover the actual default branch (`master`); CI must provision a PostgreSQL service and run the full `bun test` and frontend `vitest`, so the "real-DB loop" is reproducible at the team level, not only locally;
 - **three forms**: single-machine demo (docker-compose), private cloud (K8s), group multi-campus (multi-cluster/federation).
 
 ---
