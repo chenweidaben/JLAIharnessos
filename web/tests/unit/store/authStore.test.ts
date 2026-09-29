@@ -10,16 +10,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from '@/store/authStore';
 import { tokenStorage } from '@/utils/auth';
-import { LoginError } from '@/types/auth';
+import { LoginError, LoginMfaRequiredError } from '@/types/auth';
 import type { AuthLoginApiResponse } from '@/services/authMapper';
 import type { AuthUser } from '@/types/auth';
 
 vi.mock('@/services/api/auth', () => ({
   loginApi: vi.fn(),
   refreshApi: vi.fn(),
+  verifyLoginMfaApi: vi.fn(),
+  isMfaRequiredResult: (r: unknown): r is { mfaRequired: true; challengeId: string } =>
+    !!r && typeof r === 'object' &&
+    (r as { mfaRequired?: unknown }).mfaRequired === true &&
+    typeof (r as { challengeId?: unknown }).challengeId === 'string',
 }));
 
-import { loginApi, refreshApi } from '@/services/api/auth';
+import { loginApi, refreshApi, verifyLoginMfaApi } from '@/services/api/auth';
 
 /* ---------------- 测试夹具 ---------------- */
 
@@ -110,6 +115,7 @@ beforeEach(() => {
   window.localStorage.clear();
   vi.mocked(loginApi).mockResolvedValue(buildAdminResponse());
   vi.mocked(refreshApi).mockResolvedValue(buildDoctorResponse());
+  vi.mocked(verifyLoginMfaApi).mockResolvedValue(buildDoctorResponse());
 });
 
 describe('authStore 初始状态', () => {
@@ -294,7 +300,6 @@ describe('authStore Token 刷新', () => {
     expect(await useAuthStore.getState().refreshAccessToken()).toBe(false);
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
-
   it('refreshApi 成功时轮换令牌并返回 true', async () => {
     await useAuthStore.getState().login({ username: 'admin', password: 'x', captcha: 'ABCD' });
     vi.mocked(refreshApi).mockResolvedValue(buildDoctorResponse());
@@ -308,5 +313,39 @@ describe('authStore Token 刷新', () => {
     vi.mocked(refreshApi).mockRejectedValueOnce(new Error('invalid refresh token'));
     expect(await useAuthStore.getState().refreshAccessToken()).toBe(false);
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+});
+
+describe('authStore MFA 第二因子', () => {
+  it('密码通过但需 MFA：抛 LoginMfaRequiredError、记录挑战、不发令牌', async () => {
+    vi.mocked(loginApi).mockResolvedValueOnce({
+      mfaRequired: true,
+      challengeId: 'ch_123',
+    });
+    await expect(
+      useAuthStore.getState().login({ username: 'doctor_chen', password: 'pw', captcha: 'AB' }),
+    ).rejects.toBeInstanceOf(LoginMfaRequiredError);
+    const s = useAuthStore.getState();
+    expect(s.isAuthenticated).toBe(false);
+    expect(s.accessToken).toBe('');
+    expect(s.mfaChallengeId).toBe('ch_123');
+  });
+
+  it('completeMfa 提交动态码后建立会话并清空挑战', async () => {
+    vi.mocked(loginApi).mockResolvedValueOnce({ mfaRequired: true, challengeId: 'ch_9' });
+    await expect(
+      useAuthStore.getState().login({ username: 'doctor_chen', password: 'pw', captcha: 'AB' }),
+    ).rejects.toBeInstanceOf(LoginMfaRequiredError);
+
+    await useAuthStore.getState().completeMfa('123456');
+    expect(verifyLoginMfaApi).toHaveBeenCalledWith('ch_9', '123456');
+    const s = useAuthStore.getState();
+    expect(s.isAuthenticated).toBe(true);
+    expect(s.mfaChallengeId).toBeNull();
+    expect(s.user?.username).toBe('doctor_chen');
+  });
+
+  it('completeMfa 未持有挑战时报错', async () => {
+    await expect(useAuthStore.getState().completeMfa('123456')).rejects.toBeInstanceOf(LoginError);
   });
 });

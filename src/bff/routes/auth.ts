@@ -9,8 +9,6 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { InMemoryMfaStore, MfaService } from '@/security/mfa/index.js';
-
 import { signJwt, verifyJwt } from '../middleware/auth';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
@@ -20,17 +18,13 @@ import {
   getUserRoleLinks,
 } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
+import { getMfaService } from '../mfaRuntime.js';
+import { issueLoginChallenge } from '../aggregators/mfaAggregator.js';
 
 /**
- * MFA 服务。默认使用进程内存储（适合单机试用/演示）。
- *
- * 多副本/生产部署必须切换为共享存储，否则各副本二次校验状态不一致：
- *   import { PgMfaStore, createEncryptionServiceCipher } from '@/security/mfa/index.js';
- *   const store = new PgMfaStore(pool, createEncryptionServiceCipher(new EncryptionService()));
- *   const mfaService = new MfaService(store);   // 表：iam.mfa_factors（15-iam-mfa.sql）
- * 详见 SECURITY.md 与《安全合规设计》。
+ * MFA 服务单例（见 ../mfaRuntime）：真实模式持久化到 iam.mfa_factors，
+ * 演示模式回退进程内存储。此处不再在模块加载时构造，避免无 DB 环境启动即崩。
  */
-const mfaService = new MfaService(new InMemoryMfaStore());
 
 /** 路由已声明 auth:true，此处做类型收窄并兜底未认证 */
 function requireUser(c: Ctx): NonNullable<Ctx['user']> | null {
@@ -74,8 +68,8 @@ async function loadViewByUsername(username: string): Promise<AuthView | null> {
   return buildAuthView(user, links);
 }
 
-/** 按用户 ID 加载真实用户视图 */
-async function loadViewById(id: string): Promise<AuthView | null> {
+/** 按用户 ID 加载真实用户视图（导出供 MFA 登录二发令牌使用） */
+export async function loadViewById(id: string): Promise<AuthView | null> {
   if (isDemo) return DEMO_VIEW;
   const user = await getUserById(id);
   if (!user || user.status !== 'active') return null;
@@ -83,8 +77,8 @@ async function loadViewById(id: string): Promise<AuthView | null> {
   return buildAuthView(user, links);
 }
 
-/** 为某视图签发 access / refresh（sub 为真实 iam UUID） */
-function issueTokens(view: AuthView): { accessToken: string; refreshToken: string } {
+/** 为某视图签发 access / refresh（sub 为真实 iam UUID）；导出供 MFA 登录二发令牌 */
+export function issueTokens(view: AuthView): { accessToken: string; refreshToken: string } {
   const base = {
     sub: view.id,
     name: view.realName,
@@ -113,6 +107,14 @@ export const authRoutes: RouteDef[] = [
       if (!view) {
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码错误'), 400);
       }
+
+      // M3-C：若用户已启用 MFA，密码通过后不直接发令牌，改发第二因子挑战。
+      // 客户端凭 challengeId 调 POST /api/v1/auth/login/mfa 提交 TOTP/备份码后才换发令牌。
+      if (!isDemo && (await getMfaService().isEnabled(view.id))) {
+        const challenge = await issueLoginChallenge(view.id);
+        return json(ok({ mfaRequired: true, challengeId: challenge.challengeId }));
+      }
+
       const { accessToken, refreshToken } = issueTokens(view);
       const csrfToken = issueCsrfToken();
 
@@ -209,8 +211,8 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const [enabled, remainingBackupCodes] = await Promise.all([
-        mfaService.isEnabled(user.id),
-        mfaService.remainingBackupCodes(user.id),
+        getMfaService().isEnabled(user.id),
+        getMfaService().remainingBackupCodes(user.id),
       ]);
       return json(ok({ enabled, remainingBackupCodes }));
     },
@@ -222,7 +224,7 @@ export const authRoutes: RouteDef[] = [
     handle: async (c: Ctx) => {
       const user = requireUser(c);
       if (!user) return unauthorized();
-      const result = await mfaService.beginEnroll(user.id, { accountName: user.name || user.id });
+      const result = await getMfaService().beginEnroll(user.id, { accountName: user.name || user.id });
       if (!result.ok) {
         return json(fail(ErrorCode.BAD_REQUEST, `MFA 绑定发起失败: ${result.error}`), 400);
       }
@@ -237,7 +239,7 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const body = await c.body<{ token?: string }>();
-      const result = await mfaService.confirmEnroll(user.id, (body.token ?? '').trim());
+      const result = await getMfaService().confirmEnroll(user.id, (body.token ?? '').trim());
       if (!result.ok) {
         return json(fail(ErrorCode.BAD_REQUEST, `动态码校验失败: ${result.error}`), 400);
       }
@@ -252,7 +254,7 @@ export const authRoutes: RouteDef[] = [
       const user = requireUser(c);
       if (!user) return unauthorized();
       const body = await c.body<{ token?: string }>();
-      const result = await mfaService.verify(user.id, (body.token ?? '').trim());
+      const result = await getMfaService().verify(user.id, (body.token ?? '').trim());
       if (!result.ok) {
         const status = result.error === 'NOT_ENABLED' ? 400 : 401;
         return json(
@@ -279,7 +281,7 @@ export const authRoutes: RouteDef[] = [
         token = '';
       }
       if (!token) token = new URL(c.req.url).searchParams.get('token') ?? '';
-      const disabled = await mfaService.disable(user.id, token.trim());
+      const disabled = await getMfaService().disable(user.id, token.trim());
       if (!disabled) return json(fail(ErrorCode.BAD_REQUEST, '动态码/备份码校验失败，无法停用 MFA'), 400);
       return json(ok({ disabled: true }));
     },

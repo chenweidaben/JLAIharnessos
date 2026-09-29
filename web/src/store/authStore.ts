@@ -14,7 +14,13 @@ import { create } from 'zustand';
 import { local } from '@/utils/storage';
 import { tokenStorage } from '@/utils/auth';
 import { useUserStore } from './userStore';
-import { loginApi, refreshApi } from '@/services/api/auth';
+import {
+  isMfaRequiredResult,
+  loginApi,
+  refreshApi,
+  verifyLoginMfaApi,
+} from '@/services/api/auth';
+import type { AuthLoginApiResponse } from '@/services/authMapper';
 import { toAuthUser } from '@/services/authMapper';
 import type {
   ChangePasswordRequest,
@@ -24,7 +30,7 @@ import type {
   PersistedAuthPayload,
   PersistedIdentity,
 } from '@/types/auth';
-import { LoginError } from '@/types/auth';
+import { LoginError, LoginMfaRequiredError } from '@/types/auth';
 
 const STORE_KEY = 'auth_session_v2';
 const REMEMBER_EXPIRE = 7 * 24 * 60 * 60 * 1000; // 7d
@@ -91,8 +97,12 @@ export interface AuthState {
   roles: string[];
   menus: MenuItem[];
   loading: boolean;
+  /** 密码通过后等待第二因子（MFA）的挑战 ID；非空表示登录页应进入 TOTP 输入步骤 */
+  mfaChallengeId: string | null;
 
   login: (req: LoginRequest) => Promise<LoginResponse>;
+  /** 完成第二因子：凭 challengeId + TOTP/备份码换发会话 */
+  completeMfa: (token: string) => Promise<LoginResponse>;
   logout: () => void;
   refreshAccessToken: () => Promise<boolean>;
   fetchUserInfo: () => Promise<ReturnType<typeof toAuthUser>>;
@@ -125,7 +135,67 @@ function bridgeUserStore(user: ReturnType<typeof toAuthUser>): void {
   });
 }
 
-export const useAuthStore = create<AuthState>()((set, get) => ({
+export const useAuthStore = create<AuthState>()((set, get) => {
+  /* 建立会话：登录成功 / MFA 第二因子通过后共用（持久化、桥接 userStore、写状态） */
+  async function establishSession(
+    res: AuthLoginApiResponse,
+    rememberMe: boolean,
+  ): Promise<LoginResponse> {
+    const now = Date.now();
+    const ttl = res.tokens.expiresIn * 1000;
+    const accessExpiresAt = now + ttl;
+    const refreshExpiresAt = now + REMEMBER_EXPIRE;
+    const user = toAuthUser(res.user);
+    const accessToken = res.tokens.accessToken;
+    const refreshToken = res.tokens.refreshToken;
+
+    // 随 Token 持久化登录者本人身份快照，刷新后据其恢复，杜绝越权回退超管
+    const identity: PersistedIdentity = {
+      user,
+      roles: user.roleCodes as unknown as string[],
+      permissions: user.permissions,
+    };
+    persist({
+      accessToken,
+      refreshToken,
+      accessExpiresAt,
+      refreshExpiresAt,
+      rememberMe,
+      identity,
+    });
+    tokenStorage.set({
+      accessToken,
+      refreshToken,
+      expiresIn: Math.floor(ttl / 1000),
+    });
+    bridgeUserStore(user);
+
+    const loginResponse: LoginResponse = {
+      accessToken,
+      refreshToken,
+      accessExpiresAt,
+      refreshExpiresAt,
+      user,
+      permissions: user.permissions,
+      menus: [],
+    };
+    set({
+      user,
+      accessToken,
+      refreshToken,
+      accessExpiresAt,
+      refreshExpiresAt,
+      isAuthenticated: true,
+      permissions: user.permissions,
+      roles: user.roleCodes as unknown as string[],
+      menus: [],
+      loading: false,
+      mfaChallengeId: null,
+    });
+    return loginResponse;
+  }
+
+  return {
   user: null,
   accessToken: '',
   refreshToken: '',
@@ -136,6 +206,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   roles: [],
   menus: [],
   loading: false,
+  mfaChallengeId: null,
 
   /* ---------------- 登录（真实 BFF） ---------------- */
   login: async (req) => {
@@ -146,62 +217,32 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         password: req.password,
         captcha: req.captcha,
       });
-      const now = Date.now();
-      const ttl = res.tokens.expiresIn * 1000;
-      const accessExpiresAt = now + ttl;
-      const refreshExpiresAt = now + (req.rememberMe ? REMEMBER_EXPIRE : REMEMBER_EXPIRE);
-      const user = toAuthUser(res.user);
-      const accessToken = res.tokens.accessToken;
-      const refreshToken = res.tokens.refreshToken;
-
-      // 随 Token 持久化登录者本人身份快照，刷新后据其恢复，杜绝越权回退超管
-      const identity: PersistedIdentity = {
-        user,
-        roles: user.roleCodes as unknown as string[],
-        permissions: user.permissions,
-      };
-      persist({
-        accessToken,
-        refreshToken,
-        accessExpiresAt,
-        refreshExpiresAt,
-        rememberMe: req.rememberMe ?? false,
-        identity,
-      });
-      // 桥接既有 useUserStore / tokenStorage，使旧路由守卫与顶栏用户菜单同步
-      tokenStorage.set({
-        accessToken,
-        refreshToken,
-        expiresIn: Math.floor(ttl / 1000),
-      });
-      bridgeUserStore(user);
-
-      const loginResponse: LoginResponse = {
-        accessToken,
-        refreshToken,
-        accessExpiresAt,
-        refreshExpiresAt,
-        user,
-        permissions: user.permissions,
-        menus: [],
-      };
-      set({
-        user,
-        accessToken,
-        refreshToken,
-        accessExpiresAt,
-        refreshExpiresAt,
-        isAuthenticated: true,
-        permissions: user.permissions,
-        roles: user.roleCodes as unknown as string[],
-        menus: [],
-        loading: false,
-      });
-      return loginResponse;
+      // M3-C：已启用 MFA 的用户密码通过后不发令牌，改发第二因子挑战
+      if (isMfaRequiredResult(res)) {
+        set({ loading: false, mfaChallengeId: res.challengeId });
+        throw new LoginMfaRequiredError(res.challengeId);
+      }
+      return await establishSession(res, req.rememberMe ?? false);
     } catch (e) {
       set({ loading: false });
+      if (e instanceof LoginMfaRequiredError) throw e;
       // 统一以 LoginError 透传后端真实失败原因（如"用户名或密码错误"），不吞错误、不造假身份
       const msg = e instanceof Error ? e.message : '登录失败，请稍后重试';
+      throw new LoginError('BAD_CREDENTIALS', msg);
+    }
+  },
+
+  /* ---------------- 第二因子（MFA） ---------------- */
+  completeMfa: async (token) => {
+    const { mfaChallengeId } = get();
+    if (!mfaChallengeId) throw new LoginError('BAD_CREDENTIALS', '缺少 MFA 挑战，请重新登录');
+    set({ loading: true });
+    try {
+      const res = await verifyLoginMfaApi(mfaChallengeId, token.trim());
+      return await establishSession(res, true);
+    } catch (e) {
+      set({ loading: false });
+      const msg = e instanceof Error ? e.message : '动态码校验失败';
       throw new LoginError('BAD_CREDENTIALS', msg);
     }
   },
@@ -348,4 +389,5 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     });
     return true;
   },
-}));
+  };
+});

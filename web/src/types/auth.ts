@@ -38,6 +38,19 @@ export class LoginError extends Error {
   }
 }
 
+/**
+ * 需要第二因子（MFA）：密码正确但用户已启用 TOTP，登录页应切换到动态码输入步骤，
+ * 凭 challengeId 调用 completeMfa 完成登录。
+ */
+export class LoginMfaRequiredError extends Error {
+  challengeId: string;
+  constructor(challengeId: string) {
+    super('MFA_REQUIRED');
+    this.name = 'LoginMfaRequiredError';
+    this.challengeId = challengeId;
+  }
+}
+
 /** 操作审计类型 */
 export type AuditAction =
   | 'login'

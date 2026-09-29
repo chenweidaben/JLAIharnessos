@@ -23,6 +23,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { fetchCaptcha, fetchQrCode, mockSsoLogin, ssoProviders, LoginError } from '@/mock/authMock';
 import type { Captcha, QrCodeSession, QrCodeStatus } from '@/types/auth';
+import { LoginMfaRequiredError } from '@/types/auth';
 
 const { useBreakpoint } = Grid;
 
@@ -41,8 +42,13 @@ export default function LoginPage() {
   const isMobile = !screens.md;
 
   const login = useAuthStore((s) => s.login);
+  const completeMfa = useAuthStore((s) => s.completeMfa);
   const [form] = Form.useForm<AccountForm>();
   const [submitting, setSubmitting] = useState(false);
+  // M3-C：密码通过但用户已启用 MFA 时，切换到第二因子（TOTP）输入步骤
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaToken, setMfaToken] = useState('');
+  const [mfaSubmitting, setMfaSubmitting] = useState(false);
   // 当前登录方式 Tab。二维码自动轮询仅在用户主动切到二维码 Tab 时启动，
   // 避免登录页一挂载就在后台模拟扫码并自动登录（否则退出/未登录拦截会被绕过）。
   const [activeTab, setActiveTab] = useState('account');
@@ -70,6 +76,12 @@ export default function LoginPage() {
       const from = (location.state as { from?: string } | null)?.from;
       navigate(from && from !== '/login' ? from : '/dashboard', { replace: true });
     } catch (e) {
+      if (e instanceof LoginMfaRequiredError) {
+        // 密码正确、需要第二因子：切换到 TOTP 输入步骤，不报错
+        setMfaStep(true);
+        setMfaToken('');
+        return;
+      }
       if (e instanceof LoginError) {
         if (e.code === 'CAPTCHA') {
           message.error(e.message);
@@ -83,6 +95,21 @@ export default function LoginPage() {
       form.setFieldValue('captcha', '');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  /* ---------------- MFA 第二因子 ---------------- */
+  const onFinishMfa = async () => {
+    setMfaSubmitting(true);
+    try {
+      await completeMfa(mfaToken);
+      message.success('身份验证通过');
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(from && from !== '/login' ? from : '/dashboard', { replace: true });
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '动态码校验失败');
+    } finally {
+      setMfaSubmitting(false);
     }
   };
 
@@ -391,15 +418,49 @@ export default function LoginPage() {
             </div>
           )}
           <Typography.Title level={3} style={{ marginBottom: 4 }}>
-            欢迎登录
+            {mfaStep ? '两步验证' : '欢迎登录'}
           </Typography.Title>
           <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
-            请使用工号或统一身份认证登录
+            {mfaStep
+              ? '请输入验证器生成的 6 位动态码，或任一备份码'
+              : '请使用工号或统一身份认证登录'}
           </Typography.Text>
-          <Tabs items={items} centered activeKey={activeTab} onChange={setActiveTab} />
-          <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: '#8c8c8c' }}>
-            演示账号：admin / 任意 6 位以上密码；验证码请按右侧图形输入（不区分大小写）
-          </div>
+          {mfaStep ? (
+            <Form layout="vertical" onFinish={() => void onFinishMfa()}>
+              <Form.Item name="mfaToken" rules={[{ required: true, message: '请输入动态码' }]}>
+                <Input
+                  size="large"
+                  prefix={<SafetyCertificateOutlined />}
+                  placeholder="6 位动态码 / XXXX-XXXX 备份码"
+                  value={mfaToken}
+                  onChange={(e) => setMfaToken(e.target.value)}
+                  autoFocus
+                  onPressEnter={() => void onFinishMfa()}
+                />
+              </Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                size="large"
+                loading={mfaSubmitting}
+              >
+                {mfaSubmitting ? '验证中…' : '验证并登录'}
+              </Button>
+              <div style={{ textAlign: 'center', marginTop: 12 }}>
+                <Typography.Link onClick={() => setMfaStep(false)}>
+                  返回重新输入账号密码
+                </Typography.Link>
+              </div>
+            </Form>
+          ) : (
+            <>
+              <Tabs items={items} centered activeKey={activeTab} onChange={setActiveTab} />
+              <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: '#8c8c8c' }}>
+                演示账号：admin / 任意 6 位以上密码；验证码请按右侧图形输入（不区分大小写）
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -21,6 +21,9 @@ tsconfig.tsbuildinfo
 .env.test
 .env.production
 
+# MFA 主密钥库（运行时生成，AES-256-GCM 加密 TOTP 因子用，严禁入库）
+.keys/
+
 # 测试与覆盖率
 coverage/
 *.lcov

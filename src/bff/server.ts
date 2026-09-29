@@ -27,6 +27,7 @@ import {
   getConversationById,
 } from '@/db/repositories/conversationRepo';
 import { authRoutes } from './routes/auth';
+import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
 import { chatRoutes } from './routes/chat';
@@ -55,6 +56,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 const allRoutes: RouteDef[] = [
   ...authRoutes,
+  ...mfaLoginRoutes,
   ...patientRoutes,
   ...chatRoutes,
   ...medicalRoutes,

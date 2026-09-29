@@ -37,6 +37,7 @@ describe('登录与会话', () => {
     const payload = { username: 'doctor_chen', password: 'x' };
     const r = await loginApi(payload);
     expect(post).toHaveBeenCalledWith('/auth/login', payload);
+    if ('mfaRequired' in r) throw new Error('预期直接发令牌，却返回 mfaRequired');
     expect(r.tokens.accessToken).toBe('a');
   });
 

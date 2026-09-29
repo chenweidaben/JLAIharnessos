@@ -11,7 +11,22 @@ import { env } from '@/utils/config';
 import type { LoginRequest, UserInfo } from '@/types/user';
 import type { AuthLoginApiResponse, AuthViewLike } from '../authMapper';
 
-export async function loginApi(payload: LoginRequest): Promise<AuthLoginApiResponse> {
+/**
+ * 登录结果二选一：
+ *  - 正常：tokens + user，直接建立会话
+ *  - mfaRequired：该用户已启用 MFA，密码正确但需第二因子，此时不发令牌，凭 challengeId 继续
+ */
+export type AuthLoginResult =
+  | AuthLoginApiResponse
+  | ({ mfaRequired: true; challengeId: string } & Partial<AuthLoginApiResponse>);
+
+export function isMfaRequiredResult(
+  r: AuthLoginResult,
+): r is { mfaRequired: true; challengeId: string } {
+  return Boolean((r as { mfaRequired?: boolean }).mfaRequired);
+}
+
+export async function loginApi(payload: LoginRequest): Promise<AuthLoginResult> {
   if (env.mockEnabled) {
     await delay(300, 600);
     const mock = mockLogin(payload.username);
@@ -35,7 +50,15 @@ export async function loginApi(payload: LoginRequest): Promise<AuthLoginApiRespo
     };
     return { tokens: mock.tokens, user };
   }
-  return post<AuthLoginApiResponse>('/auth/login', payload);
+  return post<AuthLoginResult>('/auth/login', payload);
+}
+
+/** 登录第二因子：提交 TOTP/备份码换发会话令牌（mfaRequired 之后调用） */
+export async function verifyLoginMfaApi(
+  challengeId: string,
+  token: string,
+): Promise<AuthLoginApiResponse> {
+  return post<AuthLoginApiResponse>('/auth/login/mfa', { challengeId, token });
 }
 
 /** 使用 refreshToken 轮换令牌（后端 /auth/refresh 返回与登录一致的结构） */
