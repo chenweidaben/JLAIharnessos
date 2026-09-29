@@ -19,6 +19,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'system:audit:view', 'system:loginlog:view', 'report:view',
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
     'front_page:read', 'front_page:code', 'front_page:audit',
+    'billing:read', 'billing:charge', 'billing:refund',
     'order:write', 'prescription:write', 'prescription:review',
     'lab:read', 'imaging:read', 'imaging:view',
     'agent:build', 'agent:publish', 'knowledge:manage',
@@ -34,7 +35,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ],
   doctor: [
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
-    'front_page:read', 'front_page:audit',
+    'front_page:read', 'front_page:audit', 'billing:read',
     'order:write', 'prescription:write',
     'lab:read', 'imaging:read', 'imaging:view',
     'report:view', 'agent:build', 'agent:publish', 'knowledge:manage',
@@ -50,6 +51,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'prescription:review', 'prescription:write',
     'medical_record:read', 'lab:read', 'report:view',
     'pharmacy:view', 'pharmacy:review', 'pharmacy:dispense', 'inventory:view',
+    'billing:read',
   ],
   nurse: [
     'medical_record:read', 'lab:read', 'order:write',
@@ -57,7 +59,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation',
     'nursing:record', 'nursing:task', 'inpatient_order:administer',
-    'inventory:view',
+    'inventory:view', 'billing:read',
   ],
   technician: ['lab:read', 'imaging:read', 'medical_record:write'],
   researcher: ['medical_record:read', 'lab:read', 'report:view'],
