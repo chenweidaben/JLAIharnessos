@@ -44,6 +44,7 @@ import { medicalQcRoutes } from './routes/medicalQc';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
 import { billingRoutes } from './routes/billing';
+import { drgRoutes } from './routes/drg';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -72,6 +73,7 @@ const allRoutes: RouteDef[] = [
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
   ...billingRoutes,
+  ...drgRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,
