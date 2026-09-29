@@ -18,6 +18,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'system:admin', 'system:user:view', 'system:role:view', 'system:perm:manage',
     'system:audit:view', 'system:loginlog:view', 'report:view',
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
+    'front_page:read', 'front_page:code', 'front_page:audit',
     'order:write', 'prescription:write', 'prescription:review',
     'lab:read', 'imaging:read', 'imaging:view',
     'agent:build', 'agent:publish', 'knowledge:manage',
@@ -33,6 +34,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ],
   doctor: [
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
+    'front_page:read', 'front_page:audit',
     'order:write', 'prescription:write',
     'lab:read', 'imaging:read', 'imaging:view',
     'report:view', 'agent:build', 'agent:publish', 'knowledge:manage',

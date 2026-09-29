@@ -34,6 +34,8 @@ const Pharmacy = lazy(() => import('@/pages/pharmacy'));
 const MedicalQc = lazy(() => import('@/pages/medicalQc'));
 // 语音电子病历工作站（M2-C）
 const VoiceMedical = lazy(() => import('@/pages/voiceMedical'));
+// 病案首页工作站（M3-A）
+const FrontPage = lazy(() => import('@/pages/frontPage'));
 // 临床业务：门诊 / 住院
 const OutpatientPage = lazy(() => import('@/pages/OutpatientPage'));
 const OutpatientConsultPage = lazy(() => import('@/pages/OutpatientConsultPage'));
@@ -147,6 +149,8 @@ export default function AppRoutes() {
           <Route path="medical-qc" element={<MedicalQc />} />
           {/* 语音电子病历工作站（M2-C） */}
           <Route path="voice-medical" element={<VoiceMedical />} />
+          {/* 病案首页工作站（M3-A）：队列/详情 front_page:read，编码 code，质控归档 audit */}
+          <Route path="front-page" element={<FrontPage />} />
           {/* 临床业务：门诊 / 住院 */}
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />

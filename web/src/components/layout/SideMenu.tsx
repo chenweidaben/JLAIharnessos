@@ -27,6 +27,7 @@ import {
   ShopOutlined,
   AuditOutlined,
   AudioOutlined,
+  FolderOpenOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -71,6 +72,7 @@ const navItems: NavItem[] = [
   { key: '/pharmacy', icon: <ShopOutlined />, label: '药房发药', perm: 'pharmacy:view' },
   { key: '/medical-qc', icon: <AuditOutlined />, label: '病历质控', perm: 'medical_record:read' },
   { key: '/voice-medical', icon: <AudioOutlined />, label: '语音病历', perm: 'medical_record:read' },
+  { key: '/front-page', icon: <FolderOpenOutlined />, label: '病案首页', perm: 'front_page:read' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',
