@@ -10,7 +10,16 @@
 import '@ant-design/v5-patch-for-react-19';
 import '@testing-library/jest-dom/vitest';
 import { afterEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
+
+/* ---------------- Testing Library 异步查询超时 ----------------
+ * 覆盖率（v8）插桩 + 多文件并行负载下，antd Form 校验与 message 成功提示
+ * 的渲染可能超过 RTL 默认的 1000ms，导致重型组件用例出现非逻辑性 flaky。
+ * 统一把 findBy 系列查询与 waitFor 等异步工具的超时放宽到 5000ms。
+ * 注意：这只放宽“等待元素出现”的时间，不改变 vitest 的 testTimeout（15s），
+ * 因此不会掩盖真实的测试挂死；挂死仍会在 15s 被判定失败。
+ */
+configure({ asyncUtilTimeout: 5000 });
 
 /* ---------------- Ant Design 样式重置：测试中不加载真实 CSS ---------------- */
 // AntD v5 基于 CSS-in-JS，jsdom 下无需额外注入样式。

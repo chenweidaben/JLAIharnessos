@@ -693,7 +693,9 @@ describe('OrderBoard 全动作闭环', () => {
     fireEvent.click(await screen.findByRole('button', { name: /开具医嘱/ }));
     expect(await screen.findByText('开具在院医嘱')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /提交审核/ }));
-    expect(await screen.findByText('医嘱内容不能为空')).toBeInTheDocument();
+    expect(
+      await screen.findByText('医嘱内容不能为空', {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
     expect(careApi.createOrder).not.toHaveBeenCalled();
   });
 

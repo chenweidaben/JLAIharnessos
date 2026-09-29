@@ -29,6 +29,7 @@ import {
   AudioOutlined,
   FolderOpenOutlined,
   MoneyCollectOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -75,6 +76,7 @@ const navItems: NavItem[] = [
   { key: '/voice-medical', icon: <AudioOutlined />, label: '语音病历', perm: 'medical_record:read' },
   { key: '/front-page', icon: <FolderOpenOutlined />, label: '病案首页', perm: 'front_page:read' },
   { key: '/billing', icon: <MoneyCollectOutlined />, label: '收费结算', perm: 'billing:read' },
+{ key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',
