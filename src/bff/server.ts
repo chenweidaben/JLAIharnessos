@@ -48,6 +48,7 @@ import { drgRoutes } from './routes/drg';
 import { labInterpretRoutes } from './routes/labInterpret';
 import { criticalRoutes } from './routes/critical';
 import { reconRoutes } from './routes/recon';
+import { surgeryRoutes } from './routes/surgery';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -80,6 +81,7 @@ const allRoutes: RouteDef[] = [
   ...labInterpretRoutes,
   ...criticalRoutes,
   ...reconRoutes,
+  ...surgeryRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,

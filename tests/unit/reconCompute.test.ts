@@ -3,7 +3,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { describe, it, expect } from 'bun:test';
-import { computeLines, type FeeLine } from '../../src/bff/aggregators/reconAggregator';
+import { computeLines } from '../../src/bff/aggregators/reconAggregator';
+import type { FeeLine } from '../../src/db/repositories/reconRepo';
 
 function mk(p: Partial<FeeLine>): FeeLine {
   return {

@@ -35,6 +35,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inpatient_order:write', 'inpatient_order:review', 'inpatient_order:administer',
     'pharmacy:view', 'pharmacy:review', 'pharmacy:dispense',
     'inventory:view', 'cds:override',
+    'surgery:view', 'surgery:schedule', 'surgery:precheck',
+    'surgery:anesthesia', 'surgery:discharge',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -52,6 +54,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ward_round:write', 'ward_round:countersign',
     'inpatient_order:write', 'inpatient_order:review',
     'cds:override',
+    'surgery:view', 'surgery:anesthesia', 'surgery:discharge',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
