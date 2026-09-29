@@ -63,7 +63,6 @@ describe.skipIf(!dbAvailable)('M3-D DRG Repository', () => {
         patientId: testPatientId,
         department: testDept,
         primaryDiagnosis: '心力衰竭',
-        primaryDiagnosisCode: 'I50.9',
         operations: [],
         totalFee: 8000,
       },

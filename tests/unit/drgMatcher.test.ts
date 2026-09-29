@@ -6,7 +6,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { describe, it, expect } from 'bun:test';
-import { matchRule, type DrgRule } from '../../src/bff/aggregators/drgAggregator';
+import { matchRule } from '../../src/bff/aggregators/drgAggregator';
+import type { DrgRule } from '../../src/db/repositories/drgRepo';
 
 const rules: DrgRule[] = [
   {
