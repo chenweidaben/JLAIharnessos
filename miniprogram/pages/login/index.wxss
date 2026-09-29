@@ -1,0 +1,59 @@
+/* 健澜科技 jlmedaios - 小程序登录页样式（M3-J） */
+.login-wrap {
+  min-height: 100vh;
+  padding: 120rpx 40rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.logo-badge {
+  width: 120rpx;
+  height: 120rpx;
+  margin: 0 auto 24rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(135deg, #0b3d91 0%, #1565c0 100%);
+  color: #ffffff;
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 120rpx;
+}
+
+.login-brand {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #0b3d91;
+}
+
+.login-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #7a869a;
+}
+
+.login-card {
+  padding: 40rpx 32rpx;
+}
+
+.login-tip {
+  font-size: 26rpx;
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  width: 100%;
+  margin: 0;
+}
+
+.login-agreement {
+  margin-top: 28rpx;
+  font-size: 22rpx;
+  color: #9aa5b1;
+  line-height: 1.6;
+  text-align: center;
+}

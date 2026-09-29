@@ -1,0 +1,33 @@
+<!-- 健澜科技 jlmedaios - 小程序就诊人详情页（M3-J） -->
+<view class="container">
+  <view wx:if="{{loading}}" class="card text-muted">加载中…</view>
+
+  <view wx:if="{{profile}}" class="card detail-card">
+    <view class="detail-name">
+      {{profile.nameMasked}}
+      <text wx:if="{{profile.authLevel >= 2}}" class="tag tag-green">已实名</text>
+      <text wx:if="{{profile.authLevel < 2}}" class="tag tag-gold">未实名</text>
+    </view>
+
+    <view class="detail-line">
+      <text class="detail-label">性别</text>
+      <text>{{profile.gender || '—'}}</text>
+    </view>
+    <view class="detail-line">
+      <text class="detail-label">认证等级</text>
+      <text>L{{profile.authLevel}}</text>
+    </view>
+    <view class="detail-line">
+      <text class="detail-label">院内档案</text>
+      <text>{{profile.patientId ? '已绑定 (EMPI)' : '未绑定'}}</text>
+    </view>
+
+    <button
+      wx:if="{{profile.authLevel < 2}}"
+      class="btn-primary detail-btn"
+      bindtap="goRealname"
+    >
+      去实名认证
+    </button>
+  </view>
+</view>

@@ -1,0 +1,69 @@
+<!-- 健澜科技 jlmedaios - 小程序实名认证页（M3-J） -->
+<view class="container">
+  <view class="card form-card">
+    <view class="title">实名认证</view>
+    <view class="text-muted rn-desc">
+      根据互联网医院监管要求，在线复诊、电子处方须完成实名认证。您的信息将加密存储，仅用于身份核验。
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">真实姓名</view>
+      <input
+        class="form-input"
+        placeholder="请输入身份证上的姓名"
+        value="{{realName}}"
+        bindinput="onNameInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">身份证号</view>
+      <input
+        class="form-input"
+        placeholder="请输入18位身份证号"
+        maxlength="18"
+        value="{{idCard}}"
+        bindinput="onIdCardInput"
+      />
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">人脸采集（用于活体比对）</view>
+      <view wx:if="{{faceCaptured}}" class="face-ok">
+        <text class="tag tag-green">已采集</text>
+        <text class="text-primary re-capture" bindtap="captureFace">重新采集</text>
+      </view>
+      <button wx:if="{{!faceCaptured}}" class="btn-ghost face-btn" bindtap="captureFace">
+        拍摄人脸
+      </button>
+    </view>
+
+    <button
+      class="btn-primary submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+      bindtap="handleSubmit"
+    >
+      提交认证
+    </button>
+  </view>
+
+  <!-- 认证结果 -->
+  <view wx:if="{{result}}" class="card result-card">
+    <view class="row result-head">
+      <text class="tag {{result.passed ? 'tag-green' : 'tag-gold'}}">
+        {{result.passed ? '认证通过' : '认证未通过'}}
+      </text>
+      <text class="text-muted">提供方：{{result.provider}}</text>
+    </view>
+    <view wx:if="{{result.isDemo}}" class="text-muted demo-tip">
+      当前为本地演示认证，不具备真实法律效力；生产环境将接入第三方持证核验。
+    </view>
+    <view wx:if="{{result.passed && result.patientId}}" class="text-muted">
+      已绑定院内健康档案（EMPI）。
+    </view>
+    <button wx:if="{{result.passed}}" class="btn-primary result-btn" bindtap="goBack">
+      返回就诊人
+    </button>
+  </view>
+</view>

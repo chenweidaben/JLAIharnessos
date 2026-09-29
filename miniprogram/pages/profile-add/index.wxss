@@ -1,0 +1,42 @@
+/* 健澜科技 jlmedaios - 小程序添加就诊人页样式（M3-J） */
+.form-card {
+  padding: 32rpx 28rpx;
+}
+
+.form-row {
+  margin-bottom: 28rpx;
+}
+
+.picker-value {
+  color: #1f2937;
+}
+
+.switch-row {
+  margin-bottom: 36rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  margin: 0 0 20rpx;
+}
+
+.form-tip {
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.empty-card {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 32rpx;
+}
+
+.empty-btn {
+  width: 80%;
+  margin: 0 auto;
+}

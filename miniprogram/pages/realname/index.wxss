@@ -1,0 +1,53 @@
+/* 健澜科技 jlmedaios - 小程序实名认证页样式（M3-J） */
+.form-card {
+  padding: 32rpx 28rpx;
+}
+
+.rn-desc {
+  font-size: 25rpx;
+  line-height: 1.7;
+  margin-bottom: 28rpx;
+}
+
+.form-row {
+  margin-bottom: 28rpx;
+}
+
+.face-btn {
+  width: 100%;
+}
+
+.face-ok {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.re-capture {
+  font-size: 26rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  margin: 12rpx 0 0;
+}
+
+.result-card {
+  padding: 28rpx;
+}
+
+.result-head {
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.demo-tip {
+  font-size: 24rpx;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+.result-btn {
+  width: 100%;
+  margin-top: 16rpx;
+}

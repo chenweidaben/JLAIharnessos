@@ -1,0 +1,57 @@
+/* 健澜科技 jlmedaios - 小程序首页样式（M3-J） */
+.page-head {
+  margin-bottom: 16rpx;
+}
+
+.add-link {
+  font-size: 28rpx;
+}
+
+.empty-card {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  margin-bottom: 40rpx;
+}
+
+.empty-btn {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.profile-card {
+  position: relative;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.relation {
+  font-size: 26rpx;
+}
+
+.profile-meta {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+}
+
+.profile-action {
+  margin-top: 24rpx;
+}
+
+.mini-btn {
+  font-size: 26rpx;
+  padding: 8rpx 28rpx;
+  display: inline-block;
+}

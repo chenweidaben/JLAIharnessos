@@ -1,0 +1,25 @@
+<!-- 健澜科技 jlmedaios - 小程序登录页（M3-J） -->
+<view class="login-wrap">
+  <view class="login-logo">
+    <view class="logo-badge">健</view>
+    <view class="login-brand">健澜互联网医院</view>
+    <view class="login-sub">jlmedaios · 安全合规的在线医疗服务</view>
+  </view>
+
+  <view class="login-card card">
+    <view class="login-tip">
+      为保障您的就诊安全与合法权益，使用在线复诊、电子处方、报告查询等服务前，请先完成微信授权登录。
+    </view>
+    <button
+      class="btn-primary login-btn"
+      loading="{{logging}}"
+      disabled="{{logging}}"
+      bindtap="handleLogin"
+    >
+      微信授权一键登录
+    </button>
+    <view class="login-agreement">
+      登录即代表同意《用户服务协议》与《隐私政策》，您的身份信息将加密存储。
+    </view>
+  </view>
+</view>

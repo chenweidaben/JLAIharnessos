@@ -1,0 +1,27 @@
+/* 健澜科技 jlmedaios - 小程序就诊人详情页样式（M3-J） */
+.detail-card {
+  padding: 32rpx 28rpx;
+}
+
+.detail-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 28rpx;
+}
+
+.detail-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eef1f5;
+  font-size: 28rpx;
+}
+
+.detail-label {
+  color: #7a869a;
+}
+
+.detail-btn {
+  width: 100%;
+  margin-top: 36rpx;
+}

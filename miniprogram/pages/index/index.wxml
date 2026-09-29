@@ -1,0 +1,53 @@
+<!-- 健澜科技 jlmedaios - 小程序就诊人列表首页（M3-J） -->
+<view class="container">
+
+  <!-- 未登录 -->
+  <view wx:if="{{!loggedIn}}" class="card empty-card">
+    <view class="empty-title">您还未登录</view>
+    <view class="text-muted empty-desc">登录后可管理就诊人、在线复诊、查询报告</view>
+    <button class="btn-primary empty-btn" bindtap="goLogin">微信授权登录</button>
+  </view>
+
+  <!-- 已登录 -->
+  <block wx:if="{{loggedIn}}">
+    <view class="row-between page-head">
+      <view class="title">我的就诊人（{{profiles.length}}）</view>
+      <view class="text-primary add-link" bindtap="goAdd">+ 添加</view>
+    </view>
+
+    <view wx:if="{{loading}}" class="card text-muted">加载中…</view>
+
+    <view wx:if="{{!loading && profiles.length === 0}}" class="card empty-card">
+      <view class="empty-title">还没有就诊人</view>
+      <view class="text-muted empty-desc">添加就诊人并完成实名认证后即可在线就诊</view>
+      <button class="btn-primary empty-btn" bindtap="goAdd">添加就诊人</button>
+    </view>
+
+    <!-- 就诊人卡片 -->
+    <view
+      wx:for="{{profiles}}"
+      wx:key="id"
+      class="card profile-card"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="row-between">
+        <view class="profile-name">
+          {{item.nameMasked || '未填写姓名'}}
+          <text wx:if="{{item.isDefault}}" class="tag tag-blue">默认</text>
+        </view>
+        <view class="text-muted relation">{{item.relation === 'self' ? '本人' : item.relation}}</view>
+      </view>
+
+      <view class="profile-meta">
+        <text wx:if="{{item.gender}}" class="text-muted">{{item.gender}} · </text>
+        <text wx:if="{{item.authLevel >= 2}}" class="tag tag-green">已实名</text>
+        <text wx:if="{{item.authLevel < 2}}" class="tag tag-gold">未实名</text>
+      </view>
+
+      <view wx:if="{{item.authLevel < 2}}" class="profile-action" catchtap="goRealname" data-id="{{item.id}}">
+        <button class="btn-ghost mini-btn" catchtap="goRealname" data-id="{{item.id}}">去实名认证</button>
+      </view>
+    </view>
+  </block>
+</view>

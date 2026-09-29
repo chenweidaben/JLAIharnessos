@@ -104,6 +104,16 @@ export async function getPatientByMrn(mrn: string, sql?: DbExecutor): Promise<Pa
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
+/** 按身份证哈希查找患者（EMPI 去重/绑定） */
+export async function getPatientByIdCardHash(idCardHash: string, sql?: DbExecutor): Promise<Patient | null> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
+    WHERE id_card_hash = ${idCardHash} AND deleted_at IS NULL
+  `;
+  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+}
+
 export interface PatientQuery {
   keyword?: string;
   gender?: string;

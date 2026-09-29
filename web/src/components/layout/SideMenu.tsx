@@ -30,6 +30,7 @@ import {
   FolderOpenOutlined,
   MoneyCollectOutlined,
   CalendarOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -77,6 +78,7 @@ const navItems: NavItem[] = [
   { key: '/front-page', icon: <FolderOpenOutlined />, label: '病案首页', perm: 'front_page:read' },
   { key: '/billing', icon: <MoneyCollectOutlined />, label: '收费结算', perm: 'billing:read' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
+  { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院', perm: 'internet:practitioner:audit' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',
