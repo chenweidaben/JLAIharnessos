@@ -80,11 +80,18 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 | M2-A | Pharmacy | dispensing, inventory linkage, health gate | concurrency no-dup, explicit DB errors |
 | M2-B | Record QC | three-level signature + return/rework/resubmit | state machine + signature chain |
 | M2-C | Voice records | dictation → review → personally signed structured record | survives restart, pluggable ASR |
+| M3-A | Front page | auto-aggregation after discharge, coding/QC/archive, defect checks | state machine, signature chain |
+| M3-B | Billing settlement | fee items → settlement → invoice → refund Saga compensation | no duplicates, outage errors |
+| M3-C | MFA | MFA persistence, login enforcement, TOTP | 403, idempotency |
+| M3-D | DRG grouping | DRG/DIP grouping, settlement, explainable review | deterministic, traceable |
+| M3-E–H | (M3 extension slices) | see tags v0.3.0-m3e…m3h | real persistence, full gates |
+| M3-I | Appointment & follow-up | appointment → confirm → visit link → follow-up plans/records | state machine, survives restart |
 
 ### 2.6.2 Current Quality Gates (real evidence)
 
-- Real DB: **61 base tables** across 5 schemas (iam 7 / clinical 30 / agent 8 / knowledge 14 / audit 2).
-- Backend **1428 tests green (120 files)**; frontend **509 tests green** (occasional timing flakiness under full load, passing in isolation); both tsc 0.
+- Real DB: **83 base tables** across 5 schemas (iam 8 / clinical 51 / agent 8 / knowledge 14 / audit 2).
+- Backend **1531 tests green (134 files, 1 skip, 6817 expect)**; frontend **553 tests green (52 files)**; both tsc 0.
+- Frontend coverage (all:false): lines 89.3 / branches 78.67 / functions 82.75 / statements 89.3; gate passed, thresholds unchanged.
 - 38 medical tools, 43 CDS rules, 22 FHIR resources, 16 HL7 messages, 26 authoritative knowledge sources.
 
 ### 2.6.3 Roadmap Adjustments per the Architecture Review (03)
@@ -93,6 +100,7 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 2. **Advance MFA**: MFA persistence (PgMfaStore) + login enforcement moves from M6 to a standalone security slice.
 3. **Events & idempotency**: replace in-process/in-memory buses with Kafka (M5), add a unified Idempotency-Key framework; high-responsibility events such as critical values require acknowledgement loops.
 4. **Next milestone**: the first M3 slice is the **inpatient medical-record front page (v0.3.0-m3a)**; the billing/insurance slice follows, with a real Saga example built before billing/refunds.
+5. **Internet hospital (from M3-J, see "04 Internet Hospital Platform")**: extends beyond the hospital on top of in-hospital capabilities — M3-J foundation → M3-K appointments/text consultation → M3-L e-prescription/review → M3-M payment/insurance/invoice → M3-N delivery/reports/inpatient → M3-O follow-up/satisfaction/smart triage; aligned to National Smart Service Level 3; all external integration via gateway isolation, Level 3 protection.
 
 ---
 
@@ -160,6 +168,21 @@ M0 Real outpatient closed loop (done)
 - explainable, reviewable DRG/DIP grouping;
 - front page auto-assembled from clinical data; verifiable coding;
 - cross-service Saga consistency validated via failure/compensation drills.
+
+### From M3-J — Internet Hospital (aligned to Smart Service Level 3)
+
+> Top-level design in "04 Internet Hospital Integrated Platform". Backend stays TypeScript + Bun; patient end is a WeChat Mini Program; external integration via gateway isolation.
+
+| Slice | Scope | DoD |
+|---|---|---|
+| **M3-J Foundation** | Internet BFF/gateway skeleton, patient accounts/patients/real-name (L1/L2), EMPI binding, clinician credentials, security baseline | real-name/patients persisted, EMPI consistent, 403 |
+| **M3-K Appointment + text consultation** | Slot sync, time-based appointments, text IM, follow-up eligibility, session state machine | no duplicates, messages queryable, survives restart |
+| **M3-L E-prescription + review** | Online prescribing (personal signature), pharmacist review, circulation, state machine | prescribing/review separated, no AI auto-Rx, return loop |
+| **M3-M Payment + insurance + invoice** | Insurance gateway, mobile payment, reconciliation, e-invoice, refund compensation | traceable amounts, idempotency, red-ink refund, outage errors |
+| **M3-N Delivery + reports/inpatient** | Logistics, pickup/external, reports/cloud film, inpatient deposit/bills/settlement | traceable fulfillment, reports consistent with in-hospital |
+| **M3-O Follow-up + satisfaction + AI** | Follow-up closure, ratings, smart triage/pre-consultation/digital escort, Level 3 self-assessment | Level 3 mapping, AI assists only |
+
+**Common DoD**: data truly persisted and retained after restart, end-to-end positive + exception loops, tsc 0, all tests green with coverage, 403/data-scope verified, real evidence (no mock masquerade); commit, dual-platform push, annotated tag, and three-way verification before being declared closed.
 
 ### M4 — Knowledge/RAG + Low-Code Orchestration
 **Scope**

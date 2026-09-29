@@ -14,6 +14,7 @@ This directory holds Phase-1 open-source research and top-level design for hospi
 | 1 | [面向 AI 原生医院的一体化平台顶层设计（中文）](./01-top-level-design.zh-CN.md) | [Top-Level Design for an AI-Native Integrated Hospital Platform (EN)](./01-top-level-design.en.md) |
 | 2 | [Strangler 渐进重构路线图（中文）](./02-strangler-roadmap.zh-CN.md) | [Strangler Incremental Refactoring Roadmap (EN)](./02-strangler-roadmap.en.md) |
 | 3 | [架构专家评审报告（中文）](./03-architecture-review.zh-CN.md) | [Architecture Expert Review (EN)](./03-architecture-review.en.md) |
+| 4 | [互联网医院一体化平台顶层架构设计（中文）](./04-internet-hospital-platform.zh-CN.md) | [Internet Hospital Platform Top-Level Design (EN)](./04-internet-hospital-platform.en.md) |
 
 ## 阅读建议 / How to Read
 
@@ -25,6 +26,8 @@ This directory holds Phase-1 open-source research and top-level design for hospi
    Then **02 Roadmap** — milestones M0–M6, migration steps, DoD, rollback.
 4. 最后读 **03 架构评审**：六视角问题/风险总表、优化建议与采纳、对路线图的影响。
    Finally **03 Architecture Review** — six-perspective issue/risk table, adopted recommendations, roadmap impact.
+5. 再读 **04 互联网医院平台**：院内院外一体化、微信小程序患者端、智慧服务三级达标、监管/医保/支付/处方网关。
+   Then **04 Internet Hospital Platform** — in/out integration, WeChat Mini Program, Smart Service Level 3, supervision/insurance/payment/prescription gateways.
 
 ## 核心立场 / Core Stance
 
