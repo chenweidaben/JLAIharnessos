@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1428-success.svg)](#quality)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-509-success.svg)](#quality)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1567-success.svg)](#quality)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-567-success.svg)](#quality)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
 [![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-imaging-assist-damo-radar-fusion)
@@ -63,11 +63,20 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M2-A** | Pharmacy | dispensing, inventory linkage, health gate | concurrency no-dup, DB-outage error + watermark |
 | **M2-B** | Record QC | three-level signature + return/rework/resubmit | state machine + signature chain |
 | **M2-C** | Voice records | dictation → review → personally signed structured record | survives restart, pluggable ASR |
-| **M3** | Billing/insurance/archive | in progress (front page → billing/insurance DRG-DIP) | — |
+| **M3-A** | Front page | auto-aggregation, coding/QC/archiving state machine | idempotent, row locks, audit |
+| **M3-B** | Billing settlement | fee items → settlement → invoice → refund Saga compensation | concurrency no-dup, state machine |
+| **M3-C** | MFA | two-factor persistence and login enforcement | TOTP/backup codes |
+| **M3-D** | DRG/DIP | local discharge-case grouping (no external insurance) | deterministic, recomputable |
+| **M3-E** | Lab/imaging interpretation | AI-assisted interpretation skeleton + physician signature | deterministic engine |
+| **M3-F** | Critical values | auto-reporting + receipt/handling state machine | full-chain trace |
+| **M3-G** | Insurance reconciliation | local recomputation skeleton (no external insurance) | diff locatable |
+| **M3-H** | OR & anesthesia | tertiary core clinical-domain state machine | state machine + records |
+| **M3-I** | Appointment & follow-up | appointment/encounter linkage + follow-up plans/records | idempotent, state machine |
+| **M3-J** | Internet hospital base | WeChat login/realname/online credentials/field encryption/mini-program | real HTTP + outage + watermark |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **61 base tables** across 5 schemas (iam 7 / clinical 30 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **87 base tables** across 5 schemas (iam 8 / clinical 54 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
@@ -85,7 +94,8 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | 🔧 **38 medical tools** | patients, records, QC, drugs/prescriptions, CDS, labs/imaging, orders, patient services, operations, integration — with unified risk levels and permissions |
 | 💊 **Clinical Decision Support** | 43 out-of-the-box rules (drug interactions, critical values, care standards) with proactive alerts and blocking confirmation |
 | 🎙️ **Voice medical records** | ASR provider abstraction + medical speech post-processing (filler removal, term normalization, dosage/frequency detection that annotates but never alters numbers) |
-| 🔐 **Healthcare-grade security** | MLPS Level-3 design, RBAC+ABAC, 16 masking rules, AES-256-GCM, hash-chained audit, multi-layer prompt-injection defense, verified JWT, security headers, CSRF |
+| 🌐 **Internet hospital base** | WeChat mini-program patient app (login/profiles/realname/detail), WeChat code login, realname verification (ID checksum/third-party gateway), clinician online-credential state machine; AES-256-GCM field encryption for name/phone/ID, aligned with Smart Service Level 3 |
+| 🔐 **Healthcare-grade security** | MLPS Level-3 design, RBAC+ABAC, 16 masking rules, AES-256-GCM, hash-chained audit, multi-layer prompt-injection defense, verified JWT, MFA, security headers, CSRF |
 | 🔌 **Interoperability** | HIS/EMR/LIS/PACS adapters (retry/circuit-breaker/timeout), HL7 v2.x (16 messages), FHIR R4 (22 resources), DICOM (DICOMWeb), Kafka event bus (planned), major-vendor skeletons |
 | 🖥️ **Web console + terminal** | React 19 + Ant Design 5 with 50+ routes; outpatient/inpatient/emergency/pharmacy/QC/voice scenarios; plus an Ink terminal UI |
 | 🗄️ **Production infrastructure** | PostgreSQL 16 + pgvector (61 tables, hash-chained audit, PITR), Redis (distributed lock/rate-limit/session/cache), Docker Compose, observability, CI/CD |
@@ -167,8 +177,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1428 tests
-cd web && bunx vitest run            # frontend 509 tests
+bun test                             # backend 1567 tests
+cd web && bunx vitest run            # frontend 567 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -261,7 +271,8 @@ jlmedaios/
 │   ├── knowledge/         # RAG retrieval + CDS rules (43)
 │   ├── knowledge-platform/# Knowledge platform (terminology/graph/tenant/version/hybrid retrieval)
 │   ├── voice/             # ASR abstraction + medical speech post-processing
-│   ├── security/          # Masking/audit/RBAC/crypto/input security/MFA/MLPS
+│   ├── internet-hospital/ # Realname/WeChat login providers (local demo + real)
+│   ├── security/          # Masking/audit/RBAC/crypto/field encryption/input security/MFA/MLPS
 │   ├── integration/       # HIS/EMR/LIS/PACS, FHIR/HL7/DICOM, adapters, monitoring
 │   ├── resilience/        # Rate limiter/circuit breaker/bulkhead/concurrency/async queue
 │   ├── cache/             # Redis abstraction/distributed lock/rate-limit/session/cache
@@ -270,8 +281,9 @@ jlmedaios/
 │   └── ui/                # Ink terminal UI
 ├── agents/                # Must-have agent packages (agent.yaml + prompts + examples)
 ├── web/                   # React19 + Vite + AntD5 console and low-code canvas
+├── miniprogram/           # WeChat mini-program patient app (login/profiles/realname/detail)
 ├── services/              # Standalone Python model services (e.g. radar-inference)
-├── deploy/postgres/init/  # 61 tables, layered schemas + seeds (SQL migrations)
+├── deploy/postgres/init/  # 87 tables, layered schemas + seeds (SQL migrations)
 ├── scripts/               # Knowledge seeds/fetcher, DB import/check/backup
 ├── docs/                  # Architecture/AI-native/API/deployment/ops/users/ADR
 ├── examples/              # API/streaming/WebSocket/orchestration examples
@@ -282,9 +294,9 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1428 and frontend 509 unit/integration tests green** (6571 backend assertions); backend coverage ~**86%**, only increasing.
+- **Backend 1567 and frontend 567 unit/integration tests green** (6875 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
-- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records.
+- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
 - GitHub Actions CI: typecheck → lint → tests+coverage → integration → security audit → build (incl. web).
 
@@ -302,6 +314,7 @@ cd web && bun run build    # frontend production build
   - [01 Top-Level Design](docs/ai-native-hospital/01-top-level-design.en.md)
   - [02 Strangler Roadmap](docs/ai-native-hospital/02-strangler-roadmap.en.md)
   - [03 Architecture Expert Review](docs/ai-native-hospital/03-architecture-review.en.md)
+  - [04 Internet Hospital Platform](docs/ai-native-hospital/04-internet-hospital-platform.en.md)
 - Deployment, operations, API, ADR, requirements, testing, and user docs are under [docs/](docs/).
 
 ---
@@ -310,7 +323,7 @@ cd web && bun run build    # frontend production build
 
 ```
 M0 Outpatient ✅ → M1 Inpatient+Emergency ✅ → M2 Pharmacy/Documentation/QC/Voice ✅
-   → M3 Billing/Insurance DRG-DIP/Front page (in progress)
+   → M3 Archive/Billing/Insurance/OR/Appointments/Internet-hospital base (core slices closed, deepening)
         → M4 Knowledge/RAG + low-code orchestration
              → M5 Multi-tenant/multi-campus + lakehouse/research cohorts
                   → M6 Cloud-native production (K8s/mesh) + MLPS L3/MFA/real integration
@@ -321,10 +334,13 @@ M0 Outpatient ✅ → M1 Inpatient+Emergency ✅ → M2 Pharmacy/Documentation/Q
 - [x] 38 tools + 43 CDS rules + must-have agents
 - [x] Knowledge platform + compliant source fetcher
 - [x] Voice records, PostgreSQL/Redis foundation, web console
-- [ ] M3 front page / billing / insurance DRG-DIP
+- [x] M3 front page / billing-refunds / DRG-DIP local grouping / OR-anesthesia / appointments-follow-up
+- [x] MFA, critical-value closed loop, lab/imaging interpretation, reconciliation skeleton, RBAC backfill
+- [x] Internet hospital base (WeChat mini-program, realname, online credentials, field encryption)
+- [ ] Internet hospital online consultation/e-prescription flow/online insurance pay/drug delivery
 - [ ] Unified Idempotency-Key framework, Kafka replacing in-memory buses, real load baseline
 - [ ] CI/local consistency (master branches, DB in CI, full gate)
-- [ ] MFA persistence and login enforcement, SM2/SM3/SM4, MLPS L3 assessment
+- [ ] Full MFA coverage, SM2/SM3/SM4, MLPS L3 assessment
 - [ ] Multi-tenant/multi-campus, lakehouse, EMPI, multimodal/federated, internationalization
 
 ---

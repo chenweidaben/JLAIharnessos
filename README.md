@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1428-success.svg)](#-测试与质量)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-509-success.svg)](#-测试与质量)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1567-success.svg)](#-测试与质量)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-567-success.svg)](#-测试与质量)
 [![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
@@ -64,11 +64,20 @@
 | **M2-A** | 药房发药 | 调剂发药、库存联动、健康门禁 | 并发不重复、断库报错 + 水印 |
 | **M2-B** | 病历质控 | 三级签名 + 退回整改重提 | 状态机 + 签名链 |
 | **M2-C** | 语音病历 | 口述转写 → 复核 → 本人签名结构化病历 | 重启不丢、ASR 可插拔 |
-| **M3** | 收费/医保/病案 | 进行中（病案首页 → 收费/医保 DRG-DIP） | — |
+| **M3-A** | 病案首页 | 出院自动汇聚、编码/质控/归档状态机 | 幂等、行锁、审计 |
+| **M3-B** | 收费结算 | 费用明细 → 结算 → 票据 → 退费 Saga 补偿 | 并发不重复、状态机 |
+| **M3-C** | MFA | 双因素认证持久化与登录强制 | TOTP/备份码 |
+| **M3-D** | DRG/DIP | 出院病例本地分组（不接外部医保） | 确定性可重算 |
+| **M3-E** | 检查检验解读 | AI 辅助解读骨架 + 医师签名 | 确定性引擎 |
+| **M3-F** | 危急值 | 自动上报 + 签收/处置状态机闭环 | 全链路留痕 |
+| **M3-G** | 医保对账 | 本地重算对账骨架（不接外部医保） | 差异可定位 |
+| **M3-H** | 手术麻醉 | 三甲核心临床域状态机闭环 | 状态机 + 记录 |
+| **M3-I** | 预约随访 | 预约确认/就诊关联 + 随访计划/记录 | 幂等、状态机 |
+| **M3-J** | 互联网医院基座 | 微信登录/实名就诊/线上资质/字段加密/小程序 | 真实 HTTP + 断库 + 水印 |
 
 **四类真实取证（非演示）**：
 
-1. **真实数据库**：本地 PostgreSQL 16（端口 5433），5 schema **61 张基表**（iam 7 / clinical 30 / agent 8 / knowledge 14 / audit 2），关键写操作可查回、**重启不丢**。
+1. **真实数据库**：本地 PostgreSQL 16（端口 5433），5 schema **87 张基表**（iam 8 / clinical 54 / agent 8 / knowledge 14 / audit 2），关键写操作可查回、**重启不丢**。
 2. **真实大模型**：DeepSeek 流式对话 + ReAct 工具调用（OpenAI 兼容），会话/消息/调用链落库；模型经 `LLM_PROVIDER` 工厂可插拔。
 3. **审计哈希链**：`audit.audit_logs` 由 BEFORE INSERT 触发器自动维护 `seq/prev_hash/hash` 哈希链，业务变更与审计同事务提交，链内防篡改。
 4. **并发/故障韧性**：并发写不重复（唯一约束 + 状态机 + 行锁/advisory lock）；断库时统一错误信封 + 水印，不白屏、不静默返回空数据；越权返回 403。
@@ -86,7 +95,8 @@
 | 🔧 **38 个医疗工具** | 患者/病历/质控/处方药品/临床决策/检验检查/医嘱/患者服务/运营/系统集成十大类，统一风险分级与权限模型 |
 | 💊 **临床决策支持 CDS** | 43 条开箱规则（药物相互作用、检验危急值、诊疗规范），主动提醒 + 拦截确认，规则热加载 |
 | 🎙️ **语音电子病历** | ASR Provider 抽象 + 医学口语后处理（去填充词、术语规范化、剂量/频次识别，只标注不改数字） |
-| 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入多层防护、JWT 验签、安全响应头、CSRF |
+| 🌐 **互联网医院基座** | 微信小程序患者端（登录/就诊人/实名/详情）、微信 code 登录、实名认证（身份证校验位/第三方网关）、医护线上资质审核状态机；AES-256-GCM 字段级加密姓名/手机号/身份证，对标智慧服务三级 |
+| 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入多层防护、JWT 验签、MFA 双因素、安全响应头、CSRF |
 | 🔌 **全系统集成** | HIS/EMR/LIS/PACS 适配器（重试/熔断/超时）、HL7 v2.x（16 消息）、FHIR R4（22 资源）、DICOM（DICOMWeb）、Kafka 事件总线（规划）、五大厂商适配骨架 |
 | 🖥️ **Web 工作台 + 终端** | React 19 + Ant Design 5：50+ 业务路由、门诊/住院/急诊/药事/质控/语音场景；同时保留 Ink 终端交互 |
 | 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（61 表/审计哈希链/PITR）、Redis（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
@@ -191,8 +201,8 @@ cd web && bun install && bun run dev    # http://localhost:5173
 
 ```bash
 bun run typecheck                 # 后端类型检查 0 错误
-bun test                          # 后端 1428 测试
-cd web && bunx vitest run         # 前端 509 测试
+bun test                          # 后端 1567 测试
+cd web && bunx vitest run         # 前端 567 测试
 cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```
 
@@ -294,7 +304,8 @@ jlmedaios/
 │   ├── knowledge/         # RAG 检索引擎 + CDS 规则（43 条）
 │   ├── knowledge-platform/# 知识中台（术语/图谱/租户/版本/混合检索）
 │   ├── voice/             # 语音 ASR 抽象与医学口语后处理
-│   ├── security/          # 脱敏/审计/RBAC/加密/输入安全/MFA/等保
+│   ├── internet-hospital/ # 实名认证 / 微信登录提供方（本地演示 + 真实双模式）
+│   ├── security/          # 脱敏/审计/RBAC/加密/字段加密/输入安全/MFA/等保
 │   ├── integration/       # HIS/EMR/LIS/PACS、FHIR/HL7/DICOM、适配器、监控
 │   ├── resilience/        # 限流/熔断/舱壁/并发限制/异步队列
 │   ├── cache/             # Redis 抽象/分布式锁/限流/会话/缓存
@@ -303,8 +314,9 @@ jlmedaios/
 │   └── ui/                # Ink 终端医疗化界面
 ├── agents/                # 刚需智能体包（agent.yaml + prompts + 示例）
 ├── web/                   # React19 + Vite + AntD5 工作台与低代码画布
+├── miniprogram/           # 微信小程序患者端（登录/就诊人/实名/详情）
 ├── services/              # Python 独立模型服务（如 radar-inference）
-├── deploy/postgres/init/  # 61 表分层 schema + 种子（SQL 迁移）
+├── deploy/postgres/init/  # 87 表分层 schema + 种子（SQL 迁移）
 ├── scripts/               # 知识种子/合规下载、DB 导入/校验/备份
 ├── docs/                  # 架构/AI 原生医院/API/部署/运维/用户/ADR
 ├── examples/              # API / 流式 / WebSocket / 编排示例
@@ -315,9 +327,9 @@ jlmedaios/
 
 ## 测试与质量
 
-- **后端 1428、前端 509 单元/集成测试全绿**（后端 6571 个断言）；后端覆盖率约 **86%**，覆盖率只增不减；
+- **后端 1567、前端 567 单元/集成测试全绿**（后端 6875 个断言）；后端覆盖率约 **86%**，前端覆盖率门禁通过，覆盖率只增不减；
 - 前后端 **TypeScript 严格模式零类型错误**，ESLint 0 error；
-- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历；
+- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历、病案首页、收费结算退费、手术麻醉、预约随访、互联网医院实名就诊；
 - 安全测试：Prompt 注入、SQL/XSS/命令注入、鉴权、数据范围、安全响应头；
 - CI（GitHub Actions）：typecheck → lint → 单测+覆盖率 → 集成 → 安全审计 → 构建（含前端）。
 
@@ -335,6 +347,7 @@ cd web && bun run build    # 前端生产构建
   - [01 顶层设计](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
   - [02 Strangler 路线图](docs/ai-native-hospital/02-strangler-roadmap.zh-CN.md)
   - [03 架构专家评审](docs/ai-native-hospital/03-architecture-review.zh-CN.md)
+  - [04 互联网医院一体化平台](docs/ai-native-hospital/04-internet-hospital-platform.zh-CN.md)
 - 部署、运维、API、ADR、需求、测试、用户手册等见 [docs/](docs/)。
 
 ---
@@ -343,7 +356,7 @@ cd web && bun run build    # 前端生产构建
 
 ```
 M0 门诊 ✅ → M1 住院+急诊 ✅ → M2 药事/病历/质控/语音 ✅
-   → M3 收费/医保 DRG-DIP/病案首页（进行中）
+   → M3 病案/收费/医保/手术/预约随访/互联网医院基座（核心切片已闭环，持续深化）
         → M4 知识中台/RAG + 低代码编排
              → M5 多租户一院多区 + 湖仓/科研专病库
                   → M6 云原生生产化(K8s/网格) + 等保三级/MFA/真实系统联调
@@ -354,10 +367,13 @@ M0 门诊 ✅ → M1 住院+急诊 ✅ → M2 药事/病历/质控/语音 ✅
 - [x] 38 医疗工具 + 43 CDS 规则 + 刚需智能体
 - [x] 知识中台 + 权威知识库合规获取
 - [x] 语音病历、PostgreSQL/Redis 基座、Web 工作台
-- [ ] M3 病案首页 / 收费 / 医保 DRG-DIP
+- [x] M3 病案首页 / 收费结算退费 / DRG-DIP 本地分组 / 手术麻醉 / 预约随访
+- [x] MFA 双因素、危急值闭环、检查检验解读、医保对账骨架、RBAC 补齐
+- [x] 互联网医院基座（微信小程序患者端、实名就诊、线上资质、字段加密）
+- [ ] 互联网医院在线问诊/电子处方流转/医保线上支付/药品配送深化
 - [ ] 统一 Idempotency-Key 框架、Kafka 替换内存总线、真实压测基线
 - [ ] CI 与本地一致性整改（分支 master、CI 内置 DB 跑全量门禁）
-- [ ] MFA 持久化与登录强制、国密 SM2/SM3/SM4、等保三级测评
+- [ ] MFA 登录全覆盖、国密 SM2/SM3/SM4、等保三级测评
 - [ ] 多租户/一院多区、湖仓、EMPI、多模态与联邦协作、国际化
 
 ---
