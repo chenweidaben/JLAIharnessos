@@ -54,20 +54,13 @@ jobs:
       - name: 生成变更日志
         id: changelog
         run: |
-          set +e
           TAG=${{ github.event.inputs.tag || github.ref_name }}
-          PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null)
-          if [ -n "$PREV_TAG" ]; then
-            git log "$PREV_TAG..$TAG" --pretty=format:"- %s (%h)" > CHANGELOG.md
-          else
-            git log "$TAG" --pretty=format:"- %s (%h)" > CHANGELOG.md
-          fi
           {
             echo "changelog<<EOF"
-            cat CHANGELOG.md
+            git log "$TAG" --pretty=format:"- %s (%h)" -n 50 || echo "（变更日志生成跳过）"
+            echo ""
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-          set -e
 
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v2
