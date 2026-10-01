@@ -87,7 +87,8 @@ async function executeQueryPatient(
   const parsed = QueryPatientInput.parse(input);
 
   // 数据源：演示模式走 mockData，真实模式走 patientRepo（字段已在数据层映射对齐）
-  const allPatients = await clinicalData.searchPatients();
+  // 将姓名/ID 作为关键字下推数据源过滤（避免分页截断把老患者挤出结果集）
+  const allPatients = await clinicalData.searchPatients(parsed.name);
 
   // 多条件过滤
   const results = allPatients.filter((p) => {

@@ -86,7 +86,12 @@ export async function createPatient(input: PatientCreateInput, sql?: DbExecutor)
   return mapRow(rows[0] as Record<string, unknown>);
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getPatientById(id: string, sql?: Sql): Promise<Patient | null> {
+  // 非 uuid 输入（如 MRN/病案号）直接返回 null，交由 getPatientByMrn 兜底，
+  // 避免参数化查询在 uuid 列上抛 invalid input syntax。
+  if (!UUID_RE.test(id)) return null;
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
