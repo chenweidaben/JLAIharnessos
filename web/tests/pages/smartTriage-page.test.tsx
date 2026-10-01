@@ -48,6 +48,11 @@ import {
 } from '@/services/api/smartTriage';
 
 const sysM = vi.mocked(systemApi);
+const mStart = vi.mocked(startTriageApi);
+const mChoose = vi.mocked(chooseDepartmentApi);
+const mSubmit = vi.mocked(submitPreliminaryApi);
+const mListPrelim = vi.mocked(listPreliminaryApi);
+const mConsume = vi.mocked(consumePreliminaryApi);
 
 const recommendations = [
   {
@@ -71,14 +76,14 @@ beforeEach(() => {
 
 it('在线：导诊全流程（症状→推荐→选择）', async () => {
   sysM.health.mockResolvedValue({ db: 'up' } as never);
-  startTriageApi.mockResolvedValue({
+  mStart.mockResolvedValue({
     session: {
       id: 's1', accountId: 'admin1', symptoms: '咳嗽发热',
       recommendations, status: 'open', dialog: [],
     },
     recommendations,
   } as never);
-  chooseDepartmentApi.mockResolvedValue({
+  mChoose.mockResolvedValue({
     id: 's1', status: 'completed', chosenDepartment: '呼吸内科',
     recommendations,
   } as never);
@@ -115,7 +120,7 @@ it('在线：导诊全流程（症状→推荐→选择）', async () => {
 
 it('在线：预问诊表单可填写并提交', async () => {
   sysM.health.mockResolvedValue({ db: 'up' } as never);
-  submitPreliminaryApi.mockResolvedValue({
+  mSubmit.mockResolvedValue({
     consultation: {
       id: 'p1', status: 'completed', targetDepartment: '呼吸内科',
       reportText: '预问诊报告',
@@ -144,7 +149,7 @@ it('在线：预问诊表单可填写并提交', async () => {
 
 it('在线：预问诊提交失败显示错误提示', async () => {
   sysM.health.mockResolvedValue({ db: 'up' } as never);
-  submitPreliminaryApi.mockRejectedValue(new Error('请完善：主诉'));
+  mSubmit.mockRejectedValue(new Error('请完善：主诉'));
 
   render(<SmartTriagePage />);
   await waitFor(() => expect(sysM.health).toHaveBeenCalled());
@@ -173,8 +178,8 @@ it('医护：报告列表 → 查看详情 → 采用报告', async () => {
     status: 'completed',
     reportText: '【预问诊报告】\n主诉：咳嗽 2 天\n现病史：2 天前出现咳嗽。',
   };
-  listPreliminaryApi.mockResolvedValue([report] as never);
-  consumePreliminaryApi.mockResolvedValue({
+  mListPrelim.mockResolvedValue([report] as never);
+  mConsume.mockResolvedValue({
     ...report,
     status: 'consumed',
   } as never);
@@ -206,8 +211,8 @@ it('医护：表格采用按钮 + 确认弹窗', async () => {
     id: 'p2', targetDepartment: '内科', chiefComplaint: '头晕',
     status: 'completed', reportText: '报告',
   };
-  listPreliminaryApi.mockResolvedValue([report] as never);
-  consumePreliminaryApi.mockResolvedValue({ ...report, status: 'consumed' } as never);
+  mListPrelim.mockResolvedValue([report] as never);
+  mConsume.mockResolvedValue({ ...report, status: 'consumed' } as never);
 
   render(<SmartTriagePage />);
   await waitFor(() => expect(sysM.health).toHaveBeenCalled());
@@ -230,7 +235,7 @@ it('医护：已采用/无科室报告的状态渲染', async () => {
     id: 'p3', targetDepartment: null, chiefComplaint: '乏力',
     status: 'consumed', reportText: '报告',
   };
-  listPreliminaryApi.mockResolvedValue([consumed] as never);
+  mListPrelim.mockResolvedValue([consumed] as never);
 
   render(<SmartTriagePage />);
   await waitFor(() => expect(sysM.health).toHaveBeenCalled());

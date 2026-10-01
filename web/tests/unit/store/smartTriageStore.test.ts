@@ -30,6 +30,12 @@ import { useSmartTriageStore } from '@/store/smartTriageStore';
 import type { TriageSession, PreliminaryConsultation } from '@/types/smartTriage';
 
 const sysM = vi.mocked(systemApi);
+const mStart = vi.mocked(startTriageApi);
+const mChoose = vi.mocked(chooseDepartmentApi);
+const mSubmit = vi.mocked(submitPreliminaryApi);
+const mListMy = vi.mocked(listMyTriageApi);
+const mListPrelim = vi.mocked(listPreliminaryApi);
+const mConsume = vi.mocked(consumePreliminaryApi);
 
 const session = (over: Partial<TriageSession> = {}): TriageSession => ({
   id: 's1',
@@ -100,7 +106,7 @@ describe('M3-P 智能导诊 Store', () => {
   });
 
   it('startTriage：推荐结果落库', async () => {
-    startTriageApi.mockResolvedValue({
+    mStart.mockResolvedValue({
       session: session(),
       recommendations: session().recommendations,
     } as never);
@@ -110,7 +116,7 @@ describe('M3-P 智能导诊 Store', () => {
   });
 
   it('chooseDepartment：会话更新', async () => {
-    chooseDepartmentApi.mockResolvedValue(
+    mChoose.mockResolvedValue(
       session({ status: 'completed', chosenDepartment: '神经内科' }),
     );
     await useSmartTriageStore.getState().chooseDepartment('s1', '神经内科');
@@ -118,7 +124,7 @@ describe('M3-P 智能导诊 Store', () => {
   });
 
   it('submitPreliminary：报告落库', async () => {
-    submitPreliminaryApi.mockResolvedValue({
+    mSubmit.mockResolvedValue({
       consultation: preliminary(),
       reportText: '报告',
     } as never);
@@ -129,22 +135,22 @@ describe('M3-P 智能导诊 Store', () => {
   });
 
   it('loadMySessions：列表落库', async () => {
-    listMyTriageApi.mockResolvedValue([session()] as never);
+    mListMy.mockResolvedValue([session()] as never);
     await useSmartTriageStore.getState().loadMySessions();
     expect(useSmartTriageStore.getState().mySessions).toHaveLength(1);
   });
 
   it('loadStaffPreliminary：列表落库', async () => {
-    listPreliminaryApi.mockResolvedValue([preliminary()] as never);
+    mListPrelim.mockResolvedValue([preliminary()] as never);
     await useSmartTriageStore.getState().loadStaffPreliminary();
     expect(useSmartTriageStore.getState().staffPreliminary).toHaveLength(1);
   });
 
   it('consumePreliminary：采用后刷新列表', async () => {
-    consumePreliminaryApi.mockResolvedValue(
+    mConsume.mockResolvedValue(
       preliminary({ status: 'consumed' }),
     );
-    listPreliminaryApi.mockResolvedValue([preliminary({ status: 'consumed' })] as never);
+    mListPrelim.mockResolvedValue([preliminary({ status: 'consumed' })] as never);
     await useSmartTriageStore.getState().consumePreliminary('p1');
     expect(useSmartTriageStore.getState().staffPreliminary[0].status).toBe('consumed');
   });
