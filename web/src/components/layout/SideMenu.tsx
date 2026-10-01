@@ -33,6 +33,8 @@ import {
   CalendarOutlined,
   GlobalOutlined,
   MessageOutlined,
+  CarOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -84,6 +86,8 @@ const navItems: NavItem[] = [
   { key: '/consultation', icon: <MessageOutlined />, label: '图文问诊', perm: 'internet:consultation' },
   { key: '/internet-prescription', icon: <MedicineBoxOutlined />, label: '电子处方', perm: 'internet:prescription' },
   { key: '/internet-payment', icon: <CreditCardOutlined />, label: '在线支付·票据', perm: 'internet:payment:refund' },
+  { key: '/internet-delivery', icon: <CarOutlined />, label: '处方配送', perm: 'internet:delivery:fulfill' },
+  { key: '/internet-reports', icon: <FileSearchOutlined />, label: '在线报告', perm: 'internet:report:view' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

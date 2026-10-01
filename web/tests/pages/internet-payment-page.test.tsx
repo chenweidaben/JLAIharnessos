@@ -212,9 +212,9 @@ it('患者在线：在途支付单可取消', async () => {
     payments: [payment({ status: 'pending', channelTxnNo: null, paidBy: null, paidAt: null })],
   });
   payM.myInvoices.mockResolvedValue({ invoices: [] });
-  payM.cancel.mockResolvedValue(
-    payment({ status: 'cancelled', cancelledAt: '2026-10-01T09:00:00Z' }),
-  );
+  payM.cancel.mockResolvedValue({
+    payment: payment({ status: 'cancelled', cancelledAt: '2026-10-01T09:00:00Z' }),
+  });
 
   render(<InternetPaymentWorkbench />);
   expect(await screen.findByText('OP20261001001')).toBeTruthy();

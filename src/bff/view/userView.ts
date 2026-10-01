@@ -40,6 +40,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'appt:view', 'appt:confirm', 'appt:followup',
     'internet:consultation:audit',
     'internet:prescription:view', 'internet:payment:refund', 'internet:invoice:view',
+    'internet:delivery:create', 'internet:delivery:view', 'internet:report:view',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -60,6 +61,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'surgery:view', 'surgery:anesthesia', 'surgery:discharge',
     'appt:view', 'appt:confirm', 'appt:followup',
     'internet:consultation', 'internet:prescription',
+    'internet:delivery:view', 'internet:report:view',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
@@ -69,6 +71,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'billing:read',
     'internet:prescription:audit', 'internet:prescription:view',
     'internet:payment:refund', 'internet:invoice:view',
+    'internet:delivery:create', 'internet:delivery:fulfill', 'internet:delivery:view',
   ],
   nurse: [
     'dashboard:view', 'patient:view',

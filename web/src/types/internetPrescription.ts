@@ -10,7 +10,8 @@ export type EPrescriptionStatus =
   | 'approved'
   | 'rejected'
   | 'returned'
-  | 'cancelled';
+  | 'cancelled'
+  | 'paid';
 
 export interface EPrescriptionItemView {
   id: string;
