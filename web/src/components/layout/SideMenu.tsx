@@ -90,6 +90,7 @@ const navItems: NavItem[] = [
   { key: '/internet-delivery', icon: <CarOutlined />, label: '处方配送', perm: 'internet:delivery:fulfill' },
   { key: '/internet-reports', icon: <FileSearchOutlined />, label: '在线报告', perm: 'internet:report:view' },
   { key: '/satisfaction', icon: <SmileOutlined />, label: '满意度评价', perm: 'satisfaction:view' },
+  { key: '/smart-triage', icon: <MedicineBoxOutlined />, label: '智能导诊', perm: 'triage:use' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

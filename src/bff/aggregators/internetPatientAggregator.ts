@@ -100,7 +100,7 @@ export async function loginWithWechat(input: { code: string; ip?: string }): Pro
         sub: r.account.id,
         name: '患者',
         roles: ['patient'],
-        permissions: ['patient:account', 'patient:realname'],
+        permissions: ['patient:account', 'patient:realname', 'triage:use'],
       },
       Number(process.env.PATIENT_TOKEN_TTL ?? 7200),
     );

@@ -42,6 +42,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'internet:prescription:view', 'internet:payment:refund', 'internet:invoice:view',
     'internet:delivery:create', 'internet:delivery:view', 'internet:report:view',
     'satisfaction:view', 'satisfaction:submit',
+    'triage:use', 'triage:view',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -64,6 +65,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'internet:consultation', 'internet:prescription',
     'internet:delivery:view', 'internet:report:view',
     'satisfaction:view', 'satisfaction:submit',
+    'triage:use', 'triage:view',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
@@ -84,10 +86,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'nursing:record', 'nursing:task', 'inpatient_order:administer',
     'inventory:view', 'billing:read',
     'satisfaction:view', 'satisfaction:submit',
+    'triage:use', 'triage:view',
   ],
   technician: ['lab:read', 'imaging:read', 'medical_record:write'],
   researcher: ['medical_record:read', 'lab:read', 'report:view'],
-  patient: ['satisfaction:view', 'satisfaction:submit'],
+  patient: ['satisfaction:view', 'satisfaction:submit', 'triage:use'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */
