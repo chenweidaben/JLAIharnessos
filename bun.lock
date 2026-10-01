@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "jianlan-medical-agent",
+      "name": "jianlan-gang-os",
       "dependencies": {
         "@anthropic-ai/sdk": "0.80.0",
         "@modelcontextprotocol/sdk": "1.29.0",
