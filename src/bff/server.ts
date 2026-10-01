@@ -52,6 +52,7 @@ import { surgeryRoutes } from './routes/surgery';
 import { apptRoutes } from './routes/appt';
 import { internetHospitalRoutes } from './routes/internetHospital';
 import { consultationRoutes } from './routes/consultation';
+import { internetPrescriptionRoutes } from './routes/internetPrescription';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -88,6 +89,7 @@ const allRoutes: RouteDef[] = [
   ...apptRoutes,
   ...internetHospitalRoutes,
   ...consultationRoutes,
+  ...internetPrescriptionRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,
