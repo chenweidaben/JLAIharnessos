@@ -29,6 +29,7 @@ import {
   AudioOutlined,
   FolderOpenOutlined,
   MoneyCollectOutlined,
+  CreditCardOutlined,
   CalendarOutlined,
   GlobalOutlined,
   MessageOutlined,
@@ -82,6 +83,7 @@ const navItems: NavItem[] = [
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院', perm: 'internet:practitioner:audit' },
   { key: '/consultation', icon: <MessageOutlined />, label: '图文问诊', perm: 'internet:consultation' },
   { key: '/internet-prescription', icon: <MedicineBoxOutlined />, label: '电子处方', perm: 'internet:prescription' },
+  { key: '/internet-payment', icon: <CreditCardOutlined />, label: '在线支付·票据', perm: 'internet:payment:refund' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

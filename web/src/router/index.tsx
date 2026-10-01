@@ -44,6 +44,8 @@ const InternetHospital = lazy(() => import('@/pages/internetHospital'));
 const ConsultationWorkbench = lazy(() => import('@/pages/consultation'));
 // 互联网电子处方（M3-L）
 const InternetPrescriptionWorkbench = lazy(() => import('@/pages/internetPrescription'));
+// 互联网在线支付 / 电子票据（M3-M）
+const InternetPaymentWorkbench = lazy(() => import('@/pages/internetPayment'));
 // 临床业务：门诊 / 住院
 const OutpatientPage = lazy(() => import('@/pages/OutpatientPage'));
 const OutpatientConsultPage = lazy(() => import('@/pages/OutpatientConsultPage'));
@@ -169,6 +171,7 @@ export default function AppRoutes() {
           <Route path="consultation" element={<ConsultationWorkbench />} />
           {/* 互联网电子处方工作站（M3-L）：医生开方 / 药师审方 */}
           <Route path="internet-prescription" element={<InternetPrescriptionWorkbench />} />
+          <Route path="internet-payment" element={<InternetPaymentWorkbench />} />
           {/* 临床业务：门诊 / 住院 */}
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />
