@@ -59,6 +59,7 @@ import { satisfactionRoutes } from './routes/satisfaction';
 import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
 import { referralRoutes } from './routes/referral';
+import { knowledgeBaseRoutes } from './routes/knowledgeBase';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -102,6 +103,7 @@ const allRoutes: RouteDef[] = [
   ...smartTriageRoutes,
   ...delegationRoutes,
   ...referralRoutes,
+  ...knowledgeBaseRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,

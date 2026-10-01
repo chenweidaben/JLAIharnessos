@@ -43,6 +43,7 @@ const Satisfaction = lazy(() => import('@/pages/satisfaction'));
 const SmartTriage = lazy(() => import('@/pages/smartTriage'));
 const DigitalCompanion = lazy(() => import('@/pages/digitalCompanion'));
 const Referral = lazy(() => import('@/pages/referral'));
+const KnowledgeBase = lazy(() => import('@/pages/knowledgeBase'));
 // 互联网医院管理端（M3-J）
 const InternetHospital = lazy(() => import('@/pages/internetHospital'));
 const ConsultationWorkbench = lazy(() => import('@/pages/consultation'));
@@ -179,6 +180,8 @@ export default function AppRoutes() {
           <Route path="digital-companion" element={<DigitalCompanion />} />
           {/* 双向转诊（M3-R）：referral:manage/view/accept */}
           <Route path="referral" element={<Referral />} />
+          {/* 知识库管理（M4-A）：knowledge:read/manage */}
+          <Route path="knowledge-base" element={<KnowledgeBase />} />
           {/* 互联网医院管理端（M3-J）：医护线上资质审核 */}
           <Route path="internet-hospital" element={<InternetHospital />} />
           {/* 互联网问诊工作站（M3-K）：医生接诊/图文回复 */}
