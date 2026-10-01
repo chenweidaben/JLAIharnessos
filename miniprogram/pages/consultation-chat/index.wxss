@@ -1,0 +1,61 @@
+/* 健澜科技 jlmedaios - 问诊聊天（M3-K） */
+page { height: 100%; }
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 18rpx 28rpx;
+}
+.header-dept { font-size: 28rpx; font-weight: 600; color: #1f2937; }
+.header-status { font-size: 24rpx; }
+.status-pending { color: #ad6800; }
+.status-in_consultation { color: #0b3d91; }
+.status-completed { color: #389e0d; }
+.status-cancelled, .status-timed_out { color: #8c8c8c; }
+
+.messages { flex: 1; padding: 24rpx; }
+
+.system { text-align: center; margin: 18rpx 0; }
+.system text { font-size: 22rpx; color: #9ca3af; }
+
+.row { display: flex; margin-bottom: 20rpx; }
+.row.left { justify-content: flex-start; }
+.row.right { justify-content: flex-end; }
+.bubble {
+  max-width: 70%;
+  padding: 16rpx 22rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  word-break: break-word;
+}
+.bubble-patient { background: #fff; color: #1f2937; }
+.bubble-doctor { background: #0b3d91; color: #fff; }
+
+.footer { background: #fff; border-top: 1rpx solid #eef0f3; }
+.cancel-bar { text-align: center; padding: 12rpx 0; }
+.cancel-btn { color: #d4380d; font-size: 26rpx; }
+
+.input-bar {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 20rpx;
+  gap: 16rpx;
+}
+.input {
+  flex: 1;
+  background: #f5f7fa;
+  border-radius: 10rpx;
+  padding: 14rpx 20rpx;
+  font-size: 28rpx;
+}
+.send { background: #0b3d91; margin: 0; }
+
+.ended { text-align: center; color: #9ca3af; font-size: 24rpx; padding: 24rpx; }

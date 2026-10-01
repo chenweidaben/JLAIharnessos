@@ -1,0 +1,42 @@
+/* 健澜科技 jlmedaios - 我的问诊列表（M3-K） */
+.page { padding: 24rpx; padding-bottom: 180rpx; }
+
+.session {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 18rpx;
+}
+.session-top { display: flex; align-items: center; justify-content: space-between; }
+.session-no { font-size: 22rpx; color: #9ca3af; }
+.session-dept { font-size: 26rpx; color: #4b5563; margin-top: 12rpx; }
+.session-complaint {
+  font-size: 24rpx; color: #6b7280; margin-top: 8rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+}
+.status-pending { background: #fff7e6; color: #ad6800; }
+.status-in_consultation { background: #e6f4ff; color: #0b3d91; }
+.status-completed { background: #f6ffed; color: #389e0d; }
+.status-cancelled, .status-timed_out { background: #f5f5f5; color: #8c8c8c; }
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 26rpx;
+  padding: 60rpx 0;
+}
+.btn { margin-top: 20rpx; }
+
+.fab {
+  position: fixed;
+  left: 40rpx;
+  right: 40rpx;
+  bottom: 40rpx;
+  background: #0b3d91;
+}

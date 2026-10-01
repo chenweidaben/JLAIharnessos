@@ -1,0 +1,60 @@
+/* 健澜科技 jlmedaios - 发起复诊问诊（M3-K） */
+.page { padding: 24rpx; padding-bottom: 160rpx; }
+
+.notice {
+  background: #fff7e6;
+  border: 1rpx solid #ffd591;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 20rpx;
+}
+.notice-text { color: #ad6800; font-size: 24rpx; }
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+.card-title { font-size: 28rpx; font-weight: 600; color: #1f2937; margin-bottom: 16rpx; }
+
+.picker { display: flex; align-items: center; justify-content: space-between; }
+.picker .placeholder { color: #9ca3af; }
+.picker-arrow { color: #9ca3af; }
+
+.search {
+  background: #f5f7fa;
+  border-radius: 10rpx;
+  padding: 14rpx 20rpx;
+  font-size: 26rpx;
+  margin-bottom: 16rpx;
+}
+
+.doctor {
+  border: 1rpx solid #eef0f3;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  margin-bottom: 14rpx;
+}
+.doctor.selected { border-color: #0b3d91; background: #f0f6ff; }
+.doctor-main { display: flex; align-items: center; gap: 12rpx; }
+.doctor-name { font-size: 28rpx; font-weight: 600; color: #1f2937; }
+.doctor-title { font-size: 22rpx; color: #0b3d91; }
+.doctor-sub {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8rpx; font-size: 24rpx; color: #6b7280;
+}
+.badge { color: #0b3d91; font-size: 22rpx; }
+.empty { text-align: center; color: #9ca3af; font-size: 24rpx; padding: 20rpx; }
+
+.textarea {
+  width: 100%;
+  min-height: 140rpx;
+  background: #f5f7fa;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  box-sizing: border-box;
+}
+
+.submit { margin-top: 12rpx; background: #0b3d91; }

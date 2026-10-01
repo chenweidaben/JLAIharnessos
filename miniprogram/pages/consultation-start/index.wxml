@@ -1,0 +1,56 @@
+<!-- 健澜科技 jlmedaios - 发起复诊问诊（M3-K） -->
+<view class="page">
+  <view class="notice">
+    <text class="notice-text">互联网医院仅提供复诊服务，禁止首诊；发起前请确认已在本院就诊。</text>
+  </view>
+
+  <!-- 就诊人 -->
+  <view class="card">
+    <view class="card-title">就诊人</view>
+    <picker mode="selector" range="{{profiles}}" range-key="nameMasked"
+            value="{{profileIndex}}" bindchange="onProfileChange">
+      <view class="picker">
+        <block wx:if="{{profiles.length}}">
+          <text>{{profiles[profileIndex].nameMasked}}</text>
+          <text class="picker-arrow" wx:if="{{profiles[profileIndex].authLevel < 2}}">（未实名）</text>
+        </block>
+        <text wx:else class="placeholder">请先添加就诊人</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 医生 -->
+  <view class="card">
+    <view class="card-title">选择医生</view>
+    <input class="search" placeholder="按科室筛选，如：内科"
+           value="{{department}}" bindinput="onDepartmentInput" />
+    <view class="doctor-list">
+      <view class="doctor {{selectedDoctor === item.userId ? 'selected' : ''}}"
+            wx:for="{{doctors}}" wx:key="userId"
+            data-id="{{item.userId}}" bindtap="selectDoctor">
+        <view class="doctor-main">
+          <text class="doctor-name">{{item.name}}</text>
+          <text class="doctor-title" wx:if="{{item.title}}">{{item.title}}</text>
+        </view>
+        <view class="doctor-sub">
+          <text>{{item.department || item.practiceScope}}</text>
+          <text class="badge" wx:if="{{selectedDoctor === item.userId}}">已选</text>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{!doctors.length}}">暂无可问诊医生</view>
+    </view>
+  </view>
+
+  <!-- 主诉 -->
+  <view class="card">
+    <view class="card-title">主诉 / 病情描述</view>
+    <textarea class="textarea" placeholder="请简要描述本次复诊的症状与诉求"
+              maxlength="300" value="{{chiefComplaint}}"
+              bindinput="onComplaintInput" />
+  </view>
+
+  <button class="submit" type="primary" loading="{{submitting}}" bindtap="onSubmit">
+    发起复诊问诊
+  </button>
+</view>

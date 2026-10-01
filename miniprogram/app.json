@@ -4,7 +4,10 @@
     "pages/login/index",
     "pages/profile-add/index",
     "pages/realname/index",
-    "pages/profile-detail/index"
+    "pages/profile-detail/index",
+    "pages/consultation-list/index",
+    "pages/consultation-start/index",
+    "pages/consultation-chat/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -19,6 +22,10 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
+      {
+        "pagePath": "pages/consultation-list/index",
+        "text": "问诊"
+      },
       {
         "pagePath": "pages/index/index",
         "text": "就诊人"

@@ -1,0 +1,30 @@
+<!-- 健澜科技 jlmedaios - 我的问诊列表（M3-K） -->
+<view class="page">
+  <block wx:if="{{loggedIn}}">
+    <view class="session {{item.status}}" wx:for="{{sessions}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goChat">
+      <view class="session-top">
+        <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+        <text class="session-no">{{item.sessionNo}}</text>
+      </view>
+      <view class="session-dept">{{item.department}}</view>
+      <view class="session-complaint" wx:if="{{item.chiefComplaint}}">
+        主诉：{{item.chiefComplaint}}
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!sessions.length && !loading}}">
+      暂无问诊记录
+    </view>
+    <view class="empty" wx:if="{{loading}}">加载中...</view>
+  </block>
+
+  <view class="empty" wx:if="{{!loggedIn}}">
+    <view>请先登录</view>
+    <button class="btn" size="mini" type="primary" bindtap="goLogin">去登录</button>
+  </view>
+
+  <button class="fab" type="primary" bindtap="goStart" wx:if="{{loggedIn}}">
+    + 发起问诊
+  </button>
+</view>

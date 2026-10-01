@@ -1,0 +1,39 @@
+<!-- 健澜科技 jlmedaios - 问诊聊天（M3-K） -->
+<view class="page">
+  <view class="header" wx:if="{{session}}">
+    <text class="header-dept">{{session.department}}</text>
+    <text class="header-status status-{{session.status}}">
+      {{session.status === 'pending' ? '待接诊' :
+        session.status === 'in_consultation' ? '问诊中' :
+        session.status === 'completed' ? '已结束' :
+        session.status === 'cancelled' ? '已取消' : '已超时'}}
+    </text>
+  </view>
+
+  <scroll-view scroll-y class="messages" scroll-into-view="{{anchor}}">
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="system" wx:if="{{item.senderType === 'system'}}">
+        <text>{{item.content}}</text>
+      </view>
+      <view class="row {{item.senderType === 'doctor' ? 'right' : 'left'}}"
+            wx:else>
+        <view class="bubble bubble-{{item.senderType}}">{{item.content}}</view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <view class="footer">
+    <view class="cancel-bar" wx:if="{{canCancel}}">
+      <text class="cancel-btn" bindtap="cancel">取消问诊</text>
+    </view>
+    <view class="input-bar" wx:if="{{canSend}}">
+      <input class="input" value="{{input}}" placeholder="输入消息"
+             bindinput="onInput" confirm-type="send" bindconfirm="send" />
+      <button class="send" size="mini" type="primary"
+              loading="{{sending}}" bindtap="send">发送</button>
+    </view>
+    <view class="ended" wx:if="{{!canSend && !canCancel}}">
+      会话已结束
+    </view>
+  </view>
+</view>
