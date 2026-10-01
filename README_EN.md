@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1567-success.svg)](#quality)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-567-success.svg)](#quality)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1595-success.svg)](#quality)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-586-success.svg)](#quality)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
 [![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-imaging-assist-damo-radar-fusion)
@@ -74,10 +74,11 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-I** | Appointment & follow-up | appointment/encounter linkage + follow-up plans/records | idempotent, state machine |
 | **M3-J** | Internet hospital base | WeChat login/realname/online credentials/field encryption/mini-program | real HTTP + outage + watermark |
 | **M3-K** | Text consultation | appointment + consultation session/messages, revisit eligibility gate, state machine | real HTTP + unauthorized 403 + outage |
+| **M3-L** | Internet e-prescription | prescribing/review duty separation, no AI auto-prescribing, idempotency key, mandatory comment on reject/return | real HTTP + unauthorized 403 + state machine |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **89 base tables** across 5 schemas (iam 9 / clinical 56 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **91 base tables** across 5 schemas (iam 9 / clinical 58 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
@@ -178,8 +179,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1567 tests
-cd web && bunx vitest run            # frontend 567 tests
+bun test                             # backend 1595 tests
+cd web && bunx vitest run            # frontend 586 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -295,9 +296,9 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1567 and frontend 567 unit/integration tests green** (6875 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
+- **Backend 1595 and frontend 586 unit/integration tests green** (6938 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
-- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname.
+- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
 - GitHub Actions CI: typecheck → lint → tests+coverage → integration → security audit → build (incl. web).
 

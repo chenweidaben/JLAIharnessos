@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1567-success.svg)](#-测试与质量)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-567-success.svg)](#-测试与质量)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1595-success.svg)](#-测试与质量)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-586-success.svg)](#-测试与质量)
 [![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
@@ -75,10 +75,11 @@
 | **M3-I** | 预约随访 | 预约确认/就诊关联 + 随访计划/记录 | 幂等、状态机 |
 | **M3-J** | 互联网医院基座 | 微信登录/实名就诊/线上资质/字段加密/小程序 | 真实 HTTP + 断库 + 水印 |
 | **M3-K** | 图文问诊 | 预约 + 图文问诊会话/消息、复诊资格门禁、状态机 | 真实 HTTP + 越权 403 + 断库 |
+| **M3-L** | 互联网电子处方 | 开方/审方职责分离、无 AI 自动处方、幂等键、驳回退回必填意见 | 真实 HTTP + 越权 403 + 状态机 |
 
 **四类真实取证（非演示）**：
 
-1. **真实数据库**：本地 PostgreSQL 16（端口 5433），5 schema **89 张基表**（iam 9 / clinical 56 / agent 8 / knowledge 14 / audit 2），关键写操作可查回、**重启不丢**。
+1. **真实数据库**：本地 PostgreSQL 16（端口 5433），5 schema **91 张基表**（iam 9 / clinical 58 / agent 8 / knowledge 14 / audit 2），关键写操作可查回、**重启不丢**。
 2. **真实大模型**：DeepSeek 流式对话 + ReAct 工具调用（OpenAI 兼容），会话/消息/调用链落库；模型经 `LLM_PROVIDER` 工厂可插拔。
 3. **审计哈希链**：`audit.audit_logs` 由 BEFORE INSERT 触发器自动维护 `seq/prev_hash/hash` 哈希链，业务变更与审计同事务提交，链内防篡改。
 4. **并发/故障韧性**：并发写不重复（唯一约束 + 状态机 + 行锁/advisory lock）；断库时统一错误信封 + 水印，不白屏、不静默返回空数据；越权返回 403。
@@ -202,8 +203,8 @@ cd web && bun install && bun run dev    # http://localhost:5173
 
 ```bash
 bun run typecheck                 # 后端类型检查 0 错误
-bun test                          # 后端 1567 测试
-cd web && bunx vitest run         # 前端 567 测试
+bun test                          # 后端 1595 测试
+cd web && bunx vitest run         # 前端 586 测试
 cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```
 
@@ -328,9 +329,9 @@ jlmedaios/
 
 ## 测试与质量
 
-- **后端 1567、前端 567 单元/集成测试全绿**（后端 6875 个断言）；后端覆盖率约 **86%**，前端覆盖率门禁通过，覆盖率只增不减；
+- **后端 1595、前端 586 单元/集成测试全绿**（后端 6938 个断言）；后端覆盖率约 **86%**，前端覆盖率门禁通过，覆盖率只增不减；
 - 前后端 **TypeScript 严格模式零类型错误**，ESLint 0 error；
-- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历、病案首页、收费结算退费、手术麻醉、预约随访、互联网医院实名就诊；
+- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历、病案首页、收费结算退费、手术麻醉、预约随访、互联网医院实名就诊、图文问诊、电子处方/药师审方；
 - 安全测试：Prompt 注入、SQL/XSS/命令注入、鉴权、数据范围、安全响应头；
 - CI（GitHub Actions）：typecheck → lint → 单测+覆盖率 → 集成 → 安全审计 → 构建（含前端）。
 
