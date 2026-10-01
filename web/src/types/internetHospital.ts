@@ -23,6 +23,7 @@ export interface PatientProfileView {
   authLevel: number;
   isDefault: boolean;
   patientId: string | null;
+  delegatedScopes: string[];
 }
 
 /** 实名认证结果 */

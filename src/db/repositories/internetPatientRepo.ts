@@ -41,6 +41,9 @@ export interface PatientProfile {
   authLevel: number;
   guardianId: string | null;
   isDefault: boolean;
+  delegatedScopes: string[];
+  delegationGrantedAt: string | null;
+  delegationRevokedAt: string | null;
   verifiedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -81,6 +84,7 @@ const ACCT_COLS = `
 const PROFILE_COLS = `
   id, account_id, patient_id, relation, name_enc, name_masked, id_card_enc,
   id_card_hash, gender, birth_date, auth_level, guardian_id, is_default,
+  delegated_scopes, delegation_granted_at, delegation_revoked_at,
   verified_at, created_at, updated_at
 `;
 const PRACT_COLS = `
@@ -104,6 +108,23 @@ function mapAccount(r: Record<string, unknown>): PatientAccount {
   };
 }
 
+/**
+ * 解析 jsonb 数组：postgres.js 通常自动解析，但新建列/类型缓存
+ * 未命中时可能返回字符串，这里统一兜底，保证返回 string[]。
+ */
+function parseJsonbArray(v: unknown): string[] {
+  if (Array.isArray(v)) return v as string[];
+  if (typeof v === 'string' && v.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(v);
+      return Array.isArray(parsed) ? (parsed as string[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 function mapProfile(r: Record<string, unknown>): PatientProfile {
   return {
     id: String(r.id),
@@ -119,6 +140,9 @@ function mapProfile(r: Record<string, unknown>): PatientProfile {
     authLevel: Number(r.auth_level),
     guardianId: r.guardian_id ? String(r.guardian_id) : null,
     isDefault: Boolean(r.is_default),
+    delegatedScopes: parseJsonbArray(r.delegated_scopes),
+    delegationGrantedAt: r.delegation_granted_at ? String(r.delegation_granted_at) : null,
+    delegationRevokedAt: r.delegation_revoked_at ? String(r.delegation_revoked_at) : null,
     verifiedAt: r.verified_at ? String(r.verified_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),

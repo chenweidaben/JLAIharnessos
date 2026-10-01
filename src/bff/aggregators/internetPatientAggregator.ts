@@ -100,7 +100,7 @@ export async function loginWithWechat(input: { code: string; ip?: string }): Pro
         sub: r.account.id,
         name: '患者',
         roles: ['patient'],
-        permissions: ['patient:account', 'patient:realname', 'triage:use'],
+        permissions: ['patient:account', 'patient:realname', 'triage:use', 'delegation:manage'],
       },
       Number(process.env.PATIENT_TOKEN_TTL ?? 7200),
     );
@@ -148,6 +148,7 @@ export async function listMyProfiles(accountId: string): Promise<Array<{
   authLevel: number;
   isDefault: boolean;
   patientId: string | null;
+  delegatedScopes: string[];
 }>> {
   const profiles = await listProfilesRepo(accountId);
   return profiles.map((p) => ({
@@ -158,6 +159,7 @@ export async function listMyProfiles(accountId: string): Promise<Array<{
     authLevel: p.authLevel,
     isDefault: p.isDefault,
     patientId: p.patientId,
+    delegatedScopes: p.delegatedScopes,
   }));
 }
 
