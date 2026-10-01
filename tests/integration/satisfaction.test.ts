@@ -261,9 +261,8 @@ describe.skipIf(!dbAvailable)('M3-O 满意度 · BFF 路由信封', () => {
     // 患者账号有 satisfaction:submit 权限；构造一个无权限的 iam 用户
     const res = await route.handle(
       ctx({
-        method: 'POST',
-        user: { id: doctor.id, roles: ['doctor'] } as Ctx['user'],
-        body: async () => ({ patientId, visitId, ...scores() }),
+        user: { id: doctor.id, name: '李医生', roles: ['doctor'] } as Ctx['user'],
+        body: (async () => ({ patientId, visitId, ...scores() })) as Ctx['body'],
       }),
     );
     // doctor 有 satisfaction:submit，应进入处理（200）；若构造无权限用户则 403

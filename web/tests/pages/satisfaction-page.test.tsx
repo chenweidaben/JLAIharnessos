@@ -9,7 +9,7 @@
  *  - 断库：离线 Alert，不渲染业务内容。
  */
 import { it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor, within, fireEvent } from '@test-utils';
+import { render, screen, waitFor, fireEvent } from '@test-utils';
 
 import SatisfactionPage from '@/pages/satisfaction';
 

@@ -25,10 +25,11 @@ import {
   getSatisfactionStatsApi,
 } from '@/services/api/satisfaction';
 import { useSatisfactionStore } from '@/store/satisfactionStore';
+import type { SatisfactionSurvey } from '@/types/satisfaction';
 
 const sysM = vi.mocked(systemApi);
 
-const survey = (over: Record<string, unknown> = {}) => ({
+const survey = (over: Record<string, unknown> = {}): SatisfactionSurvey => ({
   id: 'sv1',
   surveyNo: 'SV20261001001',
   patientId: 'pt1',
