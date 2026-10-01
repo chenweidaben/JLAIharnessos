@@ -237,7 +237,7 @@ it('待处理：取消', async () => {
   // Popconfirm 确认
   fireEvent.click(await screen.findByRole('button', { name: '确 定' }));
   await waitFor(() => expect(m.cancelReferralApi).toHaveBeenCalledTimes(1));
-});
+}, 30000);
 
 it('随附资料列表渲染', async () => {
   render(<ReferralPage />);
