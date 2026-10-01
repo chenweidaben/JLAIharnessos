@@ -86,11 +86,13 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 | M3-D | DRG grouping | DRG/DIP grouping, settlement, explainable review | deterministic, traceable |
 | M3-E–H | (M3 extension slices) | see tags v0.3.0-m3e…m3h | real persistence, full gates |
 | M3-I | Appointment & follow-up | appointment → confirm → visit link → follow-up plans/records | state machine, survives restart |
+| M3-J | Internet hospital base | WeChat login/realname/credentials/field encryption/mini-program | real HTTP, outage, watermark |
+| M3-K | Text consultation | appointment + consultation session/messages, revisit eligibility gate, state machine | real HTTP, unauthorized 403, outage |
 
 ### 2.6.2 Current Quality Gates (real evidence)
 
-- Real DB: **83 base tables** across 5 schemas (iam 8 / clinical 51 / agent 8 / knowledge 14 / audit 2).
-- Backend **1531 tests green (134 files, 1 skip, 6817 expect)**; frontend **553 tests green (52 files)**; both tsc 0.
+- Real DB: **89 base tables** across 5 schemas (iam 9 / clinical 56 / agent 8 / knowledge 14 / audit 2).
+- Backend **1581 tests green (137 files, 1 skip, 6902 expect)**; frontend **582 tests green (56 files)**; both tsc 0.
 - Frontend coverage (all:false): lines 89.3 / branches 78.67 / functions 82.75 / statements 89.3; gate passed, thresholds unchanged.
 - 38 medical tools, 43 CDS rules, 22 FHIR resources, 16 HL7 messages, 26 authoritative knowledge sources.
 

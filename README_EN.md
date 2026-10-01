@@ -73,10 +73,11 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-H** | OR & anesthesia | tertiary core clinical-domain state machine | state machine + records |
 | **M3-I** | Appointment & follow-up | appointment/encounter linkage + follow-up plans/records | idempotent, state machine |
 | **M3-J** | Internet hospital base | WeChat login/realname/online credentials/field encryption/mini-program | real HTTP + outage + watermark |
+| **M3-K** | Text consultation | appointment + consultation session/messages, revisit eligibility gate, state machine | real HTTP + unauthorized 403 + outage |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **87 base tables** across 5 schemas (iam 8 / clinical 54 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **89 base tables** across 5 schemas (iam 9 / clinical 56 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
