@@ -78,10 +78,11 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-M** | Online payment / e-invoice | pluggable payment channels (WeChat Pay v3/mock), local Medicare split, invoice reversal, finance refund in one transaction | real HTTP + outage 503 + unauthorized 403 + state machine |
 | **M3-N** | Rx delivery / online reports | fulfillment of paid e-prescriptions (self-pick/express channels, tracking no., pickup-code redemption), online access to lab/imaging/AI interpretation | real HTTP + unauthorized 403 + audit-chain concurrency hardening |
 | **M3-O** | Satisfaction surveys | patient multi-dimension star ratings (6 dimensions) + comments, staff entry on behalf, average/positive-rate stats, one survey per visit/consultation | real HTTP + idempotency + unauthorized 403 + outage 503 |
+| **M3-P** | Smart triage / pre-consultation | symptom dialog → deterministic rule engine recommending departments (13 departments, emergency first), structured pre-consultation history → report for clinician to adopt | real HTTP + unauthorized 403 + restart persistence + outage 503 |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **93 base tables** across 5 schemas (iam 9 / clinical 60 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **95 base tables** across 5 schemas (iam 9 / clinical 62 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
@@ -182,8 +183,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1631 tests
-cd web && bunx vitest run            # frontend 628 tests
+bun test                             # backend 1673 tests (1 skip)
+cd web && bunx vitest run            # frontend 645 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -299,7 +300,7 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1631 and frontend 628 unit/integration tests green** (7036 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
+- **Backend 1673 and frontend 645 unit/integration tests green** (7103 backend assertions); backend coverage ~**87%**, frontend coverage gate passed, only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
 - E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review, online payment/e-invoice/finance refund.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
