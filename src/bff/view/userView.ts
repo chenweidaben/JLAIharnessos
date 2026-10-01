@@ -43,6 +43,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'internet:delivery:create', 'internet:delivery:view', 'internet:report:view',
     'satisfaction:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
+    'referral:view', 'referral:manage', 'referral:accept',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -66,6 +67,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'internet:delivery:view', 'internet:report:view',
     'satisfaction:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
+    'referral:view', 'referral:manage', 'referral:accept',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
@@ -87,6 +89,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'inventory:view', 'billing:read',
     'satisfaction:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
+    'referral:view',
   ],
   technician: ['lab:read', 'imaging:read', 'medical_record:write'],
   researcher: ['medical_record:read', 'lab:read', 'report:view'],

@@ -37,6 +37,7 @@ import {
   FileSearchOutlined,
   SmileOutlined,
   CustomerServiceOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -93,6 +94,7 @@ const navItems: NavItem[] = [
   { key: '/satisfaction', icon: <SmileOutlined />, label: '满意度评价', perm: 'satisfaction:view' },
   { key: '/smart-triage', icon: <MedicineBoxOutlined />, label: '智能导诊', perm: 'triage:use' },
   { key: '/digital-companion', icon: <CustomerServiceOutlined />, label: '数字陪诊', perm: 'delegation:view' },
+  { key: '/referral', icon: <SwapOutlined />, label: '双向转诊', perm: 'referral:view' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

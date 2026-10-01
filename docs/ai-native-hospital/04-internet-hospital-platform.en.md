@@ -237,25 +237,25 @@ Level 3 requires: **8 basic items all met (some application ratios ≥80%) + at 
 
 | # | Category | Item | Platform Support | Basic/Optional |
 |---|---|---|---|---|
-| 1 | Pre-visit | Appointment | WeChat time-based appointment, slot sync, in-consultation/follow-up/medical-community appointment | Basic |
-| 2 | Pre-visit | Emergency linkage | (in-hospital built; online call/appointment) | Optional |
-| 3 | Pre-visit | Referral | Online referral, community/group coordination | Optional |
-| 4 | During visit | Information push | Subscription messages: waiting/reports/critical values/surgery/admission-discharge/medication | Basic |
-| 5 | During visit | Signage & navigation | In-hospital navigation, building/department localization | Optional |
-| 6 | During visit | Patient convenience | Online convenience, escort/facilities (per hospital) | Optional |
-| 7 | Post-visit | Patient feedback | Mini-program satisfaction/complaints, service supervision | Basic |
-| 8 | Post-visit | Patient management (follow-up) | Follow-up plans/records, chronic disease management (in-hospital engine built) | Basic |
-| 9 | Post-visit | (other follow-up) | Return reminders, health records | Optional |
+| 1 | Pre-visit | Appointment | WeChat time-based appointment, slot sync, in-consultation/follow-up/medical-community appointment (M3-K) | Basic |
+| 2 | Pre-visit | Emergency linkage | In-hospital emergency linkage built; online appointment/call (M3-F) | Optional |
+| 3 | Pre-visit | Referral | Bidirectional referral orders, external document capture & storage, patient registration + visit creation on acceptance, medical-community coordination (M3-R) | Basic |
+| 4 | During visit | Information push | Subscription messages: waiting/reports/critical values/surgery/admission-discharge/medication (M3-F) | Basic |
+| 5 | During visit | Signage & navigation | Companion-guide step navigation; in-hospital indoor positioning/navigation per hospital (M3-Q) | Optional |
+| 6 | During visit | Patient convenience | Online convenience, escort/catering/facilities (per hospital) | Optional |
+| 7 | Post-visit | Patient feedback | Mini-program satisfaction/complaints, service supervision (M3-O) | Basic |
+| 8 | Post-visit | Patient management (follow-up) | Follow-up plans/records, chronic disease management (M3-I) | Optional |
+| 9 | Post-visit | Drug dispensing & delivery | Prescription lookup, drug leaflets, rational-use review, online delivery (M3-L/N) | Basic |
 | 10 | Post-visit | Family services | Family doctor signing, online family services (per region) | Optional |
-| 11 | End-to-end | (settlement assistance) | One-stop service, smart triage | Optional |
-| 12 | End-to-end | Payment | Online insurance settlement + mobile payment + e-invoice (core) | Basic |
-| 13 | End-to-end | Smart triage | AI triage + pre-consultation (core) | Basic |
-| 14 | End-to-end | (personalized) | Personalized push, health management | Optional |
-| 15 | End-to-end | Telemedicine | Video consultation, remote consultation (in-hospital built) | Optional |
-| 16 | Infrastructure | Security management | Real-name/MFA/encryption/Level 3/audit (core) | Basic |
-| 17 | Infrastructure | Service supervision | Service supervision mechanism, records, complaint closure | Basic |
+| 11 | End-to-end | Primary-care physician guidance | Remote teaching/consultation guidance, clinical decision support (per community) | Optional |
+| 12 | End-to-end | Payment | Online insurance settlement + mobile payment + e-invoice (M3-M) | Basic |
+| 13 | End-to-end | Smart triage | AI triage + pre-consultation (M3-P) | Basic |
+| 14 | End-to-end | Health education | Medical knowledge lookup, health education content (per hospital) | Optional |
+| 15 | End-to-end | Telemedicine | Text/video consultation, remote consultation (M3-K) | Basic |
+| 16 | Infrastructure | Security management | Real-name/MFA/encryption/audit (M3-C); MLPS Level 3 per assessment | Optional |
+| 17 | Infrastructure | Service supervision | Service supervision mechanism, records, complaint closure (M3-O) | Optional |
 
-> The 8 basic items (1, 4, 7, 8, 12, 13, 16, 17) are all built with priority; at least 4 optional items are met per hospital (e.g., 3, 5, 15), ensuring Level 3.
+> Per Annex 3 of the official *Hospital Smart Service Grading Assessment Standard System (Trial)*, the **Level 3 basic items are 1, 3, 4, 7, 9, 12, 13, 15 (8 items)**, all genuinely delivered by this platform (see *05 Smart Service Level 3 Self-Assessment*); among the 9 optional items, 2, 5, 6, 8, 16, 17 are available or partially available, satisfying the "at least 4 optional items met (application ratio ≥50%)" requirement.
 
 ---
 

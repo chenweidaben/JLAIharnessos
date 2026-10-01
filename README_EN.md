@@ -80,10 +80,11 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-O** | Satisfaction surveys | patient multi-dimension star ratings (6 dimensions) + comments, staff entry on behalf, average/positive-rate stats, one survey per visit/consultation | real HTTP + idempotency + unauthorized 403 + outage 503 |
 | **M3-P** | Smart triage / pre-consultation | symptom dialog → deterministic rule engine recommending departments (13 departments, emergency first), structured pre-consultation history → report for clinician to adopt | real HTTP + unauthorized 403 + restart persistence + outage 503 |
 | **M3-Q** | Digital companion | family delegation (scopes explicitly granted, empty by default; payment/refund high-risk requires second confirmation) + full audit trail; eight-step companion guide with large-font accessibility | real HTTP + unauthorized 403 + restart persistence + outage 503 |
+| **M3-R** | Bidirectional referral | incoming/outgoing referral orders, external document capture & storage, on acceptance external patient EMPI registration + local visit creation, reject/complete/cancel state machine; fills Smart Service Level 3 basic item [3 Referral] | 21 real HTTP checks + unauthorized 403 + restart persistence + outage 503 + watermark screenshots |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **98 base tables** across 5 schemas (iam 9 / clinical 65 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **100 base tables** across 5 schemas (iam 9 / clinical 67 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
