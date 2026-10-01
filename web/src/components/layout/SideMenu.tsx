@@ -35,6 +35,7 @@ import {
   MessageOutlined,
   CarOutlined,
   FileSearchOutlined,
+  SmileOutlined,
 } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -88,6 +89,7 @@ const navItems: NavItem[] = [
   { key: '/internet-payment', icon: <CreditCardOutlined />, label: '在线支付·票据', perm: 'internet:payment:refund' },
   { key: '/internet-delivery', icon: <CarOutlined />, label: '处方配送', perm: 'internet:delivery:fulfill' },
   { key: '/internet-reports', icon: <FileSearchOutlined />, label: '在线报告', perm: 'internet:report:view' },
+  { key: '/satisfaction', icon: <SmileOutlined />, label: '满意度评价', perm: 'satisfaction:view' },
   { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
   {
     key: 'grp-operation',

@@ -39,6 +39,7 @@ const FrontPage = lazy(() => import('@/pages/frontPage'));
 // 收费结算工作站（M3-B）
 const Billing = lazy(() => import('@/pages/billing'));
 const Appt = lazy(() => import('@/pages/appt'));
+const Satisfaction = lazy(() => import('@/pages/satisfaction'));
 // 互联网医院管理端（M3-J）
 const InternetHospital = lazy(() => import('@/pages/internetHospital'));
 const ConsultationWorkbench = lazy(() => import('@/pages/consultation'));
@@ -168,6 +169,8 @@ export default function AppRoutes() {
           <Route path="billing" element={<Billing />} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}
           <Route path="appt" element={<Appt />} />
+          {/* 满意度评价（M3-O）：satisfaction:view 统计，satisfaction:submit 评价 */}
+          <Route path="satisfaction" element={<Satisfaction />} />
           {/* 互联网医院管理端（M3-J）：医护线上资质审核 */}
           <Route path="internet-hospital" element={<InternetHospital />} />
           {/* 互联网问诊工作站（M3-K）：医生接诊/图文回复 */}
