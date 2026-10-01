@@ -75,6 +75,7 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-J** | Internet hospital base | WeChat login/realname/online credentials/field encryption/mini-program | real HTTP + outage + watermark |
 | **M3-K** | Text consultation | appointment + consultation session/messages, revisit eligibility gate, state machine | real HTTP + unauthorized 403 + outage |
 | **M3-L** | Internet e-prescription | prescribing/review duty separation, no AI auto-prescribing, idempotency key, mandatory comment on reject/return | real HTTP + unauthorized 403 + state machine |
+| **M3-M** | Online payment / e-invoice | pluggable payment channels (WeChat Pay v3/mock), local Medicare split, invoice reversal, finance refund in one transaction | real HTTP + outage 503 + unauthorized 403 + state machine |
 
 **Four kinds of real evidence (not demos)**:
 
@@ -179,8 +180,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1595 tests
-cd web && bunx vitest run            # frontend 586 tests
+bun test                             # backend 1606 tests
+cd web && bunx vitest run            # frontend 595 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -296,9 +297,9 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1595 and frontend 586 unit/integration tests green** (6938 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
+- **Backend 1606 and frontend 595 unit/integration tests green** (6969 backend assertions); backend coverage ~**86%**, frontend coverage gate passed, only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
-- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review.
+- E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review, online payment/e-invoice/finance refund.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
 - GitHub Actions CI: typecheck → lint → tests+coverage → integration → security audit → build (incl. web).
 
