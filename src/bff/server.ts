@@ -44,6 +44,7 @@ import { pharmacyRoutes } from './routes/pharmacy';
 import { medicalQcRoutes } from './routes/medicalQc';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
+import { researchRoutes } from './routes/research';
 import { billingRoutes } from './routes/billing';
 import { drgRoutes } from './routes/drg';
 import { labInterpretRoutes } from './routes/labInterpret';
@@ -90,6 +91,7 @@ const allRoutes: RouteDef[] = [
   ...medicalQcRoutes,
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
+  ...researchRoutes,
   ...billingRoutes,
   ...drgRoutes,
   ...labInterpretRoutes,

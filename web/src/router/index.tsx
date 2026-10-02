@@ -36,6 +36,8 @@ const MedicalQc = lazy(() => import('@/pages/medicalQc'));
 const VoiceMedical = lazy(() => import('@/pages/voiceMedical'));
 // 病案首页工作站（M3-A）
 const FrontPage = lazy(() => import('@/pages/frontPage'));
+// 科研专病队列（M5-B）
+const Research = lazy(() => import('@/pages/research'));
 // 收费结算工作站（M3-B）
 const Billing = lazy(() => import('@/pages/billing'));
 const Appt = lazy(() => import('@/pages/appt'));
@@ -175,6 +177,8 @@ export default function AppRoutes() {
           <Route path="voice-medical" element={<VoiceMedical />} />
           {/* 病案首页工作站（M3-A）：队列/详情 front_page:read，编码 code，质控归档 audit */}
           <Route path="front-page" element={<FrontPage />} />
+          {/* 科研专病队列（M5-B）：research:read/write */}
+          <Route path="research" element={<Research />} />
           {/* 收费结算工作站（M3-B）：计费/收款 billing:charge，退费 billing:refund */}
           <Route path="billing" element={<Billing />} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}
