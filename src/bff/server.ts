@@ -30,6 +30,7 @@ import { authRoutes } from './routes/auth';
 import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
+import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
 import { imagingRoutes } from './routes/imaging';
@@ -364,6 +365,9 @@ async function initDatabase(): Promise<void> {
     console.log('[db] PostgreSQL 连接成功');
     await autoMigrate();
     console.log('[db] 数据库迁移完成');
+    // 加载租户/院区注册表到内存（运行时解析保持内存级，写操作写穿透回库）
+    const tenantCount = await tenantService.hydrate();
+    console.log(`[db] 租户/院区注册表已加载（${tenantCount} 个节点）`);
   } catch (err) {
     console.error('[db] 数据库初始化失败，服务无法启动：', String(err));
     console.error('[db] 如需无 DB 演示，请设置 DEMO_MODE=1');

@@ -1,15 +1,18 @@
 /**
- * 健澜科技数智医院智能体（jlmedaios）— 租户/院区注册表（内存实现）
+ * 健澜科技数智医院智能体（jlmedaios）— 租户/院区注册表
  *
- * 职责：
- *  - 维护 hospital → campus 的层级注册表；
- *  - 内置默认医院 + 默认院区（对应 env: DEFAULT_TENANT_ID / DEFAULT_CAMPUS_ID）；
- *  - CRUD、启停、软删、租户级 config 读写、祖先链解析、启用过滤；
- *  - 纯内存实现（本机无 Postgres），生产可将存储替换为数据库而不改动接口。
+ * 维护 hospital → campus 的层级注册表；内置默认医院 + 默认院区
+ * （对应 env: DEFAULT_TENANT_ID / DEFAULT_CAMPUS_ID）。
+ *
+ * 两种工作模式：
+ *  - 纯内存（默认）：同步写方法，开箱即用，便于测试与无库演示；
+ *  - 持久化（BFF 连库时）：启动调用 hydrate() 从 iam.tenants 加载，
+ *    管理端写操作走 persistXxx() 异步方法，先落库再更新内存，保证重启不丢。
  *
  * 安全：
  *  - 停用/软删节点一律不可被「解析」到运行时上下文；
  *  - 删除为软删除（标记 deletedAt），保留审计痕迹；
+ *  - 默认医院租户受保护，不可停用/删除；
  *  - 不存放任何密钥。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
@@ -17,6 +20,9 @@
  */
 
 import { MedicalAgentError } from '../core/errors';
+import { withTx } from '../db/pool';
+import { listAllTenants, upsertTenant } from '../db/repositories/tenantRepo';
+import type { DbExecutor } from '../db/pool';
 import {
   type Campus,
   type Tenant,
@@ -60,7 +66,7 @@ export class TenantService {
     this.defaultCampusId = opts.defaultCampusId ?? process.env.DEFAULT_CAMPUS_ID ?? 'main-campus';
 
     // 内置默认医院 + 默认院区（保证任何部署开箱即有一个可用租户）
-    this.nodes.set(this.defaultTenantId, {
+    this.commit({
       id: this.defaultTenantId,
       name: opts.defaultHospitalName ?? '健澜示范医院',
       level: 'hospital',
@@ -68,7 +74,7 @@ export class TenantService {
       config: {},
       createdAt: now(),
     });
-    this.nodes.set(this.defaultCampusId, {
+    this.commit({
       id: this.defaultCampusId,
       name: opts.defaultCampusName ?? '主院区',
       level: 'campus',
@@ -138,7 +144,9 @@ export class TenantService {
 
   /** 列出某医院下的全部院区（未删除） */
   listCampuses(hospitalId: TenantId): Tenant[] {
-    return this.listNotDeleted().filter((t) => t.level === 'campus' && t.parentId === hospitalId);
+    return this.listNotDeleted().filter(
+      (t) => t.level === 'campus' && t.parentId === hospitalId,
+    );
   }
 
   /** 节点自身到根的祖先链（含自身），循环防护 */
@@ -164,19 +172,136 @@ export class TenantService {
   }
 
   // ------------------------------------------------------------------
-  // 写入
+  // 纯内存写方法（同步；测试与无库场景使用）
   // ------------------------------------------------------------------
 
   /** 创建医院（level=hospital） */
   createHospital(name: string, config: Record<string, unknown> = {}): Tenant {
-    const id = this.genId('hospital');
-    const node: Tenant = { id, name, level: 'hospital', enabled: true, config, createdAt: now() };
-    this.nodes.set(id, node);
+    const node = this.buildHospital(name, config);
+    this.commit(node);
     return node;
   }
 
   /** 创建院区（挂在某医院下） */
   createCampus(hospitalId: TenantId, name: string, config: Record<string, unknown> = {}): Tenant {
+    const node = this.buildCampus(hospitalId, name, config);
+    this.commit(node);
+    return node;
+  }
+
+  /** 启停节点（默认医院不可停用，避免锁死系统） */
+  setEnabled(id: TenantId, enabled: boolean): Tenant {
+    const node = this.buildStatusChange(id, enabled);
+    this.commit(node);
+    return node;
+  }
+
+  /** 浅合并租户级配置（已存在的 key 覆盖，未提及的 key 保留） */
+  mergeConfig(id: TenantId, patch: Record<string, unknown>): Tenant {
+    const node = this.buildConfigMerge(id, patch);
+    this.commit(node);
+    return node;
+  }
+
+  /** 软删除（默认医院不可删除；级联软删其下院区） */
+  softDelete(id: TenantId): Tenant {
+    const nodes = this.buildSoftDelete(id);
+    for (const n of nodes) this.commit(n);
+    return nodes[0];
+  }
+
+  // ------------------------------------------------------------------
+  // 持久化写方法（异步；先落库再更新内存，BFF 管理端使用）
+  // ------------------------------------------------------------------
+
+  /** 从 iam.tenants 加载全部节点到内存（BFF 启动时调用，需先完成迁移） */
+  async hydrate(): Promise<number> {
+    const all = await listAllTenants();
+    this.nodes.clear();
+    for (const n of all) this.commit(n);
+    return all.length;
+  }
+
+  /** 持久化创建医院 */
+  async persistCreateHospital(
+    name: string,
+    config: Record<string, unknown> = {},
+    tx?: DbExecutor,
+  ): Promise<Tenant> {
+    const node = this.buildHospital(name, config);
+    await upsertTenant(node, tx);
+    this.commit(node);
+    return node;
+  }
+
+  /** 持久化创建院区 */
+  async persistCreateCampus(
+    hospitalId: TenantId,
+    name: string,
+    config: Record<string, unknown> = {},
+    tx?: DbExecutor,
+  ): Promise<Tenant> {
+    const node = this.buildCampus(hospitalId, name, config);
+    await upsertTenant(node, tx);
+    this.commit(node);
+    return node;
+  }
+
+  /** 持久化启停 */
+  async persistSetEnabled(id: TenantId, enabled: boolean, tx?: DbExecutor): Promise<Tenant> {
+    const node = this.buildStatusChange(id, enabled);
+    await upsertTenant(node, tx);
+    this.commit(node);
+    return node;
+  }
+
+  /** 持久化合并配置 */
+  async persistMergeConfig(
+    id: TenantId,
+    patch: Record<string, unknown>,
+    tx?: DbExecutor,
+  ): Promise<Tenant> {
+    const node = this.buildConfigMerge(id, patch);
+    await upsertTenant(node, tx);
+    this.commit(node);
+    return node;
+  }
+
+  /** 持久化软删除（同事务级联院区） */
+  async persistSoftDelete(id: TenantId): Promise<Tenant> {
+    const nodes = this.buildSoftDelete(id);
+    await withTx(async (tx) => {
+      for (const n of nodes) await upsertTenant(n, tx);
+    });
+    for (const n of nodes) this.commit(n);
+    return nodes[0];
+  }
+
+  // ------------------------------------------------------------------
+  // 内部：构造（纯函数，不写内存）+ 提交
+  // ------------------------------------------------------------------
+
+  /** 写入/替换内存节点 */
+  private commit(node: Tenant): void {
+    this.nodes.set(node.id, node);
+  }
+
+  private buildHospital(name: string, config: Record<string, unknown>): Tenant {
+    return {
+      id: this.genId('hospital'),
+      name,
+      level: 'hospital',
+      enabled: true,
+      config,
+      createdAt: now(),
+    };
+  }
+
+  private buildCampus(
+    hospitalId: TenantId,
+    name: string,
+    config: Record<string, unknown>,
+  ): Campus {
     const parent = this.nodes.get(hospitalId);
     if (!parent || parent.deletedAt) {
       throw new MedicalAgentError(
@@ -190,9 +315,8 @@ export class TenantService {
         `上级必须为医院节点: ${hospitalId}`,
       );
     }
-    const id = this.genId('campus');
-    const node: Campus = {
-      id,
+    return {
+      id: this.genId('campus'),
       name,
       level: 'campus',
       parentId: hospitalId,
@@ -200,12 +324,9 @@ export class TenantService {
       config,
       createdAt: now(),
     };
-    this.nodes.set(id, node);
-    return node;
   }
 
-  /** 启停节点（默认医院不可停用，避免锁死系统） */
-  setEnabled(id: TenantId, enabled: boolean): Tenant {
+  private buildStatusChange(id: TenantId, enabled: boolean): Tenant {
     const node = this.requireNotDeleted(id);
     if (id === this.defaultTenantId && !enabled) {
       throw new MedicalAgentError(
@@ -213,45 +334,31 @@ export class TenantService {
         '默认医院租户不可停用',
       );
     }
-    node.enabled = enabled;
-    node.updatedAt = now();
-    return node;
+    return { ...node, enabled, updatedAt: now() };
   }
 
-  /** 浅合并租户级配置（已存在的 key 覆盖，未提及的 key 保留） */
-  mergeConfig(id: TenantId, patch: Record<string, unknown>): Tenant {
+  private buildConfigMerge(id: TenantId, patch: Record<string, unknown>): Tenant {
     const node = this.requireNotDeleted(id);
-    node.config = { ...node.config, ...patch };
-    node.updatedAt = now();
-    return node;
+    return { ...node, config: { ...node.config, ...patch }, updatedAt: now() };
   }
 
-  /** 软删除（默认医院不可删除；级联软删其下院区） */
-  softDelete(id: TenantId): Tenant {
+  private buildSoftDelete(id: TenantId): Tenant[] {
+    const node = this.requireNotDeleted(id);
     if (id === this.defaultTenantId) {
       throw new MedicalAgentError(
         TenantErrorCodes.DEFAULT_TENANT_PROTECTED,
         '默认医院租户不可删除',
       );
     }
-    const node = this.requireNotDeleted(id);
-    node.deletedAt = now();
-    node.enabled = false;
-    node.updatedAt = now();
-    // 级联软删院区
+    const ts = now();
+    const result: Tenant[] = [{ ...node, deletedAt: ts, enabled: false, updatedAt: ts }];
     if (node.level === 'hospital') {
       for (const campus of this.listCampuses(id)) {
-        campus.deletedAt = now();
-        campus.enabled = false;
-        campus.updatedAt = now();
+        result.push({ ...campus, deletedAt: ts, enabled: false, updatedAt: ts });
       }
     }
-    return node;
+    return result;
   }
-
-  // ------------------------------------------------------------------
-  // 内部
-  // ------------------------------------------------------------------
 
   private requireNotDeleted(id: TenantId): Tenant {
     const node = this.nodes.get(id);

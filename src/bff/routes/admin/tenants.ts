@@ -24,11 +24,13 @@ import {
   type RouteDef,
 } from '../../../bff/types';
 import { MedicalAgentError } from '../../../core/errors';
+import { listAllTenants } from '../../../db/repositories/tenantRepo';
 import {
   createTenantSchema,
   mergeTenantConfigSchema,
   setTenantStatusSchema,
   tenantService,
+  type Tenant,
 } from '../../../tenant';
 
 /* ------------------------------------------------------------------ */
@@ -61,14 +63,24 @@ export const tenantAdminRoutes: RouteDef[] = [
     // 租户/院区树（医院 → 院区）
     method: 'GET',
     path: '/api/v1/admin/tenants/tree',
-    handle: (c: Ctx) => {
+    // 管理端低频读取：直接从库加载，保证实时性；断库时由错误中间件返回 500
+    handle: async (c: Ctx) => {
       const denied = requireRole(c, 'admin');
       if (denied) return denied;
+      // 从库读取全部节点（含停用/软删），构造医院→院区树
+      const all = await listAllTenants();
+      const hospitals = all.filter((t) => t.level === 'hospital' && !t.deletedAt);
+      const tree = hospitals.map((h) => ({
+        node: h,
+        children: all
+          .filter((x): x is Tenant => x.level === 'campus' && x.parentId === h.id && !x.deletedAt)
+          .map((campus) => ({ node: campus, children: [] })),
+      }));
       return json(
         ok({
           defaultTenantId: tenantService.getDefaultTenantId(),
           defaultCampusId: tenantService.getDefaultCampusId(),
-          tree: tenantService.tree(),
+          tree,
         }),
       );
     },
@@ -85,12 +97,16 @@ export const tenantAdminRoutes: RouteDef[] = [
         const body = createTenantSchema.parse(await c.body());
         let node;
         if (body.level === 'hospital') {
-          node = tenantService.createHospital(body.name, body.config ?? {});
+          node = await tenantService.persistCreateHospital(body.name, body.config ?? {});
         } else {
           if (!body.parentId) {
             return json(fail(ErrorCode.BAD_REQUEST, '创建院区必须提供 parentId（上级医院 id）'), 400);
           }
-          node = tenantService.createCampus(body.parentId, body.name, body.config ?? {});
+          node = await tenantService.persistCreateCampus(
+            body.parentId,
+            body.name,
+            body.config ?? {},
+          );
         }
         return json(ok(node, '租户已创建'));
       } catch (e) {
@@ -112,7 +128,7 @@ export const tenantAdminRoutes: RouteDef[] = [
       try {
         const id = c.params.id;
         const body = setTenantStatusSchema.parse(await c.body());
-        const node = tenantService.setEnabled(id, body.enabled);
+        const node = await tenantService.persistSetEnabled(id, body.enabled);
         return json(ok(node, body.enabled ? '租户已启用' : '租户已停用'));
       } catch (e) {
         return (
@@ -133,7 +149,7 @@ export const tenantAdminRoutes: RouteDef[] = [
       try {
         const id = c.params.id;
         const body = mergeTenantConfigSchema.parse(await c.body());
-        const node = tenantService.mergeConfig(id, body.config);
+        const node = await tenantService.persistMergeConfig(id, body.config);
         return json(ok(node, '租户配置已更新'));
       } catch (e) {
         return (
@@ -148,12 +164,12 @@ export const tenantAdminRoutes: RouteDef[] = [
     // 软删除（级联院区）
     method: 'DELETE',
     path: '/api/v1/admin/tenants/:id',
-    handle: (c: Ctx) => {
+    handle: async (c: Ctx) => {
       const denied = requireRole(c, 'admin');
       if (denied) return denied;
       try {
         const id = c.params.id;
-        const node = tenantService.softDelete(id);
+        const node = await tenantService.persistSoftDelete(id);
         return json(ok(node, '租户已删除'));
       } catch (e) {
         return (

@@ -85,6 +85,7 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M4-B** | Low-code agent builder | persisting canvas agent definitions (idempotent draft via `ON CONFLICT`), structural & semantic validation (zod schema + DSL checks for orphan edges/cycles/unreachability/tool & knowledge references), SemVer release management (major/minor/patch + SHA-256 checksum), owner/admin permissions and cascade delete; release and hash-chained audit run in one transaction (execution/run-instance persistence is left to a later slice) | 12 real HTTP checks + unauthorized 403/401 + restart persistence + outage 500 with traceId |
 | **M4-C** | Agent runtime integration | triggering published agents (enabled only; a version newer than latest returns 409); a running `workflow_instances` row is inserted up-front for traceability, with `workflow_node_records` aggregated from recorder events (state/attempts/output/duration) and `agent_invocations` logs; result replay and mid-flight cancellation (abortable delay sleep); instances/invocations cascade-delete via foreign keys; execution and hash-chained audit run in one transaction | 6 real aggregator checks (success/replay/404/409/concurrent/cancel) + outage 500 with traceId + watermark |
 | **M4-D** | Human-in-the-loop & task center | when a workflow reaches a human node (or a high-risk node forces manual review), the instance enters `waiting_human` and a review task is persisted; reviewers claim (CAS to prevent duplicates) and approve/reject with e-signature, then the workflow resumes or terminates; cancellation/overall timeout syncs open tasks to a terminal state with no leftovers; `PersistentHumanTaskHandler` suspends in memory while persisting to the DB, and a BFF restart can be handled by the recovery flow; BFF `/human-tasks` endpoints + frontend task center (watermark/outage gate) | 13 real integration cases + 403 unauthorized + 409 duplicate + restart persistence + outage 503/500 with traceId + UI screenshots |
+| **M5-A** | Multi-tenant registry persistence | persist the hospital→campus registry to `iam.tenants` (hierarchy CHECK, partial indexes, soft-delete, default hospital protected); the BFF hydrates the in-memory registry at startup, admin writes are write-through (persist first, then memory); admin tree reads come straight from the DB; row-level isolation of business tables is a later slice | 12 real integration cases + 403 unauthorized/401 + restart persistence + outage 500 with traceId |
 
 **Four kinds of real evidence (not demos)**:
 
@@ -189,7 +190,7 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1773 tests (1 skip)
+bun test                             # backend 1785 tests (1 skip)
 cd web && bunx vitest run            # frontend 778 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
@@ -306,7 +307,7 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1773 and frontend 778 unit/integration tests green** (7266 backend assertions, 1 skip); backend coverage ~**87%**, frontend coverage gate passed (Lines 92.12 / Branch 78.47 / Funcs 84.07), only increasing.
+- **Backend 1785 and frontend 778 unit/integration tests green** (7288 backend assertions, 1 skip); backend coverage ~**87%**, frontend coverage gate passed (Lines 92.12 / Branch 78.47 / Funcs 84.07), only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
 - E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review, online payment/e-invoice/finance refund.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
@@ -349,6 +350,7 @@ M0 Outpatient ✅ → M1 Inpatient+Emergency ✅ → M2 Pharmacy/Documentation/Q
 - [x] M3 front page / billing-refunds / DRG-DIP local grouping / OR-anesthesia / appointments-follow-up
 - [x] MFA, critical-value closed loop, lab/imaging interpretation, reconciliation skeleton, RBAC backfill
 - [x] Internet hospital base (WeChat mini-program, realname, online credentials, field encryption)
+- [x] M5-A Multi-tenant/multi-campus registry persistence (iam.tenants, startup hydrate, write-through, default tenant protection)
 - [ ] Internet hospital online consultation/e-prescription flow/online insurance pay/drug delivery
 - [ ] Unified Idempotency-Key framework, Kafka replacing in-memory buses, real load baseline
 - [ ] CI/local consistency (master branches, DB in CI, full gate)
