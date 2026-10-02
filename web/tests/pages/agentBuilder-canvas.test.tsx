@@ -170,7 +170,7 @@ it('设置抽屉：打开并编辑文本字段', async () => {
   fireEvent.change(screen.getByPlaceholderText('如 medical-record-writer'), { target: { value: 'my-agent' } });
   // 无 placeholder 的普通文本输入：[0]中文名称 [1]英文名称 [2]版本
   const plainInputs = Array.from(document.querySelectorAll('.ant-input')).filter(
-    (el) => !el.placeholder && (el as HTMLInputElement).type === 'text',
+    (el) => !(el as HTMLInputElement).placeholder && (el as HTMLInputElement).type === 'text',
   ) as HTMLInputElement[];
   fireEvent.change(plainInputs[0], { target: { value: '我的智能体' } });
   fireEvent.change(plainInputs[1], { target: { value: 'My Agent' } });

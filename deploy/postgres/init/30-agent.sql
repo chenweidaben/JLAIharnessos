@@ -50,7 +50,7 @@ CREATE INDEX idx_agent_versions_published ON agent.agent_versions(agent_id, publ
 CREATE TABLE agent.workflow_instances (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   instance_no     text NOT NULL UNIQUE,
-  agent_id        text NOT NULL,
+  agent_id        text NOT NULL REFERENCES agent.agents(agent_id) ON DELETE CASCADE,
   agent_version   text,
   workflow_id     text NOT NULL,
   state           text NOT NULL CHECK (state IN
@@ -122,7 +122,7 @@ CREATE INDEX idx_human_tasks_assignee ON agent.human_tasks USING gin (assignee_r
 CREATE TABLE agent.agent_invocations (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   trace_id      text,
-  agent_id      text NOT NULL,
+  agent_id      text NOT NULL REFERENCES agent.agents(agent_id) ON DELETE CASCADE,
   agent_version text,
   actor_id      uuid REFERENCES iam.users(id),
   trigger_type  text,

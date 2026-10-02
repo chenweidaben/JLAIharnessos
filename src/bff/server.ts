@@ -61,6 +61,7 @@ import { delegationRoutes } from './routes/delegation';
 import { referralRoutes } from './routes/referral';
 import { knowledgeBaseRoutes } from './routes/knowledgeBase';
 import { agentBuilderRoutes } from './routes/agentBuilder';
+import { agentRuntimeRoutes } from './routes/agentRuntime';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { skillRoutes } from './routes/skills';
@@ -106,6 +107,7 @@ const allRoutes: RouteDef[] = [
   ...referralRoutes,
   ...knowledgeBaseRoutes,
   ...agentBuilderRoutes,
+  ...agentRuntimeRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,

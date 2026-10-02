@@ -107,6 +107,36 @@ function genId(prefix: string): string {
 }
 
 /**
+ * 包装 sleep 使其可被取消信号立即中断：
+ * abort 时 reject WorkflowCancelledError，工作流进入 cancelled，而非等满延时。
+ */
+function makeAbortableSleep(
+  signal: AbortSignal,
+  rawSleep: (ms: number) => Promise<void>,
+): (ms: number) => Promise<void> {
+  return (ms: number) => {
+    if (signal.aborted) return Promise.reject(new WorkflowCancelledError());
+    return new Promise<void>((resolve, reject) => {
+      const onAbort = (): void => {
+        signal.removeEventListener('abort', onAbort);
+        reject(new WorkflowCancelledError());
+      };
+      signal.addEventListener('abort', onAbort);
+      rawSleep(ms).then(
+        () => {
+          signal.removeEventListener('abort', onAbort);
+          resolve();
+        },
+        (e: unknown) => {
+          signal.removeEventListener('abort', onAbort);
+          reject(e);
+        },
+      );
+    });
+  };
+}
+
+/**
  * 工作流引擎（无状态，可并发执行多实例）
  */
 export class WorkflowEngine {
@@ -172,7 +202,10 @@ export class WorkflowEngine {
     const runtime: WorkflowRuntime = {
       ...this.baseRuntime,
       ...options.runtimeOverride,
-      sleep: options.runtimeOverride?.sleep ?? this.baseRuntime.sleep ?? defaultSleep,
+      sleep: makeAbortableSleep(
+        abortController.signal,
+        options.runtimeOverride?.sleep ?? this.baseRuntime.sleep ?? defaultSleep,
+      ),
       onEvent: (event: unknown) => {
         const e = event as { type?: string };
         try {
