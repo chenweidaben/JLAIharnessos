@@ -9,8 +9,14 @@
  *
  * BFF 经 vi.mock 隔离；真实断库/越权另有端到端取证。
  */
-import { it, expect, beforeEach, vi } from 'vitest';
+import { it as vitestIt, expect, beforeEach, vi } from 'vitest';
+import type { TestFunction } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test-utils';
+
+// 重型页面（健康门禁 + 角色分流 + 大量异步渲染）：串行/覆盖率插桩下，15s 默认
+// 超时会出现计时抖动；统一提至 30s。这些用例单跑均很快，若真挂死 30s 仍会暴露。
+const it = (name: string, fn: TestFunction) =>
+  vitestIt(name, fn, 30000);
 
 import InternetPrescriptionWorkbench from '@/pages/internetPrescription';
 import { useInternetPrescriptionStore } from '@/store/internetPrescriptionStore';

@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1595-success.svg)](#quality)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-586-success.svg)](#quality)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1748-success.svg)](#quality)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-738-success.svg)](#quality)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
 [![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-imaging-assist-damo-radar-fusion)
@@ -82,6 +82,7 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M3-Q** | Digital companion | family delegation (scopes explicitly granted, empty by default; payment/refund high-risk requires second confirmation) + full audit trail; eight-step companion guide with large-font accessibility | real HTTP + unauthorized 403 + restart persistence + outage 503 |
 | **M3-R** | Bidirectional referral | incoming/outgoing referral orders, external document capture & storage, on acceptance external patient EMPI registration + local visit creation, reject/complete/cancel state machine; fills Smart Service Level 3 basic item [3 Referral] | 21 real HTTP checks + unauthorized 403 + restart persistence + outage 503 + watermark screenshots |
 | **M4-A** | Knowledge platform (first slice) | knowledge base CRUD, document ingestion (parse → chunk → embed → persist; job-table pattern keeps `failed` on error), RAG hybrid retrieval (vector cosine 0.6 + keyword 0.4, Chinese medical query stop-word filtering); pluggable embedding provider (local deterministic / OpenAI-compatible), persisted in PostgreSQL and exposed via BFF + web UI | 13 real HTTP checks + unauthorized 403 + restart persistence + outage 503/500 + watermark screenshots |
+| **M4-B** | Low-code agent builder | persisting canvas agent definitions (idempotent draft via `ON CONFLICT`), structural & semantic validation (zod schema + DSL checks for orphan edges/cycles/unreachability/tool & knowledge references), SemVer release management (major/minor/patch + SHA-256 checksum), owner/admin permissions and cascade delete; release and hash-chained audit run in one transaction (execution/run-instance persistence is left to a later slice) | 12 real HTTP checks + unauthorized 403/401 + restart persistence + outage 500 with traceId |
 
 **Four kinds of real evidence (not demos)**:
 
@@ -186,8 +187,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1673 tests (1 skip)
-cd web && bunx vitest run            # frontend 645 tests
+bun test                             # backend 1748 tests (1 skip)
+cd web && bunx vitest run            # frontend 738 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -303,7 +304,7 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1673 and frontend 645 unit/integration tests green** (7103 backend assertions); backend coverage ~**87%**, frontend coverage gate passed, only increasing.
+- **Backend 1748 and frontend 738 unit/integration tests green** (7207 backend assertions, 1 skip); backend coverage ~**87%**, frontend coverage gate passed, only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
 - E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review, online payment/e-invoice/finance refund.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.

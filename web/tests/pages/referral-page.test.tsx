@@ -9,8 +9,15 @@
  *
  * BFF 经 vi.mock 隔离；真实断库/HTTP 另有端到端取证。
  */
-import { it, expect, beforeEach, vi } from 'vitest';
+import { it as vitestIt, expect, beforeEach, vi } from 'vitest';
+import type { TestFunction } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@test-utils';
+
+// 重型页面（健康门禁 + 大量异步渲染）：串行/覆盖率插桩下，15s 默认超时会出现
+// 计时抖动（整文件耗时可达 130s+）；统一提至 30s。这些用例单跑均 <2s，
+// 若真挂死，30s 仍会失败暴露，不会掩盖问题。
+const it = (name: string, fn: TestFunction) =>
+  vitestIt(name, fn, 30000);
 
 import ReferralPage from '@/pages/referral';
 import type { ReferralDetail, ReferralOrder } from '@/types/referral';
@@ -237,7 +244,7 @@ it('待处理：取消', async () => {
   // Popconfirm 确认
   fireEvent.click(await screen.findByRole('button', { name: '确 定' }));
   await waitFor(() => expect(m.cancelReferralApi).toHaveBeenCalledTimes(1));
-}, 30000);
+});
 
 it('随附资料列表渲染', async () => {
   render(<ReferralPage />);

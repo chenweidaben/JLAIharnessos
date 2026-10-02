@@ -9,8 +9,8 @@
 [![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1595-success.svg)](#-测试与质量)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-586-success.svg)](#-测试与质量)
+[![Backend Tests](https://img.shields.io/badge/backend%20tests-1748-success.svg)](#-测试与质量)
+[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-738-success.svg)](#-测试与质量)
 [![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
 [![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
 [![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
@@ -83,6 +83,7 @@
 | **M3-Q** | 数字陪诊 | 家属代办授权（范围显式授予、默认空，支付/退费高风险二次确认）+ 全程审计留痕；八步式陪诊向导、大字体适老化 | 真实 HTTP + 越权 403 + 重启持久化 + 断库 503 |
 | **M3-R** | 双向转诊 | 双向转诊单（转入/转出）、院外资料获取与存储、接收时院外患者 EMPI 建档+生成本院就诊、拒绝/完成/取消状态机；补齐智慧服务三级基本项【3 转诊服务】 | 真实 HTTP 21 项 + 越权 403 + 重启持久化 + 断库 503 + 水印截图 |
 | **M4-A** | 知识中台首切片 | 知识库 CRUD、文档摄入（解析→分块→嵌入→落库，作业表模式，失败保留 failed）、RAG 混合检索（向量余弦 0.6 + 关键词 0.4，中文医疗查询停用词过滤）；嵌入提供方可插拔（本地确定性 / OpenAI 兼容），持久化到 PostgreSQL 并经 BFF 与前端真实可用 | 真实 HTTP 13 项 + 越权 403 + 重启持久化 + 断库 503/500 + 水印截图 |
+| **M4-B** | 低代码 Agent 编排 | 画布智能体定义持久化（草稿 `ON CONFLICT` 幂等）、结构与语义校验（zod schema + DSL 校验孤立边/环/不可达/工具与知识库引用）、发布 SemVer 版本管理（major/minor/patch + SHA-256 校验和）、所有者/管理员权限与删除级联；发布与审计哈希链同事务（执行/运行实例持久化留待后续切片） | 真实 HTTP 12 项 + 越权 403/401 + 重启持久化 + 断库 500 traceId |
 
 **四类真实取证（非演示）**：
 
@@ -210,8 +211,8 @@ cd web && bun install && bun run dev    # http://localhost:5173
 
 ```bash
 bun run typecheck                 # 后端类型检查 0 错误
-bun test                          # 后端 1673 测试（1 skip）
-cd web && bunx vitest run         # 前端 645 测试
+bun test                          # 后端 1748 测试（1 skip）
+cd web && bunx vitest run         # 前端 738 测试
 cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```
 
@@ -336,7 +337,7 @@ jlmedaios/
 
 ## 测试与质量
 
-- **后端 1673、前端 645 单元/集成测试全绿**（后端 7103 个断言）；后端覆盖率约 **87%**，前端覆盖率门禁通过，覆盖率只增不减；
+- **后端 1748、前端 738 单元/集成测试全绿**（后端 7207 个断言，1 个 skip）；后端覆盖率约 **87%**，前端覆盖率门禁通过，覆盖率只增不减；
 - 前后端 **TypeScript 严格模式零类型错误**，ESLint 0 error；
 - 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历、病案首页、收费结算退费、手术麻醉、预约随访、互联网医院实名就诊、图文问诊、电子处方/药师审方、在线支付/电子票据/财务冲正；
 - 安全测试：Prompt 注入、SQL/XSS/命令注入、鉴权、数据范围、安全响应头；

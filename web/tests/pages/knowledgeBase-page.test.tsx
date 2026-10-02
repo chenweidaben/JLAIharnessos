@@ -10,7 +10,7 @@
  * BFF 经 vi.mock 隔离；真实断库/HTTP 另有端到端取证。
  */
 import { it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@test-utils';
+import { render, screen, fireEvent, waitFor } from '@test-utils';
 
 import KnowledgeBasePage from '@/pages/knowledgeBase';
 import type {
@@ -94,7 +94,7 @@ function result(over: Partial<RetrievalResult> = {}): RetrievalResult {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  healthMock.mockResolvedValue({ status: 'ok', db: 'up' });
+  healthMock.mockResolvedValue({ status: 'ok', db: 'up', demoMode: false });
   m.listKbsApi.mockResolvedValue([kb()]);
   m.listDocumentsApi.mockResolvedValue([doc()]);
   m.deleteKbApi.mockResolvedValue({ deleted: 'x' });

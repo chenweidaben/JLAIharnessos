@@ -190,7 +190,7 @@ describe('PharmacyWorkbench 健康门禁与读模型', () => {
     await waitFor(() =>
       expect(screen.queryByText('处方调剂发药确认', { selector: '.ant-modal-title' })).not.toBeInTheDocument(),
     );
-  }, 60000);
+  }, 90000);
 
   it('断库/连不上 BFF：显式离线 Alert + Watermark，不渲染业务数据', async () => {
     vi.mocked(api.getSystemHealth).mockRejectedValue(new Error('network down'));

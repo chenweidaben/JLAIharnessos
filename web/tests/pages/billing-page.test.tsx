@@ -35,6 +35,7 @@ vi.mock('@/services/api/pharmacy', () => ({ getSystemHealth: vi.fn() }));
 
 import * as api from '@/services/api/billing';
 import { getSystemHealth } from '@/services/api/pharmacy';
+import { useBillingStore } from '@/store/billingStore';
 
 const m = api as unknown as Record<string, ReturnType<typeof vi.fn>>;
 const healthMock = vi.mocked(getSystemHealth);
@@ -184,6 +185,15 @@ it('未勾选费用时收费按钮禁用', async () => {
   // 清空选择（antd 两字按钮可访问名含空格）
   fireEvent.click(screen.getByRole('button', { name: '清 空' }));
   expect(screen.getByTestId('billing-checkout')).toBeDisabled();
+  // store 直接切换某一项（toggleItem 选中→取消）
+  const store = useBillingStore.getState();
+  store.toggleItem('f1');
+  expect(useBillingStore.getState().selectedItemIds).toContain('f1');
+  store.toggleItem('f1');
+  expect(useBillingStore.getState().selectedItemIds).not.toContain('f1');
+  // 全选后应包含全部费用
+  store.selectAll();
+  expect(useBillingStore.getState().selectedItemIds.length).toBeGreaterThan(0);
 });
 
 it('退费：已结算明细发起退费（原因必填）', async () => {

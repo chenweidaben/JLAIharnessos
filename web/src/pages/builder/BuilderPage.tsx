@@ -29,12 +29,17 @@ import {
   message,
   Segmented,
   Upload,
+  Modal,
+  Radio,
+  Input,
 } from 'antd';
 import {
   ArrowLeftOutlined,
   CheckCircleOutlined,
   DownloadOutlined,
   RedoOutlined,
+  SaveOutlined,
+  SendOutlined,
   SettingOutlined,
   UndoOutlined,
   UploadOutlined,
@@ -50,6 +55,12 @@ import AgentMetaDrawer from './components/AgentMetaDrawer';
 import { useBuilderStore } from './builderStore';
 import { builderToPackage, parsePackageText, toYaml } from './graph';
 import { BUILTIN_PACKAGES } from '@/mock/agentMarket';
+import {
+  getBuilderAgentApi,
+  publishDraftApi,
+  saveDraftApi,
+} from '@/services/api/agentBuilder';
+import type { BumpKind } from '@/types/agentBuilder';
 import type { NodeType } from '@/types/builder';
 
 function download(filename: string, content: string, mime: string) {
@@ -86,16 +97,102 @@ function Canvas() {
   const [issuesOpen, setIssuesOpen] = useState(false);
   const [loaded, setLoaded] = useState<string | null>(null);
   const [exportFmt, setExportFmt] = useState<'yaml' | 'json'>('yaml');
+  const [saving, setSaving] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [bump, setBump] = useState<BumpKind>('minor');
+  const [changelog, setChangelog] = useState('');
 
   const nodeTypes = useMemo(() => ({ medicalNode: FlowCanvasNode }), []);
 
-  // 从市场进入：加载内置模板
+  // 从市场进入：new=空白；内置模板加载 mock；其余从真实后端加载草稿。
   useEffect(() => {
-    if (agentId && agentId !== loaded && BUILTIN_PACKAGES[agentId]) {
-      loadPackage(BUILTIN_PACKAGES[agentId]);
-      setLoaded(agentId);
-    }
+    if (!agentId || agentId === loaded) return;
+    let cancelled = false;
+    const apply = async () => {
+      if (agentId === 'new') {
+        useBuilderStore.getState().reset();
+      } else if (BUILTIN_PACKAGES[agentId]) {
+        loadPackage(BUILTIN_PACKAGES[agentId]);
+      } else {
+        try {
+          const detail = await getBuilderAgentApi(agentId);
+          if (cancelled) return;
+          if (detail.draft) {
+            loadPackage({
+              packageFormatVersion: '1.0.0',
+              agent: detail.draft.definition,
+              prompts: detail.draft.prompts,
+            });
+          } else {
+            message.warning('该智能体暂无草稿，已打开空白画布');
+          }
+        } catch {
+          if (!cancelled) message.error('加载智能体失败，请返回市场重试');
+        }
+      }
+      if (!cancelled) setLoaded(agentId);
+    };
+    void apply();
+    return () => {
+      cancelled = true;
+    };
   }, [agentId, loaded, loadPackage]);
+
+  /** 组装当前画布为智能体包 */
+  const buildCurrentPackage = () => {
+    const s = useBuilderStore.getState();
+    return builderToPackage(s.nodes, s.edges, s.meta);
+  };
+
+  /** 保存草稿 */
+  const handleSave = async (silent = false): Promise<string | null> => {
+    setSaving(true);
+    try {
+      const res = await saveDraftApi(buildCurrentPackage());
+      if (!silent) {
+        message.success(res.created ? '已创建并保存草稿' : '草稿已保存');
+      }
+      // 新建后把 URL 替换为真实标识，避免重复创建
+      if (agentId === 'new') {
+        navigate(`/builder/edit/${res.agentId}`, { replace: true });
+      }
+      return res.agentId;
+    } catch (e) {
+      message.error(`保存失败：${(e as Error).message}`);
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /** 打开发布弹窗（先静默保存） */
+  const handlePublishClick = async () => {
+    const id = await handleSave(true);
+    if (!id) {
+      message.error('请先成功保存草稿再发布');
+      return;
+    }
+    setChangelog('');
+    setPublishOpen(true);
+  };
+
+  /** 确认发布 */
+  const confirmPublish = async () => {
+    const fallbackId = String(buildCurrentPackage().agent.id);
+    const targetId = agentId === 'new' || !agentId ? fallbackId : agentId;
+    setPublishing(true);
+    try {
+      const res = await publishDraftApi(targetId, { bump, changelog: changelog || undefined });
+      message.success(`已发布 v${res.version}（校验和 ${res.checksum.slice(0, 12)}…）`);
+      setPublishOpen(false);
+      useBuilderStore.getState().loadPackage(buildCurrentPackage());
+    } catch (e) {
+      message.error(`发布失败：${(e as Error).message}`);
+    } finally {
+      setPublishing(false);
+    }
+  };
 
   const onConnect = useCallback((conn: Connection) => connect(conn), [connect]);
 
@@ -212,6 +309,23 @@ function Canvas() {
             options={[{ label: 'YAML', value: 'yaml' }, { label: 'JSON', value: 'json' }]}
             onChange={(v) => setExportFmt(v as 'yaml' | 'json')}
           />
+          <Button
+            size="small"
+            icon={<SaveOutlined />}
+            loading={saving}
+            onClick={() => handleSave()}
+          >
+            保存
+          </Button>
+          <Button
+            size="small"
+            type="primary"
+            ghost
+            icon={<SendOutlined />}
+            onClick={handlePublishClick}
+          >
+            发布
+          </Button>
           <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => handleExport(exportFmt)}>
             导出
           </Button>
@@ -257,6 +371,41 @@ function Canvas() {
       </div>
 
       <AgentMetaDrawer open={metaOpen} onClose={() => setMetaOpen(false)} />
+
+      <Modal
+        title="发布智能体"
+        open={publishOpen}
+        onOk={confirmPublish}
+        onCancel={() => setPublishOpen(false)}
+        confirmLoading={publishing}
+        okText="确认发布"
+        cancelText="取消"
+      >
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="发布前已自动保存草稿。发布将创建一个正式版本，纳入版本管理与审计。"
+        />
+        <Typography.Text strong>版本递增方式</Typography.Text>
+        <Radio.Group
+          style={{ display: 'block', margin: '8px 0 16px' }}
+          value={bump}
+          onChange={(e) => setBump(e.target.value as BumpKind)}
+        >
+          <Radio value="major">主版本（major）：不兼容的重大变更</Radio>
+          <Radio value="minor">次版本（minor）：向下兼容的功能新增</Radio>
+          <Radio value="patch">修订（patch）：向下兼容的问题修复</Radio>
+        </Radio.Group>
+        <Typography.Text strong>变更说明（可选）</Typography.Text>
+        <Input.TextArea
+          style={{ marginTop: 8 }}
+          rows={3}
+          placeholder="描述本次发布的主要变更，便于追溯"
+          value={changelog}
+          onChange={(e) => setChangelog(e.target.value)}
+        />
+      </Modal>
 
       <Drawer title="校验结果" open={issuesOpen} onClose={() => setIssuesOpen(false)} width={480}>
         {validation.issues.length === 0 ? (
