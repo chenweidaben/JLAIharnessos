@@ -98,6 +98,7 @@ const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
 // 智能体运行台（M4-C）：执行已发布智能体 + 实例/节点记录 + 结果回放
 const AgentRuntime = lazy(() => import('@/pages/agentRuntime'));
+const HumanTask = lazy(() => import('@/pages/humanTask'));
 // 技能体系（jlmedaios SKILLS）：技能市场 + 技能工作室
 const SkillMarket = lazy(() =>
   import('@/pages/skills').then((m) => ({ default: m.SkillMarketPage })),
@@ -159,6 +160,7 @@ export default function AppRoutes() {
           <Route path="builder/market" element={<BuilderMarket />} />
           {/* 智能体运行台（M4-C）：执行已发布智能体 + 实例/节点回放 */}
           <Route path="agent-runtime" element={<AgentRuntime />} />
+          <Route path="human-tasks" element={<HumanTask />} />
           {/* 技能体系：技能市场（浏览）与技能工作室（低代码编排） */}
           <Route path="skills/market" element={<SkillMarket />} />
           <Route path="skills/studio" element={<SkillStudio />} />

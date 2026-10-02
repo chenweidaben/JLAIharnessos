@@ -41,6 +41,7 @@ bun-debug.log*
 data/
 !src/data/
 runtime/
+!src/bff/runtime/
 tmp/
 *.pid
 *.seed

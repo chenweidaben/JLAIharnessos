@@ -23,6 +23,10 @@ import {
   getAgentRun,
   listAgentRuns,
   startAgentRun,
+  listMyHumanTasks,
+  getHumanTask,
+  claimMyHumanTask,
+  resolveMyHumanTask,
 } from '../aggregators/agentRuntimeAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
@@ -121,6 +125,82 @@ export const agentRuntimeRoutes: RouteDef[] = [
       try {
         const body = await c.body<{ reason?: string }>();
         return json(ok(await cancelAgentRun(view, c.params.instanceId, body?.reason)));
+      } catch (err) {
+        return mapError(err, c);
+      }
+    },
+  },
+  // ----- 我的人工工单列表（M4-D） -----
+  {
+    method: 'GET',
+    path: '/api/v1/human-tasks',
+    handle: async (c) => {
+      const denied = requirePermissionCode(c, 'agent:build');
+      if (denied) return denied;
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      try {
+        const url = new URL(c.req.url);
+        const status = url.searchParams.get('status') ?? 'pending';
+        const limit = Number(url.searchParams.get('limit') ?? 100);
+        return json(ok(await listMyHumanTasks(view, { status, limit })));
+      } catch (err) {
+        return mapError(err, c);
+      }
+    },
+  },
+  // ----- 工单详情 -----
+  {
+    method: 'GET',
+    path: '/api/v1/human-tasks/:taskId',
+    handle: async (c) => {
+      const denied = requirePermissionCode(c, 'agent:build');
+      if (denied) return denied;
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      try {
+        return json(ok(await getHumanTask(view, c.params.taskId)));
+      } catch (err) {
+        return mapError(err, c);
+      }
+    },
+  },
+  // ----- 认领工单 -----
+  {
+    method: 'POST',
+    path: '/api/v1/human-tasks/:taskId/claim',
+    handle: async (c) => {
+      const denied = requirePermissionCode(c, 'agent:build');
+      if (denied) return denied;
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      try {
+        return json(ok(await claimMyHumanTask(view, c.params.taskId)));
+      } catch (err) {
+        return mapError(err, c);
+      }
+    },
+  },
+  // ----- 处理工单（批准/驳回） -----
+  {
+    method: 'POST',
+    path: '/api/v1/human-tasks/:taskId/resolve',
+    handle: async (c) => {
+      const denied = requirePermissionCode(c, 'agent:build');
+      if (denied) return denied;
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      try {
+        const body = await c.body<{ approved: boolean; comment?: string; formData?: Record<string, unknown> }>();
+        const approved = body?.approved;
+        if (typeof approved !== 'boolean') {
+          return json(fail(ErrorCode.BAD_REQUEST, 'approved 必须为布尔值', c.traceId), 400);
+        }
+        return json(ok(await resolveMyHumanTask(view, c.params.taskId, {
+          approved,
+          comment: body?.comment,
+          formData: body?.formData,
+        })));
       } catch (err) {
         return mapError(err, c);
       }

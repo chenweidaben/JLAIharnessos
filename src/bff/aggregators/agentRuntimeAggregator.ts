@@ -28,6 +28,7 @@ import {
 import {
   insertRunningInstance,
   updateInstanceTerminal,
+  markInstanceWaitingHuman,
   listInstances,
   getInstanceById,
   upsertNodeRecord,
@@ -37,9 +38,17 @@ import {
   type NodeRecord,
 } from '../../db/repositories/agentRuntimeRepo.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
+import {
+  cancelOpenTasksByInstance,
+  timeoutOpenTasksByInstance,
+  listHumanTasks,
+  getHumanTaskById,
+  claimHumanTask,
+  type HumanTaskRecord,
+} from '../../db/repositories/humanTaskRepo.js';
 import { createMockRuntimeDeps, MockRagRetriever } from '../../orchestrator/adapters/mockRuntime.js';
-import { InMemoryHumanTaskHandler } from '../../orchestrator/engine/humanTaskHandler.js';
 import { createOrchestrator, type Orchestrator } from '../../orchestrator/factory.js';
+import { PersistentHumanTaskHandler } from '../runtime/persistentHumanTaskHandler.js';
 import type { AgentDefinition } from '../../orchestrator/dsl/types.js';
 import type { AuthView } from '../view/userView.js';
 
@@ -63,6 +72,9 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 
 /** 运行中实例句柄（用于取消）：instanceId -> WorkflowInstance */
 const liveHandles = new Map<string, ReturnType<Orchestrator['engine']['run']>>();
+
+/** 运行中实例的人工任务处理器：instanceId -> PersistentHumanTaskHandler */
+const liveHumanHandlers = new Map<string, PersistentHumanTaskHandler>();
 
 // ============================================================================
 // 视图模型
@@ -124,7 +136,7 @@ export async function startAgentRun(
   });
 
   // 装配确定性演示运行时（注册智能体声明的工具/知识库兜底）
-  const orchestrator = buildDemoOrchestrator(agentDef);
+  const { orchestrator, humanHandler } = buildDemoOrchestrator(agentDef);
   orchestrator.registry.register(agentDef, versionRecord.prompts as Record<string, string>);
 
   const wf = agentDef.workflows.find((w) => w.meta.id === agentDef.entryWorkflow);
@@ -135,6 +147,8 @@ export async function startAgentRun(
 
   const startedAt = Date.now();
   const handle = orchestrator.engine.run(wf, {
+    // 用数据库实例 UUID 作为引擎 instanceId，使 human_tasks 等持久化记录正确关联
+    instanceId: instance.id,
     input: runInput,
     timeoutMs,
     trigger: { type: triggerType, traceId, userId: actor.id },
@@ -143,16 +157,103 @@ export async function startAgentRun(
     },
   });
   liveHandles.set(instance.id, handle);
+  liveHumanHandlers.set(instance.id, humanHandler);
 
-  let result;
-  try {
-    result = await handle.result;
-  } finally {
-    liveHandles.delete(instance.id);
+  const result = await Promise.race([
+    handle.result.then((r) => ({ kind: 'done' as const, r })),
+    waitingForHuman(handle),
+  ]);
+
+  if (result.kind === 'waiting') {
+    // 工作流挂起等待人工：把 DB 状态更新为 waiting_human，并持久化已完成节点；
+    // 终态持久化放到后台（人工处理后工作流继续），立即返回不阻塞。
+    await markInstanceWaitingHuman(instance.id);
+    const partialNodes = extractNodeRecords(
+      // 从引擎当前事件提取已完成节点（含 human 节点 waiting）
+      handle.recorder.getEvents(),
+      instance.id,
+    );
+    await withTx(async (tx) => {
+      for (const n of partialNodes) await persistNodeRecord(instance.id, n, tx);
+    });
+    scheduleBackgroundFinalize({
+      handle, humanHandler, instance, agent, versionRecord, actor,
+      triggerType, traceId, startedAt,
+    });
+    const refreshed = await getInstanceById(instance.id);
+    const nodes = await listNodeRecords(instance.id);
+    return { instance: refreshed ?? instance, nodes };
   }
-  const latencyMs = Date.now() - startedAt;
 
-  // 从事件提取节点记录
+  liveHandles.delete(instance.id);
+  liveHumanHandlers.delete(instance.id);
+  await persistRunOutcome({
+    runResult: result.r, instance, agent, versionRecord, actor,
+    triggerType, traceId, startedAt,
+  });
+  const refreshed = await getInstanceById(instance.id);
+  const nodes = await listNodeRecords(instance.id);
+  return { instance: refreshed ?? instance, nodes };
+}
+
+/**
+ * 等待工作流进入 waiting_human：轮询引擎状态。
+ * 工作流在 human 节点挂起时状态机转为 waiting_human，据此快速返回。
+ */
+async function waitingForHuman(
+  handle: ReturnType<Orchestrator['engine']['run']>,
+): Promise<{ kind: 'waiting' }> {
+  while (true) {
+    if (handle.getState() === 'waiting_human') return { kind: 'waiting' };
+    await new Promise((r) => setTimeout(r, 25));
+  }
+}
+
+/** 后台终态持久化：工作流被人工处理后继续执行，完成时落库（不阻塞发起请求） */
+function scheduleBackgroundFinalize(ctx: {
+  handle: ReturnType<Orchestrator['engine']['run']>;
+  humanHandler: PersistentHumanTaskHandler;
+  instance: WorkflowInstanceRecord;
+  agent: { riskLevel: string };
+  versionRecord: { version: string; prompts: Record<string, string> };
+  actor: AuthView;
+  triggerType: string;
+  traceId: string;
+  startedAt: number;
+}): void {
+  const { handle } = ctx;
+  void handle.result
+    .then((runResult) => {
+      liveHandles.delete(ctx.instance.id);
+      liveHumanHandlers.delete(ctx.instance.id);
+      return persistRunOutcome({ ...ctx, runResult });
+    })
+    .catch((e) => {
+      // 后台异常不应吞掉：记录到审计/日志（终态落库失败需可观测）
+      console.error('[agent-runtime] background finalize failed', ctx.traceId, e);
+    });
+}
+
+/** 持久化一次执行的终态（成功/失败），节点记录、实例终态、调用日志与审计同事务 */
+async function persistRunOutcome(ctx: {
+  runResult: {
+    success: boolean;
+    state: string;
+    events: readonly unknown[];
+    output?: unknown;
+    error?: string;
+    summary: { tokens: { input: number; output: number } };
+  };
+  instance: WorkflowInstanceRecord;
+  agent: { riskLevel: string };
+  versionRecord: { version: string; prompts: Record<string, string> };
+  actor: AuthView;
+  triggerType: string;
+  traceId: string;
+  startedAt: number;
+}): Promise<void> {
+  const { runResult: result, instance, agent, versionRecord, actor, triggerType, traceId, startedAt } = ctx;
+  const latencyMs = Date.now() - startedAt;
   const nodeRecords = extractNodeRecords(result.events, instance.id);
 
   if (result.success) {
@@ -172,7 +273,7 @@ export async function startAgentRun(
       await insertInvocation(
         {
           traceId,
-          agentId,
+          agentId: instance.agentId,
           agentVersion: versionRecord.version,
           actorId: actor.id,
           triggerType,
@@ -188,7 +289,7 @@ export async function startAgentRun(
           actorId: actor.id,
           action: 'agent.run',
           resourceType: 'agent',
-          resourceId: agentId,
+          resourceId: instance.agentId,
           result: 'success',
           riskLevel: agent.riskLevel === 'high' ? 'medium' : 'low',
           detail: { version: versionRecord.version, durationMs: latencyMs, instanceNo: instance.instanceNo },
@@ -202,6 +303,14 @@ export async function startAgentRun(
     const finalState = isCancelled ? 'cancelled' : isTimedOut ? 'timed_out' : 'failed';
     await withTx(async (tx) => {
       for (const n of nodeRecords) await persistNodeRecord(instance.id, n, tx);
+      // 实例进入终态时，把未完成人工工单同步置为终态（取消/超时/失败），避免悬挂
+      if (isCancelled) {
+        await cancelOpenTasksByInstance(instance.id, tx);
+      } else if (isTimedOut) {
+        await timeoutOpenTasksByInstance(instance.id, tx);
+      } else {
+        await cancelOpenTasksByInstance(instance.id, tx);
+      }
       await updateInstanceTerminal(
         instance.id,
         {
@@ -218,7 +327,7 @@ export async function startAgentRun(
       await insertInvocation(
         {
           traceId,
-          agentId,
+          agentId: instance.agentId,
           agentVersion: versionRecord.version,
           actorId: actor.id,
           triggerType,
@@ -235,7 +344,7 @@ export async function startAgentRun(
           actorId: actor.id,
           action: 'agent.run',
           resourceType: 'agent',
-          resourceId: agentId,
+          resourceId: instance.agentId,
           result: 'failure',
           riskLevel: 'medium',
           detail: { version: versionRecord.version, error: result.error, instanceNo: instance.instanceNo },
@@ -244,10 +353,6 @@ export async function startAgentRun(
       );
     });
   }
-
-  const refreshed = await getInstanceById(instance.id);
-  const nodes = await listNodeRecords(instance.id);
-  return { instance: refreshed ?? instance, nodes };
 }
 
 // ============================================================================
@@ -275,24 +380,29 @@ export async function cancelAgentRun(actor: AuthView, instanceId: string, reason
   const instance = await getInstanceById(instanceId);
   if (!instance) throw notFound('运行实例不存在');
   const handle = liveHandles.get(instanceId);
+  const humanHandler = liveHumanHandlers.get(instanceId);
   if (handle) {
+    // 先把 DB 未完成工单置为 cancelled，解除内存人工等待，再取消工作流
+    await cancelOpenTasksByInstance(instanceId);
+    humanHandler?.cancelAll();
     handle.cancel(reason ?? '用户取消');
     // 等待工作流进入终态（startAgentRun 负责持久化终态）
     await handle.result.catch(() => {});
-    // 轮询等待终态落库，确保返回最终状态而非 running
-    for (let i = 0; i < 20; i++) {
+    // 轮询等待终态落库，确保返回最终状态而非 running/waiting_human
+    for (let i = 0; i < 30; i++) {
       const current = await getInstanceById(instanceId);
-      if (current && current.state !== 'running' && current.state !== 'pending') break;
+      if (current && current.state !== 'running' && current.state !== 'pending' && current.state !== 'waiting_human') break;
       await new Promise((r) => setTimeout(r, 150));
     }
-  } else if (instance.state === 'running') {
-    // 句柄已不在内存（如 BFF 重启）：直接回写取消态
+  } else if (instance.state === 'running' || instance.state === 'waiting_human') {
+    // 句柄已不在内存（如 BFF 重启）：直接回写取消态，并取消未完成工单
     await withTx(async (tx) => {
       await updateInstanceTerminal(
         instanceId,
         { state: 'cancelled', output: null, errorCode: 'CANCELLED', errorMessage: reason ?? '已取消' },
         tx,
       );
+      await cancelOpenTasksByInstance(instanceId, tx);
       await recordChainAudit(
         {
           actorId: actor.id,
@@ -307,9 +417,117 @@ export async function cancelAgentRun(actor: AuthView, instanceId: string, reason
       );
     });
   }
+  liveHandles.delete(instanceId);
+  liveHumanHandlers.delete(instanceId);
   const refreshed = await getInstanceById(instanceId);
   const nodes = await listNodeRecords(instanceId);
   return { instance: refreshed ?? instance, nodes };
+}
+
+// ============================================================================
+// 人工工单中心（M4-D）
+// ============================================================================
+
+/** 工单详情视图（含关联实例摘要） */
+export interface HumanTaskDetail {
+  task: HumanTaskRecord;
+  instance: WorkflowInstanceRecord | null;
+}
+
+/** 列出当前审核人可处理的工单（按角色/用户命中），默认仅未完成 */
+export async function listMyHumanTasks(
+  actor: AuthView,
+  filter: { status?: string; limit?: number } = {},
+): Promise<HumanTaskRecord[]> {
+  return listHumanTasks({
+    status: filter.status ?? 'pending',
+    roles: actor.rawRoles,
+    userId: actor.id,
+    limit: filter.limit ?? 100,
+  });
+}
+
+/** 获取工单详情（含关联实例） */
+export async function getHumanTask(actor: AuthView, taskId: string): Promise<HumanTaskDetail> {
+  const task = await getHumanTaskById(taskId);
+  if (!task) throw notFound('人工工单不存在');
+  const instance = await getInstanceById(task.instanceId);
+  return { task, instance };
+}
+
+/** 认领工单（仅 pending 可认领；已被他人认领返回 409） */
+export async function claimMyHumanTask(actor: AuthView, taskId: string): Promise<HumanTaskDetail> {
+  const task = await getHumanTaskById(taskId);
+  if (!task) throw notFound('人工工单不存在');
+  if (!canHandle(task, actor)) throw new AgentRuntimeError(403, 'FORBIDDEN', '您不在该工单的审核人范围内');
+  const claimed = await claimHumanTask(taskId, actor.id);
+  if (!claimed) {
+    throw conflict('工单已被认领或已处理，无法重复认领');
+  }
+  const instance = await getInstanceById(claimed.instanceId);
+  return { task: claimed, instance };
+}
+
+/**
+ * 处理工单（批准/驳回）：在线解除工作流挂起，工作流继续执行。
+ * 审核人必须在工单范围内；工单已处理返回 409。
+ */
+export async function resolveMyHumanTask(
+  actor: AuthView,
+  taskId: string,
+  body: { approved: boolean; comment?: string; formData?: Record<string, unknown> },
+): Promise<HumanTaskDetail> {
+  const task = await getHumanTaskById(taskId);
+  if (!task) throw notFound('人工工单不存在');
+  if (!canHandle(task, actor)) throw new AgentRuntimeError(403, 'FORBIDDEN', '您不在该工单的审核人范围内');
+
+  // 已认领工单须由认领人处理；未认领（pending）可由范围内审核人直接处理
+  if (task.status === 'claimed' && task.claimedBy !== actor.id) {
+    throw conflict('工单已由他人认领，仅认领人可处理');
+  }
+
+  const handler = liveHumanHandlers.get(task.instanceId);
+  let updated: HumanTaskRecord | null = null;
+  if (handler && handler.isLive(taskId)) {
+    // 工作流在本进程等待：持久化 + 解除内存挂起
+    updated = await handler.resolveByDbTaskId(taskId, {
+      approved: body.approved,
+      reviewerId: actor.id,
+      comment: body.comment,
+      formData: body.formData,
+    });
+  } else {
+    // 工作流不在线（BFF 重启/分布式）：仅更新工单；由恢复流程接管
+    const { resolveHumanTask } = await import('../../db/repositories/humanTaskRepo.js');
+    updated = await resolveHumanTask(taskId, {
+      approved: body.approved,
+      reviewerId: actor.id,
+      comment: body.comment,
+      formData: body.formData,
+    });
+  }
+
+  if (!updated) throw conflict('工单已处理，无法重复处理');
+
+  await recordChainAudit({
+    actorId: actor.id,
+    action: 'agent.human_task.resolve',
+    resourceType: 'human_task',
+    resourceId: taskId,
+    result: 'success',
+    riskLevel: body.approved ? 'low' : 'medium',
+    detail: { approved: body.approved, taskNo: updated.taskNo, comment: body.comment ?? null },
+  });
+
+  const instance = await getInstanceById(updated.instanceId);
+  return { task: updated, instance };
+}
+
+/** 判断审核人是否在工单的处理范围内（角色交集或被指定） */
+function canHandle(task: HumanTaskRecord, actor: AuthView): boolean {
+  if (task.assigneeUsers.includes(actor.id)) return true;
+  if (task.assigneeRoles.some((r) => actor.rawRoles.includes(r))) return true;
+  return false;
 }
 
 // ============================================================================
@@ -317,7 +535,10 @@ export async function cancelAgentRun(actor: AuthView, instanceId: string, reason
 // ============================================================================
 
 /** 装配确定性演示运行时：为智能体声明的工具/知识库注册可重复的兜底实现 */
-function buildDemoOrchestrator(agentDef: AgentDefinition): Orchestrator {
+function buildDemoOrchestrator(agentDef: AgentDefinition): {
+  orchestrator: Orchestrator;
+  humanHandler: PersistentHumanTaskHandler;
+} {
   const deps = createMockRuntimeDeps();
 
   // 注册智能体声明的工具：演示兜底（成功，不臆造医疗数据）
@@ -346,7 +567,9 @@ function buildDemoOrchestrator(agentDef: AgentDefinition): Orchestrator {
     });
   }
 
-  return createOrchestrator({ runtime: { ...deps, human: new InMemoryHumanTaskHandler() } });
+  const humanHandler = new PersistentHumanTaskHandler();
+  const orchestrator = createOrchestrator({ runtime: { ...deps, human: humanHandler } });
+  return { orchestrator, humanHandler };
 }
 
 /** 节点聚合中间结构 */

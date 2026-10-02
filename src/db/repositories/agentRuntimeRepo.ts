@@ -134,6 +134,21 @@ export async function insertRunningInstance(
   return mapInstance(rows[0]);
 }
 
+/**
+ * 工作流进入 waiting_human：轻量更新状态（不写 finished_at/终态）。
+ * 人工处理后工作流继续，最终由 updateInstanceTerminal 回写终态。
+ */
+export async function markInstanceWaitingHuman(
+  instanceId: string,
+  exec?: DbExecutor,
+): Promise<void> {
+  const db = exec ?? getDb();
+  await db`
+    UPDATE agent.workflow_instances SET state = 'waiting_human'
+    WHERE id = ${instanceId} AND state IN ('running','pending')
+  `;
+}
+
 /** 执行结束：回写终态 */
 export async function updateInstanceTerminal(
   instanceId: string,

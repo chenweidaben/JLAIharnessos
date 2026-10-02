@@ -429,9 +429,12 @@ const demoAlertTimer = isProduction || isDemoMode
   ? null
   : setInterval(() => {
       // 事件名与前端 useAlert 订阅的 critical:alert 通道保持一致；
-      // payload 对齐前端 Alert 契约（type/level/title/content/patientId）
+      // payload 对齐前端 Alert 契约（type/level/title/content/patientId）。
+      // 演示告警使用固定 id：前端按 id 去重（seenRef），同一客户端只弹一次，
+      // 避免同一危急值每 30s 重复弹窗/堆积（真实场景同一危急值不应重复强提醒）；
+      // 新连接的客户端仍会收到首次广播，保留实时告警演示效果。
       broadcast('critical:alert', {
-        id: `al_${Date.now()}`,
+        id: 'al-demo-critical-cTni',
         type: 'critical-value',
         level: 'critical',
         title: '肌钙蛋白危急值',
