@@ -14,10 +14,10 @@ import type { TestFunction } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@test-utils';
 
 // 重型页面（健康门禁 + 大量异步渲染）：串行/覆盖率插桩下，15s 默认超时会出现
-// 计时抖动（整文件耗时可达 130s+）；统一提至 30s。这些用例单跑均 <2s，
-// 若真挂死，30s 仍会失败暴露，不会掩盖问题。
+// 计时抖动（整文件耗时可达 130s+）；统一提至 60s。这些用例单跑均 <2s，
+// 若真挂死，60s 仍会失败暴露，不会掩盖问题。
 const it = (name: string, fn: TestFunction) =>
-  vitestIt(name, fn, 30000);
+  vitestIt(name, fn, 60000);
 
 import ReferralPage from '@/pages/referral';
 import type { ReferralDetail, ReferralOrder } from '@/types/referral';

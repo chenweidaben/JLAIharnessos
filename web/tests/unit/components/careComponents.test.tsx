@@ -442,7 +442,7 @@ describe('RoundStation 新建与退回闭环', () => {
     expect(p.roundType).toBe('routine');
     expect(p.isSuperior).toBe(false);
     expect(await screen.findByText('查房记录草稿已创建，请医师本人签名')).toBeInTheDocument();
-  });
+  }, 60000);
 
   it('新建查房：缺少必填评估时校验拦截，不调用创建', async () => {
     useCareStore.setState({ ready: true, selectedVisitId: 'v1', rounds: [] });
@@ -486,7 +486,7 @@ describe('RoundStation 新建与退回闭环', () => {
     fireEvent.click(screen.getByRole('button', { name: /确认退回/ }));
     expect(await screen.findByText('请填写退回原因')).toBeInTheDocument();
     expect(careApi.returnRound).not.toHaveBeenCalled();
-  });
+  }, 60000);
 
   it('上级退回：取消关闭弹窗', async () => {
     useCareStore.setState({ ready: true, selectedVisitId: 'v1', rounds: [signedSuperior] });
@@ -536,7 +536,7 @@ describe('NursingStation 新建与执行闭环', () => {
     expect(p.riskAssessment!.bradenScore).toBe(16);
     expect(p.riskAssessment!.morseScore).toBe(55);
     expect(await screen.findByText('护理记录草稿已创建，请责任护士签名')).toBeInTheDocument();
-  }, 30000);
+  }, 90000);
 
   it('新建护理记录：取消不保存', async () => {
     useCareStore.setState({

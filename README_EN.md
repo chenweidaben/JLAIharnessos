@@ -88,10 +88,11 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M5-A** | Multi-tenant registry persistence | persist the hospital→campus registry to `iam.tenants` (hierarchy CHECK, partial indexes, soft-delete, default hospital protected); the BFF hydrates the in-memory registry at startup, admin writes are write-through (persist first, then memory); admin tree reads come straight from the DB; row-level isolation of business tables is a later slice | 12 real integration cases + 403 unauthorized/401 + restart persistence + outage 500 with traceId |
 | **M5-B** | Research cohort | define a cohort (disease + include/exclude criteria jsonb) → publish → a deterministic rule engine scans patients and auto-enrolls matches (age/gender/diagnosis/tag/lab, exclusion first); member snapshots are de-identified (no name/phone/ID); cohort statistics (gender/age buckets/top tags) and de-identified dataset export; archive state machine; every action on the audit hash chain | real HTTP + 403/401 unauthorized + restart persistence + outage 503/500 with traceId + logged root cause |
 | **M5-C** | EMPI (Enterprise Master Patient Index) | cross-domain identifier registration (ID card / insurance / phone / WeChat / external — raw values hashed, only last 4 kept) → a deterministic matching engine scans patient pairs and produces suspected duplicates (no auto-merge) → manual review: confirm creates a logical master/linked link inside a transaction (**no physical merge, no migration of 40+ foreign keys**), reject marks it; 409 if either patient is already linked to prevent conflicts; master chosen by creation time/ID; audit hash chain | real HTTP 18 items + 403/401 + 404/400/409 + restart persistence + outage 503/500 traceId + logged root cause + watermark screenshots |
+| **M5-D** | Lakehouse layering & incremental processing | adds dwd/dws/ads/meta schemas: DWD incrementally extracts by source `updated_at` watermark (idempotent UPSERT, re-runnable), DWS recomputes dept daily summaries for affected dates (delete-then-insert), ADS recomputes hospital daily metrics; **watermark is computed and stored entirely in the database (microsecond precision), each job completes extract/write/registration inside one transaction**, whose snapshot keeps watermark and extraction consistent; job run history, data lineage, metric queries; processing requires admin, queries require read | real HTTP 14 items + 403/401 + 400 + restart persistence + outage 503/500 traceId + logged root cause + watermark screenshots; DWD=ADS=clinical cross-check reconciled |
 
 **Four kinds of real evidence (not demos)**:
 
-1. **Real database**: local PostgreSQL 16 (port 5433), **106 base tables** across 5 schemas (iam 10 / clinical 72 / agent 8 / knowledge 14 / audit 2); key writes read back and **survive restart**.
+1. **Real database**: local PostgreSQL 16 (port 5433), **113 base tables** across 9 schemas (iam 10 / clinical 72 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 3); key writes read back and **survive restart**.
 2. **Real LLM**: DeepSeek streaming + ReAct tool calls (OpenAI-compatible); sessions/messages/invocations persisted; models are pluggable via the `LLM_PROVIDER` factory.
 3. **Hash-chained audit**: `audit.audit_logs` is maintained by a BEFORE INSERT trigger that builds the `seq/prev_hash/hash` chain; business changes and audits commit in the same transaction, making the chain internally tamper-evident.
 4. **Concurrency/failure resilience**: concurrent writes never duplicate (unique constraints + state machines + row/advisory locks); on DB outage the system returns a unified error envelope with a watermark — no blank screens, no silent empty arrays; out-of-scope access returns 403.
@@ -192,8 +193,8 @@ cd web && bun install && bun run dev # http://localhost:5173
 
 # 4. Verify
 bun run typecheck                    # backend tsc 0
-bun test                             # backend 1853 tests (1 skip)
-cd web && bunx vitest run            # frontend 817 tests
+bun test                             # backend 1870 tests (1 skip)
+cd web && bunx vitest run            # frontend 826 tests
 cd web && npx tsc --noEmit           # frontend tsc 0
 ```
 
@@ -309,7 +310,7 @@ jlmedaios/
 
 ## Quality
 
-- **Backend 1853 and frontend 817 unit/integration tests green** (7393 backend assertions, 1 skip); backend coverage ~**87%**, frontend coverage gate passed (Lines 92.22 / Branch 78.65 / Funcs 84.16), only increasing.
+- **Backend 1870 and frontend 826 unit/integration tests green** (7440 backend assertions, 1 skip); backend coverage ~**87%**, frontend coverage gate passed (Lines 92.18 / Branch 78.55 / Funcs 84.13), only increasing.
 - **Zero type errors** in strict TypeScript for both frontend and backend; ESLint 0 errors.
 - E2E clinical scenarios: outpatient, inpatient ADT/rounds, emergency triage/green channel, critical values, prescription review, pharmacy dispensing, record QC, voice records, front page, billing/refunds, OR-anesthesia, appointments/follow-up, internet-hospital realname, text consultation, e-prescription/pharmacist review, online payment/e-invoice/finance refund.
 - Security tests for prompt injection, SQL/XSS/command injection, authz, data scope, and security headers.
@@ -355,11 +356,12 @@ M0 Outpatient ✅ → M1 Inpatient+Emergency ✅ → M2 Pharmacy/Documentation/Q
 - [x] M5-A Multi-tenant/multi-campus registry persistence (iam.tenants, startup hydrate, write-through, default tenant protection)
 - [x] M5-B Research cohort (define → publish → deterministic rule matching → de-identified member snapshots → stats & dataset export → archive)
 - [x] M5-C EMPI (cross-domain hashed identifiers → deterministic match candidates → manual review → logical master/linked links, no physical merge)
+- [x] M5-D Lakehouse layering & incremental processing (DWD watermark increment → DWS dept daily → ADS hospital daily metrics, idempotent in transactions, lineage traceable)
 - [ ] Internet hospital online consultation/e-prescription flow/online insurance pay/drug delivery
 - [ ] Unified Idempotency-Key framework, Kafka replacing in-memory buses, real load baseline
 - [ ] CI/local consistency (master branches, DB in CI, full gate)
 - [ ] Full MFA coverage, SM2/SM3/SM4, MLPS L3 assessment
-- [ ] Multi-tenant/multi-campus, lakehouse, EMPI, multimodal/federated, internationalization
+- [ ] Multi-tenant/multi-campus, lakehouse incremental scheduling (CDC/Kafka), EMPI, multimodal/federated, internationalization
 
 ---
 

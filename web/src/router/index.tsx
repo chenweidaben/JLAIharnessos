@@ -40,6 +40,7 @@ const FrontPage = lazy(() => import('@/pages/frontPage'));
 const Research = lazy(() => import('@/pages/research'));
 // 患者主索引 EMPI（M5-C）
 const Empi = lazy(() => import('@/pages/empi'));
+const DataWarehouse = lazy(() => import('@/pages/dataWarehouse'));
 // 收费结算工作站（M3-B）
 const Billing = lazy(() => import('@/pages/billing'));
 const Appt = lazy(() => import('@/pages/appt'));
@@ -183,6 +184,8 @@ export default function AppRoutes() {
           <Route path="research" element={<Research />} />
           {/* 患者主索引 EMPI（M5-C）：empi:read/write */}
           <Route path="empi" element={<Empi />} />
+          {/* 数据湖仓（M5-D）：data_warehouse:read/admin */}
+          <Route path="data-warehouse" element={<DataWarehouse />} />
           {/* 收费结算工作站（M3-B）：计费/收款 billing:charge，退费 billing:refund */}
           <Route path="billing" element={<Billing />} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}

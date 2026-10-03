@@ -376,7 +376,7 @@ describe('GreenChannel 绿色通道', () => {
     const args = vi.mocked(api.startGreenChannel).mock.calls[0];
     expect(args[0]).toBe(triagedItem.visitId);
     expect(args[1]).toEqual({ type: 'chest_pain', subtype: 'STEMI' });
-  });
+  }, 60000);
 
   it('节点“记录”弹窗：保存调用 recordNode', async () => {
     renderWithApp(<GreenChannel />);
@@ -494,7 +494,7 @@ describe('Observation 留观管理', () => {
     fireEvent.click(await screen.findByRole('button', { name: '更新' }));
     fireEvent.click(await screen.findByRole('button', { name: /保\s*存/ }));
     await waitFor(() => expect(api.updateObservation).toHaveBeenCalled());
-  });
+  }, 60000);
 
   it('点击“入院”调用 endObservation(admitted)', async () => {
     vi.mocked(api.getQueue).mockResolvedValue([obsItem]);

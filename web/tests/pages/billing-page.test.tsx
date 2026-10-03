@@ -246,14 +246,14 @@ it('未付作废：打开未付结算单 → 作废', async () => {
   const voidBtn = await screen.findByTestId('billing-void-btn');
   fireEvent.click(voidBtn);
   await waitFor(() => expect(m.voidSettlement).toHaveBeenCalledTimes(1));
-});
+}, 60000);
 
 it('Saga 日志渲染：正向/补偿标签', async () => {
   render(<BillingPage />);
   await waitOnline();
   fireEvent.click(screen.getAllByRole('button', { name: '查看' })[0]);
   expect(await screen.findByTestId('billing-saga-item')).toBeInTheDocument();
-});
+}, 60000);
 
 it('断库：显式离线 Alert，不渲染业务内容', async () => {
   healthMock.mockResolvedValue({
