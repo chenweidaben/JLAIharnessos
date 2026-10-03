@@ -209,14 +209,22 @@ export function requirePermissionCode(c: Ctx, code: string): Response | null {
   );
 }
 
-export function newCtx(req: Request, params: Record<string, string>, query: URLSearchParams): Ctx {
+export function newCtx(
+  req: Request,
+  params: Record<string, string>,
+  query: URLSearchParams,
+  rawBody: string | null = null,
+): Ctx {
   return {
     req,
     params,
     query,
+    rawBody,
     body: async () => {
+      // 优先使用预读取的原始 body（保证幂等指纹与 handler 读取一致）
+      const text = rawBody !== null ? rawBody : await req.text();
       try {
-        return (await req.json()) as never;
+        return JSON.parse(text) as never;
       } catch {
         return {} as never;
       }

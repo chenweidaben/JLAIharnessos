@@ -46,6 +46,8 @@ export interface Ctx {
   req: Request;
   params: Record<string, string>;
   query: URLSearchParams;
+  /** 预读取的原始请求体文本（GET/HEAD 为 null），供幂等指纹与 body() 复用 */
+  rawBody: string | null;
   /** 解析后的 JSON body（按需调用） */
   body: <T = unknown>() => Promise<T>;
   /** 认证后注入的用户（未登录为 null） */

@@ -18,6 +18,7 @@ import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
+import { withIdempotency } from './middleware/idempotency';
 import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
@@ -290,7 +291,10 @@ async function handleFetch(
     });
   }
 
-  const ctx: Ctx = newCtx(req, {}, url.searchParams);
+  // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
+  const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
+  const rawBody = mayHaveBody ? await req.text() : null;
+  const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody);
   attachUser(ctx);
 
   let status = 200;
@@ -333,7 +337,11 @@ async function handleFetch(
           return withSecurityHeaders(denied);
         }
       }
-      const wrapped = withErrorHandler(r.def.handle);
+      const handler = r.def.handle;
+      // 错误处理在外、幂等在内：beginProcessing 与 handler 任何阶段抛错
+      // 都转结构化错误信封（含 traceId），不返回 HTML 错误页
+      const wrapped = withErrorHandler((c: Ctx) =>
+        withIdempotency(c, () => handler(c)));
       const res = await wrapped(ctx);
       status = res.status;
       return withSecurityHeaders(res);
