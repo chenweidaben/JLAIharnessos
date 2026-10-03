@@ -211,3 +211,42 @@ ingress:
 networkPolicy:
   # -- 是否启用 NetworkPolicy
   enabled: true
+
+# ---------------------------------------------------------------------------
+# 服务网格（Istio / Istio 兼容，如 ASM）
+# 需集群已安装 Istio（istiod）。启用后渲染 VirtualService / DestinationRule /
+# PeerAuthentication；可与 Ingress 共存，或用 VirtualService 替代 Ingress。
+# ---------------------------------------------------------------------------
+istio:
+  # -- 是否启用 Istio 服务网格资源
+  enabled: false
+  # -- 引用的 Istio Gateway（命名空间/名称，如 "default/public-gateway"）；
+  # VirtualService 将挂到该 Gateway
+  gateway: ""
+  # -- 命名空间内 mTLS 模式：STRICT / PERMISSIVE / DISABLE
+  mtlsMode: STRICT
+  # -- 连接池（应用于 web / bff 的 DestinationRule）
+  connectionPool:
+    tcp:
+      maxConnections: 100
+    http:
+      http2MaxRequests: 1000
+      maxRequestsPerConnection: 10
+      idleTimeoutSeconds: 60
+  # -- 异常检测（故障实例自动摘除）
+  outlierDetection:
+    consecutive5xxErrors: 5
+    intervalSeconds: 30
+    baseEjectionTimeSeconds: 30
+    maxEjectionPercent: 50
+  # -- 灰度（canary）：当 stable 与 canary 版本同时存在时，按权重分流
+  canary:
+    # -- 是否启用灰度加权路由
+    enabled: false
+    # -- 稳定版本权重
+    stableWeight: 90
+    # -- 灰度版本权重
+    canaryWeight: 10
+    # -- 灰度版本标签（Deployment 版本 label）
+    versionLabel: canary
+

@@ -1,0 +1,58 @@
+{{- if .Values.istio.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: web
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: web
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  host: web
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.connectionPool.tcp.maxConnections }}
+      http:
+        http2MaxRequests: {{ .Values.istio.connectionPool.http.http2MaxRequests }}
+        maxRequestsPerConnection: {{ .Values.istio.connectionPool.http.maxRequestsPerConnection }}
+        idleTimeout: {{ .Values.istio.connectionPool.http.idleTimeoutSeconds }}s
+    outlierDetection:
+      consecutive5xxErrors: {{ .Values.istio.outlierDetection.consecutive5xxErrors }}
+      interval: {{ .Values.istio.outlierDetection.intervalSeconds }}s
+      baseEjectionTime: {{ .Values.istio.outlierDetection.baseEjectionTimeSeconds }}s
+      maxEjectionPercent: {{ .Values.istio.outlierDetection.maxEjectionPercent }}
+  {{- if .Values.istio.canary.enabled }}
+  subsets:
+    - name: stable
+      labels:
+        app.kubernetes.io/version: stable
+    - name: canary
+      labels:
+        app.kubernetes.io/version: {{ .Values.istio.canary.versionLabel | quote }}
+  {{- end }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: bff
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: bff
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  host: app
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.istio.connectionPool.tcp.maxConnections }}
+      http:
+        http2MaxRequests: {{ .Values.istio.connectionPool.http.http2MaxRequests }}
+        maxRequestsPerConnection: {{ .Values.istio.connectionPool.http.maxRequestsPerConnection }}
+        idleTimeout: {{ .Values.istio.connectionPool.http.idleTimeoutSeconds }}s
+    outlierDetection:
+      consecutive5xxErrors: {{ .Values.istio.outlierDetection.consecutive5xxErrors }}
+      interval: {{ .Values.istio.outlierDetection.intervalSeconds }}s
+      baseEjectionTime: {{ .Values.istio.outlierDetection.baseEjectionTimeSeconds }}s
+      maxEjectionPercent: {{ .Values.istio.outlierDetection.maxEjectionPercent }}
+{{- end -}}

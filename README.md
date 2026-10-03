@@ -93,6 +93,7 @@
 | **M5-E** | 数据质量监控与隐私分级治理 | 在 meta 建质量规则/运行/结果与字段分级台账：检测引擎对真实业务表执行**五维质量检测**（完整性 not_null、唯一性 unique、有效性 valid_values/valid_regex、一致性 fk_exists、及时性 conditional_not_null），schema/表/列 qi() 转义、允许值与正则参数绑定、condition 为规则内置固定文本；逐规则登记总行/失败行/失败样本并计算质量评分与趋势；隐私分级自动扫描 information_schema 列（DataClassifier，不覆盖人工修正），人工修正留痕（master 或 linked 任一已链接即冲突）。检测/扫描/修正需 admin、查询需 read | 真实 HTTP 12 项 + 越权 403/401 + 404/400 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图；代码审查修复结果字段 ruleName/dimension/severity/target 缺失、EMPI 仅查 linked 漏 master 的冲突检测 bug |
 | **M6-A** | 云原生容器化与 K8s 部署 | 多阶段镜像（后端 Bun 非 root + 前端 Nginx 非 root）、生产级 `docker-compose`（postgres/redis/kafka/边缘网关/可观测全栈，健康检查/依赖顺序/资源配额/安全加固）与 **Kubernetes 一体化清单**（namespace/configmap/secret、postgres/redis StatefulSet+PVC、bff/web Deployment+HPA+PDB、Ingress TLS、零信任 NetworkPolicy）；BFF 启动自动迁移、空库即可拉起 | 全部 K8s/compose YAML 语法校验通过；部署引用文件齐备；代码审查修复后端运行镜像缺失 `deploy/postgres/init` 导致自动迁移 ENOENT 的启动 bug |
 | **M6-B** | Helm Chart 参数化部署 | 在 K8s 清单基础上提供生产级 Helm Chart：镜像/副本/资源/存储类/域名/内置或外部 PostgreSQL·Redis 全部参数化，Secret/Ingress/NetworkPolicy/HPA/PDB 可按需开关，支持外部密钥系统 | 用 helm v3.18 实跑 `lint` 通过；`template` 默认渲染 23 文档与 K8s 清单一致；生产（外部库+外部密钥）、混合、镜像覆盖等组合渲染均正确 |
+| **M6-C** | 服务网格与灰度发布 | 作为 Chart 可选模板提供 Istio 资源：`PeerAuthentication`（命名空间 mTLS）、`DestinationRule`（连接池、异常检测、灰度 subsets）、`VirtualService`（统一入口、超时重试、灰度权重分流） | helm `lint` 通过；`template` 验证默认不渲染、启用后 mTLS/流量策略、Gateway 入口、灰度 80/20 权重与 stable/canary subsets 均正确 |
 
 **四类真实取证（非演示）**：
 

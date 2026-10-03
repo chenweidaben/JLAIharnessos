@@ -1,0 +1,38 @@
+{{- if and .Values.istio.enabled .Values.istio.gateway -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: jlmedaios
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ .Values.ingress.host | quote }}
+  gateways:
+    - {{ .Values.istio.gateway | quote }}
+  http:
+    - name: web
+      route:
+        {{- if .Values.istio.canary.enabled }}
+        - destination:
+            host: web
+            port:
+              number: {{ .Values.web.containerPort }}
+          weight: {{ .Values.istio.canary.stableWeight }}
+        - destination:
+            host: web-canary
+            port:
+              number: {{ .Values.web.containerPort }}
+          weight: {{ .Values.istio.canary.canaryWeight }}
+        {{- else }}
+        - destination:
+            host: web
+            port:
+              number: {{ .Values.web.containerPort }}
+        {{- end }}
+      timeout: 600s
+      retries:
+        attempts: 2
+        perTryTimeout: 30s
+{{- end -}}

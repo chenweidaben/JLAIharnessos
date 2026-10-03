@@ -93,8 +93,36 @@ ingress:
 | `ingress.enabled` / `className` / `host` | Ingress | `true` / `nginx` / 示例域名 |
 | `ingress.tls.enabled` / `secretName` | TLS | `true` / `jlmedaios-tls` |
 | `networkPolicy.enabled` | 零信任网络策略 | `true` |
+| `istio.enabled` | 启用 Istio 服务网格资源 | `false` |
+| `istio.gateway` | 引用的 Istio Gateway（提供后渲染 VirtualService） | 空 |
+| `istio.mtlsMode` | 命名空间 mTLS 模式 | `STRICT` |
+| `istio.canary.enabled` / `stableWeight` / `canaryWeight` | 灰度加权路由 | `false` / `90` / `10` |
 
 完整参数见 [`values.yaml`](values.yaml)。
+
+## 服务网格与灰度发布（Istio）
+
+集群已安装 Istio（或兼容实现，如 ASM）时，可启用服务网格：
+
+```bash
+# 仅启用 mTLS + 流量策略（DestinationRule / PeerAuthentication）
+helm upgrade jlmedaios . --set istio.enabled=true
+
+# 启用 VirtualService 入口（需先存在 Istio Gateway）
+helm upgrade jlmedaios . \
+  --set istio.enabled=true \
+  --set istio.gateway=default/public-gateway \
+  --set ingress.enabled=false
+
+# 灰度发布：stable 与 canary 版本按权重分流（需同时部署 web-canary 版本）
+helm upgrade jlmedaios . \
+  --set istio.enabled=true --set istio.gateway=default/public-gateway \
+  --set istio.canary.enabled=true \
+  --set istio.canary.stableWeight=80 --set istio.canary.canaryWeight=20
+```
+
+启用后：`PeerAuthentication` 强制命名空间 mTLS；`DestinationRule` 配置连接池与异常检测（故障实例自动摘除）；
+`VirtualService` 统一入口并支持灰度权重。
 
 ## 安全提示
 
