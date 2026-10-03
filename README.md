@@ -95,6 +95,7 @@
 | **M6-B** | Helm Chart 参数化部署 | 在 K8s 清单基础上提供生产级 Helm Chart：镜像/副本/资源/存储类/域名/内置或外部 PostgreSQL·Redis 全部参数化，Secret/Ingress/NetworkPolicy/HPA/PDB 可按需开关，支持外部密钥系统 | 用 helm v3.18 实跑 `lint` 通过；`template` 默认渲染 23 文档与 K8s 清单一致；生产（外部库+外部密钥）、混合、镜像覆盖等组合渲染均正确 |
 | **M6-C** | 服务网格与灰度发布 | 作为 Chart 可选模板提供 Istio 资源：`PeerAuthentication`（命名空间 mTLS）、`DestinationRule`（连接池、异常检测、灰度 subsets）、`VirtualService`（统一入口、超时重试、灰度权重分流） | helm `lint` 通过；`template` 验证默认不渲染、启用后 mTLS/流量策略、Gateway 入口、灰度 80/20 权重与 stable/canary subsets 均正确 |
 | **M7-A** | 统一幂等键框架 | 新增 `clinical.idempotency_keys` 表（迁移 81），按「用户 + 幂等键」记录首次请求的方法/路径/请求体指纹（SHA-256）与响应；`withIdempotency` 中间件实现首次执行并缓存、重复安全重放（`Idempotent-Replay` 头）、处理中并发 409、同键不同指纹 409、键长非法 400、未登录以 IP 为匿名作用域；预读取 rawBody 保证指纹与 handler 一致 | 真实 HTTP 取证（首次/重放/指纹冲突/数量不重复）+ 集成测试 9 例全绿 + 重启持久化 + 断库 500 traceId；代码审查修复幂等错误返回 HTML 而非结构化信封的问题（错误处理调整到幂等外层） |
+| **M7-B** | 危急值实时事件闭环 | `alertBus` 标准化事件层：`buildCriticalAlertPayload` 构造对齐前端 Alert 契约的 payload，事件 id 稳定唯一（重连重放不重复）；扫描产生告警后经 WebSocket 实时推送 `critical:alert`，签收/处置状态变更后广播 `critical:status`；`scanAndRaise` 返回完整告警并批量取脱敏姓名；前端 `useAlert` 按 id 去重（不重复入列、不覆盖 latest）、同步业务状态，`RealtimeAlertBridge` 收到状态后实时关闭强提醒 | 真实 WS 取证：扫描 85 条实时推送 85 条、id 全唯一、数量一致；重复扫描不重复推送；签收/处置 HTTP 200 且 WS 收到状态广播；重启持久化（状态分布保留）+ 断库 503/500 traceId；新增 alertBus 单测 8 + critical-realtime 集成 4，后端 1908/前端 844 全绿 |
 
 **四类真实取证（非演示）**：
 
