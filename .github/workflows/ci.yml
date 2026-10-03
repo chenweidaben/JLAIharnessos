@@ -9,9 +9,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [master, main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [master, main, develop]
   workflow_dispatch: ~
 
 # 同一分支新推送自动取消旧流水线
@@ -105,9 +105,23 @@ jobs:
           retention-days: 14
 
   integration-test:
-    name: 集成测试
+    name: 集成测试（真实 PostgreSQL）
     runs-on: ubuntu-latest
     needs: typecheck
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: jlmedaios
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -115,8 +129,23 @@ jobs:
           bun-version: ${{ env.BUN_VERSION }}
       - name: 安装依赖
         run: bun install --frozen-lockfile || npm ci
-      - name: 运行集成测试
-        run: bun run test:integration || echo "::warning::暂无集成测试用例，跳过"
+      - name: 初始化数据库（按编号顺序执行全部迁移与种子）
+        run: |
+          shopt -s nullglob
+          for f in deploy/postgres/init/*.sql; do
+            if [ "$(basename "$f")" = "90-pgvector-optional.sql" ]; then
+              psql -h 127.0.0.1 -U postgres -d jlmedaios -f "$f" || echo "::warning::pgvector 扩展不可用，跳过可选向量迁移"
+            else
+              echo ">> $f"
+              psql -v ON_ERROR_STOP=1 -q -h 127.0.0.1 -U postgres -d jlmedaios -f "$f"
+            fi
+          done
+      - name: 运行集成测试（TEST_REAL=1 连真实库）
+        env:
+          TEST_REAL: '1'
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/jlmedaios
+          PGSSLMODE: disable
+        run: bun run test:integration
 
   security-audit:
     name: 安全审计
@@ -184,7 +213,7 @@ jobs:
     name: 失败通知
     runs-on: ubuntu-latest
     needs: [typecheck, lint, unit-test, integration-test, security-audit, build, web-build]
-    if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: failure() && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     steps:
       - name: 输出失败摘要
         run: |
