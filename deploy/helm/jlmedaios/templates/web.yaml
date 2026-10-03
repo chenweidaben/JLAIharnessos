@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: web
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: web
+  ports:
+    - name: http
+      port: {{ .Values.web.containerPort }}
+      targetPort: {{ .Values.web.containerPort }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: web
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.web.hpa.enabled }}
+  replicas: {{ .Values.web.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web
+        {{- include "jlmedaios.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          image: {{ include "jlmedaios.webImage" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.web.containerPort }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.web.containerPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.web.containerPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- if .Values.web.pdb.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: web
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.web.pdb.minAvailable }}
+  minAvailable: {{ .Values.web.pdb.minAvailable }}
+  {{- else if .Values.web.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.web.pdb.maxUnavailable }}
+  {{- else }}
+  minAvailable: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web
+{{- end }}
+{{- if .Values.web.hpa.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    app.kubernetes.io/name: web
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: {{ .Values.web.hpa.minReplicas }}
+  maxReplicas: {{ .Values.web.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.web.hpa.targetCPUUtilizationPercentage }}
+{{- end }}

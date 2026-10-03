@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jlmedaios-config
+  namespace: {{ include "jlmedaios.namespace" . }}
+  labels:
+    {{- include "jlmedaios.labels" . | nindent 4 }}
+data:
+  NODE_ENV: {{ .Values.app.env | quote }}
+  BUN_ENV: {{ .Values.app.env | quote }}
+  APP_ENV: {{ .Values.app.env | quote }}
+  DEMO_MODE: "0"
+  HTTP_PORT: {{ .Values.bff.containerPort | quote }}
+  LOG_LEVEL: {{ .Values.app.logLevel | quote }}
+  TZ: {{ .Values.app.timezone | quote }}
+  DATABASE_HOST: {{ include "jlmedaios.pgHost" . | quote }}
+  DATABASE_PORT: {{ include "jlmedaios.pgPort" . | quote }}
+  DATABASE_NAME: {{ include "jlmedaios.pgDatabase" . | quote }}
+  {{- if .Values.internal.postgres.enabled }}
+  PGSSLMODE: "disable"
+  {{- else }}
+  PGSSLMODE: {{ .Values.external.postgres.sslMode | quote }}
+  {{- end }}
+  REDIS_HOST: {{ include "jlmedaios.redisHost" . | quote }}
+  REDIS_PORT: {{ include "jlmedaios.redisPort" . | quote }}

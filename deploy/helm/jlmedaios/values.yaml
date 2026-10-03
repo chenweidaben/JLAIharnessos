@@ -1,0 +1,213 @@
+# ============================================================================
+# 健澜科技 jlmedaios（健澜科技杠OS）— Helm Chart 默认值
+#
+# 生产部署提示：
+#   1. 所有 change-me-* 密钥必须替换（或设置 secret.create=false 并由
+#      External Secrets / Sealed Secrets / Vault 注入）；
+#   2. 大三甲建议 internal.postgres/redis.enabled=false，改用云托管多可用区
+#      RDS / Redis，并在 external.* 中填写内网地址；
+#   3. ingress.host 必须替换为医院真实域名。
+# ============================================================================
+
+# -- 名称覆盖；为空时使用 Chart 名
+nameOverride: ""
+# -- 完整名称覆盖；为空时自动生成
+fullnameOverride: ""
+
+# ---------------------------------------------------------------------------
+# 命名空间
+# ---------------------------------------------------------------------------
+namespace:
+  # -- 是否由本 Chart 创建命名空间（部署到已存在命名空间时设为 false）
+  create: true
+  # -- 命名空间名
+  name: jlmedaios
+
+# ---------------------------------------------------------------------------
+# 镜像
+# ---------------------------------------------------------------------------
+image:
+  # -- 镜像仓库地址
+  registry: registry.jianlan.tech
+  pullPolicy: IfNotPresent
+  # -- 镜像拉取凭据，例如 [{"name": "regcred"}]
+  pullSecrets: []
+  backend:
+    # -- 后端镜像仓库路径
+    repository: jianlan/backend
+    # -- 后端镜像标签（默认取 Chart appVersion）
+    tag: ""
+  web:
+    # -- 前端镜像仓库路径
+    repository: jianlan/web
+    # -- 前端镜像标签（默认取 Chart appVersion）
+    tag: ""
+
+# ---------------------------------------------------------------------------
+# 通用应用配置
+# ---------------------------------------------------------------------------
+app:
+  # -- 运行环境标识
+  env: production
+  # -- 日志级别
+  logLevel: info
+  # -- 时区
+  timezone: Asia/Shanghai
+
+# ---------------------------------------------------------------------------
+# 密钥（占位值，生产必须替换）
+# ---------------------------------------------------------------------------
+secret:
+  # -- 是否由 Chart 创建 Secret；使用外部密钥系统时设为 false
+  create: true
+  # -- Secret 名称
+  name: jlmedaios-secret
+  postgresUser: postgres
+  postgresPassword: change-me-pg-password
+  redisPassword: change-me-redis-password
+  # -- JWT 签名密钥，至少 32 字符
+  jwtSecret: change-me-jwt-secret-min-32-chars
+  # -- 字段级加密主密钥
+  encryptionMasterKey: change-me-encryption-master-key
+
+# ---------------------------------------------------------------------------
+# 内置 PostgreSQL（StatefulSet）
+# ---------------------------------------------------------------------------
+internal:
+  postgres:
+    # -- 是否部署集群内 PostgreSQL
+    enabled: true
+    image: postgres:16.4-alpine3.20
+    # -- 自动创建的数据库名
+    database: jlmedaios
+    # -- 存储大小
+    storage: 50Gi
+    # -- StorageClass；为空使用集群默认
+    storageClass: ""
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "4"
+        memory: 4Gi
+  # -------------------------------------------------------------------------
+  # 内置 Redis（StatefulSet）
+  # -------------------------------------------------------------------------
+  redis:
+    # -- 是否部署集群内 Redis
+    enabled: true
+    image: redis:7.4.0-alpine3.20
+    # -- 存储大小
+    storage: 5Gi
+    # -- StorageClass；为空使用集群默认
+    storageClass: ""
+    resources:
+      requests:
+        cpu: "250m"
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+
+# ---------------------------------------------------------------------------
+# 外部数据服务（internal.*.enabled=false 时使用）
+# ---------------------------------------------------------------------------
+external:
+  postgres:
+    host: ""
+    port: 5432
+    database: jlmedaios
+    # -- disable | require | verify-ca | verify-full
+    sslMode: disable
+  redis:
+    host: ""
+    port: 6379
+
+# ---------------------------------------------------------------------------
+# BFF 后端
+# ---------------------------------------------------------------------------
+bff:
+  # -- 副本数（HPA 启用时作为初始值）
+  replicas: 2
+  # -- 容器端口
+  containerPort: 8080
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 768Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  hpa:
+    # -- 是否启用 HPA
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    # -- CPU 目标利用率
+    targetCPUUtilizationPercentage: 70
+    # -- 内存目标利用率
+    targetMemoryUtilizationPercentage: 80
+  pdb:
+    # -- 是否启用 PodDisruptionBudget
+    enabled: true
+    # -- 最小可用数（与 maxUnavailable 二选一）
+    minAvailable: 1
+    maxUnavailable: ""
+
+# ---------------------------------------------------------------------------
+# Web 前端
+# ---------------------------------------------------------------------------
+web:
+  # -- 副本数（HPA 启用时作为初始值）
+  replicas: 2
+  # -- 容器端口
+  containerPort: 8080
+  resources:
+    requests:
+      cpu: "100m"
+      memory: 64Mi
+    limits:
+      cpu: "500m"
+      memory: 256Mi
+  hpa:
+    # -- 是否启用 HPA
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    # -- CPU 目标利用率
+    targetCPUUtilizationPercentage: 70
+  pdb:
+    # -- 是否启用 PodDisruptionBudget
+    enabled: true
+    # -- 最小可用数（与 maxUnavailable 二选一）
+    minAvailable: 1
+    maxUnavailable: ""
+
+# ---------------------------------------------------------------------------
+# Ingress
+# ---------------------------------------------------------------------------
+ingress:
+  # -- 是否启用 Ingress
+  enabled: true
+  # -- Ingress Class 名
+  className: nginx
+  # -- 对外主机名（必须替换为医院真实域名）
+  host: jlmedaios.example.com
+  # -- 额外注解
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  tls:
+    # -- 是否启用 TLS
+    enabled: true
+    # -- TLS 证书 Secret 名
+    secretName: jlmedaios-tls
+
+# ---------------------------------------------------------------------------
+# 零信任 NetworkPolicy（需支持 NetworkPolicy 的 CNI）
+# ---------------------------------------------------------------------------
+networkPolicy:
+  # -- 是否启用 NetworkPolicy
+  enabled: true

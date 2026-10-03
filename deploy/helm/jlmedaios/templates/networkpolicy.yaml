@@ -1,0 +1,127 @@
+{{- if .Values.networkPolicy.enabled -}}
+# 默认拒绝所有 Pod 的入站流量
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# 所有 Pod 允许 DNS 出站（CoreDNS）
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Web：允许 ingress-nginx 命名空间入站
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-ingress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: {{ .Values.web.containerPort }}
+---
+# BFF：允许 Web 入站；出站放行集群内（postgres/redis）与外网（LLM）
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bff-ingress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: bff
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: web
+      ports:
+        - protocol: TCP
+          port: {{ .Values.bff.containerPort }}
+  egress:
+    - to:
+        - podSelector: {}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+---
+# PostgreSQL：仅允许 BFF 入站
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-ingress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: bff
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# Redis：仅允许 BFF 入站
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-ingress
+  namespace: {{ include "jlmedaios.namespace" . }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: bff
+      ports:
+        - protocol: TCP
+          port: 6379
+{{- end -}}

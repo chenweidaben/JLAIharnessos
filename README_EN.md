@@ -91,6 +91,7 @@ The project advances incrementally with the **Strangler pattern**. Every milesto
 | **M5-D** | Lakehouse layering & incremental processing | adds dwd/dws/ads/meta schemas: DWD incrementally extracts by source `updated_at` watermark (idempotent UPSERT, re-runnable), DWS recomputes dept daily summaries for affected dates (delete-then-insert), ADS recomputes hospital daily metrics; **watermark is computed and stored entirely in the database (microsecond precision), each job completes extract/write/registration inside one transaction**, whose snapshot keeps watermark and extraction consistent; job run history, data lineage, metric queries; processing requires admin, queries require read | real HTTP 14 items + 403/401 + 400 + restart persistence + outage 503/500 traceId + logged root cause + watermark screenshots; DWD=ADS=clinical cross-check reconciled |
 | **M5-E** | Data quality monitoring & privacy classification governance | adds quality rule/run/result and field-classification ledgers in meta: the engine runs **five-dimension quality checks** over real tables (completeness not_null, uniqueness unique, validity valid_values/valid_regex, consistency fk_exists, timeliness conditional_not_null), with qi() escaping for schema/table/column, bound parameters for allowed values/regex, and fixed built-in condition text; per-rule total/failed rows and failed samples are recorded with a quality score and trend; privacy classification auto-scans information_schema columns (DataClassifier, never overwriting manual fixes), and manual fixes are audit-trailed (conflict if either side is already linked, master or linked). Runs/scans/fixes require admin, queries require read | real HTTP 12 items + 403/401 + 404/400 + restart persistence + outage 503/500 traceId + logged root cause + watermark screenshots; review fixed missing result ruleName/dimension/severity/target and an EMPI conflict check that only queried linked and missed master |
 | **M6-A** | Cloud-native containerization & K8s deployment | multi-stage images (non-root Bun backend + non-root Nginx frontend), a production-grade `docker-compose` full stack (postgres/redis/kafka/edge gateway/observability with health checks, dependency ordering, resource quotas, hardening), and a **Kubernetes all-in-one manifest set** (namespace/configmap/secret, postgres/redis StatefulSets+PVC, bff/web Deployments+HPA+PDB, TLS Ingress, zero-trust NetworkPolicy); the BFF auto-migrates on startup and boots from an empty database | all K8s/compose YAML passes syntax validation; referenced deployment files verified; review fixed a startup bug where the backend runtime image lacked `deploy/postgres/init`, causing an ENOENT during auto-migration |
+| **M6-B** | Parameterized Helm Chart | builds on the K8s manifests with a production-grade Helm Chart: images, replicas, resources, storage classes, domains, and internal/external PostgreSQL·Redis are fully parameterized; Secret/Ingress/NetworkPolicy/HPA/PDB can be toggled, and external secret systems are supported | ran `lint` with helm v3.18 (passed); default `template` renders 23 docs matching the K8s manifests; production (external DB + external secrets), hybrid, and image-override combinations all render correctly |
 
 **Four kinds of real evidence (not demos)**:
 
@@ -212,11 +213,16 @@ docker compose up -d                # open https://localhost
 
 # Kubernetes all-in-one deployment (HPA/PDB/Ingress/NetworkPolicy; see deploy/k8s/README.md)
 kubectl apply -f deploy/k8s/
+
+# Parameterized Helm deployment (recommended for production; external DB, external secrets,
+# replicas/resources), see deploy/helm/jlmedaios/README.md
+helm install jlmedaios deploy/helm/jlmedaios --namespace jlmedaios --create-namespace
 ```
 
 > Production configuration, cloud-managed database replacement, and secret management
-> (External Secrets/Vault) are covered in [deploy/k8s/README.md](deploy/k8s/README.md)
-> and [docs/deployment/](docs/deployment/).
+> (External Secrets/Vault) are covered in [deploy/k8s/README.md](deploy/k8s/README.md),
+> [deploy/helm/jlmedaios/README.md](deploy/helm/jlmedaios/README.md), and
+> [docs/deployment/](docs/deployment/).
 
 ---
 

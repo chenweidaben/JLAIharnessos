@@ -1,0 +1,22 @@
+# VCS
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+# Backup and temp
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+# Editors
+.idea/
+.vscode/
+.DS_Store
+# Tests and local values
+tests/
+values.local.yaml
+values-*.local.yaml

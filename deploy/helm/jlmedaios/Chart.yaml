@@ -1,0 +1,28 @@
+apiVersion: v2
+name: jlmedaios
+description: |
+  健澜科技 jlmedaios（健澜科技杠OS）数智医院操作系统 —— 云原生 AI 原生
+  HIS·EMR 一体化平台。本 Chart 部署 BFF 后端、Web 前端，以及可选的内置
+  PostgreSQL / Redis（StatefulSet + PVC）、Ingress、HPA、PDB 与零信任
+  NetworkPolicy。
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://github.com/chenweidaben/JLAIharnessos
+sources:
+  - https://github.com/chenweidaben/JLAIharnessos
+  - https://gitcode.com/weixin_46642356/JLMEDAIOS
+keywords:
+  - healthcare
+  - his
+  - emr
+  - ai-native
+  - hospital
+  - medical
+  - cloud-native
+maintainers:
+  - name: 健澜科技
+    url: https://github.com/chenweidaben
+icon: ""
+annotations:
+  licenses: Apache-2.0
