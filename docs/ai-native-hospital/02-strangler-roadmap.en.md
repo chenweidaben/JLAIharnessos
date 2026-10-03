@@ -67,7 +67,7 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 
 ---
 
-## 2.6 Progress Update (through M2-C, 2026-09-29)
+## 2.6 Progress Update (through M6-C, 2026-10-03)
 
 ### 2.6.1 Closed Milestones (real persistence + evidence)
 
@@ -84,17 +84,37 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 | M3-B | Billing settlement | fee items → settlement → invoice → refund Saga compensation | no duplicates, outage errors |
 | M3-C | MFA | MFA persistence, login enforcement, TOTP | 403, idempotency |
 | M3-D | DRG grouping | DRG/DIP grouping, settlement, explainable review | deterministic, traceable |
-| M3-E–H | (M3 extension slices) | see tags v0.3.0-m3e…m3h | real persistence, full gates |
+| M3-E–H | Billing/insurance extensions | reconciliation, invoice, settlement extensions | real persistence, full gates |
 | M3-I | Appointment & follow-up | appointment → confirm → visit link → follow-up plans/records | state machine, survives restart |
 | M3-J | Internet hospital base | WeChat login/realname/credentials/field encryption/mini-program | real HTTP, outage, watermark |
-| M3-K | Text consultation | appointment + consultation session/messages, revisit eligibility gate, state machine | real HTTP, unauthorized 403, outage |
+| M3-K | Text consultation | appointment + consultation session/messages, revisit eligibility gate | real HTTP, unauthorized 403 |
+| M3-L | Internet e-prescription | online prescribing/pharmacist review, state machine | separation, no AI auto-Rx |
+| M3-M | Online payment/invoice | mobile payment, reconciliation, e-invoice, reversal | traceable, idempotent |
+| M3-N | Delivery/reports | delivery fulfillment, online report query | traceable, audit-chain hardening |
+| M3-O | Satisfaction | satisfaction survey loop | real submit, unauthorized |
+| M3-P | Smart triage | smart triage and pre-consultation | deterministic rules |
+| M3-Q | Digital companion | family delegation and companion guide | delegation, patient side |
+| M3-R | Referral | referral service, smart-service L3 [referral] | state machine, unauthorized |
+| M4-A | Knowledge platform | document ingestion + persistent RAG retrieval | cited, pluggable embeddings |
+| M4-B | Agent authoring | low-code definition persistence+validation+release | canvas, market |
+| M4-C | Agent runtime | execution engine and persistent run instances | real runs, persisted |
+| M4-D | Human-in-the-loop | HITL persistence and work-order center | state machine, unauthorized |
+| M5-A | Multi-tenant | tenant/multi-campus registry persistence | isolation, write-through |
+| M5-B | Research cohorts | cohort define→publish→match→desensitized export | rule engine, traceable |
+| M5-C | EMPI | identifier registry→match→manual review→link | conflict detection, unauthorized |
+| M5-D | Data lakehouse | lakehouse layering and incremental processing (lineage) | layer checks, outage |
+| M5-E | Data governance | quality monitoring and privacy classification | rule detection, manual fix |
+| M6-A | Containerization/K8s | multi-stage images, compose, all-in-one K8s manifests | startup fix, zero-trust |
+| M6-B | Helm Chart | parameterized production deploy (lint/template) | multi-combination render |
+| M6-C | Service mesh | optional Istio templates, canary release | weight fix, scenario renders |
+| Fix | Menu permissions | align menu permission codes with role permissions | three-way HEAD match |
 
 ### 2.6.2 Current Quality Gates (real evidence)
 
-- Real DB: **89 base tables** across 5 schemas (iam 9 / clinical 56 / agent 8 / knowledge 14 / audit 2).
-- Backend **1581 tests green (137 files, 1 skip, 6902 expect)**; frontend **582 tests green (56 files)**; both tsc 0.
-- Frontend coverage (all:false): lines 89.3 / branches 78.67 / functions 82.75 / statements 89.3; gate passed, thresholds unchanged.
-- 38 medical tools, 43 CDS rules, 22 FHIR resources, 16 HL7 messages, 26 authoritative knowledge sources.
+- Real DB: **106 base tables** across 5 schemas (iam 10 / clinical 72 / agent 8 / knowledge 14 / audit 2).
+- Backend **1887 tests green (158 files, 1 skip, 7632 expect)**; frontend **840 tests green (82 files)**; both tsc 0.
+- Frontend coverage (all:false): gate passed, thresholds unchanged (lines/statements ≥80, branches ≥70, functions ≥80).
+- Deployment assets: multi-stage Dockerfiles, docker-compose, all-in-one K8s manifests, Helm Chart, and Istio canary templates.
 
 ### 2.6.3 Roadmap Adjustments per the Architecture Review (03)
 
