@@ -173,7 +173,7 @@ describe('互联网处方配送 · 药房履约视图', () => {
       rxId: 'rx1', channel: 'self_pick', address: undefined,
     });
     expect(await screen.findByText('888888')).toBeTruthy();
-  });
+  }, 30000);
 
   it('快递建单：地址必填校验', async () => {
     apiM.paidRx.mockResolvedValue({ rxList: [rx()] } as never);

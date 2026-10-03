@@ -30,6 +30,7 @@ import {
   requeueDeadLetter,
   countByStatus,
   oldestPendingAgeSeconds,
+  listEventsAfter,
 } from '../../src/db/repositories/outboxRepo.js';
 
 let dbAvailable = false;
@@ -189,5 +190,38 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
   it('M7-D oldestPendingAgeSeconds：返回非负年龄（无 pending 为 0）', async () => {
     const age = await oldestPendingAgeSeconds();
     expect(age).toBeGreaterThanOrEqual(0);
+  });
+
+  it('M7-E listEventsAfter：仅返回 id > afterId 的已发布事件，按 id 升序', async () => {
+    // 写两条并发布
+    const ids: number[] = [];
+    for (const tag of ['a', 'b']) {
+      const eid = crypto.randomUUID();
+      await withTx(async (tx) => {
+        await appendEvent(
+          { eventId: eid, eventType: 'test:recover', aggregateType: 'test_outbox', aggregateId: `agg-7-${tag}`, payload: { tag } },
+          tx,
+        );
+      });
+      const claimed = await withTx(async (tx) => {
+        const c = await claimBatch(10, tx);
+        return c.filter((e) => e.eventId === eid);
+      });
+      await markPublished(claimed.map((e) => e.id));
+      ids.push(claimed[0].id);
+    }
+    const firstId = Math.min(...ids);
+    // afterId=firstId 应只返回第二条（及之后已发布的），不含第一条
+    const page = await listEventsAfter(firstId, 100);
+    expect(page.every((e) => e.id > firstId)).toBe(true);
+    expect(page.some((e) => e.id === Math.max(...ids))).toBe(true);
+    // 升序
+    const sorted = page.map((e) => e.id);
+    expect([...sorted].sort((x, y) => x - y)).toEqual(sorted);
+    // pending/dead 事件不应出现在补拉结果中
+    expect(page.every((e) => e.status === 'published')).toBe(true);
+    // limit 上限：limit=1 只返回一条
+    const small = await listEventsAfter(0, 1);
+    expect(small.length).toBe(1);
   });
 });

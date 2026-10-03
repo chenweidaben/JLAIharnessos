@@ -26,6 +26,7 @@ import {
   appendEvent,
   claimBatch,
   markDead,
+  markPublished,
   countByStatus,
 } from '../../src/db/repositories/outboxRepo.js';
 import { outboxRoutes } from '../../src/bff/routes/outbox.js';
@@ -101,6 +102,29 @@ async function seedDeadLetter(aggId: string): Promise<number> {
   return claimed[0].id;
 }
 
+/** 造一条已发布事件，返回其 id。 */
+async function seedPublished(aggId: string): Promise<number> {
+  const eid = crypto.randomUUID();
+  await withTx(async (tx) => {
+    await appendEvent(
+      {
+        eventId: eid,
+        eventType: 'test:recover',
+        aggregateType: 'test_outbox_mgmt',
+        aggregateId: aggId,
+        payload: { from: aggId },
+      },
+      tx,
+    );
+  });
+  const claimed = await withTx(async (tx) => {
+    const c = await claimBatch(100, tx);
+    return c.filter((e) => e.eventId === eid);
+  });
+  await markPublished(claimed.map((e) => e.id));
+  return claimed[0].id;
+}
+
 describe.skipIf(!dbAvailable)('M7-D 死信队列管理路由', () => {
   it('admin 列出死信：包含刚造的死信并给总数', async () => {
     const id = await seedDeadLetter('mgmt-1');
@@ -162,6 +186,46 @@ describe.skipIf(!dbAvailable)('M7-D 死信队列管理路由', () => {
 
   it('未登录：401', async () => {
     const res = await findRoute('GET', '/api/v1/outbox/dead-letters').handle(makeCtx(null));
+    expect(res.status).toBe(401);
+  });
+
+  it('M7-E 补拉：admin 拉取已发布事件，包含刚造的事件', async () => {
+    const id = await seedPublished('mgmt-r1');
+    const res = await findRoute('GET', '/api/v1/outbox/events').handle(
+      makeCtx(admin, { query: { after_id: '0', limit: '100' } }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.code).toBe(0);
+    const found = body.data.items.find((e: { id: number }) => e.id === id);
+    expect(found).toBeTruthy();
+    expect(found.eventType).toBe('test:recover');
+    // after_id=id 时不含该事件
+    const res2 = await findRoute('GET', '/api/v1/outbox/events').handle(
+      makeCtx(admin, { query: { after_id: String(id) } }),
+    );
+    const body2 = await res2.json();
+    expect(body2.data.items.some((e: { id: number }) => e.id === id)).toBe(false);
+  });
+
+  it('M7-E 补拉：普通医生（无 outbox:manage）也可补拉（与 WS 同范围）', async () => {
+    const res = await findRoute('GET', '/api/v1/outbox/events').handle(
+      makeCtx(doctorChen, { query: { after_id: '0' } }),
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it('M7-E 非法 after_id：400', async () => {
+    const res = await findRoute('GET', '/api/v1/outbox/events').handle(
+      makeCtx(admin, { query: { after_id: 'abc' } }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.code).toBe(40000);
+  });
+
+  it('M7-E 未登录补拉：401', async () => {
+    const res = await findRoute('GET', '/api/v1/outbox/events').handle(makeCtx(null));
     expect(res.status).toBe(401);
   });
 });
