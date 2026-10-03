@@ -22,10 +22,14 @@ import {
   appendEvent,
   claimBatch,
   markPublished,
+  markDead,
   resetToPending,
   reclaimStale,
   listByAggregate,
+  listDeadLetters,
+  requeueDeadLetter,
   countByStatus,
+  oldestPendingAgeSeconds,
 } from '../../src/db/repositories/outboxRepo.js';
 
 let dbAvailable = false;
@@ -136,5 +140,54 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
     const history = await listByAggregate('test_outbox', 'agg-1');
     expect(history.length).toBeGreaterThan(0);
     expect(history.every((e) => e.aggregateId === 'agg-1')).toBe(true);
+  });
+
+  it('M7-D markDead：processing -> dead，记录最后错误与死信时间', async () => {
+    const eid = crypto.randomUUID();
+    await withTx(async (tx) => {
+      await appendEvent(
+        { eventId: eid, eventType: 'test:dead', aggregateType: 'test_outbox', aggregateId: 'agg-6', payload: {} },
+        tx,
+      );
+    });
+    const claimed = await withTx(async (tx) => {
+      const c = await claimBatch(10, tx);
+      return c.filter((e) => e.eventId === eid);
+    });
+    await markDead(claimed.map((e) => e.id), 'publish failed: 永久错误');
+    const history = await listByAggregate('test_outbox', 'agg-6');
+    expect(history[0].status).toBe('dead');
+    expect(history[0].lastError).toBe('publish failed: 永久错误');
+    expect(history[0].deadAt).toBeTruthy();
+    expect(history[0].attempts).toBe(1);
+  });
+
+  it('M7-D listDeadLetters：分页返回死信并给总数', async () => {
+    const { items, total } = await listDeadLetters(10, 0);
+    const mine = items.filter((e) => e.aggregateType === 'test_outbox');
+    expect(mine.length).toBeGreaterThan(0);
+    expect(total).toBeGreaterThanOrEqual(mine.length);
+    // 分页：offset 超出后不返回
+    const page2 = await listDeadLetters(10, total + 50);
+    expect(page2.items.length).toBe(0);
+  });
+
+  it('M7-D requeueDeadLetter：dead -> pending，清空错误/死信时间/attempts', async () => {
+    const history = await listByAggregate('test_outbox', 'agg-6');
+    const id = history[0].id;
+    const ok = await requeueDeadLetter(id);
+    expect(ok).toBe(true);
+    const after = await listByAggregate('test_outbox', 'agg-6');
+    expect(after[0].status).toBe('pending');
+    expect(after[0].lastError).toBeNull();
+    expect(after[0].deadAt).toBeNull();
+    expect(after[0].attempts).toBe(0);
+    // 非 dead 再次重投返回 false
+    expect(await requeueDeadLetter(id)).toBe(false);
+  });
+
+  it('M7-D oldestPendingAgeSeconds：返回非负年龄（无 pending 为 0）', async () => {
+    const age = await oldestPendingAgeSeconds();
+    expect(age).toBeGreaterThanOrEqual(0);
   });
 });

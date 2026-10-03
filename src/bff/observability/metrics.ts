@@ -54,6 +54,12 @@ export const bffMetrics = {
     ),
   ),
   wsConnections: registry.register(new Gauge('gangos_ws_connections', '当前 WebSocket 连接数')),
+  outboxEvents: registry.register(
+    new Gauge('gangos_outbox_events', '事务性发件箱各状态事件数', ['status']),
+  ),
+  outboxOldestPendingAge: registry.register(
+    new Gauge('gangos_outbox_oldest_pending_age_seconds', '最老未发布（pending）事件年龄（秒）'),
+  ),
 };
 
 /** 聚合全部指标（业务 + BFF），便于按名访问 */

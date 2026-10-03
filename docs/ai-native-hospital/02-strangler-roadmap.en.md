@@ -110,12 +110,13 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 | M7-A | Unified idempotency key | idempotency_keys table + replay/fingerprint/concurrency middleware | first/replay/fingerprint conflict |
 | M7-B | Critical-value realtime | standardized event layer + WS push + frontend dedup by id | real WS, restart/outage |
 | M7-C | Transactional Outbox | event_outbox + at-least-once Relay (pending→processing→published) | persisted means deliverable, restart/outage |
+| M7-D | Dead-Letter Queue & Outbox Metrics | failures over the limit enter dead (no infinite retry), admin list/requeue, /metrics outbox gauges | dead-letter/requeue, authz, metrics |
 | Fix | Menu permissions | align menu permission codes with role permissions | three-way HEAD match |
 
 ### 2.6.2 Current Quality Gates (real evidence)
 
 - Real DB: **119 base tables** across 9 schemas (iam 10 / clinical 74 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7).
-- Backend **1919 tests green (1 skip)**; frontend **844 tests green (82 files)**; both tsc 0.
+- Backend **1931 tests green (1 skip)**; frontend **844 tests green (82 files)**; both tsc 0.
 - Frontend coverage (all:false): gate passed, thresholds unchanged (lines/statements ≥80, branches ≥70, functions ≥80).
 - Deployment assets: multi-stage Dockerfiles, docker-compose, all-in-one K8s manifests, Helm Chart, and Istio canary templates.
 

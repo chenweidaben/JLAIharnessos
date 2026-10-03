@@ -97,6 +97,7 @@
 | **M7-A** | 统一幂等键框架 | 新增 `clinical.idempotency_keys` 表（迁移 81），按「用户 + 幂等键」记录首次请求的方法/路径/请求体指纹（SHA-256）与响应；`withIdempotency` 中间件实现首次执行并缓存、重复安全重放（`Idempotent-Replay` 头）、处理中并发 409、同键不同指纹 409、键长非法 400、未登录以 IP 为匿名作用域；预读取 rawBody 保证指纹与 handler 一致 | 真实 HTTP 取证（首次/重放/指纹冲突/数量不重复）+ 集成测试 9 例全绿 + 重启持久化 + 断库 500 traceId；代码审查修复幂等错误返回 HTML 而非结构化信封的问题（错误处理调整到幂等外层） |
 | **M7-B** | 危急值实时事件闭环 | `alertBus` 标准化事件层：`buildCriticalAlertPayload` 构造对齐前端 Alert 契约的 payload，事件 id 稳定唯一（重连重放不重复）；扫描产生告警后经 WebSocket 实时推送 `critical:alert`，签收/处置状态变更后广播 `critical:status`；`scanAndRaise` 返回完整告警并批量取脱敏姓名；前端 `useAlert` 按 id 去重（不重复入列、不覆盖 latest）、同步业务状态，`RealtimeAlertBridge` 收到状态后实时关闭强提醒 | 真实 WS 取证：扫描 85 条实时推送 85 条、id 全唯一、数量一致；重复扫描不重复推送；签收/处置 HTTP 200 且 WS 收到状态广播；重启持久化（状态分布保留）+ 断库 503/500 traceId；新增 alertBus 单测 8 + critical-realtime 集成 4，后端 1908/前端 844 全绿 |
 | **M7-C** | 事务性发件箱（Transactional Outbox） | 新增 `clinical.event_outbox` 表（迁移 82），业务事务与领域事件写入同一事务（原子提交），解决「业务落库后、推送前崩溃丢事件」；`OutboxRelay` 以 at-least-once 状态机 `pending → processing → published` 轮询发布到 WebSocket：`claimBatch`（FOR UPDATE SKIP LOCKED，多实例并发分摊）、`markPublished`、`resetToPending`（失败 attempts+1 重试）、`reclaimStale`（认领后崩溃的 processing 超时回收）；危急值聚合器移除内存直推，改为同事务 `appendEvent`；消费端按稳定 event_id 幂等（前端已按 id 去重，重复安全） | 真实 WS 取证：扫描 87 条经 outbox 全发布、id 唯一、outbox 全 published；重启持久化（87 条 event_id 不丢、BFF 自动重连）；断库 BFF 存活、ready=503、Relay 轮询不崩溃、恢复后续发；新增 event-outbox 集成 6 + outboxRelay 单测 4，后端 1919/前端 844 全绿、tsc 双零 |
+| **M7-D** | 死信队列与事件可观测性（Dead-Letter Queue + Outbox Metrics） | 发布失败达到 `maxAttempts`（默认 5）的事件不再无限重试，进入死信 `dead`（迁移 83：扩展状态 CHECK、新增 `last_error`/`dead_at` 列与死信部分索引、新增 `outbox:manage` 权限仅授 admin）；`outboxRepo` 新增 `markDead`、`listDeadLetters`（分页）、`requeueDeadLetter`（dead→pending，清空错误/attempts）、`oldestPendingAgeSeconds`；`OutboxRelay` 按 `attempts+1` 区分死信/重试，新增 `onDeadLetter` 回调与 `updateMetrics()`；管理端 BFF 路由 `GET /api/v1/outbox/dead-letters`、`POST /api/v1/outbox/requeue/:id`（重投写审计 `outbox.requeue`）；`/metrics` 暴露 `gangos_outbox_events`（按状态）与 `gangos_outbox_oldest_pending_age_seconds` 两个 gauge | 真实库取证：markDead 记录错误/死信时间、listDeadLetters 分页、requeueDeadLetter 复位、越权 doctor 403/未登录 401/404/400；event-outbox 集成 6→10、outboxRelay 单测 4→5（连续 3 轮失败恰在第 3 轮进死信、不再被认领）、新增 outbox-admin 路由 7；后端 1931/前端 844 全绿、tsc 双零 |
 
 **四类真实取证（非演示）**：
 
@@ -224,7 +225,7 @@ cd web && bun install && bun run dev    # http://localhost:5173
 
 ```bash
 bun run typecheck                 # 后端类型检查 0 错误
-bun test                          # 后端 1919 测试（1 skip）
+bun test                          # 后端 1931 测试（1 skip）
 cd web && bunx vitest run         # 前端 844 测试
 cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```

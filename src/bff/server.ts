@@ -50,6 +50,7 @@ import { researchRoutes } from './routes/research';
 import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataGovernanceRoutes } from './routes/dataGovernance';
+import { outboxRoutes } from './routes/outbox';
 import { billingRoutes } from './routes/billing';
 import { drgRoutes } from './routes/drg';
 import { labInterpretRoutes } from './routes/labInterpret';
@@ -100,6 +101,7 @@ const allRoutes: RouteDef[] = [
   ...empiRoutes,
   ...dataWarehouseRoutes,
   ...dataGovernanceRoutes,
+  ...outboxRoutes,
   ...billingRoutes,
   ...drgRoutes,
   ...labInterpretRoutes,

@@ -18,7 +18,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 
-export type OutboxStatus = 'pending' | 'processing' | 'published';
+export type OutboxStatus = 'pending' | 'processing' | 'published' | 'dead';
 
 export interface OutboxEvent {
   id: number;
@@ -32,6 +32,8 @@ export interface OutboxEvent {
   createdAt: string;
   lockedAt: string | null;
   publishedAt: string | null;
+  lastError: string | null;
+  deadAt: string | null;
 }
 
 export interface NewOutboxEvent {
@@ -43,7 +45,7 @@ export interface NewOutboxEvent {
 }
 
 const SELECT_COLS = `id, event_id, event_type, aggregate_type, aggregate_id, payload,
-  status, attempts, created_at, locked_at, published_at`;
+  status, attempts, created_at, locked_at, published_at, last_error, dead_at`;
 
 function mapRow(row: Record<string, unknown>): OutboxEvent {
   return {
@@ -58,6 +60,8 @@ function mapRow(row: Record<string, unknown>): OutboxEvent {
     createdAt: String(row.created_at),
     lockedAt: row.locked_at ? String(row.locked_at) : null,
     publishedAt: row.published_at ? String(row.published_at) : null,
+    lastError: row.last_error ? String(row.last_error) : null,
+    deadAt: row.dead_at ? String(row.dead_at) : null,
   };
 }
 
@@ -120,6 +124,65 @@ export async function resetToPending(ids: number[], sql?: DbExecutor): Promise<v
 }
 
 /**
+ * 发布失败且达到最大重试：processing -> dead（死信），记录最后错误，不再自动重试。
+ * 死信须人工排查后通过 requeueDeadLetter 重投。
+ */
+export async function markDead(
+  ids: number[],
+  lastError: string,
+  sql?: DbExecutor,
+): Promise<void> {
+  if (ids.length === 0) return;
+  const db = sql ?? getDb();
+  await db`
+    UPDATE clinical.event_outbox
+      SET status = 'dead', attempts = attempts + 1, locked_at = NULL,
+          last_error = ${lastError}, dead_at = now()
+    WHERE id IN ${db(ids)} AND status = 'processing'`;
+}
+
+/**
+ * 列出死信（dead）事件，支持分页（管理端排障/重投）。
+ * 返回死信列表与总数。
+ */
+export async function listDeadLetters(
+  limit: number,
+  offset: number,
+  sql?: DbExecutor,
+): Promise<{ items: OutboxEvent[]; total: number }> {
+  const db = sql ?? getDb();
+  const safeLimit = Math.min(Math.max(limit, 1), 200);
+  const safeOffset = Math.max(offset, 0);
+  const rows = await db`
+    SELECT ${db.unsafe(SELECT_COLS)}
+    FROM clinical.event_outbox
+    WHERE status = 'dead'
+    ORDER BY dead_at DESC, id DESC
+    LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+  const totalRows = await db`
+    SELECT count(*)::int AS n FROM clinical.event_outbox WHERE status = 'dead'`;
+  return {
+    items: (rows as Record<string, unknown>[]).map(mapRow),
+    total: Number((totalRows[0] as Record<string, unknown>).n),
+  };
+}
+
+/**
+ * 死信重投：dead -> pending，清空错误/死信时间，attempts 归零（修复后重新投递）。
+ * 返回是否找到并重置（找不到该 id 或非 dead 返回 false）。
+ */
+export async function requeueDeadLetter(id: number, sql?: DbExecutor): Promise<boolean> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    UPDATE clinical.event_outbox
+      SET status = 'pending', attempts = 0, locked_at = NULL,
+          last_error = NULL, dead_at = NULL, published_at = NULL
+    WHERE id = ${id} AND status = 'dead'
+    RETURNING id`;
+  return (rows as unknown[]).length > 0;
+}
+
+/**
  * 回收认领后崩溃的事件：processing 且 locked_at 超过 staleMs，重置为 pending。
  * 应周期性调用（Relay 每轮或定时）。
  */
@@ -157,9 +220,22 @@ export async function countByStatus(
   const rows = await db`
     SELECT status, count(*)::int AS n
     FROM clinical.event_outbox GROUP BY status`;
-  const result: Record<OutboxStatus, number> = { pending: 0, processing: 0, published: 0 };
+  const result: Record<OutboxStatus, number> = {
+    pending: 0, processing: 0, published: 0, dead: 0,
+  };
   for (const r of rows as Record<string, unknown>[]) {
     result[r.status as OutboxStatus] = Number(r.n);
   }
   return result;
+}
+
+/**
+ * 最老未发布（pending）事件的年龄（秒），用于「事件积压」告警（无 pending 返回 0）。
+ */
+export async function oldestPendingAgeSeconds(sql?: DbExecutor): Promise<number> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT COALESCE(extract(epoch FROM now() - min(created_at)), 0)::float AS age
+    FROM clinical.event_outbox WHERE status = 'pending'`;
+  return Number((rows[0] as Record<string, unknown>).age);
 }

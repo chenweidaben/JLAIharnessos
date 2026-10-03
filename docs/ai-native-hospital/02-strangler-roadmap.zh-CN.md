@@ -110,12 +110,13 @@
 | M7-A | 统一幂等键 | idempotency_keys 表 + 重放/指纹/并发中间件 | 首次/重放/指纹冲突 |
 | M7-B | 危急值实时 | 标准化事件层 + WS 实时推送 + 前端按 id 去重 | 真实 WS、重启/断库 |
 | M7-C | 事务性发件箱 | event_outbox + at-least-once Relay（pending→processing→published） | 业务落库即必发、重启/断库 |
+| M7-D | 死信队列与事件可观测性 | 失败超限进 dead（不再无限重试）、管理端列表/重投、/metrics outbox 指标 | 死信/重投、越权、指标 |
 | 修复 | 菜单权限 | 对齐菜单权限码与角色规范权限 | 三方 HEAD 一致 |
 
 ### 2.6.2 当前质量门（以真实取证为准）
 
 - 真实数据库：9 schema **119 张基表**（iam 10 / clinical 74 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7）。
-- 后端 **1919 测试全绿（1 skip）**；前端 **844 测试全绿（82 文件）**；前后端 tsc 0。
+- 后端 **1931 测试全绿（1 skip）**；前端 **844 测试全绿（82 文件）**；前后端 tsc 0。
 - 前端覆盖率（all:false）：门禁通过、未改阈值（lines/statements ≥80、branches ≥70、functions ≥80）。
 - 部署产物：多阶段 Dockerfile、docker-compose、K8s 一体化清单、Helm Chart、Istio 灰度模板齐备。
 
