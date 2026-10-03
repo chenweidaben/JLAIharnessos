@@ -88,7 +88,7 @@ export async function createPatient(input: PatientCreateInput, sql?: DbExecutor)
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function getPatientById(id: string, sql?: Sql): Promise<Patient | null> {
+export async function getPatientById(id: string, sql?: DbExecutor): Promise<Patient | null> {
   // 非 uuid 输入（如 MRN/病案号）直接返回 null，交由 getPatientByMrn 兜底，
   // 避免参数化查询在 uuid 列上抛 invalid input syntax。
   if (!UUID_RE.test(id)) return null;

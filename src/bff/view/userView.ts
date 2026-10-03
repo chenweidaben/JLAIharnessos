@@ -45,6 +45,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'triage:use', 'triage:view',
     'referral:view', 'referral:manage', 'referral:accept',
     'research:read', 'research:write',
+    'empi:read', 'empi:write',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -70,6 +71,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'triage:use', 'triage:view',
     'referral:view', 'referral:manage', 'referral:accept',
     'research:read', 'research:write',
+    'empi:read',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
