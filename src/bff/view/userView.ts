@@ -47,6 +47,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'research:read', 'research:write',
     'empi:read', 'empi:write',
     'data_warehouse:read', 'data_warehouse:admin',
+    'data_governance:read', 'data_governance:admin',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -74,6 +75,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'research:read', 'research:write',
     'empi:read',
     'data_warehouse:read',
+    'data_governance:read',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',

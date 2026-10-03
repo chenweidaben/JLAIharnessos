@@ -104,6 +104,7 @@ const navItems: NavItem[] = [
   { key: '/research', icon: <ExperimentOutlined />, label: '科研队列', perm: 'research:read' },
   { key: '/empi', icon: <IdcardOutlined />, label: '患者主索引', perm: 'empi:read' },
   { key: '/data-warehouse', icon: <DatabaseOutlined />, label: '数据湖仓', perm: 'data_warehouse:read' },
+  { key: '/data-governance', icon: <SafetyCertificateOutlined />, label: '数据治理', perm: 'data_governance:read' },
   { key: '/billing', icon: <MoneyCollectOutlined />, label: '收费结算', perm: 'billing:read' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院', perm: 'internet:practitioner:audit' },

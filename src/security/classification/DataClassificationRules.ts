@@ -64,7 +64,7 @@ export const DATA_CLASSIFICATION_RULES: ClassificationRule[] = [
     name: '身份证号',
     level: DataLevel.L4_CONFIDENTIAL,
     category: '患者标识信息',
-    fieldNamePatterns: ['idcard', 'idno', 'identity', 'sfz', '身份证', '证件号'],
+    fieldNamePatterns: ['idcard', 'id_card', 'idno', 'identity', 'sfz', '身份证', '证件号'],
     contentPatterns: [
       /[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]/g,
     ],
@@ -104,7 +104,7 @@ export const DATA_CLASSIFICATION_RULES: ClassificationRule[] = [
     name: '银行卡号',
     level: DataLevel.L4_CONFIDENTIAL,
     category: '患者标识信息',
-    fieldNamePatterns: ['bankcard', 'cardno', 'bank_account', '银行卡', '卡号'],
+    fieldNamePatterns: ['bankcard', 'bank_card', 'cardno', 'bank_account', '银行卡', '卡号'],
     contentPatterns: [/\b(?:6[0-9]{15,18}|4[0-9]{15,18}|5[0-9]{15,18}|9[0-9]{15,18})\b/g],
     description: '银行卡号',
   },
