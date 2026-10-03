@@ -32,8 +32,14 @@ import {
   type OutboxEvent,
 } from '../db/repositories/outboxRepo.js';
 
-/** 事件发布器：把一条 outbox 事件投递到具体通道（WS / Kafka） */
-export type OutboxPublisher = (eventType: string, payload: unknown) => Promise<void> | void;
+/** 事件发布器：把一条 outbox 事件投递到具体通道（WS / Kafka）。
+ *  第三个参数为事件元数据（数字主键 seq 与稳定 event_id），供通道在帧中携带，
+ *  客户端据此做重连补拉（gap recovery）。 */
+export type OutboxPublisher = (
+  eventType: string,
+  payload: unknown,
+  meta: { seq: number; eventId: string },
+) => Promise<void> | void;
 
 export interface OutboxRelayOptions {
   /** 每轮最多认领事件数 */
@@ -130,7 +136,10 @@ export class OutboxRelay {
       const dead: { id: number; error: string }[] = [];
       for (const event of events) {
         try {
-          await this.publisher(event.eventType, event.payload);
+          await this.publisher(event.eventType, event.payload, {
+            seq: event.id,
+            eventId: event.eventId,
+          });
           successIds.push(event.id);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);

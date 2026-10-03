@@ -239,3 +239,26 @@ export async function oldestPendingAgeSeconds(sql?: DbExecutor): Promise<number>
     FROM clinical.event_outbox WHERE status = 'pending'`;
   return Number((rows[0] as Record<string, unknown>).age);
 }
+
+/**
+ * 事件重连补拉（gap recovery）：返回 id > afterId 的已发布事件（按 id 升序）。
+ * 客户端 WS 断连重连后，传最后收到的数字主键 id，拉取错过的事件（与 WS
+ * broadcast 同范围：所有已发布事件，客户端按 event_id 幂等去重）。
+ * afterId<=0 表示从头拉取；limit 限制单次返回数量。
+ */
+export async function listEventsAfter(
+  afterId: number,
+  limit: number,
+  sql?: DbExecutor,
+): Promise<OutboxEvent[]> {
+  const db = sql ?? getDb();
+  const safeAfter = Math.max(Number.isFinite(afterId) ? Math.floor(afterId) : 0, 0);
+  const safeLimit = Math.min(Math.max(limit, 1), 200);
+  const rows = await db`
+    SELECT ${db.unsafe(SELECT_COLS)}
+    FROM clinical.event_outbox
+    WHERE id > ${safeAfter} AND status = 'published'
+    ORDER BY id ASC
+    LIMIT ${safeLimit}`;
+  return (rows as Record<string, unknown>[]).map(mapRow);
+}

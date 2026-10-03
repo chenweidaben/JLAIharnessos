@@ -7,11 +7,22 @@
 import type { WsEventType, WsMessage } from '@/types/chat';
 import { env } from '@/utils/config';
 import { tokenStorage } from '@/utils/auth';
+import { get } from './request';
 
 type Listener = (message: WsMessage) => void;
 
 const HEARTBEAT_INTERVAL = 30_000;
 const MAX_RECONNECT_DELAY = 30_000;
+const RECOVER_PAGE_SIZE = 100;
+
+/** 补拉事件（outbox 已发布事件）的返回结构 */
+interface RecoveredEvent {
+  id: number;
+  eventId: string;
+  eventType: WsEventType;
+  payload: unknown;
+  publishedAt: string | null;
+}
 
 class WebSocketClient {
   private ws: WebSocket | null = null;
@@ -22,6 +33,10 @@ class WebSocketClient {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private manuallyClosed = false;
   private connecting = false;
+  /** 最后收到（含补拉）的 outbox 数字主键，用于重连补拉；0 表示尚未收到 */
+  private lastSeq = 0;
+  /** 本次连接是否为重连（用于在 onopen 时触发补拉） */
+  private hasConnectedBefore = false;
 
   constructor(url?: string) {
     this.url = url ?? env.wsUrl;
@@ -40,12 +55,16 @@ class WebSocketClient {
       this.connecting = false;
       this.reconnectDelay = 1_000;
       this.startHeartbeat();
+      // 首次连接不补拉（hasConnectedBefore=false）；重连后补拉断连期间错过的事件
+      if (this.hasConnectedBefore) void this.recoverGap();
+      this.hasConnectedBefore = true;
     };
 
     this.ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data as string) as WsMessage;
         if (msg.event === 'heartbeat') return;
+        if (typeof msg.seq === 'number') this.lastSeq = Math.max(this.lastSeq, msg.seq);
         this.listeners.forEach((fn) => fn(msg));
       } catch {
         /* ignore */
@@ -101,6 +120,45 @@ class WebSocketClient {
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
+    }
+  }
+
+  /**
+   * 重连补拉（gap recovery）：从 lastSeq 起分页拉取已发布事件并分发，
+   * 补齐断连期间错过的事件。与实时帧重叠的事件（id <= lastSeq）跳过、不重复分发。
+   * 补拉失败（断库/未授权）时静默放弃，等下次重连再试，不影响实时通道。
+   */
+  private async recoverGap(): Promise<void> {
+    let cursor = this.lastSeq;
+    for (;;) {
+      let page: RecoveredEvent[];
+      try {
+        const data = await get<{ items: RecoveredEvent[] }>('/api/v1/outbox/events', {
+          after_id: cursor,
+          limit: RECOVER_PAGE_SIZE,
+        });
+        page = data.items;
+      } catch {
+        return;
+      }
+      if (!page || page.length === 0) return;
+      for (const e of page) {
+        // 实时帧可能已推进 lastSeq：跳过已覆盖事件，避免重复分发
+        if (e.id <= this.lastSeq) {
+          cursor = Math.max(cursor, e.id);
+          continue;
+        }
+        const msg: WsMessage = {
+          event: e.eventType,
+          payload: e.payload,
+          timestamp: e.publishedAt ? Date.parse(e.publishedAt) : Date.now(),
+          seq: e.id,
+        };
+        this.listeners.forEach((fn) => fn(msg));
+        this.lastSeq = Math.max(this.lastSeq, e.id);
+        cursor = e.id;
+      }
+      if (page.length < RECOVER_PAGE_SIZE) return;
     }
   }
 

@@ -38,6 +38,8 @@ export interface WsMessage<T = unknown> {
   refId?: string;
   payload: T;
   timestamp: number;
+  /** outbox 数字主键（仅经发件箱发布的事件携带），用于重连补拉 */
+  seq?: number;
 }
 
 export interface AgentDeltaPayload {

@@ -12,13 +12,49 @@
 
 import { recordChainAudit } from '@/db/repositories/auditChainRepo';
 import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
-import { requirePermissionCode } from '../middleware/auth';
+import { requireAuth, requirePermissionCode } from '../middleware/auth';
 import {
   listDeadLetters,
+  listEventsAfter,
   requeueDeadLetter,
 } from '../../db/repositories/outboxRepo';
 
 export const outboxRoutes: RouteDef[] = [
+  {
+    // M7-E 事件重连补拉：任何登录用户可拉取 id > after_id 的已发布事件（WS 断连补拉）
+    method: 'GET',
+    path: '/api/v1/outbox/events',
+    auth: true,
+    handle: async (c: Ctx) => {
+      // 防御性登录校验（框架层 auth:true 已做，handle 内再校验，保证直接调用也安全）
+      const unauthorized = requireAuth(c);
+      if (unauthorized) return unauthorized;
+      try {
+        const afterId = c.query.get('after_id') ? Number(c.query.get('after_id')) : 0;
+        const limit = c.query.get('limit') ? Number(c.query.get('limit')) : 100;
+        if (!Number.isFinite(afterId) || afterId < 0) {
+          return json(fail(ErrorCode.BAD_REQUEST, '非法的 after_id', c.traceId), 400);
+        }
+        const events = await listEventsAfter(afterId, limit);
+        return json(
+          ok({
+            items: events.map((e) => ({
+              id: e.id,
+              eventId: e.eventId,
+              eventType: e.eventType,
+              aggregateType: e.aggregateType,
+              aggregateId: e.aggregateId,
+              payload: e.payload,
+              publishedAt: e.publishedAt,
+            })),
+          }),
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '事件补拉失败';
+        return json(fail(ErrorCode.INTERNAL_ERROR, message, c.traceId), 500);
+      }
+    },
+  },
   {
     method: 'GET',
     path: '/api/v1/outbox/dead-letters',

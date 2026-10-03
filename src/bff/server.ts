@@ -158,8 +158,14 @@ const compiled: Compiled[] = allRoutes.map((def) => {
 
 const chatClients = new Set<Bun.ServerWebSocket<unknown>>();
 
-function broadcast(event: string, payload: unknown): void {
-  const frame = JSON.stringify({ event, timestamp: Date.now(), payload });
+function broadcast(event: string, payload: unknown, seq?: number): void {
+  // seq 为 outbox 数字主键（仅经发件箱发布的事件携带），客户端据此重连补拉
+  const frame = JSON.stringify({
+    event,
+    timestamp: Date.now(),
+    payload,
+    ...(seq !== undefined ? { seq } : {}),
+  });
   for (const ws of chatClients) {
     try {
       ws.send(frame);
@@ -175,7 +181,7 @@ setCriticalAlertSink(broadcast);
 // M7-C 事务性发件箱中继：业务事务写入 event_outbox，Relay 轮询发布到 WebSocket。
 // publisher 复用 broadcast（同 /ws/chat 通道）；发布失败仅记录，不影响业务。
 const outboxRelay = new OutboxRelay(
-  (event, payload) => broadcast(event, payload),
+  (event, payload, meta) => broadcast(event, payload, meta.seq),
   {
     batchSize: 50,
     pollIntervalMs: 500,
