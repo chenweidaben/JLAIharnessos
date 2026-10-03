@@ -107,12 +107,15 @@
 | M6-A | 容器化/K8s | 多阶段镜像、docker-compose、K8s 一体化清单 | 启动修复、零信任策略 |
 | M6-B | Helm Chart | 参数化生产部署（lint/template 验证） | 多组合渲染核对 |
 | M6-C | 服务网格 | Istio 可选模板、灰度发布 | 权重修复、多场景渲染 |
+| M7-A | 统一幂等键 | idempotency_keys 表 + 重放/指纹/并发中间件 | 首次/重放/指纹冲突 |
+| M7-B | 危急值实时 | 标准化事件层 + WS 实时推送 + 前端按 id 去重 | 真实 WS、重启/断库 |
+| M7-C | 事务性发件箱 | event_outbox + at-least-once Relay（pending→processing→published） | 业务落库即必发、重启/断库 |
 | 修复 | 菜单权限 | 对齐菜单权限码与角色规范权限 | 三方 HEAD 一致 |
 
 ### 2.6.2 当前质量门（以真实取证为准）
 
-- 真实数据库：5 schema **107 张基表**（iam 10 / clinical 73 / agent 8 / knowledge 14 / audit 2）。
-- 后端 **1887 测试全绿（158 文件，1 skip，7632 expect）**；前端 **840 测试全绿（82 文件）**；前后端 tsc 0。
+- 真实数据库：9 schema **119 张基表**（iam 10 / clinical 74 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7）。
+- 后端 **1919 测试全绿（1 skip）**；前端 **844 测试全绿（82 文件）**；前后端 tsc 0。
 - 前端覆盖率（all:false）：门禁通过、未改阈值（lines/statements ≥80、branches ≥70、functions ≥80）。
 - 部署产物：多阶段 Dockerfile、docker-compose、K8s 一体化清单、Helm Chart、Istio 灰度模板齐备。
 

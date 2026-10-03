@@ -22,6 +22,7 @@ import { withIdempotency } from './middleware/idempotency';
 import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
+import { OutboxRelay } from './outboxRelay';
 import { autoMigrate, closeDb, verifyDbConnection } from '@/db';
 import {
   createConversation,
@@ -168,6 +169,20 @@ function broadcast(event: string, payload: unknown): void {
 
 // 影像 AI（DAMO-RADAR）critical 发现复用同一 /ws/chat critical:alert 通道推送危急值
 setCriticalAlertSink(broadcast);
+
+// M7-C 事务性发件箱中继：业务事务写入 event_outbox，Relay 轮询发布到 WebSocket。
+// publisher 复用 broadcast（同 /ws/chat 通道）；发布失败仅记录，不影响业务。
+const outboxRelay = new OutboxRelay(
+  (event, payload) => broadcast(event, payload),
+  {
+    batchSize: 50,
+    pollIntervalMs: 500,
+    onPublishError: (ev, err) =>
+      // eslint-disable-next-line no-console
+      console.error(`[outbox-relay] 发布事件 ${ev.eventType}#${ev.id} 失败:`, err),
+  },
+);
+outboxRelay.start();
 
 /** 校验 WebSocket 升级请求的 Token（query 参数 ?token= 或 Sec-WebSocket-Protocol） */
 function wsAuthorized(req: Request): boolean {
@@ -475,6 +490,7 @@ function shutdown(signal: string): void {
   // eslint-disable-next-line no-console
   console.log(`[jianlan-bff] 收到 ${signal}，开始优雅停机…`);
   if (demoAlertTimer) clearInterval(demoAlertTimer);
+  outboxRelay.stop();
   for (const ws of chatClients) {
     try {
       ws.close(1001, 'server shutting down');
