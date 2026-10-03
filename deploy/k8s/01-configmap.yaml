@@ -1,0 +1,30 @@
+# ============================================================================
+# 健澜科技杠OS — 非敏感运行配置（ConfigMap）
+#
+# 仅存放不含机密的配置；口令、JWT/加密密钥见 02-secret.yaml。
+# 若使用云托管数据库（RDS），将 DATABASE_HOST/REDIS_HOST 改为对应内网地址。
+#
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# ============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jlmedaios-config
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/part-of: jlmedaios
+data:
+  NODE_ENV: "production"
+  BUN_ENV: "production"
+  APP_ENV: "prod"
+  DEMO_MODE: "0"
+  HTTP_PORT: "8080"
+  LOG_LEVEL: "info"
+  TZ: "Asia/Shanghai"
+  # 集群内访问 StatefulSet 提供的 Service
+  DATABASE_HOST: "postgres"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "jlmedaios"
+  PGSSLMODE: "disable"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"

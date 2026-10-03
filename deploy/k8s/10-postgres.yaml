@@ -1,0 +1,113 @@
+# ============================================================================
+# 健澜科技杠OS — PostgreSQL（StatefulSet + Headless Service + PVC）
+#
+# 一体化部署时使用集群内 PostgreSQL；BFF 启动时通过 autoMigrate 自动建表，
+# 因此无需手工初始化。生产环境也可改用云托管 RDS（删除本文件并调整 ConfigMap）。
+#
+# 高可用：单副本适合中小规模；大三甲生产建议采用云 RDS 多可用区或
+# CloudNativePG / Patroni  Operator（本清单不内置，避免过度复杂）。
+#
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# ============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: jlmedaios
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: postgres
+  ports:
+    - name: tcp-postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: jlmedaios
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+        app.kubernetes.io/part-of: jlmedaios
+    spec:
+      securityContext:
+        fsGroup: 70
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgres:16.4-alpine3.20
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: jlmedaios-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jlmedaios-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: jlmedaios
+            - name: TZ
+              value: Asia/Shanghai
+          ports:
+            - name: tcp-postgres
+              containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "jlmedaios"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "jlmedaios"]
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 4Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/part-of: jlmedaios
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi

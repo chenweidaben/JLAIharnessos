@@ -119,6 +119,10 @@ RUN bun install --frozen-lockfile --production \
 # 从构建阶段复制编译产物（dist/server.js 为 BFF 服务入口）。--chown 直接归属非 root 用户。
 COPY --from=builder --chown=bunapp:bunapp /app/dist ./dist
 
+# 复制迁移 SQL：启动时 autoMigrate 按 deploy/postgres/init 顺序执行，缺失该目录
+# 会导致 readdirSync 抛 ENOENT、服务无法启动。仅复制 init 子目录，保持镜像最小。
+COPY --chown=bunapp:bunapp deploy/postgres/init ./deploy/postgres/init
+
 # 复制容器健康检查探针脚本（Bun 实现，不依赖 curl）。
 COPY --chown=bunapp:bunapp scripts/docker/healthcheck.ts ./scripts/docker/healthcheck.ts
 

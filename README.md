@@ -91,6 +91,7 @@
 | **M5-C** | 患者主索引 EMPI | 患者跨标识域登记（身份证/医保/手机/微信/外部，原始值哈希存储、仅留末四位）→ 确定性匹配引擎两两扫描生成疑似重复候选（不自动合并）→ 人工审核：确认在事务内建立逻辑主从链接（**不物理合并、不迁移 40+ 外键**）、拒绝标记；任一患者已存在链接即 409 防冲突；master 按创建时间/ID 选取；全程审计哈希链 | 真实 HTTP 18 项 + 越权 403/401 + 404/400/409 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图 |
 | **M5-D** | 数据湖仓分层与增量加工 | 新建 dwd/dws/ads/meta 四 schema：DWD 基于源表 updated_at watermark 增量抽取（幂等 UPSERT，可重跑）、DWS 按受影响日期重算科室日汇总（先删后插）、ADS 重算院级日指标；**watermark 全程数据库端计算存储（微秒精度）、每作业在事务内完成抽取/写入/登记**，事务快照保证 watermark 与抽取一致；作业运行历史、数据血缘、指标查询；加工需 admin、查询需 read | 真实 HTTP 14 项 + 越权 403/401 + 400 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图；DWD=ADS=clinical 交叉核对一致 |
 | **M5-E** | 数据质量监控与隐私分级治理 | 在 meta 建质量规则/运行/结果与字段分级台账：检测引擎对真实业务表执行**五维质量检测**（完整性 not_null、唯一性 unique、有效性 valid_values/valid_regex、一致性 fk_exists、及时性 conditional_not_null），schema/表/列 qi() 转义、允许值与正则参数绑定、condition 为规则内置固定文本；逐规则登记总行/失败行/失败样本并计算质量评分与趋势；隐私分级自动扫描 information_schema 列（DataClassifier，不覆盖人工修正），人工修正留痕（master 或 linked 任一已链接即冲突）。检测/扫描/修正需 admin、查询需 read | 真实 HTTP 12 项 + 越权 403/401 + 404/400 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图；代码审查修复结果字段 ruleName/dimension/severity/target 缺失、EMPI 仅查 linked 漏 master 的冲突检测 bug |
+| **M6-A** | 云原生容器化与 K8s 部署 | 多阶段镜像（后端 Bun 非 root + 前端 Nginx 非 root）、生产级 `docker-compose`（postgres/redis/kafka/边缘网关/可观测全栈，健康检查/依赖顺序/资源配额/安全加固）与 **Kubernetes 一体化清单**（namespace/configmap/secret、postgres/redis StatefulSet+PVC、bff/web Deployment+HPA+PDB、Ingress TLS、零信任 NetworkPolicy）；BFF 启动自动迁移、空库即可拉起 | 全部 K8s/compose YAML 语法校验通过；部署引用文件齐备；代码审查修复后端运行镜像缺失 `deploy/postgres/init` 导致自动迁移 ENOENT 的启动 bug |
 
 **四类真实取证（非演示）**：
 
@@ -223,7 +224,22 @@ cd web && bunx vitest run         # 前端 826 测试
 cd web && npx tsc --noEmit        # 前端类型检查 0 错误
 ```
 
-> 无数据库演示：设置 `DEMO_MODE=1` 后启动 BFF，使用内存数据并显示水印（不持久化），仅用于演示。完整容器化、云原生（K8s/Helm）、生产配置见 [部署文档](docs/deployment/)。
+> 无数据库演示：设置 `DEMO_MODE=1` 后启动 BFF，使用内存数据并显示水印（不持久化），仅用于演示。
+
+### 5. 一键容器化 / 云原生部署
+
+```bash
+# Docker Compose 全栈（边缘网关 + BFF + 前端 + PostgreSQL + Redis + Kafka + 可观测）
+cp .env.compose.example .env     # 必须替换全部占位口令/密钥
+docker compose build
+docker compose up -d             # 访问 https://localhost
+
+# Kubernetes 一体化部署（含 HPA/PDB/Ingress/NetworkPolicy，详见 deploy/k8s/README.md）
+kubectl apply -f deploy/k8s/
+```
+
+> 完整生产配置、云托管数据库替换、密钥管理（External Secrets/Vault）见
+> [deploy/k8s/README.md](deploy/k8s/README.md) 与 [docs/deployment/](docs/deployment/)。
 
 ---
 

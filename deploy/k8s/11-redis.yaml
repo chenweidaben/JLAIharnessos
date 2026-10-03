@@ -1,0 +1,113 @@
+# ============================================================================
+# 健澜科技杠OS — Redis（StatefulSet + Headless Service + PVC）
+#
+# 缓存 / 分布式锁 / 限流 / 会话黑名单。启用 AOF 持久化与密码鉴权。
+# 生产环境也可改用云托管 Redis（删除本文件并调整 BFF 的 REDIS_URL）。
+#
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# ============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: jlmedaios
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: redis
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/part-of: jlmedaios
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/part-of: jlmedaios
+    spec:
+      securityContext:
+        fsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: redis
+          image: redis:7.4.0-alpine3.20
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - exec redis-server --appendonly yes --requirepass "$(REDIS_PASSWORD)"
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jlmedaios-secret
+                  key: REDIS_PASSWORD
+            - name: TZ
+              value: Asia/Shanghai
+          ports:
+            - name: tcp-redis
+              containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli -a "$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - redis-cli -a "$REDIS_PASSWORD" --no-auth-warning ping | grep -q PONG
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: "250m"
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/part-of: jlmedaios
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

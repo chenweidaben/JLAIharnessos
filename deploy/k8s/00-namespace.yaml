@@ -1,0 +1,14 @@
+# ============================================================================
+# 健澜科技杠OS — Kubernetes 命名空间
+#
+# 所有 jlmedaios 工作负载隔离在独立命名空间，便于配额、网络策略与权限收敛。
+#
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# ============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jlmedaios
+  labels:
+    app.kubernetes.io/part-of: jlmedaios
+    app.kubernetes.io/managed-by: kubectl

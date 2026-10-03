@@ -1,0 +1,40 @@
+# ============================================================================
+# 健澜科技杠OS — Ingress（统一对外入口，TLS 终止）
+#
+# 所有流量进入前端 Web（Nginx），由其托管静态资源并将 /api、/ws 反代到 BFF。
+# 部署前：
+#   1. 将 host 替换为医院真实域名；
+#   2. 创建 TLS 证书 Secret（或由 cert-manager 自动签发）：
+#      kubectl -n jlmedaios create secret tls jlmedaios-tls \
+#        --cert=tls.crt --key=tls.key
+#
+# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# ============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jlmedaios
+  namespace: jlmedaios
+  labels:
+    app.kubernetes.io/part-of: jlmedaios
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jlmedaios.example.com
+      secretName: jlmedaios-tls
+  rules:
+    - host: jlmedaios.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 8080
