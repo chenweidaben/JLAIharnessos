@@ -28,7 +28,7 @@ import {
   type PatientIdentifier,
   type IdentifierDomain,
   getCandidateById,
-  getLinkByLinkedPatient,
+  getLinkByPatient,
   insertCandidate,
   insertLink,
   listAllIdentifiers,
@@ -201,9 +201,9 @@ export async function confirmMatchCandidate(
     ]);
     if (!pa || !pb) throw notFound('候选关联患者不存在');
 
-    // 任一患者已存在链接 → 拒绝，避免链接冲突
-    const linkA = await getLinkByLinkedPatient(pa.id, tx);
-    const linkB = await getLinkByLinkedPatient(pb.id, tx);
+    // 任一患者已存在链接（master 或 linked）→ 拒绝，避免链接冲突
+    const linkA = await getLinkByPatient(pa.id, tx);
+    const linkB = await getLinkByPatient(pb.id, tx);
     if (linkA || linkB) {
       throw conflict('其中患者已存在主索引链接，不能重复建立');
     }

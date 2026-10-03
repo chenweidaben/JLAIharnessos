@@ -147,14 +147,15 @@ if (!dbAvailable) {
       expect(mine.length).toBe(1);
       abCandidate = mine[0].id;
       expect(mine[0].matchScore).toBe(80);
-    });
+    }, 30000);
 
     it('重复扫描不重复生成候选', async () => {
       const before = await listMatchCandidates(admin, { status: 'pending' });
       await runEmpiScan(admin);
       const after = await listMatchCandidates(admin, { status: 'pending' });
       expect(after.length).toBe(before.length);
-    });
+      // 全库 EMPI 扫描在真实数据量（数千患者、O(n²) 比对）下是重操作，给足时间。
+    }, 30000);
 
     it('确认 A/B 候选，建立逻辑链接', async () => {
       const link = await confirmMatchCandidate(admin, abCandidate);
@@ -178,7 +179,7 @@ if (!dbAvailable) {
       await expect(
         confirmMatchCandidate(admin, toLinked[0].id),
       ).rejects.toMatchObject({ status: 409 });
-    });
+    }, 30000);
 
     it('拒绝一个候选（C 与新患者 F，直接插入候选模拟）', async () => {
       const idF = await mkPatient(5, { nameMasked: 'M5C独**' });

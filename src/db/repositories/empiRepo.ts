@@ -269,3 +269,19 @@ export async function getLinkByLinkedPatient(
   `;
   return rows.length > 0 ? mapLink(rows[0] as Record<string, unknown>) : null;
 }
+
+/**
+ * 患者是否已处于任何主索引链接中（无论作为 master 还是 linked）。
+ * 用于建立新链接前的冲突检测：一个患者只能属于一个主索引组。
+ */
+export async function getLinkByPatient(
+  patientId: string,
+  sql?: DbExecutor,
+): Promise<EmpiLink | null> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT ${db.unsafe(LINK_COLS)} FROM clinical.empi_links
+    WHERE master_patient_id = ${patientId} OR linked_patient_id = ${patientId}
+  `;
+  return rows.length > 0 ? mapLink(rows[0] as Record<string, unknown>) : null;
+}
