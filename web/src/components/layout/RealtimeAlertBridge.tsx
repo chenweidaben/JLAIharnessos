@@ -21,11 +21,13 @@ import type { Alert } from '@/types/medical';
 
 export default function RealtimeAlertBridge() {
   const { notification } = AntdApp.useApp();
-  const { alerts } = useAlert();
+  const { alerts, statusEvents } = useAlert();
   const navigate = useNavigate();
   const addNotification = useDashboardStore((s) => s.addNotification);
   // 跨渲染去重：同一条告警只处理一次（重连/重渲染不重复弹）
   const seenRef = useRef<Set<string>>(new Set());
+  // 已处理过的状态变更（避免重复 destroy）
+  const seenStatusRef = useRef<Set<string>>(new Set());
   // 保存最新的跳转引用，避免闭包过期
   const navigateRef = useRef(navigate);
   navigateRef.current = navigate;
@@ -81,6 +83,18 @@ export default function RealtimeAlertBridge() {
       });
     });
   }, [alerts, addNotification, notification]);
+
+  // 签收/处置后实时关闭对应强提醒弹窗（其他客户端处置时本端同步）
+  useEffect(() => {
+    statusEvents.forEach((evt) => {
+      const sig = `${evt.id}:${evt.status}`;
+      if (seenStatusRef.current.has(sig)) return;
+      seenStatusRef.current.add(sig);
+      if (evt.status === 'acked' || evt.status === 'resolved') {
+        notification.destroy(String(evt.id));
+      }
+    });
+  }, [statusEvents, notification]);
 
   return null;
 }

@@ -40,10 +40,11 @@ afterAll(async () => {
 describe.skipIf(!dbAvailable)('M3-F CriticalValue Repository', () => {
   it('扫描上报：产生告警，重复扫描不重复', async () => {
     const first = await scanAndRaise();
-    expect(first).toBeGreaterThan(0);
+    expect(first.length).toBeGreaterThan(0);
+    const totalAfterFirst = await countAlerts();
     const second = await scanAndRaise();
-    expect(second).toBe(0); // 幂等：已有告警的危急值不再重复上报
-    expect(await countAlerts()).toBe(first);
+    expect(second.length).toBe(0); // 幂等：已有告警的危急值不再重复上报
+    expect(await countAlerts()).toBe(totalAfterFirst);
   });
 
   it('状态机：raised -> acked -> resolved，非法跳转拒绝', async () => {

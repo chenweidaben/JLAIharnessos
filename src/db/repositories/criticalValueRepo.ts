@@ -74,9 +74,9 @@ function mapRow(row: Record<string, unknown>): CriticalAlert {
 }
 
 /**
- * 扫描全部 is_critical 但尚无告警的检验结果，幂等上报。返回新产生的告警数。
+ * 扫描全部 is_critical 但尚无告警的检验结果，幂等上报。返回新产生的告警（完整信息）。
  */
-export async function scanAndRaise(sql?: DbExecutor): Promise<number> {
+export async function scanAndRaise(sql?: DbExecutor): Promise<CriticalAlert[]> {
   const db = sql ?? getDb();
   const rows = await db`
     INSERT INTO clinical.critical_value_alerts (
@@ -92,9 +92,9 @@ export async function scanAndRaise(sql?: DbExecutor): Promise<number> {
         SELECT 1 FROM clinical.critical_value_alerts a WHERE a.lab_result_id = lr.id
       )
     ON CONFLICT (lab_result_id) DO NOTHING
-    RETURNING id
+    RETURNING ${db.unsafe(COLS)}
   `;
-  return rows.length;
+  return (rows as Record<string, unknown>[]).map((r) => mapRow(r));
 }
 
 export async function getById(id: string, sql?: DbExecutor): Promise<CriticalAlert | null> {
@@ -184,4 +184,23 @@ export async function countAlerts(sql?: DbExecutor): Promise<number> {
   const db = sql ?? getDb();
   const rows = await db<{ n: number }[]>`SELECT count(*) AS n FROM clinical.critical_value_alerts`;
   return Number(rows[0]?.n ?? 0);
+}
+
+/** 批量获取患者的脱敏姓名（用于实时推送 payload）。 */
+export async function getPatientNameMap(
+  patientIds: string[],
+  sql?: DbExecutor,
+): Promise<Record<string, string>> {
+  if (patientIds.length === 0) return {};
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT id::text AS pid, name_masked
+    FROM clinical.patients
+    WHERE id IN ${db(patientIds)}
+  `;
+  const map: Record<string, string> = {};
+  for (const r of rows as Record<string, unknown>[]) {
+    map[String(r.pid)] = String(r.name_masked);
+  }
+  return map;
 }

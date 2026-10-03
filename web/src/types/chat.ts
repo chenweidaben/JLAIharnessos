@@ -31,7 +31,7 @@ export interface Conversation {
 }
 
 export type WsEventType =
-  'agent:delta' | 'agent:done' | 'agent:error' | 'critical:alert' | 'message:push' | 'heartbeat';
+  'agent:delta' | 'agent:done' | 'agent:error' | 'critical:alert' | 'critical:status' | 'message:push' | 'heartbeat';
 
 export interface WsMessage<T = unknown> {
   event: WsEventType;

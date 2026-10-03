@@ -14,10 +14,12 @@ import {
   getById,
   listAlerts,
   setStatus,
+  getPatientNameMap,
   type CriticalAlert,
   type CriticalListRow,
   type CriticalStatus,
 } from '../../db/repositories/criticalValueRepo.js';
+import { emitCriticalValueAlert, emitCriticalStatus } from '../alertBus.js';
 
 export class CriticalError extends Error {
   constructor(
@@ -42,10 +44,32 @@ function canAccess(auth: AuthView, department: string): boolean {
   return false;
 }
 
-/** 扫描并上报新危急值（幂等），返回新产生条数。 */
+/**
+ * 扫描并上报新危急值（幂等）。对每条新产生的告警通过 WebSocket 实时推送
+ * （payload 含稳定 id，前端按 id 去重），返回新产生条数。
+ */
 export async function scanCritical(): Promise<{ raised: number }> {
   const raised = await scanAndRaise();
-  return { raised };
+  if (raised.length > 0) {
+    const nameMap = await getPatientNameMap(raised.map((a) => a.patientId));
+    for (const a of raised) {
+      emitCriticalValueAlert({
+        id: a.id,
+        visitId: a.visitId,
+        patientId: a.patientId,
+        patientName: nameMap[a.patientId],
+        department: a.department,
+        itemName: a.itemName,
+        value: a.value,
+        unit: a.unit,
+        refLow: a.refLow,
+        refHigh: a.refHigh,
+        status: a.status,
+        raisedAt: a.raisedAt,
+      });
+    }
+  }
+  return { raised: raised.length };
 }
 
 /** 告警队列（按 DataScope 过滤）。 */
@@ -54,7 +78,7 @@ export async function listQueue(auth: AuthView, status: CriticalStatus | null): 
   return all.filter((r) => canAccess(auth, r.department));
 }
 
-/** 医师签收（raised -> acked）。 */
+/** 医师签收（raised -> acked），签收后广播状态变更。 */
 export async function ackAlert(id: string, auth: AuthView): Promise<CriticalAlert> {
   const existing = await getById(id);
   if (!existing) throw notFound('危急值告警不存在');
@@ -64,10 +88,11 @@ export async function ackAlert(id: string, auth: AuthView): Promise<CriticalAler
     setStatus(id, ['raised'], 'acked', { ackedBy: auth.id }, tx),
   );
   if (!updated) throw conflict('告警状态已变更，请刷新');
+  emitCriticalStatus(updated.id, 'acked', { actedBy: auth.id });
   return updated;
 }
 
-/** 医师处置闭环（acked -> resolved）。 */
+/** 医师处置闭环（acked -> resolved），处置后广播状态变更。 */
 export async function resolveAlert(
   id: string,
   auth: AuthView,
@@ -82,5 +107,6 @@ export async function resolveAlert(
     setStatus(id, ['acked'], 'resolved', { resolvedBy: auth.id, dispositionNote: note.trim() }, tx),
   );
   if (!updated) throw conflict('告警状态已变更，请刷新');
+  emitCriticalStatus(updated.id, 'resolved', { actedBy: auth.id, note: note.trim() });
   return updated;
 }
