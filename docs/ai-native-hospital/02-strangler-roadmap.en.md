@@ -111,7 +111,7 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 
 ### 2.6.2 Current Quality Gates (real evidence)
 
-- Real DB: **106 base tables** across 5 schemas (iam 10 / clinical 72 / agent 8 / knowledge 14 / audit 2).
+- Real DB: **107 base tables** across 5 schemas (iam 10 / clinical 73 / agent 8 / knowledge 14 / audit 2).
 - Backend **1887 tests green (158 files, 1 skip, 7632 expect)**; frontend **840 tests green (82 files)**; both tsc 0.
 - Frontend coverage (all:false): gate passed, thresholds unchanged (lines/statements ≥80, branches ≥70, functions ≥80).
 - Deployment assets: multi-stage Dockerfiles, docker-compose, all-in-one K8s manifests, Helm Chart, and Istio canary templates.

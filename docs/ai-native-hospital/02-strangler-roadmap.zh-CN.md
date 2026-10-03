@@ -111,7 +111,7 @@
 
 ### 2.6.2 当前质量门（以真实取证为准）
 
-- 真实数据库：5 schema **106 张基表**（iam 10 / clinical 72 / agent 8 / knowledge 14 / audit 2）。
+- 真实数据库：5 schema **107 张基表**（iam 10 / clinical 73 / agent 8 / knowledge 14 / audit 2）。
 - 后端 **1887 测试全绿（158 文件，1 skip，7632 expect）**；前端 **840 测试全绿（82 文件）**；前后端 tsc 0。
 - 前端覆盖率（all:false）：门禁通过、未改阈值（lines/statements ≥80、branches ≥70、functions ≥80）。
 - 部署产物：多阶段 Dockerfile、docker-compose、K8s 一体化清单、Helm Chart、Istio 灰度模板齐备。
