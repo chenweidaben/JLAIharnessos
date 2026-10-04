@@ -99,10 +99,11 @@
 | **M7-C** | 事务性发件箱（Transactional Outbox） | 新增 `clinical.event_outbox` 表（迁移 82），业务事务与领域事件写入同一事务（原子提交），解决「业务落库后、推送前崩溃丢事件」；`OutboxRelay` 以 at-least-once 状态机 `pending → processing → published` 轮询发布到 WebSocket：`claimBatch`（FOR UPDATE SKIP LOCKED，多实例并发分摊）、`markPublished`、`resetToPending`（失败 attempts+1 重试）、`reclaimStale`（认领后崩溃的 processing 超时回收）；危急值聚合器移除内存直推，改为同事务 `appendEvent`；消费端按稳定 event_id 幂等（前端已按 id 去重，重复安全） | 真实 WS 取证：扫描 87 条经 outbox 全发布、id 唯一、outbox 全 published；重启持久化（87 条 event_id 不丢、BFF 自动重连）；断库 BFF 存活、ready=503、Relay 轮询不崩溃、恢复后续发；新增 event-outbox 集成 6 + outboxRelay 单测 4，后端 1919/前端 844 全绿、tsc 双零 |
 | **M7-D** | 死信队列与事件可观测性（Dead-Letter Queue + Outbox Metrics） | 发布失败达到 `maxAttempts`（默认 5）的事件不再无限重试，进入死信 `dead`（迁移 83：扩展状态 CHECK、新增 `last_error`/`dead_at` 列与死信部分索引、新增 `outbox:manage` 权限仅授 admin）；`outboxRepo` 新增 `markDead`、`listDeadLetters`（分页）、`requeueDeadLetter`（dead→pending，清空错误/attempts）、`oldestPendingAgeSeconds`；`OutboxRelay` 按 `attempts+1` 区分死信/重试，新增 `onDeadLetter` 回调与 `updateMetrics()`；管理端 BFF 路由 `GET /api/v1/outbox/dead-letters`、`POST /api/v1/outbox/requeue/:id`（重投写审计 `outbox.requeue`）；`/metrics` 暴露 `gangos_outbox_events`（按状态）与 `gangos_outbox_oldest_pending_age_seconds` 两个 gauge | 真实库取证：markDead 记录错误/死信时间、listDeadLetters 分页、requeueDeadLetter 复位、越权 doctor 403/未登录 401/404/400；event-outbox 集成 6→10、outboxRelay 单测 4→5（连续 3 轮失败恰在第 3 轮进死信、不再被认领）、新增 outbox-admin 路由 7；后端 1931/前端 844 全绿、tsc 双零 |
 | **M7-E** | 事件重连补拉（Gap Recovery / Replay） | WebSocket 不保证离线消息，客户端断连期间的事件重连后会丢失。服务端 `outboxRepo` 新增 `listEventsAfter(afterId, limit)`（仅返回 `id > afterId` 的 `published` 事件，按 id 升序、limit 上限 200）与补拉路由 `GET /api/v1/outbox/events?after_id=&limit=`（任何登录用户，与 WS broadcast 同范围；非法 after_id 400）；中继发布的 WS 帧携带数字主键 `seq`（`OutboxPublisher` 增加 meta）。前端 `wsClient` 记录最后收到的 `lastSeq`，重连（非首次连接）后分页调用补拉接口，把错过的事件转成 WS 消息分发，与实时帧重叠的事件（`id <= lastSeq`）跳过、不重复分发；补拉失败（断库/未授权）静默放弃，等下次重连再试，不影响实时通道 | 新增前端 websocket 补拉测试 4 例（首次不补拉、重连按 lastSeq 补拉分发、id<=lastSeq 跳过、补拉失败静默）；后端 event-outbox 加 listEventsAfter 用例、outbox-admin 加补拉路由 4 例（含普通医生可补拉、非法参数 400、未登录 401）；后端 1936/前端 848 全绿、tsc 双零 |
+| **M7-F** | 会话管理与 JWT 主动吊销（Server-side Sessions + Revocation） | JWT 无状态，默认在过期前始终有效——医院共享工作站仅前端清令牌无法阻止已签发令牌继续使用。迁移 84 建 `clinical.user_sessions`（jti/refresh_jti 唯一、access 与 refresh 过期时间、吊销时间与原因、IP/UA，活跃会话部分索引）；登录（含 MFA 第二因子）签发时写入会话，`signJwt` 自动注入 `jti`；新增 `sessionGuard` 中间件在认证后校验会话状态（活跃放行、吊销则清空 `ctx.user`，进程内缓存 active 30s/revoked 5min，DB 抖动时 fail-open 由健康检查暴露）；登出改为按 jti 吊销并立即标记；刷新走轮换（校验旧 refresh 会话、吊销旧会话、登记新会话，旧 access 立即失效）；管理端 `GET /api/v1/admin/sessions`（可按用户筛选）与 `POST /api/v1/admin/sessions/revoke`（按 jti 或 userId 强制下线，写审计 `session.revoke`/`session.force_user_offline`，权限 `session:manage` 仅授 admin） | 真实 HTTP 取证：登录会话落库、登出后旧 access 与 refresh 均 401、刷新轮换后旧 access 401/新 access 200、admin 强制下线后 access 401、doctor 越权 403/未登录 401/缺参 400/吊销不存在 404；psql 核对会话与吊销原因、审计留痕；新增后端集成 14（真实模式 10、默认模式 4）与前端页面 6；后端 1940/前端 865 全绿、tsc 双零 |
 
 **四类真实取证（非演示）**：
 
-1. **真实数据库**：本地 PostgreSQL 16（端口 5433），9 schema **119 张基表**（iam 10 / clinical 74 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7），关键写操作可查回、**重启不丢**。
+1. **真实数据库**：本地 PostgreSQL 16（端口 5433），9 schema **120 张基表**（iam 10 / clinical 75 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7），关键写操作可查回、**重启不丢**。
 2. **真实大模型**：DeepSeek 流式对话 + ReAct 工具调用（OpenAI 兼容），会话/消息/调用链落库；模型经 `LLM_PROVIDER` 工厂可插拔。
 3. **审计哈希链**：`audit.audit_logs` 由 BEFORE INSERT 触发器自动维护 `seq/prev_hash/hash` 哈希链，业务变更与审计同事务提交，链内防篡改。
 4. **并发/故障韧性**：并发写不重复（唯一约束 + 状态机 + 行锁/advisory lock）；断库时统一错误信封 + 水印，不白屏、不静默返回空数据；越权返回 403。
@@ -124,7 +125,7 @@
 | 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入多层防护、JWT 验签、MFA 双因素、安全响应头、CSRF |
 | 🔌 **全系统集成** | HIS/EMR/LIS/PACS 适配器（重试/熔断/超时）、HL7 v2.x（16 消息）、FHIR R4（22 资源）、DICOM（DICOMWeb）、Kafka 事件总线（规划）、五大厂商适配骨架 |
 | 🖥️ **Web 工作台 + 终端** | React 19 + Ant Design 5：50+ 业务路由、门诊/住院/急诊/药事/质控/语音场景；同时保留 Ink 终端交互 |
-| 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（61 表/审计哈希链/PITR）、Redis（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
+| 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（120 表/审计哈希链/PITR）、Redis（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
 
 ---
 
