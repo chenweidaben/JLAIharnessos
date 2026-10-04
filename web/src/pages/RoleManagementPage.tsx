@@ -2,260 +2,297 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 角色管理：12 种预设角色 + 权限树分配 + 用户分配
+ * 角色管理：角色列表 / 新增编辑 / 权限树分配 / 角色详情（权限+关联用户）/
+ * 删除自定义角色。真实 BFF + PostgreSQL，无 mock。
  */
-import { useMemo, useState, type Key } from 'react';
+import { useEffect, useMemo, useState, type Key } from 'react';
 import {
+  Alert,
   App as AntdApp,
   Button,
+  Drawer,
   Form,
   Input,
+  Layout,
   Modal,
   Popconfirm,
-  Select,
   Space,
-  Switch,
+  Spin,
   Table,
   Tag,
   Tree,
+  Watermark,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, PlusOutlined, SafetyOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SafetyOutlined,
+} from '@ant-design/icons';
 
-import PageContainer from '@/components/common/PageContainer';
-// TODO(P2): 接入真实 API（/system/roles、/system/permissions）后移除本地 mock
-import { manageUsers, permissionTree, roles as roleMock } from '@/mock/authMock';
-import type { Role, RoleLevel, DataScope } from '@/types/auth';
+import DemoModeBanner from '@/components/common/DemoModeBanner';
+import { useRoleAdminStore } from '@/store/roleAdminStore';
+import type { AdminRole } from '@/types/adminRole';
 
-const LEVEL_MAP: Record<RoleLevel, { label: string; color: string }> = {
-  system: { label: '系统级', color: 'red' },
-  dept: { label: '科室级', color: 'blue' },
-  personal: { label: '个人级', color: 'default' },
-};
+const { Header, Content } = Layout;
 
-const SCOPE_MAP: Record<DataScope, string> = {
-  all: '全部数据',
-  dept: '本科室',
-  group: '本组',
-  self: '仅本人',
-};
-
-interface RoleFormState {
-  name: string;
+interface RoleFormValues {
   code: string;
-  description: string;
-  level: RoleLevel;
-  dataScope: DataScope;
-  status: 'enabled' | 'disabled';
+  name: string;
+  description?: string;
 }
 
 export default function RoleManagementPage() {
   const { message } = AntdApp.useApp();
-  const [list, setList] = useState<Role[]>(roleMock);
+  const {
+    dbUp, healthChecking, roles, permissionGroups, selected, loading, acting,
+    checkHealth, loadRoles, loadPermissions, openRole, clearSelected,
+    createRole, updateRole, assignPermissions, deleteRole,
+  } = useRoleAdminStore();
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [editing, setEditing] = useState<Role | null>(null);
-  const [form] = Form.useForm<RoleFormState>();
+  const [ready, setReady] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<AdminRole | null>(null);
+  const [form] = Form.useForm<RoleFormValues>();
 
   const [permOpen, setPermOpen] = useState(false);
-  const [permRole, setPermRole] = useState<Role | null>(null);
+  const [permRole, setPermRole] = useState<AdminRole | null>(null);
   const [checkedKeys, setCheckedKeys] = useState<Key[]>([]);
 
-  const [userOpen, setUserOpen] = useState(false);
-  const [userRole, setUserRole] = useState<Role | null>(null);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  useEffect(() => {
+    void (async () => {
+      const up = await checkHealth();
+      if (up) {
+        await Promise.all([loadRoles(), loadPermissions()]);
+      }
+      setReady(true);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  /* 权限树 data */
+  /** 权限树数据（按模块分组） */
   const treeData = useMemo(
     () =>
-      permissionTree.map((mod) => ({
-        key: mod.code,
-        title: `${mod.name}（${mod.children?.length ?? 0}）`,
-        children: (mod.children ?? []).map((c) => ({ key: c.code, title: c.name })),
+      permissionGroups.map((g) => ({
+        key: `__module_${g.module}`,
+        title: `${g.module}（${g.count}）`,
+        children: g.permissions.map((p) => ({ key: p.code, title: `${p.name}（${p.code}）` })),
       })),
-    [],
+    [permissionGroups],
   );
 
-  const openEdit = (r?: Role) => {
-    setEditing(r ?? null);
-    form.setFieldsValue(
-      r
-        ? {
-            name: r.name,
-            code: r.code,
-            description: r.description,
-            level: r.level,
-            dataScope: r.dataScope,
-            status: r.status,
-          }
-        : { level: 'dept', dataScope: 'self', status: 'enabled' },
-    );
-    setEditOpen(true);
+  const openEdit = (record?: AdminRole) => {
+    setEditing(record ?? null);
+    if (record) {
+      form.setFieldsValue({
+        code: record.code,
+        name: record.name,
+        description: record.description ?? undefined,
+      });
+    } else {
+      form.resetFields();
+    }
+    setModalOpen(true);
   };
 
   const onSave = async () => {
-    const v = await form.validateFields();
+    const values = await form.validateFields();
+    let okAction = false;
     if (editing) {
-      setList((ls) => ls.map((r) => (r.id === editing.id ? { ...r, ...v, code: r.code } : r)));
-      message.success('角色已更新');
+      okAction = await updateRole(editing.code, {
+        name: values.name,
+        description: values.description ?? null,
+      });
+      if (okAction) message.success('角色已更新');
     } else {
-      setList((ls) => [
-        ...ls,
-        {
-          id: `role_${Date.now()}`,
-          code: v.code as Role['code'],
-          name: v.name,
-          description: v.description,
-          level: v.level,
-          dataScope: v.dataScope,
-          status: v.status,
-          userCount: 0,
-          permissionCount: 0,
-          permissionCodes: [],
-          createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
-          createdBy: 'admin',
-        },
-      ]);
-      message.success('角色已创建');
+      okAction = await createRole({
+        code: values.code,
+        name: values.name,
+        description: values.description ?? null,
+      });
+      if (okAction) message.success('角色已创建');
     }
-    setEditOpen(false);
+    if (okAction) setModalOpen(false);
   };
 
-  const openPerm = (r: Role) => {
-    setPermRole(r);
-    setCheckedKeys(r.permissionCodes.filter((c) => c !== '*'));
+  const openPerm = (record: AdminRole) => {
+    setPermRole(record);
+    setCheckedKeys(record.permissionCodes);
     setPermOpen(true);
   };
 
-  const savePerm = () => {
+  const savePerm = async () => {
     if (!permRole) return;
-    setList((ls) =>
-      ls.map((r) =>
-        r.id === permRole.id
-          ? {
-              ...r,
-              permissionCodes: [...checkedKeys.map(String)],
-              permissionCount: checkedKeys.length,
-            }
-          : r,
-      ),
-    );
-    message.success(`已为「${permRole.name}」分配 ${checkedKeys.length} 项权限`);
-    setPermOpen(false);
+    const codes = checkedKeys.map(String);
+    const okAction = await assignPermissions(permRole.code, codes);
+    if (okAction) {
+      message.success(`已为「${permRole.name}」分配 ${codes.length} 项权限`);
+      setPermOpen(false);
+    }
   };
 
-  const openUser = (r: Role) => {
-    setUserRole(r);
-    setSelectedUsers(manageUsers.filter((u) => u.roleCodes.includes(r.code)).map((u) => u.id));
-    setUserOpen(true);
-  };
-
-  const columns: ColumnsType<Role> = [
+  const columns: ColumnsType<AdminRole> = [
     {
       title: '角色',
-      dataIndex: 'name',
-      width: 176,
       render: (_, r) => (
         <div style={{ minWidth: 0 }}>
-          <div
-            style={{ fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            title={r.name}
-          >
-            {r.name}
-          </div>
-          <div
-            style={{ fontSize: 12, color: '#8c8c8c', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            title={r.code}
-          >
-            {r.code}
-          </div>
+          <div style={{ fontWeight: 600 }}>{r.name}</div>
+          <div style={{ fontSize: 12, color: '#8c8c8c' }}>{r.code}</div>
         </div>
       ),
     },
-    { title: '描述', dataIndex: 'description', width: 220, ellipsis: true },
+    { title: '描述', dataIndex: 'description', width: 240, ellipsis: true, render: (v: string | null) => v ?? '—' },
     {
-      title: '等级',
-      dataIndex: 'level',
+      title: '类型',
+      dataIndex: 'isSystem',
       width: 100,
-      render: (l: RoleLevel) => <Tag color={LEVEL_MAP[l].color}>{LEVEL_MAP[l].label}</Tag>,
-    },
-    {
-      title: '数据范围',
-      dataIndex: 'dataScope',
-      width: 110,
-      render: (s: DataScope) => SCOPE_MAP[s],
-    },
-    { title: '关联用户', dataIndex: 'userCount', width: 90 },
-    { title: '权限数', dataIndex: 'permissionCount', width: 90 },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 90,
-      render: (s: 'enabled' | 'disabled') => (
-        <Tag color={s === 'enabled' ? 'success' : 'default'}>
-          {s === 'enabled' ? '启用' : '禁用'}
-        </Tag>
+      render: (isSystem: boolean) => (
+        <Tag color={isSystem ? 'red' : 'blue'}>{isSystem ? '系统内置' : '自定义'}</Tag>
       ),
     },
-    { title: '创建时间', dataIndex: 'createdAt', width: 160 },
+    { title: '权限数', dataIndex: 'permissionCodes', width: 90, render: (c: string[]) => c.length },
+    { title: '关联用户', dataIndex: 'userCount', width: 90 },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      width: 170,
+      render: (v: string) => new Date(v).toLocaleString('zh-CN'),
+    },
     {
       title: '操作',
       width: 260,
+      fixed: 'right',
       render: (_, r) => (
-        <Space size={2}>
+        <Space size={2} wrap>
+          <Button type="link" size="small" onClick={() => void openRole(r.code)}>
+            查看
+          </Button>
           <Button type="link" size="small" icon={<EditOutlined />} onClick={() => openEdit(r)}>
             编辑
           </Button>
           <Button type="link" size="small" icon={<SafetyOutlined />} onClick={() => openPerm(r)}>
             分配权限
           </Button>
-          <Button type="link" size="small" icon={<TeamOutlined />} onClick={() => openUser(r)}>
-            分配用户
-          </Button>
-          <Popconfirm
-            title="删除角色将解除其下所有用户授权，确认？"
-            onConfirm={() => {
-              setList((ls) => ls.filter((x) => x.id !== r.id));
-              message.success('已删除');
-            }}
-          >
-            <Button type="link" size="small" danger>
-              删除
-            </Button>
-          </Popconfirm>
+          {!r.isSystem && (
+            <Popconfirm
+              title="删除角色"
+              description="将解除该角色的权限与用户关联，确认？"
+              okText="删除"
+              cancelText="取消"
+              onConfirm={() =>
+                deleteRole(r.code).then((okAction) => {
+                  if (okAction) message.success('角色已删除');
+                })
+              }
+            >
+              <Button type="link" size="small" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
   ];
 
   return (
-    <PageContainer
-      title="角色管理"
-      description={`共 ${list.length} 种预设角色，支持权限树分配与用户授权`}
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => openEdit()}>
-          新增角色
-        </Button>
-      }
-    >
-      <Table<Role>
-        rowKey="id"
-        size="middle"
-        columns={columns}
-        dataSource={list}
-        pagination={false}
-        scroll={{ x: 1280 }}
-      />
+    <Watermark content={['健澜科技', '角色管理', 'jlmedaios']}>
+      <Layout className="min-h-screen bg-ink-bg">
+        <Header className="flex items-center justify-between bg-jl-primary px-6 shadow-card">
+          <div className="flex items-center gap-3">
+            <SafetyOutlined className="text-2xl text-white" />
+            <span className="text-lg font-semibold text-white">
+              角色管理 · 角色、权限与关联用户
+            </span>
+          </div>
+          <Tag color={dbUp ? 'green' : 'red'} data-testid="role-health-tag">
+            {dbUp ? 'BFF/DB 正常 (up)' : 'BFF/DB 不可用'}
+          </Tag>
+        </Header>
+        <Content className="p-4">
+          <DemoModeBanner />
+          <Spin spinning={!ready || healthChecking}>
+            {!dbUp ? (
+              <Alert
+                data-testid="role-offline-alert"
+                type="error"
+                showIcon
+                banner
+                message="无法连接 BFF 或数据库，角色管理不可用"
+                description="请检查数据库服务；恢复后点击刷新重新探活。系统不会以缓存或假数据冒充角色数据。"
+                action={
+                  <button
+                    type="button"
+                    className="ant-btn ant-btn-default"
+                    onClick={() =>
+                      void checkHealth().then((up) => {
+                        if (up) void Promise.all([loadRoles(), loadPermissions()]);
+                      })
+                    }
+                  >
+                    刷 新
+                  </button>
+                }
+              />
+            ) : (
+              <div data-testid="role-content">
+                <div className="jl-card mb-3 flex items-center justify-between p-3">
+                  <span className="text-sm text-gray-600">共 {roles.length} 个角色</span>
+                  <Space>
+                    <Button
+                      icon={<ReloadOutlined />}
+                      loading={loading}
+                      onClick={() => void Promise.all([loadRoles(), loadPermissions()])}
+                    >
+                      刷新
+                    </Button>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => openEdit()}>
+                      新增角色
+                    </Button>
+                  </Space>
+                </div>
+
+                <Table<AdminRole>
+                  rowKey="code"
+                  size="middle"
+                  columns={columns}
+                  dataSource={roles}
+                  loading={loading || acting}
+                  scroll={{ x: 1200 }}
+                  pagination={false}
+                />
+              </div>
+            )}
+          </Spin>
+        </Content>
+      </Layout>
 
       {/* 新增/编辑角色 */}
       <Modal
-        open={editOpen}
+        open={modalOpen}
         title={editing ? '编辑角色' : '新增角色'}
-        onCancel={() => setEditOpen(false)}
-        onOk={onSave}
+        onCancel={() => setModalOpen(false)}
+        onOk={() => void onSave()}
         width={560}
+        okText="保存"
+        cancelText="取消"
+        confirmLoading={acting}
       >
         <Form form={form} layout="vertical">
+          <Form.Item
+            name="code"
+            label="角色编码"
+            rules={[
+              { required: true, message: '请输入角色编码' },
+              {
+                pattern: /^[a-z][a-z0-9_]{1,49}$/,
+                message: '需为小写字母/数字/下划线，2-50 位，字母开头',
+              },
+            ]}
+          >
+            <Input placeholder="如 ward_nurse" disabled={!!editing} />
+          </Form.Item>
           <Form.Item
             name="name"
             label="角色名称"
@@ -263,28 +300,8 @@ export default function RoleManagementPage() {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="code"
-            label="角色编码"
-            rules={[{ required: true, message: '请输入角色编码' }]}
-          >
-            <Input placeholder="如 chief_physician" disabled={!!editing} />
-          </Form.Item>
           <Form.Item name="description" label="角色描述">
-            <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="level" label="角色等级" rules={[{ required: true }]}>
-            <Select
-              options={Object.entries(LEVEL_MAP).map(([value, v]) => ({ value, label: v.label }))}
-            />
-          </Form.Item>
-          <Form.Item name="dataScope" label="数据范围" rules={[{ required: true }]}>
-            <Select
-              options={Object.entries(SCOPE_MAP).map(([value, label]) => ({ value, label }))}
-            />
-          </Form.Item>
-          <Form.Item name="status" label="状态">
-            <Switch checkedChildren="启用" unCheckedChildren="禁用" />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>
@@ -294,8 +311,11 @@ export default function RoleManagementPage() {
         open={permOpen}
         title={`分配权限 - ${permRole?.name ?? ''}（已选 ${checkedKeys.length} 项）`}
         onCancel={() => setPermOpen(false)}
-        onOk={savePerm}
-        width={640}
+        onOk={() => void savePerm()}
+        width={680}
+        okText="保存"
+        cancelText="取消"
+        confirmLoading={acting}
       >
         <Tree
           checkable
@@ -306,33 +326,70 @@ export default function RoleManagementPage() {
         />
       </Modal>
 
-      {/* 分配用户 */}
-      <Modal
-        open={userOpen}
-        title={`分配用户 - ${userRole?.name ?? ''}`}
-        onCancel={() => setUserOpen(false)}
-        onOk={() => {
-          message.success(`已为「${userRole?.name}」分配 ${selectedUsers.length} 个用户`);
-          setUserOpen(false);
-        }}
+      {/* 角色详情抽屉 */}
+      <Drawer
+        open={!!selected}
+        title="角色详情"
         width={640}
+        onClose={() => clearSelected()}
       >
-        <Table
-          rowKey="id"
-          size="small"
-          dataSource={manageUsers}
-          rowSelection={{
-            selectedRowKeys: selectedUsers,
-            onChange: (k) => setSelectedUsers(k as string[]),
-          }}
-          pagination={{ pageSize: 6 }}
-          columns={[
-            { title: '姓名', dataIndex: 'realName' },
-            { title: '科室', dataIndex: 'deptName' },
-            { title: '工号', dataIndex: 'employeeNo' },
-          ]}
-        />
-      </Modal>
-    </PageContainer>
+        {selected && (
+          <div>
+            <div style={{ marginBottom: 16 }}>
+              <Space>
+                <span style={{ fontSize: 18, fontWeight: 600 }}>{selected.role.name}</span>
+                <Tag color={selected.role.isSystem ? 'red' : 'blue'}>
+                  {selected.role.isSystem ? '系统内置' : '自定义'}
+                </Tag>
+              </Space>
+              <div style={{ color: '#8c8c8c', marginTop: 4 }}>{selected.role.code}</div>
+              {selected.role.description && (
+                <div style={{ marginTop: 8 }}>{selected.role.description}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                已分配权限（{selected.role.permissionCodes.length}）
+              </div>
+              <Space size={4} wrap>
+                {selected.role.permissionCodes.map((c) => (
+                  <Tag key={c} color="blue">
+                    {c}
+                  </Tag>
+                ))}
+                {selected.role.permissionCodes.length === 0 && (
+                  <span style={{ color: '#8c8c8c' }}>暂无权限</span>
+                )}
+              </Space>
+            </div>
+
+            <div>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                关联用户（{selected.users.length}）
+              </div>
+              <Table
+                rowKey="id"
+                size="small"
+                dataSource={selected.users}
+                pagination={{ pageSize: 8 }}
+                columns={[
+                  { title: '姓名', dataIndex: 'realName' },
+                  { title: '用户名', dataIndex: 'username' },
+                  { title: '科室', dataIndex: 'department', render: (v: string | null) => v ?? '—' },
+                  {
+                    title: '状态',
+                    dataIndex: 'status',
+                    render: (s: string) => (
+                      <Tag color={s === 'active' ? 'success' : 'default'}>{s}</Tag>
+                    ),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+        )}
+      </Drawer>
+    </Watermark>
   );
 }

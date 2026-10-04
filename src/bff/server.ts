@@ -34,6 +34,7 @@ import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
 import { userAdminRoutes } from './routes/admin/users';
+import { roleAdminRoutes } from './routes/admin/roles';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -130,6 +131,7 @@ const allRoutes: RouteDef[] = [
   ...skillRoutes,
   ...tenantAdminRoutes,
   ...userAdminRoutes,
+  ...roleAdminRoutes,
   ...imagingRoutes,
 ];
 

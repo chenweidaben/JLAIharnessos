@@ -2,268 +2,204 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 权限管理：权限树表格 / 新增编辑 / 角色×权限矩阵
+ * 权限管理：权限目录（按模块分组，只读）/ 角色-权限矩阵（只读查看）。
+ * 权限点由迁移/代码统一定义，不在运行时凭空新增。真实 BFF + PostgreSQL，无 mock。
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  App as AntdApp,
+  Alert,
   Button,
-  Form,
-  Input,
-  Modal,
-  Popconfirm,
-  Select,
+  Layout,
   Space,
+  Spin,
   Table,
   Tabs,
   Tag,
+  Tree,
+  Watermark,
 } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { ReloadOutlined, SafetyOutlined } from '@ant-design/icons';
 
-import PageContainer from '@/components/common/PageContainer';
-// TODO(P2): 接入真实 API（/system/permissions）后移除本地 mock
-import { flatPermissions, permissionTree, roles } from '@/mock/authMock';
-import type { PermissionNode, PermissionType } from '@/types/auth';
+import DemoModeBanner from '@/components/common/DemoModeBanner';
+import { useRoleAdminStore } from '@/store/roleAdminStore';
 
-const TYPE_MAP: Record<PermissionType, { label: string; color: string }> = {
-  menu: { label: '菜单', color: 'blue' },
-  button: { label: '按钮', color: 'green' },
-  data: { label: '数据', color: 'orange' },
-  api: { label: 'API', color: 'purple' },
-};
-
-interface PermFormState {
-  name: string;
-  code: string;
-  type: PermissionType;
-  path?: string;
-  component?: string;
-  sort: number;
-  visible: boolean;
-  status: 'enabled' | 'disabled';
-}
+const { Header, Content } = Layout;
 
 export default function PermissionManagementPage() {
-  const { message } = AntdApp.useApp();
-  const [tree] = useState<PermissionNode[]>(permissionTree);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<PermissionNode | null>(null);
-  const [form] = Form.useForm<PermFormState>();
+  const {
+    dbUp, healthChecking, roles, permissionGroups, loading,
+    checkHealth, loadRoles, loadPermissions,
+  } = useRoleAdminStore();
 
-  const treeTableData = useMemo(
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    void (async () => {
+      const up = await checkHealth();
+      if (up) {
+        await Promise.all([loadRoles(), loadPermissions()]);
+      }
+      setReady(true);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** 权限目录树（只读，按模块分组） */
+  const treeData = useMemo(
     () =>
-      tree.map((mod) => ({
-        ...mod,
-        children: (mod.children ?? []).map((c) => ({ ...c, parentId: mod.id })),
-      })),
-    [tree],
-  );
-
-  const openEdit = (p?: PermissionNode) => {
-    setEditing(p ?? null);
-    form.setFieldsValue(
-      p
-        ? {
-            name: p.name,
-            code: p.code,
-            type: p.type,
-            path: p.path,
-            component: p.component,
-            sort: p.sort,
-            visible: p.visible,
-            status: p.status,
-          }
-        : { type: 'button', sort: 100, visible: true, status: 'enabled' },
-    );
-    setModalOpen(true);
-  };
-
-  const onSave = async () => {
-    const v = await form.validateFields();
-    if (editing) {
-      message.success(`权限「${v.name}」已更新`);
-    } else {
-      message.success(`权限「${v.name}」已创建`);
-    }
-    setModalOpen(false);
-  };
-
-  const columns: ColumnsType<PermissionNode> = [
-    { title: '权限名称', dataIndex: 'name' },
-    {
-      title: '权限编码',
-      dataIndex: 'code',
-      render: (c: string) => <code style={{ fontSize: 12 }}>{c}</code>,
-    },
-    {
-      title: '类型',
-      dataIndex: 'type',
-      width: 90,
-      render: (t: PermissionType) => <Tag color={TYPE_MAP[t].color}>{TYPE_MAP[t].label}</Tag>,
-    },
-    { title: '所属模块', dataIndex: 'module', width: 120 },
-    {
-      title: '路由/组件',
-      render: (_: unknown, r) => r.path ?? r.component ?? '-',
-      width: 180,
-      ellipsis: true,
-    },
-    { title: '排序', dataIndex: 'sort', width: 70 },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      width: 90,
-      render: (s: string) => (
-        <Tag color={s === 'enabled' ? 'success' : 'default'}>
-          {s === 'enabled' ? '启用' : '禁用'}
-        </Tag>
-      ),
-    },
-    {
-      title: '操作',
-      width: 200,
-      render: (_: unknown, r) => (
-        <Space size={2}>
-          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => openEdit(r)}>
-            编辑
-          </Button>
-          {r.type === 'menu' && (
-            <Button type="link" size="small" icon={<PlusOutlined />} onClick={() => openEdit()}>
-              新增子权限
-            </Button>
-          )}
-          <Popconfirm title="确认删除该权限？" onConfirm={() => message.success('已删除')}>
-            <Button type="link" size="small" danger>
-              删除
-            </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
-  const matrixData = useMemo(
-    () => flatPermissions.map((p) => ({ key: p.code, name: p.name, code: p.code })),
-    [],
-  );
-  const roleCols = useMemo(
-    () =>
-      roles.map((r) => ({
-        title: r.name,
-        dataIndex: r.code,
-        key: r.code,
-        width: 90,
-        align: 'center' as const,
-        render: (_: unknown, row: { code: string }) =>
-          r.permissionCodes.includes('*') || r.permissionCodes.includes(row.code) ? (
-            <Tag color="green">✓</Tag>
-          ) : (
-            <span style={{ color: '#d9d9d9' }}>—</span>
+      permissionGroups.map((g) => ({
+        key: `__module_${g.module}`,
+        title: `${g.module}（${g.count}）`,
+        children: g.permissions.map((p) => ({
+          key: p.code,
+          title: (
+            <Space size={8}>
+              <span>{p.name}</span>
+              <code style={{ fontSize: 12, color: '#8c8c8c' }}>{p.code}</code>
+            </Space>
           ),
+        })),
       })),
-    [],
+    [permissionGroups],
   );
 
-  const treeTab = (
-    <Table<PermissionNode>
-      rowKey="id"
-      size="middle"
-      columns={columns}
-      dataSource={treeTableData}
-      pagination={false}
-      defaultExpandAllRows
-    />
+  /** 角色-权限矩阵数据（权限点为行） */
+  const matrixData = useMemo(
+    () =>
+      permissionGroups.flatMap((g) =>
+        g.permissions.map((p) => ({
+          key: p.code,
+          module: g.module,
+          name: p.name,
+          code: p.code,
+        })),
+      ),
+    [permissionGroups],
+  );
+
+  /** 角色权限码集合（用于矩阵勾选） */
+  const rolePermSet = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const r of roles) map.set(r.code, new Set(r.permissionCodes));
+    return map;
+  }, [roles]);
+
+  /** 数据加载后用 key 变化重新挂载 Tree，确保 defaultExpandAll 展开模块节点 */
+  const catalogTab = (
+    <div className="jl-card" style={{ padding: 16 }}>
+      <Tree
+        key={`catalog-${permissionGroups.length}`}
+        treeData={treeData}
+        defaultExpandAll
+        selectable={false}
+      />
+    </div>
   );
 
   const matrixTab = (
-    <div className="jl-card" style={{ padding: 8, overflow: 'auto' }}>
+    <div className="jl-card" style={{ padding: 8 }}>
       <Table
         rowKey="key"
         size="small"
-        columns={[{ title: '权限', dataIndex: 'name', width: 200 }, ...roleCols]}
         dataSource={matrixData}
+        loading={loading}
+        data-testid="perm-matrix-table"
+        scroll={{ x: 'max-content', y: 560 }}
         pagination={false}
-        scroll={{ x: 'max-content' }}
+        columns={[
+          { title: '模块', dataIndex: 'module', width: 160, fixed: 'left', render: (m: string) => <Tag>{m}</Tag> },
+          { title: '权限', dataIndex: 'name', width: 180, fixed: 'left' },
+          {
+            title: '编码',
+            dataIndex: 'code',
+            width: 220,
+            fixed: 'left',
+            render: (c: string) => <code style={{ fontSize: 12 }}>{c}</code>,
+          },
+          ...roles.map((r) => ({
+            title: r.name,
+            key: r.code,
+            width: 90,
+            align: 'center' as const,
+            render: (_: unknown, row: { key: string }) =>
+              rolePermSet.get(r.code)?.has(row.key) ? (
+                <Tag color="green">✓</Tag>
+              ) : (
+                <span style={{ color: '#d9d9d9' }}>—</span>
+              ),
+          })),
+        ]}
       />
     </div>
   );
 
   return (
-    <PageContainer
-      title="权限管理"
-      description={`共 ${flatPermissions.length} 个权限点，按菜单 / 按钮 / 数据 / API 分类`}
-      extra={
-        <>
-          <Button onClick={() => message.info('权限导入（演示）')}>导入</Button>
-          <Button onClick={() => message.success('权限导出成功')}>导出</Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => openEdit()}>
-            新增权限
-          </Button>
-        </>
-      }
-    >
-      <Tabs
-        items={[
-          { key: 'tree', label: '权限树', children: treeTab },
-          { key: 'matrix', label: '角色-权限矩阵', children: matrixTab },
-        ]}
-      />
+    <Watermark content={['健澜科技', '权限管理', 'jlmedaios']}>
+      <Layout className="min-h-screen bg-ink-bg">
+        <Header className="flex items-center justify-between bg-jl-primary px-6 shadow-card">
+          <div className="flex items-center gap-3">
+            <SafetyOutlined className="text-2xl text-white" />
+            <span className="text-lg font-semibold text-white">
+              权限管理 · 权限目录与角色-权限矩阵
+            </span>
+          </div>
+          <Tag color={dbUp ? 'green' : 'red'} data-testid="perm-health-tag">
+            {dbUp ? 'BFF/DB 正常 (up)' : 'BFF/DB 不可用'}
+          </Tag>
+        </Header>
+        <Content className="p-4">
+          <DemoModeBanner />
+          <Spin spinning={!ready || healthChecking}>
+            {!dbUp ? (
+              <Alert
+                data-testid="perm-offline-alert"
+                type="error"
+                showIcon
+                banner
+                message="无法连接 BFF 或数据库，权限管理不可用"
+                description="请检查数据库服务；恢复后点击刷新重新探活。系统不会以缓存或假数据冒充权限数据。"
+                action={
+                  <button
+                    type="button"
+                    className="ant-btn ant-btn-default"
+                    onClick={() =>
+                      void checkHealth().then((up) => {
+                        if (up) void Promise.all([loadRoles(), loadPermissions()]);
+                      })
+                    }
+                  >
+                    刷 新
+                  </button>
+                }
+              />
+            ) : (
+              <div data-testid="perm-content">
+                <div className="jl-card mb-3 flex items-center justify-between p-3">
+                  <span className="text-sm text-gray-600">
+                    {permissionGroups.length} 个模块 · {matrixData.length} 个权限点 · {roles.length} 个角色
+                  </span>
+                  <Space>
+                    <Button
+                      icon={<ReloadOutlined />}
+                      loading={loading}
+                      onClick={() => void Promise.all([loadRoles(), loadPermissions()])}
+                    >
+                      刷新
+                    </Button>
+                  </Space>
+                </div>
 
-      <Modal
-        open={modalOpen}
-        title={editing ? `编辑权限 - ${editing.name}` : '新增权限'}
-        onCancel={() => setModalOpen(false)}
-        onOk={onSave}
-        width={560}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="name"
-            label="权限名称"
-            rules={[{ required: true, message: '请输入名称' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="code"
-            label="权限编码"
-            rules={[{ required: true, message: '如 patient:view' }]}
-          >
-            <Input placeholder="module:action" />
-          </Form.Item>
-          <Form.Item name="type" label="权限类型" rules={[{ required: true }]}>
-            <Select
-              options={Object.entries(TYPE_MAP).map(([value, v]) => ({ value, label: v.label }))}
-            />
-          </Form.Item>
-          <Form.Item name="path" label="路由路径">
-            <Input placeholder="/system/users" />
-          </Form.Item>
-          <Form.Item name="component" label="组件路径">
-            <Input placeholder="pages/UserManagementPage" />
-          </Form.Item>
-          <Form.Item name="sort" label="排序">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item name="visible" label="是否显示在菜单">
-            <Select
-              options={[
-                { value: true, label: '显示' },
-                { value: false, label: '隐藏' },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name="status" label="状态">
-            <Select
-              options={[
-                { value: 'enabled', label: '启用' },
-                { value: 'disabled', label: '禁用' },
-              ]}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </PageContainer>
+                <Tabs
+                  items={[
+                    { key: 'catalog', label: '权限目录', children: catalogTab },
+                    { key: 'matrix', label: '角色-权限矩阵', children: matrixTab },
+                  ]}
+                />
+              </div>
+            )}
+          </Spin>
+        </Content>
+      </Layout>
+    </Watermark>
   );
 }
