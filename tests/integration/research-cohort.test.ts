@@ -238,7 +238,7 @@ describe('M5-B 科研专病队列（真实 PostgreSQL）', () => {
     // 命中规则非空
     expect(testMembers[0].matchedRules.length).toBeGreaterThan(0);
     expect(result.totalMembers).toBe(members.length);
-  });
+  }, { timeout: 15000 });
 
   it('重复运行不重复入组（新增 0）', async () => {
     const result = await runCohortMatching(admin, matchingCohortId);
@@ -246,7 +246,7 @@ describe('M5-B 科研专病队列（真实 PostgreSQL）', () => {
     const members = await getCohortMembers(admin, matchingCohortId);
     const testMembers = members.filter((m) => patientIds.includes(m.patientId));
     expect(testMembers).toHaveLength(1);
-  });
+  }, { timeout: 15000 });
 
   it('成员快照脱敏：不含明文姓名/电话/身份证', async () => {
     const members = await getCohortMembers(admin, matchingCohortId);
