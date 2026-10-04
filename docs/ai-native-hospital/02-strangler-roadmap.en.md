@@ -67,7 +67,7 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 
 ---
 
-## 2.6 Progress Update (through M6-C, 2026-10-03)
+## 2.6 Progress Update (through M7-F, 2026-10-04)
 
 ### 2.6.1 Closed Milestones (real persistence + evidence)
 
@@ -118,7 +118,7 @@ Here the strangled targets are: (1) early in-memory mocks and hard-coded rules; 
 ### 2.6.2 Current Quality Gates (real evidence)
 
 - Real DB: **120 base tables** across 9 schemas (iam 10 / clinical 75 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7).
-- Backend **1936 tests green (1 skip)**; frontend **848 tests green (83 files)**; both tsc 0.
+- Backend **1940 tests green (1 skip)**; frontend **865 tests green (85 files)**; both tsc 0.
 - Frontend coverage (all:false): gate passed, thresholds unchanged (lines/statements ≥80, branches ≥70, functions ≥80).
 - Deployment assets: multi-stage Dockerfiles, docker-compose, all-in-one K8s manifests, Helm Chart, and Istio canary templates.
 

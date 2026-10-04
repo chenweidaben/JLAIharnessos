@@ -67,7 +67,7 @@
 
 ---
 
-## 2.6 进展更新（截至 M6-C，2026-10-03）
+## 2.6 进展更新（截至 M7-F，2026-10-04）
 
 ### 2.6.1 已闭环里程碑（真实落库 + 取证）
 
@@ -118,7 +118,7 @@
 ### 2.6.2 当前质量门（以真实取证为准）
 
 - 真实数据库：9 schema **120 张基表**（iam 10 / clinical 75 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7）。
-- 后端 **1936 测试全绿（1 skip）**；前端 **848 测试全绿（83 文件）**；前后端 tsc 0。
+- 后端 **1940 测试全绿（1 skip）**；前端 **865 测试全绿（85 文件）**；前后端 tsc 0。
 - 前端覆盖率（all:false）：门禁通过、未改阈值（lines/statements ≥80、branches ≥70、functions ≥80）。
 - 部署产物：多阶段 Dockerfile、docker-compose、K8s 一体化清单、Helm Chart、Istio 灰度模板齐备。
 
