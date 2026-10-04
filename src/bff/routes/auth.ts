@@ -23,6 +23,7 @@ import {
   revokeByJti,
   revokeByRefreshJti,
 } from '@/db/repositories/sessionRepo';
+import { recordLoginAttempt } from '@/db/repositories/loginAttemptRepo';
 import { markSessionRevoked } from '../middleware/sessionGuard';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { getMfaService } from '../mfaRuntime.js';
@@ -68,10 +69,11 @@ const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true'
 
 /** 提取登录终端信息（IP 取代理转发头，UA 截断存储）。 */
 function requestEndpoint(c: Ctx): { ip: string | null; userAgent: string | null } {
+  // 经反向代理（nginx 等）时取 x-forwarded-for 首段；直连时回退到 socket IP。
   const fwd = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
   const ua = c.req.headers.get('user-agent') ?? '';
   return {
-    ip: fwd || null,
+    ip: fwd || c.clientIp || null,
     userAgent: ua ? ua.slice(0, 256) : null,
   };
 }
@@ -90,6 +92,14 @@ export async function registerSession(
     userId: view.id,
     accessExpiresAt: tokens.accessExpiresAt,
     refreshExpiresAt: tokens.refreshExpiresAt,
+    ip,
+    userAgent,
+  });
+  // 成功登录记入登录尝试台账（MFA 登录成功同样经此函数，统一留痕）
+  await recordLoginAttempt({
+    username: view.username,
+    userId: view.id,
+    success: true,
     ip,
     userAgent,
   });
@@ -159,8 +169,20 @@ export const authRoutes: RouteDef[] = [
       }
       // 真实模式：从 iam 加载用户（试用构建不校验生产口令哈希，统一放行已存在账号）；
       // 用户不存在/停用 → 通用文案，不区分原因（防枚举）。
-      const view = await loadViewByUsername(body.username.trim());
+      const loginUsername = body.username.trim();
+      const view = await loadViewByUsername(loginUsername);
       if (!view) {
+        // 记录失败登录（用户不存在/停用/口令错误统一文案，防枚举）
+        if (!isDemo) {
+          const ep = requestEndpoint(c);
+          await recordLoginAttempt({
+            username: loginUsername,
+            success: false,
+            failReason: '用户名或密码错误',
+            ip: ep.ip,
+            userAgent: ep.userAgent,
+          });
+        }
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码错误'), 400);
       }
 

@@ -35,6 +35,8 @@ import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
 import { userAdminRoutes } from './routes/admin/users';
 import { roleAdminRoutes } from './routes/admin/roles';
+import { auditLogRoutes } from './routes/admin/auditLogs';
+import { loginLogRoutes } from './routes/admin/loginLogs';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -132,6 +134,8 @@ const allRoutes: RouteDef[] = [
   ...tenantAdminRoutes,
   ...userAdminRoutes,
   ...roleAdminRoutes,
+  ...auditLogRoutes,
+  ...loginLogRoutes,
   ...imagingRoutes,
 ];
 
@@ -324,7 +328,10 @@ async function handleFetch(
   // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
   const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
   const rawBody = mayHaveBody ? await req.text() : null;
-  const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody);
+  // 直连客户端 IP（Bun 运行时从 socket 解析）；经反向代理时各路由以
+  // x-forwarded-for 首段为准，此值仅作直连/兜底。
+  const socketIp = server.requestIP(req)?.address ?? null;
+  const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody, socketIp);
   attachUser(ctx);
   // M7-F：校验会话是否已登出/被吊销（异步，按 jti 查会话台账）
   await enforceSession(ctx);

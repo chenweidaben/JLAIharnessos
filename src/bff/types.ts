@@ -46,6 +46,8 @@ export interface Ctx {
   req: Request;
   params: Record<string, string>;
   query: URLSearchParams;
+  /** 直连客户端 IP（由运行时从 socket 注入）；经代理时以 x-forwarded-for 首段为准 */
+  clientIp: string | null;
   /** 预读取的原始请求体文本（GET/HEAD 为 null），供幂等指纹与 body() 复用 */
   rawBody: string | null;
   /** 解析后的 JSON body（按需调用） */

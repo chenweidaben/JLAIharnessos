@@ -2,161 +2,157 @@
  * 健澜科技数智医院智能体
  * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
  *
- * 操作审计日志：列表 / 筛选 / 详情 / 统计概览 / 导出（只读，不可删除）
+ * 操作审计日志：列表 / 筛选 / 详情 / 统计概览 / 分布图与趋势（只读，不可删除）。
+ * 真实 BFF + PostgreSQL 哈希链审计，无 mock。
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  App as AntdApp,
+  Alert,
   Button,
   Col,
-  DatePicker,
   Drawer,
   Input,
+  Layout,
   Row,
   Select,
   Space,
+  Spin,
   Statistic,
   Table,
   Tag,
+  Watermark,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  FileSearchOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 
-import PageContainer from '@/components/common/PageContainer';
+import DemoModeBanner from '@/components/common/DemoModeBanner';
 import BaseChart from '@/components/charts/BaseChart';
-// TODO(P2): 接入真实 API（GET /system/audit-logs）后移除本地 mock
-import { auditLogs } from '@/mock/authMock';
-import type { AuditAction, AuditLog, OperateResult } from '@/types/auth';
+import { useAuditLogStore } from '@/store/auditLogStore';
+import type { AuditLogItem } from '@/types/adminLog';
 
-const { RangePicker } = DatePicker;
+const { Header, Content } = Layout;
 
-const ACTION_MAP: Record<AuditAction, { label: string; color: string }> = {
-  login: { label: '登录', color: 'blue' },
-  logout: { label: '登出', color: 'default' },
-  create: { label: '新增', color: 'green' },
-  update: { label: '修改', color: 'orange' },
-  delete: { label: '删除', color: 'red' },
-  query: { label: '查询', color: 'cyan' },
-  export: { label: '导出', color: 'purple' },
-  approve: { label: '审批', color: 'geekblue' },
-  config: { label: '配置', color: 'magenta' },
-  other: { label: '其他', color: 'default' },
+const RESULT_COLOR: Record<string, string> = {
+  success: 'success',
+  denied: 'warning',
+  failure: 'error',
 };
-
+const RESULT_LABEL: Record<string, string> = {
+  success: '成功',
+  denied: '拒绝',
+  failure: '失败',
+};
 const RISK_COLOR = { low: 'success', medium: 'warning', high: 'error' } as const;
+const RISK_LABEL = { low: '低', medium: '中', high: '高' } as const;
 
 export default function AuditLogPage() {
-  const { message } = AntdApp.useApp();
-  const [operator, setOperator] = useState('');
-  const [action, setAction] = useState<AuditAction>();
-  const [module, setModule] = useState<string>();
-  const [result, setResult] = useState<OperateResult>();
-  const [detail, setDetail] = useState<AuditLog | null>(null);
+  const {
+    dbUp, healthChecking, items, total, overview, distribution, trend, selected, loading,
+    filter, checkHealth, load, setFilter, resetFilter, openDetail, closeDetail,
+  } = useAuditLogStore();
 
-  const modules = useMemo(() => [...new Set(auditLogs.map((l) => l.module))], []);
+  const [ready, setReady] = useState(false);
+  const [keyword, setKeyword] = useState('');
 
-  const filtered = useMemo(
-    () =>
-      auditLogs.filter((l) => {
-        if (operator && !l.operatorName.includes(operator) && !l.operatorNo.includes(operator))
-          return false;
-        if (action && l.action !== action) return false;
-        if (module && l.module !== module) return false;
-        if (result && l.result !== result) return false;
-        return true;
-      }),
-    [operator, action, module, result],
-  );
-
-  const stats = useMemo(() => {
-    const today = auditLogs.filter((l) =>
-      l.createdAt.startsWith(new Date().toISOString().slice(0, 10)),
-    );
-    return {
-      total: auditLogs.length,
-      abnormal: auditLogs.filter((l) => l.result === 'failure').length,
-      highRisk: auditLogs.filter((l) => l.riskLevel === 'high').length,
-      today: today.length,
-    };
+  useEffect(() => {
+    void (async () => {
+      const up = await checkHealth();
+      if (up) await load();
+      setReady(true);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* 操作类型分布饼图 */
-  const pieOption = useMemo(() => {
-    const map = new Map<AuditAction, number>();
-    auditLogs.forEach((l) => map.set(l.action, (map.get(l.action) ?? 0) + 1));
-    return {
+  /* 操作类型分布饼图（真实数据） */
+  const pieOption = useMemo(
+    () => ({
       tooltip: { trigger: 'item' as const },
-      legend: { bottom: 0 },
+      legend: { type: 'scroll', bottom: 0 },
       series: [
         {
           type: 'pie' as const,
           radius: ['40%', '70%'],
-          data: [...map.entries()].map(([k, v]) => ({ name: ACTION_MAP[k].label, value: v })),
+          data: distribution.map((d) => ({ name: d.action, value: d.count })),
         },
       ],
-    };
-  }, []);
+    }),
+    [distribution],
+  );
 
-  /* 近 7 天趋势 */
-  const lineOption = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().slice(5, 10);
-    });
-    const data = days.map((_, i) => 20 + ((i * 13) % 40));
-    return {
+  /* 近 7 天趋势（总量/异常，真实数据） */
+  const lineOption = useMemo(
+    () => ({
       tooltip: { trigger: 'axis' as const },
-      xAxis: { type: 'category' as const, data: days },
+      legend: { data: ['总量', '异常'] },
+      xAxis: {
+        type: 'category' as const,
+        data: trend.map((t) => t.date.slice(5)),
+      },
       yAxis: { type: 'value' as const },
-      series: [{ type: 'line' as const, data, smooth: true, areaStyle: {} }],
-    };
-  }, []);
+      series: [
+        { name: '总量', type: 'line' as const, data: trend.map((t) => t.total), smooth: true },
+        {
+          name: '异常',
+          type: 'line' as const,
+          data: trend.map((t) => t.abnormal),
+          smooth: true,
+        },
+      ],
+    }),
+    [trend],
+  );
 
-  const columns: ColumnsType<AuditLog> = [
-    { title: '操作时间', dataIndex: 'createdAt', width: 170 },
+  const doSearch = () => {
+    setFilter({ actorKeyword: keyword });
+  };
+
+  const columns: ColumnsType<AuditLogItem> = [
+    { title: '操作时间', dataIndex: 'createdAt', width: 175 },
     {
       title: '操作人',
       render: (_, l) => (
         <div>
-          <div>{l.operatorName}</div>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-            {l.operatorNo} · {l.operatorDept}
-          </div>
+          <div>{l.actorName ?? '（匿名/系统）'}</div>
+          {l.actorRole && (
+            <div style={{ fontSize: 12, color: '#8c8c8c' }}>{l.actorRole}</div>
+          )}
         </div>
       ),
     },
-    {
-      title: '操作类型',
-      dataIndex: 'action',
-      width: 90,
-      render: (a: AuditAction) => <Tag color={ACTION_MAP[a].color}>{ACTION_MAP[a].label}</Tag>,
-    },
-    { title: '模块', dataIndex: 'module', width: 110 },
-    { title: '操作内容', dataIndex: 'content', ellipsis: true },
-    { title: 'IP', dataIndex: 'ip', width: 130 },
-    { title: '设备', dataIndex: 'device', width: 150, ellipsis: true },
+    { title: '动作', dataIndex: 'action', width: 180 },
+    { title: '资源类型', dataIndex: 'resourceType', width: 110 },
+    { title: 'IP', dataIndex: 'clientIp', width: 130 },
     {
       title: '结果',
       dataIndex: 'result',
       width: 90,
-      render: (r: OperateResult) => (
-        <Tag color={r === 'success' ? 'success' : 'error'}>{r === 'success' ? '成功' : '失败'}</Tag>
+      render: (r: string) => (
+        <Tag color={RESULT_COLOR[r] ?? 'default'}>{RESULT_LABEL[r] ?? r}</Tag>
       ),
     },
     {
       title: '风险',
       dataIndex: 'riskLevel',
       width: 80,
-      render: (r: 'low' | 'medium' | 'high') => (
-        <Tag color={RISK_COLOR[r]}>{r === 'high' ? '高' : r === 'medium' ? '中' : '低'}</Tag>
-      ),
+      render: (r: string | null) =>
+        r ? (
+          <Tag color={RISK_COLOR[r as keyof typeof RISK_COLOR]}>
+            {RISK_LABEL[r as keyof typeof RISK_LABEL]}
+          </Tag>
+        ) : (
+          <span style={{ color: '#d9d9d9' }}>—</span>
+        ),
     },
     {
       title: '详情',
       width: 80,
       render: (_, l) => (
-        <Button type="link" size="small" onClick={() => setDetail(l)}>
+        <Button type="link" size="small" icon={<FileSearchOutlined />} onClick={() => void openDetail(l.seq)}>
           查看
         </Button>
       ),
@@ -164,148 +160,224 @@ export default function AuditLogPage() {
   ];
 
   return (
-    <PageContainer
-      title="操作审计"
-      description="审计日志只读、不可删除或修改，满足医疗行业数据安全合规要求"
-      extra={
-        <Button
-          icon={<DownloadOutlined />}
-          onClick={() => message.success('审计日志已导出（CSV）')}
-        >
-          导出
-        </Button>
-      }
-    >
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <Statistic title="今日操作" value={stats.today} />
+    <Watermark content={['健澜科技', '操作审计', 'jlmedaios']}>
+      <Layout className="min-h-screen bg-ink-bg">
+        <Header className="flex items-center justify-between bg-jl-primary px-6 shadow-card">
+          <div className="flex items-center gap-3">
+            <SafetyCertificateOutlined className="text-2xl text-white" />
+            <span className="text-lg font-semibold text-white">
+              操作审计 · 只读、哈希链防篡改
+            </span>
           </div>
-        </Col>
-        <Col span={6}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <Statistic title="异常操作" value={stats.abnormal} valueStyle={{ color: '#f5222d' }} />
-          </div>
-        </Col>
-        <Col span={6}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <Statistic title="高危操作" value={stats.highRisk} valueStyle={{ color: '#fa8c16' }} />
-          </div>
-        </Col>
-        <Col span={6}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <Statistic title="累计日志" value={stats.total} />
-          </div>
-        </Col>
-      </Row>
+          <Tag color={dbUp ? 'green' : 'red'} data-testid="audit-health-tag">
+            {dbUp ? 'BFF/DB 正常 (up)' : 'BFF/DB 不可用'}
+          </Tag>
+        </Header>
+        <Content className="p-4">
+          <DemoModeBanner />
+          <Spin spinning={!ready || healthChecking}>
+            {!dbUp ? (
+              <Alert
+                data-testid="audit-offline-alert"
+                type="error"
+                showIcon
+                banner
+                message="无法连接 BFF 或数据库，审计日志不可用"
+                description="请检查数据库服务；恢复后点击刷新重新探活。系统不会以缓存或假数据冒充审计结果。"
+                action={
+                  <button
+                    type="button"
+                    className="ant-btn ant-btn-default"
+                    onClick={() =>
+                      void checkHealth().then((up) => {
+                        if (up) void load();
+                      })
+                    }
+                  >
+                    刷 新
+                  </button>
+                }
+              />
+            ) : (
+              <div data-testid="audit-content">
+                <Row gutter={16} className="mb-3">
+                  <Col span={6}>
+                    <div className="jl-card p-4">
+                      <Statistic title="今日操作" value={overview?.today ?? 0} />
+                    </div>
+                  </Col>
+                  <Col span={6}>
+                    <div className="jl-card p-4">
+                      <Statistic
+                        title="异常（拒绝/失败）"
+                        value={overview?.abnormal ?? 0}
+                        valueStyle={{ color: '#f5222d' }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={6}>
+                    <div className="jl-card p-4">
+                      <Statistic
+                        title="高危操作"
+                        value={overview?.highRisk ?? 0}
+                        valueStyle={{ color: '#fa8c16' }}
+                      />
+                    </div>
+                  </Col>
+                  <Col span={6}>
+                    <div className="jl-card p-4">
+                      <Statistic title="累计日志" value={overview?.total ?? 0} />
+                    </div>
+                  </Col>
+                </Row>
 
-      <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={12}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <BaseChart option={pieOption} height={260} />
-          </div>
-        </Col>
-        <Col span={12}>
-          <div className="jl-card" style={{ padding: 16 }}>
-            <BaseChart option={lineOption} height={260} />
-          </div>
-        </Col>
-      </Row>
+                <Row gutter={16} className="mb-3">
+                  <Col span={12}>
+                    <div className="jl-card p-4">
+                      <BaseChart option={pieOption} height={260} />
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div className="jl-card p-4">
+                      <BaseChart option={lineOption} height={260} />
+                    </div>
+                  </Col>
+                </Row>
 
-      <div className="jl-card" style={{ padding: 16, marginBottom: 16 }}>
-        <Space wrap>
-          <RangePicker />
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder="操作人姓名/工号"
-            style={{ width: 180 }}
-            value={operator}
-            onChange={(e) => setOperator(e.target.value)}
-          />
-          <Select
-            allowClear
-            placeholder="操作类型"
-            style={{ width: 120 }}
-            value={action}
-            onChange={setAction}
-            options={Object.entries(ACTION_MAP).map(([v, x]) => ({ value: v, label: x.label }))}
-          />
-          <Select
-            allowClear
-            placeholder="模块"
-            style={{ width: 140 }}
-            value={module}
-            onChange={setModule}
-            options={modules.map((m) => ({ value: m, label: m }))}
-          />
-          <Select
-            allowClear
-            placeholder="结果"
-            style={{ width: 110 }}
-            value={result}
-            onChange={setResult}
-            options={[
-              { value: 'success', label: '成功' },
-              { value: 'failure', label: '失败' },
-            ]}
-          />
-        </Space>
-      </div>
+                <div className="jl-card mb-3 p-3">
+                  <Space wrap>
+                    <Input
+                      prefix={<SearchOutlined />}
+                      placeholder="操作人姓名"
+                      style={{ width: 180 }}
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      onPressEnter={doSearch}
+                      allowClear
+                    />
+                    <Select
+                      allowClear
+                      placeholder="动作"
+                      style={{ width: 180 }}
+                      value={filter.action}
+                      onChange={(v) => setFilter({ action: v })}
+                      options={distribution.map((d) => ({ value: d.action, label: d.action }))}
+                    />
+                    <Select
+                      allowClear
+                      placeholder="结果"
+                      style={{ width: 120 }}
+                      value={filter.result}
+                      onChange={(v) => setFilter({ result: v })}
+                      options={[
+                        { value: 'success', label: '成功' },
+                        { value: 'denied', label: '拒绝' },
+                        { value: 'failure', label: '失败' },
+                      ]}
+                    />
+                    <Select
+                      allowClear
+                      placeholder="风险"
+                      style={{ width: 110 }}
+                      value={filter.riskLevel}
+                      onChange={(v) => setFilter({ riskLevel: v })}
+                      options={[
+                        { value: 'low', label: '低' },
+                        { value: 'medium', label: '中' },
+                        { value: 'high', label: '高' },
+                      ]}
+                    />
+                    <Button type="primary" icon={<SearchOutlined />} onClick={doSearch}>
+                      查询
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setKeyword('');
+                        resetFilter();
+                      }}
+                    >
+                      重置
+                    </Button>
+                    <Button icon={<ReloadOutlined />} loading={loading} onClick={() => load()}>
+                      刷新
+                    </Button>
+                  </Space>
+                </div>
 
-      <Table<AuditLog>
-        rowKey="id"
-        size="middle"
-        columns={columns}
-        dataSource={filtered}
-        pagination={{ pageSize: 12, showTotal: (t) => `共 ${t} 条` }}
-      />
+                <Table<AuditLogItem>
+                  rowKey="seq"
+                  size="middle"
+                  columns={columns}
+                  dataSource={items}
+                  loading={loading}
+                  scroll={{ x: 1100 }}
+                  pagination={{
+                    current: filter.page,
+                    pageSize: filter.pageSize,
+                    total,
+                    showTotal: (t) => `共 ${t} 条`,
+                    onChange: (page, pageSize) => {
+                      setFilter({ page, pageSize });
+                    },
+                  }}
+                />
+              </div>
+            )}
+          </Spin>
+        </Content>
+      </Layout>
 
-      <Drawer open={!!detail} title="日志详情" width={640} onClose={() => setDetail(null)}>
-        {detail && (
+      <Drawer
+        open={!!selected}
+        title="审计日志详情"
+        width={640}
+        onClose={closeDetail}
+      >
+        {selected && (
           <div>
             <p>
-              <b>操作内容：</b>
-              {detail.content}
+              <b>动作：</b>
+              {selected.action}
             </p>
             <p>
               <b>操作人：</b>
-              {detail.operatorName}（{detail.operatorNo}）· {detail.operatorDept}
+              {selected.actorName ?? '（匿名/系统）'}
+              {selected.actorRole ? ` · ${selected.actorRole}` : ''}
             </p>
             <p>
               <b>时间：</b>
-              {detail.createdAt} · 耗时 {detail.duration}ms
+              {selected.createdAt}
             </p>
             <p>
-              <b>IP / 设备：</b>
-              {detail.ip} · {detail.device}
+              <b>资源：</b>
+              {selected.resourceType ?? '—'} / {selected.resourceId ?? '—'}
+            </p>
+            <p>
+              <b>IP / 终端：</b>
+              {selected.clientIp ?? '—'}
+              {selected.userAgent ? ` · ${selected.userAgent}` : ''}
             </p>
             <p>
               <b>结果：</b>
-              <Tag color={detail.result === 'success' ? 'success' : 'error'}>
-                {detail.result === 'success' ? '成功' : '失败'}
+              <Tag color={RESULT_COLOR[selected.result]}>
+                {RESULT_LABEL[selected.result]}
               </Tag>
             </p>
-            <div style={{ marginTop: 16 }}>
-              <b>请求参数</b>
-              <pre style={{ background: '#f5f7fa', padding: 12, borderRadius: 6, fontSize: 12 }}>
-                {detail.requestParams}
-              </pre>
-            </div>
-            <div>
-              <b>响应数据</b>
-              <pre style={{ background: '#f5f7fa', padding: 12, borderRadius: 6, fontSize: 12 }}>
-                {detail.responseData}
-              </pre>
-            </div>
-            {detail.detail && (
-              <div>
-                <b>异常说明：</b>
-                <Tag color="error">{detail.detail}</Tag>
-              </div>
+            {selected.traceId && (
+              <p>
+                <b>Trace ID：</b>
+                <span style={{ fontSize: 12 }}>{selected.traceId}</span>
+              </p>
             )}
+            <div className="mt-3">
+              <b>变更摘要 detail</b>
+              <pre className="mt-2 overflow-auto rounded p-3" style={{ background: '#f5f7fa', fontSize: 12 }}>
+                {JSON.stringify(selected.detail, null, 2)}
+              </pre>
+            </div>
           </div>
         )}
       </Drawer>
-    </PageContainer>
+    </Watermark>
   );
 }

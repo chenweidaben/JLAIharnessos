@@ -225,11 +225,13 @@ export function newCtx(
   params: Record<string, string>,
   query: URLSearchParams,
   rawBody: string | null = null,
+  clientIp: string | null = null,
 ): Ctx {
   return {
     req,
     params,
     query,
+    clientIp,
     rawBody,
     body: async () => {
       // 优先使用预读取的原始 body（保证幂等指纹与 handler 读取一致）
