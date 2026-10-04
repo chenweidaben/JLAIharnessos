@@ -9,7 +9,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { signJwt, verifyJwt } from '../middleware/auth';
+import { newJti, signJwt, verifyJwt } from '../middleware/auth';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
@@ -17,6 +17,13 @@ import {
   getUserByUsername,
   getUserRoleLinks,
 } from '@/db/repositories/userRepo';
+import {
+  createSession,
+  getActiveByRefreshJti,
+  revokeByJti,
+  revokeByRefreshJti,
+} from '@/db/repositories/sessionRepo';
+import { markSessionRevoked } from '../middleware/sessionGuard';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { getMfaService } from '../mfaRuntime.js';
 import { issueLoginChallenge } from '../aggregators/mfaAggregator.js';
@@ -59,6 +66,35 @@ const DEMO_VIEW: AuthView = {
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
+/** 提取登录终端信息（IP 取代理转发头，UA 截断存储）。 */
+function requestEndpoint(c: Ctx): { ip: string | null; userAgent: string | null } {
+  const fwd = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
+  const ua = c.req.headers.get('user-agent') ?? '';
+  return {
+    ip: fwd || null,
+    userAgent: ua ? ua.slice(0, 256) : null,
+  };
+}
+
+/** 登录/MFA 成功后登记会话（演示模式无库，跳过）。导出供 MFA 登录复用。 */
+export async function registerSession(
+  c: Ctx,
+  view: AuthView,
+  tokens: IssuedTokens,
+): Promise<void> {
+  if (isDemo) return;
+  const { ip, userAgent } = requestEndpoint(c);
+  await createSession({
+    jti: tokens.accessJti,
+    refreshJti: tokens.refreshJti,
+    userId: view.id,
+    accessExpiresAt: tokens.accessExpiresAt,
+    refreshExpiresAt: tokens.refreshExpiresAt,
+    ip,
+    userAgent,
+  });
+}
+
 /** 按用户名加载真实用户视图（含角色/权限/数据范围） */
 async function loadViewByUsername(username: string): Promise<AuthView | null> {
   if (isDemo) return DEMO_VIEW;
@@ -77,8 +113,24 @@ export async function loadViewById(id: string): Promise<AuthView | null> {
   return buildAuthView(user, links);
 }
 
-/** 为某视图签发 access / refresh（sub 为真实 iam UUID）；导出供 MFA 登录二发令牌 */
-export function issueTokens(view: AuthView): { accessToken: string; refreshToken: string } {
+/** 一次签发的令牌与配套会话信息（jti/过期时间用于登记会话） */
+export interface IssuedTokens {
+  accessToken: string;
+  refreshToken: string;
+  accessJti: string;
+  refreshJti: string;
+  accessExpiresAt: Date;
+  refreshExpiresAt: Date;
+}
+
+/**
+ * 为某视图签发 access / refresh（sub 为真实 iam UUID）；
+ * 同时生成 jti 与过期时间，供登录后登记会话。导出供 MFA 登录二发令牌。
+ */
+export function issueTokens(view: AuthView): IssuedTokens {
+  const now = Date.now();
+  const accessJti = newJti();
+  const refreshJti = newJti();
   const base = {
     sub: view.id,
     name: view.realName,
@@ -87,8 +139,12 @@ export function issueTokens(view: AuthView): { accessToken: string; refreshToken
     dept: view.deptName,
   };
   return {
-    accessToken: signJwt(base, 7200),
-    refreshToken: signJwt(base, 7 * 24 * 3600),
+    accessToken: signJwt({ ...base, jti: accessJti }, 7200),
+    refreshToken: signJwt({ ...base, jti: refreshJti }, 7 * 24 * 3600),
+    accessJti,
+    refreshJti,
+    accessExpiresAt: new Date(now + 7200 * 1000),
+    refreshExpiresAt: new Date(now + 7 * 24 * 3600 * 1000),
   };
 }
 
@@ -115,14 +171,15 @@ export const authRoutes: RouteDef[] = [
         return json(ok({ mfaRequired: true, challengeId: challenge.challengeId }));
       }
 
-      const { accessToken, refreshToken } = issueTokens(view);
+      const tokens = issueTokens(view);
+      await registerSession(c, view, tokens);
       const csrfToken = issueCsrfToken();
 
       const res = json(
         ok({
           tokens: {
-            accessToken,
-            refreshToken,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
             expiresIn: 7200,
           },
           user: view,
@@ -133,27 +190,55 @@ export const authRoutes: RouteDef[] = [
       return res;
     },
   },
-  { method: 'POST', path: '/api/v1/auth/logout', handle: () => json(ok(null)), auth: true },
+  {
+    method: 'POST',
+    path: '/api/v1/auth/logout',
+    handle: async (c: Ctx) => {
+      // 主动登出：吊销当前访问令牌会话，使令牌立即失效
+      const user = c.user;
+      if (user?.jti) {
+        await revokeByJti(user.jti, 'logout');
+        markSessionRevoked(user.jti);
+      }
+      return json(ok(null));
+    },
+    auth: true,
+  },
   {
     method: 'POST',
     path: '/api/v1/auth/refresh',
     handle: async (c: Ctx) => {
       const body = await c.body<{ refreshToken?: string }>();
       const payload = body.refreshToken ? verifyJwt(body.refreshToken) : null;
-      if (!payload) {
+      if (!payload || !payload.jti) {
         return json(fail(ErrorCode.UNAUTHORIZED, 'refreshToken 无效或已过期'), 401);
+      }
+      // 校验 refresh 会话是否仍有效（登出/轮换后旧 refresh 被吊销）
+      let prevAccessJti: string | null = null;
+      if (!isDemo) {
+        const refreshSession = await getActiveByRefreshJti(payload.jti);
+        if (!refreshSession) {
+          return json(fail(ErrorCode.UNAUTHORIZED, 'refreshToken 已失效，请重新登录'), 401);
+        }
+        prevAccessJti = refreshSession.jti;
       }
       const view = await loadViewById(payload.sub);
       if (!view) {
         return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
       }
-      // 轮换 access（refresh 保持有效，简化为一并轮换）
-      const { accessToken, refreshToken } = issueTokens(view);
+      // 刷新轮换：吊销旧会话，签发并登记新会话
+      const tokens = issueTokens(view);
+      if (!isDemo) {
+        await revokeByRefreshJti(payload.jti, 'refresh_rotation');
+        // 旧 access 令牌同步标记失效（同一会话行已吊销，缓存立即失效）
+        if (prevAccessJti) markSessionRevoked(prevAccessJti);
+        await registerSession(c, view, tokens);
+      }
       return json(
         ok({
           tokens: {
-            accessToken,
-            refreshToken,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
             expiresIn: 7200,
           },
           user: view,

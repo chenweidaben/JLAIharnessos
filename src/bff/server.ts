@@ -19,6 +19,7 @@ import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
 import { withIdempotency } from './middleware/idempotency';
+import { enforceSession } from './middleware/sessionGuard';
 import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
@@ -51,6 +52,7 @@ import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { outboxRoutes } from './routes/outbox';
+import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
 import { drgRoutes } from './routes/drg';
 import { labInterpretRoutes } from './routes/labInterpret';
@@ -102,6 +104,7 @@ const allRoutes: RouteDef[] = [
   ...dataWarehouseRoutes,
   ...dataGovernanceRoutes,
   ...outboxRoutes,
+  ...sessionAdminRoutes,
   ...billingRoutes,
   ...drgRoutes,
   ...labInterpretRoutes,
@@ -319,6 +322,8 @@ async function handleFetch(
   const rawBody = mayHaveBody ? await req.text() : null;
   const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody);
   attachUser(ctx);
+  // M7-F：校验会话是否已登出/被吊销（异步，按 jti 查会话台账）
+  await enforceSession(ctx);
 
   let status = 200;
   let routeLabel = 'unmatched';

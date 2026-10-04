@@ -42,6 +42,8 @@ const Research = lazy(() => import('@/pages/research'));
 const Empi = lazy(() => import('@/pages/empi'));
 const DataWarehouse = lazy(() => import('@/pages/dataWarehouse'));
 const DataGovernance = lazy(() => import('@/pages/dataGovernance'));
+// 会话管理与强制下线（M7-F）
+const Sessions = lazy(() => import('@/pages/sessions'));
 // 收费结算工作站（M3-B）
 const Billing = lazy(() => import('@/pages/billing'));
 const Appt = lazy(() => import('@/pages/appt'));
@@ -189,6 +191,8 @@ export default function AppRoutes() {
           <Route path="data-warehouse" element={<DataWarehouse />} />
           {/* 数据治理（M5-E）：data_governance:read/admin */}
           <Route path="data-governance" element={<DataGovernance />} />
+          {/* 会话管理（M7-F）：session:manage 查看在线会话、强制下线 */}
+          <Route path="sessions" element={<Sessions />} />
           {/* 收费结算工作站（M3-B）：计费/收款 billing:charge，退费 billing:refund */}
           <Route path="billing" element={<Billing />} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}

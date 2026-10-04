@@ -50,8 +50,8 @@ export interface Ctx {
   rawBody: string | null;
   /** 解析后的 JSON body（按需调用） */
   body: <T = unknown>() => Promise<T>;
-  /** 认证后注入的用户（未登录为 null） */
-  user: { id: string; name: string; roles: string[]; permissions?: string[] } | null;
+  /** 认证后注入的用户（未登录为 null）；jti 为访问令牌唯一标识（M7-F） */
+  user: { id: string; name: string; roles: string[]; permissions?: string[]; jti?: string } | null;
   traceId: string;
 }
 

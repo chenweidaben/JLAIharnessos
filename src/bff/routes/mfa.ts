@@ -12,7 +12,7 @@
 
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
-import { loadViewById, issueTokens } from './auth.js';
+import { loadViewById, issueTokens, registerSession } from './auth.js';
 import { verifyLoginChallenge } from '../aggregators/mfaAggregator.js';
 
 export const mfaLoginRoutes: RouteDef[] = [
@@ -53,11 +53,12 @@ export const mfaLoginRoutes: RouteDef[] = [
       if (!view) {
         return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
       }
-      const { accessToken, refreshToken } = issueTokens(view);
+      const tokens = issueTokens(view);
+      await registerSession(c, view, tokens);
       const csrfToken = issueCsrfToken();
       const res = json(
         ok({
-          tokens: { accessToken, refreshToken, expiresIn: 7200 },
+          tokens: { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken, expiresIn: 7200 },
           user: view,
         }),
       );

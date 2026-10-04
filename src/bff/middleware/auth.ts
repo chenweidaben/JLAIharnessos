@@ -37,6 +37,7 @@ interface JwtPayload {
   roles: string[];
   permissions?: string[];
   dept?: string;
+  jti?: string;
   iss?: string;
   exp?: number;
   nbf?: number;
@@ -52,15 +53,24 @@ function getJwtSecret(): string {
   return secret;
 }
 
-/** 签发 JWT（开发/登录路由用） */
+/** 生成 JWT 唯一标识（jti），供会话管理与令牌吊销使用 */
+export function newJti(): string {
+  return crypto.randomUUID();
+}
+
+/**
+ * 签发 JWT（开发/登录路由用）。
+ * 若 payload 未提供 jti，则自动生成并写入令牌。
+ */
 export function signJwt(
   payload: Omit<JwtPayload, 'iss' | 'exp' | 'nbf'>,
   expiresInSec = 7200,
 ): string {
   const header = b64urlEncode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const now = Math.floor(Date.now() / 1000);
+  const jti = payload.jti ?? newJti();
   const body = b64urlEncode(
-    JSON.stringify({ ...payload, iss: 'jianlan-bff', nbf: now, exp: now + expiresInSec }),
+    JSON.stringify({ ...payload, jti, iss: 'jianlan-bff', nbf: now, exp: now + expiresInSec }),
   );
   const data = `${header}.${body}`;
   const sig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
@@ -128,6 +138,7 @@ export function attachUser(c: Ctx): void {
         name: payload.name,
         roles: payload.roles ?? [],
         permissions: payload.permissions,
+        jti: payload.jti,
       };
       return;
     }
