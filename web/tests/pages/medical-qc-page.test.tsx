@@ -108,7 +108,7 @@ it('在线：队列渲染 → 打开详情 → 规则检查无缺陷 → 质控�
   await waitFor(() => expect(m.submitQc).toHaveBeenCalledTimes(1));
   const payload = m.submitQc.mock.calls[0][1];
   expect(payload.decision).toBe('pass');
-}, 30000);
+}, 60000);
 
 it('退回整改：填写意见后退回，提交 return', async () => {
   render(<MedicalQcPage />);

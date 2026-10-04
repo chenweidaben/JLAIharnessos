@@ -179,7 +179,7 @@ it('取消运行中实例：Modal.confirm 确认后调用取消', async () => {
   const confirm = await screen.findByRole('button', { name: '取消实例' });
   fireEvent.click(confirm);
   await waitFor(() => expect(rt.cancelAgentRunApi).toHaveBeenCalledTimes(1));
-}, 30000);
+}, 60000);
 
 it('断库：显式离线 Alert，不渲染业务内容', async () => {
   healthMock.mockResolvedValue({

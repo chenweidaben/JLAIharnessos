@@ -15,9 +15,10 @@ import { it as vitestIt, expect, beforeEach, vi } from 'vitest';
 import type { TestFunction } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@test-utils';
 
-// 重型页面（健康门禁 + 异步渲染）：提至 30s 避免计时抖动。
+// 重型页面（健康门禁 + 异步渲染 + 全数据丰富渲染）：覆盖率插桩与高负载下
+// 提至 60s 避免计时抖动；非覆盖率模式实测各用例均在 15s 内完成。
 const it = (name: string, fn: TestFunction) =>
-  vitestIt(name, fn, 30000);
+  vitestIt(name, fn, 60000);
 
 import DataGovernancePage from '@/pages/dataGovernance';
 import { useDataGovernanceStore } from '@/store/dataGovernanceStore';

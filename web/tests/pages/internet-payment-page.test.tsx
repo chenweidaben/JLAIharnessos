@@ -204,7 +204,7 @@ it('药师在线：支付队列加载、冲正弹窗原因必填、冲正成功'
   );
   // 冲正成功提示（原票据已冲红）
   expect(await screen.findByText(/冲正完成/)).toBeTruthy();
-}, 30000);
+}, 60000);
 
 it('患者在线：在途支付单可取消', async () => {
   payM.payable.mockResolvedValue({ payable: [] });

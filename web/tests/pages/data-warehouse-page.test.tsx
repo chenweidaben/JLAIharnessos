@@ -17,7 +17,7 @@ import { render, screen, fireEvent, waitFor } from '@test-utils';
 
 // 重型页面（健康门禁 + 异步渲染）：提至 30s 避免计时抖动。
 const it = (name: string, fn: TestFunction) =>
-  vitestIt(name, fn, 30000);
+  vitestIt(name, fn, 60000);
 
 import DataWarehousePage from '@/pages/dataWarehouse';
 import type {

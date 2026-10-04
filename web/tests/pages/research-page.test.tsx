@@ -15,7 +15,7 @@ import { render, screen, fireEvent, waitFor, within } from '@test-utils';
 
 // 重型页面（健康门禁 + 大量异步渲染）：提至 30s 避免计时抖动。
 const it = (name: string, fn: TestFunction) =>
-  vitestIt(name, fn, 30000);
+  vitestIt(name, fn, 60000);
 
 import ResearchPage from '@/pages/research';
 import type { CohortMember, CohortStats, ResearchCohort } from '@/types/research';

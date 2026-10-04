@@ -79,7 +79,7 @@ describe('MfaSettings', () => {
     // 确认成功后即进入已开启状态（背景卡片渲染，不依赖弹窗卸载动画）
     expect(await screen.findByText('已开启')).toBeInTheDocument();
     expect(screen.getByText('关闭 MFA')).toBeInTheDocument();
-  }, 30000);
+  }, 60000);
 
   it('动态码非 6 位数字时不提交确认', async () => {
     const user = userEvent.setup({ delay: null });

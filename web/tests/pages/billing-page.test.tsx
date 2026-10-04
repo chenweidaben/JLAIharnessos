@@ -222,7 +222,7 @@ it('退费：已结算明细发起退费（原因必填）', async () => {
   expect(m.refundFeeItem.mock.calls[0][0]).toMatchObject({
     feeItemId: 'f1', reason: '患者拒查',
   });
-}, 30000);
+}, 60000);
 
 it('未付作废：打开未付结算单 → 作废', async () => {
   // 队列与详情均为未付
