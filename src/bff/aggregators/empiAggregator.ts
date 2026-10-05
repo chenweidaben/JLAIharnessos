@@ -252,9 +252,12 @@ export async function rejectMatchCandidate(
 
 export async function listMatchCandidates(
   auth: AuthView,
-  options?: { status?: string },
+  options?: { status?: string; patientId?: string },
 ): Promise<MatchCandidate[]> {
-  return listCandidates(options?.status ? { status: options.status } : undefined);
+  return listCandidates({
+    status: options?.status,
+    patientId: options?.patientId,
+  });
 }
 
 export async function listEmpiLinks(

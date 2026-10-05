@@ -97,6 +97,10 @@ afterAll(async () => {
   for (const id of patientIds) {
     await db`DELETE FROM clinical.patients WHERE id = ${id}`;
   }
+  // runEmpiScan 为全库种子数据中的同名患者产生候选（集成测试副作用）。
+  // 本测试是唯一调用 runEmpiScan 的地方，故在此清空候选表，避免跨运行累积
+  // （empi_links 已随患者 CASCADE 删除，无候选被链接引用）。
+  await db`DELETE FROM clinical.empi_match_candidates`;
 });
 
 if (!dbAvailable) {
@@ -142,7 +146,7 @@ if (!dbAvailable) {
     it('扫描患者生成 A/B 候选（80 分）', async () => {
       const summary = await runEmpiScan(admin);
       expect(summary.scanned).toBeGreaterThanOrEqual(3);
-      const pending = await listMatchCandidates(admin, { status: 'pending' });
+      const pending = await listMatchCandidates(admin, { status: 'pending', patientId: idA });
       const mine = pending.filter((c) => samePair(c, idA, idB));
       expect(mine.length).toBe(1);
       abCandidate = mine[0].id;
@@ -150,9 +154,9 @@ if (!dbAvailable) {
     }, 30000);
 
     it('重复扫描不重复生成候选', async () => {
-      const before = await listMatchCandidates(admin, { status: 'pending' });
+      const before = await listMatchCandidates(admin, { status: 'pending', patientId: idA });
       await runEmpiScan(admin);
-      const after = await listMatchCandidates(admin, { status: 'pending' });
+      const after = await listMatchCandidates(admin, { status: 'pending', patientId: idA });
       expect(after.length).toBe(before.length);
       // 全库 EMPI 扫描在真实数据量（数千患者、O(n²) 比对）下是重操作，给足时间。
     }, 30000);
@@ -172,7 +176,7 @@ if (!dbAvailable) {
     it('与已 linked 患者确认候选 → 409（防链接冲突）', async () => {
       idE = await mkPatient(4, { nameMasked: 'M5C同**' });
       await runEmpiScan(admin);
-      const pending = await listMatchCandidates(admin, { status: 'pending' });
+      const pending = await listMatchCandidates(admin, { status: 'pending', patientId: idE });
       // A 是 master、B 是 linked；idE 与 B 的候选确认时，B 已存在链接 → 409
       const toLinked = pending.filter((c) => samePair(c, idE, idB));
       expect(toLinked).toHaveLength(1);

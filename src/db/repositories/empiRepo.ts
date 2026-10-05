@@ -195,12 +195,21 @@ export async function getCandidateById(
 }
 
 export async function listCandidates(
-  options?: { status?: string; limit?: number; offset?: number },
+  options?: {
+    status?: string;
+    patientId?: string;
+    limit?: number;
+    offset?: number;
+  },
   sql?: Sql,
 ): Promise<MatchCandidate[]> {
   const db = sql ?? getDb();
   const qb = new QueryBuilder();
   if (options?.status) qb.where('status = ?', options.status);
+  // 按患者过滤：候选任一端命中即可（患者对在存储时已规范化，故需同时查两列）
+  if (options?.patientId) {
+    qb.where('(patient_a_id = ? OR patient_b_id = ?)', options.patientId, options.patientId);
+  }
   return dynamicSelect<Record<string, unknown>>(
     db, CANDIDATE_COLS, 'clinical.empi_match_candidates', qb,
     'match_score DESC, created_at DESC',
