@@ -82,6 +82,18 @@ HTMLCanvasElement.prototype.getContext = (() =>
     scale: () => {},
     arc: () => {},
     rect: () => {},
+    // ECharts/zrender 渲染所需的其余 canvas 2d 方法（jsdom 不实现，桩为空操作）
+    clip: () => {},
+    strokeRect: () => {},
+    bezierCurveTo: () => {},
+    quadraticCurveTo: () => {},
+    setLineDash: () => {},
+    getLineDash: () => [],
+    isPointInPath: () => false,
+    drawFocusIfNeeded: () => {},
+    createLinearGradient: () => ({ addColorStop: () => {} }),
+    createRadialGradient: () => ({ addColorStop: () => {} }),
+    createPattern: () => ({}),
   })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
 
 // antd Watermark 还会调用 canvas.toDataURL 生成水印背景图，jsdom 未实现会抛
