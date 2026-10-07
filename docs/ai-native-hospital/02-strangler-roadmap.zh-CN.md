@@ -114,11 +114,14 @@
 | M7-E | 事件重连补拉 | WS 帧携带 seq + 重连后按 lastSeq 经 HTTP 补拉错过事件、去重 | 首次不补拉、重连补拉、重叠跳过 |
 | M7-F | 会话管理与 JWT 主动吊销 | 登录建立服务端会话（jti）+ sessionGuard 校验 + 登出/强制下线/刷新轮换 | 登出旧令牌失效、刷新轮换、强制下线、越权 |
 | 修复 | 菜单权限 | 对齐菜单权限码与角色规范权限 | 三方 HEAD 一致 |
+| M9-C | 手术麻醉 | 手术排班/麻醉记录/三方核查/复苏评分 | 状态机、双签、断库 |
+| M10-A | 输血管理 | 申请→配血→发血扣库→双人核对输注→不良反应 | 并发不重复、断库、重启 |
+| M10-B | 用血质量 | 输血疗效评估+用血合理性评价+等级评审质控指标 | 规则确定性、断库、重启 |
 
 ### 2.6.2 当前质量门（以真实取证为准）
 
-- 真实数据库：9 schema **120 张基表**（iam 10 / clinical 75 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7）。
-- 后端 **1940 测试全绿（1 skip）**；前端 **865 测试全绿（85 文件）**；前后端 tsc 0。
+- 真实数据库：9 schema **128 张基表**（iam 11 / clinical 81 / agent 8 / knowledge 14 / audit 2 / quality 1 / dwd 2 / dws 1 / ads 1 / meta 7）。
+- 后端 **2095 测试全绿（11 skip）**；前端 **1007 测试全绿（99 文件）**；前后端 tsc 0。
 - 前端覆盖率（all:false）：门禁通过、未改阈值（lines/statements ≥80、branches ≥70、functions ≥80）。
 - 部署产物：多阶段 Dockerfile、docker-compose、K8s 一体化清单、Helm Chart、Istio 灰度模板齐备。
 
