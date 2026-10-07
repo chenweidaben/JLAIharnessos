@@ -13,6 +13,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import type { Audience, DeepSource, LlmStatus } from '../../medical-tools/interpret/interpretEngine.js';
 
 export type LabInterpStatus = 'pending_review' | 'signed' | 'rejected';
 
@@ -49,6 +50,16 @@ export interface LabInterpretation {
   rejectReason: string | null;
   createdAt: string;
   updatedAt: string;
+  // M12-A 新增列
+  audience: Audience;
+  deepSource: DeepSource;
+  model: string | null;
+  overallImpression: string | null;
+  itemExplanations: Record<string, unknown>[];
+  trends: Record<string, unknown>[];
+  recommendations: Record<string, unknown>[];
+  plainLanguageSummary: string | null;
+  llmStatus: LlmStatus;
 }
 
 const COLS = `
@@ -56,7 +67,9 @@ const COLS = `
   item_count, abnormal_count, critical_count, summary,
   abnormal_items, critical_items, engine_version,
   status, generated_at, reviewed_by, reviewed_at, reject_reason,
-  created_at, updated_at
+  created_at, updated_at,
+  audience, deep_source, model, overall_impression,
+  item_explanations, trends, recommendations, plain_language_summary, llm_status
 `;
 
 function asArr(v: unknown): Record<string, unknown>[] {
@@ -92,6 +105,15 @@ function mapRow(row: Record<string, unknown>): LabInterpretation {
     rejectReason: row.reject_reason ? String(row.reject_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
+    audience: (row.audience as Audience) ?? 'doctor',
+    deepSource: (row.deep_source as DeepSource) ?? 'rule',
+    model: row.model ? String(row.model) : null,
+    overallImpression: row.overall_impression ? String(row.overall_impression) : null,
+    itemExplanations: asArr(row.item_explanations),
+    trends: asArr(row.trends),
+    recommendations: asArr(row.recommendations),
+    plainLanguageSummary: row.plain_language_summary ? String(row.plain_language_summary) : null,
+    llmStatus: (row.llm_status as LlmStatus) ?? 'rule_only',
   };
 }
 
@@ -104,7 +126,7 @@ export async function listLabResultsByVisit(
   const db = sql ?? getDb();
   const rows = await db`
     SELECT id, item_name, item_code, value, numeric_value, unit,
-           ref_low, ref_high, abnormal_flag, is_critical, result_time
+           ref_low, ref_high, abnormal_flag, is_critical, result_time::text AS result_time
     FROM clinical.lab_results
     WHERE visit_id = ${visitId}
     ORDER BY result_time ASC, created_at ASC
@@ -124,6 +146,46 @@ export async function listLabResultsByVisit(
   }));
 }
 
+/* --------------------------- 患者历史结果（趋势用） --------------------------- */
+
+export interface LabHistoryRow {
+  itemCode: string | null;
+  itemName: string;
+  numericValue: string | null;
+  unit: string | null;
+  resultTime: string | null;
+}
+
+/**
+ * 拉取某患者在 beforeTime 之前的历史数值结果（升序），供确定性趋势对比。
+ * 仅取有 item_code 与 numeric_value 的行；不含本次（result_time < beforeTime）。
+ */
+export async function listLabHistoryByPatient(
+  patientId: string,
+  beforeTime: string,
+  limit = 500,
+  sql?: DbExecutor,
+): Promise<LabHistoryRow[]> {
+  const db = sql ?? getDb();
+  const rows = await db`
+    SELECT item_code, item_name, numeric_value, unit, result_time::text AS result_time
+    FROM clinical.lab_results
+    WHERE patient_id = ${patientId}
+      AND result_time < ${beforeTime}
+      AND numeric_value IS NOT NULL
+      AND item_code IS NOT NULL
+    ORDER BY result_time ASC
+    LIMIT ${limit}
+  `;
+  return (rows as Record<string, unknown>[]).map((r) => ({
+    itemCode: r.item_code ? String(r.item_code) : null,
+    itemName: String(r.item_name),
+    numericValue: r.numeric_value != null ? String(r.numeric_value) : null,
+    unit: r.unit ? String(r.unit) : null,
+    resultTime: r.result_time ? String(r.result_time) : null,
+  }));
+}
+
 /* --------------------------- 幂等解读草稿写入 --------------------------- */
 
 export interface InterpUpsertInput {
@@ -137,25 +199,44 @@ export interface InterpUpsertInput {
   abnormalItems: Record<string, unknown>[];
   criticalItems: Record<string, unknown>[];
   engineVersion: string;
+  // M12-A 新增（可选，向后兼容 M3-E 旧调用）
+  audience?: Audience;
+  overallImpression?: string | null;
+  itemExplanations?: Record<string, unknown>[];
+  trends?: Record<string, unknown>[];
+  recommendations?: Record<string, unknown>[];
+  plainLanguageSummary?: string | null;
+  deepSource?: DeepSource;
+  model?: string | null;
+  llmStatus?: LlmStatus;
 }
 
-/** 幂等写入解读草稿：同一 visit_id 重新生成覆盖业务字段，状态重置 pending_review。 */
+/** 幂等写入解读草稿：同一 (visit_id, audience) 重新生成覆盖业务字段，状态重置 pending_review。 */
 export async function upsertInterpretation(
   input: InterpUpsertInput,
   tx: DbExecutor,
 ): Promise<LabInterpretation> {
+  const audience: Audience = input.audience ?? 'doctor';
   const rows = await tx`
     INSERT INTO clinical.lab_interpretations (
       visit_id, patient_id, department,
       item_count, abnormal_count, critical_count, summary,
-      abnormal_items, critical_items, engine_version, status
+      abnormal_items, critical_items, engine_version, status,
+      audience, overall_impression, item_explanations, trends, recommendations,
+      plain_language_summary, deep_source, model, llm_status
     ) VALUES (
       ${input.visitId}, ${input.patientId}, ${input.department},
       ${input.itemCount}, ${input.abnormalCount}, ${input.criticalCount}, ${input.summary},
       ${tx.json(toJson(input.abnormalItems))}, ${tx.json(toJson(input.criticalItems))},
-      ${input.engineVersion}, 'pending_review'
+      ${input.engineVersion}, 'pending_review',
+      ${audience}, ${input.overallImpression ?? null},
+      ${tx.json(toJson(input.itemExplanations ?? []))},
+      ${tx.json(toJson(input.trends ?? []))},
+      ${tx.json(toJson(input.recommendations ?? []))},
+      ${input.plainLanguageSummary ?? null},
+      ${input.deepSource ?? 'rule'}, ${input.model ?? null}, ${input.llmStatus ?? 'rule_only'}
     )
-    ON CONFLICT (visit_id) DO UPDATE SET
+    ON CONFLICT (visit_id, audience) DO UPDATE SET
       item_count = EXCLUDED.item_count,
       abnormal_count = EXCLUDED.abnormal_count,
       critical_count = EXCLUDED.critical_count,
@@ -163,6 +244,14 @@ export async function upsertInterpretation(
       abnormal_items = EXCLUDED.abnormal_items,
       critical_items = EXCLUDED.critical_items,
       engine_version = EXCLUDED.engine_version,
+      overall_impression = EXCLUDED.overall_impression,
+      item_explanations = EXCLUDED.item_explanations,
+      trends = EXCLUDED.trends,
+      recommendations = EXCLUDED.recommendations,
+      plain_language_summary = EXCLUDED.plain_language_summary,
+      deep_source = EXCLUDED.deep_source,
+      model = EXCLUDED.model,
+      llm_status = EXCLUDED.llm_status,
       status = 'pending_review',
       generated_at = now(),
       reviewed_by = NULL,
@@ -175,9 +264,16 @@ export async function upsertInterpretation(
 
 /* -------------------------------- 查询 -------------------------------- */
 
-export async function getByVisit(visitId: string, sql?: DbExecutor): Promise<LabInterpretation | null> {
+export async function getByVisit(
+  visitId: string,
+  audience: Audience = 'doctor',
+  sql?: DbExecutor,
+): Promise<LabInterpretation | null> {
   const db = sql ?? getDb();
-  const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.lab_interpretations WHERE visit_id = ${visitId}`;
+  const rows = await db`
+    SELECT ${db.unsafe(COLS)} FROM clinical.lab_interpretations
+    WHERE visit_id = ${visitId} AND audience = ${audience}
+  `;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
@@ -196,22 +292,24 @@ export interface InterpListRow {
   abnormalCount: number;
   criticalCount: number;
   status: LabInterpStatus;
+  audience: Audience;
   updatedAt: string;
 }
 
 export async function listInterpretations(
   status: LabInterpStatus | null,
+  audience: Audience | null = null,
   sql?: DbExecutor,
 ): Promise<InterpListRow[]> {
   const db = sql ?? getDb();
-  const where = status ? db`WHERE r.status = ${status}` : db``;
   const rows = await db`
     SELECT r.id, r.visit_id, v.visit_no, p.name_masked, r.department,
-           r.abnormal_count, r.critical_count, r.status, r.updated_at
+           r.abnormal_count, r.critical_count, r.status, r.audience, r.updated_at
     FROM clinical.lab_interpretations r
     JOIN clinical.visits v ON v.id = r.visit_id
     JOIN clinical.patients p ON p.id = r.patient_id
-    ${where}
+    WHERE (${status ?? null}::text IS NULL OR r.status = ${status ?? null})
+      AND (${audience ?? null}::text IS NULL OR r.audience = ${audience ?? null})
     ORDER BY r.updated_at DESC
   `;
   return (rows as Record<string, unknown>[]).map((r) => ({
@@ -223,6 +321,7 @@ export async function listInterpretations(
     abnormalCount: Number(r.abnormal_count),
     criticalCount: Number(r.critical_count),
     status: r.status as LabInterpStatus,
+    audience: (r.audience as Audience) ?? 'doctor',
     updatedAt: String(r.updated_at),
   }));
 }

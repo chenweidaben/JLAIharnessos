@@ -60,6 +60,7 @@ import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
 import { drgRoutes } from './routes/drg';
 import { labInterpretRoutes } from './routes/labInterpret';
+import { imagingInterpretRoutes } from './routes/imagingInterpret';
 import { criticalRoutes } from './routes/critical';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
@@ -118,6 +119,7 @@ const allRoutes: RouteDef[] = [
   ...billingRoutes,
   ...drgRoutes,
   ...labInterpretRoutes,
+  ...imagingInterpretRoutes,
   ...criticalRoutes,
   ...reconRoutes,
   ...surgeryRoutes,

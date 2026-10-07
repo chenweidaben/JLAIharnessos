@@ -70,6 +70,12 @@ const navItems: NavItem[] = [
     label: 'AI 辅诊',
     perm: 'imaging:view',
   },
+  {
+    key: '/interpret',
+    icon: <RobotOutlined />,
+    label: 'AI 智能解读',
+    perm: 'lab:interpret:view',
+  },
   { key: '/outpatient', icon: <ScheduleOutlined />, label: '门诊问诊', perm: 'emr:view' },
   {
     key: '/ward',

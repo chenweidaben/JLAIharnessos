@@ -1,11 +1,12 @@
 /**
- * 健澜科技 jlmedaios - 检验 AI 辅助解读 BFF 路由（M3-E + M12-A）
+ * 健澜科技 jlmedaios - 影像报告 AI 解读 BFF 路由（M12-A）
  *
- * 真实落 PostgreSQL，去 mock：
- *  - 队列 / 详情（lab:interpret:view）；
- *  - 生成解读、医师签名、退回（lab:interpret:sign）。
+ * 真实落 PostgreSQL：
+ *  - 队列 / 详情（imaging:interpret:view）；
+ *  - 生成解读、医师签名、退回（imaging:interpret:sign）。
  * 查询参数 audience=doctor|patient（默认 doctor）；body {mode: auto|rule|llm}（默认 auto）。
- * 统一错误信封；AI 仅辅助，签名后生效。
+ * 仅已发布报告可解读；统一错误信封 + traceId；AI 仅辅助，签名后生效。
+ * 集合路由（queue）声明在 :id/:reportId 之前，避免被动态段吞掉。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -15,13 +16,13 @@ import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
 import {
-  LabInterpError,
-  generateForVisit,
-  getForVisit,
+  ImagingInterpError,
+  generateForReport,
+  getForReport,
   listQueue,
   signInterpretation,
   rejectInterpretation,
-} from '../aggregators/labInterpretAggregator';
+} from '../aggregators/imagingInterpretAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -31,7 +32,7 @@ async function requester(c: Ctx): Promise<AuthView | null> {
 }
 
 function mapError(err: unknown): Response {
-  if (err instanceof LabInterpError) {
+  if (err instanceof ImagingInterpError) {
     const code =
       err.status === 404
         ? ErrorCode.NOT_FOUND
@@ -46,7 +47,7 @@ function mapError(err: unknown): Response {
                 : ErrorCode.INTERNAL_ERROR;
     return json(fail(code, err.message), err.status);
   }
-  const message = err instanceof Error ? err.message : '检验解读处理失败';
+  const message = err instanceof Error ? err.message : '影像解读处理失败';
   return json(fail(ErrorCode.INTERNAL_ERROR, message), 500);
 }
 
@@ -73,11 +74,11 @@ function audienceOf(c: Ctx): string {
   return a === 'patient' ? 'patient' : 'doctor';
 }
 
-export const labInterpretRoutes: RouteDef[] = [
+export const imagingInterpretRoutes: RouteDef[] = [
   {
     method: 'GET',
-    path: '/api/v1/lab-interpret/queue',
-    handle: guarded('lab:interpret:view', async (c, view) => {
+    path: '/api/v1/imaging-interpret/queue',
+    handle: guarded('imaging:interpret:view', async (c, view) => {
       const params = new URL(c.req.url).searchParams;
       const s = params.get('status');
       const status =
@@ -89,29 +90,31 @@ export const labInterpretRoutes: RouteDef[] = [
   },
   {
     method: 'POST',
-    path: '/api/v1/lab-interpret/generate/:visitId',
-    handle: guarded('lab:interpret:sign', async (c, view) => {
+    path: '/api/v1/imaging-interpret/generate/:reportId',
+    handle: guarded('imaging:interpret:sign', async (c, view) => {
       const body = await c.body<{ mode?: string }>().catch(() => ({} as { mode?: string }));
-      return generateForVisit(c.params.visitId, audienceOf(c), body?.mode ?? 'auto', view);
+      return generateForReport(c.params.reportId, audienceOf(c), body?.mode ?? 'auto', view);
     }),
     auth: true,
   },
   {
     method: 'GET',
-    path: '/api/v1/lab-interpret/visit/:visitId',
-    handle: guarded('lab:interpret:view', (c, view) => getForVisit(c.params.visitId, audienceOf(c), view)),
+    path: '/api/v1/imaging-interpret/report/:reportId',
+    handle: guarded('imaging:interpret:view', (c, view) =>
+      getForReport(c.params.reportId, audienceOf(c), view),
+    ),
     auth: true,
   },
   {
     method: 'POST',
-    path: '/api/v1/lab-interpret/sign/:id',
-    handle: guarded('lab:interpret:sign', (c, view) => signInterpretation(c.params.id, view)),
+    path: '/api/v1/imaging-interpret/sign/:id',
+    handle: guarded('imaging:interpret:sign', (c, view) => signInterpretation(c.params.id, view)),
     auth: true,
   },
   {
     method: 'POST',
-    path: '/api/v1/lab-interpret/reject/:id',
-    handle: guarded('lab:interpret:sign', async (c, view) =>
+    path: '/api/v1/imaging-interpret/reject/:id',
+    handle: guarded('imaging:interpret:sign', async (c, view) =>
       rejectInterpretation(c.params.id, view, (await c.body<{ reason?: string }>()).reason ?? ''),
     ),
     auth: true,

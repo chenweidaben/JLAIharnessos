@@ -111,6 +111,8 @@ const BloodQualityPage = lazy(() => import('@/pages/bloodQuality'));
 const LisPage = lazy(() => import('@/pages/lis'));
 // 检查管理 RIS/PACS（M11-B）
 const RisPage = lazy(() => import('@/pages/ris'));
+// 检查检验结果 AI 智能解读工作站（M12-A）：查看 lab:interpret:view，写操作按 sign 细分
+const InterpretPage = lazy(() => import('@/pages/interpret'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -257,6 +259,8 @@ export default function AppRoutes() {
           <Route path="lis" element={<LisPage />} />
           {/* 检查管理 RIS/PACS（M11-B）：查询 imaging:read，写操作按 ris:* 细分 */}
           <Route path="ris" element={<RisPage />} />
+          {/* 检查检验结果 AI 智能解读（M12-A）：查看 lab:interpret:view，写/签名按 lab/imaging:interpret:sign */}
+          <Route path="interpret" element={<InterpretPage />} />
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />
