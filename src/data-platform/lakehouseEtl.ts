@@ -64,6 +64,12 @@ async function runDwdVisit(mode: RunMode): Promise<JobResult> {
     `;
     const runId = String((runRows as Record<string, unknown>[])[0].run_id);
 
+    if (mode === 'full') {
+      // DWS/ADS 全量均先清空重算；DWD 全量同样必须清空，
+      // 否则已被删除的源行（如取证/测试夹具清理）会残留污染后续聚合。
+      await tx`TRUNCATE dwd.visit_detail`;
+    }
+
     const selectCols = `
       id, patient_id, visit_no, visit_type, department, campus_id,
       attending_doctor_id, status, triage_level, admit_at, discharge_at,
@@ -149,6 +155,10 @@ async function runDwdFee(mode: RunMode): Promise<JobResult> {
       RETURNING run_id
     `;
     const runId = String((runRows as Record<string, unknown>[])[0].run_id);
+
+    if (mode === 'full') {
+      await tx`TRUNCATE dwd.fee_item_detail`;
+    }
 
     const selectCols = `
       id, patient_id, visit_id, department, category, item_code, item_name,
