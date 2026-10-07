@@ -8,6 +8,7 @@ import { useLabInterpStore } from '@/store/labInterpStore';
 vi.mock('@/services/api/labInterpret', () => ({
   fetchLabInterpQueue: vi.fn(),
   generateLabInterp: vi.fn(),
+  fetchLabInterp: vi.fn(),
   signLabInterp: vi.fn(),
   rejectLabInterp: vi.fn(),
 }));
@@ -15,6 +16,7 @@ vi.mock('@/services/api/labInterpret', () => ({
 import {
   fetchLabInterpQueue,
   generateLabInterp,
+  fetchLabInterp,
   signLabInterp,
   rejectLabInterp,
 } from '@/services/api/labInterpret';
@@ -26,6 +28,9 @@ const draft = {
   abnormalItems: [], criticalItems: [], engineVersion: 'lab-rule-1.0',
   status: 'pending_review' as const, generatedAt: new Date().toISOString(),
   reviewedBy: null, reviewedAt: null, rejectReason: null,
+  audience: 'doctor' as const, overallImpression: null, itemExplanations: [],
+  trends: [], recommendations: [], plainLanguageSummary: null,
+  deepSource: 'rule' as const, model: null, llmStatus: 'rule_only' as const,
 };
 
 beforeEach(() => {
@@ -34,6 +39,7 @@ beforeEach(() => {
     items: [{ id: 'r1', visitId: 'v1', visitNo: 'V001', patientName: '张**', department: '心血管内科', abnormalCount: 1, criticalCount: 1, status: 'pending_review', updatedAt: new Date().toISOString() }],
   });
   vi.mocked(generateLabInterp).mockResolvedValue(draft);
+  vi.mocked(fetchLabInterp).mockResolvedValue(draft);
   vi.mocked(signLabInterp).mockResolvedValue({ ...draft, status: 'signed' });
   vi.mocked(rejectLabInterp).mockResolvedValue({ ...draft, status: 'rejected' });
 });
@@ -48,6 +54,17 @@ describe('labInterpStore', () => {
     const r = await useLabInterpStore.getState().generate('v1');
     expect(r.criticalCount).toBe(1);
     expect(generateLabInterp).toHaveBeenCalledWith('v1');
+  });
+
+  it('generate 带视角/模式时透传 audience 与 mode', async () => {
+    await useLabInterpStore.getState().generate('v1', 'patient', 'llm');
+    expect(generateLabInterp).toHaveBeenCalledWith('v1', 'patient', 'llm');
+  });
+
+  it('fetchCurrent 加载某就诊某视角草稿', async () => {
+    await useLabInterpStore.getState().fetchCurrent('v1', 'patient');
+    expect(fetchLabInterp).toHaveBeenCalledWith('v1', 'patient');
+    expect(useLabInterpStore.getState().current?.visitId).toBe('v1');
   });
 
   it('断库失败写入 error 且不吞', async () => {
