@@ -78,6 +78,7 @@ import { agentBuilderRoutes } from './routes/agentBuilder';
 import { agentRuntimeRoutes } from './routes/agentRuntime';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
+import { rectificationRoutes } from './routes/rectification';
 import { skillRoutes } from './routes/skills';
 import { systemRoutes } from './routes/system';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
@@ -94,6 +95,7 @@ const allRoutes: RouteDef[] = [
   ...medicalRoutes,
   ...dashboardRoutes,
   ...qualityRoutes,
+  ...rectificationRoutes,
   ...operationRoutes,
   ...outpatientRoutes,
   ...inpatientRoutes,

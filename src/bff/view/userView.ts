@@ -19,6 +19,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'system:audit:view', 'system:loginlog:view', 'system:config',
     'dashboard:view', 'patient:view', 'report:view',
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
+    'quality:rectify', 'quality:review',
     'front_page:read', 'front_page:code', 'front_page:audit',
     'billing:read', 'billing:charge', 'billing:refund',
     'order:write', 'order:view', 'prescription:write', 'prescription:review',
@@ -55,6 +56,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   doctor: [
     'dashboard:view', 'patient:view',
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
+    'quality:rectify',
     'front_page:read', 'front_page:audit', 'billing:read',
     'order:write', 'order:view', 'prescription:write',
     'lab:read', 'imaging:read', 'imaging:view',

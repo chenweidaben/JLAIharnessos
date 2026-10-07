@@ -155,7 +155,11 @@ export default function FeedbackRectification() {
             <Button
               type="link"
               size="small"
-              onClick={() => message.info(`整改质量评分：${r.rectifyScore} 分`)}
+              onClick={() =>
+                r.reviewNote
+                  ? message.info(`审核意见：${r.reviewNote}`)
+                  : message.info('该整改任务已审核通过')
+              }
             >
               查看
             </Button>
@@ -273,13 +277,6 @@ export default function FeedbackRectification() {
               showIcon
               message="点击“查看病历”可定位到问题位置，修改后填写整改说明。"
             />
-            <Button
-              block
-              className="mb-3"
-              onClick={() => message.info('定位到病历对应章节（演示）')}
-            >
-              查看缺陷定位
-            </Button>
             <Form form={rectifyForm} layout="vertical">
               <Form.Item name="content" label="整改内容（修改说明）" rules={[{ required: true }]}>
                 <Input.TextArea rows={4} placeholder="描述您对病历做了哪些修改" />

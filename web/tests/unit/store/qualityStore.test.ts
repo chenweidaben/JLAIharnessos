@@ -6,7 +6,7 @@
  * 缺陷增删与扣分重算 / 规则管理与命中测试 / 整改提交与复核 / 首页与核心制度。
  * 数据来自 src/mock/qualityMock，真实落库由后端集成测试覆盖。
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { useQualityStore, gradeFromScore } from '@/store/qualityStore';
 import {
@@ -16,6 +16,16 @@ import {
   mockCurrentRecord,
 } from '@/mock/qualityMock';
 import type { QualityDefect, QualityResult } from '@/types/quality';
+
+// 整改任务走真实 BFF API；单测层 mock 服务边界（真实落库由后端集成测试覆盖）
+vi.mock('@/services/api/rectification', async () => {
+  const { mockRectificationTasks } = await import('@/mock/qualityMock');
+  return {
+    fetchRectificationTasks: vi.fn(async () => mockRectificationTasks),
+    submitRectify: vi.fn(async () => undefined),
+    reviewRectify: vi.fn(async () => undefined),
+  };
+});
 
 const recordNo = mockQualityTasks[0].recordNo;
 
@@ -188,32 +198,48 @@ describe('质控统计与规则管理', () => {
 });
 
 describe('整改任务', () => {
-  it('fetchRectificationTasks 加载任务', async () => {
+  it('fetchRectificationTasks 从 BFF 加载任务并回填', async () => {
     await useQualityStore.getState().fetchRectificationTasks();
-    expect(useQualityStore.getState().rectificationTasks.length).toBe(mockRectificationTasks.length);
+    const s = useQualityStore.getState();
+    expect(s.rectificationTasks.length).toBe(mockRectificationTasks.length);
+    expect(s.loading).toBe(false);
+    expect(s.rectificationTasks[0]).toMatchObject({
+      taskId: expect.any(String),
+      patientName: expect.any(String),
+      status: expect.any(String),
+    });
   });
 
-  it('submitRectify 更新任务为已整改', async () => {
+  it('submitRectify 调用 BFF 并将任务置为已整改', async () => {
     await useQualityStore.getState().fetchRectificationTasks();
     const task = useQualityStore.getState().rectificationTasks[0];
-    await useQualityStore.getState().submitRectify(task.taskId, '整改内容', '备注');
+    await useQualityStore.getState().submitRectify(task.taskId, '已补充既往史。', '备注');
     const t = useQualityStore.getState().rectificationTasks.find((x) => x.taskId === task.taskId);
     expect(t?.status).toBe('rectified');
-    expect(t?.rectifyContent).toBe('整改内容');
+    expect(t?.rectifyContent).toBe('已补充既往史。');
+    expect(t?.rectifyNote).toBe('备注');
   });
 
-  it('reviewRectify 通过/驳回分别更新状态与分数', async () => {
+  it('reviewRectify 通过/驳回分别更新状态与复核结论', async () => {
     await useQualityStore.getState().fetchRectificationTasks();
     const tasks = useQualityStore.getState().rectificationTasks;
-    await useQualityStore.getState().reviewRectify(tasks[0].taskId, 'approved', '通过');
+    await useQualityStore.getState().reviewRectify(tasks[0].taskId, 'approved', '整改到位');
     const t0 = useQualityStore.getState().rectificationTasks[0];
     expect(t0.status).toBe('reviewed');
     expect(t0.reviewResult).toBe('approved');
+    expect(t0.reviewNote).toBe('整改到位');
     if (tasks[1]) {
-      await useQualityStore.getState().reviewRectify(tasks[1].taskId, 'rejected', '不通过');
+      await useQualityStore.getState().reviewRectify(tasks[1].taskId, 'rejected', '整改不完整');
       const t1 = useQualityStore.getState().rectificationTasks[1];
       expect(t1.reviewResult).toBe('rejected');
+      expect(t1.reviewNote).toBe('整改不完整');
     }
+  });
+
+  it('无任务时 submitRectify/reviewRectify 安全处理', async () => {
+    await useQualityStore.getState().submitRectify('missing', '内容', '');
+    await useQualityStore.getState().reviewRectify('missing', 'approved', 'ok');
+    expect(useQualityStore.getState().rectificationTasks).toEqual([]);
   });
 });
 

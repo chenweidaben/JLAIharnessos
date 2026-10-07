@@ -23,9 +23,13 @@ import {
   mockQualityRules,
   mockQualityStats,
   mockQualityTasks,
-  mockRectificationTasks,
 } from '@/mock/qualityMock';
 import { delay } from '@/mock/utils';
+import {
+  fetchRectificationTasks as apiFetchRectificationTasks,
+  reviewRectify as apiReviewRectify,
+  submitRectify as apiSubmitRectify,
+} from '@/services/api/rectification';
 
 /** 根据缺陷计算扣分与病历等级 */
 export function gradeFromScore(score: number, vetoItems: string[]): 'A' | 'B' | 'C' {
@@ -255,12 +259,18 @@ export const useQualityStore = create<QualityStore>((set, get) => ({
   },
 
   fetchRectificationTasks: async () => {
-    await delay();
-    set({ rectificationTasks: mockRectificationTasks });
+    set({ loading: true });
+    try {
+      const tasks = await apiFetchRectificationTasks();
+      set({ rectificationTasks: tasks, loading: false });
+    } catch (err) {
+      set({ loading: false });
+      throw err;
+    }
   },
 
   submitRectify: async (taskId, content, note) => {
-    await delay(200);
+    await apiSubmitRectify(taskId, content, note);
     set({
       rectificationTasks: get().rectificationTasks.map((t) =>
         t.taskId === taskId
@@ -277,7 +287,7 @@ export const useQualityStore = create<QualityStore>((set, get) => ({
   },
 
   reviewRectify: async (taskId, result, note) => {
-    await delay(200);
+    await apiReviewRectify(taskId, result, note);
     set({
       rectificationTasks: get().rectificationTasks.map((t) =>
         t.taskId === taskId
@@ -286,7 +296,6 @@ export const useQualityStore = create<QualityStore>((set, get) => ({
               status: 'reviewed' as const,
               reviewResult: result,
               reviewNote: note,
-              rectifyScore: result === 'approved' ? 92 : t.rectifyScore,
             }
           : t,
       ),
