@@ -66,6 +66,7 @@ import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
+import { vteRoutes } from './routes/vte';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -125,6 +126,7 @@ const allRoutes: RouteDef[] = [
   ...surgeryRoutes,
   ...transfusionRoutes,
   ...bloodQualityRoutes,
+  ...vteRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
