@@ -63,6 +63,7 @@ import { labInterpretRoutes } from './routes/labInterpret';
 import { criticalRoutes } from './routes/critical';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
+import { transfusionRoutes } from './routes/transfusion';
 import { apptRoutes } from './routes/appt';
 import { internetHospitalRoutes } from './routes/internetHospital';
 import { consultationRoutes } from './routes/consultation';
@@ -117,6 +118,7 @@ const allRoutes: RouteDef[] = [
   ...criticalRoutes,
   ...reconRoutes,
   ...surgeryRoutes,
+  ...transfusionRoutes,
   ...apptRoutes,
   ...internetHospitalRoutes,
   ...consultationRoutes,

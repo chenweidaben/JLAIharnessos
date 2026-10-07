@@ -136,6 +136,7 @@ const navItems: NavItem[] = [
       { key: '/operation/staff', label: '人员管理', perm: 'ops:view' },
       { key: '/operation/equipment', label: '设备物资', perm: 'ops:view' },
       { key: '/surgery', label: '手术麻醉', perm: 'surgery:view' },
+      { key: '/transfusion', label: '输血管理', perm: 'blood:apply' },
     ],
   },
   { key: '/alerts', icon: <AlertOutlined />, label: '告警中心', perm: 'patient:view' },
