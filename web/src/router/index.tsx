@@ -105,6 +105,8 @@ const OperationEquipment = lazy(() => import('@/pages/operation/equipment'));
 const SurgeryPage = lazy(() => import('@/pages/surgery'));
 // 输血管理（M10-A）
 const TransfusionPage = lazy(() => import('@/pages/transfusion'));
+// 临床用血质量（M10-B）
+const BloodQualityPage = lazy(() => import('@/pages/bloodQuality'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -246,6 +248,7 @@ export default function AppRoutes() {
           <Route path="operation/equipment" element={<OperationEquipment />} />
           <Route path="surgery" element={<SurgeryPage />} />
           <Route path="transfusion" element={<TransfusionPage />} />
+          <Route path="blood-quality" element={<BloodQualityPage />} />
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />

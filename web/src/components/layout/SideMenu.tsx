@@ -137,6 +137,7 @@ const navItems: NavItem[] = [
       { key: '/operation/equipment', label: '设备物资', perm: 'ops:view' },
       { key: '/surgery', label: '手术麻醉', perm: 'surgery:view' },
       { key: '/transfusion', label: '输血管理', perm: 'blood:apply' },
+      { key: '/blood-quality', label: '用血质量', perm: 'blood:audit' },
     ],
   },
   { key: '/alerts', icon: <AlertOutlined />, label: '告警中心', perm: 'patient:view' },
