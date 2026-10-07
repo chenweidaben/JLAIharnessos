@@ -107,6 +107,8 @@ const SurgeryPage = lazy(() => import('@/pages/surgery'));
 const TransfusionPage = lazy(() => import('@/pages/transfusion'));
 // 临床用血质量（M10-B）
 const BloodQualityPage = lazy(() => import('@/pages/bloodQuality'));
+// 检验管理 LIS（M11-A）
+const LisPage = lazy(() => import('@/pages/lis'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -249,6 +251,8 @@ export default function AppRoutes() {
           <Route path="surgery" element={<SurgeryPage />} />
           <Route path="transfusion" element={<TransfusionPage />} />
           <Route path="blood-quality" element={<BloodQualityPage />} />
+          {/* 检验管理 LIS（M11-A）：查看 lab:read，写操作按 lis:* 细分 */}
+          <Route path="lis" element={<LisPage />} />
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />
