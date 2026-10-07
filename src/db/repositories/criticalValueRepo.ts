@@ -75,9 +75,18 @@ function mapRow(row: Record<string, unknown>): CriticalAlert {
 
 /**
  * 扫描全部 is_critical 但尚无告警的检验结果，幂等上报。返回新产生的告警（完整信息）。
+ *
+ * 可选 options.labResultIds：仅扫描指定的检验结果（用于测试隔离或针对性重扫）；
+ * 不传则扫描全部。
  */
-export async function scanAndRaise(sql?: DbExecutor): Promise<CriticalAlert[]> {
+export async function scanAndRaise(
+  sql?: DbExecutor,
+  options?: { labResultIds?: string[] },
+): Promise<CriticalAlert[]> {
   const db = sql ?? getDb();
+  const scope = options?.labResultIds?.length
+    ? db`AND lr.id IN ${db(options.labResultIds)}`
+    : db``;
   const rows = await db`
     INSERT INTO clinical.critical_value_alerts (
       lab_result_id, visit_id, patient_id, department,
@@ -91,6 +100,7 @@ export async function scanAndRaise(sql?: DbExecutor): Promise<CriticalAlert[]> {
       AND NOT EXISTS (
         SELECT 1 FROM clinical.critical_value_alerts a WHERE a.lab_result_id = lr.id
       )
+      ${scope}
     ON CONFLICT (lab_result_id) DO NOTHING
     RETURNING ${db.unsafe(COLS)}
   `;

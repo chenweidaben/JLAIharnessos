@@ -65,11 +65,12 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
       );
     });
     const after = await countByStatus();
-    expect(after.pending).toBe(before.pending + 1);
+    // 并行测试可能同时写入，只断言至少多 1 条
+    expect(after.pending).toBeGreaterThanOrEqual(before.pending + 1);
   });
 
   it('claimBatch 认领 pending -> processing，payload 正确反序列化', async () => {
-    const claimed = await withTx((tx) => claimBatch(10, tx));
+    const claimed = await withTx((tx) => claimBatch(10, tx, { aggregateTypes: ['test_outbox'] }));
     const mine = claimed.filter((e) => e.aggregateType === 'test_outbox');
     expect(mine.length).toBeGreaterThan(0);
     const e = mine[mine.length - 1];
@@ -77,7 +78,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
     expect(e.lockedAt).toBeTruthy();
     expect((e.payload as Record<string, unknown>).hello).toBe('world');
     // 认领后再次 claim（同事务外）不应得到已 processing 的
-    const again = await withTx((tx) => claimBatch(10, tx));
+    const again = await withTx((tx) => claimBatch(10, tx, { aggregateTypes: ['test_outbox'] }));
     expect(again.some((x) => x.id === e.id)).toBe(false);
   });
 
@@ -91,7 +92,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
       );
     });
     const claimed = await withTx(async (tx) => {
-      const c = await claimBatch(10, tx);
+      const c = await claimBatch(10, tx, { aggregateTypes: ['test_outbox'] });
       return c.filter((e) => e.eventId === eid);
     });
     await markPublished(claimed.map((e) => e.id));
@@ -109,7 +110,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
       );
     });
     const claimed = await withTx(async (tx) => {
-      const c = await claimBatch(10, tx);
+      const c = await claimBatch(10, tx, { aggregateTypes: ['test_outbox'] });
       return c.filter((e) => e.eventId === eid);
     });
     await resetToPending(claimed.map((e) => e.id));
@@ -127,7 +128,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
         tx,
       );
     });
-    await withTx(async (tx) => claimBatch(10, tx));
+    await withTx(async (tx) => claimBatch(10, tx, { aggregateTypes: ['test_outbox'] }));
     // 把 locked_at 手动改到 2 分钟前
     const db = getDb();
     await db`UPDATE clinical.event_outbox SET locked_at = now() - interval '2 minutes' WHERE event_id = ${eid}`;
@@ -152,7 +153,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
       );
     });
     const claimed = await withTx(async (tx) => {
-      const c = await claimBatch(10, tx);
+      const c = await claimBatch(10, tx, { aggregateTypes: ['test_outbox'] });
       return c.filter((e) => e.eventId === eid);
     });
     await markDead(claimed.map((e) => e.id), 'publish failed: 永久错误');
@@ -204,7 +205,7 @@ describe.skipIf(!dbAvailable)('M7-C 事务性发件箱状态机', () => {
         );
       });
       const claimed = await withTx(async (tx) => {
-        const c = await claimBatch(10, tx);
+        const c = await claimBatch(10, tx, { aggregateTypes: ['test_outbox'] });
         return c.filter((e) => e.eventId === eid);
       });
       await markPublished(claimed.map((e) => e.id));

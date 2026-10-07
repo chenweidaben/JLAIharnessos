@@ -81,16 +81,23 @@ export async function appendEvent(input: NewOutboxEvent, sql: DbExecutor): Promi
 /**
  * Relay 认领一批 pending 事件：加行锁并标记 processing（返回认领的事件）。
  * FOR UPDATE SKIP LOCKED：多个 Relay 实例并发时跳过被锁定的行，实现负载分摊。
+ *
+ * options.aggregateTypes：可选，仅认领指定聚合类型的事件。不同 Relay（或测试）
+ * 可各自订阅不同聚合类型，避免在同一张 outbox 上争抢彼此的事件。
  */
 export async function claimBatch(
   batchSize: number,
   tx: DbExecutor,
+  options: { aggregateTypes?: string[] } = {},
 ): Promise<OutboxEvent[]> {
+  const types = options.aggregateTypes;
+  const typeFilter = types && types.length > 0 ? tx`AND aggregate_type IN ${tx(types)}` : tx``;
   const rows = await tx`
     WITH picked AS (
       SELECT id AS picked_id
       FROM clinical.event_outbox
       WHERE status = 'pending'
+      ${typeFilter}
       ORDER BY id
       LIMIT ${batchSize}
       FOR UPDATE SKIP LOCKED

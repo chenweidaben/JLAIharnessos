@@ -50,6 +50,8 @@ export interface OutboxRelayOptions {
   staleMs?: number;
   /** 发布失败达到该次数后进入死信（dead），不再自动重试（默认 5） */
   maxAttempts?: number;
+  /** 仅中继指定聚合类型的事件（默认全部）；不同 Relay 可各订阅各的，避免争抢。 */
+  aggregateTypes?: string[];
   /** 发布失败时的回调（可接日志/监控） */
   onPublishError?: (event: OutboxEvent, error: unknown) => void;
   /** 事件进入死信时的回调（可接告警） */
@@ -65,6 +67,7 @@ export class OutboxRelay {
   private readonly pollIntervalMs: number;
   private readonly staleMs: number;
   private readonly maxAttempts: number;
+  private readonly aggregateTypes?: string[];
   private readonly onPublishError?: (event: OutboxEvent, error: unknown) => void;
   private readonly onDeadLetter?: (event: OutboxEvent, error: unknown) => void;
 
@@ -76,6 +79,7 @@ export class OutboxRelay {
     this.pollIntervalMs = options.pollIntervalMs ?? 500;
     this.staleMs = options.staleMs ?? 60_000;
     this.maxAttempts = options.maxAttempts ?? 5;
+    this.aggregateTypes = options.aggregateTypes;
     this.onPublishError = options.onPublishError;
     this.onDeadLetter = options.onDeadLetter;
   }
@@ -121,7 +125,7 @@ export class OutboxRelay {
       // 阶段1：事务内认领 pending（-> processing），提交
       let events: OutboxEvent[] = [];
       await withTx(async (tx) => {
-        events = await claimBatch(this.batchSize, tx);
+        events = await claimBatch(this.batchSize, tx, { aggregateTypes: this.aggregateTypes });
       });
       if (events.length === 0) {
         hadEvents = false;

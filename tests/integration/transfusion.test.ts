@@ -117,13 +117,23 @@ if (dbAvailable) {
 afterAll(async () => {
   if (dbAvailable) {
     const db = getDb();
-    // 恢复已被发血扣减的库存（共享种子资源，测试后还原基线）
+    // 恢复已被发血扣减的库存（共享种子资源，测试后还原基线）。
+    // 注意：必须先按 (blood_type, component, batch_no) 聚合 SUM(unit_count)，
+    // 再 UPDATE...FROM 聚合行；否则多个申请对应同一 stock 行时，PostgreSQL
+    // 对该行只更新一次（随机取一个 b 行），不会累加，导致库存少恢复。
     await db`
-      UPDATE clinical.blood_stock s SET units = s.units + b.unit_count, updated_at = now()
-      FROM clinical.blood_transfusion_requests b, clinical.visits v, clinical.patients p
-      WHERE b.visit_id = v.id AND v.patient_id = p.id AND p.tags @> '["M10A_TEST"]'::jsonb
-        AND b.status IN ('dispensed', 'transfusing', 'completed')
-        AND s.blood_type = b.blood_type AND s.component = b.component AND s.batch_no = b.batch_no
+      UPDATE clinical.blood_stock s SET units = s.units + agg.total, updated_at = now()
+      FROM (
+        SELECT b.blood_type, b.component, b.batch_no, SUM(b.unit_count) AS total
+        FROM clinical.blood_transfusion_requests b, clinical.visits v, clinical.patients p
+        WHERE b.visit_id = v.id AND v.patient_id = p.id
+          AND p.tags @> '["M10A_TEST"]'::jsonb
+          AND b.status IN ('dispensed', 'transfusing', 'completed')
+          AND b.batch_no IS NOT NULL
+        GROUP BY b.blood_type, b.component, b.batch_no
+      ) agg
+      WHERE s.blood_type = agg.blood_type AND s.component = agg.component
+        AND s.batch_no = agg.batch_no
     `;
     await db`
       DELETE FROM clinical.blood_transfusion_reactions r

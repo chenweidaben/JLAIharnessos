@@ -232,7 +232,13 @@ export async function dispense(
     const locked = await lockById(id, tx);
     if (!locked) throw notFound('输血申请不存在');
     assertTransition(locked.status, 'dispensed');
-    const stock = await deductStock(locked.bloodType, locked.component, locked.unitCount, tx);
+    const stock = await deductStock(
+      locked.bloodType,
+      locked.component,
+      locked.unitCount,
+      tx,
+      input.batchNo ? { batchNo: input.batchNo } : undefined,
+    );
     if (!stock) {
       throw conflict(`血库库存不足：${locked.bloodType}型${locked.component} 现存不足 ${locked.unitCount} 单位`);
     }

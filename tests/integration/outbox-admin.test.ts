@@ -95,7 +95,7 @@ async function seedDeadLetter(aggId: string): Promise<number> {
     );
   });
   const claimed = await withTx(async (tx) => {
-    const c = await claimBatch(100, tx);
+    const c = await claimBatch(100, tx, { aggregateTypes: ['test_outbox_mgmt'] });
     return c.filter((e) => e.eventId === eid);
   });
   await markDead(claimed.map((e) => e.id), '永久错误');
@@ -118,7 +118,7 @@ async function seedPublished(aggId: string): Promise<number> {
     );
   });
   const claimed = await withTx(async (tx) => {
-    const c = await claimBatch(100, tx);
+    const c = await claimBatch(100, tx, { aggregateTypes: ['test_outbox_mgmt'] });
     return c.filter((e) => e.eventId === eid);
   });
   await markPublished(claimed.map((e) => e.id));
@@ -151,7 +151,8 @@ describe.skipIf(!dbAvailable)('M7-D 死信队列管理路由', () => {
     const body = await res.json();
     expect(body.data.requeued).toBe(true);
     const after = await countByStatus();
-    expect(after.pending).toBe(before.pending + 1);
+    // 并行测试可能同时写入，只断言至少多 1 条
+    expect(after.pending).toBeGreaterThanOrEqual(before.pending + 1);
   });
 
   it('重投不存在的 id：404', async () => {

@@ -188,17 +188,27 @@ export async function listStock(sql?: DbExecutor): Promise<BloodStock[]> {
   }));
 }
 
-/** 发血时锁定库存行，扣减后返回余量；库存不足返回 null（调用方抛 409）。 */
+/**
+ * 发血时锁定库存行，扣减后返回余量；库存不足返回 null（调用方抛 409）。
+ *
+ * options.batchNo：指定从哪个批次发血（实际发血须指定实物批次）；不传则按
+ * FEFO（最早到期优先）自动选择。
+ */
 export async function deductStock(
   bloodType: string,
   component: string,
   units: number,
   tx: DbExecutor,
+  options?: { batchNo?: string },
 ): Promise<BloodStock | null> {
+  const batchFilter = options?.batchNo
+    ? tx`AND batch_no = ${options.batchNo}`
+    : tx``;
   const rows = await tx`
     SELECT id, blood_type, component, batch_no, units, expiry_date
     FROM clinical.blood_stock
     WHERE blood_type = ${bloodType} AND component = ${component}
+    ${batchFilter}
     ORDER BY expiry_date IS NULL, expiry_date ASC
     FOR UPDATE`;
   if (rows.length === 0) return null;

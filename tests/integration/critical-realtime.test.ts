@@ -49,9 +49,9 @@ try {
   await verifyDbConnection(2, 1000);
   dbAvailable = true;
   const db = getDb();
-  // 从干净状态开始，避免历史告警/事件干扰计数
+  // 从干净状态开始，避免历史告警/事件干扰计数（只清本测试聚合，避免破坏并行测试）
   await db`DELETE FROM clinical.critical_value_alerts`;
-  await db`DELETE FROM clinical.event_outbox`;
+  await db`DELETE FROM clinical.event_outbox WHERE aggregate_type = 'critical_value'`;
   const user = await getUserByUsername('admin');
   if (user) {
     admin = buildAuthView(user, await getUserRoleLinks(user.id));
@@ -65,7 +65,7 @@ const relay = new OutboxRelay(
   (event, payload) => {
     captured.push({ event, payload: payload as Record<string, unknown> });
   },
-  { batchSize: 100, pollIntervalMs: 100 },
+  { batchSize: 100, pollIntervalMs: 100, aggregateTypes: ['critical_value'] },
 );
 if (dbAvailable) relay.start();
 
@@ -74,7 +74,7 @@ afterAll(async () => {
   if (dbAvailable) {
     const db = getDb();
     await db`DELETE FROM clinical.critical_value_alerts`;
-    await db`DELETE FROM clinical.event_outbox`;
+    await db`DELETE FROM clinical.event_outbox WHERE aggregate_type = 'critical_value'`;
     await closeDbForTest();
   }
 });

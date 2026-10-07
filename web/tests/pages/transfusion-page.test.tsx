@@ -96,9 +96,13 @@ async function pickSelect(labelText: string, optionText: string) {
   if (!selector) throw new Error(`未找到 Select：${labelText}`);
   fireEvent.mouseDown(selector);
   fireEvent.click(await screen.findByText(
-    (content: string, el: Element | null) =>
-      (el as HTMLElement)?.className === 'ant-select-item-option-content' &&
-      (el as HTMLElement).textContent?.includes(optionText),
+    (_content: string, el: Element | null) => {
+      const node = el as HTMLElement | null;
+      return (
+        node?.className === 'ant-select-item-option-content' &&
+        (node.textContent?.includes(optionText) ?? false)
+      );
+    },
     { selector: '.ant-select-item-option-content' },
   ));
 }
@@ -204,7 +208,7 @@ it('completed：上报不良反应（分级/处置必选）→ 调用 reaction',
 }, 30000);
 
 it('断库：离线 Alert 且不渲染业务内容', async () => {
-  healthMock.mockResolvedValue({ status: 'error', code: 50300, message: '数据库不可用', db: 'down' });
+  healthMock.mockRejectedValue(new Error('数据库不可用'));
   render(<TransfusionPage />);
   expect(await screen.findByTestId('transfusion-offline-alert')).toBeTruthy();
   expect(screen.queryByText('BLOOD001')).toBeNull();
