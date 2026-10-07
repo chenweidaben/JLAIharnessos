@@ -139,6 +139,7 @@ const navItems: NavItem[] = [
       { key: '/transfusion', label: '输血管理', perm: 'blood:apply' },
       { key: '/blood-quality', label: '用血质量', perm: 'blood:audit' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
+      { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
   },
   { key: '/alerts', icon: <AlertOutlined />, label: '告警中心', perm: 'patient:view' },
