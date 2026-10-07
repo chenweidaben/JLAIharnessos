@@ -19,44 +19,44 @@ export interface ApplyTransfusionBody {
 }
 
 export async function applyTransfusion(body: ApplyTransfusionBody): Promise<{ req: TransfusionRequest; created: boolean }> {
-  return post(`/api/v1/transfusions`, body);
+  return post(`/transfusions`, body);
 }
 
 export async function listTransfusions(): Promise<TransfusionRequest[]> {
-  return get(`/api/v1/transfusions`);
+  return get(`/transfusions`);
 }
 
 export async function getTransfusion(id: string): Promise<TransfusionDetail> {
-  return get(`/api/v1/transfusions/${id}`);
+  return get(`/transfusions/${id}`);
 }
 
 export async function crossmatchTransfusion(id: string, result: string, note?: string): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/crossmatch`, { result, note });
+  return post(`/transfusions/${id}/crossmatch`, { result, note });
 }
 
 export async function dispenseTransfusion(id: string, batchNo?: string): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/dispense`, { batchNo });
+  return post(`/transfusions/${id}/dispense`, { batchNo });
 }
 
 export async function startTransfusion(id: string, coSignBy: string, dripRate?: string): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/start`, { coSignBy, dripRate });
+  return post(`/transfusions/${id}/start`, { coSignBy, dripRate });
 }
 
 export async function completeTransfusion(id: string, vitalSigns?: Record<string, unknown>): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/complete`, { vitalSigns });
+  return post(`/transfusions/${id}/complete`, { vitalSigns });
 }
 
 export async function stopTransfusion(id: string, reason: string): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/stop`, { reason });
+  return post(`/transfusions/${id}/stop`, { reason });
 }
 
 export async function cancelTransfusion(id: string, reason: string): Promise<TransfusionRequest> {
-  return post(`/api/v1/transfusions/${id}/cancel`, { reason });
+  return post(`/transfusions/${id}/cancel`, { reason });
 }
 
 export async function reportReaction(
   id: string,
   body: { severity: string; symptom: string; action: string; outcome?: string },
 ): Promise<{ reaction: Record<string, unknown>; req: TransfusionRequest }> {
-  return post(`/api/v1/transfusions/${id}/reaction`, body);
+  return post(`/transfusions/${id}/reaction`, body);
 }
