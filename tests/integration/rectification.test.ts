@@ -61,7 +61,7 @@ async function newRecordFixture(): Promise<{ recordId: string; visitId: string }
   });
   const record = await createMedicalRecord({
     visitId: visit.id,
-    recordType: 'inpatient',
+    recordType: 'admission',
     title: '入院记录',
     content: { chiefComplaint: '咳嗽咳痰1周' },
     plainText: '患者咳嗽咳痰1周，无发热。',
