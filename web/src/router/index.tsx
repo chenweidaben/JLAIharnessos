@@ -113,6 +113,8 @@ const LisPage = lazy(() => import('@/pages/lis'));
 const RisPage = lazy(() => import('@/pages/ris'));
 // 检查检验结果 AI 智能解读工作站（M12-A）：查看 lab:interpret:view，写操作按 sign 细分
 const InterpretPage = lazy(() => import('@/pages/interpret'));
+// VTE 智能防治闭环（M13-A）：查看 vte:read，评估 vte:assess / 药物确认 vte:prevent / 机械执行 vte:execute
+const VtePage = lazy(() => import('@/pages/vte'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -261,6 +263,8 @@ export default function AppRoutes() {
           <Route path="ris" element={<RisPage />} />
           {/* 检查检验结果 AI 智能解读（M12-A）：查看 lab:interpret:view，写/签名按 lab/imaging:interpret:sign */}
           <Route path="interpret" element={<InterpretPage />} />
+          {/* VTE 智能防治（M13-A）：查看 vte:read，评估/药物确认/机械执行按权限细分 */}
+          <Route path="vte" element={<VtePage />} />
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />

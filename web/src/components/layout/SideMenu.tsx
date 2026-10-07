@@ -144,6 +144,7 @@ const navItems: NavItem[] = [
       { key: '/surgery', label: '手术麻醉', perm: 'surgery:view' },
       { key: '/transfusion', label: '输血管理', perm: 'blood:apply' },
       { key: '/blood-quality', label: '用血质量', perm: 'blood:audit' },
+      { key: '/vte', label: 'VTE 防治', perm: 'vte:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
