@@ -69,6 +69,7 @@ import { bloodQualityRoutes } from './routes/bloodQuality';
 import { vteRoutes } from './routes/vte';
 import { amsRoutes } from './routes/ams';
 import { pathwayRoutes } from './routes/pathway';
+import { mobileNursingRoutes } from './routes/mobileNursing';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -131,6 +132,7 @@ const allRoutes: RouteDef[] = [
   ...vteRoutes,
   ...amsRoutes,
   ...pathwayRoutes,
+  ...mobileNursingRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,

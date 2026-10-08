@@ -135,6 +135,15 @@ const SkillStudio = lazy(() =>
 // 影像 AI 辅诊（DAMO-RADAR）
 const ImagingAiReportPage = lazy(() => import('@/pages/imaging/AiReportPage'));
 
+// AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
+const MobileLogin = lazy(() => import('@/pages/mobile/login'));
+const MobileLayout = lazy(() => import('@/components/mobile/MobileLayout'));
+const MobilePatients = lazy(() => import('@/pages/mobile/Patients'));
+const MobileBedSide = lazy(() => import('@/pages/mobile/BedSide'));
+const MobileTasks = lazy(() => import('@/pages/mobile/Tasks'));
+const MobileHandoff = lazy(() => import('@/pages/mobile/Handoff'));
+const MobileMe = lazy(() => import('@/pages/mobile/Me'));
+
 function PageLoading() {
   return (
     <div className="flex h-full w-full items-center justify-center">
@@ -328,6 +337,24 @@ export default function AppRoutes() {
           <Route path="data" element={<DemoData />} />
           <Route path="architecture" element={<DemoArchitecture />} />
           <Route path="about" element={<DemoAbout />} />
+        </Route>
+
+        {/* AI 移动护理 PDA 执行端（M16-A）：独立移动布局，需 mobile_nursing:execute */}
+        <Route path="/m/login" element={<MobileLogin />} />
+        <Route
+          path="/m"
+          element={
+            <RequirePermission permission="mobile_nursing:execute">
+              <MobileLayout />
+            </RequirePermission>
+          }
+        >
+          <Route index element={<Navigate to="/m/patients" replace />} />
+          <Route path="patients" element={<MobilePatients />} />
+          <Route path="bed/:visitId" element={<MobileBedSide />} />
+          <Route path="tasks" element={<MobileTasks />} />
+          <Route path="handoff" element={<MobileHandoff />} />
+          <Route path="me" element={<MobileMe />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

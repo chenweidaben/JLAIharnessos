@@ -1,0 +1,19 @@
+{
+  "name": "健澜科技 AI 移动护理",
+  "short_name": "移动护理",
+  "description": "健澜科技数智医院 - PDA 移动护理执行端（M16-A）",
+  "start_url": "/m/patients",
+  "scope": "/m/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fa",
+  "theme_color": "#0b3d91",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

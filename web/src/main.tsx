@@ -18,9 +18,13 @@ import 'dayjs/locale/zh-cn';
 import App from './App';
 import { jlTheme } from './styles/antd-theme';
 import { useAuthStore } from './store/authStore';
+import { registerServiceWorker } from './pwa/registerSW';
 import './styles/index.css';
 
 dayjs.locale('zh-cn');
+
+// PWA：仅生产注册 Service Worker（registerSW 内部含浏览器/开发守卫，测试不报错）。
+registerServiceWorker();
 
 const container = document.getElementById('root');
 if (!container) {

@@ -131,3 +131,22 @@ export type PharmacyPermissionCode =
 /** 全部已登记的药房权限码（便于自检遍历） */
 export const ALL_PHARMACY_PERMISSION_CODES: readonly string[] =
   Object.values(PHARMACY_PERMISSIONS);
+
+/* ===========================================================================
+ * 移动护理 PDA 执行端权限码（M16-A）
+ *  - mobile_nursing:execute  PDA 床旁扫码核对给药、体征采集、护理任务执行、
+ *      评估量表、护理记录与交接班（护士为主，医师/管理员兜底）。
+ *
+ * 重要：仅授予真实登录医护/管理员，绝不授予 Agent 服务账号；AI 仅辅助评分/
+ *      建议/语音录入，护士本人签名生效，给药须五重核对通过。
+ * ========================================================================= */
+export const MOBILE_NURSING_PERMISSIONS = {
+  EXECUTE: 'mobile_nursing:execute',
+} as const;
+
+export type MobileNursingPermissionCode =
+  (typeof MOBILE_NURSING_PERMISSIONS)[keyof typeof MOBILE_NURSING_PERMISSIONS];
+
+/** 全部已登记的移动护理权限码（便于自检遍历） */
+export const ALL_MOBILE_NURSING_PERMISSION_CODES: readonly string[] =
+  Object.values(MOBILE_NURSING_PERMISSIONS);
