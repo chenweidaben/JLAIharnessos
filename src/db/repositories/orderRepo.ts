@@ -78,7 +78,12 @@ function mapRow(row: Record<string, unknown>): Order {
 function generateOrderNo(): string {
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-  return `ORD${ymd}${Math.floor(Math.random() * 900000) + 100000}`;
+  // 12 位十六进制（48 位加密随机）后缀：库内累积大量同日订单时，避免 6 位随机数
+  // 偶发命中 orders_order_no_key 唯一约束导致的并发/重跑抖动。
+  const buf = new Uint8Array(6);
+  globalThis.crypto.getRandomValues(buf);
+  const suffix = Array.from(buf, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `ORD${ymd}${suffix}`;
 }
 
 /**

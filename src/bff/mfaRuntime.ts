@@ -28,12 +28,14 @@ let _mfa: MfaService | null = null;
 
 /** postgres.js → PgMfaStore 需要的 node-postgres 风格 SqlExecutor 适配 */
 function pgExecutor(): SqlExecutor {
-  const sql = getDb();
   return {
     async query<T extends object = Record<string, unknown>>(
       text: string,
       params: unknown[] = [],
     ): Promise<{ rows: T[] }> {
+      // 每次查询实时取当前连接池：测试中连接池会被 closeDbForTest 关闭并重建，
+      // 不能在构造时缓存池对象，否则会持有已关闭的池导致 CONNECTION_ENDED。
+      const sql = getDb();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rows = (await sql.unsafe(text, params)) as any as T[];
       return { rows };
