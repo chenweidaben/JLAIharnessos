@@ -30,6 +30,7 @@ import { tenantAdminRoutes } from '../../src/bff/routes/admin/tenants.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctor: AuthView;
 
@@ -64,7 +65,7 @@ afterAll(async () => {
   }
 });
 
-describe('M5-A 多租户持久化（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M5-A 多租户持久化（真实 PostgreSQL）', () => {
   if (!dbAvailable) {
     it.skip('数据库不可用，跳过（不冒充通过）', () => {});
     return;

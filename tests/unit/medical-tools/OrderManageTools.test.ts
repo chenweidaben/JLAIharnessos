@@ -11,6 +11,9 @@ import { describe, it, expect } from 'bun:test';
 import { makeDoctorContext } from './helpers.js';
 import { cancelOrderTool } from '@/medical-tools/order/cancelOrder.js';
 import { orderAuditTool } from '@/medical-tools/order/orderAudit.js';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 const doctorCtx = makeDoctorContext();
 

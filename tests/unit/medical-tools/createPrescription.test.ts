@@ -8,6 +8,9 @@
 import { describe, it, expect } from 'bun:test';
 import { createPrescriptionTool } from '@medical/pharmacy/createPrescription';
 import { createMedicalToolContext } from './helpers';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 describe('create_prescription', () => {
   it('执业医师可成功开具无风险处方，返回待审核与费用预估', async () => {

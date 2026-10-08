@@ -15,6 +15,9 @@ import { queryPatientTool } from '@/medical-tools/patient/queryPatient.js';
 import { getPatientDetailTool } from '@/medical-tools/patient/getPatientDetail.js';
 import { getOrderListTool } from '@/medical-tools/order/getOrderList.js';
 import { getPrescriptionListTool } from '@/medical-tools/pharmacy/getPrescriptionList.js';
+import { useMockData } from '../support/mockScope.js';
+
+useMockData();
 
 const ctx = makeDoctorContext();
 

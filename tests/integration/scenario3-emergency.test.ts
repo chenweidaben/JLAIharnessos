@@ -14,6 +14,9 @@ import { diagnosisSuggestionTool } from '@/medical-tools/cds/diagnosisSuggestion
 import { criticalValueAlertTool } from '@/medical-tools/cds/criticalValueAlert.js';
 import { orderLabTestTool } from '@/medical-tools/lab/orderLabTest.js';
 import { orderImagingExamTool } from '@/medical-tools/lab/orderImagingExam.js';
+import { useMockData } from '../support/mockScope.js';
+
+useMockData();
 
 const doctor = makeDoctorContext();
 

@@ -36,6 +36,7 @@ const TAG = 'M12A_TEST';
 const seq = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let radDoc: AuthView;
@@ -151,7 +152,7 @@ afterAll(async () => {
   }
 });
 
-describe('M12-A AI 智能解读（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M12-A AI 智能解读（真实 PostgreSQL）', () => {
   it('环境就绪：角色权限按新契约授权', () => {
     expect(dbAvailable).toBe(true);
     expect(radDoc.permissions).toContain('imaging:interpret:view');

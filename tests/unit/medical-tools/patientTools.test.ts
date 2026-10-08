@@ -12,6 +12,9 @@ import { makeDoctorContext, emptyCtx } from './helpers.js';
 import { queryPatientTool } from '@/medical-tools/patient/queryPatient.js';
 import { getPatientDetailTool } from '@/medical-tools/patient/getPatientDetail.js';
 import { getPatientHistoryTool } from '@/medical-tools/patient/getPatientHistory.js';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 const ctx = makeDoctorContext();
 

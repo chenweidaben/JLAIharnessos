@@ -13,6 +13,9 @@ import { getMedicalRecordTool } from '@/medical-tools/emr/getMedicalRecord.js';
 import { generateMedicalRecordTool } from '@/medical-tools/emr/generateMedicalRecord.js';
 import { medicalRecordQaTool } from '@/medical-tools/emr/medicalRecordQA.js';
 import { getMedicalTemplateTool } from '@/medical-tools/emr/getMedicalTemplate.js';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 const ctx = makeDoctorContext();
 const nurseCtx = makeNurseContext();

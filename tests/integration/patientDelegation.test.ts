@@ -34,6 +34,7 @@ import { delegationRoutes } from '../../src/bff/routes/delegation.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 
 const rand = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const accountIds: string[] = [];
@@ -63,7 +64,7 @@ try {
   dbAvailable = false;
 }
 
-describe('M3-Q 家属代办授权（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M3-Q 家属代办授权（真实 PostgreSQL）', () => {
   if (!dbAvailable) {
     it.skip('数据库不可用，跳过（不冒充通过）', () => {});
   }

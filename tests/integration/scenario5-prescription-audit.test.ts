@@ -13,6 +13,9 @@ import { createMedicalToolContext } from '../unit/medical-tools/helpers.js';
 import { createPrescriptionTool } from '@/medical-tools/pharmacy/createPrescription.js';
 import { prescriptionAuditTool } from '@/medical-tools/pharmacy/prescriptionAudit.js';
 import { getPrescriptionListTool } from '@/medical-tools/pharmacy/getPrescriptionList.js';
+import { useMockData } from '../support/mockScope.js';
+
+useMockData();
 
 const doctor = createMedicalToolContext({ role: 'doctor' });
 const pharmacist = createMedicalToolContext({ role: 'pharmacist' });

@@ -8,6 +8,9 @@
 import { describe, it, expect } from 'bun:test';
 import { prescriptionAuditTool } from '@medical/pharmacy/prescriptionAudit';
 import { createMedicalToolContext } from './helpers';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 // 说明：种子数据中仅 RX20260910002 为"待审核"，本文件用例按"先不修改状态、后修改状态"顺序编写，
 // 保证对该待审核处方的校验类用例不被状态变更影响。

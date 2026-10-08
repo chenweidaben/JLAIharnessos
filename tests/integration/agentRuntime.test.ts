@@ -46,6 +46,7 @@ import {
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let pharmacist: AuthView;
 
@@ -148,7 +149,7 @@ afterAll(async () => {
   }
 });
 
-describe('M4-C 智能体运行时（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M4-C 智能体运行时（真实 PostgreSQL）', () => {
   if (!dbAvailable) {
     it.skip('数据库不可用，跳过（不冒充通过）', () => {});
     return;

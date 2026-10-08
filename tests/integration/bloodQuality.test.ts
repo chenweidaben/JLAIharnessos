@@ -39,6 +39,7 @@ import { bloodQualityRoutes } from '../../src/bff/routes/bloodQuality.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let nurse: AuthView;
@@ -206,7 +207,7 @@ afterAll(async () => {
   }
 });
 
-describe('M10-B 用血质量闭环（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M10-B 用血质量闭环（真实 PostgreSQL）', () => {
   it('环境就绪：账号权限分离', () => {
     expect(dbAvailable).toBe(true);
     expect(admin.permissions).toContain('blood:assess');

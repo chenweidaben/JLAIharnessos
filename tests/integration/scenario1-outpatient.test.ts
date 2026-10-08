@@ -18,6 +18,9 @@ import { medicalRecordQaTool } from '@/medical-tools/emr/medicalRecordQA.js';
 import { createOrderTool } from '@/medical-tools/order/createOrder.js';
 import { createPrescriptionTool } from '@/medical-tools/pharmacy/createPrescription.js';
 import { diagnosisSuggestionTool } from '@/medical-tools/cds/diagnosisSuggestion.js';
+import { useMockData } from '../support/mockScope.js';
+
+useMockData();
 
 const doctor = makeDoctorContext();
 

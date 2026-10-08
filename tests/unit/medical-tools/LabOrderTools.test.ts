@@ -12,6 +12,9 @@ import { makeDoctorContext, makeNurseContext } from './helpers.js';
 import { orderLabTestTool } from '@/medical-tools/lab/orderLabTest.js';
 import { orderImagingExamTool } from '@/medical-tools/lab/orderImagingExam.js';
 import { viewDicomTool } from '@/medical-tools/lab/viewDicom.js';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 const doctorCtx = makeDoctorContext();
 const nurseCtx = makeNurseContext();

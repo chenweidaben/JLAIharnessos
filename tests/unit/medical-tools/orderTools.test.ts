@@ -13,6 +13,9 @@ import { createOrderTool } from '@/medical-tools/order/createOrder.js';
 import { getOrderListTool } from '@/medical-tools/order/getOrderList.js';
 import { cancelOrderTool } from '@/medical-tools/order/cancelOrder.js';
 import { orderAuditTool } from '@/medical-tools/order/orderAudit.js';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 const doctorCtx = makeDoctorContext();
 const nurseCtx = makeNurseContext();

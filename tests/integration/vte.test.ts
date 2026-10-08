@@ -36,6 +36,7 @@ import { vteRoutes } from '../../src/bff/routes/vte.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let nurse: AuthView;
@@ -121,7 +122,7 @@ afterAll(async () => {
   }
 });
 
-describe('M13-A VTE 智能防治闭环（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M13-A VTE 智能防治闭环（真实 PostgreSQL）', () => {
   it('环境就绪：账号权限分离', () => {
     expect(dbAvailable).toBe(true);
     expect(admin.permissions).toContain('vte:read');

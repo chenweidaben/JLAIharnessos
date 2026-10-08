@@ -40,6 +40,7 @@ import { referralRoutes } from '../../src/bff/routes/referral.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let pharmacist: AuthView;
@@ -87,7 +88,7 @@ afterAll(async () => {
   }
 });
 
-describe('M3-R 双向转诊（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQL）', () => {
   if (!dbAvailable) {
     it.skip('数据库不可用，跳过（不冒充通过）', () => {});
     return;

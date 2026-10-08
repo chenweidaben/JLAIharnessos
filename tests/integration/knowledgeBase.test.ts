@@ -38,6 +38,7 @@ import { MockEmbeddingService } from '../../src/knowledge/vector/EmbeddingServic
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let pharmacist: AuthView;
@@ -94,7 +95,7 @@ afterAll(async () => {
   setEmbeddingServiceForTest(null);
 });
 
-describe('M4-A 知识库管理与 RAG 检索（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M4-A 知识库管理与 RAG 检索（真实 PostgreSQL）', () => {
   if (!dbAvailable) {
     it.skip('数据库不可用，跳过（不冒充通过）', () => {});
     return;

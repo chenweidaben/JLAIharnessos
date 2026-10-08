@@ -46,6 +46,7 @@ import { risRoutes } from '../../src/bff/routes/ris.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let radTech: AuthView;
@@ -196,7 +197,7 @@ afterAll(async () => {
   }
 });
 
-describe('M11-B RIS 全流程（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M11-B RIS 全流程（真实 PostgreSQL）', () => {
   it('环境就绪：目录种子与角色权限', () => {
     expect(dbAvailable).toBe(true);
     expect(radTech.permissions).toContain('ris:schedule');

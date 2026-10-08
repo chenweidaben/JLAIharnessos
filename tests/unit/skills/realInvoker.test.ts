@@ -18,6 +18,9 @@ import {
 } from '@/skills/integration/realInvoker';
 import { executeSkill } from '@/skills/executor';
 import { parseSkillMarkdown } from '@/skills/loader';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 // ---------------------------------------------------------------------------
 // Mock LLM client

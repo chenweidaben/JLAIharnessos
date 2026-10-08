@@ -8,6 +8,9 @@
 import { describe, it, expect } from 'bun:test';
 import { getPrescriptionListTool } from '@medical/pharmacy/getPrescriptionList';
 import { createMedicalToolContext } from './helpers';
+import { useMockData } from '../../support/mockScope.js';
+
+useMockData();
 
 describe('get_prescription_list', () => {
   it('可查询到患者 P2026090001 的处方', async () => {

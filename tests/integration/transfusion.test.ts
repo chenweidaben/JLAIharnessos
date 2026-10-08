@@ -38,6 +38,7 @@ import { transfusionRoutes } from '../../src/bff/routes/transfusion.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
+const realMode = process.env.DEMO_MODE !== '1';
 let admin: AuthView;
 let doctorChen: AuthView;
 let doctorLi: AuthView;
@@ -161,7 +162,7 @@ afterAll(async () => {
   }
 });
 
-describe('M10-A 输血管理闭环（真实 PostgreSQL）', () => {
+describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 PostgreSQL）', () => {
   it('环境就绪：连接真实库并加载账号权限', () => {
     expect(dbAvailable).toBe(true);
     expect(admin.permissions).toContain('blood:apply');

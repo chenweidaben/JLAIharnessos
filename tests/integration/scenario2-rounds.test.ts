@@ -16,6 +16,9 @@ import { getOrderListTool } from '@/medical-tools/order/getOrderList.js';
 import { getMedicalRecordTool } from '@/medical-tools/emr/getMedicalRecord.js';
 import { viewDicomTool } from '@/medical-tools/lab/viewDicom.js';
 import { generateMedicalRecordTool } from '@/medical-tools/emr/generateMedicalRecord.js';
+import { useMockData } from '../support/mockScope.js';
+
+useMockData();
 
 const doctor = makeDoctorContext();
 
