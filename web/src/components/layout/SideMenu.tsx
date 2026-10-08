@@ -146,6 +146,7 @@ const navItems: NavItem[] = [
       { key: '/blood-quality', label: '用血质量', perm: 'blood:audit' },
       { key: '/vte', label: 'VTE 防治', perm: 'vte:read' },
       { key: '/ams', label: '抗菌药物管理', perm: 'ams:read' },
+      { key: '/pathway', label: '临床路径管理', perm: 'pathway:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
