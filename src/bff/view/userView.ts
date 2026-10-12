@@ -51,6 +51,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'cds:read', 'cds:override',
     'nurse_station:read',
     'schedule:manage', 'schedule:book',
+    'report_push:manage', 'report:view_patient',
     'ams:read', 'ams:prescribe', 'ams:review', 'ams:approve', 'ams:audit',
     'pathway:read', 'pathway:manage', 'pathway:execute', 'pathway:audit',
     'lis:catalog', 'lis:request', 'lis:collect', 'lis:receive', 'lis:enter', 'lis:review', 'lis:publish',
@@ -102,6 +103,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'cds:read', 'cds:override',
     'nurse_station:read',
     'schedule:manage', 'schedule:book',
+    'report_push:manage', 'report:view_patient',
     'ams:read', 'ams:prescribe',
     'pathway:read', 'pathway:manage', 'pathway:execute',
     'lis:request',
@@ -151,6 +153,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'cds:read', 'cds:override',
     'nurse_station:read',
     'schedule:book',
+    'report:view_patient',
     'ams:read',
     'pathway:read', 'pathway:execute',
     'lis:collect',
@@ -170,7 +173,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'imaging:interpret:view', 'imaging:interpret:sign'],
   ams_officer: ['dashboard:view', 'patient:view', 'ams:read', 'ams:approve', 'ams:audit'],
   researcher: ['medical_record:read', 'lab:read', 'report:view', 'knowledge:read'],
-  patient: ['satisfaction:view', 'satisfaction:submit', 'triage:use', 'schedule:book'],
+  patient: ['satisfaction:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */

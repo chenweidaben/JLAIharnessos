@@ -130,6 +130,7 @@ const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
+const ReportPushPage = lazy(() => import('@/pages/reportPush'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -377,6 +378,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="schedule:book">
                 <ScheduleSlotPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 我的报告推送（M19-B） */}
+          <Route
+            path="report-pushes"
+            element={
+              <RequirePermission permission="report:view_patient">
+                <ReportPushPage />
               </RequirePermission>
             }
           />
