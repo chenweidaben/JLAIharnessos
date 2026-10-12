@@ -1,6 +1,5 @@
 /**
- * 护理评估汇总纯函数（M30-A）。
- * 把各模块最新值聚合成卡片摘要，生成 needsAttention 标记。
+ * 护理评估汇总纯函数（M30-A + M32-A 手术麻醉块）。
  */
 
 export interface EvalSummaryInput {
@@ -10,6 +9,14 @@ export interface EvalSummaryInput {
   tubeCount?: number;
   ioBalance?: number;
   openTaskCount?: number;
+  surgery?: {
+    preopComplete?: boolean;
+    preopMissing?: string[];
+    pacuAldrete?: number | null;
+    pacuReady?: boolean;
+    followupPending?: number;
+    anesthesiaOpenTasks?: number;
+  };
 }
 
 export interface EvalSummary {
@@ -21,6 +28,14 @@ export interface EvalSummary {
   openTaskCount: number;
   needsAttention: boolean;
   flags: string[];
+  surgery: {
+    preopComplete: boolean;
+    preopMissing: string[];
+    pacuAldrete: number | null;
+    pacuReady: boolean;
+    followupPending: number;
+    anesthesiaOpenTasks: number;
+  };
 }
 
 export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
@@ -29,6 +44,13 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   if (inp.pain && inp.pain.score >= 4) flags.push('pain_analgesia');
   if (inp.risk?.bradenLevel === 'high' || inp.risk?.morseLevel === 'high') flags.push('fall_pressure_risk');
   if ((inp.openTaskCount ?? 0) > 0) flags.push('open_intervention_tasks');
+
+  const s = inp.surgery ?? {};
+  if (s.preopComplete === false) flags.push('preop_incomplete');
+  if (s.pacuAldrete != null && !s.pacuReady) flags.push('pacu_not_ready');
+  if ((s.followupPending ?? 0) > 0) flags.push('postop_followup_pending');
+  if ((s.anesthesiaOpenTasks ?? 0) > 0) flags.push('anesthesia_open_task');
+
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
     painSevere: (inp.pain?.score ?? 0) >= 7,
@@ -38,5 +60,13 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
     openTaskCount: inp.openTaskCount ?? 0,
     needsAttention: flags.length > 0,
     flags,
+    surgery: {
+      preopComplete: s.preopComplete ?? true,
+      preopMissing: s.preopMissing ?? [],
+      pacuAldrete: s.pacuAldrete ?? null,
+      pacuReady: s.pacuReady ?? true,
+      followupPending: s.followupPending ?? 0,
+      anesthesiaOpenTasks: s.anesthesiaOpenTasks ?? 0,
+    },
   };
 }

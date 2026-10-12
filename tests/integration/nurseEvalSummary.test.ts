@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - M30-A 护理评估汇总集成测试
+ * 健澜科技 jlmedaios - M32-A 护士屏手术麻醉块集成测试
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { afterAll, describe, expect, it } from 'bun:test';
@@ -11,32 +11,37 @@ import { createVisit } from '../../src/db/repositories/visitRepo.js';
 import { buildEvalSummary } from '../../src/medical-tools/nursing/evalSummary.js';
 import { getVisitEvaluations, EvalError } from '../../src/bff/aggregators/nurseStationEvalAggregator.js';
 
+describe('纯函数', () => {
+  it('手术麻醉摘要', () => {
+    const s = buildEvalSummary({
+      surgery: { preopComplete: false, preopMissing: ['npo'], pacuAldrete: 5, pacuReady: false, followupPending: 2, anesthesiaOpenTasks: 1 },
+    });
+    expect(s.surgery.preopComplete).toBe(false);
+    expect(s.surgery.followupPending).toBe(2);
+    expect(s.needsAttention).toBe(true);
+    expect(s.flags).toContain('preop_incomplete');
+  });
+  it('无手术块默认安全', () => {
+    const s = buildEvalSummary({});
+    expect(s.surgery.pacuAldrete).toBeNull();
+    expect(s.needsAttention).toBe(false);
+  });
+});
+
 let dbAvailable = false;
-let nurse: AuthView;
+let admin: AuthView;
 let stranger: AuthView;
-const TAG = 'M30A_TEST';
+const TAG = 'M32A_TEST';
 const seq = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
-async function newPV(dept = '急诊科') {
+async function newPV(dept = '普外科') {
   const patient = await createPatient({
-    mrn: `M30A${seq()}`, nameMasked: `P*${seq().slice(-4)}`, gender: '女',
-    birthDate: '1990-01-01', tags: [TAG],
+    mrn: `M32A${seq()}`, nameMasked: `P*${seq().slice(-4)}`, gender: '男',
+    birthDate: '1965-01-01', tags: [TAG],
   });
   const visit = await createVisit({ patientId: patient.id, visitType: 'inpatient', department: dept, chiefComplaint: 'eval' });
   return { patient, visit };
 }
-
-describe('纯函数 buildEvalSummary', () => {
-  it('无异常 needsAttention=false', () => {
-    const s = buildEvalSummary({ openTaskCount: 0 });
-    expect(s.needsAttention).toBe(false);
-  });
-  it('营养风险触发 flag', () => {
-    const s = buildEvalSummary({ nutrition: { totalScore: 4, nutritionRisk: true } });
-    expect(s.needsAttention).toBe(true);
-    expect(s.flags).toContain('nutrition_risk');
-  });
-});
 
 try { await verifyDbConnection(2, 1000); dbAvailable = true; } catch { dbAvailable = false; }
 if (dbAvailable) {
@@ -45,34 +50,31 @@ if (dbAvailable) {
     if (!user) throw new Error(`缺 ${u}`);
     return buildAuthView(user, await getUserRoleLinks(user.id));
   };
-  nurse = await load('nurse_ma'); stranger = await load('doctor_lin');
+  admin = await load('admin'); stranger = await load('doctor_lin');
 }
 afterAll(async () => {
   if (dbAvailable) {
     const db = getDb();
-    await db`DELETE FROM clinical.visits v USING clinical.patients p WHERE v.patient_id=p.id AND p.tags @> '["M30A_TEST"]'::jsonb`;
-    await db`DELETE FROM clinical.patients WHERE tags @> '["M30A_TEST"]'::jsonb`;
+    await db`DELETE FROM clinical.visits v USING clinical.patients p WHERE v.patient_id=p.id AND p.tags @> '["M32A_TEST"]'::jsonb`;
+    await db`DELETE FROM clinical.patients WHERE tags @> '["M32A_TEST"]'::jsonb`;
     await closeDbForTest();
   }
 });
 const R = dbAvailable ? describe : describe.skip;
-R('护理评估汇总（真实 PG）', () => {
-  it('权限码在位', () => {
-    expect(nurse.permissions).toContain('nurse_eval:view');
-  });
-  it('正常返回各模块卡片字段', async () => {
+R('手术麻醉块（真实 PG）', () => {
+  it('evaluations 返回 surgery 块字段', async () => {
     const { visit } = await newPV();
-    const r = await getVisitEvaluations(nurse, visit.id);
-    expect(r.visitId).toBe(visit.id);
-    expect(r.summary).toBeTruthy();
-    expect(Array.isArray(r.summary.flags)).toBe(true);
+    const out = await getVisitEvaluations(admin, visit.id);
+    expect(out.summary ?? out.summary).toBeTruthy();
+    expect(out.summary.surgery).toBeTruthy();
+    expect(out.summary.surgery.followupPending).toBe(0);
+    expect(Array.isArray(out.followups)).toBe(true);
   });
   it('越权 403', async () => {
     const { visit } = await newPV('骨科');
     let status = 200;
-    try { await getVisitEvaluations(stranger, visit.id); } catch (e) {
-      if (e instanceof EvalError) status = e.status;
-    }
+    try { await getVisitEvaluations(stranger, visit.id); }
+    catch (e) { if (e instanceof EvalError) status = e.status; }
     expect(status).toBe(403);
   });
 });

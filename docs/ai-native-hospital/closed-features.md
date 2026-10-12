@@ -19,6 +19,10 @@
 | 营养/疼痛阳性自动工单 | risk=true / score≥4 时同事务幂等建 clinical_improvement_tasks（source=nutrition/pain）分派主治 | v0.49.0-m29c |
 | 单患者护理评估汇总屏 | GET /:visitId/evaluations 聚合营养/疼痛/风险/工单 flags 与 needsAttention | v0.50.0-m30a |
 | 术前访视 ASA 分级 | ASA I-VI + 禁食水/过敏史/知情同意三项确认，缺项标红、≥III 高风险 | v0.51.0-m31a |
+| PACU Aldrete 复苏记录 | 五项 0-2 打分为 Aldrete 0-10，≥9 可出室，苏醒延迟提示 | v0.52.0-m31b |
+| 术后 6/24/48h 镇痛随访 | 自动生成三时间点 due_at，完成记 NRS，≥4 自动转镇痛工单 | v0.53.0-m31c |
+| 麻醉异常自动工单 | 术前三项缺失 / PACU Aldrete 不可出室 → source=anesthesia 工单（幂等） | v0.54.0-m31d |
+| 护士屏手术麻醉块 | evaluations 聚合术前完成度/最新 Aldrete/术后随访待办/麻醉告警 open 工单数 | v0.55.0-m32a |
 
 ## 二、互联网医院（智慧服务三级）
 
