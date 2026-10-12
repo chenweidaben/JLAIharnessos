@@ -6,7 +6,9 @@ import type { AuthView } from '../view/userView.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import { getTask } from '../../db/repositories/improvementTaskRepo.js';
 import { getByTask, upsertReview } from '../../db/repositories/improvementOutcomeRepo.js';
+import { createEscalatedTask, getLatestEscalation } from '../../db/repositories/escalationRepo.js';
 import { judgeOutcome } from '../../medical-tools/operations/improvementOutcome.js';
+import { shouldEscalate } from '../../medical-tools/operations/escalation.js';
 
 export class ImprovementOutcomeError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -50,7 +52,26 @@ export async function evaluateView(
   await recordChainAudit(
     { actorId: auth.id, action: 'improvement_outcome.evaluate', resourceType: 'improvement_outcome_reviews', resourceId: r.id, result: 'success', riskLevel: 'low', detail: { taskId, verdict } },
   );
-  return r;
+
+  // M22-F：verdict=worse/no_improvement → 自动建二级升级单（幂等：同 parent 只一条）
+  let escalated = null;
+  if (shouldEscalate(verdict)) {
+    const existing = await getLatestEscalation(taskId);
+    if (!existing) {
+      escalated = await createEscalatedTask({
+        parentTaskId: taskId,
+        escalationLevel: 2,
+        title: `[ESC] re-review after ${verdict}`,
+        finding: `original task ${taskId} verdict=${verdict}`,
+        assigneeId: auth.id, // 上级医师/科主任（复用当前操作用户为占位）
+        createdBy: auth.id,
+      });
+      await recordChainAudit(
+        { actorId: auth.id, action: 'improvement.escalate', resourceType: 'clinical_improvement_tasks', resourceId: escalated.id, result: 'success', riskLevel: 'high', detail: { parentTaskId: taskId, verdict } },
+      );
+    }
+  }
+  return { review: r, escalated };
 }
 
 function judgeOutout(b: number, f: number) {

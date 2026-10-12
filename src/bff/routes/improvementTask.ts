@@ -14,6 +14,7 @@ import {
   listMineView,
   transitionView,
 } from '../aggregators/improvementTaskAggregator';
+import { getChain } from '../../db/repositories/escalationRepo.js';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -51,6 +52,8 @@ export const improvementTaskRoutes: RouteDef[] = [
     handle: guarded('improvement_task:handle', (c, view) => listMineView(view)), auth: true },
   { method: 'GET', path: '/api/v1/improvement-tasks',
     handle: guarded('improvement_task:assign', (c, view) => listBySourceView(view, c.query.get('source') ?? 'drg_attribution')), auth: true },
+  { method: 'GET', path: '/api/v1/improvement-tasks/:id/chain',
+    handle: guarded('improvement_task:handle', (c, view) => getChain(c.params.id)), auth: true },
   { method: 'POST', path: '/api/v1/improvement-tasks/:id/transition',
     handle: guarded('improvement_task:handle', async (c, view) => transitionView(view, c.params.id, (await c.body<{ to: any }>()).to, (await c.body<{ resolutionNote?: string }>()).resolutionNote)), auth: true },
 ];

@@ -165,6 +165,7 @@ const navItems: NavItem[] = [
       { key: '/cost-attribution', label: '成本归因', perm: 'drg_attribution:view' },
       { key: '/improvement-tasks', label: '整改任务', perm: 'improvement_task:handle' },
       { key: '/improvement-outcome', label: '效果回看', perm: 'improvement_outcome:view' },
+      { key: '/escalation', label: '升级链', perm: 'improvement_task:handle' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

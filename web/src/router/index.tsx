@@ -139,6 +139,7 @@ const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor
 const CostAttributionPage = lazy(() => import('@/pages/costAttribution'));
 const ImprovementTaskPage = lazy(() => import('@/pages/improvementTask'));
 const ImprovementOutcomePage = lazy(() => import('@/pages/improvementOutcome'));
+const EscalationPage = lazy(() => import('@/pages/escalation'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -476,6 +477,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="improvement_outcome:view">
                 <ImprovementOutcomePage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 升级链（M22-F） */}
+          <Route
+            path="escalation"
+            element={
+              <RequirePermission permission="improvement_task:handle">
+                <EscalationPage />
               </RequirePermission>
             }
           />
