@@ -87,6 +87,7 @@ import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
 import { costAttributionRoutes } from './routes/costAttribution';
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
+import { dipRoutes } from './routes/dip';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -167,6 +168,7 @@ const allRoutes: RouteDef[] = [
   ...costAttributionRoutes,
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
+  ...dipRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,

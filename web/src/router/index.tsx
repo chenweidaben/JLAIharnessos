@@ -140,6 +140,7 @@ const CostAttributionPage = lazy(() => import('@/pages/costAttribution'));
 const ImprovementTaskPage = lazy(() => import('@/pages/improvementTask'));
 const ImprovementOutcomePage = lazy(() => import('@/pages/improvementOutcome'));
 const EscalationPage = lazy(() => import('@/pages/escalation'));
+const DipPage = lazy(() => import('@/pages/dip'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -487,6 +488,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="improvement_task:handle">
                 <EscalationPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* DIP 点值（M23-A） */}
+          <Route
+            path="dip"
+            element={
+              <RequirePermission permission="dip:view">
+                <DipPage />
               </RequirePermission>
             }
           />
