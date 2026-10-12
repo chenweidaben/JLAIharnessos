@@ -165,6 +165,7 @@ const navItems: NavItem[] = [
       { key: '/er-green', label: '绿色通道催办', perm: 'er_triage:view' },
       { key: '/chronic', label: '慢病随访', perm: 'chronic:view' },
       { key: '/healthcheck', label: '体检中心', perm: 'healthcheck:view' },
+      { key: '/healthcheck-referrals', label: '体检转诊', perm: 'healthcheck:referral' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
       { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/schedule-slots', label: '分时段预约', perm: 'schedule:book' },
