@@ -127,6 +127,7 @@ const MedAdminPage = lazy(() => import('@/pages/medAdmin'));
 const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
 const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
+const NutritionScreeningPage = lazy(() => import('@/pages/nutritionScreening'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -362,6 +363,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nursing_io:read">
                 <NursingIoPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 入院营养风险筛查 NRS-2002（M29-A） */}
+          <Route
+            path="nutrition-screening"
+            element={
+              <RequirePermission permission="nutrition:view">
+                <NutritionScreeningPage />
               </RequirePermission>
             }
           />
