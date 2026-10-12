@@ -89,6 +89,7 @@ import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
 import { paymentSelectionRoutes } from './routes/paymentSelection';
+import { settlementReportRoutes } from './routes/settlementReport';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -171,6 +172,7 @@ const allRoutes: RouteDef[] = [
   ...improvementOutcomeRoutes,
   ...dipRoutes,
   ...paymentSelectionRoutes,
+  ...settlementReportRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,

@@ -142,6 +142,7 @@ const ImprovementOutcomePage = lazy(() => import('@/pages/improvementOutcome'));
 const EscalationPage = lazy(() => import('@/pages/escalation'));
 const DipPage = lazy(() => import('@/pages/dip'));
 const PaymentSelectionPage = lazy(() => import('@/pages/paymentSelection'));
+const SettlementReportPage = lazy(() => import('@/pages/settlementReport'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -509,6 +510,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="payment_select:view">
                 <PaymentSelectionPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 月度结算报表（M23-C） */}
+          <Route
+            path="settlement-report"
+            element={
+              <RequirePermission permission="settlement_report:view">
+                <SettlementReportPage />
               </RequirePermission>
             }
           />

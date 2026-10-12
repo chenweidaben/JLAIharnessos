@@ -168,6 +168,7 @@ const navItems: NavItem[] = [
       { key: '/escalation', label: '升级链', perm: 'improvement_task:handle' },
       { key: '/dip', label: 'DIP点值', perm: 'dip:view' },
       { key: '/payment-selection', label: '病组双轨', perm: 'payment_select:view' },
+      { key: '/settlement-report', label: '结算报表', perm: 'settlement_report:view' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
