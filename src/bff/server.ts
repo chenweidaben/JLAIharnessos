@@ -90,6 +90,7 @@ import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
 import { healthCheckRoutes } from './routes/healthCheck';
 import { healthCheckReferralRoutes } from './routes/healthCheckReferral';
+import { oncologyRoutes } from './routes/oncology';
 import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
@@ -189,6 +190,7 @@ const allRoutes: RouteDef[] = [
   ...patientChronicRoutes,
   ...healthCheckRoutes,
   ...healthCheckReferralRoutes,
+  ...oncologyRoutes,
   ...orderCdsRoutes,
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
