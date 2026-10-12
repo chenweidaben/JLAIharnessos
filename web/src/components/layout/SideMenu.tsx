@@ -160,6 +160,7 @@ const navItems: NavItem[] = [
       { key: '/notifications', label: '通知中心', perm: 'notification:read' },
       { key: '/renewal', label: '续方流转', perm: 'renewal:pay' },
       { key: '/pharmacy-tasks', label: '待配药任务', perm: 'pharmacy:dispense' },
+      { key: '/drg-budget', label: 'DRG预算预警', perm: 'drg_budget:view' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

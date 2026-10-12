@@ -134,6 +134,7 @@ const ReportPushPage = lazy(() => import('@/pages/reportPush'));
 const NotificationPage = lazy(() => import('@/pages/notification'));
 const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
+const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -421,6 +422,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="pharmacy:dispense">
                 <PharmacyTaskPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* DRG 预算预警（M22-A） */}
+          <Route
+            path="drg-budget"
+            element={
+              <RequirePermission permission="drg_budget:view">
+                <DrgBudgetPage />
               </RequirePermission>
             }
           />

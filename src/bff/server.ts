@@ -82,6 +82,7 @@ import { scheduleSlotRoutes } from './routes/scheduleSlot';
 import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { renewalRoutes } from './routes/renewalFlow';
+import { drgBudgetRoutes } from './routes/drgBudget';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -157,6 +158,7 @@ const allRoutes: RouteDef[] = [
   ...reportPushRoutes,
   ...patientNotificationRoutes,
   ...renewalRoutes,
+  ...drgBudgetRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
