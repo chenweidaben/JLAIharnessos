@@ -93,6 +93,7 @@ import { healthCheckReferralRoutes } from './routes/healthCheckReferral';
 import { oncologyRoutes } from './routes/oncology';
 import { chemoReminderRoutes } from './routes/chemoReminder';
 import { psychScreeningRoutes } from './routes/psychScreening';
+import { nissRoutes } from './routes/nissReporting';
 import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
@@ -195,6 +196,7 @@ const allRoutes: RouteDef[] = [
   ...oncologyRoutes,
   ...chemoReminderRoutes,
   ...psychScreeningRoutes,
+  ...nissRoutes,
   ...orderCdsRoutes,
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
