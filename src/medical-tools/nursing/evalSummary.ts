@@ -27,6 +27,14 @@ export interface EvalSummaryInput {
     jaundiceElevated?: boolean;
     breastfeedingAdequate?: boolean;
   };
+  er?: {
+    level?: string | null;
+    greenChannel?: boolean;
+  };
+  rehab?: {
+    totalScore?: number | null;
+    dependencyLevel?: string;
+  };
 }
 
 export interface EvalSummary {
@@ -55,6 +63,14 @@ export interface EvalSummary {
     day: number | null;
     jaundiceElevated: boolean;
     breastfeedingAdequate: boolean;
+  };
+  er: {
+    level: string | null;
+    greenChannel: boolean;
+  };
+  rehab: {
+    totalScore: number | null;
+    dependencyLevel: string;
   };
 }
 
@@ -97,6 +113,14 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       day: inp.postpartum?.day ?? null,
       jaundiceElevated: inp.postpartum?.jaundiceElevated ?? false,
       breastfeedingAdequate: inp.postpartum?.breastfeedingAdequate ?? true,
+    },
+    er: {
+      level: inp.er?.level ?? null,
+      greenChannel: inp.er?.greenChannel ?? false,
+    },
+    rehab: {
+      totalScore: inp.rehab?.totalScore ?? null,
+      dependencyLevel: inp.rehab?.dependencyLevel ?? 'unknown',
     },
   };
 }

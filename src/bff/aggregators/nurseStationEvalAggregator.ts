@@ -15,6 +15,8 @@ import { listByVisit as listPacu } from '../../db/repositories/pacuRecordRepo.js
 import { listByVisit as listFollowup } from '../../db/repositories/postopFollowupRepo.js';
 import { listByVisit as listIcu } from '../../db/repositories/icuSedationRepo.js';
 import { listByMother } from '../../db/repositories/postpartumVisitRepo.js';
+import { getByVisit as getTriage } from '../../db/repositories/erTriageRepo.js';
+import { listByVisit as listBarthel } from '../../db/repositories/barthelRepo.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
@@ -40,7 +42,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -49,9 +51,12 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listFollowup(visitId),
     listIcu(visitId),
     listByMother(visitId),
+    getTriage(visitId),
+    listBarthel(visitId),
   ]);
   const latestIcu = icuList[0] ?? null;
   const latestPp = ppList[0] ?? null;
+  const latestBarthel = barthelList[0] ?? null;
   const latestNut = nuts[0] ?? null;
   const latestPain = pains[0] ?? null;
   const latestPreop = preops[0] ?? null;
@@ -86,6 +91,13 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       day: latestPp.postpartumDay,
       jaundiceElevated: jaundiceElevated(latestPp.postpartumDay, latestPp.jaundiceTcb),
       breastfeedingAdequate: breastfeedingAdequacy(latestPp.breastfeedingScore),
+    } : undefined,
+    er: triage ? {
+      level: triage.level, greenChannel: triage.greenChannel,
+    } : undefined,
+    rehab: latestBarthel ? {
+      totalScore: latestBarthel.totalScore,
+      dependencyLevel: latestBarthel.dependencyLevel,
     } : undefined,
   });
 

@@ -30,6 +30,8 @@
 | 急诊预检分诊五级 | SBP<90/SpO2<90/GCS<9→I，HR>120/RR>30→II，I/II 自动绿色通道 | v0.60.0-m35a |
 | Barthel ADL 指数 | 10 项 0-100 分五档分级（independent/mild/moderate/severe/total） | v0.61.0-m35b |
 | Barthel<40 康复自动工单 | 总分<40 自动建 source=rehab 康复介入工单（幂等） | v0.62.0-m36a |
+| 急诊绿色通道超时催办 | I>10min/II>30min 自动建 source=er_green 催办工单（幂等） | v0.63.0-m37a |
+| 护士屏急诊/Barthel块 | evaluations 聚合最新分诊 level/green_channel + 最新 Barthel total/dependency | v0.64.0-m38a |
 
 ## 二、互联网医院（智慧服务三级）
 
