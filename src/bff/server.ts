@@ -94,6 +94,7 @@ import { oncologyRoutes } from './routes/oncology';
 import { chemoReminderRoutes } from './routes/chemoReminder';
 import { psychScreeningRoutes } from './routes/psychScreening';
 import { nissRoutes } from './routes/nissReporting';
+import { vteAnticoagRoutes } from './routes/vteAnticoag';
 import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
@@ -197,6 +198,7 @@ const allRoutes: RouteDef[] = [
   ...chemoReminderRoutes,
   ...psychScreeningRoutes,
   ...nissRoutes,
+  ...vteAnticoagRoutes,
   ...orderCdsRoutes,
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
