@@ -135,6 +135,7 @@ const PostopFollowupPage = lazy(() => import('@/pages/postopFollowup'));
 const IcuSedationPage = lazy(() => import('@/pages/icuSedation'));
 const PostpartumVisitPage = lazy(() => import('@/pages/postpartumVisit'));
 const ErTriagePage = lazy(() => import('@/pages/erTriage'));
+const BarthelPage = lazy(() => import('@/pages/barthel'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -450,6 +451,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="er_triage:view">
                 <ErTriagePage />
+              </RequirePermission>
+            }
+          />
+
+          {/* Barthel ADL（M35-B） */}
+          <Route
+            path="barthel"
+            element={
+              <RequirePermission permission="barthel:view">
+                <BarthelPage />
               </RequirePermission>
             }
           />
