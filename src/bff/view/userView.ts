@@ -22,6 +22,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'quality:rectify', 'quality:review',
     'front_page:read', 'front_page:code', 'front_page:audit',
     'billing:read', 'billing:charge', 'billing:refund',
+    'patient_billing:view',
     'order:write', 'order:view', 'prescription:write', 'prescription:review',
     'lab:read', 'imaging:read', 'imaging:view',
     'agent:build', 'agent:publish', 'knowledge:manage', 'knowledge:read',
@@ -235,7 +236,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'imaging:interpret:view', 'imaging:interpret:sign'],
   ams_officer: ['dashboard:view', 'patient:view', 'ams:read', 'ams:approve', 'ams:audit'],
   researcher: ['medical_record:read', 'lab:read', 'report:view', 'knowledge:read'],
-  patient: ['satisfaction:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay'],
+  patient: ['satisfaction:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */

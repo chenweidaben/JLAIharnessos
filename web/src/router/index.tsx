@@ -152,6 +152,7 @@ const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
 const ReportPushPage = lazy(() => import('@/pages/reportPush'));
 const NotificationPage = lazy(() => import('@/pages/notification'));
 const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
+const PatientBillingPage = lazy(() => import('@/pages/patientBilling'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -631,6 +632,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="renewal:pay">
                 <RenewalPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 患者端住院费用（M50-A） */}
+          <Route
+            path="patient-billing"
+            element={
+              <RequirePermission permission="patient_billing:view">
+                <PatientBillingPage />
               </RequirePermission>
             }
           />
