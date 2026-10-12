@@ -35,6 +35,12 @@ export interface EvalSummaryInput {
     totalScore?: number | null;
     dependencyLevel?: string;
   };
+  psych?: {
+    phq9Total?: number | null;
+    phq9Level?: string;
+    gad7Total?: number | null;
+    gad7Level?: string;
+  };
 }
 
 export interface EvalSummary {
@@ -72,6 +78,13 @@ export interface EvalSummary {
     totalScore: number | null;
     dependencyLevel: string;
   };
+  psych: {
+    phq9Total: number | null;
+    phq9Level: string;
+    gad7Total: number | null;
+    gad7Level: string;
+    severe: boolean;
+  };
 }
 
 export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
@@ -86,6 +99,10 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   if (s.pacuAldrete != null && !s.pacuReady) flags.push('pacu_not_ready');
   if ((s.followupPending ?? 0) > 0) flags.push('postop_followup_pending');
   if ((s.anesthesiaOpenTasks ?? 0) > 0) flags.push('anesthesia_open_task');
+
+  const p = inp.psych ?? {};
+  const psychSevere = (p.phq9Total ?? 0) >= 15 || (p.gad7Total ?? 0) >= 15;
+  if (psychSevere) flags.push('psych_severe');
 
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
@@ -121,6 +138,13 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
     rehab: {
       totalScore: inp.rehab?.totalScore ?? null,
       dependencyLevel: inp.rehab?.dependencyLevel ?? 'unknown',
+    },
+    psych: {
+      phq9Total: p.phq9Total ?? null,
+      phq9Level: p.phq9Level ?? 'unknown',
+      gad7Total: p.gad7Total ?? null,
+      gad7Level: p.gad7Level ?? 'unknown',
+      severe: psychSevere,
     },
   };
 }

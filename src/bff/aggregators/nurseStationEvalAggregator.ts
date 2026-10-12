@@ -17,6 +17,7 @@ import { listByVisit as listIcu } from '../../db/repositories/icuSedationRepo.js
 import { listByMother } from '../../db/repositories/postpartumVisitRepo.js';
 import { getByVisit as getTriage } from '../../db/repositories/erTriageRepo.js';
 import { listByVisit as listBarthel } from '../../db/repositories/barthelRepo.js';
+import { listByVisit as listPsych } from '../../db/repositories/psychScreeningRepo.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
@@ -42,7 +43,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -53,7 +54,9 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listByMother(visitId),
     getTriage(visitId),
     listBarthel(visitId),
+    listPsych(visitId),
   ]);
+  const latestPsych = psychList[0] ?? null;
   const latestIcu = icuList[0] ?? null;
   const latestPp = ppList[0] ?? null;
   const latestBarthel = barthelList[0] ?? null;
@@ -98,6 +101,10 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     rehab: latestBarthel ? {
       totalScore: latestBarthel.totalScore,
       dependencyLevel: latestBarthel.dependencyLevel,
+    } : undefined,
+    psych: latestPsych ? {
+      phq9Total: latestPsych.phq9Total, phq9Level: latestPsych.phq9Level,
+      gad7Total: latestPsych.gad7Total, gad7Level: latestPsych.gad7Level,
     } : undefined,
   });
 
