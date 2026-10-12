@@ -18,6 +18,8 @@ import { listByMother } from '../../db/repositories/postpartumVisitRepo.js';
 import { getByVisit as getTriage } from '../../db/repositories/erTriageRepo.js';
 import { listByVisit as listBarthel } from '../../db/repositories/barthelRepo.js';
 import { listByVisit as listPsych } from '../../db/repositories/psychScreeningRepo.js';
+import { listByVisit as listVteAnticoag } from '../../db/repositories/vteAnticoagRepo.js';
+import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
@@ -43,7 +45,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -55,7 +57,13 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     getTriage(visitId),
     listBarthel(visitId),
     listPsych(visitId),
+    listVteAnticoag(visitId),
   ]);
+  const latestVte = vteList[0] ?? null;
+  const db = getDb();
+  const nissRows = await db`SELECT id, infection_type, status FROM clinical.nosocomial_infections WHERE visit_id=${visitId} AND status IN ('reported','under_investigation') ORDER BY created_at DESC`;
+  const nissActiveCount = nissRows.length;
+  const nissLatest = nissRows[0] ?? null;
   const latestPsych = psychList[0] ?? null;
   const latestIcu = icuList[0] ?? null;
   const latestPp = ppList[0] ?? null;
@@ -106,6 +114,14 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       phq9Total: latestPsych.phq9Total, phq9Level: latestPsych.phq9Level,
       gad7Total: latestPsych.gad7Total, gad7Level: latestPsych.gad7Level,
     } : undefined,
+    vte: latestVte ? {
+      drug: latestVte.drug, active: latestVte.active, bleedingScore: latestVte.bleedingScore,
+    } : undefined,
+    infection: {
+      activeCount: nissActiveCount,
+      latestType: nissLatest ? String(nissLatest.infection_type) : null,
+      latestStatus: nissLatest ? String(nissLatest.status) : null,
+    },
   });
 
   return {

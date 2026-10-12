@@ -41,6 +41,16 @@ export interface EvalSummaryInput {
     gad7Total?: number | null;
     gad7Level?: string;
   };
+  vte?: {
+    drug?: string | null;
+    active?: boolean;
+    bleedingScore?: number;
+  };
+  infection?: {
+    activeCount?: number;
+    latestType?: string | null;
+    latestStatus?: string | null;
+  };
 }
 
 export interface EvalSummary {
@@ -85,6 +95,17 @@ export interface EvalSummary {
     gad7Level: string;
     severe: boolean;
   };
+  vte: {
+    drug: string | null;
+    active: boolean;
+    bleedingScore: number;
+    highBleeding: boolean;
+  };
+  infection: {
+    activeCount: number;
+    latestType: string | null;
+    latestStatus: string | null;
+  };
 }
 
 export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
@@ -103,6 +124,13 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const p = inp.psych ?? {};
   const psychSevere = (p.phq9Total ?? 0) >= 15 || (p.gad7Total ?? 0) >= 15;
   if (psychSevere) flags.push('psych_severe');
+
+  const v = inp.vte ?? {};
+  const vteHighBleeding = (v.bleedingScore ?? 0) >= 40;
+  if (vteHighBleeding) flags.push('vte_high_bleeding');
+
+  const inf = inp.infection ?? {};
+  if ((inf.activeCount ?? 0) > 0) flags.push('active_niss');
 
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
@@ -145,6 +173,17 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       gad7Total: p.gad7Total ?? null,
       gad7Level: p.gad7Level ?? 'unknown',
       severe: psychSevere,
+    },
+    vte: {
+      drug: v.drug ?? null,
+      active: v.active ?? false,
+      bleedingScore: v.bleedingScore ?? 0,
+      highBleeding: vteHighBleeding,
+    },
+    infection: {
+      activeCount: inf.activeCount ?? 0,
+      latestType: inf.latestType ?? null,
+      latestStatus: inf.latestStatus ?? null,
     },
   };
 }
