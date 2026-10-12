@@ -75,20 +75,34 @@ export async function listOpenSlots(department?: string, workDate?: string): Pro
 }
 
 /**
- * 占号：row lock 防超卖。0 行即号满/已关闭。
- * 成功返回更新后行；失败返回 null。
+ * 占号 + 写 appointment：row lock 防超卖；0 行即号满/已关闭。
+ * 返回 { slot, appointment }。
  */
-export async function bookSlot(slotId: string, tx: DbExecutor): Promise<AppointmentSlot | null> {
+export async function bookSlotWithAppointment(
+  slotId: string,
+  booking: { patientId: string; department?: string | null; purpose?: string | null },
+  appointmentNo: string,
+  tx: DbExecutor,
+): Promise<{ slot: AppointmentSlot; appointmentNo: string } | null> {
   const rows = await tx`
     UPDATE clinical.appointment_slots
     SET booked_count = booked_count + 1
     WHERE id = ${slotId} AND status = 'open' AND booked_count < total_quota
     RETURNING id, schedule_id, slot_start, slot_end, total_quota, booked_count, status`;
-  return rows.length > 0 ? mapRowToSlot(rows[0] as Record<string, unknown>) : null;
+  if (rows.length === 0) return null;
+  const slot = mapRowToSlot(rows[0] as Record<string, unknown>);
+  await tx`
+    INSERT INTO clinical.appointments (appointment_no, patient_id, scheduled_at, department, purpose, status, slot_id)
+    VALUES (${appointmentNo}, ${booking.patientId}, ${slot.slotStart}, ${booking.department ?? 'TBD'}, ${booking.purpose ?? 'booked via slot'}, 'scheduled', ${slotId})`;
+  return { slot, appointmentNo };
 }
 
-/** 退号回补。 */
-export async function cancelBooking(slotId: string, tx: DbExecutor): Promise<AppointmentSlot | null> {
+/** 退号：appointment CAS scheduled→cancelled，再 booked_count-1。 */
+export async function cancelBookingWithAppointment(slotId: string, tx: DbExecutor): Promise<AppointmentSlot | null> {
+  const cancelled = await tx`
+    UPDATE clinical.appointments SET status = 'cancelled'
+    WHERE slot_id = ${slotId} AND status = 'scheduled'`;
+  void cancelled;
   const rows = await tx`
     UPDATE clinical.appointment_slots
     SET booked_count = booked_count - 1

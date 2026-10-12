@@ -11,13 +11,14 @@ import type { AuthView } from '../view/userView.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import {
   addSlot,
-  bookSlot,
-  cancelBooking,
+  bookSlotWithAppointment,
+  cancelBookingWithAppointment,
   createSchedule,
   getSlotById,
   listOpenSlots,
 } from '../../db/repositories/scheduleSlotRepo.js';
 import { isAvailable, remainingQuota } from '../../medical-tools/internet/slotQuota.js';
+import { makeAppointmentId } from '../../medical-tools/internet/appointmentNo.js';
 
 export class ScheduleError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -68,29 +69,31 @@ export async function listSlotsView(auth: AuthView, department?: string, workDat
   return rows.map((s) => ({ ...s, remaining: remainingQuota(s), available: isAvailable(s) }));
 }
 
-/** 占号：row lock；号满/关闭 → 409。 */
-export async function bookSlotView(auth: AuthView, slotId: string) {
+/** 占号：row lock；号满/关闭 → 409。同时写 appointment。 */
+export async function bookSlotView(auth: AuthView, slotId: string, booking: { patientId: string; department?: string | null; purpose?: string | null }) {
   assertPermission(auth, 'schedule:book');
   assertUuid(slotId, '时段');
+  assertUuid(booking.patientId, '患者');
   return withTx(async (tx) => {
     const before = await getSlotById(slotId, tx);
     if (!before) throw notFound('时段不存在');
-    const booked = await bookSlot(slotId, tx);
+    const appointmentNo = makeAppointmentId();
+    const booked = await bookSlotWithAppointment(slotId, booking, appointmentNo, tx);
     if (!booked) throw conflict('号源已满或时段已关闭');
     await recordChainAudit(
-      { actorId: auth.id, action: 'schedule.book', resourceType: 'appointment_slot', resourceId: slotId, result: 'success', riskLevel: 'low', detail: {} },
+      { actorId: auth.id, action: 'schedule.book', resourceType: 'appointment_slot', resourceId: slotId, result: 'success', riskLevel: 'low', detail: { appointmentNo } },
       tx,
     );
     return booked;
   });
 }
 
-/** 退号回补。 */
+/** 退号：appointment CAS cancelled + booked_count-1。 */
 export async function cancelBookingView(auth: AuthView, slotId: string) {
   assertPermission(auth, 'schedule:book');
   assertUuid(slotId, '时段');
   return withTx(async (tx) => {
-    const c = await cancelBooking(slotId, tx);
+    const c = await cancelBookingWithAppointment(slotId, tx);
     if (!c) throw conflict('无可退号');
     await recordChainAudit(
       { actorId: auth.id, action: 'schedule.cancel', resourceType: 'appointment_slot', resourceId: slotId, result: 'success', riskLevel: 'low', detail: {} },

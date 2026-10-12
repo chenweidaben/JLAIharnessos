@@ -67,7 +67,8 @@ export const scheduleSlotRoutes: RouteDef[] = [
   {
     method: 'POST',
     path: '/api/v1/schedule-slots/:id/book',
-    handle: guarded('schedule:book', (c, view) => bookSlotView(view, c.params.id)),
+    handle: guarded('schedule:book', async (c, view) =>
+      bookSlotView(view, c.params.id, await c.body<{ patientId: string; department?: string; purpose?: string }>())),
     auth: true,
   },
   {

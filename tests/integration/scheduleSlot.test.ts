@@ -7,6 +7,7 @@ import { afterAll, describe, expect, it } from 'bun:test';
 import { closeDbForTest, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import { getUserByUsername, getUserRoleLinks } from '../../src/db/repositories/userRepo.js';
+import { createPatient } from '../../src/db/repositories/patientRepo.js';
 import {
   bookSlotView,
   cancelBookingView,
@@ -40,21 +41,22 @@ D('号源排班（真实 PG）', () => {
     expect(admin.permissions).toContain('schedule:book');
   });
 
-  it('建排班+约号+退号', async () => {
+  it('建排班+约号写appointment+超号409+退号', async () => {
     const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
     const sched = await createScheduleView(admin, {
-      doctorId: admin.id, department: 'M19A_TEST', workDate: tomorrow, note: 'test',
+      doctorId: crypto.randomUUID(), department: 'M19A_TEST', workDate: tomorrow, note: 'test',
       slots: [{ slotStart: `${tomorrow}T09:00:00Z`, slotEnd: `${tomorrow}T09:30:00Z`, totalQuota: 1 }],
     });
     expect(sched.slots).toHaveLength(1);
     const sid = sched.slots[0].id;
+    const p = await createPatient({ mrn: `M19C${Date.now()}`, nameMasked: 'P*19c', gender: '男', birthDate: '1990-01-01' });
 
-    // 约号成功
-    const booked = await bookSlotView(admin, sid);
-    expect(booked.bookedCount).toBe(1);
+    // 约号成功，应返回 appointment_no
+    const booked = await bookSlotView(admin, sid, { patientId: p.id, department: 'TestDept' });
+    expect(booked.appointmentNo).toMatch(/^APT-/);
 
     // 二次约号超号 409
-    const s = await statusOf(bookSlotView(admin, sid));
+    const s = await statusOf(bookSlotView(admin, sid, { patientId: p.id, department: 'TestDept' }));
     expect(s).toBe(409);
 
     // 退号回补
