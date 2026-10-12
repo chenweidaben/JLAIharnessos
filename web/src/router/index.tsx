@@ -126,6 +126,7 @@ const NursingRiskPage = lazy(() => import('@/pages/nursingRisk'));
 const MedAdminPage = lazy(() => import('@/pages/medAdmin'));
 const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
 const EventReviewPage = lazy(() => import('@/pages/eventReview'));
+const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -333,6 +334,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="event_review:read">
                 <EventReviewPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 护理出入量（M17-E） */}
+          <Route
+            path="nursing-io"
+            element={
+              <RequirePermission permission="nursing_io:read">
+                <NursingIoPage />
               </RequirePermission>
             }
           />
