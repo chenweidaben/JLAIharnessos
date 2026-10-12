@@ -131,6 +131,7 @@ const NutritionScreeningPage = lazy(() => import('@/pages/nutritionScreening'));
 const PainAssessmentPage = lazy(() => import('@/pages/painAssessment'));
 const PreopAssessmentPage = lazy(() => import('@/pages/preopAssessment'));
 const PacuRecordPage = lazy(() => import('@/pages/pacuRecord'));
+const PostopFollowupPage = lazy(() => import('@/pages/postopFollowup'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -406,6 +407,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="pacu:view">
                 <PacuRecordPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 术后镇痛随访（M31-C） */}
+          <Route
+            path="postop-followup"
+            element={
+              <RequirePermission permission="postop_followup:view">
+                <PostopFollowupPage />
               </RequirePermission>
             }
           />
