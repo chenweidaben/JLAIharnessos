@@ -129,6 +129,7 @@ const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
+const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -366,6 +367,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nurse_station:read">
                 <NurseStationPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 号源排班选号（M19-A） */}
+          <Route
+            path="schedule-slots"
+            element={
+              <RequirePermission permission="schedule:book">
+                <ScheduleSlotPage />
               </RequirePermission>
             }
           />
