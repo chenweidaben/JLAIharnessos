@@ -37,6 +37,7 @@ if (dbAvailable) {
 afterAll(async () => {
   if (dbAvailable) {
     const db = getDb();
+    await db`DELETE FROM clinical.clinical_improvement_tasks WHERE visit_id='00000000-0000-0000-0000-000000000001'`;
     await db`DELETE FROM clinical.vte_anticoagulations WHERE visit_id='00000000-0000-0000-0000-000000000001'`;
     await closeDbForTest();
   }
