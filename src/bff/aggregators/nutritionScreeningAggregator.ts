@@ -14,6 +14,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { createScreening, listByVisit, type NutritionScreening } from '../../db/repositories/nutritionScreeningRepo.js';
 import { assessNutrition, type NutritionResult } from '../../medical-tools/nursing/nutritionScreening.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { nutritionTaskFinding, nutritionTaskShouldCreate, nutritionTaskTitle } from '../../medical-tools/nursing/interventionTask.js';
 
 export class NutritionError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -43,7 +45,7 @@ async function loadVisit(auth: AuthView, visitId: string): Promise<Visit> {
 export async function createScreeningView(
   auth: AuthView,
   input: { visitId: string; nutritionScore: number; diseaseSeverity: number; ageYears: number; resultNote?: string },
-): Promise<NutritionScreening & { advice: string }> {
+): Promise<NutritionScreening & { advice: string; interventionTaskId: string | null }> {
   assertPermission(auth, 'nutrition:screen');
   assertUuid(input.visitId, '就诊');
   if (!Number.isInteger(input.nutritionScore) || input.nutritionScore < 0 || input.nutritionScore > 3) {
@@ -61,7 +63,7 @@ export async function createScreeningView(
     diseaseSeverity: input.diseaseSeverity,
     ageYears: input.ageYears,
   });
-  const rec = await withTx(async (tx) => {
+  const out = await withTx(async (tx) => {
     const r = await createScreening({
       visitId: input.visitId,
       nutritionScore: result.nutritionScore,
@@ -84,9 +86,24 @@ export async function createScreeningView(
       result: 'success',
       detail: { totalScore: r.totalScore, risk: r.nutritionRisk },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (nutritionTaskShouldCreate(result.nutritionRisk, result.totalScore)) {
+      const exists = await hasOpenTask(input.visitId, 'nutrition', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'nutrition',
+          visitId: input.visitId,
+          title: nutritionTaskTitle(result.totalScore),
+          finding: nutritionTaskFinding(result.totalScore),
+          assigneeId: visit.attendingDoctorId ?? auth.id,
+          createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
-  return { ...rec, advice: result.advice };
+  return { ...out.rec, advice: result.advice, interventionTaskId: out.taskId };
 }
 
 export async function listScreeningsView(auth: AuthView, visitId: string): Promise<NutritionScreening[]> {

@@ -11,6 +11,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { createAssessment, listByVisit, type PainAssessment } from '../../db/repositories/painAssessmentRepo.js';
 import { advice, needAnalgesia, painLevel, reassessIntervalHours, type PainLevel } from '../../medical-tools/nursing/painAssessment.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { painTaskFinding, painTaskShouldCreate, painTaskTitle } from '../../medical-tools/nursing/interventionTask.js';
 
 export class PainError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -41,13 +43,13 @@ async function loadVisit(auth: AuthView, visitId: string): Promise<Visit> {
 export async function createAssessmentView(
   auth: AuthView,
   input: { visitId: string; score: number; assessType: string; location?: string; note?: string },
-): Promise<PainAssessment & { level: PainLevel; needAnalgesia: boolean; reassessHours: number; advice: string }> {
+): Promise<PainAssessment & { level: PainLevel; needAnalgesia: boolean; reassessHours: number; advice: string; interventionTaskId: string | null }> {
   assertPermission(auth, 'pain:assess');
   assertUuid(input.visitId, '就诊');
   if (!Number.isInteger(input.score) || input.score < 0 || input.score > 10) throw badRequest('score 须为 0..10');
   if (!TYPES.has(input.assessType)) throw badRequest('非法 assess_type');
   const visit = await loadVisit(auth, input.visitId);
-  const rec = await withTx(async (tx) => {
+  const out = await withTx(async (tx) => {
     const r = await createAssessment({
       visitId: input.visitId, score: input.score, assessType: input.assessType,
       location: input.location ?? null, note: input.note ?? null, createdBy: auth.id,
@@ -58,14 +60,27 @@ export async function createAssessmentView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { score: r.score, level: painLevel(r.score) },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (painTaskShouldCreate(r.score)) {
+      const exists = await hasOpenTask(input.visitId, 'pain', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'pain', visitId: input.visitId,
+          title: painTaskTitle(r.score), finding: painTaskFinding(r.score),
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
   return {
-    ...rec,
-    level: painLevel(rec.score),
-    needAnalgesia: needAnalgesia(rec.score),
-    reassessHours: reassessIntervalHours(rec.assessType, rec.score),
-    advice: advice(rec.score, rec.assessType),
+    ...out.rec,
+    level: painLevel(out.rec.score),
+    needAnalgesia: needAnalgesia(out.rec.score),
+    reassessHours: reassessIntervalHours(out.rec.assessType, out.rec.score),
+    advice: advice(out.rec.score, out.rec.assessType),
+    interventionTaskId: out.taskId,
   };
 }
 

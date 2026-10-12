@@ -58,6 +58,16 @@ export async function getTask(id: string, tx: DbExecutor = db): Promise<TaskRow 
   return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
 }
 
+/** 幂等：查某 visit 在某 source 下是否已有 open/accepted/in_progress 工单。 */
+export async function hasOpenTask(visitId: string, source: string, tx: DbExecutor = db): Promise<boolean> {
+  const rows = await tx`
+    SELECT 1 FROM clinical.clinical_improvement_tasks
+    WHERE visit_id=${visitId} AND source=${source}
+      AND status IN ('open','accepted','in_progress')
+    LIMIT 1`;
+  return rows.length > 0;
+}
+
 /** CAS：仅当前状态 = expectedFrom 才转。0 行即冲突。 */
 export async function transitionStatus(
   id: string, to: string, expectedFrom: string, resolutionNote: string | null,
