@@ -125,6 +125,7 @@ const NursingAdminPage = lazy(() => import('@/pages/nursingAdmin'));
 const NursingRiskPage = lazy(() => import('@/pages/nursingRisk'));
 const MedAdminPage = lazy(() => import('@/pages/medAdmin'));
 const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
+const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -322,6 +323,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="tube_care:read">
                 <TubeCarePage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 不良事件后结构化评估（M17-D） */}
+          <Route
+            path="event-review"
+            element={
+              <RequirePermission permission="event_review:read">
+                <EventReviewPage />
               </RequirePermission>
             }
           />
