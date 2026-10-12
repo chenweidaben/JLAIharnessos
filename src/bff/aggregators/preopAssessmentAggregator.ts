@@ -10,6 +10,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { create, listByVisit, type PreopAssessment } from '../../db/repositories/preopAssessmentRepo.js';
 import { isComplete, isHighRisk, missingItems } from '../../medical-tools/nursing/preopAssessment.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { preopMissingItems, preopTaskTitle, shouldCreatePreopTask } from '../../medical-tools/nursing/anesthesiaAlert.js';
 
 export class PreopError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -36,12 +38,12 @@ async function loadVisit(auth: AuthView, visitId: string): Promise<Visit> {
 export async function createPreopView(
   auth: AuthView,
   input: { visitId: string; asaGrade: string; npoConfirmed: boolean; allergyChecked: boolean; consentSigned: boolean; assessmentNote?: string },
-): Promise<PreopAssessment & { complete: boolean; missing: string[]; highRisk: boolean }> {
+): Promise<PreopAssessment & { complete: boolean; missing: string[]; highRisk: boolean; interventionTaskId: string | null }> {
   assertPermission(auth, 'preop:assess');
   if (!UUID_RE.test(input.visitId)) throw badRequest('visitId 非法');
   if (!ASA.has(input.asaGrade)) throw badRequest('asa_grade 非法');
   const visit = await loadVisit(auth, input.visitId);
-  const rec = await withTx(async (tx) => {
+  const out = await withTx(async (tx) => {
     const r = await create({
       visitId: input.visitId, asaGrade: input.asaGrade,
       npoConfirmed: input.npoConfirmed, allergyChecked: input.allergyChecked,
@@ -54,13 +56,27 @@ export async function createPreopView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { asa: r.asaGrade, complete: isComplete(r.npoConfirmed, r.allergyChecked, r.consentSigned) },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (shouldCreatePreopTask(r.npoConfirmed, r.allergyChecked, r.consentSigned)) {
+      const exists = await hasOpenTask(r.visitId, 'anesthesia', tx);
+      if (!exists) {
+        const miss = preopMissingItems(r.npoConfirmed, r.allergyChecked, r.consentSigned);
+        const t = await createTask({
+          source: 'anesthesia', visitId: r.visitId, title: preopTaskTitle(miss),
+          finding: `preop missing: ${miss.join(',')}`,
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
   return {
-    ...rec,
-    complete: isComplete(rec.npoConfirmed, rec.allergyChecked, rec.consentSigned),
-    missing: missingItems(rec.npoConfirmed, rec.allergyChecked, rec.consentSigned),
-    highRisk: isHighRisk(rec.asaGrade),
+    ...out.rec,
+    complete: isComplete(out.rec.npoConfirmed, out.rec.allergyChecked, out.rec.consentSigned),
+    missing: missingItems(out.rec.npoConfirmed, out.rec.allergyChecked, out.rec.consentSigned),
+    highRisk: isHighRisk(out.rec.asaGrade),
+    interventionTaskId: out.taskId,
   };
 }
 

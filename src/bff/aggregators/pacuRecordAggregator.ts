@@ -10,6 +10,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { create, discharge, listByVisit, type PacuRecord } from '../../db/repositories/pacuRecordRepo.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { pacuTaskTitle, shouldCreatePacuTask } from '../../medical-tools/nursing/anesthesiaAlert.js';
 
 export class PacuError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -37,12 +39,12 @@ function inRange(v: number): boolean { return Number.isInteger(v) && v >= 0 && v
 export async function recordPacuView(
   auth: AuthView,
   input: { visitId: string; activity: number; respiration: number; circulation: number; consciousness: number; spo2: number; note?: string },
-): Promise<PacuRecord & { aldrete: number; ready: boolean }> {
+): Promise<PacuRecord & { aldrete: number; ready: boolean; interventionTaskId: string | null }> {
   assertPermission(auth, 'pacu:record');
   if (!UUID_RE.test(input.visitId)) throw badRequest('visitId 非法');
   if (![input.activity, input.respiration, input.circulation, input.consciousness, input.spo2].every(inRange)) throw badRequest('Aldrete 各项须为 0..2');
   const visit = await loadVisit(auth, input.visitId);
-  const rec = await withTx(async (tx) => {
+  const out = await withTx(async (tx) => {
     const r = await create({
       visitId: input.visitId, activity: input.activity, respiration: input.respiration,
       circulation: input.circulation, consciousness: input.consciousness, spo2: input.spo2,
@@ -54,10 +56,23 @@ export async function recordPacuView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { aldrete: aldreteTotal(r.activity, r.respiration, r.circulation, r.consciousness, r.spo2) },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    const total = aldreteTotal(r.activity, r.respiration, r.circulation, r.consciousness, r.spo2);
+    const delayed = !readyForDischarge(total);
+    if (shouldCreatePacuTask(delayed)) {
+      const exists = await hasOpenTask(r.visitId, 'anesthesia', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'anesthesia', visitId: r.visitId, title: pacuTaskTitle(),
+          finding: `pacu aldrete=${total} not ready`,
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId, total };
   });
-  const total = aldreteTotal(rec.activity, rec.respiration, rec.circulation, rec.consciousness, rec.spo2);
-  return { ...rec, aldrete: total, ready: readyForDischarge(total) };
+  return { ...out.rec, aldrete: out.total, ready: readyForDischarge(out.total), interventionTaskId: out.taskId };
 }
 
 export async function dischargePacuView(auth: AuthView, id: string, destination: string): Promise<PacuRecord> {
