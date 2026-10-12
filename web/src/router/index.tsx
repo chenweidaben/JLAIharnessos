@@ -119,6 +119,8 @@ const VtePage = lazy(() => import('@/pages/vte'));
 const AmsPage = lazy(() => import('@/pages/ams'));
 // 临床路径管理闭环（M15-A）：查看 pathway:read，入径/执行/变异/出径 pathway:manage/execute，质控 pathway:audit
 const PathwayPage = lazy(() => import('@/pages/pathway'));
+// 护理管理后台（M16-B）：查看 nursing_admin:view，排班/指标写操作按 nursing_admin:schedule/indicator 细分
+const NursingAdminPage = lazy(() => import('@/pages/nursingAdmin'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -282,6 +284,15 @@ export default function AppRoutes() {
           <Route path="ams" element={<AmsPage />} />
           {/* 临床路径管理（M15-A）：查看 pathway:read，入径/执行/变异/出径按权限细分 */}
           <Route path="pathway" element={<PathwayPage />} />
+          {/* 护理管理后台（M16-B）：查看 nursing_admin:view，排班/指标写操作按权限细分 */}
+          <Route
+            path="nursing-admin"
+            element={
+              <RequirePermission permission="nursing_admin:view">
+                <NursingAdminPage />
+              </RequirePermission>
+            }
+          />
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />

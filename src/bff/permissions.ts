@@ -150,3 +150,28 @@ export type MobileNursingPermissionCode =
 /** 全部已登记的移动护理权限码（便于自检遍历） */
 export const ALL_MOBILE_NURSING_PERMISSION_CODES: readonly string[] =
   Object.values(MOBILE_NURSING_PERMISSIONS);
+
+/* ===========================================================================
+ * 护理管理后台权限码（M16-B）
+ *  - nursing_admin:schedule        排班发布调整 / 请假登记（护士长/护理部）
+ *  - nursing_admin:indicator:view   NQI 敏感指标只读（全员护士/医师）
+ *  - nursing_admin:indicator:enter 指标人工录入补全（护士长/护理部）
+ *  - nursing_admin:indicator:audit 指标全院全量审计/上报（护理部/admin）
+ *
+ * DataScope：admin/护理部全量；普通护士/护士长按本病区科室过滤。
+ * 排班为辅助建议、最终护士长确认；异常指标人工核实后方可上报。
+ * ========================================================================= */
+export const NURSING_ADMIN_PERMISSIONS = {
+  SCHEDULE_VIEW: 'nursing_admin:schedule:view',
+  SCHEDULE: 'nursing_admin:schedule',
+  INDICATOR_VIEW: 'nursing_admin:indicator:view',
+  INDICATOR_ENTER: 'nursing_admin:indicator:enter',
+  INDICATOR_AUDIT: 'nursing_admin:indicator:audit',
+} as const;
+
+export type NursingAdminPermissionCode =
+  (typeof NURSING_ADMIN_PERMISSIONS)[keyof typeof NURSING_ADMIN_PERMISSIONS];
+
+/** 全部已登记的护理管理权限码（便于自检遍历） */
+export const ALL_NURSING_ADMIN_PERMISSION_CODES: readonly string[] =
+  Object.values(NURSING_ADMIN_PERMISSIONS);
