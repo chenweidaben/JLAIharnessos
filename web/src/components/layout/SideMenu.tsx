@@ -154,6 +154,7 @@ const navItems: NavItem[] = [
       { key: '/event-review', label: '不良事件评估', perm: 'event_review:read' },
       { key: '/nursing-io', label: '出入量记录', perm: 'nursing_io:read' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
+      { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

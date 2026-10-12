@@ -128,6 +128,7 @@ const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
 const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
+const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -355,6 +356,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="cds:read">
                 <CdsOverridePage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 护士站四合一屏（M18-B） */}
+          <Route
+            path="nurse-station"
+            element={
+              <RequirePermission permission="nurse_station:read">
+                <NurseStationPage />
               </RequirePermission>
             }
           />

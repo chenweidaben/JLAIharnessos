@@ -77,6 +77,7 @@ import { tubeCareRoutes } from './routes/tubeCare';
 import { nursingEventReviewRoutes } from './routes/nursingEventReview';
 import { nursingIoRoutes } from './routes/nursingIo';
 import { orderCdsRoutes } from './routes/orderCds';
+import { nurseStationRoutes } from './routes/nurseStation';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -147,6 +148,7 @@ const allRoutes: RouteDef[] = [
   ...nursingEventReviewRoutes,
   ...nursingIoRoutes,
   ...orderCdsRoutes,
+  ...nurseStationRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
