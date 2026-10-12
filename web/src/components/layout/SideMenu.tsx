@@ -155,6 +155,7 @@ const navItems: NavItem[] = [
       { key: '/nursing-io', label: '出入量记录', perm: 'nursing_io:read' },
       { key: '/nutrition-screening', label: '营养风险筛查', perm: 'nutrition:view' },
       { key: '/pain-assessment', label: '疼痛评估', perm: 'pain:view' },
+      { key: '/preop-assessment', label: '术前访视', perm: 'preop:view' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
       { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/schedule-slots', label: '分时段预约', perm: 'schedule:book' },

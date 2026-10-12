@@ -14,6 +14,11 @@
 | 出入量 I&O | intake/output 分类录入，24h 平衡与三班（06-14/14-22/22-06）汇总 | v0.21.0-m17e |
 | 医嘱开方 CDS override | 开方层过敏/重复活跃医嘱/剂量范围/频次规则，hard 拦截须医生填 override_reason 才放行 | v0.22.0-m18a |
 | 护士站四合一屏 | 床旁一览聚合：床号/最新体征/24h 出入量/待给药/在院管路/风险等级/未处理 hard CDS | v0.23.0-m18b（v0.23.1-m18b-perm 补权限码迁移） |
+| 入院营养风险筛查 NRS-2002 | 营养状态/疾病严重度/年龄≥70 加分，总分≥3 判风险，建议营养科会诊 | v0.47.0-m29a |
+| NRS 疼痛评估 | 0-10 滑块分级 mild/moderate/severe，≥4 分触发镇痛建议与再评估间隔 | v0.48.0-m29b |
+| 营养/疼痛阳性自动工单 | risk=true / score≥4 时同事务幂等建 clinical_improvement_tasks（source=nutrition/pain）分派主治 | v0.49.0-m29c |
+| 单患者护理评估汇总屏 | GET /:visitId/evaluations 聚合营养/疼痛/风险/工单 flags 与 needsAttention | v0.50.0-m30a |
+| 术前访视 ASA 分级 | ASA I-VI + 禁食水/过敏史/知情同意三项确认，缺项标红、≥III 高风险 | v0.51.0-m31a |
 
 ## 二、互联网医院（智慧服务三级）
 

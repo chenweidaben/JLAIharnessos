@@ -129,6 +129,7 @@ const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const NutritionScreeningPage = lazy(() => import('@/pages/nutritionScreening'));
 const PainAssessmentPage = lazy(() => import('@/pages/painAssessment'));
+const PreopAssessmentPage = lazy(() => import('@/pages/preopAssessment'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -384,6 +385,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="pain:view">
                 <PainAssessmentPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 术前访视 ASA（M31-A） */}
+          <Route
+            path="preop-assessment"
+            element={
+              <RequirePermission permission="preop:view">
+                <PreopAssessmentPage />
               </RequirePermission>
             }
           />
