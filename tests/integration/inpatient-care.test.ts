@@ -88,7 +88,10 @@ async function admitPatient(): Promise<any> {
 
 async function safeDischarge(visitId: string): Promise<void> {
   try {
-    await discharge(admin, { visitId, reason: '护理测试兜底清理' });
+    await Promise.race([
+      discharge(admin, { visitId, reason: '护理测试兜底清理' }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('discharge timeout')), 5000)),
+    ]);
   } catch {
     /* ignore */
   }
