@@ -148,6 +148,7 @@ const navItems: NavItem[] = [
       { key: '/ams', label: '抗菌药物管理', perm: 'ams:read' },
       { key: '/pathway', label: '临床路径管理', perm: 'pathway:read' },
       { key: '/nursing-admin', label: '护理管理后台', perm: 'nursing_admin:view' },
+      { key: '/nursing-risk', label: '压疮/跌倒预警', perm: 'nursing_risk:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

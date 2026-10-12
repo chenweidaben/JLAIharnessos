@@ -71,6 +71,7 @@ import { amsRoutes } from './routes/ams';
 import { pathwayRoutes } from './routes/pathway';
 import { mobileNursingRoutes } from './routes/mobileNursing';
 import { nursingAdminRoutes } from './routes/nursingAdmin';
+import { nursingRiskRoutes } from './routes/nursingRisk';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -135,6 +136,7 @@ const allRoutes: RouteDef[] = [
   ...pathwayRoutes,
   ...mobileNursingRoutes,
   ...nursingAdminRoutes,
+  ...nursingRiskRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
