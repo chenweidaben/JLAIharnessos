@@ -56,6 +56,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'payment_select:view', 'payment_select:adjust',
     'settlement_report:view',
     'settlement_analytics:view',
+    'settlement_drilldown:view',
     'ams:read', 'ams:prescribe', 'ams:review', 'ams:approve', 'ams:audit',
     'pathway:read', 'pathway:manage', 'pathway:execute', 'pathway:audit',
     'lis:catalog', 'lis:request', 'lis:collect', 'lis:receive', 'lis:enter', 'lis:review', 'lis:publish',

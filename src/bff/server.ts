@@ -91,6 +91,7 @@ import { dipRoutes } from './routes/dip';
 import { paymentSelectionRoutes } from './routes/paymentSelection';
 import { settlementReportRoutes } from './routes/settlementReport';
 import { settlementAnalyticsRoutes } from './routes/settlementAnalytics';
+import { settlementDrilldownRoutes } from './routes/settlementDrilldown';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -175,6 +176,7 @@ const allRoutes: RouteDef[] = [
   ...paymentSelectionRoutes,
   ...settlementReportRoutes,
   ...settlementAnalyticsRoutes,
+  ...settlementDrilldownRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,

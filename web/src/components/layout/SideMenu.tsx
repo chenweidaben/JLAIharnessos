@@ -170,6 +170,7 @@ const navItems: NavItem[] = [
       { key: '/payment-selection', label: '病组双轨', perm: 'payment_select:view' },
       { key: '/settlement-report', label: '结算报表', perm: 'settlement_report:view' },
       { key: '/settlement-analytics', label: '医保驾驶舱', perm: 'settlement_analytics:view' },
+      { key: '/settlement-drilldown', label: '科室医生排名', perm: 'settlement_drilldown:view' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

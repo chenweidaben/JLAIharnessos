@@ -144,6 +144,7 @@ const DipPage = lazy(() => import('@/pages/dip'));
 const PaymentSelectionPage = lazy(() => import('@/pages/paymentSelection'));
 const SettlementReportPage = lazy(() => import('@/pages/settlementReport'));
 const SettlementAnalyticsPage = lazy(() => import('@/pages/settlementAnalytics'));
+const SettlementDrilldownPage = lazy(() => import('@/pages/settlementDrilldown'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -531,6 +532,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="settlement_analytics:view">
                 <SettlementAnalyticsPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 结算下钻（M23-E） */}
+          <Route
+            path="settlement-drilldown"
+            element={
+              <RequirePermission permission="settlement_drilldown:view">
+                <SettlementDrilldownPage />
               </RequirePermission>
             }
           />
