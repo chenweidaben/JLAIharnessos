@@ -142,6 +142,7 @@ const PatientChronicPage = lazy(() => import('@/pages/patientChronic'));
 const HealthCheckPage = lazy(() => import('@/pages/healthCheck'));
 const HealthCheckReferralPage = lazy(() => import('@/pages/healthCheckReferral'));
 const OncologyPage = lazy(() => import('@/pages/oncology'));
+const ChemoReminderPage = lazy(() => import('@/pages/chemoReminder'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -527,6 +528,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="oncology:view">
                 <OncologyPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 化疗提醒（M43-A） */}
+          <Route
+            path="chemo-reminder"
+            element={
+              <RequirePermission permission="oncology:view">
+                <ChemoReminderPage />
               </RequirePermission>
             }
           />
