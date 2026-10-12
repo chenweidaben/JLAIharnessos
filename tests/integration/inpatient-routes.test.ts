@@ -20,11 +20,11 @@ import {
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import {
   closeDbForTest,
+  releaseTestVisit,
   verifyDbConnection,
 } from '../../src/db/pool.js';
 import { getWardByCode } from '../../src/db/repositories/wardRepo.js';
 import { listBedsByWard } from '../../src/db/repositories/bedRepo.js';
-import { discharge } from '../../src/bff/aggregators/inpatientAggregator.js';
 import type { Ward } from '../../src/db/repositories/wardRepo.js';
 
 let dbAvailable = false;
@@ -35,6 +35,15 @@ let cardio: Ward;
 let resp: Ward;
 const tracked: string[] = [];
 const seq = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+
+/**
+ * 兜底出院清理：bun:test 在 Windows（bun 1.2.x）afterEach 阶段池连接读循环失效，
+ * 池查询会永久挂起。故清理改走 releaseTestVisit 的独立新连接（内部自带 5s 超时
+ * 兜底），不碰主池，避免 afterEach 永久 hang 拖死整套件（M48-A）。
+ */
+async function safeDischarge(visitId: string): Promise<void> {
+  await releaseTestVisit(visitId);
+}
 
 /** 与 newCtx 同构的最小 fake Ctx */
 function makeCtx(user: any, body: any = {}, params: any = {}): any {
@@ -92,17 +101,12 @@ beforeAll(async () => {
 
 afterEach(async () => {
   if (!dbAvailable) return;
-  for (const v of tracked.splice(0)) {
-    try {
-      await discharge(adminView, { visitId: v });
-    } catch {
-      /* ignore */
-    }
-  }
+  for (const v of tracked.splice(0)) await safeDischarge(v);
 });
 
 afterAll(async () => {
-  if (dbAvailable) await closeDbForTest();
+  if (!dbAvailable) return;
+  await closeDbForTest();
 });
 
 const skip = () => !dbAvailable;

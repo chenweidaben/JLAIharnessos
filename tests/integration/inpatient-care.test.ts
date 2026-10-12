@@ -22,7 +22,7 @@
 
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'bun:test';
 
-import { admit, discharge } from '../../src/bff/aggregators/inpatientAggregator.js';
+import { admit } from '../../src/bff/aggregators/inpatientAggregator.js';
 import {
   CareError,
   administerInpatientOrder,
@@ -50,6 +50,7 @@ import {
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import {
   closeDbForTest,
+  releaseTestVisit,
   verifyDbConnection,
 } from '../../src/db/pool.js';
 import { getWardByCode } from '../../src/db/repositories/wardRepo.js';
@@ -87,14 +88,10 @@ async function admitPatient(): Promise<any> {
 }
 
 async function safeDischarge(visitId: string): Promise<void> {
-  try {
-    await Promise.race([
-      discharge(admin, { visitId, reason: '护理测试兜底清理' }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('discharge timeout')), 5000)),
-    ]);
-  } catch {
-    /* ignore */
-  }
+  // bun:test 在 Windows（bun 1.2.x）afterEach 阶段池连接读循环失效，池查询会永久
+  // 挂起。故清理改走 releaseTestVisit 的独立新连接（内部自带 5s 超时兜底），
+  // 不碰主池，避免整套件 hang（M48-A）。
+  await releaseTestVisit(visitId);
 }
 
 /** 断言某动作以指定 HTTP 状态码抛出 CareError */

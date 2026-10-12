@@ -120,3 +120,60 @@ export async function closeDbForTest(): Promise<void> {
   }
   _shuttingDown = false;
 }
+
+/**
+ * 测试专用：用一条【独立新连接】释放某次住院就诊占用的床并标记出院。
+ *
+ * 根因（M48-A）：bun:test 在 Windows（bun 1.2.x）上，测试体用过的 postgres.js
+ * 池连接在 afterEach 阶段读循环不再 pump——服务端已执行完查询、在 ClientRead 等
+ * 客户端，但 socket data 事件不触发，导致 afterEach 里任何池查询（哪怕 SELECT 1）
+ * 永久挂起。直接 closeDbForTest 重建主池又会触发 postgres.js 堆崩溃。全仓其余 ~80
+ * 个集成文件不做 afterEach 打库，唯住院类文件每用例出院清理才踩中。
+ *
+ * 实证：afterEach 里新建的独立连接（fresh postgres()）读循环正常。故清理改走独立
+ * 连接，不碰主池。该函数仅做测试清理所需的最小副作用（释放床 + 标记 visit/admission
+ * 出院），不写审计/ADT 事件，保证后续用例能分到床。
+ *
+ * 带 5s 超时兜底；超时即放弃（最坏泄漏一床，远优于整套件 hang）。
+ */
+export async function releaseTestVisit(visitId: string): Promise<void> {
+  const url = process.env.DATABASE_URL;
+  if (!url) return;
+  const sql = postgres(url, {
+    max: 1,
+    idle_timeout: 2,
+    connect_timeout: 3,
+    ssl: process.env.NODE_ENV === 'production',
+    transform: { undefined: null },
+  });
+  const doRelease = (async () => {
+    await sql.begin(async (tx) => {
+      await tx`
+        UPDATE clinical.beds
+        SET status = 'available', current_visit_id = NULL,
+            current_patient_id = NULL, occupied_at = NULL
+        WHERE current_visit_id = ${visitId}
+      `;
+      await tx`
+        UPDATE clinical.visits
+        SET status = 'discharged', discharge_at = COALESCE(discharge_at, now())
+        WHERE id = ${visitId}
+      `;
+      await tx`
+        UPDATE clinical.admissions
+        SET discharged_at = COALESCE(discharged_at, now())
+        WHERE visit_id = ${visitId} AND discharged_at IS NULL
+      `;
+    });
+  })();
+  try {
+    await Promise.race([
+      doRelease,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('release timeout')), 5000)),
+    ]);
+  } catch {
+    /* 超时或失败：放弃清理，不阻塞后续用例 */
+  } finally {
+    await sql.end({ timeout: 3 });
+  }
+}
