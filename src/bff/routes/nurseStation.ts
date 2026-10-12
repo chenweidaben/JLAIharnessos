@@ -10,6 +10,7 @@ import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
 import { getVisitWorkbench, getWardBoard, NurseStationError } from '../aggregators/nurseStationAggregator';
+import { getVisitEvaluations, EvalError } from '../aggregators/nurseStationEvalAggregator';
 
 const PERM = 'nurse_station:read';
 
@@ -57,6 +58,25 @@ export const nurseStationRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/nurse-station/visit/:visitId',
     handle: guarded((c, view) => getVisitWorkbench(view, PERM, c.params.visitId)),
+    auth: true,
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/nurse-station/:visitId/evaluations',
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requirePermissionCode(c, 'nurse_eval:view');
+      if (denied) return denied;
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await getVisitEvaluations(view, c.params.visitId))); }
+      catch (e) {
+        if (e instanceof EvalError) {
+          const code = e.status === 404 ? ErrorCode.NOT_FOUND : ErrorCode.FORBIDDEN;
+          return json(fail(code, e.message), e.status);
+        }
+        return json(fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : 'eval fail'), 500);
+      }
+    },
     auth: true,
   },
 ];
