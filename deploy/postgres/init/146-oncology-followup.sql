@@ -29,7 +29,7 @@ ALTER TABLE clinical.clinical_improvement_tasks
   DROP CONSTRAINT IF EXISTS clinical_improvement_tasks_source_check;
 ALTER TABLE clinical.clinical_improvement_tasks
   ADD CONSTRAINT clinical_improvement_tasks_source_check
-  CHECK (source IN ('drg_attribution','quality_safety','nutrition','pain','anesthesia','icu_sedation','postpartum','rehab','er_green','chronic','oncology','other'));
+  CHECK (source IN ('drg_attribution','quality_safety','nutrition','pain','anesthesia','icu_sedation','postpartum','rehab','er_green','chronic','chronic_disease','oncology','mental_health','vte','infection','other'));
 
 INSERT INTO iam.permissions (code, name, module, description) VALUES
   ('oncology:manage', '肿瘤随访管理', 'oncology', '化疗周期/不良反应登记（doctor/admin）'),

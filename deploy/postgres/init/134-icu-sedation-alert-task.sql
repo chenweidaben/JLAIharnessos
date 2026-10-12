@@ -9,4 +9,4 @@ ALTER TABLE clinical.clinical_improvement_tasks
 
 ALTER TABLE clinical.clinical_improvement_tasks
   ADD CONSTRAINT clinical_improvement_tasks_source_check
-  CHECK (source IN ('drg_attribution','quality_safety','nutrition','pain','anesthesia','icu_sedation','other'));
+  CHECK (source IN ('drg_attribution','quality_safety','nutrition','pain','anesthesia','icu_sedation','postpartum','rehab','er_green','chronic','chronic_disease','oncology','mental_health','vte','infection','other'));
