@@ -139,6 +139,7 @@ const BarthelPage = lazy(() => import('@/pages/barthel'));
 const ErGreenPage = lazy(() => import('@/pages/erGreen'));
 const ChronicPage = lazy(() => import('@/pages/chronicDisease'));
 const PatientChronicPage = lazy(() => import('@/pages/patientChronic'));
+const HealthCheckPage = lazy(() => import('@/pages/healthCheck'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -494,6 +495,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="patient_chronic:view">
                 <PatientChronicPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 体检中心（M40-A） */}
+          <Route
+            path="healthcheck"
+            element={
+              <RequirePermission permission="healthcheck:view">
+                <HealthCheckPage />
               </RequirePermission>
             }
           />
