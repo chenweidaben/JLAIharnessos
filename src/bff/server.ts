@@ -88,6 +88,7 @@ import { costAttributionRoutes } from './routes/costAttribution';
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
+import { paymentSelectionRoutes } from './routes/paymentSelection';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -169,6 +170,7 @@ const allRoutes: RouteDef[] = [
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
   ...dipRoutes,
+  ...paymentSelectionRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
