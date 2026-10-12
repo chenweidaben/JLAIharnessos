@@ -80,6 +80,7 @@ import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
 import { reportPushRoutes } from './routes/reportPush';
+import { patientNotificationRoutes } from './routes/patientNotification';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -153,6 +154,7 @@ const allRoutes: RouteDef[] = [
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
   ...reportPushRoutes,
+  ...patientNotificationRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
