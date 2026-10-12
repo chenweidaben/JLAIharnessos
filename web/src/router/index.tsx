@@ -132,6 +132,7 @@ const PainAssessmentPage = lazy(() => import('@/pages/painAssessment'));
 const PreopAssessmentPage = lazy(() => import('@/pages/preopAssessment'));
 const PacuRecordPage = lazy(() => import('@/pages/pacuRecord'));
 const PostopFollowupPage = lazy(() => import('@/pages/postopFollowup'));
+const IcuSedationPage = lazy(() => import('@/pages/icuSedation'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -417,6 +418,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="postop_followup:view">
                 <PostopFollowupPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* ICU RASS 镇静评分（M33-A） */}
+          <Route
+            path="icu-sedation"
+            element={
+              <RequirePermission permission="icu_sedation:view">
+                <IcuSedationPage />
               </RequirePermission>
             }
           />
