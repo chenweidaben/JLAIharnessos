@@ -8,6 +8,8 @@ import { withTx } from '../../db/pool.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import { reportInfection, listActive, getById, updateStatus, type Infection } from '../../db/repositories/nissRepo.js';
 import { requiresIsolation, infectionCategory } from '../../medical-tools/nursing/nissReporting.js';
+import { needsTask, buildTask } from '../../medical-tools/nursing/nissAlert.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
 
 export class NissError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -23,11 +25,11 @@ const VALID_STATUS = ['reported', 'under_investigation', 'resolved', 'dismissed'
 export async function reportView(
   auth: AuthView,
   inp: { visitId: string; infectionType: string; pathogen?: string | null; note?: string | null },
-): Promise<Infection> {
+): Promise<Infection & { taskId: string | null }> {
   if (!auth.permissions.includes('infection:report')) throw forbidden('缺少权限：infection:report');
   if (!UUID_RE.test(inp.visitId)) throw badRequest('visitId 非法');
   const iso = requiresIsolation(inp.infectionType);
-  return withTx(async (tx) => {
+  const { rec, taskId } = await withTx(async (tx) => {
     const r = await reportInfection({ ...inp, isolationRequired: iso, reportedBy: auth.id }, tx);
     await recordChainAudit({
       actorId: auth.id, actorRole: auth.rawRoles.join(','), actorDept: auth.deptName,
@@ -35,8 +37,22 @@ export async function reportView(
       patientRef: null, visitRef: r.visitId, result: 'success',
       detail: { type: r.infectionType, category: infectionCategory(r.infectionType), isolation: r.isolationRequired },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (needsTask(r.infectionType)) {
+      const exists = await hasOpenTask(r.visitId, 'infection', tx);
+      if (!exists) {
+        const t = buildTask(r.infectionType, r.pathogen);
+        const tk = await createTask({
+          source: 'infection', visitId: r.visitId,
+          title: t.title, finding: t.finding,
+          assigneeId: auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = tk.id;
+      }
+    }
+    return { rec: r, taskId };
   });
+  return { ...rec, taskId };
 }
 
 export async function listView(auth: AuthView): Promise<Infection[]> {
