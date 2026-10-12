@@ -159,6 +159,7 @@ const navItems: NavItem[] = [
       { key: '/report-pushes', label: '我的报告', perm: 'report:view_patient' },
       { key: '/notifications', label: '通知中心', perm: 'notification:read' },
       { key: '/renewal', label: '续方流转', perm: 'renewal:pay' },
+      { key: '/pharmacy-tasks', label: '待配药任务', perm: 'pharmacy:dispense' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],

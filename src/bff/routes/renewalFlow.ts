@@ -7,7 +7,7 @@ import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
-import { dispenseView, listMineView, payView, prescribeView, RenewalError } from '../aggregators/renewalFlowAggregator';
+import { completeTaskView, dispenseView, listMineView, listPendingTasksView, payView, prescribeView, RenewalError } from '../aggregators/renewalFlowAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -47,4 +47,8 @@ export const renewalRoutes: RouteDef[] = [
     handle: guarded('renewal:pay', (c, view) => payView(view, c.params.id)), auth: true },
   { method: 'POST', path: '/api/v1/renewal/:id/dispense',
     handle: guarded('renewal:prescribe', (c, view) => dispenseView(view, c.params.id)), auth: true },
+  { method: 'GET', path: '/api/v1/pharmacy-tasks',
+    handle: guarded('pharmacy:dispense', (c, view) => listPendingTasksView(view)), auth: true },
+  { method: 'POST', path: '/api/v1/pharmacy-tasks/:id/complete',
+    handle: guarded('pharmacy:dispense', (c, view) => completeTaskView(view, c.params.id)), auth: true },
 ];

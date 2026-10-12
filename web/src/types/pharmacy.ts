@@ -165,3 +165,13 @@ export interface PharmacyHealth {
   db: 'up' | 'down' | 'skipped';
   checks?: unknown[];
 }
+
+// ============================== M21-B 配药任务队列 ==============================
+
+export interface PharmacyTaskItem {
+  id: string;
+  prescriptionId: string;
+  patientId: string;
+  status: string;
+  createdAt: string;
+}

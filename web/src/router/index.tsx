@@ -133,6 +133,7 @@ const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
 const ReportPushPage = lazy(() => import('@/pages/reportPush'));
 const NotificationPage = lazy(() => import('@/pages/notification'));
 const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
+const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -410,6 +411,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="renewal:pay">
                 <RenewalPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 待配药任务（M21-B） */}
+          <Route
+            path="pharmacy-tasks"
+            element={
+              <RequirePermission permission="pharmacy:dispense">
+                <PharmacyTaskPage />
               </RequirePermission>
             }
           />
