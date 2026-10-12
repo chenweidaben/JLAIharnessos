@@ -150,6 +150,7 @@ const navItems: NavItem[] = [
       { key: '/nursing-admin', label: '护理管理后台', perm: 'nursing_admin:view' },
       { key: '/nursing-risk', label: '压疮/跌倒预警', perm: 'nursing_risk:read' },
       { key: '/med-admin', label: '给药三查七对', perm: 'med_admin:read' },
+      { key: '/tube-care', label: '管路护理', perm: 'tube_care:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
