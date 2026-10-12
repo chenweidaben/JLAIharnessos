@@ -130,6 +130,7 @@ const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const NutritionScreeningPage = lazy(() => import('@/pages/nutritionScreening'));
 const PainAssessmentPage = lazy(() => import('@/pages/painAssessment'));
 const PreopAssessmentPage = lazy(() => import('@/pages/preopAssessment'));
+const PacuRecordPage = lazy(() => import('@/pages/pacuRecord'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -395,6 +396,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="preop:view">
                 <PreopAssessmentPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* PACU 复苏记录（M31-B） */}
+          <Route
+            path="pacu-record"
+            element={
+              <RequirePermission permission="pacu:view">
+                <PacuRecordPage />
               </RequirePermission>
             }
           />
