@@ -163,6 +163,7 @@ const navItems: NavItem[] = [
       { key: '/er-triage', label: '急诊分诊', perm: 'er_triage:view' },
       { key: '/barthel', label: 'Barthel ADL', perm: 'barthel:view' },
       { key: '/er-green', label: '绿色通道催办', perm: 'er_triage:view' },
+      { key: '/chronic', label: '慢病随访', perm: 'chronic:view' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
       { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/schedule-slots', label: '分时段预约', perm: 'schedule:book' },
