@@ -51,7 +51,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'cds:read', 'cds:override',
     'nurse_station:read',
     'schedule:manage', 'schedule:book',
-    'report_push:manage', 'report:view_patient', 'notification:read', 'renewal:prescribe', 'renewal:pay', 'pharmacy:dispense', 'drg_budget:manage', 'drg_budget:view', 'inpatient_cost:view', 'drg_attribution:view', 'improvement_task:assign', 'improvement_task:handle',
+    'report_push:manage', 'report:view_patient', 'notification:read', 'renewal:prescribe', 'renewal:pay', 'pharmacy:dispense', 'drg_budget:manage', 'drg_budget:view', 'inpatient_cost:view', 'drg_attribution:view', 'improvement_task:assign', 'improvement_task:handle', 'improvement_outcome:view',
     'ams:read', 'ams:prescribe', 'ams:review', 'ams:approve', 'ams:audit',
     'pathway:read', 'pathway:manage', 'pathway:execute', 'pathway:audit',
     'lis:catalog', 'lis:request', 'lis:collect', 'lis:receive', 'lis:enter', 'lis:review', 'lis:publish',

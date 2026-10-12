@@ -138,6 +138,7 @@ const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
 const CostAttributionPage = lazy(() => import('@/pages/costAttribution'));
 const ImprovementTaskPage = lazy(() => import('@/pages/improvementTask'));
+const ImprovementOutcomePage = lazy(() => import('@/pages/improvementOutcome'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -465,6 +466,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="improvement_task:handle">
                 <ImprovementTaskPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 效果回看（M22-E） */}
+          <Route
+            path="improvement-outcome"
+            element={
+              <RequirePermission permission="improvement_outcome:view">
+                <ImprovementOutcomePage />
               </RequirePermission>
             }
           />
