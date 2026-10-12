@@ -143,6 +143,7 @@ const EscalationPage = lazy(() => import('@/pages/escalation'));
 const DipPage = lazy(() => import('@/pages/dip'));
 const PaymentSelectionPage = lazy(() => import('@/pages/paymentSelection'));
 const SettlementReportPage = lazy(() => import('@/pages/settlementReport'));
+const SettlementAnalyticsPage = lazy(() => import('@/pages/settlementAnalytics'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -520,6 +521,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="settlement_report:view">
                 <SettlementReportPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 医保驾驶舱（M23-D） */}
+          <Route
+            path="settlement-analytics"
+            element={
+              <RequirePermission permission="settlement_analytics:view">
+                <SettlementAnalyticsPage />
               </RequirePermission>
             }
           />
