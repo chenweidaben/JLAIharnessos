@@ -39,11 +39,11 @@ D('整改效果回看（真实 PG）', () => {
 
     // evaluate: baseline 0.5 → followup 0.1 = effective
     const r = await evaluateView(admin, t.id, { baselineVisits: 10, baselineOverspendRate: 0.5, followupVisits: 8, followupOverspendRate: 0.1 });
-    expect(r.verdict).toBe('effective');
+    expect(r.review.verdict).toBe('effective');
 
     // 重复 evaluate 幂等（同 task 一行）
     const r2 = await evaluateView(admin, t.id, { baselineVisits: 10, baselineOverspendRate: 0.5, followupVisits: 8, followupOverspendRate: 0.2 });
-    expect(r2.taskId).toBe(t.id);
+    expect(r2.review.taskId).toBe(t.id);
   });
 
   it('未关闭任务 evaluate 400', async () => {
