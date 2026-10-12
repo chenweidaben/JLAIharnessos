@@ -123,6 +123,7 @@ const PathwayPage = lazy(() => import('@/pages/pathway'));
 const NursingAdminPage = lazy(() => import('@/pages/nursingAdmin'));
 // 压疮/跌倒风险预警（M17-A）：查看 nursing_risk:read，评估 assess/预防 execute 按权限细分
 const NursingRiskPage = lazy(() => import('@/pages/nursingRisk'));
+const MedAdminPage = lazy(() => import('@/pages/medAdmin'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -301,6 +302,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nursing_risk:read">
                 <NursingRiskPage />
+              </RequirePermission>
+            }
+          />
+          {/* 给药三查七对 MAR（M17-B）：查看 med_admin:read，给药执行按权限细分 */}
+          <Route
+            path="med-admin"
+            element={
+              <RequirePermission permission="med_admin:read">
+                <MedAdminPage />
               </RequirePermission>
             }
           />
