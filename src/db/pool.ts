@@ -177,3 +177,34 @@ export async function releaseTestVisit(visitId: string): Promise<void> {
     await sql.end({ timeout: 3 });
   }
 }
+
+/**
+ * 测试专用：在一条【独立短连接】上执行任意清理回调（DELETE/UPDATE 等）。
+ *
+ * 与 releaseTestVisit 同一根因（M48-A/M49-A）：bun:test 在 Windows（bun 1.2.x）的
+ * afterEach/afterAll 阶段，主池连接读循环不 pump，池上的清理查询会永久挂起。本函数
+ * 开独立连接执行回调，跑完即 end，不碰主池。带 10s 超时兜底，超时放弃清理。
+ */
+export async function execTestCleanup(
+  fn: (sql: ReturnType<typeof postgres>) => Promise<void>,
+): Promise<void> {
+  const url = process.env.DATABASE_URL;
+  if (!url) return;
+  const sql = postgres(url, {
+    max: 1,
+    idle_timeout: 2,
+    connect_timeout: 3,
+    ssl: process.env.NODE_ENV === 'production',
+    transform: { undefined: null },
+  });
+  try {
+    await Promise.race([
+      fn(sql),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('cleanup timeout')), 10000)),
+    ]);
+  } catch {
+    /* 超时或失败：放弃清理，不阻塞测试收尾 */
+  } finally {
+    await sql.end({ timeout: 3 });
+  }
+}

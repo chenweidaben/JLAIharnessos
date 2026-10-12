@@ -15,7 +15,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, execTestCleanup, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import { getUserByUsername, getUserRoleLinks } from '../../src/db/repositories/userRepo.js';
 import { createPatient } from '../../src/db/repositories/patientRepo.js';
@@ -93,35 +93,38 @@ if (dbAvailable) {
 
 afterAll(async () => {
   if (dbAvailable) {
-    const db = getDb();
-    await db`
-      DELETE FROM clinical.front_page_reviews r
-      USING clinical.medical_record_front_pages fp
-      WHERE r.front_page_id = fp.id AND fp.visit_id IN (
-        SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
-        WHERE p.tags @> '["M3A_TEST"]'::jsonb
-      )
-    `;
-    await db`
-      DELETE FROM clinical.medical_record_front_pages fp
-      WHERE fp.visit_id IN (
-        SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
-        WHERE p.tags @> '["M3A_TEST"]'::jsonb
-      )
-    `;
-    await db`
-      DELETE FROM clinical.diagnoses d
-      WHERE d.visit_id IN (
-        SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
-        WHERE p.tags @> '["M3A_TEST"]'::jsonb
-      )
-    `;
-    await db`
-      DELETE FROM clinical.visits v
-      USING clinical.patients p
-      WHERE v.patient_id=p.id AND p.tags @> '["M3A_TEST"]'::jsonb
-    `;
-    await db`DELETE FROM clinical.patients WHERE tags @> '["M3A_TEST"]'::jsonb`;
+    // bun:test 在 Windows（bun 1.2.x）afterAll 阶段池连接读循环失效，池 DELETE 会
+    // 永久挂起；清理改走独立短连接（M48-A/M49-A），跑完即 end，不碰主池。
+    await execTestCleanup(async (sql) => {
+      await sql`
+        DELETE FROM clinical.front_page_reviews r
+        USING clinical.medical_record_front_pages fp
+        WHERE r.front_page_id = fp.id AND fp.visit_id IN (
+          SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
+          WHERE p.tags @> '["M3A_TEST"]'::jsonb
+        )
+      `;
+      await sql`
+        DELETE FROM clinical.medical_record_front_pages fp
+        WHERE fp.visit_id IN (
+          SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
+          WHERE p.tags @> '["M3A_TEST"]'::jsonb
+        )
+      `;
+      await sql`
+        DELETE FROM clinical.diagnoses d
+        WHERE d.visit_id IN (
+          SELECT v.id FROM clinical.visits v JOIN clinical.patients p ON p.id=v.patient_id
+          WHERE p.tags @> '["M3A_TEST"]'::jsonb
+        )
+      `;
+      await sql`
+        DELETE FROM clinical.visits v
+        USING clinical.patients p
+        WHERE v.patient_id=p.id AND p.tags @> '["M3A_TEST"]'::jsonb
+      `;
+      await sql`DELETE FROM clinical.patients WHERE tags @> '["M3A_TEST"]'::jsonb`;
+    });
     await closeDbForTest();
   }
 });
@@ -208,8 +211,8 @@ describe.skipIf(!dbAvailable)('M3-A 职责分离与权限/数据范围', () => {
   it('DataScope 跨科：心血管内科医生不能访问急诊科首页 → 403', async () => {
     const { pageId } = await newDischargedPage({ department: '急诊科' });
     { let __e: unknown = null; try { await (getFrontPageDetail(doctorChen, pageId)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
-    // admin（全院）可访问
-    await expect(getFrontPageDetail(admin, pageId)).resolves.toBeTruthy();
+    // admin（全院）可访问（手动 await，避免 expect.resolves 在 bun/Windows 下不 pump）
+    { let __ok = false; try { await getFrontPageDetail(admin, pageId); __ok = true; } catch { /* 断言下一行 */ } expect(__ok).toBe(true); }
   });
 
   it('乐观锁：错误版本号推进 → 409', async () => {

@@ -37,6 +37,7 @@ import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import {
   closeDbForTest,
   getDb,
+  releaseTestVisit,
   verifyDbConnection,
 } from '../../src/db/pool.js';
 import {
@@ -97,13 +98,14 @@ async function admitPatient(
   return item;
 }
 
-/** 兜底：出院仍在院的跟踪就诊（忽略错误） */
-async function safeDischarge(view: AuthView, visitId: string): Promise<void> {
-  try {
-    await discharge(view, { visitId, reason: '单元测试兜底清理' });
-  } catch {
-    /* 已出院/不存在，忽略 */
-  }
+/**
+ * 兜底：出院仍在院的跟踪就诊。
+ * bun:test 在 Windows（bun 1.2.x）afterEach 阶段池连接读循环失效，池查询会永久
+ * 挂起，故清理改走 releaseTestVisit 的独立短连接（内部自带 5s 超时兜底），不碰主池
+ * （M48-A/M49-A）。已出院/不存在时 UPDATE 影响 0 行，无副作用。
+ */
+async function safeDischarge(visitId: string): Promise<void> {
+  await releaseTestVisit(visitId);
 }
 
 beforeAll(async () => {
@@ -130,12 +132,12 @@ beforeAll(async () => {
 // 逐用例清床：每个用例结束即出院其创建的患者，使床位回到基线，避免病区空闲床被累积占满
 afterEach(async () => {
   if (!dbAvailable) return;
-  for (const v of tracked.splice(0)) await safeDischarge(admin, v);
+  for (const v of tracked.splice(0)) await safeDischarge(v);
 });
 
 afterAll(async () => {
   if (!dbAvailable) return;
-  for (const v of tracked.splice(0)) await safeDischarge(admin, v);
+  for (const v of tracked.splice(0)) await safeDischarge(v);
   await closeDbForTest();
 });
 

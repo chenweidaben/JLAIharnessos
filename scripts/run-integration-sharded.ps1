@@ -16,7 +16,8 @@ $files = Get-ChildItem tests/integration/*.test.ts | Sort-Object Name
 $totalPass = 0; $totalFail = 0; $filesRun = 0; $failFiles = @(); $timeoutFiles = @()
 # known-flaky: bun on Windows 连接句柄不退出导致单文件 hang（环境问题，非业务 bug）
 # M48-A：inpatient-care / inpatient-routes 已改 afterEach 走独立新连接清理，移出 flaky。
-$knownFlaky = @('inpatient-core.test.ts','medical-record-front-page.test.ts')
+# M49-A：inpatient-core / medical-record-front-page 同样改独立短连接清理，移出 flaky；名单已空。
+$knownFlaky = @()
 $flakyHit = @()
 
 foreach ($f in $files) {
