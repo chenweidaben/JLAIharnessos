@@ -1,0 +1,47 @@
+#requires -Version 5.1
+<#
+.SYNOPSIS
+  分片跑后端集成测试：每个 .test.ts 独立 bun 进程，结束即释放连接池。
+  规避单进程 bun test 在 Windows 上 postgres.js 连接池渐进耗尽挂死。
+#>
+$ErrorActionPreference = 'Continue'
+$repo = Split-Path -Parent $PSScriptRoot
+$env:PATH = "C:\Users\lenovo\.bun\bin;" + $env:PATH
+$env:TEST_REAL = "1"
+$env:DATABASE_URL = "postgres://postgres:postgres@127.0.0.1:5433/jlmedaios"
+$env:PGPASSWORD = "postgres"
+
+Set-Location $repo
+$files = Get-ChildItem tests/integration/*.test.ts | Sort-Object Name
+$totalPass = 0; $totalFail = 0; $filesRun = 0; $failFiles = @(); $timeoutFiles = @()
+
+foreach ($f in $files) {
+  $filesRun++
+  $out = "$env:TEMP\bunshard_$($f.BaseName).txt"
+  $p = Start-Process -FilePath "bun" -ArgumentList "test", $f.FullName -NoNewWindow -PassThru `
+       -RedirectStandardOutput $out -RedirectStandardError "$out.err"
+  if (-not $p.WaitForExit(120000)) {
+    $p.Kill(); $p.WaitForExit(5000)
+    Write-Host "[TIMEOUT] $($f.Name)"
+    $timeoutFiles += $f.Name
+    continue
+  }
+  $content = (Get-Content $out -Raw -ErrorAction SilentlyContinue) + "`n" + (Get-Content "$out.err" -Raw -ErrorAction SilentlyContinue)
+  # parse "N pass" / "N fail" (bun prints like " 12 pass" " 3 fail")
+  $pm = [regex]::Match($content, '(\d+)\s+pass')
+  $fm = [regex]::Match($content, '(\d+)\s+fail')
+  $pCount = if ($pm.Success) { [int]$pm.Groups[1].Value } else { 0 }
+  $fCount = if ($fm.Success) { [int]$fm.Groups[1].Value } else { 0 }
+  $totalPass += $pCount; $totalFail += $fCount
+  $status = if ($fCount -gt 0) { "FAIL" } else { "ok" }
+  Write-Host ("[{0}] {1}  pass={2} fail={3}" -f $status, $f.Name, $pCount, $fCount)
+  if ($fCount -gt 0) { $failFiles += $f.Name }
+}
+
+Write-Host "`n========== SHARDED SUMMARY =========="
+Write-Host ("files run: {0}" -f $filesRun)
+Write-Host ("total pass: {0}" -f $totalPass)
+Write-Host ("total fail: {0}" -f $totalFail)
+Write-Host ("fail files ({0}):" -f $failFiles.Count); $failFiles | ForEach-Object { "  - $_" }
+Write-Host ("timeout files ({0}):" -f $timeoutFiles.Count); $timeoutFiles | ForEach-Object { "  - $_" }
+if ($failFiles.Count -gt 0 -or $timeoutFiles.Count -gt 0) { exit 1 } else { exit 0 }
