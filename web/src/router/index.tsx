@@ -136,6 +136,7 @@ const IcuSedationPage = lazy(() => import('@/pages/icuSedation'));
 const PostpartumVisitPage = lazy(() => import('@/pages/postpartumVisit'));
 const ErTriagePage = lazy(() => import('@/pages/erTriage'));
 const BarthelPage = lazy(() => import('@/pages/barthel'));
+const ErGreenPage = lazy(() => import('@/pages/erGreen'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -461,6 +462,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="barthel:view">
                 <BarthelPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 绿色通道催办（M37-A） */}
+          <Route
+            path="er-green"
+            element={
+              <RequirePermission permission="er_triage:view">
+                <ErGreenPage />
               </RequirePermission>
             }
           />
