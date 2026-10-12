@@ -133,6 +133,7 @@ const PreopAssessmentPage = lazy(() => import('@/pages/preopAssessment'));
 const PacuRecordPage = lazy(() => import('@/pages/pacuRecord'));
 const PostopFollowupPage = lazy(() => import('@/pages/postopFollowup'));
 const IcuSedationPage = lazy(() => import('@/pages/icuSedation'));
+const PostpartumVisitPage = lazy(() => import('@/pages/postpartumVisit'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -428,6 +429,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="icu_sedation:view">
                 <IcuSedationPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 产后访视（M34-A） */}
+          <Route
+            path="postpartum"
+            element={
+              <RequirePermission permission="postpartum:view">
+                <PostpartumVisitPage />
               </RequirePermission>
             }
           />

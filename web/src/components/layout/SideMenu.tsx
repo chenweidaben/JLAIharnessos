@@ -159,6 +159,7 @@ const navItems: NavItem[] = [
       { key: '/pacu-record', label: 'PACU复苏', perm: 'pacu:view' },
       { key: '/postop-followup', label: '术后镇痛随访', perm: 'postop_followup:view' },
       { key: '/icu-sedation', label: 'ICU镇静', perm: 'icu_sedation:view' },
+      { key: '/postpartum', label: '产后访视', perm: 'postpartum:view' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
       { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/schedule-slots', label: '分时段预约', perm: 'schedule:book' },

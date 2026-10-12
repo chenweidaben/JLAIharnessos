@@ -82,6 +82,7 @@ import { preopAssessmentRoutes } from './routes/preopAssessment';
 import { pacuRecordRoutes } from './routes/pacuRecord';
 import { postopFollowupRoutes } from './routes/postopFollowup';
 import { icuSedationRoutes } from './routes/icuSedation';
+import { postpartumRoutes } from './routes/postpartumVisit';
 import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
@@ -173,6 +174,7 @@ const allRoutes: RouteDef[] = [
   ...pacuRecordRoutes,
   ...postopFollowupRoutes,
   ...icuSedationRoutes,
+  ...postpartumRoutes,
   ...orderCdsRoutes,
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
