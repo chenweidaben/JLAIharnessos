@@ -138,6 +138,7 @@ const ErTriagePage = lazy(() => import('@/pages/erTriage'));
 const BarthelPage = lazy(() => import('@/pages/barthel'));
 const ErGreenPage = lazy(() => import('@/pages/erGreen'));
 const ChronicPage = lazy(() => import('@/pages/chronicDisease'));
+const PatientChronicPage = lazy(() => import('@/pages/patientChronic'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -483,6 +484,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="chronic:view">
                 <ChronicPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 患者端慢病（M39-B） */}
+          <Route
+            path="patient-chronic"
+            element={
+              <RequirePermission permission="patient_chronic:view">
+                <PatientChronicPage />
               </RequirePermission>
             }
           />
