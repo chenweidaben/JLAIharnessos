@@ -136,6 +136,7 @@ const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
+const CostAttributionPage = lazy(() => import('@/pages/costAttribution'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -443,6 +444,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="inpatient_cost:view">
                 <InpatientCostMonitorPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 成本归因（M22-C） */}
+          <Route
+            path="cost-attribution"
+            element={
+              <RequirePermission permission="drg_attribution:view">
+                <CostAttributionPage />
               </RequirePermission>
             }
           />

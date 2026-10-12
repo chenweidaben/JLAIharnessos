@@ -162,6 +162,7 @@ const navItems: NavItem[] = [
       { key: '/pharmacy-tasks', label: '待配药任务', perm: 'pharmacy:dispense' },
       { key: '/drg-budget', label: 'DRG预算预警', perm: 'drg_budget:view' },
       { key: '/inpatient-cost-monitor', label: '在院费用监控', perm: 'inpatient_cost:view' },
+      { key: '/cost-attribution', label: '成本归因', perm: 'drg_attribution:view' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
