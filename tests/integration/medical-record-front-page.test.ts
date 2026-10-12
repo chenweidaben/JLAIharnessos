@@ -202,23 +202,19 @@ describe.skipIf(!dbAvailable)('M3-A 职责分离与权限/数据范围', () => {
     await saveCoding(admin, pageId, { version: 1, primaryDiagnosisCode: 'C34.900' });
     const detail = await getFrontPageDetail(admin, pageId);
     // admin 即编码员，本人质控必须被拒
-    await expect(
-      submitReview(admin, pageId, { version: detail.page.version, decision: 'pass' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (submitReview(admin, pageId, { version: detail.page.version, decision: 'pass' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('DataScope 跨科：心血管内科医生不能访问急诊科首页 → 403', async () => {
     const { pageId } = await newDischargedPage({ department: '急诊科' });
-    await expect(getFrontPageDetail(doctorChen, pageId)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (getFrontPageDetail(doctorChen, pageId)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
     // admin（全院）可访问
     await expect(getFrontPageDetail(admin, pageId)).resolves.toBeTruthy();
   });
 
   it('乐观锁：错误版本号推进 → 409', async () => {
     const { pageId } = await newDischargedPage({ department: '心血管内科' });
-    await expect(
-      saveCoding(admin, pageId, { version: 999, primaryDiagnosisCode: 'C34.900' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (saveCoding(admin, pageId, { version: 999, primaryDiagnosisCode: 'C34.900' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 

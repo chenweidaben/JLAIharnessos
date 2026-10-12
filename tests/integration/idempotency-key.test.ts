@@ -173,7 +173,8 @@ describe('M7-A 统一幂等键框架', () => {
       return json(ok({ result: 'retry-ok' }), 200);
     };
     const ctx1 = await makeCtx('idemp-test-retry-005', { order: 'X5' });
-    expect(withIdempotency(ctx1, run)).rejects.toThrow('首次处理失败');
+    let __e: unknown = null; try { await withIdempotency(ctx1, run); } catch (e) { __e = e; }
+    expect((__e as Error).message).toContain('首次处理失败');
     // 占位已删除，可重试
     const ctx2 = await makeCtx('idemp-test-retry-005', { order: 'X5' });
     const res2 = await withIdempotency(ctx2, run);

@@ -198,19 +198,15 @@ describe.skipIf(!dbAvailable || !realMode)('M5-B 科研专病队列（真实 Pos
   });
 
   it('创建队列缺名称 → 400', async () => {
-    await expect(
-      createResearchCohort(admin, {
+    { let __e: unknown = null; try { await (createResearchCohort(admin, {
         name: '',
         disease: 'x',
         criteria: { include: {}, exclude: {} },
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('草稿态运行匹配 → 409', async () => {
-    await expect(
-      runCohortMatching(admin, matchingCohortId),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (runCohortMatching(admin, matchingCohortId)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('发布队列（draft→active）', async () => {
@@ -219,15 +215,11 @@ describe.skipIf(!dbAvailable || !realMode)('M5-B 科研专病队列（真实 Pos
   });
 
   it('重复发布 → 409', async () => {
-    await expect(
-      publishResearchCohort(admin, matchingCohortId),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (publishResearchCohort(admin, matchingCohortId)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('编辑已发布队列 → 409', async () => {
-    await expect(
-      updateResearchCohort(admin, matchingCohortId, { name: '改名' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (updateResearchCohort(admin, matchingCohortId, { name: '改名' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('运行匹配：仅符合患者入组（1 人）', async () => {
@@ -289,21 +281,15 @@ describe.skipIf(!dbAvailable || !realMode)('M5-B 科研专病队列（真实 Pos
   });
 
   it('已归档再运行匹配 → 409', async () => {
-    await expect(
-      runCohortMatching(admin, matchingCohortId),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (runCohortMatching(admin, matchingCohortId)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('重复归档 → 409', async () => {
-    await expect(
-      archiveResearchCohort(admin, matchingCohortId),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (archiveResearchCohort(admin, matchingCohortId)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('详情查询：不存在 → 404', async () => {
-    await expect(
-      getResearchCohort(admin, '00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (getResearchCohort(admin, '00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('错误类型为 ResearchError', async () => {

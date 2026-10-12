@@ -252,7 +252,7 @@ describe.skipIf(!dbAvailable)('M3-B 状态机非法转换', () => {
       visitId, itemIds: outstanding.items.map((i) => i.id),
     });
     await paySettlementFlow(admin, settlement.id);
-    await expect(paySettlementFlow(admin, settlement.id)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (paySettlementFlow(admin, settlement.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('非已结算费用退费 → 409', async () => {
@@ -261,9 +261,7 @@ describe.skipIf(!dbAvailable)('M3-B 状态机非法转换', () => {
     const outstanding = await getOutstanding(admin, visitId);
     // 未收款，费用仍是 active，退费被拒
     const cbc = outstanding.items.find((i) => i.itemName === '血常规')!;
-    await expect(
-      refundFeeItem(admin, { feeItemId: cbc.id, reason: 'x' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (refundFeeItem(admin, { feeItemId: cbc.id, reason: 'x' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('退费原因必填 → 400', async () => {
@@ -275,9 +273,7 @@ describe.skipIf(!dbAvailable)('M3-B 状态机非法转换', () => {
     });
     await paySettlementFlow(admin, settlement.id);
     const cbc = outstanding.items.find((i) => i.itemName === '血常规')!;
-    await expect(
-      refundFeeItem(admin, { feeItemId: cbc.id, reason: '   ' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (refundFeeItem(admin, { feeItemId: cbc.id, reason: '   ' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 
@@ -299,7 +295,7 @@ describe.skipIf(!dbAvailable)('M3-B 权限与数据范围', () => {
     const { settlement } = await createSettlement(admin, {
       visitId, itemIds: [outstanding.items[0].id],
     });
-    await expect(getSettlementDetail(doctorChen, settlement.id)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (getSettlementDetail(doctorChen, settlement.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('医生有 billing:read 只读，可看队列', async () => {

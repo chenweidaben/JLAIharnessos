@@ -92,9 +92,7 @@ describe.skipIf(!dbAvailable || !realMode)('M3-Q 家属代办授权（真实 Pos
 
   it('高风险：支付未二次确认 → 400', async () => {
     const { accountId, profileId } = await seedAccountWithProfile('pay-noconfirm');
-    await expect(
-      grantDelegation(accountId, { profileId, scopes: ['payment'] }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (grantDelegation(accountId, { profileId, scopes: ['payment'] })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('高风险：支付二次确认后成功', async () => {
@@ -109,19 +107,15 @@ describe.skipIf(!dbAvailable || !realMode)('M3-Q 家属代办授权（真实 Pos
 
   it('非法范围 → 400', async () => {
     const { accountId, profileId } = await seedAccountWithProfile('invalid');
-    await expect(
-      grantDelegation(accountId, {
+    { let __e: unknown = null; try { await (grantDelegation(accountId, {
         profileId,
         scopes: ['booking', 'not-a-scope'],
-      }),
-    ).rejects.toBeInstanceOf(DelegationError);
+      })); } catch (e) { __e = e; } expect(__e).toBeInstanceOf(DelegationError); }
   });
 
   it('空范围 → 400', async () => {
     const { accountId, profileId } = await seedAccountWithProfile('empty');
-    await expect(
-      grantDelegation(accountId, { profileId, scopes: [] }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (grantDelegation(accountId, { profileId, scopes: [] })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('更新：已授权后再次授予为 update', async () => {
@@ -156,20 +150,16 @@ describe.skipIf(!dbAvailable || !realMode)('M3-Q 家属代办授权（真实 Pos
   it('越权：对他人就诊人授权 → 403', async () => {
     const a = await seedAccountWithProfile('owner-a');
     const b = await seedAccountWithProfile('intruder-b');
-    await expect(
-      grantDelegation(b.accountId, {
+    { let __e: unknown = null; try { await (grantDelegation(b.accountId, {
         profileId: a.profileId,
         scopes: ['booking'],
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('越权：撤销他人就诊人 → 403', async () => {
     const a = await seedAccountWithProfile('owner-a2');
     const b = await seedAccountWithProfile('intruder-b2');
-    await expect(
-      revokeDelegation(b.accountId, { profileId: a.profileId }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (revokeDelegation(b.accountId, { profileId: a.profileId })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('越权：查看他人就诊人历史 → 403', async () => {
@@ -179,9 +169,7 @@ describe.skipIf(!dbAvailable || !realMode)('M3-Q 家属代办授权（真实 Pos
       profileId: a.profileId,
       scopes: ['booking'],
     });
-    await expect(
-      listDelegations(b.accountId, { profileId: a.profileId }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (listDelegations(b.accountId, { profileId: a.profileId })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('历史：记录授予/更新/撤销全过程', async () => {

@@ -223,7 +223,7 @@ describe.skipIf(!dbAvailable || !realMode)('M11-A LIS 全流程（真实 Postgre
     await submitReport(techLab, report.id);
 
     // 录入人自审被拒（职责分离 409）
-    await expect(approveReport(techLab, report.id)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (approveReport(techLab, report.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 另一技师审核通过
     const approved = await approveReport(techLab2, report.id);
@@ -295,21 +295,15 @@ describe.skipIf(!dbAvailable || !realMode)('M11-A LIS 全流程（真实 Postgre
     const { req, panelId } = await setupReceived('CBC');
     const { report } = await createLabReport(techLab, req.id, { panelId });
     // 未录入任何结果直接提交，应被拒绝
-    await expect(submitReport(techLab, report.id)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (submitReport(techLab, report.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('权限：护士建报告 403；医生签收标本 403；不存在报告 404', async () => {
     const { req, panelId } = await setupReceived('CBC');
-    await expect(
-      createLabReport(nurseMa, req.id, { panelId }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (createLabReport(nurseMa, req.id, { panelId })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // doctor 无 lis:receive
-    await expect(
-      receiveSpecimen(doctorChen, '00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      getReportDetail('00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (receiveSpecimen(doctorChen, '00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (getReportDetail('00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401', async () => {

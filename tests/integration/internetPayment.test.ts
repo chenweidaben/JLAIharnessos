@@ -302,17 +302,13 @@ describe.skipIf(!dbAvailable)('M3-M 在线支付 · 聚合器全链路', () => {
     });
     paymentIds.push(r1.payment.id);
     // 同幂等键
-    await expect(
-      createPaymentByPatient(p.accountId, p.patientId, {
+    { let __e: unknown = null; try { await (createPaymentByPatient(p.accountId, p.patientId, {
         prescriptionId: rx.id, channel: 'mock', idempotencyKey: key,
-      }),
-    ).rejects.toMatchObject({ status: 409, code: 'CONFLICT' });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409, code: 'CONFLICT' }); }
     // 同处方在途支付单（新键）
-    await expect(
-      createPaymentByPatient(p.accountId, p.patientId, {
+    { let __e: unknown = null; try { await (createPaymentByPatient(p.accountId, p.patientId, {
         prescriptionId: rx.id, channel: 'mock', idempotencyKey: 'paym-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('状态机：非 approved 处方不可支付；paid 支付单不可取消', async () => {
@@ -334,11 +330,9 @@ describe.skipIf(!dbAvailable)('M3-M 在线支付 · 聚合器全链路', () => {
     })();
     void session;
     // pending_review 处方不可支付
-    await expect(
-      createPaymentByPatient(p.accountId, p.patientId, {
+    { let __e: unknown = null; try { await (createPaymentByPatient(p.accountId, p.patientId, {
         prescriptionId: rx.id, channel: 'mock', idempotencyKey: 'paym-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('越权：他人患者发起支付 403；本人支付单被他人取消 403', async () => {
@@ -351,14 +345,10 @@ describe.skipIf(!dbAvailable)('M3-M 在线支付 · 聚合器全链路', () => {
     paymentIds.push(r.payment.id);
 
     const other = await seedFollowupPatient('pay4b');
-    await expect(
-      createPaymentByPatient(other.accountId, p.patientId, {
+    { let __e: unknown = null; try { await (createPaymentByPatient(other.accountId, p.patientId, {
         prescriptionId: rx.id, channel: 'mock', idempotencyKey: 'paym-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      cancelPaymentByPatient(other.accountId, other.patientId, r.payment.id),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (cancelPaymentByPatient(other.accountId, other.patientId, r.payment.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('财务冲正：paid → cancelled + 票据 reversed + 处方 returned；原因必填', async () => {
@@ -372,9 +362,7 @@ describe.skipIf(!dbAvailable)('M3-M 在线支付 · 聚合器全链路', () => {
     expect(r.invoice).not.toBeNull();
 
     // 原因必填
-    await expect(
-      refundPaymentByFinance(pharmacist, r.payment.id, ''),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (refundPaymentByFinance(pharmacist, r.payment.id, '')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     // 药师冲正
     const rr = await refundPaymentByFinance(pharmacist, r.payment.id, '患者拒付');
     expect(rr.payment.status).toBe('cancelled');

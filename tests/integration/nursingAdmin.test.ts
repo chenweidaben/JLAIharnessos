@@ -116,9 +116,7 @@ describe.skipIf(!dbAvailable || !realMode)('M16-B 护理管理后台（真实 Po
   });
 
   it('医师排班 403（职责分离）', async () => {
-    await expect(
-      assignShift(doctorLin, { wardId, date: FUTURE_DATE, nurseId: doctorLin.id, shiftId: dayShiftId }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (assignShift(doctorLin, { wardId, date: FUTURE_DATE, nurseId: doctorLin.id, shiftId: dayShiftId })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('休假登记', async () => {
@@ -134,12 +132,10 @@ describe.skipIf(!dbAvailable || !realMode)('M16-B 护理管理后台（真实 Po
       numerator: 1, denominator: 30, note: 'M16B 夹具',
     });
     expect(ok.value.indicatorCode).toBe('NQI_FALL_INCIDENT');
-    await expect(
-      enterIndicatorValue(nurseZhao, {
+    { let __e: unknown = null; try { await (enterIndicatorValue(nurseZhao, {
         indicatorCode: 'NQI_FALL_INCIDENT', wardId, period: FUTURE_PERIOD,
         numerator: 99, denominator: 30,
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('指标仪表盘：自动指标有数、未接入标 pending', async () => {

@@ -213,7 +213,7 @@ describe.skipIf(!dbAvailable || !realMode)('M13-A VTE 智能防治闭环（真�
     expect(a.assessment.bleedingLevel).toBe('high');
     const ph = a.suggestedPreventions.find((p) => p.category === 'pharmacological')!;
     // 无 override => 409
-    await expect(confirmPharmacological(doctorChen, ph.id, {})).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (confirmPharmacological(doctorChen, ph.id, {})); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     // 有 override + 原因 => 放行
     const r = await confirmPharmacological(doctorChen, ph.id, {
       override: true, overrideReason: '权衡血栓获益大于出血风险，医师床旁确认',
@@ -266,22 +266,18 @@ describe.skipIf(!dbAvailable || !realMode)('M13-A VTE 智能防治闭环（真�
     const ph = a.suggestedPreventions.find((p) => p.category === 'pharmacological')!;
     const mech = a.suggestedPreventions.find((p) => p.category === 'mechanical')!;
     // 护士无 vte:prevent
-    await expect(confirmPharmacological(nurse, ph.id, {})).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (confirmPharmacological(nurse, ph.id, {})); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 医生无 vte:execute
-    await expect(executeMechanical(doctorChen, mech.id)).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (executeMechanical(doctorChen, mech.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 护士无 vte:assess
-    await expect(
-      assessVte(nurse, { visitId: visit.id, scale: 'padua', occasion: 'admission', vteFactorKeys: [], bleedingFactorKeys: [] }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (assessVte(nurse, { visitId: visit.id, scale: 'padua', occasion: 'admission', vteFactorKeys: [], bleedingFactorKeys: [] })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('404：不存在就诊评估', async () => {
-    await expect(
-      assessVte(doctorChen, {
+    { let __e: unknown = null; try { await (assessVte(doctorChen, {
         visitId: '00000000-0000-0000-0000-000000000000', scale: 'padua', occasion: 'admission',
         vteFactorKeys: [], bleedingFactorKeys: [],
-      }),
-    ).rejects.toMatchObject({ status: 404 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401；不存在评估 404', async () => {

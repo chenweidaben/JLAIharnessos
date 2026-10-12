@@ -197,36 +197,30 @@ if (!dbAvailable) {
     });
 
     it('非法分级（0）→ 400', async () => {
-      await expect(
-        overrideClassification(admin, {
+      { let __e: unknown = null; try { await (overrideClassification(admin, {
           schemaName: 'clinical',
           tableName: 'patients',
           columnName: 'blood_type',
           level: 0,
-        }),
-      ).rejects.toMatchObject({ status: 400 });
+        })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     });
 
     it('非法分级（5）→ 400', async () => {
-      await expect(
-        overrideClassification(admin, {
+      { let __e: unknown = null; try { await (overrideClassification(admin, {
           schemaName: 'clinical',
           tableName: 'patients',
           columnName: 'blood_type',
           level: 5,
-        }),
-      ).rejects.toMatchObject({ status: 400 });
+        })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     });
 
     it('目标列不存在 → 404', async () => {
-      await expect(
-        overrideClassification(admin, {
+      { let __e: unknown = null; try { await (overrideClassification(admin, {
           schemaName: 'clinical',
           tableName: 'patients',
           columnName: 'no_such_column',
           level: 2,
-        }),
-      ).rejects.toMatchObject({ status: 404 });
+        })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
     });
 
     it('错误类型为 DataGovernanceError', async () => {

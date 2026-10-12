@@ -175,9 +175,7 @@ describe.skipIf(!dbAvailable)('M3-O 满意度评价 · 聚合器', () => {
   it('归属：患者评价他人就诊 403', async () => {
     const { patientId, visitId } = await seedPatientVisit('c');
     const other = { id: accountIds[0] } as AuthView; // 另一个账号
-    await expect(
-      submitMySurvey(other, { patientId, visitId, ...scores() }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (submitMySurvey(other, { patientId, visitId, ...scores() })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('医护代提交：成功', async () => {
@@ -194,12 +192,8 @@ describe.skipIf(!dbAvailable)('M3-O 满意度评价 · 聚合器', () => {
 
   it('校验：评分越界 400、缺关联 400', async () => {
     const { view, patientId, visitId } = await seedPatientVisit('e');
-    await expect(
-      submitMySurvey(view, { patientId, visitId, ...scores({ overallScore: 6 }) }),
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      submitMySurvey(view, { patientId, ...scores() }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (submitMySurvey(view, { patientId, visitId, ...scores({ overallScore: 6 }) })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
+    { let __e: unknown = null; try { await (submitMySurvey(view, { patientId, ...scores() })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('患者/医护查询：我的列表、全部列表、详情', async () => {

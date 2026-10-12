@@ -159,7 +159,7 @@ describe.skipIf(!dbAvailable)('M3-I 状态机非法转换与入参校验', () =>
       scheduledAt: new Date(Date.now() + 86400000).toISOString(),
       purpose: '复诊',
     });
-    await expect(completeAppointment(r.appt.id, admin, 'completed')).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (completeAppointment(r.appt.id, admin, 'completed')); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('已取消再确认 → 409', async () => {
@@ -170,17 +170,15 @@ describe.skipIf(!dbAvailable)('M3-I 状态机非法转换与入参校验', () =>
       purpose: '复诊',
     });
     await cancelAppointment(r.appt.id, admin, 'x');
-    await expect(confirmAppointment(r.appt.id, admin)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (confirmAppointment(r.appt.id, admin)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('空就诊目的 → 400', async () => {
     const patientId = await newPatient();
-    await expect(
-      submitAppointment(admin, {
+    { let __e: unknown = null; try { await (submitAppointment(admin, {
         appointmentNo: `APPT${seq()}`, patientId,
         scheduledAt: new Date().toISOString(), purpose: '   ',
-      }),
-    ).rejects.toBeTruthy();
+      })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('空取消原因 → 400', async () => {
@@ -189,7 +187,7 @@ describe.skipIf(!dbAvailable)('M3-I 状态机非法转换与入参校验', () =>
       appointmentNo: `APPT${seq()}`, patientId,
       scheduledAt: new Date().toISOString(), purpose: '复诊',
     });
-    await expect(cancelAppointment(r.appt.id, admin, '  ')).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (cancelAppointment(r.appt.id, admin, '  ')); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 
@@ -215,9 +213,7 @@ describe.skipIf(!dbAvailable)('M3-I 随访计划与记录', () => {
       scheduledDate: '2026-10-15', content: '复诊提醒',
     });
     await recordFollowUpResult(plan.id, admin, { outcome: '已完成' });
-    await expect(
-      recordFollowUpResult(plan.id, admin, { outcome: '再次记录' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (recordFollowUpResult(plan.id, admin, { outcome: '再次记录' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('空随访结果 → 400', async () => {
@@ -226,9 +222,7 @@ describe.skipIf(!dbAvailable)('M3-I 随访计划与记录', () => {
       planNo: `FU${seq()}`, patientId,
       scheduledDate: '2026-10-15', content: '复诊提醒',
     });
-    await expect(
-      recordFollowUpResult(plan.id, admin, { outcome: '  ' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (recordFollowUpResult(plan.id, admin, { outcome: '  ' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 

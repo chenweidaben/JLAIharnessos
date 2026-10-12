@@ -248,7 +248,7 @@ describe.skipIf(!dbAvailable || !realMode)('M11-B RIS 全流程（真实 Postgre
     expect(submitted.status).toBe('reviewing');
 
     // 书写人自审被拒（职责分离 409）
-    await expect(approveImagingReport(radDoc, report.id)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (approveImagingReport(radDoc, report.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 另一医师审核通过
     const approved = await approveImagingReport(radDoc2, report.id);
@@ -300,11 +300,9 @@ describe.skipIf(!dbAvailable || !realMode)('M11-B RIS 全流程（真实 Postgre
     const r2 = await createImagingRequest(doctorChen, {
       requestNo: `M11B-RQ${seq()}`, visitId: v2.id, items: [{ examId }],
     });
-    await expect(
-      bookAppointment(radTech, {
+    { let __e: unknown = null; try { await (bookAppointment(radTech, {
         appointmentNo: `M11B-RA${seq()}`, requestId: r2.req.id, examId, slotId: slot.id,
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('医疗安全：未执行不能建报告；空报告不能提交', async () => {
@@ -320,14 +318,12 @@ describe.skipIf(!dbAvailable || !realMode)('M11-B RIS 全流程（真实 Postgre
     });
     await checkinAppointment(radTech, booked.appointment.id);
     // 未 perform：study 不存在 -> 建报告 404
-    await expect(
-      createDraftReport(radDoc, '00000000-0000-0000-0000-000000000000', { reportNo: `M11B-RR${seq()}` }),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (createDraftReport(radDoc, '00000000-0000-0000-0000-000000000000', { reportNo: `M11B-RR${seq()}` })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
 
     // 空报告守卫：执行后建草稿但不书写直接提交 -> 409
     const { study } = await performExam(radTech, booked.appointment.id, {});
     const { report } = await createDraftReport(radDoc, study.id, { reportNo: `M11B-RR${seq()}` });
-    await expect(submitImagingReport(radDoc, report.id)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (submitImagingReport(radDoc, report.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     expect(patient.id).toBeTruthy();
   });
 
@@ -356,12 +352,8 @@ describe.skipIf(!dbAvailable || !realMode)('M11-B RIS 全流程（真实 Postgre
 
   it('权限：医生执行 403；不存在报告 404', async () => {
     // doctor_chen 无 ris:perform
-    await expect(
-      performExam(doctorChen, '00000000-0000-0000-0000-000000000000', {}),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      getImagingReportDetail('00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (performExam(doctorChen, '00000000-0000-0000-0000-000000000000', {})); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (getImagingReportDetail('00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401', async () => {

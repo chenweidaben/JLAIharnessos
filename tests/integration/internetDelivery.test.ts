@@ -278,9 +278,7 @@ describe.skipIf(!dbAvailable)('M3-N 处方配送 · 聚合器全链路', () => {
     const { rx } = await openPaidRx(doc, 'del2');
 
     // 快递缺地址 → 400
-    await expect(
-      createDeliveryByPharmacy(pharmacist, { rxId: rx.id, channel: 'express' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (createDeliveryByPharmacy(pharmacist, { rxId: rx.id, channel: 'express' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
 
     const res = await createDeliveryByPharmacy(pharmacist, {
       rxId: rx.id, channel: 'express', address: '浙江省杭州市余杭区 某某小区 3-2-1101 张三 13800000000',
@@ -295,9 +293,7 @@ describe.skipIf(!dbAvailable)('M3-N 处方配送 · 聚合器全链路', () => {
     expect(packed.status).toBe('packed');
 
     // 发货缺物流 → 400
-    await expect(
-      fulfillDeliveryByPharmacy(pharmacist, { deliveryId: res.delivery.id, to: 'shipped' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (fulfillDeliveryByPharmacy(pharmacist, { deliveryId: res.delivery.id, to: 'shipped' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
 
     const shipped = await fulfillDeliveryByPharmacy(pharmacist, {
       deliveryId: res.delivery.id, to: 'shipped',
@@ -355,35 +351,27 @@ describe.skipIf(!dbAvailable)('M3-N 处方配送 · 聚合器全链路', () => {
     await reviewEPrescriptionByPharmacist(pharmacist, {
       prescriptionId: rx.id, decision: 'approved', auditComment: '审核通过',
     });
-    await expect(
-      createDeliveryByPharmacy(pharmacist, { rxId: rx.id, channel: 'self_pick' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (createDeliveryByPharmacy(pharmacist, { rxId: rx.id, channel: 'self_pick' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // paid 处方建单后：created→shipped 非法（跳过打包）
     const { rx: rx2 } = await openPaidRx(doc, 'del4b');
     const d = await createDeliveryByPharmacy(pharmacist, { rxId: rx2.id, channel: 'express', address: '北京市朝阳区 测试地址 李四' });
     deliveryIds.push(d.delivery.id);
-    await expect(
-      fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d.delivery.id, to: 'shipped', courierCompany: '中通', trackingNo: 'ZT123' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d.delivery.id, to: 'shipped', courierCompany: '中通', trackingNo: 'ZT123' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 自取单不可发货
     const { rx: rx3 } = await openPaidRx(doc, 'del4c');
     const d2 = await createDeliveryByPharmacy(pharmacist, { rxId: rx3.id, channel: 'self_pick' });
     deliveryIds.push(d2.delivery.id);
     await fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d2.delivery.id, to: 'packed' });
-    await expect(
-      fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d2.delivery.id, to: 'shipped', courierCompany: '顺丰', trackingNo: 'SF1' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d2.delivery.id, to: 'shipped', courierCompany: '顺丰', trackingNo: 'SF1' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 快递单不可自取核销
     const { rx: rx4 } = await openPaidRx(doc, 'del4d');
     const d3 = await createDeliveryByPharmacy(pharmacist, { rxId: rx4.id, channel: 'express', address: '北京市朝阳区 测试地址2 王五' });
     deliveryIds.push(d3.delivery.id);
     await fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d3.delivery.id, to: 'packed' });
-    await expect(
-      fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d3.delivery.id, to: 'picked_up' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (fulfillDeliveryByPharmacy(pharmacist, { deliveryId: d3.delivery.id, to: 'picked_up' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('越权：他人患者查看指定配送单 403；药房列表不含他人单', async () => {
@@ -394,9 +382,7 @@ describe.skipIf(!dbAvailable)('M3-N 处方配送 · 聚合器全链路', () => {
     deliveryIds.push(d.delivery.id);
 
     const other = await seedFollowupPatient('del5b');
-    await expect(
-      listMyDeliveries(other.accountId, other.patientId, d.delivery.id),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (listMyDeliveries(other.accountId, other.patientId, d.delivery.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 他人列表不含该单
     const mine = await listMyDeliveries(other.accountId, other.patientId);
     expect(mine.some((x) => x.id === d.delivery.id)).toBe(false);
@@ -424,9 +410,7 @@ describe.skipIf(!dbAvailable)('M3-N 处方配送 · 聚合器全链路', () => {
     expect(Array.isArray(mine.interpretations)).toBe(true);
 
     // 医护缺患者 ID → 400
-    await expect(
-      listReportsForStaff(doc),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (listReportsForStaff(doc)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
 
     const staff = await listReportsForStaff(doc, p.patientId);
     expect(Array.isArray(staff.labs)).toBe(true);

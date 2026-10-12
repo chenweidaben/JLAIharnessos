@@ -126,26 +126,22 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
   });
 
   it('转入登记缺患者姓名 → 400', async () => {
-    await expect(
-      createReferral(admin, {
+    { let __e: unknown = null; try { await (createReferral(admin, {
         direction: 'incoming',
         sourceOrg: SOURCE,
         targetOrg: TARGET,
         reason: 'x',
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('转诊原因/机构为空 → 400', async () => {
-    await expect(
-      createReferral(admin, {
+    { let __e: unknown = null; try { await (createReferral(admin, {
         direction: 'incoming',
         patientName: '某人',
         sourceOrg: '',
         targetOrg: TARGET,
         reason: 'x',
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('补充随附资料（院外资料直接存储）', async () => {
@@ -182,9 +178,7 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
       reason: 'x',
     });
     referralIds.push(r.id);
-    await expect(
-      addDocument(admin, r.id, { docType: 'other', title: '空' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (addDocument(admin, r.id, { docType: 'other', title: '空' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('接收转入：院外患者建档 + 生成本院就诊', async () => {
@@ -247,9 +241,7 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
       reason: 'x',
     });
     referralIds.push(r.id);
-    await expect(
-      acceptReferral(admin, r.id, { department: '心血管内科' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (acceptReferral(admin, r.id, { department: '心血管内科' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('重复接收 → 409', async () => {
@@ -264,9 +256,7 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
     const d = await acceptReferral(admin, r.id, { department: '心血管内科' });
     if (d.referral.encounterId) encounterIds.push(d.referral.encounterId);
     if (d.referral.patientId) patientIds.push(d.referral.patientId);
-    await expect(
-      acceptReferral(admin, r.id, { department: '心血管内科' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (acceptReferral(admin, r.id, { department: '心血管内科' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('拒绝转诊', async () => {
@@ -292,9 +282,9 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
       reason: 'x',
     });
     referralIds.push(r.id);
-    await expect(rejectReferral(admin, r.id, '   ')).rejects.toMatchObject({
+    { let __e: unknown = null; try { await (rejectReferral(admin, r.id, '   ')); } catch (e) { __e = e; } expect(__e).toMatchObject({
       status: 400,
-    });
+    }); }
   });
 
   it('已接收 → 完成转诊', async () => {
@@ -322,9 +312,9 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
       reason: 'x',
     });
     referralIds.push(r.id);
-    await expect(completeReferral(admin, r.id)).rejects.toMatchObject({
+    { let __e: unknown = null; try { await (completeReferral(admin, r.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({
       status: 409,
-    });
+    }); }
   });
 
   it('取消转诊', async () => {
@@ -350,19 +340,15 @@ describe.skipIf(!dbAvailable || !realMode)('M3-R 双向转诊（真实 PostgreSQ
     });
     referralIds.push(r.id);
     await rejectReferral(admin, r.id, '不符');
-    await expect(
-      addDocument(admin, r.id, {
+    { let __e: unknown = null; try { await (addDocument(admin, r.id, {
         docType: 'other',
         title: '迟到的资料',
         contentText: '内容',
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('详情查询：不存在 → 404', async () => {
-    await expect(
-      getReferral(admin, '00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (getReferral(admin, '00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('列表：按方向过滤', async () => {

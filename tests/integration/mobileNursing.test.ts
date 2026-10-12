@@ -158,7 +158,7 @@ describe.skipIf(!dbAvailable || !realMode)('M16-A 移动护理 PDA 闭环（真�
     expect(res.kind).toBe('wristband');
     expect(res.visitId).toBe(visit.id);
     expect(res.patientName).toBe(patient.nameMasked);
-    await expect(scanCode(nurseMa, 'ZZZ999')).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (scanCode(nurseMa, 'ZZZ999')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('扫药结合就诊定位 active 医嘱', async () => {
@@ -175,11 +175,9 @@ describe.skipIf(!dbAvailable || !realMode)('M16-A 移动护理 PDA 闭环（真�
     const order = await newActiveDrugOrder(visit.id, 'D001', '100mg');
 
     // 错患者 → MobileVerifyError 409
-    await expect(
-      scanAndAdminister(nurseMa, order.id, {
+    { let __e: unknown = null; try { await (scanAndAdminister(nurseMa, order.id, {
         bedNo: 'M16床', patientName: '错误姓名', drugCode: 'D001', dose: '100mg',
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     // 确认错误类型携带 mismatches
     try {
       await scanAndAdminister(nurseMa, order.id, {
@@ -203,11 +201,9 @@ describe.skipIf(!dbAvailable || !realMode)('M16-A 移动护理 PDA 闭环（真�
     const order = await newActiveDrugOrder(visit.id, 'D002', '0.4ml', true);
 
     // 高风险药未填 checkedBy → 400
-    await expect(
-      scanAndAdminister(nurseMa, order.id, {
+    { let __e: unknown = null; try { await (scanAndAdminister(nurseMa, order.id, {
         bedNo: 'M16床', patientName: patient.nameMasked, drugCode: 'D002', dose: '0.4ml',
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
 
     // 第二护士双人核对 → 成功
     const ok = await scanAndAdminister(nurseMa, order.id, {
@@ -272,11 +268,9 @@ describe.skipIf(!dbAvailable || !realMode)('M16-A 移动护理 PDA 闭环（真�
   it('医生给药 403（职责分离）', async () => {
     const { visit, patient } = await newFixtureVisit();
     const order = await newActiveDrugOrder(visit.id, 'D009', '5mg');
-    await expect(
-      scanAndAdminister(doctorLin, order.id, {
+    { let __e: unknown = null; try { await (scanAndAdminister(doctorLin, order.id, {
         bedNo: 'M16床', patientName: patient.nameMasked, drugCode: 'D009', dose: '5mg',
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('路由：未认证 401；任务不存在 404', async () => {

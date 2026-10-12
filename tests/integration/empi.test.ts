@@ -168,9 +168,7 @@ if (!dbAvailable) {
     });
 
     it('已确认候选再次确认 → 409', async () => {
-      await expect(
-        confirmMatchCandidate(admin, abCandidate),
-      ).rejects.toMatchObject({ status: 409 });
+      { let __e: unknown = null; try { await (confirmMatchCandidate(admin, abCandidate)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     });
 
     it('与已 linked 患者确认候选 → 409（防链接冲突）', async () => {
@@ -180,9 +178,7 @@ if (!dbAvailable) {
       // A 是 master、B 是 linked；idE 与 B 的候选确认时，B 已存在链接 → 409
       const toLinked = pending.filter((c) => samePair(c, idE, idB));
       expect(toLinked).toHaveLength(1);
-      await expect(
-        confirmMatchCandidate(admin, toLinked[0].id),
-      ).rejects.toMatchObject({ status: 409 });
+      { let __e: unknown = null; try { await (confirmMatchCandidate(admin, toLinked[0].id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     }, 30000);
 
     it('拒绝一个候选（C 与新患者 F，直接插入候选模拟）', async () => {
@@ -198,15 +194,11 @@ if (!dbAvailable) {
     });
 
     it('已拒绝候选再操作 → 409', async () => {
-      await expect(
-        rejectMatchCandidate(admin, rejectCandidateId),
-      ).rejects.toMatchObject({ status: 409 });
+      { let __e: unknown = null; try { await (rejectMatchCandidate(admin, rejectCandidateId)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     });
 
     it('确认不存在的候选 → 404', async () => {
-      await expect(
-        confirmMatchCandidate(admin, '00000000-0000-0000-0000-000000000000'),
-      ).rejects.toMatchObject({ status: 404 });
+      { let __e: unknown = null; try { await (confirmMatchCandidate(admin, '00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
     });
 
     it('错误类型为 EmpiAggregatorError', async () => {
@@ -220,11 +212,9 @@ if (!dbAvailable) {
     });
 
     it('登记空标识值 → 400', async () => {
-      await expect(
-        registerPatientIdentifier(admin, {
+      { let __e: unknown = null; try { await (registerPatientIdentifier(admin, {
           patientId: idC, domain: 'phone', rawValue: '   ',
-        }),
-      ).rejects.toMatchObject({ status: 400 });
+        })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     });
 
     it('BFF 路由信封：未认证 → 401', async () => {

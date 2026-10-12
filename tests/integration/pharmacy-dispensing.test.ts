@@ -200,9 +200,7 @@ describe.skipIf(!dbAvailable)('M2-A 审方与队列', () => {
       items: [makeItem('D021', '对乙酰氨基酚', 2)],
     });
     await reviewPendingPrescription(pharmacist, rx.id, { decision: 'approved' });
-    await expect(
-      reviewPendingPrescription(pharmacist, rx.id, { decision: 'approved' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (reviewPendingPrescription(pharmacist, rx.id, { decision: 'approved' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 });
 
@@ -264,9 +262,7 @@ describe.skipIf(!dbAvailable)('M2-A 调剂发药 + 库存真实联动', () => {
     const { visit } = await newPatientVisit();
     // 数量超过库存（200），触发不足
     const rx = await newApprovedRx(visit, [makeItem('D020', '布洛芬', 5000)]);
-    await expect(
-      dispensePrescription(pharmacist, rx.id, {}),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (dispensePrescription(pharmacist, rx.id, {})); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 库存未被改动（仍为 200）
     const inv = (await listInventory({ keyword: '布洛芬', limit: 5 })).find(

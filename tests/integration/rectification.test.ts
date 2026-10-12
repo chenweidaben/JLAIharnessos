@@ -205,15 +205,13 @@ describe.skipIf(!dbAvailable || !realMode)('M9-B 缺陷整改闭环（真实 Pos
   it('权限：非质控人下发/复核 403；非 assignee 整改 403', async () => {
     const { recordId } = await newRecordFixture();
     // 护士无 quality:review → 下发被拒
-    await expect(
-      issueRectification(nurse, {
+    { let __e: unknown = null; try { await (issueRectification(nurse, {
         recordId,
         defectRuleId: 'RULE-LOGIC-001',
         defectMessage: '诊断与用药不符',
         defectType: 'logic',
         defectLevel: 'critical',
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 医生无 quality:review → 复核被拒
     const { task } = await issueRectification(admin, {
       recordId,
@@ -222,18 +220,12 @@ describe.skipIf(!dbAvailable || !realMode)('M9-B 缺陷整改闭环（真实 Pos
       defectType: 'logic',
       defectLevel: 'critical',
     });
-    await expect(
-      reviewRectification(doctorChen, task.id, { result: 'approved', note: 'x' }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (reviewRectification(doctorChen, task.id, { result: 'approved', note: 'x' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // doctor_li 非 assignee → 整改被拒
-    await expect(
-      submitRectification(doctorLi, task.id, { content: '无权整改' }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (submitRectification(doctorLi, task.id, { content: '无权整改' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 驳回缺原因 → 400
     await submitRectification(doctorChen, task.id, { content: '已整改：补充用药说明。' });
-    await expect(
-      reviewRectification(admin, task.id, { result: 'rejected', note: '' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (reviewRectification(admin, task.id, { result: 'rejected', note: '' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('状态机：已整改不可重复提交 409；已复核不可再复核 409', async () => {
@@ -246,13 +238,9 @@ describe.skipIf(!dbAvailable || !realMode)('M9-B 缺陷整改闭环（真实 Pos
       defectLevel: 'minor',
     });
     await submitRectification(doctorChen, task.id, { content: '已补充签名。' });
-    await expect(
-      submitRectification(doctorChen, task.id, { content: '再次提交' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (submitRectification(doctorChen, task.id, { content: '再次提交' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     await reviewRectification(admin, task.id, { result: 'approved', note: 'ok' });
-    await expect(
-      reviewRectification(admin, task.id, { result: 'rejected', note: 'x' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (reviewRectification(admin, task.id, { result: 'rejected', note: 'x' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('复核驳回 → 回到 pending 可重新整改再通过', async () => {
@@ -292,9 +280,9 @@ describe.skipIf(!dbAvailable || !realMode)('M9-B 缺陷整改闭环（真实 Pos
     expect(liList.some((t) => t.recordId === recordId)).toBe(false);
     // doctor_li 无权查看 doctor_chen 的任务详情
     const target = chenList.find((t) => t.recordId === recordId)!;
-    await expect(getRectificationDetail(doctorLi, target.id)).rejects.toMatchObject({
+    { let __e: unknown = null; try { await (getRectificationDetail(doctorLi, target.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({
       status: 403,
-    });
+    }); }
     // 质控人可查看
     const detail = await getRectificationDetail(admin, target.id);
     expect(detail.assigneeName).toBeTruthy();

@@ -186,9 +186,7 @@ describe.skipIf(!dbAvailable || !realMode)('M12-A AI 智能解读（真实 Postg
   });
 
   it('检验 mode=llm 强制：未配置明确报 503，不假装成功', async () => {
-    await expect(
-      generateForVisit(visitCurId, 'doctor', 'llm', admin),
-    ).rejects.toMatchObject({ status: 503 });
+    { let __e: unknown = null; try { await (generateForVisit(visitCurId, 'doctor', 'llm', admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 503 }); }
   });
 
   it('检验签名/退回状态机', async () => {
@@ -196,7 +194,7 @@ describe.skipIf(!dbAvailable || !realMode)('M12-A AI 智能解读（真实 Postg
     const signed = await signLab(doc.id, admin);
     expect(signed.status).toBe('signed');
     // 二次签名 409
-    await expect(signLab(doc.id, admin)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (signLab(doc.id, admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     const pat = await getForVisit(visitCurId, 'patient', admin);
     const rejected = await rejectLab(pat.id, admin, '草稿过于简略');
@@ -205,9 +203,7 @@ describe.skipIf(!dbAvailable || !realMode)('M12-A AI 智能解读（真实 Postg
   });
 
   it('影像：未发布(draft)报告解读 409', async () => {
-    await expect(
-      generateForReport(reportDraftId, 'doctor', 'auto', radDoc),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (generateForReport(reportDraftId, 'doctor', 'auto', radDoc)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('影像：已发布报告生成 200 + 降级标注', async () => {
@@ -231,20 +227,12 @@ describe.skipIf(!dbAvailable || !realMode)('M12-A AI 智能解读（真实 Postg
 
   it('越权 403 / 不存在 404', async () => {
     // 放射科技师访问心血管内科检验 -> 403
-    await expect(
-      generateForVisit(visitCurId, 'doctor', 'rule', radDoc),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (generateForVisit(visitCurId, 'doctor', 'rule', radDoc)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 非放射科医生解读放射科报告 -> 403
-    await expect(
-      generateForReport(reportPublishedId, 'doctor', 'rule', doctorChen),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (generateForReport(reportPublishedId, 'doctor', 'rule', doctorChen)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 不存在
-    await expect(
-      generateForVisit('00000000-0000-0000-0000-000000000000', 'doctor', 'rule', admin),
-    ).rejects.toMatchObject({ status: 404 });
-    await expect(
-      generateForReport('00000000-0000-0000-0000-000000000000', 'doctor', 'rule', admin),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (generateForVisit('00000000-0000-0000-0000-000000000000', 'doctor', 'rule', admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
+    { let __e: unknown = null; try { await (generateForReport('00000000-0000-0000-0000-000000000000', 'doctor', 'rule', admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401', async () => {

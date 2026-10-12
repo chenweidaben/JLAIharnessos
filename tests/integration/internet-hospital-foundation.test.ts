@@ -118,7 +118,7 @@ describe.skipIf(!dbAvailable)('M3-J 微信登录', () => {
   });
 
   it('空 code → 400', async () => {
-    await expect(loginWithWechat({ code: '  ' })).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (loginWithWechat({ code: '  ' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 
@@ -149,12 +149,12 @@ describe.skipIf(!dbAvailable)('M3-J 就诊人管理', () => {
     const a = await loginAccount('owner-' + rand());
     const b = await loginAccount('other-' + rand());
     const p = await addProfile(a.accountId, { relation: 'self', name: '王五' });
-    await expect(getMyProfile(b.accountId, p.id)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (getMyProfile(b.accountId, p.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('不存在就诊人 → 404', async () => {
     const acc = await loginAccount('nf-' + rand());
-    await expect(getMyProfile(acc.accountId, crypto.randomUUID())).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (getMyProfile(acc.accountId, crypto.randomUUID())); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 
@@ -218,9 +218,7 @@ describe.skipIf(!dbAvailable)('M3-J 医护线上资质', () => {
       practiceScope: '内科',
     });
     practitionerIds.push(s.id);
-    await expect(
-      auditPractitioner(s.id, admin.id, { decision: 'rejected' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (auditPractitioner(s.id, admin.id, { decision: 'rejected' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('已审核资质再次审核 → 409', async () => {
@@ -230,9 +228,7 @@ describe.skipIf(!dbAvailable)('M3-J 医护线上资质', () => {
     });
     practitionerIds.push(s.id);
     await auditPractitioner(s.id, admin.id, { decision: 'approved' });
-    await expect(
-      auditPractitioner(s.id, admin.id, { decision: 'rejected', reason: 'x' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (auditPractitioner(s.id, admin.id, { decision: 'rejected', reason: 'x' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('驳回（带理由）成功并记录理由', async () => {

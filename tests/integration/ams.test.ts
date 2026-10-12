@@ -171,12 +171,10 @@ describe.skipIf(!dbAvailable || !realMode)('M14-A 抗菌药物管理闭环（真
   it('越权：住院医师（unrestricted）开限制使用级 403；开非限制级放行', async () => {
     const { visit } = await newPatientVisit();
     // 限制使用级 -> 403
-    await expect(
-      consumeAntibiotic(doctorRes, {
+    { let __e: unknown = null; try { await (consumeAntibiotic(doctorRes, {
         visitId: visit.id, drugId: drugRestricted, purpose: 'therapeutic',
         dose: 1.5, doseUnit: 'g', totalAmount: 3,
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 非限制使用级 -> 放行
     const ok = await consumeAntibiotic(doctorRes, {
       visitId: visit.id, drugId: drugUnrestricted, purpose: 'therapeutic',
@@ -193,12 +191,10 @@ describe.skipIf(!dbAvailable || !realMode)('M14-A 抗菌药物管理闭环（真
     });
     expect(apply.status).toBe('pending');
     // 未审批 -> 409
-    await expect(
-      consumeAntibiotic(doctorChen, {
+    { let __e: unknown = null; try { await (consumeAntibiotic(doctorChen, {
         visitId: visit.id, drugId: drugSpecial, purpose: 'therapeutic',
         dose: 0.5, doseUnit: 'g', totalAmount: 2,
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     // 审批通过 -> 生成医嘱并电子签名
     const approved = await approveSpecialView(amsApprover, apply.id, {});
     expect(approved.approval.status).toBe('approved');
@@ -222,12 +218,10 @@ describe.skipIf(!dbAvailable || !realMode)('M14-A 抗菌药物管理闭环（真
     });
     await rejectSpecialView(amsApprover, apply.id, '指征不充分，先留取病原学');
     // 驳回后无 approved 审批 -> 409
-    await expect(
-      consumeAntibiotic(doctorChen, {
+    { let __e: unknown = null; try { await (consumeAntibiotic(doctorChen, {
         visitId: visit.id, drugId: drugSpecial, purpose: 'therapeutic',
         dose: 0.5, doseUnit: 'g', totalAmount: 2,
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('围术期点评：合理 / 不合理判定 + 药师签名 / 退回', async () => {
@@ -283,24 +277,18 @@ describe.skipIf(!dbAvailable || !realMode)('M14-A 抗菌药物管理闭环（真
 
   it('权限：护士记录使用 403；药师开方 403', async () => {
     const { visit } = await newPatientVisit();
-    await expect(
-      consumeAntibiotic(nurse, {
+    { let __e: unknown = null; try { await (consumeAntibiotic(nurse, {
         visitId: visit.id, drugId: drugUnrestricted, purpose: 'therapeutic',
         dose: 0.5, doseUnit: 'g',
-      }),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      consumeAntibiotic(pharmacist, {
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (consumeAntibiotic(pharmacist, {
         visitId: visit.id, drugId: drugUnrestricted, purpose: 'therapeutic',
         dose: 0.5, doseUnit: 'g',
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('404：不存在点评', async () => {
-    await expect(
-      signReviewView(pharmacist, '00000000-0000-0000-0000-000000000000', 'x'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (signReviewView(pharmacist, '00000000-0000-0000-0000-000000000000', 'x')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401；不存在点评 404', async () => {

@@ -286,9 +286,7 @@ describe.skipIf(!dbAvailable || !realMode)('M10-B 用血质量闭环（真实 Po
     const { patient, visit } = await newPatientVisit();
     const body = applyBody(visit.id, patient.id, { unitCount: 1 });
     const { req } = await applyTransfusion(doctorChen, body);
-    await expect(
-      assessEfficacy(doctorChen, { requestId: req.id, manualPre: 60, manualPost: 80 }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (assessEfficacy(doctorChen, { requestId: req.id, manualPre: 60, manualPost: 80 })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('合理性评价：指征合规+检测完整+剂量合理 → 合理', async () => {
@@ -338,12 +336,8 @@ describe.skipIf(!dbAvailable || !realMode)('M10-B 用血质量闭环（真实 Po
 
   it('权限：医师做合理性审核 403；护士评估疗效 403', async () => {
     const { req } = await setupCompleted();
-    await expect(
-      reviewUtilization(doctorChen, { requestId: req.id }),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      assessEfficacy(nurse, { requestId: req.id, manualPre: 60, manualPost: 80 }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (reviewUtilization(doctorChen, { requestId: req.id })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (assessEfficacy(nurse, { requestId: req.id, manualPre: 60, manualPost: 80 })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('质控指标：周期内聚合', async () => {

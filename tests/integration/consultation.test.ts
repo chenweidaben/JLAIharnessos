@@ -221,9 +221,7 @@ describe.skipIf(!dbAvailable)('M3-K 复诊全链路', () => {
     expect(session.lastVisitId).toBeTruthy();
 
     // 患者待接诊时发消息 → 409
-    await expect(
-      patientSendMessage(p.accountId, session.id, { content: '在吗' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (patientSendMessage(p.accountId, session.id, { content: '在吗' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
 
     // 医生接诊
     const accepted = await acceptSession(doctorId, session.id);
@@ -272,9 +270,7 @@ describe.skipIf(!dbAvailable)('M3-K 发起门禁', () => {
       't',
     );
     patientIds.push(rn.patientId!);
-    await expect(
-      startConsultation(login.accountId, { profileId: profile.id, doctorId }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (startConsultation(login.accountId, { profileId: profile.id, doctorId })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('未实名 → 拒绝发起', async () => {
@@ -282,26 +278,20 @@ describe.skipIf(!dbAvailable)('M3-K 发起门禁', () => {
     const login = await loginWithWechat({ code: 'noname-' + rand() });
     accountIds.push(login.accountId);
     const profile = await addProfile(login.accountId, { relation: 'self', name: '未实名' });
-    await expect(
-      startConsultation(login.accountId, { profileId: profile.id, doctorId }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (startConsultation(login.accountId, { profileId: profile.id, doctorId })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('医生无线上资质 → 拒绝', async () => {
     const p = await seedFollowupPatient('noqual');
     // docC 未创建资质
-    await expect(
-      startConsultation(p.accountId, { profileId: p.profileId, doctorId: docC.id }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (startConsultation(p.accountId, { profileId: p.profileId, doctorId: docC.id })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('重复发起未结束会话 → 409', async () => {
     const doctorId = docA.id;
     const p = await seedFollowupPatient('dup');
     await startConsultation(p.accountId, { profileId: p.profileId, doctorId });
-    await expect(
-      startConsultation(p.accountId, { profileId: p.profileId, doctorId }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (startConsultation(p.accountId, { profileId: p.profileId, doctorId })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('空消息 → 400', async () => {
@@ -312,9 +302,7 @@ describe.skipIf(!dbAvailable)('M3-K 发起门禁', () => {
       doctorId,
     });
     await acceptSession(doctorId, session.id);
-    await expect(
-      patientSendMessage(p.accountId, session.id, { content: '   ' }),
-    ).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (patientSendMessage(p.accountId, session.id, { content: '   ' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 
@@ -336,11 +324,9 @@ describe.skipIf(!dbAvailable)('M3-K 医生端与越权', () => {
       profileId: p.profileId,
       doctorId,
     });
-    await expect(acceptSession(docB.id, session.id)).rejects.toBeTruthy();
-    await expect(
-      doctorSendMessage(docB.id, session.id, { content: '我来看看' }),
-    ).rejects.toBeTruthy();
-    await expect(completeSession(docB.id, session.id)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (acceptSession(docB.id, session.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
+    { let __e: unknown = null; try { await (doctorSendMessage(docB.id, session.id, { content: '我来看看' })); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
+    { let __e: unknown = null; try { await (completeSession(docB.id, session.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 
   it('患者不能访问医生端（无权限码）', async () => {
@@ -359,7 +345,7 @@ describe.skipIf(!dbAvailable)('M3-K 医生端与越权', () => {
       profileId: a.profileId,
       doctorId,
     });
-    await expect(getMySession(b.accountId, session.id)).rejects.toBeTruthy();
+    { let __e: unknown = null; try { await (getMySession(b.accountId, session.id)); } catch (e) { __e = e; } expect(__e).toBeTruthy(); }
   });
 });
 

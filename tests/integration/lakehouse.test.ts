@@ -172,15 +172,11 @@ if (!dbAvailable) {
     });
 
     it('非法 mode → 400', async () => {
-      await expect(
-        triggerPipeline(admin, 'invalid' as never),
-      ).rejects.toMatchObject({ status: 400 });
+      { let __e: unknown = null; try { await (triggerPipeline(admin, 'invalid' as never)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     });
 
     it('非法 jobCode → 400', async () => {
-      await expect(
-        triggerJob(admin, 'unknown_job' as never),
-      ).rejects.toMatchObject({ status: 400 });
+      { let __e: unknown = null; try { await (triggerJob(admin, 'unknown_job' as never)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
     });
 
     it('错误类型为 LakehouseAggregatorError', async () => {

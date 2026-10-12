@@ -181,22 +181,18 @@ describe.skipIf(!dbAvailable || !realMode)('M15-A 临床路径管理闭环（真
     expect(enr.enrollmentDiagnosis).toBe('社区获得性肺炎');
 
     // 重复入径 -> 409
-    await expect(
-      enrollView(doctorChen, {
+    { let __e: unknown = null; try { await (enrollView(doctorChen, {
         visitId: visit.id, pathwayId: cap.id,
         confirmedInclusion: cap.inclusionCriteria, confirmedExclusion: [],
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 命中排除项 -> 409
     const other = await newPatientVisit();
     await addDx(other.visit.id, other.patient.id, 'J18.9', '社区获得性肺炎');
-    await expect(
-      enrollView(doctorChen, {
+    { let __e: unknown = null; try { await (enrollView(doctorChen, {
         visitId: other.visit.id, pathwayId: cap.id,
         confirmedInclusion: cap.inclusionCriteria, confirmedExclusion: cap.exclusionCriteria,
-      }),
-    ).rejects.toMatchObject({ status: 409 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('路径执行：一键下达 -> 执行人本人电子签名（AI 不自主开方）；跳过', async () => {
@@ -265,9 +261,7 @@ describe.skipIf(!dbAvailable || !realMode)('M15-A 临床路径管理闭环（真
     });
 
     // 未逐项满足 -> 409
-    await expect(
-      completeView(doctorChen, enr.id, { confirmedDischarge: [cap.dischargeCriteria[0]] }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (completeView(doctorChen, enr.id, { confirmedDischarge: [cap.dischargeCriteria[0]] })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     // 全部满足 -> completed
     const done = await completeView(doctorChen, enr.id, { confirmedDischarge: cap.dischargeCriteria });
@@ -302,18 +296,14 @@ describe.skipIf(!dbAvailable || !realMode)('M15-A 临床路径管理闭环（真
     const cap = defs.find((d) => d.pathwayCode === 'PW-CAP')!;
     const { visit, patient } = await newPatientVisit();
     await addDx(visit.id, patient.id, 'J18.9', '社区获得性肺炎');
-    await expect(
-      enrollView(nurseMa, {
+    { let __e: unknown = null; try { await (enrollView(nurseMa, {
         visitId: visit.id, pathwayId: cap.id,
         confirmedInclusion: cap.inclusionCriteria, confirmedExclusion: [],
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('404：不存在入径记录', async () => {
-    await expect(
-      getEnrollmentDetailView(admin, '00000000-0000-0000-0000-000000000000'),
-    ).rejects.toMatchObject({ status: 404 });
+    { let __e: unknown = null; try { await (getEnrollmentDetailView(admin, '00000000-0000-0000-0000-000000000000')); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 
   it('路由：未认证 401；不存在入径 404', async () => {

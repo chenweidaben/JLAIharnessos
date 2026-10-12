@@ -183,7 +183,8 @@ describe.skipIf(!dbAvailable)('M2-B 退回整改与职责分离', () => {
     const returned = await getQcRecord(admin, id);
     expect(returned.nextLevel).toBe(1);
 
-    expect(resubmitRecord(admin, id)).rejects.toBeTruthy();
+    let __e1: unknown = null; try { await resubmitRecord(admin, id); } catch (e) { __e1 = e; }
+    expect(__e1).toBeTruthy();
 
     const resub = await resubmitRecord(doctorChen, id);
     expect(resub.status).toBe('submitted');
@@ -199,16 +200,14 @@ describe.skipIf(!dbAvailable)('M2-B 退回整改与职责分离', () => {
 
   it('质控人不得为作者本人：作者提交结论 403', async () => {
     const id = await newSubmittedRecord({ author: doctorChen, department: '心血管内科' });
-    expect(
-      submitQcReview(doctorChen, id, { decision: 'pass', level: 1 }),
-    ).rejects.toBeTruthy();
+    let __e2: unknown = null; try { await submitQcReview(doctorChen, id, { decision: 'pass', level: 1 }); } catch (e) { __e2 = e; }
+    expect(__e2).toBeTruthy();
   });
 
   it('越级质控 409：submitted 状态直接提交 2 级', async () => {
     const id = await newSubmittedRecord({ author: doctorChen, department: '心血管内科' });
-    expect(
-      submitQcReview(admin, id, { decision: 'pass', level: 2 }),
-    ).rejects.toBeTruthy();
+    let __e3: unknown = null; try { await submitQcReview(admin, id, { decision: 'pass', level: 2 }); } catch (e) { __e3 = e; }
+    expect(__e3).toBeTruthy();
   });
 });
 
@@ -230,9 +229,8 @@ describe.skipIf(!dbAvailable)('M2-B 缺陷门禁与队列范围', () => {
     expect(check.canPass).toBe(false);
     expect(check.rule.blockCount).toBeGreaterThan(0);
 
-    expect(
-      submitQcReview(admin, id, { decision: 'pass', level: 1 }),
-    ).rejects.toBeTruthy();
+    let __e4: unknown = null; try { await submitQcReview(admin, id, { decision: 'pass', level: 1 }); } catch (e) { __e4 = e; }
+    expect(__e4).toBeTruthy();
 
     const pass = await submitQcReview(admin, id, {
       decision: 'pass', level: 1,

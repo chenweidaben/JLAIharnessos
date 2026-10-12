@@ -188,9 +188,7 @@ describe.skipIf(!dbAvailable)('M3-P 智能导诊/预问诊 · 聚合器', () => 
     const b = await seedPatientAccount('b');
     const r = await startTriage(a, { symptoms: '头痛' });
     sessionIds.push(r.session.id);
-    await expect(
-      chooseDepartment(b, { sessionId: r.session.id, department: '内科' }),
-    ).rejects.toBeInstanceOf(SmartTriageError);
+    { let __e: unknown = null; try { await (chooseDepartment(b, { sessionId: r.session.id, department: '内科' })); } catch (e) { __e = e; } expect(__e).toBeInstanceOf(SmartTriageError); }
   });
 
   it('越权：使用他人导诊会话提交预问诊 → 403', async () => {
@@ -198,39 +196,31 @@ describe.skipIf(!dbAvailable)('M3-P 智能导诊/预问诊 · 聚合器', () => 
     const b = await seedPatientAccount('b2');
     const t = await startTriage(a, { symptoms: '咳嗽' });
     sessionIds.push(t.session.id);
-    await expect(
-      submitPreliminary(b, {
+    { let __e: unknown = null; try { await (submitPreliminary(b, {
         triageSessionId: t.session.id,
         history: goodHistory,
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('校验：空症状 → 400', async () => {
     const patient = await seedPatientAccount('empty');
-    await expect(
-      startTriage(patient, { symptoms: '' }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (startTriage(patient, { symptoms: '' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('校验：缺主诉/现病史 → 400', async () => {
     const patient = await seedPatientAccount('empty2');
-    await expect(
-      submitPreliminary(patient, {
+    { let __e: unknown = null; try { await (submitPreliminary(patient, {
         targetDepartment: '内科',
         history: { chiefComplaint: '', presentIllness: '' },
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('不存在会话 → 404', async () => {
     const patient = await seedPatientAccount('nf');
-    await expect(
-      chooseDepartment(patient, {
+    { let __e: unknown = null; try { await (chooseDepartment(patient, {
         sessionId: crypto.randomUUID(),
         department: '内科',
-      }),
-    ).rejects.toMatchObject({ status: 404 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 404 }); }
   });
 });
 

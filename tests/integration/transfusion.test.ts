@@ -217,43 +217,27 @@ describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 Po
 
   it('参数校验：缺指征/非法血型/非法成分/剂量<=0 均 400', async () => {
     const { visitId, patientId } = await newVisitFixture();
-    await expect(
-      applyTransfusion(doctorChen, applyBody(visitId, patientId, { indication: '' })),
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      applyTransfusion(doctorChen, applyBody(visitId, patientId, { bloodType: 'X' })),
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      applyTransfusion(doctorChen, applyBody(visitId, patientId, { component: 'water' })),
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 0 })),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (applyTransfusion(doctorChen, applyBody(visitId, patientId, { indication: '' }))); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
+    { let __e: unknown = null; try { await (applyTransfusion(doctorChen, applyBody(visitId, patientId, { bloodType: 'X' }))); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
+    { let __e: unknown = null; try { await (applyTransfusion(doctorChen, applyBody(visitId, patientId, { component: 'water' }))); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
+    { let __e: unknown = null; try { await (applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 0 }))); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('权限：护士申请 403、医师配血 403、无 review 上报 403', async () => {
     const { visitId, patientId } = await newVisitFixture();
-    await expect(
-      applyTransfusion(nurse, applyBody(visitId, patientId)),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (applyTransfusion(nurse, applyBody(visitId, patientId))); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     const { req } = await applyTransfusion(doctorChen, applyBody(visitId, patientId));
-    await expect(
-      crossmatch(req.id, doctorChen, { result: '相合' }),
-    ).rejects.toMatchObject({ status: 403 });
-    await expect(
-      reportReaction(req.id, doctorChen, { severity: 'mild', symptom: '皮疹', action: 'observe' }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (crossmatch(req.id, doctorChen, { result: '相合' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
+    { let __e: unknown = null; try { await (reportReaction(req.id, doctorChen, { severity: 'mild', symptom: '皮疹', action: 'observe' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
   });
 
   it('状态机：未配血直接发血 409；取消后配血 409；完成后再停输 409', async () => {
     const { visitId, patientId } = await newVisitFixture();
     const { req } = await applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 1 }));
-    await expect(dispense(req.id, admin)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (dispense(req.id, admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     await cancelRequest(req.id, doctorChen, { reason: '患者转院' });
     expect(req.status).not.toBe('cancelled'); // req 是旧快照，取消结果在返回里
-    await expect(
-      crossmatch(req.id, admin, { result: '相合' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (crossmatch(req.id, admin, { result: '相合' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
 
     const b2 = await newVisitFixture();
     const r2 = await applyTransfusion(doctorChen, applyBody(b2.visitId, b2.patientId, { unitCount: 1 }));
@@ -261,9 +245,7 @@ describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 Po
     await dispense(r2.req.id, admin);
     await startTransfusion(r2.req.id, nurse, { coSignBy: admin.id });
     await completeTransfusion(r2.req.id, nurse);
-    await expect(
-      stopTransfusion(r2.req.id, nurse, { reason: '事后停输' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (stopTransfusion(r2.req.id, nurse, { reason: '事后停输' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('双人核对：执行护士与核对护士同人 400', async () => {
@@ -271,9 +253,7 @@ describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 Po
     const { req } = await applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 1 }));
     await crossmatch(req.id, admin, { result: '相合' });
     await dispense(req.id, admin);
-    await expect(
-      startTransfusion(req.id, nurse, { coSignBy: nurse.id }),
-    ).rejects.toMatchObject({ status: 400 });
+    { let __e: unknown = null; try { await (startTransfusion(req.id, nurse, { coSignBy: nurse.id })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('库存不足：需求超出可发库存 → 409 且不扣库', async () => {
@@ -281,7 +261,7 @@ describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 Po
     const before = await getTransfusionStock('O', 'red_cell');
     const { req } = await applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 9999 }));
     await crossmatch(req.id, admin, { result: '相合' });
-    await expect(dispense(req.id, admin)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (dispense(req.id, admin)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     const after = await getTransfusionStock('O', 'red_cell');
     expect(before - after).toBe(0);
   });
@@ -289,9 +269,7 @@ describe.skipIf(!dbAvailable || !realMode)('M10-A 输血管理闭环（真实 Po
   it('不良反应：输注中/完成后可上报；未输注 409', async () => {
     const { visitId, patientId } = await newVisitFixture();
     const { req } = await applyTransfusion(doctorChen, applyBody(visitId, patientId, { unitCount: 1 }));
-    await expect(
-      reportReaction(req.id, admin, { severity: 'mild', symptom: '皮疹', action: 'observe' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (reportReaction(req.id, admin, { severity: 'mild', symptom: '皮疹', action: 'observe' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     await crossmatch(req.id, admin, { result: '相合' });
     await dispense(req.id, admin);
     await startTransfusion(req.id, nurse, { coSignBy: admin.id });

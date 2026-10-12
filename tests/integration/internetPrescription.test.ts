@@ -283,9 +283,7 @@ describe.skipIf(!dbAvailable)('M3-L 电子处方 · 聚合器全链路', () => {
     expect(returned.auditComment).toBe('青霉素类需补充皮试结果');
 
     // 非开方医生重提 → 403
-    await expect(
-      resubmitEPrescriptionByDoctor(docB, { prescriptionId: rx.id, items: rx.items }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (resubmitEPrescriptionByDoctor(docB, { prescriptionId: rx.id, items: rx.items })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
 
     // 医生修改明细（去掉需皮试的阿莫西林）并重提
     const items = rx.items.filter((i) => i.drugCode !== 'D018');
@@ -313,10 +311,8 @@ describe.skipIf(!dbAvailable)('M3-L 电子处方 · 聚合器全链路', () => {
     });
     expect(rejected.status).toBe('rejected');
 
-    await expect(
-      resubmitEPrescriptionByDoctor(docA, { prescriptionId: rx.id, items: rx.items }),
-    ).rejects.toMatchObject({ status: 409 });
-    await expect(cancelEPrescriptionByDoctor(docA, rx.id)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (resubmitEPrescriptionByDoctor(docA, { prescriptionId: rx.id, items: rx.items })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
+    { let __e: unknown = null; try { await (cancelEPrescriptionByDoctor(docA, rx.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('无 AI 自动处方：空明细 / 缺药名拒绝', async () => {
@@ -328,20 +324,16 @@ describe.skipIf(!dbAvailable)('M3-L 电子处方 · 聚合器全链路', () => {
     });
     await acceptSession(docA.id, session.id);
 
-    await expect(
-      createEPrescriptionByDoctor(docA, {
+    { let __e: unknown = null; try { await (createEPrescriptionByDoctor(docA, {
         sessionId: session.id,
         items: [],
         idempotencyKey: 'erlx-empty-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 400 });
-    await expect(
-      createEPrescriptionByDoctor(docA, {
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
+    { let __e: unknown = null; try { await (createEPrescriptionByDoctor(docA, {
         sessionId: session.id,
         items: [{ drugName: '' } as never],
         idempotencyKey: 'erlx-noname-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 400 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 400 }); }
   });
 
   it('幂等键重复提交 → 409（防重复开方）', async () => {
@@ -360,7 +352,7 @@ describe.skipIf(!dbAvailable)('M3-L 电子处方 · 聚合器全链路', () => {
     };
     const first = await createEPrescriptionByDoctor(docA, input);
     rxIds.push(first.id);
-    await expect(createEPrescriptionByDoctor(docA, input)).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (createEPrescriptionByDoctor(docA, input)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('状态机非法转换：非 pending_review 审方 409；非 returned 重提 409', async () => {
@@ -370,34 +362,24 @@ describe.skipIf(!dbAvailable)('M3-L 电子处方 · 聚合器全链路', () => {
       decision: 'approved',
     });
     // 已 approved，再审（approved 不需要意见，触发状态机 409）→ 409
-    await expect(
-      reviewEPrescriptionByPharmacist(pharmacist, { prescriptionId: rx.id, decision: 'approved' }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (reviewEPrescriptionByPharmacist(pharmacist, { prescriptionId: rx.id, decision: 'approved' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
     // 已 approved，重提 → 409
-    await expect(
-      resubmitEPrescriptionByDoctor(docA, { prescriptionId: rx.id, items: rx.items }),
-    ).rejects.toMatchObject({ status: 409 });
+    { let __e: unknown = null; try { await (resubmitEPrescriptionByDoctor(docA, { prescriptionId: rx.id, items: rx.items })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 409 }); }
   });
 
   it('越权：非接诊医生开方 403；非药师审方 403；他人处方查看 403', async () => {
     const { p, session, rx } = await openSessionAndCreateRx(docA, 'perm');
     // 非接诊医生开方 → 403
-    await expect(
-      createEPrescriptionByDoctor(docB, {
+    { let __e: unknown = null; try { await (createEPrescriptionByDoctor(docB, {
         sessionId: session.id,
         items: [{ drugName: '对乙酰氨基酚片' }],
         idempotencyKey: 'erlx-perm-' + rand(),
-      }),
-    ).rejects.toMatchObject({ status: 403 });
+      })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 医生审方（非药师角色）→ 403
-    await expect(
-      reviewEPrescriptionByPharmacist(docA, { prescriptionId: rx.id, decision: 'approved' }),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (reviewEPrescriptionByPharmacist(docA, { prescriptionId: rx.id, decision: 'approved' })); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 他人患者查看 → 403
     const other = await seedFollowupPatient('perm2');
-    await expect(
-      getMyPrescription(other.accountId, other.patientId, rx.id),
-    ).rejects.toMatchObject({ status: 403 });
+    { let __e: unknown = null; try { await (getMyPrescription(other.accountId, other.patientId, rx.id)); } catch (e) { __e = e; } expect(__e).toMatchObject({ status: 403 }); }
     // 药师队列可见
     const queue = await listForAudit(pharmacist);
     expect(queue.some((r) => r.id === rx.id)).toBe(true);
