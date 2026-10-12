@@ -31,6 +31,7 @@ import {
   getRiskMetrics,
 } from '../../src/bff/aggregators/nursingRiskAggregator.js';
 import { nursingRiskRoutes } from '../../src/bff/routes/nursingRisk.js';
+import { listAssessments, listEvents, listPreventions } from '../../src/db/repositories/nursingRiskRepo.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
@@ -248,5 +249,28 @@ describe.skipIf(!dbAvailable || !realMode)('M17-A 压疮/跌倒风险预警闭�
     const route = nursingRiskRoutes.find((r) => r.path === '/api/v1/nursing-risk/assessments/:id')!;
     const r404 = await route.handle(detailCtx);
     expect(r404.status).toBe(404);
+  });
+
+  it('回归：空 uuid 过滤不炸 500——空参列表 [] 与按 visitId 过滤带数据', async () => {
+    // 回归 M17-A hotfix：visit_id/assessment_id 为 uuid 列，空串占位会触发 invalid input syntax for type uuid
+    // 1) 空参（无 visitId）不应抛错，返回数组（库内可能有其他数据，但必须是数组而非 500）
+    const emptyAssess = await listAssessments({});
+    expect(Array.isArray(emptyAssess)).toBe(true);
+    const emptyEvents = await listEvents({});
+    expect(Array.isArray(emptyEvents)).toBe(true);
+    const emptyPrev = await listPreventions({});
+    expect(Array.isArray(emptyPrev)).toBe(true);
+
+    // 2) 种 1 条压疮评估（admin 在急诊科），再按 visitId 过滤，应命中该条
+    const { visit } = await newPatientVisit('急诊科');
+    const made = await assessRisk(admin, {
+      visitId: visit.id, riskType: 'pressure_ulcer',
+      items: { sensory: 1, moisture: 1, activity: 1, mobility: 1, nutrition: 1, frictionShear: 1 },
+    });
+    const byVisit = await listAssessments({ visitId: visit.id });
+    expect(byVisit.length).toBeGreaterThanOrEqual(1);
+    expect(byVisit.some((a) => a.id === made.assessment.id)).toBe(true);
+    const prevByAssess = await listPreventions({ assessmentId: made.assessment.id });
+    expect(prevByAssess.length).toBeGreaterThan(0);
   });
 });

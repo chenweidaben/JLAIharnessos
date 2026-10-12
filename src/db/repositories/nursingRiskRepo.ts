@@ -110,11 +110,20 @@ export async function listAssessments(
   sql?: DbExecutor,
 ): Promise<NursingRiskAssessment[]> {
   const db = sql ?? getDb();
+  // visit_id 为 uuid 列：不得用空串占位（Postgres 不保证 OR 短路，visit_id='' 会抛 invalid uuid），
+  // 仅在有值时拼接该谓词；text 列 risk_type/level 空串占位无碍，保留以兼容既有调用。
+  const conds = [];
+  if (filter.visitId) conds.push(db`visit_id = ${filter.visitId}`);
+  if (filter.riskType) conds.push(db`risk_type = ${filter.riskType}`);
+  if (filter.level) conds.push(db`level = ${filter.level}`);
+  let where = db``;
+  if (conds.length > 0) {
+    where = db`WHERE ${conds[0]}`;
+    for (let i = 1; i < conds.length; i++) where = db`${where} AND ${conds[i]}`;
+  }
   const rows = await db`
     SELECT ${db.unsafe(ASSESS_COLS)} FROM clinical.nursing_risk_assessments
-    WHERE (${filter.visitId ?? ''} = '' OR visit_id = ${filter.visitId ?? ''})
-      AND (${filter.riskType ?? ''} = '' OR risk_type = ${filter.riskType ?? ''})
-      AND (${filter.level ?? ''} = '' OR level = ${filter.level ?? ''})
+    ${where}
     ORDER BY assessed_at DESC, created_at DESC`;
   return (rows as Record<string, unknown>[]).map(mapAssessment);
 }
@@ -209,10 +218,17 @@ export async function listPreventions(
       ORDER BY p.created_at ASC`;
     return (rows as Record<string, unknown>[]).map(mapPrevention);
   }
+  const conds = [];
+  if (filter.assessmentId) conds.push(db`assessment_id = ${filter.assessmentId}`);
+  if (filter.status) conds.push(db`status = ${filter.status}`);
+  let where = db``;
+  if (conds.length > 0) {
+    where = db`WHERE ${conds[0]}`;
+    for (let i = 1; i < conds.length; i++) where = db`${where} AND ${conds[i]}`;
+  }
   const rows = await db`
     SELECT ${db.unsafe(PREV_COLS)} FROM clinical.nursing_risk_preventions
-    WHERE (${filter.assessmentId ?? ''} = '' OR assessment_id = ${filter.assessmentId ?? ''})
-      AND (${filter.status ?? ''} = '' OR status = ${filter.status ?? ''})
+    ${where}
     ORDER BY created_at ASC`;
   return (rows as Record<string, unknown>[]).map(mapPrevention);
 }
@@ -313,11 +329,18 @@ export async function listEvents(
   sql?: DbExecutor,
 ): Promise<NursingRiskEvent[]> {
   const db = sql ?? getDb();
+  const conds = [];
+  if (filter.visitId) conds.push(db`visit_id = ${filter.visitId}`);
+  if (filter.riskType) conds.push(db`risk_type = ${filter.riskType}`);
+  if (filter.eventType) conds.push(db`event_type = ${filter.eventType}`);
+  let where = db``;
+  if (conds.length > 0) {
+    where = db`WHERE ${conds[0]}`;
+    for (let i = 1; i < conds.length; i++) where = db`${where} AND ${conds[i]}`;
+  }
   const rows = await db`
     SELECT ${db.unsafe(EVENT_COLS)} FROM clinical.nursing_risk_events
-    WHERE (${filter.visitId ?? ''} = '' OR visit_id = ${filter.visitId ?? ''})
-      AND (${filter.riskType ?? ''} = '' OR risk_type = ${filter.riskType ?? ''})
-      AND (${filter.eventType ?? ''} = '' OR event_type = ${filter.eventType ?? ''})
+    ${where}
     ORDER BY occurred_at DESC NULLS LAST, created_at DESC`;
   return (rows as Record<string, unknown>[]).map(mapEvent);
 }
