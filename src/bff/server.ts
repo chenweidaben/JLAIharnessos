@@ -83,6 +83,7 @@ import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
+import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
 import { lisRoutes } from './routes/lis';
 import { risRoutes } from './routes/ris';
 import { apptRoutes } from './routes/appt';
@@ -159,6 +160,7 @@ const allRoutes: RouteDef[] = [
   ...patientNotificationRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
+  ...inpatientCostMonitorRoutes,
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
