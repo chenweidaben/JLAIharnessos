@@ -134,6 +134,7 @@ const PacuRecordPage = lazy(() => import('@/pages/pacuRecord'));
 const PostopFollowupPage = lazy(() => import('@/pages/postopFollowup'));
 const IcuSedationPage = lazy(() => import('@/pages/icuSedation'));
 const PostpartumVisitPage = lazy(() => import('@/pages/postpartumVisit'));
+const ErTriagePage = lazy(() => import('@/pages/erTriage'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -439,6 +440,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="postpartum:view">
                 <PostpartumVisitPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 急诊分诊（M35-A） */}
+          <Route
+            path="er-triage"
+            element={
+              <RequirePermission permission="er_triage:view">
+                <ErTriagePage />
               </RequirePermission>
             }
           />
