@@ -127,6 +127,7 @@ const MedAdminPage = lazy(() => import('@/pages/medAdmin'));
 const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
 const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
+const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 // 低代码智能体编排平台
 const BuilderMarket = lazy(() => import('@/pages/builder/MarketPage'));
 const BuilderEditor = lazy(() => import('@/pages/builder/BuilderPage'));
@@ -344,6 +345,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nursing_io:read">
                 <NursingIoPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 医嘱开方 CDS（M18-A） */}
+          <Route
+            path="cds-override"
+            element={
+              <RequirePermission permission="cds:read">
+                <CdsOverridePage />
               </RequirePermission>
             }
           />
