@@ -10,6 +10,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { create, listByVisit, type Sedation } from '../../db/repositories/icuSedationRepo.js';
 import { rassLevel, withinTarget, overSedated } from '../../medical-tools/nursing/icuSedation.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { needsAdjustment, sedationTaskTitle, sedationTaskFinding } from '../../medical-tools/nursing/icuSedationAlert.js';
 
 export class SedationError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -35,14 +37,14 @@ async function loadVisit(auth: AuthView, visitId: string): Promise<Visit> {
 export async function recordSedationView(
   auth: AuthView,
   inp: { visitId: string; rassScore: number; targetRass?: number; onVentilator?: boolean; sedativeDrug?: string | null; note?: string | null },
-): Promise<Sedation & { level: string; inTarget: boolean; overSedated: boolean }> {
+): Promise<Sedation & { level: string; inTarget: boolean; overSedated: boolean; interventionTaskId: string | null }> {
   assertPermission(auth, 'icu_sedation:assess');
   if (!UUID_RE.test(inp.visitId)) throw badRequest('visitId 非法');
   if (!Number.isInteger(inp.rassScore) || inp.rassScore < -5 || inp.rassScore > 4) throw badRequest('rass_score 须 -5..4');
   const target = inp.targetRass ?? -1;
   if (!Number.isInteger(target) || target < -5 || target > 1) throw badRequest('target_rass 须 -5..1');
   const visit = await loadVisit(auth, inp.visitId);
-  const rec = await withTx(async (tx) => {
+  const out = await withTx(async (tx) => {
     const r = await create({
       visitId: inp.visitId, rassScore: inp.rassScore, targetRass: target,
       onVentilator: inp.onVentilator ?? false, sedativeDrug: inp.sedativeDrug ?? null,
@@ -54,13 +56,26 @@ export async function recordSedationView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { rass: r.rassScore, target: r.targetRass },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (needsAdjustment(r.rassScore)) {
+      const exists = await hasOpenTask(r.visitId, 'icu_sedation', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'icu_sedation', visitId: r.visitId,
+          title: sedationTaskTitle(r.rassScore), finding: sedationTaskFinding(r.rassScore),
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
   return {
-    ...rec,
-    level: rassLevel(rec.rassScore),
-    inTarget: withinTarget(rec.rassScore, rec.targetRass),
-    overSedated: overSedated(rec.rassScore),
+    ...out.rec,
+    level: rassLevel(out.rec.rassScore),
+    inTarget: withinTarget(out.rec.rassScore, out.rec.targetRass),
+    overSedated: overSedated(out.rec.rassScore),
+    interventionTaskId: out.taskId,
   };
 }
 
