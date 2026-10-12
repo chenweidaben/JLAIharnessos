@@ -23,6 +23,10 @@
 | 术后 6/24/48h 镇痛随访 | 自动生成三时间点 due_at，完成记 NRS，≥4 自动转镇痛工单 | v0.53.0-m31c |
 | 麻醉异常自动工单 | 术前三项缺失 / PACU Aldrete 不可出室 → source=anesthesia 工单（幂等） | v0.54.0-m31d |
 | 护士屏手术麻醉块 | evaluations 聚合术前完成度/最新 Aldrete/术后随访待办/麻醉告警 open 工单数 | v0.55.0-m32a |
+| ICU RASS 镇静评分 | -5~+4 分级，目标 ±1 达标判定，过深 ≤-3 提示 | v0.56.0-m33a |
+| 镇静异常自动工单 | RASS ≤-3 过深或 ≥+2 躁动 → source=icu_sedation 工单（幂等） | v0.57.0-m33b |
+| 产后 1/2/3 天访视 | 母乳喂养 0-3 + 黄疸 TcB 按日阈值（6/9/12）+ 可视范围 | v0.58.0-m34a |
+| 产后异常工单+屏聚合 | 黄疸 elevated/喂养不足自动建 source=postpartum 工单；evaluations 加 icu/postpartum 块 | v0.59.0-m34b |
 
 ## 二、互联网医院（智慧服务三级）
 

@@ -10,6 +10,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { create, listByMother, type PostpartumVisit } from '../../db/repositories/postpartumVisitRepo.js';
 import { jaundiceElevated, breastfeedingAdequacy } from '../../medical-tools/nursing/postpartumVisit.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { needsReferral, postpartumTaskTitle, postpartumTaskFinding } from '../../medical-tools/nursing/postpartumAlert.js';
 
 export class PostpartumError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -40,7 +42,7 @@ export async function recordPostpartumView(
     breastfeedingScore: number; jaundiceTcb?: number | null; jaundiceVisual?: string;
     motherTempC?: number | null; note?: string | null;
   },
-): Promise<PostpartumVisit & { jaundiceElevated: boolean; breastfeedingAdequate: boolean; referToNICU: boolean }> {
+): Promise<PostpartumVisit & { jaundiceElevated: boolean; breastfeedingAdequate: boolean; referToNICU: boolean; interventionTaskId: string | null }> {
   assertPermission(auth, 'postpartum:assess');
   if (!UUID_RE.test(inp.motherVisitId)) throw badRequest('motherVisitId 非法');
   if (![1,2,3].includes(inp.postpartumDay)) throw badRequest('postpartum_day 须 1/2/3');
@@ -55,14 +57,28 @@ export async function recordPostpartumView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { day: r.postpartumDay, tcb: r.jaundiceTcb },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (needsReferral(r.postpartumDay, r.jaundiceTcb, r.breastfeedingScore)) {
+      const exists = await hasOpenTask(r.motherVisitId, 'postpartum', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'postpartum', visitId: r.motherVisitId,
+          title: postpartumTaskTitle(r.postpartumDay, r.jaundiceTcb, r.breastfeedingScore),
+          finding: postpartumTaskFinding(r.postpartumDay, r.jaundiceTcb, r.breastfeedingScore),
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
-  const elevated = jaundiceElevated(rec.postpartumDay, rec.jaundiceTcb);
+  const elevated = jaundiceElevated(rec.rec.postpartumDay, rec.rec.jaundiceTcb);
   return {
-    ...rec,
+    ...rec.rec,
     jaundiceElevated: elevated,
-    breastfeedingAdequate: breastfeedingAdequacy(rec.breastfeedingScore),
-    referToNICU: elevated || rec.jaundiceVisual === 'generalized',
+    breastfeedingAdequate: breastfeedingAdequacy(rec.rec.breastfeedingScore),
+    referToNICU: elevated || rec.rec.jaundiceVisual === 'generalized',
+    interventionTaskId: rec.taskId,
   };
 }
 

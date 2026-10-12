@@ -17,6 +17,16 @@ export interface EvalSummaryInput {
     followupPending?: number;
     anesthesiaOpenTasks?: number;
   };
+  icu?: {
+    rass?: number | null;
+    targetRass?: number;
+    overSedated?: boolean;
+  };
+  postpartum?: {
+    day?: number | null;
+    jaundiceElevated?: boolean;
+    breastfeedingAdequate?: boolean;
+  };
 }
 
 export interface EvalSummary {
@@ -35,6 +45,16 @@ export interface EvalSummary {
     pacuReady: boolean;
     followupPending: number;
     anesthesiaOpenTasks: number;
+  };
+  icu: {
+    rass: number | null;
+    targetRass: number;
+    overSedated: boolean;
+  };
+  postpartum: {
+    day: number | null;
+    jaundiceElevated: boolean;
+    breastfeedingAdequate: boolean;
   };
 }
 
@@ -67,6 +87,16 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       pacuReady: s.pacuReady ?? true,
       followupPending: s.followupPending ?? 0,
       anesthesiaOpenTasks: s.anesthesiaOpenTasks ?? 0,
+    },
+    icu: {
+      rass: inp.icu?.rass ?? null,
+      targetRass: inp.icu?.targetRass ?? -1,
+      overSedated: inp.icu?.overSedated ?? false,
+    },
+    postpartum: {
+      day: inp.postpartum?.day ?? null,
+      jaundiceElevated: inp.postpartum?.jaundiceElevated ?? false,
+      breastfeedingAdequate: inp.postpartum?.breastfeedingAdequate ?? true,
     },
   };
 }

@@ -13,9 +13,12 @@ import { listByAssignee } from '../../db/repositories/improvementTaskRepo.js';
 import { listByVisit as listPreop } from '../../db/repositories/preopAssessmentRepo.js';
 import { listByVisit as listPacu } from '../../db/repositories/pacuRecordRepo.js';
 import { listByVisit as listFollowup } from '../../db/repositories/postopFollowupRepo.js';
+import { listByVisit as listIcu } from '../../db/repositories/icuSedationRepo.js';
+import { listByMother } from '../../db/repositories/postpartumVisitRepo.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
+import { jaundiceElevated, breastfeedingAdequacy } from '../../medical-tools/nursing/postpartumVisit.js';
 
 export class EvalError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -37,14 +40,18 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
     listPreop(visitId),
     listPacu(visitId),
     listFollowup(visitId),
+    listIcu(visitId),
+    listByMother(visitId),
   ]);
+  const latestIcu = icuList[0] ?? null;
+  const latestPp = ppList[0] ?? null;
   const latestNut = nuts[0] ?? null;
   const latestPain = pains[0] ?? null;
   const latestPreop = preops[0] ?? null;
@@ -71,6 +78,15 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       followupPending,
       anesthesiaOpenTasks,
     },
+    icu: latestIcu ? {
+      rass: latestIcu.rassScore, targetRass: latestIcu.targetRass,
+      overSedated: latestIcu.rassScore <= -3,
+    } : undefined,
+    postpartum: latestPp ? {
+      day: latestPp.postpartumDay,
+      jaundiceElevated: jaundiceElevated(latestPp.postpartumDay, latestPp.jaundiceTcb),
+      breastfeedingAdequate: breastfeedingAdequacy(latestPp.breastfeedingScore),
+    } : undefined,
   });
 
   return {
