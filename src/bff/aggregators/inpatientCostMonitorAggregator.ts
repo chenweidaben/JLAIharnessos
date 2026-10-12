@@ -12,6 +12,8 @@ import {
   upsertSnapshot,
 } from '../../db/repositories/inpatientCostMonitorRepo.js';
 import { levelOf, needsDischargeReview } from '../../medical-tools/operations/inpatientCostMonitor.js';
+import { getByVisit as getSelectionByVisit } from '../../db/repositories/paymentSelectionRepo.js';
+import { resolveBudgetBasis } from '../../medical-tools/operations/monitorBudgetBasis.js';
 
 export class InpatientCostError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -35,17 +37,20 @@ export async function refreshVisitView(
 ) {
   assertPermission(auth);
   if (!UUID_RE.test(input.visitId.trim())) throw badRequest('visit_id 非法');
-  const budget = await getBudgetByGroup(input.groupCode);
+  // M23-F：取该 visit 的 payment_selection → 纯函数定 DRG/DIP 预算基准与金额。
+  const sel = await getSelectionByVisit(input.visitId);
+  const basis = resolveBudgetBasis(sel);
+  const budget = basis.basis === 'drg' ? await getBudgetByGroup(input.groupCode) : null;
   const warningRatio = budget ? Number(budget.warningRatio) : 1.1;
-  const budgetCost = budget ? Number(budget.expectedCost) : null;
+  const budgetCost = basis.basis === 'dip' ? basis.budget : budget ? Number(budget.expectedCost) : null;
   const ratio = budgetCost && budgetCost > 0 ? input.accumulatedCost / budgetCost : null;
   const level = levelOf(ratio, warningRatio);
   const row = await upsertSnapshot({
-    visitId: input.visitId, groupCode: input.groupCode, budgetCost,
+    visitId: input.visitId, groupCode: input.groupCode, budgetCost, budgetBasis: basis.basis,
     accumulatedCost: input.accumulatedCost, ratio, level,
   });
   await recordChainAudit(
-    { actorId: auth.id, action: 'inpatient_cost.refresh', resourceType: 'inpatient_cost_monitor', resourceId: row.id, result: 'success', riskLevel: level === 'ok' ? 'low' : level === 'warn' ? 'medium' : 'high', detail: { level, ratio } },
+    { actorId: auth.id, action: 'inpatient_cost.refresh', resourceType: 'inpatient_cost_monitor', resourceId: row.id, result: 'success', riskLevel: level === 'ok' ? 'low' : level === 'warn' ? 'medium' : 'high', detail: { level, ratio, budgetBasis: basis.basis } },
   );
   return row;
 }

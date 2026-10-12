@@ -11,6 +11,7 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 const LEVEL_COLOR: Record<string, string> = { over: 'red', warn: 'orange', ok: 'green' };
+const BASIS_COLOR: Record<string, string> = { drg: 'blue', dip: 'purple' };
 
 export default function InpatientCostMonitorPage() {
   const { dbUp, monitors, loading, error, checkHealth, load, review } = useInpatientCostStore();
@@ -44,7 +45,7 @@ export default function InpatientCostMonitorPage() {
               ]}
             >
               <List.Item.Meta
-                title={<span>就诊 {it.visitId.slice(0, 8)} <Tag color={LEVEL_COLOR[it.level]}>{it.level}</Tag></span>}
+                title={<span>就诊 {it.visitId.slice(0, 8)} <Tag color={LEVEL_COLOR[it.level]}>{it.level}</Tag> <Tag color={BASIS_COLOR[it.budgetBasis] ?? 'default'}>{it.budgetBasis.toUpperCase()}</Tag></span>}
                 description={`累计 ${it.accumulatedCost} / 预算 ${it.budgetCost ?? '-'} · 比 ${it.ratio ?? '-'} · ${new Date(it.lastSnapshotAt).toLocaleString()}`}
               />
             </List.Item>

@@ -7,6 +7,7 @@ export interface MonitorItem {
   visitId: string;
   groupCode: string | null;
   budgetCost: string | null;
+  budgetBasis: 'drg' | 'dip';
   accumulatedCost: string;
   ratio: string | null;
   level: 'ok' | 'warn' | 'over';
