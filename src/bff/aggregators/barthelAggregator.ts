@@ -10,6 +10,8 @@ import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { create, listByVisit, type Barthel } from '../../db/repositories/barthelRepo.js';
 import { barthelTotal, barthelLevel, type BarthelItems } from '../../medical-tools/nursing/barthelAdl.js';
+import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
+import { needsRehabTherapy, rehabTaskTitle, rehabTaskFinding } from '../../medical-tools/nursing/rehabAlert.js';
 
 export class BarthelError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -35,13 +37,13 @@ async function loadVisit(auth: AuthView, visitId: string): Promise<Visit> {
 export async function recordBarthelView(
   auth: AuthView,
   inp: { visitId: string; note?: string | null } & BarthelItems,
-): Promise<Barthel> {
+): Promise<Barthel & { interventionTaskId: string | null }> {
   assertPermission(auth, 'barthel:assess');
   if (!UUID_RE.test(inp.visitId)) throw badRequest('visitId 非法');
   const visit = await loadVisit(auth, inp.visitId);
   const total = barthelTotal(inp);
   const level = barthelLevel(total);
-  const rec = await withTx(async (tx) => {
+  const { rec, taskId } = await withTx(async (tx) => {
     const r = await create({
       visitId: inp.visitId,
       feeding: inp.feeding, bathing: inp.bathing, grooming: inp.grooming, dressing: inp.dressing,
@@ -56,9 +58,21 @@ export async function recordBarthelView(
       patientRef: visit.patientId, visitRef: visit.id, result: 'success',
       detail: { total, level },
     }, tx);
-    return r;
+    let taskId: string | null = null;
+    if (needsRehabTherapy(total)) {
+      const exists = await hasOpenTask(r.visitId, 'rehab', tx);
+      if (!exists) {
+        const t = await createTask({
+          source: 'rehab', visitId: r.visitId,
+          title: rehabTaskTitle(total), finding: rehabTaskFinding(total),
+          assigneeId: visit.attendingDoctorId ?? auth.id, createdBy: auth.id,
+        }, tx);
+        taskId = t.id;
+      }
+    }
+    return { rec: r, taskId };
   });
-  return rec;
+  return { ...rec, interventionTaskId: taskId };
 }
 
 export async function listBarthelView(auth: AuthView, visitId: string): Promise<Barthel[]> {

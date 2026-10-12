@@ -27,6 +27,9 @@
 | 镇静异常自动工单 | RASS ≤-3 过深或 ≥+2 躁动 → source=icu_sedation 工单（幂等） | v0.57.0-m33b |
 | 产后 1/2/3 天访视 | 母乳喂养 0-3 + 黄疸 TcB 按日阈值（6/9/12）+ 可视范围 | v0.58.0-m34a |
 | 产后异常工单+屏聚合 | 黄疸 elevated/喂养不足自动建 source=postpartum 工单；evaluations 加 icu/postpartum 块 | v0.59.0-m34b |
+| 急诊预检分诊五级 | SBP<90/SpO2<90/GCS<9→I，HR>120/RR>30→II，I/II 自动绿色通道 | v0.60.0-m35a |
+| Barthel ADL 指数 | 10 项 0-100 分五档分级（independent/mild/moderate/severe/total） | v0.61.0-m35b |
+| Barthel<40 康复自动工单 | 总分<40 自动建 source=rehab 康复介入工单（幂等） | v0.62.0-m36a |
 
 ## 二、互联网医院（智慧服务三级）
 
