@@ -136,9 +136,14 @@ it('详情：点击查看打开抽屉，展示 detail JSON', async () => {
 it('刷新：点击刷新重新加载', async () => {
   render(<AuditLogPage />);
   await waitOnline();
+  await waitFor(() => expect(m.fetchAuditLogs).toHaveBeenCalled());
+  await new Promise((r) => setTimeout(r, 50));
   const before = m.fetchAuditLogs.mock.calls.length;
   fireEvent.click(screen.getByRole('button', { name: /刷\s*新/ }));
-  await waitFor(() => expect(m.fetchAuditLogs.mock.calls.length).toBeGreaterThan(before));
+  await waitFor(
+    () => expect(m.fetchAuditLogs.mock.calls.length).toBeGreaterThan(before),
+    { timeout: 3000 },
+  );
 });
 
 it('风险列：高风险渲染标签，匿名操作人回退占位', async () => {

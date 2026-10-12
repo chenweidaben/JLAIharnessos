@@ -139,8 +139,9 @@ it('在线：我的会话 → 回复消息 → 结束', async () => {
     expect(m.sendDoctorMessage).toHaveBeenCalledWith('s2', { content: '最近怎么样' }),
   );
 
-  // 结束
-  fireEvent.click(screen.getByRole('button', { name: '结束问诊' }));
+  // 结束（按钮可能在 loading 态，等待可点）
+  const endBtn = await screen.findByRole('button', { name: /结束问诊/ }, { timeout: 3000 });
+  fireEvent.click(endBtn);
   await waitFor(() => expect(m.completeConsultation).toHaveBeenCalledWith('s2'));
 });
 

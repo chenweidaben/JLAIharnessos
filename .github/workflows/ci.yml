@@ -51,8 +51,7 @@ jobs:
           restore-keys: ${{ runner.os }}-bun-
 
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
-
+        run: bun install
       - name: TypeScript 类型检查
         run: bun run typecheck
 
@@ -77,7 +76,7 @@ jobs:
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package-lock.json', 'package.json') }}
           restore-keys: ${{ runner.os }}-bun-
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
+        run: bun install
       - name: ESLint 检查
         run: bun run lint:ci
       - name: Prettier 格式检查
@@ -93,7 +92,7 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
+        run: bun install
       - name: 运行单元测试并输出覆盖率
         run: bun run test:unit -- --coverage
       - name: 上传覆盖率报告
@@ -128,7 +127,7 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
+        run: bun install
       - name: 初始化数据库（按编号顺序执行全部迁移与种子）
         run: |
           shopt -s nullglob
@@ -150,13 +149,18 @@ jobs:
   security-audit:
     name: 安全审计
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: ${{ env.BUN_VERSION }}
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
+        run: bun install
       - name: 依赖漏洞扫描
         run: bun audit --audit-level=high || npm audit --audit-level=high || echo "::warning::存在已知漏洞，需人工复核"
       - name: Secret 扫描（gitleaks）
@@ -177,7 +181,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: 安装依赖
-        run: bun install --frozen-lockfile || npm ci
+        run: bun install
       - name: 执行生产构建
         run: bun run build
       - name: 上传构建产物

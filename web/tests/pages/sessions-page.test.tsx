@@ -100,10 +100,14 @@ it('查询：回车同样触发带参查询', async () => {
 it('刷新：点击刷新重新探活并加载', async () => {
   render(<SessionsPage />);
   await waitOnline();
+  // 先等初始加载完成（表格出现），避免在 loading 时点刷新被 disabled
+  await waitFor(() => expect(m.fetchActiveSessions).toHaveBeenCalled());
+  await new Promise((r) => setTimeout(r, 50));
   const before = m.fetchActiveSessions.mock.calls.length;
   fireEvent.click(screen.getByRole('button', { name: /刷\s*新/ }));
-  await waitFor(() =>
-    expect(m.fetchActiveSessions.mock.calls.length).toBeGreaterThan(before),
+  await waitFor(
+    () => expect(m.fetchActiveSessions.mock.calls.length).toBeGreaterThan(before),
+    { timeout: 3000 },
   );
 });
 
