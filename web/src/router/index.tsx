@@ -128,6 +128,7 @@ const TubeCarePage = lazy(() => import('@/pages/tubeCare'));
 const EventReviewPage = lazy(() => import('@/pages/eventReview'));
 const NursingIoPage = lazy(() => import('@/pages/nursingIo'));
 const NutritionScreeningPage = lazy(() => import('@/pages/nutritionScreening'));
+const PainAssessmentPage = lazy(() => import('@/pages/painAssessment'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -373,6 +374,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nutrition:view">
                 <NutritionScreeningPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 疼痛评估 NRS（M29-B） */}
+          <Route
+            path="pain-assessment"
+            element={
+              <RequirePermission permission="pain:view">
+                <PainAssessmentPage />
               </RequirePermission>
             }
           />
