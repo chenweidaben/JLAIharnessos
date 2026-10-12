@@ -143,6 +143,7 @@ const HealthCheckPage = lazy(() => import('@/pages/healthCheck'));
 const HealthCheckReferralPage = lazy(() => import('@/pages/healthCheckReferral'));
 const OncologyPage = lazy(() => import('@/pages/oncology'));
 const ChemoReminderPage = lazy(() => import('@/pages/chemoReminder'));
+const PsychScreeningPage = lazy(() => import('@/pages/psychScreening'));
 const CdsOverridePage = lazy(() => import('@/pages/cdsOverride'));
 const NurseStationPage = lazy(() => import('@/pages/nurseStation'));
 const ScheduleSlotPage = lazy(() => import('@/pages/scheduleSlot'));
@@ -538,6 +539,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="oncology:view">
                 <ChemoReminderPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 心理筛查（M44-A） */}
+          <Route
+            path="psych-screening"
+            element={
+              <RequirePermission permission="psych:view">
+                <PsychScreeningPage />
               </RequirePermission>
             }
           />

@@ -168,6 +168,7 @@ const navItems: NavItem[] = [
       { key: '/healthcheck-referrals', label: '体检转诊', perm: 'healthcheck:referral' },
       { key: '/oncology', label: '肿瘤随访', perm: 'oncology:view' },
       { key: '/chemo-reminder', label: '化疗提醒', perm: 'oncology:view' },
+      { key: '/psych-screening', label: '心理筛查', perm: 'psych:view' },
       { key: '/cds-override', label: '医嘱CDS拦截', perm: 'cds:read' },
       { key: '/nurse-station', label: '护士站一览', perm: 'nurse_station:read' },
       { key: '/schedule-slots', label: '分时段预约', perm: 'schedule:book' },
