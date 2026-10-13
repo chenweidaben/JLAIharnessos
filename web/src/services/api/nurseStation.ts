@@ -3,7 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { get } from '../request';
-import type { WardRow } from '@/types/nurseStation';
+import type { WardRow, VisitEvaluations } from '@/types/nurseStation';
 
 const base = '/nurse-station';
 
@@ -12,4 +12,7 @@ export function wardBoard() {
 }
 export function visitWorkbench(visitId: string) {
   return get<Record<string, unknown>>(`${base}/visit/${visitId}`);
+}
+export function visitEvaluations(visitId: string) {
+  return get<VisitEvaluations>(`${base}/${visitId}/evaluations`);
 }

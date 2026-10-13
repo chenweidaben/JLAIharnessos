@@ -16,3 +16,27 @@ export interface WardRow {
   unresolvedHardCds: number;
   outstanding: number;
 }
+
+export interface EvalSummary {
+  rehabTreatment: {
+    modality: string | null;
+    status: string | null;
+    efficacy: string | null;
+    poorEfficacy: boolean;
+  };
+  painClinic: {
+    baselineNrs: number | null;
+    currentNrs: number | null;
+    breakthroughCount: number;
+    adjustmentSuggestion: string | null;
+    severeNrs: boolean;
+  };
+  flags: string[];
+}
+
+export interface VisitEvaluations {
+  visitId: string;
+  patientId: string;
+  department: string;
+  summary: EvalSummary;
+}

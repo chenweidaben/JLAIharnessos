@@ -19,6 +19,8 @@ import { getByVisit as getTriage } from '../../db/repositories/erTriageRepo.js';
 import { listByVisit as listBarthel } from '../../db/repositories/barthelRepo.js';
 import { listByVisit as listPsych } from '../../db/repositories/psychScreeningRepo.js';
 import { listByVisit as listVteAnticoag } from '../../db/repositories/vteAnticoagRepo.js';
+import { listByVisit as listRehabTreatments } from '../../db/repositories/rehabTreatmentRepo.js';
+import { listByPatient as listPainClinic } from '../../db/repositories/painClinicRepo.js';
 import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
@@ -45,7 +47,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -58,8 +60,12 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listBarthel(visitId),
     listPsych(visitId),
     listVteAnticoag(visitId),
+    listRehabTreatments(visitId),
+    listPainClinic(visit.patientId),
   ]);
   const latestVte = vteList[0] ?? null;
+  const latestRehabTx = rehabTxList[0] ?? null;
+  const latestPainClinic = painClinicList[0] ?? null;
   const db = getDb();
   const nissRows = await db`SELECT id, infection_type, status FROM clinical.nosocomial_infections WHERE visit_id=${visitId} AND status IN ('reported','under_investigation') ORDER BY created_at DESC`;
   const nissActiveCount = nissRows.length;
@@ -110,6 +116,17 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       totalScore: latestBarthel.totalScore,
       dependencyLevel: latestBarthel.dependencyLevel,
     } : undefined,
+    rehabTreatment: latestRehabTx ? {
+      modality: latestRehabTx.modality,
+      status: latestRehabTx.status,
+      efficacy: latestRehabTx.efficacy,
+    } : undefined,
+    painClinic: latestPainClinic ? {
+      baselineNrs: latestPainClinic.baselineNrs,
+      currentNrs: latestPainClinic.currentNrs,
+      breakthroughCount: latestPainClinic.breakthroughCount,
+      adjustmentSuggestion: latestPainClinic.adjustmentSuggestion,
+    } : undefined,
     psych: latestPsych ? {
       phq9Total: latestPsych.phq9Total, phq9Level: latestPsych.phq9Level,
       gad7Total: latestPsych.gad7Total, gad7Level: latestPsych.gad7Level,
@@ -134,6 +151,8 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     latestPacu: latestPacu,
     followups,
     openTasks: openTasksForVisit,
+    latestRehabTreatment: latestRehabTx,
+    latestPainClinic,
     summary,
   };
 }

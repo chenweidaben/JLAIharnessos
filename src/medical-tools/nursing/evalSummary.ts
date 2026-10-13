@@ -35,6 +35,17 @@ export interface EvalSummaryInput {
     totalScore?: number | null;
     dependencyLevel?: string;
   };
+  rehabTreatment?: {
+    modality?: string;
+    status?: string;
+    efficacy?: string | null;
+  } | null;
+  painClinic?: {
+    baselineNrs?: number;
+    currentNrs?: number;
+    breakthroughCount?: number;
+    adjustmentSuggestion?: string | null;
+  } | null;
   psych?: {
     phq9Total?: number | null;
     phq9Level?: string;
@@ -88,6 +99,19 @@ export interface EvalSummary {
     totalScore: number | null;
     dependencyLevel: string;
   };
+  rehabTreatment: {
+    modality: string | null;
+    status: string | null;
+    efficacy: string | null;
+    poorEfficacy: boolean;
+  };
+  painClinic: {
+    baselineNrs: number | null;
+    currentNrs: number | null;
+    breakthroughCount: number;
+    adjustmentSuggestion: string | null;
+    severeNrs: boolean;
+  };
   psych: {
     phq9Total: number | null;
     phq9Level: string;
@@ -132,6 +156,14 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const inf = inp.infection ?? {};
   if ((inf.activeCount ?? 0) > 0) flags.push('active_niss');
 
+  const rt = inp.rehabTreatment ?? {};
+  const poorEfficacy = rt.efficacy === 'fair' || rt.efficacy === 'poor';
+  if (poorEfficacy) flags.push('rehab_poor_efficacy');
+
+  const pc = inp.painClinic ?? {};
+  const severeNrs = (pc.currentNrs ?? 0) >= 7 || (pc.breakthroughCount ?? 0) >= 3;
+  if (severeNrs) flags.push('pain_severe_nrs');
+
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
     painSevere: (inp.pain?.score ?? 0) >= 7,
@@ -166,6 +198,19 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
     rehab: {
       totalScore: inp.rehab?.totalScore ?? null,
       dependencyLevel: inp.rehab?.dependencyLevel ?? 'unknown',
+    },
+    rehabTreatment: {
+      modality: rt.modality ?? null,
+      status: rt.status ?? null,
+      efficacy: rt.efficacy ?? null,
+      poorEfficacy,
+    },
+    painClinic: {
+      baselineNrs: pc.baselineNrs ?? null,
+      currentNrs: pc.currentNrs ?? null,
+      breakthroughCount: pc.breakthroughCount ?? 0,
+      adjustmentSuggestion: pc.adjustmentSuggestion ?? null,
+      severeNrs,
     },
     psych: {
       phq9Total: p.phq9Total ?? null,
