@@ -8,6 +8,12 @@
  */
 import { get, post } from '../request';
 import type { PatientProfileView } from '@/types/internetHospital';
+import type { PortalView } from '@/types/patientPortal';
+
+/** 患者端首页门户聚合（M80-A）。 */
+export function getPatientPortalApi() {
+  return get<PortalView>('/patient/portal');
+}
 
 /** 患者登录（微信 code；本地演示任意 code 派生账号）。 */
 export async function patientLoginApi(code: string): Promise<{

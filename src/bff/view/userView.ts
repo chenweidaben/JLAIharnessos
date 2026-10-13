@@ -337,7 +337,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
     'am_dash:submit', 'am_dash:view',
-    'workbench:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view'],
+    'workbench:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view',
+    'patient_portal:view'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */

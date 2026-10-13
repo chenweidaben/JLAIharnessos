@@ -120,6 +120,7 @@ import { edObservationRoutes } from './routes/edObservation';
 import { infectionDashboardRoutes } from './routes/infectionDashboard';
 import { amDashboardRoutes } from './routes/amDashboard';
 import { doctorWorkbenchRoutes } from './routes/doctorWorkbench';
+import { patientPortalRoutes } from './routes/patientPortal';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -244,6 +245,7 @@ const allRoutes: RouteDef[] = [
 ...infectionDashboardRoutes,
 ...amDashboardRoutes,
 ...doctorWorkbenchRoutes,
+...patientPortalRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,
