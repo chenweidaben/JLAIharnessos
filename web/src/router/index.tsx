@@ -170,6 +170,7 @@ const TransfusionReactionPage = lazy(() => import('@/pages/transfusionReaction')
 const SbarHandoffPage = lazy(() => import('@/pages/sbarHandoff'));
 const EdObservationPage = lazy(() => import('@/pages/edObservation'));
 const InfectionDashboardPage = lazy(() => import('@/pages/infectionDashboard'));
+const AmDashboardPage = lazy(() => import('@/pages/amDashboard'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -829,6 +830,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="infection_dash:view">
                 <InfectionDashboardPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 合理用药看板（M77-A） */}
+          <Route
+            path="am-dashboard"
+            element={
+              <RequirePermission permission="am_dash:view">
+                <AmDashboardPage />
               </RequirePermission>
             }
           />

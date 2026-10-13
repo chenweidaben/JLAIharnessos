@@ -118,6 +118,7 @@ import { transfusionReactionRoutes } from './routes/transfusionReaction';
 import { sbarRoutes } from './routes/sbar';
 import { edObservationRoutes } from './routes/edObservation';
 import { infectionDashboardRoutes } from './routes/infectionDashboard';
+import { amDashboardRoutes } from './routes/amDashboard';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -240,6 +241,7 @@ const allRoutes: RouteDef[] = [
 ...sbarRoutes,
 ...edObservationRoutes,
 ...infectionDashboardRoutes,
+...amDashboardRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,
