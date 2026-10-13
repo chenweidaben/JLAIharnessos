@@ -105,3 +105,11 @@
 |---|---|---|
 | 老年综合评估 CGA | ADL/IADL/MMSE/MNA/GDS+跌倒 六维评分分级，high 自动 quality_safety 工单 | v0.87.0-m56a |
 | 护士屏 CGA 块 | evaluations 聚合最新 CGA，high 风险标红 | v0.88.0-m57a |
+
+## M58-M60 追加
+
+| 模块 | 能力 | tag |
+|---|---|---|
+| 营养科会诊执行 | 会诊方案分级+随访到期提醒 | v0.89.0-m58a |
+| STOP-BANG 睡眠筛查 | 8 项打分，>=3 自动睡眠监测工单 | v0.90.0-m59a |
+| 护士屏营养/睡眠块 | evaluations 聚合最新营养会诊与 STOP-BANG，高能量/OSA 高危标红 | v0.91.0-m60a |
