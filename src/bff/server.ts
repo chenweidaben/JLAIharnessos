@@ -108,6 +108,7 @@ import { nutritionConsultRoutes } from './routes/nutritionConsult';
 import { stopbangRoutes } from './routes/stopbang';
 import { dischargePlanRoutes } from './routes/dischargePlan';
 import { followupApptRoutes } from './routes/followupAppt';
+import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -220,6 +221,7 @@ const allRoutes: RouteDef[] = [
 ...stopbangRoutes,
 ...dischargePlanRoutes,
 ...followupApptRoutes,
+...satisfactionSurveyRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

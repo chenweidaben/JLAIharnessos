@@ -122,6 +122,7 @@ const navItems: NavItem[] = [
   { key: '/stopbang', icon: <MedicineBoxOutlined />, label: '睡眠筛查', perm: 'stopbang:view' },
   { key: '/discharge-plan', icon: <MedicineBoxOutlined />, label: '出院计划', perm: 'discharge_plan:view' },
   { key: '/followup-appointment', icon: <MedicineBoxOutlined />, label: '复诊预约', perm: 'followup_appt:view' },
+  { key: '/satisfaction-survey', icon: <MedicineBoxOutlined />, label: '满意度调查', perm: 'satisfaction:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },

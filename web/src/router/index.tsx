@@ -160,6 +160,7 @@ const NutritionConsultPage = lazy(() => import('@/pages/nutritionConsult'));
 const StopbangPage = lazy(() => import('@/pages/stopbang'));
 const DischargePlanPage = lazy(() => import('@/pages/dischargePlan'));
 const FollowupAppointmentPage = lazy(() => import('@/pages/followupAppointment'));
+const SatisfactionSurveyPage = lazy(() => import('@/pages/satisfactionSurvey'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -719,6 +720,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="followup_appt:view">
                 <FollowupAppointmentPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 患者满意度调查（M63-A） */}
+          <Route
+            path="satisfaction-survey"
+            element={
+              <RequirePermission permission="satisfaction:view">
+                <SatisfactionSurveyPage />
               </RequirePermission>
             }
           />
