@@ -394,3 +394,14 @@ M0 门诊真实闭环(已完成)
 | v0.75.0-m46a | 151 | VTE 抗凝疗程追踪+出血监测 |
 | v0.76.0-m46b | 152 | 院感 SSI/CRBSI/CAUTI 自动工单 |
 | v0.77.0-m46c | 153 | 护士屏 VTE/院感块 |
+
+## M48-M53 已闭环里程碑追加
+
+| tag | 迁移号 | 能力 |
+|---|---|---|
+| v0.79.0-m48gate | - | 根治 inpatient-care/inpatient-routes afterEach 连接句柄 hang |
+| v0.80.0-m49gate | - | 根治剩余 2 known-flaky（inpatient-core/medical-record-front-page）全量 0 fail |
+| v0.81.0-m50a | 154 | 患者端住院费用按类汇总+医保自付预估+押金余额 |
+| v0.82.0-m51a | 155 | 康复治疗执行：开单->签到->疗效，fair/poor 自动复评工单 |
+| v0.83.0-m52a | 156 | 疼痛门诊癌痛 NRS 滴定+爆发痛+镇痛调整工单 |
+| v0.84.0-m53a | 157 | 护士屏康复疗效/疼痛 NRS 块（poor/NRS>=7 标红） |
