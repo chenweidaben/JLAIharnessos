@@ -107,6 +107,7 @@ import { cgaRoutes } from './routes/cga';
 import { nutritionConsultRoutes } from './routes/nutritionConsult';
 import { stopbangRoutes } from './routes/stopbang';
 import { dischargePlanRoutes } from './routes/dischargePlan';
+import { followupApptRoutes } from './routes/followupAppt';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -218,6 +219,7 @@ const allRoutes: RouteDef[] = [
 ...nutritionConsultRoutes,
 ...stopbangRoutes,
 ...dischargePlanRoutes,
+...followupApptRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

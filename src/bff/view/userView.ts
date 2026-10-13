@@ -61,6 +61,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'nutrition_consult:manage', 'nutrition_consult:view',
     'stopbang:assess', 'stopbang:view',
     'discharge_plan:manage', 'discharge_plan:view',
+    'followup_appt:book', 'followup_appt:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -143,6 +144,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'nutrition_consult:manage', 'nutrition_consult:view',
     'stopbang:assess', 'stopbang:view',
     'discharge_plan:manage', 'discharge_plan:view',
+    'followup_appt:book', 'followup_appt:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -218,6 +220,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'nutrition_consult:manage', 'nutrition_consult:view',
     'stopbang:assess', 'stopbang:view',
     'discharge_plan:manage', 'discharge_plan:view',
+    'followup_appt:book', 'followup_appt:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -382,6 +385,7 @@ export function buildAuthView(user: User, links: UserRoleLink[]): AuthView {
     createdAt: user.createdAt,
   };
 }
+
 
 
 

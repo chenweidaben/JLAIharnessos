@@ -159,6 +159,7 @@ const CgaPage = lazy(() => import('@/pages/cgaAssessment'));
 const NutritionConsultPage = lazy(() => import('@/pages/nutritionConsult'));
 const StopbangPage = lazy(() => import('@/pages/stopbang'));
 const DischargePlanPage = lazy(() => import('@/pages/dischargePlan'));
+const FollowupAppointmentPage = lazy(() => import('@/pages/followupAppointment'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -708,6 +709,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="discharge_plan:view">
                 <DischargePlanPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 复诊号源预约（M62-A） */}
+          <Route
+            path="followup-appointment"
+            element={
+              <RequirePermission permission="followup_appt:view">
+                <FollowupAppointmentPage />
               </RequirePermission>
             }
           />
