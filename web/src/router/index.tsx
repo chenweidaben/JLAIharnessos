@@ -169,6 +169,7 @@ const CdiReviewPage = lazy(() => import('@/pages/cdiReview'));
 const TransfusionReactionPage = lazy(() => import('@/pages/transfusionReaction'));
 const SbarHandoffPage = lazy(() => import('@/pages/sbarHandoff'));
 const EdObservationPage = lazy(() => import('@/pages/edObservation'));
+const InfectionDashboardPage = lazy(() => import('@/pages/infectionDashboard'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -818,6 +819,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="ed_obs:view">
                 <EdObservationPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 院感监测看板（M76-A） */}
+          <Route
+            path="infection-dashboard"
+            element={
+              <RequirePermission permission="infection_dash:view">
+                <InfectionDashboardPage />
               </RequirePermission>
             }
           />

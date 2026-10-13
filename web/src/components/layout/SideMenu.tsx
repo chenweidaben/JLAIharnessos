@@ -131,6 +131,7 @@ const navItems: NavItem[] = [
   { key: '/transfusion-reaction', icon: <MedicineBoxOutlined />, label: '输血反应', perm: 'transfusion:view' },
   { key: '/sbar-handoff', icon: <MedicineBoxOutlined />, label: '转运交接', perm: 'sbar:view' },
   { key: '/ed-observation', icon: <MedicineBoxOutlined />, label: '急诊留观', perm: 'ed_obs:view' },
+  { key: '/infection-dashboard', icon: <MedicineBoxOutlined />, label: '院感看板', perm: 'infection_dash:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
