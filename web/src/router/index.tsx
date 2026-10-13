@@ -168,6 +168,7 @@ const PiccMaintenancePage = lazy(() => import('@/pages/piccMaintenance'));
 const CdiReviewPage = lazy(() => import('@/pages/cdiReview'));
 const TransfusionReactionPage = lazy(() => import('@/pages/transfusionReaction'));
 const SbarHandoffPage = lazy(() => import('@/pages/sbarHandoff'));
+const EdObservationPage = lazy(() => import('@/pages/edObservation'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -807,6 +808,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="sbar:view">
                 <SbarHandoffPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 急诊留观登记（M74-A） */}
+          <Route
+            path="ed-observation"
+            element={
+              <RequirePermission permission="ed_obs:view">
+                <EdObservationPage />
               </RequirePermission>
             }
           />
