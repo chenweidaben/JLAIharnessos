@@ -16,7 +16,8 @@ const fake = {
   summary: {
     rehabTreatment: { modality: 'pt', status: 'completed', efficacy: 'poor', poorEfficacy: true },
     painClinic: { baselineNrs: 9, currentNrs: 8, breakthroughCount: 0, adjustmentSuggestion: 'x', severeNrs: true },
-    flags: ['rehab_poor_efficacy', 'pain_severe_nrs'],
+    cga: { adlScore: 50, iadlScore: 20, mmseScore: 28, fallRisk: false, mnaScore: 13, gdsScore: 2, riskLevel: 'high', highRisk: true },
+    flags: ['rehab_poor_efficacy', 'pain_severe_nrs', 'cga_high_risk'],
   },
 };
 
@@ -39,5 +40,6 @@ describe('evalSummaryStore', () => {
     expect(nurseApi.visitEvaluations).toHaveBeenCalledWith('v1');
     expect(useEvalSummaryStore.getState().data?.summary.rehabTreatment.poorEfficacy).toBe(true);
     expect(useEvalSummaryStore.getState().data?.summary.painClinic.severeNrs).toBe(true);
+    expect(useEvalSummaryStore.getState().data?.summary.cga.highRisk).toBe(true);
   });
 });
