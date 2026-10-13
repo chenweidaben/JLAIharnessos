@@ -156,6 +156,7 @@ const PatientBillingPage = lazy(() => import('@/pages/patientBilling'));
 const RehabTreatmentPage = lazy(() => import('@/pages/rehabTreatment'));
 const PainClinicPage = lazy(() => import('@/pages/painClinic'));
 const CgaPage = lazy(() => import('@/pages/cgaAssessment'));
+const NutritionConsultPage = lazy(() => import('@/pages/nutritionConsult'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -675,6 +676,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="cga:view">
                 <CgaPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 营养科会诊（M58-A） */}
+          <Route
+            path="nutrition-consults"
+            element={
+              <RequirePermission permission="nutrition_consult:view">
+                <NutritionConsultPage />
               </RequirePermission>
             }
           />
