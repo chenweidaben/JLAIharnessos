@@ -167,6 +167,7 @@ const MdtTreatmentPlanPage = lazy(() => import('@/pages/mdtTreatmentPlan'));
 const PiccMaintenancePage = lazy(() => import('@/pages/piccMaintenance'));
 const CdiReviewPage = lazy(() => import('@/pages/cdiReview'));
 const TransfusionReactionPage = lazy(() => import('@/pages/transfusionReaction'));
+const SbarHandoffPage = lazy(() => import('@/pages/sbarHandoff'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -796,6 +797,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="transfusion:view">
                 <TransfusionReactionPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 院内转运交接 SBAR（M73-A） */}
+          <Route
+            path="sbar-handoff"
+            element={
+              <RequirePermission permission="sbar:view">
+                <SbarHandoffPage />
               </RequirePermission>
             }
           />

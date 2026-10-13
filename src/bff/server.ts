@@ -115,6 +115,7 @@ import { mdtTreatmentPlanRoutes } from './routes/mdtTreatmentPlan';
 import { piccRoutes } from './routes/picc';
 import { cdiRoutes } from './routes/cdi';
 import { transfusionReactionRoutes } from './routes/transfusionReaction';
+import { sbarRoutes } from './routes/sbar';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -234,6 +235,7 @@ const allRoutes: RouteDef[] = [
 ...piccRoutes,
 ...cdiRoutes,
 ...transfusionReactionRoutes,
+...sbarRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

@@ -129,6 +129,7 @@ const navItems: NavItem[] = [
   { key: '/picc-maintenance', icon: <MedicineBoxOutlined />, label: 'PICC 维护', perm: 'picc:view' },
   { key: '/cdi-review', icon: <MedicineBoxOutlined />, label: '用药审查', perm: 'cdi:view' },
   { key: '/transfusion-reaction', icon: <MedicineBoxOutlined />, label: '输血反应', perm: 'transfusion:view' },
+  { key: '/sbar-handoff', icon: <MedicineBoxOutlined />, label: '转运交接', perm: 'sbar:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
