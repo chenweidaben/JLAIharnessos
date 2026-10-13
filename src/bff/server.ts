@@ -109,6 +109,7 @@ import { stopbangRoutes } from './routes/stopbang';
 import { dischargePlanRoutes } from './routes/dischargePlan';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
+import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -222,6 +223,7 @@ const allRoutes: RouteDef[] = [
 ...dischargePlanRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
+...satisfactionReminderRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

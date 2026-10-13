@@ -161,6 +161,7 @@ const StopbangPage = lazy(() => import('@/pages/stopbang'));
 const DischargePlanPage = lazy(() => import('@/pages/dischargePlan'));
 const FollowupAppointmentPage = lazy(() => import('@/pages/followupAppointment'));
 const SatisfactionSurveyPage = lazy(() => import('@/pages/satisfactionSurvey'));
+const SatisfactionReminderPage = lazy(() => import('@/pages/satisfactionReminder'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -730,6 +731,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="satisfaction:view">
                 <SatisfactionSurveyPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 满意度提醒推送（M64-A） */}
+          <Route
+            path="satisfaction-reminder"
+            element={
+              <RequirePermission permission="satisfaction:notify">
+                <SatisfactionReminderPage />
               </RequirePermission>
             }
           />

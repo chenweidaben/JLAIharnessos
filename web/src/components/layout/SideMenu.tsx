@@ -123,6 +123,7 @@ const navItems: NavItem[] = [
   { key: '/discharge-plan', icon: <MedicineBoxOutlined />, label: '出院计划', perm: 'discharge_plan:view' },
   { key: '/followup-appointment', icon: <MedicineBoxOutlined />, label: '复诊预约', perm: 'followup_appt:view' },
   { key: '/satisfaction-survey', icon: <MedicineBoxOutlined />, label: '满意度调查', perm: 'satisfaction:view' },
+  { key: '/satisfaction-reminder', icon: <MedicineBoxOutlined />, label: '满意度提醒', perm: 'satisfaction:notify' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
