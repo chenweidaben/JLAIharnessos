@@ -98,3 +98,10 @@
 | 康复治疗执行 | 开单->签到->疗效评定；fair/poor 自动建 source=rehab 复评工单 | v0.79.0-m51a |
 | 疼痛门诊滴定 | NRS 滴定+爆发痛计数+镇痛建议；NRS>=7 或爆发痛>=3 自动建 source=pain 工单 | v0.83.0-m52a |
 | 护士屏康复/疼痛块 | evaluations 聚合最新治疗疗效与疼痛 NRS，poor/NRS>=7 标红 | v0.84.0-m53a |
+
+## M56-M57 追加
+
+| 模块 | 能力 | tag |
+|---|---|---|
+| 老年综合评估 CGA | ADL/IADL/MMSE/MNA/GDS+跌倒 六维评分分级，high 自动 quality_safety 工单 | v0.87.0-m56a |
+| 护士屏 CGA 块 | evaluations 聚合最新 CGA，high 风险标红 | v0.88.0-m57a |
