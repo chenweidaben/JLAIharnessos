@@ -88,6 +88,12 @@ export interface EvalSummaryInput {
     lastMaintainedAt?: string;
     complication?: string | null;
   } | null;
+  surgical?: {
+    signinComplete?: boolean;
+    timeoutComplete?: boolean;
+    signoutComplete?: boolean;
+    status?: string;
+  } | null;
 }
 
 export interface EvalSummary {
@@ -188,6 +194,13 @@ export interface EvalSummary {
     due: boolean;
     complicationAlert: boolean;
   };
+  surgical: {
+    signinComplete: boolean;
+    timeoutComplete: boolean;
+    signoutComplete: boolean;
+    status: string;
+    failed: boolean;
+  };
 }
 
 export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
@@ -245,6 +258,10 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const piccComplicationAlert = pc2.complication != null && pc2.complication !== 'none';
   if (piccDue) flags.push('picc_maintenance_due');
   if (piccComplicationAlert) flags.push('picc_complication');
+
+  const sc = inp.surgical ?? {};
+  const surgicalFailed = sc.status === 'failed';
+  if (surgicalFailed) flags.push('surgical_check_failed');
 
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
@@ -343,6 +360,13 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       complication: pc2.complication ?? null,
       due: piccDue,
       complicationAlert: piccComplicationAlert,
+    },
+    surgical: {
+      signinComplete: sc.signinComplete ?? false,
+      timeoutComplete: sc.timeoutComplete ?? false,
+      signoutComplete: sc.signoutComplete ?? false,
+      status: sc.status ?? 'none',
+      failed: surgicalFailed,
     },
   };
 }

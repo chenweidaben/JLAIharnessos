@@ -19,6 +19,20 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
   const cg = data.summary.cga;
   const nc = data.summary.nutritionConsult;
   const sb = data.summary.stopbang;
+  const sc = data.summary.surgical;
+
+  const surgicalExtra = sc.failed
+    ? <Tag color="red">核查未通过需整改</Tag>
+    : sc.status === 'passed'
+      ? <Tag color="green">三阶段通过</Tag>
+      : sc.status === 'in_progress'
+        ? <Tag color="orange">核查进行中</Tag>
+        : <Tag>未核查</Tag>;
+  const stageTag = (label: string, done: boolean) => (
+    <Tag color={done ? 'green' : 'default'} style={{ marginBottom: 8 }}>
+      {label}{done ? ' 通过' : ' 未完成'}
+    </Tag>
+  );
 
   return (
     <>
@@ -74,6 +88,15 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
             loading={loading}
           >
             <Statistic title="总分" value={sb.score ?? '—'} suffix="/8" />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={16} style={{ marginTop: 16 }}>
+        <Col span={24}>
+          <Card title="手术安全核查（WHO）" extra={surgicalExtra} loading={loading}>
+            {stageTag('Sign-in 麻醉前', sc.signinComplete)}
+            {stageTag('Time-out 切皮前', sc.timeoutComplete)}
+            {stageTag('Sign-out 离室前', sc.signoutComplete)}
           </Card>
         </Col>
       </Row>

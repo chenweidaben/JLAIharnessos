@@ -100,3 +100,17 @@ export async function getById(id: string): Promise<SurgicalChecklist | null> {
     WHERE id=${id} LIMIT 1`;
   return rows.length ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
+
+export async function getLatestByVisit(visitId: string): Promise<SurgicalChecklist | null> {
+  const db = getDb();
+  const rows = await db`
+    SELECT sc.id, sc.surgery_id, sc.signin_complete, sc.timeout_complete, sc.signout_complete,
+           sc.patient_confirmed, sc.site_marked, sc.procedure_confirmed, sc.allergy_confirmed,
+           sc.antibiotic_given, sc.blood_prepared, sc.instruments_counted, sc.status, sc.created_at
+    FROM clinical.surgical_checklists sc
+    JOIN clinical.surgery_requests sr ON sc.surgery_id = sr.id
+    WHERE sr.visit_id=${visitId}
+    ORDER BY sc.created_at DESC
+    LIMIT 1`;
+  return rows.length ? mapRow(rows[0] as Record<string, unknown>) : null;
+}

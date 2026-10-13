@@ -25,6 +25,7 @@ import { getLatestByVisit as getLatestCga } from '../../db/repositories/cgaRepo.
 import { listByVisit as listNutritionConsult } from '../../db/repositories/nutritionConsultRepo.js';
 import { getLatestByVisit as getLatestStopbang } from '../../db/repositories/stopbangRepo.js';
 import { getLatest as getLatestPicc } from '../../db/repositories/piccRepo.js';
+import { getLatestByVisit as getLatestSurgical } from '../../db/repositories/surgicalChecklistRepo.js';
 import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { planTier } from '../../medical-tools/nursing/nutritionConsult.js';
@@ -52,7 +53,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga, nutritionConsultList, latestStopbang, latestPicc] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga, nutritionConsultList, latestStopbang, latestPicc, latestSurgical] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -71,6 +72,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listNutritionConsult(visitId),
     getLatestStopbang(visitId),
     getLatestPicc(visit.patientId),
+    getLatestSurgical(visitId),
   ]);
   const latestVte = vteList[0] ?? null;
   const latestRehabTx = rehabTxList[0] ?? null;
@@ -175,6 +177,12 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       lastMaintainedAt: latestPicc.lastMaintainedAt,
       complication: latestPicc.complication,
     } : undefined,
+    surgical: latestSurgical ? {
+      signinComplete: latestSurgical.signinComplete,
+      timeoutComplete: latestSurgical.timeoutComplete,
+      signoutComplete: latestSurgical.signoutComplete,
+      status: latestSurgical.status,
+    } : undefined,
   });
 
   return {
@@ -193,6 +201,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     latestNutritionConsult,
     latestStopbang,
     latestPicc,
+    latestSurgicalChecklist: latestSurgical,
     summary,
   };
 }

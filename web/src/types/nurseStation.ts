@@ -63,6 +63,13 @@ export interface EvalSummary {
     due: boolean;
     complicationAlert: boolean;
   };
+  surgical: {
+    signinComplete: boolean;
+    timeoutComplete: boolean;
+    signoutComplete: boolean;
+    status: string;
+    failed: boolean;
+  };
   flags: string[];
 }
 
