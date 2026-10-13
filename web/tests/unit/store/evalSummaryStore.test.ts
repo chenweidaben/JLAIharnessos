@@ -19,6 +19,7 @@ const fake = {
     cga: { adlScore: 50, iadlScore: 20, mmseScore: 28, fallRisk: false, mnaScore: 13, gdsScore: 2, riskLevel: 'high', highRisk: true },
     nutritionConsult: { nutritionDiagnosis: 'x', planTier: 'high', caloriesPerDay: 2800, followupDays: 7, status: 'consulted', highPlan: true, followupOverdue: true },
     stopbang: { score: 5, riskLevel: 'high', highRisk: true },
+    surgical: { signinComplete: true, timeoutComplete: true, signoutComplete: false, status: 'in_progress', failed: false },
     flags: ['rehab_poor_efficacy', 'pain_severe_nrs', 'cga_high_risk', 'osa_high_risk'],
   },
 };
@@ -45,5 +46,8 @@ describe('evalSummaryStore', () => {
     expect(useEvalSummaryStore.getState().data?.summary.cga.highRisk).toBe(true);
     expect(useEvalSummaryStore.getState().data?.summary.nutritionConsult.highPlan).toBe(true);
     expect(useEvalSummaryStore.getState().data?.summary.stopbang.highRisk).toBe(true);
+    expect(useEvalSummaryStore.getState().data?.summary.surgical.signinComplete).toBe(true);
+    expect(useEvalSummaryStore.getState().data?.summary.surgical.signoutComplete).toBe(false);
+    expect(useEvalSummaryStore.getState().data?.summary.surgical.failed).toBe(false);
   });
 });
