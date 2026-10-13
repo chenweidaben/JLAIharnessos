@@ -155,6 +155,7 @@ const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
 const PatientBillingPage = lazy(() => import('@/pages/patientBilling'));
 const RehabTreatmentPage = lazy(() => import('@/pages/rehabTreatment'));
 const PainClinicPage = lazy(() => import('@/pages/painClinic'));
+const CgaPage = lazy(() => import('@/pages/cgaAssessment'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -664,6 +665,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="pain_clinic:view">
                 <PainClinicPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 老年综合评估 CGA（M56-A） */}
+          <Route
+            path="cga"
+            element={
+              <RequirePermission permission="cga:view">
+                <CgaPage />
               </RequirePermission>
             }
           />

@@ -117,6 +117,7 @@ const navItems: NavItem[] = [
   { key: '/billing', icon: <MoneyCollectOutlined />, label: '收费结算', perm: 'billing:read' },
   { key: '/rehab-treatment', icon: <FundOutlined />, label: '康复治疗', perm: 'rehab_treatment:view' },
   { key: '/pain-clinic', icon: <AlertOutlined />, label: '疼痛门诊', perm: 'pain_clinic:view' },
+  { key: '/cga', icon: <HeartOutlined />, label: '老年评估', perm: 'cga:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },

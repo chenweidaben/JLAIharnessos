@@ -103,6 +103,7 @@ import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientBillingRoutes } from './routes/patientBilling';
 import { rehabTreatmentRoutes } from './routes/rehabTreatment';
 import { painClinicRoutes } from './routes/painClinic';
+import { cgaRoutes } from './routes/cga';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -210,6 +211,7 @@ const allRoutes: RouteDef[] = [
   ...patientBillingRoutes,
   ...rehabTreatmentRoutes,
   ...painClinicRoutes,
+...cgaRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

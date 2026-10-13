@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技 jlmedaios - 登录用户视图映射
  *
  * 将 iam.users（+ user_roles）映射为前端 AuthUser 契约（web/src/types/auth.ts），
@@ -57,6 +57,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'postop_followup:view',
     'rehab_treatment:manage', 'rehab_treatment:view',
     'pain_clinic:manage', 'pain_clinic:view',
+    'cga:assess', 'cga:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -135,6 +136,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'postop_followup:view',
     'rehab_treatment:manage', 'rehab_treatment:view',
     'pain_clinic:manage', 'pain_clinic:view',
+    'cga:assess', 'cga:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -206,6 +208,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'postop_followup:view',
     'rehab_treatment:manage', 'rehab_treatment:view',
     'pain_clinic:manage', 'pain_clinic:view',
+    'cga:assess', 'cga:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -370,3 +373,4 @@ export function buildAuthView(user: User, links: UserRoleLink[]): AuthView {
     createdAt: user.createdAt,
   };
 }
+
