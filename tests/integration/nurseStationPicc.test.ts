@@ -60,7 +60,7 @@ D('护士屏 PICC 块（真实 PG）', () => {
   it('evaluations 返回 picc 块', async () => {
     const { visitId } = await seed();
     const ev = await getVisitEvaluations(admin, visitId);
-    expect((ev.summary as Record<string, unknown>).picc).toBeTruthy();
+    expect((ev.summary as unknown as { picc?: unknown }).picc).toBeTruthy();
   });
 
   it('越权（self 非主治）-> 403', async () => {

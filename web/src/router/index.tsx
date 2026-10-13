@@ -165,6 +165,7 @@ const SatisfactionReminderPage = lazy(() => import('@/pages/satisfactionReminder
 const MdtConsultPage = lazy(() => import('@/pages/mdtConsult'));
 const MdtTreatmentPlanPage = lazy(() => import('@/pages/mdtTreatmentPlan'));
 const PiccMaintenancePage = lazy(() => import('@/pages/piccMaintenance'));
+const CdiReviewPage = lazy(() => import('@/pages/cdiReview'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -774,6 +775,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="picc:view">
                 <PiccMaintenancePage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 合理用药审查 CDI（M70-A） */}
+          <Route
+            path="cdi-review"
+            element={
+              <RequirePermission permission="cdi:view">
+                <CdiReviewPage />
               </RequirePermission>
             }
           />
