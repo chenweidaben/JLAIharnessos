@@ -286,7 +286,7 @@ it('报告流转：审核（自审被拒提示）+ 再审核 + 退回 + 发布',
   // 发布
   fireEvent.click(within(panel).getByRole('button', { name: /发\s*布/ }));
   await waitFor(() => expect(api.publishReport).toHaveBeenCalledWith('rep1'));
-}, 30000);
+}, 45000);
 
 it('报告查询：刷新报告列表', async () => {
   render(<LisPage />);

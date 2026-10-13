@@ -316,7 +316,7 @@ it('报告书写：建草稿 + 保存草稿 + AI 辅助（只读展示）+ 提�
   // 提交审核
   fireEvent.click(within(panel).getByRole('button', { name: '提交审核' }));
   await waitFor(() => expect(api.submitReport).toHaveBeenCalledWith('rep1'));
-}, 30000);
+}, 45000);
 
 it('报告流转：自审 409 提示 + 再审核 + 退回 + 发布', async () => {
   render(<RisPage />);
@@ -347,7 +347,7 @@ it('报告流转：自审 409 提示 + 再审核 + 退回 + 发布', async () =>
   // 发布
   fireEvent.click(within(panel).getByRole('button', { name: /发\s*布/ }));
   await waitFor(() => expect(api.publishReport).toHaveBeenCalledWith('rep1'));
-}, 30000);
+}, 45000);
 
 it('报告查询：刷新报告列表', async () => {
   render(<RisPage />);

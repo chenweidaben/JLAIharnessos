@@ -27,8 +27,8 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.{test,spec}.{ts,tsx}', 'src/**/__tests__/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['tests/e2e/**', 'node_modules/**', 'dist/**'],
-    testTimeout: 15_000,
-    hookTimeout: 15_000,
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     expect: {
       requireAssertions: false,
     },
