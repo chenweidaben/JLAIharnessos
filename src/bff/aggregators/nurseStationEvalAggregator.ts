@@ -24,6 +24,7 @@ import { listByPatient as listPainClinic } from '../../db/repositories/painClini
 import { getLatestByVisit as getLatestCga } from '../../db/repositories/cgaRepo.js';
 import { listByVisit as listNutritionConsult } from '../../db/repositories/nutritionConsultRepo.js';
 import { getLatestByVisit as getLatestStopbang } from '../../db/repositories/stopbangRepo.js';
+import { getLatest as getLatestPicc } from '../../db/repositories/piccRepo.js';
 import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { planTier } from '../../medical-tools/nursing/nutritionConsult.js';
@@ -51,7 +52,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga, nutritionConsultList, latestStopbang] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga, nutritionConsultList, latestStopbang, latestPicc] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -69,6 +70,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     getLatestCga(visitId),
     listNutritionConsult(visitId),
     getLatestStopbang(visitId),
+    getLatestPicc(visit.patientId),
   ]);
   const latestVte = vteList[0] ?? null;
   const latestRehabTx = rehabTxList[0] ?? null;
@@ -167,6 +169,12 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       latestType: nissLatest ? String(nissLatest.infection_type) : null,
       latestStatus: nissLatest ? String(nissLatest.status) : null,
     },
+    picc: latestPicc ? {
+      deviceType: latestPicc.deviceType,
+      insertedAt: latestPicc.insertedAt,
+      lastMaintainedAt: latestPicc.lastMaintainedAt,
+      complication: latestPicc.complication,
+    } : undefined,
   });
 
   return {
@@ -184,6 +192,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     latestCga,
     latestNutritionConsult,
     latestStopbang,
+    latestPicc,
     summary,
   };
 }

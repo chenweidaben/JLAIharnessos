@@ -82,6 +82,12 @@ export interface EvalSummaryInput {
     latestType?: string | null;
     latestStatus?: string | null;
   };
+  picc?: {
+    deviceType?: string;
+    insertedAt?: string;
+    lastMaintainedAt?: string;
+    complication?: string | null;
+  } | null;
 }
 
 export interface EvalSummary {
@@ -174,6 +180,14 @@ export interface EvalSummary {
     latestType: string | null;
     latestStatus: string | null;
   };
+  picc: {
+    deviceType: string | null;
+    insertedAt: string | null;
+    lastMaintainedAt: string | null;
+    complication: string | null;
+    due: boolean;
+    complicationAlert: boolean;
+  };
 }
 
 export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
@@ -221,6 +235,16 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const sb = inp.stopbang ?? {};
   const sbHigh = sb.riskLevel === 'high';
   if (sbHigh) flags.push('osa_high_risk');
+
+  const pc2 = inp.picc ?? {};
+  const piccDue = (() => {
+    if (!pc2.lastMaintainedAt) return false;
+    const diff = (Date.now() - new Date(pc2.lastMaintainedAt).getTime()) / 86_400_000;
+    return diff > 7;
+  })();
+  const piccComplicationAlert = pc2.complication != null && pc2.complication !== 'none';
+  if (piccDue) flags.push('picc_maintenance_due');
+  if (piccComplicationAlert) flags.push('picc_complication');
 
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
@@ -311,6 +335,14 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       activeCount: inf.activeCount ?? 0,
       latestType: inf.latestType ?? null,
       latestStatus: inf.latestStatus ?? null,
+    },
+    picc: {
+      deviceType: pc2.deviceType ?? null,
+      insertedAt: pc2.insertedAt ?? null,
+      lastMaintainedAt: pc2.lastMaintainedAt ?? null,
+      complication: pc2.complication ?? null,
+      due: piccDue,
+      complicationAlert: piccComplicationAlert,
     },
   };
 }

@@ -8,10 +8,30 @@ import { useEffect, useState } from 'react';
 import { Alert, Card, Col, Layout, List, Row, Tag, Typography } from 'antd';
 import { usePermission } from '@/router/guards';
 import { useNurseStationStore } from '@/store/nurseStationStore';
+import { useEvalSummaryStore } from '@/store/evalSummaryStore';
 import type { WardRow } from '@/types/nurseStation';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
+
+function PiccCard({ visitId }: { visitId: string }) {
+  const { data, load } = useEvalSummaryStore();
+  useEffect(() => { void load(visitId); }, [load, visitId]);
+  const picc = data?.summary?.picc;
+  if (!picc || !picc.deviceType) return null;
+  return (
+    <div style={{ marginTop: 8, padding: 8, background: '#fff7e6', borderRadius: 4 }}>
+      <strong>管路（PICC/输液港）</strong>
+      <div style={{ marginTop: 4 }}>
+        <Tag color="blue">{picc.deviceType === 'port' ? '输液港' : 'PICC'}</Tag>
+        <span style={{ marginLeft: 8 }}>置管：{picc.insertedAt ?? '—'}</span>
+        <span style={{ marginLeft: 8 }}>上次维护：{picc.lastMaintainedAt ?? '—'}</span>
+        {picc.due && <Tag color="orange" style={{ marginLeft: 8 }}>维护到期</Tag>}
+        {picc.complicationAlert && <Tag color="red" style={{ marginLeft: 8 }}>并发症：{picc.complication}</Tag>}
+      </div>
+    </div>
+  );
+}
 
 export default function NurseStationPage() {
   const { dbUp, health, items, loading, error, checkHealth, load } = useNurseStationStore();
@@ -63,6 +83,7 @@ export default function NurseStationPage() {
                 <p>最新体征：T={sel.latestVitals.temperature ?? '—'} BP={sel.latestVitals.sbp ?? '—'} P={sel.latestVitals.pulse ?? '—'}</p>
                 <p>24h 出入量平衡：{sel.ioBalance24h ?? '—'} ml</p>
                 <p>待给药 {sel.pendingMeds} · 在院管路 {sel.activeTubes} · 风险 {sel.riskLevel} · 未处理 hard CDS {sel.unresolvedHardCds}</p>
+                <PiccCard visitId={sel.visitId} />
               </Card>
             ) : <Card size="small">点击左侧患者查看详情</Card>}
           </Col>

@@ -55,6 +55,14 @@ export interface EvalSummary {
     riskLevel: string;
     highRisk: boolean;
   };
+  picc: {
+    deviceType: string | null;
+    insertedAt: string | null;
+    lastMaintainedAt: string | null;
+    complication: string | null;
+    due: boolean;
+    complicationAlert: boolean;
+  };
   flags: string[];
 }
 
