@@ -153,6 +153,7 @@ const ReportPushPage = lazy(() => import('@/pages/reportPush'));
 const NotificationPage = lazy(() => import('@/pages/notification'));
 const RenewalPage = lazy(() => import('@/pages/renewalFlow'));
 const PatientBillingPage = lazy(() => import('@/pages/patientBilling'));
+const RehabTreatmentPage = lazy(() => import('@/pages/rehabTreatment'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -642,6 +643,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="patient_billing:view">
                 <PatientBillingPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 康复治疗执行（M51-A） */}
+          <Route
+            path="rehab-treatment"
+            element={
+              <RequirePermission permission="rehab_treatment:view">
+                <RehabTreatmentPage />
               </RequirePermission>
             }
           />
