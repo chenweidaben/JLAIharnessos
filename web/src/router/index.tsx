@@ -162,6 +162,7 @@ const DischargePlanPage = lazy(() => import('@/pages/dischargePlan'));
 const FollowupAppointmentPage = lazy(() => import('@/pages/followupAppointment'));
 const SatisfactionSurveyPage = lazy(() => import('@/pages/satisfactionSurvey'));
 const SatisfactionReminderPage = lazy(() => import('@/pages/satisfactionReminder'));
+const MdtConsultPage = lazy(() => import('@/pages/mdtConsult'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -741,6 +742,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="satisfaction:notify">
                 <SatisfactionReminderPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* MDT 多学科会诊（M66-A） */}
+          <Route
+            path="mdt-consult"
+            element={
+              <RequirePermission permission="mdt:view">
+                <MdtConsultPage />
               </RequirePermission>
             }
           />
