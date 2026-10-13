@@ -158,6 +158,7 @@ const PainClinicPage = lazy(() => import('@/pages/painClinic'));
 const CgaPage = lazy(() => import('@/pages/cgaAssessment'));
 const NutritionConsultPage = lazy(() => import('@/pages/nutritionConsult'));
 const StopbangPage = lazy(() => import('@/pages/stopbang'));
+const DischargePlanPage = lazy(() => import('@/pages/dischargePlan'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -697,6 +698,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="stopbang:view">
                 <StopbangPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 出院计划与随访（M61-A） */}
+          <Route
+            path="discharge-plan"
+            element={
+              <RequirePermission permission="discharge_plan:view">
+                <DischargePlanPage />
               </RequirePermission>
             }
           />

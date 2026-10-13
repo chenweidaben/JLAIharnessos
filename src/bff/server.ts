@@ -106,6 +106,7 @@ import { painClinicRoutes } from './routes/painClinic';
 import { cgaRoutes } from './routes/cga';
 import { nutritionConsultRoutes } from './routes/nutritionConsult';
 import { stopbangRoutes } from './routes/stopbang';
+import { dischargePlanRoutes } from './routes/dischargePlan';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -216,6 +217,7 @@ const allRoutes: RouteDef[] = [
 ...cgaRoutes,
 ...nutritionConsultRoutes,
 ...stopbangRoutes,
+...dischargePlanRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,
