@@ -166,6 +166,7 @@ const MdtConsultPage = lazy(() => import('@/pages/mdtConsult'));
 const MdtTreatmentPlanPage = lazy(() => import('@/pages/mdtTreatmentPlan'));
 const PiccMaintenancePage = lazy(() => import('@/pages/piccMaintenance'));
 const CdiReviewPage = lazy(() => import('@/pages/cdiReview'));
+const TransfusionReactionPage = lazy(() => import('@/pages/transfusionReaction'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -785,6 +786,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="cdi:view">
                 <CdiReviewPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 输血反应监控（M71-A） */}
+          <Route
+            path="transfusion-reaction"
+            element={
+              <RequirePermission permission="transfusion:view">
+                <TransfusionReactionPage />
               </RequirePermission>
             }
           />
