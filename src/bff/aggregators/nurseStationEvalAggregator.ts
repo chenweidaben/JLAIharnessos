@@ -22,8 +22,11 @@ import { listByVisit as listVteAnticoag } from '../../db/repositories/vteAnticoa
 import { listByVisit as listRehabTreatments } from '../../db/repositories/rehabTreatmentRepo.js';
 import { listByPatient as listPainClinic } from '../../db/repositories/painClinicRepo.js';
 import { getLatestByVisit as getLatestCga } from '../../db/repositories/cgaRepo.js';
+import { listByVisit as listNutritionConsult } from '../../db/repositories/nutritionConsultRepo.js';
+import { getLatestByVisit as getLatestStopbang } from '../../db/repositories/stopbangRepo.js';
 import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
+import { planTier } from '../../medical-tools/nursing/nutritionConsult.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
 import { aldreteTotal, readyForDischarge } from '../../medical-tools/nursing/pacuRecord.js';
 import { jaundiceElevated, breastfeedingAdequacy } from '../../medical-tools/nursing/postpartumVisit.js';
@@ -48,7 +51,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga, nutritionConsultList, latestStopbang] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -64,10 +67,13 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listRehabTreatments(visitId),
     listPainClinic(visit.patientId),
     getLatestCga(visitId),
+    listNutritionConsult(visitId),
+    getLatestStopbang(visitId),
   ]);
   const latestVte = vteList[0] ?? null;
   const latestRehabTx = rehabTxList[0] ?? null;
   const latestPainClinic = painClinicList[0] ?? null;
+  const latestNutritionConsult = nutritionConsultList[0] ?? null;
   const db = getDb();
   const nissRows = await db`SELECT id, infection_type, status FROM clinical.nosocomial_infections WHERE visit_id=${visitId} AND status IN ('reported','under_investigation') ORDER BY created_at DESC`;
   const nissActiveCount = nissRows.length;
@@ -138,6 +144,17 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       gdsScore: latestCga.gdsScore,
       riskLevel: latestCga.riskLevel,
     } : undefined,
+    nutritionConsult: latestNutritionConsult ? {
+      nutritionDiagnosis: latestNutritionConsult.nutritionDiagnosis,
+      planTier: planTier(latestNutritionConsult.caloriesPerDay),
+      caloriesPerDay: latestNutritionConsult.caloriesPerDay,
+      followupDays: latestNutritionConsult.followupDays,
+      status: latestNutritionConsult.status,
+    } : undefined,
+    stopbang: latestStopbang ? {
+      score: latestStopbang.score,
+      riskLevel: latestStopbang.riskLevel,
+    } : undefined,
     psych: latestPsych ? {
       phq9Total: latestPsych.phq9Total, phq9Level: latestPsych.phq9Level,
       gad7Total: latestPsych.gad7Total, gad7Level: latestPsych.gad7Level,
@@ -165,6 +182,8 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     latestRehabTreatment: latestRehabTx,
     latestPainClinic,
     latestCga,
+    latestNutritionConsult,
+    latestStopbang,
     summary,
   };
 }

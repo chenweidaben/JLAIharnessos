@@ -55,6 +55,17 @@ export interface EvalSummaryInput {
     gdsScore?: number;
     riskLevel?: string;
   } | null;
+  nutritionConsult?: {
+    nutritionDiagnosis?: string;
+    planTier?: string;
+    caloriesPerDay?: number;
+    followupDays?: number;
+    status?: string;
+  } | null;
+  stopbang?: {
+    score?: number;
+    riskLevel?: string;
+  } | null;
   psych?: {
     phq9Total?: number | null;
     phq9Level?: string;
@@ -131,6 +142,20 @@ export interface EvalSummary {
     riskLevel: string;
     highRisk: boolean;
   };
+  nutritionConsult: {
+    nutritionDiagnosis: string | null;
+    planTier: string;
+    caloriesPerDay: number | null;
+    followupDays: number;
+    status: string;
+    highPlan: boolean;
+    followupOverdue: boolean;
+  };
+  stopbang: {
+    score: number | null;
+    riskLevel: string;
+    highRisk: boolean;
+  };
   psych: {
     phq9Total: number | null;
     phq9Level: string;
@@ -186,6 +211,16 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const cg = inp.cga ?? {};
   const cgaHigh = cg.riskLevel === 'high';
   if (cgaHigh) flags.push('cga_high_risk');
+
+  const nc = inp.nutritionConsult ?? {};
+  const ncHighPlan = nc.planTier === 'high';
+  const ncOverdue = nc.status === 'consulted';
+  if (ncHighPlan) flags.push('nutrition_high_plan');
+  if (ncOverdue) flags.push('nutrition_followup_pending');
+
+  const sb = inp.stopbang ?? {};
+  const sbHigh = sb.riskLevel === 'high';
+  if (sbHigh) flags.push('osa_high_risk');
 
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
@@ -244,6 +279,20 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       gdsScore: cg.gdsScore ?? null,
       riskLevel: cg.riskLevel ?? 'unknown',
       highRisk: cgaHigh,
+    },
+    nutritionConsult: {
+      nutritionDiagnosis: nc.nutritionDiagnosis ?? null,
+      planTier: nc.planTier ?? 'unknown',
+      caloriesPerDay: nc.caloriesPerDay ?? null,
+      followupDays: nc.followupDays ?? 0,
+      status: nc.status ?? 'unknown',
+      highPlan: ncHighPlan,
+      followupOverdue: ncOverdue,
+    },
+    stopbang: {
+      score: sb.score ?? null,
+      riskLevel: sb.riskLevel ?? 'unknown',
+      highRisk: sbHigh,
     },
     psych: {
       phq9Total: p.phq9Total ?? null,

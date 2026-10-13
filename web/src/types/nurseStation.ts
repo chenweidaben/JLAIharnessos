@@ -41,6 +41,20 @@ export interface EvalSummary {
     riskLevel: string;
     highRisk: boolean;
   };
+  nutritionConsult: {
+    nutritionDiagnosis: string | null;
+    planTier: string;
+    caloriesPerDay: number | null;
+    followupDays: number;
+    status: string;
+    highPlan: boolean;
+    followupOverdue: boolean;
+  };
+  stopbang: {
+    score: number | null;
+    riskLevel: string;
+    highRisk: boolean;
+  };
   flags: string[];
 }
 

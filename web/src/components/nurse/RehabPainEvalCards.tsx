@@ -17,40 +17,66 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
   const rt = data.summary.rehabTreatment;
   const pc = data.summary.painClinic;
   const cg = data.summary.cga;
+  const nc = data.summary.nutritionConsult;
+  const sb = data.summary.stopbang;
 
   return (
-    <Row gutter={16}>
-      <Col span={8}>
-        <Card
-          title="康复治疗"
-          extra={rt.poorEfficacy ? <Tag color="red">疗效不佳需复评</Tag> : <Tag color="green">有效</Tag>}
-          loading={loading}
-        >
-          <Statistic title="最新方式" value={rt.modality ?? '—'} />
-          <Statistic title="疗效" value={rt.efficacy ?? '—'} />
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card
-          title="疼痛门诊"
-          extra={pc.severeNrs ? <Tag color="red">重度需升级镇痛</Tag> : <Tag color="green">可控</Tag>}
-          loading={loading}
-        >
-          <Statistic title="当前 NRS" value={pc.currentNrs ?? '—'} />
-          <Statistic title="爆发痛次数" value={pc.breakthroughCount} />
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card
-          title="老年综合评估"
-          extra={cg.highRisk ? <Tag color="red">高危需多学科干预</Tag> : <Tag color="green">{cg.riskLevel === 'unknown' ? '未评估' : '低中危'}</Tag>}
-          loading={loading}
-        >
-          <Statistic title="ADL" value={cg.adlScore ?? '—'} />
-          <Statistic title="MMSE" value={cg.mmseScore ?? '—'} />
-          <Statistic title="风险分级" value={cg.riskLevel === 'unknown' ? '—' : cg.riskLevel} />
-        </Card>
-      </Col>
-    </Row>
+    <>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card
+            title="康复治疗"
+            extra={rt.poorEfficacy ? <Tag color="red">疗效不佳需复评</Tag> : <Tag color="green">有效</Tag>}
+            loading={loading}
+          >
+            <Statistic title="最新方式" value={rt.modality ?? '—'} />
+            <Statistic title="疗效" value={rt.efficacy ?? '—'} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="疼痛门诊"
+            extra={pc.severeNrs ? <Tag color="red">重度需升级镇痛</Tag> : <Tag color="green">可控</Tag>}
+            loading={loading}
+          >
+            <Statistic title="当前 NRS" value={pc.currentNrs ?? '—'} />
+            <Statistic title="爆发痛次数" value={pc.breakthroughCount} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="老年综合评估"
+            extra={cg.highRisk ? <Tag color="red">高危需多学科干预</Tag> : <Tag color="green">{cg.riskLevel === 'unknown' ? '未评估' : '低中危'}</Tag>}
+            loading={loading}
+          >
+            <Statistic title="ADL" value={cg.adlScore ?? '—'} />
+            <Statistic title="MMSE" value={cg.mmseScore ?? '—'} />
+            <Statistic title="风险分级" value={cg.riskLevel === 'unknown' ? '—' : cg.riskLevel} />
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={16} style={{ marginTop: 16 }}>
+        <Col span={12}>
+          <Card
+            title="营养会诊"
+            extra={nc.highPlan ? <Tag color="red">高能量方案</Tag> : <Tag color="green">{nc.planTier === 'unknown' ? '未会诊' : '常规'}</Tag>}
+            loading={loading}
+          >
+            <Statistic title="每日能量" value={nc.caloriesPerDay ?? '—'} />
+            <Statistic title="随访状态" value={nc.status === 'unknown' ? '—' : nc.status} />
+            {nc.followupOverdue ? <Tag color="orange">随访到期</Tag> : null}
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card
+            title="睡眠筛查 STOP-BANG"
+            extra={sb.highRisk ? <Tag color="red">OSA 高危需睡眠监测</Tag> : <Tag color="green">{sb.riskLevel === 'unknown' ? '未筛查' : '低风险'}</Tag>}
+            loading={loading}
+          >
+            <Statistic title="总分" value={sb.score ?? '—'} suffix="/8" />
+          </Card>
+        </Col>
+      </Row>
+    </>
   );
 }
