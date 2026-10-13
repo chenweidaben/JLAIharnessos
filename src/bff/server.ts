@@ -112,6 +112,7 @@ import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
 import { mdtRoutes } from './routes/mdt';
 import { mdtTreatmentPlanRoutes } from './routes/mdtTreatmentPlan';
+import { piccRoutes } from './routes/picc';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -228,6 +229,7 @@ const allRoutes: RouteDef[] = [
 ...satisfactionReminderRoutes,
 ...mdtRoutes,
 ...mdtTreatmentPlanRoutes,
+...piccRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

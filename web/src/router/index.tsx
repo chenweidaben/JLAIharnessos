@@ -164,6 +164,7 @@ const SatisfactionSurveyPage = lazy(() => import('@/pages/satisfactionSurvey'));
 const SatisfactionReminderPage = lazy(() => import('@/pages/satisfactionReminder'));
 const MdtConsultPage = lazy(() => import('@/pages/mdtConsult'));
 const MdtTreatmentPlanPage = lazy(() => import('@/pages/mdtTreatmentPlan'));
+const PiccMaintenancePage = lazy(() => import('@/pages/piccMaintenance'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -763,6 +764,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="treatment_plan:view">
                 <MdtTreatmentPlanPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* PICC/输液港维护（M68-A） */}
+          <Route
+            path="picc-maintenance"
+            element={
+              <RequirePermission permission="picc:view">
+                <PiccMaintenancePage />
               </RequirePermission>
             }
           />

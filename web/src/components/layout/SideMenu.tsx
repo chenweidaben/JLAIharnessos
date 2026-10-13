@@ -126,6 +126,7 @@ const navItems: NavItem[] = [
   { key: '/satisfaction-reminder', icon: <MedicineBoxOutlined />, label: '满意度提醒', perm: 'satisfaction:notify' },
   { key: '/mdt-consult', icon: <MedicineBoxOutlined />, label: 'MDT 会诊', perm: 'mdt:view' },
   { key: '/mdt-treatment-plan', icon: <MedicineBoxOutlined />, label: 'MDT 治疗方案', perm: 'treatment_plan:view' },
+  { key: '/picc-maintenance', icon: <MedicineBoxOutlined />, label: 'PICC 维护', perm: 'picc:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
