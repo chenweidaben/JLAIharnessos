@@ -139,3 +139,5 @@
 | 合理用药统计看板 | 月度 DDDs/抗菌药使用率/特殊级占比/围术期合理率+DDDs 排名+超阈值标红 | v1.08.0-m77a |
 | 医生站首页工作台 | one-screen 聚合待办工单/未读通知/急诊在观/待确认方案/本月院感用药 KPI 红黄分级 | v1.10.0-m79a |
 | 患者端首页门户 | 患者侧聚合复诊/未读报告/未读通知/押金余额/慢病随访/满意度待填，自限域患者角色 | v1.11.0-m80a |
+| WHO 手术安全核查表 | Sign-in/Time-out/Sign-out 三阶段三方核对，缺项不通过 failed，surgery_id UNIQUE，权限码 surgical_check:complete/view | v1.13.0-m82a |
+| 床旁屏手术核查块 | evaluations Promise.all 并联最新核查，三阶段 Tag 展示，status=failed 标红 surgical_check_failed | v1.14.0-m83a |
