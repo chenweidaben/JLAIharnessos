@@ -17,7 +17,9 @@ const fake = {
     rehabTreatment: { modality: 'pt', status: 'completed', efficacy: 'poor', poorEfficacy: true },
     painClinic: { baselineNrs: 9, currentNrs: 8, breakthroughCount: 0, adjustmentSuggestion: 'x', severeNrs: true },
     cga: { adlScore: 50, iadlScore: 20, mmseScore: 28, fallRisk: false, mnaScore: 13, gdsScore: 2, riskLevel: 'high', highRisk: true },
-    flags: ['rehab_poor_efficacy', 'pain_severe_nrs', 'cga_high_risk'],
+    nutritionConsult: { nutritionDiagnosis: 'x', planTier: 'high', caloriesPerDay: 2800, followupDays: 7, status: 'consulted', highPlan: true, followupOverdue: true },
+    stopbang: { score: 5, riskLevel: 'high', highRisk: true },
+    flags: ['rehab_poor_efficacy', 'pain_severe_nrs', 'cga_high_risk', 'osa_high_risk'],
   },
 };
 
@@ -41,5 +43,7 @@ describe('evalSummaryStore', () => {
     expect(useEvalSummaryStore.getState().data?.summary.rehabTreatment.poorEfficacy).toBe(true);
     expect(useEvalSummaryStore.getState().data?.summary.painClinic.severeNrs).toBe(true);
     expect(useEvalSummaryStore.getState().data?.summary.cga.highRisk).toBe(true);
+    expect(useEvalSummaryStore.getState().data?.summary.nutritionConsult.highPlan).toBe(true);
+    expect(useEvalSummaryStore.getState().data?.summary.stopbang.highRisk).toBe(true);
   });
 });
