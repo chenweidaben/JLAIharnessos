@@ -121,6 +121,7 @@ import { infectionDashboardRoutes } from './routes/infectionDashboard';
 import { amDashboardRoutes } from './routes/amDashboard';
 import { doctorWorkbenchRoutes } from './routes/doctorWorkbench';
 import { patientPortalRoutes } from './routes/patientPortal';
+import { surgicalChecklistRoutes } from './routes/surgicalChecklist';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -246,6 +247,7 @@ const allRoutes: RouteDef[] = [
 ...amDashboardRoutes,
 ...doctorWorkbenchRoutes,
 ...patientPortalRoutes,
+...surgicalChecklistRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

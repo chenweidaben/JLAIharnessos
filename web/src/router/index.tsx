@@ -173,6 +173,7 @@ const InfectionDashboardPage = lazy(() => import('@/pages/infectionDashboard'));
 const AmDashboardPage = lazy(() => import('@/pages/amDashboard'));
 const DoctorWorkbenchPage = lazy(() => import('@/pages/doctorWorkbench'));
 const PatientPortalPage = lazy(() => import('@/pages/patientPortal'));
+const SurgicalChecklistPage = lazy(() => import('@/pages/surgicalChecklist'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -862,6 +863,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="patient_portal:view">
                 <PatientPortalPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* WHO 手术核查表（M82-A） */}
+          <Route
+            path="surgical-checklist"
+            element={
+              <RequirePermission permission="surgical_check:view">
+                <SurgicalChecklistPage />
               </RequirePermission>
             }
           />
