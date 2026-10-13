@@ -157,6 +157,7 @@ const RehabTreatmentPage = lazy(() => import('@/pages/rehabTreatment'));
 const PainClinicPage = lazy(() => import('@/pages/painClinic'));
 const CgaPage = lazy(() => import('@/pages/cgaAssessment'));
 const NutritionConsultPage = lazy(() => import('@/pages/nutritionConsult'));
+const StopbangPage = lazy(() => import('@/pages/stopbang'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -686,6 +687,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="nutrition_consult:view">
                 <NutritionConsultPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* STOP-BANG 睡眠筛查（M59-A） */}
+          <Route
+            path="stopbang"
+            element={
+              <RequirePermission permission="stopbang:view">
+                <StopbangPage />
               </RequirePermission>
             }
           />

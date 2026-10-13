@@ -119,6 +119,7 @@ const navItems: NavItem[] = [
   { key: '/pain-clinic', icon: <AlertOutlined />, label: '疼痛门诊', perm: 'pain_clinic:view' },
   { key: '/cga', icon: <HeartOutlined />, label: '老年评估', perm: 'cga:view' },
   { key: '/nutrition-consults', icon: <MedicineBoxOutlined />, label: '营养会诊', perm: 'nutrition_consult:view' },
+  { key: '/stopbang', icon: <MedicineBoxOutlined />, label: '睡眠筛查', perm: 'stopbang:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
