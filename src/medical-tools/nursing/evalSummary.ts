@@ -46,6 +46,15 @@ export interface EvalSummaryInput {
     breakthroughCount?: number;
     adjustmentSuggestion?: string | null;
   } | null;
+  cga?: {
+    adlScore?: number;
+    iadlScore?: number;
+    mmseScore?: number;
+    fallRisk?: boolean;
+    mnaScore?: number;
+    gdsScore?: number;
+    riskLevel?: string;
+  } | null;
   psych?: {
     phq9Total?: number | null;
     phq9Level?: string;
@@ -112,6 +121,16 @@ export interface EvalSummary {
     adjustmentSuggestion: string | null;
     severeNrs: boolean;
   };
+  cga: {
+    adlScore: number | null;
+    iadlScore: number | null;
+    mmseScore: number | null;
+    fallRisk: boolean;
+    mnaScore: number | null;
+    gdsScore: number | null;
+    riskLevel: string;
+    highRisk: boolean;
+  };
   psych: {
     phq9Total: number | null;
     phq9Level: string;
@@ -164,6 +183,10 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
   const severeNrs = (pc.currentNrs ?? 0) >= 7 || (pc.breakthroughCount ?? 0) >= 3;
   if (severeNrs) flags.push('pain_severe_nrs');
 
+  const cg = inp.cga ?? {};
+  const cgaHigh = cg.riskLevel === 'high';
+  if (cgaHigh) flags.push('cga_high_risk');
+
   return {
     nutritionRisk: inp.nutrition?.nutritionRisk ?? false,
     painSevere: (inp.pain?.score ?? 0) >= 7,
@@ -211,6 +234,16 @@ export function buildEvalSummary(inp: EvalSummaryInput): EvalSummary {
       breakthroughCount: pc.breakthroughCount ?? 0,
       adjustmentSuggestion: pc.adjustmentSuggestion ?? null,
       severeNrs,
+    },
+    cga: {
+      adlScore: cg.adlScore ?? null,
+      iadlScore: cg.iadlScore ?? null,
+      mmseScore: cg.mmseScore ?? null,
+      fallRisk: cg.fallRisk ?? false,
+      mnaScore: cg.mnaScore ?? null,
+      gdsScore: cg.gdsScore ?? null,
+      riskLevel: cg.riskLevel ?? 'unknown',
+      highRisk: cgaHigh,
     },
     psych: {
       phq9Total: p.phq9Total ?? null,

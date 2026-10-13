@@ -21,6 +21,7 @@ import { listByVisit as listPsych } from '../../db/repositories/psychScreeningRe
 import { listByVisit as listVteAnticoag } from '../../db/repositories/vteAnticoagRepo.js';
 import { listByVisit as listRehabTreatments } from '../../db/repositories/rehabTreatmentRepo.js';
 import { listByPatient as listPainClinic } from '../../db/repositories/painClinicRepo.js';
+import { getLatestByVisit as getLatestCga } from '../../db/repositories/cgaRepo.js';
 import { getDb } from '../../db/pool.js';
 import { buildEvalSummary } from '../../medical-tools/nursing/evalSummary.js';
 import { isComplete } from '../../medical-tools/nursing/preopAssessment.js';
@@ -47,7 +48,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
   if (!visit) throw notFound('就诊不存在');
   if (!canAccessVisit(auth, visit)) throw forbidden('超出数据权限范围');
 
-  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList] = await Promise.all([
+  const [nuts, pains, myTasks, preops, pacus, followups, icuList, ppList, triage, barthelList, psychList, vteList, rehabTxList, painClinicList, latestCga] = await Promise.all([
     listNutrition(visitId),
     listPain(visitId),
     listByAssignee(auth.id),
@@ -62,6 +63,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     listVteAnticoag(visitId),
     listRehabTreatments(visitId),
     listPainClinic(visit.patientId),
+    getLatestCga(visitId),
   ]);
   const latestVte = vteList[0] ?? null;
   const latestRehabTx = rehabTxList[0] ?? null;
@@ -127,6 +129,15 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
       breakthroughCount: latestPainClinic.breakthroughCount,
       adjustmentSuggestion: latestPainClinic.adjustmentSuggestion,
     } : undefined,
+    cga: latestCga ? {
+      adlScore: latestCga.adlScore,
+      iadlScore: latestCga.iadlScore,
+      mmseScore: latestCga.mmseScore,
+      fallRisk: latestCga.fallRisk,
+      mnaScore: latestCga.mnaScore,
+      gdsScore: latestCga.gdsScore,
+      riskLevel: latestCga.riskLevel,
+    } : undefined,
     psych: latestPsych ? {
       phq9Total: latestPsych.phq9Total, phq9Level: latestPsych.phq9Level,
       gad7Total: latestPsych.gad7Total, gad7Level: latestPsych.gad7Level,
@@ -153,6 +164,7 @@ export async function getVisitEvaluations(auth: AuthView, visitId: string) {
     openTasks: openTasksForVisit,
     latestRehabTreatment: latestRehabTx,
     latestPainClinic,
+    latestCga,
     summary,
   };
 }

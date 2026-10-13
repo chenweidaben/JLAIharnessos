@@ -16,10 +16,11 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
 
   const rt = data.summary.rehabTreatment;
   const pc = data.summary.painClinic;
+  const cg = data.summary.cga;
 
   return (
     <Row gutter={16}>
-      <Col span={12}>
+      <Col span={8}>
         <Card
           title="康复治疗"
           extra={rt.poorEfficacy ? <Tag color="red">疗效不佳需复评</Tag> : <Tag color="green">有效</Tag>}
@@ -29,7 +30,7 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
           <Statistic title="疗效" value={rt.efficacy ?? '—'} />
         </Card>
       </Col>
-      <Col span={12}>
+      <Col span={8}>
         <Card
           title="疼痛门诊"
           extra={pc.severeNrs ? <Tag color="red">重度需升级镇痛</Tag> : <Tag color="green">可控</Tag>}
@@ -37,6 +38,17 @@ export function RehabPainEvalCards({ visitId }: { visitId: string }) {
         >
           <Statistic title="当前 NRS" value={pc.currentNrs ?? '—'} />
           <Statistic title="爆发痛次数" value={pc.breakthroughCount} />
+        </Card>
+      </Col>
+      <Col span={8}>
+        <Card
+          title="老年综合评估"
+          extra={cg.highRisk ? <Tag color="red">高危需多学科干预</Tag> : <Tag color="green">{cg.riskLevel === 'unknown' ? '未评估' : '低中危'}</Tag>}
+          loading={loading}
+        >
+          <Statistic title="ADL" value={cg.adlScore ?? '—'} />
+          <Statistic title="MMSE" value={cg.mmseScore ?? '—'} />
+          <Statistic title="风险分级" value={cg.riskLevel === 'unknown' ? '—' : cg.riskLevel} />
         </Card>
       </Col>
     </Row>

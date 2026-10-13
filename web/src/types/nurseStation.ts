@@ -31,6 +31,16 @@ export interface EvalSummary {
     adjustmentSuggestion: string | null;
     severeNrs: boolean;
   };
+  cga: {
+    adlScore: number | null;
+    iadlScore: number | null;
+    mmseScore: number | null;
+    fallRisk: boolean;
+    mnaScore: number | null;
+    gdsScore: number | null;
+    riskLevel: string;
+    highRisk: boolean;
+  };
   flags: string[];
 }
 
