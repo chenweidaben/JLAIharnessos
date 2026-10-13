@@ -73,6 +73,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
     'am_dash:submit', 'am_dash:view',
+    'workbench:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -118,7 +119,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'sbar:create', 'sbar:view',
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
-    'am_dash:submit', 'am_dash:view', 'satisfaction:submit',
+    'am_dash:submit', 'am_dash:view',
+    'workbench:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
     'referral:view', 'referral:manage', 'referral:accept',
     'research:read', 'research:write',
@@ -177,6 +179,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
     'am_dash:submit', 'am_dash:view',
+    'workbench:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -214,7 +217,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'sbar:create', 'sbar:view',
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
-    'am_dash:submit', 'am_dash:view', 'satisfaction:submit',
+    'am_dash:submit', 'am_dash:view',
+    'workbench:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
     'referral:view', 'referral:manage', 'referral:accept',
     'research:read', 'research:write',
@@ -274,6 +278,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
     'am_dash:submit', 'am_dash:view',
+    'workbench:view',
     'icu_sedation:assess', 'icu_sedation:view',
     'postpartum:assess', 'postpartum:view',
     'er_triage:assess', 'er_triage:view',
@@ -306,7 +311,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'sbar:create', 'sbar:view',
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
-    'am_dash:submit', 'am_dash:view', 'satisfaction:submit',
+    'am_dash:submit', 'am_dash:view',
+    'workbench:view', 'satisfaction:submit',
     'triage:use', 'triage:view',
     'referral:view',
   ],
@@ -330,7 +336,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'sbar:create', 'sbar:view',
     'ed_obs:register', 'ed_obs:view',
     'infection_dash:submit', 'infection_dash:view',
-    'am_dash:submit', 'am_dash:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view'],
+    'am_dash:submit', 'am_dash:view',
+    'workbench:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */
@@ -458,6 +465,7 @@ export function buildAuthView(user: User, links: UserRoleLink[]): AuthView {
     createdAt: user.createdAt,
   };
 }
+
 
 
 

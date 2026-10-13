@@ -171,6 +171,7 @@ const SbarHandoffPage = lazy(() => import('@/pages/sbarHandoff'));
 const EdObservationPage = lazy(() => import('@/pages/edObservation'));
 const InfectionDashboardPage = lazy(() => import('@/pages/infectionDashboard'));
 const AmDashboardPage = lazy(() => import('@/pages/amDashboard'));
+const DoctorWorkbenchPage = lazy(() => import('@/pages/doctorWorkbench'));
 const PharmacyTaskPage = lazy(() => import('@/pages/pharmacyTask'));
 const DrgBudgetPage = lazy(() => import('@/pages/drgBudget'));
 const InpatientCostMonitorPage = lazy(() => import('@/pages/inpatientCostMonitor'));
@@ -840,6 +841,16 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="am_dash:view">
                 <AmDashboardPage />
+              </RequirePermission>
+            }
+          />
+
+          {/* 医生站工作台（M79-A） */}
+          <Route
+            path="doctor-workbench"
+            element={
+              <RequirePermission permission="workbench:view">
+                <DoctorWorkbenchPage />
               </RequirePermission>
             }
           />

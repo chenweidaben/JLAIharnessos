@@ -133,6 +133,7 @@ const navItems: NavItem[] = [
   { key: '/ed-observation', icon: <MedicineBoxOutlined />, label: '急诊留观', perm: 'ed_obs:view' },
   { key: '/infection-dashboard', icon: <MedicineBoxOutlined />, label: '院感看板', perm: 'infection_dash:view' },
   { key: '/am-dashboard', icon: <MedicineBoxOutlined />, label: '药事看板', perm: 'am_dash:view' },
+  { key: '/doctor-workbench', icon: <MedicineBoxOutlined />, label: '医生工作台', perm: 'workbench:view' },
 { key: '/appt', icon: <CalendarOutlined />, label: '预约随访', perm: 'appt:view' },
   { key: '/internet-hospital', icon: <GlobalOutlined />, label: '互联网医院',
     perm: ['internet:practitioner:audit', 'internet:consultation:audit'] },
