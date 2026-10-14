@@ -224,6 +224,8 @@ const TerminalQcPage = lazy(() => import('@/pages/emrGap/terminalQc'));
 const DeptCockpitPage = lazy(() => import('@/pages/medmuse/DeptCockpit'));
 // AI 第八剑客合理用药实时审查（M94-B）
 const DrugReviewPage = lazy(() => import('@/pages/emrGap/drugReview'));
+// 电子病历五级评审自评仪表盘（M94-C）
+const EmrLevel5Page = lazy(() => import('@/pages/emrGap/level5'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -375,6 +377,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="drug_review:view">
                 <DrugReviewPage />
+              </RequirePermission>
+            }
+          />
+          {/* 电子病历五级评审自评仪表盘（M94-C） */}
+          <Route
+            path="emr/level5"
+            element={
+              <RequirePermission permission="emr_level5:view">
+                <EmrLevel5Page />
               </RequirePermission>
             }
           />

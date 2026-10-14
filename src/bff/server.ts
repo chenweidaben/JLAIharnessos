@@ -180,6 +180,7 @@ import { aiNursingPlanRoutes } from './routes/aiNursingPlan';
 import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
+import { emrLevel5Routes } from './routes/emrLevel5';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
@@ -349,6 +350,7 @@ const allRoutes: RouteDef[] = [
   ...terminalQcRoutes,
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
+  ...emrLevel5Routes,
 ];
 
 interface Compiled {

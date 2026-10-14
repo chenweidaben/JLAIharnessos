@@ -148,6 +148,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'terminal_qc:view',
     'dept_cockpit:view',
     'drug_review:view',
+    'emr_level5:view',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -266,6 +267,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'terminal_qc:view',
     'dept_cockpit:view',
     'drug_review:view',
+    'emr_level5:view',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
