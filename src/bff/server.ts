@@ -126,6 +126,7 @@ import { consentFormRoutes } from './routes/consentForm';
 import { eSignRoutes } from './routes/eSign';
 import { orderRoutes } from './routes/order';
 import { nursingRecordRoutes } from './routes/nursingRecord';
+import { nurseHandoffRoutes } from './routes/nurseHandoff';
 import { surgeryRecordRoutes } from './routes/surgeryRecord';
 import { medicalHeaderRoutes } from './routes/medicalHeader';
 import { followupApptRoutes } from './routes/followupAppt';
@@ -288,6 +289,7 @@ const allRoutes: RouteDef[] = [
 ...eSignRoutes,
 ...orderRoutes,
 ...nursingRecordRoutes,
+...nurseHandoffRoutes,
 ...surgeryRecordRoutes,
 ...medicalHeaderRoutes,
 ...medicalQcRoutes,

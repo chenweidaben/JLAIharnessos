@@ -242,6 +242,8 @@ const AgentHealthPage = lazy(() => import('@/pages/medmuse/AgentHealth'));
 const PathwayVariancePage = lazy(() => import('@/pages/emrGap/pathwayVariance'));
 // 手术排程看板（M99-C）
 const SurgerySchedulePage = lazy(() => import('@/pages/surgery/Schedule'));
+// 护士交接班记录（M100-B）
+const NurseHandoffPage = lazy(() => import('@/pages/nursing/Handoff'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -418,6 +420,8 @@ export default function AppRoutes() {
           />
           {/* 手术排程看板（M99-C） */}
           <Route path="surgery/schedule" element={<SurgerySchedulePage />} />
+          {/* 护士交接班记录（M100-B） */}
+          <Route path="nursing/handoff" element={<NurseHandoffPage />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
