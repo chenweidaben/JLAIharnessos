@@ -18,6 +18,7 @@ import {
   type ToolContext,
 } from './toolRegistry';
 import { evaluate, createApprovalTicket } from './sentinel';
+import { searchKnowledge, buildCitationBlock } from './kbSearchTool';
 import {
   appendMessage,
   listMessages,
@@ -185,7 +186,10 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
   }
 
   // 7. 落 agent 回复
-  const reply = [modelReply.content, ...toolNotes].filter(Boolean).join('\n\n');
+  //    知识中台 RAG：对用户提问做关键词倒序扫描，命中院内规章制度/临床路径时，
+  //    在回复尾部追加「参考依据」引用块；无命中不追加。
+  const citationBlock = buildCitationBlock(searchKnowledge(userMessage));
+  const reply = [modelReply.content, ...toolNotes, citationBlock].filter(Boolean).join('\n\n');
   await appendMessage({ sessionId, role: 'agent', content: reply, confidence, disclaimer });
   newMessages.push({ role: 'agent', content: reply });
 

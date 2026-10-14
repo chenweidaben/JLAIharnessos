@@ -25,6 +25,7 @@ import * as prescriptionRepo from '../../db/repositories/prescriptionRepo';
 import * as drgRepo from '../../db/repositories/drgRepo';
 import * as dipRepo from '../../db/repositories/dipRepo';
 import * as followupApptRepo from '../../db/repositories/followupApptRepo';
+import { searchKnowledge } from './kbSearchTool';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -398,6 +399,27 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  // ---- 知识中台 RAG（M4-A）：院内规章制度/临床路径关键词检索（info，只读）----
+  {
+    name: 'kb_search',
+    description: '检索院内规章制度与临床路径条目，返回带来源的引用清单（只读）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'kb_search',
+        description: '按关键词检索院内规章制度/临床路径，返回标题、摘要、来源与更新时间的引用清单（只读，无向量依赖）',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: '检索关键词或用户问题原文' },
+            limit: { type: 'integer', description: '返回上限，默认 5', default: 5 },
+          },
+          required: ['query'],
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -631,6 +653,8 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.listFollowups(args, ctx);
         case 'getFollowupGuidance':
           return await this.getFollowupGuidance(args, ctx);
+        case 'kb_search':
+          return await this.kbSearch(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -1185,6 +1209,29 @@ export class DefaultToolExecutor implements ToolExecutor {
           '请您按提示逐项反馈；如出现发热、剧痛、伤口异常等情况，请立即联系主管医生或返院就诊。',
         disclaimer:
           '本话术为 AI 生成的沟通模板，不构成诊疗建议，不得据此调整用药；任何病情变化请联系主管医生。',
+      },
+    };
+  }
+
+  /**
+   * kb_search（知识中台 RAG，info，只读）：
+   *  - 纯函数 searchKnowledge 关键词倒序扫描院内规章制度/临床路径；
+   *  - 不连接数据库、不调用向量模型，命中即返回引用清单；
+   *  - 当前数据源为内置演示条目（demo:true），接入真实知识表后自动切换。
+   */
+  private async kbSearch(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const query = str(args, 'query');
+    const limit = typeof args.limit === 'number' && args.limit > 0 ? Math.min(args.limit, 20) : 5;
+    const hits = searchKnowledge(query).slice(0, limit);
+    return {
+      ok: true,
+      result: {
+        refs: hits,
+        total: hits.length,
+        dataSource: 'demo-kb',
       },
     };
   }
