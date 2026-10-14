@@ -50,6 +50,7 @@ import type {
   CdsFacts,
   RuleHit,
 } from '../../knowledge/cds/Rule.js';
+import { writeESignLog } from '../signing/signLogWriter.js';
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -431,7 +432,7 @@ export async function reviewPendingPrescription(
   const patient = visit ? await getPatientById(visit.patientId) : null;
 
   const db = getDb();
-  return db.begin(async (tx) => {
+  const reviewed = await db.begin(async (tx) => {
     const auditResult = {
       reviewerComment: input.comment ?? null,
       reviewedAt: new Date().toISOString(),
@@ -454,6 +455,22 @@ export async function reviewPendingPrescription(
     );
     return (await getPrescriptionById(rx.id, tx))!;
   });
+  // 电子签名留痕：事务提交成功后追加，失败仅告警、不阻断审方主流程
+  try {
+    await writeESignLog({
+      bizType: 'prescription_audit',
+      bizId: reviewed.id,
+      operatorId: auth.id,
+      content: JSON.stringify({
+        rxNo: reviewed.rxNo,
+        decision: input.decision,
+        comment: input.comment ?? null,
+      }),
+    });
+  } catch (e) {
+    console.warn('[e-sign] 处方审方留痕失败（不阻断主流程）', e);
+  }
+  return reviewed;
 }
 
 /** 发药前 CDS 预览（只读，不扣库存）：返回命中与是否存在 block。 */

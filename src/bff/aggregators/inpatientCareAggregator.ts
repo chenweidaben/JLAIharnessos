@@ -65,6 +65,7 @@ import {
   listAdministrationsByOrder,
   type Administration,
 } from '../../db/repositories/orderAdministrationRepo.js';
+import { writeESignLog } from '../signing/signLogWriter.js';
 
 /* ------------------------------ 错误类型 ------------------------------- */
 
@@ -474,9 +475,9 @@ export async function reviewInpatientOrder(auth: AuthView, orderId: string): Pro
   await loadInpatientVisit(auth, existing.visitId);
 
   const db = getDb();
-  return db.begin(async (tx) => {
-    const order = await repoReviewOrder(orderId, auth.id, tx);
-    if (!order) {
+  const order = await db.begin(async (tx) => {
+    const reviewed = await repoReviewOrder(orderId, auth.id, tx);
+    if (!reviewed) {
       const cur = await getOrderById(orderId, tx);
       if (!cur) throw notFound('医嘱不存在');
       throw conflict(`医嘱当前状态 ${cur.status}，不可审核`);
@@ -484,13 +485,25 @@ export async function reviewInpatientOrder(auth: AuthView, orderId: string): Pro
     await recordChainAudit(
       {
         actorId: auth.id, actorRole: auth.rawRoles.join(','), actorDept: auth.deptName,
-        action: 'inpatient_order.review', resourceType: 'order', resourceId: order.id,
-        visitRef: order.visitId, result: 'success', detail: { orderNo: order.orderNo },
+        action: 'inpatient_order.review', resourceType: 'order', resourceId: reviewed.id,
+        visitRef: reviewed.visitId, result: 'success', detail: { orderNo: reviewed.orderNo },
       },
       tx,
     );
-    return order;
+    return reviewed;
   });
+  // 电子签名留痕：事务提交成功后追加，失败仅告警、不阻断审核主流程
+  try {
+    await writeESignLog({
+      bizType: 'order_audit',
+      bizId: order.id,
+      operatorId: auth.id,
+      content: `${order.orderNo ?? ''}\n${order.content}`,
+    });
+  } catch (e) {
+    console.warn('[e-sign] 医嘱审核留痕失败（不阻断主流程）', e);
+  }
+  return order;
 }
 
 export async function rejectInpatientOrder(
