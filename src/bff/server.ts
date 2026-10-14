@@ -107,6 +107,11 @@ import { cgaRoutes } from './routes/cga';
 import { nutritionConsultRoutes } from './routes/nutritionConsult';
 import { stopbangRoutes } from './routes/stopbang';
 import { dischargePlanRoutes } from './routes/dischargePlan';
+import { dischargeSummaryRoutes } from './routes/dischargeSummary';
+import { vitalsTrendRoutes } from './routes/vitalsTrend';
+import { medicalArchiveRoutes } from './routes/medicalArchive';
+import { medicalCopyRoutes } from './routes/medicalCopy';
+import { admissionNoteRoutes } from './routes/admissionNote';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -233,6 +238,11 @@ const allRoutes: RouteDef[] = [
 ...nutritionConsultRoutes,
 ...stopbangRoutes,
 ...dischargePlanRoutes,
+...dischargeSummaryRoutes,
+...vitalsTrendRoutes,
+...medicalArchiveRoutes,
+...medicalCopyRoutes,
+...admissionNoteRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
