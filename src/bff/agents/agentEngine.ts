@@ -31,6 +31,7 @@ import {
 } from './medmuseRepo';
 import { getAgentEntry } from './agentRegistry';
 import { splitForSummary } from './contextSummary';
+import { recordCall } from './agentMetrics';
 
 /** 拉取历史的窗口：超阈值后用于覆盖早期对话做规则压缩 */
 const CONTEXT_FETCH_LIMIT = 200;
@@ -72,7 +73,13 @@ function toChatHistoryRole(m: { role: string }): 'system' | 'user' | 'assistant'
 }
 
 export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTurnResult> {
-  const { agent, userId, sessionId, userMessage, idempotencyKey, confirmed } = input;
+  // 健康度埋点：入口打时戳；try 体内任一 return 前置 ok=true，抛错则保持 false。
+  const startedAt = Date.now();
+  const { agent } = input;
+  let ok = false;
+
+  try {
+  const { userId, sessionId, userMessage, idempotencyKey, confirmed } = input;
   const newMessages: RunAgentTurnResult['newMessages'] = [];
 
   // 0. 会话归属校验
@@ -85,6 +92,7 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
   if (idempotencyKey) {
     const { cached } = await consumeIdempotencyKey({ key: idempotencyKey, sessionId, userId });
     if (cached?.consumed_at && cached.response) {
+      ok = true;
       return { ...(cached.response as RunAgentTurnResult), cached: true };
     }
   }
@@ -203,5 +211,10 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
     await saveIdempotencyResponse({ key: idempotencyKey, response: result });
   }
 
+  ok = true;
   return result;
+  } finally {
+    // 无论成功/失败/缓存回放都上报；ok=false 仅由体内抛错产生
+    recordCall(agent.role_code, Date.now() - startedAt, ok);
+  }
 }
