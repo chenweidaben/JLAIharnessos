@@ -117,6 +117,7 @@ import { orderRoutes } from './routes/order';
 import { nursingRecordRoutes } from './routes/nursingRecord';
 import { surgeryRecordRoutes } from './routes/surgeryRecord';
 import { medicalHeaderRoutes } from './routes/medicalHeader';
+import { medicalQcRoutes } from './routes/medicalQc';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -255,6 +256,7 @@ const allRoutes: RouteDef[] = [
 ...nursingRecordRoutes,
 ...surgeryRecordRoutes,
 ...medicalHeaderRoutes,
+...medicalQcRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
