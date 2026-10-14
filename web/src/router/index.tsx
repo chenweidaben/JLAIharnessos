@@ -232,6 +232,8 @@ const Patient360Timeline = lazy(() => import('@/pages/patients/Patient360'));
 const SystemHealthPage = lazy(() => import('@/pages/system/Health'));
 // 互联网医院患者端简化工作台（M97-C）
 const PatientWorkbenchPage = lazy(() => import('@/pages/patientPortal/Workbench'));
+// 数据导出中心（M97-D）
+const SystemExportPage = lazy(() => import('@/pages/system/Export'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -412,6 +414,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="patient_portal:view">
                 <PatientWorkbenchPage />
+              </RequirePermission>
+            }
+          />
+          {/* 数据导出中心（M97-D） */}
+          <Route
+            path="system/export"
+            element={
+              <RequirePermission permission="system:view">
+                <SystemExportPage />
               </RequirePermission>
             }
           />

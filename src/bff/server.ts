@@ -64,6 +64,7 @@ import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
 import { drgRoutes } from './routes/drg';
+import { exportRoutes } from './routes/export';
 import { labInterpretRoutes } from './routes/labInterpret';
 import { imagingInterpretRoutes } from './routes/imagingInterpret';
 import { criticalRoutes } from './routes/critical';
@@ -219,6 +220,7 @@ const allRoutes: RouteDef[] = [
   ...sessionAdminRoutes,
   ...billingRoutes,
   ...drgRoutes,
+  ...exportRoutes,
   ...labInterpretRoutes,
   ...imagingInterpretRoutes,
   ...criticalRoutes,

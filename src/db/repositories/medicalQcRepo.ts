@@ -28,6 +28,13 @@ export async function listByVisit(visitId: string): Promise<MedicalQc[]> {
   return rows.map(mapRow);
 }
 
+/** 数据导出中心：按检查日期倒序取全院最近质控单（默认上限 500，防导出过大） */
+export async function listRecent(limit = 500): Promise<MedicalQc[]> {
+  const db = getDb();
+  const rows = await db`SELECT * FROM clinical.medical_qc_records ORDER BY check_date DESC LIMIT ${limit}`;
+  return rows.map(mapRow);
+}
+
 export async function rectify(id: string): Promise<MedicalQc | null> {
   const db = getDb();
   const rows = await db`
