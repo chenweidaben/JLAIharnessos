@@ -32,6 +32,7 @@ import {
   PlusOutlined,
   RobotOutlined,
   SendOutlined,
+  ThunderboltOutlined,
   ToolOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -64,6 +65,14 @@ const ROLE_OPTIONS = [
 ] as const;
 
 type RoleCode = (typeof ROLE_OPTIONS)[number]['value'];
+
+/** 快捷指令：点击后直接把对应指令文本填入并发送 */
+const QUICK_COMMANDS = [
+  { label: '交班报告', text: '请生成今日交班报告' },
+  { label: '在管患者', text: '列出我在管的患者' },
+  { label: '待审医嘱', text: '列出待审核的医嘱' },
+  { label: '超支病例', text: '列出费用超支的病例' },
+] as const;
 
 /** confidence → 标签配色 */
 function confidenceColor(level?: 'high' | 'medium' | 'low' | null): string {
@@ -156,9 +165,9 @@ export default function MedMuseChatPage() {
     }
   }, [roleCode]);
 
-  /** 发送消息 */
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
+  /** 发送消息；传入 overrideText 时（快捷指令）直接发送该文本，否则发送输入框内容 */
+  const handleSend = useCallback(async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || sending) return;
     let sessionId = currentId;
     if (!sessionId) {
@@ -453,13 +462,38 @@ export default function MedMuseChatPage() {
             <div ref={bottomRef} />
           </div>
 
+          {/* 快捷指令按钮组：点击即填入指令文本并发送 */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              flexWrap: 'wrap',
+              padding: '8px 12px 0',
+              borderTop: '1px solid #e5e9f0',
+              background: '#fff',
+            }}
+          >
+            {QUICK_COMMANDS.map((c) => (
+              <Button
+                key={c.label}
+                size="small"
+                icon={<ThunderboltOutlined />}
+                style={{ borderColor: PRIMARY, color: PRIMARY }}
+                disabled={sending}
+                onClick={() => handleSend(c.text)}
+              >
+                {c.label}
+              </Button>
+            ))}
+          </div>
+
           {/* 底部输入框 */}
-          <div style={{ display: 'flex', gap: 8, padding: 12, borderTop: '1px solid #e5e9f0', background: '#fff' }}>
+          <div style={{ display: 'flex', gap: 8, padding: 12, background: '#fff' }}>
             <Input
               placeholder={`向${activeRoleLabel}智能体提问…（写操作会触发审批卡片）`}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onPressEnter={handleSend}
+              onPressEnter={() => handleSend()}
               disabled={sending}
             />
             <Button
@@ -467,7 +501,7 @@ export default function MedMuseChatPage() {
               icon={<SendOutlined />}
               style={{ background: PRIMARY, borderColor: PRIMARY }}
               loading={sending}
-              onClick={handleSend}
+              onClick={() => handleSend()}
             >
               发送
             </Button>
