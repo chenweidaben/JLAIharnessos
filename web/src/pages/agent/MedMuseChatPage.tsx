@@ -5,9 +5,10 @@
  *   - 左侧会话列表：GET /api/v1/medmuse/sessions
  *   - 右侧消息区：用户右对齐（深海蓝 #0B3D6B），agent 左对齐（白底），
  *     下方显示 confidence 标签（high=绿/medium=黄/low=灰）+ 小字免责声明；
- *   - 工具调用渲染为折叠卡片；
+ *   - 工具调用消息（role=tool）渲染为可折叠卡片：显示工具名 + 结果摘要，
+ *     点击展开查看完整返回（JSON 自动美化）；
+ *   - 审批请求内联在消息流中：展示「批准」「驳回」按钮，点击调 decideApproval；
  *   - 底部输入框：POST /api/v1/medmuse/sessions/:id/chat，自动带 Idempotency-Key；
- *   - 审批卡片：pendingApproval 时展示"批准/驳回"按钮，调 decideApproval；
  *   - 顶部角色选择器：主治/住院/护士/药师/医保办/患者，切换后用对应 roleCode 新建会话。
  *
  * 深海蓝主题：主色 #0B3D6B，辅助背景 #E8F0F8。
@@ -42,6 +43,7 @@ import { usePageTitle } from '@/hooks';
 import {
   createSession,
   decideApproval,
+  listApprovals,
   listMessages,
   listSessions,
   sendMessage,
@@ -97,6 +99,103 @@ function sortSessionsByRecent<T extends MedmuseSession>(list: T[]): T[] {
   );
 }
 
+/** 工具返回内容摘要：取首个非空行并截断，避免卡片头过长 */
+function summarizeToolContent(content: string, max = 80): string {
+  if (!content) return '（无返回内容）';
+  const firstLine = content
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)[0] ?? '';
+  const text = firstLine.replace(/\s+/g, ' ');
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+/** 尝试把工具返回按 JSON 美化；失败则原样返回 */
+function prettyToolContent(content: string): string {
+  const trimmed = content.trim();
+  if (!trimmed) return '';
+  try {
+    return JSON.stringify(JSON.parse(trimmed), null, 2);
+  } catch {
+    return content;
+  }
+}
+
+/** 审批风险等级 → 标签配色 */
+function riskColor(level: MedmuseApproval['riskLevel']): string {
+  if (level === 'critical') return 'red';
+  if (level === 'warning') return 'orange';
+  return 'blue';
+}
+
+/** 审批风险等级 → 中文文案 */
+function riskText(level: MedmuseApproval['riskLevel']): string {
+  if (level === 'critical') return '高危';
+  if (level === 'warning') return '中风险';
+  return '低风险';
+}
+
+/** 工具调用消息卡片：折叠显示工具名 + 结果摘要，展开看完整返回 */
+function ToolCallCard({ message }: { message: MedmuseMessage }) {
+  const [open, setOpen] = useState(false);
+  const toolName = message.toolName ?? '未知工具';
+  const raw = message.content || '（无返回内容）';
+  return (
+    <div
+      style={{
+        maxWidth: '72%',
+        background: '#f4f7fb',
+        border: '1px dashed #b9c9dd',
+        borderRadius: 8,
+        padding: '6px 10px',
+        fontSize: 12,
+      }}
+    >
+      <div
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          color: '#4a5a70',
+        }}
+      >
+        <ToolOutlined style={{ color: PRIMARY }} />
+        <b style={{ color: PRIMARY }}>{toolName}</b>
+        <span
+          style={{
+            flex: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: '#7a8699',
+          }}
+        >
+          {summarizeToolContent(raw)}
+        </span>
+        <span style={{ color: '#999' }}>{open ? '▾' : '▸'}</span>
+      </div>
+      {open && (
+        <pre
+          style={{
+            fontSize: 11,
+            margin: '8px 0 0',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-all',
+            background: '#fff',
+            border: '1px solid #e5e9f0',
+            borderRadius: 6,
+            padding: 8,
+          }}
+        >
+          {prettyToolContent(raw)}
+        </pre>
+      )}
+    </div>
+  );
+}
+
 export default function MedMuseChatPage() {
   usePageTitle('MEDMUSE 岗位智能体');
 
@@ -104,11 +203,12 @@ export default function MedMuseChatPage() {
   const [sessions, setSessions] = useState<MedmuseSession[]>([]);
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [messages, setMessages] = useState<MedmuseMessage[]>([]);
+  /** 当前会话内联待审批工单（消息流中渲染「批准/驳回」卡片） */
+  const [inlineApprovals, setInlineApprovals] = useState<MedmuseApproval[]>([]);
   const [input, setInput] = useState('');
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [sending, setSending] = useState(false);
-  const [pendingApproval, setPendingApproval] = useState<MedmuseApproval | null>(null);
   /** 正在流式输出的 agent 气泡 id（打字机光标高亮），null = 无流式 */
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -134,10 +234,21 @@ export default function MedMuseChatPage() {
     void loadSessions();
   }, [loadSessions]);
 
-  /* 切换会话 → 拉历史 */
+  /* 按会话拉取待审批工单，以服务端为准刷新内联审批卡片 */
+  const refreshApprovals = useCallback(async (sessionId: string) => {
+    try {
+      const list = await listApprovals('pending');
+      setInlineApprovals(list.filter((a) => a.sessionId === sessionId));
+    } catch {
+      /* 审批列表非关键路径，静默 */
+    }
+  }, []);
+
+  /* 切换会话 → 拉历史 + 待审批工单 */
   useEffect(() => {
     if (!currentId) {
       setMessages([]);
+      setInlineApprovals([]);
       return;
     }
     let alive = true;
@@ -153,6 +264,13 @@ export default function MedMuseChatPage() {
       .finally(() => {
         if (alive) setLoadingMsgs(false);
       });
+    listApprovals('pending')
+      .then((list) => {
+        if (alive) setInlineApprovals(list.filter((a) => a.sessionId === currentId));
+      })
+      .catch(() => {
+        /* 审批列表非关键路径，静默 */
+      });
     return () => {
       alive = false;
     };
@@ -161,7 +279,7 @@ export default function MedMuseChatPage() {
   /* 滚动到底部 */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loadingMsgs]);
+  }, [messages, inlineApprovals, loadingMsgs]);
 
   /** 新建会话：按当前角色 roleCode 创建 */
   const handleCreate = useCallback(async () => {
@@ -170,136 +288,137 @@ export default function MedMuseChatPage() {
       setSessions((prev) => [session, ...prev]);
       setCurrentId(session.id);
       setMessages([]);
-      setPendingApproval(null);
+      setInlineApprovals([]);
     } catch (e) {
       antdMessage.error(e instanceof Error ? e.message : '新建会话失败');
     }
   }, [roleCode]);
 
   /** 一次性发送（fallback）：保留原有 POST chat 逻辑，流式失败/不支持时兜底 */
-  const legacySend = useCallback(
-    async (sessionId: string, text: string) => {
-      const result: MedmuseChatResult = await sendMessage(sessionId, text);
-      if (result?.message) {
-        setMessages((prev) => [...prev, result.message!]);
-      } else if (result?.reply) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `local-agent-${Date.now()}`,
-            sessionId,
-            role: 'assistant',
-            content: result.reply!,
-            confidence: result.confidence ?? 'low',
-            disclaimer: result.disclaimer ?? null,
-            createdAt: new Date().toISOString(),
-          },
-        ]);
-      }
-      if (result?.pendingApproval) {
-        setPendingApproval(result.pendingApproval);
-      }
-    },
-    [],
-  );
+  const legacySend = useCallback(async (sessionId: string, text: string) => {
+    const result: MedmuseChatResult = await sendMessage(sessionId, text);
+    if (result?.message) {
+      setMessages((prev) => [...prev, result.message!]);
+    } else if (result?.reply) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `local-agent-${Date.now()}`,
+          sessionId,
+          role: 'assistant',
+          content: result.reply!,
+          confidence: result.confidence ?? 'low',
+          disclaimer: result.disclaimer ?? null,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    }
+    if (result?.pendingApproval) {
+      setInlineApprovals((prev) =>
+        prev.some((a) => a.id === result.pendingApproval!.id)
+          ? prev
+          : [...prev, result.pendingApproval!],
+      );
+    }
+  }, []);
 
   /** 发送消息：优先 SSE 流式打字机输出；失败自动回退到一次性发送 */
-  const handleSend = useCallback(async (overrideText?: string) => {
-    const text = (overrideText ?? input).trim();
-    if (!text || sending) return;
-    let sessionId = currentId;
-    if (!sessionId) {
-      try {
-        const { session } = await createSession(roleCode, text.slice(0, 20) || '新对话');
-        setSessions((prev) => [session, ...prev]);
-        setCurrentId(session.id);
-        sessionId = session.id;
-      } catch (e) {
-        antdMessage.error(e instanceof Error ? e.message : '新建会话失败');
-        return;
+  const handleSend = useCallback(
+    async (overrideText?: string) => {
+      const text = (overrideText ?? input).trim();
+      if (!text || sending) return;
+      let sessionId = currentId;
+      if (!sessionId) {
+        try {
+          const { session } = await createSession(roleCode, text.slice(0, 20) || '新对话');
+          setSessions((prev) => [session, ...prev]);
+          setCurrentId(session.id);
+          sessionId = session.id;
+        } catch (e) {
+          antdMessage.error(e instanceof Error ? e.message : '新建会话失败');
+          return;
+        }
       }
-    }
-    setInput('');
-    setSending(true);
-    const sid = sessionId!;
-    const optimistic: MedmuseMessage = {
-      id: `local-${Date.now()}`,
-      sessionId: sid,
-      role: 'user',
-      content: text,
-      createdAt: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, optimistic]);
-
-    // 先挂一个空的 agent 气泡，流式片段逐帧追加进去形成打字机效果
-    const streamId = `local-agent-stream-${Date.now()}`;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: streamId,
+      setInput('');
+      setSending(true);
+      const sid = sessionId!;
+      const optimistic: MedmuseMessage = {
+        id: `local-${Date.now()}`,
         sessionId: sid,
-        role: 'assistant',
-        content: '',
-        confidence: 'medium',
-        disclaimer: null,
+        role: 'user',
+        content: text,
         createdAt: new Date().toISOString(),
-      },
-    ]);
-    setStreamingId(streamId);
+      };
+      setMessages((prev) => [...prev, optimistic]);
 
-    // 用流式片段原地更新该气泡
-    const patchStream = (fn: (m: MedmuseMessage) => MedmuseMessage) =>
-      setMessages((prev) => prev.map((m) => (m.id === streamId ? fn(m) : m)));
-
-    try {
-      await streamMedmuseReply(
-        sid,
-        text,
+      // 先挂一个空的 agent 气泡，流式片段逐帧追加进去形成打字机效果
+      const streamId = `local-agent-stream-${Date.now()}`;
+      setMessages((prev) => [
+        ...prev,
         {
-          onDelta: (piece) => patchStream((m) => ({ ...m, content: m.content + piece })),
-          onMeta: (meta) =>
-            patchStream((m) => ({
-              ...m,
-              confidence: meta.confidence ?? m.confidence,
-              disclaimer: meta.disclaimer ?? m.disclaimer,
-            })),
+          id: streamId,
+          sessionId: sid,
+          role: 'assistant',
+          content: '',
+          confidence: 'medium',
+          disclaimer: null,
+          createdAt: new Date().toISOString(),
         },
-      );
-    } catch (e) {
-      // 流式失败：撤掉空气泡，回退到一次性发送（保留旧行为）
-      setMessages((prev) => prev.filter((m) => m.id !== streamId));
-      try {
-        await legacySend(sid, text);
-      } catch (err) {
-        antdMessage.error(err instanceof Error ? err.message : '发送失败');
-      }
-    } finally {
-      setStreamingId(null);
-      setSending(false);
-      // 发送完成后本地把当前会话置顶（刷新 lastActiveAt），保持倒序展示
-      setSessions((prev) =>
-        sortSessionsByRecent(
-          prev.map((s) => (s.id === sid ? { ...s, lastActiveAt: new Date().toISOString() } : s)),
-        ),
-      );
-    }
-  }, [input, sending, currentId, roleCode, legacySend]);
+      ]);
+      setStreamingId(streamId);
 
-  /** 审批决议 */
-  const handleDecide = useCallback(
-    async (approved: boolean) => {
-      if (!pendingApproval) return;
+      // 用流式片段原地更新该气泡
+      const patchStream = (fn: (m: MedmuseMessage) => MedmuseMessage) =>
+        setMessages((prev) => prev.map((m) => (m.id === streamId ? fn(m) : m)));
+
       try {
-        await decideApproval(pendingApproval.id, approved, approved ? 'approve via chat' : 'reject via chat');
-        antdMessage.success(approved ? '已批准' : '已驳回');
-        setPendingApproval(null);
-        // 重新发一条空消息触发 agent 继续（若需要）
+        await streamMedmuseReply(
+          sid,
+          text,
+          {
+            onDelta: (piece) => patchStream((m) => ({ ...m, content: m.content + piece })),
+            onMeta: (meta) =>
+              patchStream((m) => ({
+                ...m,
+                confidence: meta.confidence ?? m.confidence,
+                disclaimer: meta.disclaimer ?? m.disclaimer,
+              })),
+          },
+        );
       } catch (e) {
-        antdMessage.error(e instanceof Error ? e.message : '审批失败');
+        // 流式失败：撤掉空气泡，回退到一次性发送（保留旧行为）
+        setMessages((prev) => prev.filter((m) => m.id !== streamId));
+        try {
+          await legacySend(sid, text);
+        } catch (err) {
+          antdMessage.error(err instanceof Error ? err.message : '发送失败');
+        }
+      } finally {
+        setStreamingId(null);
+        setSending(false);
+        // 发送完成后本地把当前会话置顶（刷新 lastActiveAt），保持倒序展示
+        setSessions((prev) =>
+          sortSessionsByRecent(
+            prev.map((s) => (s.id === sid ? { ...s, lastActiveAt: new Date().toISOString() } : s)),
+          ),
+        );
+        // 以服务端为准刷新本会话待审批工单（流式路径后端可能新产生审批）
+        void refreshApprovals(sid);
       }
     },
-    [pendingApproval],
+    [input, sending, currentId, roleCode, legacySend, refreshApprovals],
   );
+
+  /** 审批决议：点击内联审批卡片的「批准/驳回」按钮 */
+  const handleDecide = useCallback(async (approval: MedmuseApproval, approved: boolean) => {
+    try {
+      await decideApproval(approval.id, approved, approved ? 'approve via chat' : 'reject via chat');
+      antdMessage.success(approved ? '已批准' : '已驳回');
+      setInlineApprovals((prev) => prev.filter((a) => a.id !== approval.id));
+    } catch (e) {
+      antdMessage.error(e instanceof Error ? e.message : '审批失败');
+    }
+  }, []);
 
   const activeRoleLabel = ROLE_OPTIONS.find((r) => r.value === roleCode)?.label ?? roleCode;
   /** 渲染用的倒序列表（最新活跃在上） */
@@ -446,108 +565,133 @@ export default function MedMuseChatPage() {
                 选择左侧会话，或新建会话开始与 {activeRoleLabel} 对话
               </div>
             )}
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  marginBottom: 12,
-                }}
-              >
+            {messages.map((m) =>
+              m.role === 'tool' ? (
+                /* 工具调用消息：可折叠卡片 */
                 <div
+                  key={m.id}
+                  style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}
+                >
+                  <ToolCallCard message={m} />
+                </div>
+              ) : (
+                <div
+                  key={m.id}
                   style={{
-                    maxWidth: '72%',
-                    background: m.role === 'user' ? PRIMARY : '#fff',
-                    color: m.role === 'user' ? '#fff' : '#1f1f1f',
-                    border: m.role === 'user' ? 'none' : '1px solid #e5e9f0',
-                    borderRadius: 10,
-                    padding: '10px 14px',
+                    display: 'flex',
+                    justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
+                    marginBottom: 12,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    {m.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
-                    <span style={{ fontSize: 12, opacity: 0.85 }}>
-                      {m.role === 'user' ? '我' : 'MEDMUSE'}
-                    </span>
-                  </div>
-                  <div style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
-                    {m.content}
-                    {m.id === streamingId && (
-                      <span style={{ color: PRIMARY, animation: 'medmuse-blink 1s step-end infinite' }}>▍</span>
-                    )}
-                  </div>
-
-                  {m.role === 'assistant' && (
-                    <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {m.confidence && (
-                        <Tag color={confidenceColor(m.confidence)} style={{ fontSize: 11, margin: 0 }}>
-                          {confidenceText(m.confidence)}
-                        </Tag>
-                      )}
-                      <span style={{ fontSize: 10, color: '#999' }}>
-                        {m.disclaimer ?? 'AI 辅助建议，最终决策以执业医师/药师为准'}
+                  <div
+                    style={{
+                      maxWidth: '72%',
+                      background: m.role === 'user' ? PRIMARY : '#fff',
+                      color: m.role === 'user' ? '#fff' : '#1f1f1f',
+                      border: m.role === 'user' ? 'none' : '1px solid #e5e9f0',
+                      borderRadius: 10,
+                      padding: '10px 14px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      {m.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+                      <span style={{ fontSize: 12, opacity: 0.85 }}>
+                        {m.role === 'user' ? '我' : 'MEDMUSE'}
                       </span>
                     </div>
-                  )}
-                </div>
-              </div>
-            ))}
+                    <div style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
+                      {m.content}
+                      {m.id === streamingId && (
+                        <span style={{ color: PRIMARY, animation: 'medmuse-blink 1s step-end infinite' }}>▍</span>
+                      )}
+                    </div>
 
-            {/* 工具调用折叠卡片 */}
-            {pendingApproval && (
-              <Collapse
-                size="small"
-                style={{ marginBottom: 12, background: '#fff8e6', border: '1px solid #ffd591' }}
-                items={[
-                  {
-                    key: 'tool',
-                    label: (
+                    {m.role === 'assistant' && (
+                      <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {m.confidence && (
+                          <Tag color={confidenceColor(m.confidence)} style={{ fontSize: 11, margin: 0 }}>
+                            {confidenceText(m.confidence)}
+                          </Tag>
+                        )}
+                        <span style={{ fontSize: 10, color: '#999' }}>
+                          {m.disclaimer ?? 'AI 辅助建议，最终决策以执业医师/药师为准'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ),
+            )}
+
+            {/* 审批请求内联卡片：批准/驳回调 decideApproval */}
+            {inlineApprovals
+              .filter((a) => a.sessionId === currentId)
+              .map((a) => (
+                <div
+                  key={a.id}
+                  style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}
+                >
+                  <Card
+                    size="small"
+                    style={{ maxWidth: '72%', borderColor: '#fa8c16', background: '#fff7e6' }}
+                    title={
                       <span>
-                        <ToolOutlined /> 调用工具 <b>{pendingApproval.toolName}</b>（{pendingApproval.riskLevel}）
+                        <ToolOutlined style={{ color: '#fa8c16' }} /> 需要审批 · 工具 <b>{a.toolName}</b>{' '}
+                        <Tag color={riskColor(a.riskLevel)} style={{ fontSize: 11, margin: 0 }}>
+                          {riskText(a.riskLevel)}
+                        </Tag>
                       </span>
-                    ),
-                    children: (
-                      <pre style={{ fontSize: 11, margin: 0, whiteSpace: 'pre-wrap' }}>
-                        {JSON.stringify(pendingApproval.payload, null, 2)}
-                      </pre>
-                    ),
-                  },
-                ]}
-              />
-            )}
-
-            {/* 审批卡片 */}
-            {pendingApproval && (
-              <Card
-                size="small"
-                title="需要审批"
-                style={{ marginBottom: 12, borderColor: '#fa8c16', background: '#fff7e6' }}
-              >
-                <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
-                  工具 <b>{pendingApproval.toolName}</b> 等待您的二次确认。批准后将实际执行写操作。
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <Button
-                    type="primary"
-                    icon={<CheckOutlined />}
-                    style={{ background: '#52c41a', borderColor: '#52c41a' }}
-                    loading={sending}
-                    onClick={() => handleDecide(true)}
+                    }
                   >
-                    批准
-                  </Button>
-                  <Button
-                    danger
-                    icon={<CloseOutlined />}
-                    loading={sending}
-                    onClick={() => handleDecide(false)}
-                  >
-                    驳回
-                  </Button>
+                    <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
+                      该写操作等待您的二次确认，批准后将实际执行。
+                    </div>
+                    <Collapse
+                      size="small"
+                      style={{ marginBottom: 8, background: '#fff' }}
+                      items={[
+                        {
+                          key: 'payload',
+                          label: <span style={{ fontSize: 12 }}>查看请求参数</span>,
+                          children: (
+                            <pre
+                              style={{
+                                fontSize: 11,
+                                margin: 0,
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-all',
+                              }}
+                            >
+                              {JSON.stringify(a.payload, null, 2)}
+                            </pre>
+                          ),
+                        },
+                      ]}
+                    />
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Button
+                        type="primary"
+                        size="small"
+                        icon={<CheckOutlined />}
+                        style={{ background: '#52c41a', borderColor: '#52c41a' }}
+                        loading={sending}
+                        onClick={() => handleDecide(a, true)}
+                      >
+                        批准
+                      </Button>
+                      <Button
+                        danger
+                        size="small"
+                        icon={<CloseOutlined />}
+                        loading={sending}
+                        onClick={() => handleDecide(a, false)}
+                      >
+                        驳回
+                      </Button>
+                    </div>
+                  </Card>
                 </div>
-              </Card>
-            )}
+              ))}
 
             <div ref={bottomRef} />
           </div>
