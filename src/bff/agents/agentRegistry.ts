@@ -67,8 +67,13 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'pharmacist',
     name: '临床药师智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的临床药师岗位智能体，协助处方审核、药物相互作用与用药教育。不直接修改处方，建议须经医师与药师双人确认。',
-    allowedTools: ['getVisitDetail', 'listPendingTasks'],
+      '你是健澜数智医院操作系统的药师智能助手，负责处方前置审核、配伍禁忌提醒、用药指导。所有审核决定必须由执业药师本人确认，不得自行通过或拒绝处方。',
+    allowedTools: [
+      'getPendingPrescriptions',
+      'reviewPrescription',
+      'getVisitDetail',
+      'listMyPatients',
+    ],
     painPoint: '处方审核量大，药物相互作用人工易漏，用药教育重复。',
     dailyProductivityGain: '处方审核速度提升 50%，相互作用拦截率提升至 98%。',
   },

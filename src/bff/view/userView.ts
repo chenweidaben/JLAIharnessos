@@ -137,7 +137,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'empi:read', 'empi:write',
     'data_warehouse:read', 'data_warehouse:admin',
     'data_governance:read', 'data_governance:admin',
-    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse',
+    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse', 'medmuse:pharmacist',
     'ai_note:generate', 'ai_note:review',
     'med_review:view', 'med_review:override',
     'ai_diagnosis:view', 'ai_pathway:view', 'ai_los_pred:view',
@@ -272,7 +272,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'internet:prescription:audit', 'internet:prescription:view',
     'internet:payment:refund', 'internet:invoice:view',
     'internet:delivery:create', 'internet:delivery:fulfill', 'internet:delivery:view',
-    'medmuse:chat',
+    'medmuse:chat', 'medmuse:pharmacist',
   ],
   nurse: [
     'dashboard:view', 'patient:view',

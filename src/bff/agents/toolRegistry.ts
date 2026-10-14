@@ -20,6 +20,8 @@ import * as timelinessRepo from '../../db/repositories/timelinessRepo';
 import * as improvementTaskRepo from '../../db/repositories/improvementTaskRepo';
 import * as consultRequestRepo from '../../db/repositories/consultRequestRepo';
 import * as nursingRecordRepo from '../../db/repositories/nursingRecordRepo';
+import * as pharmacyTaskRepo from '../../db/repositories/pharmacyTaskRepo';
+import * as prescriptionRepo from '../../db/repositories/prescriptionRepo';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -197,6 +199,49 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  {
+    name: 'getPendingPrescriptions',
+    description: '列出待药师前置审核的处方',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'getPendingPrescriptions',
+        description: '列出待药师前置审核的处方队列',
+        parameters: {
+          type: 'object',
+          properties: {
+            limit: { type: 'integer', description: '返回上限，默认 20', default: 20 },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'reviewPrescription',
+    description: '药师审核处方（approve/reject），需执业药师本人二次确认',
+    riskLevel: 'warning',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'reviewPrescription',
+        description: '药师审核处方，执行前先做配伍禁忌检查，最终决定需二次确认',
+        parameters: {
+          type: 'object',
+          properties: {
+            prescriptionId: { type: 'string', description: '处方ID' },
+            decision: {
+              type: 'string',
+              enum: ['approve', 'reject'],
+              description: '审核结论',
+            },
+            comment: { type: 'string', description: '审核意见，可空' },
+          },
+          required: ['prescriptionId', 'decision'],
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -285,6 +330,10 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.listPendingOrders(args, ctx);
         case 'createNursingNote':
           return await this.createNursingNote(args, ctx);
+        case 'getPendingPrescriptions':
+          return await this.getPendingPrescriptions(args, ctx);
+        case 'reviewPrescription':
+          return await this.reviewPrescription(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -493,6 +542,134 @@ export class DefaultToolExecutor implements ToolExecutor {
         noteId: rec.id,
         visitId: rec.visitId,
         createdAt: rec.recordedAt,
+      },
+    };
+  }
+
+  /**
+   * getPendingPrescriptions（药师，info）：列出待前置审核的处方。
+   * 通过 pharmacy_task JOIN prescriptions/visits/patients 拿到脱敏患者姓名、
+   * 首个药品名与剂量，便于药师快速分诊。
+   */
+  private async getPendingPrescriptions(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const limit = typeof args.limit === 'number' && args.limit > 0 ? Math.min(args.limit, 50) : 20;
+    const tasks = await pharmacyTaskRepo.listPending();
+    const top = tasks.slice(0, limit);
+    if (top.length === 0) {
+      return { ok: true, result: { tasks: [], total: 0 } };
+    }
+    const ids = top.map((t) => t.prescriptionId);
+    const rows = await db()<Array<{
+      task_id: string; prescription_id: string; visit_id: string;
+      patient_name: string; drug_name: string | null; dosage: string | null;
+      status: string; created_at: string;
+    }>>`
+      SELECT t.id AS task_id, t.prescription_id, r.visit_id,
+             p.name_masked AS patient_name,
+             (SELECT item.drug_name FROM clinical.prescription_items item
+               WHERE item.prescription_id = r.id ORDER BY item.created_at ASC LIMIT 1) AS drug_name,
+             (SELECT item.dosage FROM clinical.prescription_items item
+               WHERE item.prescription_id = r.id ORDER BY item.created_at ASC LIMIT 1) AS dosage,
+             t.status, t.created_at
+      FROM clinical.pharmacy_dispense_tasks t
+      JOIN clinical.prescriptions r ON r.id = t.prescription_id
+      JOIN clinical.visits v ON v.id = r.visit_id
+      LEFT JOIN clinical.patients p ON p.id = v.patient_id
+      WHERE t.prescription_id = ANY(${ids})
+      ORDER BY t.created_at ASC
+    `;
+    const list = rows.map((r) => ({
+      taskId: r.task_id,
+      prescriptionId: r.prescription_id,
+      visitId: r.visit_id,
+      patientName: r.patient_name,
+      drugName: r.drug_name,
+      dosage: r.dosage,
+      status: r.status,
+      createdAt: r.created_at,
+    }));
+    return { ok: true, result: { tasks: list, total: list.length } };
+  }
+
+  /**
+   * reviewPrescription（药师，warning）：
+   *  - 函数体顶部强制 confirmed 校验，未确认抛 CONFIRMATION_REQUIRED；
+   *  - 执行前先在 clinical.medmuse_drug_interactions 做配伍禁忌粗筛，
+   *    将 major/contraindicated 组合作为 interactionWarnings 返回给药师参考；
+   *  - 最终落库走 prescriptionRepo.auditPrescription，审计意见写入 audit_result。
+   */
+  private async reviewPrescription(
+    args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    if (!args.confirmed) throw new Error('CONFIRMATION_REQUIRED');
+    const prescriptionId = str(args, 'prescriptionId');
+    const decisionRaw = str(args, 'decision');
+    const decision: 'approved' | 'rejected' = decisionRaw === 'approve' ? 'approved' : 'rejected';
+    const comment = typeof args.comment === 'string' ? args.comment : '';
+
+    // 配伍禁忌粗筛：取该处方所有药品名，两两比对规则表
+    const items = await db()<Array<{ drug_name: string }>>`
+      SELECT drug_name FROM clinical.prescription_items
+      WHERE prescription_id = ${prescriptionId}
+    `;
+    const drugNames = Array.from(new Set(items.map((i) => i.drug_name)));
+    const interactionWarnings: Array<{
+      drugA: string; drugB: string; severity: string; description: string; recommendation: string | null;
+    }> = [];
+    if (drugNames.length >= 2) {
+      const rules = await db()<Array<{
+        drug_a: string; drug_b: string; severity: string;
+        description: string; recommendation: string | null;
+      }>>`
+        SELECT drug_a, drug_b, severity, description, recommendation
+        FROM clinical.medmuse_drug_interactions
+      `;
+      for (let i = 0; i < drugNames.length; i++) {
+        for (let j = i + 1; j < drugNames.length; j++) {
+          const a = drugNames[i];
+          const b = drugNames[j];
+          const hit = rules.find(
+            (r) =>
+              (r.drug_a === a && r.drug_b === b) || (r.drug_a === b && r.drug_b === a),
+          );
+          if (hit && hit.severity !== 'minor') {
+            interactionWarnings.push({
+              drugA: hit.drug_a,
+              drugB: hit.drug_b,
+              severity: hit.severity,
+              description: hit.description,
+              recommendation: hit.recommendation,
+            });
+          }
+        }
+      }
+    }
+
+    const updated = await prescriptionRepo.auditPrescription(
+      prescriptionId,
+      decision,
+      ctx.userId,
+      {
+        comment,
+        reviewedBy: ctx.userId,
+        interactionWarnings,
+        reviewedAt: new Date().toISOString(),
+      },
+    );
+    if (!updated) {
+      return { ok: false, result: null, error: 'PRESCRIPTION_NOT_FOUND_OR_NOT_PENDING' };
+    }
+    return {
+      ok: true,
+      result: {
+        prescriptionId: updated.id,
+        decision: updated.status,
+        reviewedAt: updated.updatedAt,
+        interactionWarnings,
       },
     };
   }
