@@ -9,15 +9,19 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import type { AuthView } from '../view/userView.js';
-import * as repo from '@/db/repositories/aiNoteQcRepo';
+import * as admissionNoteRepo from '@/db/repositories/admissionNoteRepo';
 import type { AiNoteQcIssue } from '@/db/repositories/aiNoteQcRepo';
+import * as repo from '@/db/repositories/aiNoteQcRepo';
+import * as progressNoteRepo from '@/db/repositories/progressNoteRepo';
+import * as visitRepo from '@/db/repositories/visitRepo';
+
+import type { AuthView } from '../view/userView.js';
 
 export class AiNoteQcError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-/** 规则引擎输入（生产环境应由文书索引读取填充） */
+/** 规则引擎输入（由 buildQcInput 从真实就诊/入院记录/病程映射填充） */
 export interface QcInput {
   /** 已完成的病历要素 */
   sections: {
@@ -102,33 +106,116 @@ export function evaluateQc(input: QcInput): { score: number; issues: AiNoteQcIss
   return { score, issues };
 }
 
+/* ----------------------------- 真实数据 → 规则引擎输入（纯函数） ----------------------------- */
+
+/** 从真实就诊/文书取出的质控原始上下文（数据获取在 aggregator 层完成） */
+export interface QcDataSource {
+  /** 入院时间（ISO），首次病程 8h 时效的基准事件时间 */
+  admitAt: string | null;
+  /** 就诊主表上的主诉（admissionNote 缺失时兜底） */
+  visitChiefComplaint: string | null;
+  /** 入院记录（clinical.admission_notes），查不到为 null */
+  admissionNote: {
+    chiefComplaint: string | null;
+    presentIllness: string | null;
+    physicalExam: string | null;
+    preliminaryDiagnosis: string | null;
+    treatmentPlan: string | null;
+  } | null;
+  /** 首次病程记录的 noteDate（ISO），查不到为 null */
+  firstProgressNoteAt: string | null;
+}
+
+/** 判断某个病程记录是否为「首次病程」（noteType 为自由文本，兼容中文/英文标识） */
+export function isFirstProgressNote(noteType: string | null | undefined): boolean {
+  if (!noteType) return false;
+  if (noteType.includes('首次')) return true;
+  const t = noteType.toLowerCase();
+  return t.includes('first') && t.includes('progress');
+}
+
+/** 从病程列表中挑出首次病程记录（取其中最早的一条），没有返回 null */
+export function pickFirstProgressNote<T extends { noteType: string; noteDate: string }>(
+  notes: T[],
+): T | null {
+  const matched = notes.filter((n) => isFirstProgressNote(n.noteType));
+  if (matched.length === 0) return null;
+  return matched.reduce((earliest, n) =>
+    new Date(n.noteDate).getTime() < new Date(earliest.noteDate).getTime() ? n : earliest,
+  );
+}
+
+const hasText = (v: string | null | undefined): boolean =>
+  typeof v === 'string' && v.trim().length > 0;
+
+/** 计算两个 ISO 时间点之间相差的小时数；任一缺失或非法返回 null（不臆造） */
+export function hoursBetween(fromIso: string | null, toIso: string | null): number | null {
+  if (!fromIso || !toIso) return null;
+  const a = new Date(fromIso).getTime();
+  const b = new Date(toIso).getTime();
+  if (Number.isNaN(a) || Number.isNaN(b)) return null;
+  return (b - a) / 3_600_000;
+}
+
 /**
- * 本地启发式构造扫描输入。
- * TODO: 生产环境替换为真实文书索引（入院记录/病程/诊断/治疗记录）读取。
+ * 纯函数：把真实就诊/文书上下文映射为规则引擎输入。
+ * - 完整性：入院记录各段落非空即视为「已具备」；整份入院记录缺失时全部为 false，
+ *   由 evaluateQc 统一产出「病历要素缺失」issue（而非随机种子）。
+ * - 时效：首次病程耗时 = 首次病程 noteDate − 入院时间；
+ *   入院记录完成时间戳当前 admissionNoteRepo 未导出（AdmissionNote 无时间字段），
+ *   故 admissionHours 安全降级为 null，不编造扣分。
  */
-function heuristicInput(visitId: string): QcInput {
-  let h = 0;
-  for (const ch of visitId) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const bit = (i: number) => ((h >>> i) & 1) === 1;
+export function buildQcInput(src: QcDataSource): QcInput {
+  const a = src.admissionNote;
+  const noteText = [
+    a?.chiefComplaint, a?.presentIllness, a?.physicalExam,
+    a?.preliminaryDiagnosis, a?.treatmentPlan,
+  ].filter((v): v is string => hasText(v)).join(' ');
   return {
     sections: {
-      chiefComplaint: true,
-      presentIllness: bit(0),
-      physicalExam: bit(1),
-      diagnosis: bit(2),
-      treatment: bit(3),
+      chiefComplaint: hasText(a?.chiefComplaint) || hasText(src.visitChiefComplaint),
+      presentIllness: hasText(a?.presentIllness),
+      physicalExam: hasText(a?.physicalExam),
+      diagnosis: hasText(a?.preliminaryDiagnosis),
+      treatment: hasText(a?.treatmentPlan),
     },
-    admissionHours: bit(4) ? ADMISSION_DEADLINE_H + (h % 12) : 8 + (h % 10),
-    firstProgressHours: bit(5) ? FIRST_PROGRESS_DEADLINE_H + (h % 8) : 2 + (h % 5),
-    noteText: bit(6) ? '患者一般情况挺好，没什么事。' : '患者神志清楚，双肺呼吸音清，诊断明确，治疗方案合理。',
+    admissionHours: null,
+    firstProgressHours: hoursBetween(src.admitAt, src.firstProgressNoteAt),
+    noteText,
   };
 }
 
-/** 触发一次质控扫描：权限校验 → 规则引擎 → 落库 pending 记录并返回 */
+/**
+ * aggregator 层数据获取：按 visitId 查真实就诊/入院记录/病程。
+ * 任一 repo 查询失败或无结果时安全降级为空结果集，绝不抛出、不引入会崩的依赖。
+ */
+async function loadQcSource(visitId: string): Promise<QcDataSource> {
+  const src: QcDataSource = {
+    admitAt: null, visitChiefComplaint: null, admissionNote: null, firstProgressNoteAt: null,
+  };
+  try {
+    const visit = await visitRepo.getVisitById(visitId);
+    if (visit) {
+      src.admitAt = visit.admitAt;
+      src.visitChiefComplaint = visit.chiefComplaint;
+    }
+  } catch { /* 就诊信息缺失：按无就诊继续降级 */ }
+  try {
+    src.admissionNote = await admissionNoteRepo.getByVisit(visitId);
+  } catch { /* 入院记录查询失败：按缺失处理 */ }
+  try {
+    const notes = await progressNoteRepo.listByVisit(visitId);
+    src.firstProgressNoteAt = pickFirstProgressNote(notes)?.noteDate ?? null;
+  } catch { /* 病程查询失败：首次病程时效不扣分 */ }
+  return src;
+}
+
+/** 触发一次质控扫描：权限校验 → 真实数据装载 → 规则引擎 → 落库 pending 记录并返回 */
 export async function scanView(view: AuthView, visitId: string) {
   if (!view.permissions.includes('ai_note_qc:view')) throw new AiNoteQcError(403, '无权限');
   if (!visitId) throw new AiNoteQcError(400, 'visitId 必填');
-  const { score, issues } = evaluateQc(heuristicInput(visitId));
+  const src = await loadQcSource(visitId);
+  const { score, issues } = evaluateQc(buildQcInput(src));
   return repo.create({ visitId, noteType: 'emr_qc', issues, score, status: 'pending' });
 }
 

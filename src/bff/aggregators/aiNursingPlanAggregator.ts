@@ -2,8 +2,11 @@
  * 健澜科技 jlmedaios - M90-B AI护理计划推荐 Aggregator
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/aiNursingPlanRepo';
+import * as diagnosisRepo from '@/db/repositories/diagnosisRepo';
+import * as medicalHeaderRepo from '@/db/repositories/medicalHeaderRepo';
+
+import type { AuthView } from '../view/userView.js';
 
 export class AiNursingPlanError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -51,14 +54,41 @@ export function recommendPlan(diagnosis: string): {
   return { plan, riskLevel };
 }
 
-/** 生成推荐：校验权限 → 规则引擎推荐 → 落库 pending 记录返回 */
+/**
+ * aggregator 层数据获取：按 visitId 拼接真实诊断文本。
+ * 诊断来源：诊断表（diagnoses）+ 病案首页（medical_record_headers）。
+ * 任一 repo 查询失败或无结果时安全降级为空串，绝不抛出、不引入会崩的依赖；
+ * 返回空串时 recommendPlan 自动走默认通用监测包。
+ */
+async function loadRealDiagnosis(visitId: string): Promise<string> {
+  const parts: string[] = [];
+  try {
+    const diags = await diagnosisRepo.getDiagnosesByVisit(visitId);
+    for (const d of diags) if (d?.name) parts.push(d.name);
+  } catch { /* 诊断表查询失败：降级 */ }
+  try {
+    const header = await medicalHeaderRepo.getByVisit(visitId);
+    if (header) {
+      if (header.primaryDiagnosis) parts.push(header.primaryDiagnosis);
+      for (const s of header.secondaryDiagnoses ?? []) if (s) parts.push(s);
+    }
+  } catch { /* 病案首页查询失败：降级 */ }
+  return parts.join('；');
+}
+
+/** 生成推荐：校验权限 → 真实诊断装载 → 规则引擎推荐 → 落库 pending 记录返回 */
 export async function recommendView(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('ai_nursing_plan:view')) throw new AiNursingPlanError(403, '无权限');
   if (!body.visitId) throw new AiNursingPlanError(400, 'visitId 必填');
-  const diagnosis = String(body.diagnosis ?? '');
+  // 经上方非空校验，visitId 必为字符串（来自 JSON body / query），此处收窄类型
+  const visitId = body.visitId as string;
+  const realDiagnosis = await loadRealDiagnosis(visitId);
+  // 真实诊断优先；真实诊断为空时回退调用方传入字符串诊断，仍为空则走默认通用监测包
+  const callerDiagnosis = typeof body.diagnosis === 'string' ? body.diagnosis : '';
+  const diagnosis = realDiagnosis || callerDiagnosis;
   const rec = recommendPlan(diagnosis);
   return repo.create({
-    visitId: String(body.visitId),
+    visitId,
     diagnosis,
     plan: rec.plan,
     riskLevel: rec.riskLevel,
