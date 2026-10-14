@@ -112,6 +112,7 @@ import { vitalsTrendRoutes } from './routes/vitalsTrend';
 import { medicalArchiveRoutes } from './routes/medicalArchive';
 import { medicalCopyRoutes } from './routes/medicalCopy';
 import { admissionNoteRoutes } from './routes/admissionNote';
+import { progressNoteRoutes } from './routes/progressNote';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -243,6 +244,7 @@ const allRoutes: RouteDef[] = [
 ...medicalArchiveRoutes,
 ...medicalCopyRoutes,
 ...admissionNoteRoutes,
+...progressNoteRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
