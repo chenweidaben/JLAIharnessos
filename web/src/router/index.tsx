@@ -213,6 +213,8 @@ const EmrTimelinessPage = lazy(() => import('@/pages/emrGap/timeliness'));
 const EmrAssessmentPage = lazy(() => import('@/pages/emrGap/emrAssessment'));
 // AI 病历质控（M90-A）
 const AiQcPage = lazy(() => import('@/pages/emrGap/aiQc'));
+// AI 护理计划推荐（M90-B）
+const AiNursingPlanPage = lazy(() => import('@/pages/emrGap/aiNursingPlan'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -337,6 +339,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="ai_note_qc:view">
                 <AiQcPage />
+              </RequirePermission>
+            }
+          />
+          {/* AI 护理计划推荐（M90-B） */}
+          <Route
+            path="nursing/ai-plan"
+            element={
+              <RequirePermission permission="ai_nursing_plan:view">
+                <AiNursingPlanPage />
               </RequirePermission>
             }
           />
