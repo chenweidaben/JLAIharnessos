@@ -236,6 +236,8 @@ const PatientWorkbenchPage = lazy(() => import('@/pages/patientPortal/Workbench'
 const SystemExportPage = lazy(() => import('@/pages/system/Export'));
 // 通知 webhook 配置（M98-D）
 const NotifyConfigPage = lazy(() => import('@/pages/system/NotifyConfig'));
+// MEDMUSE agent 健康度看板（M99-A）
+const AgentHealthPage = lazy(() => import('@/pages/medmuse/AgentHealth'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -442,6 +444,8 @@ export default function AppRoutes() {
           <Route path="medmuse" element={<MedMuseChatPage />} />
           {/* MEDMUSE 审批中心（M93-A）：待审批工单列表 + approve/reject */}
           <Route path="medmuse/approvals" element={<MedmuseApprovalsPage />} />
+          {/* MEDMUSE agent 健康度看板（M99-A） */}
+          <Route path="medmuse/agent-health" element={<AgentHealthPage />} />
           {/* MEDMUSE 科主任驾驶舱（M94-A）：科室 KPI 日报 + 质量预警 */}
           <Route
             path="medmuse/dept-cockpit"
