@@ -1,0 +1,37 @@
+﻿import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
+import { buildAuthView, type AuthView } from '../view/userView.js';
+import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { listView, recommendView, acceptView, PathwayError } from '../aggregators/pathwayRecommendationAggregator.js';
+
+async function requester(c: Ctx): Promise<AuthView | null> {
+  if (!c.user) return null;
+  const user = await getUserById(c.user.id);
+  if (!user) return null;
+  return buildAuthView(user, await getUserRoleLinks(user.id));
+}
+
+function mapError(err: unknown): Response {
+  if (err instanceof PathwayError) {
+    const code = err.status === 403 ? ErrorCode.FORBIDDEN : err.status === 409 ? ErrorCode.CONFLICT : err.status === 404 ? ErrorCode.NOT_FOUND : ErrorCode.BAD_REQUEST;
+    return json(fail(code, err.message), err.status);
+  }
+  return json(fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '失败'), 500);
+}
+
+export const pathwayRecommendationRoutes: RouteDef[] = [
+  { method: 'GET', path: '/api/v1/pathway-recommendations', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await listView(view, c.query.get('visitId') ?? ''))); } catch (e) { return mapError(e); }
+    } },
+  { method: 'POST', path: '/api/v1/pathway-recommendations/recommend', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await recommendView(view, (await c.body()) as Record<string, unknown>))); } catch (e) { return mapError(e); }
+    } },
+  { method: 'POST', path: '/api/v1/pathway-recommendations/:id/accept', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await acceptView(view, c.params.id))); } catch (e) { return mapError(e); }
+    } },
+];
