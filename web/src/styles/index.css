@@ -96,3 +96,11 @@ body {
   text-decoration: line-through;
   text-decoration-color: rgba(0, 0, 0, 0.25);
 }
+
+/* 药品库存预警：低库存行整行浅红警示 */
+.jl-row-low-stock > td {
+  background-color: rgba(207, 19, 34, 0.08) !important;
+}
+.jl-row-low-stock:hover > td {
+  background-color: rgba(207, 19, 34, 0.16) !important;
+}

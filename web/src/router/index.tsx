@@ -33,6 +33,8 @@ const Emergency = lazy(() => import('@/pages/emergency'));
 const EmergencyTriage = lazy(() => import('@/pages/emergency/triage-detail'));
 // 药房调剂发药工作站（M2-A）
 const Pharmacy = lazy(() => import('@/pages/pharmacy'));
+// 药品库存预警（低库存 + 建议采购量）
+const InventoryAlert = lazy(() => import('@/pages/pharmacy/InventoryAlert'));
 // 运行病历质控工作站（M2-B）
 const MedicalQc = lazy(() => import('@/pages/medicalQc'));
 // 语音电子病历工作站（M2-C）
@@ -41,6 +43,8 @@ const VoiceMedical = lazy(() => import('@/pages/voiceMedical'));
 const FrontPage = lazy(() => import('@/pages/frontPage'));
 // 科研专病队列（M5-B）
 const Research = lazy(() => import('@/pages/research'));
+// 科研专病队列导出（纳排筛选 + CSV 导出）
+const CohortExport = lazy(() => import('@/pages/research/CohortExport'));
 // 患者主索引 EMPI（M5-C）
 const Empi = lazy(() => import('@/pages/empi'));
 const DataWarehouse = lazy(() => import('@/pages/dataWarehouse'));
@@ -514,6 +518,8 @@ export default function AppRoutes() {
           <Route path="emergency/triage/:visitId" element={<EmergencyTriage />} />
           {/* 药房调剂发药工作站（M2-A） */}
           <Route path="pharmacy" element={<Pharmacy />} />
+          {/* 药品库存预警：低库存标红 + 建议采购量 */}
+          <Route path="pharmacy/inventory-alert" element={<InventoryAlert />} />
           {/* 运行病历质控工作站（M2-B） */}
           <Route path="medical-qc" element={<MedicalQc />} />
           {/* 语音电子病历工作站（M2-C） */}
@@ -522,6 +528,8 @@ export default function AppRoutes() {
           <Route path="front-page" element={<FrontPage />} />
           {/* 科研专病队列（M5-B）：research:read/write */}
           <Route path="research" element={<Research />} />
+          {/* 专病队列数据导出：纳排筛选 + CSV 下载（仅登录态） */}
+          <Route path="research/cohort-export" element={<CohortExport />} />
           {/* 患者主索引 EMPI（M5-C）：empi:read/write */}
           <Route path="empi" element={<Empi />} />
           {/* 数据湖仓（M5-D）：data_warehouse:read/admin */}
