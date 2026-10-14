@@ -1,14 +1,12 @@
-/**
- * 健澜科技数智医院智能体 - BFF HTTP/WebSocket 服务器
+﻿/**
+ * 鍋ユ緶绉戞妧鏁版櫤鍖婚櫌鏅鸿兘浣?- BFF HTTP/WebSocket 鏈嶅姟鍣? *
+ * 鍩轰簬 Bun 鍘熺敓杩愯鏃讹紝闆堕澶栦緷璧栵細
+ *  - REST锛氱粺涓€ /api/v1 鍓嶇紑锛岃仛鍚堝悗绔湇鍔″苟閫傞厤鍓嶇
+ *  - WS锛?ws/chat 瀵硅瘽娴佸紡涓庡憡璀︽帹閫侊紙闇€閴存潈锛? *  - 涓棿浠讹細璁よ瘉 / 闄愭祦 / CSRF / 瀹夊叏澶?/ 鏃ュ織 / 閿欒澶勭悊
  *
- * 基于 Bun 原生运行时，零额外依赖：
- *  - REST：统一 /api/v1 前缀，聚合后端服务并适配前端
- *  - WS：/ws/chat 对话流式与告警推送（需鉴权）
- *  - 中间件：认证 / 限流 / CSRF / 安全头 / 日志 / 错误处理
+ * 鍚姩锛歜un run src/bff/server.ts
  *
- * 启动：bun run src/bff/server.ts
- *
- * Copyright (c) 2026 杭州健澜科技有限公司
+ * Copyright (c) 2026 鏉窞鍋ユ緶绉戞妧鏈夐檺鍏徃
  */
 
 import { attachUser, newCtx, requireAuth, verifyJwt } from './middleware/auth';
@@ -113,6 +111,7 @@ import { medicalArchiveRoutes } from './routes/medicalArchive';
 import { medicalCopyRoutes } from './routes/medicalCopy';
 import { admissionNoteRoutes } from './routes/admissionNote';
 import { progressNoteRoutes } from './routes/progressNote';
+import { consultRequestRoutes } from './routes/consultRequest';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -162,7 +161,7 @@ import { systemRoutes } from './routes/system';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 // ============================================================================
-// 路由表与编译
+// 璺敱琛ㄤ笌缂栬瘧
 // ============================================================================
 
 const allRoutes: RouteDef[] = [
@@ -245,6 +244,7 @@ const allRoutes: RouteDef[] = [
 ...medicalCopyRoutes,
 ...admissionNoteRoutes,
 ...progressNoteRoutes,
+...consultRequestRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
@@ -322,13 +322,12 @@ const compiled: Compiled[] = allRoutes.map((def) => {
 });
 
 // ============================================================================
-// WebSocket（/ws/chat）— 鉴权后升级
-// ============================================================================
+// WebSocket锛?ws/chat锛夆€?閴存潈鍚庡崌绾?// ============================================================================
 
 const chatClients = new Set<Bun.ServerWebSocket<unknown>>();
 
 function broadcast(event: string, payload: unknown, seq?: number): void {
-  // seq 为 outbox 数字主键（仅经发件箱发布的事件携带），客户端据此重连补拉
+  // seq 涓?outbox 鏁板瓧涓婚敭锛堜粎缁忓彂浠剁鍙戝竷鐨勪簨浠舵惡甯︼級锛屽鎴风鎹閲嶈繛琛ユ媺
   const frame = JSON.stringify({
     event,
     timestamp: Date.now(),
@@ -344,33 +343,30 @@ function broadcast(event: string, payload: unknown, seq?: number): void {
   }
 }
 
-// 影像 AI（DAMO-RADAR）critical 发现复用同一 /ws/chat critical:alert 通道推送危急值
-setCriticalAlertSink(broadcast);
+// 褰卞儚 AI锛圖AMO-RADAR锛塩ritical 鍙戠幇澶嶇敤鍚屼竴 /ws/chat critical:alert 閫氶亾鎺ㄩ€佸嵄鎬ュ€?setCriticalAlertSink(broadcast);
 
-// M7-C 事务性发件箱中继：业务事务写入 event_outbox，Relay 轮询发布到 WebSocket。
-// publisher 复用 broadcast（同 /ws/chat 通道）；发布失败仅记录，不影响业务。
-const outboxRelay = new OutboxRelay(
+// M7-C 浜嬪姟鎬у彂浠剁涓户锛氫笟鍔′簨鍔″啓鍏?event_outbox锛孯elay 杞鍙戝竷鍒?WebSocket銆?// publisher 澶嶇敤 broadcast锛堝悓 /ws/chat 閫氶亾锛夛紱鍙戝竷澶辫触浠呰褰曪紝涓嶅奖鍝嶄笟鍔°€?const outboxRelay = new OutboxRelay(
   (event, payload, meta) => broadcast(event, payload, meta.seq),
   {
     batchSize: 50,
     pollIntervalMs: 500,
     onPublishError: (ev, err) =>
       // eslint-disable-next-line no-console
-      console.error(`[outbox-relay] 发布事件 ${ev.eventType}#${ev.id} 失败:`, err),
+      console.error(`[outbox-relay] 鍙戝竷浜嬩欢 ${ev.eventType}#${ev.id} 澶辫触:`, err),
   },
 );
 outboxRelay.start();
 
-/** 校验 WebSocket 升级请求的 Token（query 参数 ?token= 或 Sec-WebSocket-Protocol） */
+/** 鏍￠獙 WebSocket 鍗囩骇璇锋眰鐨?Token锛坬uery 鍙傛暟 ?token= 鎴?Sec-WebSocket-Protocol锛?*/
 function wsAuthorized(req: Request): boolean {
   const url = new URL(req.url);
   const token =
     url.searchParams.get('token') ??
     (req.headers.get('sec-websocket-protocol') ?? '').replace(/^bearer\./i, '');
   if (!token) return false;
-  // JWT 格式
+  // JWT 鏍煎紡
   if (token.split('.').length === 3) return verifyJwt(token) !== null;
-  // 开发态演示 token
+  // 寮€鍙戞€佹紨绀?token
   const isProd = (process.env.NODE_ENV ?? 'development') === 'production';
   if (
     !isProd &&
@@ -381,7 +377,7 @@ function wsAuthorized(req: Request): boolean {
   return false;
 }
 
-/** 前端经 /ws/chat 下发的帧（兼容 event / action、顶层 / payload 两种位置） */
+/** 鍓嶇缁?/ws/chat 涓嬪彂鐨勫抚锛堝吋瀹?event / action銆侀《灞?/ payload 涓ょ浣嶇疆锛?*/
 interface IncomingFrame {
   event?: string;
   action?: string;
@@ -391,32 +387,27 @@ interface IncomingFrame {
 }
 
 /**
- * agent:start 处理：会话不存在则创建，调用 chatAggregator.runChatTurn 跑真实 LLM，
- * 流式增量经 agent:delta 推送，结束推 agent:done（失败推 agent:error）。
- * 所有消息在 runChatTurn 内部落库。
- */
+ * agent:start 澶勭悊锛氫細璇濅笉瀛樺湪鍒欏垱寤猴紝璋冪敤 chatAggregator.runChatTurn 璺戠湡瀹?LLM锛? * 娴佸紡澧為噺缁?agent:delta 鎺ㄩ€侊紝缁撴潫鎺?agent:done锛堝け璐ユ帹 agent:error锛夈€? * 鎵€鏈夋秷鎭湪 runChatTurn 鍐呴儴钀藉簱銆? */
 async function handleAgentStart(
   ws: Bun.ServerWebSocket<unknown>,
   frame: IncomingFrame,
 ): Promise<void> {
   const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   let conversationId = frame.conversationId ?? frame.payload?.conversationId ?? '';
-  // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问候，避免空消息报错
-  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜数智医院智能体可以为我提供哪些临床辅助能力。';
+  // 鍓嶇 agent:start 閫氬父鍙甫 conversationId锛涚己鐪佽 LLM 浜у嚭鐪熷疄闂€欙紝閬垮厤绌烘秷鎭姤閿?  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '鎮ㄥソ锛岃浠嬬粛涓€涓嬪仴婢滄暟鏅哄尰闄㈡櫤鑳戒綋鍙互涓烘垜鎻愪緵鍝簺涓村簥杈呭姪鑳藉姏銆?;
 
   const send = (event: string, payload: unknown): void => {
     try {
       ws.send(JSON.stringify({ event, timestamp: Date.now(), payload }));
     } catch {
-      /* ws 已关闭 */
+      /* ws 宸插叧闂?*/
     }
   };
 
   try {
-    // 会话不存在则先创建
-    let conv = conversationId ? await getConversationById(conversationId) : null;
+    // 浼氳瘽涓嶅瓨鍦ㄥ垯鍏堝垱寤?    let conv = conversationId ? await getConversationById(conversationId) : null;
     if (!conv) {
-      conv = await createConversation({ userId: 'ws-user', title: 'WebSocket 会话' });
+      conv = await createConversation({ userId: 'ws-user', title: 'WebSocket 浼氳瘽' });
       conversationId = conv.id;
       send('agent:conversation', { conversationId });
     }
@@ -448,7 +439,7 @@ async function handleAgentStart(
 }
 
 // ============================================================================
-// Fetch 入口
+// Fetch 鍏ュ彛
 // ============================================================================
 
 async function handleFetch(
@@ -458,8 +449,7 @@ async function handleFetch(
   const url = new URL(req.url);
   const startedAt = Date.now();
 
-  // WebSocket 升级（需鉴权）
-  if (url.pathname === '/ws/chat' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
+  // WebSocket 鍗囩骇锛堥渶閴存潈锛?  if (url.pathname === '/ws/chat' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
     if (!wsAuthorized(req)) {
       return new Response('unauthorized', { status: 401 });
     }
@@ -467,9 +457,8 @@ async function handleFetch(
     return new Response('upgrade failed', { status: 426 });
   }
 
-  // Prometheus 指标端点。默认依赖内网网络策略隔离（不对公网暴露）；
-  // 配置 METRICS_TOKEN 后强制校验 Authorization: Bearer <token>。
-  if (url.pathname === '/metrics' && req.method === 'GET') {
+  // Prometheus 鎸囨爣绔偣銆傞粯璁や緷璧栧唴缃戠綉缁滅瓥鐣ラ殧绂伙紙涓嶅鍏綉鏆撮湶锛夛紱
+  // 閰嶇疆 METRICS_TOKEN 鍚庡己鍒舵牎楠?Authorization: Bearer <token>銆?  if (url.pathname === '/metrics' && req.method === 'GET') {
     const expectedToken = process.env.METRICS_TOKEN;
     if (expectedToken) {
       const auth = req.headers.get('authorization') ?? '';
@@ -483,36 +472,33 @@ async function handleFetch(
     });
   }
 
-  // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
-  const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
+  // 棰勮鍙栬姹備綋锛堝啓璇锋眰锛夛紝渚涘箓绛夋寚绾逛笌 handler 澶嶇敤鍚屼竴浠芥暟鎹?  const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
   const rawBody = mayHaveBody ? await req.text() : null;
-  // 直连客户端 IP（Bun 运行时从 socket 解析）；经反向代理时各路由以
-  // x-forwarded-for 首段为准，此值仅作直连/兜底。
-  const socketIp = server.requestIP(req)?.address ?? null;
+  // 鐩磋繛瀹㈡埛绔?IP锛圔un 杩愯鏃朵粠 socket 瑙ｆ瀽锛夛紱缁忓弽鍚戜唬鐞嗘椂鍚勮矾鐢变互
+  // x-forwarded-for 棣栨涓哄噯锛屾鍊间粎浣滅洿杩?鍏滃簳銆?  const socketIp = server.requestIP(req)?.address ?? null;
   const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody, socketIp);
   attachUser(ctx);
-  // M7-F：校验会话是否已登出/被吊销（异步，按 jti 查会话台账）
+  // M7-F锛氭牎楠屼細璇濇槸鍚﹀凡鐧诲嚭/琚悐閿€锛堝紓姝ワ紝鎸?jti 鏌ヤ細璇濆彴璐︼級
   await enforceSession(ctx);
 
   let status = 200;
   let routeLabel = 'unmatched';
   try {
-    // 限流
+    // 闄愭祦
     const limited = rateLimit(ctx);
     if (limited) {
       status = 429;
       return withSecurityHeaders(limited);
     }
 
-    // CSRF 校验（状态变更请求）
+    // CSRF 鏍￠獙锛堢姸鎬佸彉鏇磋姹傦級
     const csrfDenied = verifyCsrf(ctx);
     if (csrfDenied) {
       status = 403;
       return withSecurityHeaders(csrfDenied);
     }
 
-    // 多租户/院区上下文解析（无显式租户头时回退默认租户；未知/停用/越权院区短路 403）
-    const tenantDenied = tenantContextMiddleware(ctx);
+    // 澶氱鎴?闄㈠尯涓婁笅鏂囪В鏋愶紙鏃犳樉寮忕鎴峰ご鏃跺洖閫€榛樿绉熸埛锛涙湭鐭?鍋滅敤/瓒婃潈闄㈠尯鐭矾 403锛?    const tenantDenied = tenantContextMiddleware(ctx);
     if (tenantDenied) {
       status = 403;
       return withSecurityHeaders(tenantDenied);
@@ -535,9 +521,8 @@ async function handleFetch(
         }
       }
       const handler = r.def.handle;
-      // 错误处理在外、幂等在内：beginProcessing 与 handler 任何阶段抛错
-      // 都转结构化错误信封（含 traceId），不返回 HTML 错误页
-      const wrapped = withErrorHandler((c: Ctx) =>
+      // 閿欒澶勭悊鍦ㄥ銆佸箓绛夊湪鍐咃細beginProcessing 涓?handler 浠讳綍闃舵鎶涢敊
+      // 閮借浆缁撴瀯鍖栭敊璇俊灏侊紙鍚?traceId锛夛紝涓嶈繑鍥?HTML 閿欒椤?      const wrapped = withErrorHandler((c: Ctx) =>
         withIdempotency(c, () => handler(c)));
       const res = await wrapped(ctx);
       status = res.status;
@@ -547,7 +532,7 @@ async function handleFetch(
     status = 404;
     return withSecurityHeaders(
       json(
-        fail(ErrorCode.NOT_FOUND, `路由不存在: ${req.method} ${url.pathname}`, ctx.traceId),
+        fail(ErrorCode.NOT_FOUND, `璺敱涓嶅瓨鍦? ${req.method} ${url.pathname}`, ctx.traceId),
         404,
       ),
     );
@@ -563,33 +548,33 @@ async function handleFetch(
 }
 
 // ============================================================================
-// 数据库初始化（真实模式：连接 + 自动迁移；演示模式：跳过并明确告警）
+// 鏁版嵁搴撳垵濮嬪寲锛堢湡瀹炴ā寮忥細杩炴帴 + 鑷姩杩佺Щ锛涙紨绀烘ā寮忥細璺宠繃骞舵槑纭憡璀︼級
 // ============================================================================
 
 const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
 async function initDatabase(): Promise<void> {
   if (isDemoMode) {
-    console.warn('[db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）');
+    console.warn('[db] DEMO_MODE=1锛氳烦杩?PostgreSQL 杩炴帴锛屼娇鐢ㄥ唴瀛樻紨绀烘暟鎹紙涓嶆寔涔呭寲锛?);
     return;
   }
   try {
     await verifyDbConnection(5, 2000);
-    console.log('[db] PostgreSQL 连接成功');
+    console.log('[db] PostgreSQL 杩炴帴鎴愬姛');
     await autoMigrate();
-    console.log('[db] 数据库迁移完成');
-    // 加载租户/院区注册表到内存（运行时解析保持内存级，写操作写穿透回库）
+    console.log('[db] 鏁版嵁搴撹縼绉诲畬鎴?);
+    // 鍔犺浇绉熸埛/闄㈠尯娉ㄥ唽琛ㄥ埌鍐呭瓨锛堣繍琛屾椂瑙ｆ瀽淇濇寔鍐呭瓨绾э紝鍐欐搷浣滃啓绌块€忓洖搴擄級
     const tenantCount = await tenantService.hydrate();
-    console.log(`[db] 租户/院区注册表已加载（${tenantCount} 个节点）`);
+    console.log(`[db] 绉熸埛/闄㈠尯娉ㄥ唽琛ㄥ凡鍔犺浇锛?{tenantCount} 涓妭鐐癸級`);
   } catch (err) {
-    console.error('[db] 数据库初始化失败，服务无法启动：', String(err));
-    console.error('[db] 如需无 DB 演示，请设置 DEMO_MODE=1');
+    console.error('[db] 鏁版嵁搴撳垵濮嬪寲澶辫触锛屾湇鍔℃棤娉曞惎鍔細', String(err));
+    console.error('[db] 濡傞渶鏃?DB 婕旂ず锛岃璁剧疆 DEMO_MODE=1');
     process.exit(1);
   }
 }
 
 // ============================================================================
-// 启动
+// 鍚姩
 // ============================================================================
 
 const port = Number(process.env.HTTP_PORT ?? 8080);
@@ -618,8 +603,7 @@ const server = Bun.serve({
       } catch {
         /* ignore */
       }
-      // 兼容前端事件帧（event）与早期 action 帧
-      const kind = parsed.event ?? parsed.action;
+      // 鍏煎鍓嶇浜嬩欢甯э紙event锛変笌鏃╂湡 action 甯?      const kind = parsed.event ?? parsed.action;
 
       if (kind === 'heartbeat' || kind === 'ping') {
         ws.send(
@@ -629,8 +613,7 @@ const server = Bun.serve({
       }
 
       if (kind === 'agent:start' || kind === 'start_stream') {
-        // 真实 LLM 流式：会话不存在则创建，runChatTurn 内部落库并回调推送
-        void handleAgentStart(ws, parsed);
+        // 鐪熷疄 LLM 娴佸紡锛氫細璇濅笉瀛樺湪鍒欏垱寤猴紝runChatTurn 鍐呴儴钀藉簱骞跺洖璋冩帹閫?        void handleAgentStart(ws, parsed);
       }
     },
     close(ws) {
@@ -640,37 +623,33 @@ const server = Bun.serve({
   },
 });
 
-// 演示用：非生产环境且非 DEMO_MODE 周期性推送模拟危急值告警
-const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
+// 婕旂ず鐢細闈炵敓浜х幆澧冧笖闈?DEMO_MODE 鍛ㄦ湡鎬ф帹閫佹ā鎷熷嵄鎬ュ€煎憡璀?const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
 const demoAlertTimer = isProduction || isDemoMode
   ? null
   : setInterval(() => {
-      // 事件名与前端 useAlert 订阅的 critical:alert 通道保持一致；
-      // payload 对齐前端 Alert 契约（type/level/title/content/patientId）。
-      // 演示告警使用固定 id：前端按 id 去重（seenRef），同一客户端只弹一次，
-      // 避免同一危急值每 30s 重复弹窗/堆积（真实场景同一危急值不应重复强提醒）；
-      // 新连接的客户端仍会收到首次广播，保留实时告警演示效果。
-      broadcast('critical:alert', {
+      // 浜嬩欢鍚嶄笌鍓嶇 useAlert 璁㈤槄鐨?critical:alert 閫氶亾淇濇寔涓€鑷达紱
+      // payload 瀵归綈鍓嶇 Alert 濂戠害锛坱ype/level/title/content/patientId锛夈€?      // 婕旂ず鍛婅浣跨敤鍥哄畾 id锛氬墠绔寜 id 鍘婚噸锛坰eenRef锛夛紝鍚屼竴瀹㈡埛绔彧寮逛竴娆★紝
+      // 閬垮厤鍚屼竴鍗辨€ュ€兼瘡 30s 閲嶅寮圭獥/鍫嗙Н锛堢湡瀹炲満鏅悓涓€鍗辨€ュ€间笉搴旈噸澶嶅己鎻愰啋锛夛紱
+      // 鏂拌繛鎺ョ殑瀹㈡埛绔粛浼氭敹鍒伴娆″箍鎾紝淇濈暀瀹炴椂鍛婅婕旂ず鏁堟灉銆?      broadcast('critical:alert', {
         id: 'al-demo-critical-cTni',
         type: 'critical-value',
         level: 'critical',
-        title: '肌钙蛋白危急值',
+        title: '鑲岄挋铔嬬櫧鍗辨€ュ€?,
         content:
-          '李**（P100086）cTnI 升高达危急值，请立即复核并按危急值流程处置（10 分钟内处置 + 双人复核 + 系统登记）',
+          '鏉?*锛圥100086锛塩TnI 鍗囬珮杈惧嵄鎬ュ€硷紝璇风珛鍗冲鏍稿苟鎸夊嵄鎬ュ€兼祦绋嬪缃紙10 鍒嗛挓鍐呭缃?+ 鍙屼汉澶嶆牳 + 绯荤粺鐧昏锛?,
         patientId: 'P100086',
-        patientName: '李**',
+        patientName: '鏉?*',
         createdAt: new Date().toISOString(),
         acknowledged: false,
       });
     }, 30_000);
 
-// 优雅停机：停止接收新连接、关闭演示定时器与 WS、关闭 DB 连接池，再退出
-let shuttingDown = false;
+// 浼橀泤鍋滄満锛氬仠姝㈡帴鏀舵柊杩炴帴銆佸叧闂紨绀哄畾鏃跺櫒涓?WS銆佸叧闂?DB 杩炴帴姹狅紝鍐嶉€€鍑?let shuttingDown = false;
 function shutdown(signal: string): void {
   if (shuttingDown) return;
   shuttingDown = true;
   // eslint-disable-next-line no-console
-  console.log(`[jianlan-bff] 收到 ${signal}，开始优雅停机…`);
+  console.log(`[jianlan-bff] 鏀跺埌 ${signal}锛屽紑濮嬩紭闆呭仠鏈衡€);
   if (demoAlertTimer) clearInterval(demoAlertTimer);
   outboxRelay.stop();
   for (const ws of chatClients) {
@@ -682,8 +661,7 @@ function shutdown(signal: string): void {
   }
   void server.stop(false);
   void closeDb().catch(() => { /* ignore */ });
-  // 给在途同步响应一个极短收尾窗口后退出
-  setTimeout(() => process.exit(0), 500);
+  // 缁欏湪閫斿悓姝ュ搷搴斾竴涓瀬鐭敹灏剧獥鍙ｅ悗閫€鍑?  setTimeout(() => process.exit(0), 500);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
