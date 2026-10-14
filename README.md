@@ -1,485 +1,181 @@
 <div align="center">
 
-# jlmedaios · 健澜数智医院工业级智能体操作系统
+# jlmedaios · 健澜科技 AI 原生未来医院操作系统
 
-### 杭州健澜科技 · AI 原生未来医院操作系统（微服务云原生 HIS + EMR 一体化）
-#### 开源 · 免费 · 工业级 —— 未来十五年数智医院高质量发展新引擎
+### 微服务云原生 HIS·EMR 一体化平台 —— 未来十五年数智医院高质量发展新引擎
 
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/TypeScript-6.0-3178c6.svg)](https://www.typescriptlang.org/)
-[![Runtime](https://img.shields.io/badge/Runtime-Bun-14151a.svg)](https://bun.sh/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Backend Tests](https://img.shields.io/badge/backend%20tests-1748-success.svg)](#-测试与质量)
-[![Frontend Tests](https://img.shields.io/badge/frontend%20tests-738-success.svg)](#-测试与质量)
-[![Security](https://img.shields.io/badge/security-%E7%AD%89%E4%BF%9D%E4%B8%89%E7%BA%A7-orange.svg)](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
-[![DAMO-RADAR](https://img.shields.io/badge/DAMO--RADAR-Science%202026-blueviolet.svg)](https://doi.org/10.1126/science.aec6129)
-[![RADAR Code](https://img.shields.io/badge/RADAR%20Code-Apache--2.0-success.svg)](services/radar-inference/vendor/damo-radar/LICENSE)
-[![RADAR Weights](https://img.shields.io/badge/RADAR%20Weights-CC%20BY--NC--SA%204.0%20(non--commercial)-orange.svg)](#ai-影像辅诊damo-radar-融合)
+[![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
+[![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
+[![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
+[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%2B%20pgvector-0A2540.svg)](https://www.postgresql.org/)
+[![Cloud](https://img.shields.io/badge/Deploy-Docker%20%2F%20K8s%20%2F%20Helm-0A2540.svg)](deploy/)
+[![Security](https://img.shields.io/badge/Security-等保三级设计-1B4F8B.svg)](SECURITY.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-2E6FB7.svg)](CONTRIBUTING.md)
 
-**医院信息科自己就能搭智能体的操作系统：AI 病历生成、AI 病历质控、语音电子病历、智能处方审核、临床决策支持、危急值闭环…… 拖拽即用，私有化部署，数据不出院。**
+> 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`），本仓库品牌物料、徽章与文档配图均以此为主色。
 
-[English](README_EN.md) · [快速开始](#-快速开始) · [已闭环里程碑](#-已闭环里程碑与真实证据) · [5 分钟搭建](#-5-分钟搭建一个医疗智能体) · [架构](#-系统架构) · [文档](#-文档) · [贡献](CONTRIBUTING.md) · [安全](SECURITY.md)
+**医院信息科自己就能搭智能体的操作系统：AI 病历草稿、合理用药审查、鉴别诊断、临床路径推荐、住院天数与费用预测…… 微服务云原生底座 + AI 原生能力中台，私有化部署，数据不出院。**
+
+[English](README_EN.md) · [项目定位](#-项目定位) · [核心能力矩阵](#-核心能力矩阵) · [快速启动](#-快速启动) · [功能全景](#-功能全景) · [开放合作](#-开放合作) · [安全合规](#-安全与医疗红线)
 
 </div>
 
 ---
 
-## 项目定位
+## 🧭 项目定位
 
-**jlmedaios 是健澜科技面向未来十五年数智医院高质量发展打造的 AI 原生未来医院操作系统**：一个基于微服务云原生架构、HIS+EMR 一体化、开源免费、工业级、可被医院信息科与全球开发者共同装配和扩展的医院智能体操作系统。
+**jlmedaios** 是健澜科技面向未来十五年数智医院高质量发展打造的 **AI 原生未来医院操作系统**：一套基于微服务云原生架构、HIS·EMR 一体化、开源免费、工业级的医院智能体操作系统。
 
-它不是又一个单点 AI 助手，而是把**核心业务事务系统（HIS + EMR 一体化微服务云原生平台）**与 **AI 原生能力中台（智能体编排 / 技能 / 知识 / CDS / RAG）**深度融合：
+它不是单点 AI 助手，而是把 **核心业务事务系统**（门诊/住院/急诊/医嘱/病历/药事/收费/检查检验/手术麻醉）与 **AI 原生能力中台**（智能体编排 / 技能市场 / 知识中台 / CDS / RAG）深度融合：
 
-- **向下**：统一临床数据、主数据与外部系统接入；
-- **向中**：以云原生微服务承载挂号、就诊、住院、急诊、医嘱、处方、病历、药事、收费、检验检查、手术麻醉、病案等核心事务；
-- **向上**：AI 中台横切每个业务环节，提供 AI 病历、AI 质控、语音病历、诊断用药辅助、危急值闭环等刚需智能体；
-- **全程**：医师复核签名、权限可配、数据可追溯、合规内建。
+- **向下**：统一临床数据、主数据（EMPI）与外部系统接入；
+- **向中**：云原生微服务承载医院核心事务，状态机 + 行锁 + 幂等保证并发安全；
+- **向上**：AI 中台横切每个业务环节，提供刚需智能体，医师复核签名、合规内建；
+- **全程**：RBAC + ABAC、字段级加密、审计哈希链、数据可追溯。
 
-> 🔬 **当前阶段**：本项目处于**健澜科技医疗 AI 大模型及应用前沿实验室**阶段，我们诚邀**高校、科研院所、同行企业、医院信息科与临床专家**携手共建，共同推动医疗 AI 从实验室走向规模化落地。
+> 🔬 **实验室定位**：本项目处于 **健澜科技医疗 AI 大模型及应用前沿实验室** 阶段，诚邀高校、科研院所、同行企业、医院信息科与临床专家携手共建，推动医疗 AI 从实验室走向规模化落地。
 
-> ⚕️ **医疗安全红线（不可逾越）**：AI 始终定位为辅助（第二阅片 / 第二意见），**所有诊断结论、医嘱、处方、病历签名等具有法律效力的写操作，必须由具备权限的医务人员确认与电子签名**；系统不做自主诊疗。连不上真库/真模型时**明确报错**，演示仅在显式 `DEMO_MODE` 下带水印存在。
-
----
-
-## 为什么做这件事
-
-大模型很强，但医院用不起来：**数据敏感不能出院、HIS/LIS/PACS 系统林立、临床流程严谨容错率极低、供应商锁定严重、信息科没有可编程的智能体底座**。
-
-健澜科技以「**让医疗 AI 更简单、更落地**」的初心，把多年沉淀的 HIS+EMR 一体化微服务云原生底座与医疗智能体引擎以 **Apache-2.0** 完全开源：
-
-- 🏥 **为医院**：信息科在低代码画布上编排自有智能体，私有化、可审计、可等保合规；
-- 🧩 **为开发者**：提供智能体编排内核、38 个医疗工具、知识中台、集成适配器，像装 App 一样扩展；
-- 🎓 **为高校与科研院所**：提供完整的医疗 AI 研究底座与真实临床数据模拟环境，支持课题研究、论文实验与人才培养；
-- 🤝 **为同行与生态**：以标准化的「智能体包（Agent Package）」连接医院、厂商与开源社区，共建数智医院新生态。
-
-> 📮 **合作邀请**：无论您是医院信息科、临床专家、高校实验室、科研团队还是同行企业，欢迎通过 [GitHub Issues](https://github.com/chenweidaben/JLAIharnessos/issues) 或邮件联系健澜科技，共同推动 AI 原生医院的未来。
+> ⚕️ **医疗安全红线**：AI 始终定位为辅助（第二意见），所有诊断、医嘱、处方、病历签名等法律效力写操作必须由具备权限的医务人员确认并电子签名；系统不做自主诊疗。
 
 ---
 
-## 已闭环里程碑与真实证据
+## 🚀 核心能力矩阵
 
-项目采用 **Strangler（绞杀者）渐进式**推进，每个里程碑都坚持"真实落库、真实取证、医师签名、可回滚"，**禁止用 mock 冒充**。
-
-| 里程碑 | 切片 | 内容 | 真实证据 |
-|---|---|---|---|
-| **M0** | 门诊 | 挂号/候诊/问诊/AI 病历/诊断/医嘱/处方/药师审核 | 真落 PostgreSQL、重启不丢 |
-| **M1-A** | 住院 ADT | 入院/出院/转科、床位病区 | psql 行数、审计哈希链同事务 |
-| **M1-B1** | 急诊 | 分诊 1–4 级、绿色通道、抢救、留观 | 并发不重复、越权 403 |
-| **M1-B2** | 在院三站 | 查房/护理/医嘱执行闭环 | 状态机 + 双签 |
-| **M2-A** | 药房发药 | 调剂发药、库存联动、健康门禁 | 并发不重复、断库报错 + 水印 |
-| **M2-B** | 病历质控 | 三级签名 + 退回整改重提 | 状态机 + 签名链 |
-| **M2-C** | 语音病历 | 口述转写 → 复核 → 本人签名结构化病历 | 重启不丢、ASR 可插拔 |
-| **M3-A** | 病案首页 | 出院自动汇聚、编码/质控/归档状态机 | 幂等、行锁、审计 |
-| **M3-B** | 收费结算 | 费用明细 → 结算 → 票据 → 退费 Saga 补偿 | 并发不重复、状态机 |
-| **M3-C** | MFA | 双因素认证持久化与登录强制 | TOTP/备份码 |
-| **M3-D** | DRG/DIP | 出院病例本地分组（不接外部医保） | 确定性可重算 |
-| **M3-E** | 检查检验解读 | AI 辅助解读骨架 + 医师签名 | 确定性引擎 |
-| **M3-F** | 危急值 | 自动上报 + 签收/处置状态机闭环 | 全链路留痕 |
-| **M3-G** | 医保对账 | 本地重算对账骨架（不接外部医保） | 差异可定位 |
-| **M3-H** | 手术麻醉 | 三甲核心临床域状态机闭环 | 状态机 + 记录 |
-| **M3-I** | 预约随访 | 预约确认/就诊关联 + 随访计划/记录 | 幂等、状态机 |
-| **M3-J** | 互联网医院基座 | 微信登录/实名就诊/线上资质/字段加密/小程序 | 真实 HTTP + 断库 + 水印 |
-| **M3-K** | 图文问诊 | 预约 + 图文问诊会话/消息、复诊资格门禁、状态机 | 真实 HTTP + 越权 403 + 断库 |
-| **M3-L** | 互联网电子处方 | 开方/审方职责分离、无 AI 自动处方、幂等键、驳回退回必填意见 | 真实 HTTP + 越权 403 + 状态机 |
-| **M3-M** | 在线支付/电子票据 | 可插拔支付渠道（微信 v3/mock）、医保本地分割、票据冲红、财务冲正同事务 | 真实 HTTP + 断库 503 + 越权 403 + 状态机 |
-| **M3-N** | 处方配送/在线报告 | 已支付处方履约（自取/快递双通道、物流单号、取货码核销）、检验/影像/AI 解读在线查询 | 真实 HTTP + 越权 403 + 审计链并发加固 |
-| **M3-O** | 满意度评价 | 患者多维度星级评分（6 维度）+ 意见建议、医护代录入、平均分/好评率统计、一次就诊仅评价一次 | 真实 HTTP + 幂等 + 越权 403 + 断库 503 |
-| **M3-P** | 智能导诊/预问诊 | 症状人机对话 → 确定性规则引擎推荐科室（13 科室、急症置顶）、预问诊结构化采集病史 → 报告供医生参考采用 | 真实 HTTP + 越权 403 + 重启持久化 + 断库 503 |
-| **M3-Q** | 数字陪诊 | 家属代办授权（范围显式授予、默认空，支付/退费高风险二次确认）+ 全程审计留痕；八步式陪诊向导、大字体适老化 | 真实 HTTP + 越权 403 + 重启持久化 + 断库 503 |
-| **M3-R** | 双向转诊 | 双向转诊单（转入/转出）、院外资料获取与存储、接收时院外患者 EMPI 建档+生成本院就诊、拒绝/完成/取消状态机；补齐智慧服务三级基本项【3 转诊服务】 | 真实 HTTP 21 项 + 越权 403 + 重启持久化 + 断库 503 + 水印截图 |
-| **M4-A** | 知识中台首切片 | 知识库 CRUD、文档摄入（解析→分块→嵌入→落库，作业表模式，失败保留 failed）、RAG 混合检索（向量余弦 0.6 + 关键词 0.4，中文医疗查询停用词过滤）；嵌入提供方可插拔（本地确定性 / OpenAI 兼容），持久化到 PostgreSQL 并经 BFF 与前端真实可用 | 真实 HTTP 13 项 + 越权 403 + 重启持久化 + 断库 503/500 + 水印截图 |
-| **M4-B** | 低代码 Agent 编排 | 画布智能体定义持久化（草稿 `ON CONFLICT` 幂等）、结构与语义校验（zod schema + DSL 校验孤立边/环/不可达/工具与知识库引用）、发布 SemVer 版本管理（major/minor/patch + SHA-256 校验和）、所有者/管理员权限与删除级联；发布与审计哈希链同事务（执行/运行实例持久化留待后续切片） | 真实 HTTP 12 项 + 越权 403/401 + 重启持久化 + 断库 500 traceId |
-| **M4-C** | Agent 执行引擎接入 | 触发已发布智能体执行（仅 enabled、指定版本超最新 409）；运行实例 `workflow_instances` 开始即插 running 留痕、节点记录 `workflow_node_records`（按 recorder 事件聚合状态/尝试/输出/耗时）、调用日志 `agent_invocations`，结果回放与中途取消（延时可中断 sleep）；实例/调用外键级联删除；执行与审计哈希链同事务 | 真实聚合器 6 项（成功/回放/404/409/并发/取消）+ 断库 500 traceId + 水印 |
-| **M4-D** | 人工在环与工单中心 | 工作流执行到 human 节点（或高风险节点强制人工）时实例进入 `waiting_human` 并落审核工单；工单中心认领（CAS 防重复）、批准/驳回电子签名，工作流继续或终止；取消/整体超时同步工单终态不残留；`PersistentHumanTaskHandler` 内存挂起 + DB 留痕，BFF 重启后可由恢复流程接管；BFF `/human-tasks` 端点 + 前端工单中心（水印/断库门禁） | 真实集成 13 例 + 越权 403 + 重复 409 + 重启持久化 + 断库 503/500 traceId + UI 截图 |
-| **M5-A** | 多租户/一院多区注册表 | 原纯内存租户树（hospital→campus）持久化到 `iam.tenants`（层级 CHECK、自引用、部分索引、软删、配置 jsonb）；TenantService 写穿透（先落库再 commit）、启动 hydrate、默认医院受保护；租户树 GET 改为直接查库（断库自然 500，杜绝假成功） | 真实 HTTP + 越权 403 + 重启持久化 + 断库 500 traceId |
-| **M5-B** | 科研专病队列 | 队列定义（疾病 + 纳入/排除标准 jsonb）→ 发布 → 确定性规则引擎扫描患者自动匹配入组（年龄/性别/诊断/标签/检验，排除优先）；成员快照脱敏（无姓名/电话/身份证）；队列统计（性别/年龄段/高频标签）与脱敏数据集导出；归档状态机；全程审计哈希链 | 真实 HTTP + 越权 403/401 + 重启持久化 + 断库 503/500 traceId + 日志真因 |
-| **M5-C** | 患者主索引 EMPI | 患者跨标识域登记（身份证/医保/手机/微信/外部，原始值哈希存储、仅留末四位）→ 确定性匹配引擎两两扫描生成疑似重复候选（不自动合并）→ 人工审核：确认在事务内建立逻辑主从链接（**不物理合并、不迁移 40+ 外键**）、拒绝标记；任一患者已存在链接即 409 防冲突；master 按创建时间/ID 选取；全程审计哈希链 | 真实 HTTP 18 项 + 越权 403/401 + 404/400/409 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图 |
-| **M5-D** | 数据湖仓分层与增量加工 | 新建 dwd/dws/ads/meta 四 schema：DWD 基于源表 updated_at watermark 增量抽取（幂等 UPSERT，可重跑）、DWS 按受影响日期重算科室日汇总（先删后插）、ADS 重算院级日指标；**watermark 全程数据库端计算存储（微秒精度）、每作业在事务内完成抽取/写入/登记**，事务快照保证 watermark 与抽取一致；作业运行历史、数据血缘、指标查询；加工需 admin、查询需 read | 真实 HTTP 14 项 + 越权 403/401 + 400 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图；DWD=ADS=clinical 交叉核对一致 |
-| **M5-E** | 数据质量监控与隐私分级治理 | 在 meta 建质量规则/运行/结果与字段分级台账：检测引擎对真实业务表执行**五维质量检测**（完整性 not_null、唯一性 unique、有效性 valid_values/valid_regex、一致性 fk_exists、及时性 conditional_not_null），schema/表/列 qi() 转义、允许值与正则参数绑定、condition 为规则内置固定文本；逐规则登记总行/失败行/失败样本并计算质量评分与趋势；隐私分级自动扫描 information_schema 列（DataClassifier，不覆盖人工修正），人工修正留痕（master 或 linked 任一已链接即冲突）。检测/扫描/修正需 admin、查询需 read | 真实 HTTP 12 项 + 越权 403/401 + 404/400 + 重启持久化 + 断库 503/500 traceId + 日志真因 + 水印截图；代码审查修复结果字段 ruleName/dimension/severity/target 缺失、EMPI 仅查 linked 漏 master 的冲突检测 bug |
-| **M6-A** | 云原生容器化与 K8s 部署 | 多阶段镜像（后端 Bun 非 root + 前端 Nginx 非 root）、生产级 `docker-compose`（postgres/redis/kafka/边缘网关/可观测全栈，健康检查/依赖顺序/资源配额/安全加固）与 **Kubernetes 一体化清单**（namespace/configmap/secret、postgres/redis StatefulSet+PVC、bff/web Deployment+HPA+PDB、Ingress TLS、零信任 NetworkPolicy）；BFF 启动自动迁移、空库即可拉起 | 全部 K8s/compose YAML 语法校验通过；部署引用文件齐备；代码审查修复后端运行镜像缺失 `deploy/postgres/init` 导致自动迁移 ENOENT 的启动 bug |
-| **M6-B** | Helm Chart 参数化部署 | 在 K8s 清单基础上提供生产级 Helm Chart：镜像/副本/资源/存储类/域名/内置或外部 PostgreSQL·Redis 全部参数化，Secret/Ingress/NetworkPolicy/HPA/PDB 可按需开关，支持外部密钥系统 | 用 helm v3.18 实跑 `lint` 通过；`template` 默认渲染 23 文档与 K8s 清单一致；生产（外部库+外部密钥）、混合、镜像覆盖等组合渲染均正确 |
-| **M6-C** | 服务网格与灰度发布 | 作为 Chart 可选模板提供 Istio 资源：`PeerAuthentication`（命名空间 mTLS）、`DestinationRule`（连接池、异常检测、灰度 subsets）、`VirtualService`（统一入口、超时重试、灰度权重分流） | helm `lint` 通过；`template` 验证默认不渲染、启用后 mTLS/流量策略、Gateway 入口、灰度 80/20 权重与 stable/canary subsets 均正确 |
-| **M7-A** | 统一幂等键框架 | 新增 `clinical.idempotency_keys` 表（迁移 81），按「用户 + 幂等键」记录首次请求的方法/路径/请求体指纹（SHA-256）与响应；`withIdempotency` 中间件实现首次执行并缓存、重复安全重放（`Idempotent-Replay` 头）、处理中并发 409、同键不同指纹 409、键长非法 400、未登录以 IP 为匿名作用域；预读取 rawBody 保证指纹与 handler 一致 | 真实 HTTP 取证（首次/重放/指纹冲突/数量不重复）+ 集成测试 9 例全绿 + 重启持久化 + 断库 500 traceId；代码审查修复幂等错误返回 HTML 而非结构化信封的问题（错误处理调整到幂等外层） |
-| **M7-B** | 危急值实时事件闭环 | `alertBus` 标准化事件层：`buildCriticalAlertPayload` 构造对齐前端 Alert 契约的 payload，事件 id 稳定唯一（重连重放不重复）；扫描产生告警后经 WebSocket 实时推送 `critical:alert`，签收/处置状态变更后广播 `critical:status`；`scanAndRaise` 返回完整告警并批量取脱敏姓名；前端 `useAlert` 按 id 去重（不重复入列、不覆盖 latest）、同步业务状态，`RealtimeAlertBridge` 收到状态后实时关闭强提醒 | 真实 WS 取证：扫描 85 条实时推送 85 条、id 全唯一、数量一致；重复扫描不重复推送；签收/处置 HTTP 200 且 WS 收到状态广播；重启持久化（状态分布保留）+ 断库 503/500 traceId；新增 alertBus 单测 8 + critical-realtime 集成 4，后端 1908/前端 844 全绿 |
-| **M7-C** | 事务性发件箱（Transactional Outbox） | 新增 `clinical.event_outbox` 表（迁移 82），业务事务与领域事件写入同一事务（原子提交），解决「业务落库后、推送前崩溃丢事件」；`OutboxRelay` 以 at-least-once 状态机 `pending → processing → published` 轮询发布到 WebSocket：`claimBatch`（FOR UPDATE SKIP LOCKED，多实例并发分摊）、`markPublished`、`resetToPending`（失败 attempts+1 重试）、`reclaimStale`（认领后崩溃的 processing 超时回收）；危急值聚合器移除内存直推，改为同事务 `appendEvent`；消费端按稳定 event_id 幂等（前端已按 id 去重，重复安全） | 真实 WS 取证：扫描 87 条经 outbox 全发布、id 唯一、outbox 全 published；重启持久化（87 条 event_id 不丢、BFF 自动重连）；断库 BFF 存活、ready=503、Relay 轮询不崩溃、恢复后续发；新增 event-outbox 集成 6 + outboxRelay 单测 4，后端 1919/前端 844 全绿、tsc 双零 |
-| **M7-D** | 死信队列与事件可观测性（Dead-Letter Queue + Outbox Metrics） | 发布失败达到 `maxAttempts`（默认 5）的事件不再无限重试，进入死信 `dead`（迁移 83：扩展状态 CHECK、新增 `last_error`/`dead_at` 列与死信部分索引、新增 `outbox:manage` 权限仅授 admin）；`outboxRepo` 新增 `markDead`、`listDeadLetters`（分页）、`requeueDeadLetter`（dead→pending，清空错误/attempts）、`oldestPendingAgeSeconds`；`OutboxRelay` 按 `attempts+1` 区分死信/重试，新增 `onDeadLetter` 回调与 `updateMetrics()`；管理端 BFF 路由 `GET /api/v1/outbox/dead-letters`、`POST /api/v1/outbox/requeue/:id`（重投写审计 `outbox.requeue`）；`/metrics` 暴露 `gangos_outbox_events`（按状态）与 `gangos_outbox_oldest_pending_age_seconds` 两个 gauge | 真实库取证：markDead 记录错误/死信时间、listDeadLetters 分页、requeueDeadLetter 复位、越权 doctor 403/未登录 401/404/400；event-outbox 集成 6→10、outboxRelay 单测 4→5（连续 3 轮失败恰在第 3 轮进死信、不再被认领）、新增 outbox-admin 路由 7；后端 1931/前端 844 全绿、tsc 双零 |
-| **M7-E** | 事件重连补拉（Gap Recovery / Replay） | WebSocket 不保证离线消息，客户端断连期间的事件重连后会丢失。服务端 `outboxRepo` 新增 `listEventsAfter(afterId, limit)`（仅返回 `id > afterId` 的 `published` 事件，按 id 升序、limit 上限 200）与补拉路由 `GET /api/v1/outbox/events?after_id=&limit=`（任何登录用户，与 WS broadcast 同范围；非法 after_id 400）；中继发布的 WS 帧携带数字主键 `seq`（`OutboxPublisher` 增加 meta）。前端 `wsClient` 记录最后收到的 `lastSeq`，重连（非首次连接）后分页调用补拉接口，把错过的事件转成 WS 消息分发，与实时帧重叠的事件（`id <= lastSeq`）跳过、不重复分发；补拉失败（断库/未授权）静默放弃，等下次重连再试，不影响实时通道 | 新增前端 websocket 补拉测试 4 例（首次不补拉、重连按 lastSeq 补拉分发、id<=lastSeq 跳过、补拉失败静默）；后端 event-outbox 加 listEventsAfter 用例、outbox-admin 加补拉路由 4 例（含普通医生可补拉、非法参数 400、未登录 401）；后端 1936/前端 848 全绿、tsc 双零 |
-| **M7-F** | 会话管理与 JWT 主动吊销（Server-side Sessions + Revocation） | JWT 无状态，默认在过期前始终有效——医院共享工作站仅前端清令牌无法阻止已签发令牌继续使用。迁移 84 建 `clinical.user_sessions`（jti/refresh_jti 唯一、access 与 refresh 过期时间、吊销时间与原因、IP/UA，活跃会话部分索引）；登录（含 MFA 第二因子）签发时写入会话，`signJwt` 自动注入 `jti`；新增 `sessionGuard` 中间件在认证后校验会话状态（活跃放行、吊销则清空 `ctx.user`，进程内缓存 active 30s/revoked 5min，DB 抖动时 fail-open 由健康检查暴露）；登出改为按 jti 吊销并立即标记；刷新走轮换（校验旧 refresh 会话、吊销旧会话、登记新会话，旧 access 立即失效）；管理端 `GET /api/v1/admin/sessions`（可按用户筛选）与 `POST /api/v1/admin/sessions/revoke`（按 jti 或 userId 强制下线，写审计 `session.revoke`/`session.force_user_offline`，权限 `session:manage` 仅授 admin） | 真实 HTTP 取证：登录会话落库、登出后旧 access 与 refresh 均 401、刷新轮换后旧 access 401/新 access 200、admin 强制下线后 access 401、doctor 越权 403/未登录 401/缺参 400/吊销不存在 404；psql 核对会话与吊销原因、审计留痕；新增后端集成 14（真实模式 10、默认模式 4）与前端页面 6；后端 1940/前端 865 全绿、tsc 双零 |
-| **M8-A** | 用户管理真实化（User Administration） | 系统管理「用户管理」页此前仍用本地 mock。迁移 85 给 `iam.users` 增加 `gender/email/phone/position`，`status` 在 active/disabled/locked 基础上增加 `leave`（离职走软删除 `deleted_at`），新增权限码 `user:manage` 并仅授 admin；`adminUserRepo` 提供分页列表（关键字匹配姓名/用户名/工号/电话、科室、状态）、PBKDF2-SHA512 哈希建账、角色与数据范围（`user_roles`）事务内替换、状态变更、重置密码、软删除；`adminUserAggregator` 所有写操作事务化并与哈希链审计同事务提交，禁用/删除/重置密码时吊销该用户会话强制下线；护栏：不能改/删自己、最后一个启用 admin 保护、用户名/工号唯一冲突 409；BFF `/api/v1/admin/users` 7 端点全部 `user:manage` 鉴权 + Zod 校验；前端页面去 mock（健康门禁、水印、断库 Alert、表格/新增编辑弹窗/详情抽屉） | 新增后端集成 16、前端页面 8、store 15；后端 1956（基线 1940+16）/前端 888 全绿、tsc 双零；覆盖率 Stmts/Lines 92.03、Branch 78.74、Funcs 84.62 门禁通过；测试夹具账户 afterAll 硬删除、残留 0 |
-| **M8-B** | 角色与权限管理真实化（Role & Permission Administration） | 系统管理「角色管理」「权限管理」两页此前仍用本地 mock。迁移 86 新增权限码 `role:manage` 并仅授 admin（角色管理所有端点统一鉴权，权限目录只读端点用既有 `system:perm:manage`）；核心设计：权限点由迁移/代码统一定义、管理端只读，**不接受运行时凭空新增权限**（不做权限增删改端点）；`roleAdminRepo` 提供角色列表（系统角色排前、批量加载权限码与用户数）、角色详情/关联用户、权限目录分组、自定义角色创建（23505→409）、编辑（COALESCE 名称/描述）、权限整体替换（先校验权限码存在否则 400、DELETE 后逐条 INSERT）、删除（系统角色 400、有用户关联 409、再清理 role_permissions 与 roles）；`roleAdminAggregator` 所有写操作 `begin` 事务 + 哈希链审计同事务（role.create/update/assign_permissions/delete，分配与删除 riskLevel=high）；BFF `/api/v1/admin/roles` 与 `/api/v1/admin/permissions` 共 7 端点 + Zod 校验；前端角色管理（表格/新增编辑/权限树/详情抽屉/删除）与权限管理（权限目录树 + 角色-权限矩阵）去 mock，含健康门禁、水印、断库 Alert | 新增后端集成 17、前端 store 18、角色页面 9、权限页面 3；后端 1973（基线 1956+17）/前端 918 全绿、tsc 双零；覆盖率 Stmts/Lines 92.19、Branch 78.99、Funcs 84.66（较 M8-A 全项不回落）门禁通过 |
-| **M8-C** | 审计日志与登录日志查询真实化（Audit & Login Logs） | 系统管理「审计日志」「登录日志」两页此前仍用本地 mock。迁移 87 新增 `iam.login_attempts` 登录尝试台账（id/username/user_id/success/fail_reason/ip/user_agent/created_at，含用户时间与失败专用部分索引）；`auditLogRepo` 提供多条件检索（操作人、动作、资源类型、结果、风险等级、时间区间，分页上限 100）、概览、操作分布、每日趋势（`generate_series` LEFT JOIN，默认 7 天、上限 90）；`loginAttemptRepo` 写入登录成功/失败并 JOIN 活跃会话标注在线；登录成功统一经 `registerSession` 留痕（MFA 成功同样），失败统一文案「用户名或密码错误」防枚举；BFF 审计日志 5 端点（`system:audit:view`）、登录日志 3 GET（`system:loginlog:view`）+ 强制下线（`session:manage`，事务内吊销会话并写高风险审计）；**修复直连场景登录 IP 缺失缺陷**：运行时用 `server.requestIP` 注入 socket IP，代理时以 `x-forwarded-for` 首段为准；前端两页去 mock，含健康门禁、水印、断库 Alert | 新增后端集成 20、前端 store 18、页面 21；后端 1993（基线 1973+20）/前端 957 全绿、tsc 双零；覆盖率 Stmts/Lines 92.44、Branch 79.29、Funcs 84.73（较 M8-B 全项不回落）门禁通过；HTTP 20 项取证、重启持久化、断库 500/503（日志记真因 ECONNREFUSED 5433）、越权 403 均通过；取证夹具与临时会话已清理、残留 0 |
-| **M9-A** | 院长驾驶舱/工作台真实统计（Executive Dashboard） | 管理端「工作台/院长驾驶舱」前后端此前均为硬编码假数据（今日门诊 2136、在院 86、今日告警 7、Agent 调用 1240、危急值处理率 96.4 等）。新增 `dashboardStatsRepo`：单条 SQL 多子查询统计今日门急诊量、当前在院、今日入出院、待审医嘱/处方、未处理危急值、床位规模与占用率（除零保护、保留一位小数）；`generate_series` 生成近 N 天门急诊/入出院趋势（默认 14、上限 90、下限 1）；在院患者按科室分布（COALESCE 未分配）与最新危急值；全部只读、limit/days 走绑定参数（无 SQL 注入），失败直接抛错、绝不返回编造数字。重写 `dashboardAggregator`：移除 DEMO 模式分支，与标准业务聚合器一致直接走真实库，`Promise.all` 并行四个查询；BFF `/api/v1/dashboard/stats` 鉴权 + days 解析（非法回退 14、超限截断 90）。前端工作台：健康门禁、断库 Alert + Watermark、4 张真实卡片与门急诊/入出院/科室分布图表、待办区，加载失败由错误 Alert 展示。**顺带从根因修复 EMPI 全库扫描候选跨运行累积的 flaky**（`listCandidates` 增加 patientId 精确过滤、afterAll 清空候选） | 新增后端集成 8、前端页面 4；后端 2001（基线 1993+8）/前端 961（基线 957+4）全绿、tsc 双零；覆盖率 Stmts/Lines 92.5、Branch 79.38、Funcs 84.84（较 M8-C 全项不回落）门禁通过；HTTP 取证（200/days 边界/401）、psql 逐项核对一致、重启持久化（统计逐行保留、BFF 自动重连）、断库 503（code 50300）+ stats 500 traceId（日志按同一 traceId 记真因 ECONNREFUSED 5433）均通过；M9-A 为只读统计无业务夹具、临时取证脚本已清理 |
-| **M9-B** | 医疗质控缺陷整改闭环（Quality Rectification Workflow） | 质控医生发现病历缺陷后下发整改，责任医生按「待整改→整改中→已整改→已审核」状态机整改，质控复核可**驳回重提**，全程审计留痕、越权 fail-closed。迁移 88 新增 `quality.rectification_tasks`（状态机四态、defect_type integrity/standardization/logic/timeliness、defect_level minor/major/critical、唯一约束 record_id+defect_rule_id、幂等 ON CONFLICT DO NOTHING+回查）+ 权限码 `quality:rectify`/`quality:review`（admin×2、doctor×1）；`rectificationRepo`（创建幂等回查、getTaskForUpdate FOR UPDATE 行锁、列表 JOIN 患者/就诊/责任医生/质控医生、统计）；`rectificationAggregator`（issue/submit/review 与哈希链审计**同事务**、状态机非法转换 409、医生按 assigneeId 数据隔离、复核驳回缺原因 400）；BFF `/api/v1/rectifications` 6 端点统一错误信封；前端整改中心去 mock（整改任务统计卡/逾期预警/待整改·整改中·已整改·已审核 Tab/整改提交抽屉/审核弹窗），健康门禁 + 水印 + 断库 Alert | 新增后端集成 10、前端 store 3；后端 2022（基线 2001+10 新增用例全绿、唯一失败为 EMPI 扫描 30s 环境性超时、单独重跑 15/15 通过）/前端 962 全绿、tsc 双零；覆盖率 All files Stmts/Lines 92.47、Branch 79.36、Funcs 84.89（较 M9-A 全项不回落）门禁通过；HTTP 取证 24/24（401/越权 403/下发 200/幂等 created:false/状态机 409/驳回重提/复核通过/审计链四 action 齐全）、psql 落库核对、重启持久化（任务逐行保留、BFF 自动重连）、断库 health 503 + rectifications 500（日志记真因 ECONNREFUSED 5433）均通过；M9B_EVIDENCE 夹具已清理、整改任务归零 |
-| **M9-C** | 手术麻醉管理工作站（Surgery & Anesthesia Workstation） | 后端 `src/bff/routes/surgery.ts` 12 端点 + `surgeryAggregator` 状态机（requested→scheduled→prechecked→induction→maintenance→recovery→pacu→discharged，非法转换 409、powered fail+ErrorCode+traceId）与迁移 61（surgery_requests/anesthesia_records/intraop_events/pacu_assessments 四表，术中事件类型 CHECK 枚举、PRECHECK_KEYS 六项、双签离室）此前已就绪但前端零引用。本轮打通前端闭环：`surgeryStore` 重写（健康门禁 + SURGERY_STATUS_META 9 态全生命周期动作）、`services/api/surgery.ts` 补 submit/stage/event/cancel（相对路径）、`pages/surgery` 工作站（健康门禁 Tag/断库 Alert+Watermark/新建申请 Modal/刷新探活）、`SurgeryQueue`（状态 Tab 筛选）与 `SurgeryDetailPanel`（排班→三方核对→诱导→术中事件/阶段→PACU 评分→双签→离室/取消，缺项 400、重复签名 409、已终结 409），路由懒加载 + 侧边菜单「手术麻醉」（surgery:view）。顺带修正 rectification 集成测试 recordType 'inpatient'→'admission'（合法枚举）；页面测试补刷新/新建提交两用例并显式超时防高负载抖动 | 前端 store 16、页面 10（+2）；后端 2011（基线 2022 缺 11 为 DB 缺失 skip 的正常口径，真实库口径全绿）/前端串行全量 985 全绿（96 文件，983 基线 +2）、tsc 双零；覆盖率 All files Stmts/Lines 92.6、Branch 79.34、Funcs 84.9（Functions 较 M9-B 84.89 不回落；pages/surgery 函数覆盖 12.5%→75%）门禁通过；HTTP 取证 37/37（权限 401/403、幂等 created:false、缺项/Aldrete 400、全状态机推进、非法转换 409、重复签名 409、终结态 409、psql 落库状态/双签/麻醉记录/事件 2 条/PACU 2 次/审计链 action 齐全）、断库 health 503 + 业务 500 traceId 不假成功（恢复后自动重连 db up）、重启持久化（3 手术/4 事件/6 PACU 逐行保留）均通过；M9C_EVIDENCE 夹具已清零（0/0/0）、audit 留痕 39 条保留 |
-| **M10-A** | 输血管理闭环（Blood Transfusion Workstation） | 三甲必查用血安全全链路。迁移 89 新增 `clinical.blood_transfusion_requests / blood_stock / blood_transfusions / blood_transfusion_reactions` 四表（request_no 唯一、状态机 CHECK、成分/血型/紧急度/不良反应分级枚举、库存批次）与 8 条血库库存种子、权限码 `blood:apply/crossmatch/dispense/transfuse/review`（admin×5、doctor=apply、technician=crossmatch+dispense、nurse=transfuse）；`transfusionRepo`（幂等 ON CONFLICT 回查、FOR UPDATE 行锁）；`transfusionAggregator`（CDS 指征 evaluateIndication 建议留痕非阻断、状态机 requested→crossmatched→dispensed→transfusing→completed/cancelled 非法 409、发血事务内 expiry 升序扣库、双人核对同人 400、UUID 输入 400 防御、不良反应分级处置）；BFF `/api/v1/transfusions` 10 端点统一错误信封+traceId；前端输血工作站（队列状态 Tab/新建申请 CDS 建议展示/详情全动作/不良反应 Modal/健康门禁+断库 Alert+水印）去 mock | 后端单元 8+集成 12、前端页面 12+store 5；后端全量串行 2031（基线 2022+9，多 worker 并行下危急值 outbox/并发审计 flaky 属已知，串行为基准口径）pass/0 fail、tsc 双零；前端全量 1002 pass（98 文件，985 基线 +17）、覆盖率 All files Stmts/Lines 92.67、Branch 79.25、Funcs 85.02（Functions 较 M9-C 84.9 不回落）门禁通过；HTTP 取证 15 项（登录 3 角色、申请 200/幂等 DB 无重复行、CDS 建议文本留痕、护士申请 403、未认证 401、配血/发血/异人双签 200、同人核对 400、完成后再停 409、不良反应 200、并发发血 6 连恰 1 成功+5×409、psql 落库 1 输注/3 申请/29 审计/无负库存、库存扣减与申请量吻合）；断库 health 503 + 列表/申请 500 traceId 不假成功（恢复后自动重连 db up、数据逐行保留）、重启持久化均通过；M10A_EVIDENCE 夹具已清零（患者/申请/输注/反应 0/0/0/0）、库存还原种子 20 |
-| **M10-B** | 临床用血质量闭环（Blood Utilization Quality） | 依据《医疗机构临床用血管理办法》及三甲等级评审，补齐 M10-A 输血后的质量评价。迁移 90 新增 `clinical.transfusion_efficacy_assessments`（UNIQUE transfusion_id）、`clinical.blood_utilization_reviews`（UNIQUE request_id）两表与权限码 `blood:assess/audit`（admin×2、doctor=assess、technician×2）；规则引擎 `bloodUtilizationQuality`（纯函数、确定性：预期疗效红细胞 1U→Hb+10 g/L、血小板 1 治疗量→PLT+20、冷沉淀 1U→Fib+0.3 g/L、血浆以 INR≤1.5 为目标；疗效分级 effective/partial/ineffective/indeterminate；严格指征红细胞 Hb<70、血浆 INR>1.7、血小板 PLT<50、冷沉淀 Fib<1.0、全血失血>1500 或休克；剂量合理性急诊豁免；输血前 7 项检测完整性；合理性结论 rational/largely/irrational 指征不合规一票否决；质控指标成分输血率/指征合格率/输血前检测率/不良反应率/疗效评估率/住院输血率含分子分母）；`bloodQualityRepo`（疗效/评价幂等 upsert、按时间窗自动匹配检验指标）；`bloodQualityAggregator`（人工取值优先、人工确认指征须留依据、住院出院人数从 admissions 统计）；BFF `/api/v1/blood-quality` 6 端点（权限+DataScope+统一错误信封）；前端用血质量工作站（质控指标看板 RangePicker+6 指标卡/疗效评估/合理性评价三 Tab，健康门禁+水印+断库 Alert）去 mock | 规则引擎单测 37、集成 16、前端页面 5；后端全量 2095 pass/0 fail、tsc 双零；前端全量 1007 pass（99 文件）、覆盖率 All files Stmts/Lines 92.71、Branch 79.18、Funcs 85.07 门禁通过；HTTP 取证（疗效自动匹配 Hb65→86=effective、手动 Hb65→73=partial、幂等重评、合理性 rational/largely 缺检测列 6 项、指标数学正确、护士评估 403、医师评价 403、未认证 401、详情 404）；psql 核对 2 eff/2 util、专用批次 100→96 扣 4U 吻合、审计哈希链 blood.efficacy/utilization 留痕；断库 health 503 + 6 端点 500 顶层 code=50000 唯一 traceId 不假成功、BFF 日志记真因 ECONNREFUSED；重启持久化逐行保留、自动重连；M10B_HTTP 夹具已清零（患者/疗效/评价/批次 0）、全局血库库存还原种子（O型红细胞 20）；顺带修复 M10-A 库存恢复 SQL 的 UPDATE...FROM 多申请同行只更新一次缺陷（改 GROUP BY SUM 聚合） |
-| **M11-A** | LIS 检验全流程闭环（Laboratory Information System Workflow） | 检验申请→标本→结果→报告全链路，此前仅有结果项级 `clinical.lab_results`。迁移 91 新增 `clinical.lab_items / lab_panels / lab_panel_items / lab_requests / lab_request_items / lab_specimens / lab_reports` 七表（编号/单号唯一、状态机 CHECK、标本类型/紧急度/异常标志枚举），并给 `lab_results` 扩 `request_id/specimen_id/report_id/entered_by` 四列与回写触发器；种子技师 `tech_lab/tech_lab2`、CBC/BIO/COAG 三面板、13 项目、13 条面板-项目映射；权限码 `lis:catalog/request/collect/receive/enter/review/publish`（admin×7、doctor=request、nurse=collect、technician=catalog/receive/enter/review/publish）。规则引擎 `lisWorkflow`（纯函数、确定性：标本 registered→collected→received→tested/rejected、报告 draft→reviewing→approved→published/returned 转移表；evaluateItem 按危急→异常→正常顺序判定 HH/LL/H/L/N、严格不等号边界、文本/空串降级为 N；assertSeparation 录入人≠审核人）；`lisRepo`（目录/申请/标本/报告幂等 upsert 与 ON CONFLICT 回查、FOR UPDATE 行锁、数组参数化 IN）；`lisAggregator`（申请状态机 requested→accepted→specimen_collected→in_progress→completed/cancelled；标本条码生成/采集/签收/拒收/上机；结果录入须标本已签收、同事务复用既有 `criticalValueRepo.scanAndRaise` 危急值；报告提交/审核/退回/发布电子签名，自审 409 拒绝，**空报告或未签收标本禁止提交**，同申请报告全部发布后申请完成）；BFF `/api/v1/lab` 22 端点统一错误信封+traceId；前端 LIS 工作站（健康门禁+水印+断库 Alert+四 Tab，目录勾选式选择，写按钮按 lis:perm 入口隐藏）去 mock | 单元 23、集成 9、页面 8；后端全量 2127（基线 2095+32）/2116 pass/11 skip/0 fail（TEST_REAL=1）、tsc 双零；前端全量 1015 pass（100 文件，基线 1007+8）、覆盖率 All files Stmts/Lines 92.66、Branch 79.18、Funcs 85.1（阈值未改且不回落）门禁通过；HTTP 取证 28/28（登录、建申请/标本、采集/签收/拒收、结果录入、报告审核双签发布/退回、自审 409 职责分离、越权 403/401/404）；psql 核对 3 申请/3 标本/2 双签发布报告/4 结果/1 危急告警、审计哈希链 98068 行零坏链；断库 ready 503（code 50300）+ 各端点 500 顶层 code=50000 唯一 traceId 不假成功、BFF 日志记真因 ECONNREFUSED 5433；重启持久化逐行保留、自动重连；M11A_HTTP 夹具单事务清零（患者/申请/标本/报告/告警 0）；取证中发现并修复真实医疗安全缺口（空报告/未签收标本可被一路提交发布，补守卫+集成测试） |
-| **M12-A** | 检查检验结果 AI 智能解读（AI Interpretation of Lab & Imaging Results） | 在 M3-E 纯规则解读上叠加可插拔 LLM 深度解读，并新增影像报告解读与医生/患者双视角。迁移 93 给 `clinical.lab_interpretations` 扩 `audience/overall_impression/item_explanations/trends/recommendations/plain_language_summary/deep_source/model/llm_status` 九列，将原 `visit_id` 唯一约束替换为 `(visit_id, audience)`（医生/患者各一行）；新增 `clinical.imaging_interpretations` 表（报告×视角唯一，含 explained_findings/overall_direction 等 23 列）；新增权限码 `imaging:interpret:view/sign`（admin×4、doctor=lab+imaging 各 view/sign、technician=imaging 两码）。规则引擎 `interpretEngine`（纯函数、确定性：异常/危急识别、`computeTrends` 逐项历史对比 delta/pct/rising/falling/stable/no_history、双视角 prompt 构建、`safeParseLlmJson` 去围栏取首尾花括号并按视角校验形状、患者端安全约束）；`llmClient`（OpenAI 兼容 `${baseURL}/chat/completions`，AbortController 超时，`LlmNotConfiguredError/LlmTransportError`，从 LLM_API_KEY/LLM_BASE_URL/LLM_MODEL 读取）；扩展 `labInterpretRepo`（新增历史结果 `listLabHistoryByPatient`、result_time 显式 ::text）、新增 `imagingInterpretRepo`；扩展 `labInterpretAggregator`、新增 `imagingInterpretAggregator`（**LLM 三态降级**：llm_ok/llm_not_configured 规则+明确标注/llm_error 规则回退，mode=llm 强制未配置或失败时 503，绝不以写死文本冒充 LLM；仅已发布影像报告可解读；AI 仅解释层不改原始数值与异常判定；解读须医师签名后生效，自审/对象归属受 DataScope 限制）；BFF `/api/v1/lab-interpret`、`/api/v1/imaging-interpret` 各 5 对称端点统一错误信封+traceId；前端 AI 解读工作站（健康门禁+水印+断库 Alert+视角/模式切换，检验解读/影像解读/待复核队列三 Tab，患者端隐藏队列与签名只给通俗说明，签名按钮按 interpret:sign 入口隐藏）去 mock | 单元 16、集成 10、页面 9、store 7；后端全量 2185（基线 2159+26）/2124 pass（TEST_REAL=1，61 个为干净 HEAD 同样复现的既有并发 flaky，零 interpret 失败）、tsc 双零；前端全量 1040 pass（103 文件，基线 1024+16）、覆盖率 All files Stmts/Lines 92.55、Branch 78.82、Funcs 85.07（阈值 80/70/80 未改且不回落）门禁通过；HTTP 取证 LLM-OK 34/34（检验/影像×医生/患者四组合、llm_ok+模型标注、整体印象/逐项解释/所见解释/分级建议、WBC 9→12 rising delta=3 pct=33.33、危急计数、签名/退回、视角隔离、403/401/404）；未配置 LLM 降级 8/8（auto 降级 llm_not_configured 标注"未配置大模型"、mode=llm 报 503 code=50300）；LLM 不可达降级 8/8（auto 降级 llm_error/llm_fallback、mode=llm 503、消息含真实原因 Unable to connect）；断库 11/11（health 恒 200、ready 503 code=50300、各鉴权端点 500 顶层 code=50000 唯一 traceId 无假成功、BFF 日志记真因 ECONNREFUSED 5433）；psql 独立复算审计哈希链 104100 行零坏链；重启持久化逐行保留、BFF 自动重连；M12A_HTTP 夹具单事务清零（患者/解读/孤儿行 0）；取证中发现并修复跨日期字典序比较缺陷（postgres.js 把 timestamptz 返回 Date，String(Date) 带星期前缀致 computeTrends 按字典序误跳过历史行报 no_history，两处 result_time 改 ::text 取 ISO 字符串） |
-| **M13-A** | VTE 智能防治闭环（Venous Thromboembolism Prevention） | 全国肺栓塞和深静脉血栓形成防治能力建设项目（VTE 防治中心）要求，库内此前无任何 VTE/血栓/抗凝业务表。迁移 94 新增 `clinical.vte_assessments`（版本化 VTE+出血评估，同就诊多版本，assessment_no 唯一）、`clinical.vte_preventions`（机械/药物预防，一措施一行，状态机留痕）、`clinical.vte_outcomes`（DVT/PE/出血/抗凝相关不良事件）三表与索引；权限码 `vte:read/assess/prevent/execute/audit`（admin×5、doctor=read/assess/prevent、nurse=read/execute、technician=read）。规则引擎 `vteRisk`（纯函数、确定性：**Caprini** 外科 24 因素，年龄分层+大手术>45min+卧床+既往 VTE+肿瘤+妊娠/避孕药/HRT 等，四档分层 低 0-1/中 2/高 3-4/极高 ≥5；**Padua** 内科 11 因素，活动肿瘤/既往 VTE/卧床≥3天/急性感染/心梗卒中/年龄≥70/心衰呼衰/肥胖/激素，两档 <4 低/≥4 高；**出血风险** 9 因素命中任一即高；确定性预防建议 recommendPrevention 高危药物+机械 IPC、中危仅机械、低危早期活动，高出血药物 deferred 优先机械；detectPreventionMismatch 高危未预防提醒；computeVteMetrics 风险评估率/高危预防实施率/医院获得性 VTE 发生率三指标含分子分母）；可选 LLM 危险因素抽取 `vteFactorExtract`（复用 M12-A llmClient，默认关闭、待确认、fetch 可注入，未配置 Key 抛 LlmNotConfiguredError 不冒充闭环）；`vteRepo`（三表读写、CAS 状态机、jsonb 纯对象）；`vteAggregator`（**AI 不自主开抗凝药**：评估只生成 suggested 草稿；药物预防须 vte:prevent 医师确认，确认时创建 drug 医嘱并由确认医师电子签名 review→active；高出血药物默认 409 拦截须 override+原因；机械预防由 vte:execute 护士执行落护理任务本人签名；PE 走既有危急值闭环）；BFF `/api/v1/vte` 15 端点（集合路由先于 :id）统一错误信封+traceId；前端 VTE 防治工作站（健康门禁+水印+断库 Alert+四 Tab：风险评估 Checkbox 实时累加总分/层级/出血/建议、高危看板 mismatch 提醒、就诊详情评估历史+机械执行+药物确认+记录结局、质控指标分子分母+目标值对比）去 mock | 单元 28、集成 11、页面 6、前端纯函数 15；后端全量 2224（基线 2185+39）/2163 pass（TEST_REAL=1，61 个为干净 HEAD 41adebe 同样复现的既有并发 flaky，逐名比对零 VTE 新增失败）、tsc 双零；前端全量 1061 pass（105 文件，基线 1040+21）、覆盖率 All files Stmts/Lines 92.5、Branch 78.87、Funcs 84.55（阈值 80/70/80 未改且不回落）门禁通过；HTTP 取证 24/24（Caprini score=6 极高危 alertRaised+机械/药物 suggested+mismatch、Padua 高危、护士执行机械 executed+护理任务、医师确认药物 confirmed+医嘱 drug/active/已签名、高出血药物 409→override+原因后 confirmed、看板 mismatch 干预后消除、DVT 结局、质控指标、护士确认药物/医生执行机械/护士评估 403 code=40300、未登录 401 code=40100、不存在就诊 404 code=40400）；psql 独立复算审计哈希链 107564 行零坏链（bad_hash/bad_prev 均 0）；重启持久化（停 PG 再启，audit 107564/评估 8/预防 15/结局 1 及内容 MD5 逐行一致、BFF 自动重连）；断库取证（health 恒 200、ready 503 code=50300"数据库不可用"、各鉴权端点 500 顶层 code=50000 唯一 traceId 无假成功、BFF 日志记真因 ECONNREFUSED 127.0.0.1:5433）；M13A_HTTP 夹具单事务清零（患者/评估/预防/结局 0） |
-| **M16-A** | AI 移动护理（PDA 执行端核心闭环，Mobile Nursing / PDA） | 对标《大型三甲医院移动护理系统技术开发文档》（四域/505 项/8 Agent），**技术栈对齐现有 TS+Bun+React+PostgreSQL**：移动端用 React 移动 H5/PWA（独立移动布局、底部 Tab、卡片式大按钮、触摸友好），独立路由前缀 `/m/*`、不套 PC 侧边栏，可被 PDA 浏览器/Android WebView/鸿蒙 WebView 承载，**不另起 Java Spring Boot/uni-app**；范围裁剪到「移动护理 PDA 端」P0（护理管理后台 505 项、智慧病房硬件、8 Agent、RocketMQ/Flowable 不在本次）。**零新业务表、零加列**：迁移 97 仅登记 1 个权限码 `mobile_nursing:execute` 并完成 nurse/doctor/admin 授权（幂等，连跑两遍第二遍 INSERT 0 0）。**条码口径复用现有唯一号**：患者腕带=`visits.visit_no`（IP）、标本=`lab_specimens.specimen_no`（SM）、药品=`drug_catalog.drug_code`（D+三位）。纯函数模块 `src/medical-tools/nursing/mobileNursing.ts`（9 个确定性函数：`parseBarcode` 腕带/标本/药品三类前缀解析；`verifyFiveRights` 床号/姓名/药名/剂量/时间五重核对，输出每项 {ok,expected,actual}、allOk、mismatches；`scoreBraden` 6 子项分层 ≤9 高/10-12 中/13-14 低/≥15 无（供压疮）、`scoreMorse`（≥45 高/25-44 中/<25 低，供跌倒）、`scoreBarthel`（≤40 重度/41-60 中度/61-99 轻度/100 自理）、`painLevel`（NRS 0-10）、`nutritionRisk`（NRS2002 简化，≥3 高风险）、`buildSbarSections`（S/B/A/R 纯结构化）、`detectSyncConflict`（医嘱执行类远端同 slot 已有记录→冲突需人工确认）；`mobileNursingRepo`（腕带/标本/药品定位、批量待办计数、最新风险、SBAR 聚合读）；`mobileNursingAggregator`（最大化复用 `inpatientCareAggregator` 既有 createNursingCareRecord/signNursingCareRecord/createCareTask/executeCareTask/administerInpatientOrder/canAccessVisit，**AI 不自主开医嘱/护理措施**：扫码给药先五重核对，不通过抛 MobileVerifyError→409 回结构化 mismatches，通过才 administerInpatientOrder（高风险药双人核对/幂等/审计哈希链）；体征/评估/记录/交班均经护士本人签名）；BFF `/api/v1/m/*` 10 端点（bed-board、scan、orders/:id/verify、orders/:id/administer、vitals、tasks/:id/execute、assessments、records、sbar、sbar/sign，集合路由先于 :id，统一错误信封+traceId）。前端：`MobileLayout`（顶部病区/护士/离线点+底部大按钮 Tab）+ 6 页面（login/Patients 床位看板/BedSide 床旁工作台/Tasks/Handoff/Me），PWA 手动轻量实现（`public/manifest.webmanifest`+`public/sw.js` app shell 与 GET 运行时缓存+离线兜底、`registerSW` 浏览器守卫、`offlineQueue` IndexedDB 本地缓存+同步队列，医嘱执行类冲突人工确认、不自动覆盖）；健康门禁复用 getSystemHealth，db!=='up' 显式红 Alert+水印+不渲染业务数据；写按钮按 mobile_nursing:execute 入口隐藏 | 后端单元 20、集成 13；前端纯函数 20、offlineQueue 5、页面 9；后端全量 2322（基线 2289+33）/2322 pass/0 fail（TEST_REAL=1）、tsc 双零；前端全量 1170 pass（112 文件，基线 1136+34）、覆盖率 All files Stmts/Lines 91.96、Branch 78.49、Funcs 82.48（阈值 80/70/80 未改且不回落）门禁通过；HTTP 取证（护士登录、床位看板在列、扫腕带定位、扫未知条码 400、扫药结合就诊定位 active 医嘱、五重核对错患者 409 code=40900 回"患者身份不符"、匹配普通药给药 200、高风险药缺 checkedBy 400、双人核对给药 200 checked_by=第二护士、体征采集 temp=36.6、任务执行 done、Braden 全 1 分 pressure_sore_risk=high、护理记录 ai_assisted、SBAR 草稿+本人签名 signed、医生给药 403 职责分离、无令牌 401、任务不存在 404）；psql 独立复算审计哈希链全表 132482 条 hash/prev 全匹配、0 断链；重启持久化（停 PG 再启，夹具 4 记录/2 给药/1 任务逐行校验和 edcf27de 前后一致、BFF 自动重连 bed-board 200）；断库取证（health 恒 200、ready 503 code=50300"数据库不可用"、各鉴权端点 500 顶层 code=50000 唯一 traceId 无假成功、BFF 日志记真因 ECONNREFUSED 127.0.0.1:5433）；M16A_HTTP 夹具单事务清零（患者/就诊/医嘱/给药/记录/任务 0） |
-| **M17-A** | 住院压疮(Braden)/跌倒(Morse)风险预警与预防闭环 | 补 M16-A 纯打分只在 PDA、无闭环，与 M16-B 迁移98 把 NQI_PRESSURE_INJURY/NQI_FALL_INCIDENT 标 pending 待接结局的缺口。技术栈沿用 TS+Bun+React+PostgreSQL，不另起 Java/uni-app。迁移 99 新增 `clinical.nursing_risk_assessments`（visit_id+risk_type+items jsonb+total_score+level，assess_no 唯一，索引 (visit_id,risk_type,assessed_at)）、`clinical.nursing_risk_preventions`（assessment_id ON DELETE CASCADE，状态机 suggested→accepted→executed/cancelled，executed_by+signature 本人签名）、`clinical.nursing_risk_events`（结局 pressure_injury_stage2/3/4/fall）三表与权限码 `nursing_risk:read/assess/execute`（admin×3、doctor=read/assess、nurse=read/execute，幂等）。纯函数 `src/medical-tools/nursing/riskWarning.ts` **复用 mobileNursing 的 scoreBraden/scoreMorse（不复制重写）**，对外 classifyLevel 三档（压疮 ≤9高/10-12中/≥13低、跌倒 ≥45高/25-44中/<25低）、recommendPreventions 确定性建议、detectNoPrevention 高危无 executed 预警、computeRiskMetrics 压疮/跌倒高危率+事件发生率分子分母。`nursingRiskRepo`（三表读写、预防 CAS 状态机、jsonb 纯对象）；`nursingRiskAggregator` **复用 inpatientCareAggregator 的 canAccessVisit**，**AI 不自主开单**：评估只生成 suggested 预防草稿，护士本人 accepted→executed 并电子签名才落库（可联动既有护理任务），结局事件由护士登记；BFF `/api/v1/nursing-risk`（集合路由先于 :id，统一错误信封+traceId，越权 403 code=40300/未登录 401/不存在 404）。前端 `/nursing-risk` 四 Tab 工作站（评估登记/高危预警看板/预防执行/结局与指标），健康门禁 getSystemHealth db!=='up' 显式红 Alert+水印不渲染业务数据，写按钮按 nursing_risk:execute 入口隐藏 | M17 后端 23 pass（15 纯函数单测 + 8 集成 TEST_REAL=1：Braden/Morse 高危、状态机+重复执行 409、看板执行前后、事件+指标、权限 403/401/404）、前端 20 pass（utils 7+store 10+页面 3）、tsc 后端+前端双零；迁移两跑幂等（全部 INSERT 0 0）；pg_ctl 重启 PG 后取证行 assess=1/prevention=5/event=1/executed=1 逐行一致 |
-
-**四类真实取证（非演示）**：
-
-1. **真实数据库**：本地 PostgreSQL 16（端口 5433），10 个业务 schema **156 张业务基表**（iam 11 / clinical 109 / agent 8 / knowledge 14 / audit 2 / dwd 2 / dws 1 / ads 1 / meta 7 / quality 1；另有 `public.schema_migrations` 迁移基础设施表），关键写操作可查回、**重启不丢**。
-2. **真实大模型**：DeepSeek 流式对话 + ReAct 工具调用（OpenAI 兼容），会话/消息/调用链落库；模型经 `LLM_PROVIDER` 工厂可插拔。
-3. **审计哈希链**：`audit.audit_logs` 由 BEFORE INSERT 触发器自动维护 `seq/prev_hash/hash` 哈希链，业务变更与审计同事务提交，链内防篡改。
-4. **并发/故障韧性**：并发写不重复（唯一约束 + 状态机 + 行锁/advisory lock）；断库时统一错误信封 + 水印，不白屏、不静默返回空数据；越权返回 403。
+| 能力域 | 核心模块 | 说明 |
+|---|---|---|
+| 🧠 **智能体编排** | 可视化画布 · DAG 工作流 · Agent Package | 声明式 DSL + 节点编排，人工在环、版本化、可移植 `agent.yaml` |
+| 🛒 **技能市场** | 医疗技能包注册 · 权限分级 · 热加载 | 像装 App 一样装配医疗技能，统一风险分级与权限模型 |
+| 📚 **知识中台** | 文档摄入 · 向量+关键词混合检索 · 引用溯源 | 解析→分块→嵌入→落库，RAG 引用可追溯 |
+| 💊 **CDS 临床决策** | 合理用药审查 · 危急值闭环 · 规则热加载 | 主动提醒 + 拦截确认，规则纯函数确定性可重算 |
+| 📝 **EMR 五级文书** | 入院记录/病程/出院小结/病案首页/知情同意 | 三级签名 + 退回整改 + 内涵质控状态机闭环 |
+| 🌐 **互联网医院** | 号源预约 · 在线报告 · 在线续方 · 支付配药 · 通知 | 微信小程序患者端，实名就诊、字段加密、履约闭环 |
+| 🚑 **急诊绿色通道** | 分级分诊 · 绿色通道 · 抢救留观 · 时间节点质控 | 急诊状态机全链路留痕 |
+| 🩸 **专项质控** | VTE 防治 · AMS 抗菌药物管理 · 院感监测 | Caprini/Padua 评分、DDD 指标、院感看板全闭环 |
+| 🏥 **手术麻醉** | 手术申请 · 术前评估 · 术中记录 · PACU 双签 | 九态状态机，三方核对、双人核对离室 |
+| 🧪 **检验检查** | LIS 全流程 · RIS/影像 · AI 辅助解读 | 标本条码闭环、报告双签发布、检验/影像双视角解读 |
+| 📱 **移动护理 PDA** | 条码腕带 · 五重核对 · 体征采集 · SBAR 交班 | 床旁执行端，离线队列 + 冲突人工确认 |
+| 🛡️ **安全合规** | 等保三级设计 · MFA · 审计哈希链 · 脱敏 | 16 类敏感数据脱敏、AES-256-GCM、JWT 主动吊销 |
+| 📦 **云原生底座** | Docker · K8s · Helm · HPA/PDB/NetworkPolicy | 多阶段非 root 镜像，零信任网格与灰度发布可选 |
 
 ---
 
-## 核心能力
+## 🏛️ 技术架构
 
-| 能力 | 说明 |
-|------|------|
-| 🧠 **智能体编排内核** | 声明式 YAML/JSON DSL + DAG 工作流引擎；12 类节点（LLM/工具/RAG/条件/循环/并行/人工/子智能体/代码/延时…）；自研**安全表达式沙箱**（无 eval）、人工挂起、取消、断点、可追溯执行记录 |
-| 🛠️ **低代码智能体工厂** | 基于 React Flow 的可视化画布：拖拽编排、实时 DAG 校验、一键导入导出 `agent.yaml`、撤销重做、智能体市场。**信息科无需写代码** |
-| 📚 **医疗知识中台** | 文档解析 → 分块 → 混合检索（向量+关键词，RRF 融合 + 重排）→ 引用溯源；术语/图谱/指南/中医多知识库；**26 个权威开放知识库合规获取工具**（见 [DATA_LICENSES.md](DATA_LICENSES.md)） |
-| 🩺 **刚需智能体** | AI 电子病历生成、AI 病历质控、语音电子病历、智能诊断辅助、智能处方审核、检验检查报告解读、智能编码 DRG/DIP、智能随访、导诊预问诊、医务统计报表 |
-| 🔧 **38 个医疗工具** | 患者/病历/质控/处方药品/临床决策/检验检查/医嘱/患者服务/运营/系统集成十大类，统一风险分级与权限模型 |
-| 💊 **临床决策支持 CDS** | 43 条开箱规则（药物相互作用、检验危急值、诊疗规范），主动提醒 + 拦截确认，规则热加载 |
-| 🎙️ **语音电子病历** | ASR Provider 抽象 + 医学口语后处理（去填充词、术语规范化、剂量/频次识别，只标注不改数字） |
-| 🌐 **互联网医院基座** | 微信小程序患者端（登录/就诊人/实名/详情）、微信 code 登录、实名认证（身份证校验位/第三方网关）、医护线上资质审核状态机；AES-256-GCM 字段级加密姓名/手机号/身份证，对标智慧服务三级 |
-| 🔐 **医疗级安全合规** | 等保三级设计、RBAC+ABAC、16 类敏感数据脱敏、AES-256-GCM、审计哈希链防篡改、Prompt 注入多层防护、JWT 验签、MFA 双因素、安全响应头、CSRF |
-| 🔌 **全系统集成** | HIS/EMR/LIS/PACS 适配器（重试/熔断/超时）、HL7 v2.x（16 消息）、FHIR R4（22 资源）、DICOM（DICOMWeb）、Kafka 事件总线（规划）、五大厂商适配骨架 |
-| 🖥️ **Web 工作台 + 终端** | React 19 + Ant Design 5：50+ 业务路由、门诊/住院/急诊/药事/质控/语音场景；同时保留 Ink 终端交互 |
-| 🗄️ **生产级基础设施** | PostgreSQL 16 + pgvector（120 表/审计哈希链/PITR）、Redis（分布式锁/限流/会话/缓存旁路）、Docker Compose、可观测、CI/CD |
-
----
-
-## 系统架构
-
-```mermaid
-flowchart TB
-    subgraph Access["L1 接入层"]
-        WEB["Web 工作台 (React19 + AntD5)"]
-        CLI["终端 CLI (Ink)"]
-        API["API 网关 / BFF / WebSocket"]
-    end
-
-    subgraph Biz["L2 核心业务事务层（HIS + EMR 一体化）"]
-        OUT["门诊"]
-        INP["住院 ADT"]
-        EM["急诊"]
-        ORD["医嘱处方"]
-        DOC["病历文书"]
-        PHA["药事"]
-        BIL["收费/病案"]
-    end
-
-    subgraph AI["L3 AI 原生能力中台"]
-        ENGINE["智能体编排引擎 (DAG)"]
-        TOOLS["38 医疗工具"]
-        CDS["CDS 规则引擎"]
-        RAG["知识中台 / RAG"]
-        VOICE["语音 ASR"]
-    end
-
-    subgraph Data["L4/L5 数据与集成层"]
-        PG[("PostgreSQL+pgvector")]
-        REDIS[("Redis")]
-        KB[("知识/术语/图谱")]
-        INT["HIS/EMR/LIS/PACS · HL7/FHIR/DICOM"]
-    end
-
-    subgraph Sec["L6 安全合规（贯穿全层）"]
-        RBAC["RBAC+ABAC"]
-        MASK["脱敏/加密"]
-        AUDIT["审计哈希链"]
-    end
-
-    WEB --> API
-    API --> OUT & INP & EM & ORD & DOC & PHA & BIL
-    BIL -.调用.-> AI
-    AI --> TOOLS & CDS & RAG & VOICE
-    TOOLS --> INT
-    RAG --> KB
-    Biz --> PG
-    AI --> PG & REDIS
-    Sec -.-> Biz & AI & Data
+```
+┌─────────────────────────────────────────────────────────┐
+│  L1 接入层   Web 工作台(React19+AntD5) · 移动PDA · 小程序 │
+├─────────────────────────────────────────────────────────┤
+│  L2 业务事务层  门诊 · 住院ADT · 急诊 · 医嘱处方 · 病历文书 │
+│              药事 · 收费结算 · 手术麻醉 · 检验检查 · 护理   │
+├─────────────────────────────────────────────────────────┤
+│  L3 AI 中台    智能体编排引擎 · 技能市场 · 知识中台/RAG     │
+│              CDS 规则引擎 · 语音 ASR · 大模型可插拔        │
+├─────────────────────────────────────────────────────────┤
+│  L4 数据层    PostgreSQL 16(+pgvector) · Redis · 湖仓分层  │
+├─────────────────────────────────────────────────────────┤
+│  L5 集成标准  HL7 v2 · FHIR R4 · DICOM · HIS/LIS/PACS 适配 │
+├─────────────────────────────────────────────────────────┤
+│  L6 安全合规  RBAC+ABAC · 加密脱敏 · 审计哈希链(贯穿全层)   │
+└─────────────────────────────────────────────────────────┘
 ```
 
-**六层视图**：L1 接入 · L2 核心业务事务（HIS+EMR 一体化微服务）· L3 AI 原生能力中台 · L4 数据平台 · L5 集成与标准（FHIR/openEHR/HL7/DICOM）· L6 平台与安全。详见[顶层设计](docs/ai-native-hospital/01-top-level-design.zh-CN.md)。
-
-**编排引擎是核心**：每个智能体是可版本化、可校验、可移植的 **Agent Package**（`agent.yaml` + 提示词 + 知识引用 + 校验和）。工作流主图恒为 DAG，可静态分析、可审计、不会死循环（迭代上限保护）。
+**架构特征**：微服务云原生、前后端分离、BFF 统一收口；TypeScript + Bun 单一语言栈；事务与审计哈希链同提交；大模型经 OpenAI 兼容接口可插拔（DeepSeek / 本地模型均可替换）。
 
 ---
 
-## 快速开始
+## 🏃 快速启动
 
-### 环境要求
-
-- [Bun](https://bun.sh/) ≥ 1.3（后端运行时与包管理）
-- Node.js ≥ 18（前端构建）
-- 完整依赖服务（PostgreSQL/Redis/…）可用 Docker Compose 一键拉起；本地开发也可直连 PostgreSQL
-
-### 1. 克隆并安装
+**环境要求**：Bun ≥ 1.3、Node.js ≥ 18、Docker（可选，用于一键拉起 PostgreSQL/Redis）。
 
 ```bash
-git clone https://github.com/chenweidaben/JLAIharnessos.git
-cd JLAIharnessos
+git clone <仓库地址>.git
+cd jlmedaios
 bun install
+cp .env.example .env          # 配置 JWT_SECRET、DATABASE_URL、LLM_API_KEY 等
+
+docker compose up -d postgres redis   # 依赖服务
+bun run db:seed                       # 导入药品/ICD/检验/临床路径等种子
+
+bun run bff                           # 后端 BFF：REST 8080 + WebSocket
+cd web && bun install && bun run dev  # 前端工作台 http://localhost:5173
 ```
 
-### 2. 准备配置与数据库
+**容器化部署**：
 
 ```bash
-cp .env.example .env          # 填入 JWT_SECRET、LLM_API_KEY、DATABASE_URL 等
-# 方式 A：Docker 启动 PostgreSQL + Redis
-docker compose up -d postgres redis
-# 方式 B：使用本地 PostgreSQL（默认连接 postgres://postgres@127.0.0.1:5433/jlmedaios）
-bun run db:seed               # 导入权威精炼种子（药品/ICD/检验/临床路径/中医）
+docker compose up -d                      # 全栈一键（网关+BFF+前端+PG+Redis）
+kubectl apply -f deploy/k8s/              # Kubernetes 一体化清单
+helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 ```
 
-### 3. 运行后端与前端
-
-```bash
-# 后端 BFF（REST 8080 + WebSocket /ws/chat）
-bun run bff
-
-# 前端（新终端）
-cd web && bun install && bun run dev    # http://localhost:5173
-```
-
-### 4. 跑测试确认环境
-
-```bash
-bun run typecheck                 # 后端类型检查 0 错误
-bun test                          # 后端 1936 测试（1 skip）
-cd web && bunx vitest run         # 前端 848 测试
-cd web && npx tsc --noEmit        # 前端类型检查 0 错误
-```
-
-> 无数据库演示：设置 `DEMO_MODE=1` 后启动 BFF，使用内存数据并显示水印（不持久化），仅用于演示。
-
-### 5. 一键容器化 / 云原生部署
-
-```bash
-# Docker Compose 全栈（边缘网关 + BFF + 前端 + PostgreSQL + Redis + Kafka + 可观测）
-cp .env.compose.example .env     # 必须替换全部占位口令/密钥
-docker compose build
-docker compose up -d             # 访问 https://localhost
-
-# Kubernetes 一体化部署（含 HPA/PDB/Ingress/NetworkPolicy，详见 deploy/k8s/README.md）
-kubectl apply -f deploy/k8s/
-
-# Helm 参数化部署（推荐生产，支持外部数据库、外部密钥、副本/资源配置）
-helm install jlmedaios deploy/helm/jlmedaios --namespace jlmedaios --create-namespace
-```
-
-> 完整生产配置、云托管数据库替换、密钥管理（External Secrets/Vault）见
-> [deploy/k8s/README.md](deploy/k8s/README.md)、[deploy/helm/jlmedaios/README.md](deploy/helm/jlmedaios/README.md)
-> 与 [docs/deployment/](docs/deployment/)。
+> 无数据库体验：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示。
 
 ---
 
-## AI 影像辅诊（DAMO-RADAR 融合）
+## 🧩 功能全景
 
-平台已融合达摩院 **DAMO-RADAR**——腹部增强 CT 视觉-语言基础模型（Science 393(6817):eaec6129, 2026），作为**第二阅片/辅助决策**能力嵌入影像工作站。
+### AI 原生五剑客
 
-| 能力 | 说明 |
-|------|------|
-| 🫀 **18 器官 / 146 发现** | 一次 CT 覆盖主动脉、肝、胃、胰、肾、肺等 18 个解剖结构，输出 146 项临床发现概率（0~1） |
-| 🎯 **第二阅片定位** | 阳性发现自动定位、critical（恶性肿瘤/急重症）红色警示并触达危急值通道；**最终诊断须放射科医师复核签名** |
-| 🧪 **双模式 demo / production** | `demo`（CPU，无权重，确定性结果）与 `production`（真实推理，需约 5GB 权重 + CUDA）；缺权重自动降级 |
-| 🛡️ **降级不白屏** | 推理服务不可用时切回确定性 mock，并显示「演示数据」水印 |
+| 智能体 | 能力 | 落点 |
+|---|---|---|
+| 📄 病历草稿生成 | 基于就诊信息自动生成入院记录/病程草稿 | 医师复核后签名入档 |
+| 💊 合理用药审查 | 相互作用、配伍、禁忌、剂量实时审查 | 医嘱/处方环节主动拦截提醒 |
+| 🔍 鉴别诊断 | 结合病史体征推荐鉴别方向与检查 | 仅供医师参考，不做自主诊断 |
+| 🛤️ 临床路径推荐 | 按病种推荐标准路径与变异管理 | 路径执行与偏差留痕 |
+| 📈 住院天数/费用预测 | 基于在院数据预测 LOS 与费用区间 | 辅助床位调度与成本管控 |
 
-> 权重 `checkpoint_radar_pretrain.pth`（约 5GB，**CC BY-NC-SA 4.0 非商业**）严禁入库，由部署方自行下载挂载。详见 [`services/radar-inference/README.md`](services/radar-inference/README.md) 与 [`docs/RADAR_FUSION_CONTRACT.md`](docs/RADAR_FUSION_CONTRACT.md)。
+### 临床业务体系
 
-**引用**：[Science 393(6817):eaec6129, 2026 · doi:10.1126/science.aec6129](https://doi.org/10.1126/science.aec6129)。代码 vendor 自 [damo-radar](https://github.com/alibaba-damo-academy/damo-radar)（Apache-2.0），并站在 LAVIS、nnU-Net、MONAI 等开源项目之上。
-
----
-
-## 5 分钟搭建一个医疗智能体
-
-**方式一：低代码画布（推荐给信息科）**
-
-1. 打开 Web 工作台 → 侧边栏「**智能体工厂**」；
-2. 选择内置模板（如「AI 病历质控」）或「新建空白智能体」；
-3. 从左侧拖入节点：`开始 → 检索规范(RAG) → 质控工具 → 人工审核 → 归档`；
-4. 右侧配置工具入参、知识库、风险等级；顶部「**校验**」实时检查 DAG 与引用；
-5. 「**导出**」得到可移植的 `agent.yaml`，导入生产即可发布。
-
-**方式二：直接写 Agent Package（推荐给开发者）**
-
-```yaml
-packageFormatVersion: '1.0.0'
-agent:
-  id: demo-record-qc
-  name: 演示病历质控
-  version: 1.0.0
-  riskLevel: low
-  entryWorkflow: main
-  tools: [medical_record_quality_check, sync_to_his]
-  knowledgeBases: [medical-record-standards]
-  workflows:
-    - meta: { id: main, name: 主流程 }
-      nodes:
-        - { id: start, type: start }
-        - { id: qc, type: tool, name: 内涵质控,
-            config: { toolName: medical_record_quality_check,
-                      inputMapping: { recordContent: input.recordText } } }
-        - { id: review, type: human, name: 医生确认,
-            config: { title: 质控结果确认, assigneeRoles: [doctor] } }
-        - { id: end, type: end, config: { outputMapping: { report: nodes.qc.output } } }
-      edges:
-        - { source: start, target: qc }
-        - { source: qc, target: review }
-        - { source: review, target: end }
-  disclaimer: 本智能体输出为临床辅助建议，最终诊疗决策由经治医师负责。
-```
-
-```ts
-import { createMockOrchestrator } from './src/orchestrator';
-const orch = createMockOrchestrator();
-await orch.loadAllAgents('./agents');
-const result = await orch.invoke('demo-record-qc', { recordText: '…' });
-```
-
-> 刚需智能体的完整实现见 [`agents/`](agents/) 目录，可直接作为模板二次编辑。
-
----
-
-## 技术栈
-
-| 层 | 选型 |
+| 业务线 | 已闭环能力 |
 |---|---|
-| 业务微服务 / BFF | **TypeScript + Bun**（零额外依赖，Bun.serve） |
-| 前端 | React 19 + Vite + Ant Design 5 + Zustand + React Flow |
-| 事务数据库 | **PostgreSQL 16**（JSONB、分区、pgvector） |
-| 缓存 | Redis（会话、缓存、限流、分布式锁） |
-| 事件流 | Kafka（兼容 Redpanda，规划替换内存总线） |
-| 模型服务 | Python(FastAPI) 独立微服务（影像/AI，经契约协作） |
-| 大模型 | DeepSeek（OpenAI 兼容，经 `LLM_PROVIDER` 多供应商可插拔） |
-| 标准/互操作 | FHIR R4、openEHR（演进）、HL7 v2、DICOM |
-| 可观测/部署 | Prometheus、OpenTelemetry（接入中）、Grafana、Docker/K8s |
+| **门诊** | 挂号候诊、问诊、诊断、医嘱处方、药师审核、智能导诊预问诊、满意度评价 |
+| **住院 ADT** | 入出转、床位病区、查房、护理记录、医嘱执行双签、出院计划与随访 |
+| **急诊** | 1–4 级分诊、绿色通道、抢救、留观、急诊时间节点质控 |
+| **药事** | 调剂发药、库存联动、处方点评、用药咨询 |
+| **EMR 五级文书** | 入院记录、手术记录、病程记录、出院小结、病案首页、知情同意；三级签名、内涵质控、缺陷整改闭环 |
+| **医保双轨** | DRG + DIP 本地分组、预算管理、成本分摊、结算分析与报表（不接外部医保，本地可重算） |
+| **护理线** | 护士工作站、护理记录、医嘱执行、压疮/跌倒/疼痛/Barthel 评估、SBAR 交班、管路护理、PDA 移动执行 |
+| **互联网医院** | 号源预约、在线报告查询、在线续方复诊、在线支付与电子票据、药品配送（自取/快递）、就诊通知 |
+| **专项质控** | VTE 风险评估与预防闭环、AMS 抗菌药物分级管理、院感监测看板、危急值实时事件闭环 |
+| **手术麻醉** | 手术排班、术前评估、三方核对、诱导/术中/维持、PACU 评分、双签离室 |
+| **检验检查** | LIS 申请-标本-结果-报告全流程、RIS 检查预约、影像/检验 AI 辅助解读（医师签名生效） |
+| **血库** | 申请-配血-发血-输注-不良反应全链路、用血合理性与疗效评价 |
+| **管理与数据** | 多租户一院多区、EMPI 患者主索引、科研专病队列、湖仓分层加工、数据质量与隐私分级、院长驾驶舱 |
+| **系统管理** | 用户/角色/权限、审计日志与登录日志、会话管理与 JWT 吊销、MFA 双因素 |
 
 ---
 
-## 目录结构
+## 🤝 开放合作
 
-```
-jlmedaios/
-├── src/
-│   ├── bff/               # Bun.serve BFF（REST + WebSocket + 中间件 + 路由/聚合）
-│   ├── orchestrator/      # 智能体编排内核（DSL/DAG 引擎/沙箱/人工/触发器/打包）
-│   ├── medical-tools/     # 38 个医疗工具与注册中心
-│   ├── knowledge/         # RAG 检索引擎 + CDS 规则（43 条）
-│   ├── knowledge-platform/# 知识中台（术语/图谱/租户/版本/混合检索）
-│   ├── voice/             # 语音 ASR 抽象与医学口语后处理
-│   ├── internet-hospital/ # 实名认证 / 微信登录提供方（本地演示 + 真实双模式）
-│   ├── security/          # 脱敏/审计/RBAC/加密/字段加密/输入安全/MFA/等保
-│   ├── integration/       # HIS/EMR/LIS/PACS、FHIR/HL7/DICOM、适配器、监控
-│   ├── resilience/        # 限流/熔断/舱壁/并发限制/异步队列
-│   ├── cache/             # Redis 抽象/分布式锁/限流/会话/缓存
-│   ├── core/              # Agent 循环、LLM 客户端、上下文、会话
-│   ├── db/                # 连接池/迁移器 + repositories 数据访问层
-│   └── ui/                # Ink 终端医疗化界面
-├── agents/                # 刚需智能体包（agent.yaml + prompts + 示例）
-├── web/                   # React19 + Vite + AntD5 工作台与低代码画布
-├── miniprogram/           # 微信小程序患者端（登录/就诊人/实名/详情）
-├── services/              # Python 独立模型服务（如 radar-inference）
-├── deploy/postgres/init/  # 87 表分层 schema + 种子（SQL 迁移）
-├── scripts/               # 知识种子/合规下载、DB 导入/校验/备份
-├── docs/                  # 架构/AI 原生医院/API/部署/运维/用户/ADR
-├── examples/              # API / 流式 / WebSocket / 编排示例
-└── tests/                # 后端测试
-```
+本项目处于 **健澜科技医疗 AI 大模型及应用前沿实验室** 阶段，我们以完全开放的姿态邀请：
+
+- 🏥 **医院**：信息科与临床专家共建真实场景智能体，私有化、可审计、数据不出院；
+- 🎓 **高校与科研院所**：提供完整医疗 AI 研究底座与模拟临床数据环境，支持课题、论文与人才联合培养；
+- 🧑‍💻 **同行与开发者**：以标准化 Agent Package 接入，一个工具、一条 CDS 规则、一个智能体模板都是贡献；
+- 🧩 **生态伙伴**：HL7 / FHIR / DICOM 适配器与医疗模型服务共建。
+
+合作方向：联合实验室、课题研究、产品共创、源码贡献、学术发表。欢迎通过 Issue 或官方渠道与健澜科技联系。
 
 ---
 
-## 测试与质量
+## 🔒 安全与医疗红线
 
-- **后端 1870、前端 826 单元/集成测试全绿**（后端 7440 个断言，1 个 skip）；后端覆盖率约 **87%**，前端覆盖率门禁通过（Lines 92.18 / Branch 78.55 / Funcs 84.13），覆盖率只增不减；
-- 前后端 **TypeScript 严格模式零类型错误**，ESLint 0 error；
-- 端到端医疗场景验收：门诊问诊、住院 ADT/查房、急诊分诊/绿色通道、危急值处理、处方审核、药房发药、病历质控、语音病历、病案首页、收费结算退费、手术麻醉、预约随访、互联网医院实名就诊、图文问诊、电子处方/药师审方、在线支付/电子票据/财务冲正；
-- 安全测试：Prompt 注入、SQL/XSS/命令注入、鉴权、数据范围、安全响应头；
-- CI（GitHub Actions）：typecheck → lint → 单测+覆盖率 → 集成 → 安全审计 → 构建（含前端）。
-
-```bash
-bun run ci                 # 后端全量门禁
-cd web && bun run build    # 前端生产构建
-```
+- AI 输出为临床辅助建议，**最终诊疗决策由经治医师负责**，所有法律效力写操作须电子签名；
+- 等保三级设计：RBAC+ABAC、字段级 AES-256-GCM 加密、16 类敏感数据脱敏；
+- 审计哈希链（BEFORE INSERT 触发器防篡改）、操作与审计同事务提交；
+- 断库即显式报错 + 水印，不白屏、不静默返回假数据；越权一律 403；
+- 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，勿公开 Issue。
 
 ---
 
-## 文档
+## 📄 许可证与版权
 
-- **AI 原生医院系列**（[docs/ai-native-hospital/](docs/ai-native-hospital/)）：
-  - [00 开源对标调研](docs/ai-native-hospital/00-open-source-research.zh-CN.md)
-  - [01 顶层设计](docs/ai-native-hospital/01-top-level-design.zh-CN.md)
-  - [02 Strangler 路线图](docs/ai-native-hospital/02-strangler-roadmap.zh-CN.md)
-  - [03 架构专家评审](docs/ai-native-hospital/03-architecture-review.zh-CN.md)
-  - [04 互联网医院一体化平台](docs/ai-native-hospital/04-internet-hospital-platform.zh-CN.md)
-- 部署、运维、API、ADR、需求、测试、用户手册等见 [docs/](docs/)。
-
----
-
-## 路线图
-
-```
-M0 门诊 ✅ → M1 住院+急诊 ✅ → M2 药事/病历/质控/语音 ✅
-   → M3 病案/收费/医保/手术/预约随访/互联网医院基座（核心切片已闭环，持续深化）
-        → M4 知识中台/RAG + 低代码编排
-             → M5 多租户一院多区 + 湖仓/科研专病库
-                  → M6 云原生生产化(K8s/网格) + 等保三级/MFA/真实系统联调
-```
-
-- [x] 智能体编排内核 + 安全表达式沙箱 + 人工在环
-- [x] 低代码智能体工厂（画布 + 市场 + agent.yaml 互操作）
-- [x] 38 医疗工具 + 43 CDS 规则 + 刚需智能体
-- [x] 知识中台 + 权威知识库合规获取
-- [x] 语音病历、PostgreSQL/Redis 基座、Web 工作台
-- [x] M3 病案首页 / 收费结算退费 / DRG-DIP 本地分组 / 手术麻醉 / 预约随访
-- [x] MFA 双因素、危急值闭环、检查检验解读、医保对账骨架、RBAC 补齐
-- [x] 互联网医院基座（微信小程序患者端、实名就诊、线上资质、字段加密）
-- [x] M5-A 多租户/一院多区注册表持久化（iam.tenants、启动 hydrate、写穿透、默认租户保护）
-- [x] M5-B 科研专病队列（队列定义→发布→确定性规则匹配入组→成员脱敏快照→统计与脱敏数据集导出→归档）
-- [x] M5-C 患者主索引 EMPI（跨标识域哈希登记→确定性匹配候选→人工审核→逻辑主从链接，不物理合并）
-- [x] M5-D 数据湖仓分层与增量加工（DWD watermark 增量→DWS 科室日汇总→ADS 院级日指标，事务内幂等、血缘可追溯）
-- [x] M5-E 数据质量监控与隐私分级治理（五维质量检测→评分趋势，字段级隐私分级自动扫描+人工修正留痕）
-- [ ] 互联网医院在线问诊/电子处方流转/医保线上支付/药品配送深化
-- [ ] 统一 Idempotency-Key 框架、Kafka 替换内存总线、真实压测基线
-- [ ] CI 与本地一致性整改（分支 master、CI 内置 DB 跑全量门禁）
-- [ ] MFA 登录全覆盖、国密 SM2/SM3/SM4、等保三级测评
-- [ ] 多租户/一院多区、湖仓增量调度（CDC/Kafka）、EMPI、多模态与联邦协作、国际化
-
----
-
-## 参与贡献
-
-我们欢迎并珍视每一份贡献——一个工具、一条 CDS 规则、一个智能体模板、一份文档、一个 Issue。
-
-- 阅读 [贡献指南](CONTRIBUTING.md) 与 [开发规范](docs/technical/00-开发规范与代码规范.md)；
-- 提交 PR 前确保 `bun run typecheck && bun test` 与前端 `vitest` 通过，并补充测试；
-- 安全问题**请勿公开 Issue**，按 [安全策略](SECURITY.md) 私下报告；
-- 请遵守 [贡献者公约](CODE_OF_CONDUCT.md)。
-
-> 健澜科技希望与全国医院信息科、医疗 IT 厂商、高校与独立开发者一道，把这个免费开源的工业级医疗智能体操作系统，打磨成**医疗 AI 的安卓系统**。
-
----
-
-## 贡献者墙 · Contributors Wall
-
-| <a href="https://github.com/chenweidaben"><img src="https://github.com/chenweidaben.png" width="80" height="80" alt="chenweidaben"/></a><br/><sub><b>chenweidaben</b></sub><br/><sub>项目发起人 · 架构 · 医疗 AI</sub> |
-|:---:|
-
-> **成为贡献者**：提交一个 PR、修复一个 Bug、补充一条 CDS 规则、写一份智能体模板、翻译一段文档——你的名字将留在这里。
-
----
-
-## 许可证与致谢
-
-- 代码以 [Apache License 2.0](LICENSE) 开源；第三方依赖许可见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)，归属声明见 [NOTICE](NOTICE)。
-- **数据许可独立于代码许可**，使用前务必阅读 [DATA_LICENSES.md](DATA_LICENSES.md)。
-- 特别感谢相关开源框架与公开医学知识资源的贡献者。
-
-## 免责声明
-
-本软件为医疗**辅助决策与效率工具**，不构成医疗器械的诊断结论，不能替代执业医师的面诊与判断。部署与使用方须遵守所在国家/地区法律法规，自行完成数据合规、安全测评与临床验证。作者与贡献者不对因使用本软件造成的任何后果承担责任。
+- 代码以 [Apache License 2.0](LICENSE) 开源；数据许可独立，使用前请阅读 [DATA_LICENSES.md](DATA_LICENSES.md)；
+- 第三方依赖归属见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) 与 [NOTICE](NOTICE)；
+- 本软件为医疗辅助决策与效率工具，不构成医疗器械诊断结论，部署方须自行完成数据合规、安全测评与临床验证。
 
 <div align="center">
 
-**健澜科技（杭州健澜科技有限公司） · 让医疗 AI 更简单、更落地**
+**杭州健澜科技有限公司（健澜科技） · 让医疗 AI 更简单、更落地**
 
 </div>
