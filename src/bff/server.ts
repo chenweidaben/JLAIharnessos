@@ -173,6 +173,7 @@ import { referralRoutes } from './routes/referral';
 import { knowledgeBaseRoutes } from './routes/knowledgeBase';
 import { agentBuilderRoutes } from './routes/agentBuilder';
 import { agentRuntimeRoutes } from './routes/agentRuntime';
+import { medmuseRoutes } from './routes/medmuse';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
@@ -335,6 +336,7 @@ const allRoutes: RouteDef[] = [
   ...auditLogRoutes,
   ...loginLogRoutes,
   ...imagingRoutes,
+  ...medmuseRoutes,
 ];
 
 interface Compiled {
