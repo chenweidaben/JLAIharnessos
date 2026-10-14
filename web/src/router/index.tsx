@@ -250,6 +250,8 @@ const BillListPage = lazy(() => import('@/pages/billing/BillList'));
 const QcRectificationPage = lazy(() => import('@/pages/qc/Rectification'));
 // 床位管理可视化（M102-C）
 const BedMapPage = lazy(() => import('@/pages/nursing/BedMap'));
+// 科室月度运营报表（M102-D）
+const MonthlyReportPage = lazy(() => import('@/pages/ops/MonthlyReport'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -434,6 +436,8 @@ export default function AppRoutes() {
           <Route path="qc/rectification" element={<QcRectificationPage />} />
           {/* 床位管理可视化（M102-C） */}
           <Route path="nursing/bed-map" element={<BedMapPage />} />
+          {/* 科室月度运营报表（M102-D） */}
+          <Route path="ops/monthly-report" element={<MonthlyReportPage />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
