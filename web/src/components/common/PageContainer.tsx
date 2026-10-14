@@ -18,7 +18,7 @@ export default function PageContainer({ title, description, extra, children }: P
     <div className="animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h2 className="m-0 text-lg font-semibold text-ink-primary">{title}</h2>
+          <h2 className="m-0 text-lg font-semibold" style={{ color: '#0A2540' }}>{title}</h2>
           {description && <p className="mt-1 mb-0 text-sm text-ink-secondary">{description}</p>}
         </div>
         {extra && <div className="flex items-center gap-2">{extra}</div>}

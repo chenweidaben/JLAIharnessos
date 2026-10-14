@@ -52,6 +52,13 @@ const { Text, Paragraph } = Typography;
 const fmt = (t?: string) => (t ? dayjs(t).format('YYYY-MM-DD HH:mm') : '—');
 const fmtShort = (t?: string) => (t ? dayjs(t).format('MM-DD HH:mm') : '—');
 
+/** 深海蓝 VI 色板 */
+const JL = {
+  navy: '#0A2540', // 主色：深蓝
+  blue: '#1E5F8C', // 辅色
+  accent: '#4A90D9', // 强调色
+} as const;
+
 /* ----------------------------- 展示映射 ----------------------------- */
 const ENCOUNTER_META: Record<Encounter['type'], { label: string; color: string }> = {
   inpatient: { label: '住院', color: 'blue' },
@@ -262,7 +269,9 @@ export default function PatientDetail() {
                   </Col>
                 </Row>
                 <div className="jl-card mt-4 p-4">
-                  <h3 className="m-0 mb-2 text-base font-medium">生命体征趋势（24h）</h3>
+                  <h3 className="m-0 mb-2 text-base font-medium" style={{ color: JL.navy }}>
+                    生命体征趋势（24h）
+                  </h3>
                   <LineChart
                     xData={chartX}
                     series={[
@@ -419,10 +428,15 @@ export default function PatientDetail() {
             key: 'orders',
             label: `医嘱 (${view.orders.length})`,
             children: (
-              <Card>
+              <Card
+                title={
+                  <span style={{ color: JL.navy, fontWeight: 600 }}>医嘱台账</span>
+                }
+              >
                 <Table
                   rowKey="id"
                   size="small"
+                  className="jl-table-hover"
                   dataSource={view.orders}
                   columns={orderColumns}
                   pagination={{ pageSize: 10, showSizeChanger: false }}

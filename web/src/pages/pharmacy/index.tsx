@@ -48,6 +48,13 @@ function formatTime(v: string | null): string {
   return new Date(v).toLocaleString('zh-CN', { hour12: false });
 }
 
+/** 深海蓝 VI 色板 */
+const JL = {
+  navy: '#0A2540', // 主色：深蓝
+  blue: '#1E5F8C', // 辅色
+  accent: '#4A90D9', // 强调色
+} as const;
+
 export default function PharmacyWorkbench() {
   const {
     health, dbUp, healthChecking,
@@ -118,6 +125,11 @@ export default function PharmacyWorkbench() {
           onClick={() =>
             mode === 'dispense' ? setDispenseTarget(row) : setReviewTarget(row)
           }
+          style={{
+            background: JL.accent,
+            borderColor: JL.accent,
+            boxShadow: '0 2px 6px rgba(74,144,217,0.3)',
+          }}
         >
           {mode === 'dispense' ? '调剂发药' : '审 方'}
         </Button>
@@ -203,10 +215,10 @@ export default function PharmacyWorkbench() {
     <Watermark content={watermarkText}>
       {contextHolder}
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
-        <Card size="small">
+        <Card size="small" style={{ borderTop: `3px solid ${JL.accent}` }}>
           <Row justify="space-between" align="middle">
             <Col>
-              <Typography.Title level={4} style={{ margin: 0 }}>
+              <Typography.Title level={4} style={{ margin: 0, color: JL.navy }}>
                 药房调剂发药工作站
               </Typography.Title>
             </Col>
@@ -222,6 +234,11 @@ export default function PharmacyWorkbench() {
                   icon={<ReloadOutlined />}
                   onClick={() => void onRefresh()}
                   loading={loading}
+                  style={{
+                    background: JL.accent,
+                    borderColor: JL.accent,
+                    color: '#fff',
+                  }}
                 >
                   刷 新
                 </Button>
@@ -269,6 +286,7 @@ export default function PharmacyWorkbench() {
                       rowKey={(r) => r.prescription.id}
                       size="small"
                       loading={loading}
+                      className="jl-table-hover"
                       columns={queueColumns('dispense')}
                       dataSource={dispenseQueue}
                     />
@@ -282,6 +300,7 @@ export default function PharmacyWorkbench() {
                       rowKey={(r) => r.prescription.id}
                       size="small"
                       loading={loading}
+                      className="jl-table-hover"
                       columns={queueColumns('review')}
                       dataSource={reviewQueue}
                     />
@@ -295,6 +314,7 @@ export default function PharmacyWorkbench() {
                       rowKey="id"
                       size="small"
                       loading={loading}
+                      className="jl-table-hover"
                       columns={inventoryColumns}
                       dataSource={inventory}
                     />
@@ -308,6 +328,7 @@ export default function PharmacyWorkbench() {
                       rowKey="id"
                       size="small"
                       loading={loading}
+                      className="jl-table-hover"
                       columns={movementColumns}
                       dataSource={movements}
                     />
@@ -321,6 +342,7 @@ export default function PharmacyWorkbench() {
                       rowKey="id"
                       size="small"
                       loading={loading}
+                      className="jl-table-hover"
                       columns={dispensingColumns}
                       dataSource={dispensings}
                     />

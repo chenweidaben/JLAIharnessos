@@ -15,6 +15,13 @@ import { listPatients } from '@/api/patient';
 import { usePatientStore } from '@/store/patientStore';
 import type { Patient } from '@/types/patient';
 
+/** 深海蓝 VI 色板 */
+const JL = {
+  navy: '#0A2540', // 主色：深蓝
+  blue: '#1E5F8C', // 辅色
+  accent: '#4A90D9', // 强调色
+} as const;
+
 export default function PatientList() {
   usePageTitle('患者管理');
   const navigate = useNavigate();
@@ -72,8 +79,11 @@ export default function PatientList() {
 
   return (
     <PageContainer title="患者管理" description="在院患者列表（演示数据已脱敏）">
-      <Card className="shadow-card">
-        <div className="mb-3">
+      <Card className="jl-card" style={{ borderTop: `3px solid ${JL.accent}` }}>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h3 className="m-0 text-base font-medium" style={{ color: JL.navy }}>
+            在院患者台账
+          </h3>
           <Input.Search
             placeholder="按住院号 / 姓名 / 诊断搜索"
             style={{ maxWidth: 320 }}
@@ -85,6 +95,7 @@ export default function PatientList() {
         <Spin spinning={loading}>
           <Table<Patient>
             rowKey="id"
+            className="jl-table-hover"
             columns={columns}
             dataSource={filtered}
             locale={{ emptyText: <EmptyState description="暂无患者数据" /> }}

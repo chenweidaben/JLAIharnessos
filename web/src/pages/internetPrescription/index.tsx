@@ -16,6 +16,13 @@ import { AuditQueue } from '../../components/internetPrescription/AuditQueue';
 import { PrescribePanel } from '../../components/internetPrescription/PrescribePanel';
 import type { ConsultationSessionView } from '../../types/consultation';
 
+/** 深海蓝 VI 色板 */
+const JL = {
+  navy: '#0A2540', // 主色：深蓝
+  blue: '#1E5F8C', // 辅色
+  accent: '#4A90D9', // 强调色
+} as const;
+
 export default function InternetPrescriptionWorkbench() {
   const user = useAuthStore((s) => s.user);
   const { health, healthChecking, checkHealth } = useInternetPrescriptionStore();
@@ -60,6 +67,22 @@ export default function InternetPrescriptionWorkbench() {
       font={{ color: 'rgba(22,119,255,0.08)', fontSize: 13 }}
       gap={[150, 150]}
     >
+      {/* 深海蓝 Hero 横幅：标题 */}
+      <div
+        className="mb-3 flex flex-wrap items-center gap-3 px-5 py-4 text-white"
+        style={{
+          borderRadius: 8,
+          background: `linear-gradient(135deg, ${JL.navy} 0%, ${JL.blue} 55%, ${JL.accent} 100%)`,
+          boxShadow: '0 8px 24px rgba(10,37,64,0.25)',
+        }}
+      >
+        <div>
+          <h2 className="m-0 text-lg font-semibold">互联网电子处方工作台</h2>
+          <p className="m-0 mt-0.5 text-xs" style={{ opacity: 0.85 }}>
+            {isDoctor ? '医生开方：选择问诊会话后开具电子处方' : '药师审方：独立审核医生开具的处方'} · 健澜深海蓝 VI
+          </p>
+        </div>
+      </div>
       {!healthChecking && !health.online && (
         <Alert
           type="error"
