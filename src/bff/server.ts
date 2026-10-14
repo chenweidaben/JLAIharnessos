@@ -187,6 +187,7 @@ import { systemRoutes } from './routes/system';
 import { systemHealthRoutes } from './routes/systemHealth';
 import { agentHealthRoutes } from './routes/agentHealth';
 import { notifyConfigRoutes } from './routes/notifyConfig';
+import { insuranceAuditRoutes } from './routes/insuranceAudit';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -361,6 +362,7 @@ const allRoutes: RouteDef[] = [
   ...terminalQcRoutes,
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
+  ...insuranceAuditRoutes,
   ...emrLevel5Routes,
 ];
 
