@@ -47,6 +47,7 @@ import { inpatientCareRoutes } from './routes/inpatientCare';
 import { emergencyRoutes } from './routes/emergency';
 import { pharmacyRoutes } from './routes/pharmacy';
 import { medicalQcRoutes } from './routes/medicalQc';
+import { timelinessRoutes } from './routes/timeliness';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
@@ -118,6 +119,7 @@ import { nursingRecordRoutes } from './routes/nursingRecord';
 import { surgeryRecordRoutes } from './routes/surgeryRecord';
 import { medicalHeaderRoutes } from './routes/medicalHeader';
 import { medicalQcRoutes } from './routes/medicalQc';
+import { timelinessRoutes } from './routes/timeliness';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -186,6 +188,7 @@ const allRoutes: RouteDef[] = [
   ...emergencyRoutes,
   ...pharmacyRoutes,
   ...medicalQcRoutes,
+...timelinessRoutes,
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
   ...researchRoutes,
@@ -257,6 +260,7 @@ const allRoutes: RouteDef[] = [
 ...surgeryRecordRoutes,
 ...medicalHeaderRoutes,
 ...medicalQcRoutes,
+...timelinessRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
