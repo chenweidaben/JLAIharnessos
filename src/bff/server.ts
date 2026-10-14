@@ -170,6 +170,7 @@ import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
 import { referralRoutes } from './routes/referral';
 import { knowledgeBaseRoutes } from './routes/knowledgeBase';
+import { emrTemplateRoutes } from './routes/emrTemplate';
 import { agentBuilderRoutes } from './routes/agentBuilder';
 import { agentRuntimeRoutes } from './routes/agentRuntime';
 import { medmuseRoutes } from './routes/medmuse';
@@ -348,6 +349,7 @@ const allRoutes: RouteDef[] = [
   ...delegationRoutes,
   ...referralRoutes,
   ...knowledgeBaseRoutes,
+  ...emrTemplateRoutes,
   ...agentBuilderRoutes,
   ...agentRuntimeRoutes,
   ...systemHealthRoutes,

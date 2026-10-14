@@ -22,6 +22,8 @@ const PermissionManagementPage = lazy(() => import('@/pages/PermissionManagement
 const AuditLogPage = lazy(() => import('@/pages/AuditLogPage'));
 const LoginLogPage = lazy(() => import('@/pages/LoginLogPage'));
 const Dashboard = lazy(() => import('@/pages/dashboard'));
+// 院长数据驾驶舱（院长版）：六大核心指标大屏
+const CeoBoard = lazy(() => import('@/pages/dashboard/CeoBoard'));
 const PatientList = lazy(() => import('@/pages/patients'));
 const PatientDetail = lazy(() => import('@/pages/patients/detail'));
 const AgentChat = lazy(() => import('@/pages/agent'));
@@ -252,6 +254,8 @@ const QcRectificationPage = lazy(() => import('@/pages/qc/Rectification'));
 const BedMapPage = lazy(() => import('@/pages/nursing/BedMap'));
 // 科室月度运营报表（M102-D）
 const MonthlyReportPage = lazy(() => import('@/pages/ops/MonthlyReport'));
+// 电子病历模板管理（M103-A）
+const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -298,6 +302,8 @@ export default function AppRoutes() {
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          {/* 院长数据驾驶舱（院长版）：登录即可，六大核心指标大屏 */}
+          <Route path="dashboard/ceo-board" element={<CeoBoard />} />
           <Route path="patients" element={<PatientList />} />
           <Route path="patients/:id" element={<PatientDetail />} />
           {/* 患者 360 综合时间线（M96-C） */}
@@ -438,6 +444,8 @@ export default function AppRoutes() {
           <Route path="nursing/bed-map" element={<BedMapPage />} />
           {/* 科室月度运营报表（M102-D） */}
           <Route path="ops/monthly-report" element={<MonthlyReportPage />} />
+          {/* 电子病历模板管理（M103-A） */}
+          <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
