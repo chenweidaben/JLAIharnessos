@@ -256,6 +256,8 @@ const BedMapPage = lazy(() => import('@/pages/nursing/BedMap'));
 const MonthlyReportPage = lazy(() => import('@/pages/ops/MonthlyReport'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
+// 处方点评系统（M103-B）
+const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -446,6 +448,8 @@ export default function AppRoutes() {
           <Route path="ops/monthly-report" element={<MonthlyReportPage />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
+          {/* 处方点评系统（M103-B） */}
+          <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
