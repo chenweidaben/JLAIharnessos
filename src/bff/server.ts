@@ -181,6 +181,7 @@ import { rectificationRoutes } from './routes/rectification';
 import { skillRoutes } from './routes/skills';
 import { systemRoutes } from './routes/system';
 import { systemHealthRoutes } from './routes/systemHealth';
+import { notifyConfigRoutes } from './routes/notifyConfig';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -334,6 +335,7 @@ const allRoutes: RouteDef[] = [
   ...agentRuntimeRoutes,
   ...systemHealthRoutes,
   ...systemRoutes,
+  ...notifyConfigRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,
   ...tenantAdminRoutes,

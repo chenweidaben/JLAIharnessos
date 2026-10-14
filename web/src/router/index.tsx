@@ -234,6 +234,8 @@ const SystemHealthPage = lazy(() => import('@/pages/system/Health'));
 const PatientWorkbenchPage = lazy(() => import('@/pages/patientPortal/Workbench'));
 // 数据导出中心（M97-D）
 const SystemExportPage = lazy(() => import('@/pages/system/Export'));
+// 通知 webhook 配置（M98-D）
+const NotifyConfigPage = lazy(() => import('@/pages/system/NotifyConfig'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -423,6 +425,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="system:view">
                 <SystemExportPage />
+              </RequirePermission>
+            }
+          />
+          {/* 通知 webhook 配置（M98-D） */}
+          <Route
+            path="system/notify"
+            element={
+              <RequirePermission permission="system:view">
+                <NotifyConfigPage />
               </RequirePermission>
             }
           />
