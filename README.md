@@ -134,7 +134,7 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 | **/medmuse 工作台** | 岗位智能体对话页内嵌审批卡片，医师/药师可在对话流中直接批准或驳回待决事项 |
 | **双平台同步** | 代码仓库 GitCode + GitHub 双平台镜像同步 |
 
-### 版本迭代记录（v1.66–v1.77）
+### 版本迭代记录（v1.66–v1.89）
 
 | 版本 | 说明 |
 |---|---|
@@ -150,6 +150,18 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 | **v1.75.0-multimodality** | MEDMUSE 多模态扩展骨架 |
 | **v1.76.0-nursehandoff** | 护士交接班记录 |
 | **v1.77.0-insuranceaudit** | 医保智能审核规则引擎 |
+| **v1.78.0-readme** | README 版本迭代记录 |
+| **v1.79.0-quickcommands** | MEDMUSE 快捷指令面板 |
+| **v1.80.0-billlist** | 住院费用清单页 |
+| **v1.81.0-qcrectification** | 质控整改闭环看板 |
+| **v1.82.0-streaming** | MEDMUSE SSE 流式输出 |
+| **v1.83.0-criticalclosure** | 危急值闭环升级 |
+| **v1.84.0-bedmap** | 床位管理可视化 |
+| **v1.85.0-monthlyreport** | 科室月度运营报表 |
+| **v1.86.0-sessionhistory** | MEDMUSE 会话历史列表增强 |
+| **v1.87.0-emrtemplate** | 电子病历模板管理 |
+| **v1.88.0-prescriptionreview** | 处方点评系统 |
+| **v1.89.0-ceoboard** | 院长数据驾驶舱 |
 
 ### 临床业务体系
 
