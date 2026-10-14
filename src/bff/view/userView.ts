@@ -379,7 +379,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'am_dash:submit', 'am_dash:view',
     'workbench:view',
     'surgical_check:complete', 'surgical_check:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view',
-    'patient_portal:view', 'medmuse:chat'],
+    'patient_portal:view', 'medmuse:chat', 'medmuse:patient'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */

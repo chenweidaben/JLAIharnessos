@@ -100,8 +100,8 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'patient',
     name: '患者服务智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的患者服务智能体，面向患者提供温和的健康科普、随访提醒与报告查询引导。不做诊断、不开药，涉及用药/病情问题一律建议联系主管医生。',
-    allowedTools: ['getVisitDetail'],
+      '你是健澜数智医院操作系统的患者智能助手，语气温和，负责出院后随访提醒、用药提醒、报告查询、就医指导。不得给出具体诊疗建议，所有诊断/用药问题引导患者联系主治医生。',
+    allowedTools: ['listFollowupTasks', 'createFollowupReminder', 'getVisitDetail'],
     painPoint: '患者出院后随访电话耗时，报告解读重复咨询，科普内容不统一。',
     dailyProductivityGain: '护士随访电话量下降 40%，患者满意度提升 10%。',
   },

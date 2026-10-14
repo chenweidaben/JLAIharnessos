@@ -24,6 +24,7 @@ import * as pharmacyTaskRepo from '../../db/repositories/pharmacyTaskRepo';
 import * as prescriptionRepo from '../../db/repositories/prescriptionRepo';
 import * as drgRepo from '../../db/repositories/drgRepo';
 import * as dipRepo from '../../db/repositories/dipRepo';
+import * as followupApptRepo from '../../db/repositories/followupApptRepo';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -263,6 +264,47 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  {
+    name: 'listFollowupTasks',
+    description: '列出患者本人某次就诊关联的出院随访任务',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listFollowupTasks',
+        description: '按就诊ID列出患者的随访预约',
+        parameters: {
+          type: 'object',
+          properties: {
+            visitId: { type: 'string', description: '就诊ID' },
+          },
+          required: ['visitId'],
+        },
+      },
+    },
+  },
+  {
+    name: 'createFollowupReminder',
+    description: '为患者预约出院随访号源（需医生/患者二次确认）',
+    riskLevel: 'warning',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'createFollowupReminder',
+        description: '为患者创建随访预约，执行前必须二次确认',
+        parameters: {
+          type: 'object',
+          properties: {
+            dischargePlanId: { type: 'string', description: '出院计划ID' },
+            scheduleId: { type: 'string', description: '随访排班ID' },
+            appointmentDate: { type: 'string', description: '预约日期 YYYY-MM-DD' },
+            department: { type: 'string', description: '随访科室' },
+          },
+          required: ['dischargePlanId', 'scheduleId', 'appointmentDate', 'department'],
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -357,6 +399,10 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.reviewPrescription(args, ctx);
         case 'listOverbudgetCases':
           return await this.listOverbudgetCases(args, ctx);
+        case 'listFollowupTasks':
+          return await this.listFollowupTasks(args, ctx);
+        case 'createFollowupReminder':
+          return await this.createFollowupReminder(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -755,6 +801,60 @@ export class DefaultToolExecutor implements ToolExecutor {
         period: latestDip ? latestDip.period : null,
         totalOverbudget,
         overbudgetCount: enriched.length,
+      },
+    };
+  }
+
+  /**
+   * listFollowupTasks（患者端，info）：
+   * 按就诊ID列出已预约的随访号。FollowupAppt 字段映射：
+   *   id→followupId, appointmentDate→plannedDate, department→type。
+   */
+  private async listFollowupTasks(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const visitId = str(args, 'visitId');
+    const rows = await followupApptRepo.listByVisit(visitId);
+    const list = rows.map((r) => ({
+      followupId: r.id,
+      visitId,
+      plannedDate: r.appointmentDate,
+      status: r.status,
+      type: r.department,
+      note: null as string | null,
+    }));
+    return { ok: true, result: { tasks: list, total: list.length } };
+  }
+
+  /**
+   * createFollowupReminder（患者端，warning）：
+   *  - 函数体顶部强制 confirmed 校验，未确认抛 CONFIRMATION_REQUIRED；
+   *  - 直接委托 followupApptRepo.bookFollowup，号源占用在事务内完成；
+   *  - 返回预约ID与日期，供前端展示。
+   */
+  private async createFollowupReminder(
+    args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    if (!args.confirmed) throw new Error('CONFIRMATION_REQUIRED');
+    const dischargePlanId = str(args, 'dischargePlanId');
+    const scheduleId = str(args, 'scheduleId');
+    const appointmentDate = str(args, 'appointmentDate');
+    const department = str(args, 'department');
+    const rec = await followupApptRepo.bookFollowup({
+      dischargePlanId,
+      scheduleId,
+      appointmentDate,
+      department,
+      bookedBy: ctx.userId,
+    });
+    return {
+      ok: true,
+      result: {
+        followupId: rec.id,
+        scheduledDate: rec.appointmentDate,
+        createdAt: rec.createdAt,
       },
     };
   }
