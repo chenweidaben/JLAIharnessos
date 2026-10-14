@@ -19,6 +19,9 @@ import {
   requeueDeadLetter,
 } from '../../db/repositories/outboxRepo';
 
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，事件补拉返回内存空兜底。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
 export const outboxRoutes: RouteDef[] = [
   {
     // M7-E 事件重连补拉：任何登录用户可拉取 id > after_id 的已发布事件（WS 断连补拉）
@@ -29,6 +32,7 @@ export const outboxRoutes: RouteDef[] = [
       // 防御性登录校验（框架层 auth:true 已做，handle 内再校验，保证直接调用也安全）
       const unauthorized = requireAuth(c);
       if (unauthorized) return unauthorized;
+      if (isDemo) return json(ok({ items: [], demo: true }));
       try {
         const afterId = c.query.get('after_id') ? Number(c.query.get('after_id')) : 0;
         const limit = c.query.get('limit') ? Number(c.query.get('limit')) : 100;

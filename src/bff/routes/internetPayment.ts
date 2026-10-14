@@ -17,6 +17,9 @@ import {
   type RouteDef,
 } from '../types';
 import { requirePermissionCode, requireRole } from '../middleware/auth';
+
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 import { getUserById, getUserRoleLinks } from '../../db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import {
@@ -197,6 +200,7 @@ export const internetPaymentRoutes: RouteDef[] = [
     path: '/api/v1/internet/payment/patient-profile',
     handle: async (c) => {
       if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录', c.traceId), 401);
+      if (isDemo) return json(ok({ accountId: c.user.id, patientId: 'P100001', demo: true }, 'ok', c.traceId));
       try {
         const patientId = await getPatientIdByAccount(c.user.id);
         if (!patientId) {

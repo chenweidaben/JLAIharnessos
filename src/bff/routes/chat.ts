@@ -23,11 +23,15 @@ import {
 
 const RECENT_MESSAGE_LIMIT = 200;
 
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存空兜底。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
 export const chatRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/chat/conversations',
     handle: async (c: Ctx) => {
+      if (isDemo) return json(ok([], 'ok', c.traceId));
       const list = await listConversations({ userId: c.user?.id, limit: 50 });
       return json(ok(list, 'ok', c.traceId));
     },
@@ -102,6 +106,7 @@ export const chatRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/chat/conversations/:id/messages',
     handle: async (c: Ctx) => {
+      if (isDemo) return json(ok([], 'ok', c.traceId));
       const conversationId = c.params.id;
       const conv = await getConversationById(conversationId);
       if (!conv) {

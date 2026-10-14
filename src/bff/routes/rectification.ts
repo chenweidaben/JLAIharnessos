@@ -28,6 +28,9 @@ import {
   submitRectification,
 } from '../aggregators/rectificationAggregator';
 
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
   const user = await getUserById(c.user.id);
@@ -59,6 +62,13 @@ function authOnly<T>(
   render: (data: T) => Response = (d) => json(ok(d)),
 ) {
   return async (c: Ctx): Promise<Response> => {
+    if (isDemo) {
+      // 列表→空数组；stats/详情→带 demo 标记的空对象（shape 与真实返回一致，不伪造数字）
+      const path = new URL(c.req.url).pathname;
+      if (path.endsWith('/stats')) return json(ok({ demo: true }));
+      if (/\/rectifications\/[^/]+$/.test(path)) return json(ok({ demo: true }));
+      return json(ok([]));
+    }
     const view = await requester(c);
     if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在'), 401);
     try {

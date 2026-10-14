@@ -24,6 +24,8 @@ import {
 import { generateAiRecord } from '../aggregators/aiRecordAggregator';
 
 /** 解析登录用户视图（含科室/数据范围） */
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
   const user = await getUserById(c.user.id);
@@ -104,6 +106,7 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/queue',
     handle: async (c) => {
+      if (isDemo) return json(ok([]));
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const q = c.query.get('dept');
@@ -118,6 +121,7 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/encounters/:id',
     handle: async (c) => {
+      if (isDemo) return json(ok({ demo: true, encounterId: c.params.id }));
       const bundle = await getEncounter(c.params.id);
       if (!bundle) return json(fail(ErrorCode.NOT_FOUND, '就诊不存在'), 404);
       return json(ok(bundle));
@@ -269,6 +273,7 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/stats',
     handle: async (c) => {
+      if (isDemo) return json(ok({ demo: true }));
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const dept = c.query.get('dept') ?? view.deptName;
@@ -282,6 +287,7 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/drugs',
     handle: async (c) => {
+      if (isDemo) return json(ok([]));
       const keyword = c.query.get('keyword') ?? '';
       return json(ok(await findDrugs(keyword)));
     },

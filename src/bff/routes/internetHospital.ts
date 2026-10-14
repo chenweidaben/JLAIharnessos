@@ -16,6 +16,9 @@ import {
   type RouteDef,
 } from '../types';
 import { requirePermissionCode, requireRole } from '../middleware/auth';
+
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 import {
   InternetPatientError,
   loginWithWechat,
@@ -176,6 +179,7 @@ export const internetHospitalRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requireRole(c, 'doctor', 'pharmacist', 'nurse');
       if (denied) return denied;
+      if (isDemo) return json(ok({ demo: true }));
       try {
         return json(ok(await getMyPractitioner(c.user!.id)));
       } catch (err) {
