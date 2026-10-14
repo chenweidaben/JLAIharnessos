@@ -53,6 +53,7 @@ import { aiNoteDraftRoutes } from './routes/aiNoteDraft';
 import { medReviewRoutes } from './routes/medReview';
 import { diagnosisSuggestionRoutes } from './routes/diagnosisSuggestion';
 import { pathwayRecommendationRoutes } from './routes/pathwayRecommendation';
+import { losPredictionRoutes } from './routes/losPrediction';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
@@ -130,6 +131,7 @@ import { aiNoteDraftRoutes } from './routes/aiNoteDraft';
 import { medReviewRoutes } from './routes/medReview';
 import { diagnosisSuggestionRoutes } from './routes/diagnosisSuggestion';
 import { pathwayRecommendationRoutes } from './routes/pathwayRecommendation';
+import { losPredictionRoutes } from './routes/losPrediction';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -204,6 +206,7 @@ const allRoutes: RouteDef[] = [
 ...medReviewRoutes,
 ...diagnosisSuggestionRoutes,
 ...pathwayRecommendationRoutes,
+...losPredictionRoutes,
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
   ...researchRoutes,
@@ -281,6 +284,7 @@ const allRoutes: RouteDef[] = [
 ...medReviewRoutes,
 ...diagnosisSuggestionRoutes,
 ...pathwayRecommendationRoutes,
+...losPredictionRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
