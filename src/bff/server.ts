@@ -178,6 +178,8 @@ import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
 import { skillRoutes } from './routes/skills';
 import { systemRoutes } from './routes/system';
+import { systemHealthRoutes } from './routes/systemHealth';
+import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 // ============================================================================
@@ -326,6 +328,7 @@ const allRoutes: RouteDef[] = [
   ...knowledgeBaseRoutes,
   ...agentBuilderRoutes,
   ...agentRuntimeRoutes,
+  ...systemHealthRoutes,
   ...systemRoutes,
   ...permissionAdminRoutes,
   ...skillRoutes,
@@ -606,6 +609,7 @@ async function handleFetch(
       code: status,
       durationSeconds: (Date.now() - startedAt) / 1000,
     });
+    recordSystemHttpRequest();
   }
 }
 

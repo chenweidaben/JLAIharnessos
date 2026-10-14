@@ -149,6 +149,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'dept_cockpit:view',
     'drug_review:view',
     'emr_level5:view',
+    'system:view',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
