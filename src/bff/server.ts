@@ -70,6 +70,7 @@ import { imagingInterpretRoutes } from './routes/imagingInterpret';
 import { criticalRoutes } from './routes/critical';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
+import { surgeryScheduleRoutes } from './routes/surgerySchedule';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
 import { vteRoutes } from './routes/vte';
@@ -230,6 +231,7 @@ const allRoutes: RouteDef[] = [
   ...criticalRoutes,
   ...reconRoutes,
   ...surgeryRoutes,
+  ...surgeryScheduleRoutes,
   ...transfusionRoutes,
   ...bloodQualityRoutes,
   ...vteRoutes,
