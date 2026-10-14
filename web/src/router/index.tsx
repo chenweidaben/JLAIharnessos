@@ -220,6 +220,8 @@ const AiNursingPlanPage = lazy(() => import('@/pages/emrGap/aiNursingPlan'));
 const MedmuseApprovalsPage = lazy(() => import('@/pages/medmuse/Approvals'));
 // AI 病历终末质控（M93-B）
 const TerminalQcPage = lazy(() => import('@/pages/emrGap/terminalQc'));
+// MEDMUSE 科主任驾驶舱（M94-A）
+const DeptCockpitPage = lazy(() => import('@/pages/medmuse/DeptCockpit'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -370,6 +372,15 @@ export default function AppRoutes() {
           <Route path="medmuse" element={<MedMuseChatPage />} />
           {/* MEDMUSE 审批中心（M93-A）：待审批工单列表 + approve/reject */}
           <Route path="medmuse/approvals" element={<MedmuseApprovalsPage />} />
+          {/* MEDMUSE 科主任驾驶舱（M94-A）：科室 KPI 日报 + 质量预警 */}
+          <Route
+            path="medmuse/dept-cockpit"
+            element={
+              <RequirePermission permission="dept_cockpit:view">
+                <DeptCockpitPage />
+              </RequirePermission>
+            }
+          />
           <Route path="builder/market" element={<BuilderMarket />} />
           {/* 智能体运行台（M4-C）：执行已发布智能体 + 实例/节点回放 */}
           <Route path="agent-runtime" element={<AgentRuntime />} />
