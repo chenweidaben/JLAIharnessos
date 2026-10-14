@@ -25,6 +25,7 @@ const Dashboard = lazy(() => import('@/pages/dashboard'));
 const PatientList = lazy(() => import('@/pages/patients'));
 const PatientDetail = lazy(() => import('@/pages/patients/detail'));
 const AgentChat = lazy(() => import('@/pages/agent'));
+const MedMuseChatPage = lazy(() => import('@/pages/agent/MedMuseChatPage'));
 const Alerts = lazy(() => import('@/pages/alerts'));
 const Emergency = lazy(() => import('@/pages/emergency'));
 const EmergencyTriage = lazy(() => import('@/pages/emergency/triage-detail'));
@@ -352,6 +353,8 @@ export default function AppRoutes() {
             }
           />
           <Route path="agent" element={<AgentChat />} />
+          {/* MEDMUSE 多岗位智能体聊天（M89-H）：confidence + 免责声明 + 审批卡片 */}
+          <Route path="medmuse" element={<MedMuseChatPage />} />
           <Route path="builder/market" element={<BuilderMarket />} />
           {/* 智能体运行台（M4-C）：执行已发布智能体 + 实例/节点回放 */}
           <Route path="agent-runtime" element={<AgentRuntime />} />
