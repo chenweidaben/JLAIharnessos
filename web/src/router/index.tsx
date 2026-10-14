@@ -201,6 +201,16 @@ const SkillStudio = lazy(() =>
 );
 // 影像 AI 辅诊（DAMO-RADAR）
 const ImagingAiReportPage = lazy(() => import('@/pages/imaging/AiReportPage'));
+// AI 原生五剑客（M88-A~E）
+const AiNoteDraftPage = lazy(() => import('@/pages/aiNative/noteDraft'));
+const MedReviewPage = lazy(() => import('@/pages/aiNative/medReview'));
+const DiagnosisSuggestionPage = lazy(() => import('@/pages/aiNative/diagnosis'));
+const PathwayRecommendationPage = lazy(() => import('@/pages/aiNative/pathwayRec'));
+const LosPredictionPage = lazy(() => import('@/pages/aiNative/losPrediction'));
+// EMR 文书缺口（出院小结 / M87-C 时效监控 / M87-D 评级自评）
+const EmrDischargeSummaryPage = lazy(() => import('@/pages/emrGap/dischargeSummary'));
+const EmrTimelinessPage = lazy(() => import('@/pages/emrGap/timeliness'));
+const EmrAssessmentPage = lazy(() => import('@/pages/emrGap/emrAssessment'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -255,6 +265,67 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="imaging:view">
                 <ImagingAiReportPage />
+              </RequirePermission>
+            }
+          />
+          {/* AI 原生五剑客（M88-A~E） */}
+          <Route
+            path="ai/note-draft"
+            element={
+              <RequirePermission permission="ai_note:generate">
+                <AiNoteDraftPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="ai/med-review"
+            element={
+              <RequirePermission permission="med_review:view">
+                <MedReviewPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="ai/diagnosis"
+            element={
+              <RequirePermission permission="ai_diagnosis:view">
+                <DiagnosisSuggestionPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="ai/pathway-rec"
+            element={
+              <RequirePermission permission="ai_pathway:view">
+                <PathwayRecommendationPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="ai/los-prediction"
+            element={
+              <RequirePermission permission="ai_los_pred:view">
+                <LosPredictionPage />
+              </RequirePermission>
+            }
+          />
+          {/* 出院小结：登录即可查询，写/审按钮级权限控制 */}
+          <Route path="emr/discharge-summary" element={<EmrDischargeSummaryPage />} />
+          {/* 文书时效监控（M87-C） */}
+          <Route
+            path="emr/timeliness"
+            element={
+              <RequirePermission permission="timeliness:view">
+                <EmrTimelinessPage />
+              </RequirePermission>
+            }
+          />
+          {/* 电子病历评级自评（M87-D） */}
+          <Route
+            path="emr/assessment"
+            element={
+              <RequirePermission permission="emr_assessment:view">
+                <EmrAssessmentPage />
               </RequirePermission>
             }
           />
