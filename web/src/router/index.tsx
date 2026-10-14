@@ -230,6 +230,8 @@ const EmrLevel5Page = lazy(() => import('@/pages/emrGap/level5'));
 const Patient360Timeline = lazy(() => import('@/pages/patients/Patient360'));
 // 系统健康监控仪表盘（M96-D）
 const SystemHealthPage = lazy(() => import('@/pages/system/Health'));
+// 互联网医院患者端简化工作台（M97-C）
+const PatientWorkbenchPage = lazy(() => import('@/pages/patientPortal/Workbench'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -401,6 +403,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="system:view">
                 <SystemHealthPage />
+              </RequirePermission>
+            }
+          />
+          {/* 互联网医院患者端简化工作台（M97-C） */}
+          <Route
+            path="portal/workbench"
+            element={
+              <RequirePermission permission="patient_portal:view">
+                <PatientWorkbenchPage />
               </RequirePermission>
             }
           />
