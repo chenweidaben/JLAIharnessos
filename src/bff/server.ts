@@ -51,6 +51,7 @@ import { timelinessRoutes } from './routes/timeliness';
 import { emrAssessmentRoutes } from './routes/emrAssessment';
 import { aiNoteDraftRoutes } from './routes/aiNoteDraft';
 import { medReviewRoutes } from './routes/medReview';
+import { diagnosisSuggestionRoutes } from './routes/diagnosisSuggestion';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
@@ -126,6 +127,7 @@ import { timelinessRoutes } from './routes/timeliness';
 import { emrAssessmentRoutes } from './routes/emrAssessment';
 import { aiNoteDraftRoutes } from './routes/aiNoteDraft';
 import { medReviewRoutes } from './routes/medReview';
+import { diagnosisSuggestionRoutes } from './routes/diagnosisSuggestion';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -198,6 +200,7 @@ const allRoutes: RouteDef[] = [
 ...emrAssessmentRoutes,
 ...aiNoteDraftRoutes,
 ...medReviewRoutes,
+...diagnosisSuggestionRoutes,
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
   ...researchRoutes,
@@ -273,6 +276,7 @@ const allRoutes: RouteDef[] = [
 ...emrAssessmentRoutes,
 ...aiNoteDraftRoutes,
 ...medReviewRoutes,
+...diagnosisSuggestionRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
