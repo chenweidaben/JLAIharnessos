@@ -177,6 +177,7 @@ import { medmuseRoutes } from './routes/medmuse';
 import { medmuseRoundReportRoutes } from './routes/medmuseRoundReport';
 import { aiNoteQcRoutes } from './routes/aiNoteQc';
 import { aiNursingPlanRoutes } from './routes/aiNursingPlan';
+import { terminalQcRoutes } from './routes/terminalQc';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
@@ -343,6 +344,7 @@ const allRoutes: RouteDef[] = [
   ...medmuseRoundReportRoutes,
   ...aiNoteQcRoutes,
   ...aiNursingPlanRoutes,
+  ...terminalQcRoutes,
 ];
 
 interface Compiled {

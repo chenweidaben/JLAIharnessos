@@ -356,6 +356,15 @@ export default function AppRoutes() {
               </RequirePermission>
             }
           />
+          {/* AI 病历终末质控（M93-B）：甲/乙/丙级判定 */}
+          <Route
+            path="emr/terminal-qc"
+            element={
+              <RequirePermission permission="terminal_qc:view">
+                <TerminalQcPage />
+              </RequirePermission>
+            }
+          />
           <Route path="agent" element={<AgentChat />} />
           {/* MEDMUSE 多岗位智能体聊天（M89-H）：confidence + 免责声明 + 审批卡片 */}
           <Route path="medmuse" element={<MedMuseChatPage />} />
