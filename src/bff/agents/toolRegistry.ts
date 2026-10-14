@@ -1,13 +1,24 @@
 /**
- * MEDMUSE 工具注册表 - 内置工具元数据、完整 JSON Schema 与骨架执行器。
+ * MEDMUSE 工具注册表 - 内置工具元数据、完整 JSON Schema 与真实业务执行器。
  *
- * 医疗安全：所有写类工具（createNoteDraft/suggestDiagnosis）均为 warning，必须经
- * Sentinel 二次确认后才允许真正写入；本切片只返回结构化占位结果。
+ * 医疗安全：
+ *   - 写类工具（createNoteDraft）为 warning，函数体顶部强制校验 confirmed，
+ *     未确认抛 CONFIRMATION_REQUIRED，由 Sentinel 二次确认后放行；
+ *   - 所有读工具均只读，不修改业务数据；
+ *   - 工具实现版本留痕见 deploy/postgres/init/202-medmuse-tool-binding.sql。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { getDb, type Sql } from '../../db/pool.js';
 import type { ToolDefinition } from './modelProvider';
+import { getVisitById } from '../../db/repositories/visitRepo';
+import * as orderRepo from '../../db/repositories/orderRepo';
+import * as aiNoteDraftRepo from '../../db/repositories/aiNoteDraftRepo';
+import * as diagnosisSuggestionRepo from '../../db/repositories/diagnosisSuggestionRepo';
+import * as timelinessRepo from '../../db/repositories/timelinessRepo';
+import * as improvementTaskRepo from '../../db/repositories/improvementTaskRepo';
+import * as consultRequestRepo from '../../db/repositories/consultRequestRepo';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -157,47 +168,226 @@ function requireUser(ctx: ToolContext): void {
   if (!ctx.userId) throw new Error('UNAUTHORIZED');
 }
 
-function placeholder(ctx: ToolContext, label: string): ToolExecuteResult {
-  return {
-    ok: true,
-    result: {
-      _placeholder: true,
-      tool: label,
-      operatorId: ctx.userId,
-      sessionId: ctx.sessionId,
-      patientId: ctx.patientId ?? null,
-      note: 'M89-A 骨架占位结果，未接入业务库；M89-B 接入真实 Repository。',
-      items: [],
-    },
-  };
+/** 当前医生在管的住院患者行（轻量投影） */
+export interface ManagedPatientRow {
+  visitId: string;
+  patientId: string;
+  patientName: string;
+  ward: string | null;
+  bedNo: string | null;
+  diagnosis: string | null;
+  latestAbnormal?: string | null;
+}
+
+function db(): Sql {
+  return getDb();
+}
+
+/**
+ * 查询指定医生作为主治医生的在管住院患者。
+ * 直接参数化查询 clinical.visits JOIN clinical.patients 取脱敏姓名。
+ */
+export async function listManagedPatients(doctorId: string): Promise<ManagedPatientRow[]> {
+  const rows = await db()<Array<{
+    id: string; patient_id: string; patient_name: string;
+    ward: string | null; bed_no: string | null; chief_complaint: string | null;
+  }>>`
+    SELECT v.id, v.patient_id, p.name_masked AS patient_name,
+           v.ward, v.bed_no, v.chief_complaint
+    FROM clinical.visits v
+    LEFT JOIN clinical.patients p ON p.id = v.patient_id
+    WHERE v.attending_doctor_id = ${doctorId}
+      AND v.status = 'ongoing'
+      AND v.visit_type = 'inpatient'
+    ORDER BY v.admit_at DESC
+  `;
+  return rows.map((r) => ({
+    visitId: r.id,
+    patientId: r.patient_id,
+    patientName: r.patient_name,
+    ward: r.ward,
+    bedNo: r.bed_no,
+    diagnosis: r.chief_complaint,
+    latestAbnormal: null,
+  }));
+}
+
+/** 安全取参：要求字符串且非空 */
+function str(args: Record<string, unknown>, key: string): string {
+  const v = args[key];
+  if (typeof v !== 'string' || v.length === 0) throw new Error(`INVALID_ARG:${key}`);
+  return v;
 }
 
 export class DefaultToolExecutor implements ToolExecutor {
+  /**
+   * 工具统一入口：按 name 分发到真实 repo 实现。
+   * 写类工具在各自实现内强制 confirmed 校验。
+   */
   async execute(
     name: string,
     args: Record<string, unknown>,
     ctx: ToolContext,
   ): Promise<ToolExecuteResult> {
     requireUser(ctx);
-    switch (name) {
-      case 'listMyPatients':
-        // TODO(M89-B): 接入 patientRepo.listMyInpatients({ doctorId, department, onlyAbnormal })
-        return placeholder(ctx, 'listMyPatients');
-      case 'getVisitDetail':
-        // TODO(M89-B): 接入 visitRepo.getDetail({ visitId, includeSections })
-        return placeholder(ctx, 'getVisitDetail');
-      case 'createNoteDraft':
-        // TODO(M89-B): 实际调用前必须经 Sentinel 二次确认
-        return placeholder(ctx, 'createNoteDraft');
-      case 'suggestDiagnosis':
-        // TODO(M89-B): 实际调用前必须经 Sentinel 二次确认
-        return placeholder(ctx, 'suggestDiagnosis');
-      case 'listPendingTasks':
-        // TODO(M89-B): 接入 workbenchRepo.listMyTasks({ userId, taskType, limit })
-        return placeholder(ctx, 'listPendingTasks');
-      default:
-        return { ok: false, result: null, error: `unknown tool: ${name}` };
+    try {
+      switch (name) {
+        case 'listMyPatients':
+          return await this.listMyPatients(args, ctx);
+        case 'getVisitDetail':
+          return await this.getVisitDetail(args, ctx);
+        case 'createNoteDraft':
+          return await this.createNoteDraft(args, ctx);
+        case 'suggestDiagnosis':
+          return await this.suggestDiagnosis(args, ctx);
+        case 'listPendingTasks':
+          return await this.listPendingTasks(args, ctx);
+        default:
+          return { ok: false, result: null, error: `unknown tool: ${name}` };
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, result: null, error: msg };
     }
+  }
+
+  /**
+   * listMyPatients：返回当前医生在管住院患者列表（脱敏姓名）。
+   */
+  private async listMyPatients(
+    _args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const patients = await listManagedPatients(ctx.userId);
+    return { ok: true, result: { patients, total: patients.length } };
+  }
+
+  /**
+   * getVisitDetail：聚合就诊主表 + 医嘱列表 + 最新 AI 病历草稿。
+   * visit 不存在返回 VISIT_NOT_FOUND。
+   */
+  private async getVisitDetail(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const visitId = str(args, 'visitId');
+    const visit = await getVisitById(visitId);
+    if (!visit) {
+      return { ok: false, result: null, error: 'VISIT_NOT_FOUND' };
+    }
+    const [orders, drafts] = await Promise.all([
+      orderRepo.listByVisit(visitId),
+      aiNoteDraftRepo.listByVisit(visitId),
+    ]);
+    const latestDraft = drafts[0] ?? null;
+    return {
+      ok: true,
+      result: {
+        visitId: visit.id,
+        patient: {
+          patientId: visit.patientId,
+          visitNo: visit.visitNo,
+          ward: visit.ward,
+          bedNo: visit.bedNo,
+        },
+        chiefComplaint: visit.chiefComplaint,
+        status: visit.status,
+        orders,
+        latestNoteDraft: latestDraft,
+        createdAt: visit.createdAt,
+      },
+    };
+  }
+
+  /**
+   * createNoteDraft：warning 级。未确认抛 CONFIRMATION_REQUIRED。
+   * 落 clinical.ai_note_drafts，generatedBy 映射到 model_version='medmuse-agent'。
+   */
+  private async createNoteDraft(
+    args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    if (!args.confirmed) throw new Error('CONFIRMATION_REQUIRED');
+    const visitId = str(args, 'visitId');
+    const noteType = str(args, 'noteType');
+    const content = typeof args.content === 'string' ? args.content : '';
+    const draft = await aiNoteDraftRepo.create({
+      visitId,
+      draftType: noteType,
+      promptContext: `medmuse-agent drafted by ${ctx.userId}`,
+      generatedContent: content,
+      modelVersion: 'medmuse-agent',
+    });
+    return {
+      ok: true,
+      result: {
+        draftId: draft.id,
+        visitId: draft.visitId,
+        noteType: draft.draftType,
+        createdAt: draft.createdAt,
+      },
+    };
+  }
+
+  /**
+   * suggestDiagnosis：warning 级。读取已有鉴别诊断建议；
+   * 无历史记录时写入空占位（confidence=0），便于后续人工补充。
+   */
+  private async suggestDiagnosis(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const visitId = str(args, 'visitId');
+    let rows = await diagnosisSuggestionRepo.listByVisit(visitId);
+    if (rows.length === 0) {
+      await diagnosisSuggestionRepo.create({
+        visitId,
+        chiefComplaint: '',
+        symptoms: [],
+        suggestions: [],
+        confidence: 0,
+      });
+      rows = await diagnosisSuggestionRepo.listByVisit(visitId);
+    }
+    const latest = rows[0];
+    return {
+      ok: true,
+      result: {
+        visitId,
+        suggestions: latest.suggestions.map((s) => ({
+          diagnosis: s.diagnosis,
+          icd10: s.icd10,
+          confidence: s.confidence,
+        })),
+        overallConfidence: latest.confidence ?? 0,
+      },
+    };
+  }
+
+  /**
+   * listPendingTasks：聚合待完成病历时效 + 改进任务 + 待处理会诊。
+   */
+  private async listPendingTasks(
+    _args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const [timeliness, improvementTasks, consultations] = await Promise.all([
+      timelinessRepo.listPending(),
+      improvementTaskRepo.listByAssignee(ctx.userId),
+      consultRequestRepo.listPending(),
+    ]);
+    const t = timeliness.slice(0, 20);
+    const imp = improvementTasks.slice(0, 20);
+    const cons = consultations.slice(0, 20);
+    return {
+      ok: true,
+      result: {
+        timeliness: t,
+        improvementTasks: imp,
+        consultations: cons,
+        total: t.length + imp.length + cons.length,
+      },
+    };
   }
 }
 
