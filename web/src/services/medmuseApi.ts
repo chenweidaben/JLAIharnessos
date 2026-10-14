@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import request, { get, post } from './request';
+import request, { get } from './request';
 
 /** 会话条目（listSessions 返回） */
 export interface MedmuseSession {
@@ -46,9 +46,12 @@ export interface MedmuseApproval {
   createdAt: string;
 }
 
-/** 发消息响应（runAgentTurn 返回） */
+/** 发消息响应（runAgentTurn 返回：reply + newMessages；message 为兼容旧字段） */
 export interface MedmuseChatResult {
-  message: MedmuseMessage;
+  message?: MedmuseMessage;
+  reply?: string;
+  confidence?: 'high' | 'medium' | 'low';
+  disclaimer?: string;
   pendingApproval?: MedmuseApproval | null;
   toolCalls?: Array<{ name: string; summary?: string }>;
 }

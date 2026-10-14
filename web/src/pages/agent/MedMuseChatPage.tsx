@@ -185,7 +185,22 @@ export default function MedMuseChatPage() {
     try {
       const result: MedmuseChatResult = await sendMessage(sessionId!, text);
       if (result?.message) {
-        setMessages((prev) => [...prev, result.message]);
+        setMessages((prev) => [...prev, result.message!]);
+      } else if (result?.reply) {
+        // 后端 runAgentTurn 返回 reply：agent 回复气泡即时补上；
+        // 刷新/切会话后的完整历史由 listMessages 从后端拉取恢复。
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `local-agent-${Date.now()}`,
+            sessionId: sessionId!,
+            role: 'assistant',
+            content: result.reply!,
+            confidence: result.confidence ?? 'low',
+            disclaimer: result.disclaimer ?? null,
+            createdAt: new Date().toISOString(),
+          },
+        ]);
       }
       if (result?.pendingApproval) {
         setPendingApproval(result.pendingApproval);
@@ -233,7 +248,7 @@ export default function MedMuseChatPage() {
         <span style={{ color: PRIMARY, fontWeight: 600 }}>当前角色：</span>
         <Select
           value={roleCode}
-          options={ROLE_OPTIONS}
+          options={[...ROLE_OPTIONS]}
           style={{ width: 160 }}
           onChange={(v) => setRoleCode(v as RoleCode)}
         />

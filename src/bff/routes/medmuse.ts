@@ -10,6 +10,12 @@
  */
 
 import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
+import {
+  insertMessage,
+  listBySession,
+  markRead,
+  toMessageView,
+} from '@/db/repositories/medmuseMessageRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
@@ -21,11 +27,28 @@ import {
   getSessionById,
   listAgents,
   listApprovals,
-  listMessages,
   listSessions,
   getApprovalById,
 } from '../agents/medmuseRepo';
+import { TemplateFallbackProvider } from '../agents/modelProvider';
 import { resolveApprovalTicket, expireStaleApprovals } from '../agents/sentinel';
+
+/** 无 DB 演示模式：会话/消息走进程内内存兜底，不连 PostgreSQL、不抛错 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+interface DemoMedmuseSession {
+  id: string;
+  agentId: string;
+  userId: string;
+  title: string;
+  createdAt: string;
+  lastActiveAt: string;
+}
+const demoSessions = new Map<string, DemoMedmuseSession>();
+
+function newDemoSessionId(): string {
+  return `demo_sess_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+}
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -58,8 +81,6 @@ export const medmuseRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requirePermissionCode(c, 'medmuse:chat');
       if (denied) return denied;
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
       const idemKey = getIdempotencyKey(c);
       if (!idemKey) {
         return json(fail(ErrorCode.BAD_REQUEST, '缺少 Idempotency-Key 请求头', c.traceId), 400);
@@ -70,6 +91,27 @@ export const medmuseRoutes: RouteDef[] = [
         if (!roleCode) {
           return json(fail(ErrorCode.BAD_REQUEST, 'roleCode 不能为空', c.traceId), 400);
         }
+        // DEMO：不连 PG，会话写入内存 Map
+        if (isDemo) {
+          const now = new Date().toISOString();
+          const session: DemoMedmuseSession = {
+            id: newDemoSessionId(),
+            agentId: 'demo-agent',
+            userId: c.user!.id,
+            title: body?.title?.trim() || '新对话',
+            createdAt: now,
+            lastActiveAt: now,
+          };
+          demoSessions.set(session.id, session);
+          return json(
+            ok({
+              session,
+              agent: { id: 'demo-agent', roleCode, name: `${roleCode} 智能体（演示）` },
+            }),
+          );
+        }
+        const view = await requester(c);
+        if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
         const agent = await getAgentByRole(roleCode);
         if (!agent) {
           return json(fail(ErrorCode.NOT_FOUND, `未找到岗位 agent: ${roleCode}`, c.traceId), 404);
@@ -93,6 +135,13 @@ export const medmuseRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requirePermissionCode(c, 'medmuse:chat');
       if (denied) return denied;
+      // DEMO：不连 PG，直接返回内存会话列表（当前用户）
+      if (isDemo) {
+        const list = [...demoSessions.values()]
+          .filter((s) => s.userId === c.user?.id)
+          .sort((a, b) => b.lastActiveAt.localeCompare(a.lastActiveAt));
+        return json(ok(list));
+      }
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
       try {
@@ -109,8 +158,6 @@ export const medmuseRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requirePermissionCode(c, 'medmuse:chat');
       if (denied) return denied;
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
       const idemKey = getIdempotencyKey(c);
       if (!idemKey) {
         return json(fail(ErrorCode.BAD_REQUEST, '缺少 Idempotency-Key 请求头', c.traceId), 400);
@@ -121,6 +168,44 @@ export const medmuseRoutes: RouteDef[] = [
         if (!content) {
           return json(fail(ErrorCode.BAD_REQUEST, 'content 不能为空', c.traceId), 400);
         }
+        // DEMO：不连 PG/模型，消息经 medmuseMessageRepo 内存落库，模板兜底回复
+        if (isDemo) {
+          const demoSession = demoSessions.get(c.params.sessionId);
+          if (!demoSession || demoSession.userId !== c.user!.id) {
+            return json(fail(ErrorCode.NOT_FOUND, '会话不存在或无权访问', c.traceId), 404);
+          }
+          await insertMessage({
+            sessionId: demoSession.id,
+            role: 'user',
+            content,
+            idempotencyKey: idemKey,
+          });
+          const provider = new TemplateFallbackProvider();
+          const reply = await provider.chat([{ role: 'user', content }], []);
+          await insertMessage({
+            sessionId: demoSession.id,
+            role: 'agent',
+            content: reply.content,
+            confidence: reply.confidence,
+            disclaimer: reply.disclaimer,
+          });
+          demoSession.lastActiveAt = new Date().toISOString();
+          return json(
+            ok({
+              reply: reply.content,
+              confidence: reply.confidence,
+              disclaimer: reply.disclaimer,
+              newMessages: [
+                { role: 'user' as const, content },
+                { role: 'agent' as const, content: reply.content },
+              ],
+              pendingApproval: undefined,
+              cached: false,
+            }),
+          );
+        }
+        const view = await requester(c);
+        if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
         const session = await getSessionById(c.params.sessionId);
         if (!session || session.user_id !== view.id) {
           return json(fail(ErrorCode.NOT_FOUND, '会话不存在或无权访问', c.traceId), 404);
@@ -150,14 +235,27 @@ export const medmuseRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requirePermissionCode(c, 'medmuse:chat');
       if (denied) return denied;
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
       try {
+        // DEMO：不连 PG，直接读内存消息（camelCase 视图）
+        if (isDemo) {
+          const demoSession = demoSessions.get(c.params.sessionId);
+          if (!demoSession || demoSession.userId !== c.user!.id) {
+            return json(fail(ErrorCode.NOT_FOUND, '会话不存在或无权访问', c.traceId), 404);
+          }
+          const rows = await listBySession(c.params.sessionId);
+          await markRead(c.params.sessionId);
+          return json(ok(rows.map(toMessageView)));
+        }
+        const view = await requester(c);
+        if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
         const session = await getSessionById(c.params.sessionId);
         if (!session || session.user_id !== view.id) {
           return json(fail(ErrorCode.NOT_FOUND, '会话不存在或无权访问', c.traceId), 404);
         }
-        return json(ok(await listMessages(c.params.sessionId)));
+        // 历史从 clinical.medmuse_messages 读取（替代内存），读后批量标记已读
+        const rows = await listBySession(c.params.sessionId);
+        await markRead(c.params.sessionId);
+        return json(ok(rows.map(toMessageView)));
       } catch (err) {
         return mapError(err, c);
       }

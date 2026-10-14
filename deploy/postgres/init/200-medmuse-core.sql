@@ -76,6 +76,8 @@ ALTER TABLE clinical.medmuse_messages ADD COLUMN IF NOT EXISTS confidence text N
 ALTER TABLE clinical.medmuse_messages ADD COLUMN IF NOT EXISTS disclaimer text NOT NULL DEFAULT '本建议由 AI 生成，不构成诊疗依据，最终决策由执业医师做出。';
 ALTER TABLE clinical.medmuse_messages ADD COLUMN IF NOT EXISTS system_prompt_version text NOT NULL DEFAULT '1.0';
 ALTER TABLE clinical.medmuse_messages ADD COLUMN IF NOT EXISTS idempotency_key text;
+-- 已读标记（会话历史拉取后 markRead 批量回写）
+ALTER TABLE clinical.medmuse_messages ADD COLUMN IF NOT EXISTS read_at timestamptz;
 -- 同一 session 内幂等键唯一（部分唯一索引，仅对 user 消息有效）
 CREATE UNIQUE INDEX IF NOT EXISTS uq_medmuse_messages_idempotency
   ON clinical.medmuse_messages(session_id, idempotency_key)
