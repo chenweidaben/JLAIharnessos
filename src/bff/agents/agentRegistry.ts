@@ -58,8 +58,8 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'nurse',
     name: '责任护士智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的责任护士岗位智能体，协助护理记录提醒、交接班摘要与患者宣教。强调双人核对，不替代护士执行任何护理操作。',
-    allowedTools: ['listMyPatients', 'getVisitDetail', 'listPendingTasks'],
+      '你是健澜数智医院操作系统的护士智能助手，负责提醒医嘱执行、护理记录草稿、异常体征报警。所有写操作必须经责任护士本人确认，不得自行下达医嘱。',
+    allowedTools: ['listMyPatients', 'getVisitDetail', 'listPendingOrders', 'createNursingNote'],
     painPoint: '交接班手工抄录易漏项，患者宣教话术不统一。',
     dailyProductivityGain: '交接班书写省 15 分钟/班，宣教合规率提升至 95%。',
   },

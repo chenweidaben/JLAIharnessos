@@ -19,6 +19,7 @@ import * as diagnosisSuggestionRepo from '../../db/repositories/diagnosisSuggest
 import * as timelinessRepo from '../../db/repositories/timelinessRepo';
 import * as improvementTaskRepo from '../../db/repositories/improvementTaskRepo';
 import * as consultRequestRepo from '../../db/repositories/consultRequestRepo';
+import * as nursingRecordRepo from '../../db/repositories/nursingRecordRepo';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -158,6 +159,44 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  {
+    name: 'listPendingOrders',
+    description: '列出护士所在科室病区待执行的医嘱',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listPendingOrders',
+        description: '列出当前护士待执行的医嘱',
+        parameters: {
+          type: 'object',
+          properties: {
+            wardId: { type: 'string', description: '病区ID，可空，默认当前护士科室' },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'createNursingNote',
+    description: '为指定就诊生成护理记录草稿（需责任护士确认后写入）',
+    riskLevel: 'warning',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'createNursingNote',
+        description: '为指定就诊生成护理记录草稿（需责任护士确认后写入）',
+        parameters: {
+          type: 'object',
+          properties: {
+            visitId: { type: 'string', description: '就诊ID' },
+            content: { type: 'string', description: '护理记录草稿正文' },
+          },
+          required: ['visitId', 'content'],
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -242,6 +281,10 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.suggestDiagnosis(args, ctx);
         case 'listPendingTasks':
           return await this.listPendingTasks(args, ctx);
+        case 'listPendingOrders':
+          return await this.listPendingOrders(args, ctx);
+        case 'createNursingNote':
+          return await this.createNursingNote(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -386,6 +429,70 @@ export class DefaultToolExecutor implements ToolExecutor {
         improvementTasks: imp,
         consultations: cons,
         total: t.length + imp.length + cons.length,
+      },
+    };
+  }
+
+  /**
+   * listPendingOrders（护士，info）：列出当前护士所在科室待执行医嘱。
+   * 说明：iam.users 无 ward_id 列，故按护士 department 关联 visits.department；
+   * orders.status='active' 即待执行（DB 无 'pending' 状态）。
+   */
+  private async listPendingOrders(
+    _args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const rows = await db()<Array<{
+      id: string; visit_id: string; patient_name: string;
+      content: string; created_at: string; priority: string;
+    }>>`
+      SELECT o.id, o.visit_id, p.name_masked AS patient_name,
+             o.content, o.created_at, o.priority
+      FROM clinical.orders o
+      JOIN clinical.visits v ON o.visit_id = v.id
+      LEFT JOIN clinical.patients p ON p.id = v.patient_id
+      WHERE o.status = 'active'
+        AND v.status = 'ongoing'
+        AND v.department = (SELECT department FROM iam.users WHERE id = ${ctx.userId})
+      ORDER BY CASE o.priority WHEN 'stat' THEN 0 WHEN 'urgent' THEN 1 ELSE 2 END,
+               o.created_at ASC
+      LIMIT 50
+    `;
+    const orders = rows.map((r) => ({
+      orderId: r.id,
+      visitId: r.visit_id,
+      patientName: r.patient_name,
+      content: r.content,
+      orderedAt: r.created_at,
+      priority: r.priority,
+    }));
+    return { ok: true, result: { orders, total: orders.length } };
+  }
+
+  /**
+   * createNursingNote（护士，warning）：未确认抛 CONFIRMATION_REQUIRED。
+   * 落 clinical.nursing_records，record_type='nursing_note_draft'，
+   * recordedBy 为责任护士本人。
+   */
+  private async createNursingNote(
+    args: Record<string, unknown>,
+    ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    if (!args.confirmed) throw new Error('CONFIRMATION_REQUIRED');
+    const visitId = str(args, 'visitId');
+    const content = typeof args.content === 'string' ? args.content : '';
+    const rec = await nursingRecordRepo.create({
+      visitId,
+      recordType: 'nursing_note_draft',
+      content,
+      recordedBy: ctx.userId,
+    });
+    return {
+      ok: true,
+      result: {
+        noteId: rec.id,
+        visitId: rec.visitId,
+        createdAt: rec.recordedAt,
       },
     };
   }
