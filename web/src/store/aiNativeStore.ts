@@ -104,7 +104,7 @@ export const useNoteDraftStore = create<NoteDraftState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ drafts: await get<AiNoteDraft[]>('/api/v1/ai-note-drafts', { visitId }) });
+      set({ drafts: await get<AiNoteDraft[]>('/ai-note-drafts', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -114,7 +114,7 @@ export const useNoteDraftStore = create<NoteDraftState>((set, get) => ({
   generate: async (input) => {
     set({ submitting: true, error: null });
     try {
-      const draft = await post<AiNoteDraft>('/api/v1/ai-note-drafts/generate', input);
+      const draft = await post<AiNoteDraft>('/ai-note-drafts/generate', input);
       await get().load(input.visitId);
       return draft;
     } catch (err) {
@@ -127,7 +127,7 @@ export const useNoteDraftStore = create<NoteDraftState>((set, get) => ({
   review: async (id, status, doctorEdit) => {
     set({ submitting: true, error: null });
     try {
-      await post<AiNoteDraft>(`/api/v1/ai-note-drafts/${id}/review`, { status, doctorEdit });
+      await post<AiNoteDraft>(`/ai-note-drafts/${id}/review`, { status, doctorEdit });
       // 复核成功后由页面按 visitId 重新 load
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '复核失败' });
@@ -162,7 +162,7 @@ export const useMedReviewStore = create<MedReviewState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ reviews: await get<MedReview[]>('/api/v1/med-reviews', { visitId }) });
+      set({ reviews: await get<MedReview[]>('/med-reviews', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -172,7 +172,7 @@ export const useMedReviewStore = create<MedReviewState>((set, get) => ({
   run: async (input) => {
     set({ submitting: true, error: null });
     try {
-      const result = await post<MedReview[]>('/api/v1/med-reviews/run', input);
+      const result = await post<MedReview[]>('/med-reviews/run', input);
       set({ reviews: result });
       return result;
     } catch (err) {
@@ -185,7 +185,7 @@ export const useMedReviewStore = create<MedReviewState>((set, get) => ({
   override: async (id, reason) => {
     set({ submitting: true, error: null });
     try {
-      await post<MedReview>(`/api/v1/med-reviews/${id}/override`, { reason });
+      await post<MedReview>(`/med-reviews/${id}/override`, { reason });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '豁免失败' });
     } finally {
@@ -217,7 +217,7 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ list: await get<DiagnosisSuggestion[]>('/api/v1/diagnosis-suggestions', { visitId }) });
+      set({ list: await get<DiagnosisSuggestion[]>('/diagnosis-suggestions', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -227,7 +227,7 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
   suggest: async (input) => {
     set({ submitting: true, error: null });
     try {
-      const rec = await post<DiagnosisSuggestion>('/api/v1/diagnosis-suggestions/suggest', input);
+      const rec = await post<DiagnosisSuggestion>('/diagnosis-suggestions/suggest', input);
       await get().load(input.visitId);
       return rec;
     } catch (err) {
@@ -240,7 +240,7 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
   review: async (id, accepted, selectedDiagnosis) => {
     set({ submitting: true, error: null });
     try {
-      await post<DiagnosisSuggestion>(`/api/v1/diagnosis-suggestions/${id}/review`, { accepted, selectedDiagnosis });
+      await post<DiagnosisSuggestion>(`/diagnosis-suggestions/${id}/review`, { accepted, selectedDiagnosis });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '审核失败' });
     } finally {
@@ -272,7 +272,7 @@ export const usePathwayRecStore = create<PathwayRecState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ list: await get<PathwayRec[]>('/api/v1/pathway-recommendations', { visitId }) });
+      set({ list: await get<PathwayRec[]>('/pathway-recommendations', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -282,7 +282,7 @@ export const usePathwayRecStore = create<PathwayRecState>((set, get) => ({
   recommend: async (input) => {
     set({ submitting: true, error: null });
     try {
-      const rec = await post<PathwayRec>('/api/v1/pathway-recommendations/recommend', input);
+      const rec = await post<PathwayRec>('/pathway-recommendations/recommend', input);
       await get().load(input.visitId);
       return rec;
     } catch (err) {
@@ -295,7 +295,7 @@ export const usePathwayRecStore = create<PathwayRecState>((set, get) => ({
   accept: async (id) => {
     set({ submitting: true, error: null });
     try {
-      await post<PathwayRec>(`/api/v1/pathway-recommendations/${id}/accept`, {});
+      await post<PathwayRec>(`/pathway-recommendations/${id}/accept`, {});
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '采纳失败' });
     } finally {
@@ -326,7 +326,7 @@ export const useLosPredictionStore = create<LosPredictionState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ latest: await get<LosPrediction | null>('/api/v1/los-predictions/latest', { visitId }) });
+      set({ latest: await get<LosPrediction | null>('/los-predictions/latest', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -336,7 +336,7 @@ export const useLosPredictionStore = create<LosPredictionState>((set, get) => ({
   predict: async (input) => {
     set({ submitting: true, error: null });
     try {
-      const rec = await post<LosPrediction>('/api/v1/los-predictions/predict', input);
+      const rec = await post<LosPrediction>('/los-predictions/predict', input);
       set({ latest: rec });
       return rec;
     } catch (err) {

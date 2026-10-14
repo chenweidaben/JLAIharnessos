@@ -6,21 +6,21 @@ import { get, post } from '../request';
 import type { ReconRun, ReconRunDetail } from '@/types/recon';
 
 export async function listReconRuns(): Promise<ReconRun[]> {
-  return get<ReconRun[]>(`/api/v1/recon/runs`);
+  return get<ReconRun[]>(`/recon/runs`);
 }
 
 export async function triggerReconRun(): Promise<ReconRun> {
-  return post<ReconRun>(`/api/v1/recon/run`, {});
+  return post<ReconRun>(`/recon/run`, {});
 }
 
 export async function getReconRun(id: string): Promise<ReconRunDetail> {
-  return get<ReconRunDetail>(`/api/v1/recon/run/${id}`);
+  return get<ReconRunDetail>(`/recon/run/${id}`);
 }
 
 export async function confirmReconRun(id: string): Promise<ReconRun> {
-  return post<ReconRun>(`/api/v1/recon/confirm/${id}`, {});
+  return post<ReconRun>(`/recon/confirm/${id}`, {});
 }
 
 export async function disputeReconRun(id: string, note: string): Promise<ReconRun> {
-  return post<ReconRun>(`/api/v1/recon/dispute/${id}`, { note });
+  return post<ReconRun>(`/recon/dispute/${id}`, { note });
 }

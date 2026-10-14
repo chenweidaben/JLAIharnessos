@@ -17,27 +17,27 @@ export interface SubmitSurgeryBody {
 }
 
 export async function submitSurgery(body: SubmitSurgeryBody): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/requests`, body);
+  return post<SurgeryRequest>(`/surgery/requests`, body);
 }
 
 export async function listSurgeries(): Promise<SurgeryRequest[]> {
-  return get<SurgeryRequest[]>(`/api/v1/surgery/requests`);
+  return get<SurgeryRequest[]>(`/surgery/requests`);
 }
 
 export async function getSurgery(id: string): Promise<SurgeryDetail> {
-  return get<SurgeryDetail>(`/api/v1/surgery/request/${id}`);
+  return get<SurgeryDetail>(`/surgery/request/${id}`);
 }
 
 export async function scheduleSurgery(id: string, body: Record<string, unknown>): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/schedule/${id}`, body);
+  return post<SurgeryRequest>(`/surgery/schedule/${id}`, body);
 }
 
 export async function precheckSurgery(id: string, precheck: Record<string, unknown>): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/precheck/${id}`, { precheck });
+  return post<SurgeryRequest>(`/surgery/precheck/${id}`, { precheck });
 }
 
 export async function inductionSurgery(id: string, notes: string): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/induction/${id}`, { notes });
+  return post<SurgeryRequest>(`/surgery/induction/${id}`, { notes });
 }
 
 export async function stageSurgery(
@@ -45,7 +45,7 @@ export async function stageSurgery(
   to: 'maintenance' | 'recovery' | 'pacu',
   notes?: string,
 ): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/stage/${id}`, { to, notes });
+  return post<SurgeryRequest>(`/surgery/stage/${id}`, { to, notes });
 }
 
 export async function eventSurgery(
@@ -53,21 +53,21 @@ export async function eventSurgery(
   eventType: string,
   payload: Record<string, unknown>,
 ): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/event/${id}`, { eventType, payload });
+  return post<SurgeryRequest>(`/surgery/event/${id}`, { eventType, payload });
 }
 
 export async function pacuAssess(id: string, aldrete: number, note?: string): Promise<{ req: SurgeryRequest; canDischarge: boolean }> {
-  return post(`/api/v1/surgery/pacu/${id}`, { aldrete, note });
+  return post(`/surgery/pacu/${id}`, { aldrete, note });
 }
 
 export async function signSurgery(id: string, role: 'surgeon' | 'anesthetist'): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/sign/${id}`, { role });
+  return post<SurgeryRequest>(`/surgery/sign/${id}`, { role });
 }
 
 export async function dischargeSurgery(id: string): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/discharge/${id}`, {});
+  return post<SurgeryRequest>(`/surgery/discharge/${id}`, {});
 }
 
 export async function cancelSurgery(id: string, reason: string): Promise<SurgeryRequest> {
-  return post<SurgeryRequest>(`/api/v1/surgery/cancel/${id}`, { reason });
+  return post<SurgeryRequest>(`/surgery/cancel/${id}`, { reason });
 }
