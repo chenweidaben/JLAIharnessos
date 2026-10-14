@@ -18,6 +18,7 @@ import {
   listAlerts,
   setStatus,
   getPatientNameMap,
+  markNotified,
   type CriticalAlert,
   type CriticalListRow,
   type CriticalStatus,
@@ -98,6 +99,9 @@ export async function scanCritical(): Promise<{ raised: number }> {
         },
         tx,
       );
+      // 闭环升级（216）：outbox 推送即「通知医生」，同事务写 notified_at，
+      // 状态机由 pending -> notified，等待医生接收。
+      await markNotified(a.id, tx);
     }
     return { raised: raised.length };
   });

@@ -69,6 +69,7 @@ import { exportRoutes } from './routes/export';
 import { labInterpretRoutes } from './routes/labInterpret';
 import { imagingInterpretRoutes } from './routes/imagingInterpret';
 import { criticalRoutes } from './routes/critical';
+import { criticalValueClosureRoutes } from './routes/criticalValueClosure';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
 import { surgeryScheduleRoutes } from './routes/surgerySchedule';
@@ -236,6 +237,7 @@ const allRoutes: RouteDef[] = [
   ...labInterpretRoutes,
   ...imagingInterpretRoutes,
   ...criticalRoutes,
+  ...criticalValueClosureRoutes,
   ...reconRoutes,
   ...surgeryRoutes,
   ...surgeryScheduleRoutes,

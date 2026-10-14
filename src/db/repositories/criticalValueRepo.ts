@@ -196,6 +196,92 @@ export async function countAlerts(sql?: DbExecutor): Promise<number> {
   return Number(rows[0]?.n ?? 0);
 }
 
+/* ---------------------------------------------------------------------------
+ * 闭环升级（216）：报告→通知医生→接收→记录处理时间→闭环
+ * 状态由聚合器纯函数 closureState(record) 依据时间戳推导，此处只做行级读写。
+ * ------------------------------------------------------------------------- */
+
+/** 闭环留痕行（不含业务快照，仅状态机时间戳与操作人）。 */
+export interface CriticalClosure {
+  id: string;
+  notifiedAt: string | null;
+  doctorAcceptedAt: string | null;
+  doctorAcceptedBy: string | null;
+  processedAt: string | null;
+  processedBy: string | null;
+  processedNote: string | null;
+  closedAt: string | null;
+  closedBy: string | null;
+}
+
+const CLOSURE_COLS = `
+  id, notified_at, doctor_accepted_at, doctor_accepted_by,
+  processed_at, processed_by, processed_note, closed_at, closed_by
+`;
+
+function mapClosure(row: Record<string, unknown>): CriticalClosure {
+  return {
+    id: String(row.id),
+    notifiedAt: row.notified_at ? String(row.notified_at) : null,
+    doctorAcceptedAt: row.doctor_accepted_at ? String(row.doctor_accepted_at) : null,
+    doctorAcceptedBy: row.doctor_accepted_by ? String(row.doctor_accepted_by) : null,
+    processedAt: row.processed_at ? String(row.processed_at) : null,
+    processedBy: row.processed_by ? String(row.processed_by) : null,
+    processedNote: row.processed_note ? String(row.processed_note) : null,
+    closedAt: row.closed_at ? String(row.closed_at) : null,
+    closedBy: row.closed_by ? String(row.closed_by) : null,
+  };
+}
+
+/** FOR UPDATE 行锁读取闭环留痕行；不存在返回 null。 */
+export async function lockClosureById(
+  id: string,
+  tx: DbExecutor,
+): Promise<CriticalClosure | null> {
+  const rows = await tx`
+    SELECT ${tx.unsafe(CLOSURE_COLS)}
+    FROM clinical.critical_value_alerts
+    WHERE id = ${id}
+    FOR UPDATE
+  `;
+  return rows.length > 0 ? mapClosure(rows[0] as Record<string, unknown>) : null;
+}
+
+/** 整行覆写闭环留痕字段（聚合器纯函数产出完整记录后整体落库）。 */
+export async function updateClosure(
+  id: string,
+  row: CriticalClosure,
+  tx: DbExecutor,
+): Promise<CriticalClosure> {
+  const rows = await tx`
+    UPDATE clinical.critical_value_alerts SET
+      notified_at       = ${row.notifiedAt},
+      doctor_accepted_at = ${row.doctorAcceptedAt},
+      doctor_accepted_by = ${row.doctorAcceptedBy},
+      processed_at      = ${row.processedAt},
+      processed_by      = ${row.processedBy},
+      processed_note    = ${row.processedNote},
+      closed_at         = ${row.closedAt},
+      closed_by         = ${row.closedBy}
+    WHERE id = ${id}
+    RETURNING ${tx.unsafe(CLOSURE_COLS)}
+  `;
+  return mapClosure(rows[0] as Record<string, unknown>);
+}
+
+/**
+ * 标记「已通知医生」（pending -> notified）。
+ * 与 critical:alert 事件在同一业务事务内调用（outbox 推送即通知）。
+ * 仅当尚未通知时写入，幂等。
+ */
+export async function markNotified(id: string, tx: DbExecutor): Promise<void> {
+  await tx`
+    UPDATE clinical.critical_value_alerts
+       SET notified_at = now()
+     WHERE id = ${id} AND notified_at IS NULL
+  `;
+}
+
 /** 批量获取患者的脱敏姓名（用于实时推送 payload）。 */
 export async function getPatientNameMap(
   patientIds: string[],
