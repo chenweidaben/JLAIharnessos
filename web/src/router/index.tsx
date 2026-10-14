@@ -238,6 +238,8 @@ const SystemExportPage = lazy(() => import('@/pages/system/Export'));
 const NotifyConfigPage = lazy(() => import('@/pages/system/NotifyConfig'));
 // MEDMUSE agent 健康度看板（M99-A）
 const AgentHealthPage = lazy(() => import('@/pages/medmuse/AgentHealth'));
+// 临床路径变异管理（M99-B）
+const PathwayVariancePage = lazy(() => import('@/pages/emrGap/pathwayVariance'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -400,6 +402,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="emr_level5:view">
                 <EmrLevel5Page />
+              </RequirePermission>
+            }
+          />
+          {/* 临床路径变异管理（M99-B） */}
+          <Route
+            path="emr/pathway-variance"
+            element={
+              <RequirePermission permission="pathway:read">
+                <PathwayVariancePage />
               </RequirePermission>
             }
           />
