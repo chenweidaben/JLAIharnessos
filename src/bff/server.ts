@@ -377,6 +377,9 @@ const compiled: Compiled[] = allRoutes.map((def) => {
   return { method: def.method.toUpperCase(), regex, keys, def };
 });
 
+import { startMedmuseScheduler } from './jobs/medmuseScheduler';
+startMedmuseScheduler();
+
 // ============================================================================
 // WebSocket�?ws/chat）��?鉴权后升�?// ============================================================================
 
