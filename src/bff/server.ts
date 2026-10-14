@@ -173,6 +173,7 @@ import { agentBuilderRoutes } from './routes/agentBuilder';
 import { agentRuntimeRoutes } from './routes/agentRuntime';
 import { medmuseRoutes } from './routes/medmuse';
 import { medmuseRoundReportRoutes } from './routes/medmuseRoundReport';
+import { medmuseStreamRoutes } from './routes/medmuseStream';
 import { multimodalityRoutes } from './routes/multimodality';
 import { aiNoteQcRoutes } from './routes/aiNoteQc';
 import { aiNursingPlanRoutes } from './routes/aiNursingPlan';
@@ -359,6 +360,7 @@ const allRoutes: RouteDef[] = [
   ...medmuseRoutes,
   ...agentHealthRoutes,
   ...medmuseRoundReportRoutes,
+  ...medmuseStreamRoutes,
   ...multimodalityRoutes,
   ...aiNoteQcRoutes,
   ...aiNursingPlanRoutes,

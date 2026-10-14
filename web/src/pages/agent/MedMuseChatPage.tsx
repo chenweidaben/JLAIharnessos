@@ -50,6 +50,7 @@ import {
   type MedmuseMessage,
   type MedmuseSession,
 } from '@/services/medmuseApi';
+import { streamMedmuseReply } from '@/services/medmuseStream';
 
 const PRIMARY = '#0B3D6B';
 const BG_SOFT = '#E8F0F8';
@@ -101,6 +102,8 @@ export default function MedMuseChatPage() {
   const [loadingMsgs, setLoadingMsgs] = useState(false);
   const [sending, setSending] = useState(false);
   const [pendingApproval, setPendingApproval] = useState<MedmuseApproval | null>(null);
+  /** 正在流式输出的 agent 气泡 id（打字机光标高亮），null = 无流式 */
+  const [streamingId, setStreamingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   /* 加载会话列表 */
@@ -165,7 +168,34 @@ export default function MedMuseChatPage() {
     }
   }, [roleCode]);
 
-  /** 发送消息；传入 overrideText 时（快捷指令）直接发送该文本，否则发送输入框内容 */
+  /** 一次性发送（fallback）：保留原有 POST chat 逻辑，流式失败/不支持时兜底 */
+  const legacySend = useCallback(
+    async (sessionId: string, text: string) => {
+      const result: MedmuseChatResult = await sendMessage(sessionId, text);
+      if (result?.message) {
+        setMessages((prev) => [...prev, result.message!]);
+      } else if (result?.reply) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `local-agent-${Date.now()}`,
+            sessionId,
+            role: 'assistant',
+            content: result.reply!,
+            confidence: result.confidence ?? 'low',
+            disclaimer: result.disclaimer ?? null,
+            createdAt: new Date().toISOString(),
+          },
+        ]);
+      }
+      if (result?.pendingApproval) {
+        setPendingApproval(result.pendingApproval);
+      }
+    },
+    [],
+  );
+
+  /** 发送消息：优先 SSE 流式打字机输出；失败自动回退到一次性发送 */
   const handleSend = useCallback(async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
     if (!text || sending) return;
@@ -183,43 +213,63 @@ export default function MedMuseChatPage() {
     }
     setInput('');
     setSending(true);
+    const sid = sessionId!;
     const optimistic: MedmuseMessage = {
       id: `local-${Date.now()}`,
-      sessionId: sessionId!,
+      sessionId: sid,
       role: 'user',
       content: text,
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, optimistic]);
+
+    // 先挂一个空的 agent 气泡，流式片段逐帧追加进去形成打字机效果
+    const streamId = `local-agent-stream-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: streamId,
+        sessionId: sid,
+        role: 'assistant',
+        content: '',
+        confidence: 'medium',
+        disclaimer: null,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+    setStreamingId(streamId);
+
+    // 用流式片段原地更新该气泡
+    const patchStream = (fn: (m: MedmuseMessage) => MedmuseMessage) =>
+      setMessages((prev) => prev.map((m) => (m.id === streamId ? fn(m) : m)));
+
     try {
-      const result: MedmuseChatResult = await sendMessage(sessionId!, text);
-      if (result?.message) {
-        setMessages((prev) => [...prev, result.message!]);
-      } else if (result?.reply) {
-        // 后端 runAgentTurn 返回 reply：agent 回复气泡即时补上；
-        // 刷新/切会话后的完整历史由 listMessages 从后端拉取恢复。
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `local-agent-${Date.now()}`,
-            sessionId: sessionId!,
-            role: 'assistant',
-            content: result.reply!,
-            confidence: result.confidence ?? 'low',
-            disclaimer: result.disclaimer ?? null,
-            createdAt: new Date().toISOString(),
-          },
-        ]);
-      }
-      if (result?.pendingApproval) {
-        setPendingApproval(result.pendingApproval);
-      }
+      await streamMedmuseReply(
+        sid,
+        text,
+        {
+          onDelta: (piece) => patchStream((m) => ({ ...m, content: m.content + piece })),
+          onMeta: (meta) =>
+            patchStream((m) => ({
+              ...m,
+              confidence: meta.confidence ?? m.confidence,
+              disclaimer: meta.disclaimer ?? m.disclaimer,
+            })),
+        },
+      );
     } catch (e) {
-      antdMessage.error(e instanceof Error ? e.message : '发送失败');
+      // 流式失败：撤掉空气泡，回退到一次性发送（保留旧行为）
+      setMessages((prev) => prev.filter((m) => m.id !== streamId));
+      try {
+        await legacySend(sid, text);
+      } catch (err) {
+        antdMessage.error(err instanceof Error ? err.message : '发送失败');
+      }
     } finally {
+      setStreamingId(null);
       setSending(false);
     }
-  }, [input, sending, currentId, roleCode]);
+  }, [input, sending, currentId, roleCode, legacySend]);
 
   /** 审批决议 */
   const handleDecide = useCallback(
@@ -241,6 +291,7 @@ export default function MedMuseChatPage() {
 
   return (
     <PageContainer title="MEDMUSE 岗位智能体" description="健澜数智医院操作系统 · 多岗位 AI 副驾（confidence + 免责声明）">
+      <style>{`@keyframes medmuse-blink { 50% { opacity: 0; } }`}</style>
       {/* 顶部角色选择器 */}
       <div
         style={{
@@ -386,7 +437,12 @@ export default function MedMuseChatPage() {
                       {m.role === 'user' ? '我' : 'MEDMUSE'}
                     </span>
                   </div>
-                  <div style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{m.content}</div>
+                  <div style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
+                    {m.content}
+                    {m.id === streamingId && (
+                      <span style={{ color: PRIMARY, animation: 'medmuse-blink 1s step-end infinite' }}>▍</span>
+                    )}
+                  </div>
 
                   {m.role === 'assistant' && (
                     <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
