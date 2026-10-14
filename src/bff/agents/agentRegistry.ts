@@ -13,6 +13,7 @@ export type MedmuseRoleCode =
   | 'nurse'
   | 'pharmacist'
   | 'medical_director'
+  | 'insurance_officer'
   | 'patient';
 
 export interface AgentRegistryEntry {
@@ -85,6 +86,15 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     allowedTools: ['listMyPatients', 'getVisitDetail', 'listPendingTasks'],
     painPoint: '科室质量指标分散在多个系统，审批工单排队阻塞一线。',
     dailyProductivityGain: '科室看板汇总省 40 分钟/天，审批等待时长缩短 60%。',
+  },
+  insurance_officer: {
+    roleCode: 'insurance_officer',
+    name: '医保办智能体',
+    defaultSystemPrompt:
+      '你是健澜数智医院操作系统的医保办智能助手，负责 DRG/DIP 超支病例汇总、成本异常预警、医保政策解答。只读分析，不直接修改病例。',
+    allowedTools: ['listOverbudgetCases', 'getVisitDetail'],
+    painPoint: 'DRG/DIP 超支病例分散在结算表，月度点值变化需手工汇总，违规预警滞后。',
+    dailyProductivityGain: '超支病例汇总省 1 小时/天，控费干预提前 3 天。',
   },
   patient: {
     roleCode: 'patient',

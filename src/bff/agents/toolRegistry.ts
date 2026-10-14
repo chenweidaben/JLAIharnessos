@@ -22,6 +22,8 @@ import * as consultRequestRepo from '../../db/repositories/consultRequestRepo';
 import * as nursingRecordRepo from '../../db/repositories/nursingRecordRepo';
 import * as pharmacyTaskRepo from '../../db/repositories/pharmacyTaskRepo';
 import * as prescriptionRepo from '../../db/repositories/prescriptionRepo';
+import * as drgRepo from '../../db/repositories/drgRepo';
+import * as dipRepo from '../../db/repositories/dipRepo';
 
 export type RiskLevel = 'info' | 'warning' | 'critical';
 
@@ -242,6 +244,25 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  {
+    name: 'listOverbudgetCases',
+    description: '列出 DRG 已结算超支病例，并聚合 DIP 月度点值（医保办只读）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listOverbudgetCases',
+        description: '列出实际费用 > DRG 支付标准的超支病例，同时返回 DIP 最新点值',
+        parameters: {
+          type: 'object',
+          properties: {
+            deptName: { type: 'string', description: '科室名过滤，可空' },
+            limit: { type: 'integer', description: '返回上限，默认 30', default: 30 },
+          },
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -334,6 +355,8 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.getPendingPrescriptions(args, ctx);
         case 'reviewPrescription':
           return await this.reviewPrescription(args, ctx);
+        case 'listOverbudgetCases':
+          return await this.listOverbudgetCases(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -670,6 +693,68 @@ export class DefaultToolExecutor implements ToolExecutor {
         decision: updated.status,
         reviewedAt: updated.updatedAt,
         interactionWarnings,
+      },
+    };
+  }
+
+  /**
+   * listOverbudgetCases（医保办，info，只读）：
+   *  - 拉取已 confirmed 的 DRG 结果，过滤 totalFee > estimatedPayment 的超支病例；
+   *  - 可选科室名过滤；
+   *  - 同时取 DIP 最新月度点值，便于医保办整体控费分析。
+   * 注意：drgRepo.listDrgResults 仅接受 status 枚举（grouped/confirmed/rejected），
+   * 已结算语义对应 'confirmed'。
+   */
+  private async listOverbudgetCases(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const limit = typeof args.limit === 'number' && args.limit > 0 ? Math.min(args.limit, 100) : 30;
+    const deptFilter = typeof args.deptName === 'string' && args.deptName ? args.deptName : null;
+
+    const [rows, dipPoints] = await Promise.all([
+      drgRepo.listDrgResults('confirmed'),
+      dipRepo.listMonthlyPoints(),
+    ]);
+
+    const enriched = rows
+      .map((r) => {
+        const weight = Number(r.weight);
+        const payment = Number(r.estimatedPayment);
+        const actualCost = r.totalFee == null ? null : Number(r.totalFee);
+        const overbudget = actualCost != null && actualCost > payment;
+        return {
+          visitId: r.visitId,
+          patientName: r.patientName,
+          deptName: r.department,
+          drgGroup: r.groupCode,
+          drgGroupName: r.groupName,
+          weight,
+          payment,
+          actualCost,
+          overbudget,
+          updatedAt: r.updatedAt,
+        };
+      })
+      .filter((r) => r.overbudget)
+      .filter((r) => (deptFilter ? r.deptName === deptFilter : true))
+      .sort((a, b) => (b.actualCost ?? 0) - (a.actualCost ?? 0))
+      .slice(0, limit);
+
+    const latestDip = dipPoints[dipPoints.length - 1] ?? null;
+    const totalOverbudget = enriched.reduce(
+      (acc, r) => acc + Math.max(0, (r.actualCost ?? 0) - r.payment),
+      0,
+    );
+
+    return {
+      ok: true,
+      result: {
+        drgCases: enriched,
+        dipPointValue: latestDip ? latestDip.pointValue : null,
+        period: latestDip ? latestDip.period : null,
+        totalOverbudget,
+        overbudgetCount: enriched.length,
       },
     };
   }

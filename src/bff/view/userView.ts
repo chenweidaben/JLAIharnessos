@@ -137,7 +137,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'empi:read', 'empi:write',
     'data_warehouse:read', 'data_warehouse:admin',
     'data_governance:read', 'data_governance:admin',
-    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse', 'medmuse:pharmacist',
+    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse', 'medmuse:pharmacist', 'medmuse:insurance',
     'ai_note:generate', 'ai_note:review',
     'med_review:view', 'med_review:override',
     'ai_diagnosis:view', 'ai_pathway:view', 'ai_los_pred:view',
