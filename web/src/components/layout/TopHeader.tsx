@@ -4,7 +4,7 @@
  *
  * 顶部栏：折叠按钮 / 面包屑 / 通知中心 / 用户菜单 / 主题切换
  */
-import { Avatar, Badge, Breadcrumb, Dropdown, Input, Tooltip } from 'antd';
+import { Avatar, Badge, Breadcrumb, Button, Dropdown, Input, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   BellOutlined,
@@ -13,6 +13,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   MoonOutlined,
+  RobotOutlined,
   SearchOutlined,
   SunOutlined,
   UserOutlined,
@@ -65,6 +66,21 @@ export default function TopHeader() {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* MEDMUSE 医疗智能体：跳转 /agent，深海蓝强调色高亮 */}
+        <Button
+          type="primary"
+          size="middle"
+          icon={<RobotOutlined />}
+          onClick={() => navigate('/agent')}
+          style={{
+            background: '#4A90D9',
+            borderColor: '#4A90D9',
+            fontWeight: 600,
+            boxShadow: '0 2px 8px rgba(74,144,217,0.35)',
+          }}
+        >
+          MEDMUSE 医疗智能体
+        </Button>
         <Input
           placeholder="搜索患者 / 病历号"
           prefix={<SearchOutlined />}
@@ -95,7 +111,7 @@ export default function TopHeader() {
         </Tooltip>
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <div className="flex cursor-pointer items-center gap-2">
-            <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#0A4D8C' }} />
+            <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#0A2540' }} />
             <span className="text-sm text-ink-primary">{user?.realName ?? '未登录'}</span>
           </div>
         </Dropdown>

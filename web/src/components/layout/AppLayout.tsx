@@ -28,7 +28,7 @@ export default function AppLayout() {
         collapsed={collapsed}
         trigger={null}
         theme="dark"
-        style={{ background: 'linear-gradient(180deg, #0A4D8C 0%, #073A6B 100%)' }}
+        style={{ background: 'linear-gradient(180deg, #0A2540 0%, #1E5F8C 100%)' }}
       >
         <div className="flex h-14 items-center justify-center gap-2 overflow-hidden">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/15 text-sm font-bold text-white">
