@@ -1,7 +1,7 @@
 ﻿import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
-import { view, latest, LosPredError } from '../aggregators/losPredictionAggregator.js';
+import { view as predictView, latest, LosPredError } from '../aggregators/losPredictionAggregator.js';
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -28,6 +28,6 @@ export const losPredictionRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/los-predictions/predict', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      try { return json(ok(await view(view, (await c.body()) as Record<string, unknown>))); } catch (e) { return mapError(e); }
+      try { return json(ok(await predictView(view, (await c.body()) as Record<string, unknown>))); } catch (e) { return mapError(e); }
     } },
 ];
