@@ -90,6 +90,13 @@ function confidenceText(level?: 'high' | 'medium' | 'low' | null): string {
   return '';
 }
 
+/** 会话列表按最近活跃时间倒序（不依赖后端返回顺序，保证"最新在上"） */
+function sortSessionsByRecent<T extends MedmuseSession>(list: T[]): T[] {
+  return [...list].sort(
+    (a, b) => new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime(),
+  );
+}
+
 export default function MedMuseChatPage() {
   usePageTitle('MEDMUSE 岗位智能体');
 
@@ -111,9 +118,10 @@ export default function MedMuseChatPage() {
     setLoadingSessions(true);
     try {
       const list = await listSessions();
-      setSessions(list);
-      if (!currentId && list.length > 0) {
-        setCurrentId(list[0].id);
+      const sorted = sortSessionsByRecent(list);
+      setSessions(sorted);
+      if (!currentId && sorted.length > 0) {
+        setCurrentId(sorted[0].id);
       }
     } catch (e) {
       antdMessage.error(e instanceof Error ? e.message : '会话列表加载失败');
@@ -268,6 +276,12 @@ export default function MedMuseChatPage() {
     } finally {
       setStreamingId(null);
       setSending(false);
+      // 发送完成后本地把当前会话置顶（刷新 lastActiveAt），保持倒序展示
+      setSessions((prev) =>
+        sortSessionsByRecent(
+          prev.map((s) => (s.id === sid ? { ...s, lastActiveAt: new Date().toISOString() } : s)),
+        ),
+      );
     }
   }, [input, sending, currentId, roleCode, legacySend]);
 
@@ -288,6 +302,8 @@ export default function MedMuseChatPage() {
   );
 
   const activeRoleLabel = ROLE_OPTIONS.find((r) => r.value === roleCode)?.label ?? roleCode;
+  /** 渲染用的倒序列表（最新活跃在上） */
+  const sortedSessions = sortSessionsByRecent(sessions);
 
   return (
     <PageContainer title="MEDMUSE 岗位智能体" description="健澜数智医院操作系统 · 多岗位 AI 副驾（confidence + 免责声明）">
@@ -336,8 +352,26 @@ export default function MedMuseChatPage() {
             overflow: 'hidden',
           }}
         >
-          <div style={{ padding: 8, background: BG_SOFT, fontWeight: 600, color: PRIMARY }}>
-            会话列表
+          <div
+            style={{
+              padding: '8px 10px',
+              background: BG_SOFT,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{ fontWeight: 600, color: PRIMARY }}>
+              会话列表（{sessions.length}）
+            </span>
+            <Button
+              size="small"
+              type="text"
+              icon={<PlusOutlined />}
+              style={{ color: PRIMARY }}
+              onClick={handleCreate}
+              title={`新建${activeRoleLabel}会话`}
+            />
           </div>
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {loadingSessions && (
@@ -345,12 +379,12 @@ export default function MedMuseChatPage() {
                 <Spin size="small" />
               </div>
             )}
-            {!loadingSessions && sessions.length === 0 && (
+            {!loadingSessions && sortedSessions.length === 0 && (
               <div style={{ padding: 24, textAlign: 'center', color: '#888' }}>暂无会话</div>
             )}
             <List
               size="small"
-              dataSource={sessions}
+              dataSource={sortedSessions}
               rowKey="id"
               renderItem={(s) => (
                 <List.Item
