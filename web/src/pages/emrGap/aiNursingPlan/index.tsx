@@ -13,7 +13,8 @@ import { useAiNursingPlanStore } from '@/store/aiNursingPlanStore';
 import type { NursingPlanItem } from '@/services/api/aiNursingPlan';
 
 const { Header, Content } = Layout;
-const { Title, TextArea } = Input;
+const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const RISK_META: Record<string, { color: string; label: string }> = {
   low: { color: 'green', label: '低风险' },

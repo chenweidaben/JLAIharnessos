@@ -21,7 +21,7 @@ import type { ApprovalStatus, MedmuseApproval } from '@/services/api/medmuse';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
-const { Textarea } = Input;
+const { TextArea } = Input;
 
 /** 风险级标签：warning=橙，critical=红，info=蓝 */
 const RISK_TAG: Record<string, { color: string; label: string }> = {
@@ -199,7 +199,7 @@ export default function MedmuseApprovalsPage() {
           onOk={() => void handleRejectOk()}
         >
           <p style={{ marginBottom: 8 }}>驳回理由将写入工单 rejection_reason，必填：</p>
-          <Textarea
+          <TextArea
             rows={4}
             value={reason}
             maxLength={500}

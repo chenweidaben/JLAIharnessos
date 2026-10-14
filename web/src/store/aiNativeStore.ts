@@ -7,7 +7,7 @@
  * 字段形状与 BFF src/db/repositories/*Repo 的 mapRow 输出保持一致（camelCase）。
  */
 import { create } from 'zustand';
-import { get, post } from '@/api/client';
+import { get as httpGet, post } from '@/api/client';
 
 /* ------------------------------------------------------------------ */
 /* 领域类型（与后端 repo mapRow 对齐）                                    */
@@ -104,7 +104,7 @@ export const useNoteDraftStore = create<NoteDraftState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ drafts: await get<AiNoteDraft[]>('/ai-note-drafts', { visitId }) });
+      set({ drafts: await httpGet<AiNoteDraft[]>('/ai-note-drafts', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -153,7 +153,7 @@ interface MedReviewState {
   override: (id: string, reason: string) => Promise<void>;
 }
 
-export const useMedReviewStore = create<MedReviewState>((set, get) => ({
+export const useMedReviewStore = create<MedReviewState>((set, _get) => ({
   reviews: [],
   loading: false,
   submitting: false,
@@ -162,7 +162,7 @@ export const useMedReviewStore = create<MedReviewState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ reviews: await get<MedReview[]>('/med-reviews', { visitId }) });
+      set({ reviews: await httpGet<MedReview[]>('/med-reviews', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -217,7 +217,7 @@ export const useDiagnosisStore = create<DiagnosisState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ list: await get<DiagnosisSuggestion[]>('/diagnosis-suggestions', { visitId }) });
+      set({ list: await httpGet<DiagnosisSuggestion[]>('/diagnosis-suggestions', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -272,7 +272,7 @@ export const usePathwayRecStore = create<PathwayRecState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ list: await get<PathwayRec[]>('/pathway-recommendations', { visitId }) });
+      set({ list: await httpGet<PathwayRec[]>('/pathway-recommendations', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {
@@ -317,7 +317,7 @@ interface LosPredictionState {
   predict: (input: { visitId: string; age?: number; diagnosis?: string; comorbidities?: number }) => Promise<LosPrediction | null>;
 }
 
-export const useLosPredictionStore = create<LosPredictionState>((set, get) => ({
+export const useLosPredictionStore = create<LosPredictionState>((set, _get) => ({
   latest: null,
   loading: false,
   submitting: false,
@@ -326,7 +326,7 @@ export const useLosPredictionStore = create<LosPredictionState>((set, get) => ({
     if (!visitId) return;
     set({ loading: true, error: null });
     try {
-      set({ latest: await get<LosPrediction | null>('/los-predictions/latest', { visitId }) });
+      set({ latest: await httpGet<LosPrediction | null>('/los-predictions/latest', { visitId }) });
     } catch (err) {
       set({ error: err instanceof Error ? err.message : '加载失败' });
     } finally {

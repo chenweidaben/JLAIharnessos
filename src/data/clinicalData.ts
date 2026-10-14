@@ -276,7 +276,7 @@ async function mapDbOrderToDto(o: orderRepo.Order): Promise<MockOrder> {
     dosage: detail.dosage ? String(detail.dosage) : null,
     frequency: detail.frequency ? String(detail.frequency) : null,
     status: mapOrderStatus(o.status),
-    priority: mapOrderPriority(o.priority),
+    priority: mapOrderPriority(o.priority ?? 'routine'),
     startDate: toDateOnly(o.startAt) ?? new Date().toISOString().slice(0, 10),
     endDate: toDateOnly(o.stopAt),
     prescribingDoctor: o.doctorId ? String(o.doctorId) : '医生',
