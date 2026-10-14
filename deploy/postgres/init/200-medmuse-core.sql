@@ -55,6 +55,9 @@ CREATE TABLE IF NOT EXISTS clinical.medmuse_sessions (
 CREATE INDEX IF NOT EXISTS idx_medmuse_sessions_user
   ON clinical.medmuse_sessions(user_id, last_active_at DESC);
 
+-- 多轮对话早期摘要（contextSummary 纯规则压缩产出；超 20 轮自动摘要早期对话）
+ALTER TABLE clinical.medmuse_sessions ADD COLUMN IF NOT EXISTS context_summary text;
+
 -- ---------------------------------------------------------------------------
 -- 对话消息（role: user/agent/tool；tool_calls/tool_result 记录函数调用过程）
 -- ---------------------------------------------------------------------------

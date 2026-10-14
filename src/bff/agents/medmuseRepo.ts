@@ -38,6 +38,8 @@ export interface MedmuseSessionRow {
   title: string;
   last_active_at: string;
   created_at: string;
+  /** 多轮对话早期摘要（contextSummary 模块产出，纯规则压缩），未摘要时为 null */
+  context_summary?: string | null;
 }
 
 export interface MedmuseMessageRow {
@@ -141,6 +143,16 @@ export async function getSessionById(sessionId: string): Promise<MedmuseSessionR
 export async function touchSession(sessionId: string): Promise<void> {
   await db()`
     UPDATE clinical.medmuse_sessions SET last_active_at = now() WHERE id = ${sessionId}
+  `;
+}
+
+/**
+ * 落库多轮对话早期摘要（最小改动：写到 sessions.context_summary 列，
+ * 不进入消息流、不污染前端历史）。摘要由 contextSummary 纯函数产出。
+ */
+export async function upsertSessionSummary(sessionId: string, summary: string): Promise<void> {
+  await db()`
+    UPDATE clinical.medmuse_sessions SET context_summary = ${summary} WHERE id = ${sessionId}
   `;
 }
 

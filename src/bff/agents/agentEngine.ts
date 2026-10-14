@@ -26,11 +26,14 @@ import {
   touchSession,
   consumeIdempotencyKey,
   saveIdempotencyResponse,
+  upsertSessionSummary,
   type MedmuseAgentRow,
 } from './medmuseRepo';
 import { getAgentEntry } from './agentRegistry';
+import { splitForSummary } from './contextSummary';
 
-const HISTORY_ROUNDS = 20;
+/** 拉取历史的窗口：超阈值后用于覆盖早期对话做规则压缩 */
+const CONTEXT_FETCH_LIMIT = 200;
 
 export interface RunAgentTurnInput {
   agent: MedmuseAgentRow;
@@ -62,24 +65,10 @@ export interface RunAgentTurnResult {
   cached?: boolean;
 }
 
-function toChatHistory(
-  rows: Awaited<ReturnType<typeof listMessages>>,
-  systemPrompt: string,
-): ChatMessage[] {
-  // 最近 20 轮（user+agent 配对），更早的折叠为一条占位
-  const recent = rows.slice(-HISTORY_ROUNDS);
-  const omitted = rows.length - recent.length;
-  const history: ChatMessage[] = [];
-  if (omitted > 0) {
-    history.push({ role: 'system', content: `[早期对话 ${omitted} 条已省略]` });
-  }
-  for (const m of recent) {
-    history.push({
-      role: m.role === 'agent' ? 'assistant' : m.role,
-      content: m.content ?? '',
-    });
-  }
-  return [{ role: 'system', content: systemPrompt }, ...history];
+function toChatHistoryRole(m: { role: string }): 'system' | 'user' | 'assistant' | 'tool' {
+  if (m.role === 'agent') return 'assistant';
+  if (m.role === 'user' || m.role === 'tool') return m.role;
+  return 'system';
 }
 
 export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTurnResult> {
@@ -109,9 +98,21 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
   });
   newMessages.push({ role: 'user', content: userMessage });
 
-  // 3. 拼上下文
-  const history = (await listMessages(sessionId, HISTORY_ROUNDS * 2)).filter((m) => m.id !== userRow.id);
-  const messages = toChatHistory(history, agent.system_prompt);
+  // 3. 拼上下文：历史超 20 条时，早期 N 条压缩为规则摘要 + 最近 10 条原文；
+  //    未超阈值则保留全部历史原文（行为与压缩前一致）。
+  const history = (await listMessages(sessionId, CONTEXT_FETCH_LIMIT)).filter(
+    (m) => m.id !== userRow.id,
+  );
+  const { recent, summary } = splitForSummary(history);
+  const messages: ChatMessage[] = [{ role: 'system', content: agent.system_prompt }];
+  if (summary) {
+    messages.push({ role: 'system', content: summary });
+    // 摘要落库（写 sessions.context_summary，不进入消息流）
+    await upsertSessionSummary(sessionId, summary);
+  }
+  for (const m of recent) {
+    messages.push({ role: toChatHistoryRole(m), content: m.content ?? '' });
+  }
   messages.push({ role: 'user', content: userMessage });
 
   // 4. 岗位允许的工具子集
