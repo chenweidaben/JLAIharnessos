@@ -137,7 +137,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'empi:read', 'empi:write',
     'data_warehouse:read', 'data_warehouse:admin',
     'data_governance:read', 'data_governance:admin',
-    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse', 'medmuse:pharmacist', 'medmuse:insurance',
+    'medmuse:chat', 'medmuse:admin', 'medmuse:nurse', 'medmuse:pharmacist', 'medmuse:insurance', 'medmuse:patient',
     'ai_note:generate', 'ai_note:review',
     'med_review:view', 'med_review:override',
     'ai_diagnosis:view', 'ai_pathway:view', 'ai_los_pred:view',
@@ -380,6 +380,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'workbench:view',
     'surgical_check:complete', 'surgical_check:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view',
     'patient_portal:view', 'medmuse:chat', 'medmuse:patient'],
+  finance: ['dashboard:view', 'drg_budget:view', 'dip:view', 'billing:read',
+    'medmuse:chat', 'medmuse:insurance'],
 };
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */

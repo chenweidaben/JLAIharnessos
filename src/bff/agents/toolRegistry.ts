@@ -305,6 +305,99 @@ export const MEDMUSE_TOOL_DEFS: ToolMeta[] = [
       },
     },
   },
+  // ---- Phase 3（209-medmuse-phase3.sql）岗位工具规范名 ----
+  {
+    name: 'listPendingPrescriptions',
+    description: '列出当前待前置审核的处方队列（药师只读）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listPendingPrescriptions',
+        description: '列出当前待前置审核的处方队列（规范名）',
+        parameters: {
+          type: 'object',
+          properties: {
+            limit: { type: 'integer', description: '返回上限，默认 20', default: 20 },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'summarizeOverspend',
+    description: '按病组汇总当月 DRG/DIP 超支金额与例数（医保办只读聚合）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'summarizeOverspend',
+        description: '按病组汇总当月超支金额与例数（只读，纯聚合函数）',
+        parameters: {
+          type: 'object',
+          properties: {
+            period: {
+              type: 'string',
+              enum: ['month'],
+              description: '汇总周期，默认当月',
+              default: 'month',
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'listOverspendCases',
+    description: '钻取指定病组超支病例明细（医保办只读）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listOverspendCases',
+        description: '钻取指定病组超支病例明细（只读，规范名）',
+        parameters: {
+          type: 'object',
+          properties: {
+            groupCode: { type: 'string', description: '病组编码，可空，默认全部超支病组' },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'listFollowups',
+    description: '列出待随访患者与随访日期（逾期优先、按日期升序）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'listFollowups',
+        description: '列出待随访患者与随访日期（只读，不回写病历）',
+        parameters: { type: 'object', properties: {} },
+      },
+    },
+  },
+  {
+    name: 'getFollowupGuidance',
+    description: '生成随访沟通话术模板（只读，不回写病历、不做诊断）',
+    riskLevel: 'info',
+    openAiSchema: {
+      type: 'function',
+      function: {
+        name: 'getFollowupGuidance',
+        description: '生成指定随访的沟通话术模板（只读）',
+        parameters: {
+          type: 'object',
+          properties: {
+            visitId: { type: 'string', description: '就诊ID' },
+            timepoint: { type: 'string', description: '随访节点，可空' },
+          },
+          required: ['visitId'],
+        },
+      },
+    },
+  },
 ];
 
 export interface ToolExecutor {
@@ -366,6 +459,130 @@ function str(args: Record<string, unknown>, key: string): string {
   return v;
 }
 
+// ============================================================================
+// Phase 3 纯函数（不连库、可单测；deploy/postgres/init/209-medmuse-phase3.sql）
+//   - normalizeReviewPrescriptionArgs：药师审方参数校验
+//   - summarizeOverspendByGroup      ：医保 DRG/DIP 超支按病组聚合
+//   - sortFollowupsByDue             ：患者端随访列表排序（逾期优先）
+// ============================================================================
+
+/** 审方规范化结果：decision 映射为处方表枚举 approved/rejected */
+export interface NormalizedReview {
+  prescriptionId: string;
+  decision: 'approved' | 'rejected';
+  opinion: string;
+}
+
+/**
+ * 药师审方参数校验（纯函数）：
+ *   - prescriptionId 非空；
+ *   - decision ∈ {approve, reject}；
+ *   - reject 时 opinion（comment）必填，否则抛 OPINION_REQUIRED_ON_REJECT。
+ * 安全红线：本函数只做参数校验与规范化，绝不修改处方药品内容。
+ */
+export function normalizeReviewPrescriptionArgs(args: Record<string, unknown>): NormalizedReview {
+  const prescriptionId = args.prescriptionId;
+  if (typeof prescriptionId !== 'string' || prescriptionId.length === 0) {
+    throw new Error('INVALID_ARG:prescriptionId');
+  }
+  const decision = args.decision;
+  if (decision !== 'approve' && decision !== 'reject') {
+    throw new Error('INVALID_ARG:decision');
+  }
+  const opinion = typeof args.opinion === 'string' ? args.opinion.trim() : '';
+  // 兼容既有 comment 入参
+  const comment = typeof args.comment === 'string' ? args.comment.trim() : '';
+  const opinionText = opinion || comment;
+  if (decision === 'reject' && opinionText.length === 0) {
+    throw new Error('OPINION_REQUIRED_ON_REJECT');
+  }
+  return {
+    prescriptionId,
+    decision: decision === 'approve' ? 'approved' : 'rejected',
+    opinion: opinionText || '同意通过前置审核',
+  };
+}
+
+/** 超支明细行（DRG/DIP 只读聚合输入） */
+export interface OverspendRow {
+  groupCode: string;
+  groupName?: string | null;
+  totalFee: number;
+  estimatedPayment: number;
+}
+
+export interface OverspendGroup {
+  groupCode: string;
+  groupName: string | null;
+  overspendAmount: number;
+  caseCount: number;
+}
+
+export interface OverspendSummary {
+  groups: OverspendGroup[];
+  totalOverspendAmount: number;
+  totalCases: number;
+  currency: string;
+}
+
+/**
+ * 超支按病组聚合（纯函数）：
+ *   - 仅纳入 totalFee > estimatedPayment 的病例（超支为正）；
+ *   - 同病组累计超支金额（分）与例数；
+ *   - 按超支金额降序；金额四舍五入到分。
+ */
+export function summarizeOverspendByGroup(rows: OverspendRow[]): OverspendSummary {
+  const byGroup = new Map<string, OverspendGroup>();
+  for (const r of rows) {
+    const over = Number(r.totalFee) - Number(r.estimatedPayment);
+    if (!(over > 0)) continue;
+    const cur = byGroup.get(r.groupCode) ?? {
+      groupCode: r.groupCode,
+      groupName: r.groupName ?? null,
+      overspendAmount: 0,
+      caseCount: 0,
+    };
+    cur.overspendAmount += over;
+    cur.caseCount += 1;
+    byGroup.set(r.groupCode, cur);
+  }
+  const groups = [...byGroup.values()]
+    .map((g) => ({ ...g, overspendAmount: Math.round(g.overspendAmount * 100) / 100 }))
+    .sort((a, b) => b.overspendAmount - a.overspendAmount);
+  const totalOverspendAmount =
+    Math.round(groups.reduce((s, g) => s + g.overspendAmount, 0) * 100) / 100;
+  const totalCases = groups.reduce((s, g) => s + g.caseCount, 0);
+  return { groups, totalOverspendAmount, totalCases, currency: 'CNY' };
+}
+
+/** 待随访条目 */
+export interface FollowupItem {
+  visitId: string;
+  patientId?: string | null;
+  patientName: string;
+  /** 随访日期，ISO yyyy-mm-dd */
+  dueDate: string;
+  timepoint?: string | null;
+}
+
+/**
+ * 随访列表排序（纯函数）：
+ *   - 逾期（dueDate < today）排最前；
+ *   - 同优先级内按随访日期升序（最近到期者优先）；
+ *   - 不修改入参数组。
+ */
+export function sortFollowupsByDue(items: FollowupItem[], today: string): FollowupItem[] {
+  const t = today.slice(0, 10);
+  return [...items].sort((a, b) => {
+    const ad = a.dueDate.slice(0, 10);
+    const bd = b.dueDate.slice(0, 10);
+    const aOverdue = ad < t ? 1 : 0;
+    const bOverdue = bd < t ? 1 : 0;
+    if (aOverdue !== bOverdue) return bOverdue - aOverdue; // 逾期在前
+    return ad < bd ? -1 : ad > bd ? 1 : 0;
+  });
+}
+
 export class DefaultToolExecutor implements ToolExecutor {
   /**
    * 工具统一入口：按 name 分发到真实 repo 实现。
@@ -403,6 +620,17 @@ export class DefaultToolExecutor implements ToolExecutor {
           return await this.listFollowupTasks(args, ctx);
         case 'createFollowupReminder':
           return await this.createFollowupReminder(args, ctx);
+        // ---- Phase 3 规范名（209）----
+        case 'listPendingPrescriptions':
+          return await this.getPendingPrescriptions(args, ctx);
+        case 'summarizeOverspend':
+          return await this.summarizeOverspend(args, ctx);
+        case 'listOverspendCases':
+          return await this.listOverbudgetCases(args, ctx);
+        case 'listFollowups':
+          return await this.listFollowups(args, ctx);
+        case 'getFollowupGuidance':
+          return await this.getFollowupGuidance(args, ctx);
         default:
           return { ok: false, result: null, error: `unknown tool: ${name}` };
       }
@@ -855,6 +1083,108 @@ export class DefaultToolExecutor implements ToolExecutor {
         followupId: rec.id,
         scheduledDate: rec.appointmentDate,
         createdAt: rec.createdAt,
+      },
+    };
+  }
+
+  /**
+   * summarizeOverspend（医保办，info，只读聚合）：
+   *  - 取已确认 DRG 分组结果，映射为 OverspendRow 后交给纯函数
+   *    summarizeOverspendByGroup 按病组汇总当月超支金额与例数；
+   *  - 数据源不可用（表缺失/查询异常）时返回结构化占位说明，不抛错、不编造数字；
+   *  - 全程只读，不写费用、不调整结算。
+   */
+  private async summarizeOverspend(
+    _args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    try {
+      const rows = await drgRepo.listDrgResults('confirmed');
+      const summary = summarizeOverspendByGroup(
+        rows.map((r) => ({
+          groupCode: r.groupCode,
+          groupName: r.groupName,
+          totalFee: r.totalFee == null ? 0 : Number(r.totalFee),
+          estimatedPayment: Number(r.estimatedPayment),
+        })),
+      );
+      return {
+        ok: true,
+        result: { ...summary, period: 'month', dataSource: 'clinical.drg_group_results' },
+      };
+    } catch {
+      // 无真实聚合表/查询不可用时的结构化占位说明（只读、不臆造）
+      return {
+        ok: true,
+        result: {
+          dataAvailable: false,
+          placeholder: true,
+          reason: 'DRG/DIP 聚合数据源暂不可用，返回结构化占位说明',
+          groups: [],
+          totalOverspendAmount: 0,
+          totalCases: 0,
+          currency: 'CNY',
+        },
+      };
+    }
+  }
+
+  /**
+   * listFollowups（患者端，info，只读）：
+   *  - 列出未完成的术后随访（completed_at IS NULL），关联就诊/患者取脱敏姓名；
+   *  - 交给纯函数 sortFollowupsByDue 排序（逾期优先、日期升序）；
+   *  - 只读，不回写病历。
+   */
+  private async listFollowups(
+    _args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const rows = await db()<Array<{
+      visit_id: string; patient_id: string; patient_name: string;
+      timepoint: string | null; due_at: string;
+    }>>`
+      SELECT f.visit_id, v.patient_id, p.name_masked AS patient_name,
+             f.timepoint, f.due_at
+      FROM clinical.postop_pain_followups f
+      JOIN clinical.visits v ON v.id = f.visit_id
+      LEFT JOIN clinical.patients p ON p.id = v.patient_id
+      WHERE f.completed_at IS NULL
+      ORDER BY f.due_at ASC
+      LIMIT 50
+    `;
+    const today = new Date().toISOString().slice(0, 10);
+    const items: FollowupItem[] = rows.map((r) => ({
+      visitId: r.visit_id,
+      patientId: r.patient_id,
+      patientName: r.patient_name,
+      dueDate: String(r.due_at).slice(0, 10),
+      timepoint: r.timepoint,
+    }));
+    const sorted = sortFollowupsByDue(items, today);
+    return { ok: true, result: { followups: sorted, total: sorted.length, today } };
+  }
+
+  /**
+   * getFollowupGuidance（患者端，info，只读）：
+   *  - 返回随访沟通话术模板，不回写病历、不做诊断、不开药；
+   *  - 涉及用药/病情一律引导联系主管医生。
+   */
+  private async getFollowupGuidance(
+    args: Record<string, unknown>,
+    _ctx: ToolContext,
+  ): Promise<ToolExecuteResult> {
+    const visitId = str(args, 'visitId');
+    const timepoint = typeof args.timepoint === 'string' ? args.timepoint : '';
+    return {
+      ok: true,
+      result: {
+        visitId,
+        timepoint: timepoint || null,
+        guidance:
+          '您好，这里是健澜数智医院随访专员。本次随访主要了解您出院后的恢复情况与用药依从性，' +
+          '请您按提示逐项反馈；如出现发热、剧痛、伤口异常等情况，请立即联系主管医生或返院就诊。',
+        disclaimer:
+          '本话术为 AI 生成的沟通模板，不构成诊疗建议，不得据此调整用药；任何病情变化请联系主管医生。',
       },
     };
   }

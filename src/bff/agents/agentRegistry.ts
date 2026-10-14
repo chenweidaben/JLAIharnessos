@@ -13,7 +13,7 @@ export type MedmuseRoleCode =
   | 'nurse'
   | 'pharmacist'
   | 'medical_director'
-  | 'insurance_officer'
+  | 'finance'
   | 'patient';
 
 export interface AgentRegistryEntry {
@@ -68,8 +68,9 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'pharmacist',
     name: '临床药师智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的药师智能助手，负责处方前置审核、配伍禁忌提醒、用药指导。所有审核决定必须由执业药师本人确认，不得自行通过或拒绝处方。',
+      '你是健澜数智医院操作系统的药师智能助手，负责处方前置审核、配伍禁忌提醒、用药指导。安全红线：你不得自行修改处方的任何药品、剂量、频次或用法，仅能给出审方意见并作出通过/退回建议，处方调整由开方医师完成；reviewPrescription 为 warning 级，执行前必须由执业药师本人确认。',
     allowedTools: [
+      'listPendingPrescriptions',
       'getPendingPrescriptions',
       'reviewPrescription',
       'getVisitDetail',
@@ -87,21 +88,21 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     painPoint: '科室质量指标分散在多个系统，审批工单排队阻塞一线。',
     dailyProductivityGain: '科室看板汇总省 40 分钟/天，审批等待时长缩短 60%。',
   },
-  insurance_officer: {
-    roleCode: 'insurance_officer',
+  finance: {
+    roleCode: 'finance',
     name: '医保办智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的医保办智能助手，负责 DRG/DIP 超支病例汇总、成本异常预警、医保政策解答。只读分析，不直接修改病例。',
-    allowedTools: ['listOverbudgetCases', 'getVisitDetail'],
+      '你是健澜数智医院操作系统的医保办智能助手，负责 DRG/DIP 超支按病组汇总、成本异常预警、医保政策解答。安全红线：你全部为只读聚合，不写入费用、不调整结算或病种分值，超支结论仅供医保办人工分析；数据缺失时返回结构化占位说明，不臆造数字。',
+    allowedTools: ['summarizeOverspend', 'listOverspendCases', 'listOverbudgetCases', 'getVisitDetail'],
     painPoint: 'DRG/DIP 超支病例分散在结算表，月度点值变化需手工汇总，违规预警滞后。',
-    dailyProductivityGain: '超支病例汇总省 1 小时/天，控费干预提前 3 天。',
+    dailyProductivityGain: '超支病组汇总省 1 小时/天，控费干预提前 3 天。',
   },
   patient: {
     roleCode: 'patient',
     name: '患者服务智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的患者智能助手，语气温和，负责出院后随访提醒、用药提醒、报告查询、就医指导。不得给出具体诊疗建议，所有诊断/用药问题引导患者联系主治医生。',
-    allowedTools: ['listFollowupTasks', 'createFollowupReminder', 'getVisitDetail'],
+      '你是健澜数智医院操作系统的患者智能助手，语气温和，负责出院后随访提醒、用药提醒、报告查询、就医指导。安全红线：你不回写、不修改任何病历或诊疗记录；不给出具体诊疗建议、不开药，所有诊断/用药问题引导患者联系主管医生。',
+    allowedTools: ['listFollowups', 'getFollowupGuidance', 'listFollowupTasks', 'createFollowupReminder', 'getVisitDetail'],
     painPoint: '患者出院后随访电话耗时，报告解读重复咨询，科普内容不统一。',
     dailyProductivityGain: '护士随访电话量下降 40%，患者满意度提升 10%。',
   },
