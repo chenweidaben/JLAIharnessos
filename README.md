@@ -124,6 +124,16 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 | 🛤️ 临床路径推荐 | 按病种推荐标准路径与变异管理 | 路径执行与偏差留痕 |
 | 📈 住院天数/费用预测 | 基于在院数据预测 LOS 与费用区间 | 辅助床位调度与成本管控 |
 
+### MEDMUSE 岗位智能体体系（M89–M91）
+
+| 里程碑 | 最新进展 |
+|---|---|
+| **M89 岗位智能体体系** | 8 类岗位角色智能体（admin / doctor / nurse / pharmacist / finance / patient 等），内置 14+ 岗位工具：处方前置审核、DRG/DIP 超支汇总、随访提醒、护理记录、查房交班报告等；Sentinel 审批红线——critical 级事项禁止自批自，必须跨岗位审批 |
+| **M90 真实数据打通** | AI 病历质控与护理计划推荐已接入真实 visit / diagnosis 数据，不再使用演示假数据 |
+| **M91 深海蓝 VI 体系** | Dashboard、患者、处方、药房等界面统一深海蓝配色 `#0A2540` / `#1E5F8C` / `#4A90D9` |
+| **/medmuse 工作台** | 岗位智能体对话页内嵌审批卡片，医师/药师可在对话流中直接批准或驳回待决事项 |
+| **双平台同步** | 代码仓库 GitCode + GitHub 双平台镜像同步 |
+
 ### 临床业务体系
 
 | 业务线 | 已闭环能力 |

@@ -124,6 +124,16 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 | 🛤️ Pathway Recommendation | Standard pathway & variance management by diagnosis | Execution and deviations fully logged |
 | 📈 LOS & Cost Prediction | Predicted length-of-stay and cost range | Bed scheduling & cost control support |
 
+### MEDMUSE Role-Agent System (M89–M91)
+
+| Milestone | Latest progress |
+|---|---|
+| **M89 Role-agent system** | 8 role-based agent personas (admin / doctor / nurse / pharmacist / finance / patient, etc.) with 14+ built-in role tools: pre-prescription review, DRG/DIP over-spend summary, follow-up reminders, nursing records, ward-round handoff reports; Sentinel approval guardrail — critical-level items prohibit self-approval and require cross-role sign-off |
+| **M90 Real data wired in** | AI note QC and nursing-plan recommendation now run on real visit / diagnosis data — no longer demo mock data |
+| **M91 Deep-sea-blue VI** | Dashboard, patient, prescription and pharmacy UIs unified on the Deep Sea Blue palette `#0A2540` / `#1E5F8C` / `#4A90D9` |
+| **/medmuse workbench** | The role-agent chat page embeds approval cards — clinicians and pharmacists can approve or reject pending items directly in the conversation flow |
+| **Dual-platform sync** | Repository mirrored on both GitCode and GitHub |
+
 ### Clinical Business Lines
 
 | Line | Closed-loop capabilities |
