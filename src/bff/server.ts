@@ -199,6 +199,7 @@ import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
+import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -386,6 +387,7 @@ const allRoutes: RouteDef[] = [
   ...monthlyReportRoutes,
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
+  ...opdWorkstationRoutes,
 ];
 
 interface Compiled {
