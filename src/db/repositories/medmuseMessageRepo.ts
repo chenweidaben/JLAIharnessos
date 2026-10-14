@@ -96,16 +96,37 @@ export function mapMessageRow(row: Record<string, unknown>): MedmuseMessage {
 /**
  * 领域对象 → 前端 wire 视图。
  * 前端约定 agent 角色展示为 assistant（user/tool 保持不变）。
+ *
+ * 工具调用入参持久化：role=tool 消息落库时已把入参包存进 tool_calls
+ * （结构 [{ id, name, args }]，args 即模型裁决的工具入参 JSON），
+ * 此处原样透传 toolCalls；同时补透 toolResult（执行结果）与派生 toolName，
+ * 供前端 ToolCallCard 展开时同屏对照「入参 / 结果」。
  */
 export interface MedmuseMessageView {
   id: string;
   sessionId: string;
   role: 'user' | 'assistant' | 'tool';
   content: string;
+  /** 工具调用入参包：[{ id, name, args }]，args 为工具入参 JSON */
   toolCalls: unknown;
+  /** 工具执行结果（仅 role=tool 消息携带） */
+  toolResult: unknown;
+  /** 从 toolCalls[0].name 派生的工具名，供卡片头部展示 */
+  toolName: string | null;
   confidence: MedmuseConfidence | null;
   disclaimer: string | null;
   createdAt: string;
+}
+
+/** 从 toolCalls 数组首项提取工具名（兼容对象行形态） */
+function deriveToolName(toolCalls: unknown): string | null {
+  if (!Array.isArray(toolCalls)) return null;
+  const first = toolCalls[0];
+  if (first && typeof first === 'object' && first !== null && 'name' in first) {
+    const name = (first as { name?: unknown }).name;
+    if (typeof name === 'string' && name) return name;
+  }
+  return null;
 }
 
 export function toMessageView(m: MedmuseMessage): MedmuseMessageView {
@@ -115,6 +136,8 @@ export function toMessageView(m: MedmuseMessage): MedmuseMessageView {
     role: m.role === 'agent' ? 'assistant' : m.role,
     content: m.content,
     toolCalls: m.toolCalls,
+    toolResult: m.toolResult,
+    toolName: deriveToolName(m.toolCalls),
     confidence: m.confidence,
     disclaimer: m.disclaimer,
     createdAt: m.createdAt,

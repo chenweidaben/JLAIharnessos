@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import {
   Button,
   Card,
@@ -110,14 +110,25 @@ function summarizeToolContent(content: string, max = 80): string {
   return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
-/** 尝试把工具返回按 JSON 美化；失败则原样返回 */
-function prettyToolContent(content: string): string {
-  const trimmed = content.trim();
-  if (!trimmed) return '';
+/**
+ * 把工具入参/结果对象美化成可读 JSON 文本。
+ * 入参 args 可能是对象、JSON 字符串或标量，统一兜底；空值返回空串。
+ */
+function prettyJson(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    try {
+      return JSON.stringify(JSON.parse(trimmed), null, 2);
+    } catch {
+      return value;
+    }
+  }
   try {
-    return JSON.stringify(JSON.parse(trimmed), null, 2);
+    return JSON.stringify(value, null, 2);
   } catch {
-    return content;
+    return String(value);
   }
 }
 
@@ -135,11 +146,35 @@ function riskText(level: MedmuseApproval['riskLevel']): string {
   return '低风险';
 }
 
-/** 工具调用消息卡片：折叠显示工具名 + 结果摘要，展开看完整返回 */
+/** 工具调用消息卡片：折叠显示工具名 + 结果摘要，展开同屏查看「入参 / 结果」 */
 function ToolCallCard({ message }: { message: MedmuseMessage }) {
   const [open, setOpen] = useState(false);
-  const toolName = message.toolName ?? '未知工具';
-  const raw = message.content || '（无返回内容）';
+  // 入参包落库为 toolCalls:[{ id, name, args }]，取首项即本次调用
+  const firstCall =
+    Array.isArray(message.toolCalls) && message.toolCalls.length > 0
+      ? message.toolCalls[0]
+      : null;
+  const toolName = message.toolName ?? firstCall?.name ?? '未知工具';
+  const args = firstCall?.args ?? null;
+  const result = message.toolResult ?? null;
+
+  // 折叠头摘要：优先摘要结果 JSON，结果缺失再退回 content（“xx 执行完成”）
+  const summarySource =
+    result != null ? prettyJson(result) : message.content || '（无返回内容）';
+  const argsText = prettyJson(args);
+  const resultText = prettyJson(result) || message.content || '（无返回内容）';
+
+  const preStyle: CSSProperties = {
+    fontSize: 11,
+    margin: '4px 0 0',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-all',
+    background: '#fff',
+    border: '1px solid #e5e9f0',
+    borderRadius: 6,
+    padding: 8,
+  };
+
   return (
     <div
       style={{
@@ -172,25 +207,25 @@ function ToolCallCard({ message }: { message: MedmuseMessage }) {
             color: '#7a8699',
           }}
         >
-          {summarizeToolContent(raw)}
+          {summarizeToolContent(summarySource)}
         </span>
         <span style={{ color: '#999' }}>{open ? '▾' : '▸'}</span>
       </div>
       {open && (
-        <pre
-          style={{
-            fontSize: 11,
-            margin: '8px 0 0',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-all',
-            background: '#fff',
-            border: '1px solid #e5e9f0',
-            borderRadius: 6,
-            padding: 8,
-          }}
-        >
-          {prettyToolContent(raw)}
-        </pre>
+        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 11, color: PRIMARY, fontWeight: 600, marginBottom: 2 }}>
+              入参
+            </div>
+            <pre style={preStyle}>{argsText || '（无入参）'}</pre>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: PRIMARY, fontWeight: 600, marginBottom: 2 }}>
+              结果
+            </div>
+            <pre style={preStyle}>{resultText}</pre>
+          </div>
+        </div>
       )}
     </div>
   );

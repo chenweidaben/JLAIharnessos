@@ -27,6 +27,11 @@ export interface MedmuseMessage {
   sessionId: string;
   role: 'user' | 'assistant' | 'tool';
   content: string;
+  /** 工具调用入参包：[{ id, name, args }]，args 即工具入参 JSON（role=tool 时携带） */
+  toolCalls?: Array<{ id?: string; name?: string; args?: unknown }> | null;
+  /** 工具执行结果（role=tool 时携带），与入参同屏对照 */
+  toolResult?: unknown;
+  /** 工具名（后端从 toolCalls[0].name 派生） */
   toolName?: string | null;
   confidence?: 'high' | 'medium' | 'low' | null;
   disclaimer?: string | null;
