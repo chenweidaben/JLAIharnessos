@@ -57,6 +57,7 @@ import { losPredictionRoutes } from './routes/losPrediction';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
+import { researchExportRoutes } from './routes/researchExport';
 import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataGovernanceRoutes } from './routes/dataGovernance';
@@ -231,6 +232,7 @@ const allRoutes: RouteDef[] = [
   ...voiceMedicalRoutes,
   ...frontPageRoutes,
   ...researchRoutes,
+  ...researchExportRoutes,
   ...empiRoutes,
   ...dataWarehouseRoutes,
   ...dataGovernanceRoutes,
