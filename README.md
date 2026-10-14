@@ -134,6 +134,23 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 | **/medmuse 工作台** | 岗位智能体对话页内嵌审批卡片，医师/药师可在对话流中直接批准或驳回待决事项 |
 | **双平台同步** | 代码仓库 GitCode + GitHub 双平台镜像同步 |
 
+### 版本迭代记录（v1.66–v1.77）
+
+| 版本 | 说明 |
+|---|---|
+| **v1.66.0-smoke** | 前端 jsdom 冒烟测试（5 页渲染） |
+| **v1.67.0-summary** | MEDMUSE 多轮对话上下文摘要（超20轮） |
+| **v1.68.0-esign** | 电子签名留痕（SHA-256+时间戳+操作人） |
+| **v1.69.0-notify** | 微信/钉钉 webhook 通知骨架 |
+| **v1.70.0-esignmount** | 电子签名挂载到病历/医嘱/处方主流程 |
+| **v1.71.0-agenthealth** | MEDMUSE agent 健康度看板 |
+| **v1.72.0-pathwayvariance** | 临床路径变异管理 |
+| **v1.73.0-surgeryschedule** | 手术排程看板（日/周视图） |
+| **v1.74.0-agenthook** | agent 健康度真实挂钩 |
+| **v1.75.0-multimodality** | MEDMUSE 多模态扩展骨架 |
+| **v1.76.0-nursehandoff** | 护士交接班记录 |
+| **v1.77.0-insuranceaudit** | 医保智能审核规则引擎 |
+
 ### 临床业务体系
 
 | 业务线 | 已闭环能力 |
