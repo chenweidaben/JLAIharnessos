@@ -113,6 +113,7 @@ import { admissionNoteRoutes } from './routes/admissionNote';
 import { progressNoteRoutes } from './routes/progressNote';
 import { consultRequestRoutes } from './routes/consultRequest';
 import { consentFormRoutes } from './routes/consentForm';
+import { orderRoutes } from './routes/order';
 import { followupApptRoutes } from './routes/followupAppt';
 import { satisfactionSurveyRoutes } from './routes/satisfactionSurvey';
 import { satisfactionReminderRoutes } from './routes/satisfactionReminder';
@@ -247,6 +248,7 @@ const allRoutes: RouteDef[] = [
 ...progressNoteRoutes,
 ...consultRequestRoutes,
 ...consentFormRoutes,
+...orderRoutes,
 ...followupApptRoutes,
 ...satisfactionSurveyRoutes,
 ...satisfactionReminderRoutes,
