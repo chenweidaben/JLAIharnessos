@@ -63,6 +63,7 @@ import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
+import { billRoutes } from './routes/bill';
 import { drgRoutes } from './routes/drg';
 import { exportRoutes } from './routes/export';
 import { labInterpretRoutes } from './routes/labInterpret';
@@ -227,6 +228,7 @@ const allRoutes: RouteDef[] = [
   ...outboxRoutes,
   ...sessionAdminRoutes,
   ...billingRoutes,
+  ...billRoutes,
   ...drgRoutes,
   ...exportRoutes,
   ...labInterpretRoutes,

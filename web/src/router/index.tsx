@@ -244,6 +244,8 @@ const PathwayVariancePage = lazy(() => import('@/pages/emrGap/pathwayVariance'))
 const SurgerySchedulePage = lazy(() => import('@/pages/surgery/Schedule'));
 // 护士交接班记录（M100-B）
 const NurseHandoffPage = lazy(() => import('@/pages/nursing/Handoff'));
+// 住院费用清单（M101-A）
+const BillListPage = lazy(() => import('@/pages/billing/BillList'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -422,6 +424,8 @@ export default function AppRoutes() {
           <Route path="surgery/schedule" element={<SurgerySchedulePage />} />
           {/* 护士交接班记录（M100-B） */}
           <Route path="nursing/handoff" element={<NurseHandoffPage />} />
+          {/* 住院费用清单（M101-A） */}
+          <Route path="billing/bill-list" element={<BillListPage />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
