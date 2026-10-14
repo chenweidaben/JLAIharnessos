@@ -37,7 +37,8 @@ export const useDashboardStatsStore = create<DashboardStatsState>()((set) => ({
     set({ healthChecking: true });
     try {
       const health = await getSystemHealth();
-      const dbUp = health.db === 'up';
+      // DEMO_MODE 下 db 为 "skipped"，但 BFF 提供内存演示数据，视为可用
+      const dbUp = health.db === 'up' || health.demoMode === true || health.db === 'skipped';
       set({ dbUp, healthChecking: false, error: null });
       return dbUp;
     } catch {

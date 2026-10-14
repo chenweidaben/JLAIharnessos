@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技数智医院智能�?- BFF HTTP/WebSocket 服务�? *
  * 基于 Bun 原生运行时，零额外依赖：
  *  - REST：统丢� /api/v1 前缀，聚合后端服务并适配前端
@@ -391,9 +391,12 @@ function broadcast(event: string, payload: unknown, seq?: number): void {
   }
 }
 
-// 影像 AI（DAMO-RADAR）critical 发现复用同一 /ws/chat critical:alert 通道推��危急��?setCriticalAlertSink(broadcast);
+// 影像 AI critical 发现复用同一 /ws/chat critical:alert 通道推送危急值
+setCriticalAlertSink(broadcast);
 
-// M7-C 事务性发件箱中继：业务事务写�?event_outbox，Relay 轮询发布�?WebSocket�?// publisher 复用 broadcast（同 /ws/chat 通道）；发布失败仅记录，不影响业务��?const outboxRelay = new OutboxRelay(
+// M7-C 事务性发件箱中继：业务事务写 event_outbox，Relay 轮询发布到 WebSocket
+// publisher 复用 broadcast（同 /ws/chat 通道）；发布失败仅记录，不影响业务事务
+const outboxRelay = new OutboxRelay(
   (event, payload, meta) => broadcast(event, payload, meta.seq),
   {
     batchSize: 50,
@@ -442,7 +445,8 @@ async function handleAgentStart(
 ): Promise<void> {
   const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   let conversationId = frame.conversationId ?? frame.payload?.conversationId ?? '';
-  // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问��，避免空消息报�?  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍丢�下健澜数智医院智能体可以为我提供哪些临床辅助能力�?;
+  // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问候，避免空消息报错
+  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜数智医院智能体可以为我提供哪些临床辅助能力。';
 
   const send = (event: string, payload: unknown): void => {
     try {
@@ -453,7 +457,8 @@ async function handleAgentStart(
   };
 
   try {
-    // 会话不存在则先创�?    let conv = conversationId ? await getConversationById(conversationId) : null;
+    // 会话不存在则先创建
+    let conv = conversationId ? await getConversationById(conversationId) : null;
     if (!conv) {
       conv = await createConversation({ userId: 'ws-user', title: 'WebSocket 会话' });
       conversationId = conv.id;
@@ -497,7 +502,8 @@ async function handleFetch(
   const url = new URL(req.url);
   const startedAt = Date.now();
 
-  // WebSocket 升级（需鉴权�?  if (url.pathname === '/ws/chat' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
+  // WebSocket 升级（需鉴权）
+  if (url.pathname === '/ws/chat' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
     if (!wsAuthorized(req)) {
       return new Response('unauthorized', { status: 401 });
     }
@@ -506,7 +512,8 @@ async function handleFetch(
   }
 
   // Prometheus 指标端点。默认依赖内网网络策略隔离（不对公网暴露）；
-  // 配置 METRICS_TOKEN 后强制校�?Authorization: Bearer <token>�?  if (url.pathname === '/metrics' && req.method === 'GET') {
+  // 配置 METRICS_TOKEN 后强制校验 Authorization: Bearer <token>
+  if (url.pathname === '/metrics' && req.method === 'GET') {
     const expectedToken = process.env.METRICS_TOKEN;
     if (expectedToken) {
       const auth = req.headers.get('authorization') ?? '';
@@ -520,10 +527,12 @@ async function handleFetch(
     });
   }
 
-  // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数�?  const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
+  // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
+  const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
   const rawBody = mayHaveBody ? await req.text() : null;
   // 直连客户�?IP（Bun 运行时从 socket 解析）；经反向代理时各路由以
-  // x-forwarded-for 首段为准，此值仅作直�?兜底�?  const socketIp = server.requestIP(req)?.address ?? null;
+  // x-forwarded-for 首段为准，此值仅作直连兜底
+  const socketIp = server.requestIP(req)?.address ?? null;
   const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody, socketIp);
   attachUser(ctx);
   // M7-F：校验会话是否已登出/被吊锢�（异步，�?jti 查会话台账）
@@ -546,7 +555,8 @@ async function handleFetch(
       return withSecurityHeaders(csrfDenied);
     }
 
-    // 多租�?院区上下文解析（无显式租户头时回逢�默认租户；未�?停用/越权院区短路 403�?    const tenantDenied = tenantContextMiddleware(ctx);
+    // 多租户/院区上下文解析（无显式租户头时回退默认租户；未授权/停用/越权院区短路 403）
+    const tenantDenied = tenantContextMiddleware(ctx);
     if (tenantDenied) {
       status = 403;
       return withSecurityHeaders(tenantDenied);
@@ -570,7 +580,8 @@ async function handleFetch(
       }
       const handler = r.def.handle;
       // 错误处理在外、幂等在内：beginProcessing �?handler 任何阶段抛错
-      // 都转结构化错误信封（�?traceId），不返�?HTML 错误�?      const wrapped = withErrorHandler((c: Ctx) =>
+      // 都转结构化错误信封（带 traceId），不返回 HTML 错误页
+      const wrapped = withErrorHandler((c: Ctx) =>
         withIdempotency(c, () => handler(c)));
       const res = await wrapped(ctx);
       status = res.status;
@@ -580,7 +591,7 @@ async function handleFetch(
     status = 404;
     return withSecurityHeaders(
       json(
-        fail(ErrorCode.NOT_FOUND, `路由不存�? ${req.method} ${url.pathname}`, ctx.traceId),
+        fail(ErrorCode.NOT_FOUND, `路由不存在： `, ctx.traceId),
         404,
       ),
     );
@@ -603,20 +614,20 @@ const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 't
 
 async function initDatabase(): Promise<void> {
   if (isDemoMode) {
-    console.warn('[db] DEMO_MODE=1：跳�?PostgreSQL 连接，使用内存演示数据（不持久化�?);
+    console.warn('[db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）');
     return;
   }
   try {
     await verifyDbConnection(5, 2000);
     console.log('[db] PostgreSQL 连接成功');
     await autoMigrate();
-    console.log('[db] 数据库迁移完�?);
-    // 加载租户/院区注册表到内存（运行时解析保持内存级，写操作写穿��回库）
+    console.log('[db] 数据库迁移完成');
+    // 加载租户/院区注册表到内存（运行时解析保持内存级，写操作写穿透回库））
     const tenantCount = await tenantService.hydrate();
     console.log(`[db] 租户/院区注册表已加载�?{tenantCount} 个节点）`);
   } catch (err) {
     console.error('[db] 数据库初始化失败，服务无法启动：', String(err));
-    console.error('[db] 如需�?DB 演示，请设置 DEMO_MODE=1');
+    console.error('[db] 如需无 DB 演示，请设置 DEMO_MODE=1');
     process.exit(1);
   }
 }
@@ -651,7 +662,8 @@ const server = Bun.serve({
       } catch {
         /* ignore */
       }
-      // 兼容前端事件帧（event）与早期 action �?      const kind = parsed.event ?? parsed.action;
+      // 兼容前端事件帧（event）与早期 action
+      const kind = parsed.event ?? parsed.action;
 
       if (kind === 'heartbeat' || kind === 'ping') {
         ws.send(
@@ -661,7 +673,8 @@ const server = Bun.serve({
       }
 
       if (kind === 'agent:start' || kind === 'start_stream') {
-        // 真实 LLM 流式：会话不存在则创建，runChatTurn 内部落库并回调推�?        void handleAgentStart(ws, parsed);
+        // 真实 LLM 流式：会话不存在则创建，runChatTurn 内部落库并回调推送
+        void handleAgentStart(ws, parsed);
       }
     },
     close(ws) {
@@ -671,33 +684,31 @@ const server = Bun.serve({
   },
 });
 
-// 演示用：非生产环境且�?DEMO_MODE 周期性推送模拟危急��告�?const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
+// 演示用：非生产环境周期性推送模拟危急值告警
+const isProduction = (process.env.NODE_ENV ?? 'development') === 'production';
 const demoAlertTimer = isProduction || isDemoMode
   ? null
   : setInterval(() => {
-      // 事件名与前端 useAlert 订阅�?critical:alert 通道保持丢�致；
-      // payload 对齐前端 Alert 契约（type/level/title/content/patientId）��?      // 演示告警使用固定 id：前端按 id 去重（seenRef），同一客户端只弹一次，
-      // 避免同一危����每 30s 重复弹窗/堆积（真实场景同丢�危����不应重复强提醒）；
-      // 新连接的客户端仍会收到首次广播，保留实时告警演示效果�?      broadcast('critical:alert', {
+      broadcast('critical:alert', {
         id: 'al-demo-critical-cTni',
         type: 'critical-value',
         level: 'critical',
-        title: '肌钙蛋白危����?,
-        content:
-          '�?*（P100086）cTnI 升高达危急��，请立即复核并按危急��流程处置（10 分钟内处�?+ 双人复核 + 系统登记�?,
+        title: '肌钙蛋白危急值',
+        content: '患者（P100086）cTnI 升高达危急值，请立即复核并按危急值流程处置（10 分钟内处理 + 双人复核 + 系统登记）',
         patientId: 'P100086',
-        patientName: '�?*',
+        patientName: '张*',
         createdAt: new Date().toISOString(),
         acknowledged: false,
       });
     }, 30_000);
 
-// 优雅停机：停止接收新连接、关闭演示定时器�?WS、关�?DB 连接池，再����?let shuttingDown = false;
+// 优雅停机
+let shuttingDown = false;
 function shutdown(signal: string): void {
   if (shuttingDown) return;
   shuttingDown = true;
   // eslint-disable-next-line no-console
-  console.log(`[jianlan-bff] 收到 ${signal}，开始优雅停机��`);
+  console.log(`[jianlan-bff] 收到 ${signal}，开始优雅停机...`);
   if (demoAlertTimer) clearInterval(demoAlertTimer);
   outboxRelay.stop();
   for (const ws of chatClients) {

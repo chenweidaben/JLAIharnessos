@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技杠OS — 知识加工流水线
  *
  * 阶段：parse → clean → split → normalize → entity → relation → embed → ingest
@@ -113,7 +113,7 @@ export function cleanText(text: string): string {
   return text
     .replace(/[\t ]+/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/[�]{2,}/g, '')
+    .replace(/[]{2,}/g, '')
     .split('\n')
     .map((l) => l.trimEnd())
     .join('\n')

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技数智医院智能体 - 统一临床数据访问层
  *
  * 对上层医疗工具（src/medical-tools/）屏蔽"演示内存数据"与"真实 PostgreSQL"的差异：
@@ -425,7 +425,7 @@ export const clinicalData = {
       });
       return { id: orderId };
     }
-    return orderRepo.createOrder(input);
+    return orderRepo.create(input);
   },
 
   async cancelOrder(orderId: string, reason: string): Promise<orderRepo.Order | null> {

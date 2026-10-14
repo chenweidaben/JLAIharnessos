@@ -23,7 +23,7 @@ export async function listView(view: AuthView) {
 }
 
 export async function acceptView(view: AuthView, id: string) {
-  if (!view.permissions.includes('consult:respond')) throw new ConsultError(403,'无应答权限'');
+  if (!view.permissions.includes('consult:respond')) throw new ConsultError(403, '无应答权限');
   const r = await repo.accept(id, view.id);
   if (!r) throw new ConsultError(409, '仅待应答会诊可接受');
   return r;
