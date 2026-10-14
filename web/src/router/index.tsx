@@ -226,6 +226,8 @@ const DeptCockpitPage = lazy(() => import('@/pages/medmuse/DeptCockpit'));
 const DrugReviewPage = lazy(() => import('@/pages/emrGap/drugReview'));
 // 电子病历五级评审自评仪表盘（M94-C）
 const EmrLevel5Page = lazy(() => import('@/pages/emrGap/level5'));
+// 患者 360 综合时间线（M96-C）
+const Patient360Timeline = lazy(() => import('@/pages/patients/Patient360'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -274,6 +276,8 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="patients" element={<PatientList />} />
           <Route path="patients/:id" element={<PatientDetail />} />
+          {/* 患者 360 综合时间线（M96-C） */}
+          <Route path="patients/360/:id" element={<Patient360Timeline />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
