@@ -12,7 +12,10 @@ import { describe, expect, it } from 'bun:test';
 import {
   buildWarnings,
   computeDeptKpis,
+  pickDeptFeeSamples,
+  summarizeInpatientVisits,
   type DeptKpiRow,
+  type InpatientVisitLike,
 } from '../../src/bff/aggregators/deptCockpitAggregator';
 
 /** 与 aggregator 内 DEMO_ROW 同形的完整行 */
@@ -109,5 +112,75 @@ describe('buildWarnings 红线推导', () => {
     expect(k.gradeARate).toBe(1);
     const ws = buildWarnings(k);
     expect(ws.some((w) => w.severity === 'info' && w.id === 'all-good')).toBe(true);
+  });
+});
+
+describe('summarizeInpatientVisits 真实就诊汇总（纯函数）', () => {
+  const today = '2026-10-14';
+  const nowIso = '2026-10-14T08:00:00.000Z';
+
+  it('在院 ongoing 计为在院，住院日=now-admit；缺 dischargeAt 用已住院天数', () => {
+    const visits: InpatientVisitLike[] = [
+      // 已在院 3 天
+      { status: 'ongoing', admitAt: '2026-10-11T08:00:00.000Z', dischargeAt: null },
+    ];
+    const s = summarizeInpatientVisits(visits, today, nowIso);
+    expect(s.inHospitalCount).toBe(1);
+    expect(s.dischargedToday).toBe(0);
+    expect(s.losDays.length).toBe(1);
+    expect(s.losDays[0]).toBeCloseTo(3, 5);
+  });
+
+  it('当日出院计 dischargedToday，住院日=discharge-admit；隔日出院不计当日', () => {
+    const visits: InpatientVisitLike[] = [
+      // 今天出院：住院 4 天
+      { status: 'discharged', admitAt: '2026-10-10T08:00:00.000Z', dischargeAt: '2026-10-14T08:00:00.000Z' },
+      // 昨天出院：住院 4 天，但不计当日出院
+      { status: 'discharged', admitAt: '2026-10-09T08:00:00.000Z', dischargeAt: '2026-10-13T08:00:00.000Z' },
+    ];
+    const s = summarizeInpatientVisits(visits, today, nowIso);
+    expect(s.inHospitalCount).toBe(0);
+    expect(s.dischargedToday).toBe(1);
+    expect(s.losDays).toHaveLength(2);
+    expect(s.losDays[0]).toBeCloseTo(4, 5);
+    expect(s.losDays[1]).toBeCloseTo(4, 5);
+  });
+
+  it('transferred/cancelled 不计入在院、当日出院与住院日样本', () => {
+    const visits: InpatientVisitLike[] = [
+      { status: 'transferred', admitAt: '2026-10-12T08:00:00.000Z', dischargeAt: null },
+      { status: 'cancelled', admitAt: '2026-10-12T08:00:00.000Z', dischargeAt: null },
+    ];
+    const s = summarizeInpatientVisits(visits, today, nowIso);
+    expect(s.inHospitalCount).toBe(0);
+    expect(s.dischargedToday).toBe(0);
+    expect(s.losDays).toHaveLength(0);
+  });
+
+  it('缺 admitAt 的就诊不产出非法住院日（不臆造）', () => {
+    const visits: InpatientVisitLike[] = [
+      { status: 'ongoing', admitAt: null, dischargeAt: null },
+    ];
+    const s = summarizeInpatientVisits(visits, today, nowIso);
+    expect(s.inHospitalCount).toBe(1);
+    expect(s.losDays).toHaveLength(0);
+  });
+});
+
+describe('pickDeptFeeSamples DRG/DIP 结算费用筛选（纯函数）', () => {
+  it('只取本科室、可解析、非负的费用样本', () => {
+    const fees = pickDeptFeeSamples([
+      { department: '内科', totalFee: '8200.5' },
+      { department: '内科', totalFee: null },
+      { department: '外科', totalFee: '9000' }, // 非本科室
+      { department: '内科', totalFee: -100 },   // 非法负值
+      { department: '内科', totalFee: 5000 },  // 数值型
+    ], '内科');
+    expect(fees).toEqual([8200.5, 5000]);
+  });
+
+  it('空行或无本科室行返回空数组（次均费用降级 null，不臆造）', () => {
+    expect(pickDeptFeeSamples([], '内科')).toEqual([]);
+    expect(pickDeptFeeSamples([{ department: '外科', totalFee: '1' }], '内科')).toEqual([]);
   });
 });

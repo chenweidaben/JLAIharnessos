@@ -7,14 +7,19 @@
  *  - 次均费用 = 已结算就诊 totalFee 均值（元）；
  *  - 甲级病历率 = 终末质控评分 ≥90 分占比。
  *
- * 数据策略：优先用 medicalHeaderRepo.listByDept + terminalQcRepo 做真实聚合；
- * repo 无数据/查询失败时，安全降级为内存演示行（demo: true），绝不抛 500。
+ * 数据策略：真实装载 ——
+ *  - 在院/当日出院/平均住院日：visitRepo.listInpatientByDept（状态过滤）；
+ *  - 次均费用：drgRepo.listDrgResults 本科室结算 totalFee；
+ *  - 甲级病历率：terminalQcRepo.listRecentByDept 近 30 日 ≥90 分占比；
+ * 各 repo 调用独立 try/catch，单项失败只令该 KPI 降级为 null，不波及其它字段；
+ * 就诊主查询无数据/失败时整体回退内存演示行（demo: true），绝不抛 500。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import * as medicalHeaderRepo from '@/db/repositories/medicalHeaderRepo';
+import * as drgRepo from '@/db/repositories/drgRepo';
 import type { TerminalQcIssue } from '@/db/repositories/terminalQcRepo';
 import * as terminalQcRepo from '@/db/repositories/terminalQcRepo';
+import * as visitRepo from '@/db/repositories/visitRepo';
 
 import type { AuthView } from '../view/userView.js';
 
@@ -174,55 +179,124 @@ function daysBetween(fromDate: string, toDate: string): number | null {
   return (b - a) / 86_400_000;
 }
 
+/* ----------------------- 纯函数：真实就诊/结算 → 统计样本 ----------------------- */
+
+/** 住院就诊的最小视图（与 visitRepo.Visit 对齐的可测子集） */
+export interface InpatientVisitLike {
+  status: string;
+  admitAt: string | null;
+  dischargeAt: string | null;
+}
+
+/**
+ * 纯函数：把住院就诊列表汇总为在院数 / 当日出院数 / 住院日样本。
+ * - 在院：status === 'ongoing'（未出院）；
+ * - 当日出院：status === 'discharged' 且 dischargeAt 的日期等于 today；
+ * - 住院日：已出院 = dischargeAt - admitAt；在院且缺 dischargeAt = nowIso - admitAt（已住院天数）；
+ * - transferred/cancelled 不计入在院、出院与住院日样本。
+ */
+export function summarizeInpatientVisits(
+  visits: InpatientVisitLike[],
+  today: string,
+  nowIso: string,
+): { inHospitalCount: number; dischargedToday: number; losDays: number[] } {
+  let inHospitalCount = 0;
+  let dischargedToday = 0;
+  const losDays: number[] = [];
+  for (const v of visits) {
+    const ongoing = v.status === 'ongoing';
+    const discharged = v.status === 'discharged';
+    if (!ongoing && !discharged) continue;
+    if (ongoing) inHospitalCount++;
+    // 缺 dischargeAt 的在院患者用「已住院天数」（nowIso - admitAt）
+    const endIso = v.dischargeAt ?? nowIso;
+    const los = daysBetween(v.admitAt ?? '', endIso);
+    if (los != null && los >= 0) losDays.push(los);
+    if (discharged && v.dischargeAt && v.dischargeAt.slice(0, 10) === today) {
+      dischargedToday++;
+    }
+  }
+  return { inHospitalCount, dischargedToday, losDays };
+}
+
+/** DRG/DIP 结算结果的最小费用视图（与 drgRepo.DrgResultListRow 对齐） */
+export interface DeptFeeRow {
+  department: string;
+  totalFee: string | number | null;
+}
+
+/**
+ * 纯函数：从 DRG/DIP 结算结果中挑出本科室、含总费用的样本（元）。
+ * totalFee 为字符串/数值均可解析；非法或空值跳过（不臆造费用）。
+ */
+export function pickDeptFeeSamples(rows: DeptFeeRow[], dept: string): number[] {
+  const fees: number[] = [];
+  for (const r of rows) {
+    if (r.department !== dept) continue;
+    if (r.totalFee == null) continue;
+    const n = Number(r.totalFee);
+    if (Number.isFinite(n) && n >= 0) fees.push(n);
+  }
+  return fees;
+}
+
 /**
  * 尝试从真实 repo 聚合当日科室统计行。
- * 仅 medicalHeaderRepo.listByDept 是科室级查询；床位无 repo 来源，bedCount 置 0（周转率诚实降级）。
- * 任一查询失败或无科室病历首页时返回 null，由上层走 DEMO 兜底，绝不抛错。
+ * - 就诊主查询（visitRepo.listInpatientByDept）是锚点：失败或无在院/出院住院记录 → 返回 null，
+ *   由上层走 DEMO 兜底；
+ * - 次均费用（drgRepo）、甲级病历率（terminalQcRepo 近 30 日）各自独立 try/catch，
+ *   单项失败只令对应样本为空（KPI 降级 null），不波及其它字段；
+ * - 床位无 repo 来源，bedCount 置 0（周转率诚实降级为 null，不臆造）。
  */
 async function tryLoadRealRow(
   dept: string,
 ): Promise<{ row: DeptKpiRow; qcIssues: TerminalQcIssue[] } | null> {
   if (!dept) return null;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const nowIso = new Date().toISOString();
+
+  // (1) 锚点：在院人数 / 当日出院数 / 住院日样本 —— visitRepo 状态过滤
+  let inHospitalCount = 0;
+  let dischargedToday = 0;
+  const losDays: number[] = [];
+  let hasRealVisits = false;
   try {
-    const headers = await medicalHeaderRepo.listByDept(dept, 100);
-    if (!headers || headers.length === 0) return null;
-
-    const today = new Date().toISOString().slice(0, 10);
-    const losDays: number[] = [];
-    const fees: number[] = [];
-    let inHospitalCount = 0;
-    let dischargedToday = 0;
-
-    for (const h of headers) {
-      if (h.dischargeDate) {
-        const los = daysBetween(h.admissionDate, h.dischargeDate);
-        if (los != null && los >= 0) losDays.push(los);
-        if (h.dischargeDate.slice(0, 10) === today) dischargedToday++;
-      } else {
-        inHospitalCount++;
-      }
-      if (h.totalCost != null) fees.push(h.totalCost);
+    const visits = await visitRepo.listInpatientByDept(dept, 500);
+    if (visits && visits.length > 0) {
+      hasRealVisits = true;
+      const s = summarizeInpatientVisits(visits, today, nowIso);
+      inHospitalCount = s.inHospitalCount;
+      dischargedToday = s.dischargedToday;
+      losDays.push(...s.losDays);
     }
+  } catch { /* 就诊查询失败：整体走 DEMO 兜底 */ }
 
-    // 终末质控：按就诊取最新一条（限制 20 次以内，避免 N 次查询）
-    const qcScores: number[] = [];
-    const qcIssues: TerminalQcIssue[] = [];
-    for (const h of headers.slice(0, 20)) {
-      try {
-        const recs = await terminalQcRepo.listLatestByVisit(h.visitId, 1);
-        const latest = recs[0];
-        if (latest && latest.score != null) qcScores.push(latest.score);
-        qcIssues.push(...(latest?.issues ?? []));
-      } catch { /* 单就诊质控缺失不影响整体 */ }
+  // 无任何真实就诊数据 → 回退演示行
+  if (!hasRealVisits) return null;
+
+  // (2) 次均费用 —— drgRepo 真实结算 totalFee（失败/为空不影响其它字段）
+  const fees: number[] = [];
+  try {
+    const results = await drgRepo.listDrgResults(null);
+    fees.push(...pickDeptFeeSamples(results, dept));
+  } catch { /* DRG/DIP 结算缺失：次均费用降级 null */ }
+
+  // (3) 甲级病历率 —— terminalQcRepo 近 30 日评分 ≥90 占比（失败不影响其它字段）
+  const qcScores: number[] = [];
+  const qcIssues: TerminalQcIssue[] = [];
+  try {
+    const recs = await terminalQcRepo.listRecentByDept(dept, 30, 200);
+    for (const r of recs) {
+      if (r.score != null) qcScores.push(r.score);
+      qcIssues.push(...r.issues);
     }
+  } catch { /* 终末质控缺失：甲级病历率降级 null */ }
 
-    return {
-      row: { inHospitalCount, dischargedToday, bedCount: 0, losDays, fees, qcScores },
-      qcIssues,
-    };
-  } catch {
-    return null;
-  }
+  return {
+    row: { inHospitalCount, dischargedToday, bedCount: 0, losDays, fees, qcScores },
+    qcIssues,
+  };
 }
 
 /** 内存演示兜底行（DEMO 风格，前端明确标注 demo） */
@@ -265,5 +339,5 @@ export async function loadDeptDaily(view: AuthView): Promise<DeptCockpitResult> 
 
   // 真实数据不可用：DEMO 兜底
   const kpis = computeDeptKpis(DEMO_ROW);
-  return { deptName, date, demo: true, kpis: buildWarnings(kpis) };
+  return { deptName, date, demo: true, kpis, warnings: buildWarnings(kpis) };
 }

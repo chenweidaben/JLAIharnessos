@@ -157,6 +157,23 @@ export async function getVisitsByPatient(
   return rows.map(mapRow);
 }
 
+/**
+ * 按科室列住院就诊（在院 + 近期出院），供科主任驾驶舱聚合。
+ * 仅 visit_type='inpatient'；状态过滤（ongoing/discharged）与当日口径由上层聚合器完成。
+ */
+export async function listInpatientByDept(
+  dept: string, limit = 500, sql?: Sql,
+): Promise<Visit[]> {
+  const db = sql ?? getDb();
+  const qb = new QueryBuilder()
+    .where('department = ?', dept)
+    .where('visit_type = ?', 'inpatient');
+  const rows = await dynamicSelect<Record<string, unknown>>(
+    db, SELECT_COLS, 'clinical.visits', qb, 'admit_at DESC', limit,
+  );
+  return rows.map(mapRow);
+}
+
 export async function updateVisitStatus(id: string, status: VisitStatus, sql?: Sql): Promise<Visit | null> {
   const db = sql ?? getDb();
   const dischargeAt = status === 'discharged' ? new Date().toISOString() : null;

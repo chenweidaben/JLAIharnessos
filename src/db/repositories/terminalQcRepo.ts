@@ -52,6 +52,41 @@ export async function listLatestByVisit(visitId: string, limit = 10): Promise<Te
   return rows.map(mapRow);
 }
 
+/** 科室近 N 日终末质控记录（JOIN visits 过滤科室），供科主任驾驶舱甲级病历率 */
+export interface DeptRecentQcRow {
+  visitId: string;
+  score: number | null;
+  issues: TerminalQcIssue[];
+  createdAt: string;
+}
+
+/**
+ * 按科室取近 N 日终末质控评分（JOIN clinical.visits 过滤 dept）。
+ * 只返回 score IS NOT NULL 的记录，按时间倒序限量；问题清单随记录带回用于预警。
+ */
+export async function listRecentByDept(
+  dept: string, days = 30, limit = 200,
+): Promise<DeptRecentQcRow[]> {
+  const db = getDb();
+  const since = new Date(Date.now() - days * 86_400_000).toISOString();
+  const rows = await db`
+    SELECT t.visit_id, t.score, t.issues, t.created_at
+    FROM clinical.terminal_qc t
+    JOIN clinical.visits v ON v.id = t.visit_id
+    WHERE v.department = ${dept}
+      AND t.created_at >= ${since}
+      AND t.score IS NOT NULL
+    ORDER BY t.created_at DESC
+    LIMIT ${limit}
+  `;
+  return (rows as Record<string, unknown>[]).map((r) => ({
+    visitId: String(r.visit_id),
+    score: r.score == null ? null : Number(r.score),
+    issues: (r.issues as TerminalQcIssue[]) ?? [],
+    createdAt: String(r.created_at),
+  }));
+}
+
 function mapRow(r: Record<string, unknown>): TerminalQcRecord {
   return {
     id: r.id as string,
