@@ -143,6 +143,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ai_diagnosis:view', 'ai_pathway:view', 'ai_los_pred:view',
     'timeliness:view', 'timeliness:alert',
     'emr_assessment:view',
+    'ai_note_qc:view',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
@@ -256,6 +257,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'ai_diagnosis:view', 'ai_pathway:view', 'ai_los_pred:view',
     'timeliness:view', 'timeliness:alert',
     'emr_assessment:view',
+    'ai_note_qc:view',
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
