@@ -104,11 +104,31 @@ const navItems: NavItem[] = [
     label: '人工工单中心',
     perm: ['ai:chat:use', 'system:config'],
   },
+  {
+    key: 'grp-medmuse',
+    icon: <RobotOutlined />,
+    label: 'MEDMUSE 智能体',
+    children: [
+      { key: '/medmuse/dept-cockpit', label: '科主任驾驶舱', perm: 'dept_cockpit:view' },
+      // 路由未挂 RequirePermission，登录即可见，菜单不设 perm
+      { key: '/medmuse/approvals', label: '审批中心' },
+    ],
+  },
   { key: '/emergency', icon: <HeartOutlined />, label: '急诊分诊', perm: 'emg:view' },
   { key: '/pharmacy', icon: <ShopOutlined />, label: '药房发药', perm: 'pharmacy:view' },
   { key: '/medical-qc', icon: <AuditOutlined />, label: '病历质控', perm: 'medical_record:read' },
   { key: '/voice-medical', icon: <AudioOutlined />, label: '语音病历', perm: 'medical_record:read' },
   { key: '/front-page', icon: <FolderOpenOutlined />, label: '病案首页', perm: 'front_page:read' },
+  {
+    key: 'grp-emr',
+    icon: <FileSearchOutlined />,
+    label: 'EMR 文书质控',
+    children: [
+      { key: '/emr/terminal-qc', label: '终末质控', perm: 'terminal_qc:view' },
+      { key: '/emr/drug-review', label: '合理用药', perm: 'drug_review:view' },
+      { key: '/emr/level5', label: '五级评审', perm: 'emr_level5:view' },
+    ],
+  },
   { key: '/research', icon: <ExperimentOutlined />, label: '科研队列', perm: 'research:read' },
   { key: '/empi', icon: <IdcardOutlined />, label: '患者主索引', perm: 'empi:read' },
   { key: '/data-warehouse', icon: <DatabaseOutlined />, label: '数据湖仓', perm: 'data_warehouse:read' },
