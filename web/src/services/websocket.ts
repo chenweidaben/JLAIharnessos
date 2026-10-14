@@ -133,7 +133,8 @@ class WebSocketClient {
     for (;;) {
       let page: RecoveredEvent[];
       try {
-        const data = await get<{ items: RecoveredEvent[] }>('/api/v1/outbox/events', {
+        // baseURL 已带 /api/v1（见 utils/config.ts），此处用相对路径，避免拼成 /api/v1/api/v1/...
+        const data = await get<{ items: RecoveredEvent[] }>('/outbox/events', {
           after_id: cursor,
           limit: RECOVER_PAGE_SIZE,
         });

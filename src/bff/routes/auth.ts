@@ -219,7 +219,11 @@ export const authRoutes: RouteDef[] = [
       // 主动登出：吊销当前访问令牌会话，使令牌立即失效
       const user = c.user;
       if (user?.jti) {
-        await revokeByJti(user.jti, 'logout');
+        // 演示模式无数据库：跳过会话吊销落库（revokeByJti 直连 PG 会 500），
+        // 仅做内存会话标记并直接返回成功；真实模式行为不变。
+        if (!isDemo) {
+          await revokeByJti(user.jti, 'logout');
+        }
         markSessionRevoked(user.jti);
       }
       return json(ok(null));
