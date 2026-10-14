@@ -196,6 +196,7 @@ import { insuranceAuditRoutes } from './routes/insuranceAudit';
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
 import { bedMapRoutes } from './routes/bedMap';
+import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -380,6 +381,7 @@ const allRoutes: RouteDef[] = [
   ...qcRectificationRoutes,
   ...monthlyReportRoutes,
   ...bedMapRoutes,
+  ...ceoDashboardRoutes,
 ];
 
 interface Compiled {
