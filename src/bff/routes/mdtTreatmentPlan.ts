@@ -39,7 +39,51 @@ function guarded(perm: string, fn: (c: Ctx, view: AuthView) => Promise<unknown>)
   };
 }
 
+/**
+ * MDT 治疗计划草稿视图（demo）。
+ */
+export interface DraftPlanView {
+  mdtConsultId: string;
+  visitId: string;
+  departments: string[];
+  conclusion: string;
+  draft: string;
+  status: 'draft';
+  updatedAt: string;
+}
+
+/**
+ * 纯函数：构造 MDT 治疗计划草稿 demo 数据（DEMO_MODE 兜底，无副作用、可单测）。
+ *
+ * @returns 草稿视图
+ */
+export function listDraftView(): DraftPlanView {
+  return {
+    mdtConsultId: 'MDT-20261015-001',
+    visitId: 'V-20261012-088',
+    departments: ['肿瘤内科', '放疗科', '胸外科', '影像科'],
+    conclusion: '建议先行新辅助化疗 2 周期后复评，再评估手术时机。',
+    draft: '1. 完善基线检查；2. 行 XELOX 方案化疗；3. 2 周期后复查胸腹部 CT。',
+    status: 'draft',
+    updatedAt: '2026-10-15T08:40:00.000Z',
+  };
+}
+
+/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，返回内存 demo。 */
+const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
 export const mdtTreatmentPlanRoutes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/v1/mdt-treatment-plans/draft',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录', c.traceId), 401);
+      if (isDemo) return json(ok(listDraftView(), 'ok', c.traceId));
+      // 真实库草稿查询暂未提供，兜底返回内存 demo 草稿。
+      return json(ok(listDraftView(), 'ok', c.traceId));
+    },
+  },
   {
     method: 'POST',
     path: '/api/v1/mdt-treatment-plans/:mdtId/draft',

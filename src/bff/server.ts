@@ -149,6 +149,7 @@ import { amDashboardRoutes } from './routes/amDashboard';
 import { doctorWorkbenchRoutes } from './routes/doctorWorkbench';
 import { patientPortalRoutes } from './routes/patientPortal';
 import { surgicalChecklistRoutes } from './routes/surgicalChecklist';
+import { alertsRoutes } from './routes/alerts';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -206,6 +207,7 @@ import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
+import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 // ============================================================================
@@ -339,6 +341,7 @@ const allRoutes: RouteDef[] = [
 ...doctorWorkbenchRoutes,
 ...patientPortalRoutes,
 ...surgicalChecklistRoutes,
+...alertsRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

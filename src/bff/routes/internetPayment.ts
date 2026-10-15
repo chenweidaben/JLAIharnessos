@@ -198,15 +198,32 @@ export const internetPaymentRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/internet/payment/patient-profile',
+    auth: true,
     handle: async (c) => {
       if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录', c.traceId), 401);
-      if (isDemo) return json(ok({ accountId: c.user.id, patientId: 'P100001', demo: true }, 'ok', c.traceId));
+      if (isDemo) {
+        return json(
+          ok(
+            {
+              accountId: c.user.id,
+              patientId: 'P100001',
+              realName: '陈*',
+              balance: 1280.5,
+              pendingAmount: 360.0,
+              insuranceType: '城镇职工医保',
+              demo: true,
+            },
+            'ok',
+            c.traceId,
+          ),
+        );
+      }
       try {
         const patientId = await getPatientIdByAccount(c.user.id);
         if (!patientId) {
           return json(fail(ErrorCode.NOT_FOUND, '尚未完成实名建档', c.traceId), 404);
         }
-        return json(ok({ accountId: c.user.id, patientId }));
+        return json(ok({ accountId: c.user.id, patientId }, 'ok', c.traceId));
       } catch (e) {
         return mapError(e, c);
       }
