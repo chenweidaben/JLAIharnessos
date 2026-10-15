@@ -207,6 +207,7 @@ import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
+import { modelInfoRoutes } from './routes/modelInfo';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -216,6 +217,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 const allRoutes: RouteDef[] = [
   ...healthRoutes,
+  ...modelInfoRoutes,
   ...authRoutes,
   ...mfaLoginRoutes,
   ...patientRoutes,

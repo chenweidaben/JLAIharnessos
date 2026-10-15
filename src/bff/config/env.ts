@@ -19,6 +19,16 @@ export interface EnvConfig {
   llmApiKey: string;
   /** 模型名称 */
   llmModel: string;
+  /** RADAR 推理端点（RADAR_ENDPOINT 优先；缺省回退 llmApiEndpoint） */
+  radarEndpoint: string;
+  /** RADAR 推理密钥（RADAR_API_KEY 优先；缺省回退 llmApiKey） */
+  radarApiKey: string;
+  /** RADAR 模型名（RADAR_MODEL 优先；缺省回退 llmModel） */
+  radarModel: string;
+  /** 单次推理请求超时（毫秒），默认 30000 */
+  timeoutMs: number;
+  /** 失败重试次数（不含首次尝试），默认 3 */
+  maxRetries: number;
   /** HTTP 监听端口 */
   port: number;
   /** PostgreSQL 连接串（演示模式可为空） */
@@ -37,6 +47,10 @@ export const DEFAULT_LLM_MODEL = 'qwen2.5-72b-instruct';
 export const DEFAULT_LLM_API_KEY = 'sk-local';
 /** 默认监听端口 */
 export const DEFAULT_PORT = 8080;
+/** 默认单次推理请求超时（毫秒） */
+export const DEFAULT_TIMEOUT_MS = 30_000;
+/** 默认失败重试次数（不含首次尝试） */
+export const DEFAULT_MAX_RETRIES = 3;
 
 /**
  * 将宽松环境变量值解析为布尔真值。
@@ -53,13 +67,23 @@ function toPort(v: string | undefined): number {
 }
 
 /**
+ * 将环境变量值解析为正整数；非法 / 非正时回退指定默认值。
+ * 用于 TIMEOUT_MS、MAX_RETRIES 等运行参数，缺省走安全默认值。
+ */
+function toPositiveInt(v: string | undefined, fallback: number): number {
+  const n = Number(v);
+  return Number.isInteger(n) && n > 0 ? n : fallback;
+}
+
+/**
  * 纯函数：从给定环境变量记录解析运行时配置。
  *
  * 无任何副作用（不读 process.env、不 console、不抛错），便于在单测中
  * 传入任意环境变量快照。兼容旧变量名作为回退：
- *  - LLM_API_ENDPOINT  <- LLM_BASE_URL <- MEDMUSE_MODEL_BASE_URL
- *  - LLM_API_KEY       <- MEDMUSE_MODEL_API_KEY
- *  - LLM_MODEL         <- MEDMUSE_MODEL_NAME
+ *  - RADAR_ENDPOINT  <- LLM_API_ENDPOINT <- LLM_BASE_URL <- MEDMUSE_MODEL_BASE_URL
+ *  - RADAR_API_KEY  <- LLM_API_KEY       <- MEDMUSE_MODEL_API_KEY
+ *  - RADAR_MODEL    <- LLM_MODEL         <- MEDMUSE_MODEL_NAME
+ *  - TIMEOUT_MS（默认 30000）/ MAX_RETRIES（默认 3）
  *  - PORT              <- HTTP_PORT
  *
  * @param env 环境变量键值记录（如 process.env 的快照）
@@ -68,10 +92,19 @@ function toPort(v: string | undefined): number {
 export function parseEnv(env: Record<string, string | undefined>): EnvConfig {
   const rawEndpoint =
     env.LLM_API_ENDPOINT ?? env.LLM_BASE_URL ?? env.MEDMUSE_MODEL_BASE_URL ?? DEFAULT_LLM_API_ENDPOINT;
+  const llmApiEndpoint = rawEndpoint.replace(/\/+$/, '');
+  const llmApiKey = env.LLM_API_KEY ?? env.MEDMUSE_MODEL_API_KEY ?? DEFAULT_LLM_API_KEY;
+  const llmModel = env.LLM_MODEL ?? env.MEDMUSE_MODEL_NAME ?? DEFAULT_LLM_MODEL;
   return {
-    llmApiEndpoint: rawEndpoint.replace(/\/+$/, ''),
-    llmApiKey: env.LLM_API_KEY ?? env.MEDMUSE_MODEL_API_KEY ?? DEFAULT_LLM_API_KEY,
-    llmModel: env.LLM_MODEL ?? env.MEDMUSE_MODEL_NAME ?? DEFAULT_LLM_MODEL,
+    llmApiEndpoint,
+    llmApiKey,
+    llmModel,
+    // RADAR_* 优先于 LLM_*；缺省即与 LLM 配置一致
+    radarEndpoint: (env.RADAR_ENDPOINT ?? rawEndpoint).replace(/\/+$/, ''),
+    radarApiKey: env.RADAR_API_KEY ?? llmApiKey,
+    radarModel: env.RADAR_MODEL ?? llmModel,
+    timeoutMs: toPositiveInt(env.TIMEOUT_MS, DEFAULT_TIMEOUT_MS),
+    maxRetries: toPositiveInt(env.MAX_RETRIES, DEFAULT_MAX_RETRIES),
     port: toPort(env.PORT ?? env.HTTP_PORT),
     databaseUrl: env.DATABASE_URL ?? '',
     demoMode: toBool(env.DEMO_MODE),
@@ -92,13 +125,13 @@ export function loadEnv(): EnvConfig {
   const env = process.env as Record<string, string | undefined>;
   const cfg = parseEnv(env);
 
-  if (!env.LLM_API_ENDPOINT && !env.LLM_BASE_URL && !env.MEDMUSE_MODEL_BASE_URL) {
+  if (!env.RADAR_ENDPOINT && !env.LLM_API_ENDPOINT && !env.LLM_BASE_URL && !env.MEDMUSE_MODEL_BASE_URL) {
     // eslint-disable-next-line no-console
-    console.warn(`[env] 未配置 LLM_API_ENDPOINT，使用默认回环地址：${cfg.llmApiEndpoint}`);
+    console.warn(`[env] 未配置 RADAR_ENDPOINT，使用默认回环地址：${cfg.radarEndpoint}`);
   }
-  if (!env.LLM_API_KEY) {
+  if (!env.RADAR_API_KEY && !env.LLM_API_KEY) {
     // eslint-disable-next-line no-console
-    console.warn('[env] 未配置 LLM_API_KEY，模型调用将使用占位密钥（生产环境请通过 KMS/密钥管理下发）');
+    console.warn('[env] 未配置 RADAR_API_KEY，模型调用将使用占位密钥（生产环境请通过 KMS/密钥管理下发）');
   }
   if (!cfg.demoMode && !cfg.databaseUrl) {
     // eslint-disable-next-line no-console
