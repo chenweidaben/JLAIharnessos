@@ -19,7 +19,7 @@ import {
   auditOverview,
   auditTrend,
   getAuditLogDetail,
-  queryAuditLogs,
+  queryAuditLogPage,
 } from '../../aggregators/auditLogAggregator';
 
 /** 解析正整数 query 参数 */
@@ -37,7 +37,7 @@ export const auditLogRoutes: RouteDef[] = [
       if (denied) return denied;
       return json(
         ok(
-          await queryAuditLogs({
+          await queryAuditLogPage({
             actorKeyword: c.query.get('actorKeyword') ?? undefined,
             action: c.query.get('action') ?? undefined,
             resourceType: c.query.get('resourceType') ?? undefined,
