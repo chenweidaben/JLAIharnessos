@@ -264,6 +264,7 @@ import { musePatternsRoutes } from './routes/musePatterns';
 import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
 import { museDeptCurveRoutes } from './routes/museDeptCurve';
+import { helpCenterRoutes } from './routes/helpCenter';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -513,6 +514,7 @@ const allRoutes: RouteDef[] = [
   ...museGrowthRoutes,
   ...patientMuseRoutes,
   ...museDeptCurveRoutes,
+  ...helpCenterRoutes,
 ];
 
 interface Compiled {
