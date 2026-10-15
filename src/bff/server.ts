@@ -161,6 +161,7 @@ import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
 import { patientMobileHomeRoutes } from './routes/patientMobileHome';
+// 【产品化收尾】M148-C：患者端 H5 一站式首页 GET /api/v1/patient/h5/home
 import { patientBillingRoutes } from './routes/patientBilling';
 import { patientProfileRoutes } from './routes/patientProfile';
 import { rehabTreatmentRoutes } from './routes/rehabTreatment';
@@ -315,6 +316,7 @@ import { userSettingsRoutes } from './routes/userSettings';
 // 【越用越聪明深化】M146-B：个人智能体成长报告 GET /api/v1/user/muse/report（让每个员工有成就感）
 import { personalGrowthRoutes } from './routes/personalGrowth';
 import { notificationRoutes } from './routes/notifications';
+// 【产品化收尾】M148-B：统一通知中心 GET /api/v1/notifications + PUT /:id/read（跨系统聚合，不各自发一条）
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';

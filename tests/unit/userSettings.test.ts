@@ -1,150 +1,164 @@
 /**
- * 健澜科技 jlmedaios - 用户个人设置（M132-D · 产品化收尾）纯函数单测
+ * 健澜科技 jlmedaios - 系统设置与个人偏好（M148-A · 产品化收尾）纯函数单测
  *
  * 覆盖：
- *  - 默认值：按角色产出开箱即用设置（患者 vs 医护 vs 未知角色）；
- *  - 设置读写：分类级部分更新（mergeSettings）只改携带分类/字段，其余保留；
- *  - 分类管理：未携带分类原样保留、同分类字段级合并；
- *  - 脏数据兜底：非法主题/字号回退默认、非布尔收敛为 false、空白字符串 trim。
+ *  - 默认值：从未设置过的员工拿到开箱默认偏好（通知/界面/助手/工作台四类齐全）；
+ *  - 偏好读取：getUserSettings 返回深拷贝，外部回写不污染库内状态；
+ *  - 偏好更新：updateUserSetting 按扁平键单键生效，其余偏好原样保留；
+ *  - 员工隔离：A 的更新不影响 B；
+ *  - 兜底：未知 key / 非法枚举 / 非布尔值 / 脏列表均收敛回合法值。
  *
- * 全部 mock 数据，不依赖数据库。
+ * 全部运行时内存数据，不依赖数据库。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 
 import {
-  getDefaultSettings,
-  mergeSettings,
-  sanitizeSettings,
-  type Settings,
+  __resetUserSettingsStore,
+  defaultSettings,
+  getUserSettings,
+  isValidSettingKey,
+  updateUserSetting,
 } from '../../src/bff/aggregators/userSettingsAggregator';
 
-describe('getDefaultSettings 角色化默认值', () => {
-  it('患者：只开站内+邮件通知，临床智能助手默认关闭', () => {
-    const s = getDefaultSettings('patient');
-    expect(s.notification).toEqual({ inApp: true, email: true, sms: false, sound: false });
-    expect(s.assistant).toEqual({ enabled: false, autoSuggest: false });
-    expect(s.appearance).toEqual({ theme: 'light', fontSize: 'medium' });
+beforeEach(() => {
+  __resetUserSettingsStore();
+});
+
+describe('默认值：从未设置的员工开箱偏好', () => {
+  it('四类偏好齐全，通知仅默认站内信开', () => {
+    const s = getUserSettings('staff-001');
+    expect(s.notification).toEqual({ sms: false, wechat: false, inApp: true });
   });
 
-  it('医生/护士/药师：通知与智能助手默认开启，提示音开', () => {
-    for (const role of ['doctor', 'nurse', 'pharmacist', 'admin']) {
-      const s = getDefaultSettings(role);
-      expect(s.notification.sound).toBe(true);
-      expect(s.assistant).toEqual({ enabled: true, autoSuggest: true });
-    }
+  it('界面默认深海蓝 / 中号字 / 标准密度', () => {
+    const s = getUserSettings('staff-001');
+    expect(s.appearance).toEqual({ themeColor: 'seaBlue', fontSize: 'medium', density: 'normal' });
   });
 
-  it('未知/空角色走医护安全默认值（浅色·中号·助手开）', () => {
-    for (const role of [undefined, null, '', 'visitor']) {
-      const s = getDefaultSettings(role);
-      expect(s.appearance).toEqual({ theme: 'light', fontSize: 'medium' });
-      expect(s.assistant.enabled).toBe(true);
-    }
+  it('助手默认开启、建议展示；工作台默认首页工作台、无置顶', () => {
+    const s = getUserSettings('staff-001');
+    expect(s.assistant).toEqual({ aiEnabled: true, suggestVisible: true });
+    expect(s.workspace).toEqual({ defaultHome: 'workbench', pinnedFavorites: [] });
   });
 
-  it('相同角色返回全新对象，不共享内部引用', () => {
-    const a = getDefaultSettings('doctor');
-    const b = getDefaultSettings('doctor');
+  it('空 staffId 也回退默认值，不抛错', () => {
+    expect(getUserSettings('')).toEqual(defaultSettings());
+  });
+});
+
+describe('偏好读取：深拷贝隔离', () => {
+  it('两次读取返回等值但互不影响的新对象', () => {
+    const a = getUserSettings('staff-002');
+    const b = getUserSettings('staff-002');
     expect(a).toEqual(b);
-    a.notification.sound = false;
-    expect(b.notification.sound).toBe(true);
+    a.notification.sms = true;
+    a.workspace.pinnedFavorites.push('orders');
+    expect(b.notification.sms).toBe(false);
+    expect(b.workspace.pinnedFavorites).toEqual([]);
+  });
+
+  it('getUserSettings 不写库：读取后再更新，只走一次更新路径', () => {
+    getUserSettings('staff-003');
+    const after = updateUserSetting('staff-003', 'notification.sms', true);
+    expect(after.notification.sms).toBe(true);
   });
 });
 
-describe('mergeSettings 分类级读写 / 分类管理', () => {
-  const base = getDefaultSettings('doctor');
-
-  it('只改某一分类时，其余分类原样保留', () => {
-    const merged = mergeSettings(base, { notification: { sound: false } });
-    // 被改分类生效
-    expect(merged.notification.sound).toBe(false);
-    // 未携带分类完全不变
-    expect(merged.appearance).toEqual(base.appearance);
-    expect(merged.assistant).toEqual(base.assistant);
-    expect(merged.workspace).toEqual(base.workspace);
+describe('偏好更新：单键即时生效', () => {
+  it('开启短信通知后，再次读取即生效', () => {
+    updateUserSetting('staff-100', 'notification.sms', true);
+    expect(getUserSettings('staff-100').notification.sms).toBe(true);
   });
 
-  it('同一分类内字段级合并，未出现字段沿用基线', () => {
-    const merged = mergeSettings(base, { appearance: { theme: 'dark' } });
-    expect(merged.appearance.theme).toBe('dark');
-    // 字号未在 patch 中，沿用基线 medium
-    expect(merged.appearance.fontSize).toBe('medium');
+  it('更新一个键时，其余偏好原样保留', () => {
+    const before = getUserSettings('staff-101');
+    updateUserSetting('staff-101', 'appearance.fontSize', 'large');
+    const after = getUserSettings('staff-101');
+    expect(after.appearance.fontSize).toBe('large');
+    expect(after.appearance.themeColor).toBe(before.appearance.themeColor);
+    expect(after.notification).toEqual(before.notification);
+    expect(after.assistant).toEqual(before.assistant);
+    expect(after.workspace).toEqual(before.workspace);
   });
 
-  it('多分类同时更新各自独立生效', () => {
-    const merged = mergeSettings(base, {
-      notification: { sms: true },
-      workspace: { defaultDeptCode: 'DEPT-INTERNAL' },
-    });
-    expect(merged.notification.sms).toBe(true);
-    expect(merged.workspace.defaultDeptCode).toBe('DEPT-INTERNAL');
-    // 其它通知位保留
-    expect(merged.notification.inApp).toBe(true);
+  it('更新返回值即更新后的完整偏好，且后续读取一致', () => {
+    const updated = updateUserSetting('staff-102', 'workspace.defaultHome', 'todos');
+    expect(updated.workspace.defaultHome).toBe('todos');
+    expect(getUserSettings('staff-102').workspace.defaultHome).toBe('todos');
   });
 
-  it('patch 中的非法枚举被收敛回基线，不污染设置', () => {
-    const merged = mergeSettings(base, {
-      appearance: { theme: 'neon' as never, fontSize: 'xl' as never },
-    });
-    expect(merged.appearance.theme).toBe('light');
-    expect(merged.appearance.fontSize).toBe('medium');
+  it('常用功能置顶：自动 trim、去重、截断 12 个', () => {
+    updateUserSetting('staff-103', 'workspace.pinnedFavorites', [
+      ' orders ',
+      'emr',
+      'emr',
+      123,
+      ...Array.from({ length: 20 }, (_, i) => `fn-${i}`),
+    ]);
+    const pinned = getUserSettings('staff-103').workspace.pinnedFavorites;
+    expect(pinned[0]).toBe('orders');
+    expect(pinned.filter((x) => x === 'emr')).toHaveLength(1);
+    expect(pinned).not.toContain(123);
+    expect(pinned.length).toBeLessThanOrEqual(12);
   });
 
-  it('patch 为 null/undefined 时返回基线的合法拷贝', () => {
-    expect(mergeSettings(base, null)).toEqual(base);
-    expect(mergeSettings(base, undefined)).toEqual(base);
-  });
-
-  it('不修改入参 current', () => {
-    const snapshot = JSON.stringify(base);
-    mergeSettings(base, { notification: { sound: false } });
-    expect(JSON.stringify(base)).toBe(snapshot);
+  it('多键连续更新各自独立生效', () => {
+    updateUserSetting('staff-104', 'notification.wechat', true);
+    updateUserSetting('staff-104', 'assistant.aiEnabled', false);
+    updateUserSetting('staff-104', 'appearance.density', 'compact');
+    const s = getUserSettings('staff-104');
+    expect(s.notification.wechat).toBe(true);
+    expect(s.assistant.aiEnabled).toBe(false);
+    expect(s.appearance.density).toBe('compact');
   });
 });
 
-describe('sanitizeSettings 脏数据兜底', () => {
-  const base = getDefaultSettings('doctor');
+describe('员工隔离：A 的更新不影响 B', () => {
+  it('跨 staffId 互不可见', () => {
+    updateUserSetting('staff-A', 'notification.sms', true);
+    updateUserSetting('staff-B', 'appearance.themeColor', 'violet');
+    const a = getUserSettings('staff-A');
+    const b = getUserSettings('staff-B');
+    expect(a.notification.sms).toBe(true);
+    expect(b.notification.sms).toBe(false);
+    expect(b.appearance.themeColor).toBe('violet');
+    expect(a.appearance.themeColor).toBe('seaBlue');
+  });
+});
 
-  it('非法主题/字号回退默认', () => {
-    const s = sanitizeSettings(
-      { appearance: { theme: '银河', fontSize: '超大' } },
-      base,
-    );
-    expect(s.appearance.theme).toBe('light');
+describe('兜底：非法键 / 非法值收敛', () => {
+  it('isValidSettingKey 白名单判定', () => {
+    expect(isValidSettingKey('notification.sms')).toBe(true);
+    expect(isValidSettingKey('appearance.unknown')).toBe(false);
+    expect(isValidSettingKey('hacker.admin')).toBe(false);
+  });
+
+  it('未知 key 不写库、原样返回默认偏好', () => {
+    const before = getUserSettings('staff-200');
+    const after = updateUserSetting('staff-200', 'hacker.admin' as never, true);
+    expect(after).toEqual(before);
+    expect(getUserSettings('staff-200')).toEqual(before);
+  });
+
+  it('非 true 值收敛为 false', () => {
+    updateUserSetting('staff-201', 'assistant.suggestVisible', 'yes');
+    updateUserSetting('staff-201', 'notification.inApp', 1);
+    const s = getUserSettings('staff-201');
+    expect(s.assistant.suggestVisible).toBe(false);
+    expect(s.notification.inApp).toBe(false);
+  });
+
+  it('非法枚举回退默认', () => {
+    updateUserSetting('staff-202', 'appearance.themeColor', '银河' as never);
+    updateUserSetting('staff-202', 'appearance.fontSize', 'xxl' as never);
+    updateUserSetting('staff-202', 'appearance.density', '超宽' as never);
+    updateUserSetting('staff-202', 'workspace.defaultHome', 'admin' as never);
+    const s = getUserSettings('staff-202');
+    expect(s.appearance.themeColor).toBe('seaBlue');
     expect(s.appearance.fontSize).toBe('medium');
-  });
-
-  it('非 true 值一律收敛为 false', () => {
-    const s = sanitizeSettings(
-      { assistant: { enabled: 'yes', autoSuggest: 1 } },
-      base,
-    );
-    expect(s.assistant.enabled).toBe(false);
-    expect(s.assistant.autoSuggest).toBe(false);
-  });
-
-  it('科室/病房编码做 trim，非字符串回退空串', () => {
-    const s = sanitizeSettings(
-      { workspace: { defaultDeptCode: '  DEPT-ICU  ', defaultWardCode: 123 } },
-      base,
-    );
-    expect(s.workspace.defaultDeptCode).toBe('DEPT-ICU');
-    expect(s.workspace.defaultWardCode).toBe('');
-  });
-
-  it('raw 为 null/undefined 返回与基线结构一致的合法对象', () => {
-    const s1 = sanitizeSettings(null, base);
-    const s2 = sanitizeSettings(undefined, base);
-    expect(s1).toEqual(base);
-    expect(s2).toEqual(base);
-  });
-
-  it('缺分类时用基线补全，不出现 undefined 分类', () => {
-    const s = sanitizeSettings({ notification: { sound: false } } as Partial<Settings>, base);
-    expect(s.appearance).toEqual(base.appearance);
-    expect(s.assistant).toEqual(base.assistant);
-    expect(s.workspace).toEqual(base.workspace);
+    expect(s.appearance.density).toBe('normal');
+    expect(s.workspace.defaultHome).toBe('workbench');
   });
 });
