@@ -33,6 +33,7 @@ import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
 // 【SaaS化+智慧度】M133-B：超管后台医院管理（仅 superadmin 角色）
+import { superAdminHospitalsRoutes } from './routes/superAdminHospitals';
 import { userAdminRoutes } from './routes/admin/users';
 import { roleAdminRoutes } from './routes/admin/roles';
 import { auditLogRoutes } from './routes/admin/auditLogs';
@@ -478,6 +479,7 @@ const allRoutes: RouteDef[] = [
   ...permissionAdminRoutes,
   ...skillRoutes,
   ...tenantAdminRoutes,
+  ...superAdminHospitalsRoutes,
   ...userAdminRoutes,
   ...roleAdminRoutes,
   ...auditLogRoutes,
