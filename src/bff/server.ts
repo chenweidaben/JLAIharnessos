@@ -53,6 +53,7 @@ import { adminTrendsRoutes } from './routes/adminTrends';
 import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 // 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
+import { todosRoutes } from './routes/todos';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
@@ -503,6 +504,7 @@ const allRoutes: RouteDef[] = [
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
   ...mobileQuickActionsRoutes,
+  ...todosRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
   ...agentHealthRoutes,
