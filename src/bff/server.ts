@@ -169,6 +169,7 @@ import { vteAnticoagRoutes } from './routes/vteAnticoag';
 import { orderCdsRoutes } from './routes/orderCds';
 import { nurseStationRoutes } from './routes/nurseStation';
 import { scheduleSlotRoutes } from './routes/scheduleSlot';
+import { smartScheduleRoutes } from './routes/smartSchedule'; // M152-C：医院智能排班（AI 能力深化）
 import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
@@ -496,6 +497,7 @@ const allRoutes: RouteDef[] = [
   ...orderCdsRoutes,
   ...nurseStationRoutes,
   ...scheduleSlotRoutes,
+  ...smartScheduleRoutes, // M152-C：医院智能排班 POST /admin/schedule/optimize + GET /admin/schedule
   ...reportPushRoutes,
   ...patientNotificationRoutes,
   ...patientReminderRoutes,
