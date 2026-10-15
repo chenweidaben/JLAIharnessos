@@ -214,6 +214,7 @@ import { monthlyReportRoutes } from './routes/monthlyReport';
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
+import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
@@ -449,6 +450,7 @@ const allRoutes: RouteDef[] = [
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
+  ...assistantOutpatientRoutes,
   ...aiFeedbackRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
