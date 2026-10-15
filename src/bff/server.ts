@@ -292,6 +292,7 @@ import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
 // 【核心业务深化】M136-C：核心 aggregator 测试覆盖率报告（仅 admin，质量门禁）
+import { testCoverageRoutes } from './routes/testCoverage';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
@@ -581,6 +582,7 @@ const allRoutes: RouteDef[] = [
   ...museAskRoutes,
   ...museRecommendRoutes,
   ...smokeTestRoutes,
+  ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
