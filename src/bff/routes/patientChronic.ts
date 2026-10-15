@@ -8,7 +8,7 @@ import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
-import { myChronicView, PatientChronicError } from '../aggregators/patientChronicAggregator';
+import { myChronicView, myChronicOverview, PatientChronicError } from '../aggregators/patientChronicAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -37,6 +37,13 @@ export const patientChronicRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/patient/chronic',
     handle: guarded((_c, view) => myChronicView(view)),
+    auth: true,
+  },
+  {
+    // M131-B 慢病管理助手：指标趋势 + 目标值对比概览（AI能力深化）
+    method: 'GET',
+    path: '/api/v1/patient/chronic/overview',
+    handle: guarded((_c, view) => myChronicOverview(view)),
     auth: true,
   },
 ];
