@@ -70,6 +70,7 @@ import { startSystemMetricSampler } from './aggregators/systemMetricsAggregator'
 // 【越用越聪明深化】M146-A：医院智慧资产看板（五维资产 + 六维雷达 + 增长报告）
 import { wisdomDashboardRoutes } from './routes/wisdomDashboard';
 // 【越用越聪明深化】M146-C：跨科室知识联邦（心内科→急诊/内分泌→营养/外科→麻醉，confidence<0.5 不推荐）
+import { knowledgeFederationRoutes } from './routes/knowledgeFederation';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -653,6 +654,7 @@ const allRoutes: RouteDef[] = [
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
   ...federatedKnowledgeRoutes,
+  ...knowledgeFederationRoutes, // M146-C：跨科室知识联邦 GET /api/v1/knowledge/federate
   ...museSearchRoutes,
   ...museAskRoutes,
   ...museRecommendRoutes,
