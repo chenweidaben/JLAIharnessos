@@ -312,6 +312,7 @@ import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { doctorGrowthRoutes } from './routes/doctorGrowth';
 import { userSettingsRoutes } from './routes/userSettings';
 // 【越用越聪明深化】M146-B：个人智能体成长报告 GET /api/v1/user/muse/report（让每个员工有成就感）
+import { personalGrowthRoutes } from './routes/personalGrowth';
 import { notificationRoutes } from './routes/notifications';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -642,6 +643,7 @@ const allRoutes: RouteDef[] = [
   ...doctorPreferenceRoutes,
   ...doctorGrowthRoutes,
   ...userSettingsRoutes,
+  ...personalGrowthRoutes, // M146-B：个人成长报告 GET /api/v1/user/muse/report
   ...notificationRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
