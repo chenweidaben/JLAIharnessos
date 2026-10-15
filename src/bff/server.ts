@@ -223,6 +223,7 @@ import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
 import { drugInventoryRoutes } from './routes/drugInventory';
+import { supplyRoutes } from './routes/supply';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
 import { assistantPharmacyRoutes } from './routes/assistantPharmacy';
 import { assistantDeepReviewRoutes } from './routes/assistantDeepReview';
@@ -540,6 +541,7 @@ const allRoutes: RouteDef[] = [
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
   ...drugInventoryRoutes,
+  ...supplyRoutes,
   ...prescriptionReviewRoutes,
   ...assistantPharmacyRoutes,
   ...assistantDeepReviewRoutes,
