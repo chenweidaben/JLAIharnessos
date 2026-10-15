@@ -42,8 +42,11 @@ import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
+// 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
+// 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
+import { dbPerformanceRoutes } from './routes/dbPerformance';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
 import { performanceReviewRoutes } from './routes/performanceReview';
@@ -60,6 +63,7 @@ import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 // 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
 import { todosRoutes } from './routes/todos';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
+// 【生产化收尾】M145-C：系统监控指标（七类指标 + 超阈值自动告警），GET /api/v1/admin/metrics
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -551,6 +555,7 @@ const allRoutes: RouteDef[] = [
   ...adminPerformanceRoutes,
   ...adminPerformanceOptimizationsRoutes,
   ...queryOptimizationRoutes,
+  ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...adminDeptPerformanceRoutes,
   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
   ...adminHealthRoutes,
@@ -690,6 +695,8 @@ const compiled: Compiled[] = allRoutes.map((def) => {
 import { startMedmuseScheduler } from './jobs/medmuseScheduler';
 startMedmuseScheduler();
 
+// 【生产化收尾】M145-C：系统指标周期采样（内存/CPU + 派生 API 延迟/错误率），
+// 超阈值（P95>1s / 错误率>1% / 内存>90%）由仪表盘接口实时评估并告警。
 // ============================================================================
 // WebSocket�?ws/chat）��?鉴权后升�?// ============================================================================
 
