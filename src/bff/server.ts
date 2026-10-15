@@ -223,6 +223,7 @@ import { learningDashboardRoutes } from './routes/learningDashboard';
 import { followupLearningRoutes } from './routes/followupLearning';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
+import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -432,6 +433,7 @@ const allRoutes: RouteDef[] = [
   ...followupLearningRoutes,
   ...weightEvolutionRoutes,
   ...referralKnowledgeRoutes,
+  ...crossDeptKnowledgeRoutes,
 ];
 
 interface Compiled {
