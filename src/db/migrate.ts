@@ -227,6 +227,17 @@ export async function runMigrations(migrationsDir: string = MIGRATIONS_DIR): Pro
   return { applied: newlyApplied, skipped };
 }
 
+/**
+ * 【运维工具】执行单个迁移文件（admin 手动触发用，M124-C）。
+ * 与 runMigrationFile 同语义：整个文件包在一个事务里，成功后写入 schema_migrations。
+ * 失败时向上抛错，由调用方（BFF 聚合器）统一捕获并登记。
+ */
+export async function runSingleMigration(filePath: string, version: string): Promise<void> {
+  const sql = getDb();
+  await ensureMigrationTable(sql);
+  await runMigrationFile(sql, filePath, version);
+}
+
 /** 启动时自动迁移（连不上 DB 时由 verifyDbConnection 统一报错） */
 export async function autoMigrate(): Promise<void> {
   const { applied, skipped } = await runMigrations();

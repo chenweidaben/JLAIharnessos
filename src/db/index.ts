@@ -7,7 +7,7 @@
  */
 
 export { closeDb, getDb, verifyDbConnection, withTx, type Sql, type TransactionSql } from './pool.js';
-export { autoMigrate, runMigrations } from './migrate.js';
+export { autoMigrate, runMigrations, runSingleMigration } from './migrate.js';
 export * as patientRepo from './repositories/patientRepo.js';
 export * as visitRepo from './repositories/visitRepo.js';
 export * as orderRepo from './repositories/orderRepo.js';
