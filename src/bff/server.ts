@@ -237,6 +237,7 @@ import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
 import { aiDrugReviewRoutes } from './routes/aiDrugReview'; // M144-C
+import { aiQualityRoutes } from './routes/aiQuality'; // M144-D：AI 质控智能审核 POST /api/v1/ai/quality-check
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { supplyRoutes } from './routes/supply';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
@@ -572,6 +573,7 @@ const allRoutes: RouteDef[] = [
   ...aiNoteQcRoutes,
   ...aiNursingPlanRoutes,
   ...terminalQcRoutes,
+  ...aiQualityRoutes,
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
   ...aiDrugReviewRoutes, // M144-C
