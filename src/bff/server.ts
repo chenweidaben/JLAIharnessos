@@ -118,6 +118,7 @@ import { exportRoutes } from './routes/export';
 import { labInterpretRoutes } from './routes/labInterpret';
 import { imagingInterpretRoutes } from './routes/imagingInterpret';
 import { imagingAiRoutes } from './routes/imagingAi';
+import { imagingAiDeepRoutes } from './routes/imagingAiDeep';
 import { criticalRoutes } from './routes/critical';
 import { criticalValueClosureRoutes } from './routes/criticalValueClosure';
 import { reconRoutes } from './routes/recon';
@@ -335,6 +336,7 @@ import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
 import { followUpRoutes } from './routes/followUps';
+// M152-D：患者随访智能化（AI能力深化）GET /api/v1/followup/auto-plan/:patientId + POST /api/v1/followup/send
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
@@ -444,6 +446,7 @@ const allRoutes: RouteDef[] = [
   ...labInterpretRoutes,
   ...imagingInterpretRoutes,
   ...imagingAiRoutes,
+  ...imagingAiDeepRoutes,
   ...criticalRoutes,
   ...criticalValueClosureRoutes,
   ...reconRoutes,
