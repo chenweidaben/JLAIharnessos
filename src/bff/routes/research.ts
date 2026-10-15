@@ -19,6 +19,7 @@ import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
 import {
+  RESEARCH_STATUS_LABEL,
   ResearchError,
   archiveResearchCohort,
   createResearchCohort,
@@ -30,6 +31,11 @@ import {
   publishResearchCohort,
   runCohortMatching,
   updateResearchCohort,
+  // M140-B 科研项目管理（医院管理深化）：跟踪到结题闭环
+  listResearchProjects,
+  registerResearchProject,
+  updateResearchProgress,
+  type ResearchProjectStatus,
 } from '../aggregators/researchAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
@@ -160,5 +166,85 @@ export const researchRoutes: RouteDef[] = [
       exportCohortDataset(view, c.params.id),
     ),
     auth: true,
+  },
+  /* ==================== M140-B 科研项目管理（医院管理深化） ====================
+   * 跟踪到结题：登记(申报中) -> 进度推进(进行中) -> progress=100(已结题)
+   *            -> 里程碑含「验收」(已验收)，不能登记完就不管了。
+   * ------------------------------------------------------------------ */
+  {
+    method: 'GET',
+    path: '/api/v1/admin/research',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try {
+        const status = c.query.get('status') ?? undefined;
+        const projects = listResearchProjects(
+          status ? { status: status as ResearchProjectStatus } : undefined,
+        );
+        return json(ok({ projects, statusLabel: RESEARCH_STATUS_LABEL }));
+      } catch (e) {
+        return json(
+          fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : '科研项目查询失败'),
+          500,
+        );
+      }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/admin/research',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try {
+        const body = await c.body<{
+          title?: string;
+          leaderId?: string;
+          dept?: string;
+          funding?: number;
+          startDate?: string;
+          endDate?: string;
+        }>();
+        const project = registerResearchProject(
+          body?.title ?? '',
+          body?.leaderId ?? '',
+          body?.dept ?? '',
+          body?.funding ?? 0,
+          body?.startDate ?? '',
+          body?.endDate ?? '',
+        );
+        return json(ok({ project }, '项目登记成功'));
+      } catch (e) {
+        return json(
+          fail(ErrorCode.BAD_REQUEST, e instanceof Error ? e.message : '项目登记失败'),
+          400,
+        );
+      }
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/admin/research/:id/progress',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try {
+        const body = await c.body<{ progress?: number; milestone?: string }>();
+        const project = updateResearchProgress(
+          c.params.id,
+          body?.progress ?? -1,
+          body?.milestone ?? '',
+        );
+        return json(ok({ project }, '进度已更新'));
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : '进度更新失败';
+        const notFound = msg.includes('不存在') || msg.includes('已验收');
+        return json(
+          fail(notFound ? ErrorCode.NOT_FOUND : ErrorCode.BAD_REQUEST, msg),
+          notFound ? 404 : 400,
+        );
+      }
+    },
   },
 ];
