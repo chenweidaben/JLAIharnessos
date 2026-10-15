@@ -230,6 +230,7 @@ import { museSearchRoutes } from './routes/museSearch';
 import { smokeTestRoutes } from './routes/smokeTest';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { museNurseRoutes } from './routes/museNurse';
+import { museHospitalRoutes } from './routes/museHospital';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -446,6 +447,7 @@ const allRoutes: RouteDef[] = [
   ...smokeTestRoutes,
   ...museOnboardingRoutes,
   ...museNurseRoutes,
+  ...museHospitalRoutes,
 ];
 
 interface Compiled {
