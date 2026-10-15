@@ -223,6 +223,7 @@ import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
 import { museLlmStatusRoutes } from './routes/museLlmStatus';
 import { aiFeedbackRoutes } from './routes/aiFeedback';
+import { patientFeedbackRoutes } from './routes/patientFeedback';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -461,6 +462,7 @@ const allRoutes: RouteDef[] = [
   ...opdWorkstationRoutes,
   ...assistantOutpatientRoutes,
   ...aiFeedbackRoutes,
+  ...patientFeedbackRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
