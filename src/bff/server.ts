@@ -135,6 +135,7 @@ import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
 import { healthCheckRoutes } from './routes/healthCheck';
 import { healthCheckReferralRoutes } from './routes/healthCheckReferral';
+import { healthCheckupRoutes } from './routes/healthCheckup'; // M142-A：健康体检管理（预防保健与患者服务）GET /patient/checkup/:id + GET /admin/checkup/list
 import { oncologyRoutes } from './routes/oncology';
 import { chemoReminderRoutes } from './routes/chemoReminder';
 import { psychScreeningRoutes } from './routes/psychScreening';
@@ -423,6 +424,7 @@ const allRoutes: RouteDef[] = [
   ...patientChronicRoutes,
   ...healthCheckRoutes,
   ...healthCheckReferralRoutes,
+  ...healthCheckupRoutes, // M142-A：健康体检管理（通俗版报告 + 异常标红建议）
   ...oncologyRoutes,
   ...chemoReminderRoutes,
   ...psychScreeningRoutes,
