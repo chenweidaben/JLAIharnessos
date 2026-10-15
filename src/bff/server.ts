@@ -229,7 +229,7 @@ import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { museSearchRoutes } from './routes/museSearch';
 import { smokeTestRoutes } from './routes/smokeTest';
 import { museOnboardingRoutes } from './routes/museOnboarding';
-import { getEnv } from './config/env';
+import { museNurseRoutes } from './routes/museNurse';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -445,6 +445,7 @@ const allRoutes: RouteDef[] = [
   ...museSearchRoutes,
   ...smokeTestRoutes,
   ...museOnboardingRoutes,
+  ...museNurseRoutes,
 ];
 
 interface Compiled {
