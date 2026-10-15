@@ -40,6 +40,7 @@ import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 // 【质量与合规】M155-B：患者隐私深度脱敏 + 合规自检 GET /api/v1/admin/privacy/compliance
+import { privacyDeepAdminRoutes } from './routes/privacyDeep';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
@@ -615,6 +616,7 @@ const allRoutes: RouteDef[] = [
   ...auditLogRoutes,
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
+  ...privacyDeepAdminRoutes, // M155-B：GET /api/v1/admin/privacy/compliance（隐私深度脱敏 + 合规自检）
   ...adminPerformanceRoutes,
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
