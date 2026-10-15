@@ -1,407 +1,267 @@
 /**
- * 健澜科技 jlmedaios - 双向转诊聚合器（M3-R）
+ * 健澜科技 jlmedaios - 双向转诊管理聚合器（M143-C）【互联网医院与远程医疗】
  *
- * 医联体/集团医院间双向转诊：发起登记、随附资料获取与存储、
- * 接收（院外患者 EMPI 建档 + 生成本院就诊）、拒绝、完成、取消。
+ * 业务目标：双向转诊要跟踪到底，不能转出去就不管了。
+ *   三个纯函数围绕「转诊单」状态机展开：
+ *     - createReferral(patientId, fromDept, toDept, reason, expectedDate)：
+ *         发起一张转诊单，登记患者、转出/转入科室、转诊原因与预计接诊日期；
+ *         新单默认「待接收」，方向按科室自动识别：
+ *           上转（基层→三甲）/ 下转（三甲→基层康复）/ 院内转科；
+ *     - acceptReferral(referralId, acceptingDoctor)：
+ *         目标科室接诊医生接收转诊，登记接收人，状态由「待接收」推进到「已接收」；
+ *     - completeReferral(referralId, outcome)：
+ *         诊疗闭环，登记转归结局，状态推进到「已完成」。
+ *   配套生命周期纯函数：
+ *     - listIncoming(toDept?)：转入队列——待目标科室接收的转诊单，
+ *         按预计接诊日期升序，最急（最可能超时）的排最前；
+ *     - getReferralReport(now?)：按三态统计转诊单量，并把「已过预计接诊日期
+ *         仍未闭环」的单子抛成超时预警清单——这就是「转出去没人接」的兜底落点。
  *
- * 对标国家医院智慧服务三级基本项目【3 转诊服务】：
- *   院外转诊信息（DICOM/病案首页/诊断证明/检验/检查）直接存储于医院信息系统。
+ * 设计说明：
+ *   本模块为无库依赖的纯函数内核（与 logisticsAggregator 同思路），状态收敛在模块级
+ *   内存台账中，id 由确定性计数器生成（rf_0001 …），同一序列恒等输出，便于单测与重放；
+ *   生产环境可在路由层把同名函数对接到 clinical.referral_record 表（见
+ *   deploy/postgres/init/285-referral.sql），函数内核口径保持不变。
+ *   expectedDate / now 可注入以便测试，缺省取系统当前时间。
  *
- * 安全边界：
- *  - 状态机白名单 + FOR UPDATE 行锁，非法转换拒绝；
- *  - 接收转诊时院外患者才建档，已建档患者不重复建档；
- *  - 全程审计哈希链留痕。
- *
- * 版权所有（c）2026 杭州健澜科技有限公司
+ * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { withTx } from '../../db/pool.js';
-import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
-import { createPatient } from '../../db/repositories/patientRepo.js';
-import { createVisit } from '../../db/repositories/visitRepo.js';
-import { nextInternetPatientNo } from '../../db/repositories/internetPatientRepo.js';
-import {
-  advanceReferralStatus,
-  getReferralById,
-  insertReferral,
-  insertReferralDocument,
-  listReferralDocuments,
-  listReferrals,
-  lockReferral,
-  nextReferralNo,
-  type ReferralDirection,
-  type ReferralDocType,
-  type ReferralOrder,
-} from '../../db/repositories/referralRepo.js';
-import type { AuthView } from '../view/userView.js';
+/** 转诊方向：上转（基层→三甲）/ 下转（三甲→基层康复）/ 院内转科 */
+export type ReferralDirection = '上转' | '下转' | '院内转科';
 
-export class ReferralError extends Error {
-  constructor(
-    public status: number,
-    public code: string,
-    message: string,
-  ) {
-    super(message);
-    this.name = 'ReferralError';
-  }
+/** 转诊状态机：待接收 → 已接收 → 已完成 */
+export type ReferralStatus = '待接收' | '已接收' | '已完成';
+
+/** 双向转诊单 */
+export interface Referral {
+  id: string;
+  patientId: string;
+  fromDept: string;
+  toDept: string;
+  direction: ReferralDirection;
+  reason: string;
+  /** 预计接诊日期（ISO 8601） */
+  expectedDate: string;
+  status: ReferralStatus;
+  /** 接诊医生工号；null = 目标科室尚未接收 */
+  acceptingDoctor: string | null;
+  acceptedAt: string | null;
+  /** 转归结局；null = 尚未闭环 */
+  outcome: string | null;
+  completedAt: string | null;
+  createdAt: string;
 }
 
-const badRequest = (m: string) => new ReferralError(400, 'BAD_REQUEST', m);
-const notFound = (m: string) => new ReferralError(404, 'NOT_FOUND', m);
-const forbidden = (m: string) => new ReferralError(403, 'FORBIDDEN', m);
-const conflict = (m: string) => new ReferralError(409, 'CONFLICT', m);
-
-/** 转诊详情：转诊单 + 随附资料。 */
-export interface ReferralDetail {
-  referral: ReferralOrder;
-  documents: Awaited<ReturnType<typeof listReferralDocuments>>;
+/** 单条超时预警 */
+export interface ReferralAlert {
+  referralId: string;
+  patientId: string;
+  fromDept: string;
+  toDept: string;
+  direction: ReferralDirection;
+  reason: string;
+  expectedDate: string;
+  /** 已超时小时数（正数） */
+  overdueHours: number;
 }
 
-/** 数据范围过滤：all 全部；dept 本科室相关；self 本人发起。 */
-function inScope(r: ReferralOrder, actor: AuthView): boolean {
-  if (actor.dataScope === 'all') return true;
-  if (actor.dataScope === 'self') return r.createdBy === actor.id;
-  // dept：目标科室或源科室匹配本科室
-  return r.targetDept === actor.deptName || r.sourceDept === actor.deptName;
+/** 双向转诊完成统计报告 */
+export interface ReferralReport {
+  total: number;
+  byStatus: Record<ReferralStatus, number>;
+  /** 已完成闭环数 */
+  completedCount: number;
+  /** 未闭环数（待接收 + 已接收） */
+  openCount: number;
+  /** 超时未闭环预警清单（超时最久排最前） */
+  overdueAlerts: ReferralAlert[];
+  overdueCount: number;
 }
 
-/** 发起转诊登记。 */
-export async function createReferral(
-  actor: AuthView,
-  input: {
-    direction: ReferralDirection;
-    patientId?: string | null;
-    profileId?: string | null;
-    patientName?: string | null;
-    gender?: string | null;
-    birthDate?: string | null;
-    sourceOrg: string;
-    sourceDept?: string | null;
-    sourceDoctor?: string | null;
-    targetOrg: string;
-    targetDept?: string | null;
-    reason: string;
-    urgency?: 'normal' | 'urgent';
-    status?: 'draft' | 'submitted';
-  },
-): Promise<ReferralOrder> {
-  if (!input.reason.trim()) throw badRequest('转诊原因不能为空');
-  if (!input.sourceOrg.trim() || !input.targetOrg.trim()) {
-    throw badRequest('源机构与目标机构不能为空');
-  }
-  if (input.direction === 'incoming' && !input.patientId && !input.patientName?.trim()) {
-    throw badRequest('转入登记需提供患者姓名或关联院内患者');
-  }
+/** 允许的转诊方向白名单 */
+export const REFERRAL_DIRECTIONS: readonly ReferralDirection[] = ['上转', '下转', '院内转科'];
 
-  return withTx(async (tx) => {
-    const referralNo = await nextReferralNo(tx);
-    const referral = await insertReferral(
-      {
-        referralNo,
-        direction: input.direction,
-        patientId: input.patientId ?? null,
-        profileId: input.profileId ?? null,
-        patientName: input.patientName ?? null,
-        gender: input.gender ?? null,
-        birthDate: input.birthDate ?? null,
-        sourceOrg: input.sourceOrg,
-        sourceDept: input.sourceDept ?? null,
-        sourceDoctor: input.sourceDoctor ?? null,
-        targetOrg: input.targetOrg,
-        targetDept: input.targetDept ?? null,
-        reason: input.reason,
-        urgency: input.urgency ?? 'normal',
-        status: input.status ?? 'submitted',
-        createdBy: actor.id,
-      },
-      tx,
-    );
+const HOUR_MS = 60 * 60 * 1000;
 
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.create',
-        resourceType: 'referral',
-        resourceId: referral.id,
-        result: 'success',
-        riskLevel: input.urgency === 'urgent' ? 'medium' : 'low',
-        detail: { referralNo, direction: referral.direction },
-      },
-      tx,
-    );
+// ---- 模块级内存台账（纯函数内核的状态载体，可被 resetReferralStore 清空） ---------
+const referralStore: Referral[] = [];
+let referralSeq = 0;
 
-    return referral;
-  });
+/** 测试辅助：清空台账与计数器，保证用例之间互不污染（不对外暴露为业务 API） */
+export function resetReferralStore(): void {
+  referralStore.length = 0;
+  referralSeq = 0;
 }
 
-/** 补充随附资料（院外转诊信息直接存储）。 */
-export async function addDocument(
-  actor: AuthView,
-  referralId: string,
-  input: {
-    docType: ReferralDocType;
-    title: string;
-    contentRef?: string | null;
-    contentText?: string | null;
-    sourceOrg?: string | null;
-  },
-): Promise<ReferralDetail> {
-  if (!input.title.trim()) throw badRequest('资料标题不能为空');
-  if (!input.contentRef && !input.contentText?.trim()) {
-    throw badRequest('资料内容（引用或文本）不能同时为空');
-  }
-
-  return withTx(async (tx) => {
-    const referral = await lockReferral(referralId, tx);
-    if (!referral) throw notFound('转诊单不存在');
-    if (referral.status === 'cancelled' || referral.status === 'rejected') {
-      throw conflict('该转诊单已结束，不能再补充资料');
-    }
-
-    await insertReferralDocument(
-      {
-        referralId,
-        docType: input.docType,
-        title: input.title,
-        contentRef: input.contentRef ?? null,
-        contentText: input.contentText ?? null,
-        sourceOrg: input.sourceOrg ?? referral.sourceOrg,
-      },
-      tx,
-    );
-
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.add_document',
-        resourceType: 'referral',
-        resourceId: referralId,
-        result: 'success',
-        riskLevel: 'low',
-        detail: { docType: input.docType, title: input.title },
-      },
-      tx,
-    );
-
-    const documents = await listReferralDocuments(referralId, tx);
-    return { referral, documents };
-  });
+function isValidIso(s: string): boolean {
+  if (typeof s !== 'string' || !s) return false;
+  return !Number.isNaN(new Date(s).getTime());
 }
 
 /**
- * 接收转诊：院外患者 EMPI 建档 + 生成本院就诊，并回填转诊单。
- * 仅 incoming 且 submitted 状态可接收。
+ * 方向自动识别：
+ *   转出是基层（社区/卫生院/康复机构）且转入不是基层 → 上转；
+ *   转出不是基层且转入是基层康复机构       → 下转；
+ *   其余（双方都是本院科室）                 → 院内转科。
  */
-export async function acceptReferral(
-  actor: AuthView,
-  referralId: string,
-  input: {
-    visitType?: 'outpatient' | 'inpatient';
-    department: string;
-    note?: string;
-  },
-): Promise<ReferralDetail> {
-  if (!input.department.trim()) throw badRequest('接收科室不能为空');
-
-  return withTx(async (tx) => {
-    const referral = await lockReferral(referralId, tx);
-    if (!referral) throw notFound('转诊单不存在');
-    if (referral.direction !== 'incoming') {
-      throw badRequest('仅转入单可执行接收操作');
-    }
-
-    const updated = await advanceReferralStatus(
-      referralId,
-      ['submitted'],
-      {
-        status: 'accepted',
-        acceptedBy: actor.id,
-        acceptedAt: new Date(),
-      },
-      tx,
-    );
-    if (!updated) throw conflict('转诊单当前状态不允许接收（可能已被处理）');
-
-    // 确定患者：已建档则复用；院外未建档则 EMPI 建档。
-    let patientId = updated.patientId;
-    if (!patientId) {
-      const mrn = await nextInternetPatientNo(tx);
-      const patient = await createPatient(
-        {
-          mrn,
-          nameMasked: updated.patientName ?? '院外转诊患者',
-          gender: (updated.gender as '男' | '女' | '未知' | '未说明') ?? '未知',
-          birthDate: updated.birthDate,
-          tags: ['M3R_REFERRAL'],
-          dataLevel: 3,
-        },
-        tx,
-      );
-      patientId = patient.id;
-    }
-
-    // 生成本院就诊。
-    const visit = await createVisit(
-      {
-        patientId,
-        visitType: input.visitType ?? 'outpatient',
-        department: input.department,
-        chiefComplaint: updated.reason,
-        status: 'ongoing',
-      },
-      tx,
-    );
-
-    // 回填转诊单的就诊与患者关联。
-    await tx`
-      UPDATE clinical.referral_orders
-         SET encounter_id = ${visit.id},
-             patient_id = COALESCE(patient_id, ${patientId})
-       WHERE id = ${referralId}
-    `;
-
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.accept',
-        resourceType: 'referral',
-        resourceId: referralId,
-        result: 'success',
-        riskLevel: 'medium',
-        detail: { encounterId: visit.id, patientId, newPatient: !updated.patientId },
-      },
-      tx,
-    );
-
-    // 所有回填完成后重新查询，确保返回最新状态（含 patient_id/encounter_id）。
-    const fresh = await getReferralById(referralId, tx);
-    const documents = await listReferralDocuments(referralId, tx);
-    return { referral: fresh ?? updated, documents };
-  });
+function classifyDirection(from: string, to: string): ReferralDirection {
+  const GRASSROOTS = ['社区卫生服务中心', '社区卫生服务站', '卫生院', '社区', '基层', '康复'];
+  const fromGrass = GRASSROOTS.some((k) => from.includes(k));
+  const toGrass = GRASSROOTS.some((k) => to.includes(k));
+  if (fromGrass && !toGrass) return '上转';
+  if (!fromGrass && toGrass) return '下转';
+  return '院内转科';
 }
 
-/** 拒绝转诊（仅 submitted 可拒绝）。 */
-export async function rejectReferral(
-  actor: AuthView,
-  referralId: string,
+/** 只读视图：按参考时间判断转诊单是否已超时（超过预计接诊日期且未闭环） */
+export function isReferralOverdue(r: Referral, now: Date = new Date()): boolean {
+  if (r.status === '已完成') return false;
+  const exp = new Date(r.expectedDate).getTime();
+  if (Number.isNaN(exp)) return false;
+  return now.getTime() > exp;
+}
+
+/**
+ * 创建一张转诊单（纯函数）。
+ * 新单默认「待接收」，接收医生为空——必须由目标科室显式接收，
+ * 从流程上杜绝「转出去就不管了」。方向按转出/转入科室自动识别。
+ */
+export function createReferral(
+  patientId: string,
+  fromDept: string,
+  toDept: string,
   reason: string,
-): Promise<ReferralOrder> {
-  if (!reason.trim()) throw badRequest('请填写拒绝原因');
+  expectedDate: string,
+): Referral {
+  const pid = (patientId ?? '').trim();
+  if (!pid) throw new Error('患者 ID 不能为空');
+  const from = (fromDept ?? '').trim();
+  if (!from) throw new Error('转出科室不能为空');
+  const to = (toDept ?? '').trim();
+  if (!to) throw new Error('转入科室不能为空');
+  if (from === to) throw new Error('转出科室与转入科室不能相同');
+  const rsn = (reason ?? '').trim();
+  if (!rsn) throw new Error('转诊原因不能为空');
+  if (!isValidIso(expectedDate)) {
+    throw new Error(`预计接诊日期格式非法：${expectedDate}（应为 ISO 8601 时间串）`);
+  }
 
-  return withTx(async (tx) => {
-    const referral = await lockReferral(referralId, tx);
-    if (!referral) throw notFound('转诊单不存在');
-
-    const updated = await advanceReferralStatus(
-      referralId,
-      ['submitted'],
-      { status: 'rejected', rejectedReason: reason },
-      tx,
-    );
-    if (!updated) throw conflict('转诊单当前状态不允许拒绝');
-
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.reject',
-        resourceType: 'referral',
-        resourceId: referralId,
-        result: 'success',
-        riskLevel: 'low',
-        detail: { reason },
-      },
-      tx,
-    );
-
-    return updated;
-  });
+  referralSeq += 1;
+  const ref: Referral = {
+    id: `rf_${String(referralSeq).padStart(4, '0')}`,
+    patientId: pid,
+    fromDept: from,
+    toDept: to,
+    direction: classifyDirection(from, to),
+    reason: rsn,
+    expectedDate,
+    status: '待接收',
+    acceptingDoctor: null,
+    acceptedAt: null,
+    outcome: null,
+    completedAt: null,
+    createdAt: new Date().toISOString(),
+  };
+  referralStore.push(ref);
+  return { ...ref };
 }
 
-/** 完成转诊（accepted -> completed）。 */
-export async function completeReferral(
-  actor: AuthView,
-  referralId: string,
-): Promise<ReferralOrder> {
-  return withTx(async (tx) => {
-    const referral = await lockReferral(referralId, tx);
-    if (!referral) throw notFound('转诊单不存在');
+/**
+ * 接收转诊：目标科室接诊医生接管病人（纯函数）。
+ * 仅「待接收」转诊单可接收；接收后状态推进到「已接收」，登记接诊医生与接收时间。
+ */
+export function acceptReferral(referralId: string, acceptingDoctor: string): Referral {
+  const ref = referralStore.find((r) => r.id === referralId);
+  if (!ref) throw new Error(`转诊单不存在：${referralId}`);
+  if (ref.status !== '待接收') {
+    throw new Error(`转诊单当前状态为「${ref.status}」，仅「待接收」转诊单可接收`);
+  }
+  const doctor = (acceptingDoctor ?? '').trim();
+  if (!doctor) throw new Error('接诊医生不能为空');
 
-    const updated = await advanceReferralStatus(
-      referralId,
-      ['accepted'],
-      { status: 'completed' },
-      tx,
-    );
-    if (!updated) throw conflict('仅已接收的转诊单可完成');
-
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.complete',
-        resourceType: 'referral',
-        resourceId: referralId,
-        result: 'success',
-        riskLevel: 'low',
-        detail: {},
-      },
-      tx,
-    );
-
-    return updated;
-  });
+  ref.status = '已接收';
+  ref.acceptingDoctor = doctor;
+  ref.acceptedAt = new Date().toISOString();
+  return { ...ref };
 }
 
-/** 取消转诊（draft/submitted -> cancelled）。 */
-export async function cancelReferral(
-  actor: AuthView,
-  referralId: string,
-): Promise<ReferralOrder> {
-  return withTx(async (tx) => {
-    const referral = await lockReferral(referralId, tx);
-    if (!referral) throw notFound('转诊单不存在');
+/**
+ * 完成转诊：诊疗闭环，登记转归结局（纯函数）。
+ * 仅「已接收」转诊单可完成——未接收直接完成即视同「没人接就结案」，禁止。
+ */
+export function completeReferral(referralId: string, outcome: string): Referral {
+  const ref = referralStore.find((r) => r.id === referralId);
+  if (!ref) throw new Error(`转诊单不存在：${referralId}`);
+  if (ref.status !== '已接收') {
+    throw new Error(`转诊单当前状态为「${ref.status}」，仅「已接收」转诊单可完成闭环`);
+  }
+  const out = (outcome ?? '').trim();
+  if (!out) throw new Error('转归结局不能为空');
 
-    const updated = await advanceReferralStatus(
-      referralId,
-      ['draft', 'submitted'],
-      { status: 'cancelled' },
-      tx,
-    );
-    if (!updated) throw conflict('转诊单当前状态不允许取消');
-
-    await recordChainAudit(
-      {
-        actorId: actor.id,
-        action: 'referral.cancel',
-        resourceType: 'referral',
-        resourceId: referralId,
-        result: 'success',
-        riskLevel: 'low',
-        detail: {},
-      },
-      tx,
-    );
-
-    return updated;
-  });
+  ref.status = '已完成';
+  ref.outcome = out;
+  ref.completedAt = new Date().toISOString();
+  return { ...ref };
 }
 
-/** 转诊详情（含随附资料）。 */
-export async function getReferral(
-  actor: AuthView,
-  id: string,
-): Promise<ReferralDetail> {
-  const referral = await getReferralById(id);
-  if (!referral) throw notFound('转诊单不存在');
-  if (!inScope(referral, actor)) throw forbidden('无权查看该转诊单');
-  const documents = await listReferralDocuments(id);
-  return { referral, documents };
+/**
+ * 转入队列（纯函数）：待目标科室接收的转诊单。
+ * @param toDept 指定转入科室时只看该科室的待收单；不传则看全部待收单。
+ *   按预计接诊日期升序——最急（最早到期）的排最前，协调员先催最可能超时的。
+ */
+export function listIncoming(toDept?: string): Referral[] {
+  const target = (toDept ?? '').trim();
+  return referralStore
+    .filter((r) => r.status === '待接收')
+    .filter((r) => !target || r.toDept === target)
+    .map((r) => ({ ...r }))
+    .sort((a, b) => a.expectedDate.localeCompare(b.expectedDate) || a.id.localeCompare(b.id));
 }
 
-/** 转诊列表（数据范围过滤）。 */
-export async function listReferralQueue(
-  actor: AuthView,
-  filter: { direction?: ReferralDirection; status?: ReferralOrder['status'] } = {},
-): Promise<ReferralOrder[]> {
-  const all = await listReferrals(filter);
-  return all.filter((r) => inScope(r, actor));
+/** 只读视图：全部转诊单（供医联体协调员看板；不暴露内部可变引用） */
+export function listAllReferrals(): Referral[] {
+  return referralStore.map((r) => ({ ...r }));
+}
+
+/**
+ * 完成统计 + 超时预警（纯函数）。
+ * 核心：把「已过预计接诊日期仍未闭环」的转诊单抛成预警清单，落实
+ * 「双向转诊要跟踪到底，不能转出去就不管了」。
+ * @param now 参考时间，测试可注入；缺省取系统当前时间
+ */
+export function getReferralReport(now: Date = new Date()): ReferralReport {
+  const byStatus: Record<ReferralStatus, number> = {
+    待接收: 0, 已接收: 0, 已完成: 0,
+  };
+  const alerts: ReferralAlert[] = [];
+  const nowMs = now.getTime();
+
+  for (const r of referralStore) {
+    byStatus[r.status] += 1;
+    if (!isReferralOverdue(r, now)) continue;
+    const overdueHours = (nowMs - new Date(r.expectedDate).getTime()) / HOUR_MS;
+    alerts.push({
+      referralId: r.id,
+      patientId: r.patientId,
+      fromDept: r.fromDept,
+      toDept: r.toDept,
+      direction: r.direction,
+      reason: r.reason,
+      expectedDate: r.expectedDate,
+      overdueHours: Math.round(overdueHours * 10) / 10,
+    });
+  }
+
+  // 超时最久的排最前，协调员先催拖得最久的单子
+  alerts.sort((a, b) => b.overdueHours - a.overdueHours);
+
+  return {
+    total: referralStore.length,
+    byStatus,
+    completedCount: byStatus['已完成'],
+    openCount: byStatus['待接收'] + byStatus['已接收'],
+    overdueAlerts: alerts,
+    overdueCount: alerts.length,
+  };
 }
