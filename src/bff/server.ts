@@ -288,6 +288,7 @@ import { helpCenterRoutes } from './routes/helpCenter';
 // 【系统集成】M129-A：统一 API 文档（Swagger UI + OpenAPI3 JSON）
 import { apiDocsRoutes } from './routes/apiDocs';
 // 【核心业务深化】M130-A：病历质控智能审核（仅 admin，结果为建议、人工确认）
+import { adminRecordAuditRoutes } from './routes/adminRecordAudit';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -556,6 +557,7 @@ const allRoutes: RouteDef[] = [
   ...museDeptCurveRoutes,
   ...helpCenterRoutes,
   ...apiDocsRoutes,
+  ...adminRecordAuditRoutes,
 ];
 
 interface Compiled {
