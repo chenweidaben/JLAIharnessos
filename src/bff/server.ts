@@ -273,6 +273,7 @@ import { assistantLlmChatRoutes } from './routes/assistantLlmChat';
 import { patientGuideRoutes } from './routes/patientGuide';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 // 【用户体验深化】M134-B：医生成长档案（月度快照表驱动，成长曲线+雷达+同科室对比）
+import { doctorGrowthRoutes } from './routes/doctorGrowth';
 import { userSettingsRoutes } from './routes/userSettings';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -555,6 +556,7 @@ const allRoutes: RouteDef[] = [
   ...assistantLlmChatRoutes,
   ...patientGuideRoutes,
   ...doctorPreferenceRoutes,
+  ...doctorGrowthRoutes,
   ...userSettingsRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,

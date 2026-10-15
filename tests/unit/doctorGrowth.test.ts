@@ -17,7 +17,11 @@ import { describe, expect, it } from 'bun:test';
 import {
   buildDoctorGrowthProfile,
   computeRadarScores,
+  buildDoctorGrowthRecordProfile,
+  computeRadarFromSkills,
   type GrowthDecision,
+  type DoctorGrowthRecordRow,
+  type PeerStat,
 } from '../../src/bff/aggregators/doctorGrowthAggregator';
 
 /** 构造一条决策：monthOffset 用固定 UTC 日期，避免时区漂移 */
@@ -188,5 +192,154 @@ describe('computeRadarScores 雷达图数据', () => {
     expect(radar.medication).toBe(radar.communication);
     expect(radar.communication).toBe(radar.management);
     expect(radar.diagnosis).toBeGreaterThanOrEqual(20);
+  });
+});
+
+/* ================================================================== */
+/* M134-B：doctor_growth_record 周期快照表驱动的成长档案                 */
+/* ================================================================== */
+
+/** 构造一条月度快照 */
+function row(
+  period: string,
+  casesHandled: number,
+  avgScore: number,
+  experienceCount: number,
+  skills: string[] = [],
+): DoctorGrowthRecordRow {
+  return { period, casesHandled, avgScore, experienceCount, skills };
+}
+
+/** 构造一个同科室医生聚合 */
+function peer(doctorId: string, casesHandled: number, avgScore: number, experienceCount: number): PeerStat {
+  return { doctorId, casesHandled, avgScore, experienceCount };
+}
+
+describe('M134-B buildDoctorGrowthRecordProfile 成长数据聚合', () => {
+  it('累计病例 / 经验条数求和，准确率按病例数加权', () => {
+    const records = [
+      row('2026-05', 40, 80, 3, ['胸痛分诊']),
+      row('2026-06', 60, 90, 5, ['胸痛分诊', '抗凝评估']),
+    ];
+    const p = buildDoctorGrowthRecordProfile('D001', records, []);
+    // 病例 40+60=100；经验 3+5=8
+    expect(p.cumulativeCases).toBe(100);
+    expect(p.totalExperience).toBe(8);
+    // 加权准确率 = (40*80 + 60*90) / 100 = 86
+    expect(p.overallAccuracy).toBe(86);
+  });
+
+  it('月度趋势按 period 升序，非法月份被过滤', () => {
+    const records = [
+      row('2026-06', 60, 90, 5),
+      row('bad-month', 999, 99, 9),
+      row('2026-05', 40, 80, 3),
+    ];
+    const p = buildDoctorGrowthRecordProfile('D001', records, []);
+    expect(p.monthlyTrend.map((m) => m.period)).toEqual(['2026-05', '2026-06']);
+    expect(p.monthlyTrend).toHaveLength(2);
+  });
+
+  it('空值 / null 兜底不抛错，返回零值档案', () => {
+    const p1 = buildDoctorGrowthRecordProfile('D001', null, undefined);
+    expect(p1.cumulativeCases).toBe(0);
+    expect(p1.overallAccuracy).toBe(0);
+    expect(p1.monthlyTrend).toEqual([]);
+    expect(p1.skillsEvolution).toEqual([]);
+    expect(p1.peerComparison.rank).toBe(1);
+    expect(p1.peerComparison.rankTotal).toBe(1);
+
+    // 无病例时准确率不除零
+    const p2 = buildDoctorGrowthRecordProfile('D001', [row('2026-05', 0, 88, 0)], []);
+    expect(p2.overallAccuracy).toBe(0);
+  });
+
+  it('脏值收敛：负数归零、超过100截断、技能非数组兜底', () => {
+    const records: DoctorGrowthRecordRow[] = [
+      { period: '2026-05', casesHandled: -5, avgScore: 150, experienceCount: -1, skills: 'not-an-array' },
+    ];
+    const p = buildDoctorGrowthRecordProfile('D001', records, []);
+    expect(p.cumulativeCases).toBe(0);
+    expect(p.overallAccuracy).toBe(0);
+    expect(p.monthlyTrend[0].avgScore).toBe(100); // 截断
+    expect(p.monthlyTrend[0].skills).toEqual([]);
+  });
+});
+
+describe('M134-B 技能标签趋势计算', () => {
+  it('技能首次出现月份与活跃月数正确，growing 趋势判定', () => {
+    const records = [
+      row('2026-05', 10, 80, 1, ['胸痛分诊']),
+      row('2026-06', 10, 80, 1, ['胸痛分诊']),
+      row('2026-07', 10, 80, 1, ['胸痛分诊', '抗凝评估']),
+      row('2026-08', 10, 80, 1, ['胸痛分诊', '抗凝评估', '路径管理']),
+    ];
+    const p = buildDoctorGrowthRecordProfile('D001', records, []);
+    const bySkill = Object.fromEntries(p.skillsEvolution.map((s) => [s.skill, s]));
+
+    expect(bySkill['胸痛分诊'].firstPeriod).toBe('2026-05');
+    expect(bySkill['胸痛分诊'].periodsActive).toBe(4);
+    expect(bySkill['抗凝评估'].firstPeriod).toBe('2026-07');
+    expect(bySkill['路径管理'].firstPeriod).toBe('2026-08');
+
+    // 路径管理仅在 1 个月出现：前半段=1 后半段=0 → fading
+    expect(bySkill['路径管理'].trend).toBe('fading');
+    // 抗凝评估在 2 个月：前半段[07]=1 后半段[08]=1 → stable
+    expect(bySkill['抗凝评估'].trend).toBe('stable');
+  });
+});
+
+describe('M134-B 同科室对比分析', () => {
+  it('排名按准确率降序，分位为低于本人的 peer 占比', () => {
+    const records = [row('2026-05', 100, 88, 10, ['胸痛分诊'])];
+    const peers = [
+      peer('D002', 120, 80, 8), // 低于本人
+      peer('D003', 90, 95, 12), // 高于本人
+      peer('D004', 80, 70, 5), // 低于本人
+    ];
+    const p = buildDoctorGrowthRecordProfile('D001', records, peers);
+    const cmp = p.peerComparison;
+
+    // 全员准确率：D003=95 > D001=88 > D002=80 > D004=70 → 本人第 2
+    expect(cmp.rank).toBe(2);
+    expect(cmp.rankTotal).toBe(4);
+    // 低于本人的 peer：D002、D004 共 2 人 / 3 peers = 67%
+    expect(cmp.percentile).toBe(67);
+    // deptAverage 为 4 人平均
+    expect(cmp.deptAverage.avgScore).toBeCloseTo((95 + 88 + 80 + 70) / 4, 1);
+  });
+
+  it('本人准确率最高时排名第 1、分位 100', () => {
+    const records = [row('2026-05', 50, 99, 5, ['重症识别'])];
+    const peers = [peer('D002', 60, 85, 4), peer('D003', 40, 90, 3)];
+    const p = buildDoctorGrowthRecordProfile('D001', records, peers);
+    expect(p.peerComparison.rank).toBe(1);
+    expect(p.peerComparison.percentile).toBe(100);
+  });
+
+  it('空 peers 时对比不崩，rankTotal=1', () => {
+    const records = [row('2026-05', 50, 85, 5, ['胸痛分诊'])];
+    const p = buildDoctorGrowthRecordProfile('D001', records, []);
+    expect(p.peerComparison.rank).toBe(1);
+    expect(p.peerComparison.rankTotal).toBe(1);
+    expect(p.peerComparison.percentile).toBe(0);
+    expect(p.peerComparison.deptAverage.avgScore).toBe(85);
+  });
+});
+
+describe('M134-B computeRadarFromSkills 雷达', () => {
+  it('用药类技能命中最高维归一到 100，其余按比例', () => {
+    const radar = computeRadarFromSkills(['抗凝桥接', '抗生素剂量', '胸痛分诊诊断', '医患沟通告知'], 88);
+    expect(radar.medication).toBe(100);
+    expect(radar.diagnosis).toBeGreaterThan(0);
+    expect(radar.communication).toBeGreaterThan(0);
+  });
+
+  it('无技能时用整体准确率给中性基线，四维相等', () => {
+    const radar = computeRadarFromSkills([], 80);
+    expect(radar.diagnosis).toBe(radar.medication);
+    expect(radar.communication).toBe(radar.management);
+    // 80% → 20 + 60*0.8 = 68
+    expect(radar.diagnosis).toBe(68);
   });
 });

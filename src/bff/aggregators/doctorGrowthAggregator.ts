@@ -494,3 +494,283 @@ export function computeRadarScores(profile: DoctorGrowthProfile): RadarScores {
   scores.management = Math.round((weights.management / maxW) * 100);
   return scores;
 }
+
+/* ================================================================== */
+/* M134-B 医生成长档案（doctor_growth_record 周期快照表驱动）            */
+/* ------------------------------------------------------------------ */
+/* 【用户体验深化】让医生看到自己的进步、有成就感：                     */
+/*   以月度快照表 medmuse.doctor_growth_record 为输入，聚合出           */
+/*   累计病例 / 平均诊断准确率 / 经验沉淀条数 / 技能标签变化趋势 /      */
+/*   同科室横向对比。与上方 M119-A（决策级记忆）互补：本入口面向         */
+/*   轻量月度快照，前端成长曲线 + 雷达直接消费。                        */
+/* ================================================================== */
+
+/** M134-B：一条 doctor_growth_record 月度快照（路由层从库表塑形后传入） */
+export interface DoctorGrowthRecordRow {
+  /** 'YYYY-MM' UTC */
+  period?: unknown;
+  casesHandled?: unknown;
+  /** 0~100 百分制 */
+  avgScore?: unknown;
+  experienceCount?: unknown;
+  /** 当期激活技能标签 */
+  skills?: unknown;
+}
+
+/** 月度趋势一个点（前端成长曲线直接消费） */
+export interface MonthlyGrowthSnapshot {
+  period: string;
+  casesHandled: number;
+  avgScore: number;
+  experienceCount: number;
+  skills: string[];
+}
+
+/** 单个技能标签的演化轨迹 */
+export interface SkillEvolutionItem {
+  skill: string;
+  /** 首次出现月份 YYYY-MM */
+  firstPeriod: string;
+  /** 最近一次出现月份 YYYY-MM */
+  lastPeriod: string;
+  /** 共在多少个月出现 */
+  periodsActive: number;
+  /** 近半段月份是否比前半段出现更多：growing / stable / fading */
+  trend: 'growing' | 'stable' | 'fading';
+}
+
+/** 同科室对比中的单人聚合（self 或 peer） */
+export interface PeerStat {
+  doctorId: string;
+  casesHandled: number;
+  /** 0~100 百分制 */
+  avgScore: number;
+  experienceCount: number;
+}
+
+/** 同科室对比结果 */
+export interface PeerComparison {
+  self: PeerStat;
+  /** 同科室（含本人）平均 */
+  deptAverage: Omit<PeerStat, 'doctorId'>;
+  /** 按 avgScore 降序的 1-based 排名 */
+  rank: number;
+  /** 同科室总人数（含本人） */
+  rankTotal: number;
+  /** 本人准确率超过同科室百分之多少的人（0~100 整数） */
+  percentile: number;
+}
+
+/** buildDoctorGrowthRecordProfile 的返回 */
+export interface DoctorGrowthRecordProfile {
+  doctorId: string;
+  /** 累计处理病例数 */
+  cumulativeCases: number;
+  /** 加权平均诊断准确率（0~100，2 位小数） */
+  overallAccuracy: number;
+  /** 累计经验沉淀条数 */
+  totalExperience: number;
+  /** 月度趋势（按 period 升序） */
+  monthlyTrend: MonthlyGrowthSnapshot[];
+  /** 技能标签演化 */
+  skillsEvolution: SkillEvolutionItem[];
+  /** 同科室对比 */
+  peerComparison: PeerComparison;
+  /** 四维能力雷达（由技能标签关键词命中推出） */
+  radar: RadarScores;
+}
+
+/** 宽松收敛为非负整数 */
+function toNonNegInt(v: unknown): number {
+  const n = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.floor(n);
+}
+
+/** 宽松收敛为 0~100 百分制分数 */
+function toScore(v: unknown): number {
+  const n = typeof v === 'number' ? v : Number(v);
+  if (!Number.isFinite(n)) return 0;
+  if (n < 0) return 0;
+  if (n > 100) return 100;
+  return n;
+}
+
+/** 宽松收敛为字符串数组（技能标签） */
+function toSkillList(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  const out: string[] = [];
+  for (const item of v) {
+    const s = toText(item);
+    if (s) out.push(s);
+  }
+  return out;
+}
+
+/** round2：百分制分数保留 2 位小数 */
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+/**
+ * buildDoctorGrowthRecordProfile：从医生月度成长快照构建成长档案。
+ *
+ * 纯函数：不打库、不写全局、不抛错；入参 null / undefined / 脏值一律兜底。
+ *
+ * @param doctorId 医生工号（仅透传，不参与计算）
+ * @param records  该医生的月度快照数组（null/undefined 按空集处理）
+ * @param peers    同科室其他医生的聚合统计（用于横向对比；null/undefined 按空集）
+ */
+export function buildDoctorGrowthRecordProfile(
+  doctorId: string,
+  records: DoctorGrowthRecordRow[] | null | undefined,
+  peers: PeerStat[] | null | undefined,
+): DoctorGrowthRecordProfile {
+  // 1) 塑形月度快照，按 period 升序
+  const raw = Array.isArray(records) ? records : [];
+  const monthlyTrend: MonthlyGrowthSnapshot[] = raw
+    .map((r) => ({
+      period: toText(r?.period),
+      casesHandled: toNonNegInt(r?.casesHandled),
+      avgScore: toScore(r?.avgScore),
+      experienceCount: toNonNegInt(r?.experienceCount),
+      skills: toSkillList(r?.skills),
+    }))
+    .filter((r) => /^[0-9]{4}-(0[1-9]|1[0-2])$/.test(r.period))
+    .sort((a, b) => a.period.localeCompare(b.period));
+
+  // 2) 累计指标：病例数 / 经验条数直接求和；准确率按病例数加权
+  let cumulativeCases = 0;
+  let totalExperience = 0;
+  let weightedScoreSum = 0;
+  for (const m of monthlyTrend) {
+    cumulativeCases += m.casesHandled;
+    totalExperience += m.experienceCount;
+    weightedScoreSum += m.avgScore * m.casesHandled;
+  }
+  const overallAccuracy = cumulativeCases > 0 ? round2(weightedScoreSum / cumulativeCases) : 0;
+
+  // 3) 技能标签演化：聚合每个技能出现的月份集合，判定趋势
+  const skillsEvolution = buildSkillsEvolution(monthlyTrend);
+
+  // 4) 同科室对比
+  const peerComparison = buildPeerComparison(doctorId, monthlyTrend, peers);
+
+  // 5) 雷达：由全部技能标签关键词命中推出
+  const allSkills = monthlyTrend.flatMap((m) => m.skills);
+  const radar = computeRadarFromSkills(allSkills, overallAccuracy);
+
+  return {
+    doctorId,
+    cumulativeCases,
+    overallAccuracy,
+    totalExperience,
+    monthlyTrend,
+    skillsEvolution,
+    peerComparison,
+    radar,
+  };
+}
+
+/** 技能演化：按首次出现排序，趋势按前/后半段出现月份数比较 */
+function buildSkillsEvolution(monthly: MonthlyGrowthSnapshot[]): SkillEvolutionItem[] {
+  const periodsBySkill = new Map<string, string[]>();
+  for (const m of monthly) {
+    for (const s of m.skills) {
+      const arr = periodsBySkill.get(s) ?? [];
+      arr.push(m.period);
+      periodsBySkill.set(s, arr);
+    }
+  }
+
+  const out: SkillEvolutionItem[] = [];
+  for (const [skill, periods] of periodsBySkill.entries()) {
+    const sorted = [...periods].sort();
+    const mid = Math.ceil(sorted.length / 2);
+    const firstHalf = sorted.slice(0, mid).length;
+    const secondHalf = sorted.slice(mid).length;
+    let trend: SkillEvolutionItem['trend'] = 'stable';
+    if (secondHalf > firstHalf) trend = 'growing';
+    else if (secondHalf < firstHalf) trend = 'fading';
+    out.push({
+      skill,
+      firstPeriod: sorted[0],
+      lastPeriod: sorted[sorted.length - 1],
+      periodsActive: sorted.length,
+      trend,
+    });
+  }
+
+  // 首次出现月份升序（早出现的排前），次键标签字典序
+  return out.sort(
+    (a, b) => a.firstPeriod.localeCompare(b.firstPeriod) || a.skill.localeCompare(b.skill, 'zh-Hans-CN'),
+  );
+}
+
+/** 同科室对比：self 由月度快照汇总，peers 由路由层聚合后传入 */
+function buildPeerComparison(
+  doctorId: string,
+  monthly: MonthlyGrowthSnapshot[],
+  peers: PeerStat[] | null | undefined,
+): PeerComparison {
+  let casesHandled = 0;
+  let experienceCount = 0;
+  let weightedScoreSum = 0;
+  for (const m of monthly) {
+    casesHandled += m.casesHandled;
+    experienceCount += m.experienceCount;
+    weightedScoreSum += m.avgScore * m.casesHandled;
+  }
+  const self: PeerStat = {
+    doctorId,
+    casesHandled,
+    avgScore: casesHandled > 0 ? round2(weightedScoreSum / casesHandled) : 0,
+    experienceCount,
+  };
+
+  const peerList = Array.isArray(peers) ? peers.filter((p) => p && toText(p.doctorId) && p.doctorId !== doctorId) : [];
+
+  // deptAverage = (self + peers) 的平均
+  const all = [self, ...peerList];
+  const n = all.length;
+  const deptAverage = {
+    casesHandled: Math.round(all.reduce((s, p) => s + p.casesHandled, 0) / n),
+    avgScore: round2(all.reduce((s, p) => s + p.avgScore, 0) / n),
+    experienceCount: Math.round(all.reduce((s, p) => s + p.experienceCount, 0) / n),
+  };
+
+  // 按 avgScore 降序排名（同分按 casesHandled 降序）
+  const ranked = [...all].sort((a, b) => b.avgScore - a.avgScore || b.casesHandled - a.casesHandled);
+  const rank = ranked.findIndex((p) => p.doctorId === doctorId) + 1;
+
+  // percentile：同科室中准确率低于本人的人数占比（0~100 整数）
+  const below = peerList.filter((p) => p.avgScore < self.avgScore).length;
+  const percentile = peerList.length > 0 ? Math.round((below / peerList.length) * 100) : 0;
+
+  return { self, deptAverage, rank: rank > 0 ? rank : n, rankTotal: n, percentile };
+}
+
+/**
+ * computeRadarFromSkills：由技能标签文本推四维雷达分（0~100 整数）。
+ * 与 M119-A computeRadarScores 共用关键词词典；无信号时用整体准确率给中性基线。
+ */
+export function computeRadarFromSkills(skills: string[], overallAccuracy: number): RadarScores {
+  const weights = { diagnosis: 0, medication: 0, communication: 0, management: 0 };
+  for (const s of skills) {
+    for (const { dim, words } of RADAR_KEYWORDS) {
+      if (words.some((w) => s.includes(w))) weights[dim] += 1;
+    }
+  }
+  const maxW = Math.max(weights.diagnosis, weights.medication, weights.communication, weights.management);
+  if (maxW <= 0) {
+    // 无维度信号：以整体准确率映射到 20~80 中性区间
+    const base = Math.round(20 + 60 * Math.min(1, Math.max(0, overallAccuracy / 100)));
+    return { diagnosis: base, medication: base, communication: base, management: base };
+  }
+  return {
+    diagnosis: Math.round((weights.diagnosis / maxW) * 100),
+    medication: Math.round((weights.medication / maxW) * 100),
+    communication: Math.round((weights.communication / maxW) * 100),
+    management: Math.round((weights.management / maxW) * 100),
+  };
+}
