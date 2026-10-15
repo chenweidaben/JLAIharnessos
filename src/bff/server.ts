@@ -199,6 +199,7 @@ import { teachingRoutes } from './routes/teaching'; // M140-C：教学管理（�
 import { disputeRoutes } from './routes/dispute'; // M141-C：医疗纠纷管理（质量与安全）GET/POST /admin/disputes
 import { patientServiceRoutes } from './routes/patientService'; // M142-C：患者服务中心（预防保健与患者服务）POST /patient/service/create + GET /my + GET /admin/service/tickets
 import { vaccinationRoutes } from './routes/vaccination'; // M142-B：预防接种（预防保健与患者服务）POST /vaccination/administer + GET /records/:patientId
+import { onlineConsultRoutes } from './routes/onlineConsult'; // M143-A：互联网医院在线问诊（互联网医院与远程医疗）POST /consult/create + PUT /:id/accept + PUT /:id/end
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
@@ -501,6 +502,7 @@ const allRoutes: RouteDef[] = [
   ...disputeRoutes, // M141-C：医疗纠纷管理（质量与安全：登记→调查中→协商中→已解决/已诉讼）
   ...patientServiceRoutes, // M142-C：患者服务中心（预防保健与患者服务：诉求受理→分派→处理→满意度回访，48h 超时自动升级）
   ...vaccinationRoutes, // M142-B：预防接种（预防保健与患者服务：排程→接种→提前7天提醒，五类疫苗）
+  ...onlineConsultRoutes, // M143-A：互联网医院在线问诊（互联网医院与远程医疗：待接单→咨询中→已结束/已取消，接单后30分钟超时自动关单）
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
   ...dipRoutes,
