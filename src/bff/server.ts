@@ -185,6 +185,7 @@ import { agentRuntimeRoutes } from './routes/agentRuntime';
 import { medmuseRoutes } from './routes/medmuse';
 import { medmuseRoundReportRoutes } from './routes/medmuseRoundReport';
 import { medmuseStreamRoutes } from './routes/medmuseStream';
+import { museLessonRoutes } from './routes/museLesson';
 import { multimodalityRoutes } from './routes/multimodality';
 import { aiNoteQcRoutes } from './routes/aiNoteQc';
 import { aiNursingPlanRoutes } from './routes/aiNursingPlan';
@@ -220,11 +221,13 @@ import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
+import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { smokeTestRoutes } from './routes/smokeTest';
+import { getEnv } from './config/env';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -407,6 +410,7 @@ const allRoutes: RouteDef[] = [
   ...agentHealthRoutes,
   ...medmuseRoundReportRoutes,
   ...medmuseStreamRoutes,
+  ...museLessonRoutes,
   ...multimodalityRoutes,
   ...aiNoteQcRoutes,
   ...aiNursingPlanRoutes,
@@ -431,6 +435,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientInsightRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
+  ...museHomeRoutes,
   ...followupLearningRoutes,
   ...weightEvolutionRoutes,
   ...referralKnowledgeRoutes,
