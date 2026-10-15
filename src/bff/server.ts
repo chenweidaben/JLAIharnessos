@@ -43,6 +43,7 @@ import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
 import { adminQualityMonitorRoutes } from './routes/adminQualityMonitor';
 import { adminMigrationsRoutes } from './routes/adminMigrations';
+import { adminTrendsRoutes } from './routes/adminTrends';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
@@ -461,6 +462,7 @@ const allRoutes: RouteDef[] = [
   ...adminDashboardRoutes,
   ...adminQualityMonitorRoutes,
   ...adminMigrationsRoutes,
+  ...adminTrendsRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
   ...agentHealthRoutes,
