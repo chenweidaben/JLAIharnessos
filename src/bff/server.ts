@@ -45,6 +45,8 @@ import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOp
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
+// 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
+import { performanceReviewRoutes } from './routes/performanceReview';
 import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
 import { adminQualityMonitorRoutes } from './routes/adminQualityMonitor';
@@ -326,6 +328,7 @@ import { eSignatureRoutes } from './routes/eSignature';
 import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
 import { oaApprovalRoutes } from './routes/oaApproval';
+// 【医院管理深化】M140-D：党建工会活动留痕（党支部学习/主题党日/工会福利/职工文体/志愿服务）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -521,6 +524,7 @@ const allRoutes: RouteDef[] = [
   ...adminPerformanceOptimizationsRoutes,
   ...queryOptimizationRoutes,
   ...adminDeptPerformanceRoutes,
+  ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
   ...adminHealthRoutes,
   ...adminDashboardRoutes,
   ...adminQualityMonitorRoutes,
