@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 健澜科技数智医院智能�?- BFF HTTP/WebSocket 服务�? *
  * 基于 Bun 原生运行时，零额外依赖：
  *  - REST：统丢� /api/v1 前缀，聚合后端服务并适配前端
@@ -38,6 +38,7 @@ import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
+import { adminHealthRoutes } from './routes/adminHealth';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
@@ -442,6 +443,7 @@ const allRoutes: RouteDef[] = [
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
+  ...adminHealthRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
   ...agentHealthRoutes,

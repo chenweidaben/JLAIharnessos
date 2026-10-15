@@ -311,6 +311,11 @@ export function recordSystemHttpRequest(): void {
   httpRequestCount += 1;
 }
 
+/** 读取进程启动以来累计 HTTP 请求数（供健康总览聚合器复用，只读） */
+export function getSystemHttpRequestCount(): number {
+  return httpRequestCount;
+}
+
 /** 智能体熔断状态内存表：code -> closed(正常) / tripped(熔断)，默认全部正常 */
 const agentCircuit = new Map<string, 'closed' | 'tripped'>();
 
