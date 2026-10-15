@@ -321,6 +321,7 @@ import { followupLearningRoutes } from './routes/followupLearning';
 import { followUpRoutes } from './routes/followUps';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
+import { selfLearningRoutes } from './routes/selfLearning';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { federatedKnowledgeRoutes } from './routes/federatedKnowledge';
@@ -651,6 +652,7 @@ const allRoutes: RouteDef[] = [
   ...followupLearningRoutes,
   ...followUpRoutes,
   ...weightEvolutionRoutes,
+  ...selfLearningRoutes, // M146-D：推荐策略自学习 POST /optimize + GET /log
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
   ...federatedKnowledgeRoutes,
