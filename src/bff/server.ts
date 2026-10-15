@@ -136,6 +136,7 @@ import { eSignRoutes } from './routes/eSign';
 import { orderRoutes } from './routes/order';
 import { nursingRecordRoutes } from './routes/nursingRecord';
 import { nurseHandoffRoutes } from './routes/nurseHandoff';
+import { assistantHandoverRoutes } from './routes/assistantHandover';
 import { surgeryRecordRoutes } from './routes/surgeryRecord';
 import { surgerySafetyLearningRoutes } from './routes/surgerySafetyLearning';
 import { medicalHeaderRoutes } from './routes/medicalHeader';
@@ -194,6 +195,7 @@ import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
+import { assistantPharmacyRoutes } from './routes/assistantPharmacy';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
 import { deptKnowledgeRoutes } from './routes/deptKnowledge';
@@ -212,6 +214,7 @@ import { monthlyReportRoutes } from './routes/monthlyReport';
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
+import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
@@ -221,6 +224,7 @@ import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
+import { assistantInpatientRoutes } from './routes/assistantInpatient';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -356,6 +360,7 @@ const allRoutes: RouteDef[] = [
 ...orderRoutes,
 ...nursingRecordRoutes,
 ...nurseHandoffRoutes,
+...assistantHandoverRoutes,
 ...surgeryRecordRoutes,
 ...surgerySafetyLearningRoutes,
 ...medicalHeaderRoutes,
@@ -434,6 +439,7 @@ const allRoutes: RouteDef[] = [
   ...drugReviewRoutes,
   ...drugInventoryRoutes,
   ...prescriptionReviewRoutes,
+  ...assistantPharmacyRoutes,
   ...insuranceAuditRoutes,
   ...drgAuditRoutes,
   ...emrLevel5Routes,
@@ -444,11 +450,13 @@ const allRoutes: RouteDef[] = [
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
+  ...assistantOutpatientRoutes,
   ...aiFeedbackRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
+  ...assistantInpatientRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
