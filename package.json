@@ -45,6 +45,7 @@
     "knowledge:fetch": "bun scripts/knowledge/download/download.ts --all-open --execute",
     "db:seed": "bun scripts/db/import-seed.ts",
     "db:check": "bun scripts/db/check-sql.ts",
+    "seed:demo": "bun run scripts/seed-demo.ts",
     "clean": "rimraf dist build coverage *.tsbuildinfo tsconfig.tsbuildinfo",
     "docs": "echo \"TODO: 接入 TypeDoc/API 文档生成\" && exit 0",
     "security:audit": "bun audit || npm audit --omit=dev",
