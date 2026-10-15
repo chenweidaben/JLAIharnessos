@@ -11,7 +11,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Badge, Button, Card, Col, Empty, List, Row, Spin, Tag, Typography } from 'antd';
 import {
-  AlertOutlined,
   BulbOutlined,
   FileDoneOutlined,
   ReloadOutlined,

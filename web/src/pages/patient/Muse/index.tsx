@@ -71,12 +71,13 @@ const LEVEL_TAG: Record<ReminderLevel, string> = {
 export default function PatientMusePage() {
   // 患者号：医生端可通过路由参数 ?patientId=xxx 查看指定患者；
   // 患者端缺省即本人（BFF 已校验 :id === c.user.id）。
-  const [patientId, setPatientId] = useState<string>(() => {
+  // URL 参数在挂载后不变，故用 useMemo 取值，无需 setState。
+  const patientId: string = useMemo(() => {
     if (typeof window !== 'undefined') {
       return new URLSearchParams(window.location.search).get('patientId') ?? 'me';
     }
     return 'me';
-  });
+  }, []);
   const [data, setData] = useState<PatientMuseData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
