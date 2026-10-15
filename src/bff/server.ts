@@ -243,6 +243,7 @@ import { aiFeedbackRoutes } from './routes/aiFeedback';
 import { patientFeedbackRoutes } from './routes/patientFeedback';
 import { adminAuditLogRoutes } from './routes/adminAuditLog';
 import { adminBackupRoutes } from './routes/adminBackup';
+import { adminImportRoutes } from './routes/adminImport';
 import { openApiRoutes } from './routes/openApi';
 import { adminApiKeysRoutes } from './routes/adminApiKeys';
 import { adminErrorsRoutes } from './routes/adminErrors';
@@ -508,6 +509,7 @@ const allRoutes: RouteDef[] = [
   ...patientFeedbackRoutes,
   ...adminAuditLogRoutes,
   ...adminBackupRoutes,
+  ...adminImportRoutes,
   ...openApiRoutes,
   ...adminApiKeysRoutes,
   ...adminErrorsRoutes,
