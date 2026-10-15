@@ -92,3 +92,51 @@ describe('五级评审 generateSuggestions 整改建议分档', () => {
     expect(low[0]).toContain('0%');
   });
 });
+
+describe('五级评审 generateSuggestions 显式边界值表（0/0.5/0.7/0.9/1.0）', () => {
+  /** 由建议文案反推所属分档 */
+  const band = (s: string[]): 'red' | 'improve' | 'consolidate' => {
+    const t = s.join('\n');
+    if (t.includes('红线')) return 'red';
+    if (t.includes('80% 基线')) return 'improve';
+    return 'consolidate';
+  };
+
+  it('ratio=0 → 红线档，文案含 0%，3 条建议', () => {
+    const s = generateSuggestions('medical_quality', 0);
+    expect(band(s)).toBe('red');
+    expect(s).toHaveLength(3);
+    expect(s[0]).toContain('0%');
+  });
+
+  it('ratio=0.5 → 红线档，文案含 50%', () => {
+    const s = generateSuggestions('medical_quality', 0.5);
+    expect(band(s)).toBe('red');
+    expect(s[0]).toContain('50%');
+  });
+
+  it('ratio=0.7 → 提升档（<0.8），文案含 70%', () => {
+    const s = generateSuggestions('medical_quality', 0.7);
+    expect(band(s)).toBe('improve');
+    expect(s[0]).toContain('70%');
+  });
+
+  it('ratio=0.9 → 巩固档（≥0.8），文案含 90%，2 条建议', () => {
+    const s = generateSuggestions('medical_quality', 0.9);
+    expect(band(s)).toBe('consolidate');
+    expect(s).toHaveLength(2);
+    expect(s[0]).toContain('90%');
+  });
+
+  it('ratio=1.0 直接入参 → 巩固档，文案含 100%', () => {
+    const s = generateSuggestions('medical_quality', 1.0);
+    expect(band(s)).toBe('consolidate');
+    expect(s[0]).toContain('100%');
+  });
+
+  it('负数入参直接截断到 0 → 红线档 0%（不依赖越界分支）', () => {
+    const s = generateSuggestions('operations', -1);
+    expect(band(s)).toBe('red');
+    expect(s[0]).toContain('0%');
+  });
+});

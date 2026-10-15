@@ -168,6 +168,30 @@ describe('buildTrend', () => {
   });
 });
 
+describe('buildTrend hours 参数边界', () => {
+  const history = { outpatient: 1000, inpatient: 200, surgery: 50 };
+
+  it('hours > 24 截断为 24 个点，末点为 23:00', () => {
+    const pts = buildTrend(history, 100);
+    expect(pts).toHaveLength(24);
+    expect(pts[23].hour).toBe('23:00');
+  });
+
+  it('hours < 0 截断为 0 个点（空数组，不抛错）', () => {
+    expect(buildTrend(history, -5)).toEqual([]);
+  });
+
+  it('hours = 0 为假值，回退默认 24 个点', () => {
+    expect(buildTrend(history, 0)).toHaveLength(24);
+  });
+
+  it('hours = 1 仅返回首小时点（00:00）', () => {
+    const pts = buildTrend(history, 1);
+    expect(pts).toHaveLength(1);
+    expect(pts[0].hour).toBe('00:00');
+  });
+});
+
 describe('listView', () => {
   it('返回演示数据 demo:true、带生成时间、八指标 + 24h 趋势', () => {
     const view = listView();

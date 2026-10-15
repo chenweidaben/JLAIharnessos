@@ -278,3 +278,54 @@ describe('批量与命中率统计', () => {
     expect(DRG_AUDIT_RULES.every((r) => r.enabled)).toBe(true);
   });
 });
+
+describe('hitRateStats 统计正确性补强', () => {
+  it('byLevel 按就诊整体风险等级计数（high/medium/low 各 1）', () => {
+    const visits: DrgAuditVisit[] = [
+      // high：目录外项目
+      { visitId: 'H', items: [{ itemCode: 'X999', itemName: '自费', category: '治疗', billedAt: '2026-01-01' }] },
+      // medium：缺主诊断
+      { visitId: 'M', losDays: 10, totalCost: 5000 },
+      // low：无任何命中
+      { visitId: 'L', principalDiagnosis: '高血压', losDays: 10, totalCost: 5000 },
+    ];
+    const stats = hitRateStats(auditBatch(visits, cfg));
+    expect(stats.byLevel.high).toBe(1);
+    expect(stats.byLevel.medium).toBe(1);
+    expect(stats.byLevel.low).toBe(1);
+  });
+
+  it('同一就诊同一规则多次命中：hits 累加、visitsHit 去重为 1', () => {
+    const visits: DrgAuditVisit[] = [
+      {
+        visitId: 'V',
+        items: [
+          { itemCode: 'X998', itemName: '自费A', category: '治疗', billedAt: '2026-01-01' },
+          { itemCode: 'X999', itemName: '自费B', category: '治疗', billedAt: '2026-01-01' },
+        ],
+      },
+    ];
+    const stats = hitRateStats(auditBatch(visits, cfg));
+    expect(stats.byRule['catalog.out_of_catalog']?.hits).toBe(2);
+    expect(stats.byRule['catalog.out_of_catalog']?.visitsHit).toBe(1);
+    expect(stats.hitVisits).toBe(1);
+  });
+
+  it('hitRate 保留四位小数（1/3 = 0.3333）', () => {
+    const visits: DrgAuditVisit[] = [
+      { visitId: 'V1', items: [{ itemCode: 'X999', itemName: '自费', category: '治疗', billedAt: '2026-01-01' }] },
+      { visitId: 'V2', principalDiagnosis: '高血压', losDays: 10, totalCost: 5000 },
+      { visitId: 'V3', principalDiagnosis: '糖尿病', losDays: 5, totalCost: 8000 },
+    ];
+    const stats = hitRateStats(auditBatch(visits, cfg));
+    expect(stats.totalVisits).toBe(3);
+    expect(stats.hitVisits).toBe(1);
+    expect(stats.hitRate).toBe(0.3333);
+  });
+
+  it('auditBatch 非数组/undefined 安全返回空数组，不抛错', () => {
+    expect(auditBatch(null, cfg)).toEqual([]);
+    expect(auditBatch(undefined, cfg)).toEqual([]);
+    expect(auditBatch('nope' as unknown as DrgAuditVisit[], cfg)).toEqual([]);
+  });
+});
