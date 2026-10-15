@@ -339,6 +339,7 @@ import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
 import { followUpRoutes } from './routes/followUps';
 // M152-D：患者随访智能化（AI能力深化）GET /api/v1/followup/auto-plan/:patientId + POST /api/v1/followup/send
+import { smartFollowupRoutes } from './routes/smartFollowup';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
@@ -694,6 +695,7 @@ const allRoutes: RouteDef[] = [
   ...museHomeRoutes,
   ...followupLearningRoutes,
   ...followUpRoutes,
+  ...smartFollowupRoutes, // M152-D：患者随访智能化 GET /api/v1/followup/auto-plan/:patientId + POST /send
   ...weightEvolutionRoutes,
   ...selfLearningRoutes, // M146-D：推荐策略自学习 POST /optimize + GET /log
   ...hospitalKpiRoutes, // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi
