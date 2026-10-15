@@ -103,6 +103,7 @@ import { pathwayRecommendationRoutes } from './routes/pathwayRecommendation';
 import { losPredictionRoutes } from './routes/losPrediction';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { voiceRecordRoutes } from './routes/voiceRecord'; // M152-B：病历 AI 语音录入与智能补全（语音转写+智能补全）
+import { opsForecastRoutes } from './routes/opsForecast'; // M154-C：【AI深化与运营预测】GET /api/v1/admin/forecast
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
 import { researchExportRoutes } from './routes/researchExport';
@@ -749,6 +750,7 @@ const allRoutes: RouteDef[] = [
   ...adminRecordAuditRoutes,
   ...userManualRoutes,
   ...emrSmartScoreRoutes, // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，重实质不抠格式）
+  ...opsForecastRoutes, // M154-C：【AI深化与运营预测】GET /api/v1/admin/forecast（移动平均+季节因子+趋势外推，含残差置信区间）
 ];
 
 interface Compiled {
