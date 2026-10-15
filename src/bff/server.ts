@@ -226,6 +226,7 @@ import { followupLearningRoutes } from './routes/followupLearning';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
+import { museSearchRoutes } from './routes/museSearch';
 import { smokeTestRoutes } from './routes/smokeTest';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { getEnv } from './config/env';
@@ -441,6 +442,7 @@ const allRoutes: RouteDef[] = [
   ...weightEvolutionRoutes,
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
+  ...museSearchRoutes,
   ...smokeTestRoutes,
   ...museOnboardingRoutes,
 ];

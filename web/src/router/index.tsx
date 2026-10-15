@@ -228,6 +228,8 @@ const MedmuseApprovalsPage = lazy(() => import('@/pages/medmuse/Approvals'));
 const TerminalQcPage = lazy(() => import('@/pages/emrGap/terminalQc'));
 // MEDMUSE 科主任驾驶舱（M94-A）
 const DeptCockpitPage = lazy(() => import('@/pages/medmuse/DeptCockpit'));
+// 全院知识检索 Hospital Muse 搜索（M115-D）
+const MuseSearchPage = lazy(() => import('@/pages/muse/Search'));
 // AI 第八剑客合理用药实时审查（M94-B）
 const DrugReviewPage = lazy(() => import('@/pages/emrGap/drugReview'));
 // 电子病历五级评审自评仪表盘（M94-C）
@@ -246,6 +248,10 @@ const SystemExportPage = lazy(() => import('@/pages/system/Export'));
 const NotifyConfigPage = lazy(() => import('@/pages/system/NotifyConfig'));
 // MEDMUSE agent 健康度看板（M99-A）
 const AgentHealthPage = lazy(() => import('@/pages/medmuse/AgentHealth'));
+// 经验/教训主动录入（M115-B，依据宪法第七章）
+const LessonNewPage = lazy(() => import('@/pages/muse/LessonNew'));
+// 个人 MUSE 主页（M115-A，依据宪法第七章）
+const MuseHomePage = lazy(() => import('@/pages/muse/Home'));
 // 临床路径变异管理（M99-B）
 const PathwayVariancePage = lazy(() => import('@/pages/emrGap/pathwayVariance'));
 // 手术排程看板（M99-C）
@@ -520,8 +526,14 @@ export default function AppRoutes() {
           <Route path="medmuse" element={<MedMuseChatPage />} />
           {/* MEDMUSE 审批中心（M93-A）：待审批工单列表 + approve/reject */}
           <Route path="medmuse/approvals" element={<MedmuseApprovalsPage />} />
+          {/* 全院知识检索 Hospital Muse 搜索（M115-D） */}
+          <Route path="muse/search" element={<MuseSearchPage />} />
           {/* MEDMUSE agent 健康度看板（M99-A） */}
           <Route path="medmuse/agent-health" element={<AgentHealthPage />} />
+          {/* 经验/教训主动录入（M115-B）：登录即可录入本人决策记忆 */}
+          <Route path="muse/lesson/new" element={<LessonNewPage />} />
+          {/* 个人 MUSE 主页（M115-A）：本人画像 + 统计卡 + 时间线 + 30 天成长曲线 */}
+          <Route path="muse/home" element={<MuseHomePage />} />
           {/* MEDMUSE 科主任驾驶舱（M94-A）：科室 KPI 日报 + 质量预警 */}
           <Route
             path="medmuse/dept-cockpit"
