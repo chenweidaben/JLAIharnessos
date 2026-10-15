@@ -223,6 +223,7 @@ import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
+import { assistantInpatientRoutes } from './routes/assistantInpatient';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -453,6 +454,7 @@ const allRoutes: RouteDef[] = [
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
+  ...assistantInpatientRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
