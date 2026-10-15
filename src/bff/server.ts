@@ -113,6 +113,7 @@ import { integrationHl7Routes } from './routes/integrationHl7'; // M155-C：【�
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
 import { researchExportRoutes } from './routes/researchExport';
+import { researchAiRoutes } from './routes/researchAi'; // M156-C【集团与科研】医学科研智能化：GET /api/v1/research/smart-search + POST /api/v1/research/auto-stats
 import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中台·数据集市
@@ -454,6 +455,7 @@ const allRoutes: RouteDef[] = [
   ...frontPageRoutes,
   ...researchRoutes,
   ...researchExportRoutes,
+  ...researchAiRoutes, // M156-C【集团与科研】医学科研智能化
   ...empiRoutes,
   ...dataWarehouseRoutes,
   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
