@@ -215,6 +215,7 @@ import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
+import { museLlmStatusRoutes } from './routes/museLlmStatus';
 import { aiFeedbackRoutes } from './routes/aiFeedback';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -244,6 +245,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 const allRoutes: RouteDef[] = [
   ...healthRoutes,
   ...modelInfoRoutes,
+  ...museLlmStatusRoutes,
   ...authRoutes,
   ...mfaLoginRoutes,
   ...patientRoutes,
