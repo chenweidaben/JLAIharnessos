@@ -88,6 +88,8 @@ import { criticalValueClosureRoutes } from './routes/criticalValueClosure';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
 import { surgeryScheduleRoutes } from './routes/surgerySchedule';
+// 【核心业务深化】M130-D 手术排班优化（POST /admin/surgery/schedule/optimize）
+import { adminSurgeryOptimizeRoutes } from './routes/adminSurgeryOptimize';
 import { surgeryChecklistRoutes } from './routes/surgeryChecklist';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
@@ -283,6 +285,7 @@ import { museDeptCurveRoutes } from './routes/museDeptCurve';
 import { helpCenterRoutes } from './routes/helpCenter';
 // 【系统集成】M129-A：统一 API 文档（Swagger UI + OpenAPI3 JSON）
 import { apiDocsRoutes } from './routes/apiDocs';
+// 【核心业务深化】M130-A：病历质控智能审核（仅 admin，结果为建议、人工确认）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 

@@ -308,3 +308,417 @@ export async function listView(date: string): Promise<ScheduleBoard> {
     demo,
   };
 }
+
+/* ============================================================================
+ * 【核心业务深化】M130-D 手术排班优化引擎（纯函数，无 IO，可单测）
+ *
+ * 优化目标：
+ *   1) 手术室利用率最大化 —— 贪心最早可行槽，长手术优先 bin packing；
+ *   2) 医生时间不冲突     —— 同 surgeon 同日期窗口互不重叠；
+ *   3) 同类手术集中       —— 同科室术式优先落同一手术间同日相邻块；
+ *   4) 急诊优先插入       —— emergency 最先排，优先占用急诊手术间。
+ *
+ * 算法定位：实用贪心，不引入 ILP/约束求解器，O(N·R·D) 量级，
+ *           满足日调度秒级出方案，便于手术室护士站现场复核调整。
+ * ==========================================================================*/
+
+/** 同间两台手术之间的消毒周转间隔（分钟） */
+export const SCHEDULE_TURNOVER_MIN = 15;
+
+export type ScheduleSurgeryType = 'elective' | 'emergency';
+
+/** 优化引擎输入：一台待排手术申请 */
+export interface ScheduleRequestInput {
+  id: string;
+  surgeryType: ScheduleSurgeryType;
+  procedure: string;
+  department: string;
+  surgeonId: string;
+  /** 预计手术时长（分钟） */
+  durationMin: number;
+  /** 期望日期 YYYY-MM-DD；为空表示可排入 horizon 任意一天 */
+  preferredDate?: string | null;
+}
+
+/** 可用手术间 */
+export interface AvailableRoom {
+  roomId: string;
+  name: string;
+  /** 开台分钟（08:00 = 480） */
+  openMin: number;
+  /** 清台分钟（17:00 = 1020） */
+  closeMin: number;
+  /** 急诊手术间：急诊优先占用 */
+  isEmergency?: boolean;
+}
+
+/** 医生已有不可用窗口（门诊 / 手术 / 休假） */
+export interface SurgeonBusyWindow {
+  surgeonId: string;
+  date: string;
+  startMin: number;
+  endMin: number;
+}
+
+/** 一条优化后排班 */
+export interface ScheduleAssignment {
+  requestId: string;
+  roomId: string;
+  roomName: string;
+  date: string;
+  startMin: number;
+  endMin: number;
+  surgeonId: string;
+  procedure: string;
+  department: string;
+  surgeryType: ScheduleSurgeryType;
+}
+
+export interface UnassignedRequest {
+  requestId: string;
+  reason: string;
+}
+
+export interface ScheduleConflict {
+  kind: 'room' | 'surgeon';
+  date: string;
+  startMin: number;
+  endMin: number;
+  requestIds: string[];
+  detail: string;
+}
+
+export interface ScheduleMetrics {
+  totalRequests: number;
+  assignedCount: number;
+  unassignedCount: number;
+  emergencyAssigned: number;
+  electiveAssigned: number;
+  /** 手术室利用率 = 已排手术总分钟 / (手术间数 × horizon 天数 × 日均开放分钟)，0~1 */
+  utilizationRate: number;
+  roomsUsed: number;
+  /** 同科室相邻块计数（同类集中度，块越少越集中） */
+  sameDeptClusterCount: number;
+}
+
+export interface ScheduleResult {
+  assignments: ScheduleAssignment[];
+  unassigned: UnassignedRequest[];
+  conflicts: ScheduleConflict[];
+  metrics: ScheduleMetrics;
+}
+
+/** 区间重叠判定（左闭右开） */
+function rangesOverlap(aS: number, aE: number, bS: number, bE: number): boolean {
+  return aS < bE && bS < aE;
+}
+
+interface BusyInterval {
+  start: number;
+  end: number;
+  requestId?: string;
+  dept?: string;
+}
+
+/**
+ * 【核心业务深化】手术排班优化主入口（纯函数）。
+ *
+ * @param requests           待排手术申请列表
+ * @param availableRooms     可用手术间及其开放时段
+ * @param surgeonAvailability 医生已有不可用窗口
+ * @returns ScheduleResult   排程结果 + 未排原因 + 冲突自检 + 利用率指标
+ */
+export function optimizeSurgerySchedule(
+  requests: ScheduleRequestInput[],
+  availableRooms: AvailableRoom[],
+  surgeonAvailability: SurgeonBusyWindow[],
+): ScheduleResult {
+  // 1. 入参清洗：去重 id、丢弃非法时长、无房间直接返回
+  const seen = new Set<string>();
+  const valid = requests.filter((r) => {
+    if (!r || !r.id || seen.has(r.id)) return false;
+    seen.add(r.id);
+    return r.durationMin > 0;
+  });
+  if (availableRooms.length === 0) {
+    return {
+      assignments: [],
+      unassigned: valid.map((r) => ({ requestId: r.id, reason: '无可用手术间' })),
+      conflicts: [],
+      metrics: {
+        totalRequests: valid.length,
+        assignedCount: 0,
+        unassignedCount: valid.length,
+        emergencyAssigned: 0,
+        electiveAssigned: 0,
+        utilizationRate: 0,
+        roomsUsed: 0,
+        sameDeptClusterCount: 0,
+      },
+    };
+  }
+
+  // 2. horizon：所有出现过的日期（期望日期 ∪ 医生忙日）
+  const dateSet = new Set<string>();
+  for (const r of valid) if (r.preferredDate) dateSet.add(r.preferredDate);
+  for (const w of surgeonAvailability) dateSet.add(w.date);
+  const dates = [...dateSet].sort();
+
+  // 3. 医生忙表：Map<surgeonId, Map<date, intervals>>
+  const surgeonBusy = new Map<string, Map<string, BusyInterval[]>>();
+  for (const w of surgeonAvailability) {
+    const byDate = surgeonBusy.get(w.surgeonId) ?? new Map<string, BusyInterval[]>();
+    const arr = byDate.get(w.date) ?? [];
+    arr.push({ start: w.startMin, end: w.endMin });
+    byDate.set(w.date, arr);
+    surgeonBusy.set(w.surgeonId, byDate);
+  }
+
+  // 4. 排序：急诊优先 → 时长降序（长手术先排，bin packing）→ id 字典序稳定
+  const sorted = [...valid].sort((a, b) => {
+    if (a.surgeryType !== b.surgeryType) return a.surgeryType === 'emergency' ? -1 : 1;
+    if (b.durationMin !== a.durationMin) return b.durationMin - a.durationMin;
+    return a.id.localeCompare(b.id);
+  });
+
+  const assignments: ScheduleAssignment[] = [];
+  const unassigned: UnassignedRequest[] = [];
+  const roomBusy = new Map<string, BusyInterval[]>();
+  /** 本轮已排到该医生的手术（跨房间），用于医生不冲突约束 */
+  const surgeonPlaced = new Map<string, BusyInterval[]>();
+  const roomKey = (roomId: string, date: string) => `${roomId}|${date}`;
+  const surgeonKey = (surgeonId: string, date: string) => `${surgeonId}|${date}`;
+
+  /**
+   * 在某间某日找最优可行槽。
+   * 打分：日期序×大权重 + 开始分钟；同科已排 → 减分集中；紧贴同科块 → 再减分。
+   */
+  function findSlot(
+    req: ScheduleRequestInput,
+    room: AvailableRoom,
+    date: string,
+    dateOrderIdx: number,
+  ): { start: number; end: number; score: number } | null {
+    const busy = roomBusy.get(roomKey(room.roomId, date)) ?? [];
+    // 医生当日不可用 = 外部忙窗口 ∪ 本轮已排手术（跨房间）
+    const sBusy = [
+      ...(surgeonBusy.get(req.surgeonId)?.get(date) ?? []),
+      ...(surgeonPlaced.get(surgeonKey(req.surgeonId, date)) ?? []),
+    ];
+
+    // 候选起点：开台时刻 + 每个已排区间结束后一个周转间隔
+    const candidates: number[] = [room.openMin];
+    for (const b of busy) candidates.push(b.end + SCHEDULE_TURNOVER_MIN);
+    candidates.sort((a, b) => a - b);
+
+    for (const start of candidates) {
+      const end = start + req.durationMin;
+      if (end > room.closeMin) continue;
+
+      // 房间冲突（含消毒周转缓冲）
+      let roomHit = false;
+      for (const b of busy) {
+        if (start < b.end + SCHEDULE_TURNOVER_MIN && b.start < end) {
+          roomHit = true;
+          break;
+        }
+      }
+      if (roomHit) continue;
+
+      // 医生冲突（无周转，直接重叠）
+      const docHit = sBusy.some((w) => rangesOverlap(start, end, w.start, w.end));
+      if (docHit) continue;
+
+      // 打分：日期优先 + 早开台优先；同类集中奖励
+      let score = dateOrderIdx * 100_000 + start;
+      const sameDeptCount = busy.filter((b) => b.dept === req.department).length;
+      if (sameDeptCount > 0) score -= 2_000;
+      const adjacentSameDept = busy.some(
+        (b) => b.dept === req.department && b.end + SCHEDULE_TURNOVER_MIN === start,
+      );
+      if (adjacentSameDept) score -= 500;
+
+      return { start, end, score };
+    }
+    return null;
+  }
+
+  // 5. 贪心逐台落位
+  for (const req of sorted) {
+    // 候选日期：preferredDate 排最前，其余自然序
+    const candDates = dates
+      .map((date, idx) => ({ date, idx }))
+      .sort((a, b) => {
+        const ap = a.date === req.preferredDate ? 0 : 1;
+        const bp = b.date === req.preferredDate ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        return a.idx - b.idx;
+      });
+
+    // 候选房间：急诊 → 急诊间优先；择期 → 普通间优先（急诊间留作急诊插入缓冲）
+    const rooms = [...availableRooms].sort((a, b) => {
+      const aEm = a.isEmergency ? 0 : 1;
+      const bEm = b.isEmergency ? 0 : 1;
+      if (req.surgeryType === 'emergency') return aEm - bEm;
+      return bEm - aEm;
+    });
+
+    let best: { assignment: ScheduleAssignment; score: number } | null = null;
+    for (const cd of candDates) {
+      for (const room of rooms) {
+        const slot = findSlot(req, room, cd.date, cd.idx);
+        if (!slot) continue;
+        const assignment: ScheduleAssignment = {
+          requestId: req.id,
+          roomId: room.roomId,
+          roomName: room.name,
+          date: cd.date,
+          startMin: slot.start,
+          endMin: slot.end,
+          surgeonId: req.surgeonId,
+          procedure: req.procedure,
+          department: req.department,
+          surgeryType: req.surgeryType,
+        };
+        if (!best || slot.score < best.score) best = { assignment, score: slot.score };
+      }
+    }
+
+    if (best) {
+      assignments.push(best.assignment);
+      const key = roomKey(best.assignment.roomId, best.assignment.date);
+      const arr = roomBusy.get(key) ?? [];
+      arr.push({
+        start: best.assignment.startMin,
+        end: best.assignment.endMin,
+        requestId: best.assignment.requestId,
+        dept: best.assignment.department,
+      });
+      roomBusy.set(key, arr);
+      // 登记该医生已占用时段（跨房间），供后续同医生申请避让
+      const sKey = surgeonKey(best.assignment.surgeonId, best.assignment.date);
+      const sArr = surgeonPlaced.get(sKey) ?? [];
+      sArr.push({ start: best.assignment.startMin, end: best.assignment.endMin });
+      surgeonPlaced.set(sKey, sArr);
+    } else {
+      unassigned.push({
+        requestId: req.id,
+        reason: req.preferredDate
+          ? `期望日期 ${req.preferredDate} 内无满足房间/医生约束的空闲槽位`
+          : '排班 horizon 内无满足房间/医生约束的空闲槽位',
+      });
+    }
+  }
+
+  // 6. 冲突自检（构造上应无冲突；作为防御性校验输出）
+  const conflicts = detectScheduleConflicts(assignments);
+
+  // 7. 指标
+  const metrics = buildScheduleMetrics(assignments, unassigned, availableRooms, dates);
+
+  return { assignments, unassigned, conflicts, metrics };
+}
+
+/** 【核心业务深化】冲突检测：按 间×日 与 医生×日 分组扫重叠 */
+export function detectScheduleConflicts(assignments: ScheduleAssignment[]): ScheduleConflict[] {
+  const out: ScheduleConflict[] = [];
+
+  const byRoom = new Map<string, ScheduleAssignment[]>();
+  for (const a of assignments) {
+    const k = `${a.roomId}|${a.date}`;
+    const arr = byRoom.get(k) ?? [];
+    arr.push(a);
+    byRoom.set(k, arr);
+  }
+  for (const arr of byRoom.values()) {
+    arr.sort((a, b) => a.startMin - b.startMin);
+    for (let i = 0; i < arr.length - 1; i++) {
+      const cur = arr[i];
+      const nxt = arr[i + 1];
+      if (rangesOverlap(cur.startMin, cur.endMin, nxt.startMin, nxt.endMin)) {
+        out.push({
+          kind: 'room',
+          date: cur.date,
+          startMin: Math.max(cur.startMin, nxt.startMin),
+          endMin: Math.min(cur.endMin, nxt.endMin),
+          requestIds: [cur.requestId, nxt.requestId],
+          detail: `手术间 ${cur.roomName} 时间重叠`,
+        });
+      }
+    }
+  }
+
+  const bySurgeon = new Map<string, ScheduleAssignment[]>();
+  for (const a of assignments) {
+    const k = `${a.surgeonId}|${a.date}`;
+    const arr = bySurgeon.get(k) ?? [];
+    arr.push(a);
+    bySurgeon.set(k, arr);
+  }
+  for (const arr of bySurgeon.values()) {
+    arr.sort((a, b) => a.startMin - b.startMin);
+    for (let i = 0; i < arr.length - 1; i++) {
+      const cur = arr[i];
+      const nxt = arr[i + 1];
+      if (rangesOverlap(cur.startMin, cur.endMin, nxt.startMin, nxt.endMin)) {
+        out.push({
+          kind: 'surgeon',
+          date: cur.date,
+          startMin: Math.max(cur.startMin, nxt.startMin),
+          endMin: Math.min(cur.endMin, nxt.endMin),
+          requestIds: [cur.requestId, nxt.requestId],
+          detail: `医生 ${cur.surgeonId} 时间重叠`,
+        });
+      }
+    }
+  }
+
+  return out;
+}
+
+/** 【核心业务深化】排程指标：利用率 / 间次占用 / 同类集中度 */
+export function buildScheduleMetrics(
+  assignments: ScheduleAssignment[],
+  unassigned: UnassignedRequest[],
+  rooms: AvailableRoom[],
+  dates: string[],
+): ScheduleMetrics {
+  const totalRequests = assignments.length + unassigned.length;
+  const emergencyAssigned = assignments.filter((a) => a.surgeryType === 'emergency').length;
+  const electiveAssigned = assignments.length - emergencyAssigned;
+  const totalSurgeryMin = assignments.reduce((s, a) => s + (a.endMin - a.startMin), 0);
+  const dayCapacity = rooms.reduce((s, r) => s + (r.closeMin - r.openMin), 0);
+  const totalCapacityMin = dayCapacity * Math.max(dates.length, 1);
+  const utilizationRate =
+    totalCapacityMin > 0 ? Math.round((totalSurgeryMin / totalCapacityMin) * 1000) / 1000 : 0;
+  const roomsUsed = new Set(assignments.map((a) => a.roomId)).size;
+
+  // 同类集中：按 间+日 分组，数科室切换次数（块数）
+  let clusters = 0;
+  const byRoomDate = new Map<string, ScheduleAssignment[]>();
+  for (const a of assignments) {
+    const k = `${a.roomId}|${a.date}`;
+    const arr = byRoomDate.get(k) ?? [];
+    arr.push(a);
+    byRoomDate.set(k, arr);
+  }
+  for (const arr of byRoomDate.values()) {
+    arr.sort((a, b) => a.startMin - b.startMin);
+    let prevDept: string | null = null;
+    for (const a of arr) {
+      if (a.department !== prevDept) clusters++;
+      prevDept = a.department;
+    }
+  }
+
+  return {
+    totalRequests,
+    assignedCount: assignments.length,
+    unassignedCount: unassigned.length,
+    emergencyAssigned,
+    electiveAssigned,
+    utilizationRate,
+    roomsUsed,
+    sameDeptClusterCount: clusters,
+  };
+}
