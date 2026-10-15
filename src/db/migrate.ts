@@ -196,7 +196,13 @@ export async function runMigrations(migrationsDir: string = MIGRATIONS_DIR): Pro
 
   const files = readdirSync(migrationsDir)
     .filter((f) => f.endsWith('.sql'))
-    .sort();
+    .sort((a, b) => {
+      // 提取数字前缀，按数字排序（而非字符串排序）
+      const numA = parseInt(a.match(/^(\d+)/)?.[1] ?? '0', 10);
+      const numB = parseInt(b.match(/^(\d+)/)?.[1] ?? '0', 10);
+      if (numA !== numB) return numA - numB;
+      return a.localeCompare(b);
+    });
 
   const newlyApplied: string[] = [];
   const skipped: string[] = [];

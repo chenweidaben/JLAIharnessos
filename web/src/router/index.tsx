@@ -266,8 +266,6 @@ const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
 const OpdWorkstationPage = lazy(() => import('@/pages/opd/Workstation'));
-// 护理敏感指标看板（M105-C）
-const NqiDashboardPage = lazy(() => import('@/pages/nursing/NqiDashboard'));
 // 手术安全核查表（M105-D）
 const SurgeryChecklistPage = lazy(() => import('@/pages/surgery/Checklist'));
 

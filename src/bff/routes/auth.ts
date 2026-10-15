@@ -59,10 +59,10 @@ const DEMO_VIEW: AuthView = {
   email: '',
   status: 'active',
   roles: [],
-  roleCodes: ['chief_physician'],
-  rawRoles: ['doctor'],
-  permissions: ['medical_record:read', 'medical_record:write', 'order:write', 'prescription:write'],
-  dataScope: 'dept',
+  roleCodes: ['admin'],
+  rawRoles: ['admin'],
+  permissions: ['*'],
+  dataScope: 'all',
 };
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
