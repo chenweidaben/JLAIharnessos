@@ -39,6 +39,7 @@ import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
+import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
@@ -461,6 +462,7 @@ const allRoutes: RouteDef[] = [
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
+  ...adminPerformanceOptimizationsRoutes,
   ...adminDeptPerformanceRoutes,
   ...adminHealthRoutes,
   ...adminDashboardRoutes,
