@@ -42,6 +42,7 @@ import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
+// 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
@@ -289,7 +290,8 @@ import { museSearchRoutes } from './routes/museSearch';
 import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
-import { securityBaselineRoutes } from './routes/securityBaseline';
+// 【核心业务深化】M136-C：核心 aggregator 测试覆盖率报告（仅 admin，质量门禁）
+import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
@@ -456,6 +458,7 @@ const allRoutes: RouteDef[] = [
 ...patientLabExplainRoutes,
 ...surgicalChecklistRoutes,
 ...alertsRoutes,
+// 【监控告警自动化】M136-D：运维监控告警中心 GET /api/v1/admin/alerts（仅 admin）
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,
@@ -576,7 +579,7 @@ const allRoutes: RouteDef[] = [
   ...museAskRoutes,
   ...museRecommendRoutes,
   ...smokeTestRoutes,
-  ...securityBaselineRoutes,
+  ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,

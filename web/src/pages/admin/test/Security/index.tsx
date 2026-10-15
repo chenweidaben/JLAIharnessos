@@ -1,12 +1,15 @@
 /**
- * 健澜科技 jlmedaios - M135-D 安全基线检查报告页（仅 admin，运维/安全工具）
+ * 健澜科技 jlmedaios - M136-A 安全基线检查报告页（仅 admin，运维/安全工具）
  *
  * 展示 BFF /api/v1/admin/test/security 聚合结果：
  *  - 整体红 / 黄 / 绿结论；
  *  - 绿(pass) / 黄(warn) / 红(fail) 计数与达标率；
- *  - 五项基线逐条结果：写操作认证 / SQL 注入 / XSS / 患者数据脱敏 / 错误信息不泄露。
+ *  - 五项基线逐条结果：写操作认证 / SQL 注入 / XSS / 患者数据脱敏 / 错误信息不泄露；
+ *  - M136-A 新增：错误脱敏自检面板，逐样本展示「原始错误 → 生产环境客户端实际收到的文案」。
  *
  * 视觉：深海蓝 VI（#0a2540 → #123a5e 渐变头部），三色用 antd Tag 语义色。
+ *
+ * 持续优化：后续可加导出 PDF / 巡检定时任务钩子。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -30,6 +33,23 @@ interface CheckItem {
   recommendation: string;
 }
 
+/** M136-A：错误脱敏单条样本 */
+interface MaskingSample {
+  label: string;
+  raw: string;
+  prodMessage: string;
+  exposed: boolean;
+  status: number;
+}
+
+/** M136-A：错误脱敏自检块 */
+interface ErrorMaskingSelfTest {
+  green: boolean;
+  total: number;
+  passed: number;
+  samples: MaskingSample[];
+}
+
 interface SecurityReport {
   baseUrl: string;
   generatedAt: string;
@@ -43,6 +63,8 @@ interface SecurityReport {
   };
   byRisk: Record<RiskLevel, number>;
   checks: CheckItem[];
+  /** M136-A 新增：错误脱敏自检（可选，老后端返回时缺省） */
+  errorMasking?: ErrorMaskingSelfTest;
 }
 
 /** 深海蓝 VI 色板 */
@@ -219,6 +241,51 @@ export default function SecurityBaselinePage() {
                 }}
               />
             </Card>
+
+            {/* M136-A：错误脱敏自检面板 */}
+            {data.errorMasking && (
+              <Card
+                style={{ marginTop: 16 }}
+                title={
+                  <span>
+                    错误脱敏自检（M136-A）{' '}
+                    <Tag color={data.errorMasking.green ? 'success' : 'error'}>
+                      {data.errorMasking.green
+                        ? `全绿 ${data.errorMasking.passed}/${data.errorMasking.total}`
+                        : `${data.errorMasking.passed}/${data.errorMasking.total} 通过`}
+                    </Tag>
+                  </span>
+                }
+              >
+                <Paragraph type="secondary" style={{ marginBottom: 12 }}>
+                  生产环境下，5xx 一律返回「系统繁忙，请稍后重试」；401/403/404 保持明确语义；
+                  堆栈 / SQL / 物理路径 / 内网地址仅写服务端日志，不下发客户端。
+                </Paragraph>
+                <List
+                  dataSource={data.errorMasking.samples}
+                  renderItem={(s) => (
+                    <List.Item style={{ borderLeft: `3px solid ${s.exposed ? '#cf1322' : '#3f8600'}`, paddingLeft: 12 }}>
+                      <Row style={{ width: '100%' }}>
+                        <Col flex="auto">
+                          <Text strong>
+                            [{s.status}] {s.label}
+                          </Text>{' '}
+                          <Tag color={s.exposed ? 'error' : 'success'}>{s.exposed ? '泄露' : '已脱敏'}</Tag>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            原始：<code style={{ wordBreak: 'break-all' }}>{s.raw}</code>
+                          </Text>
+                          <br />
+                          <Text style={{ fontSize: 12, color: VI.accent }}>
+                            客户端收到：<strong>{s.prodMessage}</strong>
+                          </Text>
+                        </Col>
+                      </Row>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            )}
           </>
         )}
       </Content>
