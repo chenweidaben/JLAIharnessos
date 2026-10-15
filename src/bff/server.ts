@@ -215,6 +215,7 @@ import { modelInfoRoutes } from './routes/modelInfo';
 import { aiFeedbackRoutes } from './routes/aiFeedback';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { operationalInsightRoutes } from './routes/operationalInsight';
+import { inpatientInsightRoutes } from './routes/inpatientInsight';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -416,6 +417,7 @@ const allRoutes: RouteDef[] = [
   ...aiFeedbackRoutes,
   ...strategyEvolutionRoutes,
   ...operationalInsightRoutes,
+  ...inpatientInsightRoutes,
 ];
 
 interface Compiled {
