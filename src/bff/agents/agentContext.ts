@@ -28,6 +28,7 @@ import type {
   DeptKnowledgeEntry,
   KnowledgeType,
 } from '../aggregators/deptKnowledgeAggregator';
+import { createCache } from '../utils/queryCache.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -56,6 +57,49 @@ interface DeptKnowledgeRow {
   title: string | null;
   content: string | null;
   knowledge_type: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* 读取缓存：同一 doctor+patient 组合 30s 内不重复聚合                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 学习上下文读取缓存 TTL：30 秒。
+ *
+ * 学习快照（患者画像 / 医生偏好 / 科室知识）按学习节奏异步沉淀，
+ * 30s 窗口内视为不变；同一会话内连续多轮 agent 调用直接复用上次
+ * 聚合结果，避免三路重复打库。缓存的是已脱敏快照，不触碰患者直接标识符。
+ */
+const AGENT_CONTEXT_TTL_MS = 30_000;
+
+/** 进程级读取缓存（闭包私有 Map，进程重启即回收） */
+const agentContextCache = createCache<AgentContextBundle>(AGENT_CONTEXT_TTL_MS);
+
+/**
+ * 归一化缓存键：把可空入参 trim 后拼接，空值统一按空串处理。
+ *
+ * 去重主单元为「医生 + 患者」；科室编码一并折入键——同一 doctor+patient
+ * 但切换科室时必须重聚合科室知识路，避免跨科室串味。
+ *
+ * @param doctorId 医生用户 ID（可空）
+ * @param patientId 院内脱敏患者主键（可空）
+ * @param deptCode 科室编码（可空）
+ * @returns 稳定字符串键
+ */
+function contextCacheKey(
+  doctorId: string | null | undefined,
+  patientId: string | null | undefined,
+  deptCode: string | null | undefined,
+): string {
+  const norm = (s: string | null | undefined): string => (s ?? '').trim();
+  return `${norm(doctorId)}|${norm(patientId)}|${norm(deptCode)}`;
+}
+
+/**
+ * 清空学习上下文读取缓存（学习数据手动重算沉淀后调用，强制下轮重聚合）。
+ */
+export function clearAgentContextCache(): void {
+  agentContextCache.clear();
 }
 
 /* ------------------------------------------------------------------ */
@@ -177,6 +221,10 @@ async function safeDeptKnowledge(
  * 脱敏（依据宪法第三章）：只读取已沉淀的脱敏快照，输出文本由
  *   buildAgentContext 保证不含患者直接标识符。
  *
+ * 缓存口径：同一 doctor+patient（+deptCode）组合 30s 内直接复用上一次
+ *   聚合结果（含冷启动兜底），不重复打库三路读取；学习数据重算沉淀后可
+ *   调用 clearAgentContextCache() 强制失效。
+ *
  * @param doctorId 医生用户 ID（可空；空则医生偏好路降级为空）
  * @param patientId 院内脱敏患者主键（可空；空则患者画像路降级为空）
  * @param deptCode 科室编码（可空；空则科室知识路降级为空）
@@ -187,6 +235,12 @@ export async function getAgentContext(
   patientId: string | null | undefined,
   deptCode: string | null | undefined,
 ): Promise<AgentContextBundle> {
+  const cacheKey = contextCacheKey(doctorId, patientId, deptCode);
+
+  // 30s 内同一组合直接命中，跳过三路聚合
+  const hit = agentContextCache.get(cacheKey);
+  if (hit) return hit;
+
   const [pref, profile, knowledge] = await Promise.all([
     safeStoredPreference(doctorId),
     safePatientProfile(patientId),
@@ -196,7 +250,16 @@ export async function getAgentContext(
   const contextText = buildAgentContext(pref, profile, knowledge);
   const empty =
     pref === null && profile === null && knowledge.length === 0;
-  return { contextText, empty };
+  const bundle: AgentContextBundle = { contextText, empty };
+
+  // 写缓存失败绝不影响主流程（缓存仅为性能优化，旁路语义）
+  try {
+    agentContextCache.set(cacheKey, bundle);
+  } catch (e) {
+    console.warn('[agent-context] 学习上下文缓存写入失败（已忽略）:', e);
+  }
+
+  return bundle;
 }
 
 /* ------------------------------------------------------------------ */

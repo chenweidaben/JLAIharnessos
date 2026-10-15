@@ -96,10 +96,14 @@ export const aiFeedbackRoutes: RouteDef[] = [
     handle: async (): Promise<Response> => {
       try {
         const db = getDb();
-        // 只读学习所需的两列，避免拉回大 jsonb 快照
+        // 只读学习所需的两列，避免拉回大 jsonb 快照；
+        // 反馈只用于近期权重聚合，固定取最近 500 条（按创建时间倒序），
+        // 防止长期运行后全表扫描拖慢 stats 接口（配合 idx_ai_feedback_role_created）。
         const rows = await db`
           SELECT suggestion_type AS suggestionType, doctor_decision AS doctorDecision
           FROM medmuse.ai_feedback_log
+          ORDER BY created_at DESC
+          LIMIT 500
         `;
         const history: Feedback[] = (
           rows as unknown as Array<{ suggestionType: string; doctorDecision: DoctorDecision }>
