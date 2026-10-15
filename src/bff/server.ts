@@ -188,6 +188,7 @@ import { drugReviewRoutes } from './routes/drugReview';
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
 import { emrLevel5Routes } from './routes/emrLevel5';
+import { emrGrade5Routes } from './routes/emrGrade5';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
@@ -387,6 +388,7 @@ const allRoutes: RouteDef[] = [
   ...prescriptionReviewRoutes,
   ...insuranceAuditRoutes,
   ...emrLevel5Routes,
+  ...emrGrade5Routes,
   ...qcRectificationRoutes,
   ...monthlyReportRoutes,
   ...bedMapRoutes,

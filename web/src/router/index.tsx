@@ -232,6 +232,8 @@ const DeptCockpitPage = lazy(() => import('@/pages/medmuse/DeptCockpit'));
 const DrugReviewPage = lazy(() => import('@/pages/emrGap/drugReview'));
 // 电子病历五级评审自评仪表盘（M94-C）
 const EmrLevel5Page = lazy(() => import('@/pages/emrGap/level5'));
+// 电子病历五级评审八维自评闭环（M106-A）
+const Grade5AssessmentPage = lazy(() => import('@/pages/emr/Grade5Assessment'));
 // 患者 360 综合时间线（M96-C）
 const Patient360Timeline = lazy(() => import('@/pages/patients/Patient360'));
 // 系统健康监控仪表盘（M96-D）
@@ -432,6 +434,15 @@ export default function AppRoutes() {
             element={
               <RequirePermission permission="emr_level5:view">
                 <EmrLevel5Page />
+              </RequirePermission>
+            }
+          />
+          {/* 电子病历五级评审八维自评闭环（M106-A） */}
+          <Route
+            path="emr/grade5"
+            element={
+              <RequirePermission permission="emr_level5:view">
+                <Grade5AssessmentPage />
               </RequirePermission>
             }
           />
