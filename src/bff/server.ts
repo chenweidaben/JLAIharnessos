@@ -196,6 +196,7 @@ import { costAttributionRoutes } from './routes/costAttribution';
 import { financeRoutes } from './routes/finance'; // M139-D：医院财务管理 GET /admin/finance/report + POST /transaction
 import { teachingRoutes } from './routes/teaching'; // M140-C：教学管理（医院管理深化）GET/POST /admin/teaching
 import { disputeRoutes } from './routes/dispute'; // M141-C：医疗纠纷管理（质量与安全）GET/POST /admin/disputes
+import { vaccinationRoutes } from './routes/vaccination'; // M142-B：预防接种（预防保健与患者服务）POST /vaccination/administer + GET /records/:patientId
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
@@ -495,6 +496,7 @@ const allRoutes: RouteDef[] = [
   ...financeRoutes, // M139-D：医院财务管理（医院运营管理）
   ...teachingRoutes, // M140-C：教学管理（医院管理深化：规培/实习/讲座/三基）
   ...disputeRoutes, // M141-C：医疗纠纷管理（质量与安全：登记→调查中→协商中→已解决/已诉讼）
+  ...vaccinationRoutes, // M142-B：预防接种（预防保健与患者服务：排程→接种→提前7天提醒，五类疫苗）
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
   ...dipRoutes,
