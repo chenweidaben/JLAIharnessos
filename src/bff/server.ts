@@ -162,6 +162,7 @@ import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
 import { patientMobileHomeRoutes } from './routes/patientMobileHome';
 // 【产品化收尾】M148-C：患者端 H5 一站式首页 GET /api/v1/patient/h5/home
+import { patientH5Routes } from './routes/patientH5';
 import { patientBillingRoutes } from './routes/patientBilling';
 import { patientProfileRoutes } from './routes/patientProfile';
 import { rehabTreatmentRoutes } from './routes/rehabTreatment';
@@ -474,6 +475,7 @@ const allRoutes: RouteDef[] = [
   ...patientNotificationRoutes,
   ...patientReminderRoutes,
   ...patientMobileHomeRoutes,
+  ...patientH5Routes,
   ...patientBillingRoutes,
   ...patientProfileRoutes,
   ...rehabTreatmentRoutes,
