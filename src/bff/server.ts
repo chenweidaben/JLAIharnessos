@@ -106,6 +106,7 @@ import { researchExportRoutes } from './routes/researchExport';
 import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中台·数据集市
+import { i18nRoutes } from './routes/i18n'; // M151-C：多语言支持框架 GET /api/v1/i18n（中文/英文，可扩展）
 import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
@@ -431,6 +432,7 @@ const allRoutes: RouteDef[] = [
   ...empiRoutes,
   ...dataWarehouseRoutes,
   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
+  ...i18nRoutes, // M151-C：多语言支持框架（GET /api/v1/i18n，中文/英文，可扩展）
   ...dataGovernanceRoutes,
   ...outboxRoutes,
   ...sessionAdminRoutes,
