@@ -285,6 +285,7 @@ const MobileBedSide = lazy(() => import('@/pages/mobile/BedSide'));
 const MobileTasks = lazy(() => import('@/pages/mobile/Tasks'));
 const MobileHandoff = lazy(() => import('@/pages/mobile/Handoff'));
 const MobileMe = lazy(() => import('@/pages/mobile/Me'));
+const MobileQuickActions = lazy(() => import('@/pages/mobile/QuickActions'));
 
 function PageLoading() {
   return (
@@ -1352,6 +1353,7 @@ export default function AppRoutes() {
           }
         >
           <Route index element={<Navigate to="/m/patients" replace />} />
+          <Route path="quick-actions" element={<MobileQuickActions />} />
           <Route path="patients" element={<MobilePatients />} />
           <Route path="bed/:visitId" element={<MobileBedSide />} />
           <Route path="tasks" element={<MobileTasks />} />
