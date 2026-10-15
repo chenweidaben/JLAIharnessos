@@ -45,6 +45,7 @@ import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOp
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
+import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -588,6 +589,7 @@ const allRoutes: RouteDef[] = [
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
+  ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（代码质量五维治理报告）
