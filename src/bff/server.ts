@@ -221,6 +221,7 @@ import { inpatientInsightRoutes } from './routes/inpatientInsight';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { followupLearningRoutes } from './routes/followupLearning';
+import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -428,6 +429,7 @@ const allRoutes: RouteDef[] = [
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
   ...followupLearningRoutes,
+  ...referralKnowledgeRoutes,
 ];
 
 interface Compiled {
