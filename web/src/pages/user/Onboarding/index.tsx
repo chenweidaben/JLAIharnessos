@@ -1,26 +1,34 @@
 /**
- * 健澜科技杠OS - 新员工入职向导页（M134-A）
+ * 健澜科技杠OS - 新员工入职向导页（M134-A + M155-D）
  *
  * 「后继者站在巨人肩膀上」——新员工登录后进入本页，一屏看清：
  *   1. 整体入职进度条（第1天 → 第3月）；
  *   2. 智慧度成长对比（入职基线 vs 当前估值）；
  *   3. 按阶段折叠的任务清单，每条任务动词开头、可验收。
  *
+ * M155-D「真帮人，不能烦人」：
+ *   4. 右下角新手引导浮层——按入职天数只给「此刻该看的 1~3 步」，
+ *      超过 90 天不出现；每步可「去看看 / 完成这步 / 跳过 / 不再提示本阶段」；
+ *   5. 快捷键面板——按 Ctrl+/ 呼出，按当前岗位给出真正用得上的快捷键。
+ *
  * 【用户体验深化】
  *  - 进入页自动拉取 GET /api/v1/user/onboarding，不要求员工选科室/选岗位；
  *  - 进度条用深海蓝主色，已完成任务打勾、未完成灰显，一眼知道下一步做什么；
- *  - 智慧度对比用双柱条（基线 vs 当前），让新员工看见成长，而非只看缺口；
+ *  - 浮层默认收起为一个小气泡，不挡病历/医嘱主操作；点「不再提示本阶段」后
+ *    写入 localStorage，本次入职周期内不再弹同一阶段；
  *  - 阶段按时间轴纵向排列（第1天 → 第1周 → 第1月 → 第3月），不堆卡片。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useCallback, useEffect, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react';
 import {
   Alert,
   App as AntdApp,
+  Button,
   Card,
   Col,
   Divider,
+  Drawer,
   List,
   Progress,
   Row,
@@ -35,10 +43,12 @@ import {
   ExperimentOutlined,
   RocketOutlined,
   SmileOutlined,
+  QuestionCircleOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
-import { get } from '@/api';
+import { get, put } from '@/api';
 
 /* ------------------------------------------------------------------ */
 /* 类型（与 BFF onboardingAggregator 对齐）                             */
@@ -86,19 +96,59 @@ interface Progress {
   wisdomCurrent: number;
 }
 
+/** M155-D：此刻该看的一步 */
+interface GuideStep {
+  stepId: string;
+  stage: OnboardingStageKey;
+  title: string;
+  description: string;
+  target: string;
+  highlight: string;
+  skippable: boolean;
+  dismissable: boolean;
+}
+
+/** M155-D：快捷键 */
+interface Shortcut {
+  key: string;
+  label: string;
+  page: string;
+  when: string;
+}
+
+/** M155-D：个性化首页配置 */
+interface HomepageConfig {
+  userId: string;
+  role: string;
+  roleLabel: string;
+  welcome: string;
+  widgets: { key: string; title: string; visible: boolean; order: number }[];
+  shortcuts: Shortcut[];
+  showGuide: boolean;
+  dismissedStages: OnboardingStageKey[];
+}
+
 interface OnboardingView {
   staffId: string;
   deptCode: string;
   deptName: string;
   realName: string;
+  role: string;
+  daysSinceJoin: number;
   guide: Guide;
   progress: Progress;
+  currentSteps: GuideStep[];
+  homepage: HomepageConfig;
+  shortcuts: Shortcut[];
 }
 
 /** 深海蓝 VI 主色（与全站一致） */
 const SEA_BLUE = '#0A4D8C';
 /** 智慧度成长用的辅助色（暖橙，与深海蓝形成对比） */
 const WARM_ORANGE = '#E8833A';
+
+/** 「不再提示本阶段」localStorage 前缀（按 staffId 隔离） */
+const DISMISS_KEY_PREFIX = 'jl.onboarding.dismissed.';
 
 /** 阶段图标映射（时间轴节点） */
 const STAGE_ICON: Record<OnboardingStageKey, ReactElement> = {
@@ -112,6 +162,14 @@ export default function UserOnboardingPage(): ReactElement {
   const { message } = AntdApp.useApp();
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<OnboardingView | null>(null);
+  /** 浮层当前展示到第几步（currentSteps 下标） */
+  const [stepIdx, setStepIdx] = useState(0);
+  /** 浮层是否展开（false = 收起为小气泡） */
+  const [overlayOpen, setOverlayOpen] = useState(true);
+  /** 快捷键面板是否打开 */
+  const [shortcutOpen, setShortcutOpen] = useState(false);
+  /** 已被本地「不再提示」的阶段 */
+  const [dismissed, setDismissed] = useState<OnboardingStageKey[]>([]);
 
   /** 拉取本人入职向导 + 进度 */
   const refresh = useCallback(async (): Promise<void> => {
@@ -119,6 +177,15 @@ export default function UserOnboardingPage(): ReactElement {
     try {
       const data = await get<OnboardingView>('/api/v1/user/onboarding');
       setView(data);
+      setStepIdx(0);
+      // 读本地「不再提示」
+      try {
+        const key = DISMISS_KEY_PREFIX + data.staffId;
+        const raw = localStorage.getItem(key);
+        if (raw) setDismissed(JSON.parse(raw) as OnboardingStageKey[]);
+      } catch {
+        /* 本地存储不可用时静默，不阻断引导 */
+      }
     } catch (e) {
       message.error(e instanceof Error ? e.message : '入职向导加载失败');
     } finally {
@@ -130,6 +197,65 @@ export default function UserOnboardingPage(): ReactElement {
     void refresh();
   }, [refresh]);
 
+  /** 全局快捷键：Ctrl+/ 呼出/收起快捷键面板 */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        setShortcutOpen((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  /** 当前可展示的引导步（过滤掉本地已「不再提示」的阶段） */
+  const visibleSteps = useMemo<GuideStep[]>(() => {
+    if (!view) return [];
+    return view.currentSteps.filter((s) => !dismissed.includes(s.stage));
+  }, [view, dismissed]);
+
+  /** 把某阶段写入「不再提示」 */
+  const dismissStage = useCallback(
+    (stage: OnboardingStageKey) => {
+      setDismissed((prev) => {
+        const next = prev.includes(stage) ? prev : [...prev, stage];
+        if (view) {
+          try {
+            localStorage.setItem(DISMISS_KEY_PREFIX + view.staffId, JSON.stringify(next));
+          } catch {
+            /* ignore */
+          }
+        }
+        return next;
+      });
+      message.success('好的，本阶段不再提示');
+    },
+    [message, view],
+  );
+
+  /** 标记一步完成 → PUT → 刷新进度 */
+  const completeStep = useCallback(
+    async (step: GuideStep) => {
+      try {
+        await put<{ progress: Progress }>(`/api/v1/user/onboarding/complete/${step.stepId}`);
+        message.success(`已完成「${step.title}」`);
+        // 跳到下一步或收起浮层
+        setStepIdx((i) => {
+          if (i + 1 >= visibleSteps.length) {
+            setOverlayOpen(false);
+            return i;
+          }
+          return i + 1;
+        });
+        void refresh();
+      } catch (e) {
+        message.error(e instanceof Error ? e.message : '完成状态更新失败');
+      }
+    },
+    [message, refresh, visibleSteps.length],
+  );
+
   if (loading || !view) {
     return (
       <PageContainer title="我的入职向导" description="前 90 天路线图，跟着 Personal Agent 一步步走">
@@ -140,20 +266,29 @@ export default function UserOnboardingPage(): ReactElement {
     );
   }
 
-  const { guide, progress, realName, deptName } = view;
+  const { guide, progress, realName, deptName, homepage, shortcuts } = view;
   const wisdomDelta = progress.wisdomCurrent - progress.wisdomBaseline;
+  const currentStep = visibleSteps[stepIdx];
 
   return (
     <PageContainer
       title="我的入职向导"
       description={`${realName} · ${deptName} · ${guide.roleLabel}岗 · 前 90 天路线图`}
+      extra={
+        <Button
+          icon={<QuestionCircleOutlined />}
+          onClick={() => setShortcutOpen(true)}
+        >
+          快捷键 (Ctrl+/)
+        </Button>
+      }
     >
-      {/* 欢迎语：第一屏温度 */}
+      {/* 个性化欢迎语（M155-D） */}
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 16, borderColor: SEA_BLUE }}
-        message={guide.welcome}
+        message={homepage.welcome}
       />
 
       {/* 顶部：总进度条 + 智慧度成长对比 */}
@@ -258,6 +393,112 @@ export default function UserOnboardingPage(): ReactElement {
           </Card>
         );
       })}
+
+      {/* M155-D：新手引导浮层（右下角气泡，不挡主操作） */}
+      {currentStep && overlayOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            right: 24,
+            bottom: 24,
+            width: 360,
+            maxWidth: 'calc(100vw - 48px)',
+            background: '#fff',
+            borderRadius: 12,
+            boxShadow: '0 8px 32px rgba(10,77,140,0.18)',
+            border: `1px solid ${SEA_BLUE}`,
+            padding: 16,
+            zIndex: 1000,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Tag color={SEA_BLUE}>{stageTitleOf(currentStep.stage)}</Tag>
+            <Button
+              type="text"
+              size="small"
+              icon={<CloseOutlined />}
+              onClick={() => setOverlayOpen(false)}
+            />
+          </div>
+          <Typography.Title level={5} style={{ marginTop: 8, marginBottom: 4 }}>
+            {currentStep.title}
+          </Typography.Title>
+          <Typography.Paragraph type="secondary" style={{ fontSize: 13, marginBottom: 12 }}>
+            {currentStep.description}
+          </Typography.Paragraph>
+          <Space wrap>
+            <Button type="primary" onClick={() => void completeStep(currentStep)}>
+              完成这步
+            </Button>
+            {currentStep.skippable && (
+              <Button
+                onClick={() =>
+                  setStepIdx((i) => (i + 1 >= visibleSteps.length ? i : i + 1))
+                }
+              >
+                跳过
+              </Button>
+            )}
+            {currentStep.dismissable && (
+              <Button type="link" onClick={() => dismissStage(currentStep.stage)}>
+                不再提示本阶段
+              </Button>
+            )}
+          </Space>
+          {visibleSteps.length > 1 && (
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+              {stepIdx + 1} / {visibleSteps.length}
+            </Typography.Text>
+          )}
+        </div>
+      )}
+
+      {/* 浮层收起后：一个小气泡可重新展开 */}
+      {!overlayOpen && currentStep && (
+        <Button
+          type="primary"
+          shape="circle"
+          size="large"
+          icon={<RocketOutlined />}
+          style={{ position: 'fixed', right: 24, bottom: 24, zIndex: 1000, background: SEA_BLUE }}
+          onClick={() => setOverlayOpen(true)}
+        />
+      )}
+
+      {/* M155-D：快捷键面板 Drawer */}
+      <Drawer
+        title="快捷键面板"
+        placement="right"
+        open={shortcutOpen}
+        onClose={() => setShortcutOpen(false)}
+        width={360}
+      >
+        <Typography.Paragraph type="secondary">
+          按岗位排好的高频快捷键，记住 3 个就能省一半重复点击。
+        </Typography.Paragraph>
+        <List
+          dataSource={shortcuts}
+          renderItem={(sc) => (
+            <List.Item>
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Typography.Text>{sc.label}</Typography.Text>
+                <kbd
+                  style={{
+                    background: '#F0F4F8',
+                    border: '1px solid #D0D8E0',
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                    fontFamily: 'monospace',
+                    color: SEA_BLUE,
+                  }}
+                >
+                  {sc.key}
+                </kbd>
+              </Space>
+            </List.Item>
+          )}
+        />
+      </Drawer>
     </PageContainer>
   );
 }

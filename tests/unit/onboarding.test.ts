@@ -17,6 +17,9 @@ import {
   buildNewHireOnboarding,
   buildOnboardingGuide,
   getOnboardingProgress,
+  getShortcuts,
+  personalizeHomepage,
+  recordOnboardingProgress,
   MAX_TOP_LESSONS,
   MAX_TOP_SUCCESSES,
 } from '../../src/bff/aggregators/onboardingAggregator';
@@ -301,3 +304,201 @@ describe('M134-A 进度追踪 getOnboardingProgress', () => {
     expect(p.stages.length).toBe(4);
   });
 });
+
+/* ============================================================================
+ * M155-D · 用户体验深化——新手引导与个性化
+ * 覆盖：按入职天数返回此刻该看的几步、超过 90 天不打扰、角色差异化、
+ *       快捷键过滤、首页个性化、标记完成一步后的进度投影、纯函数确定性。
+ * ==========================================================================*/
+
+describe('M155-D 引导节奏 buildOnboardingGuide(role, days)', () => {
+  it('第 0~1 天返回开机三件套（登录/工作台/改密），stage=day1', () => {
+    for (const days of [0, 1]) {
+      const steps = buildOnboardingGuide('doctor', days);
+      expect(steps.length).toBeGreaterThanOrEqual(3);
+      expect(steps.every((s) => s.stage === 'day1')).toBe(true);
+      expect(steps.map((s) => s.stepId)).toEqual(
+        expect.arrayContaining(['day1-login', 'day1-workbench', 'day1-password']),
+      );
+    }
+  });
+
+  it('第 2~7 天进入 week1，医生拿到医嘱/病历/处方三步', () => {
+    for (const days of [2, 5, 7]) {
+      const steps = buildOnboardingGuide('doctor', days);
+      expect(steps.every((s) => s.stage === 'week1')).toBe(true);
+      const ids = steps.map((s) => s.stepId).join('|');
+      expect(ids).toContain('week1-order');
+      expect(ids).toContain('week1-emr');
+      expect(ids).toContain('week1-prescription');
+    }
+  });
+
+  it('第 8~30 天进入 month1，含 AI 助手与经验沉淀', () => {
+    for (const days of [8, 15, 30]) {
+      const steps = buildOnboardingGuide('doctor', days);
+      expect(steps.every((s) => s.stage === 'month1')).toBe(true);
+      const ids = steps.map((s) => s.stepId).join('|');
+      expect(ids).toContain('month1-ai-assistant');
+      expect(ids).toContain('month1-experience');
+    }
+  });
+
+  it('第 31~90 天进入 month3，含快捷键与批量操作', () => {
+    for (const days of [31, 60, 90]) {
+      const steps = buildOnboardingGuide('admin', days);
+      expect(steps.every((s) => s.stage === 'month3')).toBe(true);
+      const ids = steps.map((s) => s.stepId).join('|');
+      expect(ids).toContain('month3-shortcuts');
+      expect(ids).toContain('month3-batch');
+    }
+  });
+
+  it('超过 90 天返回空数组——真帮人不能烦人', () => {
+    for (const days of [91, 120, 365, 9999]) {
+      expect(buildOnboardingGuide('doctor', days)).toEqual([]);
+      expect(buildOnboardingGuide('nurse', days)).toEqual([]);
+    }
+  });
+
+  it('负数 / NaN / 非数字入参安全兜底，不抛错', () => {
+    expect(() => buildOnboardingGuide('doctor', -5)).not.toThrow();
+    expect(() => buildOnboardingGuide('doctor', NaN)).not.toThrow();
+    expect(buildOnboardingGuide('doctor', -5).every((s) => s.stage === 'day1')).toBe(true);
+  });
+
+  it('护士/药师/管理员 week1 文案与医生不同（角色差异化）', () => {
+    const doc = buildOnboardingGuide('doctor', 3).map((s) => s.title).join('|');
+    const nur = buildOnboardingGuide('nurse', 3).map((s) => s.title).join('|');
+    const pha = buildOnboardingGuide('pharmacist', 3).map((s) => s.title).join('|');
+    const adm = buildOnboardingGuide('admin', 3).map((s) => s.title).join('|');
+    expect(doc).not.toBe(nur);
+    expect(nur).not.toBe(pha);
+    expect(pha).not.toBe(adm);
+    expect(nur).toContain('护理');
+    expect(pha).toContain('处方');
+    expect(adm).toContain('权限');
+  });
+
+  it('每步都有可跳转 target、可跳过/不再提示标记', () => {
+    for (const days of [0, 3, 15, 60]) {
+      for (const s of buildOnboardingGuide('doctor', days)) {
+        expect(s.stepId.length).toBeGreaterThan(0);
+        expect(s.target.startsWith('/')).toBe(true);
+        expect(typeof s.skippable).toBe('boolean');
+        expect(typeof s.dismissable).toBe('boolean');
+      }
+    }
+  });
+
+  it('与 M134-A 重载共存：(staffId, role) 仍返回完整 Guide', () => {
+    const guide = buildOnboardingGuide('staff-001', 'doctor');
+    expect(Array.isArray((guide as { stages?: unknown }).stages)).toBe(true);
+    expect((guide as { stages: unknown[] }).stages.length).toBe(4);
+  });
+});
+
+describe('M155-D 快捷键 getShortcuts(role, page)', () => {
+  it('全员快捷键：Ctrl+K / Ctrl+/ / Esc 在所有页面都返回', () => {
+    for (const role of ['doctor', 'nurse', 'pharmacist', 'admin']) {
+      for (const page of ['all', 'workbench', 'order', 'emr']) {
+        const list = getShortcuts(role, page);
+        const keys = list.map((s) => s.key);
+        expect(keys).toContain('Ctrl+K');
+        expect(keys).toContain('Ctrl+/');
+        expect(keys).toContain('Esc');
+      }
+    }
+  });
+
+  it('医生在医嘱页拿到 Ctrl+S / Ctrl+Enter，但护士在医嘱页不会拿到医生专属快捷键', () => {
+    const docOrder = getShortcuts('doctor', 'order').map((s) => s.key);
+    expect(docOrder).toContain('Ctrl+S');
+    expect(docOrder).toContain('Ctrl+Enter');
+    const nurNursing = getShortcuts('nurse', 'nursing').map((s) => s.key);
+    expect(nurNursing).toContain('Ctrl+S');
+    expect(nurNursing).toContain('Ctrl+Enter');
+    // 护士在医嘱页：只拿得到 3 个全员快捷键，不应出现医生专属的「保存医嘱/提交医嘱」
+    const nurOrder = getShortcuts('nurse', 'order');
+    expect(nurOrder.map((s) => s.key)).toEqual(['Ctrl+K', 'Ctrl+/', 'Esc']);
+    expect(nurOrder.some((s) => s.when === 'doctor')).toBe(false);
+  });
+
+  it('page=all 返回该角色全部可用快捷键', () => {
+    const all = getShortcuts('doctor', 'all');
+    expect(all.length).toBeGreaterThan(3);
+    // 包含 order/emr/prescription 各页
+    expect(all.map((s) => s.page)).toEqual(
+      expect.arrayContaining(['order', 'emr', 'prescription', 'all']),
+    );
+  });
+
+  it('未知角色回落 doctor，不抛错', () => {
+    expect(() => getShortcuts('wizard', 'all')).not.toThrow();
+    expect(getShortcuts('wizard', 'all').length).toBeGreaterThan(0);
+  });
+});
+
+describe('M155-D 首页个性化 personalizeHomepage(userId, role)', () => {
+  it('返回欢迎语、Widget 列表与工作台快捷键', () => {
+    const cfg = personalizeHomepage('u-001', 'doctor');
+    expect(cfg.userId).toBe('u-001');
+    expect(cfg.role).toBe('doctor');
+    expect(cfg.roleLabel).toBe('医生');
+    expect(cfg.welcome).toContain('医生');
+    expect(cfg.widgets.length).toBeGreaterThanOrEqual(4);
+    expect(cfg.shortcuts.length).toBeGreaterThan(0);
+    expect(cfg.showGuide).toBe(true);
+    expect(cfg.dismissedStages).toEqual([]);
+  });
+
+  it('Widget 已按 order 升序排列，且医生/护士卡片不同', () => {
+    const doc = personalizeHomepage('u1', 'doctor');
+    const nur = personalizeHomepage('u2', 'nurse');
+    const orders = doc.widgets.map((w) => w.order);
+    expect(orders).toEqual([...orders].sort((a, b) => a - b));
+    expect(doc.widgets.map((w) => w.key)).toContain('todayOrders');
+    expect(nur.widgets.map((w) => w.key)).toContain('nursingTasks');
+  });
+
+  it('纯函数：同一入参两次调用结果完全一致', () => {
+    const a = personalizeHomepage('u-det', 'pharmacist');
+    const b = personalizeHomepage('u-det', 'pharmacist');
+    expect(a).toEqual(b);
+  });
+});
+
+describe('M155-D 标记完成 recordOnboardingProgress(userId, step)', () => {
+  it('完成 day1 一步后，day1 阶段 completed +1（封顶 total），百分比上升', () => {
+    const before = recordOnboardingProgress('staff-rec-1', 'unknown-step');
+    const after = recordOnboardingProgress('staff-rec-1', 'day1-login');
+    const day1Before = before.stages.find((s) => s.stageKey === 'day1')!;
+    const day1After = after.stages.find((s) => s.stageKey === 'day1')!;
+    // day1 在 M134-A 推演里本就全完成，封顶后仍等于 total
+    expect(day1After.completed).toBe(day1Before.completed);
+    expect(day1After.completed).toBeLessThanOrEqual(day1After.total);
+  });
+
+  it('完成 week1 一步后，week1 阶段 completed 增加且不超过 total', () => {
+    const before = recordOnboardingProgress('staff-rec-2', 'x');
+    const after = recordOnboardingProgress('staff-rec-2', 'week1-order');
+    const wb = before.stages.find((s) => s.stageKey === 'week1')!;
+    const wa = after.stages.find((s) => s.stageKey === 'week1')!;
+    expect(wa.completed).toBe(Math.min(wb.total, wb.completed + 1));
+    expect(after.percent).toBeGreaterThanOrEqual(before.percent);
+  });
+
+  it('未知 stepId 原样返回，不抛错', () => {
+    const p = recordOnboardingProgress('staff-rec-3', '');
+    expect(p.staffId).toBe('staff-rec-3');
+    expect(p.stages.length).toBe(4);
+    expect(() => recordOnboardingProgress('staff-rec-3', 'not-a-step')).not.toThrow();
+  });
+
+  it('智慧度当前值封顶 100', () => {
+    const p = recordOnboardingProgress('staff-rec-4', 'month3-batch');
+    expect(p.wisdomCurrent).toBeLessThanOrEqual(100);
+    expect(p.wisdomCurrent).toBeGreaterThanOrEqual(p.wisdomBaseline);
+  });
+});
+

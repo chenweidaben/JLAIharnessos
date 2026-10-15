@@ -556,7 +556,19 @@ function stableHash(s: string): number {
 /* ------------------------------ 纯函数核心 ------------------------------ */
 
 /**
- * buildOnboardingGuide：M134-A 新员工入职向导总入口。
+ * buildOnboardingGuide（M155-D 重载）：按入职天数返回「此刻该看的几步」。
+ *
+ * 【用户体验深化 · 真帮人不能烦人】超过 90 天返回空数组，老员工不再被打扰；
+ * 每一步都可跳过 / 可不再提示。纯函数：days = 今天 - createdAt，由路由传入。
+ *
+ * @param role 岗位角色（doctor/nurse/pharmacist/admin）
+ * @param days 入职天数（0 表示当天）
+ * @returns 当前阶段的引导步骤（超过 90 天为空数组）
+ */
+export function buildOnboardingGuide(role: string, days: number): GuideStep[];
+
+/**
+ * buildOnboardingGuide（M134-A 重载）：前 90 天完整路线图总入口。
  *
  * 依据「后继者站在巨人肩膀上」理念，按第1天/第1周/第1月/第3月四个时间轴
  * 节点组装一份岗位差异化任务清单。文案全部动词开头、可验收。
@@ -567,10 +579,19 @@ function stableHash(s: string): number {
  * @param role 岗位角色（doctor/nurse/pharmacist/admin）
  * @returns Guide（欢迎语 + 四阶段任务 + 任务总数）
  */
+export function buildOnboardingGuide(staffId: string, role: string | null | undefined): Guide;
+
 export function buildOnboardingGuide(
-  staffId: string,
-  role: string | null | undefined,
-): Guide {
+  a: string,
+  b: string | number | null | undefined,
+): GuideStep[] | Guide {
+  // M155-D：第二参为数字 → 按入职天数返回此刻该看的几步
+  if (typeof b === 'number') {
+    return buildContextualGuideSteps(a, b);
+  }
+  // ---- M134-A legacy：第二参为角色字符串（含 null/undefined）----
+  const staffId = a;
+  const role = b;
   const normalizedRole = toOnboardingRole(role);
   const roleLabel = ONBOARDING_ROLE_LABEL[normalizedRole];
 
@@ -678,4 +699,337 @@ export function getOnboardingProgress(staffId: string): Progress {
     wisdomBaseline,
     wisdomCurrent,
   };
+}
+
+/* ============================================================================
+ * M155-D · 用户体验深化——新手引导与个性化（真帮人，不能烦人）
+ * ----------------------------------------------------------------------------
+ * 理念：引导不是弹窗轰炸，而是「在对的时间给对的三步」。
+ *  - buildOnboardingGuide(role, days)：按入职天数返回此刻该看的几步，
+ *    超过 90 天返回空数组——老员工不再被打扰；
+ *  - getShortcuts(role, page)：按页面给出该角色真正用得上的快捷键；
+ *  - personalizeHomepage(userId, role)：首页 Widget 排序与欢迎语个性化；
+ *  - recordOnboardingProgress(userId, step)：纯函数投影「标记完成一步」后的进度。
+ *
+ * 【质量与合规】
+ *  - 全部纯函数，不触库、不写 SQL、无新表；后续接入入职进度仓库时仅替换内部推演；
+ *  - 每一步都可跳过（skippable）、可「不再提示」（dismissable），不强制弹窗；
+ *  - 不采集患者数据，不涉及诊疗决策，仅为前端 UX 引导。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ * ==========================================================================*/
+
+/* ------------------------------- M155-D 类型 ------------------------------- */
+
+/** 引导阶段（与 M134-A 时间轴对齐，便于进度投影） */
+export type GuideStage = OnboardingStageKey;
+
+/** buildOnboardingGuide(role, days) 返回的单步引导 */
+export interface GuideStep {
+  /** 稳定步骤 ID，形如 day1-login / week1-order */
+  stepId: string;
+  stage: GuideStage;
+  /** 步骤标题（动词开头） */
+  title: string;
+  /** 一句大白话说明为什么做、做完什么样 */
+  description: string;
+  /** 点击「去看看」跳转的前端路由 */
+  target: string;
+  /** 需要高亮的前端元素标识（data-tour 属性） */
+  highlight: string;
+  /** 是否允许跳过这一步 */
+  skippable: boolean;
+  /** 是否允许「不再提示」本阶段 */
+  dismissable: boolean;
+}
+
+/** 快捷键条目 */
+export interface Shortcut {
+  /** 按键组合，如 Ctrl+K */
+  key: string;
+  /** 功能说明 */
+  label: string;
+  /** 适用页面（all / workbench / order / emr / prescription / nursing / pharmacy / admin） */
+  page: string;
+  /** 适用角色（all 表示全员可用） */
+  when: OnboardingRole | 'all';
+}
+
+/** 首页个性化 Widget */
+export interface HomepageWidget {
+  /** Widget 稳定键 */
+  key: string;
+  title: string;
+  visible: boolean;
+  /** 排序（小在前） */
+  order: number;
+}
+
+/** personalizeHomepage 总产出 */
+export interface HomepageConfig {
+  userId: string;
+  role: OnboardingRole;
+  roleLabel: string;
+  /** 个性化欢迎语 */
+  welcome: string;
+  /** 首页 Widget（已按 order 升序） */
+  widgets: HomepageWidget[];
+  /** 工作台页常用快捷键 */
+  shortcuts: Shortcut[];
+  /** 是否尚未被用户「不再提示」（纯函数切片无持久化，默认 true） */
+  showGuide: boolean;
+  /** 已「不再提示」的阶段（本切片恒为空数组，预留前端本地持久化对接位） */
+  dismissedStages: GuideStage[];
+}
+
+/* --------------------------- M155-D 引导步文案池 --------------------------- */
+
+/** 第1天：开机三件套（所有岗位同构） */
+const DAY1_STEPS: ReadonlyArray<Omit<GuideStep, 'stage'>> = [
+  {
+    stepId: 'day1-login',
+    title: '用初始密码登录',
+    description: '用工号 + 初始密码登录系统，首次登录会自动引导你进入工作台。',
+    target: '/workbench',
+    highlight: 'app-shell',
+    skippable: false,
+    dismissable: false,
+  },
+  {
+    stepId: 'day1-workbench',
+    title: '认识你的工作台',
+    description: '左侧是菜单，中间是今天的待办，右上角是 Personal Agent。花 1 分钟点一遍。',
+    target: '/workbench',
+    highlight: 'workbench-layout',
+    skippable: true,
+    dismissable: true,
+  },
+  {
+    stepId: 'day1-password',
+    title: '修改初始密码',
+    description: '在「个人设置 → 账号安全」把初始密码改成只有你知道的强密码。这是合规硬性要求。',
+    target: '/user/settings',
+    highlight: 'account-security',
+    skippable: false,
+    dismissable: false,
+  },
+];
+
+/** 第1周：核心功能（医嘱 / 病历 / 处方，按岗位差异化） */
+const WEEK1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep, 'stage'>>> = {
+  doctor: [
+    { stepId: 'week1-order', title: '开具你的第一张医嘱', description: '在医嘱页给一位测试患者下一组常规医嘱，体验草稿→提交→执行流。', target: '/order', highlight: 'order-board', skippable: true, dismissable: true },
+    { stepId: 'week1-emr', title: '写一份标准病历', description: '打开电子病历，用模板完成一份首次病程记录，对照质控要点自查。', target: '/emr', highlight: 'emr-editor', skippable: true, dismissable: true },
+    { stepId: 'week1-prescription', title: '开一张处方', description: '在处方页开具一组常用口服药，看一眼系统自动带出的配伍禁忌提示。', target: '/prescription', highlight: 'prescription-board', skippable: true, dismissable: true },
+  ],
+  nurse: [
+    { stepId: 'week1-order-execute', title: '执行一组已提交医嘱', description: '在护理任务列表核对医嘱后执行一次，体验双人核对与签名。', target: '/nursing/tasks', highlight: 'nursing-task-list', skippable: true, dismissable: true },
+    { stepId: 'week1-nursing-record', title: '写一条护理记录', description: '用护理记录单模板完成一次床边记录，重点看体温/病情栏的质控提示。', target: '/nursing/record', highlight: 'nursing-record-editor', skippable: true, dismissable: true },
+    { stepId: 'week1-handoff', title: '按 SBAR 完成一次交班', description: '在交班页按 SBAR 结构口述一次床边交接，让带教老师听一遍。', target: '/nursing/handoff', highlight: 'handoff-card', skippable: true, dismissable: true },
+  ],
+  pharmacist: [
+    { stepId: 'week1-rx-review', title: '审核一组处方', description: '在处方审核队列里完成 3 张处方审核，看拦截原因如何分类。', target: '/pharmacy/review', highlight: 'rx-review-queue', skippable: true, dismissable: true },
+    { stepId: 'week1-dispense', title: '完成一次发药交代', description: '在发药窗口跟随带教完成 5 位患者的用药交代，记录 1 个老人误区。', target: '/pharmacy/dispense', highlight: 'dispense-window', skippable: true, dismissable: true },
+    { stepId: 'week1-consult', title: '回答一次用药咨询', description: '在用药咨询入口记录 1 条临床科室的用药咨询问答。', target: '/pharmacy/consult', highlight: 'consult-entry', skippable: true, dismissable: true },
+  ],
+  admin: [
+    { stepId: 'week1-permission', title: '走一遍角色权限模板', description: '在系统管理里打开一个医生角色，看权限码是怎么按岗位聚合的。', target: '/admin/roles', highlight: 'role-permission-matrix', skippable: true, dismissable: true },
+    { stepId: 'week1-report', title: '看懂科室驾驶舱', description: '打开科室驾驶舱，找到床位周转、平均住院日、药占比三个核心指标。', target: '/admin/cockpit', highlight: 'dept-cockpit', skippable: true, dismissable: true },
+    { stepId: 'week1-flow', title: '巡检一次门诊流程', description: '跟随信息科走一遍挂号→就诊→缴费→取药，记下 2 个卡点。', target: '/admin/flow', highlight: 'flow-map', skippable: true, dismissable: true },
+  ],
+};
+
+/** 第1月：高级功能（AI 助手 + 经验沉淀，按岗位差异化） */
+const MONTH1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep, 'stage'>>> = {
+  doctor: [
+    { stepId: 'month1-ai-assistant', title: '让 AI 助手帮你写一段病程', description: '在 Personal Agent 里说「帮我写一段术后首次病程」，对照你自己的版本改一改。', target: '/workbench', highlight: 'agent-chat', skippable: true, dismissable: true },
+    { stepId: 'month1-experience', title: '沉淀你的第一条临床经验', description: '把你本周踩过的一个坑，写成「如果再遇到，我会……」归档进经验库。', target: '/knowledge', highlight: 'experience-form', skippable: true, dismissable: true },
+  ],
+  nurse: [
+    { stepId: 'month1-ai-plan', title: '用 AI 生成一份护理计划', description: '在护理计划页让 AI 按诊断生成初稿，再按本科室常规调整。', target: '/nursing/plan', highlight: 'ai-plan-draft', skippable: true, dismissable: true },
+    { stepId: 'month1-experience', title: '沉淀你的第一条护理经验', description: '写一条你在床边发现的、值得让下一位护士知道的细节。', target: '/knowledge', highlight: 'experience-form', skippable: true, dismissable: true },
+  ],
+  pharmacist: [
+    { stepId: 'month1-ai-review', title: '看 AI 用药审查给出的一条干预', description: '在医嘱点评页看 AI 标出的潜在用药问题，判断是否合理并写出理由。', target: '/pharmacy/review', highlight: 'ai-med-review', skippable: true, dismissable: true },
+    { stepId: 'month1-experience', title: '沉淀你的第一条用药经验', description: '写一条你给出的、被临床采纳的用药调整建议。', target: '/knowledge', highlight: 'experience-form', skippable: true, dismissable: true },
+  ],
+  admin: [
+    { stepId: 'month1-ai-insight', title: '问 AI 一个运营问题', description: '在 Personal Agent 里问「本月哪个科室平均住院日最长」，看它怎么取数。', target: '/workbench', highlight: 'agent-chat', skippable: true, dismissable: true },
+    { stepId: 'month1-experience', title: '沉淀你的第一条管理经验', description: '写一条你观察到的、能提升科室运转效率的小动作。', target: '/knowledge', highlight: 'experience-form', skippable: true, dismissable: true },
+  ],
+};
+
+/** 第3月：效率提升（快捷键 + 批量操作 + 个性化，所有岗位同构） */
+const MONTH3_STEPS: ReadonlyArray<Omit<GuideStep, 'stage'>> = [
+  { stepId: 'month3-shortcuts', title: '记住 3 个高频快捷键', description: '按 Ctrl+/ 呼出快捷键面板，挑你这一周用得最多的 3 个记下来。', target: '/workbench', highlight: 'shortcut-panel', skippable: true, dismissable: true },
+  { stepId: 'month3-batch', title: '试一次批量操作', description: '在待办或医嘱列表里勾选多条，用批量处理一次搞定，别再一条条点。', target: '/workbench', highlight: 'batch-toolbar', skippable: true, dismissable: true },
+  { stepId: 'month3-homepage', title: '把工作台改成你喜欢的样子', description: '在工作台右上角「自定义」里把不常用的卡片收起来，常用的置顶。', target: '/workbench', highlight: 'homepage-customize', skippable: true, dismissable: true },
+];
+
+/** 快捷键目录 */
+const SHORTCUT_CATALOG: ReadonlyArray<Shortcut> = [
+  { key: 'Ctrl+K', label: '全局搜索（患者 / 病历 / 菜单）', page: 'all', when: 'all' },
+  { key: 'Ctrl+/', label: '呼出 / 收起快捷键面板', page: 'all', when: 'all' },
+  { key: 'Esc', label: '关闭浮层 / 取消当前操作', page: 'all', when: 'all' },
+  { key: 'Ctrl+S', label: '保存医嘱草稿', page: 'order', when: 'doctor' },
+  { key: 'Ctrl+Enter', label: '提交医嘱', page: 'order', when: 'doctor' },
+  { key: 'Ctrl+S', label: '保存病历', page: 'emr', when: 'doctor' },
+  { key: 'Ctrl+D', label: '插入一段病程记录', page: 'emr', when: 'doctor' },
+  { key: 'Ctrl+Enter', label: '开具处方', page: 'prescription', when: 'doctor' },
+  { key: 'Ctrl+S', label: '保存护理记录', page: 'nursing', when: 'nurse' },
+  { key: 'Ctrl+Enter', label: '执行选中医嘱', page: 'nursing', when: 'nurse' },
+  { key: 'Ctrl+Enter', label: '审核通过处方', page: 'pharmacy', when: 'pharmacist' },
+  { key: 'Ctrl+S', label: '保存运营配置', page: 'admin', when: 'admin' },
+];
+
+/* --------------------------- M155-D 纯函数实现 --------------------------- */
+
+/** 根据入职天数（天）判断所处引导阶段；超过 90 天返回 null（不再打扰） */
+function stageForDays(days: number): GuideStage | null {
+  const d = Number.isFinite(days) ? Math.max(0, Math.floor(days)) : 0;
+  if (d <= 1) return 'day1';
+  if (d <= 7) return 'week1';
+  if (d <= 30) return 'month1';
+  if (d <= 90) return 'month3';
+  return null;
+}
+
+/** buildContextualGuideSteps：组装「此刻该看的几步」 */
+function buildContextualGuideSteps(role: string, days: number): GuideStep[] {
+  const normalized = toOnboardingRole(role);
+  const stage = stageForDays(days);
+  if (!stage) return []; // 【真帮人不能烦人】超过 90 天不再弹引导
+  switch (stage) {
+    case 'day1':
+      return DAY1_STEPS.map((s) => ({ ...s, stage }));
+    case 'week1':
+      return WEEK1_STEPS_BY_ROLE[normalized].map((s) => ({ ...s, stage }));
+    case 'month1':
+      return MONTH1_STEPS_BY_ROLE[normalized].map((s) => ({ ...s, stage }));
+    case 'month3':
+      return MONTH3_STEPS.map((s) => ({ ...s, stage }));
+  }
+}
+
+/**
+ * getShortcuts：按角色 + 页面过滤快捷键。
+ * page 传 'all' 返回该角色全部可用快捷键；未知角色回落 doctor。
+ * 纯函数：不修改入参，不抛错。
+ */
+export function getShortcuts(role: string, page: string): Shortcut[] {
+  const normalized = toOnboardingRole(role);
+  const p = (page ?? 'all').trim().toLowerCase();
+  return SHORTCUT_CATALOG.filter(
+    (sc) =>
+      (sc.when === 'all' || sc.when === normalized) &&
+      (p === 'all' || sc.page === 'all' || sc.page === p),
+  );
+}
+
+/**
+ * personalizeHomepage：首页个性化（纯函数）。
+ * 按角色给出 Widget 顺序与欢迎语；shortcuts 固定取 workbench 页。
+ * showGuide 默认 true（未被「不再提示」）；dismissedStages 预留前端本地持久化。
+ */
+export function personalizeHomepage(userId: string, role: string): HomepageConfig {
+  const normalized = toOnboardingRole(role);
+  const roleLabel = ONBOARDING_ROLE_LABEL[normalized];
+  const widgets = buildWidgetsByRole(normalized);
+  const shortcuts = getShortcuts(normalized, 'workbench');
+
+  return {
+    userId,
+    role: normalized,
+    roleLabel,
+    welcome: `${roleLabel}你好，工作台已按你的岗位排好常用卡片。点卡片右上角可收起不常用的，把空间留给今天最重要的事。`,
+    widgets,
+    shortcuts,
+    showGuide: true,
+    dismissedStages: [],
+  };
+}
+
+/** 按角色组装首页 Widget（纯函数，顺序即优先级） */
+function buildWidgetsByRole(role: OnboardingRole): HomepageWidget[] {
+  const base: HomepageWidget[] = [
+    { key: 'todo', title: '今日待办', visible: true, order: 1 },
+    { key: 'quickActions', title: '快捷操作', visible: true, order: 2 },
+  ];
+  switch (role) {
+    case 'doctor':
+      return [
+        ...base,
+        { key: 'todayOrders', title: '今日医嘱', visible: true, order: 3 },
+        { key: 'pendingEmr', title: '待写病历', visible: true, order: 4 },
+        { key: 'agentChat', title: 'Personal Agent', visible: true, order: 5 },
+      ];
+    case 'nurse':
+      return [
+        ...base,
+        { key: 'nursingTasks', title: '护理任务', visible: true, order: 3 },
+        { key: 'handoff', title: '床边交接', visible: true, order: 4 },
+        { key: 'agentChat', title: 'Personal Agent', visible: true, order: 5 },
+      ];
+    case 'pharmacist':
+      return [
+        ...base,
+        { key: 'rxReviewQueue', title: '处方审核队列', visible: true, order: 3 },
+        { key: 'dispenseToday', title: '今日发药', visible: true, order: 4 },
+        { key: 'agentChat', title: 'Personal Agent', visible: true, order: 5 },
+      ];
+    case 'admin':
+      return [
+        ...base,
+        { key: 'deptCockpit', title: '科室驾驶舱', visible: true, order: 3 },
+        { key: 'alerts', title: '系统告警', visible: true, order: 4 },
+      ];
+  }
+}
+
+/**
+ * recordOnboardingProgress：纯函数投影「标记完成一步」后的进度。
+ *
+ * 【质量与合规】本切片不写 SQL、无新表；该函数基于 getOnboardingProgress
+ * 的确定性推演，把 step 所属阶段的 completed +1（封顶 total），
+ * 重新计算百分比与智慧度。后续接入入职进度仓库时，仅需把内部推演
+ * 替换为读库 + 写库，函数签名与返回结构保持不变。
+ *
+ * @param userId 用户 ID
+ * @param step 刚完成的步骤 ID（如 day1-login）；未知步骤原样返回不抛错
+ */
+export function recordOnboardingProgress(userId: string, step: string): Progress {
+  const base = getOnboardingProgress(userId);
+  const stage = stageOfStepId(step);
+  if (!stage) return base; // 未知步骤 ID：原样返回，不抛错
+
+  const stages = base.stages.map((s) => {
+    if (s.stageKey !== stage) return s;
+    const completed = Math.min(s.total, s.completed + 1);
+    return { ...s, completed };
+  });
+
+  const completedTasks = stages.reduce((sum, s) => sum + s.completed, 0);
+  const totalTasks = stages.reduce((sum, s) => sum + s.total, 0);
+  const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+  const currentStage = stages.find((s) => s.completed < s.total)?.stageKey ?? 'month3';
+  const wisdomCurrent = Math.min(100, 20 + completedTasks * 4);
+
+  return {
+    ...base,
+    completedTasks,
+    totalTasks,
+    percent,
+    currentStage,
+    stages,
+    wisdomCurrent,
+  };
+}
+
+/** 从 stepId 解析所属阶段（day1-login → day1）；无法识别返回 null */
+function stageOfStepId(step: string): GuideStage | null {
+  const head = (step ?? '').split('-')[0];
+  if (head === 'day1' || head === 'week1' || head === 'month1' || head === 'month3') {
+    return head;
+  }
+  return null;
 }
