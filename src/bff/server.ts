@@ -267,6 +267,7 @@ import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
 import { aiDrugReviewRoutes } from './routes/aiDrugReview'; // M144-C
+import { medicalQaRoutes } from './routes/medicalQa'; // M154-D：AI 知识问答 POST /api/v1/ai/ask
 import { aiQualityRoutes } from './routes/aiQuality'; // M144-D：AI 质控智能审核 POST /api/v1/ai/quality-check
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { drugLifecycleRoutes } from './routes/drugLifecycle'; // M153-B：药品全生命周期 批次追溯/近效期预警/批次召回
@@ -648,6 +649,7 @@ const allRoutes: RouteDef[] = [
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
   ...aiDrugReviewRoutes, // M144-C
+  ...medicalQaRoutes, // M154-D
   ...drugInventoryRoutes,
   ...drugLifecycleRoutes, // M153-B：药品全生命周期
   ...supplyRoutes,
