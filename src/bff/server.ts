@@ -101,6 +101,7 @@ import { diagnosisSuggestionRoutes } from './routes/diagnosisSuggestion';
 import { pathwayRecommendationRoutes } from './routes/pathwayRecommendation';
 import { losPredictionRoutes } from './routes/losPrediction';
 import { voiceMedicalRoutes } from './routes/voiceMedical';
+import { voiceRecordRoutes } from './routes/voiceRecord'; // M152-B：病历 AI 语音录入与智能补全（语音转写+智能补全）
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
 import { researchExportRoutes } from './routes/researchExport';
@@ -428,6 +429,7 @@ const allRoutes: RouteDef[] = [
 ...pathwayRecommendationRoutes,
 ...losPredictionRoutes,
   ...voiceMedicalRoutes,
+  ...voiceRecordRoutes, // M152-B：病历 AI 语音录入与智能补全
   ...aiRecordRoutes, // M144-B：AI 病历自动生成（医生修改后用于模型优化）
   ...frontPageRoutes,
   ...researchRoutes,
