@@ -47,6 +47,7 @@ import { inpatientRoutes } from './routes/inpatient';
 import { inpatientCareRoutes } from './routes/inpatientCare';
 import { emergencyRoutes } from './routes/emergency';
 import { pharmacyRoutes } from './routes/pharmacy';
+import { pharmacyAuditLearningRoutes } from './routes/pharmacyAuditLearning';
 import { medicalQcRoutes } from './routes/medicalQc';
 import { timelinessRoutes } from './routes/timeliness';
 import { emrAssessmentRoutes } from './routes/emrAssessment';
@@ -241,6 +242,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientCareRoutes,
   ...emergencyRoutes,
   ...pharmacyRoutes,
+  ...pharmacyAuditLearningRoutes,
   ...medicalQcRoutes,
 ...timelinessRoutes,
 ...emrAssessmentRoutes,
