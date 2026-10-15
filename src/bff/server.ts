@@ -50,6 +50,7 @@ import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
 import { dbPerformanceRoutes } from './routes/dbPerformance';
 // 【代码质量提升】M150-B：any/ts-ignore/console-log/未使用变量/圈复杂度 五维治理 GET /api/v1/admin/code/quality
+import { codeQualityRoutes } from './routes/codeQuality';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
 import { performanceReviewRoutes } from './routes/performanceReview';
@@ -587,6 +588,7 @@ const allRoutes: RouteDef[] = [
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
+  ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（代码质量五维治理报告）
   ...adminDeptPerformanceRoutes,
   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
   ...adminHealthRoutes,
