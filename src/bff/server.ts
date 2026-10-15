@@ -203,6 +203,7 @@ import { drugReviewRoutes } from './routes/drugReview';
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
 import { assistantPharmacyRoutes } from './routes/assistantPharmacy';
+import { assistantDeepReviewRoutes } from './routes/assistantDeepReview';
 import { assistantLabRoutes } from './routes/assistantLab';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
@@ -466,6 +467,7 @@ const allRoutes: RouteDef[] = [
   ...drugInventoryRoutes,
   ...prescriptionReviewRoutes,
   ...assistantPharmacyRoutes,
+  ...assistantDeepReviewRoutes,
   ...assistantLabRoutes,
   ...insuranceAuditRoutes,
   ...drgAuditRoutes,
