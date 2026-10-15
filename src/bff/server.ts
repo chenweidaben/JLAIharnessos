@@ -67,6 +67,9 @@ import { recordRequestPerformance } from './aggregators/performanceMonitorAggreg
 // 【生产化收尾】M145-C：系统监控指标（七类指标 + 超阈值自动告警），GET /api/v1/admin/metrics
 import { systemMetricsRoutes } from './routes/systemMetrics';
 import { startSystemMetricSampler } from './aggregators/systemMetricsAggregator';
+// 【越用越聪明深化】M146-A：医院智慧资产看板（五维资产 + 六维雷达 + 增长报告）
+import { wisdomDashboardRoutes } from './routes/wisdomDashboard';
+// 【越用越聪明深化】M146-C：跨科室知识联邦（心内科→急诊/内分泌→营养/外科→麻醉，confidence<0.5 不推荐）
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -308,12 +311,14 @@ import { doctorPreferenceRoutes } from './routes/doctorPreference';
 // 【用户体验深化】M134-B：医生成长档案（月度快照表驱动，成长曲线+雷达+同科室对比）
 import { doctorGrowthRoutes } from './routes/doctorGrowth';
 import { userSettingsRoutes } from './routes/userSettings';
+// 【越用越聪明深化】M146-B：个人智能体成长报告 GET /api/v1/user/muse/report（让每个员工有成就感）
 import { notificationRoutes } from './routes/notifications';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
 import { followUpRoutes } from './routes/followUps';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
+// 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { federatedKnowledgeRoutes } from './routes/federatedKnowledge';
@@ -620,6 +625,7 @@ const allRoutes: RouteDef[] = [
   ...adminErrorsRoutes,
   ...adminConfigRoutes,
   ...deployConfigRoutes, // M145-D：部署配置生成（生产化收尾）
+  ...wisdomDashboardRoutes, // M146-A：GET /api/v1/admin/wisdom/dashboard（越用越聪明深化）
   ...adminLogsRoutes,
   ...adminWebhooksRoutes,
   ...strategyEvolutionRoutes,
