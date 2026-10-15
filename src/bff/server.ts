@@ -214,7 +214,6 @@ import { monthlyReportRoutes } from './routes/monthlyReport';
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
-import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
@@ -224,7 +223,6 @@ import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
-import { assistantInpatientRoutes } from './routes/assistantInpatient';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -450,13 +448,11 @@ const allRoutes: RouteDef[] = [
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
-  ...assistantOutpatientRoutes,
   ...aiFeedbackRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
-  ...assistantInpatientRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
