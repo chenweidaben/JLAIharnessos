@@ -232,6 +232,7 @@ import { museLessonRoutes } from './routes/museLesson';
 import { multimodalityRoutes } from './routes/multimodality';
 import { aiNoteQcRoutes } from './routes/aiNoteQc';
 import { aiNursingPlanRoutes } from './routes/aiNursingPlan';
+import { aiRecordRoutes } from './routes/aiRecord'; // 【AI核心能力深化】M144-B：AI 病历自动生成 POST /api/v1/ai/generate-record
 import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
@@ -381,6 +382,7 @@ const allRoutes: RouteDef[] = [
 ...pathwayRecommendationRoutes,
 ...losPredictionRoutes,
   ...voiceMedicalRoutes,
+  ...aiRecordRoutes, // M144-B：AI 病历自动生成（医生修改后用于模型优化）
   ...frontPageRoutes,
   ...researchRoutes,
   ...researchExportRoutes,
