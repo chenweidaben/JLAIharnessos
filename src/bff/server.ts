@@ -130,6 +130,7 @@ import { postpartumRoutes } from './routes/postpartumVisit';
 import { erTriageRoutes } from './routes/erTriage';
 import { barthelRoutes } from './routes/barthel';
 import { equipmentRoutes } from './routes/equipment';
+import { logisticsRoutes } from './routes/logistics';
 import { erGreenRoutes } from './routes/erGreen';
 import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
@@ -421,6 +422,7 @@ const allRoutes: RouteDef[] = [
   ...erTriageRoutes,
   ...barthelRoutes,
   ...equipmentRoutes,
+  ...logisticsRoutes,
   ...erGreenRoutes,
   ...chronicRoutes,
   ...patientChronicRoutes,
