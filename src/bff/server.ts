@@ -225,6 +225,7 @@ import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
+import { demoStatusRoutes } from './routes/demoStatus';
 import { modelInfoRoutes } from './routes/modelInfo';
 import { museLlmStatusRoutes } from './routes/museLlmStatus';
 import { aiFeedbackRoutes } from './routes/aiFeedback';
@@ -272,6 +273,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 const allRoutes: RouteDef[] = [
   ...healthRoutes,
+  ...demoStatusRoutes,
   ...modelInfoRoutes,
   ...museLlmStatusRoutes,
   ...authRoutes,
