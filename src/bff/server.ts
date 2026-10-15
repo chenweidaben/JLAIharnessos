@@ -38,6 +38,7 @@ import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
+import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
 import { adminMigrationsRoutes } from './routes/adminMigrations';
@@ -454,6 +455,7 @@ const allRoutes: RouteDef[] = [
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
+  ...adminDeptPerformanceRoutes,
   ...adminHealthRoutes,
   ...adminDashboardRoutes,
   ...adminMigrationsRoutes,
