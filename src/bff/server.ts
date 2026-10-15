@@ -182,7 +182,7 @@ import { doctorWorkbenchRoutes } from './routes/doctorWorkbench';
 import { patientPortalRoutes } from './routes/patientPortal';
 import { patientLabExplainRoutes } from './routes/patientLabExplain';
 import { surgicalChecklistRoutes } from './routes/surgicalChecklist';
-import { alertsRoutes } from './routes/alerts';
+import { alertsRoutes, adminAlertsRoutes } from './routes/alerts';
 import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
@@ -461,6 +461,7 @@ const allRoutes: RouteDef[] = [
 ...surgicalChecklistRoutes,
 ...alertsRoutes,
 // 【监控告警自动化】M136-D：运维监控告警中心 GET /api/v1/admin/alerts（仅 admin）
+...adminAlertsRoutes,
   ...renewalRoutes,
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,

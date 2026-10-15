@@ -4,6 +4,20 @@
  * DEMO_MODE 下返回内存 demo 数据；真实库告警源接入后替换实现。
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
+import fs from 'node:fs';
+import os from 'node:os';
+
+import { requireRole } from '../middleware/auth';
+import {
+  aggregatePerformance,
+  listPerformanceRecords,
+} from '../aggregators/performanceMonitorAggregator';
+import {
+  checkAlertThresholds,
+  DEFAULT_ALERT_THRESHOLDS,
+  type Alert,
+  type AlertMetrics,
+} from '../aggregators/alertingAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底。 */
@@ -94,5 +108,91 @@ export const alertsRoutes: RouteDef[] = [
       // 真实告警源接入前，兜底返回内存 demo 告警，保证告警中心可渲染。
       return json(ok(listView(), 'ok', c.traceId));
     },
+  },
+];
+
+/* ================================================================== */
+/* M136-D 运维监控告警中心：GET /api/v1/admin/alerts（仅 admin）        */
+/* ================================================================== */
+
+/** 磁盘使用率：工作目录所在分区；读取失败保守给中性低值 0.1（不误报红/黄） */
+function readDiskUsedRatio(): number {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stat = (fs as any).statfsSync(process.cwd()) as { blocks: bigint | number; bfree: bigint | number };
+    const total = Number(stat.blocks);
+    const free = Number(stat.bfree);
+    if (!Number.isFinite(total) || total <= 0) return 0.1;
+    return (total - free) / total;
+  } catch {
+    return 0.1;
+  }
+}
+
+/** 内存使用率：1 - 可用/总量；读取失败给中性低值 */
+function readMemoryUsedRatio(): number {
+  try {
+    const total = os.totalmem();
+    const free = os.freemem();
+    if (total <= 0) return 0.1;
+    return 1 - free / total;
+  } catch {
+    return 0.1;
+  }
+}
+
+/** 今日错误率与 P95：复用 BFF 进程内性能采样（零新依赖，持续优化） */
+function readTraffic(): { errorRate: number; p95LatencyMs: number } {
+  try {
+    const summary = aggregatePerformance(listPerformanceRecords());
+    const last = summary.errorRateTrend[summary.errorRateTrend.length - 1];
+    return {
+      errorRate: typeof last?.errorRate === 'number' ? last.errorRate : 0,
+      p95LatencyMs: summary.p95,
+    };
+  } catch {
+    return { errorRate: 0, p95LatencyMs: 0 };
+  }
+}
+
+/**
+ * GET /api/v1/admin/alerts
+ * 采集运行指标并跑阈值规则，返回当前触发中的监控告警（只读、无写副作用）。
+ */
+async function handleAdminAlerts(c: Ctx): Promise<Response> {
+  // 仅 admin 角色（requireRole 内部已处理 401 / 403）
+  const denied = requireRole(c, 'admin');
+  if (denied) return denied;
+
+  try {
+    const traffic = readTraffic();
+    const metrics: AlertMetrics = {
+      apiErrorRate: traffic.errorRate,
+      p95LatencyMs: traffic.p95LatencyMs,
+      diskUsedRatio: readDiskUsedRatio(),
+      memoryUsedRatio: readMemoryUsedRatio(),
+    };
+    // 纯函数跑阈值；无流量/未超限返回空数组（前端展示"运行正常"）
+    const alerts: Alert[] = checkAlertThresholds(metrics);
+    return json(
+      ok({
+        alerts,
+        metrics,
+        thresholds: DEFAULT_ALERT_THRESHOLDS,
+        demo: isDemo,
+      }),
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '监控告警数据采集失败';
+    return json(fail(ErrorCode.INTERNAL_ERROR, message, c.traceId), 500);
+  }
+}
+
+export const adminAlertsRoutes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/v1/admin/alerts',
+    auth: true,
+    handle: handleAdminAlerts,
   },
 ];
