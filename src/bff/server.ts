@@ -43,6 +43,7 @@ import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
+import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -554,6 +555,7 @@ const allRoutes: RouteDef[] = [
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
   ...adminPerformanceOptimizationsRoutes,
+  ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...adminDeptPerformanceRoutes,
