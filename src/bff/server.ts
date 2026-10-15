@@ -232,6 +232,7 @@ import { patientFeedbackRoutes } from './routes/patientFeedback';
 import { adminAuditLogRoutes } from './routes/adminAuditLog';
 import { adminBackupRoutes } from './routes/adminBackup';
 import { adminErrorsRoutes } from './routes/adminErrors';
+import { adminConfigRoutes } from './routes/adminConfig';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -479,6 +480,7 @@ const allRoutes: RouteDef[] = [
   ...adminAuditLogRoutes,
   ...adminBackupRoutes,
   ...adminErrorsRoutes,
+  ...adminConfigRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
