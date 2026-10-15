@@ -244,6 +244,7 @@ import { adminInsuranceReviewRoutes } from './routes/adminInsuranceReview';
 import { drgAuditRoutes } from './routes/drgAudit';
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
+import { reportExportRoutes } from './routes/reportExport';
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
@@ -549,6 +550,7 @@ const allRoutes: RouteDef[] = [
   ...deptKnowledgeRoutes,
   ...qcRectificationRoutes,
   ...monthlyReportRoutes,
+  ...reportExportRoutes,
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
