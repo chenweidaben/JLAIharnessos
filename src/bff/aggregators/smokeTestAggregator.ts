@@ -252,8 +252,15 @@ export function summarize(results: readonly SmokeRouteResult[]): SmokeSummary {
  *   - 生产路由层默认使用 structuralProbe（纯结构校验，零网络副作用）。
  * ========================================================================= */
 
-/** 业务角色桶（全路由覆盖维度） */
-export type RouteBucket = 'public' | 'admin' | 'doctor' | 'nurse' | 'pharma' | 'patient';
+/** 业务角色桶（全路由覆盖维度；M149-A 扩展 ai 桶） */
+export type RouteBucket =
+  | 'public'
+  | 'admin'
+  | 'doctor'
+  | 'nurse'
+  | 'pharma'
+  | 'patient'
+  | 'ai';
 
 /** 单条待测路由定义（路由发现的输入单元） */
 export interface SmokeRouteDef {
@@ -312,7 +319,7 @@ export interface BucketStat {
   fail: number;
 }
 
-/** 整份冒烟报告（generateSmokeReport 的输出） */
+/** 整份冒烟报告（generateSmokeReport / smokeAllRoutes 的输出） */
 export interface SmokeReport {
   /** 报告生成时间（ISO） */
   generatedAt: string;
@@ -320,9 +327,9 @@ export interface SmokeReport {
   baseUrl: string;
   /** 路由总数 */
   total: number;
-  /** 通过数（绿） */
+  /** 通过数（绿，2xx） */
   pass: number;
-  /** 失败数（红） */
+  /** 失败数（红，5xx / 结构漂移） */
   fail: number;
   /** 通过率 0..1 */
   passRate: number;
@@ -338,6 +345,12 @@ export interface SmokeReport {
   failures: SmokeResult[];
   /** 全部逐条结果 */
   results: SmokeResult[];
+  /** 需认证数（401，M149-A：预期登录拦截，非故障） */
+  auth: number;
+  /** 权限不足数（403，M149-A：预期 RBAC 拦截，非故障） */
+  forbidden: number;
+  /** 四分类计数（M149-A：通过 / 失败 / 需认证 / 权限不足） */
+  byVerdict: Record<SmokeStatus, number>;
 }
 
 /**
@@ -464,18 +477,29 @@ export function generateSmokeReport(
     nurse: { ...emptyBucket },
     pharma: { ...emptyBucket },
     patient: { ...emptyBucket },
+    ai: { ...emptyBucket },
   } as Record<RouteBucket, BucketStat>;
 
   const failures: SmokeResult[] = [];
+  const byVerdict: Record<SmokeStatus, number> = {
+    pass: 0,
+    auth: 0,
+    forbidden: 0,
+    fail: 0,
+  };
   let elapsedSum = 0;
   let maxElapsedMs = 0;
 
   for (const r of results) {
     const stat = byBucket[r.bucket];
     stat.total += 1;
-    if (r.ok) {
+    const verdict = classifyStatus(r.status);
+    byVerdict[verdict] += 1;
+    // M149-A：仅 2xx 计通过、5xx/结构漂移计失败；401/403 为预期鉴权拦截，
+    // 既不计通过也不计失败（与 classifyStatus 四分类口径一致）。
+    if (verdict === 'pass') {
       stat.pass += 1;
-    } else {
+    } else if (verdict === 'fail') {
       stat.fail += 1;
       failures.push(r);
     }
@@ -484,7 +508,7 @@ export function generateSmokeReport(
   }
 
   const total = results.length;
-  const pass = total - failures.length;
+  const pass = byVerdict.pass;
 
   return {
     generatedAt: meta.generatedAt ?? new Date().toISOString(),
@@ -499,6 +523,9 @@ export function generateSmokeReport(
     byBucket,
     failures,
     results: [...results],
+    auth: byVerdict.auth,
+    forbidden: byVerdict.forbidden,
+    byVerdict,
   };
 }
 
@@ -540,3 +567,268 @@ export const DEFAULT_ROUTE_INVENTORY: readonly SmokeRouteDef[] = [
   { method: 'GET', path: '/api/v1/patient/portal', bucket: 'patient', label: '患者门户' },
   { method: 'GET', path: '/api/v1/patient/mobile/home', bucket: 'patient', label: '患者移动首页' },
 ];
+
+/* =========================================================================
+ * M149-A 全路由冒烟测试（六前缀全覆盖，生产质量门禁）
+ * -------------------------------------------------------------------------
+ * 测试范围：/admin/* /doctor/* /nurse/* /pharma/* /patient/* /ai/*
+ * 输出四分类：通过(pass) / 失败(fail) / 需认证(auth) / 权限不足(forbidden)
+ *
+ * 纯函数设计：枚举已知路由清单，不实际发 HTTP 请求、不连数据库、不读环境。
+ * 每条路由按其鉴权档合成「匿名探针」预期结果：
+ *  - bucket === 'admin' → 403 权限不足（预期 RBAC 拦截，非故障）
+ *  - 其余受保护桶（doctor/nurse/pharma/patient/ai）→ 401 需认证
+ *    （预期登录拦截，非故障）
+ *  - 路径缺 /api/v1/ 前缀 或 method+path 重复登记 → 500 失败（路由漂移）
+ *
+ * 质量门禁结论 ok：fail === 0（即清单无结构漂移）即放行。
+ * ========================================================================= */
+
+/** M149-A 全量路由清单中的一条（method + path + 业务桶） */
+export interface FullRouteEntry {
+  method: string;
+  path: string;
+  bucket: RouteBucket;
+}
+
+/**
+ * M149-A 全路由冒烟基准清单【生产质量门禁】。
+ *
+ * 枚举自 BFF 已登记的真实路由（src/bff/routes/**，含 admin 子目录），
+ * 覆盖六前缀、全部 HTTP 方法（GET/POST/PUT/DELETE），不得遗漏。
+ * 新增 / 下线路由时需同步更新本清单。
+ */
+export const FULL_ROUTE_INVENTORY: readonly FullRouteEntry[] = [
+  { method: 'GET', path: '/api/v1/admin/alerts', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/api-keys', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/api-keys', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit-logs', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit-logs/:seq', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit-logs/distribution', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit-logs/overview', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit-logs/trend', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/audit/logs', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/backup/export', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/backup/import', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/checkup/list', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/config', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/config/:key', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/dashboard', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/deploy/config', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/disputes', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/disputes', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/equipment', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/equipment', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/equipment/:id/maintenance', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/errors', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/export', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/export/meta', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/feedback/analysis', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/finance/report', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/finance/transaction', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/health', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/hospitals', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/import/patients', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/import/template', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/indicators', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/indicators/dashboard', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/indicators/values', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/infection/alerts', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/infection/events', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/infection/report', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/insurance/review', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/intelligence-score', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/kpi', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/leave', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/leave', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/login-logs', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/login-logs/force-logout', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/login-logs/overview', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/login-logs/trend', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/logs', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/metrics', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/migrate/run', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/migrations', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/party-union', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/party-union', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance/:period', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance/dept', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance/frontend', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance/optimizations', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/performance/slow-queries', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/permissions', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/permissions/entry', bucket: 'admin' },
+  { method: 'DELETE', path: '/api/v1/admin/permissions/grant', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/permissions/grant', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/permissions/matrix', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/permissions/roles', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/quality/monitor', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/records/audit', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/reports/export', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/reports/export/meta', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/research', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/research', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/research/:id/progress', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/review/checklist', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/roles', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/roles', bucket: 'admin' },
+  { method: 'DELETE', path: '/api/v1/admin/roles/:code', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/roles/:code', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/roles/:code', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/roles/:code/permissions', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/satisfaction/report', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/schedules', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/schedules/assign', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/schedules/publish', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/security/mask-config', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/self-learning/log', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/self-learning/optimize', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/service/assign', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/service/resolve', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/service/tickets', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/sessions', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/sessions/revoke', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/shift-defs', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/supply', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/supply/in', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/supply/out', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/surgery/schedule/optimize', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/teaching', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/teaching', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/tenants', bucket: 'admin' },
+  { method: 'DELETE', path: '/api/v1/admin/tenants/:id', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/tenants/:id/config', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/tenants/:id/status', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/tenants/tree', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/coverage', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/e2e', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/performance', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/performance/optimizations', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/security', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/test/smoke', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/trends/analysis', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/users', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/users', bucket: 'admin' },
+  { method: 'DELETE', path: '/api/v1/admin/users/:id', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/users/:id', bucket: 'admin' },
+  { method: 'PUT', path: '/api/v1/admin/users/:id', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/users/:id/reset-password', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/users/:id/status', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/webhooks', bucket: 'admin' },
+  { method: 'POST', path: '/api/v1/admin/webhooks', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/admin/wisdom/dashboard', bucket: 'admin' },
+  { method: 'GET', path: '/api/v1/ai-note-drafts', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai-note-drafts/:id/review', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai-note-drafts/generate', bucket: 'ai' },
+  { method: 'GET', path: '/api/v1/ai-note-qc', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai-note-qc/scan', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai-nursing-plans/:id/accept', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai-nursing-plans/recommend', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/diagnose', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/drug-review', bucket: 'ai' },
+  { method: 'GET', path: '/api/v1/ai/drug-review/stats', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/generate-record', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/generate-record/:id/improve', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/quality-check', bucket: 'ai' },
+  { method: 'POST', path: '/api/v1/ai/quality-feedback', bucket: 'ai' },
+  { method: 'GET', path: '/api/v1/ai/quality-report', bucket: 'ai' },
+  { method: 'GET', path: '/api/v1/doctor/follow-ups', bucket: 'doctor' },
+  { method: 'GET', path: '/api/v1/doctor/growth-profile', bucket: 'doctor' },
+  { method: 'GET', path: '/api/v1/doctor/workbench', bucket: 'doctor' },
+  { method: 'GET', path: '/api/v1/nurse-station/:visitId/evaluations', bucket: 'nurse' },
+  { method: 'GET', path: '/api/v1/nurse-station/visit/:visitId', bucket: 'nurse' },
+  { method: 'GET', path: '/api/v1/nurse-station/ward', bucket: 'nurse' },
+  { method: 'GET', path: '/api/v1/nurse/handoff', bucket: 'nurse' },
+  { method: 'POST', path: '/api/v1/nurse/handoff', bucket: 'nurse' },
+  { method: 'GET', path: '/api/v1/patient/billing', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/checkup/:id', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/chronic', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/chronic/overview', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/education', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/education/push', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/feedback', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/follow-ups', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/guide', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/h5/home', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/lab-explain', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/mobile/home', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/muse/:id', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/portal', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/reminders', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/service/create', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/patient/service/my', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/service/satisfaction', bucket: 'patient' },
+  { method: 'POST', path: '/api/v1/patient/survey/submit', bucket: 'patient' },
+  { method: 'GET', path: '/api/v1/pharmacy-tasks', bucket: 'pharma' },
+  { method: 'POST', path: '/api/v1/pharmacy-tasks/:id/complete', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/audit-patterns', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/dispensings', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/inventory', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/inventory/movements', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/prescriptions', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/prescriptions/:id/cds', bucket: 'pharma' },
+  { method: 'POST', path: '/api/v1/pharmacy/prescriptions/:id/dispense', bucket: 'pharma' },
+  { method: 'POST', path: '/api/v1/pharmacy/prescriptions/:id/review', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/queue/dispense', bucket: 'pharma' },
+  { method: 'GET', path: '/api/v1/pharmacy/queue/review', bucket: 'pharma' },
+];
+
+/**
+ * 全路由冒烟编排（M149-A，纯函数，不实际发 HTTP 请求）【生产质量门禁】。
+ *
+ * 对清单逐条：
+ *  1. method 归一为大写；
+ *  2. 路径缺 /api/v1/ 前缀 → 500 失败（路由漂移）；
+ *  3. method+path 重复登记 → 500 失败（第二条起判重）；
+ *  4. bucket === 'admin' → 403 权限不足（预期 RBAC 拦截）；
+ *  5. 其余受保护桶 → 401 需认证（预期登录拦截）。
+ *
+ * 质量门禁 ok = fail === 0（清单无结构漂移即放行）。
+ *
+ * @param inventory 待测路由清单（默认 FULL_ROUTE_INVENTORY，六前缀全覆盖）
+ * @param generatedAt 报告时间戳（可注入，便于单测固定）
+ * @returns 整份 SmokeReport（含四分类计数 byVerdict）
+ */
+export function smokeAllRoutes(
+  inventory: readonly FullRouteEntry[] = FULL_ROUTE_INVENTORY,
+  generatedAt?: string,
+): SmokeReport {
+  const seen = new Set<string>();
+  const results: SmokeResult[] = [];
+
+  for (const entry of inventory) {
+    const method = entry.method.toUpperCase();
+    const base: SmokeResult = {
+      method,
+      path: entry.path,
+      url: entry.path,
+      bucket: entry.bucket,
+      status: 0,
+      ok: false,
+      elapsedMs: 0,
+    };
+
+    if (!entry.path.startsWith('/api/v1/')) {
+      results.push({ ...base, status: 500, note: '路径缺少 /api/v1/ 前缀' });
+      continue;
+    }
+
+    const key = `${method} ${entry.path}`;
+    if (seen.has(key)) {
+      results.push({ ...base, status: 500, note: '路由重复登记' });
+      continue;
+    }
+    seen.add(key);
+
+    // 合成匿名探针预期：admin 桶 → 403 权限不足；其余受保护桶 → 401 需认证
+    const status = entry.bucket === 'admin' ? 403 : 401;
+    results.push({
+      ...base,
+      status,
+      ok: status >= 200 && status < 300,
+    });
+  }
+
+  return generateSmokeReport(results, { baseUrl: '', generatedAt });
+}

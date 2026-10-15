@@ -19,9 +19,11 @@ import {
   classifyAuthRequirement,
   classifyStatus,
   DEFAULT_ROUTE_INVENTORY,
+  FULL_ROUTE_INVENTORY,
   generateSmokeReport,
   KNOWN_GET_ROUTES,
   resolveUrl,
+  smokeAllRoutes,
   smokeTestAllRoutes,
   structuralProbe,
   summarize,
@@ -320,5 +322,127 @@ describe('buildSmokeResults 旧版静态比对兼容', () => {
     const summary = summarize(buildSmokeResults(KNOWN_GET_ROUTES));
     expect(summary.fail).toBe(0);
     expect(summary.total).toBe(KNOWN_GET_ROUTES.length);
+  });
+});
+
+/* ===================== M149-A 全路由冒烟（六前缀全覆盖） ===================== */
+
+describe('FULL_ROUTE_INVENTORY 全量路由清单', () => {
+  it('六前缀桶均有路由且总数覆盖全部已登记路径', () => {
+    const buckets = new Set(FULL_ROUTE_INVENTORY.map((r) => r.bucket));
+    expect(buckets.has('admin')).toBe(true);
+    expect(buckets.has('doctor')).toBe(true);
+    expect(buckets.has('nurse')).toBe(true);
+    expect(buckets.has('pharma')).toBe(true);
+    expect(buckets.has('patient')).toBe(true);
+    expect(buckets.has('ai')).toBe(true);
+    // 157 条唯一路径 × 多方法 = 173 条方法配对
+    expect(FULL_ROUTE_INVENTORY.length).toBeGreaterThan(150);
+  });
+
+  it('全部路径以 /api/v1/ 开头，且 method+path 无重复', () => {
+    const seen = new Set<string>();
+    for (const r of FULL_ROUTE_INVENTORY) {
+      expect(r.path.startsWith('/api/v1/')).toBe(true);
+      const key = `${r.method.toUpperCase()} ${r.path}`;
+      expect(seen.has(key)).toBe(false);
+      seen.add(key);
+    }
+  });
+
+  it('路径前缀与桶标注一致：admin/doctor/nurse/pharma/patient/ai', () => {
+    for (const r of FULL_ROUTE_INVENTORY) {
+      if (r.path.startsWith('/api/v1/admin/')) expect(r.bucket).toBe('admin');
+      else if (r.path.startsWith('/api/v1/doctor/')) expect(r.bucket).toBe('doctor');
+      else if (r.path.startsWith('/api/v1/nurse')) expect(r.bucket).toBe('nurse');
+      else if (r.path.startsWith('/api/v1/pharma')) expect(r.bucket).toBe('pharma');
+      else if (r.path.startsWith('/api/v1/patient/')) expect(r.bucket).toBe('patient');
+      else expect(r.bucket).toBe('ai');
+    }
+  });
+});
+
+describe('smokeAllRoutes 纯函数编排（不发 HTTP 请求）', () => {
+  it('默认清单返回完整 SmokeReport，门禁 ok=true（零结构漂移）', () => {
+    const report = smokeAllRoutes();
+    expect(report.total).toBe(FULL_ROUTE_INVENTORY.length);
+    expect(report.fail).toBe(0);
+    expect(report.ok).toBe(true);
+    expect(report.results).toHaveLength(FULL_ROUTE_INVENTORY.length);
+  });
+
+  it('admin 桶全部判 403 权限不足，其余受保护桶判 401 需认证', () => {
+    const report = smokeAllRoutes();
+    let adminCount = 0;
+    let protectedCount = 0;
+    for (const r of report.results) {
+      if (r.path.startsWith('/api/v1/admin/')) {
+        expect(r.status).toBe(403);
+        adminCount += 1;
+      } else {
+        expect(r.status).toBe(401);
+        protectedCount += 1;
+      }
+    }
+    expect(adminCount).toBeGreaterThan(0);
+    expect(protectedCount).toBeGreaterThan(0);
+    expect(report.forbidden).toBe(adminCount);
+    expect(report.auth).toBe(protectedCount);
+  });
+
+  it('四分类计数 byVerdict 互斥且合计等于总数', () => {
+    const report = smokeAllRoutes();
+    const { pass, fail, auth, forbidden } = report.byVerdict;
+    expect(pass + fail + auth + forbidden).toBe(report.total);
+    expect(report.pass).toBe(pass);
+    expect(report.fail).toBe(fail);
+    expect(report.auth).toBe(auth);
+    expect(report.forbidden).toBe(forbidden);
+  });
+
+  it('byBucket 六桶独立累计 total/pass/fail', () => {
+    const report = smokeAllRoutes();
+    for (const b of ['admin', 'doctor', 'nurse', 'pharma', 'patient', 'ai'] as const) {
+      expect(report.byBucket[b].total).toBeGreaterThan(0);
+      // 受保护桶无 2xx，pass 为 0；无漂移则 fail 为 0
+      expect(report.byBucket[b].fail).toBe(0);
+    }
+    const sumByBucket =
+      report.byBucket.admin.total +
+      report.byBucket.doctor.total +
+      report.byBucket.nurse.total +
+      report.byBucket.pharma.total +
+      report.byBucket.patient.total +
+      report.byBucket.ai.total;
+    expect(sumByBucket).toBe(report.total);
+  });
+
+  it('注入含漂移的清单：缺前缀 / 重复登记判 500 失败并置顶', () => {
+    const report = smokeAllRoutes(
+      [
+        { method: 'GET', path: '/bad/path', bucket: 'admin' },
+        { method: 'GET', path: '/api/v1/admin/x', bucket: 'admin' },
+        { method: 'GET', path: '/api/v1/admin/x', bucket: 'admin' },
+        { method: 'POST', path: '/api/v1/patient/y', bucket: 'patient' },
+      ],
+      '2026-01-01T00:00:00Z',
+    );
+    expect(report.ok).toBe(false);
+    expect(report.fail).toBe(2);
+    expect(report.failures[0].note).toContain('/api/v1/');
+    expect(report.failures[1].note).toContain('重复');
+    expect(report.generatedAt).toBe('2026-01-01T00:00:00Z');
+    // 合法 admin → 403；合法 patient → 401
+    const adminOk = report.results.find((r) => r.path === '/api/v1/admin/x');
+    const patientOk = report.results.find((r) => r.path === '/api/v1/patient/y');
+    expect(adminOk?.status).toBe(403);
+    expect(patientOk?.status).toBe(401);
+  });
+
+  it('空清单：total=0、ok=true、byVerdict 全零', () => {
+    const report = smokeAllRoutes([], '2026-01-01T00:00:00Z');
+    expect(report.total).toBe(0);
+    expect(report.ok).toBe(true);
+    expect(report.byVerdict).toEqual({ pass: 0, fail: 0, auth: 0, forbidden: 0 });
   });
 });

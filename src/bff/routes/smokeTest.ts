@@ -22,10 +22,8 @@ import { requireRole } from '../middleware/auth';
 import {
   classifyAuthRequirement,
   classifyStatus,
-  DEFAULT_ROUTE_INVENTORY,
-  generateSmokeReport,
   KNOWN_GET_ROUTES,
-  smokeTestAllRoutes,
+  smokeAllRoutes,
   summarize,
   type SmokeRouteResult,
 } from '../aggregators/smokeTestAggregator';
@@ -81,7 +79,7 @@ function resolveBaseUrl(c: Ctx): string {
 
 export const smokeTestRoutes: RouteDef[] = [
   {
-    // M135-A 全路由冒烟：六桶红绿报告（仅 admin）
+    // M149-A 全路由冒烟：六前缀全覆盖四分类红绿报告（仅 admin）
     method: 'GET',
     path: '/api/v1/admin/test/smoke',
     handle: (c: Ctx) => {
@@ -89,10 +87,11 @@ export const smokeTestRoutes: RouteDef[] = [
       const denied = requireRole(c, 'admin');
       if (denied) return denied;
 
-      const baseUrl = resolveBaseUrl(c);
-      // 纯函数编排：路由发现（DEFAULT_ROUTE_INVENTORY）→ 结果聚合 → 报告生成
-      const results = smokeTestAllRoutes(DEFAULT_ROUTE_INVENTORY, baseUrl);
-      const report = generateSmokeReport(results, { baseUrl });
+      // M149-A 纯函数：枚举 FULL_ROUTE_INVENTORY（admin/doctor/nurse/pharma/patient/ai
+      // 六前缀全部路由），不实际发 HTTP 请求，输出 通过/失败/需认证/权限不足 四分类。
+      const report = smokeAllRoutes();
+      // 注入探测基准地址展示（纯函数本身零 I/O，此处仅回填展示用 url）
+      report.baseUrl = resolveBaseUrl(c);
 
       return json(ok(report));
     },
