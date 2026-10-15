@@ -65,6 +65,8 @@ import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 import { todosRoutes } from './routes/todos';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 // 【生产化收尾】M145-C：系统监控指标（七类指标 + 超阈值自动告警），GET /api/v1/admin/metrics
+import { systemMetricsRoutes } from './routes/systemMetrics';
+import { startSystemMetricSampler } from './aggregators/systemMetricsAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -554,6 +556,7 @@ const allRoutes: RouteDef[] = [
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
+  ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...queryOptimizationRoutes,
@@ -986,6 +989,8 @@ void initDatabase().then(() => {
     `[jianlan-bff] listening on http://0.0.0.0:${port}  (WebSocket /ws/chat [auth required])`,
   );
 });
+
+startSystemMetricSampler();
 
 const server = Bun.serve({
   port,
