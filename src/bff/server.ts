@@ -36,6 +36,7 @@ import { userAdminRoutes } from './routes/admin/users';
 import { roleAdminRoutes } from './routes/admin/roles';
 import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
+import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -435,6 +436,7 @@ const allRoutes: RouteDef[] = [
   ...roleAdminRoutes,
   ...auditLogRoutes,
   ...loginLogRoutes,
+  ...maskConfigAdminRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
   ...agentHealthRoutes,
