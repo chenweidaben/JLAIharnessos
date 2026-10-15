@@ -331,6 +331,8 @@ import { imRoutes } from './routes/im';
 import { oaApprovalRoutes } from './routes/oaApproval';
 // 【医院管理深化】M140-D：党建工会活动留痕（党支部学习/主题党日/工会福利/职工文体/志愿服务）
 import { partyUnionRoutes } from './routes/partyUnion';
+// 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
+import { jciReviewRoutes } from './routes/jciReview';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -615,6 +617,7 @@ const allRoutes: RouteDef[] = [
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
+  ...jciReviewRoutes, // M141-A：三甲评审准备 GET /api/v1/admin/review/checklist
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,
