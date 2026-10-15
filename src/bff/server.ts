@@ -90,6 +90,7 @@ import { tubeCareRoutes } from './routes/tubeCare';
 import { nursingEventReviewRoutes } from './routes/nursingEventReview';
 import { nursingIoRoutes } from './routes/nursingIo';
 import { nursingNqiRoutes } from './routes/nursingNqi';
+import { nursingRiskPatternRoutes } from './routes/nursingRiskPattern';
 import { nutritionScreeningRoutes } from './routes/nutritionScreening';
 import { painAssessmentRoutes } from './routes/painAssessment';
 import { preopAssessmentRoutes } from './routes/preopAssessment';
@@ -280,6 +281,7 @@ const allRoutes: RouteDef[] = [
   ...nursingEventReviewRoutes,
   ...nursingIoRoutes,
   ...nursingNqiRoutes,
+  ...nursingRiskPatternRoutes,
   ...nutritionScreeningRoutes,
   ...painAssessmentRoutes,
   ...preopAssessmentRoutes,
