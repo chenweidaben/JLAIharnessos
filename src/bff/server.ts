@@ -38,6 +38,7 @@ import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
+// 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { adminHealthRoutes } from './routes/adminHealth';
 import { adminDashboardRoutes } from './routes/adminDashboard';
@@ -126,6 +127,7 @@ import { scheduleSlotRoutes } from './routes/scheduleSlot';
 import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
+import { patientMobileHomeRoutes } from './routes/patientMobileHome';
 import { patientBillingRoutes } from './routes/patientBilling';
 import { patientProfileRoutes } from './routes/patientProfile';
 import { rehabTreatmentRoutes } from './routes/rehabTreatment';
@@ -369,6 +371,7 @@ const allRoutes: RouteDef[] = [
   ...reportPushRoutes,
   ...patientNotificationRoutes,
   ...patientReminderRoutes,
+  ...patientMobileHomeRoutes,
   ...patientBillingRoutes,
   ...patientProfileRoutes,
   ...rehabTreatmentRoutes,
