@@ -277,6 +277,8 @@ import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
 import { museDeptCurveRoutes } from './routes/museDeptCurve';
 import { helpCenterRoutes } from './routes/helpCenter';
+// 【系统集成】M129-A：统一 API 文档（Swagger UI + OpenAPI3 JSON）
+import { apiDocsRoutes } from './routes/apiDocs';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -538,6 +540,7 @@ const allRoutes: RouteDef[] = [
   ...patientMuseRoutes,
   ...museDeptCurveRoutes,
   ...helpCenterRoutes,
+  ...apiDocsRoutes,
 ];
 
 interface Compiled {
