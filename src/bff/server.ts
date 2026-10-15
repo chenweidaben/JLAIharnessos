@@ -64,6 +64,7 @@ import { adminDashboardRoutes } from './routes/adminDashboard';
 import { adminQualityMonitorRoutes } from './routes/adminQualityMonitor';
 import { adminInfectionAlertsRoutes } from './routes/adminInfectionAlerts';
 import { infectionControlRoutes } from './routes/infectionControl'; // M141-D：院感实时上报/聚集追踪/月报
+import { infectionRealtimeRoutes } from './routes/infectionRealtime'; // M153-C：院感实时监测大屏（超阈值即红色预警，不等月报）
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
 // 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
@@ -621,6 +622,7 @@ const allRoutes: RouteDef[] = [
   ...adminQualityMonitorRoutes,
   ...adminInfectionAlertsRoutes,
   ...infectionControlRoutes, // M141-D：GET /admin/infection/events + POST /admin/infection/report
+  ...infectionRealtimeRoutes, // M153-C：GET /api/v1/admin/infection/realtime 实时监测大屏
   ...adminMigrationsRoutes,
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
