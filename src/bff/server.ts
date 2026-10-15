@@ -44,10 +44,12 @@ import { adminPerformanceRoutes } from './routes/adminPerformance';
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
+// 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
 import { dbPerformanceRoutes } from './routes/dbPerformance';
+// 【代码质量提升】M150-B：any/ts-ignore/console-log/未使用变量/圈复杂度 五维治理 GET /api/v1/admin/code/quality
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
 import { performanceReviewRoutes } from './routes/performanceReview';
@@ -343,6 +345,8 @@ import { smokeTestRoutes } from './routes/smokeTest';
 import { e2eTestRoutes } from './routes/e2eTest';
 // 【核心业务深化】M136-C：核心 aggregator 测试覆盖率报告（仅 admin，质量门禁）
 import { testCoverageRoutes } from './routes/testCoverage';
+// 【测试覆盖率冲刺 80%→90%】M150-A：覆盖率报告 + 缺口识别（仅 admin，90% 门禁）
+import { coverageReportRoutes } from './routes/coverageReport';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 // 【安全】M149-B：安全基线报告（七项：写认证/SQL/XSS/PII/错误/token/密码哈希/审计链）
 import { securityReportRoutes } from './routes/securityReport';
@@ -680,6 +684,7 @@ const allRoutes: RouteDef[] = [
   ...museRecommendRoutes,
   ...smokeTestRoutes,
   ...e2eTestRoutes, // M137-D：GET /api/v1/admin/test/e2e 关键业务流程 E2E
+  ...coverageReportRoutes, // M150-A：GET /api/v1/admin/test/coverage（90% 冲刺报告，先于旧 testCoverage 路由命中）
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
