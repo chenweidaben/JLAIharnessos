@@ -211,6 +211,7 @@ import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
 import { healthRoutes } from './routes/health';
 import { modelInfoRoutes } from './routes/modelInfo';
+import { aiFeedbackRoutes } from './routes/aiFeedback';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -408,6 +409,7 @@ const allRoutes: RouteDef[] = [
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
+  ...aiFeedbackRoutes,
 ];
 
 interface Compiled {
