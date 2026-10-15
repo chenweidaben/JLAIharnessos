@@ -189,6 +189,7 @@ import { renewalRoutes } from './routes/renewalFlow';
 import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
 import { costAttributionRoutes } from './routes/costAttribution';
+import { financeRoutes } from './routes/finance'; // M139-D：医院财务管理 GET /admin/finance/report + POST /transaction
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
@@ -480,6 +481,7 @@ const allRoutes: RouteDef[] = [
   ...drgBudgetRoutes,
   ...inpatientCostMonitorRoutes,
   ...costAttributionRoutes,
+  ...financeRoutes, // M139-D：医院财务管理（医院运营管理）
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
   ...dipRoutes,
