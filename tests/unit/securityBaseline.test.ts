@@ -78,8 +78,8 @@ describe('redactError / hasInternalDetailLeak', () => {
 describe('securityBaselineCheck', () => {
   const results = securityBaselineCheck('http://localhost:8080');
 
-  it('恰好返回五项检查', () => {
-    expect(results.length).toBe(5);
+  it('恰好返回八项检查（M135-D 五项 + M149-B 三项）', () => {
+    expect(results.length).toBe(8);
   });
 
   it('覆盖任务要求的全部检查项', () => {
@@ -89,6 +89,10 @@ describe('securityBaselineCheck', () => {
     expect(ids.has('xss')).toBe(true);
     expect(ids.has('masking')).toBe(true);
     expect(ids.has('error-disclosure')).toBe(true);
+    // M149-B 新增三项
+    expect(ids.has('token-expiry')).toBe(true);
+    expect(ids.has('password-hash')).toBe(true);
+    expect(ids.has('audit-log-integrity')).toBe(true);
   });
 
   it('每条结果字段完整', () => {

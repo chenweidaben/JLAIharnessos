@@ -344,6 +344,7 @@ import { e2eTestRoutes } from './routes/e2eTest';
 import { testCoverageRoutes } from './routes/testCoverage';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 // 【安全】M149-B：安全基线报告（七项：写认证/SQL/XSS/PII/错误/token/密码哈希/审计链）
+import { securityReportRoutes } from './routes/securityReport';
 import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
@@ -679,6 +680,7 @@ const allRoutes: RouteDef[] = [
   ...e2eTestRoutes, // M137-D：GET /api/v1/admin/test/e2e 关键业务流程 E2E
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
+  ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
   ...eSignatureRoutes, // M138-B：电子签名 POST /sign + GET /verify/:id
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals

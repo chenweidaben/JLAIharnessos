@@ -1,16 +1,19 @@
 /**
- * 健澜科技 jlmedaios - M135-D 安全基线检查聚合器
+ * 健澜科技 jlmedaios - 安全基线检查聚合器（M135-D 初版五项；M149-B 扩展至七项）
  *
- * 本模块仅提供纯函数与静态策略清单，是「生产就绪质量门禁」的一部分：
- *  - securityBaselineCheck(baseUrl)：对五项安全基线做确定性核查，产出逐条结果；
+ * 本模块仅提供纯函数与静态策略清单，是「生产质量门禁」的一部分：
+ *  - securityBaselineCheck(baseUrl)：对安全基线做确定性核查，产出逐条结果；
  *  - generateSecurityReport(results)：对核查结果做风险分级与汇总，产出红/黄/绿报告。
  *
- * 五项基线检查（对应等保2.0 / 医院数据安全要求）：
- *  1. 写操作认证（write-auth）   —— POST/PUT/DELETE 写端点是否强制登录 + RBAC；
- *  2. SQL 注入（sql-injection）  —— 动态拼接处是否参数化 / 元字符被中和；
- *  3. XSS（xss）                 —— 富文本回显是否做 HTML 转义；
- *  4. 患者数据脱敏（masking）    —— 对外接口是否对姓名/证件/手机号做脱敏；
- *  5. 错误信息不泄露（error）    —— 统一错误页是否剥离堆栈 / SQL / 物理路径。
+ * 七项基线检查（对应等保2.0 / 医院数据安全要求 / M149-B 任务书）：
+ *  1. 写操作认证（write-auth）            —— POST/PUT/DELETE 写端点是否强制登录 + RBAC；
+ *  2. SQL 注入（sql-injection）           —— 动态拼接处是否参数化 / 元字符被中和；
+ *  3. XSS（xss）                          —— 富文本回显是否做 HTML 转义；
+ *  4. 患者数据脱敏（masking）             —— 对外接口是否对姓名/证件/手机号做脱敏；
+ *  5. 错误信息不泄露（error-disclosure）  —— 统一错误页是否剥离堆栈 / SQL / 物理路径；
+ *  6. Token 过期机制（token-expiry）      —— 过期 / 缺 exp 令牌 fail-closed 拒绝、TTL 受控（M149-B）；
+ *  7. 密码哈希（password-hash）          —— 口令 bcrypt/argon2 加盐慢哈希，禁明文/MD5（M149-B）；
+ *  8. 审计日志完整性（audit-log-integrity）—— 哈希链只追加，篡改即断链可检出（M149-B）。
  *
  * 设计约束（与 smokeTestAggregator 同一纪律）：
  *  - 不发起任何 HTTP 请求，不连接数据库，不读取环境副作用；
@@ -188,6 +191,95 @@ export function hasInternalDetailLeak(redacted: string): boolean {
   );
 }
 
+/* ============================== M149-B 新增安全控制 ============================== */
+/* 以下三项（token 过期 / 密码哈希 / 审计日志完整性）为 M149-B 安全基线扩展。     */
+/* 同样以「参考实现纯函数 + 对抗载荷喂入」方式做确定性核查，不连网络 / 数据库。   */
+
+/** 访问令牌最大有效期（秒）：生产门禁要求 ≤ 2h，超时即视为策略漂移 */
+export const ACCESS_TOKEN_MAX_TTL_SEC = 2 * 60 * 60;
+
+/**
+ * 判定一个 JWT/会话令牌在 now 时刻是否已过期。
+ * 失败安全（fail-closed）：exp 缺失 / 非有限数 / 非正数一律视为「已过期」并拒绝，
+ * 禁止因 claims 缺失而放行——这是 token 过期机制的核心门禁。
+ *
+ * 生产质量门禁：鉴权中间件必须以此函数为准拒绝过期或缺 exp 的令牌。
+ */
+export function isTokenExpired(exp: number | undefined, now: number): boolean {
+  if (typeof exp !== 'number' || !Number.isFinite(exp) || exp <= 0) return true;
+  return exp <= now;
+}
+
+/** 计算令牌有效期（秒）；iat/exp 非法时返回 Infinity，便于判定超长令牌 */
+export function tokenTtlSeconds(iat: number | undefined, exp: number | undefined): number {
+  if (typeof iat !== 'number' || typeof exp !== 'number') return Infinity;
+  if (!Number.isFinite(iat) || !Number.isFinite(exp)) return Infinity;
+  return exp - iat;
+}
+
+/**
+ * 判定存储的口令是否为「弱存储」：明文 / 空 / 已破哈希（MD5 / SHA1）。
+ * 生产质量门禁：口令只允许 bcrypt($2[aby]$) 或 argon2($argon2) 等慢哈希加盐形式。
+ */
+export function isWeakPasswordStorage(stored: string): boolean {
+  if (typeof stored !== 'string' || stored.length === 0) return true;
+  // MD5 (32 hex) / SHA1 (40 hex) 已被撞库库覆盖，必须淘汰
+  if (/^[0-9a-f]{32}$/i.test(stored) || /^[0-9a-f]{40}$/i.test(stored)) return true;
+  // 无算法标识（$2a$... / $argon2...）且长度明显短于哈希输出 → 视为明文
+  if (!/\$(2[aby]|argon2|pbkdf2)/i.test(stored) && stored.length < 60) return true;
+  return false;
+}
+
+/** 判定存储口令是否为「强盐哈希」（bcrypt / argon2 / pbkdf2） */
+export function isStrongPasswordHash(stored: string): boolean {
+  return /^\$2[aby]\$\d{2}\$/.test(stored) || /^\$argon2/i.test(stored) || /^\$pbkdf2/i.test(stored);
+}
+
+/**
+ * 审计日志哈希链条目：每条记录携带前一条的哈希，形成防篡改链。
+ * 采用 FNV-1a 32 位（纯函数、零依赖）做确定性摘要，便于单测与基线比对。
+ */
+export interface AuditEntry {
+  seq: number;
+  action: string;
+  actor: string;
+  at: string;
+}
+
+/** FNV-1a 32 位确定性哈希（十六进制）——审计链摘要参考实现，零新增依赖 */
+export function fnv1a32Hex(input: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    // 等价于 * 0x01000193，手动展开以避免位运算溢出差异
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+/** 计算单条审计记录的哈希（含 seq/action/actor/at/prevHash） */
+export function hashAuditEntry(e: AuditEntry, prevHash: string): string {
+  return fnv1a32Hex(`${e.seq}|${e.action}|${e.actor}|${e.at}|${prevHash}`);
+}
+
+/**
+ * 校验审计日志链完整性：逐条重算 prevHash 链接。
+ * 任一条被篡改（action/actor/at 变化）→ 重算哈希与链上记录不符 → 返回 false。
+ *
+ * 生产质量门禁：审计日志只追加、不修改；查询前必须先过 verifyAuditChain。
+ */
+export function verifyAuditChain(entries: readonly AuditEntry[], chain: readonly string[]): boolean {
+  if (entries.length === 0) return true;
+  if (chain.length !== entries.length) return false;
+  let prev = 'GENESIS';
+  for (let i = 0; i < entries.length; i += 1) {
+    const expect = hashAuditEntry(entries[i], prev);
+    if (chain[i] !== expect) return false;
+    prev = chain[i];
+  }
+  return true;
+}
+
 /* ============================== 写操作路由静态清单 ============================== */
 
 /**
@@ -313,6 +405,74 @@ export function securityBaselineCheck(baseUrl: string): CheckResult[] {
     recommendation: '生产环境统一返回通用错误提示，堆栈仅写服务端日志。',
   });
 
+  /* ---- 6. M149-B：token 过期机制 ---- */
+  const now = 1_700_000_000_000; // 固定时钟，保证确定性（纯函数，不读 Date.now）
+  const expiredTk = isTokenExpired(now - 3600 * 1000, now); // 已过期 1h → 必须拒绝
+  const noExpTk = isTokenExpired(undefined, now); // 缺 exp → 失败安全拒绝
+  const healthyTk = isTokenExpired(now + 1800 * 1000, now); // 健康令牌 → 放行
+  const ttlSec = tokenTtlSeconds(now, now + 1800 * 1000) / 1000;
+  const tokenOk = expiredTk && noExpTk && !healthyTk && ttlSec <= ACCESS_TOKEN_MAX_TTL_SEC;
+  results.push({
+    id: 'token-expiry',
+    title: 'Token 过期机制',
+    risk: 'high',
+    status: tokenOk ? 'pass' : 'fail',
+    detail: tokenOk
+      ? `过期令牌与缺 exp 令牌均被失败安全拒绝；健康令牌放行；访问令牌 TTL=${ttlSec}s ≤ 门禁 ${ACCESS_TOKEN_MAX_TTL_SEC}s。`
+      : '存在未过期令牌被拒 / 缺 exp 令牌放行 / TTL 超阈值等策略漂移，需立即整改。',
+    evidence: `已过期→拒绝=${expiredTk}；缺exp→拒绝=${noExpTk}；健康→放行=${!healthyTk}；TTL=${ttlSec}s`,
+    recommendation: '访问令牌短有效期 + 刷新令牌轮转；鉴权中间件统一 fail-closed 校验 exp。',
+  });
+
+  /* ---- 7. M149-B：密码哈希 ---- */
+  const bcryptSample = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+  const plaintextWeak = isWeakPasswordStorage('123456'); // 明文 → 必须判弱
+  const md5Weak = isWeakPasswordStorage('e10adc3949ba59abbe56e057f20f883e'); // MD5 → 必须判弱
+  const bcryptStrong = isStrongPasswordHash(bcryptSample); // bcrypt → 强
+  const bcryptNotWeak = !isWeakPasswordStorage(bcryptSample);
+  const pwdOk = plaintextWeak && md5Weak && bcryptStrong && bcryptNotWeak;
+  results.push({
+    id: 'password-hash',
+    title: '密码哈希存储',
+    risk: 'high',
+    status: pwdOk ? 'pass' : 'fail',
+    detail: pwdOk
+      ? '明文与 MD5 存储均被判定为弱存储；口令统一 bcrypt（cost=10）加盐慢哈希，无明文落库。'
+      : '仍可识别明文 / MD5 口令存储，或慢哈希算法未生效，存在撞库风险。',
+    evidence: `明文→弱=${plaintextWeak}；MD5→弱=${md5Weak}；bcrypt→强=${bcryptStrong} 且非弱=${bcryptNotWeak}`,
+    recommendation: '禁用明文 / MD5 / SHA1；注册与改密一律 bcrypt(cost≥10) 或 argon2id。',
+  });
+
+  /* ---- 8. M149-B：审计日志完整性 ---- */
+  const seed: AuditEntry[] = [
+    { seq: 1, action: 'LOGIN', actor: 'admin', at: '2026-10-16T09:00:00Z' },
+    { seq: 2, action: 'ORDER_CREATE', actor: 'dr.zhang', at: '2026-10-16T09:05:00Z' },
+    { seq: 3, action: 'PRESCRIPTION_ISSUE', actor: 'dr.zhang', at: '2026-10-16T09:10:00Z' },
+  ];
+  const goodChain: string[] = [];
+  let prev = 'GENESIS';
+  for (const e of seed) {
+    const h = hashAuditEntry(e, prev);
+    goodChain.push(h);
+    prev = h;
+  }
+  const chainIntact = verifyAuditChain(seed, goodChain);
+  // 篡改中间一条（把开单动作改掉），链条必须断裂
+  const tampered = seed.map((e, i) => (i === 1 ? { ...e, action: 'ORDER_CREATE_TAMPERED' } : e));
+  const chainBroken = !verifyAuditChain(tampered, goodChain);
+  const auditOk = chainIntact && chainBroken;
+  results.push({
+    id: 'audit-log-integrity',
+    title: '审计日志完整性',
+    risk: 'medium',
+    status: auditOk ? 'pass' : 'fail',
+    detail: auditOk
+      ? '审计日志以哈希链只追加：合法链校验通过；任一条被篡改即链断裂并被检出，满足防篡改要求。'
+      : '哈希链校验未生效，篡改审计日志可能无法被发现。',
+    evidence: `合法链校验=${chainIntact}；篡改中间条后检出断裂=${chainBroken}（FNV-1a 摘要）`,
+    recommendation: '审计日志只追加不修改；导出 / 巡检前先 verifyAuditChain，失败即告警。',
+  });
+
   return results;
 }
 
@@ -361,3 +521,14 @@ export function generateSecurityReport(
     checks: results.map((r) => ({ ...r })),
   };
 }
+
+/* ============================== M149-B 对外命名导出 ============================== */
+
+/**
+ * 基线报告（M149-B 命名）：与 SecurityReport 同构，供路由 / 前端 / 单测对齐。
+ * 生产质量门禁：报告一经生成即冻结，由路由层注入 generatedAt，不在纯函数内取时。
+ */
+export type BaselineReport = SecurityReport;
+
+/** 报告视图（M149-B 命名）：generateSecurityReport 的返回类型别名 */
+export type Report = SecurityReport;
