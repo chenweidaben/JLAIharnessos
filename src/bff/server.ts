@@ -248,6 +248,7 @@ import { openApiRoutes } from './routes/openApi';
 import { adminApiKeysRoutes } from './routes/adminApiKeys';
 import { adminErrorsRoutes } from './routes/adminErrors';
 import { adminConfigRoutes } from './routes/adminConfig';
+import { adminWebhooksRoutes } from './routes/adminWebhooks';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -514,6 +515,7 @@ const allRoutes: RouteDef[] = [
   ...adminApiKeysRoutes,
   ...adminErrorsRoutes,
   ...adminConfigRoutes,
+  ...adminWebhooksRoutes,
   ...strategyEvolutionRoutes,
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
