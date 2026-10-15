@@ -296,6 +296,7 @@ import { adminImportRoutes } from './routes/adminImport';
 import { openApiRoutes } from './routes/openApi';
 import { adminApiKeysRoutes } from './routes/adminApiKeys';
 import { adminErrorsRoutes } from './routes/adminErrors';
+import { errorStatsRoutes } from './routes/errorStats'; // M149-D：错误处理与日志完善 GET /api/v1/admin/errors/stats
 import { adminConfigRoutes } from './routes/adminConfig';
 import { deployConfigRoutes } from './routes/deployConfig'; // M145-D：部署配置生成（生产化收尾）
 import { adminLogsRoutes } from './routes/adminLogs';
@@ -639,6 +640,7 @@ const allRoutes: RouteDef[] = [
   ...openApiRoutes,
   ...adminApiKeysRoutes,
   ...adminErrorsRoutes,
+  ...errorStatsRoutes, // M149-D：错误统计聚合（总量/分级/高频码/高频路径）
   ...adminConfigRoutes,
   ...deployConfigRoutes, // M145-D：部署配置生成（生产化收尾）
   ...wisdomDashboardRoutes, // M146-A：GET /api/v1/admin/wisdom/dashboard（越用越聪明深化）
