@@ -295,6 +295,7 @@ import { apiDocsRoutes } from './routes/apiDocs';
 // 【核心业务深化】M130-A：病历质控智能审核（仅 admin，结果为建议、人工确认）
 import { adminRecordAuditRoutes } from './routes/adminRecordAudit';
 // 【产品化收尾】M132-B：按角色用户操作手册
+import { userManualRoutes } from './routes/userManual';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -569,6 +570,7 @@ const allRoutes: RouteDef[] = [
   ...helpCenterRoutes,
   ...apiDocsRoutes,
   ...adminRecordAuditRoutes,
+  ...userManualRoutes,
 ];
 
 interface Compiled {
