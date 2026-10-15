@@ -15,6 +15,8 @@ import { describe, expect, it } from 'bun:test';
 import { buildDeptMuse, type StaffMuseEntry } from '../../src/bff/aggregators/deptMuseAggregator';
 import {
   buildNewHireOnboarding,
+  buildOnboardingGuide,
+  getOnboardingProgress,
   MAX_TOP_LESSONS,
   MAX_TOP_SUCCESSES,
 } from '../../src/bff/aggregators/onboardingAggregator';
@@ -167,5 +169,135 @@ describe('纯函数：不修改入参', () => {
     buildNewHireOnboarding('doctor', DEPT_CODE, deptMuse);
     expect(muses).toEqual(snapshot);
     expect(deptMuse.deptBaseline).toEqual(baselineSnapshot);
+  });
+});
+
+/* ============================================================================
+ * M134-A · 新员工入职向导（时间轴 4 阶段 + 进度追踪）
+ * ==========================================================================*/
+
+describe('M134-A 引导生成：四阶段时间轴', () => {
+  it('返回 day1/week1/month1/month3 四个阶段，顺序固定', () => {
+    const guide = buildOnboardingGuide('staff-001', 'doctor');
+    expect(guide.stages.map((s) => s.stageKey)).toEqual([
+      'day1',
+      'week1',
+      'month1',
+      'month3',
+    ]);
+  });
+
+  it('每个阶段都有标题、目标与任务，taskId 形如 {stage}-{idx}', () => {
+    const guide = buildOnboardingGuide('staff-001', 'doctor');
+    for (const stage of guide.stages) {
+      expect(stage.title.length).toBeGreaterThan(0);
+      expect(stage.goal.length).toBeGreaterThan(0);
+      expect(stage.tasks.length).toBeGreaterThan(0);
+      stage.tasks.forEach((t, idx) => {
+        expect(t.taskId).toBe(`${stage.stageKey}-${idx + 1}`);
+        expect(t.title.length).toBeGreaterThan(0);
+        expect(t.description.length).toBeGreaterThan(0);
+        expect(t.estimatedHours).toBeGreaterThan(0);
+      });
+    }
+  });
+
+  it('医生岗位总任务数 = 4 + 3 + 2 + 2 = 11', () => {
+    const guide = buildOnboardingGuide('staff-001', 'doctor');
+    expect(guide.totalTasks).toBe(11);
+    expect(guide.stages.reduce((s, st) => s + st.tasks.length, 0)).toBe(11);
+  });
+
+  it('欢迎语包含角色称呼与「90 天路线图」', () => {
+    const guide = buildOnboardingGuide('staff-001', 'doctor');
+    expect(guide.role).toBe('doctor');
+    expect(guide.roleLabel).toBe('医生');
+    expect(guide.welcome).toContain('医生');
+    expect(guide.welcome).toContain('90 天路线图');
+  });
+
+  it('staffId 原样回显', () => {
+    const guide = buildOnboardingGuide('staff-xyz-999', 'nurse');
+    expect(guide.staffId).toBe('staff-xyz-999');
+  });
+});
+
+describe('M134-A 角色差异化', () => {
+  it('医生 / 护士 / 药师的第1周任务文案各不相同', () => {
+    const doc = buildOnboardingGuide('s1', 'doctor');
+    const nur = buildOnboardingGuide('s2', 'nurse');
+    const pha = buildOnboardingGuide('s3', 'pharmacist');
+    const docWeek1 = doc.stages[1].tasks.map((t) => t.title).join('|');
+    const nurWeek1 = nur.stages[1].tasks.map((t) => t.title).join('|');
+    const phaWeek1 = pha.stages[1].tasks.map((t) => t.title).join('|');
+    expect(docWeek1).not.toBe(nurWeek1);
+    expect(nurWeek1).not.toBe(phaWeek1);
+    expect(docWeek1).not.toBe(phaWeek1);
+    // 各自带岗位关键词
+    expect(docWeek1).toContain('病历');
+    expect(nurWeek1).toContain('护理');
+    expect(phaWeek1).toContain('处方');
+  });
+
+  it('管理员岗位第3月任务聚焦运营改进', () => {
+    const admin = buildOnboardingGuide('s4', 'admin');
+    const month3 = admin.stages[3].tasks.map((t) => t.title).join('|');
+    expect(month3).toContain('运营');
+  });
+
+  it('未知角色回落 doctor，不抛错', () => {
+    const g1 = buildOnboardingGuide('s5', '');
+    const g2 = buildOnboardingGuide('s6', undefined);
+    const g3 = buildOnboardingGuide('s7', 'superman');
+    expect(g1.role).toBe('doctor');
+    expect(g2.role).toBe('doctor');
+    expect(g3.role).toBe('doctor');
+    expect(g1.roleLabel).toBe('医生');
+  });
+});
+
+describe('M134-A 进度追踪 getOnboardingProgress', () => {
+  it('第1天任务全部完成（登录即开机）', () => {
+    const p = getOnboardingProgress('staff-001');
+    const day1 = p.stages.find((s) => s.stageKey === 'day1')!;
+    expect(day1.completed).toBe(day1.total);
+  });
+
+  it('百分比落在 0~100 闭区间，且与已完成/总数一致', () => {
+    for (const id of ['a', 'bb', 'ccc', 'staff-001', 'staff-xyz']) {
+      const p = getOnboardingProgress(id);
+      expect(p.percent).toBeGreaterThanOrEqual(0);
+      expect(p.percent).toBeLessThanOrEqual(100);
+      expect(p.completedTasks).toBe(
+        p.stages.reduce((sum, s) => sum + s.completed, 0),
+      );
+      expect(p.totalTasks).toBe(p.stages.reduce((sum, s) => sum + s.total, 0));
+      expect(p.totalTasks).toBe(11);
+    }
+  });
+
+  it('同一 staffId 两次调用结果完全一致（纯函数确定性）', () => {
+    const a = getOnboardingProgress('staff-deterministic');
+    const b = getOnboardingProgress('staff-deterministic');
+    expect(a).toEqual(b);
+  });
+
+  it('智慧度基线固定 20，当前 >= 基线，封顶 100', () => {
+    const p = getOnboardingProgress('staff-001');
+    expect(p.wisdomBaseline).toBe(20);
+    expect(p.wisdomCurrent).toBeGreaterThanOrEqual(p.wisdomBaseline);
+    expect(p.wisdomCurrent).toBeLessThanOrEqual(100);
+  });
+
+  it('currentStage 是第一个未完成阶段', () => {
+    const p = getOnboardingProgress('staff-001');
+    const firstIncomplete = p.stages.find((s) => s.completed < s.total);
+    expect(p.currentStage).toBe(firstIncomplete?.stageKey ?? 'month3');
+  });
+
+  it('空 staffId 也安全兜底，不抛错', () => {
+    const p = getOnboardingProgress('');
+    expect(p.staffId).toBe('');
+    expect(p.stages.length).toBe(4);
   });
 });

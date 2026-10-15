@@ -52,6 +52,7 @@ import { adminTrendsRoutes } from './routes/adminTrends';
 // 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
 import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
+// 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
@@ -271,6 +272,7 @@ import { assistantKnowledgeRoutes } from './routes/assistantKnowledge';
 import { assistantLlmChatRoutes } from './routes/assistantLlmChat';
 import { patientGuideRoutes } from './routes/patientGuide';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
+// 【用户体验深化】M134-B：医生成长档案（月度快照表驱动，成长曲线+雷达+同科室对比）
 import { userSettingsRoutes } from './routes/userSettings';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -285,6 +287,7 @@ import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
 import { museOnboardingRoutes } from './routes/museOnboarding';
+import { onboardingRoutes } from './routes/onboarding';
 import { museNurseRoutes } from './routes/museNurse';
 import { museHospitalRoutes } from './routes/museHospital';
 import { musePharmaRoutes } from './routes/musePharma';
@@ -566,6 +569,7 @@ const allRoutes: RouteDef[] = [
   ...museRecommendRoutes,
   ...smokeTestRoutes,
   ...museOnboardingRoutes,
+  ...onboardingRoutes,
   ...museNurseRoutes,
   ...museHospitalRoutes,
   ...musePharmaRoutes,
