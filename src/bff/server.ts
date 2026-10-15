@@ -115,6 +115,7 @@ import { scheduleSlotRoutes } from './routes/scheduleSlot';
 import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientBillingRoutes } from './routes/patientBilling';
+import { patientProfileRoutes } from './routes/patientProfile';
 import { rehabTreatmentRoutes } from './routes/rehabTreatment';
 import { painClinicRoutes } from './routes/painClinic';
 import { cgaRoutes } from './routes/cga';
@@ -301,6 +302,7 @@ const allRoutes: RouteDef[] = [
   ...reportPushRoutes,
   ...patientNotificationRoutes,
   ...patientBillingRoutes,
+  ...patientProfileRoutes,
   ...rehabTreatmentRoutes,
   ...painClinicRoutes,
 ...cgaRoutes,
