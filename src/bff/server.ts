@@ -43,6 +43,7 @@ import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 // 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
+import { perfOptimizeRoutes } from './routes/perfOptimize';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
@@ -595,6 +596,7 @@ const allRoutes: RouteDef[] = [
   ...adminPerformanceRoutes,
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
+  ...perfOptimizeRoutes, // M151-D：慢查询优化闭环（N+1/索引/物化视图）GET /api/v1/admin/performance/optimize
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
   ...accessibilityVerifyRoutes, // M151-B：GET /api/v1/admin/ui/accessibility/verify（对比度修复 + WCAG AA 复验）
