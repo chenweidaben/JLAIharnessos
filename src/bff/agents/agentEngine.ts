@@ -32,6 +32,7 @@ import {
 import { getAgentEntry } from './agentRegistry';
 import { splitForSummary } from './contextSummary';
 import { recordCall } from './agentMetrics';
+import { getAgentContext, recordAgentTurnFeedback } from './agentContext';
 
 /** 拉取历史的窗口：超阈值后用于覆盖早期对话做规则压缩 */
 const CONTEXT_FETCH_LIMIT = 200;
@@ -43,6 +44,8 @@ export interface RunAgentTurnInput {
   userMessage: string;
   idempotencyKey?: string;
   confirmed?: boolean;
+  /** 当前登录医生科室编码（可空）：用于拉取科室知识段学习上下文 */
+  deptCode?: string;
 }
 
 export interface PendingApprovalInfo {
@@ -112,7 +115,17 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
     (m) => m.id !== userRow.id,
   );
   const { recent, summary } = splitForSummary(history);
+  // 3.5 学习上下文注入（依据宪法第三章：三路学习数据各自降级，脱敏快照，
+  //     失败不阻断主流程）：患者画像 > 医生偏好 > 科室知识，拼到 system 段。
+  const learningCtx = await getAgentContext(
+    userId,
+    session.patient_id,
+    input.deptCode,
+  );
   const messages: ChatMessage[] = [{ role: 'system', content: agent.system_prompt }];
+  if (learningCtx.contextText) {
+    messages.push({ role: 'system', content: learningCtx.contextText });
+  }
   if (summary) {
     messages.push({ role: 'system', content: summary });
     // 摘要落库（写 sessions.context_summary，不进入消息流）
@@ -201,6 +214,19 @@ export async function runAgentTurn(input: RunAgentTurnInput): Promise<RunAgentTu
   const reply = [modelReply.content, ...toolNotes, citationBlock].filter(Boolean).join('\n\n');
   await appendMessage({ sessionId, role: 'agent', content: reply, confidence, disclaimer });
   newMessages.push({ role: 'agent', content: reply });
+
+  // 7.5 回合级反馈落库（依据宪法第三章）：fire-and-forget 写
+  //     medmuse.ai_feedback_log（222），独立 suggestion_type 成桶、
+  //     不 await、写失败仅告警，绝不阻塞诊疗主流程。
+  recordAgentTurnFeedback({
+    agentRole: agent.role_code,
+    patientId: session.patient_id,
+    contextSnapshot: {
+      deptCode: input.deptCode ?? null,
+      contextEmpty: learningCtx.empty,
+      contextLength: learningCtx.contextText.length,
+    },
+  });
 
   await touchSession(sessionId);
 

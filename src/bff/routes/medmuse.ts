@@ -221,6 +221,7 @@ export const medmuseRoutes: RouteDef[] = [
           userMessage: content,
           idempotencyKey: idemKey,
           confirmed: body?.confirmed ?? false,
+          deptCode: view.deptCode,
         });
         return json(ok(result));
       } catch (err) {
