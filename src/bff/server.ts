@@ -50,6 +50,7 @@ import { adminInfectionAlertsRoutes } from './routes/adminInfectionAlerts';
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
 // 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
+import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
@@ -495,6 +496,7 @@ const allRoutes: RouteDef[] = [
   ...adminInfectionAlertsRoutes,
   ...adminMigrationsRoutes,
   ...adminTrendsRoutes,
+  ...adminIntelligenceScoreRoutes,
   ...mobileQuickActionsRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
