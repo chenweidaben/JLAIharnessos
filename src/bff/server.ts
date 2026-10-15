@@ -196,6 +196,7 @@ import { drugReviewRoutes } from './routes/drugReview';
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
 import { assistantPharmacyRoutes } from './routes/assistantPharmacy';
+import { assistantLabRoutes } from './routes/assistantLab';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
 import { deptKnowledgeRoutes } from './routes/deptKnowledge';
@@ -225,6 +226,9 @@ import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
 import { assistantInpatientRoutes } from './routes/assistantInpatient';
+import { assistantEmergencyRoutes } from './routes/assistantEmergency';
+import { assistantSurgeryRoutes } from './routes/assistantSurgery';
+import { assistantInsuranceRoutes } from './routes/assistantInsurance';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
@@ -440,6 +444,7 @@ const allRoutes: RouteDef[] = [
   ...drugInventoryRoutes,
   ...prescriptionReviewRoutes,
   ...assistantPharmacyRoutes,
+  ...assistantLabRoutes,
   ...insuranceAuditRoutes,
   ...drgAuditRoutes,
   ...emrLevel5Routes,
@@ -457,6 +462,9 @@ const allRoutes: RouteDef[] = [
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
   ...assistantInpatientRoutes,
+  ...assistantEmergencyRoutes,
+  ...assistantSurgeryRoutes,
+  ...assistantInsuranceRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
