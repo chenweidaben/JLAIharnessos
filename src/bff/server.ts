@@ -245,6 +245,7 @@ import { assistantInpatientRoutes } from './routes/assistantInpatient';
 import { assistantEmergencyRoutes } from './routes/assistantEmergency';
 import { assistantSurgeryRoutes } from './routes/assistantSurgery';
 import { assistantInsuranceRoutes } from './routes/assistantInsurance';
+import { assistantKnowledgeRoutes } from './routes/assistantKnowledge';
 import { patientGuideRoutes } from './routes/patientGuide';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
@@ -498,6 +499,7 @@ const allRoutes: RouteDef[] = [
   ...assistantEmergencyRoutes,
   ...assistantSurgeryRoutes,
   ...assistantInsuranceRoutes,
+  ...assistantKnowledgeRoutes,
   ...patientGuideRoutes,
   ...doctorPreferenceRoutes,
   ...learningDashboardRoutes,
