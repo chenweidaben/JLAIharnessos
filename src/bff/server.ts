@@ -278,6 +278,7 @@ import { followUpRoutes } from './routes/followUps';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
+import { federatedKnowledgeRoutes } from './routes/federatedKnowledge';
 import { museSearchRoutes } from './routes/museSearch';
 import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
@@ -557,6 +558,7 @@ const allRoutes: RouteDef[] = [
   ...weightEvolutionRoutes,
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
+  ...federatedKnowledgeRoutes,
   ...museSearchRoutes,
   ...museAskRoutes,
   ...museRecommendRoutes,
