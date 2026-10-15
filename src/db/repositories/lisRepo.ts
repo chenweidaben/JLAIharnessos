@@ -15,6 +15,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { buildSafeSetClause } from './helpers.js';
 import type { AbnormalFlag } from '../../medical-tools/lab/lisWorkflow.js';
 
 // ---------------------------------------------------------------------------
@@ -355,19 +356,28 @@ export async function listRequests(
   return (rows as Record<string, unknown>[]).map((r) => mapRequest(r));
 }
 
-/** 通用动态 UPDATE（状态推进与取消等共用）。 */
+/** lab_requests 允许动态更新的列白名单 */
+const LAB_REQUEST_WRITABLE = new Set([
+  'status',
+  'cancelled_by',
+  'cancelled_at',
+  'cancel_reason',
+  'accepted_at',
+  'completed_at',
+  'reported_at',
+]);
+
+/** 通用动态 UPDATE（状态推进与取消等共用，列名走白名单防注入）。 */
 export async function patchRequest(
   id: string,
   fields: Record<string, unknown>,
   tx: DbExecutor,
 ): Promise<LabRequest> {
-  const cols = Object.keys(fields);
-  const setClause = cols.map((k, i) => `${k} = $${i + 1}`).join(', ');
-  const values = Object.values(fields);
+  const { clause, params } = buildSafeSetClause(LAB_REQUEST_WRITABLE, fields, 0);
   const rows = await tx.unsafe(
-    `UPDATE clinical.lab_requests SET ${setClause}, updated_at = now()
-     WHERE id = $${cols.length + 1} RETURNING ${REQUEST_COLS}`,
-    [...values, id],
+    `UPDATE clinical.lab_requests SET ${clause}, updated_at = now()
+     WHERE id = $${params.length + 1} RETURNING ${REQUEST_COLS}`,
+    [...params, id],
   );
   return mapRequest(rows[0] as Record<string, unknown>);
 }
@@ -460,18 +470,29 @@ export async function lockSpecimenById(id: string, tx: DbExecutor): Promise<LabS
   return rows.length > 0 ? mapSpecimen(rows[0] as Record<string, unknown>) : null;
 }
 
+/** lab_specimens 允许动态更新的列白名单 */
+const LAB_SPECIMEN_WRITABLE = new Set([
+  'status',
+  'collected_by',
+  'collected_at',
+  'collection_site',
+  'received_by',
+  'received_at',
+  'rejected_by',
+  'rejected_at',
+  'reject_reason',
+]);
+
 export async function patchSpecimen(
   id: string,
   fields: Record<string, unknown>,
   tx: DbExecutor,
 ): Promise<LabSpecimen> {
-  const cols = Object.keys(fields);
-  const setClause = cols.map((k, i) => `${k} = $${i + 1}`).join(', ');
-  const values = Object.values(fields);
+  const { clause, params } = buildSafeSetClause(LAB_SPECIMEN_WRITABLE, fields, 0);
   const rows = await tx.unsafe(
-    `UPDATE clinical.lab_specimens SET ${setClause}, updated_at = now()
-     WHERE id = $${cols.length + 1} RETURNING ${SPECIMEN_COLS}`,
-    [...values, id],
+    `UPDATE clinical.lab_specimens SET ${clause}, updated_at = now()
+     WHERE id = $${params.length + 1} RETURNING ${SPECIMEN_COLS}`,
+    [...params, id],
   );
   return mapSpecimen(rows[0] as Record<string, unknown>);
 }

@@ -16,7 +16,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
-import { toJson } from './helpers.js';
+import { buildSafeSetClause, toJson } from './helpers.js';
 
 // ---------------------------------------------------------------------------
 // 目录：检查项目 / 设备 / 时段
@@ -394,19 +394,29 @@ export async function listRequests(
   return (rows as Record<string, unknown>[]).map((r) => mapRequest(r));
 }
 
-/** 通用动态 UPDATE（状态推进与取消等共用）。 */
+/** imaging_requests 允许动态更新的列白名单 */
+const IMAGING_REQUEST_WRITABLE = new Set([
+  'status',
+  'cancelled_by',
+  'cancelled_at',
+  'cancel_reason',
+  'scheduled_at',
+  'arrived_at',
+  'started_at',
+  'completed_at',
+]);
+
+/** 通用动态 UPDATE（状态推进与取消等共用，列名走白名单防注入）。 */
 export async function patchRequest(
   id: string,
   fields: Record<string, unknown>,
   tx: DbExecutor,
 ): Promise<ImagingRequest> {
-  const cols = Object.keys(fields);
-  const setClause = cols.map((k, i) => `${k} = $${i + 1}`).join(', ');
-  const values = Object.values(fields);
+  const { clause, params } = buildSafeSetClause(IMAGING_REQUEST_WRITABLE, fields, 0);
   const rows = await tx.unsafe(
-    `UPDATE clinical.imaging_requests SET ${setClause}, updated_at = now()
-     WHERE id = $${cols.length + 1} RETURNING ${REQUEST_COLS}`,
-    [...values, id],
+    `UPDATE clinical.imaging_requests SET ${clause}, updated_at = now()
+     WHERE id = $${params.length + 1} RETURNING ${REQUEST_COLS}`,
+    [...params, id],
   );
   return mapRequest(rows[0] as Record<string, unknown>);
 }

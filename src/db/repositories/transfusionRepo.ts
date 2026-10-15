@@ -14,6 +14,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { buildSafeSetClause } from './helpers.js';
 
 export type TransfusionStatus =
   | 'requested' | 'crossmatched' | 'dispensed' | 'transfusing'
@@ -157,18 +158,31 @@ export async function listRequests(sql?: DbExecutor): Promise<TransfusionRequest
   return rows.map((r: Record<string, unknown>) => mapRow(r));
 }
 
+/** blood_transfusion_requests 允许动态更新的列白名单 */
+const TRANSFUSION_REQUEST_WRITABLE = new Set([
+  'status',
+  'batch_no',
+  'dispensed_by',
+  'dispensed_at',
+  'transfused_by',
+  'co_sign_by',
+  'started_at',
+  'completed_at',
+  'cancelled_by',
+  'cancelled_at',
+  'cancel_reason',
+]);
+
 export async function patchRequest(
   id: string,
   fields: Record<string, unknown>,
   tx: DbExecutor,
 ): Promise<TransfusionRequest> {
-  const cols = Object.keys(fields);
-  const setClause = cols.map((k, i) => `${k} = $${i + 1}`).join(', ');
-  const values = Object.values(fields);
+  const { clause, params } = buildSafeSetClause(TRANSFUSION_REQUEST_WRITABLE, fields, 0);
   const rows = await tx.unsafe(
-    `UPDATE clinical.blood_transfusion_requests SET ${setClause}, updated_at = now()
-     WHERE id = $${cols.length + 1} RETURNING ${COLS}`,
-    [...values, id],
+    `UPDATE clinical.blood_transfusion_requests SET ${clause}, updated_at = now()
+     WHERE id = $${params.length + 1} RETURNING ${COLS}`,
+    [...params, id],
   );
   return mapRow(rows[0]);
 }

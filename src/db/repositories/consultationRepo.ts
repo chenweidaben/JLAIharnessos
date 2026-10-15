@@ -9,6 +9,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { buildSafeSetClause } from './helpers.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -239,20 +240,31 @@ export async function createSession(
  * 条件式状态推进：仅当当前状态在 fromStatus 白名单内才更新。
  * 返回更新后的会话；状态不匹配返回 null（由聚合器转 409）。
  */
+/** consultation_sessions 允许动态更新的列白名单 */
+const SESSION_WRITABLE = new Set([
+  'status',
+  'doctor_id',
+  'department',
+  'chief_complaint',
+  'last_visit_id',
+  'last_visit_at',
+  'eligibility_passed',
+]);
+
 export async function advanceSession(
   id: string,
   fromStatus: ConsultationStatus[],
   patch: Record<string, unknown>,
   tx: DbExecutor,
 ): Promise<ConsultationSession | null> {
-  const keys = Object.keys(patch);
-  const sets = keys.map((k, i) => `${k} = $${i + 3}`).join(', ');
+  // 占位符：id=$1、fromStatus=$2，patch 值从 $3 起
+  const { clause, params } = buildSafeSetClause(SESSION_WRITABLE, patch, 2);
   const rows = await tx.unsafe(
     `UPDATE clinical.consultation_sessions
-       SET ${sets}
+       SET ${clause}
      WHERE id = $1 AND status = ANY($2)
      RETURNING ${SESSION_COLS}`,
-    [id, fromStatus, ...keys.map((k) => patch[k])],
+    [id, fromStatus, ...params],
   );
   return rows.length > 0 ? mapSession(rows[0] as Record<string, unknown>) : null;
 }

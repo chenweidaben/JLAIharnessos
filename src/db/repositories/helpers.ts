@@ -49,6 +49,38 @@ export function toJson<T>(obj: T): any {
   return JSON.parse(JSON.stringify(obj));
 }
 
+/** 列标识符安全校验：仅允许小写字母开头、字母数字下划线（防 SQL 注入） */
+const IDENT_RE = /^[a-z][a-z0-9_]{0,62}$/;
+
+/**
+ * 安全构造动态 UPDATE 的 SET 子句。
+ *
+ * 安全模型：列名（标识符）必须命中白名单 allowed 且通过标识符正则校验，
+ * 否则直接抛错（fail-closed）；值一律走参数占位符 $n，杜绝拼接注入。
+ *
+ * @param allowed 允许更新的列名白名单
+ * @param fields 待更新字段（键为列名，值为绑定参数）
+ * @param valueOffset 占位符起始序号（默认 0，即第一个值为 $1）
+ * @returns clause（`col = $n, ...`）与按序排列的 params
+ */
+export function buildSafeSetClause(
+  allowed: ReadonlySet<string>,
+  fields: Record<string, unknown>,
+  valueOffset = 0,
+): { clause: string; params: unknown[] } {
+  const entries = Object.entries(fields);
+  const sets: string[] = [];
+  const params: unknown[] = [];
+  for (const [col, value] of entries) {
+    if (!allowed.has(col) || !IDENT_RE.test(col)) {
+      throw new Error(`[db] 禁止更新的列：${col}`);
+    }
+    params.push(value);
+    sets.push(`${col} = $${valueOffset + params.length}`);
+  }
+  return { clause: sets.join(', '), params };
+}
+
 /** 执行动态 SELECT 查询 */
 export async function dynamicSelect<T>(
   sql: DbExecutor,

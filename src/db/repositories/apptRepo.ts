@@ -8,6 +8,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { buildSafeSetClause } from './helpers.js';
 
 export type ApptStatus = 'scheduled' | 'confirmed' | 'completed' | 'absent' | 'cancelled';
 
@@ -106,12 +107,21 @@ export async function listAppts(sql?: DbExecutor): Promise<Appointment[]> {
   return (rows as Record<string, unknown>[]).map(mapA);
 }
 
+/** appointments 允许动态更新的列白名单（其余列禁止写入，防 SQL 注入） */
+const APPT_WRITABLE = new Set([
+  'status',
+  'visit_id',
+  'cancel_reason',
+  'scheduled_at',
+  'department',
+  'purpose',
+]);
+
 export async function patchAppt(id: string, p: Record<string, unknown>, tx: DbExecutor): Promise<Appointment> {
-  const keys = Object.keys(p);
-  const sets = keys.map((k, i) => `${k} = $${i + 2}`);
+  const { clause, params } = buildSafeSetClause(APPT_WRITABLE, p, 1);
   const rows = await tx.unsafe(
-    `UPDATE clinical.appointments SET ${sets.join(', ')} WHERE id = $1 RETURNING ${ACOLS}`,
-    [id, ...keys.map((k) => p[k])],
+    `UPDATE clinical.appointments SET ${clause} WHERE id = $1 RETURNING ${ACOLS}`,
+    [id, ...params],
   );
   return mapA(rows[0] as Record<string, unknown>);
 }

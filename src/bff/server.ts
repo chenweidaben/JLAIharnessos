@@ -12,6 +12,7 @@
 import { attachUser, newCtx, requireAuth, verifyJwt } from './middleware/auth';
 import { verifyCsrf } from './middleware/csrf';
 import { withErrorHandler } from './middleware/error';
+import { auditOperation } from './middleware/audit';
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
@@ -660,6 +661,8 @@ async function handleFetch(
     );
   } finally {
     logRequest(ctx, status, startedAt);
+    // 操作审计（POST/PUT/DELETE 才留痕，fire-and-forget，失败不影响主请求）
+    auditOperation(ctx);
     recordHttpRequest({
       method: req.method,
       route: routeLabel,

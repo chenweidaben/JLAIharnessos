@@ -24,6 +24,7 @@ import {
   revokeByRefreshJti,
 } from '@/db/repositories/sessionRepo';
 import { recordLoginAttempt } from '@/db/repositories/loginAttemptRepo';
+import { loginRateLimit } from '../middleware/rateLimit';
 import { markSessionRevoked } from '../middleware/sessionGuard';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { getMfaService } from '../mfaRuntime.js';
@@ -163,6 +164,10 @@ export const authRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/auth/login',
     handle: async (c: Ctx) => {
+      // 登录专用限流：5 次/分钟/IP（防暴力破解/撞库）
+      const limited = loginRateLimit(c);
+      if (limited) return limited;
+
       const body = await c.body<{ username?: string; password?: string }>();
       if (!body.username || !body.password) {
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码缺失'), 400);
