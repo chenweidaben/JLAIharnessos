@@ -18,6 +18,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb } from '@/db/pool.js';
+import { getEnv } from '../config/env.js';
 import type { AuthView } from '../view/userView.js';
 
 export class EmrGrade5Error extends Error {
@@ -285,10 +286,13 @@ function toDimensionScores(rows: RawRow[]): DimensionScore[] {
 
 /**
  * listView：读取八维度最新自评结果。
- * 权限：emr_level5:view。表为空（或查询失败）时返回演示基线，demo=true。
+ * 权限：emr_level5:view。DEMO_MODE 直接返回内存演示基线；
+ * 真实模式下表为空（或查询失败）时同样回退演示基线，demo=true，绝不向路由层抛 500。
  */
 export async function listView(view: AuthView): Promise<Grade5Assessment> {
   assertPermission(view);
+  // DEMO_MODE：短路，避免 getDb() 在无 PG 环境下建池/连库
+  if (getEnv().demoMode) return demoAssessment();
   const rows = await loadLatestRows();
   if (rows.length === 0) return demoAssessment();
 
@@ -336,6 +340,17 @@ export async function submitView(
       suggestions: generateSuggestions(meta.key, ratio),
     };
   });
+
+  // DEMO_MODE：跳过写库，直接返回本次计算视图（demo:true 不持久化）
+  if (getEnv().demoMode) {
+    return {
+      demo: true,
+      assessedAt: null,
+      totalScore: Math.round(computed.reduce((s, d) => s + d.score, 0) * 100) / 100,
+      maxTotal: computed.reduce((s, d) => s + d.maxScore, 0),
+      dimensions: computed,
+    };
+  }
 
   try {
     const db = getDb();

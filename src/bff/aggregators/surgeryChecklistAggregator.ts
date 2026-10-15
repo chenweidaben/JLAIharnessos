@@ -17,6 +17,7 @@ import {
   type SafetyChecklistPhase,
   type SafetyChecklistRow,
 } from '../../db/repositories/safetyChecklistRepo.js';
+import { getEnv } from '../config/env.js';
 
 export class SafetyChecklistError extends Error {
   constructor(public status: number, message: string) {
@@ -111,10 +112,23 @@ function toPhaseView(row: SafetyChecklistRow | undefined, phase: SafetyChecklist
   };
 }
 
+/**
+ * DEMO_MODE 下的兜底视图：四阶段全部返回默认未签署项，不落库。
+ * 用于无 PG 的演示环境，保证 GET 接口不抛 500。
+ */
+function demoChecklistView(surgeryId: string): ChecklistView {
+  return {
+    surgeryId,
+    phases: CHECKLIST_PHASES.map((p) => toPhaseView(undefined, p.phase)),
+  };
+}
+
 /** GET：按手术汇总四阶段核查清单（未签署阶段返回默认项供勾选）。 */
 export async function listView(user: { id: string } | null, surgeryId: string): Promise<ChecklistView> {
   if (!user?.id) throw unauthorized('未登录');
   if (!surgeryId) throw badRequest('surgeryId 不能为空');
+  // DEMO_MODE：跳过 repo，直接返回内存默认清单，避免无 PG 环境下 500
+  if (getEnv().demoMode) return demoChecklistView(surgeryId);
   const rows = await listBySurgery(surgeryId);
   const byPhase = new Map(rows.map((r) => [r.phase, r]));
   return {
@@ -143,6 +157,18 @@ export async function signView(
   }
   const items = Array.isArray(input.items) ? input.items : defaultChecklist(phase);
   if (!items.length) throw badRequest('核查项不能为空');
+  // DEMO_MODE：跳过 upsertSigned 落库，直接回显已签署态，保证演示不崩
+  if (getEnv().demoMode) {
+    const demoRow: SafetyChecklistRow = {
+      id: `demo-${surgeryId}-${phase}`,
+      surgeryId,
+      phase,
+      items,
+      signedBy: user.id,
+      signedAt: new Date().toISOString(),
+    };
+    return toPhaseView(demoRow, phase);
+  }
   const row = await upsertSigned({ surgeryId, phase, items, signedBy: user.id });
   return toPhaseView(row, phase);
 }

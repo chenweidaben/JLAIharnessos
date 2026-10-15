@@ -700,6 +700,13 @@ async function initDatabase(): Promise<void> {
 
 const port = Number(process.env.HTTP_PORT ?? 8080);
 
+// 启动横幅：明确打印 DEMO_MODE 状态，便于运维在日志第一行识别运行模式
+// eslint-disable-next-line no-console
+console.log(
+  `[jianlan-bff] starting  nodeEnv=${(process.env.NODE_ENV ?? 'development')}  ` +
+    `DEMO_MODE=${getEnv().demoMode ? 'ON (内存演示数据，不连 PG)' : 'OFF (连 PostgreSQL)'}`,
+);
+
 void initDatabase().then(() => {
   // eslint-disable-next-line no-console
   console.log(
