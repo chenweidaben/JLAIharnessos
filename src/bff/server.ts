@@ -131,6 +131,7 @@ import { erTriageRoutes } from './routes/erTriage';
 import { barthelRoutes } from './routes/barthel';
 import { equipmentRoutes } from './routes/equipment';
 import { logisticsRoutes } from './routes/logistics';
+import { regionalCoopRoutes } from './routes/regionalCoop'; // M143-D：区域医疗协同（互联网医院与远程医疗）
 import { erGreenRoutes } from './routes/erGreen';
 import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
@@ -425,6 +426,7 @@ const allRoutes: RouteDef[] = [
   ...barthelRoutes,
   ...equipmentRoutes,
   ...logisticsRoutes,
+  ...regionalCoopRoutes, // M143-D：区域医疗协同（互联网医院与远程医疗）
   ...erGreenRoutes,
   ...chronicRoutes,
   ...patientChronicRoutes,
