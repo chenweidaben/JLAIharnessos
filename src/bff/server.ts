@@ -230,6 +230,7 @@ import { systemHealthRoutes } from './routes/systemHealth';
 import { agentHealthRoutes } from './routes/agentHealth';
 import { notifyConfigRoutes } from './routes/notifyConfig';
 import { insuranceAuditRoutes } from './routes/insuranceAudit';
+import { adminInsuranceReviewRoutes } from './routes/adminInsuranceReview';
 import { drgAuditRoutes } from './routes/drgAudit';
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
@@ -501,6 +502,7 @@ const allRoutes: RouteDef[] = [
   ...assistantDiagnosisRoutes,
   ...assistantRecordDraftRoutes,
   ...insuranceAuditRoutes,
+  ...adminInsuranceReviewRoutes,
   ...drgAuditRoutes,
   ...emrLevel5Routes,
   ...emrGrade5Routes,
