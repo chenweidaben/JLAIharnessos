@@ -268,6 +268,7 @@ import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
+import { followUpRoutes } from './routes/followUps';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
@@ -540,6 +541,7 @@ const allRoutes: RouteDef[] = [
   ...learningDashboardRoutes,
   ...museHomeRoutes,
   ...followupLearningRoutes,
+  ...followUpRoutes,
   ...weightEvolutionRoutes,
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
