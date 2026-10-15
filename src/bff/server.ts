@@ -93,6 +93,7 @@ import { drgRoutes } from './routes/drg';
 import { exportRoutes } from './routes/export';
 import { labInterpretRoutes } from './routes/labInterpret';
 import { imagingInterpretRoutes } from './routes/imagingInterpret';
+import { imagingAiRoutes } from './routes/imagingAi';
 import { criticalRoutes } from './routes/critical';
 import { criticalValueClosureRoutes } from './routes/criticalValueClosure';
 import { reconRoutes } from './routes/recon';
@@ -315,6 +316,7 @@ import { apiDocsRoutes } from './routes/apiDocs';
 import { adminRecordAuditRoutes } from './routes/adminRecordAudit';
 // 【产品化收尾】M132-B：按角色用户操作手册
 import { userManualRoutes } from './routes/userManual';
+// 【新业务场景】M138-B：电子签名（病历/处方/手术同意书）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -366,6 +368,7 @@ const allRoutes: RouteDef[] = [
   ...exportRoutes,
   ...labInterpretRoutes,
   ...imagingInterpretRoutes,
+  ...imagingAiRoutes,
   ...criticalRoutes,
   ...criticalValueClosureRoutes,
   ...reconRoutes,
