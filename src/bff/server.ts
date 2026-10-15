@@ -289,6 +289,7 @@ import { museSearchRoutes } from './routes/museSearch';
 import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
+import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
 import { museNurseRoutes } from './routes/museNurse';
@@ -574,6 +575,7 @@ const allRoutes: RouteDef[] = [
   ...museAskRoutes,
   ...museRecommendRoutes,
   ...smokeTestRoutes,
+  ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,
   ...museNurseRoutes,
