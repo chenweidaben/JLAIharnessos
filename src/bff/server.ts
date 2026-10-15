@@ -318,6 +318,8 @@ import { adminRecordAuditRoutes } from './routes/adminRecordAudit';
 import { userManualRoutes } from './routes/userManual';
 // 【新业务场景】M138-B：电子签名（病历/处方/手术同意书）
 import { eSignatureRoutes } from './routes/eSignature';
+// 【新业务场景】M138-C：医院内部即时通讯（IM）
+import { imRoutes } from './routes/im';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -593,6 +595,7 @@ const allRoutes: RouteDef[] = [
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...eSignatureRoutes, // M138-B：电子签名 POST /sign + GET /verify/:id
+  ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,
