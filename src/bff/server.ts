@@ -42,10 +42,12 @@ import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
+// 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
 import { uiConsistencyRoutes } from './routes/uiConsistency';
+// 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -350,6 +352,8 @@ import { e2eTestRoutes } from './routes/e2eTest';
 import { testCoverageRoutes } from './routes/testCoverage';
 // 【测试覆盖率冲刺 80%→90%】M150-A：覆盖率报告 + 缺口识别（仅 admin，90% 门禁）
 import { coverageReportRoutes } from './routes/coverageReport';
+// 【质量补齐与新场景】M151-A：覆盖率明细 + 函数级缺口定位（仅 admin，90%+ 门禁）
+import { coverageDetailRoutes } from './routes/coverageDetail';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 // 【安全】M149-B：安全基线报告（七项：写认证/SQL/XSS/PII/错误/token/密码哈希/审计链）
 import { securityReportRoutes } from './routes/securityReport';
@@ -691,6 +695,7 @@ const allRoutes: RouteDef[] = [
   ...smokeTestRoutes,
   ...e2eTestRoutes, // M137-D：GET /api/v1/admin/test/e2e 关键业务流程 E2E
   ...coverageReportRoutes, // M150-A：GET /api/v1/admin/test/coverage（90% 冲刺报告，先于旧 testCoverage 路由命中）
+  ...coverageDetailRoutes, // M151-A：GET /api/v1/admin/test/coverage/detailed（函数级缺口定位）
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
