@@ -74,6 +74,7 @@ import { criticalValueClosureRoutes } from './routes/criticalValueClosure';
 import { reconRoutes } from './routes/recon';
 import { surgeryRoutes } from './routes/surgery';
 import { surgeryScheduleRoutes } from './routes/surgerySchedule';
+import { surgeryChecklistRoutes } from './routes/surgeryChecklist';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
 import { vteRoutes } from './routes/vte';
@@ -87,6 +88,7 @@ import { medAdminRoutes } from './routes/medAdmin';
 import { tubeCareRoutes } from './routes/tubeCare';
 import { nursingEventReviewRoutes } from './routes/nursingEventReview';
 import { nursingIoRoutes } from './routes/nursingIo';
+import { nursingNqiRoutes } from './routes/nursingNqi';
 import { nutritionScreeningRoutes } from './routes/nutritionScreening';
 import { painAssessmentRoutes } from './routes/painAssessment';
 import { preopAssessmentRoutes } from './routes/preopAssessment';
@@ -250,6 +252,7 @@ const allRoutes: RouteDef[] = [
   ...reconRoutes,
   ...surgeryRoutes,
   ...surgeryScheduleRoutes,
+  ...surgeryChecklistRoutes,
   ...transfusionRoutes,
   ...bloodQualityRoutes,
   ...vteRoutes,
@@ -263,6 +266,7 @@ const allRoutes: RouteDef[] = [
   ...tubeCareRoutes,
   ...nursingEventReviewRoutes,
   ...nursingIoRoutes,
+  ...nursingNqiRoutes,
   ...nutritionScreeningRoutes,
   ...painAssessmentRoutes,
   ...preopAssessmentRoutes,
