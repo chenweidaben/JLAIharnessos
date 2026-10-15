@@ -19,6 +19,10 @@ import {
   resolveNode,
   asRelation,
   GRAPH_DISCLAIMER,
+  queryDiseaseGraph,
+  findDifferentialDiagnosis,
+  edgeQualifier,
+  NODE_TYPE_LABELS,
   type MedicalGraphRelation,
 } from '../../src/bff/aggregators/medicalGraphAggregator';
 
@@ -182,5 +186,120 @@ describe('关系词典与医疗安全', () => {
 
   it('免责声明固定输出（医疗安全红线）', () => {
     expect(GRAPH_DISCLAIMER).toContain('不构成医疗建议');
+  });
+});
+
+/* ===================== M147-A 知识图谱与患者教育深化 ===================== */
+
+describe('M147-A 节点/关系扩展：科室与就诊路径', () => {
+  it('节点类型新增 department（科室）', () => {
+    expect(NODE_TYPE_LABELS.department).toBe('科室');
+    const types = new Set(GRAPH_NODES.map((n) => n.type));
+    expect(types.has('department')).toBe(true);
+  });
+
+  it('存在疾病→科室边（首诊/转诊）', () => {
+    const deptEdges = GRAPH_EDGES.filter((e) => e.relation === 'disease_visit_department');
+    expect(deptEdges.length).toBeGreaterThan(0);
+    // 至少一条首诊、至少一条转诊
+    expect(deptEdges.some((e) => edgeQualifier(e) === '首诊')).toBe(true);
+    expect(deptEdges.some((e) => edgeQualifier(e) === '转诊')).toBe(true);
+  });
+
+  it('每条疾病出边带 qualifier（常见/一线/必做/首诊）', () => {
+    const dhtn = GRAPH_EDGES.filter((e) => e.source === 'D-HTN');
+    expect(dhtn.some((e) => edgeQualifier(e) === '常见')).toBe(true);
+    expect(dhtn.some((e) => edgeQualifier(e) === '一线')).toBe(true);
+    expect(dhtn.some((e) => edgeQualifier(e) === '必做')).toBe(true);
+    expect(dhtn.some((e) => edgeQualifier(e) === '首诊')).toBe(true);
+  });
+});
+
+describe('M147-A queryDiseaseGraph 疾病全景图', () => {
+  it('按疾病 id 返回分桶视图：冠心病含一线用药与首诊科室', () => {
+    const g = queryDiseaseGraph('D-CHD');
+    expect(g.matched).toBe(true);
+    expect(g.disease?.name).toBe('冠心病');
+    // 一线用药含阿司匹林
+    expect(g.firstLineDrugs.some((e) => e.target === 'M-ASA')).toBe(true);
+    // 首诊科室含心血管内科
+    expect(g.firstVisitDepartments.some((e) => e.target === 'DPT-XGNK')).toBe(true);
+    // 必做检查含心电图
+    expect(g.requiredExams.some((e) => e.target === 'E-ECG')).toBe(true);
+  });
+
+  it('支持中文名模糊定位：「高血压」命中 D-HTN', () => {
+    const g = queryDiseaseGraph('高血压');
+    expect(g.matched).toBe(true);
+    expect(g.disease?.id).toBe('D-HTN');
+  });
+
+  it('鉴别警报分桶：胃溃疡的黑便归入 differentialSymptoms', () => {
+    const g = queryDiseaseGraph('D-PU');
+    expect(g.differentialSymptoms.some((e) => e.target === 'S-MELA')).toBe(true);
+    // 上腹痛仍在常见症状
+    expect(g.commonSymptoms.some((e) => e.target === 'S-EPIG')).toBe(true);
+  });
+
+  it('二线/选做分桶：糖尿病的门冬胰岛素归二线、冠心病的冠脉造影归选做', () => {
+    const dm = queryDiseaseGraph('D-DM2');
+    expect(dm.secondLineDrugs.some((e) => e.target === 'M-INS')).toBe(true);
+    const chd = queryDiseaseGraph('D-CHD');
+    expect(chd.optionalExams.some((e) => e.target === 'E-ANGIO')).toBe(true);
+  });
+
+  it('未命中/非疾病节点返回 matched=false 且附免责声明', () => {
+    expect(queryDiseaseGraph('不存在的病XYZ').matched).toBe(false);
+    // 传入症状节点 id 不应当作疾病
+    expect(queryDiseaseGraph('S-CHESTP').matched).toBe(false);
+    expect(queryDiseaseGraph('').disclaimer).toBe(GRAPH_DISCLAIMER);
+  });
+});
+
+describe('M147-A findDifferentialDiagnosis 鉴别诊断', () => {
+  it('胸痛+胸闷 → 冠心病排第一，置信度归一为 1', () => {
+    const list = findDifferentialDiagnosis(['胸痛', '胸闷']);
+    expect(list.length).toBeGreaterThan(0);
+    expect(list[0].diseaseId).toBe('D-CHD');
+    expect(list[0].confidence).toBe(1);
+    // 命中症状含胸痛、胸闷
+    const matched = list[0].matchedSymptoms.map((s) => s.id);
+    expect(matched).toContain('S-CHESTP');
+    expect(matched).toContain('S-CHESTT');
+  });
+
+  it('多症状叠加提升匹配分：胸痛+胸闷 分 > 单胸痛', () => {
+    const both = findDifferentialDiagnosis(['胸痛', '胸闷']).find((d) => d.diseaseId === 'D-CHD');
+    const one = findDifferentialDiagnosis(['胸痛']).find((d) => d.diseaseId === 'D-CHD');
+    expect(both && one).toBeTruthy();
+    expect(both!.score).toBeGreaterThan(one!.score);
+  });
+
+  it('返回首诊科室与必做检查（患者教育下一步建议）', () => {
+    const list = findDifferentialDiagnosis(['偏瘫', '言语不清']);
+    expect(list[0].diseaseId).toBe('D-IS');
+    expect(list[0].firstVisitDepartments.some((d) => d.id === 'DPT-SJNK')).toBe(true);
+    expect(list[0].requiredExams.some((e) => e.id === 'E-MRI')).toBe(true);
+  });
+
+  it('「还要警惕」列出未提及的典型症状', () => {
+    // 只说多饮多尿，未提体重下降 → missingTypicalSymptoms 应含体重下降
+    const list = findDifferentialDiagnosis(['多饮多尿']);
+    const dm = list.find((d) => d.diseaseId === 'D-DM2');
+    expect(dm).toBeTruthy();
+    expect(dm!.missingTypicalSymptoms.some((s) => s.id === 'S-WLOSS')).toBe(true);
+  });
+
+  it('空输入 / 未知症状返回空数组，不臆造疾病', () => {
+    expect(findDifferentialDiagnosis([])).toHaveLength(0);
+    expect(findDifferentialDiagnosis(['外星人症状XYZ'])).toHaveLength(0);
+  });
+
+  it('结果按匹配分降序且不超过上限', () => {
+    const list = findDifferentialDiagnosis(['胸痛', '胸闷', '发热']);
+    for (let i = 1; i < list.length; i++) {
+      expect(list[i].score).toBeLessThanOrEqual(list[i - 1].score);
+    }
+    expect(list.length).toBeLessThanOrEqual(5);
   });
 });

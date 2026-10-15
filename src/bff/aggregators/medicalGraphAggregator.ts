@@ -26,17 +26,34 @@
 
 /* ------------------------------- 类型契约 ------------------------------- */
 
-/** 节点类型：疾病 / 症状 / 药物 / 检查 / 手术 */
-export type MedicalGraphNodeType = 'disease' | 'symptom' | 'drug' | 'exam' | 'surgery';
+/** 节点类型：疾病 / 症状 / 药物 / 检查 / 手术 / 科室（M147-A 新增科室） */
+export type MedicalGraphNodeType =
+  | 'disease'
+  | 'symptom'
+  | 'drug'
+  | 'exam'
+  | 'surgery'
+  | 'department';
 
-/** 边类型（有向医学关系） */
+/** 边类型（有向医学关系；M147-A 新增 disease_visit_department 疾病→科室） */
 export type MedicalGraphRelation =
-  | 'disease_has_symptom'       // 疾病 → 症状
-  | 'disease_treated_by_drug'   // 疾病 → 药物
-  | 'symptom_suggests_disease'  // 症状 → 疾病
+  | 'disease_has_symptom'        // 疾病 → 症状
+  | 'disease_treated_by_drug'    // 疾病 → 药物
+  | 'symptom_suggests_disease'   // 症状 → 疾病
   | 'drug_interacts_with_drug'  // 药物 → 药物（DDI）
-  | 'disease_needs_exam'        // 疾病 → 检查
-  | 'disease_has_surgery';       // 疾病 → 手术
+  | 'disease_needs_exam'         // 疾病 → 检查
+  | 'disease_has_surgery'        // 疾病 → 手术
+  | 'disease_visit_department';  // 疾病 → 科室（首诊 / 转诊）
+
+/**
+ * 关系细分 qualifier（M147-A）：
+ *   disease_has_symptom     → 常见 / 鉴别
+ *   disease_treated_by_drug → 一线 / 二线
+ *   disease_needs_exam       → 必做 / 选做
+ *   disease_visit_department → 首诊 / 转诊
+ * 其余关系（症状反推 / DDI / 手术）留空串。
+ */
+export type EdgeQualifier = '' | '常见' | '鉴别' | '一线' | '二线' | '必做' | '选做' | '首诊' | '转诊';
 
 /** 图节点（与 clinical.medical_graph_node 同构） */
 export interface GraphNode {
@@ -66,6 +83,11 @@ export interface GraphEdge {
   label: string;
   /** 关系强度 0~1（DDI 边为风险等级） */
   weight: number;
+  /**
+   * 关系细分（M147-A）：常见/鉴别、一线/二线、必做/选做、首诊/转诊；
+   * 旧种子边未标注时为空串，读取侧用 edgeQualifier() 兜底。
+   */
+  qualifier?: EdgeQualifier;
 }
 
 /** 两节点之间的一条有向推理路径 */
@@ -108,6 +130,7 @@ export const RELATION_LABELS: Record<MedicalGraphRelation, string> = {
   drug_interacts_with_drug: '相互作用',
   disease_needs_exam: '所需检查',
   disease_has_surgery: '可选手术',
+  disease_visit_department: '就诊科室',
 };
 
 /** 节点类型 → 中文标注（前端图例） */
@@ -117,6 +140,7 @@ export const NODE_TYPE_LABELS: Record<MedicalGraphNodeType, string> = {
   drug: '药物',
   exam: '检查',
   surgery: '手术',
+  department: '科室',
 };
 
 /** 合法边类型枚举（路由层参数校验用） */
@@ -127,10 +151,18 @@ export const ALL_RELATIONS: MedicalGraphRelation[] = [
   'drug_interacts_with_drug',
   'disease_needs_exam',
   'disease_has_surgery',
+  'disease_visit_department',
 ];
 
 /** 合法节点类型枚举 */
-export const ALL_NODE_TYPES: MedicalGraphNodeType[] = ['disease', 'symptom', 'drug', 'exam', 'surgery'];
+export const ALL_NODE_TYPES: MedicalGraphNodeType[] = [
+  'disease',
+  'symptom',
+  'drug',
+  'exam',
+  'surgery',
+  'department',
+];
 
 /** 路径搜索最大跳数（防止图爆炸；临床推理 4 跳已覆盖完整诊疗链） */
 export const MAX_PATH_DEPTH = 4;
@@ -201,61 +233,71 @@ export const GRAPH_NODES: GraphNode[] = [
   { id: 'O-PCI', name: 'PCI支架植入', type: 'surgery', description: '经皮冠状动脉介入治疗，球囊扩张+支架植入开通狭窄血管。', sources: [{ name: '稳定性冠心病诊断与治疗指南', year: '2018' }], evidenceLevel: 0.85 },
   { id: 'O-HEMO', name: '内镜下止血', type: 'surgery', description: '胃镜下注射/钛夹/电凝止血，溃疡出血首选内镜处理。', sources: [{ name: '消化性溃疡诊断与治疗规范', year: '2022' }], evidenceLevel: 0.8 },
   { id: 'O-LYTIC', name: '静脉溶栓', type: 'surgery', description: '时间窗（4.5h）内 rt-PA 静脉溶栓，恢复脑灌注。', sources: [{ name: '中国急性缺血性脑卒中诊治指南', year: '2023' }], evidenceLevel: 0.9 },
+
+  // —— 科室（M147-A 知识图谱与患者教育：智能导诊 / 首诊转诊路径） ——
+  { id: 'DPT-XGNK', name: '心血管内科', type: 'department', description: '高血压、冠心病等心血管疾病首诊与长期随访科室。', sources: [{ name: '中国高血压防治指南', year: '2024' }], evidenceLevel: 0.9 },
+  { id: 'DPT-NFMK', name: '内分泌科', type: 'department', description: '2型糖尿病等代谢性疾病首诊与血糖管理科室。', sources: [{ name: '中国2型糖尿病防治指南', year: '2020' }], evidenceLevel: 0.9 },
+  { id: 'DPT-HXXNK', name: '呼吸与危重症医学科', type: 'department', description: '社区获得性肺炎等呼吸道感染首诊科室。', sources: [{ name: '社区获得性肺炎诊断和治疗指南', year: '2016' }], evidenceLevel: 0.85 },
+  { id: 'DPT-XHNK', name: '消化内科', type: 'department', description: '消化性溃疡、上消化道出血等胃肠疾病首诊科室。', sources: [{ name: '消化性溃疡诊断与治疗规范', year: '2022' }], evidenceLevel: 0.9 },
+  { id: 'DPT-SJNK', name: '神经内科', type: 'department', description: '脑梗死等脑血管疾病卒中中心首诊与溶栓科室。', sources: [{ name: '中国急性缺血性脑卒中诊治指南', year: '2023' }], evidenceLevel: 0.9 },
+  { id: 'DPT-JCYY', name: '全科医学科', type: 'department', description: '慢病初筛、未分化症状首诊与双向转诊入口科室。', sources: [{ name: '国家基层高血压防治管理指南', year: '2023' }], evidenceLevel: 0.8 },
 ];
 
-/** 边种子：疾病→症状/药物/检查/手术、症状→疾病、药物↔药物 DDI */
+/** 边种子：疾病→症状/药物/检查/手术/科室、症状→疾病、药物↔药物 DDI */
+/* 【M147-A 知识图谱与患者教育】每条疾病出边带 qualifier：常见/鉴别、一线/二线、 */
+/* 必做/选做、首诊/转诊；症状反推与 DDI 边 qualifier 留空。 */
 export const GRAPH_EDGES: GraphEdge[] = [
   // 高血压
-  { source: 'D-HTN', target: 'S-DIZZ', relation: 'disease_has_symptom', label: '常见表现', weight: 0.8 },
-  { source: 'D-HTN', target: 'S-HEAD', relation: 'disease_has_symptom', label: '常见表现', weight: 0.7 },
-  { source: 'D-HTN', target: 'M-AMLO', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.9 },
-  { source: 'D-HTN', target: 'M-VALS', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.85 },
-  { source: 'D-HTN', target: 'E-BP', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.95 },
+  { source: 'D-HTN', target: 'S-DIZZ', relation: 'disease_has_symptom', label: '常见表现', weight: 0.8, qualifier: '常见' },
+  { source: 'D-HTN', target: 'S-HEAD', relation: 'disease_has_symptom', label: '常见表现', weight: 0.7, qualifier: '常见' },
+  { source: 'D-HTN', target: 'M-AMLO', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.9, qualifier: '一线' },
+  { source: 'D-HTN', target: 'M-VALS', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.85, qualifier: '一线' },
+  { source: 'D-HTN', target: 'E-BP', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.95, qualifier: '必做' },
 
   // 2型糖尿病
-  { source: 'D-DM2', target: 'S-POLY', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9 },
-  { source: 'D-DM2', target: 'S-WLOSS', relation: 'disease_has_symptom', label: '常见表现', weight: 0.6 },
-  { source: 'D-DM2', target: 'M-METF', relation: 'disease_treated_by_drug', label: '一线用药', weight: 0.95 },
-  { source: 'D-DM2', target: 'M-INS', relation: 'disease_treated_by_drug', label: '餐时强化', weight: 0.6 },
-  { source: 'D-DM2', target: 'E-FPG', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.9 },
-  { source: 'D-DM2', target: 'E-HBA1C', relation: 'disease_needs_exam', label: '金标准', weight: 0.95 },
+  { source: 'D-DM2', target: 'S-POLY', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见' },
+  { source: 'D-DM2', target: 'S-WLOSS', relation: 'disease_has_symptom', label: '常见表现', weight: 0.6, qualifier: '常见' },
+  { source: 'D-DM2', target: 'M-METF', relation: 'disease_treated_by_drug', label: '一线用药', weight: 0.95, qualifier: '一线' },
+  { source: 'D-DM2', target: 'M-INS', relation: 'disease_treated_by_drug', label: '餐时强化', weight: 0.6, qualifier: '二线' },
+  { source: 'D-DM2', target: 'E-FPG', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.9, qualifier: '必做' },
+  { source: 'D-DM2', target: 'E-HBA1C', relation: 'disease_needs_exam', label: '金标准', weight: 0.95, qualifier: '必做' },
 
   // 冠心病
-  { source: 'D-CHD', target: 'S-CHESTP', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9 },
-  { source: 'D-CHD', target: 'S-CHESTT', relation: 'disease_has_symptom', label: '伴随症状', weight: 0.8 },
-  { source: 'D-CHD', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '抗血小板基石', weight: 0.95 },
-  { source: 'D-CHD', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '调脂稳斑', weight: 0.9 },
-  { source: 'D-CHD', target: 'M-NTG', relation: 'disease_treated_by_drug', label: '急救缓解', weight: 0.7 },
-  { source: 'D-CHD', target: 'E-ECG', relation: 'disease_needs_exam', label: '初筛', weight: 0.9 },
-  { source: 'D-CHD', target: 'E-ANGIO', relation: 'disease_needs_exam', label: '确诊金标准', weight: 0.85 },
+  { source: 'D-CHD', target: 'S-CHESTP', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见' },
+  { source: 'D-CHD', target: 'S-CHESTT', relation: 'disease_has_symptom', label: '伴随症状', weight: 0.8, qualifier: '常见' },
+  { source: 'D-CHD', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '抗血小板基石', weight: 0.95, qualifier: '一线' },
+  { source: 'D-CHD', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '调脂稳斑', weight: 0.9, qualifier: '一线' },
+  { source: 'D-CHD', target: 'M-NTG', relation: 'disease_treated_by_drug', label: '急救缓解', weight: 0.7, qualifier: '二线' },
+  { source: 'D-CHD', target: 'E-ECG', relation: 'disease_needs_exam', label: '初筛', weight: 0.9, qualifier: '必做' },
+  { source: 'D-CHD', target: 'E-ANGIO', relation: 'disease_needs_exam', label: '确诊金标准', weight: 0.85, qualifier: '选做' },
   { source: 'D-CHD', target: 'O-PCI', relation: 'disease_has_surgery', label: '血运重建', weight: 0.65 },
 
   // 社区获得性肺炎
-  { source: 'D-CAP', target: 'S-FEVER', relation: 'disease_has_symptom', label: '全身表现', weight: 0.95 },
-  { source: 'D-CAP', target: 'S-COUGH', relation: 'disease_has_symptom', label: '呼吸道核心症状', weight: 0.9 },
-  { source: 'D-CAP', target: 'M-AMOX', relation: 'disease_treated_by_drug', label: '经验口服', weight: 0.7 },
-  { source: 'D-CAP', target: 'M-CFU', relation: 'disease_treated_by_drug', label: '经验治疗', weight: 0.75 },
-  { source: 'D-CAP', target: 'E-CT', relation: 'disease_needs_exam', label: '影像评估', weight: 0.85 },
-  { source: 'D-CAP', target: 'E-CBC', relation: 'disease_needs_exam', label: '感染指标', weight: 0.8 },
+  { source: 'D-CAP', target: 'S-FEVER', relation: 'disease_has_symptom', label: '全身表现', weight: 0.95, qualifier: '常见' },
+  { source: 'D-CAP', target: 'S-COUGH', relation: 'disease_has_symptom', label: '呼吸道核心症状', weight: 0.9, qualifier: '常见' },
+  { source: 'D-CAP', target: 'M-AMOX', relation: 'disease_treated_by_drug', label: '经验口服', weight: 0.7, qualifier: '一线' },
+  { source: 'D-CAP', target: 'M-CFU', relation: 'disease_treated_by_drug', label: '经验治疗', weight: 0.75, qualifier: '一线' },
+  { source: 'D-CAP', target: 'E-CT', relation: 'disease_needs_exam', label: '影像评估', weight: 0.85, qualifier: '选做' },
+  { source: 'D-CAP', target: 'E-CBC', relation: 'disease_needs_exam', label: '感染指标', weight: 0.8, qualifier: '必做' },
 
   // 胃溃疡
-  { source: 'D-PU', target: 'S-EPIG', relation: 'disease_has_symptom', label: '典型节律痛', weight: 0.9 },
-  { source: 'D-PU', target: 'S-MELA', relation: 'disease_has_symptom', label: '出血警报', weight: 0.6 },
-  { source: 'D-PU', target: 'M-OME', relation: 'disease_treated_by_drug', label: '抑酸核心', weight: 0.95 },
-  { source: 'D-PU', target: 'M-GAV', relation: 'disease_treated_by_drug', label: '黏膜保护', weight: 0.6 },
-  { source: 'D-PU', target: 'E-EGD', relation: 'disease_needs_exam', label: '确诊金标准', weight: 0.95 },
+  { source: 'D-PU', target: 'S-EPIG', relation: 'disease_has_symptom', label: '典型节律痛', weight: 0.9, qualifier: '常见' },
+  { source: 'D-PU', target: 'S-MELA', relation: 'disease_has_symptom', label: '出血警报', weight: 0.6, qualifier: '鉴别' },
+  { source: 'D-PU', target: 'M-OME', relation: 'disease_treated_by_drug', label: '抑酸核心', weight: 0.95, qualifier: '一线' },
+  { source: 'D-PU', target: 'M-GAV', relation: 'disease_treated_by_drug', label: '黏膜保护', weight: 0.6, qualifier: '二线' },
+  { source: 'D-PU', target: 'E-EGD', relation: 'disease_needs_exam', label: '确诊金标准', weight: 0.95, qualifier: '必做' },
   { source: 'D-PU', target: 'O-HEMO', relation: 'disease_has_surgery', label: '出血时首选', weight: 0.4 },
 
   // 脑梗死
-  { source: 'D-IS', target: 'S-HEMI', relation: 'disease_has_symptom', label: '典型体征', weight: 0.85 },
-  { source: 'D-IS', target: 'S-DYS', relation: 'disease_has_symptom', label: '典型体征', weight: 0.7 },
-  { source: 'D-IS', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '二级预防', weight: 0.85 },
-  { source: 'D-IS', target: 'M-CLOP', relation: 'disease_treated_by_drug', label: 'DAPT 联合', weight: 0.8 },
-  { source: 'D-IS', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '他汀稳定斑块', weight: 0.85 },
-  { source: 'D-IS', target: 'E-MRI', relation: 'disease_needs_exam', label: '早期确诊', weight: 0.9 },
+  { source: 'D-IS', target: 'S-HEMI', relation: 'disease_has_symptom', label: '典型体征', weight: 0.85, qualifier: '常见' },
+  { source: 'D-IS', target: 'S-DYS', relation: 'disease_has_symptom', label: '典型体征', weight: 0.7, qualifier: '常见' },
+  { source: 'D-IS', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '二级预防', weight: 0.85, qualifier: '一线' },
+  { source: 'D-IS', target: 'M-CLOP', relation: 'disease_treated_by_drug', label: 'DAPT 联合', weight: 0.8, qualifier: '一线' },
+  { source: 'D-IS', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '他汀稳定斑块', weight: 0.85, qualifier: '一线' },
+  { source: 'D-IS', target: 'E-MRI', relation: 'disease_needs_exam', label: '早期确诊', weight: 0.9, qualifier: '必做' },
   { source: 'D-IS', target: 'O-LYTIC', relation: 'disease_has_surgery', label: '时间窗内再灌注', weight: 0.5 },
 
-  // 症状 → 疾病（反向鉴别诊断链）
+  // 症状 → 疾病（反向鉴别诊断链；qualifier 留空，由 findDifferentialDiagnosis 聚合）
   { source: 'S-DIZZ', target: 'D-HTN', relation: 'symptom_suggests_disease', label: '可能诊断', weight: 0.6 },
   { source: 'S-HEAD', target: 'D-HTN', relation: 'symptom_suggests_disease', label: '可能诊断', weight: 0.55 },
   { source: 'S-POLY', target: 'D-DM2', relation: 'symptom_suggests_disease', label: '高度提示', weight: 0.85 },
@@ -269,7 +311,17 @@ export const GRAPH_EDGES: GraphEdge[] = [
   { source: 'S-HEMI', target: 'D-IS', relation: 'symptom_suggests_disease', label: '高度提示', weight: 0.8 },
   { source: 'S-DYS', target: 'D-IS', relation: 'symptom_suggests_disease', label: '可能诊断', weight: 0.7 },
 
-  // 药物相互作用 DDI（双向边，处方前置审核告警）
+  // 疾病 → 科室（M147-A：首诊 / 转诊，智能导诊）
+  { source: 'D-HTN', target: 'DPT-XGNK', relation: 'disease_visit_department', label: '首诊科室', weight: 0.9, qualifier: '首诊' },
+  { source: 'D-HTN', target: 'DPT-JCYY', relation: 'disease_visit_department', label: '基层管理转诊', weight: 0.6, qualifier: '转诊' },
+  { source: 'D-DM2', target: 'DPT-NFMK', relation: 'disease_visit_department', label: '首诊科室', weight: 0.9, qualifier: '首诊' },
+  { source: 'D-DM2', target: 'DPT-JCYY', relation: 'disease_visit_department', label: '基层随访转诊', weight: 0.55, qualifier: '转诊' },
+  { source: 'D-CHD', target: 'DPT-XGNK', relation: 'disease_visit_department', label: '首诊科室', weight: 0.9, qualifier: '首诊' },
+  { source: 'D-CAP', target: 'DPT-HXXNK', relation: 'disease_visit_department', label: '首诊科室', weight: 0.85, qualifier: '首诊' },
+  { source: 'D-PU', target: 'DPT-XHNK', relation: 'disease_visit_department', label: '首诊科室', weight: 0.9, qualifier: '首诊' },
+  { source: 'D-IS', target: 'DPT-SJNK', relation: 'disease_visit_department', label: '卒中中心首诊', weight: 0.9, qualifier: '首诊' },
+
+  // 药物相互作用 DDI（双向边，处方前置审核告警；qualifier 留空）
   { source: 'M-ASA', target: 'M-WARF', relation: 'drug_interacts_with_drug', label: '出血风险显著升高', weight: 0.9 },
   { source: 'M-WARF', target: 'M-ASA', relation: 'drug_interacts_with_drug', label: '出血风险显著升高', weight: 0.9 },
   { source: 'M-ATO', target: 'M-CLAR', relation: 'drug_interacts_with_drug', label: '横纹肌溶解风险', weight: 0.85 },
@@ -461,4 +513,230 @@ function findMedicalPathsById(fromId: string, toId: string, maxDepth: number): G
   dfs(fromId, [fromId], []);
   // 短路径优先（更直接的诊疗链）
   return results.sort((a, b) => a.relations.length - b.relations.length);
+}
+
+/* ===================== M147-A 知识图谱与患者教育深化 ===================== */
+
+/** 鉴别诊断候选数量上限（防止一次返回过多稀释医生注意力） */
+export const MAX_DIAGNOSIS = 5;
+
+/** 读取边的 qualifier；旧种子边未标注时回退空串（按关系类型默认桶处理） */
+export function edgeQualifier(e: GraphEdge): EdgeQualifier {
+  return e.qualifier ?? '';
+}
+
+/**
+ * queryDiseaseGraph 返回信封（患者教育版疾病全景图）。
+ * 把疾病的出边按「症状/药物/检查/科室/手术」五类、再按 qualifier 分桶，
+ * 前端可直接渲染成「常见症状 vs 鉴别警报」「一线用药 vs 二线」「必做 vs 选做」。
+ */
+export interface DiseaseGraph {
+  /** 命中的疾病节点；未命中为 null */
+  disease: GraphNode | null;
+  /** 常见症状（qualifier=常见） */
+  commonSymptoms: GraphEdge[];
+  /** 鉴别/警报症状（qualifier=鉴别，如黑便提示出血） */
+  differentialSymptoms: GraphEdge[];
+  /** 一线用药（指南强推荐） */
+  firstLineDrugs: GraphEdge[];
+  /** 二线/补救用药 */
+  secondLineDrugs: GraphEdge[];
+  /** 必做检查（诊断/随访核心） */
+  requiredExams: GraphEdge[];
+  /** 选做/影像/侵入性检查 */
+  optionalExams: GraphEdge[];
+  /** 首诊科室 */
+  firstVisitDepartments: GraphEdge[];
+  /** 转诊科室（基层/上级） */
+  referralDepartments: GraphEdge[];
+  /** 可选手术方式 */
+  surgeries: GraphEdge[];
+  /** 视图内全部节点（疾病 + 全部邻接节点） */
+  nodes: GraphNode[];
+  /** 视图内全部边 */
+  edges: GraphEdge[];
+  /** 是否命中疾病节点 */
+  matched: boolean;
+  /** 固定免责声明 */
+  disclaimer: string;
+}
+
+/**
+ * findDifferentialDiagnosis 返回的单条鉴别诊断结果。
+ * 面向「主诉症状 → 可能疾病」的分诊/患者教育场景，附置信度与下一步建议。
+ */
+export interface Diagnosis {
+  /** 疾病节点 id */
+  diseaseId: string;
+  /** 疾病中文名 */
+  diseaseName: string;
+  /** 原始匹配分：命中症状边 weight 之和（越大越可能） */
+  score: number;
+  /** 归一化置信度 0~1（按本次候选最大值归一，Top1=1） */
+  confidence: number;
+  /** 用户主诉中命中的症状节点 */
+  matchedSymptoms: GraphNode[];
+  /** 该疾病的典型症状中用户未提及者（患者教育：「还要警惕…」） */
+  missingTypicalSymptoms: GraphNode[];
+  /** 首诊科室节点 */
+  firstVisitDepartments: GraphNode[];
+  /** 一线用药节点（患者教育仅展示，不作处方） */
+  firstLineDrugs: GraphNode[];
+  /** 必做检查节点 */
+  requiredExams: GraphNode[];
+  /** 疾病来源指南 */
+  sources: Array<{ name: string; year?: string }>;
+}
+
+/** 把某疾病的出边按关系类型 + qualifier 分桶 */
+function bucketDiseaseEdges(diseaseId: string): {
+  commonSymptoms: GraphEdge[];
+  differentialSymptoms: GraphEdge[];
+  firstLineDrugs: GraphEdge[];
+  secondLineDrugs: GraphEdge[];
+  requiredExams: GraphEdge[];
+  optionalExams: GraphEdge[];
+  firstVisitDepartments: GraphEdge[];
+  referralDepartments: GraphEdge[];
+  surgeries: GraphEdge[];
+} {
+  const out = GRAPH_EDGES.filter((e) => e.source === diseaseId);
+  const pick = (rel: MedicalGraphRelation, qual: string) =>
+    out.filter((e) => e.relation === rel && edgeQualifier(e) === qual);
+  return {
+    commonSymptoms: pick('disease_has_symptom', '常见'),
+    differentialSymptoms: pick('disease_has_symptom', '鉴别'),
+    firstLineDrugs: pick('disease_treated_by_drug', '一线'),
+    secondLineDrugs: pick('disease_treated_by_drug', '二线'),
+    requiredExams: pick('disease_needs_exam', '必做'),
+    optionalExams: pick('disease_needs_exam', '选做'),
+    firstVisitDepartments: pick('disease_visit_department', '首诊'),
+    referralDepartments: pick('disease_visit_department', '转诊'),
+    surgeries: out.filter((e) => e.relation === 'disease_has_surgery'),
+  };
+}
+
+/**
+ * queryDiseaseGraph：按疾病 id（或中文名）展开疾病全景图（纯函数）。
+ *
+ * 与 queryMedicalGraph 的区别：
+ *  - 入参是疾病 id（如 D-HTN）而非任意节点；
+ *  - 出边按 qualifier 结构化分桶，前端无需再做中文 label 匹配；
+ *  - 显式输出首诊/转诊科室，支撑智能导诊与患者教育页。
+ *
+ * @param diseaseId 疾病节点 id 或中文名（可模糊）
+ */
+export function queryDiseaseGraph(diseaseId: string): DiseaseGraph {
+  const empty: DiseaseGraph = {
+    disease: null,
+    commonSymptoms: [],
+    differentialSymptoms: [],
+    firstLineDrugs: [],
+    secondLineDrugs: [],
+    requiredExams: [],
+    optionalExams: [],
+    firstVisitDepartments: [],
+    referralDepartments: [],
+    surgeries: [],
+    nodes: [],
+    edges: [],
+    matched: false,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+
+  const key = (diseaseId ?? '').trim();
+  if (!key) return empty;
+  // 先按 id 精确查，再回退中文名模糊定位
+  const disease = NODE_BY_ID.get(key) ?? resolveNode(key);
+  if (!disease || disease.type !== 'disease') return empty;
+
+  const buckets = bucketDiseaseEdges(disease.id);
+  const edges = GRAPH_EDGES.filter((e) => e.source === disease.id);
+  const neighborIds = new Set<string>(edges.map((e) => e.target));
+  const nodes: GraphNode[] = [disease, ...GRAPH_NODES.filter((n) => neighborIds.has(n.id))];
+
+  return {
+    disease,
+    ...buckets,
+    nodes,
+    edges,
+    matched: true,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+}
+
+/**
+ * findDifferentialDiagnosis：由主诉症状列表反推可能疾病（纯函数，鉴别诊断核心）。
+ *
+ * 算法（医学准确、可解释）：
+ *  1. 逐个解析症状名（模糊），沿 symptom_suggests_disease 出边收集候选疾病；
+ *  2. 同一疾病被多个症状命中时，权重累加（多症状叠加提示诊断概率上升）；
+ *  3. 置信度按本次候选最大值归一（Top1=1），避免跨批次绝对值漂移；
+ *  4. 每条结果附「未提及的典型症状」（患者教育：还要警惕什么）、
+ *     首诊科室、一线用药、必做检查——形成可解释的下一步建议；
+ *  5. 未命中任何症状返回空数组，绝不臆造疾病。
+ *
+ * @param symptoms 主诉症状中文名数组（如 ['胸痛','胸闷']）
+ */
+export function findDifferentialDiagnosis(symptoms: string[]): Diagnosis[] {
+  const list = (Array.isArray(symptoms) ? symptoms : [])
+    .map((s) => resolveNode((s ?? '').trim()))
+    .filter((n): n is GraphNode => n !== null && n.type === 'symptom');
+
+  if (list.length === 0) return [];
+
+  // diseaseId → { score, matchedSymptomIds }
+  const acc = new Map<string, { score: number; matched: Set<string> }>();
+  for (const sym of list) {
+    for (const e of GRAPH_EDGES) {
+      if (e.source !== sym.id || e.relation !== 'symptom_suggests_disease') continue;
+      const cur = acc.get(e.target) ?? { score: 0, matched: new Set<string>() };
+      cur.score += e.weight;
+      cur.matched.add(sym.id);
+      acc.set(e.target, cur);
+    }
+  }
+
+  if (acc.size === 0) return [];
+
+  const maxScore = Math.max(...[...acc.values()].map((v) => v.score));
+  const results: Diagnosis[] = [];
+
+  for (const [diseaseId, v] of acc.entries()) {
+    const disease = NODE_BY_ID.get(diseaseId);
+    if (!disease || disease.type !== 'disease') continue;
+    const buckets = bucketDiseaseEdges(diseaseId);
+
+    const matchedSymptomIds = new Set(v.matched);
+    // 该疾病的典型症状边 → 节点；未被用户提及者即「还要警惕」
+    const typicalSymptomIds = buckets.commonSymptoms.map((e) => e.target);
+    const missingTypicalSymptoms = GRAPH_NODES.filter(
+      (n) => typicalSymptomIds.includes(n.id) && !matchedSymptomIds.has(n.id),
+    );
+    const matchedSymptoms = GRAPH_NODES.filter((n) => matchedSymptomIds.has(n.id));
+
+    results.push({
+      diseaseId: disease.id,
+      diseaseName: disease.name,
+      score: Math.round(v.score * 100) / 100,
+      confidence: maxScore > 0 ? Math.round((v.score / maxScore) * 100) / 100 : 0,
+      matchedSymptoms,
+      missingTypicalSymptoms,
+      firstVisitDepartments: GRAPH_NODES.filter((n) =>
+        buckets.firstVisitDepartments.some((e) => e.target === n.id),
+      ),
+      firstLineDrugs: GRAPH_NODES.filter((n) =>
+        buckets.firstLineDrugs.some((e) => e.target === n.id),
+      ),
+      requiredExams: GRAPH_NODES.filter((n) =>
+        buckets.requiredExams.some((e) => e.target === n.id),
+      ),
+      sources: disease.sources,
+    });
+  }
+
+  // 按匹配分降序，同分按疾病证据强度降序
+  return results
+    .sort((a, b) => b.score - a.score)
+    .slice(0, MAX_DIAGNOSIS);
 }

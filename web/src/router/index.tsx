@@ -276,6 +276,8 @@ const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/Prescriptio
 const OpdWorkstationPage = lazy(() => import('@/pages/opd/Workstation'));
 // 手术安全核查表（M105-D）
 const SurgeryChecklistPage = lazy(() => import('@/pages/surgery/Checklist'));
+// 医学知识图谱可视化（M147-A 知识图谱与患者教育）
+const MedicalGraphVisualizer = lazy(() => import('@/pages/graph/Visualizer'));
 
 // AI 移动护理 PDA 执行端（M16-A）：独立移动布局 /m/*，不套 PC AppLayout/SideMenu
 const MobileLogin = lazy(() => import('@/pages/mobile/login'));
@@ -486,6 +488,8 @@ export default function AppRoutes() {
           <Route path="nursing/nqi-dashboard" element={<NqiDashboardPage />} />
           {/* 手术安全核查表（M105-D） */}
           <Route path="surgery/checklist" element={<SurgeryChecklistPage />} />
+          {/* 医学知识图谱可视化（M147-A 知识图谱与患者教育） */}
+          <Route path="graph/visualizer" element={<MedicalGraphVisualizer />} />
           {/* 系统健康监控仪表盘（M96-D） */}
           <Route
             path="system/health"
