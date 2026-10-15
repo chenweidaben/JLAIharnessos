@@ -245,6 +245,7 @@ import { internetPrescriptionRoutes } from './routes/internetPrescription';
 import { internetPaymentRoutes } from './routes/internetPayment';
 import { internetDeliveryRoutes } from './routes/internetDelivery';
 import { satisfactionRoutes } from './routes/satisfaction';
+import { satisfactionAiRoutes } from './routes/satisfactionAi'; // M153-D：患者满意度智能化分析 GET /api/v1/admin/satisfaction/ai-report（临床决策支持）
 import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
 import { referralRoutes } from './routes/referral';
@@ -586,6 +587,7 @@ const allRoutes: RouteDef[] = [
   ...internetPaymentRoutes,
   ...internetDeliveryRoutes,
   ...satisfactionRoutes,
+  ...satisfactionAiRoutes, // M153-D：满意度智能分析报告（临床决策支持）
   ...smartTriageRoutes,
   ...delegationRoutes,
   ...referralRoutes,
