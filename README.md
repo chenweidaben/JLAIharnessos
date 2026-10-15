@@ -344,6 +344,15 @@ jlmedaios/
 - 第三方依赖归属见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) 与 [NOTICE](NOTICE)；
 - 本软件为医疗辅助决策与效率工具，不构成医疗器械诊断结论。
 
+---
+
+## 🚀 部署与运维文档
+
+| 文档 | 内容 |
+|---|---|
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | 环境要求（Node 20+ / PostgreSQL 16+ / Bun）、一键安装与启动脚本、环境变量清单、pg_dump 数据备份策略、常见问题排查 |
+| [OPERATIONS.md](./OPERATIONS.md) | 健康检查端点（`/api/v1/health/detailed`）、日志位置与查询、升级（pull → migrate → restart）与回滚步骤 |
+
 <div align="center">
 
 **© 杭州健澜科技有限公司 · 让医疗 AI 更简单、更落地**
