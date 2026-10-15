@@ -1,0 +1,236 @@
+/**
+ * 健澜科技 jlmedaios - 移动端响应式全局样式（M128-A）
+ *
+ * 适配原则（移动端+性能优化）：
+ *   1. 手机端（<768px）单列布局；平板端（768~1023px）双列；桌面端（>=1024px）多列。
+ *   2. 表格在手机端折叠为卡片形态（.jl-table-cards）。
+ *   3. 导航：手机端底部 Tab（.jl-bottom-tab-nav）/ 平板抽屉 / 桌面侧边栏常驻。
+ *   4. 字号最小 14px（--jl-min-font-size）。
+ *
+ * 性能优化约定：
+ *   - 仅在媒体查询内做必要覆盖，避免重复全量规则；
+ *   - 动效只使用 transform / opacity（合成层），不触发 layout/paint；
+ *   - 使用 content-visibility 跳过屏外卡片渲染；
+ *   - 断点数值与 src/utils/responsive.ts 的 BREAKPOINTS 保持一致。
+ *
+ * 深海蓝 VI：主色 #0A4D8C / 深蓝 #0A2540 / 辅色 #1E5F8C / 强调 #4A90D9。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司. All Rights Reserved.
+ */
+
+/* ================================================================
+ * 响应式设计令牌（移动端+性能优化）
+ * ================================================================ */
+:root {
+  --jl-breakpoint-md: 768px; /* 手机/平板分界 */
+  --jl-breakpoint-lg: 1024px; /* 平板/桌面分界 */
+  --jl-min-font-size: 14px; /* 字号下限 */
+  --jl-page-pad-mobile: 12px; /* 手机端页面内边距 */
+  --jl-page-pat-desktop: 24px; /* 桌面端页面内边距 */
+  --jl-bottom-tab-height: 56px; /* 手机底部 Tab 高度 */
+}
+
+/* ================================================================
+ * 页面根布局：手机单列 / 平板双列 / 桌面多列
+ * 由 getLayoutClass() 输出的类名驱动，CSS 与 TS 断点同源
+ * ================================================================ */
+.jl-responsive-page {
+  /* 桌面默认：多列网格（4 列） */
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: var(--jl-page-pat-desktop);
+}
+
+.jl-responsive-page.jl-layout-single {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: var(--jl-page-pad-mobile);
+}
+
+.jl-responsive-page.jl-layout-double {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
+}
+
+/* 网格子项在单列/双列下自动占满整行，避免卡片错位 */
+.jl-responsive-page > .jl-card,
+.jl-responsive-page > .ant-card {
+  min-width: 0;
+  /* 移动端+性能优化：屏外卡片跳过渲染，降低首屏合成成本 */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
+/* ================================================================
+ * 字号下限：任何场景不得小于 14px（适配原则）
+ * ================================================================ */
+.jl-responsive-page,
+.jl-responsive-page .ant-typography,
+.jl-responsive-page .ant-table,
+.jl-responsive-page .ant-form,
+.jl-responsive-page .ant-btn {
+  font-size: var(--jl-min-font-size);
+}
+
+/* ================================================================
+ * 表格手机端转卡片（.jl-table-cards）
+ * 移动端+性能优化：隐藏表头，每行变为带标签的卡片
+ * ================================================================ */
+@media (max-width: 767.98px) {
+  .jl-table-cards .ant-table-thead {
+    /* 移动端+性能优化：display:none 直接移除布局开销，优于 visibility */
+    display: none;
+  }
+
+  .jl-table-cards .ant-table-tbody > tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--jl-border, #e8ecf1);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(10, 37, 64, 0.06);
+  }
+
+  .jl-table-cards .ant-table-tbody > tr > td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px dashed #f0f2f5;
+    text-align: right;
+  }
+
+  .jl-table-cards .ant-table-tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+
+  /* 单元格首列作为卡片标题（深海蓝 VI 强调色） */
+  .jl-table-cards .ant-table-tbody > tr > td:first-child {
+    font-weight: 600;
+    color: var(--jl-primary, #0a4d8c);
+    text-align: left;
+  }
+}
+
+/* ================================================================
+ * 导航：手机端底部 Tab（.jl-bottom-tab-nav）
+ * 桌面/平板隐藏，仅 <768px 固定底部展示
+ * ================================================================ */
+.jl-bottom-tab-nav {
+  display: none; /* 默认隐藏，手机端启用 */
+}
+
+@media (max-width: 767.98px) {
+  .jl-bottom-tab-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    height: var(--jl-bottom-tab-height);
+    background: linear-gradient(180deg, #0a2540 0%, #0a4d8c 100%); /* 深海蓝 VI */
+    box-shadow: 0 -2px 12px rgba(10, 37, 64, 0.25);
+    /* 移动端+性能优化：固定层只合成，不触发主文档重排 */
+    transform: translateZ(0);
+  }
+
+  .jl-bottom-tab-nav .jl-tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    text-decoration: none;
+    padding: 6px 0;
+  }
+
+  .jl-bottom-tab-nav .jl-tab-item.is-active {
+    color: #fff;
+    /* 移动端+性能优化：激活态仅 opacity/transform，不重排 */
+  }
+
+  /* 手机端页面预留底部 Tab 占位，防止内容被遮挡 */
+  .jl-responsive-page {
+    padding-bottom: calc(var(--jl-bottom-tab-height) + 16px);
+  }
+}
+
+/* ================================================================
+ * 平板端（768~1023px）：侧边栏收窄为可抽屉，顶部栏压缩
+ * ================================================================ */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .jl-responsive-page {
+    gap: 14px;
+  }
+
+  /* 平板下 antd 抽屉/侧边导航以浮层形式承载，不挤占主栅格 */
+  .jl-responsive-drawer-nav {
+    position: fixed;
+    z-index: 900;
+    box-shadow: 2px 0 16px rgba(10, 37, 64, 0.18);
+  }
+}
+
+/* ================================================================
+ * 触控优化：手机端可点击区域不小于 44px（移动端+性能优化）
+ * ================================================================ */
+@media (max-width: 767.98px) {
+  .jl-responsive-page .ant-btn,
+  .jl-responsive-page .ant-list-item,
+  .jl-bottom-tab-nav .jl-tab-item {
+    min-height: 44px;
+  }
+
+  /* 隐藏桌面端装饰性元素，降低手机端渲染负载 */
+  .jl-desktop-only {
+    display: none !important;
+  }
+}
+
+/* 大屏（>=1280px）：保持栅格呼吸感 */
+@media (min-width: 1280px) {
+  .jl-responsive-page {
+    gap: 20px;
+  }
+}
+
+/* ================================================================
+ * 门诊医生工作站四栏：桌面4列 / 平板2列 / 手机1列（移动端+性能优化）
+ * 固定视口高度仅桌面保留，手机端改为自适应高度避免小屏截断
+ * ================================================================ */
+.jl-opd-workbench-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jl-opd-card {
+  height: calc(100vh - 140px);
+  overflow: auto;
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .jl-opd-workbench-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+  .jl-opd-workbench-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .jl-opd-card {
+    /* 手机端自适应高度，取消固定视口高度（移动端+性能优化） */
+    height: auto;
+    min-height: 320px;
+  }
+}

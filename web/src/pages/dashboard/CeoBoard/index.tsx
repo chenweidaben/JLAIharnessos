@@ -189,7 +189,7 @@ export default function CeoBoard() {
 
   return (
     <Watermark content={watermarkText}>
-      <div>
+      <div className="jl-responsive">
         {/* 深海蓝 Hero 横幅 */}
         <div
           className="mb-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-white"

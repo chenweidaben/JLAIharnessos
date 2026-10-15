@@ -6,6 +6,8 @@
  */
 @import './variables.css';
 @import './animations.css';
+/* M128-A 移动端响应式全局样式（移动端+性能优化） */
+@import './mobile-responsive.css';
 
 @tailwind base;
 @tailwind components;

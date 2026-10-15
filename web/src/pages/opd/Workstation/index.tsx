@@ -75,9 +75,10 @@ export default function OpdWorkstationPage() {
         )}
 
         <Spin spinning={loading}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {/* M128-A 移动端响应式：桌面4列/平板2列/手机1列（移动端+性能优化） */}
+          <div className="jl-opd-workbench-grid">
             {/* ① 病历模板快捷调用 */}
-            <Card size="small" title="病历模板快捷调用" style={{ height: 'calc(100vh - 140px)', overflow: 'auto' }}>
+            <Card size="small" title="病历模板快捷调用" className="jl-opd-card">
               <List
                 size="small"
                 dataSource={templates}
@@ -108,7 +109,7 @@ export default function OpdWorkstationPage() {
             </Card>
 
             {/* ② 处方历史 */}
-            <Card size="small" title="处方历史" style={{ height: 'calc(100vh - 140px)', overflow: 'auto' }}>
+            <Card size="small" title="处方历史" className="jl-opd-card">
               <List
                 size="small"
                 dataSource={prescriptions}
@@ -138,7 +139,7 @@ export default function OpdWorkstationPage() {
             </Card>
 
             {/* ③ ICD 诊断搜索 */}
-            <Card size="small" title="ICD 诊断搜索" style={{ height: 'calc(100vh - 140px)', overflow: 'auto' }}>
+            <Card size="small" title="ICD 诊断搜索" className="jl-opd-card">
               <Input.Search
                 placeholder="名称 / 编码 / 拼音码，如 高血压、I10、gxy"
                 allowClear
@@ -166,7 +167,7 @@ export default function OpdWorkstationPage() {
               title={
                 <span>检查检验开立{selectedItemIds.length > 0 && <Tag color="blue" style={{ marginLeft: 8 }}>已选 {selectedItemIds.length}</Tag>}</span>
               }
-              style={{ height: 'calc(100vh - 140px)', overflow: 'auto' }}
+              className="jl-opd-card"
               extra={<Text type="secondary" style={{ fontSize: 12 }}>合计 ¥{selectedTotal.toFixed(2)}</Text>}
             >
               <List

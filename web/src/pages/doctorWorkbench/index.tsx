@@ -26,17 +26,17 @@ export default function DoctorWorkbenchPage() {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="jl-responsive" style={{ minHeight: '100vh' }}>
       <Header><Title level={4} style={{ color: '#fff' }}>医生站工作台</Title></Header>
       <Content style={{ padding: 24 }}>
         {error && <Alert type="error" showIcon style={{ marginBottom: 16 }} message={error} />}
         <Row gutter={16} style={{ marginBottom: 16 }}>
-          <Col span={6}><Card><Statistic title="待办工单" value={data?.openTasksCount ?? 0} /></Card></Col>
-          <Col span={6}><Card><Statistic title="未读通知" value={data?.unreadNotifications ?? 0} /></Card></Col>
-          <Col span={6}><Card><Statistic title="急诊在观" value={data?.activeObservations ?? 0} /></Card></Col>
-          <Col span={6}><Card><Statistic title="待确认治疗方案" value={data?.pendingPlans ?? 0} /></Card></Col>
+          <Col xs={24} sm={12} lg={6}><Card><Statistic title="待办工单" value={data?.openTasksCount ?? 0} /></Card></Col>
+          <Col xs={24} sm={12} lg={6}><Card><Statistic title="未读通知" value={data?.unreadNotifications ?? 0} /></Card></Col>
+          <Col xs={24} sm={12} lg={6}><Card><Statistic title="急诊在观" value={data?.activeObservations ?? 0} /></Card></Col>
+          <Col xs={24} sm={12} lg={6}><Card><Statistic title="待确认治疗方案" value={data?.pendingPlans ?? 0} /></Card></Col>
         </Row>
-        <Card title="科室 KPI（红黄标红）">
+        <Card title="科室 KPI（红黄标红）" className="jl-table-cards">
           <Table rowKey="department" loading={loading} columns={kpiColumns} dataSource={data?.departmentKpis ?? []} pagination={false} size="small" />
         </Card>
       </Content>

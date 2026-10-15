@@ -184,7 +184,7 @@ export default function MuseHomePage() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="jl-responsive" style={{ minHeight: '100vh' }}>
       <Header
         style={{
           background: DEEP_BG,

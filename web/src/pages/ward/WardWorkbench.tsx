@@ -37,7 +37,7 @@ export default function WardWorkbench() {
   }, [checkHealth, fetchBedMap, fetchPatients]);
 
   return (
-    <Layout className="min-h-screen bg-ink-bg">
+    <Layout className="min-h-screen bg-ink-bg jl-responsive">
       <Header className="flex items-center justify-between bg-jl-primary px-6 shadow-card">
         <div className="flex items-center gap-3">
           <MedicineBoxOutlined className="text-2xl text-white" />

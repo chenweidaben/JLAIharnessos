@@ -34,7 +34,7 @@ export default function Login() {
 
   return (
     <div
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden jl-login-responsive"
       style={{
         background: 'linear-gradient(135deg, #052E5C 0%, #0A4D8C 45%, #1890FF 100%)',
       }}
@@ -60,6 +60,7 @@ export default function Login() {
       <Card
         style={{
           width: 420,
+          maxWidth: 'calc(100vw - 32px)',
           border: 'none',
           borderRadius: 16,
           boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)',
