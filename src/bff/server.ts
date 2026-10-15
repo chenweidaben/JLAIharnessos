@@ -412,6 +412,7 @@ import { oaApprovalRoutes } from './routes/oaApproval';
 import { partyUnionRoutes } from './routes/partyUnion';
 // 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
 import { jciReviewRoutes } from './routes/jciReview';
+import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -767,6 +768,7 @@ const allRoutes: RouteDef[] = [
   ...emrSmartScoreRoutes, // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，重实质不抠格式）
   ...opsForecastRoutes, // M154-C：【AI深化与运营预测】GET /api/v1/admin/forecast（移动平均+季节因子+趋势外推，含残差置信区间）
   ...integrationHl7Routes, // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build（|^~\& 分隔，FHIR R4 Patient/Observation/MedicationRequest）
+  ...patientServiceDeepRoutes, // M156-D：【患者服务深化】一站式服务中心（老人友好六卡片）GET /api/v1/patient/service
 ];
 
 interface Compiled {
