@@ -227,6 +227,7 @@ import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { smokeTestRoutes } from './routes/smokeTest';
+import { museOnboardingRoutes } from './routes/museOnboarding';
 import { getEnv } from './config/env';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
@@ -441,6 +442,7 @@ const allRoutes: RouteDef[] = [
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
   ...smokeTestRoutes,
+  ...museOnboardingRoutes,
 ];
 
 interface Compiled {
