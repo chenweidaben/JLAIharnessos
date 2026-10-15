@@ -218,6 +218,7 @@ import { modelInfoRoutes } from './routes/modelInfo';
 import { museLlmStatusRoutes } from './routes/museLlmStatus';
 import { aiFeedbackRoutes } from './routes/aiFeedback';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
+import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
 import { inpatientInsightRoutes } from './routes/inpatientInsight';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
@@ -236,8 +237,11 @@ import { museNurseRoutes } from './routes/museNurse';
 import { museHospitalRoutes } from './routes/museHospital';
 import { musePharmaRoutes } from './routes/musePharma';
 import { museAdminRoutes } from './routes/museAdmin';
+import { museMonthlyReportRoutes } from './routes/museMonthlyReport';
 import { musePatternsRoutes } from './routes/musePatterns';
+import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
+import { museDeptCurveRoutes } from './routes/museDeptCurve';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -442,6 +446,7 @@ const allRoutes: RouteDef[] = [
   ...opdWorkstationRoutes,
   ...aiFeedbackRoutes,
   ...strategyEvolutionRoutes,
+  ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
   ...doctorPreferenceRoutes,
@@ -460,8 +465,11 @@ const allRoutes: RouteDef[] = [
   ...museHospitalRoutes,
   ...musePharmaRoutes,
   ...museAdminRoutes,
+  ...museMonthlyReportRoutes,
   ...musePatternsRoutes,
+  ...museGrowthRoutes,
   ...patientMuseRoutes,
+  ...museDeptCurveRoutes,
 ];
 
 interface Compiled {
