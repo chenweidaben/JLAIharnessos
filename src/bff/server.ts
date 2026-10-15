@@ -291,6 +291,8 @@ import { museSearchRoutes } from './routes/museSearch';
 import { museAskRoutes } from './routes/museAsk';
 import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
+// 【测试覆盖率冲刺】M137-D：关键业务流程 E2E 红绿报告（仅 admin，质量门禁）
+import { e2eTestRoutes } from './routes/e2eTest';
 // 【核心业务深化】M136-C：核心 aggregator 测试覆盖率报告（仅 admin，质量门禁）
 import { testCoverageRoutes } from './routes/testCoverage';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
@@ -583,6 +585,7 @@ const allRoutes: RouteDef[] = [
   ...museAskRoutes,
   ...museRecommendRoutes,
   ...smokeTestRoutes,
+  ...e2eTestRoutes, // M137-D：GET /api/v1/admin/test/e2e 关键业务流程 E2E
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...performanceBenchmarkRoutes,
