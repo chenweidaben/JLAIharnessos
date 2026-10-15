@@ -32,6 +32,7 @@ import { authRoutes } from './routes/auth';
 import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
 import { tenantAdminRoutes } from './routes/admin/tenants';
+// 【SaaS化+智慧度】M133-B：超管后台医院管理（仅 superadmin 角色）
 import { userAdminRoutes } from './routes/admin/users';
 import { roleAdminRoutes } from './routes/admin/roles';
 import { auditLogRoutes } from './routes/admin/auditLogs';
@@ -47,6 +48,7 @@ import { adminQualityMonitorRoutes } from './routes/adminQualityMonitor';
 import { adminInfectionAlertsRoutes } from './routes/adminInfectionAlerts';
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
+// 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
