@@ -290,6 +290,7 @@ import { openApiRoutes } from './routes/openApi';
 import { adminApiKeysRoutes } from './routes/adminApiKeys';
 import { adminErrorsRoutes } from './routes/adminErrors';
 import { adminConfigRoutes } from './routes/adminConfig';
+import { deployConfigRoutes } from './routes/deployConfig'; // M145-D：部署配置生成（生产化收尾）
 import { adminLogsRoutes } from './routes/adminLogs';
 import { adminWebhooksRoutes } from './routes/adminWebhooks';
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
@@ -618,6 +619,7 @@ const allRoutes: RouteDef[] = [
   ...adminApiKeysRoutes,
   ...adminErrorsRoutes,
   ...adminConfigRoutes,
+  ...deployConfigRoutes, // M145-D：部署配置生成（生产化收尾）
   ...adminLogsRoutes,
   ...adminWebhooksRoutes,
   ...strategyEvolutionRoutes,
