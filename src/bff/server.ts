@@ -192,6 +192,7 @@ import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
 import { costAttributionRoutes } from './routes/costAttribution';
 import { financeRoutes } from './routes/finance'; // M139-D：医院财务管理 GET /admin/finance/report + POST /transaction
+import { teachingRoutes } from './routes/teaching'; // M140-C：教学管理（医院管理深化）GET/POST /admin/teaching
 import { improvementTaskRoutes } from './routes/improvementTask';
 import { improvementOutcomeRoutes } from './routes/improvementOutcome';
 import { dipRoutes } from './routes/dip';
@@ -485,6 +486,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientCostMonitorRoutes,
   ...costAttributionRoutes,
   ...financeRoutes, // M139-D：医院财务管理（医院运营管理）
+  ...teachingRoutes, // M140-C：教学管理（医院管理深化：规培/实习/讲座/三基）
   ...improvementTaskRoutes,
   ...improvementOutcomeRoutes,
   ...dipRoutes,
