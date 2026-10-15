@@ -267,6 +267,7 @@ import { assistantKnowledgeRoutes } from './routes/assistantKnowledge';
 import { assistantLlmChatRoutes } from './routes/assistantLlmChat';
 import { patientGuideRoutes } from './routes/patientGuide';
 import { doctorPreferenceRoutes } from './routes/doctorPreference';
+import { userSettingsRoutes } from './routes/userSettings';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
@@ -543,6 +544,7 @@ const allRoutes: RouteDef[] = [
   ...assistantLlmChatRoutes,
   ...patientGuideRoutes,
   ...doctorPreferenceRoutes,
+  ...userSettingsRoutes,
   ...learningDashboardRoutes,
   ...museHomeRoutes,
   ...followupLearningRoutes,
