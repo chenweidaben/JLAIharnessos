@@ -330,6 +330,7 @@ import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
 import { oaApprovalRoutes } from './routes/oaApproval';
 // 【医院管理深化】M140-D：党建工会活动留痕（党支部学习/主题党日/工会福利/职工文体/志愿服务）
+import { partyUnionRoutes } from './routes/partyUnion';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -613,6 +614,7 @@ const allRoutes: RouteDef[] = [
   ...eSignatureRoutes, // M138-B：电子签名 POST /sign + GET /verify/:id
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
+  ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,
