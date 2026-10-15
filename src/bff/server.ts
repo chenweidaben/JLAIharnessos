@@ -192,6 +192,7 @@ import { drugInventoryRoutes } from './routes/drugInventory';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
+import { deptKnowledgeRoutes } from './routes/deptKnowledge';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
 import { rectificationRoutes } from './routes/rectification';
@@ -401,6 +402,7 @@ const allRoutes: RouteDef[] = [
   ...drgAuditRoutes,
   ...emrLevel5Routes,
   ...emrGrade5Routes,
+  ...deptKnowledgeRoutes,
   ...qcRectificationRoutes,
   ...monthlyReportRoutes,
   ...bedMapRoutes,
