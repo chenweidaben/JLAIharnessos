@@ -39,6 +39,7 @@ import { roleAdminRoutes } from './routes/admin/roles';
 import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
+// 【质量与合规】M155-B：患者隐私深度脱敏 + 合规自检 GET /api/v1/admin/privacy/compliance
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 // 【移动端+性能优化】M128-D：性能优化索引建议 + BFF 缓存观测
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
@@ -287,6 +288,7 @@ import { emrGrade5Routes } from './routes/emrGrade5';
 import { deptKnowledgeRoutes } from './routes/deptKnowledge';
 import { patientRoutes } from './routes/patient';
 import { qualityRoutes } from './routes/quality';
+import { qualityPdcaRoutes } from './routes/qualityPdca'; // M155-A：【质量与合规】PDCA 持续改进 POST /api/v1/quality/pdca
 import { rectificationRoutes } from './routes/rectification';
 import { skillRoutes } from './routes/skills';
 import { systemRoutes } from './routes/system';
@@ -423,6 +425,7 @@ const allRoutes: RouteDef[] = [
   ...medicalRoutes,
   ...dashboardRoutes,
   ...qualityRoutes,
+  ...qualityPdcaRoutes, // M155-A：PDCA 持续改进（Plan/Do/Check/Act 闭环）
   ...rectificationRoutes,
   ...operationRoutes,
   ...outpatientRoutes,
