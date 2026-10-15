@@ -236,6 +236,7 @@ import { aiRecordRoutes } from './routes/aiRecord'; // 【AI核心能力深化�
 import { terminalQcRoutes } from './routes/terminalQc';
 import { deptCockpitRoutes } from './routes/deptCockpit';
 import { drugReviewRoutes } from './routes/drugReview';
+import { aiDrugReviewRoutes } from './routes/aiDrugReview'; // M144-C
 import { drugInventoryRoutes } from './routes/drugInventory';
 import { supplyRoutes } from './routes/supply';
 import { prescriptionReviewRoutes } from './routes/prescriptionReview';
@@ -573,6 +574,7 @@ const allRoutes: RouteDef[] = [
   ...terminalQcRoutes,
   ...deptCockpitRoutes,
   ...drugReviewRoutes,
+  ...aiDrugReviewRoutes, // M144-C
   ...drugInventoryRoutes,
   ...supplyRoutes,
   ...prescriptionReviewRoutes,
