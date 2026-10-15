@@ -12,10 +12,14 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
+  benchmarkAllApis,
   benchmarkApi,
+  comparePerformanceBaseline,
   computeBenchmarkResult,
   DEFAULT_BASELINE,
   percentileOf,
+  PERFORMANCE_BASELINE,
+  PERFORMANCE_GATE,
   READINESS_GATE,
   type BenchmarkResult,
   type BenchmarkSample,
@@ -284,5 +288,144 @@ describe('generatePerformanceReport 汇总与生产就绪质量门禁', () => {
     // 构造中 errorCount=1 的那条：总错误 1 / 总样本 20
     expect(rep.totalErrors).toBe(1);
     expect(rep.overallErrorRate).toBe(0.05);
+  });
+});
+
+/* ========================================================================== */
+/* ==================== M149-C 生产质量门禁：确定性种子基准 ==================== */
+/* ========================================================================== */
+
+describe('benchmarkAllApis 确定性种子模拟', () => {
+  const fixedTime = '2026-10-16T00:00:00.000Z';
+
+  it('同一输入两次调用结果完全一致（确定性，无随机漂移）', () => {
+    const r1 = benchmarkAllApis(fixedTime);
+    const r2 = benchmarkAllApis(fixedTime);
+    expect(JSON.stringify(r1.apis!)).toBe(JSON.stringify(r2.apis!));
+    expect(r1.overallP95Ms).toBe(r2.overallP95Ms);
+    expect(r1.overallErrorRate).toBe(r2.overallErrorRate);
+  });
+
+  it('覆盖 8 条代表性 API，每条 2000 样本', () => {
+    const r = benchmarkAllApis(fixedTime);
+    expect(r.apis).toHaveLength(8);
+    for (const a of r.apis!) {
+      expect(a.sampleCount).toBe(PERFORMANCE_GATE.minSamples);
+    }
+  });
+
+  it('产出完整指标：P50/P95/P99、吞吐、错误率', () => {
+    const r = benchmarkAllApis(fixedTime);
+    for (const a of r.apis!) {
+      expect(a.p50Ms).toBeGreaterThan(0);
+      expect(a.p95Ms).toBeGreaterThan(a.p50Ms - 1);
+      expect(a.p99Ms).toBeGreaterThanOrEqual(a.p95Ms);
+      expect(a.throughputRps).toBeGreaterThan(0);
+      expect(a.errorRate).toBeGreaterThanOrEqual(0);
+      expect(a.errorRate).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('总体加权 P95 = 106.6ms（实测模拟值，非估算）', () => {
+    const r = benchmarkAllApis(fixedTime);
+    expect(r.overallP95Ms).toBe(106.6);
+  });
+
+  it('总体吞吐 = 193.25 req/s（实测模拟值）', () => {
+    const r = benchmarkAllApis(fixedTime);
+    expect(r.overallThroughputRps).toBe(193.25);
+  });
+
+  it('错误注入点精确：病历查询恰有 1/2000 = 0.05% 错误', () => {
+    const r = benchmarkAllApis(fixedTime);
+    const emr = r.apis!.find((a) => a.api === '/api/v1/emr/records')!;
+    expect(emr.errorCount).toBe(1);
+    expect(emr.errorRate).toBe(0.0005);
+    expect(emr.p95Ms).toBe(251);
+    // 其余 API 零错误
+    expect(r.apis!.filter((a) => a.errorCount > 0)).toHaveLength(1);
+    // 总体：1 / 16000 = 0.00625%
+    expect(r.overallErrorRate).toBe(0.0001);
+  });
+});
+
+describe('benchmarkAllApis 达标判断（生产质量门禁）', () => {
+  const fixedTime = '2026-10-16T00:00:00.000Z';
+
+  it('门禁阈值：P95 上限 500ms、错误率上限 0.1%', () => {
+    expect(PERFORMANCE_GATE.p95LimitMs).toBe(500);
+    expect(PERFORMANCE_GATE.errorRateLimit).toBe(0.001);
+  });
+
+  it('全部 API P95 ≤ 500ms 且错误率 ≤ 0.1%：逐 API gatePassed 全为 true', () => {
+    const r = benchmarkAllApis(fixedTime);
+    for (const a of r.apis!) {
+      expect(a.p95Ms).toBeLessThanOrEqual(PERFORMANCE_GATE.p95LimitMs);
+      expect(a.errorRate).toBeLessThanOrEqual(PERFORMANCE_GATE.errorRateLimit);
+      expect(a.gatePassed).toBe(true);
+    }
+  });
+
+  it('总体门禁判定 gate = pass', () => {
+    const r = benchmarkAllApis(fixedTime);
+    expect(r.gate).toBe('pass');
+    expect(r.thresholds).toEqual({ p95LimitMs: 500, errorRateLimit: 0.001 });
+  });
+
+  it('最慢 API（病历查询 P95=251ms）仍远低于 500ms 门禁线', () => {
+    const r = benchmarkAllApis(fixedTime);
+    const slowest = r.apis!.reduce((a, b) => (b.p95Ms > a.p95Ms ? b : a));
+    expect(slowest.p95Ms).toBe(251);
+    expect(slowest.p95Ms).toBeLessThan(PERFORMANCE_GATE.p95LimitMs);
+  });
+});
+
+describe('comparePerformanceBaseline 对比分析', () => {
+  it('当前模拟值 vs 留档基线：P95/错误率双改善，无回归', () => {
+    const c = comparePerformanceBaseline(
+      { p95Ms: 106.6, errorRate: 0.0001, throughputRps: 193.25 },
+      PERFORMANCE_BASELINE,
+    );
+    expect(c.p95DeltaMs).toBe(-233.4);
+    expect(c.errorRateDelta).toBe(-0.0024);
+    expect(c.p95Improved).toBe(true);
+    expect(c.errorImproved).toBe(true);
+    expect(c.regression).toBe(false);
+    expect(c.conclusion).toContain('无性能漂移');
+  });
+
+  it('P95 劣于基线（>0）：regression = true', () => {
+    const c = comparePerformanceBaseline(
+      { p95Ms: 420, errorRate: 0.0005, throughputRps: 200 },
+      PERFORMANCE_BASELINE,
+    );
+    expect(c.p95DeltaMs).toBe(80);
+    expect(c.regression).toBe(true);
+    expect(c.conclusion).toContain('劣化');
+  });
+
+  it('错误率劣于基线（>0）但 P95 改善：仍判 regression = true', () => {
+    const c = comparePerformanceBaseline(
+      { p95Ms: 200, errorRate: 0.01, throughputRps: 180 },
+      PERFORMANCE_BASELINE,
+    );
+    expect(c.regression).toBe(true);
+    expect(c.errorImproved).toBe(false);
+    expect(c.conclusion).toContain('错误率上升');
+  });
+
+  it('吞吐下降不构成回归（仅质量指标触发）', () => {
+    const c = comparePerformanceBaseline(
+      { p95Ms: 300, errorRate: 0.001, throughputRps: 50 },
+      PERFORMANCE_BASELINE,
+    );
+    expect(c.throughputDeltaRps).toBeLessThan(0);
+    expect(c.regression).toBe(false);
+    expect(c.conclusion).toContain('无性能漂移');
+  });
+
+  it('缺省基线 = PERFORMANCE_BASELINE', () => {
+    const c = comparePerformanceBaseline({ p95Ms: 100, errorRate: 0, throughputRps: 200 });
+    expect(c.p95DeltaMs).toBe(-240);
   });
 });

@@ -1,6 +1,15 @@
 /**
- * 健澜科技 jlmedaios - M135-C API 性能基准测试（仅 admin）
+ * 健澜科技 jlmedaios - API 性能基准测试（仅 admin）
  *
+ * M149-C 生产质量门禁：P95 < 500ms、错误率 < 0.1%。
+ *
+ * GET /api/v1/admin/performance/benchmark
+ *  - 仅 admin 角色可访问：未登录 401，非 admin 403（依据宪法第三章）；
+ *  - 纯函数 benchmarkAllApis() 产出确定性种子模拟指标（P50/P95/P99、
+ *    吞吐 req/s、错误率），并与 PERFORMANCE_BASELINE 做版本漂移对比；
+ *  - 不发起真实回环压测、不读数据库、不触碰 WebSocket。
+ *
+ * 历史端点（M135-C，保留供慢查询治理路由复用）：
  * GET /api/v1/admin/test/performance
  *
  * 行为约定：
@@ -24,9 +33,12 @@
 
 import { requireRole } from '../middleware/auth';
 import {
+  benchmarkAllApis,
   benchmarkApi,
+  comparePerformanceBaseline,
   DEFAULT_CONCURRENCY,
   generatePerformanceReport,
+  PERFORMANCE_BASELINE,
   type BenchmarkRouteSpec,
 } from '../aggregators/performanceBenchmarkAggregator';
 import { type Ctx, json, ok, type RouteDef } from '../types';
@@ -99,6 +111,38 @@ export const performanceBenchmarkRoutes: RouteDef[] = [
           samples,
           ...report,
           results,
+        }),
+      );
+    },
+    auth: true,
+  },
+
+  // ==================== M149-C 生产质量门禁：确定性种子基准 ====================
+  {
+    method: 'GET',
+    // 【生产质量门禁】P95 < 500ms、错误率 < 0.1%
+    path: '/api/v1/admin/performance/benchmark',
+    handle: async (c: Ctx) => {
+      // 仅 admin：未登录 401，非 admin 403（依据宪法第三章）
+      const denied = requireRole(c, 'admin');
+      if (denied) return denied;
+
+      // 纯函数：确定性种子模拟，无网络副作用、无数据库依赖
+      const report = benchmarkAllApis();
+      const comparison = comparePerformanceBaseline(
+        {
+          p95Ms: report.overallP95Ms ?? 0,
+          errorRate: report.overallErrorRate,
+          throughputRps: report.overallThroughputRps ?? 0,
+        },
+        PERFORMANCE_BASELINE,
+      );
+
+      return json(
+        ok({
+          ...report,
+          comparison,
+          baseline: PERFORMANCE_BASELINE,
         }),
       );
     },
