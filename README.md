@@ -2,198 +2,252 @@
 
 # jlmedaios · 健澜科技 AI 原生未来医院操作系统
 
-### 微服务云原生 HIS·EMR 一体化平台 —— 未来十五年数智医院高质量发展新引擎
+### MEDMUSE 智能体驱动 · 微服务云原生 HIS·EMR 一体化平台
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
-[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%2B%20pgvector-0A2540.svg)](https://www.postgresql.org/)
-[![Cloud](https://img.shields.io/badge/Deploy-Docker%20%2F%20K8s%20%2F%20Helm-0A2540.svg)](deploy/)
-[![Security](https://img.shields.io/badge/Security-等保三级设计-1B4F8B.svg)](SECURITY.md)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-2E6FB7.svg)](CONTRIBUTING.md)
+[![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
+[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%3A5433-0A2540.svg)](https://www.postgresql.org/)
+[![Agent](https://img.shields.io/badge/Agent-MEDMUSE-1B4F8B.svg)
+[![Copyright](https://img.shields.io/badge/%C2%A9-%E6%9D%AD%E5%B7%9E%E5%81%A5%E6%BE%9C%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8-0A2540.svg)
 
-> 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`），本仓库品牌物料、徽章与文档配图均以此为主色。
-
-**医院信息科自己就能搭智能体的操作系统：AI 病历草稿、合理用药审查、鉴别诊断、临床路径推荐、住院天数与费用预测…… 微服务云原生底座 + AI 原生能力中台，私有化部署，数据不出院。**
-
-[English](README_EN.md) · [项目定位](#-项目定位) · [核心能力矩阵](#-核心能力矩阵) · [快速启动](#-快速启动) · [功能全景](#-功能全景) · [开放合作](#-开放合作) · [安全合规](#-安全与医疗红线)
+> 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`）。
 
 </div>
 
 ---
 
-## 🧭 项目定位
+## 🧭 项目简介
 
-**jlmedaios** 是健澜科技面向未来十五年数智医院高质量发展打造的 **AI 原生未来医院操作系统**：一套基于微服务云原生架构、HIS·EMR 一体化、开源免费、工业级的医院智能体操作系统。
+**jlmedaios** 是杭州健澜科技有限公司自主研发的 **AI 原生未来医院操作系统**。它以 **MEDMUSE 智能体**为核心引擎，把医院核心业务事务系统（HIS / EMR / 护理 / 药房 / 手术 / 质控 / 医保 DRG）与 AI 能力中台深度融合，面向未来十五年数智医院高质量发展，提供私有化部署、数据不出院、工业级稳定性的一体化底座。
 
-它不是单点 AI 助手，而是把 **核心业务事务系统**（门诊/住院/急诊/医嘱/病历/药事/收费/检查检验/手术麻醉）与 **AI 原生能力中台**（智能体编排 / 技能市场 / 知识中台 / CDS / RAG）深度融合：
-
-- **向下**：统一临床数据、主数据（EMPI）与外部系统接入；
-- **向中**：云原生微服务承载医院核心事务，状态机 + 行锁 + 幂等保证并发安全；
-- **向上**：AI 中台横切每个业务环节，提供刚需智能体，医师复核签名、合规内建；
+- **向下**：统一临床数据、主数据（EMPI）与外部系统（HIS/LIS/PACS）接入；
+- **向中**：BFF 微服务承载医院核心事务，状态机 + 行锁 + 幂等保证并发安全；
+- **向上**：MEDMUSE 智能体横切每个业务环节，医师复核签名、合规内建；
 - **全程**：RBAC + ABAC、字段级加密、审计哈希链、数据可追溯。
-
-> 🔬 **实验室定位**：本项目处于 **健澜科技医疗 AI 大模型及应用前沿实验室** 阶段，诚邀高校、科研院所、同行企业、医院信息科与临床专家携手共建，推动医疗 AI 从实验室走向规模化落地。
 
 > ⚕️ **医疗安全红线**：AI 始终定位为辅助（第二意见），所有诊断、医嘱、处方、病历签名等法律效力写操作必须由具备权限的医务人员确认并电子签名；系统不做自主诊疗。
 
 ---
 
-## 🚀 核心能力矩阵
+## 🗺️ 功能全景图
 
-| 能力域 | 核心模块 | 说明 |
-|---|---|---|
-| 🧠 **智能体编排** | 可视化画布 · DAG 工作流 · Agent Package | 声明式 DSL + 节点编排，人工在环、版本化、可移植 `agent.yaml` |
-| 🛒 **技能市场** | 医疗技能包注册 · 权限分级 · 热加载 | 像装 App 一样装配医疗技能，统一风险分级与权限模型 |
-| 📚 **知识中台** | 文档摄入 · 向量+关键词混合检索 · 引用溯源 | 解析→分块→嵌入→落库，RAG 引用可追溯 |
-| 💊 **CDS 临床决策** | 合理用药审查 · 危急值闭环 · 规则热加载 | 主动提醒 + 拦截确认，规则纯函数确定性可重算 |
-| 📝 **EMR 五级文书** | 入院记录/病程/出院小结/病案首页/知情同意 | 三级签名 + 退回整改 + 内涵质控状态机闭环 |
-| 🌐 **互联网医院** | 号源预约 · 在线报告 · 在线续方 · 支付配药 · 通知 | 微信小程序患者端，实名就诊、字段加密、履约闭环 |
-| 🚑 **急诊绿色通道** | 分级分诊 · 绿色通道 · 抢救留观 · 时间节点质控 | 急诊状态机全链路留痕 |
-| 🩸 **专项质控** | VTE 防治 · AMS 抗菌药物管理 · 院感监测 | Caprini/Padua 评分、DDD 指标、院感看板全闭环 |
-| 🏥 **手术麻醉** | 手术申请 · 术前评估 · 术中记录 · PACU 双签 | 九态状态机，三方核对、双人核对离室 |
-| 🧪 **检验检查** | LIS 全流程 · RIS/影像 · AI 辅助解读 | 标本条码闭环、报告双签发布、检验/影像双视角解读 |
-| 📱 **移动护理 PDA** | 条码腕带 · 五重核对 · 体征采集 · SBAR 交班 | 床旁执行端，离线队列 + 冲突人工确认 |
-| 🛡️ **安全合规** | 等保三级设计 · MFA · 审计哈希链 · 脱敏 | 16 类敏感数据脱敏、AES-256-GCM、JWT 主动吊销 |
-| 📦 **云原生底座** | Docker · K8s · Helm · HPA/PDB/NetworkPolicy | 多阶段非 root 镜像，零信任网格与灰度发布可选 |
-
----
-
-## 🏛️ 技术架构
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  L1 接入层   Web 工作台(React19+AntD5) · 移动PDA · 小程序 │
-├─────────────────────────────────────────────────────────┤
-│  L2 业务事务层  门诊 · 住院ADT · 急诊 · 医嘱处方 · 病历文书 │
-│              药事 · 收费结算 · 手术麻醉 · 检验检查 · 护理   │
-├─────────────────────────────────────────────────────────┤
-│  L3 AI 中台    智能体编排引擎 · 技能市场 · 知识中台/RAG     │
-│              CDS 规则引擎 · 语音 ASR · 大模型可插拔        │
-├─────────────────────────────────────────────────────────┤
-│  L4 数据层    PostgreSQL 16(+pgvector) · Redis · 湖仓分层  │
-├─────────────────────────────────────────────────────────┤
-│  L5 集成标准  HL7 v2 · FHIR R4 · DICOM · HIS/LIS/PACS 适配 │
-├─────────────────────────────────────────────────────────┤
-│  L6 安全合规  RBAC+ABAC · 加密脱敏 · 审计哈希链(贯穿全层)   │
-└─────────────────────────────────────────────────────────┘
-```
-
-**架构特征**：微服务云原生、前后端分离、BFF 统一收口；TypeScript + Bun 单一语言栈；事务与审计哈希链同提交；大模型经 OpenAI 兼容接口可插拔（DeepSeek / 本地模型均可替换）。
+| 模块域 | 核心能力 |
+|---|---|
+| 🏥 **HIS** | 挂号候诊、门诊工作站、住院 ADT 入出转、床位病区、收费结算、费用清单、账单管理、多租户一院多区 |
+| 📝 **EMR 电子病历** | 入院记录/病程/出院小结/病案首页/知情同意、三级签名、内涵质控状态机、EMR 五级评审、病历模板管理、智能病历草稿 |
+| 🩺 **护理** | 护士工作站、护理记录、医嘱执行双签、压疮/跌倒/疼痛/Barthel 评估、SBAR 交班、PDA 移动执行、护理 NQI 指标 |
+| 💊 **药房药事** | 调剂发药、库存联动、处方前置审核、处方点评、合理用药审查、用药咨询、药品库存盘点 |
+| 🔪 **手术麻醉** | 手术排程看板（日/周视图）、术前评估、三方核对、术中记录、PACU 双签、手术核查清单 |
+| ✅ **质控** | 危急值闭环、质控整改闭环看板、终端质控、VTE / AMS / 院感专项、病历质控、护理质控 |
+| 📊 **医保 DRG** | DRG + DIP 本地分组、医保智能审核规则引擎、DRG 审计与超支汇总、预算管理、成本分摊 |
+| 🤖 **MEDMUSE AI** | 岗位智能体体系（医生/护士/药师/财务/管理员）、对话式工作台 `/medmuse`、多轮上下文摘要、SSE 流式输出、电子签名留痕、快捷指令、会话历史、多模态扩展、Agent 健康度看板 |
+| 📈 **驾驶舱** | 院长数据驾驶舱、科室运营驾驶舱、月度运营报表、床位可视化地图、系统健康度看板、患者 360° 视图 |
+| 🌐 **互联网医院** | 号源预约、在线报告、在线续方、支付配药、通知（微信/钉钉 webhook）、患者门户 |
+| 🧪 **检验检查** | LIS 全流程、RIS/影像预约、AI 辅助解读（医师签名生效）、多模态影像 |
+| 🛡️ **安全合规** | 等保三级设计、MFA、JWT 主动吊销、16 类敏感数据脱敏、AES-256-GCM、审计哈希链 |
 
 ---
 
-## 🏃 快速启动
+## 🏛️ 架构说明
 
-**环境要求**：Bun ≥ 1.3、Node.js ≥ 18、Docker（可选，用于一键拉起 PostgreSQL/Redis）。
+```
+┌──────────────────────────────────────────────────────────────┐
+│  接入层    React 19 + Vite + AntD 5 工作台  (web/)           │
+│           移动 PDA · 微信小程序 (miniprogram/)               │
+├──────────────────────────────────────────────────────────────┤
+│  BFF 层    Bun + TypeScript  (src/bff/)                     │
+│           REST :8080 · WebSocket · 路由/中间件/适配器       │
+│           MEDMUSE Agent 运行时 · 签名/审批/通知/可观测        │
+├──────────────────────────────────────────────────────────────┤
+│  业务服务  src/ 下各领域模块：bff / core / medical-tools /   │
+│           orchestrator / knowledge / security / tenant /     │
+│           emergency / internet-hospital / data-platform ...  │
+├──────────────────────────────────────────────────────────────┤
+│  数据层    PostgreSQL 16  (localhost:5433 / jlmedaios)        │
+│           Redis · pgvector · 湖仓分层                        │
+├──────────────────────────────────────────────────────────────┤
+│  模型层    LLM 可插拔（OpenAI 兼容协议，默认 DeepSeek）       │
+│           MCP 工具调用 · RAG 知识中台 · 语音 ASR             │
+└──────────────────────────────────────────────────────────────┘
+```
 
-```bash
-git clone <仓库地址>.git
-cd jlmedaios
+**技术栈一览**：
+
+| 层 | 技术 |
+|---|---|
+| 运行时 | Bun ≥ 1.3（单一 TypeScript 栈） |
+| 前端 | React 19 + Vite 6 + AntD 5 + TailwindCSS + Zustand + ECharts |
+| BFF | Bun HTTP + WebSocket + Zod 校验 |
+| 数据库 | PostgreSQL 16（本地开发端口 **5433**，库名 **jlmedaios**）+ Redis |
+| 智能体 | MEDMUSE 编排引擎 + MCP SDK + OpenAI 兼容 LLM |
+| 部署 | Docker / docker-compose / K8s / Helm |
+
+---
+
+## 🏃 快速启动指南（Windows）
+
+**环境要求**：Bun ≥ 1.3、Node.js ≥ 18、本地 PostgreSQL 16（端口 5433）。
+
+```powershell
+# 1. 克隆并安装依赖
+cd C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1
 bun install
-cp .env.example .env          # 配置 JWT_SECRET、DATABASE_URL、LLM_API_KEY 等
 
-docker compose up -d postgres redis   # 依赖服务
-bun run db:seed                       # 导入药品/ICD/检验/临床路径等种子
+# 2. 准备 PostgreSQL（5433 端口，库名 jlmedaios）
+#    连接串：postgres://postgres@127.0.0.1:5433/jlmedaios
+#    首次启动可执行种子数据：
+bun run db:seed
 
-bun run bff                           # 后端 BFF：REST 8080 + WebSocket
-cd web && bun install && bun run dev  # 前端工作台 http://localhost:5173
+# 3. 启动后端 BFF（开发模式）
+bun run dev
+
+# 4. 启动前端工作台（另开一个 PowerShell 窗口）
+cd web
+bun install
+bun run dev
+# 前端默认地址：http://localhost:5173
 ```
+
+**关键环境变量**（`.env`）：
+
+| 变量 | 值 | 说明 |
+|---|---|---|
+| `DATABASE_URL` | `postgres://postgres@127.0.0.1:5433/jlmedaios` | 本地 PG 连接串 |
+| `HTTP_PORT` | `8080` | BFF 端口 |
+| `DEMO_MODE` | `0` | 0 = 真实数据库模式；1 = 无 DB 演示模式 |
+| `LLM_PROVIDER` | `deepseek` | LLM 提供商（OpenAI 兼容协议） |
+
+> 💡 **无数据库体验**：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示。
 
 **容器化部署**：
 
-```bash
-docker compose up -d                      # 全栈一键（网关+BFF+前端+PG+Redis）
-kubectl apply -f deploy/k8s/              # Kubernetes 一体化清单
+```powershell
+docker compose up -d                      # 全栈一键
+kubectl apply -f deploy/k8s/              # Kubernetes
 helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 ```
 
-> 无数据库体验：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示。
+---
+
+## 📂 目录结构
+
+```
+jlmedaios/
+├── src/                        # 后端源码（Bun + TypeScript）
+│   ├── bff/                    # BFF 层：server.ts / routes / middleware / agents / adapters
+│   ├── core/                   # 核心领域模型与状态机
+│   ├── medical-tools/          # MEDMUSE 医疗技能工具集
+│   ├── orchestrator/           # 智能体编排引擎
+│   ├── knowledge/              # 知识中台 / RAG
+│   ├── knowledge-platform/      # 知识平台
+│   ├── data-platform/           # 数据平台 / 湖仓
+│   ├── security/                # 安全：RBAC/ABAC/加密/审计
+│   ├── tenant/                  # 多租户 / 一院多区
+│   ├── emergency/               # 急诊绿色通道
+│   ├── internet-hospital/      # 互联网医院
+│   ├── voice/                   # 语音 ASR
+│   ├── db/                      # 数据库迁移与 Schema
+│   ├── entrypoints/            # CLI / Server 入口
+│   ├── integration/            # HIS/LIS/PACS 适配器
+│   ├── saga/                    # 分布式事务
+│   ├── resilience/              # 熔断/重试/限流
+│   └── skills/                  # MEDMUSE 技能包
+├── web/                        # 前端工作台（React 19 + Vite）
+│   └── src/
+│       ├── pages/              # 页面（dashboard/outpatient/ward/emergency/quality/system...）
+│       ├── components/         # 通用组件
+│       ├── services/           # API 层（Axios + WebSocket）
+│       ├── store/               # Zustand 状态
+│       ├── router/              # 路由与守卫
+│       └── hooks/               # 自定义 Hooks
+├── miniprogram/                # 微信小程序患者端
+├── scripts/                    # 工具脚本（DB seed / 知识下载）
+├── deploy/                     # Docker / K8s / Helm 部署清单
+├── docs/                       # 项目文档
+├── tests/                      # 单元 / 集成 / E2E 测试
+├── config/                     # 配置文件
+├── data/                       # 本地数据（向量库等，gitignore）
+└── package.json                # 根包（Bun 工作区）
+```
 
 ---
 
-## 🧩 功能全景
+## 📈 版本迭代记录（v1.42 ~ v2.05）
 
-### AI 原生五剑客
-
-| 智能体 | 能力 | 落点 |
-|---|---|---|
-| 📄 病历草稿生成 | 基于就诊信息自动生成入院记录/病程草稿 | 医师复核后签名入档 |
-| 💊 合理用药审查 | 相互作用、配伍、禁忌、剂量实时审查 | 医嘱/处方环节主动拦截提醒 |
-| 🔍 鉴别诊断 | 结合病史体征推荐鉴别方向与检查 | 仅供医师参考，不做自主诊断 |
-| 🛤️ 临床路径推荐 | 按病种推荐标准路径与变异管理 | 路径执行与偏差留痕 |
-| 📈 住院天数/费用预测 | 基于在院数据预测 LOS 与费用区间 | 辅助床位调度与成本管控 |
-
-### MEDMUSE 岗位智能体体系（M89–M91）
-
-| 里程碑 | 最新进展 |
-|---|---|
-| **M89 岗位智能体体系** | 8 类岗位角色智能体（admin / doctor / nurse / pharmacist / finance / patient 等），内置 14+ 岗位工具：处方前置审核、DRG/DIP 超支汇总、随访提醒、护理记录、查房交班报告等；Sentinel 审批红线——critical 级事项禁止自批自，必须跨岗位审批 |
-| **M90 真实数据打通** | AI 病历质控与护理计划推荐已接入真实 visit / diagnosis 数据，不再使用演示假数据 |
-| **M91 深海蓝 VI 体系** | Dashboard、患者、处方、药房等界面统一深海蓝配色 `#0A2540` / `#1E5F8C` / `#4A90D9` |
-| **/medmuse 工作台** | 岗位智能体对话页内嵌审批卡片，医师/药师可在对话流中直接批准或驳回待决事项 |
-| **双平台同步** | 代码仓库 GitCode + GitHub 双平台镜像同步 |
-
-### 版本迭代记录（v1.66–v1.89）
+> 以下条目从 git tag 提取，按版本号升序排列。
 
 | 版本 | 说明 |
 |---|---|
-| **v1.66.0-smoke** | 前端 jsdom 冒烟测试（5 页渲染） |
-| **v1.67.0-summary** | MEDMUSE 多轮对话上下文摘要（超20轮） |
-| **v1.68.0-esign** | 电子签名留痕（SHA-256+时间戳+操作人） |
-| **v1.69.0-notify** | 微信/钉钉 webhook 通知骨架 |
-| **v1.70.0-esignmount** | 电子签名挂载到病历/医嘱/处方主流程 |
-| **v1.71.0-agenthealth** | MEDMUSE agent 健康度看板 |
-| **v1.72.0-pathwayvariance** | 临床路径变异管理 |
-| **v1.73.0-surgeryschedule** | 手术排程看板（日/周视图） |
-| **v1.74.0-agenthook** | agent 健康度真实挂钩 |
-| **v1.75.0-multimodality** | MEDMUSE 多模态扩展骨架 |
-| **v1.76.0-nursehandoff** | 护士交接班记录 |
-| **v1.77.0-insuranceaudit** | 医保智能审核规则引擎 |
-| **v1.78.0-readme** | README 版本迭代记录 |
-| **v1.79.0-quickcommands** | MEDMUSE 快捷指令面板 |
-| **v1.80.0-billlist** | 住院费用清单页 |
-| **v1.81.0-qcrectification** | 质控整改闭环看板 |
-| **v1.82.0-streaming** | MEDMUSE SSE 流式输出 |
-| **v1.83.0-criticalclosure** | 危急值闭环升级 |
-| **v1.84.0-bedmap** | 床位管理可视化 |
-| **v1.85.0-monthlyreport** | 科室月度运营报表 |
-| **v1.86.0-sessionhistory** | MEDMUSE 会话历史列表增强 |
-| **v1.87.0-emrtemplate** | 电子病历模板管理 |
-| **v1.88.0-prescriptionreview** | 处方点评系统 |
-| **v1.89.0-ceoboard** | 院长数据驾驶舱 |
-
-### 临床业务体系
-
-| 业务线 | 已闭环能力 |
-|---|---|
-| **门诊** | 挂号候诊、问诊、诊断、医嘱处方、药师审核、智能导诊预问诊、满意度评价 |
-| **住院 ADT** | 入出转、床位病区、查房、护理记录、医嘱执行双签、出院计划与随访 |
-| **急诊** | 1–4 级分诊、绿色通道、抢救、留观、急诊时间节点质控 |
-| **药事** | 调剂发药、库存联动、处方点评、用药咨询 |
-| **EMR 五级文书** | 入院记录、手术记录、病程记录、出院小结、病案首页、知情同意；三级签名、内涵质控、缺陷整改闭环 |
-| **医保双轨** | DRG + DIP 本地分组、预算管理、成本分摊、结算分析与报表（不接外部医保，本地可重算） |
-| **护理线** | 护士工作站、护理记录、医嘱执行、压疮/跌倒/疼痛/Barthel 评估、SBAR 交班、管路护理、PDA 移动执行 |
-| **互联网医院** | 号源预约、在线报告查询、在线续方复诊、在线支付与电子票据、药品配送（自取/快递）、就诊通知 |
-| **专项质控** | VTE 风险评估与预防闭环、AMS 抗菌药物分级管理、院感监测看板、危急值实时事件闭环 |
-| **手术麻醉** | 手术排班、术前评估、三方核对、诱导/术中/维持、PACU 评分、双签离室 |
-| **检验检查** | LIS 申请-标本-结果-报告全流程、RIS 检查预约、影像/检验 AI 辅助解读（医师签名生效） |
-| **血库** | 申请-配血-发血-输注-不良反应全链路、用血合理性与疗效评价 |
-| **管理与数据** | 多租户一院多区、EMPI 患者主索引、科研专病队列、湖仓分层加工、数据质量与隐私分级、院长驾驶舱 |
-| **系统管理** | 用户/角色/权限、审计日志与登录日志、会话管理与 JWT 吊销、MFA 双因素 |
-
----
-
-## 🤝 开放合作
-
-本项目处于 **健澜科技医疗 AI 大模型及应用前沿实验室** 阶段，我们以完全开放的姿态邀请：
-
-- 🏥 **医院**：信息科与临床专家共建真实场景智能体，私有化、可审计、数据不出院；
-- 🎓 **高校与科研院所**：提供完整医疗 AI 研究底座与模拟临床数据环境，支持课题、论文与人才联合培养；
-- 🧑‍💻 **同行与开发者**：以标准化 Agent Package 接入，一个工具、一条 CDS 规则、一个智能体模板都是贡献；
-- 🧩 **生态伙伴**：HL7 / FHIR / DICOM 适配器与医疗模型服务共建。
-
-合作方向：联合实验室、课题研究、产品共创、源码贡献、学术发表。欢迎通过 Issue 或官方渠道与健澜科技联系。
+| v1.42.0-m89e | M89 岗位智能体体系起步 |
+| v1.42.0-fix | M89 缺陷修复 |
+| v1.43.0-m89f | M89 岗位智能体迭代 |
+| v1.43.0-m90real | M90 真实数据打通 |
+| v1.44.0-m89g | M89 岗位智能体迭代 |
+| v1.44.0-m92a | M92 里程碑起步 |
+| v1.45.0-m89h | M89 岗位智能体迭代 |
+| v1.45.0-ui | UI 统一优化 |
+| v1.46.0-doubleprefix | 双前缀路由修复 |
+| v1.47.0-medmuseapprovals | MEDMUSE 审批流 |
+| v1.48.0-terminalqc | 终端质控 |
+| v1.49.0-readme | README 更新 |
+| v1.50.0-deptcockpit | 科室驾驶舱 |
+| v1.51.0-drugreview | 用药审查 |
+| v1.52.0-emrlevel5 | EMR 五级能力 |
+| v1.53.0-demofallback | 演示模式降级兜底 |
+| v1.54.0-lostypes | 缺失类型补全 |
+| v1.55.0-cockpitreal | 驾驶舱接真实数据 |
+| v1.56.0-scheduler | 定时任务调度器 |
+| v1.57.0-nav | 导航菜单重构 |
+| v1.58.0-servertypes | 服务端类型补全 |
+| v1.59.0-kbrag | 知识库 RAG |
+| v1.60.0-patient360 | 患者 360° 视图 |
+| v1.61.0-systemhealth | 系统健康度看板 |
+| v1.62.0-types | 类型系统完善 |
+| v1.63.0-medpersist | 医疗数据持久化 |
+| v1.64.0-portal | 患者门户 |
+| v1.65.0-export | 数据导出 |
+| v1.66.0-smoke | 前端 jsdom 冒烟测试 |
+| v1.67.0-summary | MEDMUSE 多轮对话上下文摘要 |
+| v1.68.0-esign | 电子签名留痕 |
+| v1.69.0-notify | 微信/钉钉 webhook 通知 |
+| v1.70.0-esignmount | 电子签名挂载到病历/医嘱主流程 |
+| v1.71.0-agenthealth | MEDMUSE Agent 健康度看板 |
+| v1.72.0-pathwayvariance | 临床路径变异管理 |
+| v1.73.0-surgeryschedule | 手术排程看板 |
+| v1.74.0-agenthook | Agent 健康度真实挂钩 |
+| v1.75.0-multimodality | MEDMUSE 多模态扩展 |
+| v1.76.0-nursehandoff | 护士交接班记录 |
+| v1.77.0-insuranceaudit | 医保智能审核规则引擎 |
+| v1.78.0-readme | README 版本迭代记录 |
+| v1.79.0-quickcommands | MEDMUSE 快捷指令面板 |
+| v1.80.0-billlist | 住院费用清单页 |
+| v1.81.0-qcrectification | 质控整改闭环看板 |
+| v1.82.0-streaming | MEDMUSE SSE 流式输出 |
+| v1.83.0-criticalclosure | 危急值闭环升级 |
+| v1.84.0-bedmap | 床位管理可视化 |
+| v1.85.0-monthlyreport | 科室月度运营报表 |
+| v1.86.0-sessionhistory | MEDMUSE 会话历史增强 |
+| v1.87.0-emrtemplate | 电子病历模板管理 |
+| v1.88.0-prescriptionreview | 处方点评系统 |
+| v1.89.0-ceoboard | 院长数据驾驶舱 |
+| v1.90.0-readme | README 更新 |
+| v1.91.0-toolviz | MEDMUSE 工具可视化 |
+| v1.92.0-druginventory | 药品库存管理 |
+| v1.93.0-researchexport | 科研数据导出 |
+| v1.94.0-dbfix | 数据库修复 |
+| v1.94.0-toolargs | 工具参数校验完善 |
+| v1.95.0-opdworkstation | 门诊医生工作站 |
+| v1.96.0-nursingnqi | 护理 NQI 指标 |
+| v1.97.0-surgerychecklist | 手术核查清单 |
+| v1.98.0-emrgrade5 | EMR 五级评审适配 |
+| v1.99.0-drgaudit | DRG 审计 |
+| v2.00.0-medeploy | 医疗部署体系 v2.0 |
+| v2.01.0-ceoboard | 院长驾驶舱增强 |
+| v2.02.0-api404 | API 404 修复 |
+| v2.03.0-demoguard | 演示模式安全护栏 |
+| v2.04.0-webtsc | 前端 TypeScript 严格化 |
+| v2.05.0-coverage | 测试覆盖率提升 |
 
 ---
 
@@ -203,7 +257,7 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 - 等保三级设计：RBAC+ABAC、字段级 AES-256-GCM 加密、16 类敏感数据脱敏；
 - 审计哈希链（BEFORE INSERT 触发器防篡改）、操作与审计同事务提交；
 - 断库即显式报错 + 水印，不白屏、不静默返回假数据；越权一律 403；
-- 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，勿公开 Issue。
+- 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
 
 ---
 
@@ -211,10 +265,10 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 
 - 代码以 [Apache License 2.0](LICENSE) 开源；数据许可独立，使用前请阅读 [DATA_LICENSES.md](DATA_LICENSES.md)；
 - 第三方依赖归属见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) 与 [NOTICE](NOTICE)；
-- 本软件为医疗辅助决策与效率工具，不构成医疗器械诊断结论，部署方须自行完成数据合规、安全测评与临床验证。
+- 本软件为医疗辅助决策与效率工具，不构成医疗器械诊断结论。
 
 <div align="center">
 
-**杭州健澜科技有限公司（健澜科技） · 让医疗 AI 更简单、更落地**
+**© 杭州健澜科技有限公司 · 让医疗 AI 更简单、更落地**
 
 </div>
