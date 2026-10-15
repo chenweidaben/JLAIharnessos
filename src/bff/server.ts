@@ -322,6 +322,8 @@ import { followUpRoutes } from './routes/followUps';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
+// M147-B：患者健康教育（知识图谱与患者教育）GET /api/v1/patient/education + POST /push
+import { patientEducationRoutes } from './routes/patientEducation';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { federatedKnowledgeRoutes } from './routes/federatedKnowledge';
@@ -653,6 +655,7 @@ const allRoutes: RouteDef[] = [
   ...followUpRoutes,
   ...weightEvolutionRoutes,
   ...selfLearningRoutes, // M146-D：推荐策略自学习 POST /optimize + GET /log
+  ...patientEducationRoutes, // M147-B：患者健康教育 GET /api/v1/patient/education + POST /push
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
   ...federatedKnowledgeRoutes,
