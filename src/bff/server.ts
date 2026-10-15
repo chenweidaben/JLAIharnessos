@@ -39,6 +39,7 @@ import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
 import { adminPerformanceRoutes } from './routes/adminPerformance';
 import { adminHealthRoutes } from './routes/adminHealth';
+import { adminDashboardRoutes } from './routes/adminDashboard';
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
@@ -454,6 +455,7 @@ const allRoutes: RouteDef[] = [
   ...maskConfigAdminRoutes,
   ...adminPerformanceRoutes,
   ...adminHealthRoutes,
+  ...adminDashboardRoutes,
   ...adminMigrationsRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
