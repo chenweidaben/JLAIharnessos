@@ -228,6 +228,7 @@ import { weightEvolutionRoutes } from './routes/weightEvolution';
 import { referralKnowledgeRoutes } from './routes/referralKnowledge';
 import { crossDeptKnowledgeRoutes } from './routes/crossDeptKnowledge';
 import { museSearchRoutes } from './routes/museSearch';
+import { museRecommendRoutes } from './routes/museRecommend';
 import { smokeTestRoutes } from './routes/smokeTest';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { museNurseRoutes } from './routes/museNurse';
@@ -449,6 +450,7 @@ const allRoutes: RouteDef[] = [
   ...referralKnowledgeRoutes,
   ...crossDeptKnowledgeRoutes,
   ...museSearchRoutes,
+  ...museRecommendRoutes,
   ...smokeTestRoutes,
   ...museOnboardingRoutes,
   ...museNurseRoutes,
