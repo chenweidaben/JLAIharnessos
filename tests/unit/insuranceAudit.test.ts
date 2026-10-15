@@ -120,7 +120,7 @@ describe('重复收费（billing.duplicate_same_day）', () => {
 describe('安全降级与风险汇总', () => {
   it('空处方 / 非法输入 -> low 空结果，不抛错', () => {
     expect(auditPrescription(null, SAMPLE_RULES).hits.length).toBe(0);
-    // @ts-expect-error 故意传非法输入验证防御
+    // undefined 属签名内合法入参（Prescription | null | undefined），直接调用验证防御
     expect(auditPrescription(undefined, SAMPLE_RULES).riskLevel).toBe('low');
     expect(auditPrescription({ items: [] }, SAMPLE_RULES).blocked).toBe(false);
   });
