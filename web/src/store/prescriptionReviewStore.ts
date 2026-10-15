@@ -22,7 +22,7 @@ interface PrescriptionReviewState {
   submit: (input: { prescriptionId: string; result: PrescriptionReview['result']; comment?: string }) => Promise<void>;
 }
 
-export const usePrescriptionReviewStore = create<PrescriptionReviewState>((set, get) => ({
+export const usePrescriptionReviewStore = create<PrescriptionReviewState>((set) => ({
   pending: [],
   recent: [],
   stats: null,
