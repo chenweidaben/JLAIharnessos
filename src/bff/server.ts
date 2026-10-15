@@ -37,6 +37,8 @@ import { roleAdminRoutes } from './routes/admin/roles';
 import { auditLogRoutes } from './routes/admin/auditLogs';
 import { loginLogRoutes } from './routes/admin/loginLogs';
 import { maskConfigAdminRoutes } from './routes/adminMaskConfig';
+import { adminPerformanceRoutes } from './routes/adminPerformance';
+import { recordRequestPerformance } from './aggregators/performanceMonitorAggregator';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
@@ -439,6 +441,7 @@ const allRoutes: RouteDef[] = [
   ...auditLogRoutes,
   ...loginLogRoutes,
   ...maskConfigAdminRoutes,
+  ...adminPerformanceRoutes,
   ...imagingRoutes,
   ...medmuseRoutes,
   ...agentHealthRoutes,
@@ -766,6 +769,8 @@ async function handleFetch(
       durationSeconds: (Date.now() - startedAt) / 1000,
     });
     recordSystemHttpRequest();
+    // M123-D 性能采样（内存环形缓冲，仅 route 模板 + 状态码，不含 PII）
+    recordRequestPerformance(routeLabel, startedAt, Date.now(), status);
   }
 }
 
