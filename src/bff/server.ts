@@ -278,6 +278,7 @@ import { drgAuditRoutes } from './routes/drgAudit';
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
 import { reportExportRoutes } from './routes/reportExport';
+import { exportReportRoutes } from './routes/exportReport'; // M148-D：报表中心 PDF/Excel 打印级导出（产品化收尾）
 import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
@@ -623,6 +624,7 @@ const allRoutes: RouteDef[] = [
   ...qcRectificationRoutes,
   ...monthlyReportRoutes,
   ...reportExportRoutes,
+  ...exportReportRoutes, // M148-D：报表中心 /api/v1/admin/export
   ...bedMapRoutes,
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
