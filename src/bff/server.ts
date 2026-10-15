@@ -242,6 +242,8 @@ import { assistantPharmacyRoutes } from './routes/assistantPharmacy';
 import { assistantDeepReviewRoutes } from './routes/assistantDeepReview';
 import { assistantLabRoutes } from './routes/assistantLab';
 import { assistantDiagnosisRoutes } from './routes/assistantDiagnosis';
+// 【AI核心能力深化】M144-A：AI 辅助诊断增强 POST /api/v1/ai/diagnose（Top3带置信度/鉴别/检查/治疗方向，采纳驳回留痕）
+import { aiDiagnoseRoutes } from './routes/aiDiagnose';
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
@@ -576,6 +578,7 @@ const allRoutes: RouteDef[] = [
   ...assistantDeepReviewRoutes,
   ...assistantLabRoutes,
   ...assistantDiagnosisRoutes,
+  ...aiDiagnoseRoutes, // M144-A：AI 辅助诊断增强
   ...assistantRecordDraftRoutes,
   ...insuranceAuditRoutes,
   ...adminInsuranceReviewRoutes,
