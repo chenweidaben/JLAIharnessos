@@ -48,6 +48,7 @@ import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
 import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
+import { accessibilityVerifyRoutes } from './routes/accessibilityVerify';
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -594,6 +595,7 @@ const allRoutes: RouteDef[] = [
   ...adminPerformanceOptimizationsRoutes,
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
+  ...accessibilityVerifyRoutes, // M151-B：GET /api/v1/admin/ui/accessibility/verify（对比度修复 + WCAG AA 复验）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（代码质量五维治理报告）
