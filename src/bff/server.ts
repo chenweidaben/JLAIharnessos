@@ -126,6 +126,7 @@ import { icuSedationRoutes } from './routes/icuSedation';
 import { postpartumRoutes } from './routes/postpartumVisit';
 import { erTriageRoutes } from './routes/erTriage';
 import { barthelRoutes } from './routes/barthel';
+import { equipmentRoutes } from './routes/equipment';
 import { erGreenRoutes } from './routes/erGreen';
 import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
@@ -405,6 +406,7 @@ const allRoutes: RouteDef[] = [
   ...postpartumRoutes,
   ...erTriageRoutes,
   ...barthelRoutes,
+  ...equipmentRoutes,
   ...erGreenRoutes,
   ...chronicRoutes,
   ...patientChronicRoutes,
