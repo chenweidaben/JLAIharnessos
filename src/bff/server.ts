@@ -205,6 +205,7 @@ import { bedMapRoutes } from './routes/bedMap';
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
+import { healthRoutes } from './routes/health';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
 // ============================================================================
@@ -212,6 +213,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 // ============================================================================
 
 const allRoutes: RouteDef[] = [
+  ...healthRoutes,
   ...authRoutes,
   ...mfaLoginRoutes,
   ...patientRoutes,

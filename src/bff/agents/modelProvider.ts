@@ -29,6 +29,8 @@ export interface ToolDefinition {
   };
 }
 
+import { getEnv } from '../config/env';
+
 export type Confidence = 'high' | 'medium' | 'low';
 
 export const DEFAULT_DISCLAIMER =
@@ -52,8 +54,10 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /**
  * OpenAI 兼容模型提供者。
  * - 单次请求超时 30s（AbortController）
- * - 失败重试 2 次，指数退避 200ms / 400ms
- * - 连续 3 次失败触发熔断，60 秒内直接降级到模板回复
+ * - 失败重试 1 次（共 2 次尝试），退避 200ms
+ * - 连续 3 次失败触发熔断，60 秒内直接降级到本地 mock（模板兜底）
+ *
+ * 端点 / 密钥 / 模型均从统一环境配置（config/env.ts）读取，不在代码中硬编码。
  */
 export class OpenAICompatibleModelProvider implements ModelProvider {
   private readonly baseUrl: string;
@@ -76,11 +80,12 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
     failureThreshold?: number;
     cooldownMs?: number;
   }) {
-    this.baseUrl = (options?.baseUrl ?? process.env.MEDMUSE_MODEL_BASE_URL ?? 'http://localhost:8000/v1').replace(/\/+$/, '');
-    this.apiKey = options?.apiKey ?? process.env.MEDMUSE_MODEL_API_KEY ?? 'sk-local';
-    this.model = options?.model ?? process.env.MEDMUSE_MODEL_NAME ?? 'qwen2.5-72b-instruct';
+    const cfg = getEnv();
+    this.baseUrl = (options?.baseUrl ?? cfg.llmApiEndpoint).replace(/\/+$/, '');
+    this.apiKey = options?.apiKey ?? cfg.llmApiKey;
+    this.model = options?.model ?? cfg.llmModel;
     this.timeoutMs = options?.timeoutMs ?? 30_000;
-    this.maxRetries = options?.maxRetries ?? 2;
+    this.maxRetries = options?.maxRetries ?? 1;
     this.failureThreshold = options?.failureThreshold ?? 3;
     this.cooldownMs = options?.cooldownMs ?? 60_000;
   }
@@ -206,12 +211,14 @@ function fallbackReply(prefix: string): AgentReply {
 
 let _cached: ModelProvider | null = null;
 
-/** 工厂：显式配置 MEDMUSE_MODEL_BASE_URL 走 OpenAI 兼容；否则模板兜底。 */
+/** 工厂：显式配置 LLM_API_ENDPOINT 走 OpenAI 兼容；否则模板 mock 兜底。 */
 export function getModelProvider(): ModelProvider {
   if (_cached) return _cached;
-  const baseUrl = process.env.MEDMUSE_MODEL_BASE_URL;
-  _cached = baseUrl
-    ? new OpenAICompatibleModelProvider({ baseUrl })
+  const endpointSet = Boolean(
+    process.env.LLM_API_ENDPOINT ?? process.env.LLM_BASE_URL ?? process.env.MEDMUSE_MODEL_BASE_URL,
+  );
+  _cached = endpointSet
+    ? new OpenAICompatibleModelProvider()
     : new TemplateFallbackProvider();
   return _cached;
 }
