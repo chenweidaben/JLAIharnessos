@@ -317,6 +317,7 @@ import { userSettingsRoutes } from './routes/userSettings';
 import { personalGrowthRoutes } from './routes/personalGrowth';
 import { notificationRoutes } from './routes/notifications';
 // 【产品化收尾】M148-B：统一通知中心 GET /api/v1/notifications + PUT /:id/read（跨系统聚合，不各自发一条）
+import { notificationCenterRoutes } from './routes/notificationCenter';
 import { learningDashboardRoutes } from './routes/learningDashboard';
 import { museHomeRoutes } from './routes/museHome';
 import { followupLearningRoutes } from './routes/followupLearning';
@@ -653,6 +654,7 @@ const allRoutes: RouteDef[] = [
   ...userSettingsRoutes,
   ...personalGrowthRoutes, // M146-B：个人成长报告 GET /api/v1/user/muse/report
   ...notificationRoutes,
+  ...notificationCenterRoutes, // M148-B：统一通知中心 GET /api/v1/notifications + PUT /:id/read
   ...learningDashboardRoutes,
   ...museHomeRoutes,
   ...followupLearningRoutes,
