@@ -239,6 +239,7 @@ import { musePharmaRoutes } from './routes/musePharma';
 import { museAdminRoutes } from './routes/museAdmin';
 import { museMonthlyReportRoutes } from './routes/museMonthlyReport';
 import { musePatternsRoutes } from './routes/musePatterns';
+import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
@@ -465,6 +466,7 @@ const allRoutes: RouteDef[] = [
   ...museAdminRoutes,
   ...museMonthlyReportRoutes,
   ...musePatternsRoutes,
+  ...museGrowthRoutes,
   ...patientMuseRoutes,
 ];
 
