@@ -755,6 +755,8 @@ import { nutritionReportRoutes } from './routes/nutritionReport';
 import { hospiceReportRoutes } from './routes/hospiceReport';
 // M221-A：传染病防控 V2 GET /api/v1/infectious-disease/report-v2
 import { infectiousDiseaseReportV2Routes } from './routes/infectiousDiseaseReportV2';
+// M221-B：妇幼健康 V2 GET /api/v1/maternal-child/report-v2
+import { maternalChildReportV2Routes } from './routes/maternalChildReportV2';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1374,6 +1376,7 @@ const allRoutes: RouteDef[] = [
   ...nutritionReportRoutes, // M220-C：营养膳食 GET /api/v1/nutrition/report
   ...hospiceReportRoutes, // M220-D：安宁疗护 GET /api/v1/hospice/report
   ...infectiousDiseaseReportV2Routes, // M221-A：传染病防控 V2 GET /api/v1/infectious-disease/report-v2
+  ...maternalChildReportV2Routes, // M221-B：妇幼健康 V2 GET /api/v1/maternal-child/report-v2
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
