@@ -205,6 +205,7 @@ import { postpartumRoutes } from './routes/postpartumVisit';
 import { erTriageRoutes } from './routes/erTriage';
 import { barthelRoutes } from './routes/barthel';
 import { equipmentRoutes } from './routes/equipment';
+import { equipmentDeepRoutes } from './routes/equipmentDeep'; // M177-C：【病案设备耗材】设备管理深化 GET /api/v1/equipment/deep（台账五段/维保预警/强检证书/折旧净值，账实一致）
 import { logisticsRoutes } from './routes/logistics';
 import { logisticsDeepRoutes } from './routes/logisticsDeep'; // M171-C：【科研教学后勤】后勤智能化深化 POST /api/v1/logistics/deep-dispatch（技能匹配派单/路线优化/需求预测/满意度闭环，不推诿）
 import { regionalCoopRoutes } from './routes/regionalCoop'; // M143-D：区域医疗协同（互联网医院与远程医疗）
@@ -610,6 +611,7 @@ const allRoutes: RouteDef[] = [
   ...erTriageRoutes,
   ...barthelRoutes,
   ...equipmentRoutes,
+  ...equipmentDeepRoutes, // M177-C：【病案设备耗材】设备管理深化（台账五段/维保预警/强检证书/折旧净值）
   ...logisticsRoutes,
   ...logisticsDeepRoutes, // M171-C：【科研教学后勤】后勤智能化深化（深度派单/路线优化/需求预测/满意度跟踪）
   ...regionalCoopRoutes, // M143-D：区域医疗协同（互联网医院与远程医疗）
