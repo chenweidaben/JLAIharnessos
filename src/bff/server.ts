@@ -1173,6 +1173,8 @@ import { multiCampusV5ReportRoutes } from './routes/multiCampusV5Report';
 import { groupFRHV5ReportRoutes } from './routes/groupFRHV5Report';
 // M273-C：集团质控与标准统一 V5 GET /api/v1/group-qa-v5/report
 import { groupQAV5ReportRoutes } from './routes/groupQAV5Report';
+// M273-D：集团患者转诊与资源调度 V5 GET /api/v1/group-referral-v5/report
+import { groupReferralV5ReportRoutes } from './routes/groupReferralV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2002,6 +2004,7 @@ const allRoutes: RouteDef[] = [
   ...multiCampusV5ReportRoutes, // M273-A：多院区一体化运行 V5 GET /api/v1/multi-campus-v5/report
   ...groupFRHV5ReportRoutes, // M273-B：集团财务人力物资 V5 GET /api/v1/group-frh-v5/report
   ...groupQAV5ReportRoutes, // M273-C：集团质控与标准统一 V5 GET /api/v1/group-qa-v5/report
+  ...groupReferralV5ReportRoutes, // M273-D：集团患者转诊与资源调度 V5 GET /api/v1/group-referral-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
