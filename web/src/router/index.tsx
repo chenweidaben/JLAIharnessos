@@ -866,6 +866,14 @@ const PersonalAgentV5 = lazy(() => import('@/pages/personal-agent-v5/report'));
 const AIBrainV5 = lazy(() => import('@/pages/ai-brain-v5/report'));
 // M257-D：数据飞轮 V5
 const DataFlywheelV5 = lazy(() => import('@/pages/data-flywheel-v5/report'));
+// M258-A：AI 门诊全流程闭环 V5
+const OutpatientAILoopV5 = lazy(() => import('@/pages/outpatient-ai-loop-v5/report'));
+// M258-B：AI 住院全流程闭环 V5
+const InpatientAILoopV5 = lazy(() => import('@/pages/inpatient-ai-loop-v5/report'));
+// M258-C：AI 手术全流程闭环 V5
+const SurgeryAILoopV5 = lazy(() => import('@/pages/surgery-ai-loop-v5/report'));
+// M258-D：AI 药事全流程闭环 V5
+const PharmacyAILoopV5 = lazy(() => import('@/pages/pharmacy-ai-loop-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1672,6 +1680,14 @@ export default function AppRoutes() {
           <Route path="ai-brain-v5/report" element={<AIBrainV5 />} />
           {/* M257-D：数据飞轮 V5 */}
           <Route path="data-flywheel-v5/report" element={<DataFlywheelV5 />} />
+          {/* M258-A：AI 门诊全流程闭环 V5 */}
+          <Route path="outpatient-ai-loop-v5/report" element={<OutpatientAILoopV5 />} />
+          {/* M258-B：AI 住院全流程闭环 V5 */}
+          <Route path="inpatient-ai-loop-v5/report" element={<InpatientAILoopV5 />} />
+          {/* M258-C：AI 手术全流程闭环 V5 */}
+          <Route path="surgery-ai-loop-v5/report" element={<SurgeryAILoopV5 />} />
+          {/* M258-D：AI 药事全流程闭环 V5 */}
+          <Route path="pharmacy-ai-loop-v5/report" element={<PharmacyAILoopV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
