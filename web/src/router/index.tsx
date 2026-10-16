@@ -316,6 +316,8 @@ const RationalDrugUse = lazy(() => import('@/pages/drug/rational'));
 const InfectionControlV2 = lazy(() => import('@/pages/infection/control'));
 // M188-D：医疗纠纷预警
 const DisputeWarning = lazy(() => import('@/pages/dispute/warning'));
+// M189-A：绩效管理
+const PerformanceManagement = lazy(() => import('@/pages/admin/performance-management'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -572,6 +574,8 @@ export default function AppRoutes() {
           <Route path="infection/control" element={<InfectionControlV2 />} />
           {/* M188-D：纠纷预警 */}
           <Route path="dispute/warning" element={<DisputeWarning />} />
+          {/* M189-A：绩效管理 */}
+          <Route path="admin/performance-management" element={<PerformanceManagement />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
