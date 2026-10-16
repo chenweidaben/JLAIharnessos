@@ -452,6 +452,8 @@ const NursingV3 = lazy(() => import('@/pages/nursing/report-v3'));
 const MedicalRecordV3 = lazy(() => import('@/pages/medical-record/report-v3'));
 // M205-C：医保 V3
 const InsuranceV3 = lazy(() => import('@/pages/insurance/report-v3'));
+// M205-D：等级评审
+const Accreditation = lazy(() => import('@/pages/admin/accreditation'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -844,6 +846,8 @@ export default function AppRoutes() {
           <Route path="medical-record/report-v3" element={<MedicalRecordV3 />} />
           {/* M205-C：医保 V3 */}
           <Route path="insurance/report-v3" element={<InsuranceV3 />} />
+          {/* M205-D：等级评审 */}
+          <Route path="admin/accreditation" element={<Accreditation />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
