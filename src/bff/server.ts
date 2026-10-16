@@ -120,6 +120,7 @@ import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
 import { researchExportRoutes } from './routes/researchExport';
 import { researchAiRoutes } from './routes/researchAi'; // M156-C【集团与科研】医学科研智能化：GET /api/v1/research/smart-search + POST /api/v1/research/auto-stats
+import { researchLitRoutes } from './routes/researchLit'; // M159-C【集团与科研】科研智能化深化：文献检索/摘要总结/IMRaD 大纲/基金框架
 import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中台·数据集市
@@ -471,6 +472,7 @@ const allRoutes: RouteDef[] = [
   ...researchRoutes,
   ...researchExportRoutes,
   ...researchAiRoutes, // M156-C【集团与科研】医学科研智能化
+  ...researchLitRoutes, // M159-C【集团与科研】科研智能化深化：文献/论文/基金
   ...empiRoutes,
   ...dataWarehouseRoutes,
   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
