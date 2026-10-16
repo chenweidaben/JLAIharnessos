@@ -366,6 +366,7 @@ import { insuranceAuditRoutes } from './routes/insuranceAudit';
 import { adminInsuranceReviewRoutes } from './routes/adminInsuranceReview';
 import { drgAuditRoutes } from './routes/drgAudit';
 import { drgDeepRoutes } from './routes/drgDeep'; // M176-A：【临床核心深化】DRG/DIP 付费深度分析 GET /api/v1/admin/drg/deep-analysis
+import { insuranceDeepRoutes } from './routes/insuranceDeep'; // M179-C：【护理院感医保药事】医院医保管理深化 GET /api/v1/insurance/deep（政策目录甲乙丙/费用三道防线审核/门诊住院DRG-DIP结算/拒付申诉整改追回闭环，合规不骗保）
 import { medicalRecordDeepRoutes } from './routes/medicalRecordDeep'; // M177-A：【病案设备耗材】医院病案管理深化 GET /api/v1/medical-record/deep（ICD-10诊断+ICD-9-CM-3手术编码校验/归档时限/首页合格率·编码准确率·缺项率/借阅跟踪）
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
@@ -823,6 +824,7 @@ const allRoutes: RouteDef[] = [
   ...adminInsuranceReviewRoutes,
   ...drgAuditRoutes,
   ...drgDeepRoutes, // M176-A：DRG 分组正确性/费用偏差/盈亏/CMI/离群病例深度分析
+  ...insuranceDeepRoutes, // M179-C：医保管理深化（政策目录/费用三道防线/结算结构/拒付申诉整改追回）
   ...medicalRecordDeepRoutes, // M177-A：病案 ICD 编码校验/归档时限/首页合格率·编码准确率·缺项率/借阅跟踪
   ...emrLevel5Routes,
   ...emrGrade5Routes,
