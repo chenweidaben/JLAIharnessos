@@ -645,6 +645,8 @@ import { dataAssetReportV3Routes } from './routes/dataAssetReportV3';
 import { operationsReportV3Routes } from './routes/operationsReportV3';
 // M207-B：科研 V3 GET /api/v1/research/report-v3
 import { researchReportV3Routes } from './routes/researchReportV3';
+// M207-C：教学 V3 GET /api/v1/education/report-v3
+import { educationReportV3Routes } from './routes/educationReportV3';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1209,6 +1211,7 @@ const allRoutes: RouteDef[] = [
   ...dataAssetReportV3Routes, // M206-D：数据资产 V3 GET /api/v1/data-asset/report-v3
   ...operationsReportV3Routes, // M207-A：运营 V3 GET /api/v1/operations/report-v3
   ...researchReportV3Routes, // M207-B：科研 V3 GET /api/v1/research/report-v3
+  ...educationReportV3Routes, // M207-C：教学 V3 GET /api/v1/education/report-v3
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
