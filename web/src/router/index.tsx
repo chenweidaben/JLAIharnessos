@@ -354,6 +354,8 @@ const LogisticsReportV2 = lazy(() => import('@/pages/admin/logistics-report-v2')
 const PerformanceStress = lazy(() => import('@/pages/admin/performance-stress'));
 // M193-B：安全渗透测试
 const SecurityPenTest = lazy(() => import('@/pages/admin/security-pen'));
+// M193-C：质量管理体系
+const QualitySystem = lazy(() => import('@/pages/admin/quality-system'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -648,6 +650,8 @@ export default function AppRoutes() {
           <Route path="admin/performance-stress" element={<PerformanceStress />} />
           {/* M193-B：安全渗透测试 */}
           <Route path="admin/security-pen" element={<SecurityPenTest />} />
+          {/* M193-C：质量管理体系 */}
+          <Route path="admin/quality-system" element={<QualitySystem />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
