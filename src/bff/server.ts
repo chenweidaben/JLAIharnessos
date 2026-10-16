@@ -479,6 +479,7 @@ import { coverageDetailRoutes } from './routes/coverageDetail';
 // 【质量提升与新场景】M173-A：99% → 99.5%+ 覆盖率缺口/计划/进度闭环（仅 admin）
 import { coverageGapRoutes } from './routes/coverageGap';
 // 【v5.0启动】M182-B：测试覆盖率缺口修复（输血/医保/药事九大模块，GET /api/v1/admin/test/coverage-fix）
+import { coverageFixRoutes } from './routes/coverageFix';
 // 【200版本里程碑】M157-A：里程碑总结（仅 admin，GET /api/v1/admin/milestone/summary）
 import { milestoneRoutes } from './routes/milestone';
 // 【300版本里程碑】M181-A：300 版本预告总结（仅 admin，GET /api/v1/admin/milestone/v2）
@@ -929,6 +930,7 @@ const allRoutes: RouteDef[] = [
   ...coverageReportRoutes, // M150-A：GET /api/v1/admin/test/coverage（90% 冲刺报告，先于旧 testCoverage 路由命中）
   ...coverageDetailRoutes, // M151-A：GET /api/v1/admin/test/coverage/detailed（函数级缺口定位）
   ...coverageGapRoutes, // M173-A：GET /api/v1/admin/test/coverage-gap（99%→99.5%+ 缺口/计划/进度）
+  ...coverageFixRoutes, // 【v5.0启动】M182-B：GET /api/v1/admin/test/coverage-fix（输血/医保/药事缺口识别→补测→复验）
   ...milestoneRoutes, // 【200版本里程碑】M157-A：GET /api/v1/admin/milestone/summary（仅 admin）
   ...milestoneV2Routes, // 【300版本里程碑】M181-A：GET /api/v1/admin/milestone/v2（仅 admin）
   ...testCoverageRoutes,
