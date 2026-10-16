@@ -738,6 +738,8 @@ const MedicalQualityV3 = lazy(() => import('@/pages/medical-quality-v3/report'))
 const NursingQualityV3 = lazy(() => import('@/pages/nursing-quality-v3/report'));
 // M241-D：患者体验 V3
 const PatientExperienceV3 = lazy(() => import('@/pages/patient-experience-v3/report'));
+// M242-A：学科建设 V3
+const DisciplineV3 = lazy(() => import('@/pages/discipline-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1416,6 +1418,8 @@ export default function AppRoutes() {
           <Route path="nursing-quality-v3/report" element={<NursingQualityV3 />} />
           {/* M241-D：患者体验 V3 */}
           <Route path="patient-experience-v3/report" element={<PatientExperienceV3 />} />
+          {/* M242-A：学科建设 V3 */}
+          <Route path="discipline-v3/report" element={<DisciplineV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
