@@ -842,6 +842,14 @@ const ResearchManagementV4 = lazy(() => import('@/pages/research-management-v4/r
 const TeachingTrainingV4 = lazy(() => import('@/pages/teaching-training-v4/report'));
 // M254-D：后勤设备 V4
 const LogisticsEquipmentV4 = lazy(() => import('@/pages/logistics-equipment-v4/report'));
+// M255-A：AI 辅助诊断 V3
+const AIDiagnosisV3 = lazy(() => import('@/pages/ai-diagnosis-v3/report'));
+// M255-B：智能预警 V3
+const IntelligentAlertV3 = lazy(() => import('@/pages/intelligent-alert-v3/report'));
+// M255-C：患者画像 V3
+const PatientProfileV3 = lazy(() => import('@/pages/patient-profile-v3/report'));
+// M255-D：临床规则引擎 V3
+const ClinicalRuleEngineV3 = lazy(() => import('@/pages/clinical-rule-engine-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1624,6 +1632,14 @@ export default function AppRoutes() {
           <Route path="teaching-training-v4/report" element={<TeachingTrainingV4 />} />
           {/* M254-D：后勤设备 V4 */}
           <Route path="logistics-equipment-v4/report" element={<LogisticsEquipmentV4 />} />
+          {/* M255-A：AI 辅助诊断 V3 */}
+          <Route path="ai-diagnosis-v3/report" element={<AIDiagnosisV3 />} />
+          {/* M255-B：智能预警 V3 */}
+          <Route path="intelligent-alert-v3/report" element={<IntelligentAlertV3 />} />
+          {/* M255-C：患者画像 V3 */}
+          <Route path="patient-profile-v3/report" element={<PatientProfileV3 />} />
+          {/* M255-D：临床规则引擎 V3 */}
+          <Route path="clinical-rule-engine-v3/report" element={<ClinicalRuleEngineV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
