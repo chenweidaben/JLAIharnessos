@@ -519,6 +519,7 @@ import { partyCultureRoutes } from './routes/partyCulture';
 // 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
 import { jciReviewRoutes } from './routes/jciReview';
 import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
+import { patientExperienceRoutes } from './routes/patientExperience'; // M180-C：【质量与体验】患者体验深化（四大维度度量+痛点识别+改进闭环）GET /api/v1/patient/experience
 import { researchDeepRoutes } from './routes/researchDeep'; // M162-C：【科研管理深化】课题/论文/成果转化/经费 GET /api/v1/research/projects + PUT /:id/milestone
 import { researchPipelineRoutes } from './routes/researchPipeline'; // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
 import { roadmapRoutes } from './routes/roadmap'; // M157-D：v4.x 产品路线图（三阶段/优先级/工作量估算）GET /api/v1/admin/roadmap
@@ -950,6 +951,7 @@ const allRoutes: RouteDef[] = [
   ...integrationHl7Routes, // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build（|^~\& 分隔，FHIR R4 Patient/Observation/MedicationRequest）
   ...integrationDeepRoutes, // M174-B：【系统集成深化·二期】标准接口扩展 POST /api/v1/integration/deep/parse（HL7 ADT^A08/ORM^O02/ORU^R30 + FHIR R4 Encounter/Condition + DICOM SOP + LIS 双向）
   ...patientServiceDeepRoutes, // M156-D：【患者服务深化】一站式服务中心（老人友好六卡片）GET /api/v1/patient/service
+  ...patientExperienceRoutes, // M180-C：【质量与体验】患者体验深化（四大维度度量+痛点识别+改进闭环）GET /api/v1/patient/experience
   ...researchDeepRoutes, // M162-C：【科研管理深化】科研全生命周期 GET /api/v1/research/projects?dept= + PUT /api/v1/research/projects/:id/milestone
   ...researchPipelineRoutes, // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
