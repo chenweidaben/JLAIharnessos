@@ -59,6 +59,7 @@ import { dbPerformanceRoutes } from './routes/dbPerformance';
 // 【代码质量提升】M150-B：any/ts-ignore/console-log/未使用变量/圈复杂度 五维治理 GET /api/v1/admin/code/quality
 import { codeQualityRoutes } from './routes/codeQuality';
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
+import { qualityGateRoutes } from './routes/qualityGate';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
 import { performanceReviewRoutes } from './routes/performanceReview';
@@ -635,6 +636,7 @@ const allRoutes: RouteDef[] = [
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
   ...accessibilityVerifyRoutes, // M151-B：GET /api/v1/admin/ui/accessibility/verify（对比度修复 + WCAG AA 复验）
+  ...qualityGateRoutes, // M157-C：GET /api/v1/admin/quality-gate（200版本六项质量门禁复查）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（代码质量五维治理报告）
