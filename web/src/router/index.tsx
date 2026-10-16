@@ -368,6 +368,8 @@ const LaborUnion = lazy(() => import('@/pages/admin/labor-union'));
 const Publicity = lazy(() => import('@/pages/admin/publicity'));
 // M195-A V2：互联网医院深化
 const InternetHospitalV2 = lazy(() => import('@/pages/internet-hospital-v2'));
+// M195-B：远程医疗
+const Telemedicine = lazy(() => import('@/pages/telemedicine'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -676,6 +678,8 @@ export default function AppRoutes() {
           <Route path="admin/publicity" element={<Publicity />} />
           {/* M195-A V2：互联网医院深化 */}
           <Route path="internet-hospital-v2" element={<InternetHospitalV2 />} />
+          {/* M195-B：远程医疗 */}
+          <Route path="telemedicine" element={<Telemedicine />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
