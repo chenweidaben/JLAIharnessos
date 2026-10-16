@@ -461,6 +461,8 @@ import { nurseScheduleRoutes } from './routes/nurseSchedule';
 import { smartFollowupV2Routes } from './routes/smartFollowupV2';
 // M184-C：设备预测性维护 GET /api/v1/equipment/predictive
 import { equipmentPredictiveRoutes } from './routes/equipmentPredictive';
+// M184-D：备份容灾 GET /api/v1/admin/backup/strategy
+import { backupStrategyRoutes } from './routes/backupStrategy';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -933,6 +935,7 @@ const allRoutes: RouteDef[] = [
   ...nurseScheduleRoutes, // M184-A：护士排班优化 POST /api/v1/scheduling/optimize
   ...smartFollowupV2Routes, // M184-B：智能随访 GET /api/v1/followup/smart
   ...equipmentPredictiveRoutes, // M184-C：设备预测维护 GET /api/v1/equipment/predictive
+  ...backupStrategyRoutes, // M184-D：备份容灾 GET /api/v1/admin/backup/strategy
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

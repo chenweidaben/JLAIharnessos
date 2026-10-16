@@ -282,6 +282,8 @@ const NurseScheduleOptimize = lazy(() => import('@/pages/scheduling/optimize'));
 const SmartFollowup = lazy(() => import('@/pages/followup/smart'));
 // M184-C：设备预测性维护
 const EquipmentPredictive = lazy(() => import('@/pages/equipment/predictive'));
+// M184-D：备份容灾策略
+const BackupStrategy = lazy(() => import('@/pages/admin/backup-strategy'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -504,6 +506,8 @@ export default function AppRoutes() {
           <Route path="followup/smart" element={<SmartFollowup />} />
           {/* M184-C：设备预测性维护 */}
           <Route path="equipment/predictive" element={<EquipmentPredictive />} />
+          {/* M184-D：备份容灾策略 */}
+          <Route path="admin/backup-strategy" element={<BackupStrategy />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
