@@ -390,6 +390,7 @@ import { adminWebhooksRoutes } from './routes/adminWebhooks';
 import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D
 import { budgetDeepRoutes } from './routes/budgetDeep'; // M165-B：【CDSS与运营精细化】医院预算与成本管理深化 GET /api/v1/admin/budget?dept=&year=（驱动因子测算/执行跟踪/超支预测）
 import { performanceDeepRoutes } from './routes/performanceDeep'; // M166-A：【绩效与人才】医院科室绩效考核深化 GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制，不只看工作量）
+import { opsDeepRoutes } from './routes/opsDeep'; // M172-C：【安全质量与运营】医院运营与管理深化 GET /api/v1/admin/ops/deep?dept=&period=（门诊/住院/手术/财务四域效率分析/对标/瓶颈识别，运营要有数据不拍脑袋）
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -900,6 +901,7 @@ const allRoutes: RouteDef[] = [
   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
   ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
   ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
+  ...opsDeepRoutes, // M172-C：【安全质量与运营】GET /api/v1/admin/ops/deep?dept=&period=（四域效率评分/标杆对标/瓶颈识别）
   ...patientJourneyRoutes, // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
   ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
 ];
