@@ -556,6 +556,8 @@ const PatientExperienceV2 = lazy(() => import('@/pages/patient-experience/report
 const EmployeeExperienceV2 = lazy(() => import('@/pages/employee-experience/report-v2'));
 // M218-C：流程优化
 const ProcessOptimization = lazy(() => import('@/pages/process-optimization/report'));
+// M218-D：智慧服务评级
+const SmartServiceRating = lazy(() => import('@/pages/smart-service/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1052,6 +1054,8 @@ export default function AppRoutes() {
           <Route path="employee-experience/report-v2" element={<EmployeeExperienceV2 />} />
           {/* M218-C：流程优化 */}
           <Route path="process-optimization/report" element={<ProcessOptimization />} />
+          {/* M218-D：智慧服务评级 */}
+          <Route path="smart-service/report" element={<SmartServiceRating />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
