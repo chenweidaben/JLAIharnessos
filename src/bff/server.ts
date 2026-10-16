@@ -406,6 +406,7 @@ import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D
 import { budgetDeepRoutes } from './routes/budgetDeep'; // M165-B：【CDSS与运营精细化】医院预算与成本管理深化 GET /api/v1/admin/budget?dept=&year=（驱动因子测算/执行跟踪/超支预测）
 import { performanceDeepRoutes } from './routes/performanceDeep'; // M166-A：【绩效与人才】医院科室绩效考核深化 GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制，不只看工作量）
 import { opsDeepRoutes } from './routes/opsDeep'; // M172-C：【安全质量与运营】医院运营与管理深化 GET /api/v1/admin/ops/deep?dept=&period=（门诊/住院/手术/财务四域效率分析/对标/瓶颈识别，运营要有数据不拍脑袋）
+import { officeDeepRoutes } from './routes/officeDeep'; // M178-C：【财务人力行政党建】医院行政办公深化 GET /api/v1/admin/office（公文/会议/档案/督办，节点到人不踢皮球）
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -949,6 +950,7 @@ const allRoutes: RouteDef[] = [
   ...bloodDeepRoutes, // M176-D：【临床核心深化】医院输血管理深化 GET /api/v1/blood/deep（适应症/前评估/过程监测/后评价，零差错人命关天）
   ...antibioticDeepRoutes, // M176-B：【临床核心深化】医院抗菌药物管理深化 GET /api/v1/pharmacy/antibiotic/deep（分级/使用率/AUD/送检率/合理性评价，国卫办医发〔2015〕42号口径）
   ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
+  ...officeDeepRoutes, // M178-C：【财务人力行政党建】GET /api/v1/admin/office（公文审批流转/会议预订冲突/档案/督办跟踪，节点到人不踢皮球）
 ];
 
 interface Compiled {
