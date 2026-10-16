@@ -524,6 +524,8 @@ const InternetHospitalV2 = lazy(() => import('@/pages/internet-hospital/report-v
 const TelemedicineV2 = lazy(() => import('@/pages/telemedicine/report-v2'));
 // M214-C：移动医疗 V2
 const MobileHealthV2 = lazy(() => import('@/pages/mobile-health/report-v2'));
+// M214-D：智慧药房
+const SmartPharmacy = lazy(() => import('@/pages/smart-pharmacy/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -988,6 +990,8 @@ export default function AppRoutes() {
           <Route path="telemedicine/report-v2" element={<TelemedicineV2 />} />
           {/* M214-C：移动医疗 V2 */}
           <Route path="mobile-health/report-v2" element={<MobileHealthV2 />} />
+          {/* M214-D：智慧药房 */}
+          <Route path="smart-pharmacy/report" element={<SmartPharmacy />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
