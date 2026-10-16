@@ -52,6 +52,7 @@ import { perfDeepRoutes } from './routes/perfDeep';
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【v4.x近期】M158-C：首屏与缓存优化（路由懒加载/缓存策略/FCP-LCP 测量）GET /api/v1/admin/performance/firstload
 import { firstLoadRoutes } from './routes/firstLoad';
+// 【AI深化与智能运营】M168-D：系统运维智能化（监控→异常检测→智能告警→自动修复闭环）GET /api/v1/admin/ops/monitoring
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
 import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
@@ -166,6 +167,7 @@ import { surgeryRoutes } from './routes/surgery';
 import { surgeryScheduleRoutes } from './routes/surgerySchedule';
 // 【核心业务深化】M130-D 手术排班优化（POST /admin/surgery/schedule/optimize）
 import { adminSurgeryOptimizeRoutes } from './routes/adminSurgeryOptimize';
+// 【AI深化与智能运营】M168-B 医院运营预测与调配（GET /admin/ops/predict 含置信区间 + POST /admin/ops/schedule-optimize）
 import { surgeryChecklistRoutes } from './routes/surgeryChecklist';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
@@ -327,6 +329,8 @@ import { treatmentPlanRoutes } from './routes/treatmentPlan';
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
 // 【AI能力深化】M163-C：更多病种与更准诊断 POST /api/v1/ai/diagnose/expand（神经/泌尿/血液/风湿免疫16病种库/反馈再校准/鉴别增补/检查推荐）
 import { diseaseExpandRoutes } from './routes/diseaseExpand';
+// 【AI深化与智能运营】M168-A：AI 辅助诊断深化·更多病种与鉴别诊断 POST /api/v1/ai/diagnose/expand-v2（消化/呼吸/心血管/内分泌 17 病种/鉴别深化/治疗方案/一致性核查）
+import { diagnoseDeepRoutes } from './routes/diagnoseDeep';
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
 import { guideDxRoutes } from './routes/guideDx';
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
@@ -754,6 +758,7 @@ const allRoutes: RouteDef[] = [
   ...treatmentPlanRoutes, // M161-C：AI 治疗方案推荐·个体化用药
   ...deepDiagnoseRoutes, // M154-A：AI 辅助诊断深化（Top5/鉴别/检验影像）
   ...diseaseExpandRoutes, // M163-C：更多病种与更准诊断（16新病种库/反馈再校准/鉴别增补/检查推荐）
+  ...diagnoseDeepRoutes, // M168-A：AI 诊断深化 v2（17 病种/鉴别深化/治疗方案/一致性核查）
   ...guideDxRoutes, // M160-C：临床指南对齐（四部权威指南硬阈值）
   ...assistantRecordDraftRoutes,
   ...insuranceAuditRoutes,
