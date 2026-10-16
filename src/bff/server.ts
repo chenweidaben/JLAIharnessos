@@ -767,6 +767,8 @@ import { rehabilitationReportV2Routes } from './routes/rehabilitationReportV2';
 import { healthManagementReportV2Routes } from './routes/healthManagementReportV2';
 // M222-C：急救体系 V2 GET /api/v1/emergency/report-v2
 import { emergencyDeepeningV2Routes } from './routes/emergencyDeepeningV2';
+// M222-D：疼痛管理 GET /api/v1/pain/report
+import { painReportRoutes } from './routes/painReport';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1392,6 +1394,7 @@ const allRoutes: RouteDef[] = [
   ...rehabilitationReportV2Routes, // M222-A：康复医学 V2 GET /api/v1/rehabilitation/report-v2
   ...healthManagementReportV2Routes, // M222-B：健康管理 V2 GET /api/v1/health-management/report-v2
   ...emergencyDeepeningV2Routes, // M222-C：急救体系 V2 GET /api/v1/emergency/report-v2
+  ...painReportRoutes, // M222-D：疼痛管理 GET /api/v1/pain/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
