@@ -294,6 +294,8 @@ const NurseMUSEV2 = lazy(() => import('@/pages/personal-agent/nurse-muse'));
 const PharmaMUSEV2 = lazy(() => import('@/pages/personal-agent/pharma-muse'));
 // M186-A：Admin MUSE V2
 const AdminMUSEV2 = lazy(() => import('@/pages/personal-agent/admin-muse'));
+// M186-B：Patient MUSE V2
+const PatientMUSEV2 = lazy(() => import('@/pages/personal-agent/patient-muse'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -528,6 +530,8 @@ export default function AppRoutes() {
           <Route path="personal-agent/pharma-muse" element={<PharmaMUSEV2 />} />
           {/* M186-A：Admin MUSE V2 */}
           <Route path="personal-agent/admin-muse" element={<AdminMUSEV2 />} />
+          {/* M186-B：Patient MUSE V2 */}
+          <Route path="personal-agent/patient-muse" element={<PatientMUSEV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
