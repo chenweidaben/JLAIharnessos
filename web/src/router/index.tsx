@@ -550,6 +550,8 @@ const ComplianceReport = lazy(() => import('@/pages/compliance/report'));
 const AuditReport = lazy(() => import('@/pages/audit/report'));
 // M217-D：风险管理
 const RiskReport = lazy(() => import('@/pages/risk/report'));
+// M218-A：患者体验 V2
+const PatientExperienceV2 = lazy(() => import('@/pages/patient-experience/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1040,6 +1042,8 @@ export default function AppRoutes() {
           <Route path="audit/report" element={<AuditReport />} />
           {/* M217-D：风险管理 */}
           <Route path="risk/report" element={<RiskReport />} />
+          {/* M218-A：患者体验 V2 */}
+          <Route path="patient-experience/report-v2" element={<PatientExperienceV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
