@@ -364,6 +364,7 @@ import { insuranceAuditRoutes } from './routes/insuranceAudit';
 import { adminInsuranceReviewRoutes } from './routes/adminInsuranceReview';
 import { drgAuditRoutes } from './routes/drgAudit';
 import { drgDeepRoutes } from './routes/drgDeep'; // M176-A：【临床核心深化】DRG/DIP 付费深度分析 GET /api/v1/admin/drg/deep-analysis
+import { medicalRecordDeepRoutes } from './routes/medicalRecordDeep'; // M177-A：【病案设备耗材】医院病案管理深化 GET /api/v1/medical-record/deep（ICD-10诊断+ICD-9-CM-3手术编码校验/归档时限/首页合格率·编码准确率·缺项率/借阅跟踪）
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
 import { reportExportRoutes } from './routes/reportExport';
@@ -810,6 +811,7 @@ const allRoutes: RouteDef[] = [
   ...adminInsuranceReviewRoutes,
   ...drgAuditRoutes,
   ...drgDeepRoutes, // M176-A：DRG 分组正确性/费用偏差/盈亏/CMI/离群病例深度分析
+  ...medicalRecordDeepRoutes, // M177-A：病案 ICD 编码校验/归档时限/首页合格率·编码准确率·缺项率/借阅跟踪
   ...emrLevel5Routes,
   ...emrGrade5Routes,
   ...deptKnowledgeRoutes,
