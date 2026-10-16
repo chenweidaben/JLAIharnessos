@@ -89,6 +89,7 @@ import { systemMetricsRoutes } from './routes/systemMetrics';
 import { startSystemMetricSampler } from './aggregators/systemMetricsAggregator';
 // 【越用越聪明深化】M146-A：医院智慧资产看板（五维资产 + 六维雷达 + 增长报告）
 import { wisdomDashboardRoutes } from './routes/wisdomDashboard';
+// 【智慧资产量化】M161-B：全院智慧资产看板（经验/知识/模型/数据四维 + 饱和折算 + 缺口识别 + 段位对标）
 // 【集团与科研】M156-A：医院集团多院管理（下属医院/核心指标对比/跨院资源调配/集团统一标准）
 import { groupMultiHospitalRoutes } from './routes/groupMultiHospital';
 // 【越用越聪明深化】M146-C：跨科室知识联邦（心内科→急诊/内分泌→营养/外科→麻醉，confidence<0.5 不推荐）
@@ -301,6 +302,7 @@ import { assistantLabRoutes } from './routes/assistantLab';
 import { assistantDiagnosisRoutes } from './routes/assistantDiagnosis';
 // 【AI核心能力深化】M144-A：AI 辅助诊断增强 POST /api/v1/ai/diagnose（Top3带置信度/鉴别/检查/治疗方向，采纳驳回留痕）
 import { aiDiagnoseRoutes } from './routes/aiDiagnose';
+// 【AI核心能力深化】M161-C：AI 治疗方案推荐·个体化用药 POST /api/v1/ai/treatment/plan（一线/备选/剂量个体化/相互作用/疗程复查）
 // 【AI深化与运营预测】M154-A：AI 辅助诊断深化 POST /api/v1/ai/diagnose/deep（16病种库/Top5/鉴别/检验影像建议）
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
@@ -327,6 +329,7 @@ import { reportExportRoutes } from './routes/reportExport';
 import { exportReportRoutes } from './routes/exportReport'; // M148-D：报表中心 PDF/Excel 打印级导出（产品化收尾）
 import { bedMapRoutes } from './routes/bedMap';
 import { digitalTwinRoutes } from './routes/digitalTwin'; // M160-B：医院数字孪生 2D GET /api/v1/admin/digital-twin/building/:building
+import { digitalTwinDeepRoutes } from './routes/digitalTwinDeep'; // M161-A：数字孪生深化 GET /api/v1/admin/digital-twin/stream + POST /simulate（定时快照轮询/流程仿真/资源预测）
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
@@ -721,6 +724,7 @@ const allRoutes: RouteDef[] = [
   ...exportReportRoutes, // M148-D：报表中心 /api/v1/admin/export
   ...bedMapRoutes,
   ...digitalTwinRoutes, // M160-B：数字孪生 2D（科室/病房/手术室/急诊 + 床位四态）
+  ...digitalTwinDeepRoutes, // M161-A：数字孪生深化（定时快照轮询模拟实时推送/流程仿真/资源预测）
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
   ...assistantOutpatientRoutes,
