@@ -460,6 +460,8 @@ import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错�
 import { securityReportRoutes } from './routes/securityReport';
 // 【安全与运营】M163-A：等保三级 安全合规（五大类 15 项控制，仅 admin）
 import { securityComplianceRoutes } from './routes/securityCompliance';
+// 【安全与运营】M174-A：等保三级复查（整改证据核验 + 漂移检测 + 修复跟踪 + 趋势）
+import { securityRecheckRoutes } from './routes/securityRecheck';
 import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
@@ -876,6 +878,7 @@ const allRoutes: RouteDef[] = [
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
   ...securityComplianceRoutes, // M163-A：GET /api/v1/admin/security/compliance（等保三级）
+  ...securityRecheckRoutes, // M174-A：GET /api/v1/admin/security/recheck（等保三级复查）
   ...eSignatureRoutes, // M138-B：电子签名 POST /sign + GET /verify/:id
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
