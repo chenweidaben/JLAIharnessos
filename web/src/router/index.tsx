@@ -858,6 +858,14 @@ const InfectionControlV3 = lazy(() => import('@/pages/infection-control-v3/repor
 const RecordQualityV3 = lazy(() => import('@/pages/record-quality-v3/report'));
 // M256-D：药品供应链 V3
 const DrugSupplyChainV3 = lazy(() => import('@/pages/drug-supply-chain-v3/report'));
+// M257-A：医院 OS 底座 V5
+const HospitalOSV5 = lazy(() => import('@/pages/hospital-os-v5/report'));
+// M257-B：Personal Agent 2.0 V5
+const PersonalAgentV5 = lazy(() => import('@/pages/personal-agent-v5/report'));
+// M257-C：AI 大脑 3.0 V5
+const AIBrainV5 = lazy(() => import('@/pages/ai-brain-v5/report'));
+// M257-D：数据飞轮 V5
+const DataFlywheelV5 = lazy(() => import('@/pages/data-flywheel-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1656,6 +1664,14 @@ export default function AppRoutes() {
           <Route path="record-quality-v3/report" element={<RecordQualityV3 />} />
           {/* M256-D：药品供应链 V3 */}
           <Route path="drug-supply-chain-v3/report" element={<DrugSupplyChainV3 />} />
+          {/* M257-A：医院 OS 底座 V5 */}
+          <Route path="hospital-os-v5/report" element={<HospitalOSV5 />} />
+          {/* M257-B：Personal Agent 2.0 V5 */}
+          <Route path="personal-agent-v5/report" element={<PersonalAgentV5 />} />
+          {/* M257-C：AI 大脑 3.0 V5 */}
+          <Route path="ai-brain-v5/report" element={<AIBrainV5 />} />
+          {/* M257-D：数据飞轮 V5 */}
+          <Route path="data-flywheel-v5/report" element={<DataFlywheelV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
