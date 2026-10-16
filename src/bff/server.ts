@@ -279,6 +279,7 @@ import { drgBudgetRoutes } from './routes/drgBudget';
 import { inpatientCostMonitorRoutes } from './routes/inpatientCostMonitor';
 import { costAttributionRoutes } from './routes/costAttribution';
 import { financeRoutes } from './routes/finance'; // M139-D：医院财务管理 GET /admin/finance/report + POST /transaction
+import { financeDeepRoutes } from './routes/financeDeep'; // M178-A：【财务人力行政党建】医院财务管理深化 GET /api/v1/finance/deep（预算执行/科室成本/收入结构/本量利/趋势预测，账实相符）
 import { teachingRoutes } from './routes/teaching'; // M140-C：教学管理（医院管理深化）GET/POST /admin/teaching
 import { disputeRoutes } from './routes/dispute'; // M141-C：医疗纠纷管理（质量与安全）GET/POST /admin/disputes
 import { patientServiceRoutes } from './routes/patientService'; // M142-C：患者服务中心（预防保健与患者服务）POST /patient/service/create + GET /my + GET /admin/service/tickets
@@ -505,6 +506,7 @@ import { imRoutes } from './routes/im';
 import { oaApprovalRoutes } from './routes/oaApproval';
 // 【医院管理深化】M140-D：党建工会活动留痕（党支部学习/主题党日/工会福利/职工文体/志愿服务）
 import { partyUnionRoutes } from './routes/partyUnion';
+// 【财务人力行政党建】M178-D：党建与文化深化（四维度 + 反形式主义校验 + 医德考评 + 文化问效）GET /api/v1/party/culture
 // 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
 import { jciReviewRoutes } from './routes/jciReview';
 import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
@@ -694,6 +696,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientCostMonitorRoutes,
   ...costAttributionRoutes,
   ...financeRoutes, // M139-D：医院财务管理（医院运营管理）
+  ...financeDeepRoutes, // M178-A：【财务人力行政党建】医院财务管理深化 GET /api/v1/finance/deep（预算超支预警/科室成本/收入结构/本量利CVP/趋势外推）
   ...teachingRoutes, // M140-C：教学管理（医院管理深化：规培/实习/讲座/三基）
   ...disputeRoutes, // M141-C：医疗纠纷管理（质量与安全：登记→调查中→协商中→已解决/已诉讼）
   ...patientServiceRoutes, // M142-C：患者服务中心（预防保健与患者服务：诉求受理→分派→处理→满意度回访，48h 超时自动升级）
