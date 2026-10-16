@@ -700,6 +700,8 @@ const HealthMedia = lazy(() => import('@/pages/health-media/report'));
 const InternationalHealthV2 = lazy(() => import('@/pages/international-health-v2/report'));
 // M237-A：AI 药物研发
 const AIDrugDiscovery = lazy(() => import('@/pages/ai-drug/report'));
+// M237-B：脑机接口与神经康复
+const BCINeuroRehab = lazy(() => import('@/pages/bci-neuro-rehab/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1340,6 +1342,8 @@ export default function AppRoutes() {
           <Route path="international-health-v2/report" element={<InternationalHealthV2 />} />
           {/* M237-A：AI 药物研发 */}
           <Route path="ai-drug/report" element={<AIDrugDiscovery />} />
+          {/* M237-B：脑机接口与神经康复 */}
+          <Route path="bci-neuro-rehab/report" element={<BCINeuroRehab />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
