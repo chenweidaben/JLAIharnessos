@@ -94,6 +94,7 @@ import { brainDeepRoutes } from './routes/brainDeep'; // M159-A：【中期路�
 import { deepAIAlertRoutes } from './routes/deepAIAlert'; // M175-B：【质量与新场景】AI 深度智能预警 GET /api/v1/ai-brain/deep-alert（四类12阈值/证据链/优先级/可落地处置/闭环）
 import { aiDecisionRoutes } from './routes/aiDecision'; // M164-B：【数据中台与AI大脑】POST /api/v1/ai-brain/decision 智能决策支持（方案排序/ROI 评估/效果闭环）
 import { systemMapRoutes } from './routes/systemMap'; // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图（八大领域全覆盖）
+import { systemMapV2Routes } from './routes/systemMapV2'; // M181-B：【300版本里程碑】GET /api/v1/admin/system-map/v2 系统功能全景图 V2（十大领域全覆盖）
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
 // 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
@@ -792,6 +793,7 @@ const allRoutes: RouteDef[] = [
   ...deepAIAlertRoutes, // M175-B：GET /api/v1/ai-brain/deep-alert AI 深度智能预警（四类12阈值/证据链/优先级/可落地处置/闭环）
   ...aiDecisionRoutes, // M164-B：POST /api/v1/ai-brain/decision 智能决策支持（候选方案/四维排序/ROI 评估/效果闭环）
   ...systemMapRoutes, // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图
+  ...systemMapV2Routes, // M181-B：【300版本里程碑】GET /api/v1/admin/system-map/v2 系统功能全景图 V2（十大领域全覆盖）
   ...adminMigrationsRoutes,
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
