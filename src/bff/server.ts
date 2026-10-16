@@ -62,6 +62,8 @@ import { securityScanRoutes } from './routes/securityScan';
 import { authFixRoutes } from './routes/authFix';
 // 【安全修复与质量提升】M167-A：SQL 注入参数化 + XSS 输出转义修复复验 GET /api/v1/admin/security/verify
 import { securityFixRoutes } from './routes/securityFix';
+// 【安全修复与质量提升】M167-C：信息泄露修复与日志安全（PII 脱敏 + 生产错误不泄堆栈/SQL）GET /api/v1/admin/security/log-verify
+import { logSecurityRoutes } from './routes/logSecurity';
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -700,6 +702,7 @@ const allRoutes: RouteDef[] = [
   ...securityScanRoutes, // M166-D：GET /api/v1/admin/security/scan（渗透测试 + 漏洞分级 + 修复建议）
   ...authFixRoutes, // M167-B：GET /api/v1/admin/security/auth-verify（CSRF 修复 + 认证守卫复验）
   ...securityFixRoutes, // M167-A：GET /api/v1/admin/security/verify（SQL注入参数化 + XSS转义修复复验）
+  ...logSecurityRoutes, // M167-C：GET /api/v1/admin/security/log-verify（日志 PII 真检 + 脱敏证据 + 修复对照）
   ...qualityGateRoutes, // M157-C：GET /api/v1/admin/quality-gate（200版本六项质量门禁复查）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
