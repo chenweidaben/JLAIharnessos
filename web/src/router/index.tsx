@@ -530,6 +530,8 @@ const SmartPharmacy = lazy(() => import('@/pages/smart-pharmacy/report'));
 const BigDataV2 = lazy(() => import('@/pages/big-data/report-v2'));
 // M215-B：AI 中台 V2
 const AIPlatformV2 = lazy(() => import('@/pages/ai-platform/report-v2'));
+// M215-C：物联网
+const IoTReport = lazy(() => import('@/pages/iot/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1000,6 +1002,8 @@ export default function AppRoutes() {
           <Route path="big-data/report-v2" element={<BigDataV2 />} />
           {/* M215-B：AI 中台 V2 */}
           <Route path="ai-platform/report-v2" element={<AIPlatformV2 />} />
+          {/* M215-C：物联网 */}
+          <Route path="iot/report" element={<IoTReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
