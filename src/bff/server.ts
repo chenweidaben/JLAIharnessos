@@ -324,6 +324,7 @@ import { monthlyReportRoutes } from './routes/monthlyReport';
 import { reportExportRoutes } from './routes/reportExport';
 import { exportReportRoutes } from './routes/exportReport'; // M148-D：报表中心 PDF/Excel 打印级导出（产品化收尾）
 import { bedMapRoutes } from './routes/bedMap';
+import { digitalTwinRoutes } from './routes/digitalTwin'; // M160-B：医院数字孪生 2D GET /api/v1/admin/digital-twin/building/:building
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
@@ -715,6 +716,7 @@ const allRoutes: RouteDef[] = [
   ...reportExportRoutes,
   ...exportReportRoutes, // M148-D：报表中心 /api/v1/admin/export
   ...bedMapRoutes,
+  ...digitalTwinRoutes, // M160-B：数字孪生 2D（科室/病房/手术室/急诊 + 床位四态）
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
   ...assistantOutpatientRoutes,
