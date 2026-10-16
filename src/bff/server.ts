@@ -1057,6 +1057,14 @@ import { inpatientAIClosedLoopV5ReportRoutes } from './routes/inpatientAIClosedL
 import { surgeryAIClosedLoopV5ReportRoutes } from './routes/surgeryAIClosedLoopV5Report';
 // M258-D：AI 药事全流程闭环 V5 GET /api/v1/pharmacy-ai-loop-v5/report
 import { pharmacyAIClosedLoopV5ReportRoutes } from './routes/pharmacyAIClosedLoopV5Report';
+// M259-A：AI 科研助手 V5 GET /api/v1/research-ai-v5/report
+import { researchAIV5ReportRoutes } from './routes/researchAIV5Report';
+// M259-B：AI 教学助手 V5 GET /api/v1/teaching-ai-v5/report
+import { teachingAIV5ReportRoutes } from './routes/teachingAIV5Report';
+// M259-C：AI 患者陪伴 V5 GET /api/v1/patient-companion-v5/report
+import { patientCompanionV5ReportRoutes } from './routes/patientCompanionV5Report';
+// M259-D：AI 管理决策助手 V5 GET /api/v1/management-ai-v5/report
+import { managementAIV5ReportRoutes } from './routes/managementAIV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1827,6 +1835,10 @@ const allRoutes: RouteDef[] = [
   ...inpatientAIClosedLoopV5ReportRoutes, // M258-B：AI 住院全流程闭环 V5 GET /api/v1/inpatient-ai-loop-v5/report
   ...surgeryAIClosedLoopV5ReportRoutes, // M258-C：AI 手术全流程闭环 V5 GET /api/v1/surgery-ai-loop-v5/report
   ...pharmacyAIClosedLoopV5ReportRoutes, // M258-D：AI 药事全流程闭环 V5 GET /api/v1/pharmacy-ai-loop-v5/report
+  ...researchAIV5ReportRoutes, // M259-A：AI 科研助手 V5 GET /api/v1/research-ai-v5/report
+  ...teachingAIV5ReportRoutes, // M259-B：AI 教学助手 V5 GET /api/v1/teaching-ai-v5/report
+  ...patientCompanionV5ReportRoutes, // M259-C：AI 患者陪伴 V5 GET /api/v1/patient-companion-v5/report
+  ...managementAIV5ReportRoutes, // M259-D：AI 管理决策助手 V5 GET /api/v1/management-ai-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

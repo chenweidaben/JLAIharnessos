@@ -874,6 +874,14 @@ const InpatientAILoopV5 = lazy(() => import('@/pages/inpatient-ai-loop-v5/report
 const SurgeryAILoopV5 = lazy(() => import('@/pages/surgery-ai-loop-v5/report'));
 // M258-D：AI 药事全流程闭环 V5
 const PharmacyAILoopV5 = lazy(() => import('@/pages/pharmacy-ai-loop-v5/report'));
+// M259-A：AI 科研助手 V5
+const ResearchAIV5 = lazy(() => import('@/pages/research-ai-v5/report'));
+// M259-B：AI 教学助手 V5
+const TeachingAIV5 = lazy(() => import('@/pages/teaching-ai-v5/report'));
+// M259-C：AI 患者陪伴 V5
+const PatientCompanionV5 = lazy(() => import('@/pages/patient-companion-v5/report'));
+// M259-D：AI 管理决策助手 V5
+const ManagementAIV5 = lazy(() => import('@/pages/management-ai-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1688,6 +1696,14 @@ export default function AppRoutes() {
           <Route path="surgery-ai-loop-v5/report" element={<SurgeryAILoopV5 />} />
           {/* M258-D：AI 药事全流程闭环 V5 */}
           <Route path="pharmacy-ai-loop-v5/report" element={<PharmacyAILoopV5 />} />
+          {/* M259-A：AI 科研助手 V5 */}
+          <Route path="research-ai-v5/report" element={<ResearchAIV5 />} />
+          {/* M259-B：AI 教学助手 V5 */}
+          <Route path="teaching-ai-v5/report" element={<TeachingAIV5 />} />
+          {/* M259-C：AI 患者陪伴 V5 */}
+          <Route path="patient-companion-v5/report" element={<PatientCompanionV5 />} />
+          {/* M259-D：AI 管理决策助手 V5 */}
+          <Route path="management-ai-v5/report" element={<ManagementAIV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
