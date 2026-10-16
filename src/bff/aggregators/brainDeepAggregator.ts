@@ -633,3 +633,648 @@ export function buildDeepDemo(seed?: number): { metrics: DeepMetrics; history: H
   };
   return { metrics, history };
 }
+
+// ===========================================================================
+// M170-C：AI 医院大脑深化——更多指标与预测（自学习与数字孪生）
+// ---------------------------------------------------------------------------
+// 在 M159-A「异常发现 + 根因 + 7 天预测」之上，把大脑洞察从运行指标扩展到
+//   医疗质量 / 运营效率 / 患者体验 / 财务健康 四大维度，并跨指标做相关分析
+//   与可执行洞察（不是「建议关注」，而是「谁、因为什么、做什么、预期收益」）。
+// 纯函数红线不变：不读库、不写 SQL、不触碰 WebSocket、不新增依赖。
+// ===========================================================================
+
+/**
+ * M170-C 扩展指标快照（四大维度，单位见字段注释）。
+ * 仅院区级聚合，不含患者 PII；阈值参考国家三级公立医院绩效考核与 DRG 支付规范。
+ */
+export interface ExpandedMetrics {
+  // ---- 医疗质量 ----
+  /** 甲级病历率（%，目标 ≥ 90） */
+  recordA1Rate: number;
+  /** 手术并发症率（%，目标 ≤ 1.5） */
+  surgeryComplicationRate: number;
+  /** 院感率（%，目标 ≤ 2.0） */
+  infectionRate: number;
+  // ---- 运营效率 ----
+  /** 床位周转率（次/周，目标 ≥ 1.2） */
+  bedTurnover: number;
+  /** 平均住院日（天，目标 ≤ 8.5） */
+  avgLOS: number;
+  /** 平均等待时间（分钟，目标 ≤ 30） */
+  avgWaitMinutes: number;
+  // ---- 患者体验 ----
+  /** 总体满意度（%，目标 ≥ 92） */
+  satisfaction: number;
+  /** 净推荐值 NPS（-100 ~ 100，目标 ≥ 30） */
+  nps: number;
+  /** 投诉率（‰，目标 ≤ 1.0） */
+  complaintRate: number;
+  /** 表扬率（‰，目标 ≥ 2.0） */
+  praiseRate: number;
+  // ---- 财务健康 ----
+  /** 医疗收入（万元/月） */
+  revenueWan: number;
+  /** 医疗成本（万元/月） */
+  costWan: number;
+  /** 医疗结余（万元/月，= 收入 - 成本） */
+  profitWan: number;
+  /** DRG 结余（万元/月，正值=超支已控） */
+  drgSurplusWan: number;
+}
+
+/** 维度键 */
+export type DimensionKey = 'quality' | 'efficiency' | 'experience' | 'finance';
+
+/** 单维度评分结果 */
+export interface DimensionScore {
+  key: DimensionKey;
+  /** 中文名 */
+  label: string;
+  /** 0~100 综合得分 */
+  score: number;
+  /** 健康状态 */
+  status: 'excellent' | 'good' | 'warn' | 'risk';
+  /** 距目标差距说明（人话） */
+  gap: string;
+  /** 该维度下拖后腿的子指标 */
+  drags: { name: string; value: number; target: string }[];
+}
+
+/** expandHospitalBrain 输出 */
+export interface ExpandedBrain {
+  generatedAt: string;
+  demo: true;
+  hospital: { code: string; name: string };
+  /** 大脑综合指数（0~100，四维加权） */
+  brainIndex: number;
+  /** 大脑健康等级 */
+  level: 'A' | 'B' | 'C' | 'D';
+  dimensions: DimensionScore[];
+  /** 利润率（% = profit / revenue * 100） */
+  profitMargin: number;
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 纯函数 1：expandHospitalBrain——四大维度指标扩展 + 评分
+// ---------------------------------------------------------------------------
+
+/** 把单项「越高越好」的指标映射到 0~100（target=满分线） */
+function scoreHigher(value: number, target: number, floor: number): number {
+  if (target <= 0) return 0;
+  const raw = (value / target) * 100;
+  return Math.max(0, Math.min(100, raw + floor));
+}
+
+/** 把单项「越低越好」的指标映射到 0~100（target=满分线） */
+function scoreLower(value: number, target: number, hardLimit: number): number {
+  if (value <= target) return 100;
+  if (value >= hardLimit) return 0;
+  // 线性扣分：target 处 100，hardLimit 处 0
+  return Math.max(0, 100 - ((value - target) / (hardLimit - target)) * 100);
+}
+
+/** 状态分档 */
+function statusOf(score: number): DimensionScore['status'] {
+  if (score >= 85) return 'excellent';
+  if (score >= 70) return 'good';
+  if (score >= 55) return 'warn';
+  return 'risk';
+}
+
+/**
+ * 【自学习与数字孪生】expandHospitalBrain —— 把粗粒度运行指标扩展为
+ * 四大维度的可读评分，并指出哪个子指标在拖后腿（不是「建议关注」）。
+ *
+ * 纯函数：仅由 ExpandedMetrics 决定输出，无 I/O。
+ */
+export function expandHospitalBrain(metrics: ExpandedMetrics): ExpandedBrain {
+  // ---- 医疗质量：甲级病历率 40% + 并发症率 30% + 院感率 30% ----
+  const qA1 = scoreHigher(metrics.recordA1Rate, 95, 0);
+  const qComp = scoreLower(metrics.surgeryComplicationRate, 1.5, 4.0);
+  const qInf = scoreLower(metrics.infectionRate, 2.0, 5.0);
+  const qualityScore = Math.round(qA1 * 0.4 + qComp * 0.3 + qInf * 0.3);
+  const qDrags: DimensionScore['drags'] = [];
+  if (metrics.recordA1Rate < 90)
+    qDrags.push({ name: '甲级病历率', value: metrics.recordA1Rate, target: '≥ 90%' });
+  if (metrics.surgeryComplicationRate > 1.5)
+    qDrags.push({ name: '手术并发症率', value: metrics.surgeryComplicationRate, target: '≤ 1.5%' });
+  if (metrics.infectionRate > 2.0)
+    qDrags.push({ name: '院感率', value: metrics.infectionRate, target: '≤ 2.0%' });
+
+  // ---- 运营效率：床位周转 40% + 平均住院日 30% + 等待时间 30% ----
+  const eTurn = scoreHigher(metrics.bedTurnover, 1.4, 0);
+  const eLos = scoreLower(metrics.avgLOS, 8.5, 14);
+  const eWait = scoreLower(metrics.avgWaitMinutes, 30, 90);
+  const efficiencyScore = Math.round(eTurn * 0.4 + eLos * 0.3 + eWait * 0.3);
+  const eDrags: DimensionScore['drags'] = [];
+  if (metrics.bedTurnover < 1.2)
+    eDrags.push({ name: '床位周转率', value: metrics.bedTurnover, target: '≥ 1.2 次/周' });
+  if (metrics.avgLOS > 8.5)
+    eDrags.push({ name: '平均住院日', value: metrics.avgLOS, target: '≤ 8.5 天' });
+  if (metrics.avgWaitMinutes > 30)
+    eDrags.push({ name: '平均等待时间', value: metrics.avgWaitMinutes, target: '≤ 30 分钟' });
+
+  // ---- 患者体验：满意度 40% + NPS 30% + 投诉率 15% + 表扬率 15% ----
+  const xSat = scoreHigher(metrics.satisfaction, 95, 0);
+  // NPS 归一化：-100→0 分，30→100 分
+  const xNps = Math.max(0, Math.min(100, ((metrics.nps + 100) / 130) * 100));
+  const xComp = scoreLower(metrics.complaintRate, 1.0, 5.0);
+  const xPraise = scoreHigher(metrics.praiseRate, 3.0, 0);
+  const experienceScore = Math.round(xSat * 0.4 + xNps * 0.3 + xComp * 0.15 + xPraise * 0.15);
+  const xDrags: DimensionScore['drags'] = [];
+  if (metrics.satisfaction < 92)
+    xDrags.push({ name: '满意度', value: metrics.satisfaction, target: '≥ 92%' });
+  if (metrics.nps < 30) xDrags.push({ name: 'NPS', value: metrics.nps, target: '≥ 30' });
+  if (metrics.complaintRate > 1.0)
+    xDrags.push({ name: '投诉率', value: metrics.complaintRate, target: '≤ 1.0‰' });
+  if (metrics.praiseRate < 2.0)
+    xDrags.push({ name: '表扬率', value: metrics.praiseRate, target: '≥ 2.0‰' });
+
+  // ---- 财务健康：利润率 60% + DRG 结余 40% ----
+  const profitMargin = metrics.revenueWan > 0 ? (metrics.profitWan / metrics.revenueWan) * 100 : 0;
+  // 利润率：-5%（亏损硬线）→ 0 分，8%（目标）→ 100 分，线性插值
+  const fMargin = Math.max(0, Math.min(100, ((profitMargin + 5) / 13) * 100));
+  // DRG 结余：≥0 满分，-50 万→0 分
+  const fDrg = Math.max(0, Math.min(100, ((metrics.drgSurplusWan + 50) / 50) * 100));
+  const financeScore = Math.round(fMargin * 0.6 + fDrg * 0.4);
+  const fDrags: DimensionScore['drags'] = [];
+  if (profitMargin < 8)
+    fDrags.push({ name: '结余率', value: Math.round(profitMargin * 10) / 10, target: '≥ 8%' });
+  if (metrics.drgSurplusWan < 0)
+    fDrags.push({ name: 'DRG 结余', value: metrics.drgSurplusWan, target: '≥ 0 万元' });
+
+  const dimensions: DimensionScore[] = [
+    {
+      key: 'quality',
+      label: '医疗质量',
+      score: qualityScore,
+      status: statusOf(qualityScore),
+      gap: qDrags.length === 0 ? '各子指标均达标' : `拖累项：${qDrags.map((d) => d.name).join('、')}`,
+      drags: qDrags,
+    },
+    {
+      key: 'efficiency',
+      label: '运营效率',
+      score: efficiencyScore,
+      status: statusOf(efficiencyScore),
+      gap: eDrags.length === 0 ? '各子指标均达标' : `拖累项：${eDrags.map((d) => d.name).join('、')}`,
+      drags: eDrags,
+    },
+    {
+      key: 'experience',
+      label: '患者体验',
+      score: experienceScore,
+      status: statusOf(experienceScore),
+      gap: xDrags.length === 0 ? '各子指标均达标' : `拖累项：${xDrags.map((d) => d.name).join('、')}`,
+      drags: xDrags,
+    },
+    {
+      key: 'finance',
+      label: '财务健康',
+      score: financeScore,
+      status: statusOf(financeScore),
+      gap: fDrags.length === 0 ? '各子指标均达标' : `拖累项：${fDrags.map((d) => d.name).join('、')}`,
+      drags: fDrags,
+    },
+  ];
+
+  // 四维加权：质量 35% / 效率 25% / 体验 20% / 财务 20%（符合三级国考权重）
+  const brainIndex = Math.round(qualityScore * 0.35 + efficiencyScore * 0.25 + experienceScore * 0.2 + financeScore * 0.2);
+  const level: ExpandedBrain['level'] = brainIndex >= 85 ? 'A' : brainIndex >= 70 ? 'B' : brainIndex >= 55 ? 'C' : 'D';
+
+  return {
+    generatedAt: new Date().toISOString(),
+    demo: true,
+    hospital: { code: 'HQ', name: '杭州健澜示范医院' },
+    brainIndex,
+    level,
+    dimensions,
+    profitMargin: Math.round(profitMargin * 10) / 10,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 单指标历史点（与 M159-A HistoryPoint 解耦，通用）
+// ---------------------------------------------------------------------------
+
+/** 单指标历史点 */
+export interface MetricSeriesPoint {
+  date: string;
+  value: number;
+}
+
+/** predictMetricTrend 输出 */
+export interface MetricTrendForecast {
+  metric: string;
+  horizonDays: number;
+  /** 日斜率（每天变化多少） */
+  slopePerDay: number;
+  /** 趋势方向 */
+  direction: 'up' | 'down' | 'flat';
+  /** 拟合优度 R²（0~1） */
+  r2: number;
+  /** 预测序列（含起止日期） */
+  series: { date: string; value: number }[];
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 纯函数 2：predictMetricTrend——单指标趋势预测
+// ---------------------------------------------------------------------------
+
+/** 皮尔逊相关系数（内部用） */
+function pearson(xs: number[], ys: number[]): number {
+  const n = Math.min(xs.length, ys.length);
+  if (n < 2) return 0;
+  let sx = 0;
+  let sy = 0;
+  let sxy = 0;
+  let sxx = 0;
+  let syy = 0;
+  for (let i = 0; i < n; i += 1) {
+    const x = xs[i] ?? 0;
+    const y = ys[i] ?? 0;
+    sx += x;
+    sy += y;
+    sxy += x * y;
+    sxx += x * x;
+    syy += y * y;
+  }
+  const denom = Math.sqrt((n * sxx - sx * sx) * (n * syy - sy * sy));
+  return denom === 0 ? 0 : (n * sxy - sx * sy) / denom;
+}
+
+/**
+ * 【自学习与数字孪生】predictMetricTrend —— 基于历史序列最小二乘外推
+ * 未来 N 天，并给出方向 / 斜率 / R²（让前端能画「置信带」而不是拍脑袋）。
+ *
+ * @param metric 指标名（仅用于回显）
+ * @param history 历史序列（按日期升序）
+ * @param days 预测天数
+ */
+export function predictMetricTrend(
+  metric: string,
+  history: MetricSeriesPoint[],
+  days: number,
+): MetricTrendForecast {
+  const horizon = Math.max(1, Math.min(30, Math.floor(days)));
+  if (history.length < 2) {
+    return {
+      metric,
+      horizonDays: horizon,
+      slopePerDay: 0,
+      direction: 'flat',
+      r2: 0,
+      series: [],
+    };
+  }
+
+  const n = history.length;
+  const xs = history.map((_, i) => i);
+  const ys = history.map((p) => p.value);
+  const fit = linearFit(ys);
+  // R² = (corr)^2
+  const r = pearson(xs, ys);
+  const r2 = Math.round(r * r * 1000) / 1000;
+
+  const direction: MetricTrendForecast['direction'] =
+    Math.abs(fit.slope) < Math.max(0.001, Math.abs(fit.intercept) * 0.005)
+      ? 'flat'
+      : fit.slope > 0
+        ? 'up'
+        : 'down';
+
+  const lastDate = history[n - 1]?.date ?? formatDate(new Date());
+  const series: { date: string; value: number }[] = [];
+  for (let step = 1; step <= horizon; step += 1) {
+    const x = n - 1 + step;
+    const v = fit.intercept + fit.slope * x;
+    series.push({ date: addDays(lastDate, step), value: Math.round(v * 100) / 100 });
+  }
+
+  return {
+    metric,
+    horizonDays: horizon,
+    slopePerDay: Math.round(fit.slope * 1000) / 1000,
+    direction,
+    r2,
+    series,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 纯函数 3：correlateMetrics——跨指标关联分析
+// ---------------------------------------------------------------------------
+
+/** 一组多指标同期序列：key 为指标名，value 为按日期升序的序列 */
+export type MetricPeriodSeries = Record<string, MetricSeriesPoint[]>;
+
+/** 关联对输出 */
+export interface MetricCorrelation {
+  a: string;
+  b: string;
+  /** 皮尔逊 r ∈ [-1, 1] */
+  r: number;
+  /** 强度描述 */
+  strength: 'strong' | 'moderate' | 'weak';
+  /** 人话解释（同涨同跌 / 此消彼长） */
+  interpretation: string;
+  /** 可执行启示（不是「建议关注」） */
+  implication: string;
+}
+
+/**
+ * 【自学习与数字孪生】correlateMetrics —— 在 period 天窗口内扫描所有指标对，
+ * 只保留 |r| ≥ 0.5 的显著关联，并给出可执行启示。
+ *
+ * @param series 多指标同期序列
+ * @param period 窗口天数（取最近 N 天）
+ */
+export function correlateMetrics(series: MetricPeriodSeries, period: number): MetricCorrelation[] {
+  const window = Math.max(2, Math.floor(period));
+  const keys = Object.keys(series);
+  const result: MetricCorrelation[] = [];
+
+  for (let i = 0; i < keys.length; i += 1) {
+    for (let j = i + 1; j < keys.length; j += 1) {
+      const aKey = keys[i] ?? '';
+      const bKey = keys[j] ?? '';
+      const aAll = series[aKey] ?? [];
+      const bAll = series[bKey] ?? [];
+      if (aAll.length < 3 || bAll.length < 3) continue;
+
+      // 取最近 window 天，按日期对齐
+      const aWin = aAll.slice(-window);
+      const bWin = bAll.slice(-window);
+      const minLen = Math.min(aWin.length, bWin.length);
+      const a = aWin.slice(-minLen).map((p) => p.value);
+      const b = bWin.slice(-minLen).map((p) => p.value);
+      const r = pearson(a, b);
+      if (Math.abs(r) < 0.5) continue;
+
+      const strength: MetricCorrelation['strength'] =
+        Math.abs(r) >= 0.75 ? 'strong' : Math.abs(r) >= 0.5 ? 'moderate' : 'weak';
+      const same = r > 0;
+      const interpretation = same
+        ? `「${aKey}」与「${bKey}」同向变动（r=${Math.round(r * 100) / 100}），一个升另一个也升`
+        : `「${aKey}」与「${bKey}」反向变动（r=${Math.round(r * 100) / 100}），一个升另一个反降`;
+
+      // 可执行启示：基于已知指标语义库
+      const implication = buildImplication(aKey, bKey, same);
+
+      result.push({ a: aKey, b: bKey, r: Math.round(r * 1000) / 1000, strength, interpretation, implication });
+    }
+  }
+
+  // 按 |r| 降序
+  result.sort((x, y) => Math.abs(y.r) - Math.abs(x.r));
+  return result;
+}
+
+/** 基于指标语义库给关联对配可执行启示 */
+function buildImplication(a: string, b: string, same: boolean): string {
+  const pair = [a, b].sort().join('|');
+  // 常见高价值组合
+  if (pair.includes('avgLOS') && pair.includes('bedTurnover')) {
+    // r<0（反向）：平均住院日拉长直接压周转——最常见的联动，应压缩在院日
+    // r>0（同向）：住院日升但周转也升——收治跑赢出院，警惕床位隐性积压
+    return same
+      ? '平均住院日与床位周转率同向上升：收治跑赢出院，警惕床位隐性积压与排队入院'
+      : '平均住院日上升伴随床位周转下降：应启动「日间手术 + 预住院」压缩在院日，释放床位';
+  }
+  if (pair.includes('satisfaction') && pair.includes('complaintRate')) {
+    return same
+      ? '满意度与投诉率同向：说明投诉集中在特定科室/流程，应按科室拆投诉热力图'
+      : '满意度上升同时投诉下降：体验改进有效，可复制该科室流程到全院';
+  }
+  if (pair.includes('profitWan') && pair.includes('drgSurplusWan')) {
+    return same
+      ? '结余与 DRG 结余同向：DRG 控费策略直接改善全院结余，应继续规范病案首页填写'
+      : '结余上升但 DRG 超支：收入增长可能来自自费项目，需警惕病组结构恶化';
+  }
+  if (pair.includes('bedTurnover') && pair.includes('avgWaitMinutes')) {
+    return same
+      ? '周转加快但等待变长：床位被快速轮转消耗，需增开诊室或检查通道'
+      : '周转加快等待仍短：流程优化见效，沉淀经验做法';
+  }
+  if (pair.includes('nps') && pair.includes('praiseRate')) {
+    return same ? 'NPS 与表扬率同向：患者自发口碑增强，可把表扬案例用于新媒体传播' : '表扬多但 NPS 低：可能是抽样偏差，应扩大 NPS 调研样本';
+  }
+  // 兜底：通用启示
+  return same
+    ? `「${a}」与「${b}」强同向：任一指标异常都会传导到另一指标，应联动排班与物资预算`
+    : `「${a}」与「${b}」强反向：调整一个指标时必须同步评估另一个的副作用`;
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 纯函数 4：generateBrainInsight——大脑洞察生成（可执行）
+// ---------------------------------------------------------------------------
+
+/** 单条洞察 */
+export interface BrainInsight {
+  id: string;
+  dimension: DimensionKey;
+  priority: 'high' | 'medium' | 'low';
+  /** 结论标题（一句话） */
+  title: string;
+  /** 证据链 */
+  evidence: string[];
+  /** 可执行动作（谁、做什么） */
+  action: string;
+  /** 预期收益（量化） */
+  expectedImpact: string;
+}
+
+/**
+ * 【自学习与数字孪生】generateBrainInsight —— 基于四大维度指标 + 关联分析
+ * 产出可执行洞察。每条洞察都必须有「动作 + 量化收益」，不允许「建议关注」。
+ *
+ * @param metrics 当前扩展指标快照
+ * @param correlations correlateMetrics 的输出
+ */
+export function generateBrainInsight(
+  metrics: ExpandedMetrics,
+  correlations: MetricCorrelation[],
+): BrainInsight[] {
+  const insights: BrainInsight[] = [];
+  const push = (insight: BrainInsight) => insights.push(insight);
+
+  // ---- 1. 医疗质量 ----
+  if (metrics.recordA1Rate < 90) {
+    push({
+      id: 'INS-Q-A1',
+      dimension: 'quality',
+      priority: metrics.recordA1Rate < 85 ? 'high' : 'medium',
+      title: `甲级病历率 ${metrics.recordA1Rate}%，低于 90% 国考线`,
+      evidence: [
+        `当前甲级病历率 ${metrics.recordA1Rate}%`,
+        `国考三级医院要求 ≥ 90%，距目标差 ${Math.round((90 - metrics.recordA1Rate) * 10) / 10} 个百分点`,
+      ],
+      action: '质控科下周起每日抽取运行病历 30 份，重点查现病史与诊疗计划完整性；信息科上线病历书写实时校验规则',
+      expectedImpact: '预计 4 周内甲级病历率回升至 92%，避免国考扣分 2~3 分',
+    });
+  }
+  if (metrics.surgeryComplicationRate > 1.5) {
+    push({
+      id: 'INS-Q-COMP',
+      dimension: 'quality',
+      priority: 'high',
+      title: `手术并发症率 ${metrics.surgeryComplicationRate}%，超过 1.5% 警戒线`,
+      evidence: [`当前 ${metrics.surgeryComplicationRate}%`, `安全目标 ≤ 1.5%`],
+      action: '医务处组织普外科/骨科近 30 天并发症病例 MDT 复盘，麻醉科核对术前评估遗漏项',
+      expectedImpact: '预计 6 周内并发症率回落至 1.2%，减少术后 ICU 滞留 15~20 例/月',
+    });
+  }
+
+  // ---- 2. 运营效率 ----
+  if (metrics.avgLOS > 8.5) {
+    push({
+      id: 'INS-E-LOS',
+      dimension: 'efficiency',
+      priority: metrics.avgLOS > 10 ? 'high' : 'medium',
+      title: `平均住院日 ${metrics.avgLOS} 天，高于 8.5 天目标`,
+      evidence: [
+        `当前平均住院日 ${metrics.avgLOS} 天`,
+        `与目标差 ${Math.round((metrics.avgLOS - 8.5) * 10) / 10} 天`,
+        `床位周转率 ${metrics.bedTurnover} 次/周`,
+      ],
+      action: '医务处筛选平均住院日前 10 的科室，推行「预住院 + 日间手术」；出院前 48 小时启动随访衔接',
+      expectedImpact: '每压缩 0.5 天住院日，相当于新增床位 ≈ 80 张/年，释放收益约 600 万元/年',
+    });
+  }
+  if (metrics.avgWaitMinutes > 30) {
+    push({
+      id: 'INS-E-WAIT',
+      dimension: 'efficiency',
+      priority: 'medium',
+      title: `平均等待时间 ${metrics.avgWaitMinutes} 分钟，超过 30 分钟`,
+      evidence: [`当前平均等待 ${metrics.avgWaitMinutes} 分钟`],
+      action: '门诊部高峰时段（9:00-10:30）增开 2 个机动诊室；检查科室推行分时段预约精确到 15 分钟',
+      expectedImpact: '预计平均等待降至 22 分钟，满意度提升 3~5 个百分点',
+    });
+  }
+
+  // ---- 3. 患者体验 ----
+  if (metrics.nps < 30) {
+    push({
+      id: 'INS-X-NPS',
+      dimension: 'experience',
+      priority: metrics.nps < 10 ? 'high' : 'medium',
+      title: `NPS ${metrics.nps}，低于 30 分良好线`,
+      evidence: [`当前 NPS ${metrics.nps}`, `投诉率 ${metrics.complaintRate}‰`, `表扬率 ${metrics.praiseRate}‰`],
+      action: '患者服务中心对近 30 天贬损者（0~6 分）100% 电话回访；对推荐者（9~10 分）邀请参与口碑计划',
+      expectedImpact: 'NPS 每提升 10 分，患者流失率下降约 4%，相当于年门诊量多 8000~10000 人次',
+    });
+  }
+  if (metrics.complaintRate > 1.0) {
+    push({
+      id: 'INS-X-COMP',
+      dimension: 'experience',
+      priority: 'high',
+      title: `投诉率 ${metrics.complaintRate}‰，超过 1.0‰ 警戒线`,
+      evidence: [`当前投诉率 ${metrics.complaintRate}‰`],
+      action: '投诉办按周拆解投诉到科室与环节（挂号/候诊/收费/诊疗），TOP3 科室科主任在院周会做整改汇报',
+      expectedImpact: '投诉率回落至 0.8‰，差评舆情风险显著下降',
+    });
+  }
+
+  // ---- 4. 财务健康 ----
+  const profitMargin = metrics.revenueWan > 0 ? (metrics.profitWan / metrics.revenueWan) * 100 : 0;
+  if (metrics.drgSurplusWan < 0) {
+    push({
+      id: 'INS-F-DRG',
+      dimension: 'finance',
+      priority: 'high',
+      title: `DRG 月超支 ${Math.abs(metrics.drgSurplusWan)} 万元`,
+      evidence: [
+        `DRG 结余 ${metrics.drgSurplusWan} 万元`,
+        `全院结余率 ${Math.round(profitMargin * 10) / 10}%`,
+      ],
+      action: '医保办联合病案室复盘超支病组 TOP5，重点核查病案首页主要诊断选择与耗材使用；对超支病组临床路径逐项核定',
+      expectedImpact: '若 50% 超支病组回到标准线，每月可回补 20~30 万元，季度 DRG 考核不扣分',
+    });
+  }
+  if (profitMargin < 0) {
+    push({
+      id: 'INS-F-MARGIN',
+      dimension: 'finance',
+      priority: 'high',
+      title: `月度结余率 ${Math.round(profitMargin * 10) / 10}%，已亏损`,
+      evidence: [`收入 ${metrics.revenueWan} 万 / 成本 ${metrics.costWan} 万 / 结余 ${metrics.profitWan} 万`],
+      action: '运营管理委员会启动月度成本分析会，对百元收入占比超基线的耗材与药品做专项管控；优化人力排班结构',
+      expectedImpact: '成本压降 2% 即可扭亏为盈，释放约 50~80 万元/月',
+    });
+  }
+
+  // ---- 5. 跨维度关联洞察（来自 correlateMetrics）----
+  for (const c of correlations.slice(0, 3)) {
+    if (c.strength !== 'strong') continue;
+    push({
+      id: `INS-C-${c.a}-${c.b}`,
+      dimension: 'finance', // 跨维度洞察统一挂到 finance 下做运营决策
+      priority: c.strength === 'strong' ? 'medium' : 'low',
+      title: `强关联：${c.a} 与 ${c.b}（r=${c.r}）`,
+      evidence: [c.interpretation, `最近 ${correlations.length} 组显著关联中排名前列`],
+      action: c.implication,
+      expectedImpact: '联动调整可避免单一指标优化带来的副作用，按经验可提升整体效率 5%~10%',
+    });
+  }
+
+  // 优先级排序：high → medium → low
+  const w: Record<BrainInsight['priority'], number> = { high: 0, medium: 1, low: 2 };
+  insights.sort((x, y) => w[x.priority] - w[y.priority]);
+  return insights;
+}
+
+// ---------------------------------------------------------------------------
+// M170-C 演示数据装配（路由用；纯函数、确定性 seed）
+// ---------------------------------------------------------------------------
+
+/** 构造 M170-C 演示扩展指标（带明显问题：DRG 超支、平均住院日偏长、NPS 偏低） */
+export function buildExpandedDemo(): {
+  metrics: ExpandedMetrics;
+  history: Record<string, MetricSeriesPoint[]>;
+} {
+  const metrics: ExpandedMetrics = {
+    recordA1Rate: 86.5,
+    surgeryComplicationRate: 1.8,
+    infectionRate: 1.6,
+    bedTurnover: 1.05,
+    avgLOS: 9.6,
+    avgWaitMinutes: 38,
+    satisfaction: 88.4,
+    nps: 12,
+    complaintRate: 1.6,
+    praiseRate: 1.2,
+    revenueWan: 4200,
+    costWan: 3980,
+    profitWan: 220,
+    drgSurplusWan: -35,
+  };
+
+  // 30 天历史：平均住院日缓慢上升，床位周转缓慢下降（强反向相关）
+  const history: Record<string, MetricSeriesPoint[]> = {
+    avgLOS: [],
+    bedTurnover: [],
+    satisfaction: [],
+    complaintRate: [],
+    drgSurplusWan: [],
+    profitWan: [],
+  };
+  const today = new Date();
+  for (let i = 29; i >= 0; i -= 1) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const date = formatDate(d);
+    // avgLOS 从 8.8 缓慢升到 9.6；bedTurnover 从 1.2 降到 1.05（反向强相关）
+    history.avgLOS.push({ date, value: Math.round((8.8 + (29 - i) * 0.028) * 100) / 100 });
+    history.bedTurnover.push({ date, value: Math.round((1.2 - (29 - i) * 0.005) * 100) / 100 });
+    // satisfaction 缓升、complaintRate 缓降（反向）
+    history.satisfaction.push({ date, value: Math.round((86 + (29 - i) * 0.08) * 10) / 10 });
+    history.complaintRate.push({ date, value: Math.round((2.0 - (29 - i) * 0.014) * 100) / 100 });
+    // drgSurplusWan 与 profitWan 同向波动
+    history.drgSurplusWan.push({ date, value: Math.round((-40 + Math.sin(i / 4) * 8) * 10) / 10 });
+    history.profitWan.push({ date, value: Math.round((180 + Math.sin(i / 4) * 25) * 10) / 10 });
+  }
+
+  return { metrics, history };
+}

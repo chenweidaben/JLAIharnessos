@@ -20,7 +20,12 @@
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types.js';
 import {
   buildDeepDemo,
+  buildExpandedDemo,
+  correlateMetrics,
   deepHospitalBrain,
+  expandHospitalBrain,
+  generateBrainInsight,
+  predictMetricTrend,
   type DeepBrain,
 } from '../aggregators/brainDeepAggregator.js';
 
@@ -52,11 +57,63 @@ async function handleBrainDeep(c: Ctx): Promise<Response> {
   }
 }
 
+/**
+ * M170-C：GET /api/v1/ai-brain/expand
+ * AI 医院大脑深化扩展：四大维度评分（医疗质量/运营效率/患者体验/财务健康）
+ *   + 单指标趋势预测（未来 7 天）+ 跨指标关联分析 + 可执行大脑洞察。
+ * 纯函数全部下沉到 brainDeepAggregator（expandHospitalBrain / predictMetricTrend /
+ * correlateMetrics / generateBrainInsight），本路由只做数据装配。
+ * 【自学习与数字孪生】：演示模式，无新表、无 SQL、无 WebSocket。
+ */
+async function handleBrainExpand(c: Ctx): Promise<Response> {
+  try {
+    const { metrics, history } = buildExpandedDemo();
+
+    // 1) 四大维度扩展评分
+    const expanded = expandHospitalBrain(metrics);
+
+    // 2) 关键指标未来 7 天趋势预测
+    const forecasts = [
+      predictMetricTrend('avgLOS', history.avgLOS ?? [], 7),
+      predictMetricTrend('bedTurnover', history.bedTurnover ?? [], 7),
+      predictMetricTrend('satisfaction', history.satisfaction ?? [], 7),
+      predictMetricTrend('drgSurplusWan', history.drgSurplusWan ?? [], 7),
+    ];
+
+    // 3) 跨指标关联分析（最近 14 天窗口）
+    const correlations = correlateMetrics(history, 14);
+
+    // 4) 可执行洞察（动作 + 量化收益，不是「建议关注」）
+    const insights = generateBrainInsight(metrics, correlations);
+
+    return json(
+      ok({
+        ...expanded,
+        forecasts,
+        correlations,
+        insights,
+        raw: metrics,
+        highInsightCount: insights.filter((i) => i.priority === 'high').length,
+        notice: '演示数据，自学习与数字孪生建模，不代表真实运行数据',
+      }),
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'AI 医院大脑扩展分析失败';
+    return json(fail(ErrorCode.INTERNAL_ERROR, message, c.traceId), 500);
+  }
+}
+
 export const brainDeepRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/ai-brain/deep',
     auth: true,
     handle: handleBrainDeep,
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/ai-brain/expand',
+    auth: true,
+    handle: handleBrainExpand,
   },
 ];
