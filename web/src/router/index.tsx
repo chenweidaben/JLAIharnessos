@@ -338,6 +338,8 @@ const ResearchManagement = lazy(() => import('@/pages/admin/research'));
 const TeachingManagement = lazy(() => import('@/pages/admin/teaching'));
 // M191-C：人力资源管理
 const HRManagement = lazy(() => import('@/pages/admin/hr'));
+// M191-D：设备物资管理
+const EquipmentMaterial = lazy(() => import('@/pages/admin/equipment-material'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -616,6 +618,8 @@ export default function AppRoutes() {
           <Route path="admin/teaching" element={<TeachingManagement />} />
           {/* M191-C：人力资源管理 */}
           <Route path="admin/hr" element={<HRManagement />} />
+          {/* M191-D：设备物资管理 */}
+          <Route path="admin/equipment-material" element={<EquipmentMaterial />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
