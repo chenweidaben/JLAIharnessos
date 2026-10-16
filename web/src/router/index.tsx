@@ -276,6 +276,8 @@ const PersonalAgentAdoption = lazy(() => import('@/pages/personal-agent/adoption
 const LearningFlywheel = lazy(() => import('@/pages/learning/flywheel'));
 // M183-D：安全审计日志
 const AdminAuditLog = lazy(() => import('@/pages/admin/audit-log'));
+// M184-A：护士智能排班优化
+const NurseScheduleOptimize = lazy(() => import('@/pages/scheduling/optimize'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -492,6 +494,8 @@ export default function AppRoutes() {
           <Route path="learning/flywheel" element={<LearningFlywheel />} />
           {/* M183-D：安全审计日志 */}
           <Route path="admin/audit-log" element={<AdminAuditLog />} />
+          {/* M184-A：护士智能排班优化 */}
+          <Route path="scheduling/optimize" element={<NurseScheduleOptimize />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
