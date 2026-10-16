@@ -956,6 +956,8 @@ const EdgeV5 = lazy(() => import('@/pages/5g-edge-v5/report'));
 const DigitalTwinV5 = lazy(() => import('@/pages/digital-twin-v5/report'));
 // M269-A：临床研究 RWD/RWE 平台 V5
 const RWDPlatformV5 = lazy(() => import('@/pages/rwd-platform-v5/report'));
+// M269-B：药物临床试验 GCP V5
+const GCPV5 = lazy(() => import('@/pages/gcp-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1852,6 +1854,8 @@ export default function AppRoutes() {
           <Route path="digital-twin-v5/report" element={<DigitalTwinV5 />} />
           {/* M269-A：临床研究 RWD/RWE 平台 V5 */}
           <Route path="rwd-platform-v5/report" element={<RWDPlatformV5 />} />
+          {/* M269-B：药物临床试验 GCP V5 */}
+          <Route path="gcp-v5/report" element={<GCPV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
