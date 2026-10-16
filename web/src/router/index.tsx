@@ -304,6 +304,8 @@ const SelfLearningLoop = lazy(() => import('@/pages/learning/self-loop'));
 const PerformanceReportV2 = lazy(() => import('@/pages/admin/performance-v2'));
 // M187-B：安全加固 V2
 const SecurityReportV2 = lazy(() => import('@/pages/admin/security-v2'));
+// M187-C：EMR 五级评审 V2
+const EMRGrade5V2 = lazy(() => import('@/pages/emr/grade5'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -548,6 +550,8 @@ export default function AppRoutes() {
           <Route path="admin/performance" element={<PerformanceReportV2 />} />
           {/* M187-B：安全加固 */}
           <Route path="admin/security" element={<SecurityReportV2 />} />
+          {/* M187-C：EMR 五级评审 */}
+          <Route path="emr/grade5" element={<EMRGrade5V2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
