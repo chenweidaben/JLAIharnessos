@@ -15,6 +15,10 @@ import {
   listPreliminaryForStaff,
   getPreliminaryDetail,
   consumePreliminary,
+  // M164-C：【数据中台与AI大脑】智能导诊与健康管理纯函数
+  buildSmartTriage,
+  buildPatientHealthJourney,
+  predictPatientNeeds,
 } from '../aggregators/smartTriageAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
@@ -132,5 +136,41 @@ export const smartTriageRoutes: RouteDef[] = [
       consumePreliminary(view, c.params.id),
     ),
     auth: true,
+  },
+  // M164-C：【患者服务深化】智能导诊（红旗症状硬编码直急诊）——纯函数，免登录演示
+  {
+    method: 'GET',
+    path: '/api/v1/patient/smart-triage',
+    handle: (c: Ctx): Response => {
+      const symptoms = c.query.get('symptoms') ?? '';
+      if (!symptoms.trim()) {
+        return json(
+          fail(ErrorCode.BAD_REQUEST, '请描述您的症状', c.traceId),
+          400,
+        );
+      }
+      // duration / severity 由 query 透传为字符串，纯函数内部规范化
+      const result = buildSmartTriage(
+        symptoms,
+        c.query.get('duration') ?? undefined,
+        c.query.get('severity') ?? undefined,
+      );
+      return json(ok(result));
+    },
+    auth: false,
+  },
+  // M164-C：【患者服务深化】患者健康旅程 + AI大脑需求预测——纯函数，免登录演示
+  {
+    method: 'GET',
+    path: '/api/v1/patient/health-journey/:patientId',
+    handle: (c: Ctx): Response => {
+      const patientId = c.params.patientId;
+      const journey = buildPatientHealthJourney(patientId);
+      const currentStage =
+        journey.stages.find((s) => s.status === 'current')?.key ?? 'intake';
+      const predictedNeeds = predictPatientNeeds(patientId, currentStage);
+      return json(ok({ ...journey, predictedNeeds }));
+    },
+    auth: false,
   },
 ];
