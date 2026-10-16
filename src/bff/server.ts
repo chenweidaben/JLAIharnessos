@@ -78,6 +78,8 @@ import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
 // 【SaaS化+智慧度】M133-D：系统智慧度六维评分 + 趋势
 import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
+// 【M160-A · 全自学习闭环】GET /api/v1/admin/auto-learn/report 系统每周自动进化报告
+import { autoLearnRoutes } from './routes/autoLearn';
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 // 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
 import { todosRoutes } from './routes/todos';
@@ -193,6 +195,7 @@ import { smartScheduleRoutes } from './routes/smartSchedule'; // M152-C：医院
 import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
+// M160-D：患者健康管理深化——个性化健康计划（运动/饮食/用药提醒/复查/红旗症状，不一刀切）
 import { patientMobileHomeRoutes } from './routes/patientMobileHome';
 // 【产品化收尾】M148-C：患者端 H5 一站式首页 GET /api/v1/patient/h5/home
 import { patientH5Routes } from './routes/patientH5';
@@ -299,6 +302,7 @@ import { assistantDiagnosisRoutes } from './routes/assistantDiagnosis';
 import { aiDiagnoseRoutes } from './routes/aiDiagnose';
 // 【AI深化与运营预测】M154-A：AI 辅助诊断深化 POST /api/v1/ai/diagnose/deep（16病种库/Top5/鉴别/检验影像建议）
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
+// 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
@@ -671,6 +675,7 @@ const allRoutes: RouteDef[] = [
   ...adminMigrationsRoutes,
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
+  ...autoLearnRoutes, // M160-A：GET /api/v1/admin/auto-learn/report 全自学习闭环周度报告
   ...mobileQuickActionsRoutes,
   ...todosRoutes,
   ...imagingRoutes,
