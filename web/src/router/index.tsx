@@ -412,6 +412,8 @@ const Acceptance = lazy(() => import('@/pages/admin/acceptance'));
 const Documentation = lazy(() => import('@/pages/admin/documentation'));
 // M200-C：部署准备
 const DeploymentReadiness = lazy(() => import('@/pages/admin/deployment-readiness'));
+// M200-D：版本发布
+const ReleaseM200 = lazy(() => import('@/pages/admin/release-m200'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -764,6 +766,8 @@ export default function AppRoutes() {
           <Route path="admin/documentation" element={<Documentation />} />
           {/* M200-C：部署准备 */}
           <Route path="admin/deployment-readiness" element={<DeploymentReadiness />} />
+          {/* M200-D：版本发布 */}
+          <Route path="admin/release-m200" element={<ReleaseM200 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
