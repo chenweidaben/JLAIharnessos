@@ -509,6 +509,7 @@ import { oaApprovalRoutes } from './routes/oaApproval';
 // 【医院管理深化】M140-D：党建工会活动留痕（党支部学习/主题党日/工会福利/职工文体/志愿服务）
 import { partyUnionRoutes } from './routes/partyUnion';
 // 【财务人力行政党建】M178-D：党建与文化深化（四维度 + 反形式主义校验 + 医德考评 + 文化问效）GET /api/v1/party/culture
+import { partyCultureRoutes } from './routes/partyCulture';
 // 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
 import { jciReviewRoutes } from './routes/jciReview';
 import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
@@ -912,6 +913,7 @@ const allRoutes: RouteDef[] = [
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
+  ...partyCultureRoutes, // M178-D：【财务人力行政党建】党建与文化深化 GET /api/v1/party/culture
   ...jciReviewRoutes, // M141-A：三甲评审准备 GET /api/v1/admin/review/checklist
   ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
