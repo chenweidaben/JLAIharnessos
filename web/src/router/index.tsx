@@ -672,6 +672,8 @@ const PatientServiceAIV2 = lazy(() => import('@/pages/patient-service-ai-v2/repo
 const ClinicalResearchAIV2 = lazy(() => import('@/pages/clinical-research-ai-v2/report'));
 // M233-C：运营决策智能化 V2
 const OperationsAIV2 = lazy(() => import('@/pages/operations-ai-v2/report'));
+// M233-D：质量安全智能化 V2
+const QualitySafetyAIV2 = lazy(() => import('@/pages/quality-safety-ai-v2/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1284,6 +1286,8 @@ export default function AppRoutes() {
           <Route path="clinical-research-ai-v2/report" element={<ClinicalResearchAIV2 />} />
           {/* M233-C：运营决策智能化 V2 */}
           <Route path="operations-ai-v2/report" element={<OperationsAIV2 />} />
+          {/* M233-D：质量安全智能化 V2 */}
+          <Route path="quality-safety-ai-v2/report" element={<QualitySafetyAIV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
