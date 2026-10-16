@@ -712,6 +712,8 @@ const CDSSV3 = lazy(() => import('@/pages/cdss-v3/report'));
 const ImagingAIV3 = lazy(() => import('@/pages/imaging-ai-v3/report'));
 // M238-C：病历智能 V3
 const EMRIntelligentV3 = lazy(() => import('@/pages/emr-intelligent-v3/report'));
+// M238-D：知识图谱 V3
+const KnowledgeGraphV3 = lazy(() => import('@/pages/knowledge-graph-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1364,6 +1366,8 @@ export default function AppRoutes() {
           <Route path="imaging-ai-v3/report" element={<ImagingAIV3 />} />
           {/* M238-C：病历智能 V3 */}
           <Route path="emr-intelligent-v3/report" element={<EMRIntelligentV3 />} />
+          {/* M238-D：知识图谱 V3 */}
+          <Route path="knowledge-graph-v3/report" element={<KnowledgeGraphV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
