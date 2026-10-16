@@ -972,6 +972,8 @@ const OmnichannelV5 = lazy(() => import('@/pages/omnichannel-v5/report'));
 const PatientExperienceV5 = lazy(() => import('@/pages/patient-experience-v5/report'));
 // M271-A：电子票据与移动支付 V5
 const EInvoicePaymentV5 = lazy(() => import('@/pages/e-invoice-payment-v5/report'));
+// M271-B：信用就医先诊后付 V5
+const CreditTreatmentV5 = lazy(() => import('@/pages/credit-treatment-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1884,6 +1886,8 @@ export default function AppRoutes() {
           <Route path="patient-experience-v5/report" element={<PatientExperienceV5 />} />
           {/* M271-A：电子票据与移动支付 V5 */}
           <Route path="e-invoice-payment-v5/report" element={<EInvoicePaymentV5 />} />
+          {/* M271-B：信用就医先诊后付 V5 */}
+          <Route path="credit-treatment-v5/report" element={<CreditTreatmentV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
