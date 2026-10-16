@@ -72,6 +72,7 @@ import { queryOptimizationRoutes } from './routes/queryOptimization';
 import { dbPerformanceRoutes } from './routes/dbPerformance';
 // 【代码质量提升】M150-B：any/ts-ignore/console-log/未使用变量/圈复杂度 五维治理 GET /api/v1/admin/code/quality
 import { codeQualityRoutes } from './routes/codeQuality';
+// 【质量提升与新场景】M173-B：深度代码质量（圈复杂度拆分/重复块/命名/JSDoc/死代码）GET /api/v1/admin/code/deep-quality
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
 import { qualityGateRoutes } from './routes/qualityGate';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
@@ -449,6 +450,8 @@ import { testCoverageRoutes } from './routes/testCoverage';
 import { coverageReportRoutes } from './routes/coverageReport';
 // 【质量补齐与新场景】M151-A：覆盖率明细 + 函数级缺口定位（仅 admin，90%+ 门禁）
 import { coverageDetailRoutes } from './routes/coverageDetail';
+// 【质量提升与新场景】M173-A：99% → 99.5%+ 覆盖率缺口/计划/进度闭环（仅 admin）
+import { coverageGapRoutes } from './routes/coverageGap';
 // 【200版本里程碑】M157-A：里程碑总结（仅 admin，GET /api/v1/admin/milestone/summary）
 import { milestoneRoutes } from './routes/milestone';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
@@ -688,7 +691,7 @@ const allRoutes: RouteDef[] = [
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
-  ...internetHospitalRoutes, // M163-D：互联网医院深化（处方流转 POST /prescription/route + 配送追踪 GET /delivery/track/:id）
+  ...internetHospitalRoutes, // M163-D/M173-D：互联网医院深化（处方流转 POST /prescription/route + 配送追踪 GET /delivery/track/:id + GET /api/v1/internet/deep 合规深化四件套）
   ...consultationRoutes,
   ...internetPrescriptionRoutes,
   ...internetPaymentRoutes,
@@ -864,6 +867,7 @@ const allRoutes: RouteDef[] = [
   ...e2eTestRoutes, // M137-D：GET /api/v1/admin/test/e2e 关键业务流程 E2E
   ...coverageReportRoutes, // M150-A：GET /api/v1/admin/test/coverage（90% 冲刺报告，先于旧 testCoverage 路由命中）
   ...coverageDetailRoutes, // M151-A：GET /api/v1/admin/test/coverage/detailed（函数级缺口定位）
+  ...coverageGapRoutes, // M173-A：GET /api/v1/admin/test/coverage-gap（99%→99.5%+ 缺口/计划/进度）
   ...milestoneRoutes, // 【200版本里程碑】M157-A：GET /api/v1/admin/milestone/summary（仅 admin）
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
