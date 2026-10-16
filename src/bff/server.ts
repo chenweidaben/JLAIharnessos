@@ -361,6 +361,7 @@ import { adminConfigRoutes } from './routes/adminConfig';
 import { deployConfigRoutes } from './routes/deployConfig'; // M145-D：部署配置生成（生产化收尾）
 import { adminLogsRoutes } from './routes/adminLogs';
 import { adminWebhooksRoutes } from './routes/adminWebhooks';
+import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D：【数据中台与AI大脑】API 网关 POST /api-gateway/route + /external（统一入口/认证/限流熔断，无状态多实例共享）
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -835,6 +836,7 @@ const allRoutes: RouteDef[] = [
   ...integrationHl7Routes, // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build（|^~\& 分隔，FHIR R4 Patient/Observation/MedicationRequest）
   ...patientServiceDeepRoutes, // M156-D：【患者服务深化】一站式服务中心（老人友好六卡片）GET /api/v1/patient/service
   ...researchDeepRoutes, // M162-C：【科研管理深化】科研全生命周期 GET /api/v1/research/projects?dept= + PUT /api/v1/research/projects/:id/milestone
+  ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
 ];
 
 interface Compiled {
