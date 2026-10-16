@@ -953,6 +953,14 @@ import { cultureBrandV3ReportRoutes } from './routes/cultureBrandV3Report';
 import { administrationV3ReportRoutes } from './routes/administrationV3Report';
 // M245-D：工会群团 V3 GET /api/v1/union-v3/report
 import { unionV3ReportRoutes } from './routes/unionV3Report';
+// M246-A：绿色医院 V3 GET /api/v1/green-hospital-v3/report
+import { greenHospitalV3ReportRoutes } from './routes/greenHospitalV3Report';
+// M246-B：供应链 V3 GET /api/v1/supply-chain-v3/report
+import { supplyChainV3ReportRoutes } from './routes/supplyChainV3Report';
+// M246-C：健康科普 V3 GET /api/v1/health-media-v3/report
+import { healthMediaV3ReportRoutes } from './routes/healthMediaV3Report';
+// M246-D：国际医疗 V3 GET /api/v1/international-health-v3/report
+import { internationalHealthV3ReportRoutes } from './routes/internationalHealthV3Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1671,6 +1679,10 @@ const allRoutes: RouteDef[] = [
   ...cultureBrandV3ReportRoutes, // M245-B：文化品牌 V3 GET /api/v1/culture-brand-v3/report
   ...administrationV3ReportRoutes, // M245-C：行政办公 V3 GET /api/v1/administration-v3/report
   ...unionV3ReportRoutes, // M245-D：工会群团 V3 GET /api/v1/union-v3/report
+  ...greenHospitalV3ReportRoutes, // M246-A：绿色医院 V3 GET /api/v1/green-hospital-v3/report
+  ...supplyChainV3ReportRoutes, // M246-B：供应链 V3 GET /api/v1/supply-chain-v3/report
+  ...healthMediaV3ReportRoutes, // M246-C：健康科普 V3 GET /api/v1/health-media-v3/report
+  ...internationalHealthV3ReportRoutes, // M246-D：国际医疗 V3 GET /api/v1/international-health-v3/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

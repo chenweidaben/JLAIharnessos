@@ -770,6 +770,14 @@ const CultureBrandV3 = lazy(() => import('@/pages/culture-brand-v3/report'));
 const AdministrationV3 = lazy(() => import('@/pages/administration-v3/report'));
 // M245-D：工会群团 V3
 const UnionV3 = lazy(() => import('@/pages/union-v3/report'));
+// M246-A：绿色医院 V3
+const GreenHospitalV3 = lazy(() => import('@/pages/green-hospital-v3/report'));
+// M246-B：供应链 V3
+const SupplyChainV3 = lazy(() => import('@/pages/supply-chain-v3/report'));
+// M246-C：健康科普 V3
+const HealthMediaV3 = lazy(() => import('@/pages/health-media-v3/report'));
+// M246-D：国际医疗 V3
+const InternationalHealthV3 = lazy(() => import('@/pages/international-health-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1480,6 +1488,14 @@ export default function AppRoutes() {
           <Route path="administration-v3/report" element={<AdministrationV3 />} />
           {/* M245-D：工会群团 V3 */}
           <Route path="union-v3/report" element={<UnionV3 />} />
+          {/* M246-A：绿色医院 V3 */}
+          <Route path="green-hospital-v3/report" element={<GreenHospitalV3 />} />
+          {/* M246-B：供应链 V3 */}
+          <Route path="supply-chain-v3/report" element={<SupplyChainV3 />} />
+          {/* M246-C：健康科普 V3 */}
+          <Route path="health-media-v3/report" element={<HealthMediaV3 />} />
+          {/* M246-D：国际医疗 V3 */}
+          <Route path="international-health-v3/report" element={<InternationalHealthV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
