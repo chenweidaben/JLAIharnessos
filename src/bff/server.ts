@@ -301,6 +301,7 @@ import { internetDeliveryRoutes } from './routes/internetDelivery';
 import { satisfactionRoutes } from './routes/satisfaction';
 import { satisfactionAiRoutes } from './routes/satisfactionAi'; // M153-D：患者满意度智能化分析 GET /api/v1/admin/satisfaction/ai-report（临床决策支持）
 import { satisfactionLoopRoutes } from './routes/satisfactionLoop'; // M165-C：【CDSS与运营精细化】患者满意度与服务改进闭环 GET /api/v1/patient/satisfaction/loop（收集→分析→改进→验证，真改进不只登记投诉）
+import { satisfactionDeepRoutes } from './routes/satisfactionDeep'; // M174-D：【患者体验深化】满意度闭环 GET /api/v1/patient/satisfaction/deep（多渠道/情感分析/5Why/PDCA/NPS，真改进不只登记）
 import { emrSmartScoreRoutes } from './routes/emrSmartScore'; // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，实质内容公平评分）
 import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
@@ -706,6 +707,7 @@ const allRoutes: RouteDef[] = [
   ...satisfactionRoutes,
   ...satisfactionAiRoutes, // M153-D：满意度智能分析报告（临床决策支持）
   ...satisfactionLoopRoutes, // M165-C：【CDSS与运营精细化】满意度改进闭环（收集→分析→改进→验证）
+  ...satisfactionDeepRoutes, // M174-D：【患者体验深化】满意度闭环（多渠道/情感/5Why/PDCA/NPS）
   ...smartTriageRoutes, // M164-C：【患者服务深化】智能导诊 GET /api/v1/patient/smart-triage + GET /api/v1/patient/health-journey/:patientId（红旗症状硬编码直急诊）
   ...delegationRoutes,
   ...referralRoutes,
