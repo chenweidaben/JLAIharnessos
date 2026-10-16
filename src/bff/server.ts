@@ -57,6 +57,7 @@ import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
 import { accessibilityVerifyRoutes } from './routes/accessibilityVerify';
 // 【绩效与人才 · 系统安全深化】M166-D：渗透测试与漏洞扫描（SQL注入/XSS/CSRF/信息泄露/认证绕过）GET /api/v1/admin/security/scan
+import { securityScanRoutes } from './routes/securityScan';
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -692,6 +693,7 @@ const allRoutes: RouteDef[] = [
   ...firstLoadRoutes, // M158-C：GET /api/v1/admin/performance/firstload（首屏懒加载 + 缓存策略 + FCP/LCP 测量）
   ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
   ...accessibilityVerifyRoutes, // M151-B：GET /api/v1/admin/ui/accessibility/verify（对比度修复 + WCAG AA 复验）
+  ...securityScanRoutes, // M166-D：GET /api/v1/admin/security/scan（渗透测试 + 漏洞分级 + 修复建议）
   ...qualityGateRoutes, // M157-C：GET /api/v1/admin/quality-gate（200版本六项质量门禁复查）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
