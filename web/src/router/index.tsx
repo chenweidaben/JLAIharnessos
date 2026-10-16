@@ -716,6 +716,8 @@ const EMRIntelligentV3 = lazy(() => import('@/pages/emr-intelligent-v3/report'))
 const KnowledgeGraphV3 = lazy(() => import('@/pages/knowledge-graph-v3/report'));
 // M239-A：预防医学 V3
 const PreventiveMedicineV3 = lazy(() => import('@/pages/preventive-medicine-v3/report'));
+// M239-B：妇幼全周期 V3
+const MaternalChildLifecycleV3 = lazy(() => import('@/pages/maternal-child-lifecycle-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1372,6 +1374,8 @@ export default function AppRoutes() {
           <Route path="knowledge-graph-v3/report" element={<KnowledgeGraphV3 />} />
           {/* M239-A：预防医学 V3 */}
           <Route path="preventive-medicine-v3/report" element={<PreventiveMedicineV3 />} />
+          {/* M239-B：妇幼全周期 V3 */}
+          <Route path="maternal-child-lifecycle-v3/report" element={<MaternalChildLifecycleV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

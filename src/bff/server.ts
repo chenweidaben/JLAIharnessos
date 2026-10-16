@@ -899,6 +899,8 @@ import { emrIntelligentV3ReportRoutes } from './routes/emrIntelligentV3Report';
 import { knowledgeGraphV3ReportRoutes } from './routes/knowledgeGraphV3Report';
 // M239-A：预防医学 V3 GET /api/v1/preventive-medicine-v3/report
 import { preventiveMedicineV3ReportRoutes } from './routes/preventiveMedicineV3Report';
+// M239-B：妇幼全周期 V3 GET /api/v1/maternal-child-lifecycle-v3/report
+import { maternalChildLifecycleV3ReportRoutes } from './routes/maternalChildLifecycleV3Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1590,6 +1592,7 @@ const allRoutes: RouteDef[] = [
   ...emrIntelligentV3ReportRoutes, // M238-C：病历智能 V3 GET /api/v1/emr-intelligent-v3/report
   ...knowledgeGraphV3ReportRoutes, // M238-D：知识图谱 V3 GET /api/v1/knowledge-graph-v3/report
   ...preventiveMedicineV3ReportRoutes, // M239-A：预防医学 V3 GET /api/v1/preventive-medicine-v3/report
+  ...maternalChildLifecycleV3ReportRoutes, // M239-B：妇幼全周期 V3 GET /api/v1/maternal-child-lifecycle-v3/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
