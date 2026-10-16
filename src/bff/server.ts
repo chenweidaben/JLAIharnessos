@@ -308,6 +308,7 @@ import { aiDiagnoseRoutes } from './routes/aiDiagnose';
 import { treatmentPlanRoutes } from './routes/treatmentPlan';
 // 【AI深化与运营预测】M154-A：AI 辅助诊断深化 POST /api/v1/ai/diagnose/deep（16病种库/Top5/鉴别/检验影像建议）
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
+// 【AI能力深化】M163-C：更多病种与更准诊断 POST /api/v1/ai/diagnose/expand（神经/泌尿/血液/风湿免疫16病种库/反馈再校准/鉴别增补/检查推荐）
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
 import { guideDxRoutes } from './routes/guideDx';
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
@@ -412,6 +413,8 @@ import { milestoneRoutes } from './routes/milestone';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 // 【安全】M149-B：安全基线报告（七项：写认证/SQL/XSS/PII/错误/token/密码哈希/审计链）
 import { securityReportRoutes } from './routes/securityReport';
+// 【安全与运营】M163-A：等保三级 安全合规（五大类 15 项控制，仅 admin）
+import { securityComplianceRoutes } from './routes/securityCompliance';
 import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
@@ -634,7 +637,7 @@ const allRoutes: RouteDef[] = [
   ...lisRoutes,
   ...risRoutes,
   ...apptRoutes,
-  ...internetHospitalRoutes,
+  ...internetHospitalRoutes, // M163-D：互联网医院深化（处方流转 POST /prescription/route + 配送追踪 GET /delivery/track/:id）
   ...consultationRoutes,
   ...internetPrescriptionRoutes,
   ...internetPaymentRoutes,
@@ -796,6 +799,7 @@ const allRoutes: RouteDef[] = [
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
+  ...securityComplianceRoutes, // M163-A：GET /api/v1/admin/security/compliance（等保三级）
   ...eSignatureRoutes, // M138-B：电子签名 POST /sign + GET /verify/:id
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
