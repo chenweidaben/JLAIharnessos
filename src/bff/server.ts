@@ -1163,6 +1163,8 @@ import { reconciliationFundV5ReportRoutes } from './routes/reconciliationFundV5R
 import { hospicePalliativeV5ReportRoutes } from './routes/hospicePalliativeV5Report';
 // M272-B：康复医学与日间康复 V5 GET /api/v1/rehabilitation-v5/report
 import { rehabilitationV5ReportRoutes } from './routes/rehabilitationV5Report';
+// M272-C：临床营养与膳食治疗 V5 GET /api/v1/clinical-nutrition-v5/report
+import { clinicalNutritionV5ReportRoutes } from './routes/clinicalNutritionV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1987,6 +1989,7 @@ const allRoutes: RouteDef[] = [
   ...reconciliationFundV5ReportRoutes, // M271-D：对账清算与医保基金监管 V5 GET /api/v1/reconciliation-fund-v5/report
   ...hospicePalliativeV5ReportRoutes, // M272-A：安宁疗护与缓和医疗 V5 GET /api/v1/hospice-palliative-v5/report
   ...rehabilitationV5ReportRoutes, // M272-B：康复医学与日间康复 V5 GET /api/v1/rehabilitation-v5/report
+  ...clinicalNutritionV5ReportRoutes, // M272-C：临床营养与膳食治疗 V5 GET /api/v1/clinical-nutrition-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

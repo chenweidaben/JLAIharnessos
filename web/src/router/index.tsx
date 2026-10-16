@@ -982,6 +982,8 @@ const ReconciliationFundV5 = lazy(() => import('@/pages/reconciliation-fund-v5/r
 const HospicePalliativeV5 = lazy(() => import('@/pages/hospice-palliative-v5/report'));
 // M272-B：康复医学与日间康复 V5
 const RehabilitationV5 = lazy(() => import('@/pages/rehabilitation-v5/report'));
+// M272-C：临床营养与膳食治疗 V5
+const ClinicalNutritionV5 = lazy(() => import('@/pages/clinical-nutrition-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1904,6 +1906,8 @@ export default function AppRoutes() {
           <Route path="hospice-palliative-v5/report" element={<HospicePalliativeV5 />} />
           {/* M272-B：康复医学与日间康复 V5 */}
           <Route path="rehabilitation-v5/report" element={<RehabilitationV5 />} />
+          {/* M272-C：临床营养与膳食治疗 V5 */}
+          <Route path="clinical-nutrition-v5/report" element={<ClinicalNutritionV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
