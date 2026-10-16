@@ -516,6 +516,8 @@ const EquipmentV2 = lazy(() => import('@/pages/equipment/report-v2'));
 const LogisticsSafety = lazy(() => import('@/pages/logistics-safety/report'));
 // M213-C：信息化
 const Informatization = lazy(() => import('@/pages/informatization/report'));
+// M213-D：文化品牌
+const CultureBrand = lazy(() => import('@/pages/culture-brand/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -972,6 +974,8 @@ export default function AppRoutes() {
           <Route path="logistics-safety/report" element={<LogisticsSafety />} />
           {/* M213-C：信息化 */}
           <Route path="informatization/report" element={<Informatization />} />
+          {/* M213-D：文化品牌 */}
+          <Route path="culture-brand/report" element={<CultureBrand />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
