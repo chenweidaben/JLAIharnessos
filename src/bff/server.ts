@@ -341,6 +341,8 @@ import { deepDiagnoseRoutes } from './routes/deepDiagnose';
 import { diseaseExpandRoutes } from './routes/diseaseExpand';
 // 【AI深化与智能运营】M168-A：AI 辅助诊断深化·更多病种与鉴别诊断 POST /api/v1/ai/diagnose/expand-v2（消化/呼吸/心血管/内分泌 17 病种/鉴别深化/治疗方案/一致性核查）
 import { diagnoseDeepRoutes } from './routes/diagnoseDeep';
+// 【持续优化与新场景】M174-C：AI 辅助诊断深化·更多病种 V2 POST /api/v1/ai/diagnose/expand-v2（神经/泌尿/血液/风湿免疫 16 病种/鉴别深化/治疗方案推荐）
+import { diagnoseV2Routes } from './routes/diagnoseV2';
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
 import { guideDxRoutes } from './routes/guideDx';
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
@@ -791,6 +793,7 @@ const allRoutes: RouteDef[] = [
   ...treatmentPlanRoutes, // M161-C：AI 治疗方案推荐·个体化用药
   ...deepDiagnoseRoutes, // M154-A：AI 辅助诊断深化（Top5/鉴别/检验影像）
   ...diseaseExpandRoutes, // M163-C：更多病种与更准诊断（16新病种库/反馈再校准/鉴别增补/检查推荐）
+  ...diagnoseV2Routes, // M174-C：AI 诊断深化 V2（神经/泌尿/血液/风湿免疫 16 病种/鉴别深化/治疗方案推荐）
   ...diagnoseDeepRoutes, // M168-A：AI 诊断深化 v2（17 病种/鉴别深化/治疗方案/一致性核查）
   ...guideDxRoutes, // M160-C：临床指南对齐（四部权威指南硬阈值）
   ...assistantRecordDraftRoutes,
