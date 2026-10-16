@@ -720,6 +720,8 @@ const PreventiveMedicineV3 = lazy(() => import('@/pages/preventive-medicine-v3/r
 const MaternalChildLifecycleV3 = lazy(() => import('@/pages/maternal-child-lifecycle-v3/report'));
 // M239-C：老年全周期 V3
 const GeriatricsLifecycleV3 = lazy(() => import('@/pages/geriatrics-lifecycle-v3/report'));
+// M239-D：职业环境 V3
+const OccupationalEnvironmentalV3 = lazy(() => import('@/pages/occupational-environmental-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1380,6 +1382,8 @@ export default function AppRoutes() {
           <Route path="maternal-child-lifecycle-v3/report" element={<MaternalChildLifecycleV3 />} />
           {/* M239-C：老年全周期 V3 */}
           <Route path="geriatrics-lifecycle-v3/report" element={<GeriatricsLifecycleV3 />} />
+          {/* M239-D：职业环境 V3 */}
+          <Route path="occupational-environmental-v3/report" element={<OccupationalEnvironmentalV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
