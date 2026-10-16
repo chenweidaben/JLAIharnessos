@@ -388,6 +388,8 @@ const CloudNative = lazy(() => import('@/pages/admin/cloud-native'));
 const Microservices = lazy(() => import('@/pages/admin/microservices'));
 // M197-C：DevOps
 const DevOps = lazy(() => import('@/pages/admin/devops'));
+// M197-D：SRE
+const SRE = lazy(() => import('@/pages/admin/sre'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -716,6 +718,8 @@ export default function AppRoutes() {
           <Route path="admin/microservices" element={<Microservices />} />
           {/* M197-C：DevOps */}
           <Route path="admin/devops" element={<DevOps />} />
+          {/* M197-D：SRE */}
+          <Route path="admin/sre" element={<SRE />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
