@@ -496,6 +496,8 @@ const EMRRating = lazy(() => import('@/pages/emr-rating/report'));
 const HospitalKPI = lazy(() => import('@/pages/hospital-kpi/report'));
 // M211-A：HRP V2
 const HRPV2 = lazy(() => import('@/pages/hrp/report-v2'));
+// M211-B：财务 V2
+const FinanceV2 = lazy(() => import('@/pages/finance/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -932,6 +934,8 @@ export default function AppRoutes() {
           <Route path="hospital-kpi/report" element={<HospitalKPI />} />
           {/* M211-A：HRP V2 */}
           <Route path="hrp/report-v2" element={<HRPV2 />} />
+          {/* M211-B：财务 V2 */}
+          <Route path="finance/report-v2" element={<FinanceV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
