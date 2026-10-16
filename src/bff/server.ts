@@ -63,6 +63,7 @@ import { codeQualityRoutes } from './routes/codeQuality';
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
 import { qualityGateRoutes } from './routes/qualityGate';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
+import { operationAnalysisRoutes } from './routes/operationAnalysis'; // M163-B：【安全与运营】GET /api/v1/admin/operation/analysis（收入/成本/效率/资源四维，数据支撑不拍脑袋）
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
 import { performanceReviewRoutes } from './routes/performanceReview';
 import { adminHealthRoutes } from './routes/adminHealth';
@@ -677,6 +678,7 @@ const allRoutes: RouteDef[] = [
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（代码质量五维治理报告）
   ...adminDeptPerformanceRoutes,
+  ...operationAnalysisRoutes, // M163-B：GET /api/v1/admin/operation/analysis（运营四维分析 + 成本效益 + 对标 + 问题识别）
   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
   ...adminHealthRoutes,
   ...adminDashboardRoutes,
