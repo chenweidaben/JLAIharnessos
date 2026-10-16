@@ -422,6 +422,8 @@ const MultiAgent = lazy(() => import('@/pages/admin/multi-agent'));
 const Specialty = lazy(() => import('@/pages/specialty'));
 // M201-D：生产运维
 const ProductionOps = lazy(() => import('@/pages/admin/production-ops'));
+// M202-A：康复老年
+const Rehabilitation = lazy(() => import('@/pages/specialty/rehabilitation'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -784,6 +786,8 @@ export default function AppRoutes() {
           <Route path="specialty" element={<Specialty />} />
           {/* M201-D：生产运维 */}
           <Route path="admin/production-ops" element={<ProductionOps />} />
+          {/* M202-A：康复老年 */}
+          <Route path="specialty/rehabilitation" element={<Rehabilitation />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
