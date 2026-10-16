@@ -496,3 +496,236 @@ export function generateQualityReport(
     viCards,
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* 【M167-D 安全修复与质量提升】覆盖率提升与类型/日志清零计划          */
+/* ------------------------------------------------------------------ */
+
+/** 覆盖率提升里程碑（把缺口按重点领域切成可交付的三段） */
+export interface CoverageMilestone {
+  /** 1 = 最先做 */
+  order: number;
+  /** 阶段名（中文，直接渲染） */
+  stage: string;
+  /** 本阶段起点覆盖率 0..100 */
+  from: number;
+  /** 本阶段终点覆盖率 0..100 */
+  to: number;
+  /** 本阶段补测重点说明 */
+  focus: string;
+}
+
+/** 重点补测领域（不是凑数：安全模块 / 核心业务 / 边界条件） */
+export interface CoverageFocusArea {
+  area: string;
+  reason: string;
+  priority: number;
+  estimatedGain: string;
+}
+
+/** improveTestCoverage 的产出：一份可执行的覆盖率冲刺计划 */
+export interface CoverageImprovementPlan {
+  /** 当前覆盖率 0..100 */
+  current: number;
+  /** 目标覆盖率 0..100（≥99% 红线） */
+  target: number;
+  /** 还需提升的百分点 */
+  gap: number;
+  /** 当前已达到 / 超过目标 */
+  achieved: boolean;
+  /** 三段式里程碑，终点 = target */
+  milestones: CoverageMilestone[];
+  /** 重点补测领域（安全模块优先） */
+  focusAreas: CoverageFocusArea[];
+  summary: string;
+}
+
+/** 单条清零任务（消除 any / ts-ignore / console.log 共用） */
+export interface EliminationTask {
+  order: number;
+  file: string;
+  symbol: string;
+  /** 该符号下待清零的出现次数 */
+  occurrences: number;
+  /** 具体怎么改 */
+  action: string;
+  /** 改完之后的硬性结果（可验收） */
+  expectedResult: string;
+}
+
+/** 一类清零计划（消除 any / ts-ignore / console.log 共用） */
+export interface EliminationPlan {
+  kind: 'any' | 'ts-ignore' | 'console-log';
+  title: string;
+  /** open 项涉及的总出现次数 */
+  totalOccurrences: number;
+  /** open 问题条数 */
+  openItems: number;
+  tasks: EliminationTask[];
+  /** 防止回潮的红线（CI / review / 规范） */
+  guardrails: string[];
+  summary: string;
+}
+
+/** 覆盖率百分比上界（生产红线：≥99%） */
+export const COVERAGE_TARGET_RED_LINE = 99;
+
+/** 把任意有限数夹到 [0,100] 百分比区间并保留 1 位小数 */
+function toPercent(value: number): number {
+  return Math.round(Math.min(100, Math.max(0, value)) * 10) / 10;
+}
+
+/**
+ * 纯函数：覆盖率提升计划（M167-D 安全修复与质量提升）。
+ *
+ * 不凑数：把缺口按「安全模块 → 核心业务 → 边界条件」三段切，
+ * 每段给出起止覆盖率与补测重点；当前已达标时直接返回 achieved。
+ *
+ * @throws TypeError 入参不是有限数时抛错
+ */
+export function improveTestCoverage(currentCoverage: number, targetCoverage: number): CoverageImprovementPlan {
+  if (typeof currentCoverage !== 'number' || !Number.isFinite(currentCoverage)) {
+    throw new TypeError('improveTestCoverage: currentCoverage 必须是有限数');
+  }
+  if (typeof targetCoverage !== 'number' || !Number.isFinite(targetCoverage)) {
+    throw new TypeError('improveTestCoverage: targetCoverage 必须是有限数');
+  }
+  const current = toPercent(currentCoverage);
+  const target = toPercent(Math.max(targetCoverage, COVERAGE_TARGET_RED_LINE));
+  const gap = Math.round(Math.max(0, target - current) * 10) / 10;
+  const achieved = gap === 0;
+
+  const focusAreas: CoverageFocusArea[] = [
+    {
+      area: '安全模块',
+      reason: '鉴权 / 权限码 / MFA / 签名验签 / 脱敏一旦漏测，越权与泄露风险直接进生产',
+      priority: 1,
+      estimatedGain: '约贡献缺口的 40%，且把安全回归风险压到零',
+    },
+    {
+      area: '核心业务',
+      reason: '医嘱 / 计费 / 手术安全核查 / 危急值闭环等主链路，分支多、影响面大',
+      priority: 2,
+      estimatedGain: '约贡献缺口的 35%，主链路改动可被测试即时拦截',
+    },
+    {
+      area: '边界条件',
+      reason: '空入参 / 非法枚举 / 权限拒绝 / 外部超时 / 类型守卫收窄分支——当前最易漏测',
+      priority: 3,
+      estimatedGain: '约贡献缺口的 25%，把异常路径从「人肉记忆」变成确定性用例',
+    },
+  ];
+
+  const milestones: CoverageMilestone[] = achieved
+    ? []
+    : [
+        {
+          order: 1,
+          stage: '安全模块补测',
+          from: current,
+          to: Math.round((current + gap * 0.4) * 10) / 10,
+          focus: 'auth / permissions / mfa / signing / dataMasking 的权限拒绝与越权用例',
+        },
+        {
+          order: 2,
+          stage: '核心业务补测',
+          from: Math.round((current + gap * 0.4) * 10) / 10,
+          to: Math.round((current + gap * 0.75) * 10) / 10,
+          focus: '医嘱 / 计费 / 手术安全 / 危急值闭环的主链路与状态迁移用例',
+        },
+        {
+          order: 3,
+          stage: '边界与异常路径补测',
+          from: Math.round((current + gap * 0.75) * 10) / 10,
+          to: target,
+          focus: '空入参 / 非法输入 / 外部超时 / TypeError 分支的防御性用例，锁死 ≥99%',
+        },
+      ];
+
+  const summary = achieved
+    ? `覆盖率已达 ${current}%（目标 ${target}%），维持红线、防止回潮即可。`
+    : `当前覆盖率 ${current}%，距 ${target}% 红线还差 ${gap} 个百分点：先补安全模块，再补核心业务，最后锁边界条件。`;
+
+  return { current, target, gap, achieved, milestones, focusAreas, summary };
+}
+
+/**
+ * 由台账构造一类清零计划（内部共用：消除 any / ts-ignore / console.log）。
+ * 只取 open 项，fixed 项不计入待办；台账外不臆造文件。
+ */
+function buildEliminationPlan(
+  kind: EliminationPlan['kind'],
+  ledger: readonly QualityIssue[],
+): EliminationPlan {
+  const open = ledger.filter((i) => i.category === kind && i.status === 'open');
+  const tasks: EliminationTask[] = open.map((issue, idx) => ({
+    order: idx + 1,
+    file: issue.file,
+    symbol: issue.symbol,
+    occurrences: issue.count,
+    action: issue.suggestion,
+    expectedResult:
+      kind === 'any'
+        ? '该符号下 : any 清零，入参由 unknown + 类型守卫收窄，外部契约经 zod 校验'
+        : kind === 'ts-ignore'
+          ? '该符号下 @ts-ignore 清零，外部/模型响应由 zod schema 推导类型，类型错误在编译期暴露'
+          : '该符号下裸 console.log 清零，统一走结构化 logger；console.error / console.warn 保留用于告警',
+  }));
+  const totalOccurrences = open.reduce((sum, i) => sum + i.count, 0);
+
+  const meta: Record<EliminationPlan['kind'], { title: string; guardrails: string[] }> = {
+    any: {
+      title: 'any 类型清零计划',
+      guardrails: [
+        'CI 开启 @typescript-eslint/no-explicit-any = error，新增 any 直接红灯',
+        'code review 拦截一切 as any / : any，外部入参一律 unknown + 类型守卫',
+        'legacy 适配层必须 zod schema 校验后才允许进入领域层',
+      ],
+    },
+    'ts-ignore': {
+      title: '@ts-ignore 清零计划',
+      guardrails: [
+        'CI 禁止新增 @ts-ignore / @ts-expect-error，类型错误必须修复而非压制',
+        'LLM / 第三方响应先 zod parse 再使用，用推导类型替代手写 any',
+        '遗留压制注释逐条销账，PR 关联治理台账条目',
+      ],
+    },
+    'console-log': {
+      title: 'console.log 清零计划（保留 error / warn）',
+      guardrails: [
+        '生产构建删除裸 console.log；console.error / console.warn 保留并接入告警',
+        '统一走 observability logger 输出结构化日志（traceId / level / module）',
+        'PR checklist 含「无裸 console.log」一项，CR 不通过不得合并',
+      ],
+    },
+  };
+
+  const { title, guardrails } = meta[kind];
+  const summary =
+    open.length === 0
+      ? `${title}：open 项已清零，维持 CI 红线不回潮。`
+      : `${title}：共 ${open.length} 个 open 符号、${totalOccurrences} 处待清零，按顺序销账后由 guardrails 锁死。`;
+
+  return { kind, title, totalOccurrences, openItems: open.length, tasks, guardrails, summary };
+}
+
+/** 纯函数：消除 `: any` 计划（M167-D 安全修复与质量提升） */
+export function eliminateAnyTypes(
+  ledger: readonly QualityIssue[] = CODE_QUALITY_LEDGER,
+): EliminationPlan {
+  return buildEliminationPlan('any', ledger);
+}
+
+/** 纯函数：消除 `@ts-ignore` 计划（M167-D 安全修复与质量提升） */
+export function eliminateTsIgnore(
+  ledger: readonly QualityIssue[] = CODE_QUALITY_LEDGER,
+): EliminationPlan {
+  return buildEliminationPlan('ts-ignore', ledger);
+}
+
+/** 纯函数：消除裸 console.log 计划（保留 console.error / console.warn） */
+export function eliminateConsoleLog(
+  ledger: readonly QualityIssue[] = CODE_QUALITY_LEDGER,
+): EliminationPlan {
+  return buildEliminationPlan('console-log', ledger);
+}

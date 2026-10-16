@@ -13,10 +13,15 @@ import { describe, expect, it } from 'bun:test';
 import {
   CODE_QUALITY_LEDGER,
   COMPLEXITY_THRESHOLD,
+  COVERAGE_TARGET_RED_LINE,
   computeCyclomaticComplexity,
   detectIssues,
+  eliminateAnyTypes,
+  eliminateConsoleLog,
+  eliminateTsIgnore,
   generateQualityReport,
   gradeOf,
+  improveTestCoverage,
   scanCodeQuality,
   type QualityIssue,
 } from '../../src/bff/aggregators/codeQualityAggregator';
@@ -209,5 +214,108 @@ describe('M150-B 内置台账完整性', () => {
     for (const item of CODE_QUALITY_LEDGER) {
       expect(item.suggestion.length).toBeGreaterThan(0);
     }
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* M167-D 安全修复与质量提升：覆盖率冲刺 + 类型/日志清零计划           */
+/* ------------------------------------------------------------------ */
+
+describe('M167-D improveTestCoverage 覆盖率提升计划', () => {
+  it('当前 80% 目标红线 99%：缺口 19，三段里程碑终点等于目标', () => {
+    const plan = improveTestCoverage(80, COVERAGE_TARGET_RED_LINE);
+    expect(plan.current).toBe(80);
+    expect(plan.target).toBe(COVERAGE_TARGET_RED_LINE);
+    expect(plan.achieved).toBe(false);
+    expect(plan.gap).toBeCloseTo(19, 5);
+    expect(plan.milestones.length).toBe(3);
+    // 三段首尾相接：第 1 段 from = current，第 3 段 to = target
+    expect(plan.milestones[0].from).toBe(80);
+    expect(plan.milestones[2].to).toBe(COVERAGE_TARGET_RED_LINE);
+    for (let k = 1; k < plan.milestones.length; k += 1) {
+      expect(plan.milestones[k].from).toBeCloseTo(plan.milestones[k - 1].to, 5);
+    }
+  });
+
+  it('重点补测领域恰为 安全模块 / 核心业务 / 边界条件，优先级 1..3', () => {
+    const plan = improveTestCoverage(90, 99);
+    expect(plan.focusAreas.length).toBe(3);
+    expect(plan.focusAreas.map((f) => f.area)).toEqual(['安全模块', '核心业务', '边界条件']);
+    plan.focusAreas.forEach((f, idx) => expect(f.priority).toBe(idx + 1));
+  });
+
+  it('当前已达标：gap 为 0、achieved、无里程碑', () => {
+    const plan = improveTestCoverage(99.5, 99);
+    expect(plan.achieved).toBe(true);
+    expect(plan.gap).toBe(0);
+    expect(plan.milestones.length).toBe(0);
+    expect(plan.summary).toContain('已达');
+  });
+
+  it('目标被抬到红线之上时至少按红线考核；越界值被夹到 [0,100]', () => {
+    const plan = improveTestCoverage(-50, 150);
+    expect(plan.current).toBe(0);
+    expect(plan.target).toBe(100);
+  });
+
+  it('入参非有限数直接抛 TypeError', () => {
+    expect(() => improveTestCoverage(Number.NaN, 99)).toThrow(TypeError);
+    expect(() => improveTestCoverage(90, Number.POSITIVE_INFINITY)).toThrow(TypeError);
+  });
+});
+
+describe('M167-D eliminateAnyTypes 清零计划', () => {
+  it('台账 any open 项生成任务，次数合计与台账一致', () => {
+    const plan = eliminateAnyTypes();
+    expect(plan.kind).toBe('any');
+    expect(plan.openItems).toBeGreaterThan(0);
+    const ledgerAny = CODE_QUALITY_LEDGER.filter((i) => i.category === 'any' && i.status === 'open');
+    expect(plan.tasks.length).toBe(ledgerAny.length);
+    const expectedTotal = ledgerAny.reduce((s, i) => s + i.count, 0);
+    expect(plan.totalOccurrences).toBe(expectedTotal);
+    // 验收结果必须落到 unknown + 类型守卫
+    for (const t of plan.tasks) {
+      expect(t.expectedResult).toContain('unknown');
+    }
+    // 防回潮红线含 CI no-explicit-any
+    expect(plan.guardrails.join('\n')).toContain('no-explicit-any');
+  });
+
+  it('空台账：零任务、总结为已清零', () => {
+    const plan = eliminateAnyTypes([]);
+    expect(plan.tasks.length).toBe(0);
+    expect(plan.totalOccurrences).toBe(0);
+    expect(plan.summary).toContain('已清零');
+  });
+});
+
+describe('M167-D eliminateTsIgnore 清零计划', () => {
+  it('台账 ts-ignore open 项生成任务，验收结果落到 zod 推导类型', () => {
+    const plan = eliminateTsIgnore();
+    expect(plan.kind).toBe('ts-ignore');
+    const ledger = CODE_QUALITY_LEDGER.filter((i) => i.category === 'ts-ignore' && i.status === 'open');
+    expect(plan.tasks.length).toBe(ledger.length);
+    expect(plan.totalOccurrences).toBe(ledger.reduce((s, i) => s + i.count, 0));
+    for (const t of plan.tasks) {
+      expect(t.expectedResult).toContain('zod');
+    }
+    expect(plan.guardrails.join('\n')).toContain('@ts-ignore');
+  });
+});
+
+describe('M167-D eliminateConsoleLog 清零计划（保留 error/warn）', () => {
+  it('只统计 console-log open 项，明确保留 console.error / console.warn', () => {
+    const plan = eliminateConsoleLog();
+    expect(plan.kind).toBe('console-log');
+    const ledger = CODE_QUALITY_LEDGER.filter((i) => i.category === 'console-log' && i.status === 'open');
+    expect(plan.tasks.length).toBe(ledger.length);
+    expect(plan.totalOccurrences).toBe(ledger.reduce((s, i) => s + i.count, 0));
+    // 已 fixed 的 health.ts 不得计入待办
+    for (const t of plan.tasks) {
+      expect(t.file).not.toContain('routes/health.ts');
+    }
+    // 保留 error / warn 是硬约束
+    expect(plan.tasks.map((t) => t.expectedResult).join('\n')).toContain('console.error');
+    expect(plan.guardrails.join('\n')).toContain('console.warn');
   });
 });
