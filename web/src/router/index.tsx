@@ -308,6 +308,8 @@ const SecurityReportV2 = lazy(() => import('@/pages/admin/security-v2'));
 const EMRGrade5V2 = lazy(() => import('@/pages/emr/grade5'));
 // M187-D：DRG 智能审核 V2
 const DRGAuditV2 = lazy(() => import('@/pages/drg/audit'));
+// M188-A：临床路径 V2
+const ClinicalPathwayV2 = lazy(() => import('@/pages/clinical/pathway-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -556,6 +558,8 @@ export default function AppRoutes() {
           <Route path="emr/grade5" element={<EMRGrade5V2 />} />
           {/* M187-D：DRG 审核 */}
           <Route path="drg/audit" element={<DRGAuditV2 />} />
+          {/* M188-A：临床路径 */}
+          <Route path="clinical/pathway" element={<ClinicalPathwayV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
