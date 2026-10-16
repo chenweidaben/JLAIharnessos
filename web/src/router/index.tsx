@@ -394,6 +394,8 @@ const SRE = lazy(() => import('@/pages/admin/sre'));
 const DataSecurity = lazy(() => import('@/pages/admin/data-security'));
 // M198-B：合规
 const Compliance = lazy(() => import('@/pages/admin/compliance'));
+// M198-C：审计管理
+const Audit = lazy(() => import('@/pages/admin/audit'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -728,6 +730,8 @@ export default function AppRoutes() {
           <Route path="admin/data-security" element={<DataSecurity />} />
           {/* M198-B：合规 */}
           <Route path="admin/compliance" element={<Compliance />} />
+          {/* M198-C：审计管理 */}
+          <Route path="admin/audit" element={<Audit />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
