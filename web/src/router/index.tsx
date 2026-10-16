@@ -350,6 +350,8 @@ const PublicHealth = lazy(() => import('@/pages/admin/public-health'));
 const LogisticsManagement = lazy(() => import('@/pages/admin/logistics'));
 // M192-D V2：后勤管理报表
 const LogisticsReportV2 = lazy(() => import('@/pages/admin/logistics-report-v2'));
+// M193-A：性能压测
+const PerformanceStress = lazy(() => import('@/pages/admin/performance-stress'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -640,6 +642,8 @@ export default function AppRoutes() {
           <Route path="admin/logistics" element={<LogisticsManagement />} />
           {/* M192-D V2：后勤管理报表 */}
           <Route path="admin/logistics-report-v2" element={<LogisticsReportV2 />} />
+          {/* M193-A：性能压测 */}
+          <Route path="admin/performance-stress" element={<PerformanceStress />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
