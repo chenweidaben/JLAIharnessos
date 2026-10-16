@@ -73,6 +73,7 @@ import { dbPerformanceRoutes } from './routes/dbPerformance';
 // 【代码质量提升】M150-B：any/ts-ignore/console-log/未使用变量/圈复杂度 五维治理 GET /api/v1/admin/code/quality
 import { codeQualityRoutes } from './routes/codeQuality';
 // 【质量提升与新场景】M173-B：深度代码质量（圈复杂度拆分/重复块/命名/JSDoc/死代码）GET /api/v1/admin/code/deep-quality
+import { codeQualityDeepRoutes } from './routes/codeQualityDeep';
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
 import { qualityGateRoutes } from './routes/qualityGate';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
@@ -737,6 +738,7 @@ const allRoutes: RouteDef[] = [
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（五维治理报告）；M167-D：GET /api/v1/admin/quality/code（覆盖率冲刺 + any/ts-ignore/console.log 清零）
+  ...codeQualityDeepRoutes, // M173-B：【质量提升与新场景】GET /api/v1/admin/code/deep-quality（圈复杂度拆分/重复块/命名/JSDoc/死代码 深度扫描）
   ...adminDeptPerformanceRoutes,
   ...operationAnalysisRoutes, // M163-B：GET /api/v1/admin/operation/analysis（运营四维分析 + 成本效益 + 对标 + 问题识别）
   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
