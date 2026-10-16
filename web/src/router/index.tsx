@@ -962,6 +962,8 @@ const GCPV5 = lazy(() => import('@/pages/gcp-v5/report'));
 const BiobankV5 = lazy(() => import('@/pages/biobank-v5/report'));
 // M269-D：住培教学考核 OSCE V5
 const ResidencyEducationV5 = lazy(() => import('@/pages/residency-edu-v5/report'));
+// M270-A：院内智能导航 V5
+const IndoorNavigationV5 = lazy(() => import('@/pages/indoor-navigation-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1864,6 +1866,8 @@ export default function AppRoutes() {
           <Route path="biobank-v5/report" element={<BiobankV5 />} />
           {/* M269-D：住培教学考核 OSCE V5 */}
           <Route path="residency-edu-v5/report" element={<ResidencyEducationV5 />} />
+          {/* M270-A：院内智能导航 V5 */}
+          <Route path="indoor-navigation-v5/report" element={<IndoorNavigationV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
