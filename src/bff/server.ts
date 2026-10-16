@@ -381,6 +381,7 @@ import { consumableSpdRoutes } from './routes/consumableSpd'; // M177-D：【病
 import { teachingDeepRoutes } from './routes/teachingDeep'; // M162-B：教学与培训深化 GET /api/v1/teaching/courses + POST /api/v1/teaching/exam（录播/直播/OSCE/规培出科/继教学分，考核公平不走过场）
 import { teachingOnlineRoutes } from './routes/teachingOnline'; // M171-B：【科研教学后勤】在线学习与考核 GET /api/v1/teaching/courses?category= + POST /api/v1/teaching/quiz/submit（视频课程/自动出题/自动阅卷/学习路径/学分自动认定）
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
+import { hrDeepRoutes } from './routes/hrDeep'; // M178-B：【财务人力行政党建】医院人力资源深化 GET /api/v1/hr/deep（编制公开+招聘≥3评委去两端取均+培训学分认规则+绩效KPI公式列化可复算，人力资源要公平不暗箱）
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
 import { assistantOutpatientRoutes } from './routes/assistantOutpatient';
 import { recordSystemHttpRequest } from './aggregators/systemHealthAggregator';
@@ -835,6 +836,7 @@ const allRoutes: RouteDef[] = [
   ...consumableSpdRoutes, // M177-D：SPD 耗材物流（采购/三级库位/扫码消耗计费/PPV 结算 + 高值耗材一物一码追溯不漏）
   ...teachingOnlineRoutes, // M171-B：在线学习与考核（视频课程录播/直播/回放 + 自动出题 + 服务端阅卷 + 学习路径 + 学分自动认定）
   ...teachingDeepRoutes, // M162-B：教学与培训深化（在线课程/OSCE客观结构化考核/规培轮转出科/继教学分自动记录）
+  ...hrDeepRoutes, // M178-B：人力资源深化阳光驾驶舱（编制公开+招聘≥3评委去两端取均+培训学分认规则+绩效KPI公式列化可复算）
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
   ...assistantOutpatientRoutes,
