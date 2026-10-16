@@ -141,6 +141,7 @@ import { voiceMedicalRoutes } from './routes/voiceMedical';
 import { voiceRecordRoutes } from './routes/voiceRecord'; // M152-B：病历 AI 语音录入与智能补全（语音转写+智能补全）
 import { opsForecastRoutes } from './routes/opsForecast'; // M154-C：【AI深化与运营预测】GET /api/v1/admin/forecast
 import { integrationHl7Routes } from './routes/integrationHl7'; // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build
+import { integrationDeepRoutes } from './routes/integrationDeep'; // M174-B：【系统集成深化·二期】标准接口扩展 POST /api/v1/integration/deep/parse（ADT^A08/ORM^O02/ORU^R30 + FHIR R4 Encounter/Condition + DICOM + LIS 双向）
 import { frontPageRoutes } from './routes/frontPage';
 import { researchRoutes } from './routes/research';
 import { researchExportRoutes } from './routes/researchExport';
@@ -905,6 +906,7 @@ const allRoutes: RouteDef[] = [
   ...emrSmartScoreRoutes, // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，重实质不抠格式）
   ...opsForecastRoutes, // M154-C：【AI深化与运营预测】GET /api/v1/admin/forecast（移动平均+季节因子+趋势外推，含残差置信区间）
   ...integrationHl7Routes, // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build（|^~\& 分隔，FHIR R4 Patient/Observation/MedicationRequest）
+  ...integrationDeepRoutes, // M174-B：【系统集成深化·二期】标准接口扩展 POST /api/v1/integration/deep/parse（HL7 ADT^A08/ORM^O02/ORU^R30 + FHIR R4 Encounter/Condition + DICOM SOP + LIS 双向）
   ...patientServiceDeepRoutes, // M156-D：【患者服务深化】一站式服务中心（老人友好六卡片）GET /api/v1/patient/service
   ...researchDeepRoutes, // M162-C：【科研管理深化】科研全生命周期 GET /api/v1/research/projects?dept= + PUT /api/v1/research/projects/:id/milestone
   ...researchPipelineRoutes, // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
