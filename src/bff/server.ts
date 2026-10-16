@@ -78,6 +78,7 @@ import { codeQualityRoutes } from './routes/codeQuality';
 import { codeQualityDeepRoutes } from './routes/codeQualityDeep';
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
 import { qualityGateRoutes } from './routes/qualityGate';
+// 【300版本里程碑】M181-C：八项质量门禁复查 V2 GET /api/v1/admin/quality-gate/v2
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { operationAnalysisRoutes } from './routes/operationAnalysis'; // M163-B：【安全与运营】GET /api/v1/admin/operation/analysis（收入/成本/效率/资源四维，数据支撑不拍脑袋）
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
@@ -476,6 +477,8 @@ import { coverageDetailRoutes } from './routes/coverageDetail';
 import { coverageGapRoutes } from './routes/coverageGap';
 // 【200版本里程碑】M157-A：里程碑总结（仅 admin，GET /api/v1/admin/milestone/summary）
 import { milestoneRoutes } from './routes/milestone';
+// 【300版本里程碑】M181-A：300 版本预告总结（仅 admin，GET /api/v1/admin/milestone/v2）
+import { milestoneV2Routes } from './routes/milestoneV2';
 import { errorSanitizerRoutes } from './routes/errorSanitizer'; // M136-A：错误脱敏自检（替代 securityBaselineRoutes，错误项转绿）
 // 【安全】M149-B：安全基线报告（七项：写认证/SQL/XSS/PII/错误/token/密码哈希/审计链）
 import { securityReportRoutes } from './routes/securityReport';
@@ -918,6 +921,7 @@ const allRoutes: RouteDef[] = [
   ...coverageDetailRoutes, // M151-A：GET /api/v1/admin/test/coverage/detailed（函数级缺口定位）
   ...coverageGapRoutes, // M173-A：GET /api/v1/admin/test/coverage-gap（99%→99.5%+ 缺口/计划/进度）
   ...milestoneRoutes, // 【200版本里程碑】M157-A：GET /api/v1/admin/milestone/summary（仅 admin）
+  ...milestoneV2Routes, // 【300版本里程碑】M181-A：GET /api/v1/admin/milestone/v2（仅 admin）
   ...testCoverageRoutes,
   ...errorSanitizerRoutes, // M136-A：GET /api/v1/admin/test/security（错误脱敏 green）
   ...securityReportRoutes, // M149-B：GET /api/v1/admin/security/report（七项安全基线）
