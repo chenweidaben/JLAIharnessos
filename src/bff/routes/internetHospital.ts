@@ -32,6 +32,22 @@ import {
   auditPractitioner,
   getMyPractitioner,
 } from '../aggregators/internetPatientAggregator';
+// M163-D：互联网医院深化——处方流转与药品配送（纯函数）
+import {
+  buildOnlineConsultationFlow,
+  routePrescriptionToPharmacy,
+  trackDelivery,
+  verifyOnlinePrescription,
+} from '../aggregators/internetHospitalAggregator';
+
+/** M163-D：纯函数抛出的业务错误 → 结构化错误信封 */
+function mapFlowError(err: unknown, c: Ctx): Response {
+  const msg = err instanceof Error ? err.message : '处方流转失败';
+  const status =
+    msg.includes('不存在') || msg.includes('尚未生成') ? 404 : 400;
+  const code = status === 404 ? ErrorCode.NOT_FOUND : ErrorCode.BAD_REQUEST;
+  return json(fail(code, msg, c.traceId), status);
+}
 
 function mapError(err: unknown, c: Ctx): Response {
   if (err instanceof InternetPatientError) {
@@ -213,6 +229,97 @@ export const internetHospitalRoutes: RouteDef[] = [
         return json(ok(await auditPractitioner(c.params.id, c.user!.id, body)));
       } catch (err) {
         return mapError(err, c);
+      }
+    },
+  },
+
+  /* ================== M163-D：处方流转与药品配送 ================== */
+
+  // 流程蓝图：问诊七步（含每步合规卡口），供深化页渲染
+  {
+    method: 'GET',
+    path: '/api/v1/internet/consultation-flow',
+    auth: true,
+    handle: async (c) => {
+      try {
+        return json(ok(buildOnlineConsultationFlow(), '问诊流程已加载'));
+      } catch (err) {
+        return mapFlowError(err, c);
+      }
+    },
+  },
+
+  // 合规复核：验方（麻精毒放禁开 / 二次方须审方）
+  {
+    method: 'GET',
+    path: '/api/v1/internet/prescription/:id/verify',
+    auth: true,
+    handle: async (c) => {
+      try {
+        return json(ok(verifyOnlinePrescription(c.params.id), '处方合规复核完成'));
+      } catch (err) {
+        return mapFlowError(err, c);
+      }
+    },
+  },
+
+  // 处方流转：按患者定位就近选合规药房（合规不通过即阻断，不违规售药）
+  {
+    method: 'POST',
+    path: '/api/v1/internet/prescription/route',
+    auth: true,
+    handle: async (c) => {
+      try {
+        const body = await c.body<{
+          prescriptionId?: string;
+          patientLocation?: { lng?: number; lat?: number; district?: string };
+        }>();
+        if (!body.prescriptionId?.trim()) {
+          return json(
+            fail(ErrorCode.BAD_REQUEST, '缺少 prescriptionId', c.traceId),
+            400,
+          );
+        }
+        const loc = body.patientLocation;
+        if (
+          !loc ||
+          typeof loc.lng !== 'number' ||
+          typeof loc.lat !== 'number'
+        ) {
+          return json(
+            fail(ErrorCode.BAD_REQUEST, '缺少患者定位 patientLocation.lng/lat', c.traceId),
+            400,
+          );
+        }
+        const decision = routePrescriptionToPharmacy(
+          body.prescriptionId.trim(),
+          { lng: loc.lng, lat: loc.lat, district: loc.district },
+        );
+        // 合规不通过：以 409 明确告知“禁止流转售药”，前端据此阻断
+        if (!decision.routed) {
+          const detail =
+            decision.warnings.length > 0
+              ? `${decision.reason}：${decision.warnings.join('；')}`
+              : decision.reason;
+          return json(fail(ErrorCode.CONFLICT, detail, c.traceId), 409);
+        }
+        return json(ok(decision, '处方已流转至就近合规药房'));
+      } catch (err) {
+        return mapFlowError(err, c);
+      }
+    },
+  },
+
+  // 药品配送追踪：按处方 ID 回读配送链路
+  {
+    method: 'GET',
+    path: '/api/v1/internet/delivery/track/:id',
+    auth: true,
+    handle: async (c) => {
+      try {
+        return json(ok(trackDelivery(c.params.id), '配送追踪已加载'));
+      } catch (err) {
+        return mapFlowError(err, c);
       }
     },
   },
