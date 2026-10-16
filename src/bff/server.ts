@@ -46,6 +46,7 @@ import { adminPerformanceRoutes } from './routes/adminPerformance';
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 // 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
 import { perfOptimizeRoutes } from './routes/perfOptimize';
+// 【CDSS与运营精细化】M165-D：性能深度审计（慢查询TOP10/大表/N+1/内存泄漏/前端渲染/熔断器/健康检查）GET /api/v1/admin/performance/deep-audit
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【v4.x近期】M158-C：首屏与缓存优化（路由懒加载/缓存策略/FCP-LCP 测量）GET /api/v1/admin/performance/firstload
@@ -137,6 +138,8 @@ import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { dataQualityRoutes } from './routes/dataQuality'; // M159-D：数据质量治理 GET /api/v1/admin/data-quality/report
 // 【数据中台与AI大脑】M164-A：数据资产治理 GET /api/v1/admin/data-mart/catalog + /lineage（资产清单/血缘追踪/敏感分级/数据服务）
 import { dataMartDeepRoutes } from './routes/dataMartDeep';
+// 【CDSS与运营精细化】M165-A：CDSS 临床决策支持 POST /api/v1/cdss/evaluate（规则求值/优先级合并/防告警疲劳）
+import { cdssDeepRoutes } from './routes/cdssDeep';
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
@@ -361,7 +364,7 @@ import { adminConfigRoutes } from './routes/adminConfig';
 import { deployConfigRoutes } from './routes/deployConfig'; // M145-D：部署配置生成（生产化收尾）
 import { adminLogsRoutes } from './routes/adminLogs';
 import { adminWebhooksRoutes } from './routes/adminWebhooks';
-import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D：【数据中台与AI大脑】API 网关 POST /api-gateway/route + /external（统一入口/认证/限流熔断，无状态多实例共享）
+import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -506,6 +509,7 @@ const allRoutes: RouteDef[] = [
   ...dataGovernanceRoutes,
   ...dataQualityRoutes, // M159-D：数据质量五维报告
   ...dataMartDeepRoutes, // M164-A：数据资产治理（资产目录/血缘追踪）
+  ...cdssDeepRoutes, // M165-A：CDSS 临床决策支持（POST /api/v1/cdss/evaluate，防告警疲劳）
   ...outboxRoutes,
   ...sessionAdminRoutes,
   ...billingRoutes,
