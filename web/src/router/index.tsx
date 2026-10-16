@@ -372,6 +372,8 @@ const InternetHospitalV2 = lazy(() => import('@/pages/internet-hospital-v2'));
 const Telemedicine = lazy(() => import('@/pages/telemedicine'));
 // M195-C：移动医疗
 const MobileHealth = lazy(() => import('@/pages/mobile-health'));
+// M195-D：智慧医疗
+const SmartHealthcare = lazy(() => import('@/pages/smart-healthcare'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -684,6 +686,8 @@ export default function AppRoutes() {
           <Route path="telemedicine" element={<Telemedicine />} />
           {/* M195-C：移动医疗 */}
           <Route path="mobile-health" element={<MobileHealth />} />
+          {/* M195-D：智慧医疗 */}
+          <Route path="smart-healthcare" element={<SmartHealthcare />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
