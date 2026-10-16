@@ -45,6 +45,8 @@ const FrontPage = lazy(() => import('@/pages/frontPage'));
 const Research = lazy(() => import('@/pages/research'));
 // 科研专病队列导出（纳排筛选 + CSV 导出）
 const CohortExport = lazy(() => import('@/pages/research/CohortExport'));
+// AI 辅助科研助手（M166-C）：文献综述/实验设计/统计方案/论文初稿
+const ResearchAssistant = lazy(() => import('@/pages/research/ResearchAssistant'));
 // 患者主索引 EMPI（M5-C）
 const Empi = lazy(() => import('@/pages/empi'));
 const DataWarehouse = lazy(() => import('@/pages/dataWarehouse'));
@@ -572,6 +574,8 @@ export default function AppRoutes() {
           <Route path="research" element={<Research />} />
           {/* 专病队列数据导出：纳排筛选 + CSV 下载（仅登录态） */}
           <Route path="research/cohort-export" element={<CohortExport />} />
+          {/* AI 辅助科研助手（M166-C）：真实文献词典综述，不编造 */}
+          <Route path="research/assistant" element={<ResearchAssistant />} />
           {/* 患者主索引 EMPI（M5-C）：empi:read/write */}
           <Route path="empi" element={<Empi />} />
           {/* 数据湖仓（M5-D）：data_warehouse:read/admin */}

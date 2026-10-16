@@ -18,6 +18,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { LITERATURE_DICTIONARY } from './researchLitAggregator';
+
 /* ------------------------------------------------------------------ */
 /* 类型与口径                                                          */
 /* ------------------------------------------------------------------ */
@@ -466,4 +468,587 @@ export function buildResearchPortfolio(
   };
 
   return { dept: deptCode, year: yearNum, summary, projects: matched };
+}
+
+/* ################################################################## */
+/* M166-C【绩效与人才】AI 辅助科研深化                                  */
+/* ------------------------------------------------------------------ */
+/* 文献综述 / 实验设计 / 统计方案 / 论文初稿 四件套纯函数。              */
+/*                                                                     */
+/* 真实红线：                                                           */
+/*  · 文献全部取自 researchLitAggregator.LITERATURE_DICTIONARY——       */
+/*    内置词典均为真实发表论文（期刊/作者/年份可查），本切片不新造一条   */
+/*    假文献、不编 DOI；正式环境应接 PubMed/CNKI 检索接口替换词典；     */
+/*  · 论文初稿的结果段只复述调用方传入的实测结果，缺省一律落「待填入」   */
+/*    占位，严禁由 AI 预造数字；                                        */
+/*  · 纯函数：不触库、不发网络、不读时钟、不改入参。                    */
+/* ################################################################## */
+
+/** 文献检索年份闭区间（均可空） */
+export interface ReviewYearRange {
+  start?: number;
+  end?: number;
+}
+
+/** 研究方法学标签（按关键词自动归类） */
+export type MethodTag =
+  | 'ai_deep_learning'   // 深度学习 / 人工智能
+  | 'cohort_prognosis'   // 队列 / 预后评分
+  | 'epidemiology'       // 疾病负担 / 统计报告
+  | 'systematic_review'  // 系统综述 / 综述
+  | 'other';
+
+/** 方法标签的中文标签与优劣势口径（方法对比用） */
+const METHOD_PROFILE: Record<MethodTag, { label: string; strengths: string; weaknesses: string }> = {
+  ai_deep_learning: {
+    label: '深度学习/人工智能',
+    strengths: '高维特征自动提取，影像/EHR 规模化后判别精度可达专家水平',
+    weaknesses: '数据需求大、黑箱可解释性弱、外部验证偏倚常见，易过拟合',
+  },
+  cohort_prognosis: {
+    label: '队列/预后评分',
+    strengths: '暴露-结局时序清晰，可计算发病率与 HR，评分工具可 bedside 复用',
+    weaknesses: '随访失访、混杂需校正；评分外部迁移性受限',
+  },
+  epidemiology: {
+    label: '疾病负担/统计报告',
+    strengths: '人群级发病率/死亡率权威锚点，支撑立项依据与样本量假设',
+    weaknesses: '描述性为主、无因果推断，跨区域外推需谨慎',
+  },
+  systematic_review: {
+    label: '系统综述',
+    strengths: '合并既有证据、明确偏倚风险与证据等级，是 gap 分析的金标准',
+    weaknesses: '依赖纳入研究质量，发表偏倚可能夸大效应',
+  },
+  other: {
+    label: '其他方法学',
+    strengths: '方法杂糅，视具体研究而定',
+    weaknesses: '方法学异质性高，需逐篇甄别',
+  },
+};
+
+/** 命中文献条目（综述产物） */
+export interface MatchedPaper {
+  id: string;
+  title: string;
+  authors: string[];
+  journal: string;
+  year: number;
+  keywords: string[];
+  methodTag: MethodTag;
+  /** 自动提取的要点摘要（首句截取，不编造结论） */
+  keyPoint: string;
+  /** Vancouver 风格完整引用 */
+  citation: string;
+}
+
+/** 研究趋势分析产物 */
+export interface ReviewTrend {
+  /** 按年分布（升序） */
+  byYear: Array<{ year: number; count: number }>;
+  /** 热点关键词（频次降序，top 8） */
+  hotKeywords: Array<{ tag: string; count: number }>;
+  /** 热点演变：命中文献按年份三等分的早期/中期/近期标签 */
+  evolution: Array<{ band: string; topTags: Array<{ tag: string; count: number }> }>;
+}
+
+/** 不同研究方法对比产物 */
+export interface MethodComparison {
+  method: MethodTag;
+  methodLabel: string;
+  count: number;
+  paperIds: string[];
+  strengths: string;
+  weaknesses: string;
+}
+
+/** 文献综述总产物 */
+export interface LiteratureReview {
+  topic: string;
+  yearRange: ReviewYearRange;
+  /** 命中总数（topK 截断前） */
+  totalMatched: number;
+  papers: MatchedPaper[];
+  /** 摘要总结：跨文献自动提取的要点列表 */
+  keyPoints: string[];
+  trend: ReviewTrend;
+  methodComparison: MethodComparison[];
+  /** 真实性声明（前端必显） */
+  sourceDisclaimer: string;
+}
+
+/** 方法学归类（按关键词命中，互斥优先级） */
+function classifyMethod(keywords: string[]): MethodTag {
+  const k = keywords.join(' ');
+  if (/深度学习|人工智能|神经网络/.test(k)) return 'ai_deep_learning';
+  if (/队列|预后评分/.test(k)) return 'cohort_prognosis';
+  if (/系统综述|综述/.test(k)) return 'systematic_review';
+  if (/肿瘤统计|GLOBOCAN|疾病负担/.test(k)) return 'epidemiology';
+  return 'other';
+}
+
+/** 截取摘要首句作为自动要点（不归纳、不外推） */
+function firstSentence(abstract: string, max = 90): string {
+  const hit = abstract.match(/[^。.!?！？]+[。.!?！？]?/);
+  const s = (hit ? hit[0] : abstract).trim();
+  return s.length > max ? `${s.slice(0, max)}…` : s;
+}
+
+/** 年份闭区间校验（非法抛错） */
+function sanitizeYearRange(raw: unknown): ReviewYearRange {
+  const range: ReviewYearRange = {};
+  if (raw == null) return range;
+  if (typeof raw !== 'object') throw new Error('yearRange 须为对象 { start, end }');
+  const r = raw as Record<string, unknown>;
+  for (const [key, val] of [['start', r.start], ['end', r.end]] as const) {
+    if (val == null || val === '') continue;
+    const n = typeof val === 'number' ? val : Number(val);
+    if (!Number.isInteger(n) || n < 1900 || n > 2100) {
+      throw new Error(`年份区间 ${key} 非法：${String(val)}，须为 1900~2100 整数`);
+    }
+    range[key] = n;
+  }
+  if (range.start != null && range.end != null && range.start > range.end) {
+    throw new Error(`年份区间 start(${range.start}) 大于 end(${range.end})`);
+  }
+  return range;
+}
+
+/**
+ * 【绩效与人才·M166-C】构建文献综述（纯函数）。
+ *
+ * 流程：
+ *   1. 在真实文献词典中按主题（题名/摘要/关键词子串，忽略大小写）+
+ *      年份闭区间过滤，按发表年降序、topK 截断；
+ *   2. 摘要总结：逐篇取摘要首句去重，作为自动要点；
+ *   3. 趋势分析：逐年计数 + 关键词频次 top8 + 年份三等分热点演变；
+ *   4. 方法对比：按关键词自动归类方法学，输出优劣势口径。
+ *
+ * @param topic   主题关键词（必填）
+ * @param yearRange 年份闭区间 { start, end }（可空）
+ * @param topK    返回条数（缺省 10，夹紧 1~50）
+ */
+export function buildLiteratureReview(
+  topic: unknown,
+  yearRange?: unknown,
+  topK?: unknown,
+): LiteratureReview {
+  const topicText = toText(topic);
+  if (!topicText) throw new Error('综述主题 topic 不能为空');
+  const range = sanitizeYearRange(yearRange);
+
+  let kTop = 10;
+  if (topK != null && topK !== '') {
+    const n = typeof topK === 'number' ? topK : Number(topK);
+    if (!Number.isInteger(n) || n <= 0) throw new Error(`topK 非法：${String(topK)}，须为正整数`);
+    kTop = Math.min(n, 50);
+  }
+
+  const lower = topicText.toLowerCase();
+  const hit = LITERATURE_DICTIONARY.filter((lit) => {
+    if (range.start != null && lit.year < range.start) return false;
+    if (range.end != null && lit.year > range.end) return false;
+    const hay = `${lit.title} ${lit.abstract} ${lit.keywords.join(' ')}`.toLowerCase();
+    return hay.includes(lower);
+  }).sort((a, b) => b.year - a.year);
+
+  const totalMatched = hit.length;
+  const selected = hit.slice(0, kTop).map((lit) => {
+    const methodTag = classifyMethod(lit.keywords);
+    return {
+      id: lit.id,
+      title: lit.title,
+      authors: [...lit.authors],
+      journal: lit.journal,
+      year: lit.year,
+      keywords: [...lit.keywords],
+      methodTag,
+      keyPoint: firstSentence(lit.abstract),
+      citation: lit.citation,
+    };
+  });
+
+  // —— 摘要总结：首句要点去重，保序 ——
+  const keyPoints: string[] = [];
+  for (const p of selected) {
+    if (!keyPoints.includes(p.keyPoint)) keyPoints.push(p.keyPoint);
+  }
+
+  // —— 趋势：逐年分布（升序） ——
+  const yearCounter = new Map<number, number>();
+  for (const p of selected) yearCounter.set(p.year, (yearCounter.get(p.year) ?? 0) + 1);
+  const byYear = [...yearCounter.entries()]
+    .map(([year, count]) => ({ year, count }))
+    .sort((a, b) => a.year - b.year);
+
+  // —— 热点关键词 top8 ——
+  const kwCounter = new Map<string, number>();
+  for (const p of selected) {
+    for (const kw of p.keywords) kwCounter.set(kw, (kwCounter.get(kw) ?? 0) + 1);
+  }
+  const hotKeywords = [...kwCounter.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
+    .slice(0, 8);
+
+  // —— 热点演变：按年份升序三等分 ——
+  const asc = [...selected].sort((a, b) => a.year - b.year);
+  const bands = [
+    { label: '早期', slice: asc.slice(0, Math.ceil(asc.length / 3)) },
+    { label: '中期', slice: asc.slice(Math.ceil(asc.length / 3), Math.ceil(asc.length * 2 / 3)) },
+    { label: '近期', slice: asc.slice(Math.ceil(asc.length * 2 / 3)), },
+  ];
+  const evolution = bands.map(({ label, slice }) => {
+    const c = new Map<string, number>();
+    for (const p of slice) for (const kw of p.keywords) c.set(kw, (c.get(kw) ?? 0) + 1);
+    return {
+      band: slice.length ? `${label}（${slice[0]!.year}—${slice[slice.length - 1]!.year}）` : label,
+      topTags: [...c.entries()]
+        .map(([tag, count]) => ({ tag, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4),
+    };
+  });
+
+  // —— 方法对比 ——
+  const groups = new Map<MethodTag, MatchedPaper[]>();
+  for (const p of selected) {
+    const arr = groups.get(p.methodTag) ?? [];
+    arr.push(p);
+    groups.set(p.methodTag, arr);
+  }
+  const methodComparison: MethodComparison[] = [...groups.entries()]
+    .map(([method, papers]) => ({
+      method,
+      methodLabel: METHOD_PROFILE[method].label,
+      count: papers.length,
+      paperIds: papers.map((p) => p.id),
+      strengths: METHOD_PROFILE[method].strengths,
+      weaknesses: METHOD_PROFILE[method].weaknesses,
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    topic: topicText,
+    yearRange: range,
+    totalMatched,
+    papers: selected,
+    keyPoints,
+    trend: { byYear, hotKeywords, evolution },
+    methodComparison,
+    sourceDisclaimer:
+      '本综述文献取自内置真实发表论文词典（不含编造 DOI），仅作离线演示与方法学锚点；正式使用须接 PubMed/CNKI 检索接口并人工复核。',
+  };
+}
+
+/** 实验设计方法学 */
+export type ExperimentMethod =
+  | 'randomized-trial'       // 随机对照试验
+  | 'prospective-cohort'     // 前瞻性队列
+  | 'retrospective-cohort'   // 回顾性队列
+  | 'case-control'           // 病例对照
+  | 'diagnostic-accuracy';   // 诊断准确性研究
+
+/** 实验设计产物 */
+export interface ExperimentDesign {
+  problem: string;
+  method: ExperimentMethod;
+  designLabel: string;
+  hypothesis: string;
+  arms: Array<{ name: string; description: string }>;
+  primaryEndpoint: string;
+  secondaryEndpoints: string[];
+  inclusion: string[];
+  exclusion: string[];
+  sampleSizeHint: string;
+  ethics: string[];
+  reportingStandard: string;
+}
+
+const METHOD_LABEL: Record<ExperimentMethod, string> = {
+  'randomized-trial': '随机对照试验（RCT）',
+  'prospective-cohort': '前瞻性队列研究',
+  'retrospective-cohort': '回顾性队列研究',
+  'case-control': '病例对照研究',
+  'diagnostic-accuracy': '诊断准确性研究（DA）',
+};
+
+const METHOD_STANDARD: Record<ExperimentMethod, string> = {
+  'randomized-trial': 'CONSORT 2010',
+  'prospective-cohort': 'STROBE',
+  'retrospective-cohort': 'STROBE',
+  'case-control': 'STROBE',
+  'diagnostic-accuracy': 'STARD 2015',
+};
+
+/**
+ * 【绩效与人才·M166-C】实验设计（纯函数模板装配）。
+ *
+ * 按方法学类型给出假设/分组/终点/纳排/样本量提示/伦理要点骨架；
+ * problem 仅作文字嵌入，不产生任何数据结论。
+ */
+export function designExperiment(problem: unknown, method: unknown): ExperimentDesign {
+  const problemText = toText(problem);
+  if (!problemText) throw new Error('研究问题 problem 不能为空');
+  const methodText = toText(method) as ExperimentMethod;
+  if (!(methodText in METHOD_LABEL)) {
+    throw new Error(
+      `实验方法 method 非法：${methodText}，须为 ${Object.keys(METHOD_LABEL).join('/')}`,
+    );
+  }
+
+  const base = {
+    problem: problemText,
+    method: methodText,
+    designLabel: METHOD_LABEL[methodText],
+    hypothesis: `在目标人群中，${problemText} 较常规对照可带来有临床意义的结局改善（优效假设）。`,
+    inclusion: [
+      '符合疾病/问题定义的目标人群',
+      '年龄、性别按研究问题限定并注明依据',
+      '签署知情同意书（回顾性队列可申请豁免）',
+    ],
+    exclusion: [
+      '合并严重并发症或预期随访不足者',
+      '关键变量缺失（主要终点/协变量）者',
+      '拒绝签署知情同意或无法完成随访者',
+    ],
+    ethics: [
+      '经医院伦理委员会审批并备案伦理批件号',
+      '注册前瞻性研究于 ChiCTR/ClinicalTrials.gov',
+      '受试者隐私按《个人信息保护法》《医疗卫生机构网络安全管理办法》脱敏存储',
+    ],
+    reportingStandard: METHOD_STANDARD[methodText],
+  };
+
+  switch (methodText) {
+    case 'randomized-trial':
+      return {
+        ...base,
+        arms: [
+          { name: '试验组', description: `干预：${problemText} 对应新策略` },
+          { name: '对照组', description: '干预：现行标准方案' },
+        ],
+        primaryEndpoint: '主要终点：干预组 vs 对照组的主要临床事件发生率（优效性检验）',
+        secondaryEndpoints: ['次要终点：安全性事件', '次要终点：卫生经济学指标', '次要终点：患者报告结局（PRO）'],
+        sampleSizeHint: '按主要终点预期组间差异 α=0.05、power=0.8 估算每组样本量，并加 15% 失访冗余。',
+      };
+    case 'prospective-cohort':
+      return {
+        ...base,
+        arms: [
+          { name: '暴露组', description: `具备暴露因素：${problemText} 相关暴露` },
+          { name: '非暴露组', description: '同期入院、无该暴露因素的可比人群' },
+        ],
+        primaryEndpoint: '主要终点：暴露组 vs 非暴露组的结局事件累积发生率与风险比（HR）',
+        secondaryEndpoints: ['次要终点：亚组人群效应异质性', '次要终点：暴露剂量-反应关系'],
+        sampleSizeHint: '按基线结局发生率、预期 HR=1.5~2.0、α=0.05、power=0.8 估算队列规模。',
+      };
+    case 'retrospective-cohort':
+      return {
+        ...base,
+        arms: [
+          { name: '历史暴露组', description: `既往接受 ${problemText} 相关策略的患者队列（EHR 回溯）` },
+          { name: '历史对照组', description: '同期未接受该策略的可比患者队列' },
+        ],
+        primaryEndpoint: '主要终点：两组结局差异（倾向评分匹配校正混杂后）',
+        secondaryEndpoints: ['次要终点：PSM 后协变量均衡性（SMD<0.1）', '次要终点：多因素 Cox/广义线性模型效应量'],
+        sampleSizeHint: '以可用 EHR 全量队列入组，按结局事件数满足 EPV≥10 校验模型稳定性。',
+      };
+    case 'case-control':
+      return {
+        ...base,
+        arms: [
+          { name: '病例组', description: `确诊目标结局（${problemText} 相关疾病）的患者` },
+          { name: '对照组', description: '同期就诊、无该结局的可比人群（1:1 或 1:2 匹配）' },
+        ],
+        primaryEndpoint: '主要终点：暴露因素在两组中的分布差异（OR 及 95%CI）',
+        secondaryEndpoints: ['次要终点：分层分析控制混杂', '次要终点：交互作用检验'],
+        sampleSizeHint: '按预期 OR=2.0、暴露率 30%、α=0.05、power=0.8 估算病例/对照配比。',
+      };
+    case 'diagnostic-accuracy':
+      return {
+        ...base,
+        arms: [
+          { name: '待评价试验', description: `待评价方法：${problemText} 对应诊断/预测模型` },
+          { name: '金标准', description: '同期盲法参照的金标准检查（病理/影像随访/独立专家会诊）' },
+        ],
+        primaryEndpoint: '主要终点：灵敏度、特异度与 ROC 曲线下面积（AUC，95%CI）',
+        secondaryEndpoints: ['次要终点：阳性/阴性似然比', '次要终点：与金标准的一致性（Cohen κ）'],
+        sampleSizeHint: '按预期 AUC=0.85、患病率 30%、α=0.05、power=0.8 估算，并保证阳性例数≥50。',
+      };
+  }
+}
+
+/** 统计方案产物 */
+export interface StatisticalPlan {
+  alpha: number;
+  power: number;
+  primaryAnalysis: string;
+  tests: Array<{ purpose: string; test: string; rationale: string }>;
+  multiplicity: string;
+  missingData: string;
+  sensitivityAnalysis: string[];
+  reportingStandard: string;
+}
+
+/**
+ * 【绩效与人才·M166-C】由实验设计生成统计方案（纯函数）。
+ *
+ * 按设计类型映射主分析/检验方法/多重性/缺失值/敏感性分析口径，
+ * alpha 固定 0.05、检验效能 0.80，不输出任何伪造 p 值。
+ */
+export function generateStatisticalPlan(design: ExperimentDesign): StatisticalPlan {
+  if (!design || !design.designLabel) {
+    throw new Error('实验设计对象 design 不能为空（先调用 designExperiment）');
+  }
+  const base = {
+    alpha: 0.05,
+    power: 0.8,
+    multiplicity: '主要终点单一检验；多个次要终点按 Bonferroni 或 FDR 校正并在方案中预先声明。',
+    missingData: '主要变量缺失 >5% 先行多重插补（MICE），并与完整病例分析对照作为敏感性分析。',
+    sensitivityAnalysis: ['按方案集（per-protocol）与意向性治疗（ITT）双口径对照'],
+    reportingStandard: design.reportingStandard,
+  };
+
+  switch (design.method) {
+    case 'randomized-trial':
+      return {
+        ...base,
+        primaryAnalysis: '意向性治疗分析（ITT）：组间主要终点率比较 + 95%CI。',
+        tests: [
+          { purpose: '主要终点率比较', test: '卡方检验 / Fisher 精确检验', rationale: '二分类结局组间差异' },
+          { purpose: '连续协变量调整', test: '协方差分析（ANCOVA）', rationale: '平衡基线不均衡' },
+          { purpose: '优效性判定', test: '单侧/双侧优效界值检验', rationale: '95%CI 下限大于 0 且超过临床优效界值' },
+        ],
+        sensitivityAnalysis: [...base.sensitivityAnalysis, '失访患者多重插补后重估'],
+      };
+    case 'prospective-cohort':
+      return {
+        ...base,
+        primaryAnalysis: '暴露组 vs 非暴露组的 Kaplan-Meier 累积发生率比较。',
+        tests: [
+          { purpose: '组间生存曲线', test: 'Log-rank 检验', rationale: '非参比较两组事件发生时间分布' },
+          { purpose: '效应量估计', test: 'Cox 比例风险回归（HR, 95%CI）', rationale: '校正年龄/性别/合并症等混杂' },
+          { purpose: '比例风险假定', test: 'Schoenfeld 残差检验', rationale: '不满足时改用时间分层 Cox' },
+        ],
+        sensitivityAnalysis: [...base.sensitivityAnalysis, '竞争风险模型（Fine-Gray）对照'],
+      };
+    case 'retrospective-cohort':
+      return {
+        ...base,
+        primaryAnalysis: '倾向评分匹配（PSM, 1:1）后组间结局比较。',
+        tests: [
+          { purpose: '混杂校正', test: '倾向评分匹配 + 标准化均数差（SMD<0.1）核验', rationale: '观察性数据控制选择偏倚' },
+          { purpose: '效应量估计', test: '多因素 Logistic / Cox 回归（OR/HR, 95%CI）', rationale: '匹配后残余混杂再校正' },
+          { purpose: '稳健性', test: 'E-value 敏感性分析', rationale: '评估未测量混杂需多大强度才能推翻结论' },
+        ],
+        sensitivityAnalysis: [...base.sensitivityAnalysis, '逆概率加权（IPTW）对照'],
+      };
+    case 'case-control':
+      return {
+        ...base,
+        primaryAnalysis: '病例组 vs 对照组的暴露分布比较（条件 Logistic 回归）。',
+        tests: [
+          { purpose: '暴露关联强度', test: '条件 Logistic 回归（OR, 95%CI）', rationale: '匹配设计下的标准估计方法' },
+          { purpose: '剂量-反应', test: '暴露等级趋势检验（Wald）', rationale: '支持因果推断的一致性' },
+        ],
+        sensitivityAnalysis: [...base.sensitivityAnalysis, '不同匹配比例（1:1 / 1:2）对照'],
+      };
+    case 'diagnostic-accuracy':
+      return {
+        ...base,
+        primaryAnalysis: '待评价试验 vs 金标准的灵敏度/特异度/AUC（95%CI）。',
+        tests: [
+          { purpose: '判别能力', test: 'ROC 曲线下面积（AUC）+ DeLong 检验', rationale: '与既有方法 AUC 比较' },
+          { purpose: '诊断一致性', test: 'Cohen κ / 阳性符合率', rationale: '评估观察者间一致性' },
+          { purpose: '阈值优化', test: '约登指数（Youden J）确定最佳截断', rationale: '平衡灵敏度与特异度' },
+        ],
+        sensitivityAnalysis: [...base.sensitivityAnalysis, '缺失金标准病例的多重插补对照'],
+      };
+  }
+}
+
+/** 论文初稿的实测结果（由调用方提供，纯函数不预造） */
+export interface ResearchResults {
+  sampleSize?: number;
+  keyFindings?: string[];
+  effectSize?: string;
+  pValue?: string;
+  references?: string[];
+}
+
+/** 论文初稿产物（IMRaD 骨架） */
+export interface ResearchPaperDraft {
+  title: string;
+  structuredAbstract: {
+    background: string;
+    objective: string;
+    methods: string;
+    results: string;
+    conclusion: string;
+  };
+  introduction: string[];
+  resultsNarrative: string[];
+  discussion: string[];
+  conclusion: string;
+  references: string[];
+  disclaimer: string;
+}
+
+/**
+ * 【绩效与人才·M166-C】论文初稿（IMRaD 骨架，纯函数）。
+ *
+ * 真实性红线：Results 段只复述 results 入参中的实测数字；
+ * 任何缺失一律落「待填入实测结果」占位，系统绝不预造效应量/p 值。
+ *
+ * @param topic   论文主题（必填）
+ * @param results 实测结果（样本量/关键发现/效应量/p 值/参考文献）
+ */
+export function draftResearchPaper(topic: unknown, results?: ResearchResults): ResearchPaperDraft {
+  const topicText = toText(topic);
+  if (!topicText) throw new Error('论文主题 topic 不能为空');
+
+  const r: ResearchResults = results ?? {};
+  const nText = r.sampleSize != null && Number.isFinite(r.sampleSize)
+    ? `纳入分析样本量 n=${r.sampleSize}`
+    : '（待填入实测样本量）';
+  const effectText = toText(r.effectSize) || '（待填入实测效应量，如 HR=1.32, 95%CI 1.10—1.58）';
+  const pText = toText(r.pValue) || '（待填入实测 P 值）';
+
+  const findings = Array.isArray(r.keyFindings) && r.keyFindings.length
+    ? r.keyFindings.map((x) => toText(x)).filter(Boolean)
+    : ['（待填入实测关键发现）'];
+
+  const references = Array.isArray(r.references) ? r.references.filter((x) => typeof x === 'string' && x.trim()) : [];
+
+  return {
+    title: `${topicText}：方法学、证据与临床意义（初稿）`,
+    structuredAbstract: {
+      background: `${topicText} 是当前临床/科研关注的问题，既有证据仍存在方法学异质性与外部验证缺口。`,
+      objective: `系统梳理 ${topicText} 的证据现状，并给出可复现的研究设计与统计口径。`,
+      methods: '按预设纳排标准汇总真实发表文献，方法学归类后比较各研究设计的优势与局限；统计口径 α=0.05、power=0.80。',
+      results: `${nText}；效应量 ${effectText}；${pText}。主要发现：${findings[0]}。`,
+      conclusion: `在本证据范围内，${topicText} 的结论需经独立外部验证后方可进入临床决策。`,
+    },
+    introduction: [
+      `临床/科研背景：${topicText} 的问题来源与现状（引述综述文献）。`,
+      `证据缺口：既有研究在样本代表性、偏倚控制上的不足。`,
+      '本文目标：给出可执行的研究设计、统计方案与可投稿的论文骨架。',
+    ],
+    resultsNarrative: [
+      `${nText}。`,
+      `效应量：${effectText}。`,
+      `显著性：${pText}。`,
+      ...findings.map((f) => `关键发现：${f}`),
+    ],
+    discussion: [
+      '结果与既有真实文献的一致性/差异点（逐条对照引用）。',
+      '方法学局限：回顾性偏倚、样本代表性、外部验证范围。',
+      '临床/科研意义与下一步验证计划。',
+    ],
+    conclusion: `本初稿仅为结构化骨架，所有数字均须替换为实测结果并经作者团队核验后方可投稿。`,
+    references,
+    disclaimer:
+      '本初稿由纯函数模板生成，未接入任何大模型杜撰；参考文献请人工在 PubMed/CNKI 复核后补全。',
+  };
 }

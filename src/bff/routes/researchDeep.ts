@@ -16,12 +16,18 @@
  */
 
 import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
+import { requirePermissionCode } from '../middleware/auth';
 import {
   SEED_PROJECTS,
+  buildLiteratureReview,
   buildResearchPortfolio,
   calculateResearchImpact,
+  designExperiment,
+  draftResearchPaper,
+  generateStatisticalPlan,
   trackProjectMilestone,
   type ResearchProjectDeep,
+  type ResearchResults,
 } from '../aggregators/researchDeepAggregator';
 
 /**
@@ -89,6 +95,70 @@ export const researchDeepRoutes: RouteDef[] = [
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : '里程碑登记失败';
+        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
+      }
+    },
+  },
+  {
+    // M166-C【绩效与人才】AI 辅助科研深化：文献综述（真实词典，不编造文献）
+    // POST /api/v1/research/literature-review
+    //   body: { topic, yearStart?, yearEnd?, topK?, problem?, method?, results? }
+    //   - topic 必填：在真实文献词典中检索并输出综述（检索/摘要总结/趋势/方法对比）；
+    //   - problem + method 同传时，附带实验设计与统计方案；
+    //   - results 同传时，附带论文初稿（结果段只复述传入数字，不预造）。
+    method: 'POST',
+    path: '/api/v1/research/literature-review',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requirePermissionCode(c, 'research:read');
+      if (denied) return denied;
+
+      let body: {
+        topic?: unknown;
+        yearStart?: unknown;
+        yearEnd?: unknown;
+        topK?: unknown;
+        problem?: unknown;
+        method?: unknown;
+        results?: ResearchResults;
+      };
+      try {
+        body = await c.body();
+      } catch {
+        return json(fail(ErrorCode.BAD_REQUEST, '请求体不是合法 JSON', c.traceId), 400);
+      }
+
+      try {
+        const review = buildLiteratureReview(
+          body.topic,
+          { start: body.yearStart, end: body.yearEnd },
+          body.topK,
+        );
+
+        const payload: Record<string, unknown> = { review };
+
+        // 可选：同传研究问题+方法 → 实验设计 + 统计方案
+        if (body.problem != null && String(body.problem).trim() && body.method != null) {
+          const experiment = designExperiment(body.problem, body.method);
+          payload.experiment = experiment;
+          payload.statisticalPlan = generateStatisticalPlan(experiment);
+        }
+
+        // 可选：同传实测结果 → 论文初稿（参考文献缺省取综述命中的真实引用）
+        if (body.results && typeof body.results === 'object') {
+          const results: ResearchResults = body.results;
+          payload.paperDraft = draftResearchPaper(body.topic, {
+            ...results,
+            references:
+              Array.isArray(results.references) && results.references.length
+                ? results.references
+                : review.papers.map((p) => p.citation),
+          });
+        }
+
+        return json(ok(payload, '文献综述已生成（真实文献词典，未编造）'));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '文献综述生成失败';
         return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
       }
     },
