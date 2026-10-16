@@ -94,6 +94,8 @@ import { adminTrendsRoutes } from './routes/adminTrends';
 import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
 // 【M160-A · 全自学习闭环】GET /api/v1/admin/auto-learn/report 系统每周自动进化报告
 import { autoLearnRoutes } from './routes/autoLearn';
+// 【M170-A · 自学习与数字孪生】GET /api/v1/admin/auto-learn/deep 四维度深度自学习进化报告
+import { autoLearnDeepRoutes } from './routes/autoLearnDeep';
 import { resourceOptimizeRoutes } from './routes/resourceOptimize'; // M161-D：POST /api/v1/admin/resource/optimize 资源智能调配（公平轮班）
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 // 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
@@ -106,6 +108,7 @@ import { startSystemMetricSampler } from './aggregators/systemMetricsAggregator'
 import { wisdomDashboardRoutes } from './routes/wisdomDashboard';
 // 【智慧资产量化】M161-B：全院智慧资产看板（经验/知识/模型/数据四维 + 饱和折算 + 缺口识别 + 段位对标）
 import { smartAssetRoutes } from './routes/smartAsset';
+// 【自学习与数字孪生】M170-D：医院数据资产深化（四大域15类资产清单/价值评估/缺口识别/治理策略）GET /api/v1/admin/data-asset/inventory
 // 【集团与科研】M156-A：医院集团多院管理（下属医院/核心指标对比/跨院资源调配/集团统一标准）
 import { groupMultiHospitalRoutes } from './routes/groupMultiHospital';
 // 【越用越聪明深化】M146-C：跨科室知识联邦（心内科→急诊/内分泌→营养/外科→麻醉，confidence<0.5 不推荐）
@@ -736,6 +739,7 @@ const allRoutes: RouteDef[] = [
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
   ...autoLearnRoutes, // M160-A：GET /api/v1/admin/auto-learn/report 全自学习闭环周度报告
+  ...autoLearnDeepRoutes, // M170-A：GET /api/v1/admin/auto-learn/deep 四维度深度自学习进化报告（诊断/用药/护理/管理）
   ...resourceOptimizeRoutes, // M161-D：POST /api/v1/admin/resource/optimize 资源智能调配（床位/手术室/人员，公平轮班）
   ...mobileQuickActionsRoutes,
   ...todosRoutes,
