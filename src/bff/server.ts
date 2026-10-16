@@ -172,6 +172,7 @@ import { barthelRoutes } from './routes/barthel';
 import { equipmentRoutes } from './routes/equipment';
 import { logisticsRoutes } from './routes/logistics';
 import { regionalCoopRoutes } from './routes/regionalCoop'; // M143-D：区域医疗协同（互联网医院与远程医疗）
+import { regionalCollabRoutes } from './routes/regionalCollab'; // M159-B：集团化扩展·区域医疗协同（跨院转诊/结果互认/号源共享/资源调配）
 import { erGreenRoutes } from './routes/erGreen';
 import { chronicRoutes } from './routes/chronicDisease';
 import { patientChronicRoutes } from './routes/patientChronic';
@@ -520,6 +521,7 @@ const allRoutes: RouteDef[] = [
   ...equipmentRoutes,
   ...logisticsRoutes,
   ...regionalCoopRoutes, // M143-D：区域医疗协同（互联网医院与远程医疗）
+  ...regionalCollabRoutes, // M159-B：集团化扩展·区域医疗协同（跨院转诊/结果互认/号源共享/资源调配）
   ...erGreenRoutes,
   ...chronicRoutes,
   ...patientChronicRoutes,
