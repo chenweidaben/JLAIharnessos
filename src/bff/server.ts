@@ -46,6 +46,7 @@ import { adminPerformanceRoutes } from './routes/adminPerformance';
 import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOptimizations';
 // 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
 import { perfOptimizeRoutes } from './routes/perfOptimize';
+// 【质量与体验】M180-D：性能优化 V2（索引/缓存/前端/服务器 + 基准对比 + 退化检测 + SLO）GET /api/v1/admin/performance/v2
 // 【CDSS与运营精细化】M165-D：性能深度审计（慢查询TOP10/大表/N+1/内存泄漏/前端渲染/熔断器/健康检查）GET /api/v1/admin/performance/deep-audit
 import { perfDeepRoutes } from './routes/perfDeep';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
@@ -446,6 +447,8 @@ import { talentDeepRoutes } from './routes/talentDeep';
 import { emergencyDeepRoutes } from './routes/emergencyDeep';
 // M172-B：【安全质量与运营】医院质量与安全管理深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势/风险/改进）
 import { qualityDeepRoutes } from './routes/qualityDeep';
+// M180-A：【质量与体验】医院质量与安全管理深化 GET /api/v1/quality/deep（国考20项/电子病历五级/互联互通四甲/十大安全目标/PDCA·QCC·DMAIC·Lean/三甲评审证据链）
+import { qualitySafetyRoutes } from './routes/qualitySafety';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
 // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi（4维20项 · 红黄绿三色）
@@ -894,6 +897,7 @@ const allRoutes: RouteDef[] = [
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
+  ...qualitySafetyRoutes, // M180-A：【质量与体验】质量与安全深化 GET /api/v1/quality/deep（国考/电子病历五级/互联互通四甲/十大安全目标/PDCA·QCC·DMAIC·Lean/三甲证据链）
   ...selfLearningRoutes, // M146-D：推荐策略自学习 POST /optimize + GET /log
   ...hospitalKpiRoutes, // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi
   ...patientEducationRoutes, // M147-B：患者健康教育 GET /api/v1/patient/education + POST /push
