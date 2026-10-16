@@ -402,6 +402,8 @@ const RiskManagement = lazy(() => import('@/pages/admin/risk-management'));
 const UserExperience = lazy(() => import('@/pages/admin/user-experience'));
 // M199-B：无障碍
 const Accessibility = lazy(() => import('@/pages/admin/accessibility'));
+// M199-C：适老化
+const ElderlyFriendly = lazy(() => import('@/pages/admin/elderly-friendly'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -744,6 +746,8 @@ export default function AppRoutes() {
           <Route path="admin/user-experience" element={<UserExperience />} />
           {/* M199-B：无障碍 */}
           <Route path="admin/accessibility" element={<Accessibility />} />
+          {/* M199-C：适老化 */}
+          <Route path="admin/elderly-friendly" element={<ElderlyFriendly />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
