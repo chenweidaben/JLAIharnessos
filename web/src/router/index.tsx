@@ -906,6 +906,14 @@ const MedicalAllianceV5 = lazy(() => import('@/pages/medical-alliance-v5/report'
 const FamilyDoctorV5 = lazy(() => import('@/pages/family-doctor-v5/report'));
 // M262-D：商业健康保险与惠民保 V5
 const CommercialInsuranceV5 = lazy(() => import('@/pages/commercial-insurance-v5/report'));
+// M263-A：胸痛中心智能化 V5
+const ChestPainCenterV5 = lazy(() => import('@/pages/chest-pain-center-v5/report'));
+// M263-B：卒中中心智能化 V5
+const StrokeCenterV5 = lazy(() => import('@/pages/stroke-center-v5/report'));
+// M263-C：创伤中心智能化 V5
+const TraumaCenterV5 = lazy(() => import('@/pages/trauma-center-v5/report'));
+// M263-D：危重症中心智能化 V5
+const CriticalCareCenterV5 = lazy(() => import('@/pages/critical-care-center-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1752,6 +1760,14 @@ export default function AppRoutes() {
           <Route path="family-doctor-v5/report" element={<FamilyDoctorV5 />} />
           {/* M262-D：商业健康保险与惠民保 V5 */}
           <Route path="commercial-insurance-v5/report" element={<CommercialInsuranceV5 />} />
+          {/* M263-A：胸痛中心智能化 V5 */}
+          <Route path="chest-pain-center-v5/report" element={<ChestPainCenterV5 />} />
+          {/* M263-B：卒中中心智能化 V5 */}
+          <Route path="stroke-center-v5/report" element={<StrokeCenterV5 />} />
+          {/* M263-C：创伤中心智能化 V5 */}
+          <Route path="trauma-center-v5/report" element={<TraumaCenterV5 />} />
+          {/* M263-D：危重症中心智能化 V5 */}
+          <Route path="critical-care-center-v5/report" element={<CriticalCareCenterV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
