@@ -843,6 +843,8 @@ import { emrRatingV3ReportRoutes } from './routes/emrRatingV3Report';
 import { v4MilestoneReportRoutes } from './routes/v4MilestoneReport';
 // M232-A：AI 大脑 V3 GET /api/v1/ai-brain-v3/report
 import { aiBrainV3ReportRoutes } from './routes/aiBrainV3Report';
+// M232-B：Personal Agent V3 GET /api/v1/personal-agent-v3/report
+import { personalAgentV3ReportRoutes } from './routes/personalAgentV3Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1506,6 +1508,7 @@ const allRoutes: RouteDef[] = [
   ...emrRatingV3ReportRoutes, // M231-C：EMR 评级 V3 GET /api/v1/emr-rating-v3/report
   ...v4MilestoneReportRoutes, // M231-D：v4.0.0 里程碑 GET /api/v1/v4-milestone/report
   ...aiBrainV3ReportRoutes, // M232-A：AI 大脑 V3 GET /api/v1/ai-brain-v3/report
+  ...personalAgentV3ReportRoutes, // M232-B：Personal Agent V3 GET /api/v1/personal-agent-v3/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

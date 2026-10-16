@@ -660,6 +660,8 @@ const EMRRatingV3 = lazy(() => import('@/pages/emr-rating-v3/report'));
 const V4Milestone = lazy(() => import('@/pages/v4-milestone/report'));
 // M232-A：AI 大脑 V3
 const AIBrainV3 = lazy(() => import('@/pages/ai-brain-v3/report'));
+// M232-B：Personal Agent V3
+const PersonalAgentV3 = lazy(() => import('@/pages/personal-agent-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1260,6 +1262,8 @@ export default function AppRoutes() {
           <Route path="v4-milestone/report" element={<V4Milestone />} />
           {/* M232-A：AI 大脑 V3 */}
           <Route path="ai-brain-v3/report" element={<AIBrainV3 />} />
+          {/* M232-B：Personal Agent V3 */}
+          <Route path="personal-agent-v3/report" element={<PersonalAgentV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
