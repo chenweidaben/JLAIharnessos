@@ -914,6 +914,14 @@ const StrokeCenterV5 = lazy(() => import('@/pages/stroke-center-v5/report'));
 const TraumaCenterV5 = lazy(() => import('@/pages/trauma-center-v5/report'));
 // M263-D：危重症中心智能化 V5
 const CriticalCareCenterV5 = lazy(() => import('@/pages/critical-care-center-v5/report'));
+// M264-A：肿瘤全程管理 V5
+const OncologyV5 = lazy(() => import('@/pages/oncology-v5/report'));
+// M264-B：心血管疾病管理 V5
+const CardiologyV5 = lazy(() => import('@/pages/cardiology-v5/report'));
+// M264-C：呼吸系统疾病管理 V5
+const PulmonologyV5 = lazy(() => import('@/pages/pulmonology-v5/report'));
+// M264-D：内分泌代谢疾病管理 V5
+const EndocrinologyV5 = lazy(() => import('@/pages/endocrinology-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1768,6 +1776,14 @@ export default function AppRoutes() {
           <Route path="trauma-center-v5/report" element={<TraumaCenterV5 />} />
           {/* M263-D：危重症中心智能化 V5 */}
           <Route path="critical-care-center-v5/report" element={<CriticalCareCenterV5 />} />
+          {/* M264-A：肿瘤全程管理 V5 */}
+          <Route path="oncology-v5/report" element={<OncologyV5 />} />
+          {/* M264-B：心血管疾病管理 V5 */}
+          <Route path="cardiology-v5/report" element={<CardiologyV5 />} />
+          {/* M264-C：呼吸系统疾病管理 V5 */}
+          <Route path="pulmonology-v5/report" element={<PulmonologyV5 />} />
+          {/* M264-D：内分泌代谢疾病管理 V5 */}
+          <Route path="endocrinology-v5/report" element={<EndocrinologyV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

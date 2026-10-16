@@ -1097,6 +1097,14 @@ import { strokeCenterV5ReportRoutes } from './routes/strokeCenterV5Report';
 import { traumaCenterV5ReportRoutes } from './routes/traumaCenterV5Report';
 // M263-D：危重症中心智能化 V5 GET /api/v1/critical-care-center-v5/report
 import { criticalCareCenterV5ReportRoutes } from './routes/criticalCareCenterV5Report';
+// M264-A：肿瘤全程管理 V5 GET /api/v1/oncology-v5/report
+import { oncologyV5ReportRoutes } from './routes/oncologyV5Report';
+// M264-B：心血管疾病管理 V5 GET /api/v1/cardiology-v5/report
+import { cardiologyV5ReportRoutes } from './routes/cardiologyV5Report';
+// M264-C：呼吸系统疾病管理 V5 GET /api/v1/pulmonology-v5/report
+import { pulmonologyV5ReportRoutes } from './routes/pulmonologyV5Report';
+// M264-D：内分泌代谢疾病管理 V5 GET /api/v1/endocrinology-v5/report
+import { endocrinologyV5ReportRoutes } from './routes/endocrinologyV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1887,6 +1895,10 @@ const allRoutes: RouteDef[] = [
   ...strokeCenterV5ReportRoutes, // M263-B：卒中中心智能化 V5 GET /api/v1/stroke-center-v5/report
   ...traumaCenterV5ReportRoutes, // M263-C：创伤中心智能化 V5 GET /api/v1/trauma-center-v5/report
   ...criticalCareCenterV5ReportRoutes, // M263-D：危重症中心智能化 V5 GET /api/v1/critical-care-center-v5/report
+  ...oncologyV5ReportRoutes, // M264-A：肿瘤全程管理 V5 GET /api/v1/oncology-v5/report
+  ...cardiologyV5ReportRoutes, // M264-B：心血管疾病管理 V5 GET /api/v1/cardiology-v5/report
+  ...pulmonologyV5ReportRoutes, // M264-C：呼吸系统疾病管理 V5 GET /api/v1/pulmonology-v5/report
+  ...endocrinologyV5ReportRoutes, // M264-D：内分泌代谢疾病管理 V5 GET /api/v1/endocrinology-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
