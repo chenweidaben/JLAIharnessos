@@ -411,8 +411,8 @@ export default function MedMuseChatPage() {
           sid,
           text,
           {
-            onDelta: (piece) => patchStream((m) => ({ ...m, content: m.content + piece })),
-            onMeta: (meta) =>
+            onDelta: (piece: string) => patchStream((m) => ({ ...m, content: m.content + piece })),
+            onMeta: (meta: { confidence?: 'high' | 'medium' | 'low' | null; disclaimer?: string | null }) =>
               patchStream((m) => ({
                 ...m,
                 confidence: meta.confidence ?? m.confidence,

@@ -17,7 +17,7 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["src/*", "web/src/*"],
       "@core/*": ["src/core/*"],
       "@medical/*": ["src/medical-tools/*"],
       "@ui/*": ["src/ui/*"],
