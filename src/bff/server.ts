@@ -56,6 +56,7 @@ import { firstLoadRoutes } from './routes/firstLoad';
 import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
 import { accessibilityVerifyRoutes } from './routes/accessibilityVerify';
+// 【绩效与人才 · 系统安全深化】M166-D：渗透测试与漏洞扫描（SQL注入/XSS/CSRF/信息泄露/认证绕过）GET /api/v1/admin/security/scan
 // 【性能优化 · 慢查询治理】M136-B：P95>300ms 慢路由识别 + SQL 静态优化建议 + 缓存命中观测
 import { queryOptimizationRoutes } from './routes/queryOptimization';
 // 【生产化收尾】M145-A：核心表慢查询目录 + 索引建议 GET /api/v1/admin/performance/slow-queries
@@ -368,6 +369,7 @@ import { adminLogsRoutes } from './routes/adminLogs';
 import { adminWebhooksRoutes } from './routes/adminWebhooks';
 import { apiGatewayRoutes } from './routes/apiGateway'; // M164-D
 import { budgetDeepRoutes } from './routes/budgetDeep'; // M165-B：【CDSS与运营精细化】医院预算与成本管理深化 GET /api/v1/admin/budget?dept=&year=（驱动因子测算/执行跟踪/超支预测）
+import { performanceDeepRoutes } from './routes/performanceDeep'; // M166-A：【绩效与人才】医院科室绩效考核深化 GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制，不只看工作量）
 import { strategyEvolutionRoutes } from './routes/strategyEvolution';
 import { museSystemIntelligenceRoutes } from './routes/museSystemIntelligence';
 import { operationalInsightRoutes } from './routes/operationalInsight';
@@ -399,6 +401,7 @@ import { smartFollowupRoutes } from './routes/smartFollowup';
 // M153-A：临床路径智能推荐（临床决策支持 CDS）GET /api/v1/clinical-pathway/recommend + /cost/:pathwayId + /deviation
 import { clinicalPathwayRoutes } from './routes/clinicalPathway';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
+// M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
 // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi（4维20项 · 红黄绿三色）
@@ -847,6 +850,7 @@ const allRoutes: RouteDef[] = [
   ...researchDeepRoutes, // M162-C：【科研管理深化】科研全生命周期 GET /api/v1/research/projects?dept= + PUT /api/v1/research/projects/:id/milestone
   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
+  ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
 ];
 
 interface Compiled {
