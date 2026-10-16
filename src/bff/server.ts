@@ -79,6 +79,7 @@ import { codeQualityDeepRoutes } from './routes/codeQualityDeep';
 // 【200版本里程碑】M157-C：六项质量门禁复查 GET /api/v1/admin/quality-gate
 import { qualityGateRoutes } from './routes/qualityGate';
 // 【300版本里程碑】M181-C：八项质量门禁复查 V2 GET /api/v1/admin/quality-gate/v2
+import { qualityGateV2Routes } from './routes/qualityGateV2';
 import { adminDeptPerformanceRoutes } from './routes/adminDeptPerformance';
 import { operationAnalysisRoutes } from './routes/operationAnalysis'; // M163-B：【安全与运营】GET /api/v1/admin/operation/analysis（收入/成本/效率/资源四维，数据支撑不拍脑袋）
 // 【医院管理深化】M140-A：个人绩效考核五维评分 + 排名（公平透明，每分有据）
@@ -775,6 +776,7 @@ const allRoutes: RouteDef[] = [
   ...securityFixRoutes, // M167-A：GET /api/v1/admin/security/verify（SQL注入参数化 + XSS转义修复复验）
   ...logSecurityRoutes, // M167-C：GET /api/v1/admin/security/log-verify（日志 PII 真检 + 脱敏证据 + 修复对照）
   ...qualityGateRoutes, // M157-C：GET /api/v1/admin/quality-gate（200版本六项质量门禁复查）
+  ...qualityGateV2Routes, // M181-C：GET /api/v1/admin/quality-gate/v2（300版本八项质量门禁复查 V2）
   ...queryOptimizationRoutes,
   ...dbPerformanceRoutes, // M145-A：GET /api/v1/admin/performance/slow-queries（核心表慢查询 + 索引建议）
   ...codeQualityRoutes, // M150-B：GET /api/v1/admin/code/quality（五维治理报告）；M167-D：GET /api/v1/admin/quality/code（覆盖率冲刺 + any/ts-ignore/console.log 清零）
