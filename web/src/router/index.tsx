@@ -380,6 +380,8 @@ const BigDataPlatform = lazy(() => import('@/pages/admin/big-data'));
 const AIPlatform = lazy(() => import('@/pages/admin/ai-platform'));
 // M196-C：物联网平台
 const IoTPlatform = lazy(() => import('@/pages/admin/iot-platform'));
+// M196-D：区块链
+const Blockchain = lazy(() => import('@/pages/admin/blockchain'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -700,6 +702,8 @@ export default function AppRoutes() {
           <Route path="admin/ai-platform" element={<AIPlatform />} />
           {/* M196-C：物联网平台 */}
           <Route path="admin/iot-platform" element={<IoTPlatform />} />
+          {/* M196-D：区块链 */}
+          <Route path="admin/blockchain" element={<Blockchain />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
