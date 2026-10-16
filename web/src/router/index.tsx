@@ -540,6 +540,8 @@ const CloudNativeV2 = lazy(() => import('@/pages/cloud-native/report-v2'));
 const MicroserviceV2 = lazy(() => import('@/pages/microservice/report-v2'));
 // M216-C：DevOps V2
 const DevOpsV2 = lazy(() => import('@/pages/devops/report-v2'));
+// M216-D：SRE
+const SREReport = lazy(() => import('@/pages/sre/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1020,6 +1022,8 @@ export default function AppRoutes() {
           <Route path="microservice/report-v2" element={<MicroserviceV2 />} />
           {/* M216-C：DevOps V2 */}
           <Route path="devops/report-v2" element={<DevOpsV2 />} />
+          {/* M216-D：SRE */}
+          <Route path="sre/report" element={<SREReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
