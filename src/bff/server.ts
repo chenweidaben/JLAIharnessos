@@ -961,6 +961,14 @@ import { supplyChainV3ReportRoutes } from './routes/supplyChainV3Report';
 import { healthMediaV3ReportRoutes } from './routes/healthMediaV3Report';
 // M246-D：国际医疗 V3 GET /api/v1/international-health-v3/report
 import { internationalHealthV3ReportRoutes } from './routes/internationalHealthV3Report';
+// M247-A：AI 药物 V2 GET /api/v1/ai-drug-v2/report
+import { aiDrugV2ReportRoutes } from './routes/aiDrugV2Report';
+// M247-B：脑机接口 V2 GET /api/v1/bci-neuro-rehab-v2/report
+import { bciNeuroRehabV2ReportRoutes } from './routes/bciNeuroRehabV2Report';
+// M247-C：基因精准 V2 GET /api/v1/genomic-precision-v2/report
+import { genomicPrecisionV2ReportRoutes } from './routes/genomicPrecisionV2Report';
+// M247-D：元宇宙医院 V2 GET /api/v1/metaverse-hospital-v2/report
+import { metaverseHospitalV2ReportRoutes } from './routes/metaverseHospitalV2Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1683,6 +1691,10 @@ const allRoutes: RouteDef[] = [
   ...supplyChainV3ReportRoutes, // M246-B：供应链 V3 GET /api/v1/supply-chain-v3/report
   ...healthMediaV3ReportRoutes, // M246-C：健康科普 V3 GET /api/v1/health-media-v3/report
   ...internationalHealthV3ReportRoutes, // M246-D：国际医疗 V3 GET /api/v1/international-health-v3/report
+  ...aiDrugV2ReportRoutes, // M247-A：AI 药物 V2 GET /api/v1/ai-drug-v2/report
+  ...bciNeuroRehabV2ReportRoutes, // M247-B：脑机接口 V2 GET /api/v1/bci-neuro-rehab-v2/report
+  ...genomicPrecisionV2ReportRoutes, // M247-C：基因精准 V2 GET /api/v1/genomic-precision-v2/report
+  ...metaverseHospitalV2ReportRoutes, // M247-D：元宇宙医院 V2 GET /api/v1/metaverse-hospital-v2/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

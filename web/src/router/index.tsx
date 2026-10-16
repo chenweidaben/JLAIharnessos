@@ -778,6 +778,14 @@ const SupplyChainV3 = lazy(() => import('@/pages/supply-chain-v3/report'));
 const HealthMediaV3 = lazy(() => import('@/pages/health-media-v3/report'));
 // M246-D：国际医疗 V3
 const InternationalHealthV3 = lazy(() => import('@/pages/international-health-v3/report'));
+// M247-A：AI 药物 V2
+const AIDrugV2 = lazy(() => import('@/pages/ai-drug-v2/report'));
+// M247-B：脑机接口 V2
+const BCINeuroRehabV2 = lazy(() => import('@/pages/bci-neuro-rehab-v2/report'));
+// M247-C：基因精准 V2
+const GenomicPrecisionV2 = lazy(() => import('@/pages/genomic-precision-v2/report'));
+// M247-D：元宇宙医院 V2
+const MetaverseHospitalV2 = lazy(() => import('@/pages/metaverse-hospital-v2/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1496,6 +1504,14 @@ export default function AppRoutes() {
           <Route path="health-media-v3/report" element={<HealthMediaV3 />} />
           {/* M246-D：国际医疗 V3 */}
           <Route path="international-health-v3/report" element={<InternationalHealthV3 />} />
+          {/* M247-A：AI 药物 V2 */}
+          <Route path="ai-drug-v2/report" element={<AIDrugV2 />} />
+          {/* M247-B：脑机接口 V2 */}
+          <Route path="bci-neuro-rehab-v2/report" element={<BCINeuroRehabV2 />} />
+          {/* M247-C：基因精准 V2 */}
+          <Route path="genomic-precision-v2/report" element={<GenomicPrecisionV2 />} />
+          {/* M247-D：元宇宙医院 V2 */}
+          <Route path="metaverse-hospital-v2/report" element={<MetaverseHospitalV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
