@@ -706,6 +706,8 @@ const BCINeuroRehab = lazy(() => import('@/pages/bci-neuro-rehab/report'));
 const GenomicPrecision = lazy(() => import('@/pages/genomic-precision/report'));
 // M237-D：元宇宙医院
 const MetaverseHospital = lazy(() => import('@/pages/metaverse-hospital/report'));
+// M238-A：CDSS V3
+const CDSSV3 = lazy(() => import('@/pages/cdss-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1352,6 +1354,8 @@ export default function AppRoutes() {
           <Route path="genomic-precision/report" element={<GenomicPrecision />} />
           {/* M237-D：元宇宙医院 */}
           <Route path="metaverse-hospital/report" element={<MetaverseHospital />} />
+          {/* M238-A：CDSS V3 */}
+          <Route path="cdss-v3/report" element={<CDSSV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
