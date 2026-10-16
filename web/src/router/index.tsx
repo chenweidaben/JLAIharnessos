@@ -420,6 +420,8 @@ const LLMIntegration = lazy(() => import('@/pages/admin/llm'));
 const MultiAgent = lazy(() => import('@/pages/admin/multi-agent'));
 // M201-C：专科
 const Specialty = lazy(() => import('@/pages/specialty'));
+// M201-D：生产运维
+const ProductionOps = lazy(() => import('@/pages/admin/production-ops'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -780,6 +782,8 @@ export default function AppRoutes() {
           <Route path="admin/multi-agent" element={<MultiAgent />} />
           {/* M201-C：专科 */}
           <Route path="specialty" element={<Specialty />} />
+          {/* M201-D：生产运维 */}
+          <Route path="admin/production-ops" element={<ProductionOps />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
