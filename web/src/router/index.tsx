@@ -298,6 +298,8 @@ const AdminMUSEV2 = lazy(() => import('@/pages/personal-agent/admin-muse'));
 const PatientMUSEV2 = lazy(() => import('@/pages/personal-agent/patient-muse'));
 // M186-C：区域协同分级诊疗 V2
 const RegionalCollaborationV2 = lazy(() => import('@/pages/regional/collaboration-v2'));
+// M186-D：全自学习闭环深化
+const SelfLearningLoop = lazy(() => import('@/pages/learning/self-loop'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -536,6 +538,8 @@ export default function AppRoutes() {
           <Route path="personal-agent/patient-muse" element={<PatientMUSEV2 />} />
           {/* M186-C：区域协同 */}
           <Route path="regional/collaboration" element={<RegionalCollaborationV2 />} />
+          {/* M186-D：自学习闭环 */}
+          <Route path="learning/self-loop" element={<SelfLearningLoop />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
