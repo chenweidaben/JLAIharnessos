@@ -109,6 +109,7 @@ import { wisdomDashboardRoutes } from './routes/wisdomDashboard';
 // 【智慧资产量化】M161-B：全院智慧资产看板（经验/知识/模型/数据四维 + 饱和折算 + 缺口识别 + 段位对标）
 import { smartAssetRoutes } from './routes/smartAsset';
 // 【自学习与数字孪生】M170-D：医院数据资产深化（四大域15类资产清单/价值评估/缺口识别/治理策略）GET /api/v1/admin/data-asset/inventory
+import { dataAssetRoutes } from './routes/dataAsset';
 // 【集团与科研】M156-A：医院集团多院管理（下属医院/核心指标对比/跨院资源调配/集团统一标准）
 import { groupMultiHospitalRoutes } from './routes/groupMultiHospital';
 // 【越用越聪明深化】M146-C：跨科室知识联邦（心内科→急诊/内分泌→营养/外科→麻醉，confidence<0.5 不推荐）
@@ -805,6 +806,7 @@ const allRoutes: RouteDef[] = [
   ...deployConfigRoutes, // M145-D：部署配置生成（生产化收尾）
   ...wisdomDashboardRoutes, // M146-A：GET /api/v1/admin/wisdom/dashboard（越用越聪明深化）
   ...smartAssetRoutes, // M161-B：GET /api/v1/admin/smart-assets/dashboard（智慧资产量化）
+  ...dataAssetRoutes, // M170-D：GET /api/v1/admin/data-asset/inventory（数据资产可治理清单）
   ...groupMultiHospitalRoutes, // M156-A：GET /api/v1/admin/group/dashboard（集团与科研·多院管理）
   ...adminLogsRoutes,
   ...adminWebhooksRoutes,
