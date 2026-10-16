@@ -481,6 +481,7 @@ import { musePharmaRoutes } from './routes/musePharma';
 import { museAdminRoutes } from './routes/museAdmin';
 import { adminMuseRoutes } from './routes/adminMuse'; // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
 import { museMonthlyReportRoutes } from './routes/museMonthlyReport';
+import { statReportRoutes } from './routes/statReport'; // M177-B：医院统计上报（国家口径，不凑数）POST /api/v1/admin/stat/submit
 import { musePatternsRoutes } from './routes/musePatterns';
 import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
@@ -911,6 +912,7 @@ const allRoutes: RouteDef[] = [
   ...musePharmaRoutes,
   ...museAdminRoutes,
   ...museMonthlyReportRoutes,
+  ...statReportRoutes,
   ...musePatternsRoutes,
   ...museGrowthRoutes,
   ...patientMuseRoutes,
