@@ -35,7 +35,7 @@ export type MedicalGraphNodeType =
   | 'surgery'
   | 'department';
 
-/** 边类型（有向医学关系；M147-A 新增 disease_visit_department 疾病→科室） */
+/** 边类型（有向医学关系；M147-A 新增疾病→科室；M169-A 新增疾病→并发症） */
 export type MedicalGraphRelation =
   | 'disease_has_symptom'        // 疾病 → 症状
   | 'disease_treated_by_drug'    // 疾病 → 药物
@@ -43,17 +43,25 @@ export type MedicalGraphRelation =
   | 'drug_interacts_with_drug'  // 药物 → 药物（DDI）
   | 'disease_needs_exam'         // 疾病 → 检查
   | 'disease_has_surgery'        // 疾病 → 手术
-  | 'disease_visit_department';  // 疾病 → 科室（首诊 / 转诊）
+  | 'disease_visit_department'  // 疾病 → 科室（首诊 / 转诊）
+  | 'disease_has_complication';  // 疾病 → 并发症（M169-A：近期 / 远期）
 
 /**
- * 关系细分 qualifier（M147-A）：
+ * 关系细分 qualifier（M147-A / M169-A）：
  *   disease_has_symptom     → 常见 / 鉴别
- *   disease_treated_by_drug → 一线 / 二线
- *   disease_needs_exam       → 必做 / 选做
+ *   disease_treated_by_drug → 一线 / 二线 / 禁忌（M169-A 新增「禁忌」）
+ *   disease_needs_exam       → 必做 / 选做 / 鉴别（M169-A 新增「鉴别」=鉴别诊断用检查）
  *   disease_visit_department → 首诊 / 转诊
+ *   disease_has_complication → 近期 / 远期（M169-A 新增）
  * 其余关系（症状反推 / DDI / 手术）留空串。
  */
-export type EdgeQualifier = '' | '常见' | '鉴别' | '一线' | '二线' | '必做' | '选做' | '首诊' | '转诊';
+export type EdgeQualifier =
+  | ''
+  | '常见' | '鉴别'
+  | '一线' | '二线' | '禁忌'
+  | '必做' | '选做'
+  | '首诊' | '转诊'
+  | '近期' | '远期';
 
 /** 图节点（与 clinical.medical_graph_node 同构） */
 export interface GraphNode {
@@ -84,10 +92,15 @@ export interface GraphEdge {
   /** 关系强度 0~1（DDI 边为风险等级） */
   weight: number;
   /**
-   * 关系细分（M147-A）：常见/鉴别、一线/二线、必做/选做、首诊/转诊；
-   * 旧种子边未标注时为空串，读取侧用 edgeQualifier() 兜底。
+   * 关系细分（M147-A / M169-A）：常见/鉴别、一线/二线/禁忌、必做/选做/鉴别、
+   * 首诊/转诊、近期/远期；旧种子边未标注时为空串，读取侧用 edgeQualifier() 兜底。
    */
   qualifier?: EdgeQualifier;
+  /**
+   * 症状阳性率（M169-A，0~1）：仅 disease_has_symptom 边有值，
+   * 表示该病患者中出现该症状的比例；Personal Agent 据此做验后概率粗估。
+   */
+  positiveRate?: number;
 }
 
 /** 两节点之间的一条有向推理路径 */
@@ -131,6 +144,7 @@ export const RELATION_LABELS: Record<MedicalGraphRelation, string> = {
   disease_needs_exam: '所需检查',
   disease_has_surgery: '可选手术',
   disease_visit_department: '就诊科室',
+  disease_has_complication: '并发症',
 };
 
 /** 节点类型 → 中文标注（前端图例） */
@@ -152,6 +166,7 @@ export const ALL_RELATIONS: MedicalGraphRelation[] = [
   'disease_needs_exam',
   'disease_has_surgery',
   'disease_visit_department',
+  'disease_has_complication',
 ];
 
 /** 合法节点类型枚举 */
@@ -248,23 +263,23 @@ export const GRAPH_NODES: GraphNode[] = [
 /* 必做/选做、首诊/转诊；症状反推与 DDI 边 qualifier 留空。 */
 export const GRAPH_EDGES: GraphEdge[] = [
   // 高血压
-  { source: 'D-HTN', target: 'S-DIZZ', relation: 'disease_has_symptom', label: '常见表现', weight: 0.8, qualifier: '常见' },
-  { source: 'D-HTN', target: 'S-HEAD', relation: 'disease_has_symptom', label: '常见表现', weight: 0.7, qualifier: '常见' },
+  { source: 'D-HTN', target: 'S-DIZZ', relation: 'disease_has_symptom', label: '常见表现', weight: 0.8, qualifier: '常见', positiveRate: 0.5 },
+  { source: 'D-HTN', target: 'S-HEAD', relation: 'disease_has_symptom', label: '常见表现', weight: 0.7, qualifier: '常见', positiveRate: 0.2 },
   { source: 'D-HTN', target: 'M-AMLO', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.9, qualifier: '一线' },
   { source: 'D-HTN', target: 'M-VALS', relation: 'disease_treated_by_drug', label: '一线降压', weight: 0.85, qualifier: '一线' },
   { source: 'D-HTN', target: 'E-BP', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.95, qualifier: '必做' },
 
   // 2型糖尿病
-  { source: 'D-DM2', target: 'S-POLY', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见' },
-  { source: 'D-DM2', target: 'S-WLOSS', relation: 'disease_has_symptom', label: '常见表现', weight: 0.6, qualifier: '常见' },
+  { source: 'D-DM2', target: 'S-POLY', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见', positiveRate: 0.7 },
+  { source: 'D-DM2', target: 'S-WLOSS', relation: 'disease_has_symptom', label: '常见表现', weight: 0.6, qualifier: '常见', positiveRate: 0.4 },
   { source: 'D-DM2', target: 'M-METF', relation: 'disease_treated_by_drug', label: '一线用药', weight: 0.95, qualifier: '一线' },
   { source: 'D-DM2', target: 'M-INS', relation: 'disease_treated_by_drug', label: '餐时强化', weight: 0.6, qualifier: '二线' },
   { source: 'D-DM2', target: 'E-FPG', relation: 'disease_needs_exam', label: '诊断必查', weight: 0.9, qualifier: '必做' },
   { source: 'D-DM2', target: 'E-HBA1C', relation: 'disease_needs_exam', label: '金标准', weight: 0.95, qualifier: '必做' },
 
   // 冠心病
-  { source: 'D-CHD', target: 'S-CHESTP', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见' },
-  { source: 'D-CHD', target: 'S-CHESTT', relation: 'disease_has_symptom', label: '伴随症状', weight: 0.8, qualifier: '常见' },
+  { source: 'D-CHD', target: 'S-CHESTP', relation: 'disease_has_symptom', label: '典型表现', weight: 0.9, qualifier: '常见', positiveRate: 0.75 },
+  { source: 'D-CHD', target: 'S-CHESTT', relation: 'disease_has_symptom', label: '伴随症状', weight: 0.8, qualifier: '常见', positiveRate: 0.5 },
   { source: 'D-CHD', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '抗血小板基石', weight: 0.95, qualifier: '一线' },
   { source: 'D-CHD', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '调脂稳斑', weight: 0.9, qualifier: '一线' },
   { source: 'D-CHD', target: 'M-NTG', relation: 'disease_treated_by_drug', label: '急救缓解', weight: 0.7, qualifier: '二线' },
@@ -273,24 +288,24 @@ export const GRAPH_EDGES: GraphEdge[] = [
   { source: 'D-CHD', target: 'O-PCI', relation: 'disease_has_surgery', label: '血运重建', weight: 0.65 },
 
   // 社区获得性肺炎
-  { source: 'D-CAP', target: 'S-FEVER', relation: 'disease_has_symptom', label: '全身表现', weight: 0.95, qualifier: '常见' },
-  { source: 'D-CAP', target: 'S-COUGH', relation: 'disease_has_symptom', label: '呼吸道核心症状', weight: 0.9, qualifier: '常见' },
+  { source: 'D-CAP', target: 'S-FEVER', relation: 'disease_has_symptom', label: '全身表现', weight: 0.95, qualifier: '常见', positiveRate: 0.8 },
+  { source: 'D-CAP', target: 'S-COUGH', relation: 'disease_has_symptom', label: '呼吸道核心症状', weight: 0.9, qualifier: '常见', positiveRate: 0.9 },
   { source: 'D-CAP', target: 'M-AMOX', relation: 'disease_treated_by_drug', label: '经验口服', weight: 0.7, qualifier: '一线' },
   { source: 'D-CAP', target: 'M-CFU', relation: 'disease_treated_by_drug', label: '经验治疗', weight: 0.75, qualifier: '一线' },
   { source: 'D-CAP', target: 'E-CT', relation: 'disease_needs_exam', label: '影像评估', weight: 0.85, qualifier: '选做' },
   { source: 'D-CAP', target: 'E-CBC', relation: 'disease_needs_exam', label: '感染指标', weight: 0.8, qualifier: '必做' },
 
   // 胃溃疡
-  { source: 'D-PU', target: 'S-EPIG', relation: 'disease_has_symptom', label: '典型节律痛', weight: 0.9, qualifier: '常见' },
-  { source: 'D-PU', target: 'S-MELA', relation: 'disease_has_symptom', label: '出血警报', weight: 0.6, qualifier: '鉴别' },
+  { source: 'D-PU', target: 'S-EPIG', relation: 'disease_has_symptom', label: '典型节律痛', weight: 0.9, qualifier: '常见', positiveRate: 0.7 },
+  { source: 'D-PU', target: 'S-MELA', relation: 'disease_has_symptom', label: '出血警报', weight: 0.6, qualifier: '鉴别', positiveRate: 0.1 },
   { source: 'D-PU', target: 'M-OME', relation: 'disease_treated_by_drug', label: '抑酸核心', weight: 0.95, qualifier: '一线' },
   { source: 'D-PU', target: 'M-GAV', relation: 'disease_treated_by_drug', label: '黏膜保护', weight: 0.6, qualifier: '二线' },
   { source: 'D-PU', target: 'E-EGD', relation: 'disease_needs_exam', label: '确诊金标准', weight: 0.95, qualifier: '必做' },
   { source: 'D-PU', target: 'O-HEMO', relation: 'disease_has_surgery', label: '出血时首选', weight: 0.4 },
 
   // 脑梗死
-  { source: 'D-IS', target: 'S-HEMI', relation: 'disease_has_symptom', label: '典型体征', weight: 0.85, qualifier: '常见' },
-  { source: 'D-IS', target: 'S-DYS', relation: 'disease_has_symptom', label: '典型体征', weight: 0.7, qualifier: '常见' },
+  { source: 'D-IS', target: 'S-HEMI', relation: 'disease_has_symptom', label: '典型体征', weight: 0.85, qualifier: '常见', positiveRate: 0.7 },
+  { source: 'D-IS', target: 'S-DYS', relation: 'disease_has_symptom', label: '典型体征', weight: 0.7, qualifier: '常见', positiveRate: 0.35 },
   { source: 'D-IS', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '二级预防', weight: 0.85, qualifier: '一线' },
   { source: 'D-IS', target: 'M-CLOP', relation: 'disease_treated_by_drug', label: 'DAPT 联合', weight: 0.8, qualifier: '一线' },
   { source: 'D-IS', target: 'M-ATO', relation: 'disease_treated_by_drug', label: '他汀稳定斑块', weight: 0.85, qualifier: '一线' },
@@ -328,6 +343,20 @@ export const GRAPH_EDGES: GraphEdge[] = [
   { source: 'M-CLAR', target: 'M-ATO', relation: 'drug_interacts_with_drug', label: '横纹肌溶解风险', weight: 0.85 },
   { source: 'M-OME', target: 'M-CLOP', relation: 'drug_interacts_with_drug', label: '降低抗血小板效应', weight: 0.7 },
   { source: 'M-CLOP', target: 'M-OME', relation: 'drug_interacts_with_drug', label: '降低抗血小板效应', weight: 0.7 },
+
+  // ===== M169-A 知识图谱与 Personal Agent 深化种子边 =====
+  // 疾病 → 并发症（指向疾病节点；qualifier=近期/远期）
+  { source: 'D-HTN', target: 'D-CHD', relation: 'disease_has_complication', label: '远期靶器官损害', weight: 0.85, qualifier: '远期' },
+  { source: 'D-HTN', target: 'D-IS',  relation: 'disease_has_complication', label: '远期脑血管并发症', weight: 0.8,  qualifier: '远期' },
+  { source: 'D-DM2', target: 'D-CHD', relation: 'disease_has_complication', label: '远期大血管并发症', weight: 0.85, qualifier: '远期' },
+  { source: 'D-DM2', target: 'D-IS',  relation: 'disease_has_complication', label: '远期大血管并发症', weight: 0.75, qualifier: '远期' },
+  { source: 'D-CHD', target: 'D-PU',  relation: 'disease_has_complication', label: '近期出血风险（抗血小板治疗中）', weight: 0.55, qualifier: '近期' },
+
+  // 疾病 → 禁忌药物（qualifier=禁忌；Personal Agent 主动告警）
+  { source: 'D-PU', target: 'M-ASA', relation: 'disease_treated_by_drug', label: '活动性溃疡禁用 NSAIDs', weight: 0.9, qualifier: '禁忌' },
+
+  // 疾病 → 鉴别诊断用检查（qualifier=鉴别）
+  { source: 'D-PU', target: 'E-EGD', relation: 'disease_needs_exam', label: '与胃癌/食管炎鉴别', weight: 0.7, qualifier: '鉴别' },
 ];
 
 /* ------------------------------ 内部工具 ------------------------------ */
@@ -739,4 +768,350 @@ export function findDifferentialDiagnosis(symptoms: string[]): Diagnosis[] {
   return results
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_DIAGNOSIS);
+}
+
+/* ===================== M169-A 知识图谱与 Personal Agent 深化 ===================== */
+
+/** 深度图谱最大跳数（防止图爆炸；Personal Agent 3 跳已覆盖「疾病→症状→反推疾病」链） */
+export const MAX_DEEP_DEPTH = 3;
+
+/** 深度图谱单层最大节点数（前端渲染防爆） */
+const MAX_NODES_PER_LAYER = 24;
+
+/** buildDeepMedicalGraph 返回信封 */
+export interface DeepMedicalGraph {
+  /** 根疾病节点；未命中为 null */
+  disease: GraphNode | null;
+  /** 全部节点（按层去重） */
+  nodes: GraphNode[];
+  /** 全部边 */
+  edges: GraphEdge[];
+  /** 节点分层：layer 0=根疾病，layer 1=一跳邻接，依此类推 */
+  layers: Array<{ layer: number; nodeIds: string[] }>;
+  /** 实际展开深度（入参 depth 被 clamp 后的值） */
+  depth: number;
+  /** 是否命中根疾病 */
+  matched: boolean;
+  /** 固定免责声明 */
+  disclaimer: string;
+}
+
+/**
+ * buildDeepMedicalGraph：深度知识图谱（纯函数，Personal Agent 主动展开入口）。
+ *
+ * 从根疾病出发，沿所有出边做 BFS，最多 depth 跳；同层节点去重，
+ * 返回力导向图可直接消费的 nodes/edges + 分层信息（前端按层做径向布局）。
+ *
+ * 医学准确性：
+ *  - 只沿图中已有边展开，不臆造关系；
+ *  - 同时收编反向边（如 disease_has_complication 把 D-HTN 连到 D-CHD，
+ *    从 D-CHD 出发时也能看到 D-HTN 这个上游病因，由 BFS 双向邻接实现）；
+ *  - depth clamp 到 [1, MAX_DEEP_DEPTH]，防止大图爆炸。
+ *
+ * @param disease 疾病中文名或 id（如「高血压」「D-HTN」）
+ * @param depth   展开跳数，默认 2，最大 3
+ */
+export function buildDeepMedicalGraph(
+  disease: string,
+  depth: number = 2,
+): DeepMedicalGraph {
+  const empty: DeepMedicalGraph = {
+    disease: null,
+    nodes: [],
+    edges: [],
+    layers: [],
+    depth: 0,
+    matched: false,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+
+  const root = NODE_BY_ID.get((disease ?? '').trim()) ?? resolveNode(disease ?? '');
+  if (!root || root.type !== 'disease') return empty;
+
+  const d = Math.max(1, Math.min(Math.floor(depth || 1), MAX_DEEP_DEPTH));
+
+  // 邻接表（有向边；BFS 同时沿出边与入边展开，形成 ego 全图）
+  const outgoing = new Map<string, GraphEdge[]>();
+  const incoming = new Map<string, GraphEdge[]>();
+  for (const e of GRAPH_EDGES) {
+    const o = outgoing.get(e.source) ?? [];
+    o.push(e); outgoing.set(e.source, o);
+    const inc = incoming.get(e.target) ?? [];
+    inc.push(e); incoming.set(e.target, inc);
+  }
+
+  const seen = new Set<string>([root.id]);
+  const layerNodeIds: string[][] = [[root.id]];
+  const collectedEdges = new Set<string>();
+  const edgesOut: GraphEdge[] = [];
+
+  for (let hop = 0; hop < d; hop++) {
+    const prev = layerNodeIds[hop];
+    const nextLayer: string[] = [];
+    for (const id of prev) {
+      // 出边
+      for (const e of outgoing.get(id) ?? []) {
+        pushEdge(e);
+        if (!seen.has(e.target) && nextLayer.length < MAX_NODES_PER_LAYER) {
+          seen.add(e.target);
+          nextLayer.push(e.target);
+        }
+      }
+      // 入边（反向：如并发症节点能反查上游疾病）
+      for (const e of incoming.get(id) ?? []) {
+        pushEdge(e);
+        if (!seen.has(e.source) && nextLayer.length < MAX_NODES_PER_LAYER) {
+          seen.add(e.source);
+          nextLayer.push(e.source);
+        }
+      }
+    }
+    if (nextLayer.length === 0) break;
+    layerNodeIds.push(nextLayer);
+  }
+
+  function pushEdge(e: GraphEdge): void {
+    const key = `${e.source}|${e.relation}|${e.target}`;
+    if (collectedEdges.has(key)) return;
+    collectedEdges.add(key);
+    edgesOut.push(e);
+  }
+
+  const nodes = GRAPH_NODES.filter((n) => seen.has(n.id));
+  return {
+    disease: root,
+    nodes,
+    edges: edgesOut,
+    layers: layerNodeIds.map((ids, i) => ({ layer: i, nodeIds: ids })),
+    depth: layerNodeIds.length - 1,
+    matched: true,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+}
+
+/** traverseGraph 单条遍历结果边 */
+export interface TraversalEdge extends GraphEdge {
+  /** 该边在第几跳（1 起） */
+  hop: number;
+}
+
+/** traverseGraph 返回信封 */
+export interface TraversalResult {
+  startNode: GraphNode | null;
+  nodes: GraphNode[];
+  edges: TraversalEdge[];
+  relation: MedicalGraphRelation | null;
+  depth: number;
+  matched: boolean;
+  disclaimer: string;
+}
+
+/**
+ * traverseGraph：按关系类型做图谱遍历（纯函数）。
+ *
+ * 从 startNode 出发，仅沿 relation 指定的出边做 BFS，最多 depth 跳；
+ * 与 buildDeepMedicalGraph 的区别：
+ *  - 不限节点类型（疾病/症状/药物均可作起点）；
+ *  - 严格只走指定关系类型（如只沿 disease_has_complication 展开并发症链）；
+ *  - 每条边标注 hop（第几跳），前端可做高亮动画。
+ *
+ * @param startNode 起点中文名或 id
+ * @param relation  关系类型（disease_has_complication 等）；空则遍历全部出边
+ * @param depth     最大跳数，默认 1，最大 MAX_DEEP_DEPTH
+ */
+export function traverseGraph(
+  startNode: string,
+  relation?: string | null,
+  depth: number = 1,
+): TraversalResult {
+  const rel = asRelation(relation ?? null);
+  const empty: TraversalResult = {
+    startNode: null,
+    nodes: [],
+    edges: [],
+    relation: rel,
+    depth: 0,
+    matched: false,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+  const start = NODE_BY_ID.get((startNode ?? '').trim()) ?? resolveNode(startNode ?? '');
+  if (!start) return empty;
+
+  const d = Math.max(1, Math.min(Math.floor(depth || 1), MAX_DEEP_DEPTH));
+
+  const seen = new Set<string>([start.id]);
+  const outNodes: GraphNode[] = [start];
+  const outEdges: TraversalEdge[] = [];
+
+  // BFS 队列：[nodeId, hop]
+  let frontier: string[] = [start.id];
+  for (let hop = 1; hop <= d; hop++) {
+    const next: string[] = [];
+    for (const id of frontier) {
+      for (const e of GRAPH_EDGES) {
+        if (e.source !== id) continue;
+        if (rel !== null && e.relation !== rel) continue;
+        outEdges.push({ ...e, hop });
+        if (!seen.has(e.target)) {
+          seen.add(e.target);
+          const n = NODE_BY_ID.get(e.target);
+          if (n) outNodes.push(n);
+          next.push(e.target);
+        }
+      }
+    }
+    frontier = next;
+    if (frontier.length === 0) break;
+  }
+
+  return {
+    startNode: start,
+    nodes: outNodes,
+    edges: outEdges,
+    relation: rel,
+    depth: outEdges.length > 0 ? Math.max(...outEdges.map((e) => e.hop)) : 0,
+    matched: true,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
+}
+
+/** findRelatedDiseases 单条相关疾病 */
+export interface RelatedDisease {
+  disease: GraphNode;
+  /** 与目标疾病的 Jaccard 相似度 0~1（邻接节点集合交集/并集） */
+  similarity: number;
+  /** 共享的节点 id 列表（症状/药物/检查/并发症） */
+  sharedNodeIds: string[];
+  /** 共享节点中文名（前端直接展示「共享症状：胸痛/胸闷」） */
+  sharedNodeNames: string[];
+}
+
+/**
+ * findRelatedDiseases：相关疾病发现（纯函数，Personal Agent 鉴别/共病提示）。
+ *
+ * 算法（医学准确、可解释）：
+ *  1. 取目标疾病的全部出边邻接节点（症状+药物+检查+并发症+手术+科室）集合 A；
+ *  2. 对其余每个疾病，取其出边邻接节点集合 B；
+ *  3. 相似度 = |A ∩ B| / |A ∪ B|（Jaccard），再叠加两疾病间直接并发症边加分；
+ *  4. 按相似度降序返回 topK，附共享节点中文名（可解释）。
+ *
+ * @param disease 疾病中文名或 id
+ * @param topK    返回条数，默认 5，最大 10
+ */
+export function findRelatedDiseases(disease: string, topK: number = 5): RelatedDisease[] {
+  const root = NODE_BY_ID.get((disease ?? '').trim()) ?? resolveNode(disease ?? '');
+  if (!root || root.type !== 'disease') return [];
+
+  const neighborSet = (id: string): Set<string> =>
+    new Set(GRAPH_EDGES.filter((e) => e.source === id).map((e) => e.target));
+
+  const rootNeighbors = neighborSet(root.id);
+  if (rootNeighbors.size === 0) return [];
+
+  const k = Math.max(1, Math.min(Math.floor(topK || 5), 10));
+  const diseases = GRAPH_NODES.filter((n) => n.type === 'disease' && n.id !== root.id);
+
+  const scored: RelatedDisease[] = [];
+  for (const d of diseases) {
+    const nb = neighborSet(d.id);
+    const inter: string[] = [];
+    for (const id of rootNeighbors) if (nb.has(id)) inter.push(id);
+    if (inter.length === 0) continue;
+    const union = new Set<string>([...rootNeighbors, ...nb]).size;
+    let sim = inter.length / union;
+    // 两疾病间存在直接并发症边 → 加 0.15 共病/并发症权重
+    const hasComplication = GRAPH_EDGES.some(
+      (e) =>
+        (e.source === root.id && e.target === d.id && e.relation === 'disease_has_complication') ||
+        (e.source === d.id && e.target === root.id && e.relation === 'disease_has_complication'),
+    );
+    if (hasComplication) sim += 0.15;
+    sim = Math.round(Math.min(1, sim) * 100) / 100;
+
+    const sharedNames = inter
+      .map((id) => NODE_BY_ID.get(id)?.name ?? '')
+      .filter(Boolean);
+    scored.push({ disease: d, similarity: sim, sharedNodeIds: inter, sharedNodeNames: sharedNames });
+  }
+
+  return scored.sort((a, b) => b.similarity - a.similarity).slice(0, k);
+}
+
+/** findDrugInteractions 单对相互作用 */
+export interface DrugInteractionPair {
+  drugA: GraphNode;
+  drugB: GraphNode;
+  /** 风险等级：high≥0.8 / medium≥0.5 / low<0.5 */
+  riskLevel: 'high' | 'medium' | 'low';
+  /** 医学说明（如「出血风险显著升高」） */
+  label: string;
+  /** 风险权重 0~1 */
+  weight: number;
+}
+
+/**
+ * findDrugInteractions：药物相互作用图谱（纯函数，处方前置审核 / Personal Agent 用药安全）。
+ *
+ * 入参为一组药物名（医生当前处方 / 用户正在服用的药），函数：
+ *  1. 逐个解析药物节点（模糊匹配），未识别的药物放入 unknownDrugs 返回；
+ *  2. 在 drug_interacts_with_drug 边上做两两配对，命中即输出一对；
+ *  3. 按风险权重降序，high 风险（≥0.8）排最前，Personal Agent 据此升级告警。
+ *
+ * 医学准确性：仅报告种子图中已由权威共识标注的 DDI 边，不臆造相互作用；
+ * 未命中任何对时返回空 pairs，绝不凭空生成「建议停药」类结论。
+ *
+ * @param drugList 药物中文名数组（如 ['阿司匹林','华法林']）
+ */
+export function findDrugInteractions(drugList: string[]): {
+  pairs: DrugInteractionPair[];
+  unknownDrugs: string[];
+  checkedCount: number;
+  disclaimer: string;
+} {
+  const list = Array.isArray(drugList) ? drugList : [];
+  const resolved: GraphNode[] = [];
+  const unknown: string[] = [];
+
+  for (const raw of list) {
+    const name = (raw ?? '').trim();
+    if (!name) continue;
+    const node = resolveNode(name);
+    if (node && node.type === 'drug') resolved.push(node);
+    else unknown.push(name);
+  }
+
+  const pairs: DrugInteractionPair[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; i < resolved.length; i++) {
+    for (let j = i + 1; j < resolved.length; j++) {
+      const a = resolved[i];
+      const b = resolved[j];
+      const edge = GRAPH_EDGES.find(
+        (e) =>
+          e.relation === 'drug_interacts_with_drug' &&
+          ((e.source === a.id && e.target === b.id) ||
+            (e.source === b.id && e.target === a.id)),
+      );
+      if (!edge) continue;
+      const key = [a.id, b.id].sort().join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      pairs.push({
+        drugA: a,
+        drugB: b,
+        riskLevel: edge.weight >= 0.8 ? 'high' : edge.weight >= 0.5 ? 'medium' : 'low',
+        label: edge.label,
+        weight: edge.weight,
+      });
+    }
+  }
+
+  pairs.sort((x, y) => y.weight - x.weight);
+
+  return {
+    pairs,
+    unknownDrugs: unknown,
+    checkedCount: resolved.length,
+    disclaimer: GRAPH_DISCLAIMER,
+  };
 }

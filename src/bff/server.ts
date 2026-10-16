@@ -506,7 +506,7 @@ const allRoutes: RouteDef[] = [
   ...pharmacyRoutes,
   ...pharmacyAuditLearningRoutes,
   ...medicalQcRoutes,
-  ...medicalGraphRoutes, // M131-D 医学知识图谱；M147-A 深化：/api/v1/graph/disease/:id + /differential（知识图谱与患者教育）
+  ...medicalGraphRoutes, // M131-D 医学知识图谱；M147-A 深化：/api/v1/graph/disease/:id + /differential；M169-A 知识图谱与Personal Agent：GET /api/v1/medical-graph?disease=xxx&depth=2（深度图/相关疾病/药物相互作用/关系遍历）
 ...timelinessRoutes,
 ...emrAssessmentRoutes,
 ...aiNoteDraftRoutes,

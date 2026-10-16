@@ -23,6 +23,10 @@ import {
   findDifferentialDiagnosis,
   edgeQualifier,
   NODE_TYPE_LABELS,
+  buildDeepMedicalGraph,
+  traverseGraph,
+  findRelatedDiseases,
+  findDrugInteractions,
   type MedicalGraphRelation,
 } from '../../src/bff/aggregators/medicalGraphAggregator';
 
@@ -301,5 +305,136 @@ describe('M147-A findDifferentialDiagnosis 鉴别诊断', () => {
       expect(list[i].score).toBeLessThanOrEqual(list[i - 1].score);
     }
     expect(list.length).toBeLessThanOrEqual(5);
+  });
+});
+
+/* ===================== M169-A 知识图谱与 Personal Agent 深化 ===================== */
+
+describe('M169-A buildDeepMedicalGraph（深度知识图谱）', () => {
+  it('命中疾病：返回根节点 + 多跳邻接节点/边，depth 被正确 clamp', () => {
+    const r = buildDeepMedicalGraph('高血压', 2);
+    expect(r.matched).toBe(true);
+    expect(r.disease?.name).toBe('高血压');
+    expect(r.depth).toBeGreaterThanOrEqual(1);
+    expect(r.nodes.length).toBeGreaterThan(3);
+    expect(r.edges.length).toBeGreaterThan(2);
+    expect(r.layers.length).toBeGreaterThanOrEqual(2);
+    expect(r.disclaimer).toBe(GRAPH_DISCLAIMER);
+  });
+
+  it('depth=0 / 超界均被 clamp 到合法区间 [1,3]', () => {
+    expect(buildDeepMedicalGraph('高血压', 0).depth).toBeGreaterThanOrEqual(1);
+    expect(buildDeepMedicalGraph('高血压', 99).depth).toBeLessThanOrEqual(3);
+  });
+
+  it('未命中疾病返回空图（matched=false），不臆造', () => {
+    const r = buildDeepMedicalGraph('不存在的疾病XYZ', 2);
+    expect(r.matched).toBe(false);
+    expect(r.nodes).toEqual([]);
+    expect(r.edges).toEqual([]);
+  });
+
+  it('确定性：同疾病同深度两次结果节点集合一致', () => {
+    const a = buildDeepMedicalGraph('冠心病', 2);
+    const b = buildDeepMedicalGraph('冠心病', 2);
+    expect(a.nodes.map((n) => n.id).sort()).toEqual(b.nodes.map((n) => n.id).sort());
+    expect(a.edges.length).toBe(b.edges.length);
+  });
+
+  it('深度 3 跳可收编并发症链（高血压→冠心病→近期出血风险）', () => {
+    const r = buildDeepMedicalGraph('高血压', 3);
+    const names = r.nodes.map((n) => n.name);
+    expect(names).toContain('冠心病');
+    expect(names).toContain('胃溃疡');
+    expect(r.edges.some((e) => e.relation === 'disease_has_complication')).toBe(true);
+  });
+});
+
+describe('M169-A traverseGraph（按关系遍历）', () => {
+  it('沿 disease_has_complication 遍历高血压：到达远期并发症', () => {
+    const r = traverseGraph('高血压', 'disease_has_complication', 2);
+    expect(r.matched).toBe(true);
+    expect(r.relation).toBe('disease_has_complication');
+    expect(r.edges.length).toBeGreaterThan(0);
+    expect(r.edges.every((e) => e.relation === 'disease_has_complication')).toBe(true);
+    const names = r.nodes.map((n) => n.name);
+    expect(names).toContain('冠心病');
+    expect(names).toContain('脑梗死');
+  });
+
+  it('不指定 relation：退化为沿全部出边一跳遍历', () => {
+    const r = traverseGraph('高血压', null, 1);
+    expect(r.matched).toBe(true);
+    expect(r.nodes.length).toBeGreaterThan(2);
+  });
+
+  it('未命中起点返回 matched=false 空图', () => {
+    expect(traverseGraph('不存在的节点', 'disease_has_symptom', 2).matched).toBe(false);
+  });
+});
+
+describe('M169-A findRelatedDiseases（相关疾病发现）', () => {
+  it('高血压的相关疾病应包含冠心病/脑梗死（远期并发症+共享节点）', () => {
+    const list = findRelatedDiseases('高血压', 5);
+    expect(list.length).toBeGreaterThan(0);
+    expect(list.map((r) => r.disease.name)).toContain('冠心病');
+    expect(list[0].similarity).toBeGreaterThan(0);
+    expect(list[0].sharedNodeNames.length).toBeGreaterThan(0);
+  });
+
+  it('topK 截断：topK=2 最多返回 2 条', () => {
+    expect(findRelatedDiseases('高血压', 2).length).toBeLessThanOrEqual(2);
+  });
+
+  it('未命中疾病返回空数组', () => {
+    expect(findRelatedDiseases('不存在的疾病', 5)).toEqual([]);
+  });
+
+  it('结果按相似度降序', () => {
+    const list = findRelatedDiseases('2型糖尿病', 5);
+    for (let i = 1; i < list.length; i++) {
+      expect(list[i - 1].similarity).toBeGreaterThanOrEqual(list[i].similarity);
+    }
+  });
+});
+
+describe('M169-A findDrugInteractions（药物相互作用图谱）', () => {
+  it('阿司匹林 + 华法林：命中高风险出血相互作用', () => {
+    const r = findDrugInteractions(['阿司匹林', '华法林']);
+    expect(r.checkedCount).toBe(2);
+    expect(r.pairs.length).toBe(1);
+    expect(r.pairs[0].riskLevel).toBe('high');
+    expect(r.pairs[0].label).toContain('出血');
+  });
+
+  it('阿托伐他汀 + 克拉霉素：命中横纹肌溶解风险', () => {
+    const r = findDrugInteractions(['阿托伐他汀', '克拉霉素']);
+    expect(r.pairs.length).toBe(1);
+    expect(r.pairs[0].label).toContain('横纹肌');
+  });
+
+  it('无相互作用的药物对返回空 pairs', () => {
+    const r = findDrugInteractions(['氨氯地平', '缬沙坦']);
+    expect(r.pairs).toEqual([]);
+    expect(r.checkedCount).toBe(2);
+  });
+
+  it('未识别药物进入 unknownDrugs，不报错', () => {
+    const r = findDrugInteractions(['阿司匹林', '不存在的药XYZ']);
+    expect(r.checkedCount).toBe(1);
+    expect(r.unknownDrugs).toContain('不存在的药XYZ');
+  });
+
+  it('多药对结果按风险权重降序', () => {
+    const r = findDrugInteractions(['阿司匹林', '华法林', '阿托伐他汀', '克拉霉素', '氯吡格雷', '奥美拉唑']);
+    for (let i = 1; i < r.pairs.length; i++) {
+      expect(r.pairs[i - 1].weight).toBeGreaterThanOrEqual(r.pairs[i].weight);
+    }
+  });
+
+  it('空输入返回空结果，不抛错', () => {
+    const r = findDrugInteractions([]);
+    expect(r.pairs).toEqual([]);
+    expect(r.checkedCount).toBe(0);
   });
 });

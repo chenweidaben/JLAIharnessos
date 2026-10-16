@@ -27,6 +27,10 @@ import {
   queryMedicalGraph,
   queryDiseaseGraph,
   findDifferentialDiagnosis,
+  buildDeepMedicalGraph,
+  traverseGraph,
+  findRelatedDiseases,
+  findDrugInteractions,
   type GraphNode,
   type GraphResult,
   type DiseaseGraph,
@@ -104,6 +108,66 @@ export const medicalGraphRoutes: RouteDef[] = [
       const symptoms = raw.split(',').map((s) => s.trim()).filter(Boolean);
       const list: Diagnosis[] = findDifferentialDiagnosis(symptoms);
       return json(ok({ items: list, total: list.length }, 'ok', c.traceId));
+    },
+  },
+
+  // 【M169-A 知识图谱与 Personal Agent】GET /api/v1/medical-graph
+  //   ?disease=高血压&depth=2                     → 深度知识图谱（BFS 多跳展开）
+  //   &mode=related&disease=高血压&topK=5        → 相关疾病发现
+  //   &mode=interactions&drugs=阿司匹林,华法林   → 药物相互作用图谱
+  //   &mode=traverse&startNode=高血压&relation=disease_has_complication&depth=2
+  {
+    method: 'GET',
+    path: '/api/v1/medical-graph',
+    auth: true,
+    handle: (c): Response => {
+      const mode = c.query.get('mode') ?? 'deep';
+
+      if (mode === 'related') {
+        const disease = c.query.get('disease') ?? '';
+        if (!disease.trim()) {
+          return json(fail(ErrorCode.BAD_REQUEST, '缺少 query 参数 disease（疾病中文名/id）'), 400);
+        }
+        const topK = Number.parseInt(c.query.get('topK') ?? '5', 10);
+        const items = findRelatedDiseases(disease, Number.isFinite(topK) ? topK : 5);
+        return json(ok({ items, total: items.length }, 'ok', c.traceId));
+      }
+
+      if (mode === 'interactions') {
+        const drugsRaw = c.query.get('drugs') ?? '';
+        if (!drugsRaw.trim()) {
+          return json(fail(ErrorCode.BAD_REQUEST, '缺少 query 参数 drugs（逗号分隔药物名）'), 400);
+        }
+        const drugs = drugsRaw.split(',').map((s) => s.trim()).filter(Boolean);
+        const result = findDrugInteractions(drugs);
+        return json(ok(result, 'ok', c.traceId));
+      }
+
+      if (mode === 'traverse') {
+        const startNode = c.query.get('startNode') ?? '';
+        if (!startNode.trim()) {
+          return json(fail(ErrorCode.BAD_REQUEST, '缺少 query 参数 startNode（起点中文名/id）'), 400);
+        }
+        const relation = c.query.get('relation');
+        const depth = Number.parseInt(c.query.get('depth') ?? '1', 10);
+        const result = traverseGraph(startNode, relation, Number.isFinite(depth) ? depth : 1);
+        if (!result.matched) {
+          return json(ok(result, '未检索到该起点概念', c.traceId));
+        }
+        return json(ok(result, 'ok', c.traceId));
+      }
+
+      // 默认 mode=deep：深度知识图谱
+      const disease = c.query.get('disease') ?? '';
+      if (!disease.trim()) {
+        return json(fail(ErrorCode.BAD_REQUEST, '缺少 query 参数 disease（疾病中文名/id）'), 400);
+      }
+      const depth = Number.parseInt(c.query.get('depth') ?? '2', 10);
+      const result = buildDeepMedicalGraph(disease, Number.isFinite(depth) ? depth : 2);
+      if (!result.matched) {
+        return json(ok(result, '未命中疾病节点，请检查 disease 参数', c.traceId));
+      }
+      return json(ok(result, 'ok', c.traceId));
     },
   },
 ];
