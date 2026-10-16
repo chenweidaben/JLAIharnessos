@@ -984,6 +984,8 @@ const HospicePalliativeV5 = lazy(() => import('@/pages/hospice-palliative-v5/rep
 const RehabilitationV5 = lazy(() => import('@/pages/rehabilitation-v5/report'));
 // M272-C：临床营养与膳食治疗 V5
 const ClinicalNutritionV5 = lazy(() => import('@/pages/clinical-nutrition-v5/report'));
+// M272-D：心理心身与 EAP V5
+const PsychEAPV5 = lazy(() => import('@/pages/psych-eap-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1908,6 +1910,8 @@ export default function AppRoutes() {
           <Route path="rehabilitation-v5/report" element={<RehabilitationV5 />} />
           {/* M272-C：临床营养与膳食治疗 V5 */}
           <Route path="clinical-nutrition-v5/report" element={<ClinicalNutritionV5 />} />
+          {/* M272-D：心理心身与 EAP V5 */}
+          <Route path="psych-eap-v5/report" element={<PsychEAPV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
