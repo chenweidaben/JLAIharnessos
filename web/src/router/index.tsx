@@ -802,6 +802,14 @@ const MaternalChildLifecycleV4 = lazy(() => import('@/pages/maternal-child-lifec
 const GeriatricsLifecycleV4 = lazy(() => import('@/pages/geriatrics-lifecycle-v4/report'));
 // M249-D：职业环境 V4
 const OccupationalEnvironmentalV4 = lazy(() => import('@/pages/occupational-environmental-v4/report'));
+// M250-A：运营驾驶舱 V4
+const OpsDashboardV4 = lazy(() => import('@/pages/ops-dashboard-v4/report'));
+// M250-B：成本核算 V4
+const CostAccountingV4 = lazy(() => import('@/pages/cost-accounting-v4/report'));
+// M250-C：绩效 V4
+const PerformanceV4 = lazy(() => import('@/pages/performance-v4/report'));
+// M250-D：HRP V4
+const HRPV4 = lazy(() => import('@/pages/hrp-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1544,6 +1552,14 @@ export default function AppRoutes() {
           <Route path="geriatrics-lifecycle-v4/report" element={<GeriatricsLifecycleV4 />} />
           {/* M249-D：职业环境 V4 */}
           <Route path="occupational-environmental-v4/report" element={<OccupationalEnvironmentalV4 />} />
+          {/* M250-A：运营驾驶舱 V4 */}
+          <Route path="ops-dashboard-v4/report" element={<OpsDashboardV4 />} />
+          {/* M250-B：成本核算 V4 */}
+          <Route path="cost-accounting-v4/report" element={<CostAccountingV4 />} />
+          {/* M250-C：绩效 V4 */}
+          <Route path="performance-v4/report" element={<PerformanceV4 />} />
+          {/* M250-D：HRP V4 */}
+          <Route path="hrp-v4/report" element={<HRPV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
