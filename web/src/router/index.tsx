@@ -986,6 +986,8 @@ const RehabilitationV5 = lazy(() => import('@/pages/rehabilitation-v5/report'));
 const ClinicalNutritionV5 = lazy(() => import('@/pages/clinical-nutrition-v5/report'));
 // M272-D：心理心身与 EAP V5
 const PsychEAPV5 = lazy(() => import('@/pages/psych-eap-v5/report'));
+// M273-A：多院区一体化运行 V5
+const MultiCampusV5 = lazy(() => import('@/pages/multi-campus-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1912,6 +1914,8 @@ export default function AppRoutes() {
           <Route path="clinical-nutrition-v5/report" element={<ClinicalNutritionV5 />} />
           {/* M272-D：心理心身与 EAP V5 */}
           <Route path="psych-eap-v5/report" element={<PsychEAPV5 />} />
+          {/* M273-A：多院区一体化运行 V5 */}
+          <Route path="multi-campus-v5/report" element={<MultiCampusV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
