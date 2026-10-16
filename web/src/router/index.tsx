@@ -898,6 +898,14 @@ const PrivacyComputeV5 = lazy(() => import('@/pages/privacy-compute-v5/report'))
 const ElderlyAccessibleV5 = lazy(() => import('@/pages/elderly-accessible-v5/report'));
 // M261-D：ESG 与可持续发展 V5
 const ESGV5 = lazy(() => import('@/pages/esg-v5/report'));
+// M262-A：互联网医院与处方流转 V5
+const InternetHospitalV5 = lazy(() => import('@/pages/internet-hospital-v5/report'));
+// M262-B：医联体分级诊疗智能化 V5
+const MedicalAllianceV5 = lazy(() => import('@/pages/medical-alliance-v5/report'));
+// M262-C：家庭医生签约服务 V5
+const FamilyDoctorV5 = lazy(() => import('@/pages/family-doctor-v5/report'));
+// M262-D：商业健康保险与惠民保 V5
+const CommercialInsuranceV5 = lazy(() => import('@/pages/commercial-insurance-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1736,6 +1744,14 @@ export default function AppRoutes() {
           <Route path="elderly-accessible-v5/report" element={<ElderlyAccessibleV5 />} />
           {/* M261-D：ESG 与可持续发展 V5 */}
           <Route path="esg-v5/report" element={<ESGV5 />} />
+          {/* M262-A：互联网医院与处方流转 V5 */}
+          <Route path="internet-hospital-v5/report" element={<InternetHospitalV5 />} />
+          {/* M262-B：医联体分级诊疗智能化 V5 */}
+          <Route path="medical-alliance-v5/report" element={<MedicalAllianceV5 />} />
+          {/* M262-C：家庭医生签约服务 V5 */}
+          <Route path="family-doctor-v5/report" element={<FamilyDoctorV5 />} />
+          {/* M262-D：商业健康保险与惠民保 V5 */}
+          <Route path="commercial-insurance-v5/report" element={<CommercialInsuranceV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
