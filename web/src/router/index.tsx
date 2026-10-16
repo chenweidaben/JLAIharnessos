@@ -786,6 +786,14 @@ const BCINeuroRehabV2 = lazy(() => import('@/pages/bci-neuro-rehab-v2/report'));
 const GenomicPrecisionV2 = lazy(() => import('@/pages/genomic-precision-v2/report'));
 // M247-D：元宇宙医院 V2
 const MetaverseHospitalV2 = lazy(() => import('@/pages/metaverse-hospital-v2/report'));
+// M248-A：CDSS V4
+const CDSSV4 = lazy(() => import('@/pages/cdss-v4/report'));
+// M248-B：影像 AI V4
+const ImagingAIV4 = lazy(() => import('@/pages/imaging-ai-v4/report'));
+// M248-C：病历智能 V4
+const EMRIntelligentV4 = lazy(() => import('@/pages/emr-intelligent-v4/report'));
+// M248-D：知识图谱 V4
+const KnowledgeGraphV4 = lazy(() => import('@/pages/knowledge-graph-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1512,6 +1520,14 @@ export default function AppRoutes() {
           <Route path="genomic-precision-v2/report" element={<GenomicPrecisionV2 />} />
           {/* M247-D：元宇宙医院 V2 */}
           <Route path="metaverse-hospital-v2/report" element={<MetaverseHospitalV2 />} />
+          {/* M248-A：CDSS V4 */}
+          <Route path="cdss-v4/report" element={<CDSSV4 />} />
+          {/* M248-B：影像 AI V4 */}
+          <Route path="imaging-ai-v4/report" element={<ImagingAIV4 />} />
+          {/* M248-C：病历智能 V4 */}
+          <Route path="emr-intelligent-v4/report" element={<EMRIntelligentV4 />} />
+          {/* M248-D：知识图谱 V4 */}
+          <Route path="knowledge-graph-v4/report" element={<KnowledgeGraphV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
