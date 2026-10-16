@@ -949,6 +949,10 @@ import { opsV3ReportRoutes } from './routes/opsV3Report';
 import { partyBuildingV3ReportRoutes } from './routes/partyBuildingV3Report';
 // M245-B：文化品牌 V3 GET /api/v1/culture-brand-v3/report
 import { cultureBrandV3ReportRoutes } from './routes/cultureBrandV3Report';
+// M245-C：行政办公 V3 GET /api/v1/administration-v3/report
+import { administrationV3ReportRoutes } from './routes/administrationV3Report';
+// M245-D：工会群团 V3 GET /api/v1/union-v3/report
+import { unionV3ReportRoutes } from './routes/unionV3Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1665,6 +1669,8 @@ const allRoutes: RouteDef[] = [
   ...opsV3ReportRoutes, // M244-D：运维管理 V3 GET /api/v1/ops-v3/report
   ...partyBuildingV3ReportRoutes, // M245-A：党建 V3 GET /api/v1/party-building-v3/report
   ...cultureBrandV3ReportRoutes, // M245-B：文化品牌 V3 GET /api/v1/culture-brand-v3/report
+  ...administrationV3ReportRoutes, // M245-C：行政办公 V3 GET /api/v1/administration-v3/report
+  ...unionV3ReportRoutes, // M245-D：工会群团 V3 GET /api/v1/union-v3/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

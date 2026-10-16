@@ -766,6 +766,10 @@ const OpsV3 = lazy(() => import('@/pages/ops-v3/report'));
 const PartyBuildingV3 = lazy(() => import('@/pages/party-building-v3/report'));
 // M245-B：文化品牌 V3
 const CultureBrandV3 = lazy(() => import('@/pages/culture-brand-v3/report'));
+// M245-C：行政办公 V3
+const AdministrationV3 = lazy(() => import('@/pages/administration-v3/report'));
+// M245-D：工会群团 V3
+const UnionV3 = lazy(() => import('@/pages/union-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1472,6 +1476,10 @@ export default function AppRoutes() {
           <Route path="party-building-v3/report" element={<PartyBuildingV3 />} />
           {/* M245-B：文化品牌 V3 */}
           <Route path="culture-brand-v3/report" element={<CultureBrandV3 />} />
+          {/* M245-C：行政办公 V3 */}
+          <Route path="administration-v3/report" element={<AdministrationV3 />} />
+          {/* M245-D：工会群团 V3 */}
+          <Route path="union-v3/report" element={<UnionV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
