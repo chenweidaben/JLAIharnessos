@@ -696,6 +696,8 @@ const GreenHospitalV2 = lazy(() => import('@/pages/green-hospital/report'));
 const SupplyChainV2 = lazy(() => import('@/pages/supply-chain-v2/report'));
 // M236-C：健康科普
 const HealthMedia = lazy(() => import('@/pages/health-media/report'));
+// M236-D：国际医疗 V2
+const InternationalHealthV2 = lazy(() => import('@/pages/international-health-v2/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1332,6 +1334,8 @@ export default function AppRoutes() {
           <Route path="supply-chain-v2/report" element={<SupplyChainV2 />} />
           {/* M236-C：健康科普 */}
           <Route path="health-media/report" element={<HealthMedia />} />
+          {/* M236-D：国际医疗 V2 */}
+          <Route path="international-health-v2/report" element={<InternationalHealthV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
