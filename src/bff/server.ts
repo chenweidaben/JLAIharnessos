@@ -423,6 +423,8 @@ import { clinicalPathwayRoutes } from './routes/clinicalPathway';
 import { weightEvolutionRoutes } from './routes/weightEvolution';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
+// M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
+import { emergencyDeepRoutes } from './routes/emergencyDeep';
 // 【越用越聪明深化】M146-D：推荐策略自学习 POST /optimize + GET /log（单次 ±20%、截断 [0.1,3.0]）
 import { selfLearningRoutes } from './routes/selfLearning';
 // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi（4维20项 · 红黄绿三色）
@@ -842,6 +844,7 @@ const allRoutes: RouteDef[] = [
   ...clinicalPathwayRoutes, // M153-A：临床路径智能推荐 GET /api/v1/clinical-pathway/recommend（CDS，医生可偏离）
   ...weightEvolutionRoutes,
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
+  ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...selfLearningRoutes, // M146-D：推荐策略自学习 POST /optimize + GET /log
   ...hospitalKpiRoutes, // M147-C：三级公立医院绩效考核（国考）GET /api/v1/admin/kpi
   ...patientEducationRoutes, // M147-B：患者健康教育 GET /api/v1/patient/education + POST /push
