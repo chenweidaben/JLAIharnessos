@@ -363,6 +363,7 @@ import { notifyConfigRoutes } from './routes/notifyConfig';
 import { insuranceAuditRoutes } from './routes/insuranceAudit';
 import { adminInsuranceReviewRoutes } from './routes/adminInsuranceReview';
 import { drgAuditRoutes } from './routes/drgAudit';
+import { drgDeepRoutes } from './routes/drgDeep'; // M176-A：【临床核心深化】DRG/DIP 付费深度分析 GET /api/v1/admin/drg/deep-analysis
 import { qcRectificationRoutes } from './routes/qcRectification';
 import { monthlyReportRoutes } from './routes/monthlyReport';
 import { reportExportRoutes } from './routes/reportExport';
@@ -805,6 +806,7 @@ const allRoutes: RouteDef[] = [
   ...insuranceAuditRoutes,
   ...adminInsuranceReviewRoutes,
   ...drgAuditRoutes,
+  ...drgDeepRoutes, // M176-A：DRG 分组正确性/费用偏差/盈亏/CMI/离群病例深度分析
   ...emrLevel5Routes,
   ...emrGrade5Routes,
   ...deptKnowledgeRoutes,
