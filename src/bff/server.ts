@@ -353,6 +353,7 @@ import { doctorPreferenceRoutes } from './routes/doctorPreference';
 import { doctorGrowthRoutes } from './routes/doctorGrowth';
 import { userSettingsRoutes } from './routes/userSettings';
 // 【用户体验深化】M158-D：个性化偏好与统一通知 GET/PUT /api/v1/user/preferences（v4.x近期，纯函数无新表）
+import { userPrefRoutes } from './routes/userPref';
 // 【越用越聪明深化】M146-B：个人智能体成长报告 GET /api/v1/user/muse/report（让每个员工有成就感）
 import { personalGrowthRoutes } from './routes/personalGrowth';
 import { notificationRoutes } from './routes/notifications';
@@ -734,6 +735,7 @@ const allRoutes: RouteDef[] = [
   ...doctorPreferenceRoutes,
   ...doctorGrowthRoutes,
   ...userSettingsRoutes,
+  ...userPrefRoutes, // M158-D：个性化偏好与统一通知 GET/PUT /api/v1/user/preferences
   ...personalGrowthRoutes, // M146-B：个人成长报告 GET /api/v1/user/muse/report
   ...notificationRoutes,
   ...notificationCenterRoutes, // M148-B：统一通知中心 GET /api/v1/notifications + PUT /:id/read

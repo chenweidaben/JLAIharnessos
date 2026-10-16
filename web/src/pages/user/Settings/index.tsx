@@ -1,126 +1,147 @@
 /**
- * 健澜科技 jlmedaios - 个人设置页（M148-A · 产品化收尾）
+ * 健澜科技 jlmedaios - 设置中心页（M158-D · 用户体验深化 / 个性化与通知）
  *
- * 聚合四类个人偏好，即时生效、无需刷新：
- *   - 通知偏好：短信 / 微信 / 站内信
- *   - 界面偏好：主题色（深海蓝 VI 色板）/ 字号 / 密度
- *   - 助手偏好：AI 总开关 / 建议展示
- *   - 工作台偏好：默认首页 / 常用功能置顶
+ * v4.x近期：聚合五组个性化偏好，修改即时生效、随账号漫游：
+ *   - 外观主题：深海蓝 / 浅色 / 高对比（无障碍）
+ *   - 通知方式：站内 / 邮件 / 短信（可多选）
+ *   - 默认首页：工作台 / 患者列表 / 驾驶舱
+ *   - 每页条数：10 / 20 / 50
+ *   - 助手开关：AI 辅助 / 语音录入 / 智能提示
+ * 另侧栏展示按本人已开启通道收敛后的统一收件箱与未读数。
  *
- * 交互：进入页拉取 GET /api/v1/user/settings；任一控件改动即调用
- *   PUT /api/v1/user/settings/:key 单键保存，以响应中的最新 settings 回写本地。
+ * 交互：进入页拉取 GET /api/v1/user/preferences；任一控件改动即调用
+ *   PUT /api/v1/user/preferences，以响应中的最新 preferences 回写本地。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useCallback, useEffect, useState, type ReactElement } from 'react';
 import {
   App as AntdApp,
+  Badge,
   Card,
   Col,
-  Divider,
+  List,
+  Row,
   Segmented,
-  Select,
   Space,
   Spin,
   Switch,
   Tag,
   Typography,
 } from 'antd';
-import { AppstoreOutlined, BellOutlined, DesktopOutlined, RobotOutlined } from '@ant-design/icons';
+import { BellOutlined, HomeOutlined, RobotOutlined, SkinOutlined } from '@ant-design/icons';
 
 import PageContainer from '@/components/common/PageContainer';
 import { get, put } from '@/api';
 
 /* ------------------------------------------------------------------ */
-/* 类型（与 BFF userSettingsAggregator M148-A 对齐）                     */
+/* 类型（与 BFF userPrefAggregator M158-D 对齐）                        */
 /* ------------------------------------------------------------------ */
 
-type ThemeColor = 'seaBlue' | 'teal' | 'violet' | 'slate';
-type FontSize = 'small' | 'medium' | 'large';
-type Density = 'compact' | 'normal' | 'spacious';
-type DefaultHome = 'workbench' | 'dashboard' | 'todos' | 'notifications';
+type ThemeMode = 'seaBlue' | 'light' | 'highContrast';
+type NotifyChannel = 'inApp' | 'email' | 'sms';
+type DefaultHome = 'workbench' | 'patientList' | 'cockpit';
+type PageSize = 10 | 20 | 50;
 
-interface NotificationSettings {
-  sms: boolean;
-  wechat: boolean;
-  inApp: boolean;
+interface AssistantToggles {
+  aiAssist: boolean;
+  voiceInput: boolean;
+  smartTips: boolean;
 }
-interface AppearanceSettings {
-  themeColor: ThemeColor;
-  fontSize: FontSize;
-  density: Density;
-}
-interface AssistantSettings {
-  aiEnabled: boolean;
-  suggestVisible: boolean;
-}
-interface WorkspaceSettings {
+interface Preferences {
+  theme: ThemeMode;
+  notifyChannels: NotifyChannel[];
   defaultHome: DefaultHome;
-  pinnedFavorites: string[];
+  pageSize: PageSize;
+  assistant: AssistantToggles;
 }
-interface Settings {
-  notification: NotificationSettings;
-  appearance: AppearanceSettings;
-  assistant: AssistantSettings;
-  workspace: WorkspaceSettings;
+interface UnifiedNotification {
+  id: string;
+  type: string;
+  title: string;
+  summary: string;
+  level: 'info' | 'warning' | 'critical';
+  read: boolean;
+  channel: NotifyChannel;
+  createdAt: string;
 }
-interface SettingsView {
-  staffId: string;
-  settings: Settings;
+interface PreferencesView {
+  userId: string;
+  preferences: Preferences;
+  notificationSettings: { inApp: boolean; email: boolean; sms: boolean };
+  inbox: UnifiedNotification[];
+  unreadCount: number;
   updatedAt: string;
 }
 
 /** 深海蓝 VI 主色 */
 const SEA_BLUE = '#0A4D8C';
 
-/** 主题色色板（与后端 ThemeColor 枚举对齐） */
-const THEME_COLOR_OPTIONS: { label: string; value: ThemeColor; dot: string }[] = [
-  { label: '深海蓝', value: 'seaBlue', dot: '#0A4D8C' },
-  { label: '松石青', value: 'teal', dot: '#0F766E' },
-  { label: '靛紫', value: 'violet', dot: '#5B4FCF' },
-  { label: '石墨灰', value: 'slate', dot: '#475569' },
+/** 外观主题选项 */
+const THEME_OPTIONS: { label: string; value: ThemeMode }[] = [
+  { label: '深海蓝', value: 'seaBlue' },
+  { label: '浅色', value: 'light' },
+  { label: '高对比', value: 'highContrast' },
+];
+
+/** 通知方式选项 */
+const CHANNEL_OPTIONS: { label: string; value: NotifyChannel }[] = [
+  { label: '站内消息', value: 'inApp' },
+  { label: '邮件', value: 'email' },
+  { label: '短信', value: 'sms' },
 ];
 
 /** 默认首页选项 */
 const HOME_OPTIONS: { label: string; value: DefaultHome }[] = [
-  { label: '个人工作台', value: 'workbench' },
-  { label: '运营 Dashboard', value: 'dashboard' },
-  { label: '我的待办', value: 'todos' },
-  { label: '站内信', value: 'notifications' },
+  { label: '工作台', value: 'workbench' },
+  { label: '患者列表', value: 'patientList' },
+  { label: '驾驶舱', value: 'cockpit' },
 ];
 
-/** 可置顶的常用功能候选 */
-const PINNABLE_OPTIONS = [
-  { label: '个人工作台', value: 'workbench' },
-  { label: '我的待办', value: 'todos' },
-  { label: '站内信', value: 'notifications' },
-  { label: '门诊工作台', value: 'outpatient' },
-  { label: '住院工作台', value: 'inpatient' },
-  { label: '医嘱中心', value: 'orders' },
-  { label: '病历文书', value: 'emr' },
-  { label: '统计报表', value: 'reports' },
+/** 每页条数选项 */
+const PAGE_SIZE_OPTIONS: { label: string; value: PageSize }[] = [
+  { label: '10 条/页', value: 10 },
+  { label: '20 条/页', value: 20 },
+  { label: '50 条/页', value: 50 },
 ];
 
-/** 占位默认值（拉取中兜底，避免受控组件 undefined） */
-const FALLBACK: Settings = {
-  notification: { sms: false, wechat: false, inApp: true },
-  appearance: { themeColor: 'seaBlue', fontSize: 'medium', density: 'normal' },
-  assistant: { aiEnabled: true, suggestVisible: true },
-  workspace: { defaultHome: 'workbench', pinnedFavorites: [] },
+/** 助手开关项 */
+const ASSISTANT_ITEMS: { key: keyof AssistantToggles; label: string; desc: string }[] = [
+  { key: 'aiAssist', label: 'AI 辅助', desc: '病历生成、诊断建议等 AI 写作能力' },
+  { key: 'voiceInput', label: '语音录入', desc: '在病历与交班场景使用语音转写' },
+  { key: 'smartTips', label: '智能提示', desc: '用药、危急值等被动智能提醒' },
+];
+
+/** 拉取中兜底默认值（避免受控组件 undefined） */
+const FALLBACK: Preferences = {
+  theme: 'seaBlue',
+  notifyChannels: ['inApp'],
+  defaultHome: 'workbench',
+  pageSize: 20,
+  assistant: { aiAssist: true, voiceInput: true, smartTips: true },
 };
+
+/** 通知级别标签色 */
+function levelColor(level: UnifiedNotification['level']): string {
+  return level === 'critical' ? 'red' : level === 'warning' ? 'orange' : 'blue';
+}
 
 export default function UserSettingsPage(): ReactElement {
   const { message } = AntdApp.useApp();
   const [loading, setLoading] = useState(true);
-  const [settings, setSettings] = useState<Settings>(FALLBACK);
+  const [prefs, setPrefs] = useState<Preferences>(FALLBACK);
+  const [inbox, setInbox] = useState<UnifiedNotification[]>([]);
+  const [unread, setUnread] = useState(0);
 
-  /** 拉取本人完整偏好 */
+  /** 拉取本人偏好与统一收件箱 */
   const refresh = useCallback(async (): Promise<void> => {
     try {
-      const view = await get<SettingsView>('/api/v1/user/settings');
-      setSettings(view.settings);
+      const view = await get<PreferencesView>('/api/v1/user/preferences');
+      setPrefs(view.preferences);
+      setInbox(view.inbox ?? []);
+      setUnread(view.unreadCount ?? 0);
     } catch (e) {
-      message.error(e instanceof Error ? e.message : '个人设置加载失败');
+      message.error(e instanceof Error ? e.message : '设置中心加载失败');
     } finally {
       setLoading(false);
     }
@@ -130,24 +151,34 @@ export default function UserSettingsPage(): ReactElement {
     void refresh();
   }, [refresh]);
 
-  /** 单键即时保存：PUT /api/v1/user/settings/:key，以响应最新 settings 回写 */
+  /** 部分保存：PUT /api/v1/user/preferences，以响应最新 preferences 回写 */
   const persist = useCallback(
-    async (key: string, value: unknown): Promise<void> => {
+    async (patch: Partial<Preferences>): Promise<void> => {
       try {
-        const view = await put<SettingsView>(`/api/v1/user/settings/${key}`, { value });
-        setSettings(view.settings);
+        const view = await put<PreferencesView>('/api/v1/user/preferences', { preferences: patch });
+        setPrefs(view.preferences);
       } catch (e) {
         message.error(e instanceof Error ? e.message : '偏好保存失败，已还原');
-        // 失败回滚本地，避免界面与后端不一致
         void refresh();
       }
     },
     [message, refresh],
   );
 
+  /** 通知方式多选：翻转某通道后提交完整数组 */
+  const toggleChannel = useCallback(
+    (ch: NotifyChannel, on: boolean): void => {
+      const next = on
+        ? Array.from(new Set([...prefs.notifyChannels, ch]))
+        : prefs.notifyChannels.filter((c) => c !== ch);
+      void persist({ notifyChannels: next });
+    },
+    [prefs.notifyChannels, persist],
+  );
+
   if (loading) {
     return (
-      <PageContainer title="个人设置" description="通知、界面、助手与工作台偏好">
+      <PageContainer title="设置中心" description="个性化偏好与通知方式">
         <div style={{ textAlign: 'center', padding: 48 }}>
           <Spin size="large" />
         </div>
@@ -156,187 +187,166 @@ export default function UserSettingsPage(): ReactElement {
   }
 
   return (
-    <PageContainer title="个人设置" description="修改即时生效，仅本人可见、随账号漫游">
+    <PageContainer title="设置中心" description="修改即时生效，仅本人可见、随账号漫游">
       <Row gutter={[16, 16]}>
-        {/* 通知偏好：短信 / 微信 / 站内信 */}
-        <Col xs={24} md={12}>
-          <Card
-            title={
-              <Space>
-                <BellOutlined style={{ color: SEA_BLUE }} />
-                通知偏好
-              </Space>
-            }
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              <Row justify="space-between" align="middle">
-                <Col>短信通知</Col>
-                <Col>
-                  <Switch
-                    checked={settings.notification.sms}
-                    onChange={(v) => void persist('notification.sms', v)}
-                  />
-                </Col>
-              </Row>
-              <Row justify="space-between" align="middle">
-                <Col>微信通知</Col>
-                <Col>
-                  <Switch
-                    checked={settings.notification.wechat}
-                    onChange={(v) => void persist('notification.wechat', v)}
-                  />
-                </Col>
-              </Row>
-              <Row justify="space-between" align="middle">
-                <Col>站内信通知</Col>
-                <Col>
-                  <Switch
-                    checked={settings.notification.inApp}
-                    onChange={(v) => void persist('notification.inApp', v)}
-                  />
-                </Col>
-              </Row>
-            </Space>
-          </Card>
-        </Col>
+        {/* 左列：五组偏好 */}
+        <Col xs={24} lg={16}>
+          <Row gutter={[16, 16]}>
+            {/* 外观主题 */}
+            <Col xs={24} md={12}>
+              <Card
+                title={
+                  <Space>
+                    <SkinOutlined style={{ color: SEA_BLUE }} />
+                    外观主题
+                  </Space>
+                }
+              >
+                <Segmented
+                  block
+                  value={prefs.theme}
+                  onChange={(v) => void persist({ theme: v as ThemeMode })}
+                  options={THEME_OPTIONS}
+                />
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  高对比模式面向视力较弱场景，提升文字与背景对比度。
+                </Typography.Text>
+              </Card>
+            </Col>
 
-        {/* 界面偏好：主题色 / 字号 / 密度 */}
-        <Col xs={24} md={12}>
-          <Card
-            title={
-              <Space>
-                <DesktopOutlined style={{ color: SEA_BLUE }} />
-                界面偏好
-              </Space>
-            }
-          >
-            <Typography.Text type="secondary">主题色</Typography.Text>
-            <div style={{ margin: '8px 0 16px' }}>
-              <Space size="middle">
-                {THEME_COLOR_OPTIONS.map((opt) => (
-                  <Tag.CheckableTag
-                    key={opt.value}
-                    checked={settings.appearance.themeColor === opt.value}
-                    onChange={() => void persist('appearance.themeColor', opt.value)}
-                    style={{
-                      background: opt.dot,
-                      border: 'none',
-                      color: '#fff',
-                      padding: '4px 12px',
-                    }}
-                  >
-                    {opt.label}
-                  </Tag.CheckableTag>
-                ))}
-              </Space>
-            </div>
-            <Typography.Text type="secondary">字号</Typography.Text>
-            <Segmented
-              block
-              style={{ margin: '8px 0 16px' }}
-              value={settings.appearance.fontSize}
-              onChange={(v) => void persist('appearance.fontSize', v)}
-              options={[
-                { label: '小', value: 'small' },
-                { label: '中', value: 'medium' },
-                { label: '大', value: 'large' },
-              ]}
-            />
-            <Typography.Text type="secondary">界面密度</Typography.Text>
-            <Segmented
-              block
-              style={{ marginTop: 8 }}
-              value={settings.appearance.density}
-              onChange={(v) => void persist('appearance.density', v)}
-              options={[
-                { label: '紧凑', value: 'compact' },
-                { label: '标准', value: 'normal' },
-                { label: '宽松', value: 'spacious' },
-              ]}
-            />
-          </Card>
-        </Col>
-
-        {/* 助手偏好：AI 开关 / 建议展示 */}
-        <Col xs={24} md={12}>
-          <Card
-            title={
-              <Space>
-                <RobotOutlined style={{ color: SEA_BLUE }} />
-                助手偏好
-              </Space>
-            }
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              <Row justify="space-between" align="middle">
-                <Col>
-                  AI 助手总开关
-                  <br />
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                    关闭后工作台不再展示任何 AI 辅助能力
-                  </Typography.Text>
-                </Col>
-                <Col>
-                  <Switch
-                    checked={settings.assistant.aiEnabled}
-                    onChange={(v) => void persist('assistant.aiEnabled', v)}
-                  />
-                </Col>
-              </Row>
-              <Divider style={{ margin: '4px 0' }} />
-              <Row justify="space-between" align="middle">
-                <Col>
-                  展示 AI 建议
-                  <br />
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                    在开方 / 病历等场景下主动展示建议
-                  </Typography.Text>
-                </Col>
-                <Col>
-                  <Switch
-                    disabled={!settings.assistant.aiEnabled}
-                    checked={settings.assistant.suggestVisible && settings.assistant.aiEnabled}
-                    onChange={(v) => void persist('assistant.suggestVisible', v)}
-                  />
-                </Col>
-              </Row>
-            </Space>
-          </Card>
-        </Col>
-
-        {/* 工作台偏好：默认首页 / 常用功能置顶 */}
-        <Col xs={24} md={12}>
-          <Card
-            title={
-              <Space>
-                <AppstoreOutlined style={{ color: SEA_BLUE }} />
-                工作台偏好
-              </Space>
-            }
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
-              <div>
-                <Typography.Text type="secondary">登录后默认首页</Typography.Text>
-                <Select
-                  style={{ width: '100%', marginTop: 6 }}
-                  value={settings.workspace.defaultHome}
-                  onChange={(v: DefaultHome) => void persist('workspace.defaultHome', v)}
+            {/* 默认首页 */}
+            <Col xs={24} md={12}>
+              <Card
+                title={
+                  <Space>
+                    <HomeOutlined style={{ color: SEA_BLUE }} />
+                    默认首页
+                  </Space>
+                }
+              >
+                <Segmented
+                  block
+                  value={prefs.defaultHome}
+                  onChange={(v) => void persist({ defaultHome: v as DefaultHome })}
                   options={HOME_OPTIONS}
                 />
-              </div>
-              <div>
-                <Typography.Text type="secondary">常用功能置顶（最多 12 个）</Typography.Text>
-                <Select
-                  mode="multiple"
-                  style={{ width: '100%', marginTop: 6 }}
-                  value={settings.workspace.pinnedFavorites}
-                  onChange={(v: string[]) => void persist('workspace.pinnedFavorites', v)}
-                  options={PINNABLE_OPTIONS}
-                  maxTagCount={4}
-                  placeholder="选择需要置顶展示的常用功能"
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  登录后默认落地的工作页面。
+                </Typography.Text>
+              </Card>
+            </Col>
+
+            {/* 通知方式 */}
+            <Col xs={24} md={12}>
+              <Card
+                title={
+                  <Space>
+                    <BellOutlined style={{ color: SEA_BLUE }} />
+                    通知方式
+                  </Space>
+                }
+              >
+                <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                  {CHANNEL_OPTIONS.map((opt) => (
+                    <Row key={opt.value} justify="space-between" align="middle">
+                      <Col>{opt.label}</Col>
+                      <Col>
+                        <Switch
+                          checked={prefs.notifyChannels.includes(opt.value)}
+                          onChange={(on) => toggleChannel(opt.value, on)}
+                        />
+                      </Col>
+                    </Row>
+                  ))}
+                </Space>
+              </Card>
+            </Col>
+
+            {/* 每页条数 */}
+            <Col xs={24} md={12}>
+              <Card title="列表每页条数">
+                <Segmented
+                  block
+                  value={prefs.pageSize}
+                  onChange={(v) => void persist({ pageSize: v as PageSize })}
+                  options={PAGE_SIZE_OPTIONS}
                 />
-              </div>
-            </Space>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  患者列表、待办等分页列表默认每页展示条数。
+                </Typography.Text>
+              </Card>
+            </Col>
+
+            {/* 助手开关 */}
+            <Col xs={24}>
+              <Card
+                title={
+                  <Space>
+                    <RobotOutlined style={{ color: SEA_BLUE }} />
+                    助手开关
+                  </Space>
+                }
+              >
+                <Row gutter={[16, 16]}>
+                  {ASSISTANT_ITEMS.map((item) => (
+                    <Col xs={24} md={8} key={item.key}>
+                      <Row justify="space-between" align="middle">
+                        <Col>
+                          {item.label}
+                          <br />
+                          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                            {item.desc}
+                          </Typography.Text>
+                        </Col>
+                        <Col>
+                          <Switch
+                            checked={prefs.assistant[item.key]}
+                            onChange={(on) => void persist({ assistant: { ...prefs.assistant, [item.key]: on } })}
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  ))}
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+        </Col>
+
+        {/* 右列：统一收件箱预览 */}
+        <Col xs={24} lg={8}>
+          <Card
+            title={
+              <Space>
+                统一通知
+                <Badge count={unread} size="small" offset={[4, -2]} />
+              </Space>
+            }
+          >
+            <List
+              size="small"
+              dataSource={inbox}
+              locale={{ emptyText: '暂无通知' }}
+              renderItem={(n) => (
+                <List.Item>
+                  <List.Item.Meta
+                    title={
+                      <Space size={6}>
+                        <Tag color={levelColor(n.level)} style={{ marginInlineEnd: 0 }}>
+                          {n.type}
+                        </Tag>
+                        <span style={{ fontWeight: n.read ? 400 : 600 }}>{n.title}</span>
+                      </Space>
+                    }
+                    description={
+                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                        {n.summary}
+                      </Typography.Text>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
           </Card>
         </Col>
       </Row>
