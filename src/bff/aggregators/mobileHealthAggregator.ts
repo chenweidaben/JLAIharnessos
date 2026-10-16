@@ -49,7 +49,7 @@ export interface MobileHealthReport {
   timeRange: string;
   doctorApp: { users: number; tasksCompleted: number };
   nurseApp: { users: number; tasksCompleted: number };
-  patientApp: { users: number; ma u: number };
+  patientApp: { users: number; mau: number };
   infusion: { mobileInfusions: number };
   nursing: { records: number };
   rounds: { visits: number };
