@@ -14,7 +14,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
   ADMIN_ROI_RANK_LIMIT,
   ADMIN_TIMELINE_LIMIT,
@@ -23,6 +23,13 @@ import {
   type AdminDecision,
 } from '../../src/bff/aggregators/adminMuseAggregator.js';
 import { resolveMuseAdminTarget } from '../../src/bff/routes/museAdmin.js';
+import {
+  __resetAdminExperienceStore,
+  benchmarkAdminDecision,
+  buildAdminMUSEProfile,
+  recordAdminExperience,
+  recommendAdminDecision,
+} from '../../src/bff/aggregators/adminMuseAggregator.js';
 
 /** 造一条管理决策；offsetDays 天前 */
 function mkDecision(
@@ -202,5 +209,160 @@ describe('buildAdminMuse - 空数据兜底', () => {
     expect(view.roiRanking[0].outcome).toBe('mixed');
     // mixed: ROI = 10 * 0.5 = 5
     expect(view.roiRanking[0].roi).toBe(5);
+  });
+});
+
+/* ================================================================== */
+/* M169-D 知识图谱与 Personal Agent：画像 / 沉淀 / 推荐 / 对标          */
+/* ================================================================== */
+
+describe('recordAdminExperience - 管理经验沉淀归一', () => {
+  beforeEach(() => __resetAdminExperienceStore());
+
+  it('非法类别→management，效果截断到[-2,2]，标签去重保序', () => {
+    const rec = recordAdminExperience('s1', {
+      category: 'not-a-category',
+      subType: '流程优化',
+      situation: '门诊拥堵',
+      action: '分时段预约',
+      outcome: 'success',
+      effectiveness: 9.9,
+      reflection: '先调号源',
+      tags: '门诊, 门诊、预约',
+    });
+    expect(rec.category).toBe('management');
+    expect(rec.outcome).toBe('success');
+    expect(rec.effectiveness).toBe(2);
+    expect(rec.tags).toEqual(['门诊', '预约']);
+    expect(rec.staffId).toBe('s1');
+    expect(rec.id).toBeTruthy();
+  });
+
+  it('脏输入兜底：非三态结局→mixed，非数效果→0，空标签→[]，缺省子类', () => {
+    const rec = recordAdminExperience('s2', {
+      category: 'crisis',
+      outcome: 'weird',
+      effectiveness: 'abc',
+      tags: null,
+    });
+    expect(rec.outcome).toBe('mixed');
+    expect(rec.effectiveness).toBe(0);
+    expect(rec.tags).toEqual([]);
+    expect(rec.subType).toBe('危机处置');
+  });
+
+  it('同一员工多次沉淀可累计，互不串号', () => {
+    recordAdminExperience('s3', { category: 'crisis', effectiveness: 1 });
+    recordAdminExperience('s3', { category: 'crisis', effectiveness: 1 });
+    recordAdminExperience('other', { category: 'management', effectiveness: 1 });
+    const p = buildAdminMUSEProfile('s3');
+    expect(p.totalExperiences).toBe(2);
+    expect(p.byCategory.find((c) => c.category === 'crisis')?.count).toBe(2);
+  });
+});
+
+describe('buildAdminMUSEProfile - 管理画像', () => {
+  beforeEach(() => __resetAdminExperienceStore());
+
+  it('冷启动：无沉淀返回零值画像，isColdStart=true，不抛错', () => {
+    const p = buildAdminMUSEProfile('nobody');
+    expect(p.isColdStart).toBe(true);
+    expect(p.totalExperiences).toBe(0);
+    expect(p.growthScore).toBe(0);
+    expect(p.byCategory.every((c) => c.count === 0)).toBe(true);
+  });
+
+  it('画像：擅长打法取 effectiveness≥+1，跟头取 failure，盲区按规则识别', () => {
+    recordAdminExperience('dean', { category: 'crisis', subType: '舆情', situation: '短视频发酵', action: '2小时官方说明', outcome: 'success', effectiveness: 1.5, reflection: '先认账' });
+    recordAdminExperience('dean', { category: 'crisis', subType: '舆情', situation: '类似舆情', action: '增开晚门诊', outcome: 'success', effectiveness: 1.0 });
+    recordAdminExperience('dean', { category: 'operations_decision', subType: '采购', situation: '检验慢', action: '只买设备不改造流程', outcome: 'failure', effectiveness: -1.2, reflection: '先做流程测绘' });
+    recordAdminExperience('dean', { category: 'management', subType: '团队', situation: '护士离职', action: '弹性排班', outcome: 'mixed', effectiveness: 0.3, reflection: '钱和关怀都要' });
+
+    const p = buildAdminMUSEProfile('dean');
+    expect(p.totalExperiences).toBe(4);
+    expect(p.growthScore).toBeGreaterThan(0);
+    expect(p.growthScore).toBeLessThanOrEqual(100);
+    expect(p.crisisSteadiness).toBe(1);
+    expect(p.strengths.length).toBe(2);
+    expect(p.strengths[0].effectiveness).toBeGreaterThanOrEqual(p.strengths[1].effectiveness);
+    expect(p.pitfalls.length).toBe(1);
+    expect(p.pitfalls[0].action).toContain('只买设备');
+    expect(p.gaps.some((g) => g.category === 'resource_allocation')).toBe(true);
+  });
+});
+
+describe('recommendAdminDecision - 决策推荐', () => {
+  beforeEach(() => __resetAdminExperienceStore());
+
+  it('冷启动：无战例返回基线打法，coldStart=true，confidence=0', () => {
+    const r = recommendAdminDecision('cold', { category: 'crisis', situation: '舆情发酵' });
+    expect(r.coldStart).toBe(true);
+    expect(r.confidence).toBe(0);
+    expect(r.recommendedActions[0].action).toBeTruthy();
+    expect(r.summary).toContain('还没有');
+  });
+
+  it('召回本人成过的动作，并指出栽过的坑，结论具体不空喊', () => {
+    recordAdminExperience('dean', { category: 'crisis', subType: '舆情', situation: '挂号难短视频本地发酵', action: '2小时官方说明+次日增开晚门诊', outcome: 'success', effectiveness: 1.4, reflection: '速度比措辞重要', tags: ['舆情', '短视频'] });
+    recordAdminExperience('dean', { category: 'crisis', subType: '舆情', situation: '类似网络投诉扩散', action: '只发声明不解决实际问题', outcome: 'failure', effectiveness: -1.3, reflection: '不能光辩解', tags: ['舆情'] });
+
+    const r = recommendAdminDecision('dean', { category: 'crisis', subType: '舆情', situation: '挂号难短视频又发酵了', tags: ['舆情', '短视频'] });
+    expect(r.coldStart).toBe(false);
+    expect(r.matchedCases.length).toBeGreaterThan(0);
+    expect(r.recommendedActions.length).toBeGreaterThan(0);
+    expect(r.recommendedActions[0].action).toContain('官方说明');
+    expect(r.pitfallsToAvoid.some((p) => p.action.includes('只发声明'))).toBe(true);
+    expect(r.summary).toContain('官方说明');
+    expect(r.summary).not.toContain('建议关注');
+    expect(r.confidence).toBeGreaterThan(0);
+  });
+});
+
+describe('benchmarkAdminDecision - 效果对标', () => {
+  beforeEach(() => __resetAdminExperienceStore());
+
+  it('本次远高于本人同类均值 → above_par，结论建议固化 SOP', () => {
+    recordAdminExperience('dean', { category: 'management', subType: '流程优化', situation: '排队', action: '并行窗口', outcome: 'mixed', effectiveness: 0.2 });
+    recordAdminExperience('dean', { category: 'management', subType: '流程优化', situation: '排队', action: '并行窗口v2', outcome: 'mixed', effectiveness: 0.4 });
+
+    const b = benchmarkAdminDecision(
+      'dean',
+      { category: 'management', subType: '流程优化' },
+      { effectiveness: 1.5 },
+    );
+    expect(b.sampleSize).toBe(2);
+    expect(b.thisEffectiveness).toBe(1.5);
+    expect(b.ownCategoryAvg).toBeCloseTo(0.3, 5);
+    expect(b.verdict).toBe('above_par');
+    expect(b.reflectionPrompt).toContain('固化');
+  });
+
+  it('本次远低于本人同类均值 → below_par，delta 为负', () => {
+    recordAdminExperience('dean', { category: 'resource_allocation', subType: '床位', situation: 'ICU紧张', action: '日清调度会', outcome: 'success', effectiveness: 1.2 });
+    recordAdminExperience('dean', { category: 'resource_allocation', subType: '床位', situation: 'ICU紧张', action: '日清调度会', outcome: 'success', effectiveness: 1.0 });
+
+    const b = benchmarkAdminDecision(
+      'dean',
+      { category: 'resource_allocation' },
+      { effectiveness: -1.0 },
+    );
+    expect(b.verdict).toBe('below_par');
+    expect(b.deltaVsOwn).toBeLessThan(0);
+    expect(b.reflectionPrompt).toContain('低于');
+  });
+
+  it('首次记录无基线 → sampleSize=0，仍给可执行结论不抛错', () => {
+    const b = benchmarkAdminDecision('fresh', { category: 'crisis' }, { effectiveness: 0.5 });
+    expect(b.sampleSize).toBe(0);
+    expect(b.verdict).toBe('on_par');
+    expect(b.reflectionPrompt).toContain('第 1 次');
+  });
+
+  it('趋势字段必为三态之一', () => {
+    recordAdminExperience('dean', { category: 'operations_decision', effectiveness: 0 });
+    recordAdminExperience('dean', { category: 'operations_decision', effectiveness: 0 });
+    recordAdminExperience('dean', { category: 'operations_decision', effectiveness: 0 });
+    const b = benchmarkAdminDecision('dean', { category: 'operations_decision' }, { effectiveness: 0.1 });
+    expect(['improving', 'stable', 'declining']).toContain(b.trend);
   });
 });

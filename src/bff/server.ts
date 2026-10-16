@@ -452,6 +452,7 @@ import { nurseMuseRoutes } from './routes/nurseMuse'; // M169-C：知识图谱�
 import { museHospitalRoutes } from './routes/museHospital';
 import { musePharmaRoutes } from './routes/musePharma';
 import { museAdminRoutes } from './routes/museAdmin';
+import { adminMuseRoutes } from './routes/adminMuse'; // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
 import { museMonthlyReportRoutes } from './routes/museMonthlyReport';
 import { musePatternsRoutes } from './routes/musePatterns';
 import { museGrowthRoutes } from './routes/museGrowth';
@@ -880,6 +881,7 @@ const allRoutes: RouteDef[] = [
   ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
   ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
   ...patientJourneyRoutes, // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
+  ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
 ];
 
 interface Compiled {
