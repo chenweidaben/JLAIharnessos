@@ -667,6 +667,8 @@ import { medicalRecordQualityReportV2Routes } from './routes/medicalRecordQualit
 import { drugSupplyReportV2Routes } from './routes/drugSupplyReportV2';
 // M210-A：智慧医院评价 GET /api/v1/smart-hospital/report
 import { smartHospitalReportRoutes } from './routes/smartHospitalReport';
+// M210-B：互联互通 GET /api/v1/interoperability/report
+import { interoperabilityReportRoutes } from './routes/interoperabilityReport';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1242,6 +1244,7 @@ const allRoutes: RouteDef[] = [
   ...medicalRecordQualityReportV2Routes, // M209-C：病历质量 V2 GET /api/v1/mr-quality/report-v2
   ...drugSupplyReportV2Routes, // M209-D：药品供应链 V2 GET /api/v1/drug-supply/report-v2
   ...smartHospitalReportRoutes, // M210-A：智慧医院评价 GET /api/v1/smart-hospital/report
+  ...interoperabilityReportRoutes, // M210-B：互联互通 GET /api/v1/interoperability/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

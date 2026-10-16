@@ -488,6 +488,8 @@ const MRQualityV2 = lazy(() => import('@/pages/mr-quality/report-v2'));
 const DrugSupplyV2 = lazy(() => import('@/pages/drug-supply/report-v2'));
 // M210-A：智慧医院评价
 const SmartHospital = lazy(() => import('@/pages/smart-hospital/report'));
+// M210-B：互联互通
+const Interoperability = lazy(() => import('@/pages/interoperability/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -916,6 +918,8 @@ export default function AppRoutes() {
           <Route path="drug-supply/report-v2" element={<DrugSupplyV2 />} />
           {/* M210-A：智慧医院评价 */}
           <Route path="smart-hospital/report" element={<SmartHospital />} />
+          {/* M210-B：互联互通 */}
+          <Route path="interoperability/report" element={<Interoperability />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
