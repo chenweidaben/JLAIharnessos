@@ -1141,6 +1141,8 @@ import { rwdPlatformV5ReportRoutes } from './routes/rwdPlatformV5Report';
 import { gcpV5ReportRoutes } from './routes/gcpV5Report';
 // M269-C：生物样本库与科研数据 V5 GET /api/v1/biobank-v5/report
 import { biobankV5ReportRoutes } from './routes/biobankV5Report';
+// M269-D：住培教学考核 OSCE V5 GET /api/v1/residency-edu-v5/report
+import { residencyEducationV5ReportRoutes } from './routes/residencyEducationV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1954,6 +1956,7 @@ const allRoutes: RouteDef[] = [
   ...rwdPlatformV5ReportRoutes, // M269-A：临床研究 RWD/RWE 平台 V5 GET /api/v1/rwd-platform-v5/report
   ...gcpV5ReportRoutes, // M269-B：药物临床试验 GCP V5 GET /api/v1/gcp-v5/report
   ...biobankV5ReportRoutes, // M269-C：生物样本库与科研数据 V5 GET /api/v1/biobank-v5/report
+  ...residencyEducationV5ReportRoutes, // M269-D：住培教学考核 OSCE V5 GET /api/v1/residency-edu-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -1,0 +1,29 @@
+/**
+ * 健澜科技 jlmedaios - 住培教学考核 OSCE V5 路由（M269-D）
+ *
+ * GET /api/v1/residency-edu-v5/report
+ *
+ * 权限：residency-edu-v5:report:view。
+ *
+ * Copyright (c) 杭州健澜科技有限公司
+ */
+
+import { requirePermissionCode } from "../middleware/auth.js";
+import { type Ctx, json, ok, type RouteDef } from "../types.js";
+import { buildResidencyEducationV5Report } from "../aggregators/residencyEducationV5ReportAggregator.js";
+
+export const residencyEducationV5ReportRoutes: RouteDef[] = [
+  {
+    method: "GET",
+    path: "/api/v1/residency-edu-v5/report",
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requirePermissionCode(c, "residency-edu-v5:report:view");
+      if (denied) return denied;
+
+      const timeRange = c.query.get("timeRange") ?? "30d";
+      const result = buildResidencyEducationV5Report(timeRange);
+      return json(ok(result));
+    },
+  },
+];
