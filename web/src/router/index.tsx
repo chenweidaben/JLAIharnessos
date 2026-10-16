@@ -318,6 +318,8 @@ const InfectionControlV2 = lazy(() => import('@/pages/infection/control'));
 const DisputeWarning = lazy(() => import('@/pages/dispute/warning'));
 // M189-A：绩效管理
 const PerformanceManagement = lazy(() => import('@/pages/admin/performance-management'));
+// M189-B：成本核算
+const CostAccounting = lazy(() => import('@/pages/admin/cost-accounting'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -576,6 +578,8 @@ export default function AppRoutes() {
           <Route path="dispute/warning" element={<DisputeWarning />} />
           {/* M189-A：绩效管理 */}
           <Route path="admin/performance-management" element={<PerformanceManagement />} />
+          {/* M189-B：成本核算 */}
+          <Route path="admin/cost-accounting" element={<CostAccounting />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
