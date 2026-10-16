@@ -48,6 +48,7 @@ import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOp
 import { perfOptimizeRoutes } from './routes/perfOptimize';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
+// 【v4.x近期】M158-C：首屏与缓存优化（路由懒加载/缓存策略/FCP-LCP 测量）GET /api/v1/admin/performance/firstload
 // 【UI 一致性与无障碍】M150-D：深海蓝 VI 五维度一致性 + WCAG AA 无障碍 GET /api/v1/admin/ui/consistency
 import { uiConsistencyRoutes } from './routes/uiConsistency';
 // 【质量补齐与新场景】M151-B：UI 无障碍对比度修复验证（#4A90D9→#2E6FB5 / #8C8C8C→#595959，WCAG AA）GET /api/v1/admin/ui/accessibility/verify
@@ -121,6 +122,7 @@ import { empiRoutes } from './routes/empi';
 import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中台·数据集市
 import { i18nRoutes } from './routes/i18n'; // M151-C：多语言支持框架 GET /api/v1/i18n（中文/英文，可扩展）
+import { i18nDeepRoutes } from './routes/i18nDeep'; // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
 import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
@@ -348,6 +350,7 @@ import { doctorPreferenceRoutes } from './routes/doctorPreference';
 // 【用户体验深化】M134-B：医生成长档案（月度快照表驱动，成长曲线+雷达+同科室对比）
 import { doctorGrowthRoutes } from './routes/doctorGrowth';
 import { userSettingsRoutes } from './routes/userSettings';
+// 【用户体验深化】M158-D：个性化偏好与统一通知 GET/PUT /api/v1/user/preferences（v4.x近期，纯函数无新表）
 // 【越用越聪明深化】M146-B：个人智能体成长报告 GET /api/v1/user/muse/report（让每个员工有成就感）
 import { personalGrowthRoutes } from './routes/personalGrowth';
 import { notificationRoutes } from './routes/notifications';
@@ -467,6 +470,7 @@ const allRoutes: RouteDef[] = [
   ...dataWarehouseRoutes,
   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
   ...i18nRoutes, // M151-C：多语言支持框架（GET /api/v1/i18n，中文/英文，可扩展）
+  ...i18nDeepRoutes, // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
   ...dataGovernanceRoutes,
   ...outboxRoutes,
   ...sessionAdminRoutes,
