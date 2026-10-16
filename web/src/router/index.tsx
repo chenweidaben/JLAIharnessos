@@ -618,6 +618,8 @@ const MedRecordMgmtV2 = lazy(() => import('@/pages/medical-record/report-v2'));
 const InsuranceMgmtV2 = lazy(() => import('@/pages/insurance/report-v2'));
 // M226-B：物价收费 V2
 const PricingV2 = lazy(() => import('@/pages/pricing/report-v2'));
+// M227-A：信息化规划 V2
+const InformatizationPlanV2 = lazy(() => import('@/pages/informatization/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1176,6 +1178,8 @@ export default function AppRoutes() {
           <Route path="insurance/report-v2" element={<InsuranceMgmtV2 />} />
           {/* M226-B：物价收费 V2 */}
           <Route path="pricing/report-v2" element={<PricingV2 />} />
+          {/* M227-A：信息化规划 V2 */}
+          <Route path="informatization/report-v2" element={<InformatizationPlanV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
