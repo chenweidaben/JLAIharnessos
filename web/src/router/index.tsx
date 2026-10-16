@@ -938,6 +938,8 @@ const ObGynV5 = lazy(() => import('@/pages/ob-gyn-v5/report'));
 const DermInfectiousV5 = lazy(() => import('@/pages/derm-infectious-v5/report'));
 // M266-D：眼科耳鼻喉口腔 V5
 const ENTEyeDentalV5 = lazy(() => import('@/pages/ent-eye-dental-v5/report'));
+// M267-A：国考绩效 55 指标 V5
+const NationalExamV5 = lazy(() => import('@/pages/national-exam-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1816,6 +1818,8 @@ export default function AppRoutes() {
           <Route path="derm-infectious-v5/report" element={<DermInfectiousV5 />} />
           {/* M266-D：眼科耳鼻喉口腔 V5 */}
           <Route path="ent-eye-dental-v5/report" element={<ENTEyeDentalV5 />} />
+          {/* M267-A：国考绩效 55 指标 V5 */}
+          <Route path="national-exam-v5/report" element={<NationalExamV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
