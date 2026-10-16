@@ -536,6 +536,8 @@ const IoTReport = lazy(() => import('@/pages/iot/report'));
 const BlockchainReport = lazy(() => import('@/pages/blockchain/report'));
 // M216-A：云原生 V2
 const CloudNativeV2 = lazy(() => import('@/pages/cloud-native/report-v2'));
+// M216-B：微服务 V2
+const MicroserviceV2 = lazy(() => import('@/pages/microservice/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1012,6 +1014,8 @@ export default function AppRoutes() {
           <Route path="blockchain/report" element={<BlockchainReport />} />
           {/* M216-A：云原生 V2 */}
           <Route path="cloud-native/report-v2" element={<CloudNativeV2 />} />
+          {/* M216-B：微服务 V2 */}
+          <Route path="microservice/report-v2" element={<MicroserviceV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
