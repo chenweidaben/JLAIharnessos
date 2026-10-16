@@ -572,6 +572,8 @@ const LogisticsV2 = lazy(() => import('@/pages/logistics/report-v2'));
 const EnvironmentReport = lazy(() => import('@/pages/environment/report'));
 // M220-C：营养膳食
 const NutritionReport = lazy(() => import('@/pages/nutrition/report'));
+// M220-D：安宁疗护
+const HospiceReport = lazy(() => import('@/pages/hospice/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1084,6 +1086,8 @@ export default function AppRoutes() {
           <Route path="environment/report" element={<EnvironmentReport />} />
           {/* M220-C：营养膳食 */}
           <Route path="nutrition/report" element={<NutritionReport />} />
+          {/* M220-D：安宁疗护 */}
+          <Route path="hospice/report" element={<HospiceReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
