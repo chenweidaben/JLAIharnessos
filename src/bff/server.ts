@@ -134,6 +134,8 @@ import { i18nRoutes } from './routes/i18n'; // M151-C：多语言支持框架 GE
 import { i18nDeepRoutes } from './routes/i18nDeep'; // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
 import { dataGovernanceRoutes } from './routes/dataGovernance';
 import { dataQualityRoutes } from './routes/dataQuality'; // M159-D：数据质量治理 GET /api/v1/admin/data-quality/report
+// 【数据中台与AI大脑】M164-A：数据资产治理 GET /api/v1/admin/data-mart/catalog + /lineage（资产清单/血缘追踪/敏感分级/数据服务）
+import { dataMartDeepRoutes } from './routes/dataMartDeep';
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
@@ -274,7 +276,6 @@ import { internetDeliveryRoutes } from './routes/internetDelivery';
 import { satisfactionRoutes } from './routes/satisfaction';
 import { satisfactionAiRoutes } from './routes/satisfactionAi'; // M153-D：患者满意度智能化分析 GET /api/v1/admin/satisfaction/ai-report（临床决策支持）
 import { emrSmartScoreRoutes } from './routes/emrSmartScore'; // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，实质内容公平评分）
-import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
 import { referralRoutes } from './routes/referral';
 import { knowledgeBaseRoutes } from './routes/knowledgeBase';
@@ -501,6 +502,7 @@ const allRoutes: RouteDef[] = [
   ...i18nDeepRoutes, // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
   ...dataGovernanceRoutes,
   ...dataQualityRoutes, // M159-D：数据质量五维报告
+  ...dataMartDeepRoutes, // M164-A：数据资产治理（资产目录/血缘追踪）
   ...outboxRoutes,
   ...sessionAdminRoutes,
   ...billingRoutes,
@@ -646,7 +648,6 @@ const allRoutes: RouteDef[] = [
   ...internetDeliveryRoutes,
   ...satisfactionRoutes,
   ...satisfactionAiRoutes, // M153-D：满意度智能分析报告（临床决策支持）
-  ...smartTriageRoutes,
   ...delegationRoutes,
   ...referralRoutes,
   ...knowledgeBaseRoutes,
