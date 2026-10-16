@@ -638,6 +638,8 @@ const UnionV2 = lazy(() => import('@/pages/union/report-v2'));
 const EmergencyMgmtV2 = lazy(() => import('@/pages/emergency-mgmt/report-v2'));
 // M229-B：消防安保 V2
 const FireSecurityV2 = lazy(() => import('@/pages/fire-security/report-v2'));
+// M229-C：特种设备与危化品
+const SpecialEquipHazmatReport = lazy(() => import('@/pages/special-equip-hazmat/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1216,6 +1218,8 @@ export default function AppRoutes() {
           <Route path="emergency-mgmt/report-v2" element={<EmergencyMgmtV2 />} />
           {/* M229-B：消防安保 V2 */}
           <Route path="fire-security/report-v2" element={<FireSecurityV2 />} />
+          {/* M229-C：特种设备与危化品 */}
+          <Route path="special-equip-hazmat/report" element={<SpecialEquipHazmatReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
