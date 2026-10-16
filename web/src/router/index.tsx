@@ -794,6 +794,14 @@ const ImagingAIV4 = lazy(() => import('@/pages/imaging-ai-v4/report'));
 const EMRIntelligentV4 = lazy(() => import('@/pages/emr-intelligent-v4/report'));
 // M248-D：知识图谱 V4
 const KnowledgeGraphV4 = lazy(() => import('@/pages/knowledge-graph-v4/report'));
+// M249-A：预防公卫 V4
+const PreventiveMedicineV4 = lazy(() => import('@/pages/preventive-medicine-v4/report'));
+// M249-B：妇幼 V4
+const MaternalChildLifecycleV4 = lazy(() => import('@/pages/maternal-child-lifecycle-v4/report'));
+// M249-C：老年 V4
+const GeriatricsLifecycleV4 = lazy(() => import('@/pages/geriatrics-lifecycle-v4/report'));
+// M249-D：职业环境 V4
+const OccupationalEnvironmentalV4 = lazy(() => import('@/pages/occupational-environmental-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1528,6 +1536,14 @@ export default function AppRoutes() {
           <Route path="emr-intelligent-v4/report" element={<EMRIntelligentV4 />} />
           {/* M248-D：知识图谱 V4 */}
           <Route path="knowledge-graph-v4/report" element={<KnowledgeGraphV4 />} />
+          {/* M249-A：预防公卫 V4 */}
+          <Route path="preventive-medicine-v4/report" element={<PreventiveMedicineV4 />} />
+          {/* M249-B：妇幼 V4 */}
+          <Route path="maternal-child-lifecycle-v4/report" element={<MaternalChildLifecycleV4 />} />
+          {/* M249-C：老年 V4 */}
+          <Route path="geriatrics-lifecycle-v4/report" element={<GeriatricsLifecycleV4 />} />
+          {/* M249-D：职业环境 V4 */}
+          <Route path="occupational-environmental-v4/report" element={<OccupationalEnvironmentalV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
