@@ -1127,6 +1127,8 @@ import { emrGradeV5ReportRoutes } from './routes/emrGradeV5Report';
 import { interopV5ReportRoutes } from './routes/interopV5Report';
 // M267-D：智慧医院三位一体评级 V5 GET /api/v1/smart-hospital-v5/report
 import { smartHospitalV5ReportRoutes } from './routes/smartHospitalV5Report';
+// M268-A：智慧病房 IoT V5 GET /api/v1/smart-ward-iot-v5/report
+import { smartWardIoTV5ReportRoutes } from './routes/smartWardIoTV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1933,6 +1935,7 @@ const allRoutes: RouteDef[] = [
   ...emrGradeV5ReportRoutes, // M267-B：电子病历分级评价 0-8 级 V5 GET /api/v1/emr-grade-v5/report
   ...interopV5ReportRoutes, // M267-C：互联互通标准化成熟度 V5 GET /api/v1/interop-v5/report
   ...smartHospitalV5ReportRoutes, // M267-D：智慧医院三位一体评级 V5 GET /api/v1/smart-hospital-v5/report
+  ...smartWardIoTV5ReportRoutes, // M268-A：智慧病房 IoT V5 GET /api/v1/smart-ward-iot-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
