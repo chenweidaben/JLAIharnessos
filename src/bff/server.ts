@@ -609,6 +609,8 @@ import { psychiatryRoutes } from './routes/psychiatry';
 import { tcmRoutes } from './routes/tcm';
 // M202-D：临床试验科研 GET /api/v1/admin/research/report
 import { clinicalResearchRoutes } from './routes/clinicalResearch';
+// M203-A：ICU GET /api/v1/specialty/icu/report
+import { criticalCareRoutes } from './routes/criticalCare';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1155,6 +1157,7 @@ const allRoutes: RouteDef[] = [
   ...psychiatryRoutes, // M202-B：精神心理 GET /api/v1/specialty/psychiatry/report
   ...tcmRoutes, // M202-C：中医 GET /api/v1/specialty/tcm/report
   ...clinicalResearchRoutes, // M202-D：临床试验科研 GET /api/v1/admin/research/report
+  ...criticalCareRoutes, // M203-A：ICU GET /api/v1/specialty/icu/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
