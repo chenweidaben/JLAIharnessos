@@ -456,6 +456,8 @@ import { musePatternsRoutes } from './routes/musePatterns';
 import { museGrowthRoutes } from './routes/museGrowth';
 import { patientMuseRoutes } from './routes/patientMuse';
 import { museDeptCurveRoutes } from './routes/museDeptCurve';
+// 【知识图谱与Personal Agent】M169-B：Doctor MUSE 医生个人智能体（四维经验沉淀/本人经验推荐/同行聚合对比，不公开他人经验）
+import { doctorMuseRoutes } from './routes/doctorMuse';
 import { helpCenterRoutes } from './routes/helpCenter';
 // 【系统集成】M129-A：统一 API 文档（Swagger UI + OpenAPI3 JSON）
 import { apiDocsRoutes } from './routes/apiDocs';
@@ -861,6 +863,7 @@ const allRoutes: RouteDef[] = [
   ...museGrowthRoutes,
   ...patientMuseRoutes,
   ...museDeptCurveRoutes,
+  ...doctorMuseRoutes, // M169-B：GET /api/v1/doctor/muse/:staffId 医生个人智能体（本人经验沉淀，隐私安全）
   ...helpCenterRoutes,
   ...apiDocsRoutes,
   ...adminRecordAuditRoutes,
