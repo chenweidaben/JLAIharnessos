@@ -127,6 +127,7 @@ import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中�
 import { i18nRoutes } from './routes/i18n'; // M151-C：多语言支持框架 GET /api/v1/i18n（中文/英文，可扩展）
 import { i18nDeepRoutes } from './routes/i18nDeep'; // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
 import { dataGovernanceRoutes } from './routes/dataGovernance';
+import { dataQualityRoutes } from './routes/dataQuality'; // M159-D：数据质量治理 GET /api/v1/admin/data-quality/report
 import { outboxRoutes } from './routes/outbox';
 import { sessionAdminRoutes } from './routes/sessions';
 import { billingRoutes } from './routes/billing';
@@ -479,6 +480,7 @@ const allRoutes: RouteDef[] = [
   ...i18nRoutes, // M151-C：多语言支持框架（GET /api/v1/i18n，中文/英文，可扩展）
   ...i18nDeepRoutes, // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
   ...dataGovernanceRoutes,
+  ...dataQualityRoutes, // M159-D：数据质量五维报告
   ...outboxRoutes,
   ...sessionAdminRoutes,
   ...billingRoutes,
