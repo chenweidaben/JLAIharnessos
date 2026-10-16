@@ -303,6 +303,7 @@ import { aiDiagnoseRoutes } from './routes/aiDiagnose';
 // 【AI深化与运营预测】M154-A：AI 辅助诊断深化 POST /api/v1/ai/diagnose/deep（16病种库/Top5/鉴别/检验影像建议）
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
+import { guideDxRoutes } from './routes/guideDx';
 import { assistantRecordDraftRoutes } from './routes/assistantRecordDraft';
 import { emrLevel5Routes } from './routes/emrLevel5';
 import { emrGrade5Routes } from './routes/emrGrade5';
@@ -704,6 +705,7 @@ const allRoutes: RouteDef[] = [
   ...assistantDiagnosisRoutes,
   ...aiDiagnoseRoutes, // M144-A：AI 辅助诊断增强
   ...deepDiagnoseRoutes, // M154-A：AI 辅助诊断深化（Top5/鉴别/检验影像）
+  ...guideDxRoutes, // M160-C：临床指南对齐（四部权威指南硬阈值）
   ...assistantRecordDraftRoutes,
   ...insuranceAuditRoutes,
   ...adminInsuranceReviewRoutes,
