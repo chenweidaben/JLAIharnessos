@@ -710,6 +710,8 @@ const MetaverseHospital = lazy(() => import('@/pages/metaverse-hospital/report')
 const CDSSV3 = lazy(() => import('@/pages/cdss-v3/report'));
 // M238-B：影像 AI V3
 const ImagingAIV3 = lazy(() => import('@/pages/imaging-ai-v3/report'));
+// M238-C：病历智能 V3
+const EMRIntelligentV3 = lazy(() => import('@/pages/emr-intelligent-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1360,6 +1362,8 @@ export default function AppRoutes() {
           <Route path="cdss-v3/report" element={<CDSSV3 />} />
           {/* M238-B：影像 AI V3 */}
           <Route path="imaging-ai-v3/report" element={<ImagingAIV3 />} />
+          {/* M238-C：病历智能 V3 */}
+          <Route path="emr-intelligent-v3/report" element={<EMRIntelligentV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
