@@ -16,7 +16,7 @@
  */
 
 import { EMERGENCY_PERMISSIONS } from '../permissions';
-import { requirePermissionCode } from '../middleware/auth';
+import { requirePermissionCode, requireRole } from '../middleware/auth';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import * as agg from '../aggregators/emergencyAggregator';
 
@@ -306,5 +306,61 @@ export const emergencyRoutes: RouteDef[] = [
       return agg.recordDisposition(actor, c.params.visitId, body);
     }),
     auth: true,
+  },
+
+  // ===================== M162-A 医院安全与应急管理（仅 admin） =====================
+  // GET /api/v1/admin/emergency/plan?scenario=xxx
+  //   按情景（批量伤员/火灾疏散/停电/信息系统故障/传染病暴发）生成可照做的应急预案
+  //   + 现场处置核对表。纯函数即时计算，不落敏感明文。
+  {
+    method: 'GET',
+    path: '/api/v1/admin/emergency/plan',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireRole(c, 'admin');
+      if (denied) return denied;
+      const scenario = c.query.get('scenario') ?? '';
+      const plan = agg.buildEmergencyPlan(scenario);
+      const checklist = agg.emergencyResponseChecklist(scenario);
+      return json(ok({ plan, checklist }));
+    },
+  },
+
+  // POST /api/v1/admin/emergency/drill
+  //   body：{ planId, date } → 排定演练；或 { drillId, metrics, evaluate:true } → 评估演练效果。
+  {
+    method: 'POST',
+    path: '/api/v1/admin/emergency/drill',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireRole(c, 'admin');
+      if (denied) return denied;
+
+      let body: {
+        planId?: string;
+        date?: string;
+        drillId?: string;
+        metrics?: agg.EmergencyDrillMetrics;
+        evaluate?: boolean;
+      };
+      try {
+        body = await c.body<typeof body>();
+      } catch {
+        return json(fail(ErrorCode.BAD_REQUEST, '请求体不是合法 JSON', c.traceId), 400);
+      }
+      if (!body || typeof body !== 'object') {
+        return json(fail(ErrorCode.BAD_REQUEST, '请求体为空', c.traceId), 400);
+      }
+
+      // 评估模式：提交实测指标 → 加权打分定级
+      if (body.evaluate && body.drillId) {
+        const evaluation = agg.evaluateDrillResult(body.drillId, body.metrics ?? {});
+        return json(ok({ mode: 'evaluate', evaluation }));
+      }
+
+      // 排期模式：planId + date → 生成演练计划
+      const schedule = agg.scheduleEmergencyDrill(body.planId ?? '', body.date ?? '');
+      return json(ok({ mode: 'schedule', schedule }));
+    },
   },
 ];
