@@ -578,6 +578,8 @@ const HospiceReport = lazy(() => import('@/pages/hospice/report'));
 const InfectiousDiseaseV2 = lazy(() => import('@/pages/infectious-disease/report-v2'));
 // M221-B：妇幼健康 V2
 const MaternalChildV2 = lazy(() => import('@/pages/maternal-child/report-v2'));
+// M221-C：老年健康 V2
+const GeriatricsV2 = lazy(() => import('@/pages/geriatrics/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1096,6 +1098,8 @@ export default function AppRoutes() {
           <Route path="infectious-disease/report-v2" element={<InfectiousDiseaseV2 />} />
           {/* M221-B：妇幼健康 V2 */}
           <Route path="maternal-child/report-v2" element={<MaternalChildV2 />} />
+          {/* M221-C：老年健康 V2 */}
+          <Route path="geriatrics/report-v2" element={<GeriatricsV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
