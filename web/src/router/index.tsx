@@ -666,6 +666,8 @@ const PersonalAgentV3 = lazy(() => import('@/pages/personal-agent-v3/report'));
 const DigitalTwin = lazy(() => import('@/pages/digital-twin/report'));
 // M232-D：区域健康大脑
 const RegionalBrain = lazy(() => import('@/pages/regional-brain/report'));
+// M233-A：患者服务智能化 V2
+const PatientServiceAIV2 = lazy(() => import('@/pages/patient-service-ai-v2/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1272,6 +1274,8 @@ export default function AppRoutes() {
           <Route path="digital-twin/report" element={<DigitalTwin />} />
           {/* M232-D：区域健康大脑 */}
           <Route path="regional-brain/report" element={<RegionalBrain />} />
+          {/* M233-A：患者服务智能化 V2 */}
+          <Route path="patient-service-ai-v2/report" element={<PatientServiceAIV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
