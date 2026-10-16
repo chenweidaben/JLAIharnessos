@@ -432,6 +432,8 @@ const TCM = lazy(() => import('@/pages/specialty/tcm'));
 const ClinicalResearch = lazy(() => import('@/pages/admin/clinical-research'));
 // M203-A：ICU
 const ICU = lazy(() => import('@/pages/specialty/icu'));
+// M203-B：介入内镜
+const Interventional = lazy(() => import('@/pages/specialty/interventional'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -804,6 +806,8 @@ export default function AppRoutes() {
           <Route path="admin/clinical-research" element={<ClinicalResearch />} />
           {/* M203-A：ICU */}
           <Route path="specialty/icu" element={<ICU />} />
+          {/* M203-B：介入内镜 */}
+          <Route path="specialty/interventional" element={<Interventional />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
