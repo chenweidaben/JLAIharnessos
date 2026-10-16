@@ -882,6 +882,14 @@ const TeachingAIV5 = lazy(() => import('@/pages/teaching-ai-v5/report'));
 const PatientCompanionV5 = lazy(() => import('@/pages/patient-companion-v5/report'));
 // M259-D：AI 管理决策助手 V5
 const ManagementAIV5 = lazy(() => import('@/pages/management-ai-v5/report'));
+// M260-A：MLOps 模型工程 V5
+const MLOpsV5 = lazy(() => import('@/pages/mlops-v5/report'));
+// M260-B：数据 Mesh 与数据产品化 V5
+const DataMeshV5 = lazy(() => import('@/pages/data-mesh-v5/report'));
+// M260-C：云原生 SRE 深化 V5
+const CloudNativeSREV5 = lazy(() => import('@/pages/cloud-native-sre-v5/report'));
+// M260-D：医院开发者平台 V5
+const DevPlatformV5 = lazy(() => import('@/pages/dev-platform-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1704,6 +1712,14 @@ export default function AppRoutes() {
           <Route path="patient-companion-v5/report" element={<PatientCompanionV5 />} />
           {/* M259-D：AI 管理决策助手 V5 */}
           <Route path="management-ai-v5/report" element={<ManagementAIV5 />} />
+          {/* M260-A：MLOps 模型工程 V5 */}
+          <Route path="mlops-v5/report" element={<MLOpsV5 />} />
+          {/* M260-B：数据 Mesh 与数据产品化 V5 */}
+          <Route path="data-mesh-v5/report" element={<DataMeshV5 />} />
+          {/* M260-C：云原生 SRE 深化 V5 */}
+          <Route path="cloud-native-sre-v5/report" element={<CloudNativeSREV5 />} />
+          {/* M260-D：医院开发者平台 V5 */}
+          <Route path="dev-platform-v5/report" element={<DevPlatformV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

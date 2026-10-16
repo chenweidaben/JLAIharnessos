@@ -1065,6 +1065,14 @@ import { teachingAIV5ReportRoutes } from './routes/teachingAIV5Report';
 import { patientCompanionV5ReportRoutes } from './routes/patientCompanionV5Report';
 // M259-D：AI 管理决策助手 V5 GET /api/v1/management-ai-v5/report
 import { managementAIV5ReportRoutes } from './routes/managementAIV5Report';
+// M260-A：MLOps 模型工程 V5 GET /api/v1/mlops-v5/report
+import { mlopsV5ReportRoutes } from './routes/mlopsV5Report';
+// M260-B：数据 Mesh 与数据产品化 V5 GET /api/v1/data-mesh-v5/report
+import { dataMeshV5ReportRoutes } from './routes/dataMeshV5Report';
+// M260-C：云原生 SRE 深化 V5 GET /api/v1/cloud-native-sre-v5/report
+import { cloudNativeSREV5ReportRoutes } from './routes/cloudNativeSREV5Report';
+// M260-D：医院开发者平台 V5 GET /api/v1/dev-platform-v5/report
+import { devPlatformV5ReportRoutes } from './routes/devPlatformV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1839,6 +1847,10 @@ const allRoutes: RouteDef[] = [
   ...teachingAIV5ReportRoutes, // M259-B：AI 教学助手 V5 GET /api/v1/teaching-ai-v5/report
   ...patientCompanionV5ReportRoutes, // M259-C：AI 患者陪伴 V5 GET /api/v1/patient-companion-v5/report
   ...managementAIV5ReportRoutes, // M259-D：AI 管理决策助手 V5 GET /api/v1/management-ai-v5/report
+  ...mlopsV5ReportRoutes, // M260-A：MLOps 模型工程 V5 GET /api/v1/mlops-v5/report
+  ...dataMeshV5ReportRoutes, // M260-B：数据 Mesh 与数据产品化 V5 GET /api/v1/data-mesh-v5/report
+  ...cloudNativeSREV5ReportRoutes, // M260-C：云原生 SRE 深化 V5 GET /api/v1/cloud-native-sre-v5/report
+  ...devPlatformV5ReportRoutes, // M260-D：医院开发者平台 V5 GET /api/v1/dev-platform-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
