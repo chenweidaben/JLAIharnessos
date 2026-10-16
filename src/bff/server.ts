@@ -168,6 +168,7 @@ import { surgeryScheduleRoutes } from './routes/surgerySchedule';
 // 【核心业务深化】M130-D 手术排班优化（POST /admin/surgery/schedule/optimize）
 import { adminSurgeryOptimizeRoutes } from './routes/adminSurgeryOptimize';
 // 【AI深化与智能运营】M168-B 医院运营预测与调配（GET /admin/ops/predict 含置信区间 + POST /admin/ops/schedule-optimize）
+import { opsPredictRoutes } from './routes/opsPredict';
 import { surgeryChecklistRoutes } from './routes/surgeryChecklist';
 import { transfusionRoutes } from './routes/transfusion';
 import { bloodQualityRoutes } from './routes/bloodQuality';
@@ -869,6 +870,7 @@ const allRoutes: RouteDef[] = [
   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
   ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
+  ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
 ];
 
 interface Compiled {
