@@ -469,6 +469,8 @@ import { inpatientBrainV2Routes } from './routes/inpatientBrainV2';
 import { orTwins3DRoutes } from './routes/orTwins3D';
 // M185-C：Nurse MUSE V2 护理智能体 GET /api/v1/personal-agent/nurse-muse-v2
 import { nurseMUSEV2Routes } from './routes/nurseMUSEV2';
+// M185-D：Pharma MUSE V2 药事智能体 GET /api/v1/personal-agent/pharma-muse-v2
+import { pharmaMUSEV2Routes } from './routes/pharmaMUSEV2';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -945,6 +947,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientBrainV2Routes, // M185-A：AI大脑2.0住院 GET /api/v1/ai-brain/v2/inpatient
   ...orTwins3DRoutes, // M185-B：数字孪生3D手术室 GET /api/v1/twin3d/or
   ...nurseMUSEV2Routes, // M185-C：Nurse MUSE V2 GET /api/v1/personal-agent/nurse-muse-v2
+  ...pharmaMUSEV2Routes, // M185-D：Pharma MUSE V2 GET /api/v1/personal-agent/pharma-muse-v2
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
