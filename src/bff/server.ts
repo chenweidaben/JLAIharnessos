@@ -202,6 +202,7 @@ import { erTriageRoutes } from './routes/erTriage';
 import { barthelRoutes } from './routes/barthel';
 import { equipmentRoutes } from './routes/equipment';
 import { logisticsRoutes } from './routes/logistics';
+import { logisticsDeepRoutes } from './routes/logisticsDeep'; // M171-C：【科研教学后勤】后勤智能化深化 POST /api/v1/logistics/deep-dispatch（技能匹配派单/路线优化/需求预测/满意度闭环，不推诿）
 import { regionalCoopRoutes } from './routes/regionalCoop'; // M143-D：区域医疗协同（互联网医院与远程医疗）
 import { regionalCollabRoutes } from './routes/regionalCollab'; // M159-B：集团化扩展·区域医疗协同（跨院转诊/结果互认/号源共享/资源调配）
 import { erGreenRoutes } from './routes/erGreen';
@@ -585,6 +586,7 @@ const allRoutes: RouteDef[] = [
   ...barthelRoutes,
   ...equipmentRoutes,
   ...logisticsRoutes,
+  ...logisticsDeepRoutes, // M171-C：【科研教学后勤】后勤智能化深化（深度派单/路线优化/需求预测/满意度跟踪）
   ...regionalCoopRoutes, // M143-D：区域医疗协同（互联网医院与远程医疗）
   ...regionalCollabRoutes, // M159-B：集团化扩展·区域医疗协同（跨院转诊/结果互认/号源共享/资源调配）
   ...erGreenRoutes,
