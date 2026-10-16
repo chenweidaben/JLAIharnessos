@@ -270,6 +270,7 @@ import { mdtTreatmentPlanRoutes } from './routes/mdtTreatmentPlan';
 import { piccRoutes } from './routes/picc';
 import { cdiRoutes } from './routes/cdi';
 import { transfusionReactionRoutes } from './routes/transfusionReaction';
+import { bloodClosureSlaRoutes } from './routes/bloodClosureSla';
 import { sbarRoutes } from './routes/sbar';
 import { edObservationRoutes } from './routes/edObservation';
 import { infectionDashboardRoutes } from './routes/infectionDashboard';
@@ -477,6 +478,7 @@ import { coverageReportRoutes } from './routes/coverageReport';
 import { coverageDetailRoutes } from './routes/coverageDetail';
 // 【质量提升与新场景】M173-A：99% → 99.5%+ 覆盖率缺口/计划/进度闭环（仅 admin）
 import { coverageGapRoutes } from './routes/coverageGap';
+// 【v5.0启动】M182-B：测试覆盖率缺口修复（输血/医保/药事九大模块，GET /api/v1/admin/test/coverage-fix）
 // 【200版本里程碑】M157-A：里程碑总结（仅 admin，GET /api/v1/admin/milestone/summary）
 import { milestoneRoutes } from './routes/milestone';
 // 【300版本里程碑】M181-A：300 版本预告总结（仅 admin，GET /api/v1/admin/milestone/v2）
@@ -699,6 +701,7 @@ const allRoutes: RouteDef[] = [
 ...piccRoutes,
 ...cdiRoutes,
 ...transfusionReactionRoutes,
+...bloodClosureSlaRoutes,
 ...sbarRoutes,
 ...edObservationRoutes,
 ...infectionDashboardRoutes,
