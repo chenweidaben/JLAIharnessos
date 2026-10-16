@@ -1,0 +1,29 @@
+/**
+ * 健澜科技 jlmedaios - 微服务路由（M197-B）
+ *
+ * GET /api/v1/admin/microservices/report
+ *
+ * 权限：microservices:view。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+
+import { requirePermissionCode } from '../middleware/auth.js';
+import { type Ctx, json, ok, type RouteDef } from '../types.js';
+import { buildMicroservicesReport } from '../aggregators/microservicesAggregator.js';
+
+export const microservicesRoutes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/v1/admin/microservices/report',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requirePermissionCode(c, 'microservices:view');
+      if (denied) return denied;
+
+      const timeRange = c.query.get('timeRange') ?? '30d';
+      const result = buildMicroservicesReport(timeRange);
+      return json(ok(result));
+    },
+  },
+];
