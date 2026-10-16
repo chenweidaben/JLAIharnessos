@@ -1001,6 +1001,14 @@ import { surgeryAnesthesiaV4ReportRoutes } from './routes/surgeryAnesthesiaV4Rep
 import { pharmacyV4ReportRoutes } from './routes/pharmacyV4Report';
 // M251-D：检验 V4 GET /api/v1/laboratory-v4/report
 import { laboratoryV4ReportRoutes } from './routes/laboratoryV4Report';
+// M252-A：护理 V4 GET /api/v1/nursing-v4/report
+import { nursingV4ReportRoutes } from './routes/nursingV4Report';
+// M252-B：病案 V4 GET /api/v1/medical-record-v4/report
+import { medicalRecordV4ReportRoutes } from './routes/medicalRecordV4Report';
+// M252-C：医保 V4 GET /api/v1/insurance-v4/report
+import { insuranceV4ReportRoutes } from './routes/insuranceV4Report';
+// M252-D：门诊住院 V4 GET /api/v1/outpatient-inpatient-v4/report
+import { outpatientInpatientV4ReportRoutes } from './routes/outpatientInpatientV4Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1743,6 +1751,10 @@ const allRoutes: RouteDef[] = [
   ...surgeryAnesthesiaV4ReportRoutes, // M251-B：手术麻醉 V4 GET /api/v1/surgery-anesthesia-v4/report
   ...pharmacyV4ReportRoutes, // M251-C：药房 V4 GET /api/v1/pharmacy-v4/report
   ...laboratoryV4ReportRoutes, // M251-D：检验 V4 GET /api/v1/laboratory-v4/report
+  ...nursingV4ReportRoutes, // M252-A：护理 V4 GET /api/v1/nursing-v4/report
+  ...medicalRecordV4ReportRoutes, // M252-B：病案 V4 GET /api/v1/medical-record-v4/report
+  ...insuranceV4ReportRoutes, // M252-C：医保 V4 GET /api/v1/insurance-v4/report
+  ...outpatientInpatientV4ReportRoutes, // M252-D：门诊住院 V4 GET /api/v1/outpatient-inpatient-v4/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
