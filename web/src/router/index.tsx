@@ -270,6 +270,8 @@ const BedMapPage = lazy(() => import('@/pages/nursing/BedMap'));
 const NqiDashboardPage = lazy(() => import('@/pages/nursing/NqiDashboard'));
 // 科室月度运营报表（M102-D）
 const MonthlyReportPage = lazy(() => import('@/pages/ops/MonthlyReport'));
+// M183-A：Doctor MUSE 推荐效果追踪
+const PersonalAgentAdoption = lazy(() => import('@/pages/personal-agent/adoption'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -480,6 +482,8 @@ export default function AppRoutes() {
           <Route path="nursing/nqi-dashboard" element={<NqiDashboardPage />} />
           {/* 科室月度运营报表（M102-D） */}
           <Route path="ops/monthly-report" element={<MonthlyReportPage />} />
+          {/* M183-A：Doctor MUSE 推荐效果追踪 */}
+          <Route path="personal-agent/adoption" element={<PersonalAgentAdoption />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
