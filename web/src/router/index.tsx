@@ -362,6 +362,8 @@ const PatientSafety = lazy(() => import('@/pages/admin/patient-safety'));
 const PartyBuilding = lazy(() => import('@/pages/admin/party-building'));
 // M194-B：纪检监察
 const Discipline = lazy(() => import('@/pages/admin/discipline'));
+// M194-C：工会管理
+const LaborUnion = lazy(() => import('@/pages/admin/labor-union'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -664,6 +666,8 @@ export default function AppRoutes() {
           <Route path="admin/party-building" element={<PartyBuilding />} />
           {/* M194-B：纪检监察 */}
           <Route path="admin/discipline" element={<Discipline />} />
+          {/* M194-C：工会管理 */}
+          <Route path="admin/labor-union" element={<LaborUnion />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
