@@ -373,6 +373,7 @@ import { digitalTwinRoutes } from './routes/digitalTwin'; // M160-B：医院数�
 import { digitalTwinDeepRoutes } from './routes/digitalTwinDeep'; // M161-A：数字孪生深化 GET /api/v1/admin/digital-twin/stream + POST /simulate（定时快照轮询/流程仿真/资源预测）
 import { twinDeepRoutes } from './routes/twinDeep'; // M170-B：【自学习与数字孪生】多建筑与仿真 GET /api/v1/admin/digital-twin/multi（门诊/住院/医技/急诊四楼宇 2D 可视化 + 患者流仿真 + 密度预测 + 路线优化）
 import { twin3DRoutes } from './routes/twin3D'; // M175-C：【质量与新场景】3D 数字孪生 GET /api/v1/admin/digital-twin/3d（三维挤出建模/床位四色/脱敏患者三维位置/等距投影渲染）
+import { anesthesiaDeepRoutes } from './routes/anesthesiaDeep'; // M176-C：【临床核心深化】手术麻醉管理深化 GET /api/v1/surgery/anesthesia/deep（术前 ASA/心肺风险评估 + 术中生命体征/BIS/出血监测告警 + 术后 PACU/疼痛/并发症 + 麻醉质量四级评价）
 import { teachingDeepRoutes } from './routes/teachingDeep'; // M162-B：教学与培训深化 GET /api/v1/teaching/courses + POST /api/v1/teaching/exam（录播/直播/OSCE/规培出科/继教学分，考核公平不走过场）
 import { teachingOnlineRoutes } from './routes/teachingOnline'; // M171-B：【科研教学后勤】在线学习与考核 GET /api/v1/teaching/courses?category= + POST /api/v1/teaching/quiz/submit（视频课程/自动出题/自动阅卷/学习路径/学分自动认定）
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
@@ -820,6 +821,7 @@ const allRoutes: RouteDef[] = [
   ...digitalTwinDeepRoutes, // M161-A：数字孪生深化（定时快照轮询模拟实时推送/流程仿真/资源预测）
   ...twinDeepRoutes, // M170-B：数字孪生多建筑与仿真（门诊/住院/医技/急诊 2D 可视化 + 患者流仿真 + 密度预测 + 路线优化）
   ...twin3DRoutes, // M175-C：3D 数字孪生（三维挤出建模/床位四色/脱敏患者三维位置/等距投影渲染）
+  ...anesthesiaDeepRoutes, // M176-C：手术麻醉管理深化（术前 ASA/心肺风险 + 术中体征/BIS/出血告警 + 术后 PACU/疼痛 + 麻醉质量四级评价）
   ...teachingOnlineRoutes, // M171-B：在线学习与考核（视频课程录播/直播/回放 + 自动出题 + 服务端阅卷 + 学习路径 + 学分自动认定）
   ...teachingDeepRoutes, // M162-B：教学与培训深化（在线课程/OSCE客观结构化考核/规培轮转出科/继教学分自动记录）
   ...ceoDashboardRoutes,
