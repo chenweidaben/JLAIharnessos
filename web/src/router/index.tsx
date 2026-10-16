@@ -378,6 +378,8 @@ const SmartHealthcare = lazy(() => import('@/pages/smart-healthcare'));
 const BigDataPlatform = lazy(() => import('@/pages/admin/big-data'));
 // M196-B：AI 中台
 const AIPlatform = lazy(() => import('@/pages/admin/ai-platform'));
+// M196-C：物联网平台
+const IoTPlatform = lazy(() => import('@/pages/admin/iot-platform'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -696,6 +698,8 @@ export default function AppRoutes() {
           <Route path="admin/big-data" element={<BigDataPlatform />} />
           {/* M196-B：AI 中台 */}
           <Route path="admin/ai-platform" element={<AIPlatform />} />
+          {/* M196-C：物联网平台 */}
+          <Route path="admin/iot-platform" element={<IoTPlatform />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
