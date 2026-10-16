@@ -284,6 +284,8 @@ const SmartFollowup = lazy(() => import('@/pages/followup/smart'));
 const EquipmentPredictive = lazy(() => import('@/pages/equipment/predictive'));
 // M184-D：备份容灾策略
 const BackupStrategy = lazy(() => import('@/pages/admin/backup-strategy'));
+// M185-A：AI大脑2.0住院试点
+const InpatientBrainV2 = lazy(() => import('@/pages/ai-brain/v2/inpatient'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -508,6 +510,8 @@ export default function AppRoutes() {
           <Route path="equipment/predictive" element={<EquipmentPredictive />} />
           {/* M184-D：备份容灾策略 */}
           <Route path="admin/backup-strategy" element={<BackupStrategy />} />
+          {/* M185-A：AI大脑2.0住院试点 */}
+          <Route path="ai-brain/v2/inpatient" element={<InpatientBrainV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
