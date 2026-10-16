@@ -342,6 +342,8 @@ const HRManagement = lazy(() => import('@/pages/admin/hr'));
 const EquipmentMaterial = lazy(() => import('@/pages/admin/equipment-material'));
 // M192-A：财务收费管理
 const FinanceBilling = lazy(() => import('@/pages/admin/finance'));
+// M192-B：医保管理
+const InsuranceManagement = lazy(() => import('@/pages/admin/insurance'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -624,6 +626,8 @@ export default function AppRoutes() {
           <Route path="admin/equipment-material" element={<EquipmentMaterial />} />
           {/* M192-A：财务收费管理 */}
           <Route path="admin/finance" element={<FinanceBilling />} />
+          {/* M192-B：医保管理 */}
+          <Route path="admin/insurance" element={<InsuranceManagement />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
