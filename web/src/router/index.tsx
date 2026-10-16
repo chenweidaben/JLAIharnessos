@@ -306,6 +306,8 @@ const PerformanceReportV2 = lazy(() => import('@/pages/admin/performance-v2'));
 const SecurityReportV2 = lazy(() => import('@/pages/admin/security-v2'));
 // M187-C：EMR 五级评审 V2
 const EMRGrade5V2 = lazy(() => import('@/pages/emr/grade5'));
+// M187-D：DRG 智能审核 V2
+const DRGAuditV2 = lazy(() => import('@/pages/drg/audit'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -552,6 +554,8 @@ export default function AppRoutes() {
           <Route path="admin/security" element={<SecurityReportV2 />} />
           {/* M187-C：EMR 五级评审 */}
           <Route path="emr/grade5" element={<EMRGrade5V2 />} />
+          {/* M187-D：DRG 审核 */}
+          <Route path="drg/audit" element={<DRGAuditV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
