@@ -834,6 +834,14 @@ const HealthManagementV4 = lazy(() => import('@/pages/health-management-v4/repor
 const RegionalAllianceV4 = lazy(() => import('@/pages/regional-alliance-v4/report'));
 // M253-D：数据资产 V4
 const DataAssetV4 = lazy(() => import('@/pages/data-asset-v4/report'));
+// M254-A：运营分析 V4
+const OperationsAnalysisV4 = lazy(() => import('@/pages/operations-analysis-v4/report'));
+// M254-B：科研管理 V4
+const ResearchManagementV4 = lazy(() => import('@/pages/research-management-v4/report'));
+// M254-C：教学培训 V4
+const TeachingTrainingV4 = lazy(() => import('@/pages/teaching-training-v4/report'));
+// M254-D：后勤设备 V4
+const LogisticsEquipmentV4 = lazy(() => import('@/pages/logistics-equipment-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1608,6 +1616,14 @@ export default function AppRoutes() {
           <Route path="regional-alliance-v4/report" element={<RegionalAllianceV4 />} />
           {/* M253-D：数据资产 V4 */}
           <Route path="data-asset-v4/report" element={<DataAssetV4 />} />
+          {/* M254-A：运营分析 V4 */}
+          <Route path="operations-analysis-v4/report" element={<OperationsAnalysisV4 />} />
+          {/* M254-B：科研管理 V4 */}
+          <Route path="research-management-v4/report" element={<ResearchManagementV4 />} />
+          {/* M254-C：教学培训 V4 */}
+          <Route path="teaching-training-v4/report" element={<TeachingTrainingV4 />} />
+          {/* M254-D：后勤设备 V4 */}
+          <Route path="logistics-equipment-v4/report" element={<LogisticsEquipmentV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
