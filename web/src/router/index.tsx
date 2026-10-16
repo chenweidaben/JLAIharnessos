@@ -952,6 +952,8 @@ const SmartWardIoTV5 = lazy(() => import('@/pages/smart-ward-iot-v5/report'));
 const HospitalRobotV5 = lazy(() => import('@/pages/hospital-robot-v5/report'));
 // M268-C：5G与边缘计算 V5
 const EdgeV5 = lazy(() => import('@/pages/5g-edge-v5/report'));
+// M268-D：数字孪生可视化 V5
+const DigitalTwinV5 = lazy(() => import('@/pages/digital-twin-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1844,6 +1846,8 @@ export default function AppRoutes() {
           <Route path="hospital-robot-v5/report" element={<HospitalRobotV5 />} />
           {/* M268-C：5G与边缘计算 V5 */}
           <Route path="5g-edge-v5/report" element={<EdgeV5 />} />
+          {/* M268-D：数字孪生可视化 V5 */}
+          <Route path="digital-twin-v5/report" element={<DigitalTwinV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
