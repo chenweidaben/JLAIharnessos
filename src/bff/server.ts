@@ -88,6 +88,7 @@ import { infectionControlRoutes } from './routes/infectionControl'; // M141-D：
 import { infectionRealtimeRoutes } from './routes/infectionRealtime'; // M153-C：院感实时监测大屏（超阈值即红色预警，不等月报）
 import { aiBrainRoutes } from './routes/aiBrain'; // M156-B：AI 医院大脑实时大屏（门诊/住院/手术/预警 + AI 建议，演示模式轮询）
 import { brainDeepRoutes } from './routes/brainDeep'; // M159-A：【中期路线图】AI 大脑深化 GET /api/v1/ai-brain/deep（智能预警/决策建议/7天趋势/根因分析）
+import { deepAIAlertRoutes } from './routes/deepAIAlert'; // M175-B：【质量与新场景】AI 深度智能预警 GET /api/v1/ai-brain/deep-alert（四类12阈值/证据链/优先级/可落地处置/闭环）
 import { aiDecisionRoutes } from './routes/aiDecision'; // M164-B：【数据中台与AI大脑】POST /api/v1/ai-brain/decision 智能决策支持（方案排序/ROI 评估/效果闭环）
 import { systemMapRoutes } from './routes/systemMap'; // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图（八大领域全覆盖）
 import { adminMigrationsRoutes } from './routes/adminMigrations';
@@ -152,7 +153,7 @@ import { dataWarehouseRoutes } from './routes/dataWarehouse';
 import { dataMartRoutes } from './routes/dataMart'; // M150-C：医院数据中台·数据集市
 import { i18nRoutes } from './routes/i18n'; // M151-C：多语言支持框架 GET /api/v1/i18n（中文/英文，可扩展）
 import { i18nDeepRoutes } from './routes/i18nDeep'; // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
-import { dataGovernanceRoutes } from './routes/dataGovernance';
+import { dataGovernanceRoutes } from './routes/dataGovernance'; // M5-E：数据质量检测/隐私分级；M175-A：【质量与新场景】深度数据治理驾驶舱 GET /api/v1/admin/data/governance（四大治理域/真检查/周期报告/异常识别）
 import { dataQualityRoutes } from './routes/dataQuality'; // M159-D：数据质量治理 GET /api/v1/admin/data-quality/report
 // 【数据中台与AI大脑】M164-A：数据资产治理 GET /api/v1/admin/data-mart/catalog + /lineage（资产清单/血缘追踪/敏感分级/数据服务）
 import { dataMartDeepRoutes } from './routes/dataMartDeep';
@@ -758,6 +759,7 @@ const allRoutes: RouteDef[] = [
   ...infectionRealtimeRoutes, // M153-C：GET /api/v1/admin/infection/realtime 实时监测大屏
   ...aiBrainRoutes, // M156-B：GET /api/v1/ai-brain/realtime AI 医院大脑实时大屏
   ...brainDeepRoutes, // M159-A：GET /api/v1/ai-brain/deep AI 大脑深化（智能预警/决策建议/7天趋势/根因分析）
+  ...deepAIAlertRoutes, // M175-B：GET /api/v1/ai-brain/deep-alert AI 深度智能预警（四类12阈值/证据链/优先级/可落地处置/闭环）
   ...aiDecisionRoutes, // M164-B：POST /api/v1/ai-brain/decision 智能决策支持（候选方案/四维排序/ROI 评估/效果闭环）
   ...systemMapRoutes, // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图
   ...adminMigrationsRoutes,
