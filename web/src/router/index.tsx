@@ -650,6 +650,8 @@ const AccreditationV3 = lazy(() => import('@/pages/accreditation/report-v3'));
 const DRGDIPV2 = lazy(() => import('@/pages/drg-dip/report-v2'));
 // M230-D：学科评估 V3
 const DisciplineAssessmentV3 = lazy(() => import('@/pages/discipline-assessment/report-v3'));
+// M231-A：智慧医院 V3
+const SmartHospitalV3 = lazy(() => import('@/pages/smart-hospital-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1240,6 +1242,8 @@ export default function AppRoutes() {
           <Route path="drg-dip/report-v2" element={<DRGDIPV2 />} />
           {/* M230-D：学科评估 V3 */}
           <Route path="discipline-assessment/report-v3" element={<DisciplineAssessmentV3 />} />
+          {/* M231-A：智慧医院 V3 */}
+          <Route path="smart-hospital-v3/report" element={<SmartHospitalV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
