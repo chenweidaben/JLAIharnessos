@@ -39,6 +39,15 @@ import {
   trackDelivery,
   verifyOnlinePrescription,
 } from '../aggregators/internetHospitalAggregator';
+// M173-D【质量提升与新场景】：医院互联网医院深化（合规·不违规售药）纯函数
+import {
+  buildDeepInternetHospital,
+  optimizeOnlineConsultation,
+  routePrescriptionSmart,
+  trackOnlinePatientJourney,
+  type SmartPrescription,
+  type WaitingPatient,
+} from '../aggregators/internetHospitalAggregator';
 
 /** M163-D：纯函数抛出的业务错误 → 结构化错误信封 */
 function mapFlowError(err: unknown, c: Ctx): Response {
@@ -320,6 +329,74 @@ export const internetHospitalRoutes: RouteDef[] = [
         return json(ok(trackDelivery(c.params.id), '配送追踪已加载'));
       } catch (err) {
         return mapFlowError(err, c);
+      }
+    },
+  },
+
+  /* ================== M173-D：医院互联网医院深化（合规·不违规售药） ================== */
+
+  // 深度互联网医院：四大深化域能力清单 + 合规 readiness；
+  // 带 doctorId 时附在线问诊排班优化；带 patientId 时附线上患者旅程跟踪；
+  // 并内置一条复诊处方的智能路由演示，直观展示「合规先于就近、不违规售药」。
+  {
+    method: 'GET',
+    path: '/api/v1/internet/deep',
+    auth: true,
+    handle: async (c) => {
+      try {
+        // 1) 深度互联网医院体系（总是返回）
+        const system = buildDeepInternetHospital();
+
+        // 2) 在线问诊排班优化（带 doctorId 才返回；内置最小候诊队列演示）
+        const doctorId = (c.query.get('doctorId') ?? '').trim();
+        let schedule = null;
+        if (doctorId) {
+          const demoQueue: WaitingPatient[] = [
+            { patientId: 'P-A', visitType: 'followup', channel: 'video', waitedMinutes: 12, symptom: '高血压复诊' },
+            { patientId: 'P-B', visitType: 'initial', channel: 'text', waitedMinutes: 30, symptom: '新发头痛' },
+            { patientId: 'P-C', visitType: 'followup', channel: 'text', waitedMinutes: 5, symptom: '糖尿病复诊' },
+          ];
+          schedule = optimizeOnlineConsultation(doctorId, demoQueue);
+        }
+
+        // 3) 线上患者旅程跟踪（带 patientId 才返回；内置部分完成的演示节点）
+        const patientId = (c.query.get('patientId') ?? '').trim();
+        let journey = null;
+        if (patientId) {
+          journey = trackOnlinePatientJourney(patientId, [
+            { step: 'archive', name: '在线建档', doneAt: '2026-10-10T09:00:00+08:00' },
+            { step: 'consult', name: '在线问诊', doneAt: '2026-10-12T10:30:00+08:00' },
+            { step: 'prescribe', name: '复诊开方', doneAt: '2026-10-12T10:45:00+08:00' },
+          ]);
+        }
+
+        // 4) 处方智能路由演示：一条合规复诊处方（已签名+已审方，含冷链）
+        const demoRx: SmartPrescription = {
+          prescriptionId: 'rx-demo-deep',
+          patientId: patientId || 'P-DEEP',
+          doctorId: doctorId || 'D-DEMO',
+          visitType: 'followup',
+          esignatureRef: 'esig-20261016-0001',
+          pharmacistReview: 'approved',
+          coldChain: true,
+          controlledSubstance: false,
+          diagnosis: '2型糖尿病',
+        };
+        const smartRoute = routePrescriptionSmart(demoRx, { lng: 120.16, lat: 30.275 });
+
+        return json(ok({
+          system,
+          schedule,
+          journey,
+          smartRoute,
+          generatedAt: new Date().toISOString(),
+        }, '互联网医院深化已加载（合规·不违规售药）'));
+      } catch (err) {
+        console.error(`[internet/deep] GET [${c.traceId}]`, err);
+        return json(
+          fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '互联网医院深化计算失败', c.traceId),
+          500,
+        );
       }
     },
   },
