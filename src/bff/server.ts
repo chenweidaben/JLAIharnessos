@@ -418,6 +418,7 @@ import { partyUnionRoutes } from './routes/partyUnion';
 // 【质量与安全】M141-A：三甲评审准备系统（七大类别核心条款检查清单 + 差距分析）
 import { jciReviewRoutes } from './routes/jciReview';
 import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
+import { roadmapRoutes } from './routes/roadmap'; // M157-D：v4.x 产品路线图（三阶段/优先级/工作量估算）GET /api/v1/admin/roadmap
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -711,6 +712,7 @@ const allRoutes: RouteDef[] = [
   ...adminLogsRoutes,
   ...adminWebhooksRoutes,
   ...strategyEvolutionRoutes,
+  ...roadmapRoutes, // M157-D：v4.x 路线图 GET /api/v1/admin/roadmap
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
