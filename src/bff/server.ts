@@ -1113,6 +1113,14 @@ import { nephrologyV5ReportRoutes } from './routes/nephrologyV5Report';
 import { rheumatologyV5ReportRoutes } from './routes/rheumatologyV5Report';
 // M265-D：神经与精神心理疾病 V5 GET /api/v1/neuro-psych-v5/report
 import { neuroPsychV5ReportRoutes } from './routes/neuroPsychV5Report';
+// M266-A：儿科与新生儿 V5 GET /api/v1/pediatrics-v5/report
+import { pediatricsV5ReportRoutes } from './routes/pediatricsV5Report';
+// M266-B：妇产科与围产 V5 GET /api/v1/ob-gyn-v5/report
+import { obGynV5ReportRoutes } from './routes/obGynV5Report';
+// M266-C：皮肤与感染性疾病 V5 GET /api/v1/derm-infectious-v5/report
+import { dermInfectiousV5ReportRoutes } from './routes/dermInfectiousV5Report';
+// M266-D：眼科耳鼻喉口腔 V5 GET /api/v1/ent-eye-dental-v5/report
+import { entEyeDentalV5ReportRoutes } from './routes/entEyeDentalV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1911,6 +1919,10 @@ const allRoutes: RouteDef[] = [
   ...nephrologyV5ReportRoutes, // M265-B：肾病与血液净化管理 V5 GET /api/v1/nephrology-v5/report
   ...rheumatologyV5ReportRoutes, // M265-C：风湿免疫与过敏性疾病 V5 GET /api/v1/rheumatology-v5/report
   ...neuroPsychV5ReportRoutes, // M265-D：神经与精神心理疾病 V5 GET /api/v1/neuro-psych-v5/report
+  ...pediatricsV5ReportRoutes, // M266-A：儿科与新生儿 V5 GET /api/v1/pediatrics-v5/report
+  ...obGynV5ReportRoutes, // M266-B：妇产科与围产 V5 GET /api/v1/ob-gyn-v5/report
+  ...dermInfectiousV5ReportRoutes, // M266-C：皮肤与感染性疾病 V5 GET /api/v1/derm-infectious-v5/report
+  ...entEyeDentalV5ReportRoutes, // M266-D：眼科耳鼻喉口腔 V5 GET /api/v1/ent-eye-dental-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -930,6 +930,14 @@ const NephrologyV5 = lazy(() => import('@/pages/nephrology-v5/report'));
 const RheumatologyV5 = lazy(() => import('@/pages/rheumatology-v5/report'));
 // M265-D：神经与精神心理疾病 V5
 const NeuroPsychV5 = lazy(() => import('@/pages/neuro-psych-v5/report'));
+// M266-A：儿科与新生儿 V5
+const PediatricsV5 = lazy(() => import('@/pages/pediatrics-v5/report'));
+// M266-B：妇产科与围产 V5
+const ObGynV5 = lazy(() => import('@/pages/ob-gyn-v5/report'));
+// M266-C：皮肤与感染性疾病 V5
+const DermInfectiousV5 = lazy(() => import('@/pages/derm-infectious-v5/report'));
+// M266-D：眼科耳鼻喉口腔 V5
+const ENTEyeDentalV5 = lazy(() => import('@/pages/ent-eye-dental-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1800,6 +1808,14 @@ export default function AppRoutes() {
           <Route path="rheumatology-v5/report" element={<RheumatologyV5 />} />
           {/* M265-D：神经与精神心理疾病 V5 */}
           <Route path="neuro-psych-v5/report" element={<NeuroPsychV5 />} />
+          {/* M266-A：儿科与新生儿 V5 */}
+          <Route path="pediatrics-v5/report" element={<PediatricsV5 />} />
+          {/* M266-B：妇产科与围产 V5 */}
+          <Route path="ob-gyn-v5/report" element={<ObGynV5 />} />
+          {/* M266-C：皮肤与感染性疾病 V5 */}
+          <Route path="derm-infectious-v5/report" element={<DermInfectiousV5 />} />
+          {/* M266-D：眼科耳鼻喉口腔 V5 */}
+          <Route path="ent-eye-dental-v5/report" element={<ENTEyeDentalV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
