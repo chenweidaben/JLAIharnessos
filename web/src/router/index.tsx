@@ -922,6 +922,14 @@ const CardiologyV5 = lazy(() => import('@/pages/cardiology-v5/report'));
 const PulmonologyV5 = lazy(() => import('@/pages/pulmonology-v5/report'));
 // M264-D：内分泌代谢疾病管理 V5
 const EndocrinologyV5 = lazy(() => import('@/pages/endocrinology-v5/report'));
+// M265-A：消化系统疾病管理 V5
+const GastroenterologyV5 = lazy(() => import('@/pages/gastroenterology-v5/report'));
+// M265-B：肾病与血液净化管理 V5
+const NephrologyV5 = lazy(() => import('@/pages/nephrology-v5/report'));
+// M265-C：风湿免疫与过敏性疾病 V5
+const RheumatologyV5 = lazy(() => import('@/pages/rheumatology-v5/report'));
+// M265-D：神经与精神心理疾病 V5
+const NeuroPsychV5 = lazy(() => import('@/pages/neuro-psych-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1784,6 +1792,14 @@ export default function AppRoutes() {
           <Route path="pulmonology-v5/report" element={<PulmonologyV5 />} />
           {/* M264-D：内分泌代谢疾病管理 V5 */}
           <Route path="endocrinology-v5/report" element={<EndocrinologyV5 />} />
+          {/* M265-A：消化系统疾病管理 V5 */}
+          <Route path="gastroenterology-v5/report" element={<GastroenterologyV5 />} />
+          {/* M265-B：肾病与血液净化管理 V5 */}
+          <Route path="nephrology-v5/report" element={<NephrologyV5 />} />
+          {/* M265-C：风湿免疫与过敏性疾病 V5 */}
+          <Route path="rheumatology-v5/report" element={<RheumatologyV5 />} />
+          {/* M265-D：神经与精神心理疾病 V5 */}
+          <Route path="neuro-psych-v5/report" element={<NeuroPsychV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
