@@ -47,6 +47,7 @@ import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOp
 // 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
 import { perfOptimizeRoutes } from './routes/perfOptimize';
 // 【质量与体验】M180-D：性能优化 V2（索引/缓存/前端/服务器 + 基准对比 + 退化检测 + SLO）GET /api/v1/admin/performance/v2
+import { perfOptV2Routes } from './routes/perfOptV2';
 // 【CDSS与运营精细化】M165-D：性能深度审计（慢查询TOP10/大表/N+1/内存泄漏/前端渲染/熔断器/健康检查）GET /api/v1/admin/performance/deep-audit
 import { perfDeepRoutes } from './routes/perfDeep';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
@@ -758,6 +759,7 @@ const allRoutes: RouteDef[] = [
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
   ...perfOptimizeRoutes, // M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize；M171-D（科研教学后勤）：深度性能优化 GET /api/v1/admin/performance/deep-optimize
+  ...perfOptV2Routes, // M180-D：性能优化 V2（索引/缓存/前端/服务器 + 基准对比 + 退化检测 + SLO）GET /api/v1/admin/performance/v2
   ...perfDeepRoutes, // M165-D：性能深度审计（五维 + 索引建议 + 熔断器 + 健康检查）GET /api/v1/admin/performance/deep-audit
   ...opsMonitorRoutes, // M168-D：系统运维智能化 GET /api/v1/admin/ops/monitoring（监控/异常检测/智能告警/自动修复闭环）
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
