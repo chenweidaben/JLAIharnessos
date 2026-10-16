@@ -994,6 +994,8 @@ const GroupFRHV5 = lazy(() => import('@/pages/group-frh-v5/report'));
 const GroupQAV5 = lazy(() => import('@/pages/group-qa-v5/report'));
 // M273-D：集团患者转诊与资源调度 V5
 const GroupReferralV5 = lazy(() => import('@/pages/group-referral-v5/report'));
+// M274-A：健康体检中心智能化 V5
+const HealthCheckupV5 = lazy(() => import('@/pages/health-checkup-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1928,6 +1930,8 @@ export default function AppRoutes() {
           <Route path="group-qa-v5/report" element={<GroupQAV5 />} />
           {/* M273-D：集团患者转诊与资源调度 V5 */}
           <Route path="group-referral-v5/report" element={<GroupReferralV5 />} />
+          {/* M274-A：健康体检中心智能化 V5 */}
+          <Route path="health-checkup-v5/report" element={<HealthCheckupV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
