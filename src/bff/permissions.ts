@@ -152,6 +152,25 @@ export const ALL_MOBILE_NURSING_PERMISSION_CODES: readonly string[] =
   Object.values(MOBILE_NURSING_PERMISSIONS);
 
 /* ===========================================================================
+ * 医生移动工作站权限码（M158-B，v4.x近期）
+ *  - mobile_staff:home            移动端拉取工作台首页（待办/患者/通知）
+ *  - mobile_staff:push_register   登记/续期设备推送令牌（仅通知触达）
+ *
+ * 医疗安全：仅读首页 + 登记令牌，不下发任何写操作；医嘱/病历写链路不变。
+ * ========================================================================= */
+export const MOBILE_STAFF_PERMISSIONS = {
+  HOME: 'mobile_staff:home',
+  PUSH_REGISTER: 'mobile_staff:push_register',
+} as const;
+
+export type MobileStaffPermissionCode =
+  (typeof MOBILE_STAFF_PERMISSIONS)[keyof typeof MOBILE_STAFF_PERMISSIONS];
+
+/** 全部已登记的医生移动工作站权限码（便于自检遍历） */
+export const ALL_MOBILE_STAFF_PERMISSION_CODES: readonly string[] =
+  Object.values(MOBILE_STAFF_PERMISSIONS);
+
+/* ===========================================================================
  * 护理管理后台权限码（M16-B）
  *  - nursing_admin:schedule        排班发布调整 / 请假登记（护士长/护理部）
  *  - nursing_admin:indicator:view   NQI 敏感指标只读（全员护士/医师）
