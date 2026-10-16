@@ -1073,6 +1073,14 @@ import { dataMeshV5ReportRoutes } from './routes/dataMeshV5Report';
 import { cloudNativeSREV5ReportRoutes } from './routes/cloudNativeSREV5Report';
 // M260-D：医院开发者平台 V5 GET /api/v1/dev-platform-v5/report
 import { devPlatformV5ReportRoutes } from './routes/devPlatformV5Report';
+// M261-A：零信任与身份安全 V5 GET /api/v1/zero-trust-v5/report
+import { zeroTrustV5ReportRoutes } from './routes/zeroTrustV5Report';
+// M261-B：隐私计算与数据要素流通 V5 GET /api/v1/privacy-compute-v5/report
+import { privacyComputeV5ReportRoutes } from './routes/privacyComputeV5Report';
+// M261-C：适老化与无障碍服务 V5 GET /api/v1/elderly-accessible-v5/report
+import { elderlyAccessibleV5ReportRoutes } from './routes/elderlyAccessibleV5Report';
+// M261-D：ESG 与可持续发展 V5 GET /api/v1/esg-v5/report
+import { esgV5ReportRoutes } from './routes/esgV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1851,6 +1859,10 @@ const allRoutes: RouteDef[] = [
   ...dataMeshV5ReportRoutes, // M260-B：数据 Mesh 与数据产品化 V5 GET /api/v1/data-mesh-v5/report
   ...cloudNativeSREV5ReportRoutes, // M260-C：云原生 SRE 深化 V5 GET /api/v1/cloud-native-sre-v5/report
   ...devPlatformV5ReportRoutes, // M260-D：医院开发者平台 V5 GET /api/v1/dev-platform-v5/report
+  ...zeroTrustV5ReportRoutes, // M261-A：零信任与身份安全 V5 GET /api/v1/zero-trust-v5/report
+  ...privacyComputeV5ReportRoutes, // M261-B：隐私计算与数据要素流通 V5 GET /api/v1/privacy-compute-v5/report
+  ...elderlyAccessibleV5ReportRoutes, // M261-C：适老化与无障碍服务 V5 GET /api/v1/elderly-accessible-v5/report
+  ...esgV5ReportRoutes, // M261-D：ESG 与可持续发展 V5 GET /api/v1/esg-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

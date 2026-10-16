@@ -890,6 +890,14 @@ const DataMeshV5 = lazy(() => import('@/pages/data-mesh-v5/report'));
 const CloudNativeSREV5 = lazy(() => import('@/pages/cloud-native-sre-v5/report'));
 // M260-D：医院开发者平台 V5
 const DevPlatformV5 = lazy(() => import('@/pages/dev-platform-v5/report'));
+// M261-A：零信任与身份安全 V5
+const ZeroTrustV5 = lazy(() => import('@/pages/zero-trust-v5/report'));
+// M261-B：隐私计算与数据要素流通 V5
+const PrivacyComputeV5 = lazy(() => import('@/pages/privacy-compute-v5/report'));
+// M261-C：适老化与无障碍服务 V5
+const ElderlyAccessibleV5 = lazy(() => import('@/pages/elderly-accessible-v5/report'));
+// M261-D：ESG 与可持续发展 V5
+const ESGV5 = lazy(() => import('@/pages/esg-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1720,6 +1728,14 @@ export default function AppRoutes() {
           <Route path="cloud-native-sre-v5/report" element={<CloudNativeSREV5 />} />
           {/* M260-D：医院开发者平台 V5 */}
           <Route path="dev-platform-v5/report" element={<DevPlatformV5 />} />
+          {/* M261-A：零信任与身份安全 V5 */}
+          <Route path="zero-trust-v5/report" element={<ZeroTrustV5 />} />
+          {/* M261-B：隐私计算与数据要素流通 V5 */}
+          <Route path="privacy-compute-v5/report" element={<PrivacyComputeV5 />} />
+          {/* M261-C：适老化与无障碍服务 V5 */}
+          <Route path="elderly-accessible-v5/report" element={<ElderlyAccessibleV5 />} />
+          {/* M261-D：ESG 与可持续发展 V5 */}
+          <Route path="esg-v5/report" element={<ESGV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
