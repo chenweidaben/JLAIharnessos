@@ -968,6 +968,8 @@ const IndoorNavigationV5 = lazy(() => import('@/pages/indoor-navigation-v5/repor
 const InpatientOneStopV5 = lazy(() => import('@/pages/inpatient-onestop-v5/report'));
 // M270-C：多渠道服务整合 V5
 const OmnichannelV5 = lazy(() => import('@/pages/omnichannel-v5/report'));
+// M270-D：患者体验监测与改进 V5
+const PatientExperienceV5 = lazy(() => import('@/pages/patient-experience-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1876,6 +1878,8 @@ export default function AppRoutes() {
           <Route path="inpatient-onestop-v5/report" element={<InpatientOneStopV5 />} />
           {/* M270-C：多渠道服务整合 V5 */}
           <Route path="omnichannel-v5/report" element={<OmnichannelV5 />} />
+          {/* M270-D：患者体验监测与改进 V5 */}
+          <Route path="patient-experience-v5/report" element={<PatientExperienceV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

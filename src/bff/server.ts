@@ -1149,6 +1149,8 @@ import { indoorNavigationV5ReportRoutes } from './routes/indoorNavigationV5Repor
 import { inpatientOneStopV5ReportRoutes } from './routes/inpatientOneStopV5Report';
 // M270-C：多渠道服务整合 V5 GET /api/v1/omnichannel-v5/report
 import { omnichannelV5ReportRoutes } from './routes/omnichannelV5Report';
+// M270-D：患者体验监测与改进 V5 GET /api/v1/patient-experience-v5/report
+import { patientExperienceV5ReportRoutes } from './routes/patientExperienceV5Report';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -1966,6 +1968,7 @@ const allRoutes: RouteDef[] = [
   ...indoorNavigationV5ReportRoutes, // M270-A：院内智能导航 V5 GET /api/v1/indoor-navigation-v5/report
   ...inpatientOneStopV5ReportRoutes, // M270-B：住院一站式服务 V5 GET /api/v1/inpatient-onestop-v5/report
   ...omnichannelV5ReportRoutes, // M270-C：多渠道服务整合 V5 GET /api/v1/omnichannel-v5/report
+  ...patientExperienceV5ReportRoutes, // M270-D：患者体验监测与改进 V5 GET /api/v1/patient-experience-v5/report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
