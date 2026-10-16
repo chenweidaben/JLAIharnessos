@@ -692,6 +692,8 @@ const DataPlatformAIV2 = lazy(() => import('@/pages/data-platform-ai-v2/report')
 const SecurityOpsAIV2 = lazy(() => import('@/pages/security-ops-ai-v2/report'));
 // M236-A：绿色医院 V2
 const GreenHospitalV2 = lazy(() => import('@/pages/green-hospital/report'));
+// M236-B：供应链 V2
+const SupplyChainV2 = lazy(() => import('@/pages/supply-chain-v2/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1324,6 +1326,8 @@ export default function AppRoutes() {
           <Route path="security-ops-ai-v2/report" element={<SecurityOpsAIV2 />} />
           {/* M236-A：绿色医院 V2 */}
           <Route path="green-hospital/report" element={<GreenHospitalV2 />} />
+          {/* M236-B：供应链 V2 */}
+          <Route path="supply-chain-v2/report" element={<SupplyChainV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
