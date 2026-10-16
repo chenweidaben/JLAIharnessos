@@ -458,6 +458,8 @@ const Accreditation = lazy(() => import('@/pages/admin/accreditation'));
 const PatientServiceV3 = lazy(() => import('@/pages/patient-service/report-v3'));
 // M206-B：健康管理 V3
 const HealthManagementV3 = lazy(() => import('@/pages/health-management/report-v3'));
+// M206-C：区域医联体
+const RegionalHealth = lazy(() => import('@/pages/regional/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -856,6 +858,8 @@ export default function AppRoutes() {
           <Route path="patient-service/report-v3" element={<PatientServiceV3 />} />
           {/* M206-B：健康管理 V3 */}
           <Route path="health-management/report-v3" element={<HealthManagementV3 />} />
+          {/* M206-C：区域医联体 */}
+          <Route path="regional/report" element={<RegionalHealth />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
