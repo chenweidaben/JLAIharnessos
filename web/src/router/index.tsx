@@ -954,6 +954,8 @@ const HospitalRobotV5 = lazy(() => import('@/pages/hospital-robot-v5/report'));
 const EdgeV5 = lazy(() => import('@/pages/5g-edge-v5/report'));
 // M268-D：数字孪生可视化 V5
 const DigitalTwinV5 = lazy(() => import('@/pages/digital-twin-v5/report'));
+// M269-A：临床研究 RWD/RWE 平台 V5
+const RWDPlatformV5 = lazy(() => import('@/pages/rwd-platform-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1848,6 +1850,8 @@ export default function AppRoutes() {
           <Route path="5g-edge-v5/report" element={<EdgeV5 />} />
           {/* M268-D：数字孪生可视化 V5 */}
           <Route path="digital-twin-v5/report" element={<DigitalTwinV5 />} />
+          {/* M269-A：临床研究 RWD/RWE 平台 V5 */}
+          <Route path="rwd-platform-v5/report" element={<RWDPlatformV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
