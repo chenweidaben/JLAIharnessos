@@ -74,6 +74,7 @@ import { infectionControlRoutes } from './routes/infectionControl'; // M141-D：
 import { infectionRealtimeRoutes } from './routes/infectionRealtime'; // M153-C：院感实时监测大屏（超阈值即红色预警，不等月报）
 import { aiBrainRoutes } from './routes/aiBrain'; // M156-B：AI 医院大脑实时大屏（门诊/住院/手术/预警 + AI 建议，演示模式轮询）
 import { brainDeepRoutes } from './routes/brainDeep'; // M159-A：【中期路线图】AI 大脑深化 GET /api/v1/ai-brain/deep（智能预警/决策建议/7天趋势/根因分析）
+import { aiDecisionRoutes } from './routes/aiDecision'; // M164-B：【数据中台与AI大脑】POST /api/v1/ai-brain/decision 智能决策支持（方案排序/ROI 评估/效果闭环）
 import { systemMapRoutes } from './routes/systemMap'; // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图（八大领域全覆盖）
 import { adminMigrationsRoutes } from './routes/adminMigrations';
 import { adminTrendsRoutes } from './routes/adminTrends';
@@ -690,6 +691,7 @@ const allRoutes: RouteDef[] = [
   ...infectionRealtimeRoutes, // M153-C：GET /api/v1/admin/infection/realtime 实时监测大屏
   ...aiBrainRoutes, // M156-B：GET /api/v1/ai-brain/realtime AI 医院大脑实时大屏
   ...brainDeepRoutes, // M159-A：GET /api/v1/ai-brain/deep AI 大脑深化（智能预警/决策建议/7天趋势/根因分析）
+  ...aiDecisionRoutes, // M164-B：POST /api/v1/ai-brain/decision 智能决策支持（候选方案/四维排序/ROI 评估/效果闭环）
   ...systemMapRoutes, // M157-B：【200版本里程碑】GET /api/v1/admin/system-map 系统功能全景图
   ...adminMigrationsRoutes,
   ...adminTrendsRoutes,
