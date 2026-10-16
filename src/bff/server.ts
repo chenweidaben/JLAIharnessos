@@ -304,6 +304,7 @@ import { assistantDiagnosisRoutes } from './routes/assistantDiagnosis';
 // 【AI核心能力深化】M144-A：AI 辅助诊断增强 POST /api/v1/ai/diagnose（Top3带置信度/鉴别/检查/治疗方向，采纳驳回留痕）
 import { aiDiagnoseRoutes } from './routes/aiDiagnose';
 // 【AI核心能力深化】M161-C：AI 治疗方案推荐·个体化用药 POST /api/v1/ai/treatment/plan（一线/备选/剂量个体化/相互作用/疗程复查）
+import { treatmentPlanRoutes } from './routes/treatmentPlan';
 // 【AI深化与运营预测】M154-A：AI 辅助诊断深化 POST /api/v1/ai/diagnose/deep（16病种库/Top5/鉴别/检验影像建议）
 import { deepDiagnoseRoutes } from './routes/deepDiagnose';
 // 【AI辅助诊断深化】M160-C：临床指南对齐 POST /api/v1/ai/diagnose/guide（高血压2024/CDS2024/ESC2024/IDSA-ATS2019）
@@ -710,6 +711,7 @@ const allRoutes: RouteDef[] = [
   ...assistantLabRoutes,
   ...assistantDiagnosisRoutes,
   ...aiDiagnoseRoutes, // M144-A：AI 辅助诊断增强
+  ...treatmentPlanRoutes, // M161-C：AI 治疗方案推荐·个体化用药
   ...deepDiagnoseRoutes, // M154-A：AI 辅助诊断深化（Top5/鉴别/检验影像）
   ...guideDxRoutes, // M160-C：临床指南对齐（四部权威指南硬阈值）
   ...assistantRecordDraftRoutes,
