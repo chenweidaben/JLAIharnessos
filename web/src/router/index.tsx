@@ -600,6 +600,8 @@ const PathologyV2 = lazy(() => import('@/pages/pathology/report-v2'));
 const FunctionalReport = lazy(() => import('@/pages/functional/report'));
 // M224-A：手术中心 V2
 const SurgeryV2 = lazy(() => import('@/pages/surgery/report-v2'));
+// M224-B：麻醉中心 V2
+const AnesthesiaV2 = lazy(() => import('@/pages/anesthesia/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1140,6 +1142,8 @@ export default function AppRoutes() {
           <Route path="functional/report" element={<FunctionalReport />} />
           {/* M224-A：手术中心 V2 */}
           <Route path="surgery/report-v2" element={<SurgeryV2 />} />
+          {/* M224-B：麻醉中心 V2 */}
+          <Route path="anesthesia/report-v2" element={<AnesthesiaV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
