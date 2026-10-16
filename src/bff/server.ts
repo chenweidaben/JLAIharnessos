@@ -484,6 +484,7 @@ import { partyUnionRoutes } from './routes/partyUnion';
 import { jciReviewRoutes } from './routes/jciReview';
 import { patientServiceDeepRoutes } from './routes/patientServiceDeep'; // M156-D：【患者服务深化】一站式服务中心（老人友好）GET /api/v1/patient/service
 import { researchDeepRoutes } from './routes/researchDeep'; // M162-C：【科研管理深化】课题/论文/成果转化/经费 GET /api/v1/research/projects + PUT /:id/milestone
+import { researchPipelineRoutes } from './routes/researchPipeline'; // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
 import { roadmapRoutes } from './routes/roadmap'; // M157-D：v4.x 产品路线图（三阶段/优先级/工作量估算）GET /api/v1/admin/roadmap
 import { patientJourneyRoutes } from './routes/patientJourney'; // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
 import { getEnv } from './config/env';
@@ -709,7 +710,7 @@ const allRoutes: RouteDef[] = [
   ...adminPerformanceRoutes,
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
-  ...perfOptimizeRoutes, // M151-D：慢查询优化闭环（N+1/索引/物化视图）GET /api/v1/admin/performance/optimize
+  ...perfOptimizeRoutes, // M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize；M171-D（科研教学后勤）：深度性能优化 GET /api/v1/admin/performance/deep-optimize
   ...perfDeepRoutes, // M165-D：性能深度审计（五维 + 索引建议 + 熔断器 + 健康检查）GET /api/v1/admin/performance/deep-audit
   ...opsMonitorRoutes, // M168-D：系统运维智能化 GET /api/v1/admin/ops/monitoring（监控/异常检测/智能告警/自动修复闭环）
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
@@ -884,6 +885,7 @@ const allRoutes: RouteDef[] = [
   ...integrationHl7Routes, // M155-C：【系统集成深化】HL7 v2.x/FHIR R4 接口 POST /api/v1/integration/hl7/parse + /fhir/build（|^~\& 分隔，FHIR R4 Patient/Observation/MedicationRequest）
   ...patientServiceDeepRoutes, // M156-D：【患者服务深化】一站式服务中心（老人友好六卡片）GET /api/v1/patient/service
   ...researchDeepRoutes, // M162-C：【科研管理深化】科研全生命周期 GET /api/v1/research/projects?dept= + PUT /api/v1/research/projects/:id/milestone
+  ...researchPipelineRoutes, // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
   ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
