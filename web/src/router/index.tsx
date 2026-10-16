@@ -964,6 +964,8 @@ const BiobankV5 = lazy(() => import('@/pages/biobank-v5/report'));
 const ResidencyEducationV5 = lazy(() => import('@/pages/residency-edu-v5/report'));
 // M270-A：院内智能导航 V5
 const IndoorNavigationV5 = lazy(() => import('@/pages/indoor-navigation-v5/report'));
+// M270-B：住院一站式服务 V5
+const InpatientOneStopV5 = lazy(() => import('@/pages/inpatient-onestop-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1868,6 +1870,8 @@ export default function AppRoutes() {
           <Route path="residency-edu-v5/report" element={<ResidencyEducationV5 />} />
           {/* M270-A：院内智能导航 V5 */}
           <Route path="indoor-navigation-v5/report" element={<IndoorNavigationV5 />} />
+          {/* M270-B：住院一站式服务 V5 */}
+          <Route path="inpatient-onestop-v5/report" element={<InpatientOneStopV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
