@@ -522,6 +522,7 @@ import { patientDeepRoutes } from './routes/patientDeep'; // M172-D：【安全�
 import { pharmacyDeepRoutes } from './routes/pharmacyDeep'; // M173-C：【质量提升与新场景】医院智能药房深化 GET /api/v1/pharmacy/smart（智能摆药/智能审方/智能库存/智能用药，真减差错）
 import { bloodDeepRoutes } from './routes/bloodDeep'; // M176-D：【临床核心深化】医院输血管理深化 GET /api/v1/blood/deep（适应症/前评估/过程监测/后评价，零差错人命关天）
 import { antibioticDeepRoutes } from './routes/antibioticDeep'; // M176-B：【临床核心深化】医院抗菌药物管理深化 GET /api/v1/pharmacy/antibiotic/deep（分级/使用率/AUD/送检率/合理性评价，国卫办医发〔2015〕42号口径）
+import { infectionDeepRoutes } from './routes/infectionDeep'; // M179-B：【护理院感医保药事】医院院感管理深化 GET /api/v1/infection/deep（手卫生依从率/72h聚集预警/同源性/四类国家指标，WS/T 312·313 口径）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -953,6 +954,7 @@ const allRoutes: RouteDef[] = [
   ...pharmacyDeepRoutes, // M173-C：【质量提升与新场景】医院智能药房深化 GET /api/v1/pharmacy/smart（智能摆药/智能审方/智能库存/智能用药，摆药四码复核真减差错）
   ...bloodDeepRoutes, // M176-D：【临床核心深化】医院输血管理深化 GET /api/v1/blood/deep（适应症/前评估/过程监测/后评价，零差错人命关天）
   ...antibioticDeepRoutes, // M176-B：【临床核心深化】医院抗菌药物管理深化 GET /api/v1/pharmacy/antibiotic/deep（分级/使用率/AUD/送检率/合理性评价，国卫办医发〔2015〕42号口径）
+  ...infectionDeepRoutes, // M179-B：【护理院感医保药事】医院院感管理深化 GET /api/v1/infection/deep（手卫生依从率/72h聚集预警/同源性/四类国家指标，WS/T 312·313 口径）
   ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
   ...officeDeepRoutes, // M178-C：【财务人力行政党建】GET /api/v1/admin/office（公文审批流转/会议预订冲突/档案/督办跟踪，节点到人不踢皮球）
 ];
