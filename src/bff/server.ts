@@ -543,8 +543,7 @@ import { disciplineInspectionRoutes } from './routes/disciplineInspection';
 import { laborUnionRoutes } from './routes/laborUnion';
 // M194-D：宣传管理 GET /api/v1/admin/publicity/report
 import { publicityRoutes } from './routes/publicity';
-// M195-A：互联网医院 GET /api/v1/internet-hospital/report
-import { internetHospitalRoutes } from './routes/internetHospital';
+// M195-A：互联网医院已在上方注册（避免重复 import）
 // M195-A V2：互联网医院深化 GET /api/v1/internet-hospital/report
 import { internetHospitalV2Routes } from './routes/internetHospitalV2';
 // M195-B：远程医疗 GET /api/v1/telemedicine/report
@@ -1033,8 +1032,7 @@ import { intelligentAlertV3ReportRoutes } from './routes/intelligentAlertV3Repor
 import { patientProfileV3ReportRoutes } from './routes/patientProfileV3Report';
 // M255-D：临床规则引擎 V3 GET /api/v1/clinical-rule-engine-v3/report
 import { clinicalRuleEngineV3ReportRoutes } from './routes/clinicalRuleEngineV3Report';
-// M256-A：患者安全 V3 GET /api/v1/patient-safety-v3/report
-import { patientSafetyV3ReportRoutes } from './routes/patientSafetyV3Report';
+// M256-A：患者安全 V3 已在上方注册（避免重复 import）
 // M256-B：院感控制 V3 GET /api/v1/infection-control-v3/report
 import { infectionControlV3ReportRoutes } from './routes/infectionControlV3Report';
 // M256-C：病历质量 V3 GET /api/v1/record-quality-v3/report（里程碑 v5.00.0）
@@ -1634,7 +1632,7 @@ const allRoutes: RouteDef[] = [
   ...disciplineInspectionRoutes, // M194-B：纪检监察 GET /api/v1/admin/discipline/report
   ...laborUnionRoutes, // M194-C：工会管理 GET /api/v1/admin/labor-union/report
   ...publicityRoutes, // M194-D：宣传管理 GET /api/v1/admin/publicity/report
-  ...internetHospitalRoutes, // M195-A：互联网医院 GET /api/v1/internet-hospital/report
+  // internetHospitalRoutes 已在上方注册，避免重复 spread
   ...internetHospitalV2Routes, // M195-A V2：互联网医院深化 GET /api/v1/internet-hospital/report
   ...telemedicineRoutes, // M195-B：远程医疗 GET /api/v1/telemedicine/report
   ...mobileHealthRoutes, // M195-C：移动医疗 GET /api/v1/mobile-health/report
@@ -1879,7 +1877,7 @@ const allRoutes: RouteDef[] = [
   ...intelligentAlertV3ReportRoutes, // M255-B：智能预警 V3 GET /api/v1/intelligent-alert-v3/report
   ...patientProfileV3ReportRoutes, // M255-C：患者画像 V3 GET /api/v1/patient-profile-v3/report
   ...clinicalRuleEngineV3ReportRoutes, // M255-D：临床规则引擎 V3 GET /api/v1/clinical-rule-engine-v3/report
-  ...patientSafetyV3ReportRoutes, // M256-A：患者安全 V3 GET /api/v1/patient-safety-v3/report
+  // patientSafetyV3ReportRoutes 已在上方注册，避免重复 spread
   ...infectionControlV3ReportRoutes, // M256-B：院感控制 V3 GET /api/v1/infection-control-v3/report
   ...recordQualityV3ReportRoutes, // M256-C：病历质量 V3 GET /api/v1/record-quality-v3/report（里程碑 v5.00.0）
   ...drugSupplyChainV3ReportRoutes, // M256-D：药品供应链 V3 GET /api/v1/drug-supply-chain-v3/report
