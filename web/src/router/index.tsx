@@ -810,6 +810,14 @@ const CostAccountingV4 = lazy(() => import('@/pages/cost-accounting-v4/report'))
 const PerformanceV4 = lazy(() => import('@/pages/performance-v4/report'));
 // M250-D：HRP V4
 const HRPV4 = lazy(() => import('@/pages/hrp-v4/report'));
+// M251-A：急诊 V4
+const EmergencyV4 = lazy(() => import('@/pages/emergency-v4/report'));
+// M251-B：手术麻醉 V4
+const SurgeryAnesthesiaV4 = lazy(() => import('@/pages/surgery-anesthesia-v4/report'));
+// M251-C：药房 V4
+const PharmacyV4 = lazy(() => import('@/pages/pharmacy-v4/report'));
+// M251-D：检验 V4
+const LaboratoryV4 = lazy(() => import('@/pages/laboratory-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1560,6 +1568,14 @@ export default function AppRoutes() {
           <Route path="performance-v4/report" element={<PerformanceV4 />} />
           {/* M250-D：HRP V4 */}
           <Route path="hrp-v4/report" element={<HRPV4 />} />
+          {/* M251-A：急诊 V4 */}
+          <Route path="emergency-v4/report" element={<EmergencyV4 />} />
+          {/* M251-B：手术麻醉 V4 */}
+          <Route path="surgery-anesthesia-v4/report" element={<SurgeryAnesthesiaV4 />} />
+          {/* M251-C：药房 V4 */}
+          <Route path="pharmacy-v4/report" element={<PharmacyV4 />} />
+          {/* M251-D：检验 V4 */}
+          <Route path="laboratory-v4/report" element={<LaboratoryV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
