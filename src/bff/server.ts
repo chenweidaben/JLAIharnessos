@@ -196,6 +196,7 @@ import { reportPushRoutes } from './routes/reportPush';
 import { patientNotificationRoutes } from './routes/patientNotification';
 import { patientReminderRoutes } from './routes/patientReminders';
 // M160-D：患者健康管理深化——个性化健康计划（运动/饮食/用药提醒/复查/红旗症状，不一刀切）
+import { healthPlanRoutes } from './routes/healthPlan';
 import { patientMobileHomeRoutes } from './routes/patientMobileHome';
 // 【产品化收尾】M148-C：患者端 H5 一站式首页 GET /api/v1/patient/h5/home
 import { patientH5Routes } from './routes/patientH5';
@@ -550,6 +551,7 @@ const allRoutes: RouteDef[] = [
   ...reportPushRoutes,
   ...patientNotificationRoutes,
   ...patientReminderRoutes,
+  ...healthPlanRoutes, // M160-D：个性化健康计划（GET /patient/health-plan/:id + POST track）
   ...patientMobileHomeRoutes,
   ...patientH5Routes,
   ...patientBillingRoutes,
