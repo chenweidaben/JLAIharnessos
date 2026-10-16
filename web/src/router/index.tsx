@@ -426,6 +426,8 @@ const ProductionOps = lazy(() => import('@/pages/admin/production-ops'));
 const Rehabilitation = lazy(() => import('@/pages/specialty/rehabilitation'));
 // M202-B：精神心理
 const Psychiatry = lazy(() => import('@/pages/specialty/psychiatry'));
+// M202-C：中医
+const TCM = lazy(() => import('@/pages/specialty/tcm'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -792,6 +794,8 @@ export default function AppRoutes() {
           <Route path="specialty/rehabilitation" element={<Rehabilitation />} />
           {/* M202-B：精神心理 */}
           <Route path="specialty/psychiatry" element={<Psychiatry />} />
+          {/* M202-C：中医 */}
+          <Route path="specialty/tcm" element={<TCM />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
