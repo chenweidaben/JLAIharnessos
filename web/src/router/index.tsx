@@ -608,6 +608,8 @@ const TransfusionReport = lazy(() => import('@/pages/transfusion/report'));
 const ICUV2 = lazy(() => import('@/pages/icu/report-v2'));
 // M225-A：门诊管理 V2
 const OutpatientV2 = lazy(() => import('@/pages/outpatient/report-v2'));
+// M225-B：住院管理 V2
+const InpatientV2 = lazy(() => import('@/pages/inpatient/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1156,6 +1158,8 @@ export default function AppRoutes() {
           <Route path="icu/report-v2" element={<ICUV2 />} />
           {/* M225-A：门诊管理 V2 */}
           <Route path="outpatient/report-v2" element={<OutpatientV2 />} />
+          {/* M225-B：住院管理 V2 */}
+          <Route path="inpatient/report-v2" element={<InpatientV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
