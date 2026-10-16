@@ -326,6 +326,8 @@ const QualityManagement = lazy(() => import('@/pages/admin/quality-management'))
 const OperationsAnalytics = lazy(() => import('@/pages/admin/operations-analytics'));
 // M190-A：检验检查审核
 const LabImagingAudit = lazy(() => import('@/pages/lab-imaging/audit'));
+// M190-B：输血管理
+const BloodTransfusion = lazy(() => import('@/pages/blood/transfusion'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -592,6 +594,8 @@ export default function AppRoutes() {
           <Route path="admin/operations-analytics" element={<OperationsAnalytics />} />
           {/* M190-A：检验审核 */}
           <Route path="lab-imaging/audit" element={<LabImagingAudit />} />
+          {/* M190-B：输血管理 */}
+          <Route path="blood/transfusion" element={<BloodTransfusion />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
