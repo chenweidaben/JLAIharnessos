@@ -582,6 +582,8 @@ const MaternalChildV2 = lazy(() => import('@/pages/maternal-child/report-v2'));
 const GeriatricsV2 = lazy(() => import('@/pages/geriatrics/report-v2'));
 // M221-D：职业病防治
 const OccupationalHealth = lazy(() => import('@/pages/occupational-health/report'));
+// M222-A：康复医学 V2
+const RehabilitationV2 = lazy(() => import('@/pages/rehabilitation/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1104,6 +1106,8 @@ export default function AppRoutes() {
           <Route path="geriatrics/report-v2" element={<GeriatricsV2 />} />
           {/* M221-D：职业病防治 */}
           <Route path="occupational-health/report" element={<OccupationalHealth />} />
+          {/* M222-A：康复医学 V2 */}
+          <Route path="rehabilitation/report-v2" element={<RehabilitationV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
