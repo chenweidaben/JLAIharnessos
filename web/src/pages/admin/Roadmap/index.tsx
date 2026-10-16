@@ -239,7 +239,7 @@ export default function RoadmapPage() {
             <Card title="优先级排序（业务价值高 / 风险耦合可控者先行）">
               <List
                 dataSource={prioritized}
-                renderItem((p) => (
+                renderItem={(p) => (
                   <List.Item key={p.item.id}>
                     <Space align="start">
                       <Tag color={VI.accent} style={{ minWidth: 32, textAlign: 'center' }}>
@@ -257,7 +257,7 @@ export default function RoadmapPage() {
                       </div>
                     </Space>
                   </List.Item>
-                ))}
+                )}
               />
             </Card>
           </Col>

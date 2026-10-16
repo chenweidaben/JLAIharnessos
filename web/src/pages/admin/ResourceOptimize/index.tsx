@@ -292,7 +292,7 @@ export default function ResourceOptimizePage() {
                   {
                     title: '时段',
                     render: (_: unknown, r: { startMin: number; endMin: number }) =>
-                      `${fmtMin(r.startMin)} - ${fmtMin(r.endMin)}` as unknown,
+                      `${fmtMin(r.startMin)} - ${fmtMin(r.endMin)}`,
                   },
                   {
                     title: '等待',

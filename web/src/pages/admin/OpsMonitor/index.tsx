@@ -441,7 +441,6 @@ export default function OpsMonitorPage() {
                 <Alert
                   type="warning"
                   showIcon
-                  size="small"
                   style={{ marginTop: 8 }}
                   message={`回滚预案：${plan.rollback}`}
                   description={`预计恢复时长 ${plan.estimatedRecoveryMin} 分钟`}

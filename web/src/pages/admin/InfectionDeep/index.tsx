@@ -29,7 +29,6 @@ import {
   Space,
   Spin,
   Statistic,
-  Table,
   Tag,
   Typography,
 } from 'antd';
@@ -239,7 +238,7 @@ export default function InfectionDeepPage() {
             {/* 手卫生 + 暴发识别 */}
             <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
               <Col xs={24} lg={10}>
-                <Card size="small" title={<span style={{ color: '#fff' }}>手卫生监测 · {data.hand.dept}（{data.hand.period}）</span>
+                <Card size="small" title={<span style={{ color: '#fff' }}>手卫生监测 · {data.hand.dept}（{data.hand.period}）</span>}
                   headStyle={{ background: data.hand.pass ? '#2F7A4E' : '#B07A1E' }}>
                   <Row gutter={12}>
                     <Col span={8}><Statistic title="观察次数" value={data.hand.observed} /></Col>
@@ -267,7 +266,7 @@ export default function InfectionDeepPage() {
               </Col>
 
               <Col xs={24} lg={14}>
-                <Card size="small" title={<span style={{ color: '#fff' }}>暴发识别 · {data.outbreak.dept}（{data.outbreak.windowHours}h 窗 / 阈值 {data.outbreak.threshold}）</span>
+                <Card size="small" title={<span style={{ color: '#fff' }}>暴发识别 · {data.outbreak.dept}（{data.outbreak.windowHours}h 窗 / 阈值 {data.outbreak.threshold}）</span>}
                   headStyle={{ background: data.outbreak.outbreak ? '#CF1322' : data.outbreak.cluster ? '#FA8C16' : '#2F7A4E' }}>
                   <Space style={{ marginBottom: 12 }} wrap>
                     <Text strong>聚集：</Text>

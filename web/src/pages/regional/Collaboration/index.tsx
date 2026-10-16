@@ -16,7 +16,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Card, Col, Descriptions, Divider, Form, Input, InputNumber, Layout,
+  Alert, Card, Col, Descriptions, Divider, Form, Input, Layout,
   Row, Select, Space, Spin, Statistic, Steps, Tag, Typography,
 } from 'antd';
 import {
@@ -85,7 +85,6 @@ interface RecognitionResult {
 }
 
 const LEVEL_OPTIONS = ['三级', '二级', '一级'] as const;
-const EXAM_TYPE_OPTIONS = ['检验', '超声', '影像', '病理'] as const;
 
 /** 转诊方向标签颜色 */
 function directionColor(d: string): string {

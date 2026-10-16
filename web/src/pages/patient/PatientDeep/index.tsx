@@ -18,7 +18,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Badge,
-  Button,
   Card,
   Col,
   Layout,
@@ -34,7 +33,7 @@ import {
 import {
   EnvironmentOutlined,
   HeartOutlined,
-  NavigationOutlined,
+  PartitionOutlined,
   SoundOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -235,7 +234,7 @@ export default function PatientDeepPage() {
                 <Segmented options={AGE_OPTIONS} value={ageBand} onChange={(v) => setAgeBand(String(v))} />
               </Space>
               <Space>
-                <NavigationOutlined style={{ color: '#fff' }} />
+                <PartitionOutlined style={{ color: '#fff' }} />
                 <Segmented options={FROM_OPTIONS} value={from} onChange={(v) => setFrom(String(v))} />
                 <Text style={{ color: 'rgba(255,255,255,0.7)' }}>→</Text>
                 <Segmented options={TO_OPTIONS} value={to} onChange={(v) => setTo(String(v))} />
@@ -314,7 +313,7 @@ export default function PatientDeepPage() {
                 <Tag color="orange">约 {flow.etaMin} 分钟</Tag>
                 {flow.crossFloor && <Tag color="purple">需乘电梯</Tag>}
                 {flow.barrierFree && <Tag color="green">无障碍通道</Tag>}
-                {flow.arGuidance && <Tag icon={<NavigationOutlined />}>AR 导引</Tag>}
+                {flow.arGuidance && <Tag icon={<PartitionOutlined />}>AR 导引</Tag>}
                 {flow.urgent && <Tag color="red">急诊·请立即前往</Tag>}
               </Space>
             }

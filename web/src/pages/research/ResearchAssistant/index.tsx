@@ -37,7 +37,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 
 const { Content } = Layout;
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 /* ------------------------------ 与 BFF 类型对齐 ------------------------------ */
 
@@ -254,8 +254,8 @@ export default function ResearchAssistantPage() {
             </Form.Item>
             <Form.Item label="年份">
               <Space.Compact>
-                <InputNumber min=1900 max=2100 value={yearStart} onChange={(v) => setYearStart(v)} style={{ width: 90 }} />
-                <InputNumber min=1900 max=2100 value={yearEnd} onChange={(v) => setYearEnd(v)} style={{ width: 90 }} />
+                <InputNumber min={1900} max={2100} value={yearStart} onChange={(v) => setYearStart(v)} style={{ width: 90 }} />
+                <InputNumber min={1900} max={2100} value={yearEnd} onChange={(v) => setYearEnd(v)} style={{ width: 90 }} />
               </Space.Compact>
             </Form.Item>
             <Form.Item label="TopK">

@@ -227,17 +227,17 @@ export default function FinanceDeepPage() {
         <Card style={{ marginBottom: 16 }}>
           <Row gutter={16} align="middle">
             <Col span={6}>
-              <Typography.Text style={{ color: '#666' }}>会计年度</Typography>
+              <Typography.Text style={{ color: '#666' }}>会计年度</Typography.Text>
               <Input style={{ marginTop: 8 }} type="number" value={year}
                 onChange={(e) => setYear(Number(e.target.value))} />
             </Col>
             <Col span={6}>
-              <Typography.Text style={{ color: '#666' }}>会计月份（留空=全年）</Typography>
+              <Typography.Text style={{ color: '#666' }}>会计月份（留空=全年）</Typography.Text>
               <Input style={{ marginTop: 8 }} type="number" min={1} max={12} value={month}
                 onChange={(e) => setMonth(Number(e.target.value))} />
             </Col>
             <Col span={6}>
-              <Typography.Text style={{ color: '#666' }}>重点科室（可选）</Typography>
+              <Typography.Text style={{ color: '#666' }}>重点科室（可选）</Typography.Text>
               <Input.Search style={{ marginTop: 8 }} value={dept} placeholder="如 internal_medicine"
                 onChange={(e) => setDept(e.target.value)} onSearch={load} allowClear />
             </Col>

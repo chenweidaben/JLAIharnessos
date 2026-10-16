@@ -144,7 +144,7 @@ export default function DataMartListPage() {
         setError(json.message || '刷新失败');
         return;
       }
-      const mart = json.data?.mart as DataMart | undefined;
+      const mart = json.data?.mart as DataMartDetail | undefined;
       if (mart) {
         setMarts((prev) => prev.map((m) => (m.martName === mart.martName ? mart : m)));
         if (Array.isArray(mart.preview)) {

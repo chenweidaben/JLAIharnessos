@@ -11,7 +11,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -169,11 +169,6 @@ export default function DataMartDeepPage() {
     setSelectedTable(fq);
     void loadLineage(fq);
   };
-
-  const activeTable = useMemo(
-    () => catalog?.tables.find((t) => `${t.schema}.${t.table}` === selectedTable) ?? null,
-    [catalog, selectedTable],
-  );
 
   return (
     <Layout style={{ minHeight: '100vh', background: VI.bg }}>

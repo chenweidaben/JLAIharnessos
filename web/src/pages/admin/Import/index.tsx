@@ -159,7 +159,7 @@ export default function ImportPage() {
               <Button type="primary" style={{ background: DEEP_SEA_BLUE }} loading={busy}>
                 上传导入文件
               </Button>
-            </Button>
+            </Upload>
           </Space>
         </Card>
 

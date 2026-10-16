@@ -131,7 +131,7 @@ export default function DiagnoseV2Page() {
       const abnormal = (parts.pop() ?? '').toLowerCase();
       const name = parts.join(' ');
       const allowed = ['high', 'low', 'normal', 'positive', 'negative'];
-      return { name, abnormal: (allowed.includes(abnormal) ? abnormal : 'normal') as const };
+      return { name, abnormal: (allowed.includes(abnormal) ? abnormal : 'normal') };
     });
 
   const handleSubmit = async () => {

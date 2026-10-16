@@ -433,7 +433,7 @@ export default function TwinDeepPage() {
                         {data.route.pathNames.map((n, i) => (
                           <span key={`${n}-${i}`}>
                             <Tag color={VI.accent} style={{ margin: 0 }}>{n}</Tag>
-                            {i < data.route.pathNames.length - 1 && <Text type="secondary"> → </Text>}
+                            {i < (data.route?.pathNames.length ?? 0) - 1 && <Text type="secondary"> → </Text>}
                           </span>
                         ))}
                       </div>

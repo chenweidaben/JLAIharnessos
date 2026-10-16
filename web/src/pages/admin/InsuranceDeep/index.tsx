@@ -21,7 +21,6 @@ const { Title, Paragraph, Text } = Typography;
 
 /* ---------------- 与 BFF insuranceDeep 输出对齐的类型 ---------------- */
 
-interface AuditIssue { type: string; severity: 'low' | 'medium' | 'high'; message: string; }
 interface RiskRow {
   claimId: string;
   riskScore: number;

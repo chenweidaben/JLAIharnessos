@@ -125,7 +125,7 @@ export default function TeachingDeepPage() {
 
   const fetchPlan = useCallback(async () => {
     try {
-      const res = await get<PlanResponse>('/api/v1/teaching/courses', { query: { dept: 'internal' } });
+      const res = await get<PlanResponse>('/api/v1/teaching/courses?dept=internal');
       setPlan(res);
       setError('');
     } catch (e) {

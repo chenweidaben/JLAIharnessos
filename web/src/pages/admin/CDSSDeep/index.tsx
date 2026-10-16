@@ -238,7 +238,7 @@ export default function CDSSDeepPage() {
                   <Statistic
                     title="被压制告警（防疲劳）"
                     value={data.suppressedCount}
-                    valueStyle={{ color: data.suppressedCount > 0 ? '#d46b08 : '#3f8600' }}
+                    valueStyle={{ color: data.suppressedCount > 0 ? '#d46b08' : '#3f8600' }}
                   />
                 </Card>
               </Col>

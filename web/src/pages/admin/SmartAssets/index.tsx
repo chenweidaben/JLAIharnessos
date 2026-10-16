@@ -113,13 +113,6 @@ const VI = {
   bg: '#f5f7fa',
 };
 
-const LEVEL_COLOR: Record<AssetLevel, string> = {
-  outstanding: '#52c41a',
-  mature: '#1e6fbf',
-  growing: '#13c2c2',
-  starter: '#faad14',
-};
-
 const SEVERITY_COLOR: Record<GapSeverity, string> = {
   high: 'red',
   medium: 'orange',

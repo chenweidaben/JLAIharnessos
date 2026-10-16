@@ -38,7 +38,6 @@ const DEEP_BG = '#0A2540';
 const MID_BLUE = '#1E5F8C';
 const ACCENT = '#4A90D9';
 const GREEN = '#52c41a';
-const RED = '#f5222d';
 
 /** 六段（与 BFF generateMedicalRecord.sections 对齐） */
 type SectionKey =

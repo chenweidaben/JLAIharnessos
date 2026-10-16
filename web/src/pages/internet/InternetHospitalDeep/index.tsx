@@ -186,7 +186,6 @@ export default function InternetHospitalDeepPage() {
             type="error"
             message="加载失败"
             description={error || '未知错误'}
-            showMessage
             action={<Button onClick={load}>重试</Button>}
           />
         </Content>

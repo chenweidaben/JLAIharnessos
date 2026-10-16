@@ -204,7 +204,7 @@ export default function AccessibilityVerifyPage() {
               <Row gutter={[16, 16]}>
                 {(palette?.fixes ?? []).map((f) => (
                   <Col span={12} key={f.role}>
-                    <Card type="small" size="small">
+                    <Card size="small">
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                         <Text strong>{f.label}</Text>
                         {f.fixed ? <Tag color="success">已达标</Tag> : <Tag color="error">未达标</Tag>}

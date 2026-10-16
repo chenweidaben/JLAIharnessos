@@ -31,7 +31,6 @@ import {
   Space,
   Spin,
   Statistic,
-  Tag,
   Timeline,
   Typography,
 } from 'antd';
@@ -41,7 +40,6 @@ const { Title, Paragraph, Text } = Typography;
 
 /* ------------------------------ 与 BFF 类型对齐 ------------------------------ */
 
-type BedState = 'available' | 'occupied' | 'isolation' | 'maintenance';
 type DeepFlowScenario = 'opd_peak' | 'mass_casualty' | 'or_failure';
 type PredictPeriod = 'hour' | 'day' | 'week';
 

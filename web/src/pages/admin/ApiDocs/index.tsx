@@ -12,7 +12,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Badge, Card, Collapse, Layout, Spin, Table, Tag, Typography } from 'antd';
 
-const { Content, Paragraph, Text, Title } = Typography;
+const { Paragraph, Text, Title } = Typography;
+const { Content } = Layout;
 
 /** 深海蓝 VI 色板 */
 const VI = {

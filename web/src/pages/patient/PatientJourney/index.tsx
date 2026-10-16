@@ -128,9 +128,9 @@ const LEVEL_META: Record<string, { color: string; text: string }> = {
   unknown: { color: '#8c8c8c', text: '数据不足·不预测' },
 };
 const RISK_META: Record<string, { color: string; text: string }> = {
-  low: '#52c41a',
-  medium: '#d48806',
-  high: '#cf1322',
+  low: { color: '#52c41a', text: '低' },
+  medium: { color: '#d48806', text: '中' },
+  high: { color: '#cf1322', text: '高' },
 };
 
 const DEMO_PATIENTS = [
@@ -369,7 +369,7 @@ export default function PatientJourneyPage() {
           extra={
             <Space>
               <Tag color={levelMeta.color}>{levelMeta.text}</Tag>
-              <Tag color={RISK_META[satisfaction.risk]}>投诉风险 {satisfaction.risk === 'low' ? '低' : satisfaction.risk === 'medium' ? '中' : '高'}</Tag>
+              <Tag color={RISK_META[satisfaction.risk].color}>投诉风险 {satisfaction.risk === 'low' ? '低' : satisfaction.risk === 'medium' ? '中' : '高'}</Tag>
             </Space>
           }
         >

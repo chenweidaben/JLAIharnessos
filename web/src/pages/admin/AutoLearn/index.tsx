@@ -258,7 +258,7 @@ export default function AutoLearnPage() {
                       <Tag color={DIR_TAG[v].color}>{DIR_TAG[v].label}</Tag>
                     ),
                   },
-                  { title: '采纳 / 拒绝', render: (_: unknown, r: WeightChange) => `${r.adopted} / ${r.rejected}` as unknown, width: 110 },
+                  { title: '采纳 / 拒绝', render: (_: unknown, r: WeightChange) => `${r.adopted} / ${r.rejected}`, width: 110 },
                   {
                     title: '采纳率',
                     dataIndex: 'adoptionRate',

@@ -352,7 +352,7 @@ export default function PharmacyDeepPage() {
                     {data.adverse.matchedSymptoms.length > 0 && (
                       <>
                         <Text strong style={{ color: VI.deep }}>症状匹配：</Text>
-                        <div>{data.adverse.matchedSymptoms.map((s) => <Tag key={s} color={RISK_COLOR[data.adverse.level]}>{s}</Tag>)}</div>
+                        <div>{data.adverse?.matchedSymptoms.map((s) => <Tag key={s} color={RISK_COLOR[data.adverse?.level ?? 'none']}>{s}</Tag>)}</div>
                       </>
                     )}
                   </Col>

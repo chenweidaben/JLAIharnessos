@@ -10,7 +10,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   Alert,
   Badge,
@@ -129,7 +129,7 @@ function StatCard({
   value: string;
   suffix?: string;
   accent: string;
-  sub?: string;
+  sub?: ReactNode;
 }) {
   return (
     <Card style={{ borderTop: `3px solid ${accent}`, borderRadius: 8, height: '100%' }}>

@@ -196,7 +196,7 @@ export default function FrontendPerformancePage() {
             <Card title="路由懒加载覆盖率" style={{ marginBottom: 16 }}>
               <Row gutter={16}>
                 <Col span={10}>
-                  <Progress percent={lazyPct} size="large" strokeColor={VI.accent} />
+                  <Progress percent={lazyPct} strokeColor={VI.accent} />
                 </Col>
                 <Col span={14}>
                   <Text type="secondary">

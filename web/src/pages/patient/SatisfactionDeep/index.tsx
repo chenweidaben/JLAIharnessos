@@ -125,11 +125,6 @@ const PHASE_META: Record<string, { color: string; text: string }> = {
   check: { color: '#722ed1', text: 'C·检查' },
   act: { color: '#52c41a', text: 'A·处置' },
 };
-const EMOTION_META: Record<string, { color: string; text: string }> = {
-  positive: { color: '#52c41a', text: '正面' },
-  neutral: { color: '#8c8c8c', text: '中性' },
-  negative: { color: '#cf1322', text: '负面' },
-};
 const TREND_TEXT: Record<string, string> = { rising: '↑ 恶化', stable: '→ 平稳', falling: '↓ 收敛' };
 
 function StatCard({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {

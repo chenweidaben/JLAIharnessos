@@ -221,7 +221,7 @@ export default function QualityDeepPage() {
             {data?.demo && (
               <Alert
                 type="warning"
-                showIcon"
+                showIcon
                 style={{ marginBottom: 16 }}
                 message="当前为演示模式数据：尚未接入真实质量指标采集，页面仅用于演示国家口径质量驾驶舱效果。"
               />

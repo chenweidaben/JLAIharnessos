@@ -142,7 +142,7 @@ export default function DrgDeepPage() {
   const profitChartOption = useMemo(() => {
     const list = data?.profitLosses ?? [];
     return {
-      tooltip: { trigger: 'axis' as const, formatter: (ps: Array<{ data: number; name: string }>) => '' },
+      tooltip: { trigger: 'axis' as const, formatter: () => '' },
       grid: { left: 60, right: 20, top: 30, bottom: 40 },
       xAxis: {
         type: 'category' as const,

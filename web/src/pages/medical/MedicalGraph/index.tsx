@@ -36,7 +36,7 @@ import type { EChartsOption } from 'echarts';
 import { get } from '@/services/request';
 
 const { Header, Content } = Layout;
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 /* ------------------------------- 类型契约 ------------------------------- */
 interface DeepNode {
@@ -97,16 +97,6 @@ const TYPE_COLOR: Record<DeepNode['type'], string> = {
 const TYPE_LABEL: Record<DeepNode['type'], string> = {
   disease: '疾病', symptom: '症状', drug: '药物', exam: '检查', surgery: '手术', department: '科室',
 };
-const RELATION_LABEL: Record<string, string> = {
-  disease_has_symptom: '症状',
-  disease_treated_by_drug: '用药',
-  symptom_suggests_disease: '提示',
-  drug_interacts_with_drug: '相互作用',
-  disease_needs_exam: '检查',
-  disease_has_surgery: '手术',
-  disease_visit_department: '科室',
-  disease_has_complication: '并发症',
-};
 const RISK_COLOR: Record<InteractionPairView['riskLevel'], string> = {
   high: '#F5222D',
   medium: '#FAAD14',
@@ -131,13 +121,13 @@ function buildOption(view: DeepGraphView): EChartsOption {
       borderColor: '#E8ECF1',
       textStyle: { color: '#262626', fontSize: 12 },
       formatter: (p: unknown) => {
-        const item = p as { dataType?: string; data?: Record<string, unknown> };
+        const item = p as { dataType?: string; data?: Record<string, unknown>; name?: string };
         if (item.dataType === 'edge') {
           const d = item.data ?? {};
           return `${String(d.value ?? '')}<br/><span style="color:#8c8c8c">权重 ${Number(d.w ?? 0).toFixed(2)}</span>`;
         }
         const d = item.data ?? {};
-        return `<b>${p.name}</b><br/>类型：${String(d.tname ?? '')}<br/>${String(d.desc ?? '')}<br/><span style="color:#8c8c8c">${String(d.src ?? '')}</span>`;
+        return `<b>${item.name ?? ''}</b><br/>类型：${String(d.tname ?? '')}<br/>${String(d.desc ?? '')}<br/><span style="color:#8c8c8c">${String(d.src ?? '')}</span>`;
       },
     },
     legend: {

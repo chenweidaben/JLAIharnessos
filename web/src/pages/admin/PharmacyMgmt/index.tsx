@@ -112,13 +112,6 @@ const GRADE_COLOR: Record<string, string> = {
   D: '#f5222d',
 };
 
-const ALERT_COLOR: Record<string, string> = {
-  none: 'default',
-  info: 'blue',
-  warning: 'orange',
-  critical: 'red',
-};
-
 const PILLAR_COLOR: Record<PillarCode, string> = {
   procurement: '#1e6fbf',
   inventory: '#13c2c2',
@@ -130,7 +123,7 @@ export default function PharmacyMgmtPage() {
   const [data, setData] = useState<MgmtResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [period, setPeriod] = useState('2026-Q4');
+  const [period] = useState('2026-Q4');
 
   const load = async (p: string) => {
     setLoading(true);

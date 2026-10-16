@@ -9,7 +9,7 @@
 
 import { useMemo, useState } from 'react';
 import { Button, Card, Col, Input, Row, Select, Space, Tag, Typography } from 'antd';
-import { AudioOutlined, FileTextOut, BulbOutlined, LoadingOutlined } from '@ant-design/icons';
+import { AudioOutlined, FileTextOutlined, BulbOutlined, LoadingOutlined } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -97,7 +97,7 @@ export default function VoiceEditorPage() {
       const qs = new URLSearchParams({ text, recordType, dept });
       const resp = await fetch(`/api/v1/record/smart-complete?${qs.toString()}`);
       const json = await resp.json();
-      setCompletions((json?.data?.completions as Completions[]) ?? []);
+      setCompletions((json?.data?.completions as Completion[]) ?? []);
     } catch {
       setCompletions([]);
     } finally {

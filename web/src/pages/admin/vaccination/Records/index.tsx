@@ -296,7 +296,7 @@ export default function VaccinationRecordsPage() {
                 <Card size="small">
                   <Statistic
                     title="提醒窗口"
-                    value={reminder.hasNext ? `${reminder.reminderDate ?? '-'}` : '—'}
+                    value={reminder.hasNext ? `${reminder.remindDate ?? '-'}` : '—'}
                   />
                 </Card>
               </Col>

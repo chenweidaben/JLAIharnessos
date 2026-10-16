@@ -243,7 +243,7 @@ export default function UiConsistencyPage() {
                   const tag = statusTag(d.status);
                   return (
                     <Col span={12} key={d.key}>
-                      <Card type="small" size="small">
+                      <Card size="small">
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                           <Text strong>{d.label}</Text>
                           <Tag color={tag.color}>{tag.text}</Tag>

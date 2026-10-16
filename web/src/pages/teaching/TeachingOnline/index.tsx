@@ -144,9 +144,9 @@ export default function TeachingOnlinePage() {
 
   const fetchPlatform = useCallback(async (cat: CourseCategory | '') => {
     try {
-      const query: Record<string, string> = {};
-      if (cat) query.category = cat;
-      const res = await get<PlatformResponse>('/api/v1/teaching/courses', { query });
+      const qs = new URLSearchParams();
+      if (cat) qs.set('category', cat);
+      const res = await get<PlatformResponse>(`/api/v1/teaching/courses?${qs.toString()}`);
       setPlatform(res);
       setError('');
     } catch (e) {

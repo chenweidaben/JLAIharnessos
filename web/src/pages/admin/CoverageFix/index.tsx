@@ -147,13 +147,6 @@ const TECH_LABEL: Record<FixTechnique, string> = {
   degradation: '降级路径',
 };
 
-const GRADE_COLOR: Record<CoverageVerifyResult['grade'], string> = {
-  A: 'success',
-  B: 'processing',
-  C: 'warning',
-  D: 'error',
-};
-
 function fmtPct(rate: number): string {
   return (Math.round(rate * 10000) / 100).toFixed(2);
 }

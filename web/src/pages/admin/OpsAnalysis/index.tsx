@@ -184,7 +184,7 @@ export default function OpsAnalysisPage() {
           </Row>
         </Card>
 
-        {error && <Alert type="error" style={{ marginBottom: 12 }} message={error} showAction={false} action={<Button size="small" onClick={load}>重试</Button>} />}
+        {error && <Alert type="error" style={{ marginBottom: 12 }} message={error} description={<Button size="small" onClick={load}>重试</Button>} />}
         {loading && <Spin style={{ display: 'block', margin: '40px auto' }} />}
         {!loading && !error && !data?.hasData && (
           <Alert type="info" message={data?.message || '暂无运营数据'} />

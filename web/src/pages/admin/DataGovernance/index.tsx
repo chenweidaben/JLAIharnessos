@@ -200,7 +200,7 @@ export default function DataGovernancePage() {
             {data?.demo && (
               <Alert
                 type="warning"
-                showIcon"
+                showIcon
                 style={{ marginBottom: 16 }}
                 message="当前为演示样本：尚未接入真实数据平台采集，页面用于演示深度治理驾驶舱效果。"
               />

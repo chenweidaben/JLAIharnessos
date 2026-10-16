@@ -14,7 +14,7 @@
 
 import { useState } from 'react';
 import {
-  Alert, Button, Card, Descriptions, Form, Input, InputNumber, List, Space, Tag, Typography, Watermark, message,
+  Alert, Button, Card, Descriptions, Form, Input, List, Space, Tag, Typography, Watermark, message,
 } from 'antd';
 import { ApiOutlined, SafetyOutlined, ThunderboltOutlined } from '@ant-design/icons';
 

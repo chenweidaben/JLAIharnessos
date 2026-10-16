@@ -140,7 +140,7 @@ export default function DrugLifecyclePage() {
     { title: '失效日期', dataIndex: 'expiryDate', key: 'expiryDate', width: 110, render: (v: string) => v.slice(0, 10) },
     {
       title: '状态', dataIndex: 'status', key: 'status', width: 100,
-      render: (v: Batch['status'], r) => v === 'recalled'
+      render: (v: Batch['status']) => v === 'recalled'
         ? <Tag color="red">已召回</Tag>
         : v === 'expired'
           ? <Tag color="default">已过期</Tag>

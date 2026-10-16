@@ -26,8 +26,6 @@ const { Title, Paragraph, Text } = Typography;
 
 /* ---------------- 与 BFF 输出对齐的类型 ---------------- */
 
-type ValueLevel = 'high' | 'medium' | 'low';
-
 interface HighValueTraceGap {
   itemCode: string;
   name: string;

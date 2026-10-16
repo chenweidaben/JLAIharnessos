@@ -98,7 +98,6 @@ const watermarkText = ['健澜科技', '医学知识图谱', 'jlmedaios'];
  */
 function buildGraphOption(result: GraphResultView): EChartsOption {
   const idSet = new Set(result.nodes.map((n) => n.id));
-  const nodeName = new Map(result.nodes.map((n) => [n.id, n.name]));
   const pathEdges = new Set(
     result.paths.flatMap((p, i) =>
       p.nodes.slice(0, -1).map((n, j) => `${i}:${n}->${p.nodes[j + 1]}`),
@@ -113,10 +112,10 @@ function buildGraphOption(result: GraphResultView): EChartsOption {
       borderColor: '#E8ECF1',
       textStyle: { color: '#262626', fontSize: 12 },
       formatter: (p: unknown) => {
-        const item = p as { dataType?: string; data?: { desc?: string; typeName?: string; src?: string } };
+        const item = p as { dataType?: string; data?: { desc?: string; typeName?: string; src?: string }; name?: string };
         if (item.dataType === 'edge') return '';
         const d = item.data ?? {};
-        return `<b>${p.name}</b><br/>类型：${d.typeName ?? ''}<br/>${d.desc ?? ''}<br/><span style="color:#8c8c8c">${d.src ?? ''}</span>`;
+        return `<b>${item.name ?? ''}</b><br/>类型：${d.typeName ?? ''}<br/>${d.desc ?? ''}<br/><span style="color:#8c8c8c">${d.src ?? ''}</span>`;
       },
     },
     legend: {

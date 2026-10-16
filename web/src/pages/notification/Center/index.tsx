@@ -14,7 +14,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react';
 import {
   Alert,
   Badge,
@@ -34,10 +34,10 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExperimentOutlined,
-  AlertTriangleOutlined,
   BulbOutlined,
   TeamOutlined,
   ReloadOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { get, put } from '@/services/request';
 
@@ -47,7 +47,6 @@ const { Title, Text, Paragraph } = Typography;
 /** 深海蓝主题色板（与全院 VI 一致） */
 const DEEP_BG = '#0A2540';
 const MID_BLUE = '#1E5F8C';
-const ACCENT = '#4A90D9';
 const GOLD = '#faad14';
 const GREEN = '#52c41a';
 const RED = '#f5222d';
@@ -79,10 +78,10 @@ interface UnifiedNotificationPage {
 /** 大类元数据：标签 + 图标 + 色（与后端 UNIFIED_NOTIFICATION_TYPES 对齐） */
 const TYPE_META: Record<
   UnifiedNotificationType,
-  { label: string; color: string; icon: JSX.Element }
+  { label: string; color: string; icon: ReactElement }
 > = {
   todo: { label: '待办', color: MID_BLUE, icon: <ClockCircleOutlined /> },
-  alert: { label: '告警', color: RED, icon: <AlertTriangleOutlined /> },
+  alert: { label: '告警', color: RED, icon: <WarningOutlined /> },
   recommend: { label: '推荐', color: GOLD, icon: <BulbOutlined /> },
   interact: { label: '互动', color: GREEN, icon: <TeamOutlined /> },
 };

@@ -435,7 +435,7 @@ export default function DoctorGrowthPage() {
                 </Row>
                 <Alert
                   style={{ marginTop: 12 }}
-                  type={peers && peers.avgScore >= (peers.deptAverage.avgScore ?? 0) ? 'success' : 'info'}
+                  type={peers && peers.self.avgScore >= (peers.deptAverage.avgScore ?? 0) ? 'success' : 'info'}
                   showIcon
                   message={
                     peers

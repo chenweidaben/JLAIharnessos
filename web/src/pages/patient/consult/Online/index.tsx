@@ -71,7 +71,7 @@ function fmtClock(sec: number): string {
 }
 
 export default function OnlineConsultPage() {
-  const [patientId, setPatientId] = useState('P10086');
+  const [patientId] = useState('P10086');
   const [dept, setDept] = useState('');
   const [symptoms, setSymptoms] = useState('');
   const [mode, setMode] = useState<ConsultMode>('text');

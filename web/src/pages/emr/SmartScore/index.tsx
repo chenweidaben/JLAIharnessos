@@ -10,7 +10,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { Alert, Button, Card, Col, Layout, List, Row, Spin, Statistic, Tag, Typography } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { post } from '@/services/request';
 
 const { Header, Content } = Layout;

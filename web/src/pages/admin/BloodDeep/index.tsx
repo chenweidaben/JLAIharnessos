@@ -93,7 +93,7 @@ export default function BloodDeepPage() {
   const [error, setError] = useState('');
 
   // 适应症输入
-  const [patientId, setPatientId] = useState('P-1001');
+  const [patientId] = useState('P-1001');
   const [hb, setHb] = useState(58);
   const [plt, setPlt] = useState(90);
   const [sbp, setSbp] = useState(88);
@@ -101,7 +101,7 @@ export default function BloodDeepPage() {
   const [weightKg, setWeightKg] = useState(60);
   const [lossMl, setLossMl] = useState(1500);
   const [scenario, setScenario] = useState('hemorrhage');
-  const [activeBleeding, setActiveBleeding] = useState(true);
+  const [activeBleeding] = useState(true);
 
   // 反应症状
   const [symptoms, setSymptoms] = useState<string[]>(['腰痛', '寒战', '血压骤降']);

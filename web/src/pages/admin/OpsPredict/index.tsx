@@ -303,7 +303,7 @@ export default function OpsPredictPage() {
                 <Col span={6}>
                   <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>预测方法</div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: VI.mid, marginTop: 8 }}>
-                    {result.modelMethod}
+                    {result.note ?? `${result.metric} · 时序预测${result.degraded ? '（降级口径）' : ''}`}
                   </div>
                 </Col>
               </Row>

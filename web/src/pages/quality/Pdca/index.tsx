@@ -8,7 +8,7 @@
  *   → Act（标准化+遗留问题转下一循环）
  * 深海蓝 VI：主色 #0A4D8C，深色 #073A6B，浅蓝 #E8F1FA。
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactElement } from 'react';
 import {
   Button,
   Card,
@@ -49,7 +49,7 @@ interface PdcaProject {
   closed: boolean;
 }
 
-const PHASE_META: { key: Phase; title: string; desc: string; icon: JSX.Element }[] = [
+const PHASE_META: { key: Phase; title: string; desc: string; icon: ReactElement }[] = [
   { key: 'Plan', title: 'Plan 计划', desc: '问题分析·目标设定·措施计划', icon: <AimOutlined /> },
   { key: 'Do', title: 'Do 执行', desc: '措施实施·过程记录', icon: <PlayCircleOutlined /> },
   { key: 'Check', title: 'Check 检查', desc: '前后数据对比·效果评估', icon: <ExperimentOutlined /> },

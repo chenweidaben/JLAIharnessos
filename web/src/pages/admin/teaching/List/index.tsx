@@ -308,7 +308,7 @@ export default function TeachingListPage() {
         open={modalOpen}
         onOk={submit}
         confirmLoading={submitting}
-        onCancel={() => setModalOpen(null)}
+        onCancel={() => setModalOpen(false)}
         okText="确认登记"
       >
         <Form form={form} layout="vertical">

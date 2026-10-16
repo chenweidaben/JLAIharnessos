@@ -200,7 +200,7 @@ export default function ResearchPipelinePage() {
     { title: '缓解措施', dataIndex: 'mitigation' },
   ];
 
-  const stageSteps = result?.pipeline.stages.map((s, i) => ({
+  const stageSteps = result?.pipeline.stages.map((s) => ({
     title: s.name,
     description: s.focus,
     key: s.id,

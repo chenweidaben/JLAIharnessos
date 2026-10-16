@@ -10,7 +10,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from 'react';
-import { Alert, Button, Card, Col, Layout, List, Progress, Row, Spin, Statistic, Table, Tag, Typography } from 'antd';
+import { Alert, Button, Card, Col, Layout, Progress, Row, Spin, Statistic, Table, Tag, Typography } from 'antd';
 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;

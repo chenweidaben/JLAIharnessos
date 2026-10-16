@@ -253,7 +253,7 @@ export default function HealthPlanPage(): React.JSX.Element {
           <button style={{ ...BUTTON, background: OK_BG, color: OK }} onClick={() => track({ type: 'medication', onTime: true })}>
             已按时服药
           </button>
-          <button style={{ ...BUTTON, background: OK_BG, color: OK }} onClick={() => track({ type: 'diet', onPlan: true })}>
+          <button style={{ ...BUTTON, background: OK_BG, color: OK }} onClick={() => track({ type: 'diet', onTime: true })}>
             今日饮食达标
           </button>
         </div>
