@@ -990,6 +990,8 @@ const PsychEAPV5 = lazy(() => import('@/pages/psych-eap-v5/report'));
 const MultiCampusV5 = lazy(() => import('@/pages/multi-campus-v5/report'));
 // M273-B：集团财务人力物资 V5
 const GroupFRHV5 = lazy(() => import('@/pages/group-frh-v5/report'));
+// M273-C：集团质控与标准统一 V5
+const GroupQAV5 = lazy(() => import('@/pages/group-qa-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1920,6 +1922,8 @@ export default function AppRoutes() {
           <Route path="multi-campus-v5/report" element={<MultiCampusV5 />} />
           {/* M273-B：集团财务人力物资 V5 */}
           <Route path="group-frh-v5/report" element={<GroupFRHV5 />} />
+          {/* M273-C：集团质控与标准统一 V5 */}
+          <Route path="group-qa-v5/report" element={<GroupQAV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
