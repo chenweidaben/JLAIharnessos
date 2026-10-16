@@ -288,6 +288,8 @@ const BackupStrategy = lazy(() => import('@/pages/admin/backup-strategy'));
 const InpatientBrainV2 = lazy(() => import('@/pages/ai-brain/v2/inpatient'));
 // M185-B：数字孪生3D手术室
 const ORTwins3D = lazy(() => import('@/pages/twin3d/or'));
+// M185-C：Nurse MUSE V2
+const NurseMUSEV2 = lazy(() => import('@/pages/personal-agent/nurse-muse'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -516,6 +518,8 @@ export default function AppRoutes() {
           <Route path="ai-brain/v2/inpatient" element={<InpatientBrainV2 />} />
           {/* M185-B：数字孪生3D手术室 */}
           <Route path="twin3d/or" element={<ORTwins3D />} />
+          {/* M185-C：Nurse MUSE V2 */}
+          <Route path="personal-agent/nurse-muse" element={<NurseMUSEV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
