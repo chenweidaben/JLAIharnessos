@@ -480,6 +480,8 @@ const PatientProfileV2 = lazy(() => import('@/pages/patient-profile/report-v2'))
 const KnowledgeGraphV2 = lazy(() => import('@/pages/knowledge-graph/report-v2'));
 // M209-A：患者安全 V2
 const PatientSafetyV2 = lazy(() => import('@/pages/patient-safety/report-v2'));
+// M209-B：院感 V2
+const InfectionControlV2 = lazy(() => import('@/pages/infection-control/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -900,6 +902,8 @@ export default function AppRoutes() {
           <Route path="knowledge-graph/report-v2" element={<KnowledgeGraphV2 />} />
           {/* M209-A：患者安全 V2 */}
           <Route path="patient-safety/report-v2" element={<PatientSafetyV2 />} />
+          {/* M209-B：院感 V2 */}
+          <Route path="infection-control/report-v2" element={<InfectionControlV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
