@@ -80,6 +80,7 @@ import { adminTrendsRoutes } from './routes/adminTrends';
 import { adminIntelligenceScoreRoutes } from './routes/adminIntelligenceScore';
 // 【M160-A · 全自学习闭环】GET /api/v1/admin/auto-learn/report 系统每周自动进化报告
 import { autoLearnRoutes } from './routes/autoLearn';
+import { resourceOptimizeRoutes } from './routes/resourceOptimize'; // M161-D：POST /api/v1/admin/resource/optimize 资源智能调配（公平轮班）
 import { mobileQuickActionsRoutes } from './routes/mobileQuickActions';
 // 【用户体验深化 · M134-D】工作台待办聚合：按角色聚合、按紧急度排序，进工作台即见今日最该做的事
 import { todosRoutes } from './routes/todos';
@@ -685,6 +686,7 @@ const allRoutes: RouteDef[] = [
   ...adminTrendsRoutes,
   ...adminIntelligenceScoreRoutes,
   ...autoLearnRoutes, // M160-A：GET /api/v1/admin/auto-learn/report 全自学习闭环周度报告
+  ...resourceOptimizeRoutes, // M161-D：POST /api/v1/admin/resource/optimize 资源智能调配（床位/手术室/人员，公平轮班）
   ...mobileQuickActionsRoutes,
   ...todosRoutes,
   ...imagingRoutes,
