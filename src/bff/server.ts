@@ -494,6 +494,7 @@ import { researchDeepRoutes } from './routes/researchDeep'; // M162-C：【科�
 import { researchPipelineRoutes } from './routes/researchPipeline'; // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
 import { roadmapRoutes } from './routes/roadmap'; // M157-D：v4.x 产品路线图（三阶段/优先级/工作量估算）GET /api/v1/admin/roadmap
 import { patientJourneyRoutes } from './routes/patientJourney'; // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
+import { patientDeepRoutes } from './routes/patientDeep'; // M172-D：【安全质量与运营】患者服务与体验深化 GET /api/v1/patient/deep（智能导诊/院内导航/智慧门诊/智慧住院，老人也能用）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
 
@@ -903,6 +904,7 @@ const allRoutes: RouteDef[] = [
   ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
   ...opsDeepRoutes, // M172-C：【安全质量与运营】GET /api/v1/admin/ops/deep?dept=&period=（四域效率评分/标杆对标/瓶颈识别）
   ...patientJourneyRoutes, // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
+  ...patientDeepRoutes, // M172-D：【安全质量与运营】患者服务与体验深化 GET /api/v1/patient/deep（智能导诊/院内导航/智慧门诊/智慧住院，老人也能用）
   ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
 ];
 
