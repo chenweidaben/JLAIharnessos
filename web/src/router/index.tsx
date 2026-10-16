@@ -850,6 +850,14 @@ const IntelligentAlertV3 = lazy(() => import('@/pages/intelligent-alert-v3/repor
 const PatientProfileV3 = lazy(() => import('@/pages/patient-profile-v3/report'));
 // M255-D：临床规则引擎 V3
 const ClinicalRuleEngineV3 = lazy(() => import('@/pages/clinical-rule-engine-v3/report'));
+// M256-A：患者安全 V3
+const PatientSafetyV3 = lazy(() => import('@/pages/patient-safety-v3/report'));
+// M256-B：院感控制 V3
+const InfectionControlV3 = lazy(() => import('@/pages/infection-control-v3/report'));
+// M256-C：病历质量 V3（里程碑 v5.00.0）
+const RecordQualityV3 = lazy(() => import('@/pages/record-quality-v3/report'));
+// M256-D：药品供应链 V3
+const DrugSupplyChainV3 = lazy(() => import('@/pages/drug-supply-chain-v3/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1640,6 +1648,14 @@ export default function AppRoutes() {
           <Route path="patient-profile-v3/report" element={<PatientProfileV3 />} />
           {/* M255-D：临床规则引擎 V3 */}
           <Route path="clinical-rule-engine-v3/report" element={<ClinicalRuleEngineV3 />} />
+          {/* M256-A：患者安全 V3 */}
+          <Route path="patient-safety-v3/report" element={<PatientSafetyV3 />} />
+          {/* M256-B：院感控制 V3 */}
+          <Route path="infection-control-v3/report" element={<InfectionControlV3 />} />
+          {/* M256-C：病历质量 V3（里程碑 v5.00.0） */}
+          <Route path="record-quality-v3/report" element={<RecordQualityV3 />} />
+          {/* M256-D：药品供应链 V3 */}
+          <Route path="drug-supply-chain-v3/report" element={<DrugSupplyChainV3 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

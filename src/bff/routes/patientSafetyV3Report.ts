@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 患者安全 V3 路由（M241-A）
+ * 健澜科技 jlmedaios - 患者安全 V3 路由（M256-A 深化）
  *
  * GET /api/v1/patient-safety-v3/report
  *
