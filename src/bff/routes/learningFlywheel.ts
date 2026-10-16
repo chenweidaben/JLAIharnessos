@@ -70,7 +70,7 @@ export const learningFlywheelRoutes: RouteDef[] = [
             GROUP BY DATE(recommended_at)
             ORDER BY date ASC
           `;
-          points = (rows as Array<{
+          points = (rows as unknown as Array<{
             date: string;
             recommendations: number;
             adopted: number;

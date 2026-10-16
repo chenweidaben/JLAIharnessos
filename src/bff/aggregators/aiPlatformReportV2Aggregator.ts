@@ -63,7 +63,7 @@ export function buildAIPlatformReportV2(timeRange: string): AIPlatformReportV2 {
     featureStore: { features: 500 },
     knowledgeHub: { knowledge: 1000 },
     application: { apps: 20 },
-    governance: { biasAudit: 10, explainable: true },
+    governance: { biasAudit: 10, explainable: 10 },
     platform: { mlflow: true },
     suggestions: ['监控模型漂移', '提高模型可解释性'],
   };

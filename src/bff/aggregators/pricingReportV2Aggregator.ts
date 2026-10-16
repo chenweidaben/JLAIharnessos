@@ -57,7 +57,7 @@ export function buildPricingReportV2(timeRange: string): PricingReportV2 {
     drug: { zeroMarkup: true },
     consumable: { spd: 2000, compared: 1800 },
     billing: { regulated: 50000 },
-    compliance: { disclosed: true, selfChecked: 100 },
+    compliance: { disclosed: 100, selfChecked: 100 },
     revenue: { total: 200000000 },
     analysis: { structure: 80 },
     management: { satisfaction: 90 },

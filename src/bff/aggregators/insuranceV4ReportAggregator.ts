@@ -65,7 +65,7 @@ export function buildInsuranceV4Report(timeRange: string): InsuranceV4Report {
     settlement: { realtime: 8000, yearend: 500, smart: 95 },
     review: { preAlert: 10000, postReview: 5000, abnormal: 200, appeal: 50 },
     payment: { prepaid: 10000, perCase: 4000, perDiem: 500, perCapita: 100 },
-    assessment: { score: 85, ranking: 10, penalty: 0, credit: "A" },
+    assessment: { score: 85, ranking: 10, penalty: 0, credit: 90 },
     suggestions: ["提升 DRG 入组率", "降低异常费用"],
   };
 }

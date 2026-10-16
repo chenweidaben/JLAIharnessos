@@ -28,7 +28,7 @@ describe('M157-C 门禁复查 fullQualityGate', () => {
   it('六维齐全：smoke/security/performance/coverage/tsc/ui', () => {
     const gate = fullQualityGate();
     expect(gate.dimensions.length).toBe(6);
-    const keys = gate.dimensions.map((d) => d.key).sort();
+    const keys = gate.dimensions.map((d) => d.key).sort() as string[];
     expect(keys).toEqual(
       ['coverage', 'performance', 'security', 'smoke', 'tsc', 'ui'].sort(),
     );

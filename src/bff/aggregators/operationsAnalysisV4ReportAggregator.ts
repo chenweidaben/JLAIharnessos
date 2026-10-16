@@ -62,7 +62,7 @@ export function buildOperationsAnalysisV4Report(timeRange: string): OperationsAn
     medical: { lab: 500000, imaging: 100000, pathology: 20000, positiveRate: 40, turnaround: 24 },
     finance: { revenue: 50000, expense: 40000, surplus: 10000, cost: 80, drgBenefit: 500 },
     forecast: { outpatient: 5200, inpatient: 1000, capacityAlert: false },
-    dashboard: { executive: 1, deptBoard: 40, drilldown: true, benchmark: 85 },
+    dashboard: { executive: 1, deptBoard: 40, drilldown: 100, benchmark: 85 },
     simulation: { scheduling: 90, allocation: 85, costControl: 80, revenueBoost: 75 },
     suggestions: ["提升门诊量", "降低平均住院日"],
   };

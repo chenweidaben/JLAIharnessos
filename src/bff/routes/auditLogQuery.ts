@@ -11,7 +11,7 @@
 
 import { getDb } from '../../db/pool.js';
 import { requirePermissionCode } from '../middleware/auth.js';
-import { type Ctx, json, type RouteDef } from '../types.js';
+import { type Ctx, json, ok, type RouteDef } from '../types.js';
 import {
   maskIp,
   queryAuditLog,
@@ -29,7 +29,7 @@ async function loadFromDb(c: Ctx): Promise<AuditLogRow[]> {
       ORDER BY seq DESC
       LIMIT 10000
     `;
-    return (rows as Array<{
+    return (rows as unknown as Array<{
       seq: number;
       actor_name: string;
       actor_role: string;
