@@ -13,17 +13,23 @@
 import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
-import { requirePermissionCode } from '../middleware/auth';
+import { requirePermissionCode, requireRole } from '../middleware/auth';
 import {
+  buildDeepDataGovernance,
   DataGovernanceError,
+  generateDataQualityReport,
   getLatestRun,
   getQualityTrend,
   getRunResults,
+  identifyDataAnomaly,
   listClassification,
   listRules,
   overrideClassification,
+  runDataQualityCheck,
   runQualityCheck,
   scanClassification,
+  type GovCheckResult,
+  type GovDataQualityRule,
 } from '../aggregators/dataGovernanceAggregator';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
@@ -71,7 +77,106 @@ function guarded<T>(
   };
 }
 
+/* ============================================================================
+ * M175-A · 【质量与新场景】深度数据治理驾驶舱
+ * GET /api/v1/admin/data/governance
+ *   - 四大治理体系（buildDeepDataGovernance）；
+ *   - 对关键样本跑真检查（runDataQualityCheck）；
+ *   - 周期质量报告（generateDataQualityReport）；
+ *   - 典型异常识别（identifyDataAnomaly）。
+ * 仅 admin 只读，不碰 WebSocket、不新增依赖、不暴露 PII。
+ * ==========================================================================*/
+
+/** 进程内样本（真实部署由数据平台回写；零新依赖，仅本模块） */
+const SAMPLE_CHECKS: Array<{
+  table: string;
+  field: string;
+  rule: GovDataQualityRule;
+}> = [
+  {
+    table: 'clinical.patients',
+    field: 'mrn',
+    rule: {
+      checkType: 'not_null',
+      severity: 'critical',
+      samples: ['MRN001', 'MRN002', '', 'MRN004'],
+    },
+  },
+  {
+    table: 'clinical.patients',
+    field: 'age',
+    rule: {
+      checkType: 'range',
+      severity: 'critical',
+      params: { min: 0, max: 150 },
+      samples: [45, 3, 200, 67, 12],
+    },
+  },
+  {
+    table: 'clinical.patients',
+    field: 'gender',
+    rule: {
+      checkType: 'enum',
+      severity: 'major',
+      params: { allowed: ['男', '女', '未知', '未说明'] },
+      samples: ['男', '女', '未知', '保密'],
+    },
+  },
+  {
+    table: 'clinical.visits',
+    field: 'patient_id',
+    rule: {
+      checkType: 'referential',
+      severity: 'critical',
+      params: { allowed: ['P1', 'P2', 'P3'] },
+      samples: ['P1', 'P2', 'P99', 'P3'],
+    },
+  },
+];
+
+const ANOMALY_CASES: Array<{ table: string; field: string; value: unknown }> = [
+  { table: 'clinical.patients', field: 'age', value: 200 },
+  { table: 'clinical.patients', field: 'weight_kg', value: 72.5 },
+  { table: 'clinical.observations', field: 'sbp', value: 180 },
+  { table: 'clinical.patients', field: 'mrn', value: '' },
+  { table: 'clinical.patients', field: 'mobile', value: '13800001111' },
+];
+
+async function handleDataGovernanceDeep(c: Ctx): Promise<Response> {
+  const denied = requireRole(c, 'admin');
+  if (denied) return denied;
+  try {
+    const nowIso = new Date().toISOString();
+    const system = buildDeepDataGovernance(nowIso);
+
+    const checks: GovCheckResult[] = SAMPLE_CHECKS.map((s) =>
+      runDataQualityCheck(s.table, s.field, s.rule),
+    );
+
+    const period = (c.query.get('period') ?? '2026-10').trim() || '2026-10';
+    const report = generateDataQualityReport(period, checks);
+
+    const anomalies = ANOMALY_CASES.map((a) =>
+      identifyDataAnomaly(a.table, a.field, a.value),
+    );
+
+    return json(
+      ok({ system, checks, report, anomalies, demo: true }, 'ok', c.traceId),
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '深度数据治理采集失败';
+    return json(fail(ErrorCode.INTERNAL_ERROR, message, c.traceId), 500);
+  }
+}
+
 export const dataGovernanceRoutes: RouteDef[] = [
+  // M175-A：深度数据治理驾驶舱（仅 admin）
+  {
+    method: 'GET',
+    path: '/api/v1/admin/data/governance',
+    handle: handleDataGovernanceDeep,
+    auth: true,
+  },
   // ---------- 质量检测 ----------
   {
     method: 'POST',
