@@ -491,6 +491,8 @@ import { drgAuditV2Routes } from './routes/drgAuditV2';
 import { clinicalPathwayV2Routes } from './routes/clinicalPathwayV2';
 // M188-B：合理用药监测 GET /api/v1/drug/rational/report
 import { rationalDrugUseRoutes } from './routes/rationalDrugUse';
+// M188-C：院感控制 V2 GET /api/v1/infection/control/report-v2
+import { infectionControlV2Routes } from './routes/infectionControlV2';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -978,6 +980,7 @@ const allRoutes: RouteDef[] = [
   ...drgAuditV2Routes, // M187-D：DRG 审核 V2 GET /api/v1/drg/audit/report-v2
   ...clinicalPathwayV2Routes, // M188-A：临床路径 V2 GET /api/v1/clinical/pathway/report-v2
   ...rationalDrugUseRoutes, // M188-B：合理用药 GET /api/v1/drug/rational/report
+  ...infectionControlV2Routes, // M188-C：院感控制 V2 GET /api/v1/infection/control/report-v2
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
