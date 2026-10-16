@@ -307,3 +307,575 @@ export function buildPatientMuse(
     healthReminders: reminders,
   };
 }
+
+/* ================================================================== */
+/* 【质量与新场景】M175-D：患者个人智能体深化（真帮患者，不只是看板）   */
+/* ------------------------------------------------------------------ */
+/* 说明：M117-A 的 buildPatientMuse 已沉淀「健康画像标签视图」；        */
+/* M175-D 在此基础上把患者智能体从「看板」升级为「随身健康助手」：      */
+/*   健康画像(疾病/用药/检查/过敏/家族史) / 就医偏好(时段/医生/缴费) / */
+/*   健康目标(减重/控糖/降压/运动) / 健康提醒(服药/复查/体检/疫苗)，  */
+/* 并主动产出洞察、服务推荐与进度跟踪。以下新函数均为纯函数、不打库。  */
+/* 类型刻意另命名（ProfileMedication/MuseReminder/PatientMUSE），       */
+/* 避免与上方 M117-A 的 PatientMedication/HealthReminder 发生接口合并。 */
+/* ================================================================== */
+
+/* ---------- 健康画像（深化） ---------- */
+
+/** 一条慢病 / 既往诊断 */
+export interface MuseDisease {
+  name: string;
+  since?: string;
+  status: 'controlled' | 'monitoring' | 'unstable';
+}
+
+/** 一条在用药物（深化版：含剂量/服法/依从性） */
+export interface ProfileMedication {
+  drug: string;
+  dose: string;
+  frequency: string;
+  adherence?: 'good' | 'partial' | 'poor';
+}
+
+/** 一项近期检查检验 */
+export interface ProfileCheckup {
+  item: string;
+  date: string;
+  result: 'normal' | 'abnormal' | 'pending';
+  note?: string;
+}
+
+/** 一条过敏史（深化版：明确反应） */
+export interface ProfileAllergy {
+  allergen: string;
+  reaction: string;
+}
+
+/** 一条家族史 */
+export interface ProfileFamilyHistory {
+  relation: string;
+  condition: string;
+}
+
+/** 患者健康画像（深化聚合视图） */
+export interface DeepHealthProfile {
+  diseases: MuseDisease[];
+  medications: ProfileMedication[];
+  checkups: ProfileCheckup[];
+  allergies: ProfileAllergy[];
+  familyHistory: ProfileFamilyHistory[];
+}
+
+/* ---------- 就医偏好 / 健康目标 / 健康提醒 ---------- */
+
+/** 就诊时段偏好 */
+export type VisitTime = 'morning' | 'forenoon' | 'afternoon' | 'evening';
+/** 缴费方式 */
+export type PaymentMethod = 'cash' | 'insurance' | 'mobile' | 'family_pay';
+
+/** 患者就医偏好 */
+export interface VisitPreferences {
+  preferredTime: VisitTime;
+  preferredDoctor?: string;
+  preferredDept?: string;
+  paymentMethod: PaymentMethod;
+  reminderChannels: Array<'sms' | 'wechat' | 'voice'>;
+}
+
+/** 健康目标四大类 */
+export type HealthGoalType = 'weight_loss' | 'glucose_control' | 'bp_control' | 'exercise';
+
+export const GOAL_LABEL: Record<HealthGoalType, string> = {
+  weight_loss: '减重',
+  glucose_control: '控糖',
+  bp_control: '降压',
+  exercise: '运动',
+};
+
+/** 目标方向：减重/控糖/降压往下走，运动往上走 */
+const GOAL_DIRECTION: Record<HealthGoalType, 'down' | 'up'> = {
+  weight_loss: 'down',
+  glucose_control: 'down',
+  bp_control: 'down',
+  exercise: 'up',
+};
+
+/** 一条健康目标 */
+export interface DeepHealthGoal {
+  type: HealthGoalType;
+  startValue: number;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  startDate: string;
+  deadline: string;
+}
+
+/** 健康提醒四大类 */
+export type MuseReminderType = 'medication' | 'recheck' | 'checkup' | 'vaccine';
+
+export const MUSE_REMINDER_LABEL: Record<MuseReminderType, string> = {
+  medication: '服药',
+  recheck: '复查',
+  checkup: '体检',
+  vaccine: '疫苗',
+};
+
+/** 一条健康提醒（深化版：含应办日期与优先级） */
+export interface MuseReminder {
+  type: MuseReminderType;
+  title: string;
+  dueDate: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+/* ---------- 智能洞察 / 个人智能体全景 ---------- */
+
+/** 一条智能体主动洞察（不是数据复述，而是替患者发现的问题） */
+export interface PatientInsight {
+  kind: 'adherence' | 'allergy_risk' | 'family_risk' | 'abnormal_lab';
+  level: 'high' | 'medium' | 'low';
+  message: string;
+  action: string;
+}
+
+/** buildPatientMUSE 输出：患者个人智能体全景 */
+export interface PatientMUSE {
+  patientId: string;
+  profile: DeepHealthProfile;
+  preferences: VisitPreferences;
+  goals: DeepHealthGoal[];
+  reminders: MuseReminder[];
+  insights: PatientInsight[];
+  /** 健康风险分 0-100（越高越需关注） */
+  riskScore: number;
+  summary: string;
+}
+
+/** 内置演示画像：糖肾 + 高血压、依从性一般、糖化偏高、父系糖尿病家族史 */
+function demoDeepProfile(): DeepHealthProfile {
+  return {
+    diseases: [
+      { name: '2型糖尿病', since: '2022-03-01', status: 'monitoring' },
+      { name: '原发性高血压2级', since: '2020-06-15', status: 'controlled' },
+    ],
+    medications: [
+      { drug: '二甲双胍', dose: '0.5g', frequency: 'bid', adherence: 'partial' },
+      { drug: '缬沙坦氨氯地平', dose: '80mg/5mg', frequency: 'qd', adherence: 'good' },
+      { drug: '阿托伐他汀', dose: '20mg', frequency: 'qn', adherence: 'poor' },
+    ],
+    checkups: [
+      { item: '糖化血红蛋白 HbA1c', date: '2026-09-20', result: 'abnormal', note: '7.8%（目标 <7.0%）' },
+      { item: '低密度脂蛋白 LDL-C', date: '2026-09-20', result: 'abnormal', note: '3.6 mmol/L（目标 <2.6）' },
+      { item: '尿微量白蛋白', date: '2026-09-20', result: 'normal', note: '正常' },
+    ],
+    allergies: [{ allergen: '磺胺类', reaction: '皮疹' }],
+    familyHistory: [
+      { relation: '父亲', condition: '2型糖尿病' },
+      { relation: '母亲', condition: '高血压' },
+    ],
+  };
+}
+
+function demoDeepPreferences(): VisitPreferences {
+  return {
+    preferredTime: 'forenoon',
+    preferredDoctor: '王主任（内分泌科）',
+    preferredDept: '内分泌科',
+    paymentMethod: 'mobile',
+    reminderChannels: ['wechat', 'sms'],
+  };
+}
+
+function demoDeepGoals(): DeepHealthGoal[] {
+  return [
+    { type: 'weight_loss', startValue: 82.5, currentValue: 79.8, targetValue: 75.0, unit: 'kg', startDate: '2026-07-01', deadline: '2026-12-31' },
+    { type: 'glucose_control', startValue: 8.4, currentValue: 7.8, targetValue: 6.5, unit: '%', startDate: '2026-07-01', deadline: '2026-12-31' },
+  ];
+}
+
+function demoDeepReminders(): MuseReminder[] {
+  return [
+    { type: 'medication', title: '阿托伐他汀 20mg 每晚一次', dueDate: '2026-10-16', priority: 'high' },
+    { type: 'recheck', title: '糖尿病季度复查（糖化/肾功能）', dueDate: '2026-10-25', priority: 'high' },
+    { type: 'checkup', title: '年度体检', dueDate: '2026-11-30', priority: 'medium' },
+    { type: 'vaccine', title: '流感疫苗', dueDate: '2026-11-15', priority: 'low' },
+  ];
+}
+
+/** 把画像信号翻译成「替患者着急」的洞察 */
+function buildDeepInsights(profile: DeepHealthProfile): PatientInsight[] {
+  const insights: PatientInsight[] = [];
+
+  const poor = profile.medications.filter((m) => m.adherence === 'poor');
+  const partial = profile.medications.filter((m) => m.adherence === 'partial');
+  if (poor.length > 0) {
+    insights.push({
+      kind: 'adherence',
+      level: 'high',
+      message: `您「${poor.map((m) => m.drug).join('、')}」经常忘记吃，这是控制血脂/血糖的关键药。`,
+      action: '已为您在手机设置每晚 21:00 服药提醒，吃完点一下「已服」。',
+    });
+  } else if (partial.length > 0) {
+    insights.push({
+      kind: 'adherence',
+      level: 'medium',
+      message: `您「${partial.map((m) => m.drug).join('、')}」偶尔漏服，长期下来血糖会波动。`,
+      action: '建议把药放在牙刷旁，早餐后顺手服下。',
+    });
+  }
+
+  const abnormal = profile.checkups.filter((c) => c.result === 'abnormal');
+  if (abnormal.length > 0) {
+    insights.push({
+      kind: 'abnormal_lab',
+      level: 'high',
+      message: `最近有 ${abnormal.length} 项指标偏高：${abnormal.map((c) => c.item).join('、')}。`,
+      action: '已按您偏好展示上午门诊复查号源，一键预约即可。',
+    });
+  }
+
+  const dadDiabetes = profile.familyHistory.some(
+    (f) => f.condition.includes('糖尿病') && f.relation.includes('父'),
+  );
+  if (dadDiabetes) {
+    insights.push({
+      kind: 'family_risk',
+      level: 'medium',
+      message: '您父亲有糖尿病史，您本人也是糖友，属高危人群。',
+      action: '建议每年加做一次眼底与尿微量白蛋白筛查，预防并发症。',
+    });
+  }
+
+  if (profile.allergies.length > 0) {
+    insights.push({
+      kind: 'allergy_risk',
+      level: 'medium',
+      message: `您对${profile.allergies.map((a) => a.allergen).join('、')}过敏，就诊与取药时系统会自动拦截同类药。`,
+      action: '请主动告知接诊医生，切勿自行购买复方感冒药。',
+    });
+  }
+
+  return insights;
+}
+
+/** 由洞察与控制状态估算健康风险分（0-100，越高越需关注） */
+function calcDeepRiskScore(profile: DeepHealthProfile, insights: PatientInsight[]): number {
+  let score = 0;
+  for (const ins of insights) score += ins.level === 'high' ? 25 : ins.level === 'medium' ? 12 : 5;
+  score += profile.diseases.filter((d) => d.status === 'unstable').length * 10;
+  return Math.min(100, score);
+}
+
+/**
+ * buildPatientMUSE：构建患者个人智能体（纯函数）。
+ * 一次聚合健康画像 / 就医偏好 / 健康目标 / 健康提醒，并主动产出洞察。
+ *
+ * @param patientId 患者标识（脱敏后传入）
+ * @param seed      可选：外部注入结构化数据；缺省用内置演示画像，
+ *                  保证端点开箱即有「真帮患者」的洞察可看。
+ */
+export function buildPatientMUSE(
+  patientId: string,
+  seed?: Partial<{
+    profile: DeepHealthProfile;
+    preferences: VisitPreferences;
+    goals: DeepHealthGoal[];
+    reminders: MuseReminder[];
+  }>,
+): PatientMUSE {
+  const profile = seed?.profile ?? demoDeepProfile();
+  const preferences = seed?.preferences ?? demoDeepPreferences();
+  const goals = seed?.goals ?? demoDeepGoals();
+  const reminders = seed?.reminders ?? demoDeepReminders();
+
+  const insights = buildDeepInsights(profile);
+  const riskScore = calcDeepRiskScore(profile, insights);
+
+  const summary = riskScore >= 50
+    ? '您有几项指标需要重点关注，已为您预约复查并设好服药提醒，照着做就能稳住。'
+    : riskScore >= 25
+      ? '整体平稳，注意按时服药、定期复查，把好的习惯保持住。'
+      : '各项指标控制得不错，继续保持规律作息与运动。';
+
+  return { patientId, profile, preferences, goals, reminders, insights, riskScore, summary };
+}
+
+/* ---------- 患者经验记录 ---------- */
+
+/** 患者随手记录的一条经验 */
+export interface PatientExperienceInput {
+  kind: 'symptom' | 'medication' | 'visit' | 'lifestyle';
+  title: string;
+  detail?: string;
+  /** 自评分 1-5，越高越重/越差 */
+  severity?: number;
+  recordedAt?: string;
+}
+
+export const EXPERIENCE_KIND_LABEL: Record<PatientExperienceInput['kind'], string> = {
+  symptom: '症状记录',
+  medication: '用药反馈',
+  visit: '就诊感受',
+  lifestyle: '生活记录',
+};
+
+/** recordPatientExperience 输出 */
+export interface RecordedPatientExperience {
+  patientId: string;
+  kind: PatientExperienceInput['kind'];
+  kindLabel: string;
+  title: string;
+  detail: string;
+  severity: number;
+  level: 'low' | 'medium' | 'high';
+  tags: string[];
+  /** 是否建议护士/医生主动随访 */
+  needsFollowUp: boolean;
+  recordedAt: string;
+  plainMessage: string;
+}
+
+/** 关键词 → 标签词典 */
+const TAG_DICT: ReadonlyArray<{ tag: string; keywords: string[] }> = [
+  { tag: '低血糖', keywords: ['心慌', '出冷汗', '手抖', '饥饿', '低血糖'] },
+  { tag: '高血糖', keywords: ['口渴', '多饮', '多尿', '血糖高', '口干'] },
+  { tag: '血压', keywords: ['头晕', '头胀', '血压', '头痛'] },
+  { tag: '服药困难', keywords: ['忘吃', '忘记吃', '漏服', '副作用', '恶心', '胃'] },
+  { tag: '饮食', keywords: ['吃多', '嘴馋', '主食', '米饭', '甜食', '外卖'] },
+  { tag: '运动', keywords: ['走路', '跑步', '运动', '锻炼', '散步'] },
+  { tag: '情绪睡眠', keywords: ['失眠', '睡不好', '焦虑', '情绪', '累'] },
+];
+
+/**
+ * recordPatientExperience：记录患者经验（纯函数）。
+ * 把患者大白话记录结构化：归一化严重度、关键词打标签、红旗症状判随访。
+ */
+export function recordPatientExperience(
+  patientId: string,
+  experience: PatientExperienceInput,
+): RecordedPatientExperience {
+  const title = (experience.title ?? '').trim();
+  const detail = (experience.detail ?? '').trim();
+  const text = `${title} ${detail}`;
+
+  const severity = Math.max(1, Math.min(5, Math.round(experience.severity ?? 3)));
+  const level: RecordedPatientExperience['level'] = severity >= 5 ? 'high' : severity >= 3 ? 'medium' : 'low';
+
+  const tags = TAG_DICT.filter((d) => d.keywords.some((k) => text.includes(k))).map((d) => d.tag);
+
+  const redFlag = tags.some((t) => t === '低血糖' || t === '高血糖') || severity >= 5;
+
+  return {
+    patientId,
+    kind: experience.kind,
+    kindLabel: EXPERIENCE_KIND_LABEL[experience.kind],
+    title,
+    detail,
+    severity,
+    level,
+    tags,
+    needsFollowUp: redFlag,
+    recordedAt: experience.recordedAt ?? new Date().toISOString(),
+    plainMessage: redFlag
+      ? '已收到您的记录，情况需要关注：护士会在 1 个工作日内主动联系您指导处理，期间如有加重请立即就医。'
+      : '已记下您的感受，继续保持，下次复诊时医生会看到这条记录。',
+  };
+}
+
+/* ---------- 个性化服务推荐 ---------- */
+
+/** 推荐上下文 */
+export interface PatientServiceContext {
+  symptoms?: string[];
+  knownConditions?: string[];
+  medicationAdherence?: 'good' | 'partial' | 'poor';
+  focusGoal?: HealthGoalType;
+  hasAbnormalLab?: boolean;
+}
+
+/** 一条推荐服务 */
+export interface PatientServiceItem {
+  type: 'appointment' | 'education' | 'followup' | 'checkup' | 'diet' | 'exercise' | 'medication_reminder';
+  title: string;
+  reason: string;
+  priority: 'high' | 'medium' | 'low';
+  action: string;
+}
+
+export interface PatientServiceRecommendation {
+  patientId: string;
+  services: PatientServiceItem[];
+  summary: string;
+}
+
+/**
+ * recommendPatientService：个性化服务推荐（纯函数）。
+ * 按画像与上下文推荐「下一步真正该做的事」，按优先级排序。
+ */
+export function recommendPatientService(
+  patientId: string,
+  context: PatientServiceContext = {},
+): PatientServiceRecommendation {
+  const services: PatientServiceItem[] = [];
+
+  const isDiabetic = (context.knownConditions ?? []).some((c) => c.includes('糖尿'));
+  const hasHighSugar = (context.symptoms ?? []).some((s) =>
+    ['口渴', '多饮', '多尿', '血糖高', '头晕'].includes(s),
+  );
+
+  if (context.hasAbnormalLab) {
+    services.push({
+      type: 'appointment',
+      title: '预约内分泌科复查门诊',
+      reason: '近期糖化/血脂偏高，需要医生调整方案',
+      priority: 'high',
+      action: '已按您偏好的上午时段，展示可约号源，一键挂号。',
+    });
+  }
+  if (hasHighSugar) {
+    services.push({
+      type: 'followup',
+      title: '护士主动随访指导',
+      reason: '您记录了「口渴/多饮/头晕」，可能血糖波动',
+      priority: 'high',
+      action: '留下联系方式，护士将在 1 个工作日内回电指导，必要时提前就诊。',
+    });
+  }
+  if (context.medicationAdherence === 'poor' || context.medicationAdherence === 'partial') {
+    services.push({
+      type: 'medication_reminder',
+      title: '设置智能服药提醒',
+      reason: '您近期有漏服情况，长期用药靠坚持',
+      priority: 'medium',
+      action: '按用药时间自动推送提醒，支持家属代提醒与「已服」打卡。',
+    });
+  }
+  if (isDiabetic) {
+    services.push({
+      type: 'diet',
+      title: '低糖饮食个性化食谱',
+      reason: '控糖一半靠嘴，按您口味定制一周低糖菜单',
+      priority: 'medium',
+      action: '查看「主食换杂粮、先菜后饭」的一周可执行食谱。',
+    });
+    services.push({
+      type: 'exercise',
+      title: '餐后散步运动处方',
+      reason: '餐后 30 分钟快走有助平稳血糖',
+      priority: 'low',
+      action: '每天三餐后快走 20 分钟，App 自动记录步数与时长。',
+    });
+  }
+  if (context.focusGoal === 'weight_loss') {
+    services.push({
+      type: 'education',
+      title: '科学减重：每月 2-4 斤为宜',
+      reason: '您的目标是减重，匀速减重更易坚持、不伤代谢',
+      priority: 'low',
+      action: '查看「热量缺口 300kcal」的减重科普与打卡计划。',
+    });
+  }
+
+  const order = { high: 0, medium: 1, low: 2 } as const;
+  services.sort((a, b) => order[a.priority] - order[b.priority]);
+
+  const summary = services.length === 0
+    ? '当前没有紧急事项，保持规律作息、按时复查即可。'
+    : services[0].priority === 'high'
+      ? `有需要优先处理的事项，建议今天就安排：${services[0].title}。`
+      : '为您整理了几条适合当前阶段的健康服务建议，按优先级排列。';
+
+  return { patientId, services, summary };
+}
+
+/* ---------- 健康进度跟踪 ---------- */
+
+/** trackPatientHealthProgress 输入 */
+export interface HealthProgressGoal {
+  type: HealthGoalType;
+  startValue: number;
+  currentValue: number;
+  targetValue: number;
+  unit: string;
+  daysElapsed: number;
+  daysTotal: number;
+}
+
+export interface HealthProgress {
+  patientId: string;
+  type: HealthGoalType;
+  typeLabel: string;
+  unit: string;
+  startValue: number;
+  currentValue: number;
+  targetValue: number;
+  progressPercent: number;
+  timePercent: number;
+  achieved: boolean;
+  status: 'achieved' | 'on_track' | 'at_risk' | 'off_track';
+  trend: 'improving' | 'stable' | 'worsening';
+  nextAction: string;
+}
+
+/**
+ * trackPatientHealthProgress：健康进度跟踪（纯函数）。
+ * 真实进度 = 已改善幅度 / 计划改善幅度；方向按类型自动判定。
+ *   已达标 → achieved；真实进度 ≥ 时间×0.9 → on_track；
+ *   ≥ 时间×0.6 → at_risk；否则 off_track。
+ */
+export function trackPatientHealthProgress(
+  patientId: string,
+  goal: HealthProgressGoal,
+): HealthProgress {
+  const direction = GOAL_DIRECTION[goal.type];
+  const { startValue: start, currentValue: current, targetValue: target } = goal;
+
+  const improved = direction === 'down' ? start - current : current - start;
+  const total = direction === 'down' ? start - target : target - start;
+  const achieved = direction === 'down' ? current <= target : current >= target;
+
+  let progress = total > 0 ? (improved / total) * 100 : 100;
+  progress = Math.round(Math.max(0, Math.min(100, achieved ? 100 : progress)) * 10) / 10;
+
+  const time = goal.daysTotal > 0
+    ? Math.round(Math.max(0, Math.min(100, (goal.daysElapsed / goal.daysTotal) * 100)) * 10) / 10
+    : 0;
+
+  let trend: HealthProgress['trend'] = 'stable';
+  if (improved > 0.05) trend = 'improving';
+  else if (improved < -0.05) trend = 'worsening';
+
+  let status: HealthProgress['status'];
+  if (achieved) status = 'achieved';
+  else if (progress >= time * 0.9) status = 'on_track';
+  else if (progress >= time * 0.6) status = 'at_risk';
+  else status = 'off_track';
+
+  let nextAction: string;
+  if (status === 'achieved') {
+    nextAction = '目标已达成！建议把当前值维持 3 个月，并把目标值再下调一档，巩固成果。';
+  } else if (status === 'on_track') {
+    nextAction = '节奏不错，照当前的饮食/用药/运动坚持下去，到期就能达标。';
+  } else if (status === 'at_risk') {
+    nextAction = '进度略慢于时间，建议下次复诊时请医生微调方案，并把每日打卡补上。';
+  } else {
+    nextAction = '进度明显落后，建议尽快预约医生评估，先排查用药依从性与饮食记录。';
+  }
+
+  return {
+    patientId,
+    type: goal.type,
+    typeLabel: GOAL_LABEL[goal.type],
+    unit: goal.unit,
+    startValue: start,
+    currentValue: current,
+    targetValue: target,
+    progressPercent: progress,
+    timePercent: time,
+    achieved,
+    status,
+    trend,
+    nextAction,
+  };
+}

@@ -2,8 +2,14 @@
  * 健澜科技 jlmedaios - 患者 Personal Agent（Patient MUSE）专属路由（M117-A）
  *
  * 依据宪法第七章 7.7（患者 MUSE）：
- *   GET /api/v1/patient/muse/:id —— 返回某患者的健康画像视图
+ *   GET /api/v1/patient/muse/:patientId —— 返回某患者的健康画像视图
  *   （慢病标签 / 用药过敏史 / 就医偏好 / 个性化健康提醒）。
+ *
+ * 【质量与新场景】M175-D：在同端点追加「患者个人智能体深化」agent 字段——
+ *   健康画像(疾病/用药/检查/过敏/家族史) / 就医偏好(时段/医生/缴费) /
+ *   健康目标(减重/控糖/降压/运动) / 健康提醒(服药/复查/体检/疫苗)，
+ *   并主动产出洞察、个性化服务推荐与逐目标进度跟踪，让智能体真帮患者、不只是看板。
+ *   业务规则全部在 aggregators/patientMuseAggregator.ts 纯函数层。
  *
  * 权限边界（依据第七章个人数据归属）：
  *  - 医生角色（doctor）可查看任意患者画像（医生端工作台）；
@@ -21,6 +27,10 @@ import { requireAuth } from '../middleware/auth';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   buildPatientMuse,
+  buildPatientMUSE,
+  recommendPatientService,
+  trackPatientHealthProgress,
+  type DeepHealthGoal,
   type PatientHistoryEntry,
   type PatientMedication,
   type PatientVisit,
@@ -152,33 +162,98 @@ function demoView(patientId: string): ReturnType<typeof buildPatientMuse> {
 }
 
 /* ------------------------------------------------------------------ */
+/* 【质量与新场景】M175-D：患者个人智能体深化（真帮患者，不只是看板）   */
+/* ------------------------------------------------------------------ */
+
+/** 由目标起止日期推算已过/总天数（纯日期计算，不触库） */
+function daysBetween(start: string, end: string): { elapsed: number; total: number } {
+  const MS = 86_400_000;
+  const s = new Date(start).getTime();
+  const e = new Date(end).getTime();
+  const now = Date.now();
+  if (Number.isNaN(s) || Number.isNaN(e)) return { elapsed: 0, total: 365 };
+  const total = Math.max(1, Math.round((e - s) / MS));
+  const elapsed = Math.max(0, Math.min(total, Math.round((now - s) / MS)));
+  return { elapsed, total };
+}
+
+/**
+ * 组装 M175-D 深度智能体：个人画像 + 个性化服务推荐 + 逐目标进度跟踪。
+ * 业务规则全部在 aggregators/patientMuseAggregator.ts 纯函数层，此处仅穿线。
+ */
+function buildDeepAgent(patientId: string) {
+  const muse = buildPatientMUSE(patientId);
+
+  // 由画像推导推荐上下文：已知慢病 / 是否有异常化验 / 最差依从性
+  const knownConditions = muse.profile.diseases.map((d) => d.name);
+  const hasAbnormalLab = muse.profile.checkups.some((c) => c.result === 'abnormal');
+  const adherenceRank = { poor: 0, partial: 1, good: 2 } as const;
+  const worst = muse.profile.medications
+    .map((m) => m.adherence ?? 'good')
+    .reduce<'good' | 'partial' | 'poor'>(
+      (acc, cur) => (adherenceRank[cur] < adherenceRank[acc] ? cur : acc),
+      'good',
+    );
+  const recommendation = recommendPatientService(patientId, {
+    knownConditions,
+    hasAbnormalLab,
+    medicationAdherence: worst,
+    focusGoal: 'glucose_control',
+  });
+
+  // 逐目标跟踪进度
+  const progress = muse.goals.map((g: DeepHealthGoal) => {
+    const { elapsed, total } = daysBetween(g.startDate, g.deadline);
+    return trackPatientHealthProgress(patientId, {
+      type: g.type,
+      startValue: g.startValue,
+      currentValue: g.currentValue,
+      targetValue: g.targetValue,
+      unit: g.unit,
+      daysElapsed: elapsed,
+      daysTotal: total,
+    });
+  });
+
+  return { muse, recommendation, progress };
+}
+
+/* ------------------------------------------------------------------ */
 /* 路由                                                                */
 /* ------------------------------------------------------------------ */
 
 export const patientMuseRoutes: RouteDef[] = [
   {
     method: 'GET',
-    path: '/api/v1/patient/muse/:id',
+    path: '/api/v1/patient/muse/:patientId',
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAuth(c);
       if (denied) return denied;
 
-      const resolved = resolvePatientMuseTarget(c.user!, c.params.id);
+      const resolved = resolvePatientMuseTarget(c.user!, c.params.patientId);
       if ('forbidden' in resolved) {
         return json(fail(ErrorCode.FORBIDDEN, resolved.forbidden, c.traceId), 403);
       }
       const patientId = resolved.allowed;
 
       try {
-        if (isDemo) {
-          const view = demoView(patientId);
-          return json(ok({ demo: true, patientId, ...view }));
-        }
-        const view = await buildView(patientId);
-        return json(ok({ demo: false, patientId, ...view }));
+        // M117-A：健康画像标签视图（保留，DB 优先）
+        const view = isDemo
+          ? demoView(patientId)
+          : await buildView(patientId);
+
+        // M175-D：患者个人智能体深化（画像/偏好/目标/提醒 + 洞察/推荐/进度）
+        const agent = buildDeepAgent(patientId);
+
+        return json(ok({
+          demo: isDemo,
+          patientId,
+          ...view,
+          agent,
+        }));
       } catch (err) {
-        console.error(`[patientMuse] GET /patient/muse/${patientId} [${c.traceId}]`, err);
+        console.error(`[patientMuse] GET /patient/muse/:patientId [${c.traceId}]`, err);
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,
