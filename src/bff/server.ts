@@ -529,6 +529,7 @@ import { patientExperienceRoutes } from './routes/patientExperience'; // M180-C�
 import { researchDeepRoutes } from './routes/researchDeep'; // M162-C：【科研管理深化】课题/论文/成果转化/经费 GET /api/v1/research/projects + PUT /:id/milestone
 import { researchPipelineRoutes } from './routes/researchPipeline'; // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
 import { roadmapRoutes } from './routes/roadmap'; // M157-D：v4.x 产品路线图（三阶段/优先级/工作量估算）GET /api/v1/admin/roadmap
+import { roadmapV5Routes } from './routes/roadmapV5'; // M181-D：v5.0 产品路线图（300版本里程碑/区域协同/全自学习医院）GET /api/v1/admin/roadmap/v5
 import { patientJourneyRoutes } from './routes/patientJourney'; // M168-C：【AI深化与智能运营】患者全旅程管理 GET /api/v1/patient/journey/:patientId（八节点时间线/瓶颈/流程优化/满意度预测）
 import { patientDeepRoutes } from './routes/patientDeep'; // M172-D：【安全质量与运营】患者服务与体验深化 GET /api/v1/patient/deep（智能导诊/院内导航/智慧门诊/智慧住院，老人也能用）
 import { pharmacyDeepRoutes } from './routes/pharmacyDeep'; // M173-C：【质量提升与新场景】医院智能药房深化 GET /api/v1/pharmacy/smart（智能摆药/智能审方/智能库存/智能用药，真减差错）
@@ -881,6 +882,7 @@ const allRoutes: RouteDef[] = [
   ...adminWebhooksRoutes,
   ...strategyEvolutionRoutes,
   ...roadmapRoutes, // M157-D：v4.x 路线图 GET /api/v1/admin/roadmap
+  ...roadmapV5Routes, // M181-D：v5.0 路线图 GET /api/v1/admin/roadmap/v5
   ...museSystemIntelligenceRoutes,
   ...operationalInsightRoutes,
   ...inpatientInsightRoutes,
