@@ -448,6 +448,7 @@ import { performanceBenchmarkRoutes } from './routes/performanceBenchmark';
 import { museOnboardingRoutes } from './routes/museOnboarding';
 import { onboardingRoutes } from './routes/onboarding';
 import { museNurseRoutes } from './routes/museNurse';
+import { nurseMuseRoutes } from './routes/nurseMuse'; // M169-C：知识图谱与Personal Agent GET /api/v1/nurse/muse/:staffId
 import { museHospitalRoutes } from './routes/museHospital';
 import { musePharmaRoutes } from './routes/musePharma';
 import { museAdminRoutes } from './routes/museAdmin';
@@ -855,6 +856,7 @@ const allRoutes: RouteDef[] = [
   ...museOnboardingRoutes,
   ...onboardingRoutes,
   ...museNurseRoutes,
+  ...nurseMuseRoutes, // M169-C：护士 Personal Agent 深化（画像/推荐/成长）
   ...museHospitalRoutes,
   ...musePharmaRoutes,
   ...museAdminRoutes,

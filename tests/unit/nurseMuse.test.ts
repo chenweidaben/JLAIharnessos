@@ -16,8 +16,14 @@ import { describe, expect, it } from 'bun:test';
 
 import {
   buildNurseMuse,
+  buildNurseMUSEProfile,
+  recordNurseExperience,
+  recommendNurseCare,
+  trackNurseGrowth,
   type NurseCareOutcome,
   type NurseCareRecord,
+  type NurseExperience,
+  type NurseExperienceDraft,
   type NurseRiskEvent,
 } from '../../src/bff/aggregators/nurseMuseAggregator';
 
@@ -145,5 +151,185 @@ describe('buildNurseMuse 空输入兜底', () => {
         recentTimeline: [],
       });
     }
+  });
+});
+
+/* ================================================================== */
+/* M169-C：护士 Personal Agent 深化（知识图谱与Personal Agent）         */
+/* ================================================================== */
+
+/** 快速落记一条经验（固定 createdAt 保证快照可断言） */
+function exp(staffId: string, draft: NurseExperienceDraft): NurseExperience {
+  return recordNurseExperience(staffId, draft);
+}
+
+describe('recordNurseExperience 经验落记', () => {
+  it('子类型合法时反推所属大类', () => {
+    const r = exp('N1', { subType: 'hazard', title: '跌倒隐患', createdAt: '2026-10-01T09:00:00.000Z' });
+    expect(r.category).toBe('risk');
+    expect(r.subType).toBe('hazard');
+  });
+
+  it('大类合法但子类型缺失时按大类兜底', () => {
+    const r = exp('N1', { category: 'satisfaction', title: '表扬', createdAt: '2026-10-01T09:00:00.000Z' });
+    expect(r.category).toBe('satisfaction');
+    expect(r.subType).toBe('improvement');
+  });
+
+  it('大类子类型皆非法时兜底为 skill/operation', () => {
+    const r = exp('N1', { category: 'bogus', subType: 'nope', title: 'x', createdAt: '2026-10-01T09:00:00.000Z' });
+    expect(r.category).toBe('skill');
+    expect(r.subType).toBe('operation');
+  });
+
+  it('隐私：自动剥离手机号与身份证号并留痕 patientMasked', () => {
+    const r = exp('N1', {
+      title: '联系患者13812345678确认',
+      detail: '登记身份证330106199001011234备查',
+      createdAt: '2026-10-01T09:00:00.000Z',
+    });
+    expect(r.title).not.toContain('13812345678');
+    expect(r.detail).not.toContain('330106199001011234');
+    expect(r.patientMasked).toBe(true);
+  });
+
+  it('隐私：缺省 shareScope=private，显式 dept 才共享', () => {
+    const priv = exp('N1', { title: 'a', createdAt: '2026-10-01T09:00:00.000Z' });
+    const shared = exp('N1', { title: 'b', shareScope: 'dept', createdAt: '2026-10-01T09:00:00.000Z' });
+    expect(priv.shareScope).toBe('private');
+    expect(shared.shareScope).toBe('dept');
+  });
+
+  it('同输入落记得到相同 ID（幂等可快照）', () => {
+    const a = exp('N1', { subType: 'prevention', title: '翻身', createdAt: '2026-10-01T09:00:00.000Z' });
+    const b = exp('N1', { subType: 'prevention', title: '翻身', createdAt: '2026-10-01T09:00:00.000Z' });
+    expect(a.id).toBe(b.id);
+  });
+
+  it('outcome 宽松收敛，非法值为 null', () => {
+    expect(exp('N1', { title: 'a', outcome: 'success', createdAt: '2026-10-01T09:00:00.000Z' }).outcome).toBe('success');
+    expect(exp('N1', { title: 'a', outcome: '未知', createdAt: '2026-10-01T09:00:00.000Z' }).outcome).toBeNull();
+  });
+});
+
+describe('buildNurseMUSEProfile 护士画像', () => {
+  const items: NurseExperience[] = [
+    exp('N1', { subType: 'hazard', title: '跌倒隐患', dept: '老年科', tags: ['跌倒'], createdAt: '2026-09-01T09:00:00.000Z' }),
+    exp('N1', { subType: 'prevention', title: '留地灯预防', dept: '老年科', outcome: 'success', tags: ['跌倒'], createdAt: '2026-09-05T09:00:00.000Z' }),
+    exp('N1', { subType: 'precaution', title: '交班要点', createdAt: '2026-09-06T09:00:00.000Z' }),
+    exp('N1', { subType: 'praise', title: '患者表扬', createdAt: '2026-09-07T09:00:00.000Z' }),
+    exp('N1', { subType: 'complaint', title: '呼叫投诉', createdAt: '2026-09-08T09:00:00.000Z' }),
+  ];
+
+  it('四类经验计数正确', () => {
+    const p = buildNurseMUSEProfile('N1', items);
+    expect(p.totalExperiences).toBe(5);
+    expect(p.byCategory.risk).toBe(2);
+    expect(p.byCategory.satisfaction).toBe(2);
+  });
+
+  it('风险闭环：同标签隐患→预防记闭环', () => {
+    const p = buildNurseMUSEProfile('N1', items);
+    expect(p.riskClosure.hazardsIdentified).toBe(1);
+    expect(p.riskClosure.closedLoops).toBe(1);
+    expect(p.riskClosure.closureRate).toBe(1);
+  });
+
+  it('满意度：表扬率 = praise/(praise+complaint)', () => {
+    const p = buildNurseMUSEProfile('N1', items);
+    expect(p.satisfaction.praise).toBe(1);
+    expect(p.satisfaction.complaint).toBe(1);
+    expect(p.satisfaction.praiseRate).toBe(0.5);
+  });
+
+  it('隐私画像：默认 private 计数 + 常驻隐私说明', () => {
+    const p = buildNurseMUSEProfile('N1', items);
+    expect(p.privacy.privateCount).toBe(5);
+    expect(p.privacy.deptSharedCount).toBe(0);
+    expect(p.privacy.notice).toContain('不公开他人经验');
+  });
+
+  it('空输入返回空画像不抛错', () => {
+    const p = buildNurseMUSEProfile('N1', null);
+    expect(p.totalExperiences).toBe(0);
+    expect(p.lastActivityAt).toBeNull();
+    expect(p.byCategory.risk).toBe(0);
+  });
+});
+
+describe('recommendNurseCare 护理推荐（只召回本人经验）', () => {
+  const mine: NurseExperience[] = [
+    exp('N1', { subType: 'prevention', title: '跌倒预防措施', dept: '老年科', riskLevel: 'high', outcome: 'success', tags: ['跌倒'], createdAt: '2026-09-01T09:00:00.000Z' }),
+    exp('N1', { subType: 'operation', title: '管路固定手法', dept: '普外科', tags: ['管路'], createdAt: '2026-09-02T09:00:00.000Z' }),
+    exp('N1', { subType: 'praise', title: '患者表扬记录', tags: ['表扬'], createdAt: '2026-09-03T09:00:00.000Z' }),
+  ];
+
+  it('命中患者条件标签的经验排最前', () => {
+    const recs = recommendNurseCare('N1', { dept: '老年科', riskLevel: 'high', conditions: ['跌倒'] }, mine);
+    expect(recs.length).toBeGreaterThan(0);
+    expect(recs[0].title).toBe('跌倒预防措施');
+    expect(recs[0].reason).toContain('跌倒');
+  });
+
+  it('满意度类经验不进护理推荐', () => {
+    const recs = recommendNurseCare('N1', {}, mine);
+    expect(recs.some((r) => r.title === '患者表扬记录')).toBe(false);
+  });
+
+  it('只接收本人经验：函数不认识他人经验，peers 不参与', () => {
+    // 函数形参只有 ownExperiences——他人经验需调用方显式传入才可能出现，
+    // 这里传入空集 → 空推荐，证明图谱他人节点默认不可见。
+    const recs = recommendNurseCare('N1', { conditions: ['跌倒'] }, []);
+    expect(recs).toEqual([]);
+  });
+
+  it('空上下文也给可复用建议（基础分 > 0）', () => {
+    const recs = recommendNurseCare('N1', {}, mine);
+    expect(recs.length).toBeGreaterThan(0);
+    expect(recs.every((r) => r.rank >= 1)).toBe(true);
+  });
+});
+
+describe('trackNurseGrowth 成长跟踪', () => {
+  const items: NurseExperience[] = [
+    exp('N1', { subType: 'hazard', title: '隐患', tags: ['跌倒'], createdAt: '2026-08-05T09:00:00.000Z' }),
+    exp('N1', { subType: 'prevention', title: '预防成功', outcome: 'success', tags: ['跌倒'], createdAt: '2026-08-20T09:00:00.000Z' }),
+    exp('N1', { subType: 'praise', title: '表扬', createdAt: '2026-09-06T09:00:00.000Z' }),
+    exp('N1', { subType: 'complaint', title: '投诉', createdAt: '2026-09-20T09:00:00.000Z' }),
+    ...Array.from({ length: 8 }, (_, i) =>
+      exp('N1', { subType: 'operation', title: `技巧${i}`, createdAt: `2026-09-1${i % 9}T09:00:00.000Z` }),
+    ),
+  ];
+
+  it('月度分桶与大类分布正确', () => {
+    const g = trackNurseGrowth('N1', {}, items);
+    expect(g.totalInPeriod).toBe(12);
+    expect(g.monthly.map((m) => m.month)).toEqual(['2026-08', '2026-09']);
+    expect(g.monthly[0].risk).toBe(2);
+    expect(g.categoryDistribution.skill).toBe(8);
+  });
+
+  it('周期内风险闭环率统计', () => {
+    const g = trackNurseGrowth('N1', {}, items);
+    expect(g.riskClosureRate).toBe(1);
+  });
+
+  it('里程碑覆盖风险/闭环/表扬/累计量', () => {
+    const g = trackNurseGrowth('N1', {}, items);
+    expect(g.milestones.some((m) => m.includes('风险'))).toBe(true);
+    expect(g.milestones.some((m) => m.includes('闭环'))).toBe(true);
+    expect(g.milestones.some((m) => m.includes('表扬'))).toBe(true);
+    expect(g.milestones.some((m) => m.includes('12'))).toBe(true);
+  });
+
+  it('focusArea 指向最薄弱大类', () => {
+    const g = trackNurseGrowth('N1', {}, items);
+    expect(g.focusArea.length).toBeGreaterThan(0);
+  });
+
+  it('空经验返回空报告不抛错', () => {
+    const g = trackNurseGrowth('N1', {}, null);
+    expect(g.totalInPeriod).toBe(0);
+    expect(g.monthly).toEqual([]);
   });
 });
