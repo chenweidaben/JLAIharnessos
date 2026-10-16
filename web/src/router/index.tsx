@@ -280,6 +280,8 @@ const AdminAuditLog = lazy(() => import('@/pages/admin/audit-log'));
 const NurseScheduleOptimize = lazy(() => import('@/pages/scheduling/optimize'));
 // M184-B：智能随访
 const SmartFollowup = lazy(() => import('@/pages/followup/smart'));
+// M184-C：设备预测性维护
+const EquipmentPredictive = lazy(() => import('@/pages/equipment/predictive'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -500,6 +502,8 @@ export default function AppRoutes() {
           <Route path="scheduling/optimize" element={<NurseScheduleOptimize />} />
           {/* M184-B：智能随访 */}
           <Route path="followup/smart" element={<SmartFollowup />} />
+          {/* M184-C：设备预测性维护 */}
+          <Route path="equipment/predictive" element={<EquipmentPredictive />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
