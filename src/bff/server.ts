@@ -47,6 +47,7 @@ import { adminPerformanceOptimizationsRoutes } from './routes/adminPerformanceOp
 // 【质量补齐与新场景】M151-D：慢查询优化闭环 GET /api/v1/admin/performance/optimize
 import { perfOptimizeRoutes } from './routes/perfOptimize';
 // 【CDSS与运营精细化】M165-D：性能深度审计（慢查询TOP10/大表/N+1/内存泄漏/前端渲染/熔断器/健康检查）GET /api/v1/admin/performance/deep-audit
+import { perfDeepRoutes } from './routes/perfDeep';
 // 【前端性能优化】M145-B：打包体积分析 + 路由懒加载报告 GET /api/v1/admin/performance/frontend
 import { frontendPerformanceRoutes } from './routes/frontendPerformance';
 // 【v4.x近期】M158-C：首屏与缓存优化（路由懒加载/缓存策略/FCP-LCP 测量）GET /api/v1/admin/performance/firstload
@@ -682,6 +683,7 @@ const allRoutes: RouteDef[] = [
   ...systemMetricsRoutes, // M145-C：系统监控指标 GET /api/v1/admin/metrics（超阈值自动告警）
   ...adminPerformanceOptimizationsRoutes,
   ...perfOptimizeRoutes, // M151-D：慢查询优化闭环（N+1/索引/物化视图）GET /api/v1/admin/performance/optimize
+  ...perfDeepRoutes, // M165-D：性能深度审计（五维 + 索引建议 + 熔断器 + 健康检查）GET /api/v1/admin/performance/deep-audit
   ...frontendPerformanceRoutes, // M145-B：GET /api/v1/admin/performance/frontend
   ...firstLoadRoutes, // M158-C：GET /api/v1/admin/performance/firstload（首屏懒加载 + 缓存策略 + FCP/LCP 测量）
   ...uiConsistencyRoutes, // M150-D：GET /api/v1/admin/ui/consistency（UI 一致性 + 无障碍）
