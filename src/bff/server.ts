@@ -361,6 +361,7 @@ import { exportReportRoutes } from './routes/exportReport'; // M148-D：报表�
 import { bedMapRoutes } from './routes/bedMap';
 import { digitalTwinRoutes } from './routes/digitalTwin'; // M160-B：医院数字孪生 2D GET /api/v1/admin/digital-twin/building/:building
 import { digitalTwinDeepRoutes } from './routes/digitalTwinDeep'; // M161-A：数字孪生深化 GET /api/v1/admin/digital-twin/stream + POST /simulate（定时快照轮询/流程仿真/资源预测）
+import { twinDeepRoutes } from './routes/twinDeep'; // M170-B：【自学习与数字孪生】多建筑与仿真 GET /api/v1/admin/digital-twin/multi（门诊/住院/医技/急诊四楼宇 2D 可视化 + 患者流仿真 + 密度预测 + 路线优化）
 import { teachingDeepRoutes } from './routes/teachingDeep'; // M162-B：教学与培训深化 GET /api/v1/teaching/courses + POST /api/v1/teaching/exam（录播/直播/OSCE/规培出科/继教学分，考核公平不走过场）
 import { ceoDashboardRoutes } from './routes/ceoDashboard';
 import { opdWorkstationRoutes } from './routes/opdWorkstation';
@@ -786,6 +787,7 @@ const allRoutes: RouteDef[] = [
   ...bedMapRoutes,
   ...digitalTwinRoutes, // M160-B：数字孪生 2D（科室/病房/手术室/急诊 + 床位四态）
   ...digitalTwinDeepRoutes, // M161-A：数字孪生深化（定时快照轮询模拟实时推送/流程仿真/资源预测）
+  ...twinDeepRoutes, // M170-B：数字孪生多建筑与仿真（门诊/住院/医技/急诊 2D 可视化 + 患者流仿真 + 密度预测 + 路线优化）
   ...teachingDeepRoutes, // M162-B：教学与培训深化（在线课程/OSCE客观结构化考核/规培轮转出科/继教学分自动记录）
   ...ceoDashboardRoutes,
   ...opdWorkstationRoutes,
