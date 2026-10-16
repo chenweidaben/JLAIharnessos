@@ -680,6 +680,8 @@ const InternetHospitalV3 = lazy(() => import('@/pages/internet-hospital-v3/repor
 const TelemedicineV3 = lazy(() => import('@/pages/telemedicine-v3/report'));
 // M234-C：移动医疗 V3
 const MobileHealthV3 = lazy(() => import('@/pages/mobile-health-v3/report'));
+// M234-D：生态开放
+const EcosystemOpen = lazy(() => import('@/pages/ecosystem-open/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1300,6 +1302,8 @@ export default function AppRoutes() {
           <Route path="telemedicine-v3/report" element={<TelemedicineV3 />} />
           {/* M234-C：移动医疗 V3 */}
           <Route path="mobile-health-v3/report" element={<MobileHealthV3 />} />
+          {/* M234-D：生态开放 */}
+          <Route path="ecosystem-open/report" element={<EcosystemOpen />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
