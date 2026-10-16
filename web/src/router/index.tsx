@@ -566,6 +566,8 @@ const TalentV2 = lazy(() => import('@/pages/talent/report-v2'));
 const ResearchV2 = lazy(() => import('@/pages/research/report-v2'));
 // M219-D：教学培训 V2
 const TeachingV2 = lazy(() => import('@/pages/teaching/report-v2'));
+// M220-A：后勤基建 V2
+const LogisticsV2 = lazy(() => import('@/pages/logistics/report-v2'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1072,6 +1074,8 @@ export default function AppRoutes() {
           <Route path="research/report-v2" element={<ResearchV2 />} />
           {/* M219-D：教学培训 V2 */}
           <Route path="teaching/report-v2" element={<TeachingV2 />} />
+          {/* M220-A：后勤基建 V2 */}
+          <Route path="logistics/report-v2" element={<LogisticsV2 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
