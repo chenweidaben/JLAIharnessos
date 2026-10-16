@@ -826,6 +826,14 @@ const MedicalRecordV4 = lazy(() => import('@/pages/medical-record-v4/report'));
 const InsuranceV4 = lazy(() => import('@/pages/insurance-v4/report'));
 // M252-D：门诊住院 V4
 const OutpatientInpatientV4 = lazy(() => import('@/pages/outpatient-inpatient-v4/report'));
+// M253-A：患者服务 V4
+const PatientServiceV4 = lazy(() => import('@/pages/patient-service-v4/report'));
+// M253-B：健康管理 V4
+const HealthManagementV4 = lazy(() => import('@/pages/health-management-v4/report'));
+// M253-C：区域医联体 V4
+const RegionalAllianceV4 = lazy(() => import('@/pages/regional-alliance-v4/report'));
+// M253-D：数据资产 V4
+const DataAssetV4 = lazy(() => import('@/pages/data-asset-v4/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1592,6 +1600,14 @@ export default function AppRoutes() {
           <Route path="insurance-v4/report" element={<InsuranceV4 />} />
           {/* M252-D：门诊住院 V4 */}
           <Route path="outpatient-inpatient-v4/report" element={<OutpatientInpatientV4 />} />
+          {/* M253-A：患者服务 V4 */}
+          <Route path="patient-service-v4/report" element={<PatientServiceV4 />} />
+          {/* M253-B：健康管理 V4 */}
+          <Route path="health-management-v4/report" element={<HealthManagementV4 />} />
+          {/* M253-C：区域医联体 V4 */}
+          <Route path="regional-alliance-v4/report" element={<RegionalAllianceV4 />} />
+          {/* M253-D：数据资产 V4 */}
+          <Route path="data-asset-v4/report" element={<DataAssetV4 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
