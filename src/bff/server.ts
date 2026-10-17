@@ -1745,6 +1745,14 @@ import { securityIncidentV13Routes } from './routes/securityIncidentV13';
 import { dataQualityV13Routes } from './routes/dataQualityV13';
 // M344-D：API 调用量 V13 GET /api/v1/api-call
 import { apiCallV13Routes } from './routes/apiCallV13';
+// M345-A：医保结算 V13 GET /api/v1/insurance-settlement-stats（stats 避让 M329-D）
+import { insuranceSettlementStatsV13Routes } from './routes/insuranceSettlementStatsV13';
+// M345-B：业务收入结构 V13 GET /api/v1/revenue-structure-stats（stats 避让已有 revenueStructureV13）
+import { revenueStructureStatsV13Routes } from './routes/revenueStructureStatsV13';
+// M345-C：成本控制 V13 GET /api/v1/cost-control
+import { costControlV13Routes } from './routes/costControlV13';
+// M345-D：床位使用 V13 GET /api/v1/bed-occupancy
+import { bedOccupancyV13Routes } from './routes/bedOccupancyV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2860,6 +2868,10 @@ const allRoutes: RouteDef[] = [
   ...securityIncidentV13Routes, // M344-B：信息安全事件 V13 GET /api/v1/security-incident
   ...dataQualityV13Routes, // M344-C：数据质量 V13 GET /api/v1/data-quality
   ...apiCallV13Routes, // M344-D：API 调用量 V13 GET /api/v1/api-call
+  ...insuranceSettlementStatsV13Routes, // M345-A：医保结算 V13 GET /api/v1/insurance-settlement-stats
+  ...revenueStructureStatsV13Routes, // M345-B：业务收入结构 V13 GET /api/v1/revenue-structure-stats
+  ...costControlV13Routes, // M345-C：成本控制 V13 GET /api/v1/cost-control
+  ...bedOccupancyV13Routes, // M345-D：床位使用 V13 GET /api/v1/bed-occupancy
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

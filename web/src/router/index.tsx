@@ -1561,6 +1561,14 @@ const SecurityIncident = lazy(() => import('@/pages/security-incident'));
 const DataQuality = lazy(() => import('@/pages/data-quality'));
 // M344-D：API 调用量 V13
 const ApiCall = lazy(() => import('@/pages/api-call'));
+// M345-A：医保结算 V13（stats 避让 M329-D）
+const InsuranceSettlementStats = lazy(() => import('@/pages/insurance-settlement-stats'));
+// M345-B：业务收入结构 V13（stats 避让已有 revenueStructureV13）
+const RevenueStructureStats = lazy(() => import('@/pages/revenue-structure-stats'));
+// M345-C：成本控制 V13
+const CostControl = lazy(() => import('@/pages/cost-control'));
+// M345-D：床位使用 V13
+const BedOccupancy = lazy(() => import('@/pages/bed-occupancy'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3063,6 +3071,14 @@ export default function AppRoutes() {
           <Route path="data-quality" element={<DataQuality />} />
           {/* M344-D：API 调用量 V13 */}
           <Route path="api-call" element={<ApiCall />} />
+          {/* M345-A：医保结算 V13（stats 避让 M329-D） */}
+          <Route path="insurance-settlement-stats" element={<InsuranceSettlementStats />} />
+          {/* M345-B：业务收入结构 V13（stats 避让已有 revenueStructureV13） */}
+          <Route path="revenue-structure-stats" element={<RevenueStructureStats />} />
+          {/* M345-C：成本控制 V13 */}
+          <Route path="cost-control" element={<CostControl />} />
+          {/* M345-D：床位使用 V13 */}
+          <Route path="bed-occupancy" element={<BedOccupancy />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
