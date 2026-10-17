@@ -1665,6 +1665,14 @@ const CoreSystem = lazy(() => import('@/pages/core-system'));
 const SurgicalInfection = lazy(() => import('@/pages/surgical-infection'));
 // M357-D：抗菌药物管理 V13（M357 收官）
 const AntibioticMgmt = lazy(() => import('@/pages/antibiotic-mgmt'));
+// M358-A：护理质量 V13
+const NursingQuality = lazy(() => import('@/pages/nursing-quality'));
+// M358-B：患者体验 V13
+const PatientExperience = lazy(() => import('@/pages/patient-experience'));
+// M358-C：护理人力配置 V13
+const NursingStaffing = lazy(() => import('@/pages/nursing-staffing'));
+// M358-D：护理文书管理 V13（M358 收官）
+const NursingDocument = lazy(() => import('@/pages/nursing-document'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3271,6 +3279,14 @@ export default function AppRoutes() {
           <Route path="surgical-infection" element={<SurgicalInfection />} />
           {/* M357-D：抗菌药物管理 V13（M357 收官） */}
           <Route path="antibiotic-mgmt" element={<AntibioticMgmt />} />
+          {/* M358-A：护理质量 V13 */}
+          <Route path="nursing-quality" element={<NursingQuality />} />
+          {/* M358-B：患者体验 V13 */}
+          <Route path="patient-experience" element={<PatientExperience />} />
+          {/* M358-C：护理人力配置 V13 */}
+          <Route path="nursing-staffing" element={<NursingStaffing />} />
+          {/* M358-D：护理文书管理 V13（M358 收官） */}
+          <Route path="nursing-document" element={<NursingDocument />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
