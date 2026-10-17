@@ -1024,6 +1024,8 @@ const VolumeForecast = lazy(() => import('@/pages/volume-forecast'));
 const BedForecast = lazy(() => import('@/pages/bed-forecast'));
 // M277-C：耗材库存与供应预测 V3
 const SupplyForecast = lazy(() => import('@/pages/supply-forecast'));
+// M277-D：人力排班与调度优化 V3
+const StaffSchedule = lazy(() => import('@/pages/staff-schedule'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1988,6 +1990,8 @@ export default function AppRoutes() {
           <Route path="bed-forecast" element={<BedForecast />} />
           {/* M277-C：耗材库存与供应预测 V3 */}
           <Route path="supply-forecast" element={<SupplyForecast />} />
+          {/* M277-D：人力排班与调度优化 V3 */}
+          <Route path="staff-schedule" element={<StaffSchedule />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
