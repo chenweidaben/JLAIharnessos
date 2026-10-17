@@ -1232,6 +1232,14 @@ const LookAlike = lazy(() => import('@/pages/look-alike'));
 const LearningCurve = lazy(() => import('@/pages/learning-curve'));
 // M303-D：个人化学习效果总览 V13
 const PersonalizedLearningOverview = lazy(() => import('@/pages/personalized-learning-overview'));
+// M304-A：跨科室经验扩散 V13
+const CrossDeptBroadcast = lazy(() => import('@/pages/cross-dept-broadcast'));
+// M304-B：跨科室采纳反馈 V13
+const DiffusionAdoption = lazy(() => import('@/pages/diffusion-adoption'));
+// M304-C：扩散网络图谱 V13
+const DiffusionGraph = lazy(() => import('@/pages/diffusion-graph'));
+// M304-D：跨科室扩散总览 V13
+const DiffusionOverview = lazy(() => import('@/pages/diffusion-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2404,6 +2412,14 @@ export default function AppRoutes() {
           <Route path="learning-curve" element={<LearningCurve />} />
           {/* M303-D：个人化学习效果总览 V13 */}
           <Route path="personalized-learning-overview" element={<PersonalizedLearningOverview />} />
+          {/* M304-A：跨科室经验扩散 V13 */}
+          <Route path="cross-dept-broadcast" element={<CrossDeptBroadcast />} />
+          {/* M304-B：跨科室采纳反馈 V13 */}
+          <Route path="diffusion-adoption" element={<DiffusionAdoption />} />
+          {/* M304-C：扩散网络图谱 V13 */}
+          <Route path="diffusion-graph" element={<DiffusionGraph />} />
+          {/* M304-D：跨科室扩散总览 V13 */}
+          <Route path="diffusion-overview" element={<DiffusionOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
