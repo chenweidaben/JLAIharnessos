@@ -2119,6 +2119,14 @@ const ClinicalPathwayDetail = lazy(() => import('@/pages/clinical-pathway-detail
 const AntibioticMgmtDetail = lazy(() => import('@/pages/antibiotic-mgmt-detail'));
 // M414-D：VTE 预防管理 V13（M414 收官）
 const VtePreventionMgmt = lazy(() => import('@/pages/vte-prevention-mgmt'));
+// M415-A：抢救管理 V13
+const RescueMgmt = lazy(() => import('@/pages/rescue-mgmt'));
+// M415-B：医学影像管理（细节）V13（detail 避让旧版 imagingTurnaroundV13）
+const MedicalImagingDetail = lazy(() => import('@/pages/medical-imaging-detail'));
+// M415-C：病理管理 V13
+const PathologyMgmt = lazy(() => import('@/pages/pathology-mgmt'));
+// M415-D：营养管理 V13（M415 收官）
+const NutritionMgmt = lazy(() => import('@/pages/nutrition-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4179,6 +4187,14 @@ export default function AppRoutes() {
           <Route path="antibiotic-mgmt-detail" element={<AntibioticMgmtDetail />} />
           {/* M414-D：VTE 预防管理 V13（M414 收官） */}
           <Route path="vte-prevention-mgmt" element={<VtePreventionMgmt />} />
+          {/* M415-A：抢救管理 V13 */}
+          <Route path="rescue-mgmt" element={<RescueMgmt />} />
+          {/* M415-B：医学影像管理（细节）V13（detail 避让旧版 imagingTurnaroundV13） */}
+          <Route path="medical-imaging-detail" element={<MedicalImagingDetail />} />
+          {/* M415-C：病理管理 V13 */}
+          <Route path="pathology-mgmt" element={<PathologyMgmt />} />
+          {/* M415-D：营养管理 V13（M415 收官） */}
+          <Route path="nutrition-mgmt" element={<NutritionMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
