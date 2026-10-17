@@ -1985,6 +1985,14 @@ import { labServiceV13Routes } from './routes/labServiceV13';
 import { pathologyServiceV13Routes } from './routes/pathologyServiceV13';
 // M374-D：影像质量 V13 GET /api/v1/radiology-quality（M374 收官）
 import { radiologyQualityV13Routes } from './routes/radiologyQualityV13';
+// M375-A：医保结算明细 V13 GET /api/v1/insurance-settlement-detail（detail 避让）
+import { insuranceSettlementDetailV13Routes } from './routes/insuranceSettlementDetailV13';
+// M375-B：费用控制 V13 GET /api/v1/medical-cost-control
+import { medicalCostControlV13Routes } from './routes/medicalCostControlV13';
+// M375-C：DRG 管理 V13 GET /api/v1/drg-management
+import { DRGmanagementV13Routes } from './routes/DRGmanagementV13';
+// M375-D：价格管理 V13 GET /api/v1/price-management（M375 收官）
+import { priceManagementV13Routes } from './routes/priceManagementV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3220,6 +3228,10 @@ const allRoutes: RouteDef[] = [
   ...labServiceV13Routes, // M374-B：检验服务 V13 GET /api/v1/lab-service
   ...pathologyServiceV13Routes, // M374-C：病理服务 V13 GET /api/v1/pathology-service
   ...radiologyQualityV13Routes, // M374-D：影像质量 V13 GET /api/v1/radiology-quality（M374 收官）
+  ...insuranceSettlementDetailV13Routes, // M375-A：医保结算明细 V13 GET /api/v1/insurance-settlement-detail（detail 避让）
+  ...medicalCostControlV13Routes, // M375-B：费用控制 V13 GET /api/v1/medical-cost-control
+  ...DRGmanagementV13Routes, // M375-C：DRG 管理 V13 GET /api/v1/drg-management
+  ...priceManagementV13Routes, // M375-D：价格管理 V13 GET /api/v1/price-management（M375 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

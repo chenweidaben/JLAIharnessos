@@ -1801,6 +1801,14 @@ const LabService = lazy(() => import('@/pages/lab-service'));
 const PathologyService = lazy(() => import('@/pages/pathology-service'));
 // M374-D：影像质量 V13（M374 收官）
 const RadiologyQuality = lazy(() => import('@/pages/radiology-quality'));
+// M375-A：医保结算明细 V13（detail 避让）
+const InsuranceSettlementDetail = lazy(() => import('@/pages/insurance-settlement-detail'));
+// M375-B：费用控制 V13
+const MedicalCostControl = lazy(() => import('@/pages/medical-cost-control'));
+// M375-C：DRG 管理 V13
+const DrgManagement = lazy(() => import('@/pages/drg-management'));
+// M375-D：价格管理 V13（M375 收官）
+const PriceManagement = lazy(() => import('@/pages/price-management'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3543,6 +3551,14 @@ export default function AppRoutes() {
           <Route path="pathology-service" element={<PathologyService />} />
           {/* M374-D：影像质量 V13（M374 收官） */}
           <Route path="radiology-quality" element={<RadiologyQuality />} />
+          {/* M375-A：医保结算明细 V13（detail 避让） */}
+          <Route path="insurance-settlement-detail" element={<InsuranceSettlementDetail />} />
+          {/* M375-B：费用控制 V13 */}
+          <Route path="medical-cost-control" element={<MedicalCostControl />} />
+          {/* M375-C：DRG 管理 V13 */}
+          <Route path="drg-management" element={<DrgManagement />} />
+          {/* M375-D：价格管理 V13（M375 收官） */}
+          <Route path="price-management" element={<PriceManagement />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
