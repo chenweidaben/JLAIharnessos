@@ -2057,6 +2057,14 @@ import { teachingActivityV13Routes } from './routes/teachingActivityV13';
 import { residentTrainingStatsV13Routes } from './routes/residentTrainingStatsV13';
 // M383-D：学术交流统计 V13 GET /api/v1/academic-exchange-stats（stats 避让，M383 收官）
 import { academicExchangeStatsV13Routes } from './routes/academicExchangeStatsV13';
+// M384-A：人员招聘 V13 GET /api/v1/staff-recruitment
+import { staffRecruitmentV13Routes } from './routes/staffRecruitmentV13';
+// M384-B：人员留存 V13 GET /api/v1/staff-retention
+import { staffRetentionV13Routes } from './routes/staffRetentionV13';
+// M384-C：绩效考核 V13 GET /api/v1/performance-eval
+import { performanceEvalV13Routes } from './routes/performanceEvalV13';
+// M384-D：培训计划 V13 GET /api/v1/training-plan（M384 收官）
+import { trainingPlanV13Routes } from './routes/trainingPlanV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3328,6 +3336,10 @@ const allRoutes: RouteDef[] = [
   ...teachingActivityV13Routes, // M383-B：教学活动 V13 GET /api/v1/teaching-activity
   ...residentTrainingStatsV13Routes, // M383-C：住培管理统计 V13 GET /api/v1/resident-training-stats（stats 避让）
   ...academicExchangeStatsV13Routes, // M383-D：学术交流统计 V13 GET /api/v1/academic-exchange-stats（stats 避让，M383 收官）
+  ...staffRecruitmentV13Routes, // M384-A：人员招聘 V13 GET /api/v1/staff-recruitment
+  ...staffRetentionV13Routes, // M384-B：人员留存 V13 GET /api/v1/staff-retention
+  ...performanceEvalV13Routes, // M384-C：绩效考核 V13 GET /api/v1/performance-eval
+  ...trainingPlanV13Routes, // M384-D：培训计划 V13 GET /api/v1/training-plan（M384 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

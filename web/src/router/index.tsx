@@ -1873,6 +1873,14 @@ const TeachingActivity = lazy(() => import('@/pages/teaching-activity'));
 const ResidentTrainingStats = lazy(() => import('@/pages/resident-training-stats'));
 // M383-D：学术交流统计 V13（stats 避让，M383 收官）
 const AcademicExchangeStats = lazy(() => import('@/pages/academic-exchange-stats'));
+// M384-A：人员招聘 V13
+const StaffRecruitment = lazy(() => import('@/pages/staff-recruitment'));
+// M384-B：人员留存 V13
+const StaffRetention = lazy(() => import('@/pages/staff-retention'));
+// M384-C：绩效考核 V13
+const PerformanceEval = lazy(() => import('@/pages/performance-eval'));
+// M384-D：培训计划 V13（M384 收官）
+const TrainingPlan = lazy(() => import('@/pages/training-plan'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3687,6 +3695,14 @@ export default function AppRoutes() {
           <Route path="resident-training-stats" element={<ResidentTrainingStats />} />
           {/* M383-D：学术交流统计 V13（stats 避让，M383 收官） */}
           <Route path="academic-exchange-stats" element={<AcademicExchangeStats />} />
+          {/* M384-A：人员招聘 V13 */}
+          <Route path="staff-recruitment" element={<StaffRecruitment />} />
+          {/* M384-B：人员留存 V13 */}
+          <Route path="staff-retention" element={<StaffRetention />} />
+          {/* M384-C：绩效考核 V13 */}
+          <Route path="performance-eval" element={<PerformanceEval />} />
+          {/* M384-D：培训计划 V13（M384 收官） */}
+          <Route path="training-plan" element={<TrainingPlan />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
