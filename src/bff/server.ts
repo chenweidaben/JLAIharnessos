@@ -1225,6 +1225,8 @@ import { predictiveMaintenanceV5Routes } from './routes/predictiveMaintenanceV5'
 import { energyCarbonV5Routes } from './routes/energyCarbonV5';
 // M280-A：多模型路由与降级 V5 GET/POST /api/v1/model-router
 import { modelRouterV5Routes } from './routes/modelRouterV5';
+// M280-B：Prompt 工程与模板治理 V5 GET/POST /api/v1/prompt-governance
+import { promptGovernanceV5Routes } from './routes/promptGovernanceV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2080,6 +2082,7 @@ const allRoutes: RouteDef[] = [
   ...predictiveMaintenanceV5Routes, // M279-C：设备预测性维护 V5 GET/POST /api/v1/predictive-maintenance
   ...energyCarbonV5Routes, // M279-D：能源碳排放与绿色医院 V5 GET/POST /api/v1/energy-carbon
   ...modelRouterV5Routes, // M280-A：多模型路由与降级 V5 GET/POST /api/v1/model-router
+  ...promptGovernanceV5Routes, // M280-B：Prompt 工程与模板治理 V5 GET/POST /api/v1/prompt-governance
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
