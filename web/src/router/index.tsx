@@ -1999,6 +1999,14 @@ const TelemedicineDetail = lazy(() => import('@/pages/telemedicine-detail'));
 const OnlinePaymentDetail = lazy(() => import('@/pages/online-payment-detail'));
 // M399-D：健康体检 V13（M399 收官）
 const HealthCheckup = lazy(() => import('@/pages/health-checkup'));
+// M400-A：患者服务 V13
+const PatientService = lazy(() => import('@/pages/patient-service'));
+// M400-B：满意度调查明细 V13（避让旧版 satisfaction-survey）
+const SatisfactionSurveyDetail = lazy(() => import('@/pages/satisfaction-survey-detail'));
+// M400-C：随访管理 V13
+const FollowUpMgmt = lazy(() => import('@/pages/follow-up-mgmt'));
+// M400-D：患者教育明细 V13（M400 收官，避让旧版 patient-education-stats）
+const PatientEducationDetail = lazy(() => import('@/pages/patient-education-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3939,6 +3947,14 @@ export default function AppRoutes() {
           <Route path="online-payment-detail" element={<OnlinePaymentDetail />} />
           {/* M399-D：健康体检 V13（M399 收官） */}
           <Route path="health-checkup" element={<HealthCheckup />} />
+          {/* M400-A：患者服务 V13 */}
+          <Route path="patient-service" element={<PatientService />} />
+          {/* M400-B：满意度调查明细 V13（避让旧版 satisfaction-survey） */}
+          <Route path="satisfaction-survey-detail" element={<SatisfactionSurveyDetail />} />
+          {/* M400-C：随访管理 V13 */}
+          <Route path="follow-up-mgmt" element={<FollowUpMgmt />} />
+          {/* M400-D：患者教育明细 V13（M400 收官，避让旧版 patient-education-stats） */}
+          <Route path="patient-education-detail" element={<PatientEducationDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
