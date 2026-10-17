@@ -1465,6 +1465,14 @@ import { sopUsageV13Routes } from './routes/sopUsageV13';
 import { crossDeptLearningV13Routes } from './routes/crossDeptLearningV13';
 // M309-D：个人学习曲线里程碑 V13 GET /api/v1/learning-milestone
 import { learningMilestoneV13Routes } from './routes/learningMilestoneV13';
+// M310-A：综合学习飞轮健康度仪表盘 V13 GET /api/v1/flywheel-health
+import { flywheelHealthV13Routes } from './routes/flywheelHealthV13';
+// M310-B：多科室横向对标 V13 GET /api/v1/dept-benchmark
+import { deptBenchmarkV13Routes } from './routes/deptBenchmarkV13';
+// M310-C：医生个人月度成长报告 V13 GET /api/v1/doctor-growth-report
+import { doctorGrowthReportV13Routes } from './routes/doctorGrowthReportV13';
+// M310-D：院长季度复盘报告 V13 GET /api/v1/quarterly-review
+import { quarterlyReviewV13Routes } from './routes/quarterlyReviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2440,6 +2448,10 @@ const allRoutes: RouteDef[] = [
   ...sopUsageV13Routes, // M309-B：SOP 引用次数回灌飞轮分 V13 GET /api/v1/sop-usage
   ...crossDeptLearningV13Routes, // M309-C：跨科协作任务经验双沉淀 V13 GET /api/v1/cross-dept-learning
   ...learningMilestoneV13Routes, // M309-D：个人学习曲线里程碑 V13 GET /api/v1/learning-milestone
+  ...flywheelHealthV13Routes, // M310-A：综合学习飞轮健康度仪表盘 V13 GET /api/v1/flywheel-health
+  ...deptBenchmarkV13Routes, // M310-B：多科室横向对标 V13 GET /api/v1/dept-benchmark
+  ...doctorGrowthReportV13Routes, // M310-C：医生个人月度成长报告 V13 GET /api/v1/doctor-growth-report
+  ...quarterlyReviewV13Routes, // M310-D：院长季度复盘报告 V13 GET /api/v1/quarterly-review
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -1281,6 +1281,14 @@ const SopUsage = lazy(() => import('@/pages/sop-usage'));
 const CrossDeptLearning = lazy(() => import('@/pages/cross-dept-learning'));
 // M309-D：个人学习曲线里程碑 V13
 const LearningMilestone = lazy(() => import('@/pages/learning-milestone'));
+// M310-A：综合学习飞轮健康度仪表盘 V13
+const FlywheelHealth = lazy(() => import('@/pages/flywheel-health'));
+// M310-B：多科室横向对标 V13
+const DeptBenchmark = lazy(() => import('@/pages/dept-benchmark'));
+// M310-C：医生个人月度成长报告 V13
+const DoctorGrowthReport = lazy(() => import('@/pages/doctor-growth-report'));
+// M310-D：院长季度复盘报告 V13
+const QuarterlyReview = lazy(() => import('@/pages/quarterly-review'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2503,6 +2511,14 @@ export default function AppRoutes() {
           <Route path="cross-dept-learning" element={<CrossDeptLearning />} />
           {/* M309-D：个人学习曲线里程碑 V13 */}
           <Route path="learning-milestone" element={<LearningMilestone />} />
+          {/* M310-A：综合学习飞轮健康度仪表盘 V13 */}
+          <Route path="flywheel-health" element={<FlywheelHealth />} />
+          {/* M310-B：多科室横向对标 V13 */}
+          <Route path="dept-benchmark" element={<DeptBenchmark />} />
+          {/* M310-C：医生个人月度成长报告 V13 */}
+          <Route path="doctor-growth-report" element={<DoctorGrowthReport />} />
+          {/* M310-D：院长季度复盘报告 V13 */}
+          <Route path="quarterly-review" element={<QuarterlyReview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
