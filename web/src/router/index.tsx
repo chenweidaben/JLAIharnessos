@@ -1641,6 +1641,14 @@ const MedicalRecordQuality = lazy(() => import('@/pages/medical-record-quality')
 const ComplaintMgmt = lazy(() => import('@/pages/complaint-mgmt'));
 // M354-D：继续医学教育 V13（stats 避让已有 continuingEduV13，M354 收官）
 const ContinuingEducationStats = lazy(() => import('@/pages/continuing-education-stats'));
+// M355-A：重点专科建设 V13
+const SpecialtyDevelopment = lazy(() => import('@/pages/specialty-development'));
+// M355-B：临床研究 V13（stats 避让已有 clinicalResearchV13 / M327-A）
+const ClinicalResearchStats = lazy(() => import('@/pages/clinical-research-stats'));
+// M355-C：教学工作 V13
+const TeachingWorkload = lazy(() => import('@/pages/teaching-workload'));
+// M355-D：医联体与分级诊疗 V13（M355 收官）
+const MedicalAlliance = lazy(() => import('@/pages/medical-alliance'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3223,6 +3231,14 @@ export default function AppRoutes() {
           <Route path="complaint-mgmt" element={<ComplaintMgmt />} />
           {/* M354-D：继续医学教育 V13（stats 避让已有 continuingEduV13，M354 收官） */}
           <Route path="continuing-education-stats" element={<ContinuingEducationStats />} />
+          {/* M355-A：重点专科建设 V13 */}
+          <Route path="specialty-development" element={<SpecialtyDevelopment />} />
+          {/* M355-B：临床研究 V13（stats 避让已有 clinicalResearchV13 / M327-A） */}
+          <Route path="clinical-research-stats" element={<ClinicalResearchStats />} />
+          {/* M355-C：教学工作 V13 */}
+          <Route path="teaching-workload" element={<TeachingWorkload />} />
+          {/* M355-D：医联体与分级诊疗 V13（M355 收官） */}
+          <Route path="medical-alliance" element={<MedicalAlliance />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
