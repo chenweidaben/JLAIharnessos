@@ -1219,6 +1219,8 @@ import { hqmsV5Routes } from './routes/hqmsV5';
 import { linenManagementV5Routes } from './routes/linenManagementV5';
 // M279-B：安保消防与应急指挥 V5 POST/GET /api/v1/security-emergency
 import { securityEmergencyV5Routes } from './routes/securityEmergencyV5';
+// M279-C：设备预测性维护 V5 GET/POST /api/v1/predictive-maintenance
+import { predictiveMaintenanceV5Routes } from './routes/predictiveMaintenanceV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2071,6 +2073,7 @@ const allRoutes: RouteDef[] = [
   ...hqmsV5Routes, // M278-D：医院质量监测 HQMS V5 GET/POST /api/v1/hqms
   ...linenManagementV5Routes, // M279-A：被服洗涤与织物管理 V5 GET/POST /api/v1/linen-management
   ...securityEmergencyV5Routes, // M279-B：安保消防与应急指挥 V5 POST/GET /api/v1/security-emergency
+  ...predictiveMaintenanceV5Routes, // M279-C：设备预测性维护 V5 GET/POST /api/v1/predictive-maintenance
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
