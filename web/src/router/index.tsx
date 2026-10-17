@@ -2031,6 +2031,14 @@ const TalentTeamMgmt = lazy(() => import('@/pages/talent-team-mgmt'));
 const DisciplineCompetition = lazy(() => import('@/pages/discipline-competition'));
 // M403-D：学术水平 V13（M403 收官）
 const AcademicLevel = lazy(() => import('@/pages/academic-level'));
+// M404-A：三级查房管理 V13
+const ThreeLevelWardRound = lazy(() => import('@/pages/three-level-ward-round'));
+// M404-B：会诊管理 V13
+const ConsultationMgmt = lazy(() => import('@/pages/consultation-mgmt'));
+// M404-C：病例讨论 V13
+const CaseDiscussion = lazy(() => import('@/pages/case-discussion'));
+// M404-D：分级护理 V13（M404 收官）
+const GradeNursing = lazy(() => import('@/pages/grade-nursing'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4003,6 +4011,14 @@ export default function AppRoutes() {
           <Route path="discipline-competition" element={<DisciplineCompetition />} />
           {/* M403-D：学术水平 V13（M403 收官） */}
           <Route path="academic-level" element={<AcademicLevel />} />
+          {/* M404-A：三级查房管理 V13 */}
+          <Route path="three-level-ward-round" element={<ThreeLevelWardRound />} />
+          {/* M404-B：会诊管理 V13 */}
+          <Route path="consultation-mgmt" element={<ConsultationMgmt />} />
+          {/* M404-C：病例讨论 V13 */}
+          <Route path="case-discussion" element={<CaseDiscussion />} />
+          {/* M404-D：分级护理 V13（M404 收官） */}
+          <Route path="grade-nursing" element={<GradeNursing />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

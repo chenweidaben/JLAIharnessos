@@ -2215,6 +2215,14 @@ import { talentTeamMgmtV13Routes } from './routes/talentTeamMgmtV13';
 import { disciplineCompetitionV13Routes } from './routes/disciplineCompetitionV13';
 // M403-D：学术水平 V13 GET /api/v1/academic-level（M403 收官）
 import { academicLevelV13Routes } from './routes/academicLevelV13';
+// M404-A：三级查房管理 V13 GET /api/v1/three-level-ward-round
+import { threeLevelWardRoundV13Routes } from './routes/threeLevelWardRoundV13';
+// M404-B：会诊管理 V13 GET /api/v1/consultation-mgmt
+import { consultationMgmtV13Routes } from './routes/consultationMgmtV13';
+// M404-C：病例讨论 V13 GET /api/v1/case-discussion
+import { caseDiscussionV13Routes } from './routes/caseDiscussionV13';
+// M404-D：分级护理 V13 GET /api/v1/grade-nursing（M404 收官）
+import { gradeNursingV13Routes } from './routes/gradeNursingV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3565,6 +3573,10 @@ const allRoutes: RouteDef[] = [
   ...talentTeamMgmtV13Routes, // M403-B：人才团队管理 V13 GET /api/v1/talent-team-mgmt
   ...disciplineCompetitionV13Routes, // M403-C：学科竞赛 V13 GET /api/v1/discipline-competition
   ...academicLevelV13Routes, // M403-D：学术水平 V13 GET /api/v1/academic-level（M403 收官）
+  ...threeLevelWardRoundV13Routes, // M404-A：三级查房管理 V13 GET /api/v1/three-level-ward-round
+  ...consultationMgmtV13Routes, // M404-B：会诊管理 V13 GET /api/v1/consultation-mgmt
+  ...caseDiscussionV13Routes, // M404-C：病例讨论 V13 GET /api/v1/case-discussion
+  ...gradeNursingV13Routes, // M404-D：分级护理 V13 GET /api/v1/grade-nursing（M404 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
