@@ -2151,6 +2151,14 @@ const MedicalEquipmentMgmtDetail = lazy(() => import('@/pages/medical-equipment-
 const InfectionControlDetail = lazy(() => import('@/pages/infection-control-detail'));
 // M418-D：患者安全管理 V13（M418 收官）
 const PatientSafetyMgmt = lazy(() => import('@/pages/patient-safety-mgmt'));
+// M419-A：病案管理（细节）V13（detail 避让旧版 medicalRecordMgmtV13）
+const MedicalRecordDetail = lazy(() => import('@/pages/medical-record-detail'));
+// M419-B：信息安全管理 V13
+const InformationSecurityMgmt = lazy(() => import('@/pages/information-security-mgmt'));
+// M419-C：培训管理（细节）V13（detail 避让旧版 talentTeamMgmtV13/academicLevelV13）
+const TrainingMgmtDetail = lazy(() => import('@/pages/training-mgmt-detail'));
+// M419-D：质控管理 V13（M419 收官）
+const QualityControlMgmt = lazy(() => import('@/pages/quality-control-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4243,6 +4251,14 @@ export default function AppRoutes() {
           <Route path="infection-control-detail" element={<InfectionControlDetail />} />
           {/* M418-D：患者安全管理 V13（M418 收官） */}
           <Route path="patient-safety-mgmt" element={<PatientSafetyMgmt />} />
+          {/* M419-A：病案管理（细节）V13（detail 避让旧版 medicalRecordMgmtV13） */}
+          <Route path="medical-record-detail" element={<MedicalRecordDetail />} />
+          {/* M419-B：信息安全管理 V13 */}
+          <Route path="information-security-mgmt" element={<InformationSecurityMgmt />} />
+          {/* M419-C：培训管理（细节）V13（detail 避让旧版 talentTeamMgmtV13/academicLevelV13） */}
+          <Route path="training-mgmt-detail" element={<TrainingMgmtDetail />} />
+          {/* M419-D：质控管理 V13（M419 收官） */}
+          <Route path="quality-control-mgmt" element={<QualityControlMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
