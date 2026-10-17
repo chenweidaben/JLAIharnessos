@@ -1245,6 +1245,8 @@ import { dataClassificationV5Routes } from './routes/dataClassificationV5';
 import { zeroTrustV5Routes } from './routes/zeroTrustV5';
 // M282-C：操作审计与数据防泄漏 DLP V5 GET/POST /api/v1/dlp
 import { dlpV5Routes } from './routes/dlpV5';
+// M282-D：隐私计算与联邦学习 V5 POST/GET /api/v1/federated-learning
+import { federatedLearningV5Routes } from './routes/federatedLearningV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2110,6 +2112,7 @@ const allRoutes: RouteDef[] = [
   ...dataClassificationV5Routes, // M282-A：数据分级分类与动态脱敏 V5 GET/POST /api/v1/data-classification
   ...zeroTrustV5Routes, // M282-B：零信任访问与权限最小化 V5 GET/POST /api/v1/zero-trust
   ...dlpV5Routes, // M282-C：操作审计与数据防泄漏 DLP V5 GET/POST /api/v1/dlp
+  ...federatedLearningV5Routes, // M282-D：隐私计算与联邦学习 V5 POST/GET /api/v1/federated-learning
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -1064,6 +1064,8 @@ const DataClassification = lazy(() => import('@/pages/data-classification'));
 const ZeroTrust = lazy(() => import('@/pages/zero-trust'));
 // M282-C：操作审计与数据防泄漏 DLP V5
 const Dlp = lazy(() => import('@/pages/dlp'));
+// M282-D：隐私计算与联邦学习 V5
+const FederatedLearning = lazy(() => import('@/pages/federated-learning'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2068,6 +2070,8 @@ export default function AppRoutes() {
           <Route path="zero-trust" element={<ZeroTrust />} />
           {/* M282-C：操作审计与数据防泄漏 DLP V5 */}
           <Route path="dlp" element={<Dlp />} />
+          {/* M282-D：隐私计算与联邦学习 V5 */}
+          <Route path="federated-learning" element={<FederatedLearning />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
