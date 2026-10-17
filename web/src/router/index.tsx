@@ -1753,6 +1753,14 @@ const DrugInteraction = lazy(() => import('@/pages/drug-interaction'));
 const AntibioticMgmtStats = lazy(() => import('@/pages/antibiotic-mgmt-stats'));
 // M368-D：基本药物管理 V13（M368 收官）
 const EssentialDrug = lazy(() => import('@/pages/essential-drug'));
+// M369-A：护理质量（统计）V13（stats避让）
+const NursingQualityStats = lazy(() => import('@/pages/nursing-quality-stats'));
+// M369-B：护理安全 V13
+const NursingSafety = lazy(() => import('@/pages/nursing-safety'));
+// M369-C：护理人员配置 V13
+const NursingStaff = lazy(() => import('@/pages/nursing-staff'));
+// M369-D：护理培训 V13（M369 收官）
+const NursingTraining = lazy(() => import('@/pages/nursing-training'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3447,6 +3455,14 @@ export default function AppRoutes() {
           <Route path="antibiotic-mgmt-stats" element={<AntibioticMgmtStats />} />
           {/* M368-D：基本药物管理 V13（M368 收官） */}
           <Route path="essential-drug" element={<EssentialDrug />} />
+          {/* M369-A：护理质量（统计）V13（stats避让） */}
+          <Route path="nursing-quality-stats" element={<NursingQualityStats />} />
+          {/* M369-B：护理安全 V13 */}
+          <Route path="nursing-safety" element={<NursingSafety />} />
+          {/* M369-C：护理人员配置 V13 */}
+          <Route path="nursing-staff" element={<NursingStaff />} />
+          {/* M369-D：护理培训 V13（M369 收官） */}
+          <Route path="nursing-training" element={<NursingTraining />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

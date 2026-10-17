@@ -1937,6 +1937,14 @@ import { drugInteractionV13Routes } from './routes/drugInteractionV13';
 import { antibioticMgmtStatsV13Routes } from './routes/antibioticMgmtStatsV13';
 // M368-D：基本药物管理 V13 GET /api/v1/essential-drug（M368 收官）
 import { essentialDrugV13Routes } from './routes/essentialDrugV13';
+// M369-A：护理质量（统计）V13 GET /api/v1/nursing-quality-stats（stats避让）
+import { nursingQualityStatsV13Routes } from './routes/nursingQualityStatsV13';
+// M369-B：护理安全 V13 GET /api/v1/nursing-safety
+import { nursingSafetyV13Routes } from './routes/nursingSafetyV13';
+// M369-C：护理人员配置 V13 GET /api/v1/nursing-staff
+import { nursingStaffV13Routes } from './routes/nursingStaffV13';
+// M369-D：护理培训 V13 GET /api/v1/nursing-training（M369 收官）
+import { nursingTrainingV13Routes } from './routes/nursingTrainingV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3148,6 +3156,10 @@ const allRoutes: RouteDef[] = [
   ...drugInteractionV13Routes, // M368-B：药物相互作用 V13 GET /api/v1/drug-interaction
   ...antibioticMgmtStatsV13Routes, // M368-C：抗菌药物管理（统计）V13 GET /api/v1/antibiotic-mgmt-stats（stats避让）
   ...essentialDrugV13Routes, // M368-D：基本药物管理 V13 GET /api/v1/essential-drug（M368 收官）
+  ...nursingQualityStatsV13Routes, // M369-A：护理质量（统计）V13 GET /api/v1/nursing-quality-stats（stats避让）
+  ...nursingSafetyV13Routes, // M369-B：护理安全 V13 GET /api/v1/nursing-safety
+  ...nursingStaffV13Routes, // M369-C：护理人员配置 V13 GET /api/v1/nursing-staff
+  ...nursingTrainingV13Routes, // M369-D：护理培训 V13 GET /api/v1/nursing-training（M369 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
