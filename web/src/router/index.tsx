@@ -1042,6 +1042,8 @@ const SecurityEmergency = lazy(() => import('@/pages/security-emergency'));
 const PredictiveMaintenance = lazy(() => import('@/pages/predictive-maintenance'));
 // M279-D：能源碳排放与绿色医院 V5
 const EnergyCarbon = lazy(() => import('@/pages/energy-carbon'));
+// M280-A：多模型路由与降级 V5
+const ModelRouter = lazy(() => import('@/pages/model-router'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2024,6 +2026,8 @@ export default function AppRoutes() {
           <Route path="predictive-maintenance" element={<PredictiveMaintenance />} />
           {/* M279-D：能源碳排放与绿色医院 V5 */}
           <Route path="energy-carbon" element={<EnergyCarbon />} />
+          {/* M280-A：多模型路由与降级 V5 */}
+          <Route path="model-router" element={<ModelRouter />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
