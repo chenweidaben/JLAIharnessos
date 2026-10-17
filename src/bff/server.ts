@@ -1211,6 +1211,8 @@ import { staffScheduleV3Routes } from './routes/staffScheduleV3';
 import { reportingStatsV5Routes } from './routes/reportingStatsV5';
 // M278-B：医保智能监管与 DRG/DIP 上报 V5 GET/POST/PUT /api/v1/insurance-report
 import { insuranceReportV5Routes } from './routes/insuranceReportV5';
+// M278-C：疾控传染病与慢病直报 V5 POST/GET /api/v1/cdc-notification
+import { cdcNotificationV5Routes } from './routes/cdcNotificationV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2059,6 +2061,7 @@ const allRoutes: RouteDef[] = [
   ...staffScheduleV3Routes, // M277-D：人力排班与调度优化 V3 GET/POST/PUT /api/v1/staff-schedule
   ...reportingStatsV5Routes, // M278-A：卫生健康统计与医改监测上报 V5 GET/POST /api/v1/reporting-stats
   ...insuranceReportV5Routes, // M278-B：医保智能监管与 DRG/DIP 上报 V5 GET/POST/PUT /api/v1/insurance-report
+  ...cdcNotificationV5Routes, // M278-C：疾控传染病与慢病直报 V5 POST/GET /api/v1/cdc-notification
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

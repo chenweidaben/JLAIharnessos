@@ -1030,6 +1030,8 @@ const StaffSchedule = lazy(() => import('@/pages/staff-schedule'));
 const ReportingStats = lazy(() => import('@/pages/reporting-stats'));
 // M278-B：医保智能监管与 DRG/DIP 上报 V5
 const InsuranceReport = lazy(() => import('@/pages/insurance-report'));
+// M278-C：疾控传染病与慢病直报 V5
+const CDCANotification = lazy(() => import('@/pages/cdc-notification'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2000,6 +2002,8 @@ export default function AppRoutes() {
           <Route path="reporting-stats" element={<ReportingStats />} />
           {/* M278-B：医保智能监管与 DRG/DIP 上报 V5 */}
           <Route path="insurance-report" element={<InsuranceReport />} />
+          {/* M278-C：疾控传染病与慢病直报 V5 */}
+          <Route path="cdc-notification" element={<CDCANotification />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
