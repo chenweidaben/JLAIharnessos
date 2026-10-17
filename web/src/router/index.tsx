@@ -1100,6 +1100,8 @@ const OpsPerf = lazy(() => import('@/pages/ops-perf'));
 const OpsDr = lazy(() => import('@/pages/ops-dr'));
 // M287-A：院长驾驶舱 V5
 const ExecDashboard = lazy(() => import('@/pages/exec-dashboard'));
+// M287-B：科室运营画像 V5
+const DeptProfile = lazy(() => import('@/pages/dept-profile'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2140,6 +2142,8 @@ export default function AppRoutes() {
           <Route path="ops-dr" element={<OpsDr />} />
           {/* M287-A：院长驾驶舱 V5 */}
           <Route path="exec-dashboard" element={<ExecDashboard />} />
+          {/* M287-B：科室运营画像 V5 */}
+          <Route path="dept-profile" element={<DeptProfile />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
