@@ -1729,6 +1729,14 @@ const ComplaintMgmtStats = lazy(() => import('@/pages/complaint-mgmt-stats'));
 const ServiceAttitude = lazy(() => import('@/pages/service-attitude'));
 // M365-D：就医体验（等候时间）V13（M365 收官）
 const ExperienceWaitTime = lazy(() => import('@/pages/experience-wait-time'));
+// M366-A：AI 辅助诊断（统计）V13（stats避让）
+const AiDiagnosisStats = lazy(() => import('@/pages/ai-diagnosis-stats'));
+// M366-B：AI 辅助治疗 V13
+const AiTreatment = lazy(() => import('@/pages/ai-treatment'));
+// M366-C：AI 管理应用 V13
+const AiManagement = lazy(() => import('@/pages/ai-management'));
+// M366-D：AI 教学培训 V13（M366 收官）
+const AiEducation = lazy(() => import('@/pages/ai-education'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3399,6 +3407,14 @@ export default function AppRoutes() {
           <Route path="service-attitude" element={<ServiceAttitude />} />
           {/* M365-D：就医体验（等候时间）V13（M365 收官） */}
           <Route path="experience-wait-time" element={<ExperienceWaitTime />} />
+          {/* M366-A：AI 辅助诊断（统计）V13（stats避让） */}
+          <Route path="ai-diagnosis-stats" element={<AiDiagnosisStats />} />
+          {/* M366-B：AI 辅助治疗 V13 */}
+          <Route path="ai-treatment" element={<AiTreatment />} />
+          {/* M366-C：AI 管理应用 V13 */}
+          <Route path="ai-management" element={<AiManagement />} />
+          {/* M366-D：AI 教学培训 V13（M366 收官） */}
+          <Route path="ai-education" element={<AiEducation />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

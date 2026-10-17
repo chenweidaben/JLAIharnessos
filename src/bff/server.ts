@@ -1913,6 +1913,14 @@ import { complaintMgmtStatsV13Routes } from './routes/complaintMgmtStatsV13';
 import { serviceAttitudeV13Routes } from './routes/serviceAttitudeV13';
 // M365-D：就医体验（等候时间）V13 GET /api/v1/experience-wait-time（M365 收官）
 import { experienceWaitTimeV13Routes } from './routes/experienceWaitTimeV13';
+// M366-A：AI 辅助诊断（统计）V13 GET /api/v1/ai-diagnosis-stats（stats避让）
+import { aiDiagnosisStatsV13Routes } from './routes/aiDiagnosisStatsV13';
+// M366-B：AI 辅助治疗 V13 GET /api/v1/ai-treatment
+import { aiTreatmentV13Routes } from './routes/aiTreatmentV13';
+// M366-C：AI 管理应用 V13 GET /api/v1/ai-management
+import { aiManagementV13Routes } from './routes/aiManagementV13';
+// M366-D：AI 教学培训 V13 GET /api/v1/ai-education（M366 收官）
+import { aiEducationV13Routes } from './routes/aiEducationV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3112,6 +3120,10 @@ const allRoutes: RouteDef[] = [
   ...complaintMgmtStatsV13Routes, // M365-B：投诉管理（统计）V13 GET /api/v1/complaint-mgmt-stats（stats避让）
   ...serviceAttitudeV13Routes, // M365-C：服务态度 V13 GET /api/v1/service-attitude
   ...experienceWaitTimeV13Routes, // M365-D：就医体验（等候时间）V13 GET /api/v1/experience-wait-time（M365 收官）
+  ...aiDiagnosisStatsV13Routes, // M366-A：AI 辅助诊断（统计）V13 GET /api/v1/ai-diagnosis-stats（stats避让）
+  ...aiTreatmentV13Routes, // M366-B：AI 辅助治疗 V13 GET /api/v1/ai-treatment
+  ...aiManagementV13Routes, // M366-C：AI 管理应用 V13 GET /api/v1/ai-management
+  ...aiEducationV13Routes, // M366-D：AI 教学培训 V13 GET /api/v1/ai-education（M366 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
