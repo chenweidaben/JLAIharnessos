@@ -1991,6 +1991,14 @@ const MedicalDispute = lazy(() => import('@/pages/medical-dispute'));
 const MedicalInsuranceDetail = lazy(() => import('@/pages/medical-insurance-detail'));
 // M398-D：公共关系 V13（M398 收官）
 const PublicRelation = lazy(() => import('@/pages/public-relation'));
+// M399-A：互联网医院明细 V13（避让旧版 internet-hospital/internet-hospital-stats）
+const InternetHospitalDetail = lazy(() => import('@/pages/internet-hospital-detail'));
+// M399-B：远程医疗明细 V13（避让旧版 telemedicine/telemedicine-stats）
+const TelemedicineDetail = lazy(() => import('@/pages/telemedicine-detail'));
+// M399-C：线上支付明细 V13（避让旧版 online-payment）
+const OnlinePaymentDetail = lazy(() => import('@/pages/online-payment-detail'));
+// M399-D：健康体检 V13（M399 收官）
+const HealthCheckup = lazy(() => import('@/pages/health-checkup'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3923,6 +3931,14 @@ export default function AppRoutes() {
           <Route path="medical-insurance-detail" element={<MedicalInsuranceDetail />} />
           {/* M398-D：公共关系 V13（M398 收官） */}
           <Route path="public-relation" element={<PublicRelation />} />
+          {/* M399-A：互联网医院明细 V13（避让旧版 internet-hospital/internet-hospital-stats） */}
+          <Route path="internet-hospital-detail" element={<InternetHospitalDetail />} />
+          {/* M399-B：远程医疗明细 V13（避让旧版 telemedicine/telemedicine-stats） */}
+          <Route path="telemedicine-detail" element={<TelemedicineDetail />} />
+          {/* M399-C：线上支付明细 V13（避让旧版 online-payment） */}
+          <Route path="online-payment-detail" element={<OnlinePaymentDetail />} />
+          {/* M399-D：健康体检 V13（M399 收官） */}
+          <Route path="health-checkup" element={<HealthCheckup />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
