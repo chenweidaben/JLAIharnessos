@@ -1849,6 +1849,14 @@ const ClinicalPharmacy = lazy(() => import('@/pages/clinical-pharmacy'));
 const DrugStorage = lazy(() => import('@/pages/drug-storage'));
 // M380-D：中药房 V13（M380 收官）
 const TCMPharmacy = lazy(() => import('@/pages/tcm-pharmacy'));
+// M381-A：运营看板 V13
+const OperationDashboard = lazy(() => import('@/pages/operation-dashboard'));
+// M381-B：财务明细 V13
+const FinanceDetail = lazy(() => import('@/pages/finance-detail'));
+// M381-C：患者流明细 V13
+const PatientFlowDetail = lazy(() => import('@/pages/patient-flow-detail'));
+// M381-D：资源利用明细 V13（M381 收官）
+const ResourceUtilDetail = lazy(() => import('@/pages/resource-util-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3639,6 +3647,14 @@ export default function AppRoutes() {
           <Route path="drug-storage" element={<DrugStorage />} />
           {/* M380-D：中药房 V13（M380 收官） */}
           <Route path="tcm-pharmacy" element={<TCMPharmacy />} />
+          {/* M381-A：运营看板 V13 */}
+          <Route path="operation-dashboard" element={<OperationDashboard />} />
+          {/* M381-B：财务明细 V13 */}
+          <Route path="finance-detail" element={<FinanceDetail />} />
+          {/* M381-C：患者流明细 V13 */}
+          <Route path="patient-flow-detail" element={<PatientFlowDetail />} />
+          {/* M381-D：资源利用明细 V13（M381 收官） */}
+          <Route path="resource-util-detail" element={<ResourceUtilDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
