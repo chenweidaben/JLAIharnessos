@@ -804,3 +804,43 @@ export interface MedicalSession {
   /** 总Token使用量 */
   readonly totalTokens: number;
 }
+
+// ============================================================
+// 告警（前端共享类型）
+// ============================================================
+
+/** 告警类型 */
+export type AlertType =
+  | 'critical-value' // 危急值
+  | 'allergy' // 过敏提醒
+  | 'drug-interaction' // 药物相互作用
+  | 'abnormal-vital'; // 生命体征异常
+
+/** 告警级别 */
+export type AlertLevel = 'critical' | 'abnormal' | 'warning' | 'info';
+
+/**
+ * 患者告警
+ *
+ * 用于前端患者列表、360视图和实时推送的告警展示。
+ */
+export interface Alert {
+  /** 告警唯一ID */
+  readonly id: string;
+  /** 告警类型 */
+  readonly type: AlertType;
+  /** 告警级别 */
+  readonly level: AlertLevel;
+  /** 告警标题 */
+  readonly title: string;
+  /** 告警内容 */
+  readonly content: string;
+  /** 关联患者ID */
+  readonly patientId: string;
+  /** 患者姓名（可能脱敏） */
+  readonly patientName?: string;
+  /** 创建时间（ISO字符串） */
+  readonly createdAt: string;
+  /** 是否已确认 */
+  readonly acknowledged: boolean;
+}
