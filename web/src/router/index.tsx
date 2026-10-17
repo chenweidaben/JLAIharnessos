@@ -1513,6 +1513,14 @@ const ImagingTurnaround = lazy(() => import('@/pages/imaging-turnaround'));
 const LabError = lazy(() => import('@/pages/lab-error'));
 // M338-D：标本不合格率 V13
 const SpecimenReject = lazy(() => import('@/pages/specimen-reject'));
+// M339-A：手术量分级 V13
+const SurgeryVolume = lazy(() => import('@/pages/surgery-volume'));
+// M339-B：麻醉相关并发症 V13
+const AnesthesiaComplication = lazy(() => import('@/pages/anesthesia-complication'));
+// M339-C：手术部位感染率 V13
+const SsiRate = lazy(() => import('@/pages/ssi-rate'));
+// M339-D：术中冰冻病理与术后石蜡符合率 V13
+const IntraopFrozenSection = lazy(() => import('@/pages/intraop-frozen-section'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2967,6 +2975,14 @@ export default function AppRoutes() {
           <Route path="lab-error" element={<LabError />} />
           {/* M338-D：标本不合格率 V13 */}
           <Route path="specimen-reject" element={<SpecimenReject />} />
+          {/* M339-A：手术量分级 V13 */}
+          <Route path="surgery-volume" element={<SurgeryVolume />} />
+          {/* M339-B：麻醉相关并发症 V13 */}
+          <Route path="anesthesia-complication" element={<AnesthesiaComplication />} />
+          {/* M339-C：手术部位感染率 V13 */}
+          <Route path="ssi-rate" element={<SsiRate />} />
+          {/* M339-D：术中冰冻病理与术后石蜡符合率 V13 */}
+          <Route path="intraop-frozen-section" element={<IntraopFrozenSection />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

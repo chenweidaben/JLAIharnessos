@@ -1697,6 +1697,14 @@ import { imagingTurnaroundV13Routes } from './routes/imagingTurnaroundV13';
 import { labErrorV13Routes } from './routes/labErrorV13';
 // M338-D：标本不合格率 V13 GET /api/v1/specimen-reject
 import { specimenRejectV13Routes } from './routes/specimenRejectV13';
+// M339-A：手术量分级 V13 GET /api/v1/surgery-volume
+import { surgeryVolumeV13Routes } from './routes/surgeryVolumeV13';
+// M339-B：麻醉相关并发症 V13 GET /api/v1/anesthesia-complication
+import { anesthesiaComplicationV13Routes } from './routes/anesthesiaComplicationV13';
+// M339-C：手术部位感染率 V13 GET /api/v1/ssi-rate
+import { ssiRateV13Routes } from './routes/ssiRateV13';
+// M339-D：术中冰冻病理与术后石蜡符合率 V13 GET /api/v1/intraop-frozen-section
+import { intraOpFrozenSectionV13Routes } from './routes/intraOpFrozenSectionV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2788,6 +2796,10 @@ const allRoutes: RouteDef[] = [
   ...imagingTurnaroundV13Routes, // M338-B：影像报告周转时间 V13 GET /api/v1/imaging-turnaround
   ...labErrorV13Routes, // M338-C：检验差错率 V13 GET /api/v1/lab-error
   ...specimenRejectV13Routes, // M338-D：标本不合格率 V13 GET /api/v1/specimen-reject
+  ...surgeryVolumeV13Routes, // M339-A：手术量分级 V13 GET /api/v1/surgery-volume
+  ...anesthesiaComplicationV13Routes, // M339-B：麻醉相关并发症 V13 GET /api/v1/anesthesia-complication
+  ...ssiRateV13Routes, // M339-C：手术部位感染率 V13 GET /api/v1/ssi-rate
+  ...intraOpFrozenSectionV13Routes, // M339-D：术中冰冻病理与术后石蜡符合率 V13 GET /api/v1/intraop-frozen-section
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
