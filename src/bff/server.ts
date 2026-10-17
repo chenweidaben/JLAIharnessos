@@ -1489,6 +1489,14 @@ import { pharmacyInventoryAlertV13Routes } from './routes/pharmacyInventoryAlert
 import { otSchedulingConflictV13Routes } from './routes/otSchedulingConflictV13';
 // M312-D：急诊容量预警 V13 GET /api/v1/emergency-capacity
 import { emergencyCapacityV13Routes } from './routes/emergencyCapacityV13';
+// M313-A：DRG 费用超支预警 V13 GET /api/v1/drg-cost-overrun
+import { drgCostOverrunV13Routes } from './routes/drgCostOverrunV13';
+// M313-B：门诊流量预测与分时段建议 V13 GET /api/v1/outpatient-flow-forecast
+import { outpatientFlowForecastV13Routes } from './routes/outpatientFlowForecastV13';
+// M313-C：医疗设备维保到期提醒 V13 GET /api/v1/equipment-maintenance
+import { equipmentMaintenanceV13Routes } from './routes/equipmentMaintenanceV13';
+// M313-D：院感暴发早期预警 V13 GET /api/v1/infection-outbreak
+import { infectionOutbreakV13Routes } from './routes/infectionOutbreakV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2476,6 +2484,10 @@ const allRoutes: RouteDef[] = [
   ...pharmacyInventoryAlertV13Routes, // M312-B：药房库存预警 V13 GET /api/v1/pharmacy-inventory-alert
   ...otSchedulingConflictV13Routes, // M312-C：手术排程冲突检测 V13 GET /api/v1/ot-scheduling-conflict
   ...emergencyCapacityV13Routes, // M312-D：急诊容量预警 V13 GET /api/v1/emergency-capacity
+  ...drgCostOverrunV13Routes, // M313-A：DRG 费用超支预警 V13 GET /api/v1/drg-cost-overrun
+  ...outpatientFlowForecastV13Routes, // M313-B：门诊流量预测与分时段建议 V13 GET /api/v1/outpatient-flow-forecast
+  ...equipmentMaintenanceV13Routes, // M313-C：医疗设备维保到期提醒 V13 GET /api/v1/equipment-maintenance
+  ...infectionOutbreakV13Routes, // M313-D：院感暴发早期预警 V13 GET /api/v1/infection-outbreak
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

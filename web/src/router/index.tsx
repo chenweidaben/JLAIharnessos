@@ -1305,6 +1305,14 @@ const PharmacyInventoryAlert = lazy(() => import('@/pages/pharmacy-inventory-ale
 const OtSchedulingConflict = lazy(() => import('@/pages/ot-scheduling-conflict'));
 // M312-D：急诊容量预警 V13
 const EmergencyCapacity = lazy(() => import('@/pages/emergency-capacity'));
+// M313-A：DRG 费用超支预警 V13
+const DrgCostOverrun = lazy(() => import('@/pages/drg-cost-overrun'));
+// M313-B：门诊流量预测与分时段建议 V13
+const OutpatientFlowForecast = lazy(() => import('@/pages/outpatient-flow-forecast'));
+// M313-C：医疗设备维保到期提醒 V13
+const EquipmentMaintenance = lazy(() => import('@/pages/equipment-maintenance'));
+// M313-D：院感暴发早期预警 V13
+const InfectionOutbreak = lazy(() => import('@/pages/infection-outbreak'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2551,6 +2559,14 @@ export default function AppRoutes() {
           <Route path="ot-scheduling-conflict" element={<OtSchedulingConflict />} />
           {/* M312-D：急诊容量预警 V13 */}
           <Route path="emergency-capacity" element={<EmergencyCapacity />} />
+          {/* M313-A：DRG 费用超支预警 V13 */}
+          <Route path="drg-cost-overrun" element={<DrgCostOverrun />} />
+          {/* M313-B：门诊流量预测与分时段建议 V13 */}
+          <Route path="outpatient-flow-forecast" element={<OutpatientFlowForecast />} />
+          {/* M313-C：医疗设备维保到期提醒 V13 */}
+          <Route path="equipment-maintenance" element={<EquipmentMaintenance />} />
+          {/* M313-D：院感暴发早期预警 V13 */}
+          <Route path="infection-outbreak" element={<InfectionOutbreak />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
