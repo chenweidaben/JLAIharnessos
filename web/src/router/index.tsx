@@ -2167,6 +2167,14 @@ const HealthEducationMgmt = lazy(() => import('@/pages/health-education-mgmt'));
 const MedicalEthicsMgmt = lazy(() => import('@/pages/medical-ethics-mgmt'));
 // M420-D：医务社工管理 V13（M420 收官）
 const MedicalSocialWorkMgmt = lazy(() => import('@/pages/medical-social-work-mgmt'));
+// M421-A：院感监测（细节）V13（detail 避让旧版 infectionReportMgmtV13/infectionControlDetailV13 等院感系列）
+const InfectionSurveillanceDetail = lazy(() => import('@/pages/infection-surveillance-detail'));
+// M421-B：抗菌药物使用管理 V13（换名避让旧版 antiInfectionDetailV13）
+const AntibioticUsageMgmt = lazy(() => import('@/pages/antibiotic-usage-mgmt'));
+// M421-C：输血管理（细节）V13（detail 避让旧版 bloodTransfusionMgmtV13）
+const BloodTransfusionDetail = lazy(() => import('@/pages/blood-transfusion-detail'));
+// M421-D：临床路径管理 V13（M421 收官，换名避让旧版 clinicalPathwayDetailV13）
+const ClinicalPathwayMgmt = lazy(() => import('@/pages/clinical-pathway-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4275,6 +4283,14 @@ export default function AppRoutes() {
           <Route path="medical-ethics-mgmt" element={<MedicalEthicsMgmt />} />
           {/* M420-D：医务社工管理 V13（M420 收官） */}
           <Route path="medical-social-work-mgmt" element={<MedicalSocialWorkMgmt />} />
+          {/* M421-A：院感监测（细节）V13（detail 避让旧版 infectionReportMgmtV13/infectionControlDetailV13 等院感系列） */}
+          <Route path="infection-surveillance-detail" element={<InfectionSurveillanceDetail />} />
+          {/* M421-B：抗菌药物使用管理 V13（换名避让旧版 antiInfectionDetailV13） */}
+          <Route path="antibiotic-usage-mgmt" element={<AntibioticUsageMgmt />} />
+          {/* M421-C：输血管理（细节）V13（detail 避让旧版 bloodTransfusionMgmtV13） */}
+          <Route path="blood-transfusion-detail" element={<BloodTransfusionDetail />} />
+          {/* M421-D：临床路径管理 V13（M421 收官，换名避让旧版 clinicalPathwayDetailV13） */}
+          <Route path="clinical-pathway-mgmt" element={<ClinicalPathwayMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

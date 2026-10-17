@@ -2351,6 +2351,14 @@ import { healthEducationMgmtV13Routes } from './routes/healthEducationMgmtV13';
 import { medicalEthicsMgmtV13Routes } from './routes/medicalEthicsMgmtV13';
 // M420-D：医务社工管理 V13 GET /api/v1/medical-social-work-mgmt（M420 收官）
 import { medicalSocialWorkMgmtV13Routes } from './routes/medicalSocialWorkMgmtV13';
+// M421-A：院感监测（细节）V13 GET /api/v1/infection-surveillance-detail（detail 避让旧版 infectionReportMgmtV13/infectionControlDetailV13 等院感系列）
+import { infectionSurveillanceDetailV13Routes } from './routes/infectionSurveillanceDetailV13';
+// M421-B：抗菌药物使用管理 V13 GET /api/v1/antibiotic-usage-mgmt（换名避让旧版 antiInfectionDetailV13）
+import { antibioticUsageMgmtV13Routes } from './routes/antibioticUsageMgmtV13';
+// M421-C：输血管理（细节）V13 GET /api/v1/blood-transfusion-detail（detail 避让旧版 bloodTransfusionMgmtV13）
+import { bloodTransfusionDetailV13Routes } from './routes/bloodTransfusionDetailV13';
+// M421-D：临床路径管理 V13 GET /api/v1/clinical-pathway-mgmt（M421 收官，换名避让旧版 clinicalPathwayDetailV13）
+import { clinicalPathwayMgmtV13Routes } from './routes/clinicalPathwayMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3769,6 +3777,10 @@ const allRoutes: RouteDef[] = [
   ...healthEducationMgmtV13Routes, // M420-B：健康教育管理 V13 GET /api/v1/health-education-mgmt
   ...medicalEthicsMgmtV13Routes, // M420-C：医学伦理管理 V13 GET /api/v1/medical-ethics-mgmt
   ...medicalSocialWorkMgmtV13Routes, // M420-D：医务社工管理 V13 GET /api/v1/medical-social-work-mgmt（M420 收官）
+  ...infectionSurveillanceDetailV13Routes, // M421-A：院感监测（细节）V13 GET /api/v1/infection-surveillance-detail（detail 避让旧版 infectionReportMgmtV13/infectionControlDetailV13 等院感系列）
+  ...antibioticUsageMgmtV13Routes, // M421-B：抗菌药物使用管理 V13 GET /api/v1/antibiotic-usage-mgmt（换名避让旧版 antiInfectionDetailV13）
+  ...bloodTransfusionDetailV13Routes, // M421-C：输血管理（细节）V13 GET /api/v1/blood-transfusion-detail（detail 避让旧版 bloodTransfusionMgmtV13）
+  ...clinicalPathwayMgmtV13Routes, // M421-D：临床路径管理 V13 GET /api/v1/clinical-pathway-mgmt（M421 收官，换名避让旧版 clinicalPathwayDetailV13）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
