@@ -1399,6 +1399,14 @@ import { experiencePatchesV13Routes } from './routes/experiencePatchesV13';
 import { feedbackTrendV13Routes } from './routes/feedbackTrendV13';
 // M301-D：反馈闭环总览 V13 GET /api/v1/feedback-loop-overview
 import { feedbackLoopOverviewV13Routes } from './routes/feedbackLoopOverviewV13';
+// M302-A：经验精准主动推送 V13 GET /api/v1/contextual-push
+import { contextualPushV13Routes } from './routes/contextualPushV13';
+// M302-B：推送时机与场景触发 V13 GET /api/v1/push-scene
+import { pushSceneV13Routes } from './routes/pushSceneV13';
+// M302-C：推送频控与免打扰 V13 GET /api/v1/push-quota
+import { pushQuotaV13Routes } from './routes/pushQuotaV13';
+// M302-D：推送效果与闭环总览 V13 GET /api/v1/push-effect-overview
+import { pushEffectOverviewV13Routes } from './routes/pushEffectOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2341,6 +2349,10 @@ const allRoutes: RouteDef[] = [
   ...experiencePatchesV13Routes, // M301-B：修改点归因与经验补丁 V13 GET /api/v1/experience-patches
   ...feedbackTrendV13Routes, // M301-C：反馈信号看板与趋势 V13 GET /api/v1/feedback-trend
   ...feedbackLoopOverviewV13Routes, // M301-D：反馈闭环总览 V13 GET /api/v1/feedback-loop-overview
+  ...contextualPushV13Routes, // M302-A：经验精准主动推送 V13 GET /api/v1/contextual-push
+  ...pushSceneV13Routes, // M302-B：推送时机与场景触发 V13 GET /api/v1/push-scene
+  ...pushQuotaV13Routes, // M302-C：推送频控与免打扰 V13 GET /api/v1/push-quota
+  ...pushEffectOverviewV13Routes, // M302-D：推送效果与闭环总览 V13 GET /api/v1/push-effect-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

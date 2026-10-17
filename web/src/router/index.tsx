@@ -1216,6 +1216,14 @@ const ExperiencePatches = lazy(() => import('@/pages/experience-patches'));
 const FeedbackTrend = lazy(() => import('@/pages/feedback-trend'));
 // M301-D：反馈闭环总览 V13
 const FeedbackLoopOverview = lazy(() => import('@/pages/feedback-loop-overview'));
+// M302-A：经验精准主动推送 V13
+const ContextualPush = lazy(() => import('@/pages/contextual-push'));
+// M302-B：推送时机与场景触发 V13
+const PushScene = lazy(() => import('@/pages/push-scene'));
+// M302-C：推送频控与免打扰 V13
+const PushQuota = lazy(() => import('@/pages/push-quota'));
+// M302-D：推送效果与闭环总览 V13
+const PushEffectOverview = lazy(() => import('@/pages/push-effect-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2372,6 +2380,14 @@ export default function AppRoutes() {
           <Route path="feedback-trend" element={<FeedbackTrend />} />
           {/* M301-D：反馈闭环总览 V13 */}
           <Route path="feedback-loop-overview" element={<FeedbackLoopOverview />} />
+          {/* M302-A：经验精准主动推送 V13 */}
+          <Route path="contextual-push" element={<ContextualPush />} />
+          {/* M302-B：推送时机与场景触发 V13 */}
+          <Route path="push-scene" element={<PushScene />} />
+          {/* M302-C：推送频控与免打扰 V13 */}
+          <Route path="push-quota" element={<PushQuota />} />
+          {/* M302-D：推送效果与闭环总览 V13 */}
+          <Route path="push-effect-overview" element={<PushEffectOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
