@@ -1319,6 +1319,14 @@ import { agentRuleV9Routes } from './routes/agentRuleV9';
 import { caseLessonV9Routes } from './routes/caseLessonV9';
 // M291-D：跨角色经验复用与学习飞轮 V9 POST/GET /api/v1/agent
 import { learningFlywheelV9Routes } from './routes/learningFlywheelV9';
+// M292-A：失败案例根因复盘与防再发机制 V10 POST/GET /api/v1/failure/postmortem
+import { failurePostmortemV10Routes } from './routes/failurePostmortemV10';
+// M292-B：成功案例蒸馏与最佳实践库 V10 GET/POST /api/v1/best-practice
+import { bestPracticeV10Routes } from './routes/bestPracticeV10';
+// M292-C：个人知识图谱与继任者交接 V10 GET/POST /api/v1/knowledge
+import { knowledgeHandoverV10Routes } from './routes/knowledgeHandoverV10';
+// M292-D：医院级 AI 知识资产大盘 V10 GET /api/v1/knowledge
+import { knowledgeAssetV10Routes } from './routes/knowledgeAssetV10';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2221,6 +2229,10 @@ const allRoutes: RouteDef[] = [
   ...agentRuleV9Routes, // M291-B：从反馈沉淀个性化推荐规则 V9 GET/POST /api/v1/agent/rules
   ...caseLessonV9Routes, // M291-C：Doctor MUSE 个人经验沉淀闭环 V9 POST/GET /api/v1/agent/case-lesson
   ...learningFlywheelV9Routes, // M291-D：跨角色经验复用与学习飞轮 V9 POST/GET /api/v1/agent
+  ...failurePostmortemV10Routes, // M292-A：失败案例根因复盘与防再发机制 V10 POST/GET /api/v1/failure/postmortem
+  ...bestPracticeV10Routes, // M292-B：成功案例蒸馏与最佳实践库 V10 GET/POST /api/v1/best-practice
+  ...knowledgeHandoverV10Routes, // M292-C：个人知识图谱与继任者交接 V10 GET/POST /api/v1/knowledge
+  ...knowledgeAssetV10Routes, // M292-D：医院级 AI 知识资产大盘 V10 GET /api/v1/knowledge
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

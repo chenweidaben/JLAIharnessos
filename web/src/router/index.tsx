@@ -1136,6 +1136,14 @@ const AgentRules = lazy(() => import('@/pages/agent-rules'));
 const CaseLesson = lazy(() => import('@/pages/case-lesson'));
 // M291-D：跨角色经验复用与学习飞轮 V9
 const LearningFlywheel = lazy(() => import('@/pages/learning-flywheel'));
+// M292-A：失败案例根因复盘与防再发机制 V10
+const FailurePostmortem = lazy(() => import('@/pages/failure-postmortem'));
+// M292-B：成功案例蒸馏与最佳实践库 V10
+const BestPractice = lazy(() => import('@/pages/best-practice'));
+// M292-C：个人知识图谱与继任者交接 V10
+const Knowledge = lazy(() => import('@/pages/knowledge'));
+// M292-D：医院级 AI 知识资产大盘 V10
+const KnowledgeDashboard = lazy(() => import('@/pages/knowledge-dashboard'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2212,6 +2220,14 @@ export default function AppRoutes() {
           <Route path="case-lesson" element={<CaseLesson />} />
           {/* M291-D：跨角色经验复用与学习飞轮 V9 */}
           <Route path="learning-flywheel" element={<LearningFlywheel />} />
+          {/* M292-A：失败案例根因复盘与防再发机制 V10 */}
+          <Route path="failure-postmortem" element={<FailurePostmortem />} />
+          {/* M292-B：成功案例蒸馏与最佳实践库 V10 */}
+          <Route path="best-practice" element={<BestPractice />} />
+          {/* M292-C：个人知识图谱与继任者交接 V10 */}
+          <Route path="knowledge" element={<Knowledge />} />
+          {/* M292-D：医院级 AI 知识资产大盘 V10 */}
+          <Route path="knowledge-dashboard" element={<KnowledgeDashboard />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
