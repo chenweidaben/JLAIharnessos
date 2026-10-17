@@ -1423,6 +1423,14 @@ import { diffusionAdoptionV13Routes } from './routes/diffusionAdoptionV13';
 import { diffusionGraphV13Routes } from './routes/diffusionGraphV13';
 // M304-D：跨科室扩散总览 V13 GET /api/v1/diffusion-overview
 import { diffusionOverviewV13Routes } from './routes/diffusionOverviewV13';
+// M305-A：经验资产运营与退役 V13 GET /api/v1/experience-asset
+import { experienceAssetV13Routes } from './routes/experienceAssetV13';
+// M305-B：资产盘点周期 V13 GET /api/v1/asset-audit
+import { assetAuditV13Routes } from './routes/assetAuditV13';
+// M305-C：退役经验存档与复用 V13 GET /api/v1/archived-experience
+import { archivedExperienceV13Routes } from './routes/archivedExperienceV13';
+// M305-D：经验资产生命周期总览 V13 GET /api/v1/asset-lifecycle-overview
+import { assetLifecycleOverviewV13Routes } from './routes/assetLifecycleOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2377,6 +2385,10 @@ const allRoutes: RouteDef[] = [
   ...diffusionAdoptionV13Routes, // M304-B：跨科室采纳反馈 V13 GET /api/v1/diffusion-adoption
   ...diffusionGraphV13Routes, // M304-C：扩散网络图谱 V13 GET /api/v1/diffusion-graph
   ...diffusionOverviewV13Routes, // M304-D：跨科室扩散总览 V13 GET /api/v1/diffusion-overview
+  ...experienceAssetV13Routes, // M305-A：经验资产运营与退役 V13 GET /api/v1/experience-asset
+  ...assetAuditV13Routes, // M305-B：资产盘点周期 V13 GET /api/v1/asset-audit
+  ...archivedExperienceV13Routes, // M305-C：退役经验存档与复用 V13 GET /api/v1/archived-experience
+  ...assetLifecycleOverviewV13Routes, // M305-D：经验资产生命周期总览 V13 GET /api/v1/asset-lifecycle-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

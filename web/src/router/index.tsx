@@ -1240,6 +1240,14 @@ const DiffusionAdoption = lazy(() => import('@/pages/diffusion-adoption'));
 const DiffusionGraph = lazy(() => import('@/pages/diffusion-graph'));
 // M304-D：跨科室扩散总览 V13
 const DiffusionOverview = lazy(() => import('@/pages/diffusion-overview'));
+// M305-A：经验资产运营与退役 V13
+const ExperienceAsset = lazy(() => import('@/pages/experience-asset'));
+// M305-B：资产盘点周期 V13
+const AssetAudit = lazy(() => import('@/pages/asset-audit'));
+// M305-C：退役经验存档与复用 V13
+const ArchivedExperience = lazy(() => import('@/pages/archived-experience'));
+// M305-D：经验资产生命周期总览 V13
+const AssetLifecycleOverview = lazy(() => import('@/pages/asset-lifecycle-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2420,6 +2428,14 @@ export default function AppRoutes() {
           <Route path="diffusion-graph" element={<DiffusionGraph />} />
           {/* M304-D：跨科室扩散总览 V13 */}
           <Route path="diffusion-overview" element={<DiffusionOverview />} />
+          {/* M305-A：经验资产运营与退役 V13 */}
+          <Route path="experience-asset" element={<ExperienceAsset />} />
+          {/* M305-B：资产盘点周期 V13 */}
+          <Route path="asset-audit" element={<AssetAudit />} />
+          {/* M305-C：退役经验存档与复用 V13 */}
+          <Route path="archived-experience" element={<ArchivedExperience />} />
+          {/* M305-D：经验资产生命周期总览 V13 */}
+          <Route path="asset-lifecycle-overview" element={<AssetLifecycleOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
