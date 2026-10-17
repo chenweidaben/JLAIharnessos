@@ -1737,6 +1737,14 @@ const AiTreatment = lazy(() => import('@/pages/ai-treatment'));
 const AiManagement = lazy(() => import('@/pages/ai-management'));
 // M366-D：AI 教学培训 V13（M366 收官）
 const AiEducation = lazy(() => import('@/pages/ai-education'));
+// M367-A：互联网医院（统计）V13（stats避让）
+const InternetHospitalStats = lazy(() => import('@/pages/internet-hospital-stats'));
+// M367-B：远程医疗（统计）V13（stats避让）
+const TelemedicineStats = lazy(() => import('@/pages/telemedicine-stats'));
+// M367-C：在线支付 V13
+const OnlinePayment = lazy(() => import('@/pages/online-payment'));
+// M367-D：健康档案 V13（M367 收官）
+const HealthRecord = lazy(() => import('@/pages/health-record'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3415,6 +3423,14 @@ export default function AppRoutes() {
           <Route path="ai-management" element={<AiManagement />} />
           {/* M366-D：AI 教学培训 V13（M366 收官） */}
           <Route path="ai-education" element={<AiEducation />} />
+          {/* M367-A：互联网医院（统计）V13（stats避让） */}
+          <Route path="internet-hospital-stats" element={<InternetHospitalStats />} />
+          {/* M367-B：远程医疗（统计）V13（stats避让） */}
+          <Route path="telemedicine-stats" element={<TelemedicineStats />} />
+          {/* M367-C：在线支付 V13 */}
+          <Route path="online-payment" element={<OnlinePayment />} />
+          {/* M367-D：健康档案 V13（M367 收官） */}
+          <Route path="health-record" element={<HealthRecord />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
