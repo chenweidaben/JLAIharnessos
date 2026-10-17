@@ -1200,6 +1200,14 @@ const Rollback = lazy(() => import('@/pages/rollback'));
 const ReviewerRoster = lazy(() => import('@/pages/reviewer-roster'));
 // M299-D：质量门禁总览 V13
 const QualityGate = lazy(() => import('@/pages/quality-gate'));
+// M300-A：经验与临床结局关联 V13
+const ExperienceOutcome = lazy(() => import('@/pages/experience-outcome'));
+// M300-B：疗效证据反哺规则权重 V13
+const EvidenceRules = lazy(() => import('@/pages/evidence-rules'));
+// M300-C：反向证据熔断 V13
+const CircuitBreaker = lazy(() => import('@/pages/circuit-breaker'));
+// M300-D：疗效证据总览 V13
+const EvidenceOverview = lazy(() => import('@/pages/evidence-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2340,6 +2348,14 @@ export default function AppRoutes() {
           <Route path="reviewer-roster" element={<ReviewerRoster />} />
           {/* M299-D：质量门禁总览 V13 */}
           <Route path="quality-gate" element={<QualityGate />} />
+          {/* M300-A：经验与临床结局关联 V13 */}
+          <Route path="experience-outcome" element={<ExperienceOutcome />} />
+          {/* M300-B：疗效证据反哺规则权重 V13 */}
+          <Route path="evidence-rules" element={<EvidenceRules />} />
+          {/* M300-C：反向证据熔断 V13 */}
+          <Route path="circuit-breaker" element={<CircuitBreaker />} />
+          {/* M300-D：疗效证据总览 V13 */}
+          <Route path="evidence-overview" element={<EvidenceOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

@@ -1383,6 +1383,14 @@ import { rollbackV13Routes } from './routes/rollbackV13';
 import { reviewerRosterV13Routes } from './routes/reviewerRosterV13';
 // M299-D：质量门禁总览 V13 GET /api/v1/quality-gate
 import { qualityGateV13Routes } from './routes/qualityGateV13';
+// M300-A：经验与临床结局关联 V13 GET /api/v1/experience-outcome
+import { experienceOutcomeV13Routes } from './routes/experienceOutcomeV13';
+// M300-B：疗效证据反哺规则权重 V13 GET /api/v1/evidence-rules
+import { evidenceRulesV13Routes } from './routes/evidenceRulesV13';
+// M300-C：反向证据熔断 V13 GET /api/v1/circuit-breaker
+import { circuitBreakerV13Routes } from './routes/circuitBreakerV13';
+// M300-D：疗效证据总览 V13 GET /api/v1/evidence-overview
+import { evidenceOverviewV13Routes } from './routes/evidenceOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2317,6 +2325,10 @@ const allRoutes: RouteDef[] = [
   ...rollbackV13Routes, // M299-B：错误经验拦截与回滚 V13 POST /api/v1/experience/:id/rollback
   ...reviewerRosterV13Routes, // M299-C：评审专家资质与激励 V13 GET /api/v1/reviewer-roster
   ...qualityGateV13Routes, // M299-D：质量门禁总览 V13 GET /api/v1/quality-gate
+  ...experienceOutcomeV13Routes, // M300-A：经验与临床结局关联 V13 GET /api/v1/experience-outcome
+  ...evidenceRulesV13Routes, // M300-B：疗效证据反哺规则权重 V13 GET /api/v1/evidence-rules
+  ...circuitBreakerV13Routes, // M300-C：反向证据熔断 V13 GET /api/v1/circuit-breaker
+  ...evidenceOverviewV13Routes, // M300-D：疗效证据总览 V13 GET /api/v1/evidence-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
