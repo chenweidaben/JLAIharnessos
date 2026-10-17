@@ -1697,6 +1697,14 @@ const TeachingMgmt = lazy(() => import('@/pages/teaching-mgmt'));
 const ContinuingEduCoverage = lazy(() => import('@/pages/continuing-edu-coverage'));
 // M361-D：学术交流 V13（M361 收官）
 const AcademicExchange = lazy(() => import('@/pages/academic-exchange'));
+// M362-A：人员管理 V13
+const StaffMgmt = lazy(() => import('@/pages/staff-mgmt'));
+// M362-B：培训管理 V13
+const TrainingMgmt = lazy(() => import('@/pages/training-mgmt'));
+// M362-C：后勤管理 V13
+const LogisticsMgmt = lazy(() => import('@/pages/logistics-mgmt'));
+// M362-D：安全管理 V13（M362 收官）
+const SafetyMgmt = lazy(() => import('@/pages/safety-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3335,6 +3343,14 @@ export default function AppRoutes() {
           <Route path="continuing-edu-coverage" element={<ContinuingEduCoverage />} />
           {/* M361-D：学术交流 V13（M361 收官） */}
           <Route path="academic-exchange" element={<AcademicExchange />} />
+          {/* M362-A：人员管理 V13 */}
+          <Route path="staff-mgmt" element={<StaffMgmt />} />
+          {/* M362-B：培训管理 V13 */}
+          <Route path="training-mgmt" element={<TrainingMgmt />} />
+          {/* M362-C：后勤管理 V13 */}
+          <Route path="logistics-mgmt" element={<LogisticsMgmt />} />
+          {/* M362-D：安全管理 V13（M362 收官） */}
+          <Route path="safety-mgmt" element={<SafetyMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
