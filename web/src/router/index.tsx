@@ -1919,6 +1919,14 @@ const NursingInfectionControl = lazy(() => import('@/pages/nursing-infection-con
 const NursingEducation = lazy(() => import('@/pages/nursing-education'));
 // M389-D：护理人力统计 V13（stats 避让，M389 收官）
 const NursingStaffingStats = lazy(() => import('@/pages/nursing-staffing-stats'));
+// M390-A：预约管理 V13
+const AppointmentMgmt = lazy(() => import('@/pages/appointment-mgmt'));
+// M390-B：分诊管理 V13
+const TriageMgmt = lazy(() => import('@/pages/triage-mgmt'));
+// M390-C：门诊药房 V13
+const OutpatientPharmacy = lazy(() => import('@/pages/outpatient-pharmacy'));
+// M390-D：急诊分级 V13（M390 收官）
+const EmergencySeverity = lazy(() => import('@/pages/emergency-severity'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3779,6 +3787,14 @@ export default function AppRoutes() {
           <Route path="nursing-education" element={<NursingEducation />} />
           {/* M389-D：护理人力统计 V13（stats 避让，M389 收官） */}
           <Route path="nursing-staffing-stats" element={<NursingStaffingStats />} />
+          {/* M390-A：预约管理 V13 */}
+          <Route path="appointment-mgmt" element={<AppointmentMgmt />} />
+          {/* M390-B：分诊管理 V13 */}
+          <Route path="triage-mgmt" element={<TriageMgmt />} />
+          {/* M390-C：门诊药房 V13 */}
+          <Route path="outpatient-pharmacy" element={<OutpatientPharmacy />} />
+          {/* M390-D：急诊分级 V13（M390 收官） */}
+          <Route path="emergency-severity" element={<EmergencySeverity />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
