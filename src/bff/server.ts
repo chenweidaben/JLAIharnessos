@@ -1375,6 +1375,14 @@ import { honorWallV13Routes } from './routes/honorWallV13';
 import { mentorMatchV13Routes } from './routes/mentorMatchV13';
 // M298-D：知识贡献生态总览 V13 GET /api/v1/ecosystem-dashboard
 import { ecosystemDashboardV13Routes } from './routes/ecosystemDashboardV13';
+// M299-A：经验质量同行评审 V13 GET /api/v1/review-queue
+import { reviewQueueV13Routes } from './routes/reviewQueueV13';
+// M299-B：错误经验拦截与回滚 V13 POST /api/v1/experience/:id/rollback
+import { rollbackV13Routes } from './routes/rollbackV13';
+// M299-C：评审专家资质与激励 V13 GET /api/v1/reviewer-roster
+import { reviewerRosterV13Routes } from './routes/reviewerRosterV13';
+// M299-D：质量门禁总览 V13 GET /api/v1/quality-gate
+import { qualityGateV13Routes } from './routes/qualityGateV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2305,6 +2313,10 @@ const allRoutes: RouteDef[] = [
   ...honorWallV13Routes, // M298-B：贡献荣誉墙与月度之星 V13 GET /api/v1/honor-wall
   ...mentorMatchV13Routes, // M298-C：新手医生孵化与导师匹配 V13 GET /api/v1/mentor-match
   ...ecosystemDashboardV13Routes, // M298-D：知识贡献生态总览 V13 GET /api/v1/ecosystem-dashboard
+  ...reviewQueueV13Routes, // M299-A：经验质量同行评审 V13 GET /api/v1/review-queue
+  ...rollbackV13Routes, // M299-B：错误经验拦截与回滚 V13 POST /api/v1/experience/:id/rollback
+  ...reviewerRosterV13Routes, // M299-C：评审专家资质与激励 V13 GET /api/v1/reviewer-roster
+  ...qualityGateV13Routes, // M299-D：质量门禁总览 V13 GET /api/v1/quality-gate
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -1192,6 +1192,14 @@ const HonorWall = lazy(() => import('@/pages/honor-wall'));
 const MentorMatch = lazy(() => import('@/pages/mentor-match'));
 // M298-D：知识贡献生态总览 V13
 const EcosystemDashboard = lazy(() => import('@/pages/ecosystem-dashboard'));
+// M299-A：经验质量同行评审 V13
+const ReviewQueue = lazy(() => import('@/pages/review-queue'));
+// M299-B：错误经验拦截与回滚 V13
+const Rollback = lazy(() => import('@/pages/rollback'));
+// M299-C：评审专家资质与激励 V13
+const ReviewerRoster = lazy(() => import('@/pages/reviewer-roster'));
+// M299-D：质量门禁总览 V13
+const QualityGate = lazy(() => import('@/pages/quality-gate'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2324,6 +2332,12 @@ export default function AppRoutes() {
           <Route path="mentor-match" element={<MentorMatch />} />
           {/* M298-D：知识贡献生态总览 V13 */}
           <Route path="ecosystem-dashboard" element={<EcosystemDashboard />} />
+          {/* M299-A：经验质量同行评审 V13 */}
+          <Route path="review-queue" element={<ReviewQueue />} />
+          {/* M299-B：错误经验拦截与回滚 V13 */}
+          <Route path="rollback" element={<Rollback />} />
+          {/* M299-C：评审专家资质与激励 V13 */}
+          <Route path="reviewer-roster" element={<ReviewerRoster />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
