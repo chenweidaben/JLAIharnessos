@@ -2159,6 +2159,14 @@ const InformationSecurityMgmt = lazy(() => import('@/pages/information-security-
 const TrainingMgmtDetail = lazy(() => import('@/pages/training-mgmt-detail'));
 // M419-D：质控管理 V13（M419 收官）
 const QualityControlMgmt = lazy(() => import('@/pages/quality-control-mgmt'));
+// M420-A：病案归档管理 V13（archive 维度避让旧版 medicalRecordMgmtV13/medicalRecordDetailV13）
+const MedicalRecordArchiveMgmt = lazy(() => import('@/pages/medical-record-archive-mgmt'));
+// M420-B：健康教育管理 V13
+const HealthEducationMgmt = lazy(() => import('@/pages/health-education-mgmt'));
+// M420-C：医学伦理管理 V13
+const MedicalEthicsMgmt = lazy(() => import('@/pages/medical-ethics-mgmt'));
+// M420-D：医务社工管理 V13（M420 收官）
+const MedicalSocialWorkMgmt = lazy(() => import('@/pages/medical-social-work-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4259,6 +4267,14 @@ export default function AppRoutes() {
           <Route path="training-mgmt-detail" element={<TrainingMgmtDetail />} />
           {/* M419-D：质控管理 V13（M419 收官） */}
           <Route path="quality-control-mgmt" element={<QualityControlMgmt />} />
+          {/* M420-A：病案归档管理 V13（archive 维度避让旧版 medicalRecordMgmtV13/medicalRecordDetailV13） */}
+          <Route path="medical-record-archive-mgmt" element={<MedicalRecordArchiveMgmt />} />
+          {/* M420-B：健康教育管理 V13 */}
+          <Route path="health-education-mgmt" element={<HealthEducationMgmt />} />
+          {/* M420-C：医学伦理管理 V13 */}
+          <Route path="medical-ethics-mgmt" element={<MedicalEthicsMgmt />} />
+          {/* M420-D：医务社工管理 V13（M420 收官） */}
+          <Route path="medical-social-work-mgmt" element={<MedicalSocialWorkMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
