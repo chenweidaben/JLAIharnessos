@@ -1018,6 +1018,8 @@ const KnowledgeIntake = lazy(() => import('@/pages/knowledge-intake'));
 const DrillCase = lazy(() => import('@/pages/drill-case'));
 // M276-D：医生能力画像与个性化学习路径
 const CompetencyProfile = lazy(() => import('@/pages/competency-profile'));
+// M277-A：门诊与手术量预测 V3
+const VolumeForecast = lazy(() => import('@/pages/volume-forecast'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1976,6 +1978,8 @@ export default function AppRoutes() {
           <Route path="drill-case" element={<DrillCase />} />
           {/* M276-D：医生能力画像与个性化学习路径 */}
           <Route path="competency-profile" element={<CompetencyProfile />} />
+          {/* M277-A：门诊与手术量预测 V3 */}
+          <Route path="volume-forecast" element={<VolumeForecast />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
