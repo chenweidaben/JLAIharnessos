@@ -1681,6 +1681,14 @@ const RationalDrugUseStats = lazy(() => import('@/pages/rational-drug-use-stats'
 const DrugInventoryStats = lazy(() => import('@/pages/drug-inventory-stats'));
 // M359-D：输液管理 V13（M359 收官）
 const InfusionMgmt = lazy(() => import('@/pages/infusion-mgmt'));
+// M360-A：检验质量 V13（新规格：室内质控/室间质评/报告及时率）
+const LabQuality = lazy(() => import('@/pages/lab-quality'));
+// M360-B：影像质量 V13（新规格：报告及时率/阳性率/甲级片率）
+const ImagingQuality = lazy(() => import('@/pages/imaging-quality'));
+// M360-C：病理质量 V13
+const PathologyQuality = lazy(() => import('@/pages/pathology-quality'));
+// M360-D：输血管理 V13（M360 收官）
+const BloodMgmt = lazy(() => import('@/pages/blood-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3303,6 +3311,14 @@ export default function AppRoutes() {
           <Route path="drug-inventory-stats" element={<DrugInventoryStats />} />
           {/* M359-D：输液管理 V13（M359 收官） */}
           <Route path="infusion-mgmt" element={<InfusionMgmt />} />
+          {/* M360-A：检验质量 V13（新规格：室内质控/室间质评/报告及时率） */}
+          <Route path="lab-quality" element={<LabQuality />} />
+          {/* M360-B：影像质量 V13（新规格：报告及时率/阳性率/甲级片率） */}
+          <Route path="imaging-quality" element={<ImagingQuality />} />
+          {/* M360-C：病理质量 V13 */}
+          <Route path="pathology-quality" element={<PathologyQuality />} />
+          {/* M360-D：输血管理 V13（M360 收官） */}
+          <Route path="blood-mgmt" element={<BloodMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
