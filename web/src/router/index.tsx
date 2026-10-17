@@ -2063,6 +2063,14 @@ const RevenueGrowth = lazy(() => import('@/pages/revenue-growth'));
 const ProfitAnalysis = lazy(() => import('@/pages/profit-analysis'));
 // M407-D：战略KPI V13（M407 收官）
 const StrategicKpi = lazy(() => import('@/pages/strategic-kpi'));
+// M408-A：医疗器械管理 V13
+const MedicalDeviceMgmt = lazy(() => import('@/pages/medical-device-mgmt'));
+// M408-B：耗材供应 V13
+const ConsumableSupply = lazy(() => import('@/pages/consumable-supply'));
+// M408-C：消防安全明细 V13（避让旧版 fire-safety M352-A）
+const FireSafetyDetail = lazy(() => import('@/pages/fire-safety-detail'));
+// M408-D：治安保卫 V13（M408 收官）
+const SecurityMgmt = lazy(() => import('@/pages/security-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4067,6 +4075,14 @@ export default function AppRoutes() {
           <Route path="profit-analysis" element={<ProfitAnalysis />} />
           {/* M407-D：战略KPI V13（M407 收官） */}
           <Route path="strategic-kpi" element={<StrategicKpi />} />
+          {/* M408-A：医疗器械管理 V13 */}
+          <Route path="medical-device-mgmt" element={<MedicalDeviceMgmt />} />
+          {/* M408-B：耗材供应 V13 */}
+          <Route path="consumable-supply" element={<ConsumableSupply />} />
+          {/* M408-C：消防安全明细 V13（避让旧版 fire-safety M352-A） */}
+          <Route path="fire-safety-detail" element={<FireSafetyDetail />} />
+          {/* M408-D：治安保卫 V13（M408 收官） */}
+          <Route path="security-mgmt" element={<SecurityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
