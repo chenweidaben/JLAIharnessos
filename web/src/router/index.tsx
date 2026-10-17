@@ -1056,6 +1056,8 @@ const FhirGateway = lazy(() => import('@/pages/fhir-gateway'));
 const Hl7Integration = lazy(() => import('@/pages/hl7-integration'));
 // M281-C：院间数据共享授权 V5
 const DataSharing = lazy(() => import('@/pages/data-sharing'));
+// M281-D：第三方应用市场集成 V5
+const AppStore = lazy(() => import('@/pages/app-store'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2052,6 +2054,8 @@ export default function AppRoutes() {
           <Route path="hl7-integration" element={<Hl7Integration />} />
           {/* M281-C：院间数据共享授权 V5 */}
           <Route path="data-sharing" element={<DataSharing />} />
+          {/* M281-D：第三方应用市场集成 V5 */}
+          <Route path="app-store" element={<AppStore />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

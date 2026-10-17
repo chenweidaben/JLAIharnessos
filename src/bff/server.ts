@@ -1237,6 +1237,8 @@ import { fhirGatewayV5Routes } from './routes/fhirGatewayV5';
 import { hl7IntegrationV5Routes } from './routes/hl7IntegrationV5';
 // M281-C：院间数据共享授权 V5 POST/GET /api/v1/data-sharing
 import { dataSharingV5Routes } from './routes/dataSharingV5';
+// M281-D：第三方应用市场集成 V5 POST/DELETE/GET /api/v1/app-store
+import { appStoreV5Routes } from './routes/appStoreV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2098,6 +2100,7 @@ const allRoutes: RouteDef[] = [
   ...fhirGatewayV5Routes, // M281-A：FHIR 资源建模与网关 V5 GET/POST /api/v1/fhir-gateway
   ...hl7IntegrationV5Routes, // M281-B：HL7 / WS363 标准对接升级 V5 POST/GET /api/v1/hl7-integration
   ...dataSharingV5Routes, // M281-C：院间数据共享授权 V5 POST/GET /api/v1/data-sharing
+  ...appStoreV5Routes, // M281-D：第三方应用市场集成 V5 POST/DELETE/GET /api/v1/app-store
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
