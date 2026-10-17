@@ -1130,6 +1130,12 @@ const AgentPharma = lazy(() => import('@/pages/agent-pharma'));
 const AgentManager = lazy(() => import('@/pages/agent-manager'));
 // M291-A：Agent 反馈与经验沉淀 V8
 const AgentLearning = lazy(() => import('@/pages/agent-learning'));
+// M291-B：从反馈沉淀个性化推荐规则 V9
+const AgentRules = lazy(() => import('@/pages/agent-rules'));
+// M291-C：Doctor MUSE 个人经验沉淀闭环 V9
+const CaseLesson = lazy(() => import('@/pages/case-lesson'));
+// M291-D：跨角色经验复用与学习飞轮 V9
+const LearningFlywheel = lazy(() => import('@/pages/learning-flywheel'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2200,6 +2206,12 @@ export default function AppRoutes() {
           <Route path="agent-manager" element={<AgentManager />} />
           {/* M291-A：Agent 反馈与经验沉淀 V8 */}
           <Route path="agent-learning" element={<AgentLearning />} />
+          {/* M291-B：从反馈沉淀个性化推荐规则 V9 */}
+          <Route path="agent-rules" element={<AgentRules />} />
+          {/* M291-C：Doctor MUSE 个人经验沉淀闭环 V9 */}
+          <Route path="case-lesson" element={<CaseLesson />} />
+          {/* M291-D：跨角色经验复用与学习飞轮 V9 */}
+          <Route path="learning-flywheel" element={<LearningFlywheel />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
