@@ -1329,6 +1329,14 @@ const OrderSetCompliance = lazy(() => import('@/pages/order-set-compliance'));
 const TransferSummaryCompleteness = lazy(() => import('@/pages/transfer-summary-completeness'));
 // M315-D：护理交班质量 V13
 const NursingHandover = lazy(() => import('@/pages/nursing-handover'));
+// M316-A：出院随访依从性 V13
+const FollowUpAdherence = lazy(() => import('@/pages/follow-up-adherence'));
+// M316-B：慢病管理达标率 V13
+const ChronicDiseaseMgmt = lazy(() => import('@/pages/chronic-disease-mgmt'));
+// M316-C：健教材料推送统计 V13
+const HealthEducationPush = lazy(() => import('@/pages/health-education-push'));
+// M316-D：患者门户使用度 V13
+const PatientPortalUsage = lazy(() => import('@/pages/patient-portal-usage'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2599,6 +2607,14 @@ export default function AppRoutes() {
           <Route path="transfer-summary-completeness" element={<TransferSummaryCompleteness />} />
           {/* M315-D：护理交班质量 V13 */}
           <Route path="nursing-handover" element={<NursingHandover />} />
+          {/* M316-A：出院随访依从性 V13 */}
+          <Route path="follow-up-adherence" element={<FollowUpAdherence />} />
+          {/* M316-B：慢病管理达标率 V13 */}
+          <Route path="chronic-disease-mgmt" element={<ChronicDiseaseMgmt />} />
+          {/* M316-C：健教材料推送统计 V13 */}
+          <Route path="health-education-push" element={<HealthEducationPush />} />
+          {/* M316-D：患者门户使用度 V13 */}
+          <Route path="patient-portal-usage" element={<PatientPortalUsage />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

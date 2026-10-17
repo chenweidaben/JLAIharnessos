@@ -1513,6 +1513,14 @@ import { orderSetComplianceV13Routes } from './routes/orderSetComplianceV13';
 import { transferSummaryCompletenessV13Routes } from './routes/transferSummaryCompletenessV13';
 // M315-D：护理交班质量 V13 GET /api/v1/nursing-handover
 import { nursingHandoverV13Routes } from './routes/nursingHandoverV13';
+// M316-A：出院随访依从性 V13 GET /api/v1/follow-up-adherence
+import { followUpAdherenceV13Routes } from './routes/followUpAdherenceV13';
+// M316-B：慢病管理达标率 V13 GET /api/v1/chronic-disease-mgmt
+import { chronicDiseaseMgmtV13Routes } from './routes/chronicDiseaseMgmtV13';
+// M316-C：健教材料推送统计 V13 GET /api/v1/health-education-push
+import { healthEducationPushV13Routes } from './routes/healthEducationPushV13';
+// M316-D：患者门户使用度 V13 GET /api/v1/patient-portal-usage
+import { patientPortalUsageV13Routes } from './routes/patientPortalUsageV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2512,6 +2520,10 @@ const allRoutes: RouteDef[] = [
   ...orderSetComplianceV13Routes, // M315-B：医嘱套餐规范 V13 GET /api/v1/order-set-compliance
   ...transferSummaryCompletenessV13Routes, // M315-C：转科交接单完整度评分 V13 GET /api/v1/transfer-summary-completeness
   ...nursingHandoverV13Routes, // M315-D：护理交班质量 V13 GET /api/v1/nursing-handover
+  ...followUpAdherenceV13Routes, // M316-A：出院随访依从性 V13 GET /api/v1/follow-up-adherence
+  ...chronicDiseaseMgmtV13Routes, // M316-B：慢病管理达标率 V13 GET /api/v1/chronic-disease-mgmt
+  ...healthEducationPushV13Routes, // M316-C：健教材料推送统计 V13 GET /api/v1/health-education-push
+  ...patientPortalUsageV13Routes, // M316-D：患者门户使用度 V13 GET /api/v1/patient-portal-usage
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
