@@ -1028,6 +1028,8 @@ const SupplyForecast = lazy(() => import('@/pages/supply-forecast'));
 const StaffSchedule = lazy(() => import('@/pages/staff-schedule'));
 // M278-A：卫生健康统计与医改监测上报 V5
 const ReportingStats = lazy(() => import('@/pages/reporting-stats'));
+// M278-B：医保智能监管与 DRG/DIP 上报 V5
+const InsuranceReport = lazy(() => import('@/pages/insurance-report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1996,6 +1998,8 @@ export default function AppRoutes() {
           <Route path="staff-schedule" element={<StaffSchedule />} />
           {/* M278-A：卫生健康统计与医改监测上报 V5 */}
           <Route path="reporting-stats" element={<ReportingStats />} />
+          {/* M278-B：医保智能监管与 DRG/DIP 上报 V5 */}
+          <Route path="insurance-report" element={<InsuranceReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
