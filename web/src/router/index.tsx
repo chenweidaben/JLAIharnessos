@@ -1385,6 +1385,14 @@ const PatientSafetyOverview = lazy(() => import('@/pages/patient-safety-overview
 const StaffSatisfaction = lazy(() => import('@/pages/staff-satisfaction'));
 // M322-D：医院运营效率 V13
 const HospitalEfficiency = lazy(() => import('@/pages/hospital-efficiency'));
+// M323-A：电子病历五级评级自评 V13
+const Emr5Level = lazy(() => import('@/pages/emr5-level'));
+// M323-B：互联互通四甲自评 V13
+const Intercon4Level = lazy(() => import('@/pages/intercon4-level'));
+// M323-C：智慧医院评级自评 V13
+const SmartHospitalRating = lazy(() => import('@/pages/smart-hospital-rating'));
+// M323-D：数据治理成熟度 V13
+const DataGovernanceMaturity = lazy(() => import('@/pages/data-governance-maturity'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2711,6 +2719,14 @@ export default function AppRoutes() {
           <Route path="staff-satisfaction" element={<StaffSatisfaction />} />
           {/* M322-D：医院运营效率 V13 */}
           <Route path="hospital-efficiency" element={<HospitalEfficiency />} />
+          {/* M323-A：电子病历五级评级自评 V13 */}
+          <Route path="emr5-level" element={<Emr5Level />} />
+          {/* M323-B：互联互通四甲自评 V13 */}
+          <Route path="intercon4-level" element={<Intercon4Level />} />
+          {/* M323-C：智慧医院评级自评 V13 */}
+          <Route path="smart-hospital-rating" element={<SmartHospitalRating />} />
+          {/* M323-D：数据治理成熟度 V13 */}
+          <Route path="data-governance-maturity" element={<DataGovernanceMaturity />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

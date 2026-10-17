@@ -1569,6 +1569,14 @@ import { patientSafetyV13Routes } from './routes/patientSafetyV13';
 import { staffSatisfactionV13Routes } from './routes/staffSatisfactionV13';
 // M322-D：医院运营效率 V13 GET /api/v1/hospital-efficiency
 import { hospitalEfficiencyV13Routes } from './routes/hospitalEfficiencyV13';
+// M323-A：电子病历五级评级自评 V13 GET /api/v1/emr5-level
+import { emr5LevelV13Routes } from './routes/emr5LevelV13';
+// M323-B：互联互通四甲自评 V13 GET /api/v1/intercon4-level
+import { intercon4LevelV13Routes } from './routes/intercon4LevelV13';
+// M323-C：智慧医院评级自评 V13 GET /api/v1/smart-hospital-rating
+import { smartHospitalRatingV13Routes } from './routes/smartHospitalRatingV13';
+// M323-D：数据治理成熟度 V13 GET /api/v1/data-governance-maturity
+import { dataGovernanceV13Routes } from './routes/dataGovernanceV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2596,6 +2604,10 @@ const allRoutes: RouteDef[] = [
   ...patientSafetyV13Routes, // M322-B：患者安全事件总览 V13 GET /api/v1/patient-safety-overview
   ...staffSatisfactionV13Routes, // M322-C：员工满意度 V13 GET /api/v1/staff-satisfaction
   ...hospitalEfficiencyV13Routes, // M322-D：医院运营效率 V13 GET /api/v1/hospital-efficiency
+  ...emr5LevelV13Routes, // M323-A：电子病历五级评级自评 V13 GET /api/v1/emr5-level
+  ...intercon4LevelV13Routes, // M323-B：互联互通四甲自评 V13 GET /api/v1/intercon4-level
+  ...smartHospitalRatingV13Routes, // M323-C：智慧医院评级自评 V13 GET /api/v1/smart-hospital-rating
+  ...dataGovernanceV13Routes, // M323-D：数据治理成熟度 V13 GET /api/v1/data-governance-maturity
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
