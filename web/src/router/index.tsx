@@ -1092,6 +1092,12 @@ const MuseAb = lazy(() => import('@/pages/muse-ab'));
 const MuseRoi = lazy(() => import('@/pages/muse-roi'));
 // M286-A：全链路监控与告警 V5
 const OpsMonitoring = lazy(() => import('@/pages/ops-monitoring'));
+// M286-B：灰度发布与回滚 V5
+const OpsRelease = lazy(() => import('@/pages/ops-release'));
+// M286-C：性能与容量压测 V5
+const OpsPerf = lazy(() => import('@/pages/ops-perf'));
+// M286-D：灾备与高可用 V5
+const OpsDr = lazy(() => import('@/pages/ops-dr'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2124,6 +2130,12 @@ export default function AppRoutes() {
           <Route path="muse-roi" element={<MuseRoi />} />
           {/* M286-A：全链路监控与告警 V5 */}
           <Route path="ops-monitoring" element={<OpsMonitoring />} />
+          {/* M286-B：灰度发布与回滚 V5 */}
+          <Route path="ops-release" element={<OpsRelease />} />
+          {/* M286-C：性能与容量压测 V5 */}
+          <Route path="ops-perf" element={<OpsPerf />} />
+          {/* M286-D：灾备与高可用 V5 */}
+          <Route path="ops-dr" element={<OpsDr />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
