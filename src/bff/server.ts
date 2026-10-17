@@ -2311,6 +2311,14 @@ import { medicalImagingDetailV13Routes } from './routes/medicalImagingDetailV13'
 import { pathologyMgmtV13Routes } from './routes/pathologyMgmtV13';
 // M415-D：营养管理 V13 GET /api/v1/nutrition-mgmt（M415 收官）
 import { nutritionMgmtV13Routes } from './routes/nutritionMgmtV13';
+// M416-A：ICU 管理 V13 GET /api/v1/icu-mgmt
+import { icuMgmtV13Routes } from './routes/icuMgmtV13';
+// M416-B：急诊管理 V13 GET /api/v1/er-mgmt
+import { erMgmtV13Routes } from './routes/erMgmtV13';
+// M416-C：门诊管理（细节）V13 GET /api/v1/outpatient-mgmt-detail（detail 避让旧版 outpatientWait/appointment/referral/chronicDisease）
+import { outpatientMgmtDetailV13Routes } from './routes/outpatientMgmtDetailV13';
+// M416-D：住院管理（细节）V13 GET /api/v1/inpatient-mgmt-detail（M416 收官，detail 避让旧版 inpatientBedMgmtV13）
+import { inpatientMgmtDetailV13Routes } from './routes/inpatientMgmtDetailV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3709,6 +3717,10 @@ const allRoutes: RouteDef[] = [
   ...medicalImagingDetailV13Routes, // M415-B：医学影像管理（细节）V13 GET /api/v1/medical-imaging-detail（detail 避让旧版 imagingTurnaroundV13）
   ...pathologyMgmtV13Routes, // M415-C：病理管理 V13 GET /api/v1/pathology-mgmt
   ...nutritionMgmtV13Routes, // M415-D：营养管理 V13 GET /api/v1/nutrition-mgmt（M415 收官）
+  ...icuMgmtV13Routes, // M416-A：ICU 管理 V13 GET /api/v1/icu-mgmt
+  ...erMgmtV13Routes, // M416-B：急诊管理 V13 GET /api/v1/er-mgmt
+  ...outpatientMgmtDetailV13Routes, // M416-C：门诊管理（细节）V13 GET /api/v1/outpatient-mgmt-detail（detail 避让旧版 outpatientWait/appointment/referral/chronicDisease）
+  ...inpatientMgmtDetailV13Routes, // M416-D：住院管理（细节）V13 GET /api/v1/inpatient-mgmt-detail（M416 收官，detail 避让旧版 inpatientBedMgmtV13）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
