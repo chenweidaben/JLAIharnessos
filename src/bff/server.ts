@@ -2041,6 +2041,14 @@ import { financeDetailV13Routes } from './routes/financeDetailV13';
 import { patientFlowDetailV13Routes } from './routes/patientFlowDetailV13';
 // M381-D：资源利用明细 V13 GET /api/v1/resource-util-detail（M381 收官）
 import { resourceUtilDetailV13Routes } from './routes/resourceUtilDetailV13';
+// M382-A：医保申报 V13 GET /api/v1/insurance-claim
+import { insuranceClaimV13Routes } from './routes/insuranceClaimV13';
+// M382-B：医保审核统计 V13 GET /api/v1/insurance-audit-stats（stats 避让）
+import { insuranceAuditStatsV13Routes } from './routes/insuranceAuditStatsV13';
+// M382-C：DRG分组统计 V13 GET /api/v1/drg-group-stats（stats 避让）
+import { DRGgroupStatsV13Routes } from './routes/DRGgroupStatsV13';
+// M382-D：价格监控 V13 GET /api/v1/price-monitor（M382 收官）
+import { priceMonitorV13Routes } from './routes/priceMonitorV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3304,6 +3312,10 @@ const allRoutes: RouteDef[] = [
   ...financeDetailV13Routes, // M381-B：财务明细 V13 GET /api/v1/finance-detail
   ...patientFlowDetailV13Routes, // M381-C：患者流明细 V13 GET /api/v1/patient-flow-detail
   ...resourceUtilDetailV13Routes, // M381-D：资源利用明细 V13 GET /api/v1/resource-util-detail（M381 收官）
+  ...insuranceClaimV13Routes, // M382-A：医保申报 V13 GET /api/v1/insurance-claim
+  ...insuranceAuditStatsV13Routes, // M382-B：医保审核统计 V13 GET /api/v1/insurance-audit-stats（stats 避让）
+  ...DRGgroupStatsV13Routes, // M382-C：DRG分组统计 V13 GET /api/v1/drg-group-stats（stats 避让）
+  ...priceMonitorV13Routes, // M382-D：价格监控 V13 GET /api/v1/price-monitor（M382 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

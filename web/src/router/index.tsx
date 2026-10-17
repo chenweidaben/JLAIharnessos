@@ -1857,6 +1857,14 @@ const FinanceDetail = lazy(() => import('@/pages/finance-detail'));
 const PatientFlowDetail = lazy(() => import('@/pages/patient-flow-detail'));
 // M381-D：资源利用明细 V13（M381 收官）
 const ResourceUtilDetail = lazy(() => import('@/pages/resource-util-detail'));
+// M382-A：医保申报 V13
+const InsuranceClaim = lazy(() => import('@/pages/insurance-claim'));
+// M382-B：医保审核统计 V13（stats 避让）
+const InsuranceAuditStats = lazy(() => import('@/pages/insurance-audit-stats'));
+// M382-C：DRG分组统计 V13（stats 避让）
+const DRGGroupStats = lazy(() => import('@/pages/drg-group-stats'));
+// M382-D：价格监控 V13（M382 收官）
+const PriceMonitor = lazy(() => import('@/pages/price-monitor'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3655,6 +3663,14 @@ export default function AppRoutes() {
           <Route path="patient-flow-detail" element={<PatientFlowDetail />} />
           {/* M381-D：资源利用明细 V13（M381 收官） */}
           <Route path="resource-util-detail" element={<ResourceUtilDetail />} />
+          {/* M382-A：医保申报 V13 */}
+          <Route path="insurance-claim" element={<InsuranceClaim />} />
+          {/* M382-B：医保审核统计 V13（stats 避让） */}
+          <Route path="insurance-audit-stats" element={<InsuranceAuditStats />} />
+          {/* M382-C：DRG分组统计 V13（stats 避让） */}
+          <Route path="drg-group-stats" element={<DRGGroupStats />} />
+          {/* M382-D：价格监控 V13（M382 收官） */}
+          <Route path="price-monitor" element={<PriceMonitor />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
