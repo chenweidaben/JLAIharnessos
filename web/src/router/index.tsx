@@ -1417,6 +1417,14 @@ const PatientComplaint = lazy(() => import('@/pages/patient-complaint'));
 const PatientFollowUp = lazy(() => import('@/pages/patient-follow-up'));
 // M326-D：健教材料推送 V13
 const PatientEducationStats = lazy(() => import('@/pages/patient-education-stats'));
+// M327-A：临床研究项目 V13
+const ClinicalResearchOverview = lazy(() => import('@/pages/clinical-research-overview'));
+// M327-B：教学医院指标 V13
+const TeachingHospital = lazy(() => import('@/pages/teaching-hospital'));
+// M327-C：继续教育学分 V13
+const ContinuingEducation = lazy(() => import('@/pages/continuing-education'));
+// M327-D：医学文献检索 V13
+const MedicalLiterature = lazy(() => import('@/pages/medical-literature'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2775,6 +2783,14 @@ export default function AppRoutes() {
           <Route path="patient-follow-up" element={<PatientFollowUp />} />
           {/* M326-D：健教材料推送 V13 */}
           <Route path="patient-education-stats" element={<PatientEducationStats />} />
+          {/* M327-A：临床研究项目 V13 */}
+          <Route path="clinical-research-overview" element={<ClinicalResearchOverview />} />
+          {/* M327-B：教学医院指标 V13 */}
+          <Route path="teaching-hospital" element={<TeachingHospital />} />
+          {/* M327-C：继续教育学分 V13 */}
+          <Route path="continuing-education" element={<ContinuingEducation />} />
+          {/* M327-D：医学文献检索 V13 */}
+          <Route path="medical-literature" element={<MedicalLiterature />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

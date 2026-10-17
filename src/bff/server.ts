@@ -1601,6 +1601,14 @@ import { patientComplaintV13Routes } from './routes/patientComplaintV13';
 import { patientFollowUpV13Routes } from './routes/patientFollowUpV13';
 // M326-D：健教材料推送 V13 GET /api/v1/patient-education-stats
 import { patientEducationV13Routes } from './routes/patientEducationV13';
+// M327-A：临床研究项目 V13 GET /api/v1/clinical-research-overview
+import { clinicalResearchV13Routes } from './routes/clinicalResearchV13';
+// M327-B：教学医院指标 V13 GET /api/v1/teaching-hospital
+import { teachingHospitalV13Routes } from './routes/teachingHospitalV13';
+// M327-C：继续教育学分 V13 GET /api/v1/continuing-education
+import { continuingEducationV13Routes } from './routes/continuingEducationV13';
+// M327-D：医学文献检索 V13 GET /api/v1/medical-literature
+import { medicalLiteratureV13Routes } from './routes/medicalLiteratureV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2644,6 +2652,10 @@ const allRoutes: RouteDef[] = [
   ...patientComplaintV13Routes, // M326-B：患者投诉处理 V13 GET /api/v1/patient-complaint
   ...patientFollowUpV13Routes, // M326-C：随访完成率 V13 GET /api/v1/patient-follow-up
   ...patientEducationV13Routes, // M326-D：健教材料推送 V13 GET /api/v1/patient-education-stats
+  ...clinicalResearchV13Routes, // M327-A：临床研究项目 V13 GET /api/v1/clinical-research-overview
+  ...teachingHospitalV13Routes, // M327-B：教学医院指标 V13 GET /api/v1/teaching-hospital
+  ...continuingEducationV13Routes, // M327-C：继续教育学分 V13 GET /api/v1/continuing-education
+  ...medicalLiteratureV13Routes, // M327-D：医学文献检索 V13 GET /api/v1/medical-literature
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
