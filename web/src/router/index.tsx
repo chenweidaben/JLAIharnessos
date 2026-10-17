@@ -1601,6 +1601,14 @@ const NewbornCare = lazy(() => import('@/pages/newborn-care'));
 const PediatricCare = lazy(() => import('@/pages/pediatric-care'));
 // M349-D：预防接种 V13（M349 收官）
 const Immunization = lazy(() => import('@/pages/immunization'));
+// M350-A：中医服务 V13
+const TcmService = lazy(() => import('@/pages/tcm-service'));
+// M350-B：康复医学 V13（stats 避让已有 rehabilitationV5/report-v2）
+const RehabilitationStats = lazy(() => import('@/pages/rehabilitation-stats'));
+// M350-C：老年综合评估 V13
+const GeriatricComprehensive = lazy(() => import('@/pages/geriatric-comprehensive'));
+// M350-D：安宁疗护 V13（M350 收官）
+const PalliativeCare = lazy(() => import('@/pages/palliative-care'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3143,6 +3151,14 @@ export default function AppRoutes() {
           <Route path="pediatric-care" element={<PediatricCare />} />
           {/* M349-D：预防接种 V13（M349 收官） */}
           <Route path="immunization" element={<Immunization />} />
+          {/* M350-A：中医服务 V13 */}
+          <Route path="tcm-service" element={<TcmService />} />
+          {/* M350-B：康复医学 V13（stats 避让已有 rehabilitationV5/report-v2） */}
+          <Route path="rehabilitation-stats" element={<RehabilitationStats />} />
+          {/* M350-C：老年综合评估 V13 */}
+          <Route path="geriatric-comprehensive" element={<GeriatricComprehensive />} />
+          {/* M350-D：安宁疗护 V13（M350 收官） */}
+          <Route path="palliative-care" element={<PalliativeCare />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
