@@ -519,7 +519,7 @@ const Informatization = lazy(() => import('@/pages/informatization/report'));
 // M213-D：文化品牌
 const CultureBrand = lazy(() => import('@/pages/culture-brand/report'));
 // M214-A：互联网医院 V2
-const InternetHospitalV2 = lazy(() => import('@/pages/internet-hospital/report-v2'));
+const InternetHospitalReportV2 = lazy(() => import('@/pages/internet-hospital/report-v2'));
 // M214-B：远程医疗 V2
 const TelemedicineV2 = lazy(() => import('@/pages/telemedicine/report-v2'));
 // M214-C：移动医疗 V2
@@ -635,7 +635,7 @@ const AdministrationV2 = lazy(() => import('@/pages/administration/report-v2'));
 // M228-D：工会群团 V2
 const UnionV2 = lazy(() => import('@/pages/union/report-v2'));
 // M229-A：应急管理 V2
-const EmergencyMgmtV2 = lazy(() => import('@/pages/emergency-mgmt/report-v2'));
+const EmergencyMgmtReportV2 = lazy(() => import('@/pages/emergency-mgmt/report-v2'));
 // M229-B：消防安保 V2
 const FireSecurityV2 = lazy(() => import('@/pages/fire-security/report-v2'));
 // M229-C：特种设备与危化品
@@ -743,11 +743,11 @@ const DisciplineV3 = lazy(() => import('@/pages/discipline-v3/report'));
 // M242-B：人才队伍 V3
 const TalentV3 = lazy(() => import('@/pages/talent-v3/report'));
 // M242-C：科研创新 V3
-const ResearchV3 = lazy(() => import('@/pages/research-v3/report'));
+const ResearchV3Page = lazy(() => import('@/pages/research-v3/report'));
 // M242-D：教学培训 V3
 const TeachingV3 = lazy(() => import('@/pages/teaching-v3/report'));
 // M243-A：后勤保障 V3
-const LogisticsV3 = lazy(() => import('@/pages/logistics-v3/report'));
+const LogisticsV3Page = lazy(() => import('@/pages/logistics-v3/report'));
 // M243-B：设备耗材 V3
 const EquipmentSupplyV3 = lazy(() => import('@/pages/equipment-supply-v3/report'));
 // M243-C：安全保卫 V3
@@ -851,9 +851,8 @@ const PatientProfileV3 = lazy(() => import('@/pages/patient-profile-v3/report'))
 // M255-D：临床规则引擎 V3
 const ClinicalRuleEngineV3 = lazy(() => import('@/pages/clinical-rule-engine-v3/report'));
 // M256-A：患者安全 V3
-const PatientSafetyV3 = lazy(() => import('@/pages/patient-safety-v3/report'));
 // M256-B：院感控制 V3
-const InfectionControlV3 = lazy(() => import('@/pages/infection-control-v3/report'));
+const InfectionControlV3Page = lazy(() => import('@/pages/infection-control-v3/report'));
 // M256-C：病历质量 V3（里程碑 v5.00.0）
 const RecordQualityV3 = lazy(() => import('@/pages/record-quality-v3/report'));
 // M256-D：药品供应链 V3
@@ -1135,7 +1134,7 @@ const AgentRules = lazy(() => import('@/pages/agent-rules'));
 // M291-C：Doctor MUSE 个人经验沉淀闭环 V9
 const CaseLesson = lazy(() => import('@/pages/case-lesson'));
 // M291-D：跨角色经验复用与学习飞轮 V9
-const LearningFlywheel = lazy(() => import('@/pages/learning-flywheel'));
+const LearningFlywheelPage = lazy(() => import('@/pages/learning-flywheel'));
 // M292-A：失败案例根因复盘与防再发机制 V10
 const FailurePostmortem = lazy(() => import('@/pages/failure-postmortem'));
 // M292-B：成功案例蒸馏与最佳实践库 V10
@@ -1272,6 +1271,8 @@ const DeptTaskDetail = lazy(() => import('@/pages/dept-task-detail'));
 const DeptSop = lazy(() => import('@/pages/dept-sop'));
 // M308-D：科际协作与经验共享总览 V13
 const DeptCollabOverview = lazy(() => import('@/pages/dept-collab-overview'));
+// M308-D（新规格）：科室间任务协作总览 V13
+const DeptTaskCollab = lazy(() => import('@/pages/dept-task-collab'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1731,7 +1732,7 @@ export default function AppRoutes() {
           {/* M213-D：文化品牌 */}
           <Route path="culture-brand/report" element={<CultureBrand />} />
           {/* M214-A：互联网医院 V2 */}
-          <Route path="internet-hospital/report-v2" element={<InternetHospitalV2 />} />
+          <Route path="internet-hospital/report-v2" element={<InternetHospitalReportV2 />} />
           {/* M214-B：远程医疗 V2 */}
           <Route path="telemedicine/report-v2" element={<TelemedicineV2 />} />
           {/* M214-C：移动医疗 V2 */}
@@ -1847,7 +1848,7 @@ export default function AppRoutes() {
           {/* M228-D：工会群团 V2 */}
           <Route path="union/report-v2" element={<UnionV2 />} />
           {/* M229-A：应急管理 V2 */}
-          <Route path="emergency-mgmt/report-v2" element={<EmergencyMgmtV2 />} />
+          <Route path="emergency-mgmt/report-v2" element={<EmergencyMgmtReportV2 />} />
           {/* M229-B：消防安保 V2 */}
           <Route path="fire-security/report-v2" element={<FireSecurityV2 />} />
           {/* M229-C：特种设备与危化品 */}
@@ -1955,11 +1956,11 @@ export default function AppRoutes() {
           {/* M242-B：人才队伍 V3 */}
           <Route path="talent-v3/report" element={<TalentV3 />} />
           {/* M242-C：科研创新 V3 */}
-          <Route path="research-v3/report" element={<ResearchV3 />} />
+          <Route path="research-v3/report" element={<ResearchV3Page />} />
           {/* M242-D：教学培训 V3 */}
           <Route path="teaching-v3/report" element={<TeachingV3 />} />
           {/* M243-A：后勤保障 V3 */}
-          <Route path="logistics-v3/report" element={<LogisticsV3 />} />
+          <Route path="logistics-v3/report" element={<LogisticsV3Page />} />
           {/* M243-B：设备耗材 V3 */}
           <Route path="equipment-supply-v3/report" element={<EquipmentSupplyV3 />} />
           {/* M243-C：安全保卫 V3 */}
@@ -2065,7 +2066,7 @@ export default function AppRoutes() {
           {/* M256-A：患者安全 V3 */}
           <Route path="patient-safety-v3/report" element={<PatientSafetyV3 />} />
           {/* M256-B：院感控制 V3 */}
-          <Route path="infection-control-v3/report" element={<InfectionControlV3 />} />
+          <Route path="infection-control-v3/report" element={<InfectionControlV3Page />} />
           {/* M256-C：病历质量 V3（里程碑 v5.00.0） */}
           <Route path="record-quality-v3/report" element={<RecordQualityV3 />} />
           {/* M256-D：药品供应链 V3 */}
@@ -2347,7 +2348,7 @@ export default function AppRoutes() {
           {/* M291-C：Doctor MUSE 个人经验沉淀闭环 V9 */}
           <Route path="case-lesson" element={<CaseLesson />} />
           {/* M291-D：跨角色经验复用与学习飞轮 V9 */}
-          <Route path="learning-flywheel" element={<LearningFlywheel />} />
+          <Route path="learning-flywheel" element={<LearningFlywheelPage />} />
           {/* M292-A：失败案例根因复盘与防再发机制 V10 */}
           <Route path="failure-postmortem" element={<FailurePostmortem />} />
           {/* M292-B：成功案例蒸馏与最佳实践库 V10 */}
@@ -2484,6 +2485,8 @@ export default function AppRoutes() {
           <Route path="dept-sop" element={<DeptSop />} />
           {/* M308-D：科际协作与经验共享总览 V13 */}
           <Route path="dept-collab-overview" element={<DeptCollabOverview />} />
+          {/* M308-D（新规格）：科室间任务协作总览 V13 */}
+          <Route path="dept-task-collab" element={<DeptTaskCollab />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
