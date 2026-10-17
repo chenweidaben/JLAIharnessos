@@ -1197,6 +1197,8 @@ import { aiAdviceTraceV5Routes } from './routes/aiAdviceTraceV5';
 import { knowledgeIntakeV5Routes } from './routes/knowledgeIntakeV5';
 // M276-C：虚拟病例演练与团队复盘 POST/GET /api/v1/drill-case
 import { drillCaseV5Routes } from './routes/drillCaseV5';
+// M276-D：医生能力画像与个性化学习路径 GET/PUT /api/v1/competency-profile
+import { competencyProfileV5Routes } from './routes/competencyProfileV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2038,6 +2040,7 @@ const allRoutes: RouteDef[] = [
   ...aiAdviceTraceV5Routes, // M276-A：AI 建议全链路审计 POST/GET /api/v1/ai-advice-trace
   ...knowledgeIntakeV5Routes, // M276-B：新知识自动入库与指南更新监测 POST/GET/PUT /api/v1/knowledge-intake
   ...drillCaseV5Routes, // M276-C：虚拟病例演练与团队复盘 POST/GET /api/v1/drill-case
+  ...competencyProfileV5Routes, // M276-D：医生能力画像与个性化学习路径 GET/PUT /api/v1/competency-profile
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
