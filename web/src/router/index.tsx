@@ -1553,6 +1553,14 @@ const ContinuingEdu = lazy(() => import('@/pages/continuing-edu'));
 const ResearchProject = lazy(() => import('@/pages/research-project'));
 // M343-D：专利授权 V13
 const Patent = lazy(() => import('@/pages/patent'));
+// M344-A：核心系统可用率 V13
+const SystemAvailability = lazy(() => import('@/pages/system-availability'));
+// M344-B：信息安全事件 V13
+const SecurityIncident = lazy(() => import('@/pages/security-incident'));
+// M344-C：数据质量 V13
+const DataQuality = lazy(() => import('@/pages/data-quality'));
+// M344-D：API 调用量 V13
+const ApiCall = lazy(() => import('@/pages/api-call'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3047,6 +3055,15 @@ export default function AppRoutes() {
           <Route path="research-project" element={<ResearchProject />} />
           {/* M343-D：专利授权 V13 */}
           <Route path="patent" element={<Patent />} />
+          {/* M344-A：核心系统可用率 V13 */}
+          <Route path="system-availability" element={<SystemAvailability />} />
+          {/* M344-B：信息安全事件 V13 */}
+          <Route path="security-incident" element={<SecurityIncident />} />
+          {/* M344-C：数据质量 V13 */}
+          <Route path="data-quality" element={<DataQuality />} />
+          {/* M344-D：API 调用量 V13 */}
+          <Route path="api-call" element={<ApiCall />} />
+          {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
