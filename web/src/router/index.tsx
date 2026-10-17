@@ -1721,6 +1721,14 @@ const FinanceMgmt = lazy(() => import('@/pages/finance-mgmt'));
 const PatientFlow = lazy(() => import('@/pages/patient-flow'));
 // M364-D：资源利用 V13（M364 收官）
 const ResourceUtil = lazy(() => import('@/pages/resource-util'));
+// M365-A：患者满意度（得分）V13（score避让）
+const PatientSatisfactionScore = lazy(() => import('@/pages/patient-satisfaction-score'));
+// M365-B：投诉管理（统计）V13（stats避让）
+const ComplaintMgmtStats = lazy(() => import('@/pages/complaint-mgmt-stats'));
+// M365-C：服务态度 V13
+const ServiceAttitude = lazy(() => import('@/pages/service-attitude'));
+// M365-D：就医体验（等候时间）V13（M365 收官）
+const ExperienceWaitTime = lazy(() => import('@/pages/experience-wait-time'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3383,6 +3391,14 @@ export default function AppRoutes() {
           <Route path="patient-flow" element={<PatientFlow />} />
           {/* M364-D：资源利用 V13（M364 收官） */}
           <Route path="resource-util" element={<ResourceUtil />} />
+          {/* M365-A：患者满意度（得分）V13（score避让） */}
+          <Route path="patient-satisfaction-score" element={<PatientSatisfactionScore />} />
+          {/* M365-B：投诉管理（统计）V13（stats避让） */}
+          <Route path="complaint-mgmt-stats" element={<ComplaintMgmtStats />} />
+          {/* M365-C：服务态度 V13 */}
+          <Route path="service-attitude" element={<ServiceAttitude />} />
+          {/* M365-D：就医体验（等候时间）V13（M365 收官） */}
+          <Route path="experience-wait-time" element={<ExperienceWaitTime />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

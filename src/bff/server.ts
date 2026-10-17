@@ -1905,6 +1905,14 @@ import { financeMgmtV13Routes } from './routes/financeMgmtV13';
 import { patientFlowV13Routes } from './routes/patientFlowV13';
 // M364-D：资源利用 V13 GET /api/v1/resource-util（M364 收官）
 import { resourceUtilV13Routes } from './routes/resourceUtilV13';
+// M365-A：患者满意度（得分）V13 GET /api/v1/patient-satisfaction-score（score避让）
+import { patientSatisfactionScoreV13Routes } from './routes/patientSatisfactionScoreV13';
+// M365-B：投诉管理（统计）V13 GET /api/v1/complaint-mgmt-stats（stats避让）
+import { complaintMgmtStatsV13Routes } from './routes/complaintMgmtStatsV13';
+// M365-C：服务态度 V13 GET /api/v1/service-attitude
+import { serviceAttitudeV13Routes } from './routes/serviceAttitudeV13';
+// M365-D：就医体验（等候时间）V13 GET /api/v1/experience-wait-time（M365 收官）
+import { experienceWaitTimeV13Routes } from './routes/experienceWaitTimeV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3100,6 +3108,10 @@ const allRoutes: RouteDef[] = [
   ...financeMgmtV13Routes, // M364-B：财务管理 V13 GET /api/v1/finance-mgmt
   ...patientFlowV13Routes, // M364-C：患者流量 V13 GET /api/v1/patient-flow
   ...resourceUtilV13Routes, // M364-D：资源利用 V13 GET /api/v1/resource-util（M364 收官）
+  ...patientSatisfactionScoreV13Routes, // M365-A：患者满意度（得分）V13 GET /api/v1/patient-satisfaction-score（score避让）
+  ...complaintMgmtStatsV13Routes, // M365-B：投诉管理（统计）V13 GET /api/v1/complaint-mgmt-stats（stats避让）
+  ...serviceAttitudeV13Routes, // M365-C：服务态度 V13 GET /api/v1/service-attitude
+  ...experienceWaitTimeV13Routes, // M365-D：就医体验（等候时间）V13 GET /api/v1/experience-wait-time（M365 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
