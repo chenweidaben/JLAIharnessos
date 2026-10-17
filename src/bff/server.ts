@@ -1407,6 +1407,14 @@ import { pushSceneV13Routes } from './routes/pushSceneV13';
 import { pushQuotaV13Routes } from './routes/pushQuotaV13';
 // M302-D：推送效果与闭环总览 V13 GET /api/v1/push-effect-overview
 import { pushEffectOverviewV13Routes } from './routes/pushEffectOverviewV13';
+// M303-A：推送个人化学习 V13 GET /api/v1/doctor-preference
+import { doctorPreferenceV13Routes } from './routes/doctorPreferenceV13';
+// M303-B：相似医生协同推荐 V13 GET /api/v1/look-alike
+import { lookAlikeV13Routes } from './routes/lookAlikeV13';
+// M303-C：个人学习曲线 V13 GET /api/v1/learning-curve
+import { learningCurveV13Routes } from './routes/learningCurveV13';
+// M303-D：个人化学习效果总览 V13 GET /api/v1/personalized-learning-overview
+import { personalizedLearningOverviewV13Routes } from './routes/personalizedLearningOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2353,6 +2361,10 @@ const allRoutes: RouteDef[] = [
   ...pushSceneV13Routes, // M302-B：推送时机与场景触发 V13 GET /api/v1/push-scene
   ...pushQuotaV13Routes, // M302-C：推送频控与免打扰 V13 GET /api/v1/push-quota
   ...pushEffectOverviewV13Routes, // M302-D：推送效果与闭环总览 V13 GET /api/v1/push-effect-overview
+  ...doctorPreferenceV13Routes, // M303-A：推送个人化学习 V13 GET /api/v1/doctor-preference
+  ...lookAlikeV13Routes, // M303-B：相似医生协同推荐 V13 GET /api/v1/look-alike
+  ...learningCurveV13Routes, // M303-C：个人学习曲线 V13 GET /api/v1/learning-curve
+  ...personalizedLearningOverviewV13Routes, // M303-D：个人化学习效果总览 V13 GET /api/v1/personalized-learning-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

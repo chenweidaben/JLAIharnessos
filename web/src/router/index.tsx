@@ -1224,6 +1224,14 @@ const PushScene = lazy(() => import('@/pages/push-scene'));
 const PushQuota = lazy(() => import('@/pages/push-quota'));
 // M302-D：推送效果与闭环总览 V13
 const PushEffectOverview = lazy(() => import('@/pages/push-effect-overview'));
+// M303-A：推送个人化学习 V13
+const DoctorPreference = lazy(() => import('@/pages/doctor-preference'));
+// M303-B：相似医生协同推荐 V13
+const LookAlike = lazy(() => import('@/pages/look-alike'));
+// M303-C：个人学习曲线 V13
+const LearningCurve = lazy(() => import('@/pages/learning-curve'));
+// M303-D：个人化学习效果总览 V13
+const PersonalizedLearningOverview = lazy(() => import('@/pages/personalized-learning-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2388,6 +2396,14 @@ export default function AppRoutes() {
           <Route path="push-quota" element={<PushQuota />} />
           {/* M302-D：推送效果与闭环总览 V13 */}
           <Route path="push-effect-overview" element={<PushEffectOverview />} />
+          {/* M303-A：推送个人化学习 V13 */}
+          <Route path="doctor-preference" element={<DoctorPreference />} />
+          {/* M303-B：相似医生协同推荐 V13 */}
+          <Route path="look-alike" element={<LookAlike />} />
+          {/* M303-C：个人学习曲线 V13 */}
+          <Route path="learning-curve" element={<LearningCurve />} />
+          {/* M303-D：个人化学习效果总览 V13 */}
+          <Route path="personalized-learning-overview" element={<PersonalizedLearningOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
