@@ -1545,6 +1545,14 @@ const PathologyTurnaround = lazy(() => import('@/pages/pathology-turnaround'));
 const EndoscopyVolume = lazy(() => import('@/pages/endoscopy-volume'));
 // M342-D：超声检查量 V13
 const UltrasoundVolume = lazy(() => import('@/pages/ultrasound-volume'));
+// M343-A：住院医师规范化培训 V13
+const ResidentTraining = lazy(() => import('@/pages/resident-training'));
+// M343-B：继续医学教育 V13
+const ContinuingEdu = lazy(() => import('@/pages/continuing-edu'));
+// M343-C：科研项目 V13
+const ResearchProject = lazy(() => import('@/pages/research-project'));
+// M343-D：专利授权 V13
+const Patent = lazy(() => import('@/pages/patent'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3031,6 +3039,14 @@ export default function AppRoutes() {
           <Route path="endoscopy-volume" element={<EndoscopyVolume />} />
           {/* M342-D：超声检查量 V13 */}
           <Route path="ultrasound-volume" element={<UltrasoundVolume />} />
+          {/* M343-A：住院医师规范化培训 V13 */}
+          <Route path="resident-training" element={<ResidentTraining />} />
+          {/* M343-B：继续医学教育 V13 */}
+          <Route path="continuing-edu" element={<ContinuingEdu />} />
+          {/* M343-C：科研项目 V13 */}
+          <Route path="research-project" element={<ResearchProject />} />
+          {/* M343-D：专利授权 V13 */}
+          <Route path="patent" element={<Patent />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
