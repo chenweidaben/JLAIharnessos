@@ -1895,6 +1895,14 @@ const PatientExperienceStats = lazy(() => import('@/pages/patient-experience-sta
 const ServiceQuality = lazy(() => import('@/pages/service-quality'));
 // M386-D：临床路径统计 V13（stats 避让，M386 收官）
 const ClinicalPathwayStats = lazy(() => import('@/pages/clinical-pathway-stats'));
+// M387-A：核心制度落实 V13
+const CoreSystemCompliance = lazy(() => import('@/pages/core-system-compliance'));
+// M387-B：交接班管理 V13
+const HandoverMgmt = lazy(() => import('@/pages/handover-mgmt'));
+// M387-C：知情同意统计 V13（stats 避让）
+const InformedConsentStats = lazy(() => import('@/pages/informed-consent-stats'));
+// M387-D：不良事件上报 V13（M387 收官）
+const AdverseEventReport = lazy(() => import('@/pages/adverse-event-report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3731,6 +3739,14 @@ export default function AppRoutes() {
           <Route path="service-quality" element={<ServiceQuality />} />
           {/* M386-D：临床路径统计 V13（stats 避让，M386 收官） */}
           <Route path="clinical-pathway-stats" element={<ClinicalPathwayStats />} />
+          {/* M387-A：核心制度落实 V13 */}
+          <Route path="core-system-compliance" element={<CoreSystemCompliance />} />
+          {/* M387-B：交接班管理 V13 */}
+          <Route path="handover-mgmt" element={<HandoverMgmt />} />
+          {/* M387-C：知情同意统计 V13（stats 避让） */}
+          <Route path="informed-consent-stats" element={<InformedConsentStats />} />
+          {/* M387-D：不良事件上报 V13（M387 收官） */}
+          <Route path="adverse-event-report" element={<AdverseEventReport />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

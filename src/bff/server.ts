@@ -2079,6 +2079,14 @@ import { patientExperienceStatsV13Routes } from './routes/patientExperienceStats
 import { serviceQualityV13Routes } from './routes/serviceQualityV13';
 // M386-D：临床路径统计 V13 GET /api/v1/clinical-pathway-stats（stats 避让，M386 收官）
 import { clinicalPathwayStatsV13Routes } from './routes/clinicalPathwayStatsV13';
+// M387-A：核心制度落实 V13 GET /api/v1/core-system-compliance
+import { coreSystemComplianceV13Routes } from './routes/coreSystemComplianceV13';
+// M387-B：交接班管理 V13 GET /api/v1/handover-mgmt
+import { handoverMgmtV13Routes } from './routes/handoverMgmtV13';
+// M387-C：知情同意统计 V13 GET /api/v1/informed-consent-stats（stats 避让）
+import { informedConsentStatsV13Routes } from './routes/informedConsentStatsV13';
+// M387-D：不良事件上报 V13 GET /api/v1/adverse-event-report（M387 收官）
+import { adverseEventReportV13Routes } from './routes/adverseEventReportV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3361,6 +3369,10 @@ const allRoutes: RouteDef[] = [
   ...patientExperienceStatsV13Routes, // M386-A：患者体验统计 V13 GET /api/v1/patient-experience-stats（stats 避让）
   ...serviceQualityV13Routes, // M386-B：服务质量 V13 GET /api/v1/service-quality
   ...clinicalPathwayStatsV13Routes, // M386-D：临床路径统计 V13 GET /api/v1/clinical-pathway-stats（stats 避让，M386 收官）
+  ...coreSystemComplianceV13Routes, // M387-A：核心制度落实 V13 GET /api/v1/core-system-compliance
+  ...handoverMgmtV13Routes, // M387-B：交接班管理 V13 GET /api/v1/handover-mgmt
+  ...informedConsentStatsV13Routes, // M387-C：知情同意统计 V13 GET /api/v1/informed-consent-stats（stats 避让）
+  ...adverseEventReportV13Routes, // M387-D：不良事件上报 V13 GET /api/v1/adverse-event-report（M387 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
