@@ -1289,6 +1289,14 @@ const DeptBenchmark = lazy(() => import('@/pages/dept-benchmark'));
 const DoctorGrowthReport = lazy(() => import('@/pages/doctor-growth-report'));
 // M310-D：院长季度复盘报告 V13
 const QuarterlyReview = lazy(() => import('@/pages/quarterly-review'));
+// M311-A：患者满意度闭环 V13
+const PatientSatisfaction = lazy(() => import('@/pages/patient-satisfaction'));
+// M311-B：医护工作量与疲劳度监测 V13
+const StaffWorkload = lazy(() => import('@/pages/staff-workload'));
+// M311-C：不良事件根因分析 RCA 辅助 V13
+const QualityEventRca = lazy(() => import('@/pages/quality-event-rca'));
+// M311-D：院长指挥中心一屏总览 V13
+const DeanCommandCenter = lazy(() => import('@/pages/dean-command-center'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2519,6 +2527,14 @@ export default function AppRoutes() {
           <Route path="doctor-growth-report" element={<DoctorGrowthReport />} />
           {/* M310-D：院长季度复盘报告 V13 */}
           <Route path="quarterly-review" element={<QuarterlyReview />} />
+          {/* M311-A：患者满意度闭环 V13 */}
+          <Route path="patient-satisfaction" element={<PatientSatisfaction />} />
+          {/* M311-B：医护工作量与疲劳度监测 V13 */}
+          <Route path="staff-workload" element={<StaffWorkload />} />
+          {/* M311-C：不良事件根因分析 RCA 辅助 V13 */}
+          <Route path="quality-event-rca" element={<QualityEventRca />} />
+          {/* M311-D：院长指挥中心一屏总览 V13 */}
+          <Route path="dean-command-center" element={<DeanCommandCenter />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

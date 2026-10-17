@@ -1473,6 +1473,14 @@ import { deptBenchmarkV13Routes } from './routes/deptBenchmarkV13';
 import { doctorGrowthReportV13Routes } from './routes/doctorGrowthReportV13';
 // M310-D：院长季度复盘报告 V13 GET /api/v1/quarterly-review
 import { quarterlyReviewV13Routes } from './routes/quarterlyReviewV13';
+// M311-A：患者满意度闭环 V13 GET /api/v1/patient-satisfaction
+import { patientSatisfactionLoopV13Routes } from './routes/patientSatisfactionLoopV13';
+// M311-B：医护工作量与疲劳度监测 V13 GET /api/v1/staff-workload
+import { staffWorkloadV13Routes } from './routes/staffWorkloadV13';
+// M311-C：不良事件根因分析 RCA 辅助 V13 GET /api/v1/quality-event-rca
+import { qualityEventRcaV13Routes } from './routes/qualityEventRcaV13';
+// M311-D：院长指挥中心一屏总览 V13 GET /api/v1/dean-command-center
+import { deanCommandCenterV13Routes } from './routes/deanCommandCenterV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2452,6 +2460,10 @@ const allRoutes: RouteDef[] = [
   ...deptBenchmarkV13Routes, // M310-B：多科室横向对标 V13 GET /api/v1/dept-benchmark
   ...doctorGrowthReportV13Routes, // M310-C：医生个人月度成长报告 V13 GET /api/v1/doctor-growth-report
   ...quarterlyReviewV13Routes, // M310-D：院长季度复盘报告 V13 GET /api/v1/quarterly-review
+  ...patientSatisfactionLoopV13Routes, // M311-A：患者满意度闭环 V13 GET /api/v1/patient-satisfaction
+  ...staffWorkloadV13Routes, // M311-B：医护工作量与疲劳度监测 V13 GET /api/v1/staff-workload
+  ...qualityEventRcaV13Routes, // M311-C：不良事件根因分析 RCA 辅助 V13 GET /api/v1/quality-event-rca
+  ...deanCommandCenterV13Routes, // M311-D：院长指挥中心一屏总览 V13 GET /api/v1/dean-command-center
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
