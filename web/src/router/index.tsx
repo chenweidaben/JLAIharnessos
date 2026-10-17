@@ -1345,6 +1345,14 @@ const InpatientBedDayCost = lazy(() => import('@/pages/inpatient-bed-day-cost'))
 const ProcurementLeadTime = lazy(() => import('@/pages/procurement-lead-time'));
 // M317-D：人员流失率 V13
 const StaffTurnover = lazy(() => import('@/pages/staff-turnover'));
+// M318-A：病历书写及时性 V13
+const MedicalRecordTimeliness = lazy(() => import('@/pages/medical-record-timeliness'));
+// M318-B：处方点评合格率 V13
+const PrescriptionAudit = lazy(() => import('@/pages/prescription-audit'));
+// M318-C：手卫生依从性 V13
+const HandHygieneCompliance = lazy(() => import('@/pages/hand-hygiene-compliance'));
+// M318-D：数据访问审计异常 V13
+const DataAccessAudit = lazy(() => import('@/pages/data-access-audit'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2631,6 +2639,14 @@ export default function AppRoutes() {
           <Route path="procurement-lead-time" element={<ProcurementLeadTime />} />
           {/* M317-D：人员流失率 V13 */}
           <Route path="staff-turnover" element={<StaffTurnover />} />
+          {/* M318-A：病历书写及时性 V13 */}
+          <Route path="medical-record-timeliness" element={<MedicalRecordTimeliness />} />
+          {/* M318-B：处方点评合格率 V13 */}
+          <Route path="prescription-audit" element={<PrescriptionAudit />} />
+          {/* M318-C：手卫生依从性 V13 */}
+          <Route path="hand-hygiene-compliance" element={<HandHygieneCompliance />} />
+          {/* M318-D：数据访问审计异常 V13 */}
+          <Route path="data-access-audit" element={<DataAccessAudit />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

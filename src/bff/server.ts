@@ -1529,6 +1529,14 @@ import { inpatientBedDayCostV13Routes } from './routes/inpatientBedDayCostV13';
 import { procurementLeadTimeV13Routes } from './routes/procurementLeadTimeV13';
 // M317-D：人员流失率 V13 GET /api/v1/staff-turnover
 import { staffTurnoverV13Routes } from './routes/staffTurnoverV13';
+// M318-A：病历书写及时性 V13 GET /api/v1/medical-record-timeliness
+import { medicalRecordTimelinessV13Routes } from './routes/medicalRecordTimelinessV13';
+// M318-B：处方点评合格率 V13 GET /api/v1/prescription-audit
+import { prescriptionAuditV13Routes } from './routes/prescriptionAuditV13';
+// M318-C：手卫生依从性 V13 GET /api/v1/hand-hygiene-compliance
+import { handHygieneComplianceV13Routes } from './routes/handHygieneComplianceV13';
+// M318-D：数据访问审计异常 V13 GET /api/v1/data-access-audit
+import { dataAccessAuditV13Routes } from './routes/dataAccessAuditV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2536,6 +2544,10 @@ const allRoutes: RouteDef[] = [
   ...inpatientBedDayCostV13Routes, // M317-B：住院床日成本 V13 GET /api/v1/inpatient-bed-day-cost
   ...procurementLeadTimeV13Routes, // M317-C：采购周期预警 V13 GET /api/v1/procurement-lead-time
   ...staffTurnoverV13Routes, // M317-D：人员流失率 V13 GET /api/v1/staff-turnover
+  ...medicalRecordTimelinessV13Routes, // M318-A：病历书写及时性 V13 GET /api/v1/medical-record-timeliness
+  ...prescriptionAuditV13Routes, // M318-B：处方点评合格率 V13 GET /api/v1/prescription-audit
+  ...handHygieneComplianceV13Routes, // M318-C：手卫生依从性 V13 GET /api/v1/hand-hygiene-compliance
+  ...dataAccessAuditV13Routes, // M318-D：数据访问审计异常 V13 GET /api/v1/data-access-audit
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
