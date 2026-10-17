@@ -1046,6 +1046,8 @@ const EnergyCarbon = lazy(() => import('@/pages/energy-carbon'));
 const ModelRouter = lazy(() => import('@/pages/model-router'));
 // M280-B：Prompt 工程与模板治理 V5
 const PromptGovernance = lazy(() => import('@/pages/prompt-governance'));
+// M280-C：RAG 知识库检索优化 V5
+const RagTuning = lazy(() => import('@/pages/rag-tuning'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2032,6 +2034,8 @@ export default function AppRoutes() {
           <Route path="model-router" element={<ModelRouter />} />
           {/* M280-B：Prompt 工程与模板治理 V5 */}
           <Route path="prompt-governance" element={<PromptGovernance />} />
+          {/* M280-C：RAG 知识库检索优化 V5 */}
+          <Route path="rag-tuning" element={<RagTuning />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
