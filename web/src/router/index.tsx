@@ -2039,6 +2039,14 @@ const ConsultationMgmt = lazy(() => import('@/pages/consultation-mgmt'));
 const CaseDiscussion = lazy(() => import('@/pages/case-discussion'));
 // M404-D：分级护理 V13（M404 收官）
 const GradeNursing = lazy(() => import('@/pages/grade-nursing'));
+// M405-A：护理文书质量 V13
+const NursingRecordQuality = lazy(() => import('@/pages/nursing-record-quality'));
+// M405-B：护患沟通 V13
+const NursingCommunication = lazy(() => import('@/pages/nursing-communication'));
+// M405-C：护理管理明细 V13（避让旧版 nursing-management M376-D）
+const NursingManagementDetail = lazy(() => import('@/pages/nursing-management-detail'));
+// M405-D：护理服务明细 V13（M405 收官）
+const NursingServiceDetail = lazy(() => import('@/pages/nursing-service-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4019,6 +4027,14 @@ export default function AppRoutes() {
           <Route path="case-discussion" element={<CaseDiscussion />} />
           {/* M404-D：分级护理 V13（M404 收官） */}
           <Route path="grade-nursing" element={<GradeNursing />} />
+          {/* M405-A：护理文书质量 V13 */}
+          <Route path="nursing-record-quality" element={<NursingRecordQuality />} />
+          {/* M405-B：护患沟通 V13 */}
+          <Route path="nursing-communication" element={<NursingCommunication />} />
+          {/* M405-C：护理管理明细 V13（避让旧版 nursing-management M376-D） */}
+          <Route path="nursing-management-detail" element={<NursingManagementDetail />} />
+          {/* M405-D：护理服务明细 V13（M405 收官） */}
+          <Route path="nursing-service-detail" element={<NursingServiceDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
