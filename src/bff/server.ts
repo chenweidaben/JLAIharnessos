@@ -1753,6 +1753,14 @@ import { revenueStructureStatsV13Routes } from './routes/revenueStructureStatsV1
 import { costControlV13Routes } from './routes/costControlV13';
 // M345-D：床位使用 V13 GET /api/v1/bed-occupancy
 import { bedOccupancyV13Routes } from './routes/bedOccupancyV13';
+// M346-A：员工流失率 V13 GET /api/v1/staff-turnover-stats（stats 避让已有 staffTurnoverV13）
+import { staffTurnoverStatsV13Routes } from './routes/staffTurnoverStatsV13';
+// M346-B：医师职称结构 V13 GET /api/v1/doctor-title-structure
+import { doctorTitleStructureV13Routes } from './routes/doctorTitleStructureV13';
+// M346-C：护患比 V13 GET /api/v1/nurse-patient-ratio
+import { nursePatientRatioV13Routes } from './routes/nursePatientRatioV13';
+// M346-D：员工培训学时 V13 GET /api/v1/staff-training-hours
+import { staffTrainingHoursV13Routes } from './routes/staffTrainingHoursV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2872,6 +2880,10 @@ const allRoutes: RouteDef[] = [
   ...revenueStructureStatsV13Routes, // M345-B：业务收入结构 V13 GET /api/v1/revenue-structure-stats
   ...costControlV13Routes, // M345-C：成本控制 V13 GET /api/v1/cost-control
   ...bedOccupancyV13Routes, // M345-D：床位使用 V13 GET /api/v1/bed-occupancy
+  ...staffTurnoverStatsV13Routes, // M346-A：员工流失率 V13 GET /api/v1/staff-turnover-stats
+  ...doctorTitleStructureV13Routes, // M346-B：医师职称结构 V13 GET /api/v1/doctor-title-structure
+  ...nursePatientRatioV13Routes, // M346-C：护患比 V13 GET /api/v1/nurse-patient-ratio
+  ...staffTrainingHoursV13Routes, // M346-D：员工培训学时 V13 GET /api/v1/staff-training-hours
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

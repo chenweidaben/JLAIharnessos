@@ -1569,6 +1569,14 @@ const RevenueStructureStats = lazy(() => import('@/pages/revenue-structure-stats
 const CostControl = lazy(() => import('@/pages/cost-control'));
 // M345-D：床位使用 V13
 const BedOccupancy = lazy(() => import('@/pages/bed-occupancy'));
+// M346-A：员工流失率 V13（stats 避让已有 staffTurnoverV13）
+const StaffTurnoverStats = lazy(() => import('@/pages/staff-turnover-stats'));
+// M346-B：医师职称结构 V13
+const DoctorTitleStructure = lazy(() => import('@/pages/doctor-title-structure'));
+// M346-C：护患比 V13
+const NursePatientRatio = lazy(() => import('@/pages/nurse-patient-ratio'));
+// M346-D：员工培训学时 V13（M346 收官）
+const StaffTrainingHours = lazy(() => import('@/pages/staff-training-hours'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3079,6 +3087,14 @@ export default function AppRoutes() {
           <Route path="cost-control" element={<CostControl />} />
           {/* M345-D：床位使用 V13 */}
           <Route path="bed-occupancy" element={<BedOccupancy />} />
+          {/* M346-A：员工流失率 V13（stats 避让已有 staffTurnoverV13） */}
+          <Route path="staff-turnover-stats" element={<StaffTurnoverStats />} />
+          {/* M346-B：医师职称结构 V13 */}
+          <Route path="doctor-title-structure" element={<DoctorTitleStructure />} />
+          {/* M346-C：护患比 V13 */}
+          <Route path="nurse-patient-ratio" element={<NursePatientRatio />} />
+          {/* M346-D：员工培训学时 V13（M346 收官） */}
+          <Route path="staff-training-hours" element={<StaffTrainingHours />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
