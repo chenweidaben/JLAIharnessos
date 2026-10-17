@@ -1649,6 +1649,14 @@ const ClinicalResearchStats = lazy(() => import('@/pages/clinical-research-stats
 const TeachingWorkload = lazy(() => import('@/pages/teaching-workload'));
 // M355-D：医联体与分级诊疗 V13（M355 收官）
 const MedicalAlliance = lazy(() => import('@/pages/medical-alliance'));
+// M356-A：DRG 绩效 V13
+const DrgPerformance = lazy(() => import('@/pages/drg-performance'));
+// M356-B：DIP 病种分值 V13
+const DipScore = lazy(() => import('@/pages/dip-score'));
+// M356-C：药耗占比 V13
+const DrugConsumableRatio = lazy(() => import('@/pages/drug-consumable-ratio'));
+// M356-D：收入结构（支出端） V13（expense 避让已有 revenueStructureV13 / revenueStructureStatsV13，M356 收官）
+const ExpenseStructure = lazy(() => import('@/pages/expense-structure'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3239,6 +3247,14 @@ export default function AppRoutes() {
           <Route path="teaching-workload" element={<TeachingWorkload />} />
           {/* M355-D：医联体与分级诊疗 V13（M355 收官） */}
           <Route path="medical-alliance" element={<MedicalAlliance />} />
+          {/* M356-A：DRG 绩效 V13 */}
+          <Route path="drg-performance" element={<DrgPerformance />} />
+          {/* M356-B：DIP 病种分值 V13 */}
+          <Route path="dip-score" element={<DipScore />} />
+          {/* M356-C：药耗占比 V13 */}
+          <Route path="drug-consumable-ratio" element={<DrugConsumableRatio />} />
+          {/* M356-D：收入结构（支出端） V13（expense 避让已有 revenueStructureV13 / revenueStructureStatsV13，M356 收官） */}
+          <Route path="expense-structure" element={<ExpenseStructure />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
