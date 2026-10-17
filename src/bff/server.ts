@@ -1343,6 +1343,14 @@ import { retrainTaskV12Routes } from './routes/retrainTaskV12';
 import { agentHealthV12Routes } from './routes/agentHealthV12';
 // M294-D：反馈闭环总览 V12 GET /api/v1/feedback-loop-dashboard
 import { feedbackLoopDashboardV12Routes } from './routes/feedbackLoopDashboardV12';
+// M295-A：跨角色经验安全复用 V13 GET /api/v1/cross-role-experience
+import { crossRoleExperienceV13Routes } from './routes/crossRoleExperienceV13';
+// M295-B：经验推送频控与免打扰 V13 GET /api/v1/experience-push
+import { experiencePushV13Routes } from './routes/experiencePushV13';
+// M295-C：患者侧经验转健康提示 V13 GET /api/v1/patient-tips
+import { patientTipV13Routes } from './routes/patientTipV13';
+// M295-D：经验复用效果度量 V13 GET /api/v1/reuse-roi
+import { reuseRoiV13Routes } from './routes/reuseRoiV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2257,6 +2265,10 @@ const allRoutes: RouteDef[] = [
   ...retrainTaskV12Routes, // M294-B：低采纳率规则自动复训提示 V12 GET /api/v1/retrain-tasks
   ...agentHealthV12Routes, // M294-C：智能体健康度评分 V12 GET /api/v1/agent-health
   ...feedbackLoopDashboardV12Routes, // M294-D：反馈闭环总览 V12 GET /api/v1/feedback-loop-dashboard
+  ...crossRoleExperienceV13Routes, // M295-A：跨角色经验安全复用 V13 GET /api/v1/cross-role-experience
+  ...experiencePushV13Routes, // M295-B：经验推送频控与免打扰 V13 GET /api/v1/experience-push
+  ...patientTipV13Routes, // M295-C：患者侧经验转健康提示 V13 GET /api/v1/patient-tips
+  ...reuseRoiV13Routes, // M295-D：经验复用效果度量 V13 GET /api/v1/reuse-roi
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

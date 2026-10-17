@@ -1160,6 +1160,14 @@ const RetrainTasks = lazy(() => import('@/pages/retrain-tasks'));
 const AgentHealth = lazy(() => import('@/pages/agent-health'));
 // M294-D：反馈闭环总览 V12
 const FeedbackLoop = lazy(() => import('@/pages/feedback-loop'));
+// M295-A：跨角色经验安全复用 V13
+const CrossRoleExperience = lazy(() => import('@/pages/cross-role-experience'));
+// M295-B：经验推送频控与免打扰 V13
+const ExperiencePush = lazy(() => import('@/pages/experience-push'));
+// M295-C：患者侧经验转健康提示 V13
+const PatientTips = lazy(() => import('@/pages/patient-tips'));
+// M295-D：经验复用效果度量 V13
+const ReuseRoi = lazy(() => import('@/pages/reuse-roi'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2260,6 +2268,14 @@ export default function AppRoutes() {
           <Route path="agent-health" element={<AgentHealth />} />
           {/* M294-D：反馈闭环总览 V12 */}
           <Route path="feedback-loop" element={<FeedbackLoop />} />
+          {/* M295-A：跨角色经验安全复用 V13 */}
+          <Route path="cross-role-experience" element={<CrossRoleExperience />} />
+          {/* M295-B：经验推送频控与免打扰 V13 */}
+          <Route path="experience-push" element={<ExperiencePush />} />
+          {/* M295-C：患者侧经验转健康提示 V13 */}
+          <Route path="patient-tips" element={<PatientTips />} />
+          {/* M295-D：经验复用效果度量 V13 */}
+          <Route path="reuse-roi" element={<ReuseRoi />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
