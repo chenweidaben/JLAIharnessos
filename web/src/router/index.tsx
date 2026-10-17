@@ -1433,6 +1433,14 @@ const ConsumableInventory = lazy(() => import('@/pages/consumable-inventory'));
 const PharmacyInventory = lazy(() => import('@/pages/pharmacy-inventory'));
 // M328-D：血库库存 V13
 const BloodInventory = lazy(() => import('@/pages/blood-inventory'));
+// M329-A：医保对账 V13
+const BillingReconciliation = lazy(() => import('@/pages/billing-reconciliation'));
+// M329-B：单病种成本 V13
+const CostPerPatient = lazy(() => import('@/pages/cost-per-patient'));
+// M329-C：收入结构 V13
+const RevenueStructure = lazy(() => import('@/pages/revenue-structure'));
+// M329-D：医保结算 V13
+const InsuranceSettlement = lazy(() => import('@/pages/insurance-settlement'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2807,6 +2815,14 @@ export default function AppRoutes() {
           <Route path="pharmacy-inventory" element={<PharmacyInventory />} />
           {/* M328-D：血库库存 V13 */}
           <Route path="blood-inventory" element={<BloodInventory />} />
+          {/* M329-A：医保对账 V13 */}
+          <Route path="billing-reconciliation" element={<BillingReconciliation />} />
+          {/* M329-B：单病种成本 V13 */}
+          <Route path="cost-per-patient" element={<CostPerPatient />} />
+          {/* M329-C：收入结构 V13 */}
+          <Route path="revenue-structure" element={<RevenueStructure />} />
+          {/* M329-D：医保结算 V13 */}
+          <Route path="insurance-settlement" element={<InsuranceSettlement />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
