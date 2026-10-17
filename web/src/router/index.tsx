@@ -1967,6 +1967,14 @@ const GradeReview = lazy(() => import('@/pages/grade-review'));
 const QualityMgmtSystem = lazy(() => import('@/pages/quality-mgmt-system'));
 // M395-D：绩效管理 V13（M395 收官）
 const PerformanceMgmt = lazy(() => import('@/pages/performance-mgmt'));
+// M396-A：床位利用 V13
+const BedUtilization = lazy(() => import('@/pages/bed-utilization'));
+// M396-B：收入结构明细 V13（避让旧版 revenue-structure/revenue-structure-stats）
+const RevenueStructureDetail = lazy(() => import('@/pages/revenue-structure-detail'));
+// M396-C：成本控制明细 V13（避让旧版 cost-control/medical-cost-control）
+const CostControlDetail = lazy(() => import('@/pages/cost-control-detail'));
+// M396-D：效率指标 V13（M396 收官）
+const EfficiencyIndicator = lazy(() => import('@/pages/efficiency-indicator'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3875,6 +3883,14 @@ export default function AppRoutes() {
           <Route path="quality-mgmt-system" element={<QualityMgmtSystem />} />
           {/* M395-D：绩效管理 V13（M395 收官） */}
           <Route path="performance-mgmt" element={<PerformanceMgmt />} />
+          {/* M396-A：床位利用 V13 */}
+          <Route path="bed-utilization" element={<BedUtilization />} />
+          {/* M396-B：收入结构明细 V13（避让旧版 revenue-structure/revenue-structure-stats） */}
+          <Route path="revenue-structure-detail" element={<RevenueStructureDetail />} />
+          {/* M396-C：成本控制明细 V13（避让旧版 cost-control/medical-cost-control） */}
+          <Route path="cost-control-detail" element={<CostControlDetail />} />
+          {/* M396-D：效率指标 V13（M396 收官） */}
+          <Route path="efficiency-indicator" element={<EfficiencyIndicator />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
