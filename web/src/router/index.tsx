@@ -2135,6 +2135,14 @@ const ErMgmt = lazy(() => import('@/pages/er-mgmt'));
 const OutpatientMgmtDetail = lazy(() => import('@/pages/outpatient-mgmt-detail'));
 // M416-D：住院管理（细节）V13（M416 收官，detail 避让旧版 inpatientBedMgmtV13）
 const InpatientMgmtDetail = lazy(() => import('@/pages/inpatient-mgmt-detail'));
+// M417-A：血液透析管理 V13
+const DialysisMgmt = lazy(() => import('@/pages/dialysis-mgmt'));
+// M417-B：内镜管理 V13
+const EndoscopyMgmt = lazy(() => import('@/pages/endoscopy-mgmt'));
+// M417-C：手术室管理 V13
+const OperationRoomMgmt = lazy(() => import('@/pages/operation-room-mgmt'));
+// M417-D：病房管理（细节）V13（M417 收官，detail 避让旧版 inpatientBedMgmtV13）
+const WardMgmtDetail = lazy(() => import('@/pages/ward-mgmt-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4211,6 +4219,14 @@ export default function AppRoutes() {
           <Route path="outpatient-mgmt-detail" element={<OutpatientMgmtDetail />} />
           {/* M416-D：住院管理（细节）V13（M416 收官，detail 避让旧版 inpatientBedMgmtV13） */}
           <Route path="inpatient-mgmt-detail" element={<InpatientMgmtDetail />} />
+          {/* M417-A：血液透析管理 V13 */}
+          <Route path="dialysis-mgmt" element={<DialysisMgmt />} />
+          {/* M417-B：内镜管理 V13 */}
+          <Route path="endoscopy-mgmt" element={<EndoscopyMgmt />} />
+          {/* M417-C：手术室管理 V13 */}
+          <Route path="operation-room-mgmt" element={<OperationRoomMgmt />} />
+          {/* M417-D：病房管理（细节）V13（M417 收官，detail 避让旧版 inpatientBedMgmtV13） */}
+          <Route path="ward-mgmt-detail" element={<WardMgmtDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
