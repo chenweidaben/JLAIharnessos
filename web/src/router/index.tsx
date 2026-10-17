@@ -2207,6 +2207,14 @@ const HandoverCommunicationMgmt = lazy(() => import('@/pages/handover-communicat
 const ConsentMgmt = lazy(() => import('@/pages/consent-mgmt'));
 // M425-D：隐私保护管理 V13（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419））
 const PrivacyMgmt = lazy(() => import('@/pages/privacy-mgmt'));
+// M426-A：抢救记录管理 V13（换名避让旧版 rescueMgmtV13（M415））
+const RescueRecordMgmt = lazy(() => import('@/pages/rescue-record-mgmt'));
+// M426-B：麻醉记录管理 V13（换名避让旧版 anesthesiaComplicationV13（M339））
+const AnesthesiaRecordMgmt = lazy(() => import('@/pages/anesthesia-record-mgmt'));
+// M426-C：安全核查管理 V13（换名避让旧版 surgeryVolumeV13（M339））
+const SafetyCheckMgmt = lazy(() => import('@/pages/safety-check-mgmt'));
+// M426-D：病房环境管理 V13（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
+const WardEnvironmentMgmt = lazy(() => import('@/pages/ward-environment-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4355,6 +4363,14 @@ export default function AppRoutes() {
           <Route path="consent-mgmt" element={<ConsentMgmt />} />
           {/* M425-D：隐私保护管理 V13（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419）） */}
           <Route path="privacy-mgmt" element={<PrivacyMgmt />} />
+          {/* M426-A：抢救记录管理 V13（换名避让旧版 rescueMgmtV13（M415）） */}
+          <Route path="rescue-record-mgmt" element={<RescueRecordMgmt />} />
+          {/* M426-B：麻醉记录管理 V13（换名避让旧版 anesthesiaComplicationV13（M339）） */}
+          <Route path="anesthesia-record-mgmt" element={<AnesthesiaRecordMgmt />} />
+          {/* M426-C：安全核查管理 V13（换名避让旧版 surgeryVolumeV13（M339）） */}
+          <Route path="safety-check-mgmt" element={<SafetyCheckMgmt />} />
+          {/* M426-D：病房环境管理 V13（M426 收官，换名避让旧版 wardMgmtDetailV13（M417）） */}
+          <Route path="ward-environment-mgmt" element={<WardEnvironmentMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

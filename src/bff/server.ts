@@ -2391,6 +2391,14 @@ import { handoverCommunicationMgmtV13Routes } from './routes/handoverCommunicati
 import { consentMgmtV13Routes } from './routes/consentMgmtV13';
 // M425-D：隐私保护管理 V13 GET /api/v1/privacy-mgmt（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419））
 import { privacyMgmtV13Routes } from './routes/privacyMgmtV13';
+// M426-A：抢救记录管理 V13 GET /api/v1/rescue-record-mgmt（换名避让旧版 rescueMgmtV13（M415））
+import { rescueRecordMgmtV13Routes } from './routes/rescueRecordMgmtV13';
+// M426-B：麻醉记录管理 V13 GET /api/v1/anesthesia-record-mgmt（换名避让旧版 anesthesiaComplicationV13（M339））
+import { anesthesiaRecordMgmtV13Routes } from './routes/anesthesiaRecordMgmtV13';
+// M426-C：安全核查管理 V13 GET /api/v1/safety-check-mgmt（换名避让旧版 surgeryVolumeV13（M339））
+import { safetyCheckMgmtV13Routes } from './routes/safetyCheckMgmtV13';
+// M426-D：病房环境管理 V13 GET /api/v1/ward-environment-mgmt（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
+import { wardEnvironmentMgmtV13Routes } from './routes/wardEnvironmentMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3829,6 +3837,10 @@ const allRoutes: RouteDef[] = [
   ...handoverCommunicationMgmtV13Routes, // M425-B：交接班沟通管理 V13 GET /api/v1/handover-communication-mgmt（换名避让旧版 handoverDetailV13（M413））
   ...consentMgmtV13Routes, // M425-C：知情同意管理 V13 GET /api/v1/consent-mgmt（换名避让旧版 consentDetailV13（M413））
   ...privacyMgmtV13Routes, // M425-D：隐私保护管理 V13 GET /api/v1/privacy-mgmt（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419））
+  ...rescueRecordMgmtV13Routes, // M426-A：抢救记录管理 V13 GET /api/v1/rescue-record-mgmt（换名避让旧版 rescueMgmtV13（M415））
+  ...anesthesiaRecordMgmtV13Routes, // M426-B：麻醉记录管理 V13 GET /api/v1/anesthesia-record-mgmt（换名避让旧版 anesthesiaComplicationV13（M339））
+  ...safetyCheckMgmtV13Routes, // M426-C：安全核查管理 V13 GET /api/v1/safety-check-mgmt（换名避让旧版 surgeryVolumeV13（M339））
+  ...wardEnvironmentMgmtV13Routes, // M426-D：病房环境管理 V13 GET /api/v1/ward-environment-mgmt（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
