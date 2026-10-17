@@ -1673,6 +1673,14 @@ const PatientExperience = lazy(() => import('@/pages/patient-experience'));
 const NursingStaffing = lazy(() => import('@/pages/nursing-staffing'));
 // M358-D：护理文书管理 V13（M358 收官）
 const NursingDocument = lazy(() => import('@/pages/nursing-document'));
+// M359-A：药学服务 V13
+const PharmacyService = lazy(() => import('@/pages/pharmacy-service'));
+// M359-B：合理用药 V13（stats 避让已有 rationalDrugUse）
+const RationalDrugUseStats = lazy(() => import('@/pages/rational-drug-use-stats'));
+// M359-C：药品库存管理 V13（stats 避让已有 drugInventory）
+const DrugInventoryStats = lazy(() => import('@/pages/drug-inventory-stats'));
+// M359-D：输液管理 V13（M359 收官）
+const InfusionMgmt = lazy(() => import('@/pages/infusion-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3287,6 +3295,14 @@ export default function AppRoutes() {
           <Route path="nursing-staffing" element={<NursingStaffing />} />
           {/* M358-D：护理文书管理 V13（M358 收官） */}
           <Route path="nursing-document" element={<NursingDocument />} />
+          {/* M359-A：药学服务 V13 */}
+          <Route path="pharmacy-service" element={<PharmacyService />} />
+          {/* M359-B：合理用药 V13（stats 避让已有 rationalDrugUse） */}
+          <Route path="rational-drug-use-stats" element={<RationalDrugUseStats />} />
+          {/* M359-C：药品库存管理 V13（stats 避让已有 drugInventory） */}
+          <Route path="drug-inventory-stats" element={<DrugInventoryStats />} />
+          {/* M359-D：输液管理 V13（M359 收官） */}
+          <Route path="infusion-mgmt" element={<InfusionMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

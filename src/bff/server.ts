@@ -1857,6 +1857,14 @@ import { patientExperienceV13Routes } from './routes/patientExperienceV13';
 import { nursingStaffingV13Routes } from './routes/nursingStaffingV13';
 // M358-D：护理文书管理 V13 GET /api/v1/nursing-document（M358 收官）
 import { nursingDocumentV13Routes } from './routes/nursingDocumentV13';
+// M359-A：药学服务 V13 GET /api/v1/pharmacy-service
+import { pharmacyServiceV13Routes } from './routes/pharmacyServiceV13';
+// M359-B：合理用药 V13 GET /api/v1/rational-drug-use-stats（stats 避让已有 rationalDrugUse）
+import { rationalDrugUseStatsV13Routes } from './routes/rationalDrugUseStatsV13';
+// M359-C：药品库存管理 V13 GET /api/v1/drug-inventory-stats（stats 避让已有 drugInventory）
+import { drugInventoryStatsV13Routes } from './routes/drugInventoryStatsV13';
+// M359-D：输液管理 V13 GET /api/v1/infusion-mgmt（M359 收官）
+import { infusionMgmtV13Routes } from './routes/infusionMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3028,6 +3036,10 @@ const allRoutes: RouteDef[] = [
   ...patientExperienceV13Routes, // M358-B：患者体验 V13 GET /api/v1/patient-experience
   ...nursingStaffingV13Routes, // M358-C：护理人力配置 V13 GET /api/v1/nursing-staffing
   ...nursingDocumentV13Routes, // M358-D：护理文书管理 V13 GET /api/v1/nursing-document（M358 收官）
+  ...pharmacyServiceV13Routes, // M359-A：药学服务 V13 GET /api/v1/pharmacy-service
+  ...rationalDrugUseStatsV13Routes, // M359-B：合理用药 V13 GET /api/v1/rational-drug-use-stats（stats 避让已有 rationalDrugUse）
+  ...drugInventoryStatsV13Routes, // M359-C：药品库存管理 V13 GET /api/v1/drug-inventory-stats（stats 避让已有 drugInventory）
+  ...infusionMgmtV13Routes, // M359-D：输液管理 V13 GET /api/v1/infusion-mgmt（M359 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
