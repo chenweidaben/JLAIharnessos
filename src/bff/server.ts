@@ -1633,6 +1633,14 @@ import { nurseWorkloadV13Routes } from './routes/nurseWorkloadV13';
 import { staffTurnoverNetV13Routes } from './routes/staffTurnoverNetV13';
 // M330-D：培训时长 V13 GET /api/v1/training-hours
 import { trainingHoursV13Routes } from './routes/trainingHoursV13';
+// M331-A：病房床位使用率 V13 GET /api/v1/ward-occupancy
+import { wardOccupancyV13Routes } from './routes/wardOccupancyV13';
+// M331-B：手术室利用率 V13 GET /api/v1/operating-room
+import { operatingRoomV13Routes } from './routes/operatingRoomV13';
+// M331-C：电梯等候时间 V13 GET /api/v1/elevator-wait-time
+import { elevatorWaitTimeV13Routes } from './routes/elevatorWaitTimeV13';
+// M331-D：停车场使用率 V13 GET /api/v1/parking
+import { parkingV13Routes } from './routes/parkingV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2692,6 +2700,10 @@ const allRoutes: RouteDef[] = [
   ...nurseWorkloadV13Routes, // M330-B：护士工作量 V13 GET /api/v1/nurse-workload
   ...staffTurnoverNetV13Routes, // M330-C：员工净流失率 V13 GET /api/v1/staff-turnover-net
   ...trainingHoursV13Routes, // M330-D：培训时长 V13 GET /api/v1/training-hours
+  ...wardOccupancyV13Routes, // M331-A：病房床位使用率 V13 GET /api/v1/ward-occupancy
+  ...operatingRoomV13Routes, // M331-B：手术室利用率 V13 GET /api/v1/operating-room
+  ...elevatorWaitTimeV13Routes, // M331-C：电梯等候时间 V13 GET /api/v1/elevator-wait-time
+  ...parkingV13Routes, // M331-D：停车场使用率 V13 GET /api/v1/parking
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

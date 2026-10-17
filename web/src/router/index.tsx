@@ -1449,6 +1449,14 @@ const NurseWorkload = lazy(() => import('@/pages/nurse-workload'));
 const StaffTurnoverNet = lazy(() => import('@/pages/staff-turnover-net'));
 // M330-D：培训时长 V13
 const TrainingHours = lazy(() => import('@/pages/training-hours'));
+// M331-A：病房床位使用率 V13
+const WardOccupancy = lazy(() => import('@/pages/ward-occupancy'));
+// M331-B：手术室利用率 V13
+const OperatingRoom = lazy(() => import('@/pages/operating-room'));
+// M331-C：电梯等候时间 V13
+const ElevatorWaitTime = lazy(() => import('@/pages/elevator-wait-time'));
+// M331-D：停车场使用率 V13
+const Parking = lazy(() => import('@/pages/parking'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2839,6 +2847,14 @@ export default function AppRoutes() {
           <Route path="staff-turnover-net" element={<StaffTurnoverNet />} />
           {/* M330-D：培训时长 V13 */}
           <Route path="training-hours" element={<TrainingHours />} />
+          {/* M331-A：病房床位使用率 V13 */}
+          <Route path="ward-occupancy" element={<WardOccupancy />} />
+          {/* M331-B：手术室利用率 V13 */}
+          <Route path="operating-room" element={<OperatingRoom />} />
+          {/* M331-C：电梯等候时间 V13 */}
+          <Route path="elevator-wait-time" element={<ElevatorWaitTime />} />
+          {/* M331-D：停车场使用率 V13 */}
+          <Route path="parking" element={<Parking />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
