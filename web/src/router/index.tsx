@@ -2103,6 +2103,14 @@ const NewbornMgmt = lazy(() => import('@/pages/newborn-mgmt'));
 const MaternalMgmt = lazy(() => import('@/pages/maternal-mgmt'));
 // M412-D：院感报告管理 V13（M412 收官）
 const InfectionReportMgmt = lazy(() => import('@/pages/infection-report-mgmt'));
+// M413-A：病案质量管理 V13
+const MedicalRecordMgmt = lazy(() => import('@/pages/medical-record-mgmt'));
+// M413-B：知情同意管理（细节）V13（detail 避让旧版 informedConsentStatsV13）
+const InformedConsentDetail = lazy(() => import('@/pages/informed-consent-detail'));
+// M413-C：交接班管理（细节）V13（detail 避让旧版 handoverMgmtV13）
+const HandoverDetail = lazy(() => import('@/pages/handover-detail'));
+// M413-D：不良事件管理（细节）V13（M413 收官，detail 避让旧版 adverseEventReportV13）
+const AdverseEventDetail = lazy(() => import('@/pages/adverse-event-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4147,6 +4155,14 @@ export default function AppRoutes() {
           <Route path="maternal-mgmt" element={<MaternalMgmt />} />
           {/* M412-D：院感报告管理 V13（M412 收官） */}
           <Route path="infection-report-mgmt" element={<InfectionReportMgmt />} />
+          {/* M413-A：病案质量管理 V13 */}
+          <Route path="medical-record-mgmt" element={<MedicalRecordMgmt />} />
+          {/* M413-B：知情同意管理（细节）V13（detail 避让旧版 informedConsentStatsV13） */}
+          <Route path="informed-consent-detail" element={<InformedConsentDetail />} />
+          {/* M413-C：交接班管理（细节）V13（detail 避让旧版 handoverMgmtV13） */}
+          <Route path="handover-detail" element={<HandoverDetail />} />
+          {/* M413-D：不良事件管理（细节）V13（M413 收官，detail 避让旧版 adverseEventReportV13） */}
+          <Route path="adverse-event-detail" element={<AdverseEventDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
