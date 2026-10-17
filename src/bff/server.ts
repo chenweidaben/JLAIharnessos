@@ -1447,6 +1447,14 @@ import { taskFunnelV13Routes } from './routes/taskFunnelV13';
 import { taskVerificationV13Routes } from './routes/taskVerificationV13';
 // M307-D：闭环回灌飞轮 V13 GET /api/v1/closed-loop-overview
 import { closedLoopV13Routes } from './routes/closedLoopV13';
+// M308-A：科室任务看板 V13 GET /api/v1/dept-task-board
+import { deptTaskBoardV13Routes } from './routes/deptTaskBoardV13';
+// M308-B：科室任务详情与督办 V13 GET /api/v1/dept-task-detail/:id
+import { deptTaskDetailV13Routes } from './routes/deptTaskDetailV13';
+// M308-C：科室经验 SOP 沉淀 V13 GET /api/v1/dept-sop
+import { deptSopV13Routes } from './routes/deptSopV13';
+// M308-D：科际协作与经验共享总览 V13 GET /api/v1/dept-collab-overview
+import { deptCollabOverviewV13Routes } from './routes/deptCollabOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2413,6 +2421,10 @@ const allRoutes: RouteDef[] = [
   ...taskFunnelV13Routes, // M307-B：任务进度追踪与升级 V13 GET /api/v1/task-funnel
   ...taskVerificationV13Routes, // M307-C：任务验收与效果验证 V13 GET /api/v1/task-verification
   ...closedLoopV13Routes, // M307-D：闭环回灌飞轮 V13 GET /api/v1/closed-loop-overview
+  ...deptTaskBoardV13Routes, // M308-A：科室任务看板 V13 GET /api/v1/dept-task-board
+  ...deptTaskDetailV13Routes, // M308-B：科室任务详情与督办 V13 GET /api/v1/dept-task-detail/:id
+  ...deptSopV13Routes, // M308-C：科室经验 SOP 沉淀 V13 GET /api/v1/dept-sop
+  ...deptCollabOverviewV13Routes, // M308-D：科际协作与经验共享总览 V13 GET /api/v1/dept-collab-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

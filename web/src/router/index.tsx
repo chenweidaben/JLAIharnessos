@@ -481,7 +481,7 @@ const KnowledgeGraphV2 = lazy(() => import('@/pages/knowledge-graph/report-v2'))
 // M209-A：患者安全 V2
 const PatientSafetyV2 = lazy(() => import('@/pages/patient-safety/report-v2'));
 // M209-B：院感 V2
-const InfectionControlV2 = lazy(() => import('@/pages/infection-control/report-v2'));
+const InfectionControlReportV2 = lazy(() => import('@/pages/infection-control/report-v2'));
 // M209-C：病历质量 V2
 const MRQualityV2 = lazy(() => import('@/pages/mr-quality/report-v2'));
 // M209-D：药品供应链 V2
@@ -1264,6 +1264,14 @@ const TaskFunnel = lazy(() => import('@/pages/task-funnel'));
 const TaskVerification = lazy(() => import('@/pages/task-verification'));
 // M307-D：闭环回灌飞轮 V13
 const ClosedLoopOverview = lazy(() => import('@/pages/closed-loop-overview'));
+// M308-A：科室任务看板 V13
+const DeptTaskBoard = lazy(() => import('@/pages/dept-task-board'));
+// M308-B：科室任务详情与督办 V13
+const DeptTaskDetail = lazy(() => import('@/pages/dept-task-detail'));
+// M308-C：科室经验 SOP 沉淀 V13
+const DeptSop = lazy(() => import('@/pages/dept-sop'));
+// M308-D：科际协作与经验共享总览 V13
+const DeptCollabOverview = lazy(() => import('@/pages/dept-collab-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1685,7 +1693,7 @@ export default function AppRoutes() {
           {/* M209-A：患者安全 V2 */}
           <Route path="patient-safety/report-v2" element={<PatientSafetyV2 />} />
           {/* M209-B：院感 V2 */}
-          <Route path="infection-control/report-v2" element={<InfectionControlV2 />} />
+          <Route path="infection-control/report-v2" element={<InfectionControlReportV2 />} />
           {/* M209-C：病历质量 V2 */}
           <Route path="mr-quality/report-v2" element={<MRQualityV2 />} />
           {/* M209-D：药品供应链 V2 */}
@@ -2468,6 +2476,14 @@ export default function AppRoutes() {
           <Route path="task-verification" element={<TaskVerification />} />
           {/* M307-D：闭环回灌飞轮 V13 */}
           <Route path="closed-loop-overview" element={<ClosedLoopOverview />} />
+          {/* M308-A：科室任务看板 V13 */}
+          <Route path="dept-task-board" element={<DeptTaskBoard />} />
+          {/* M308-B：科室任务详情与督办 V13 */}
+          <Route path="dept-task-detail/:id" element={<DeptTaskDetail />} />
+          {/* M308-C：科室经验 SOP 沉淀 V13 */}
+          <Route path="dept-sop" element={<DeptSop />} />
+          {/* M308-D：科际协作与经验共享总览 V13 */}
+          <Route path="dept-collab-overview" element={<DeptCollabOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
