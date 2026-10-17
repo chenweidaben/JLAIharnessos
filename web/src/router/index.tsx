@@ -1505,6 +1505,14 @@ const Appointment = lazy(() => import('@/pages/appointment'));
 const ReferralStats = lazy(() => import('@/pages/referral-stats'));
 // M337-D：慢病管理 V13
 const ChronicDiseaseStats = lazy(() => import('@/pages/chronic-disease-stats'));
+// M338-A：检验报告周转时间 V13
+const LabTurnaround = lazy(() => import('@/pages/lab-turnaround'));
+// M338-B：影像报告周转时间 V13
+const ImagingTurnaround = lazy(() => import('@/pages/imaging-turnaround'));
+// M338-C：检验差错率 V13
+const LabError = lazy(() => import('@/pages/lab-error'));
+// M338-D：标本不合格率 V13
+const SpecimenReject = lazy(() => import('@/pages/specimen-reject'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2951,6 +2959,14 @@ export default function AppRoutes() {
           <Route path="referral-stats" element={<ReferralStats />} />
           {/* M337-D：慢病管理 V13 */}
           <Route path="chronic-disease-stats" element={<ChronicDiseaseStats />} />
+          {/* M338-A：检验报告周转时间 V13 */}
+          <Route path="lab-turnaround" element={<LabTurnaround />} />
+          {/* M338-B：影像报告周转时间 V13 */}
+          <Route path="imaging-turnaround" element={<ImagingTurnaround />} />
+          {/* M338-C：检验差错率 V13 */}
+          <Route path="lab-error" element={<LabError />} />
+          {/* M338-D：标本不合格率 V13 */}
+          <Route path="specimen-reject" element={<SpecimenReject />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

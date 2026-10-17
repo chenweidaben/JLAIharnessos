@@ -1689,6 +1689,14 @@ import { appointmentV13Routes } from './routes/appointmentV13';
 import { referralV13Routes } from './routes/referralV13';
 // M337-D：慢病管理 V13 GET /api/v1/chronic-disease-stats
 import { chronicDiseaseV13Routes } from './routes/chronicDiseaseV13';
+// M338-A：检验报告周转时间 V13 GET /api/v1/lab-turnaround
+import { labTurnaroundV13Routes } from './routes/labTurnaroundV13';
+// M338-B：影像报告周转时间 V13 GET /api/v1/imaging-turnaround
+import { imagingTurnaroundV13Routes } from './routes/imagingTurnaroundV13';
+// M338-C：检验差错率 V13 GET /api/v1/lab-error
+import { labErrorV13Routes } from './routes/labErrorV13';
+// M338-D：标本不合格率 V13 GET /api/v1/specimen-reject
+import { specimenRejectV13Routes } from './routes/specimenRejectV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2776,6 +2784,10 @@ const allRoutes: RouteDef[] = [
   ...appointmentV13Routes, // M337-B：预约诊疗 V13 GET /api/v1/appointment
   ...referralV13Routes, // M337-C：双向转诊 V13 GET /api/v1/referral-stats
   ...chronicDiseaseV13Routes, // M337-D：慢病管理 V13 GET /api/v1/chronic-disease-stats
+  ...labTurnaroundV13Routes, // M338-A：检验报告周转时间 V13 GET /api/v1/lab-turnaround
+  ...imagingTurnaroundV13Routes, // M338-B：影像报告周转时间 V13 GET /api/v1/imaging-turnaround
+  ...labErrorV13Routes, // M338-C：检验差错率 V13 GET /api/v1/lab-error
+  ...specimenRejectV13Routes, // M338-D：标本不合格率 V13 GET /api/v1/specimen-reject
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
