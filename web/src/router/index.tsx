@@ -1369,6 +1369,14 @@ const PharmacistMuseUsage = lazy(() => import('@/pages/pharmacist-muse-usage'));
 const AdminMuseUsage = lazy(() => import('@/pages/admin-muse-usage'));
 // M320-D：患者个人智能体使用统计 V13
 const PatientMuseUsage = lazy(() => import('@/pages/patient-muse-usage'));
+// M321-A：五角色 MUSE 飞轮总览 V13
+const MuseFlywheelOverview = lazy(() => import('@/pages/muse-flywheel-overview'));
+// M321-B：跨角色经验互鉴 V13
+const MuseCrossRoleLearning = lazy(() => import('@/pages/muse-cross-role-learning'));
+// M321-C：模型版本迭代记录 V13
+const MuseModelVersion = lazy(() => import('@/pages/muse-model-version'));
+// M321-D：MUSE 投入产出报告 V13
+const MuseRoiReport = lazy(() => import('@/pages/muse-roi-report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2679,6 +2687,14 @@ export default function AppRoutes() {
           <Route path="admin-muse-usage" element={<AdminMuseUsage />} />
           {/* M320-D：患者个人智能体使用统计 V13 */}
           <Route path="patient-muse-usage" element={<PatientMuseUsage />} />
+          {/* M321-A：五角色 MUSE 飞轮总览 V13 */}
+          <Route path="muse-flywheel-overview" element={<MuseFlywheelOverview />} />
+          {/* M321-B：跨角色经验互鉴 V13 */}
+          <Route path="muse-cross-role-learning" element={<MuseCrossRoleLearning />} />
+          {/* M321-C：模型版本迭代记录 V13 */}
+          <Route path="muse-model-version" element={<MuseModelVersion />} />
+          {/* M321-D：MUSE 投入产出报告 V13 */}
+          <Route path="muse-roi-report" element={<MuseRoiReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
