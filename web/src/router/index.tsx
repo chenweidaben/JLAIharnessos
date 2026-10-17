@@ -1152,6 +1152,14 @@ const ShiftBrief = lazy(() => import('@/pages/shift-brief'));
 const PharmaBrief = lazy(() => import('@/pages/pharma-brief'));
 // M293-D：MANAGER_MUSE 主动式周会简报 V11
 const ManagerBrief = lazy(() => import('@/pages/manager-brief'));
+// M294-A：智能体采纳率反馈看板 V12
+const AgentAdoption = lazy(() => import('@/pages/agent-adoption'));
+// M294-B：低采纳率规则自动复训提示 V12
+const RetrainTasks = lazy(() => import('@/pages/retrain-tasks'));
+// M294-C：智能体健康度评分 V12
+const AgentHealth = lazy(() => import('@/pages/agent-health'));
+// M294-D：反馈闭环总览 V12
+const FeedbackLoop = lazy(() => import('@/pages/feedback-loop'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2244,6 +2252,14 @@ export default function AppRoutes() {
           <Route path="pharma-brief" element={<PharmaBrief />} />
           {/* M293-D：MANAGER_MUSE 主动式周会简报 V11 */}
           <Route path="manager-brief" element={<ManagerBrief />} />
+          {/* M294-A：智能体采纳率反馈看板 V12 */}
+          <Route path="agent-adoption" element={<AgentAdoption />} />
+          {/* M294-B：低采纳率规则自动复训提示 V12 */}
+          <Route path="retrain-tasks" element={<RetrainTasks />} />
+          {/* M294-C：智能体健康度评分 V12 */}
+          <Route path="agent-health" element={<AgentHealth />} />
+          {/* M294-D：反馈闭环总览 V12 */}
+          <Route path="feedback-loop" element={<FeedbackLoop />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
