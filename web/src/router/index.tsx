@@ -2047,6 +2047,14 @@ const NursingCommunication = lazy(() => import('@/pages/nursing-communication'))
 const NursingManagementDetail = lazy(() => import('@/pages/nursing-management-detail'));
 // M405-D：护理服务明细 V13（M405 收官）
 const NursingServiceDetail = lazy(() => import('@/pages/nursing-service-detail'));
+// M406-A：处方点评 V13
+const PharmacyPrescriptionReview = lazy(() => import('@/pages/pharmacy-prescription-review'));
+// M406-B：药品目录 V13
+const PharmacyDrugCatalog = lazy(() => import('@/pages/pharmacy-drug-catalog'));
+// M406-C：药品配送 V13
+const PharmacyDrugDelivery = lazy(() => import('@/pages/pharmacy-drug-delivery'));
+// M406-D：药品安全 V13（M406 收官）
+const PharmacyDrugSafety = lazy(() => import('@/pages/pharmacy-drug-safety'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4035,6 +4043,14 @@ export default function AppRoutes() {
           <Route path="nursing-management-detail" element={<NursingManagementDetail />} />
           {/* M405-D：护理服务明细 V13（M405 收官） */}
           <Route path="nursing-service-detail" element={<NursingServiceDetail />} />
+          {/* M406-A：处方点评 V13 */}
+          <Route path="pharmacy-prescription-review" element={<PharmacyPrescriptionReview />} />
+          {/* M406-B：药品目录 V13 */}
+          <Route path="pharmacy-drug-catalog" element={<PharmacyDrugCatalog />} />
+          {/* M406-C：药品配送 V13 */}
+          <Route path="pharmacy-drug-delivery" element={<PharmacyDrugDelivery />} />
+          {/* M406-D：药品安全 V13（M406 收官） */}
+          <Route path="pharmacy-drug-safety" element={<PharmacyDrugSafety />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
