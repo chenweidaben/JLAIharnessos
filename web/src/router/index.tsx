@@ -2199,6 +2199,14 @@ const HighAlertMedMgmt = lazy(() => import('@/pages/high-alert-med-mgmt'));
 const InfusionDetail = lazy(() => import('@/pages/infusion-detail'));
 // M424-D：血糖管理 V13（M424 收官）
 const BloodGlucoseMgmt = lazy(() => import('@/pages/blood-glucose-mgmt'));
+// M425-A：危急值管理（细节）V13（detail 避让旧版 criticalValueMgmtV13（M411））
+const CriticalValueDetail = lazy(() => import('@/pages/critical-value-detail'));
+// M425-B：交接班沟通管理 V13（换名避让旧版 handoverDetailV13（M413））
+const HandoverCommunicationMgmt = lazy(() => import('@/pages/handover-communication-mgmt'));
+// M425-C：知情同意管理 V13（换名避让旧版 consentDetailV13（M413））
+const ConsentMgmt = lazy(() => import('@/pages/consent-mgmt'));
+// M425-D：隐私保护管理 V13（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419））
+const PrivacyMgmt = lazy(() => import('@/pages/privacy-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4339,6 +4347,14 @@ export default function AppRoutes() {
           <Route path="infusion-detail" element={<InfusionDetail />} />
           {/* M424-D：血糖管理 V13（M424 收官） */}
           <Route path="blood-glucose-mgmt" element={<BloodGlucoseMgmt />} />
+          {/* M425-A：危急值管理（细节）V13（detail 避让旧版 criticalValueMgmtV13（M411）） */}
+          <Route path="critical-value-detail" element={<CriticalValueDetail />} />
+          {/* M425-B：交接班沟通管理 V13（换名避让旧版 handoverDetailV13（M413）） */}
+          <Route path="handover-communication-mgmt" element={<HandoverCommunicationMgmt />} />
+          {/* M425-C：知情同意管理 V13（换名避让旧版 consentDetailV13（M413）） */}
+          <Route path="consent-mgmt" element={<ConsentMgmt />} />
+          {/* M425-D：隐私保护管理 V13（M425 收官，换名避让旧版 informationSecurityMgmtV13（M419）） */}
+          <Route path="privacy-mgmt" element={<PrivacyMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
