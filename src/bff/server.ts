@@ -2255,6 +2255,14 @@ import { consumableSupplyV13Routes } from './routes/consumableSupplyV13';
 import { fireSafetyDetailV13Routes } from './routes/fireSafetyDetailV13';
 // M408-D：治安保卫 V13 GET /api/v1/security-mgmt（M408 收官）
 import { securityMgmtV13Routes } from './routes/securityMgmtV13';
+// M409-A：信息系统管理 V13 GET /api/v1/information-system-mgmt
+import { informationSystemMgmtV13Routes } from './routes/informationSystemMgmtV13';
+// M409-B：数据质量管理 V13 GET /api/v1/data-quality-mgmt
+import { dataQualityMgmtV13Routes } from './routes/dataQualityMgmtV13';
+// M409-C：网络安全管理 V13 GET /api/v1/cybersecurity-mgmt
+import { cybersecurityMgmtV13Routes } from './routes/cybersecurityMgmtV13';
+// M409-D：互联互通管理 V13 GET /api/v1/interop-mgmt（M409 收官）
+import { interopMgmtV13Routes } from './routes/interopMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3625,6 +3633,10 @@ const allRoutes: RouteDef[] = [
   ...consumableSupplyV13Routes, // M408-B：耗材供应 V13 GET /api/v1/consumable-supply
   ...fireSafetyDetailV13Routes, // M408-C：消防安全明细 V13 GET /api/v1/fire-safety-detail（避让旧版 fireSafetyV13 M352-A）
   ...securityMgmtV13Routes, // M408-D：治安保卫 V13 GET /api/v1/security-mgmt（M408 收官）
+  ...informationSystemMgmtV13Routes, // M409-A：信息系统管理 V13 GET /api/v1/information-system-mgmt
+  ...dataQualityMgmtV13Routes, // M409-B：数据质量管理 V13 GET /api/v1/data-quality-mgmt
+  ...cybersecurityMgmtV13Routes, // M409-C：网络安全管理 V13 GET /api/v1/cybersecurity-mgmt
+  ...interopMgmtV13Routes, // M409-D：互联互通管理 V13 GET /api/v1/interop-mgmt（M409 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
