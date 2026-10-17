@@ -1090,6 +1090,8 @@ const MuseInterception = lazy(() => import('@/pages/muse-interception'));
 const MuseAb = lazy(() => import('@/pages/muse-ab'));
 // M285-D：MUSE 成本与 ROI 分析 V5
 const MuseRoi = lazy(() => import('@/pages/muse-roi'));
+// M286-A：全链路监控与告警 V5
+const OpsMonitoring = lazy(() => import('@/pages/ops-monitoring'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2120,6 +2122,8 @@ export default function AppRoutes() {
           <Route path="muse-ab" element={<MuseAb />} />
           {/* M285-D：MUSE 成本与 ROI 分析 V5 */}
           <Route path="muse-roi" element={<MuseRoi />} />
+          {/* M286-A：全链路监控与告警 V5 */}
+          <Route path="ops-monitoring" element={<OpsMonitoring />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
