@@ -1078,6 +1078,8 @@ const MuseManager = lazy(() => import('@/pages/muse-manager'));
 const MusePatient = lazy(() => import('@/pages/muse-patient'));
 // M284-B：MUSE 跨角色任务流转 V5
 const MuseHandoff = lazy(() => import('@/pages/muse-handoff'));
+// M284-C：MUSE 主动提醒引擎 V5
+const MuseReminder = lazy(() => import('@/pages/muse-reminder'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2096,6 +2098,8 @@ export default function AppRoutes() {
           <Route path="muse-patient" element={<MusePatient />} />
           {/* M284-B：MUSE 跨角色任务流转 V5 */}
           <Route path="muse-handoff" element={<MuseHandoff />} />
+          {/* M284-C：MUSE 主动提醒引擎 V5 */}
+          <Route path="muse-reminder" element={<MuseReminder />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
