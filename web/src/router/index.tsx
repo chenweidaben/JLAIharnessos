@@ -1935,6 +1935,14 @@ const AnesthesiaDetail = lazy(() => import('@/pages/anesthesia-detail'));
 const PerioperativeMgmt = lazy(() => import('@/pages/perioperative-mgmt'));
 // M391-D：器械管理 V13（M391 收官）
 const InstrumentMgmt = lazy(() => import('@/pages/instrument-mgmt'));
+// M392-A：检验质控 V13
+const LabQualityControl = lazy(() => import('@/pages/lab-quality-control'));
+// M392-B：影像质控 V13
+const ImagingQualityControl = lazy(() => import('@/pages/imaging-quality-control'));
+// M392-C：病理质控 V13
+const PathologyQualityControl = lazy(() => import('@/pages/pathology-quality-control'));
+// M392-D：输血管理 V13（M392 收官）
+const BloodMgmtDetail = lazy(() => import('@/pages/blood-mgmt-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3811,6 +3819,14 @@ export default function AppRoutes() {
           <Route path="perioperative-mgmt" element={<PerioperativeMgmt />} />
           {/* M391-D：器械管理 V13（M391 收官） */}
           <Route path="instrument-mgmt" element={<InstrumentMgmt />} />
+          {/* M392-A：检验质控 V13 */}
+          <Route path="lab-quality-control" element={<LabQualityControl />} />
+          {/* M392-B：影像质控 V13 */}
+          <Route path="imaging-quality-control" element={<ImagingQualityControl />} />
+          {/* M392-C：病理质控 V13 */}
+          <Route path="pathology-quality-control" element={<PathologyQualityControl />} />
+          {/* M392-D：输血管理 V13（M392 收官） */}
+          <Route path="blood-mgmt-detail" element={<BloodMgmtDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

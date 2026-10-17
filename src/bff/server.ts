@@ -2119,6 +2119,14 @@ import { anesthesiaDetailV13Routes } from './routes/anesthesiaDetailV13';
 import { perioperativeMgmtV13Routes } from './routes/perioperativeMgmtV13';
 // M391-D：器械管理 V13 GET /api/v1/instrument-mgmt（M391 收官）
 import { instrumentMgmtV13Routes } from './routes/instrumentMgmtV13';
+// M392-A：检验质控 V13 GET /api/v1/lab-quality-control
+import { labQualityControlV13Routes } from './routes/labQualityControlV13';
+// M392-B：影像质控 V13 GET /api/v1/imaging-quality-control
+import { imagingQualityControlV13Routes } from './routes/imagingQualityControlV13';
+// M392-C：病理质控 V13 GET /api/v1/pathology-quality-control
+import { pathologyQualityControlV13Routes } from './routes/pathologyQualityControlV13';
+// M392-D：输血管理 V13 GET /api/v1/blood-mgmt-detail（M392 收官）
+import { bloodMgmtDetailV13Routes } from './routes/bloodMgmtDetailV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3421,6 +3429,10 @@ const allRoutes: RouteDef[] = [
   ...anesthesiaDetailV13Routes, // M391-B：麻醉质量 V13 GET /api/v1/anesthesia-detail
   ...perioperativeMgmtV13Routes, // M391-C：围手术期 V13 GET /api/v1/perioperative-mgmt
   ...instrumentMgmtV13Routes, // M391-D：器械管理 V13 GET /api/v1/instrument-mgmt（M391 收官）
+  ...labQualityControlV13Routes, // M392-A：检验质控 V13 GET /api/v1/lab-quality-control
+  ...imagingQualityControlV13Routes, // M392-B：影像质控 V13 GET /api/v1/imaging-quality-control
+  ...pathologyQualityControlV13Routes, // M392-C：病理质控 V13 GET /api/v1/pathology-quality-control
+  ...bloodMgmtDetailV13Routes, // M392-D：输血管理 V13 GET /api/v1/blood-mgmt-detail（M392 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
