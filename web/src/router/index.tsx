@@ -1248,6 +1248,14 @@ const AssetAudit = lazy(() => import('@/pages/asset-audit'));
 const ArchivedExperience = lazy(() => import('@/pages/archived-experience'));
 // M305-D：经验资产生命周期总览 V13
 const AssetLifecycleOverview = lazy(() => import('@/pages/asset-lifecycle-overview'));
+// M306-A：医院 AI 学习飞轮成熟度 V13
+const FlywheelScore = lazy(() => import('@/pages/flywheel-score'));
+// M306-B：六维指标明细下钻 V13
+const FlywheelDrilldown = lazy(() => import('@/pages/flywheel-drilldown'));
+// M306-C：飞轮改进建议 V13
+const FlywheelRecommendation = lazy(() => import('@/pages/flywheel-recommendation'));
+// M306-D：飞轮季度演进趋势 V13
+const FlywheelTrend = lazy(() => import('@/pages/flywheel-trend'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2436,6 +2444,14 @@ export default function AppRoutes() {
           <Route path="archived-experience" element={<ArchivedExperience />} />
           {/* M305-D：经验资产生命周期总览 V13 */}
           <Route path="asset-lifecycle-overview" element={<AssetLifecycleOverview />} />
+          {/* M306-A：医院 AI 学习飞轮成熟度 V13 */}
+          <Route path="flywheel-score" element={<FlywheelScore />} />
+          {/* M306-B：六维指标明细下钻 V13 */}
+          <Route path="flywheel-drilldown" element={<FlywheelDrilldown />} />
+          {/* M306-C：飞轮改进建议 V13 */}
+          <Route path="flywheel-recommendation" element={<FlywheelRecommendation />} />
+          {/* M306-D：飞轮季度演进趋势 V13 */}
+          <Route path="flywheel-trend" element={<FlywheelTrend />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

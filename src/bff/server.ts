@@ -1431,6 +1431,14 @@ import { assetAuditV13Routes } from './routes/assetAuditV13';
 import { archivedExperienceV13Routes } from './routes/archivedExperienceV13';
 // M305-D：经验资产生命周期总览 V13 GET /api/v1/asset-lifecycle-overview
 import { assetLifecycleOverviewV13Routes } from './routes/assetLifecycleOverviewV13';
+// M306-A：医院 AI 学习飞轮成熟度 V13 GET /api/v1/flywheel-score
+import { flywheelScoreV13Routes } from './routes/flywheelScoreV13';
+// M306-B：六维指标明细下钻 V13 GET /api/v1/flywheel-drilldown
+import { flywheelDrilldownV13Routes } from './routes/flywheelDrilldownV13';
+// M306-C：飞轮改进建议 V13 GET /api/v1/flywheel-recommendation
+import { flywheelRecommendationV13Routes } from './routes/flywheelRecommendationV13';
+// M306-D：飞轮季度演进趋势 V13 GET /api/v1/flywheel-trend
+import { flywheelTrendV13Routes } from './routes/flywheelTrendV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2389,6 +2397,10 @@ const allRoutes: RouteDef[] = [
   ...assetAuditV13Routes, // M305-B：资产盘点周期 V13 GET /api/v1/asset-audit
   ...archivedExperienceV13Routes, // M305-C：退役经验存档与复用 V13 GET /api/v1/archived-experience
   ...assetLifecycleOverviewV13Routes, // M305-D：经验资产生命周期总览 V13 GET /api/v1/asset-lifecycle-overview
+  ...flywheelScoreV13Routes, // M306-A：医院 AI 学习飞轮成熟度 V13 GET /api/v1/flywheel-score
+  ...flywheelDrilldownV13Routes, // M306-B：六维指标明细下钻 V13 GET /api/v1/flywheel-drilldown
+  ...flywheelRecommendationV13Routes, // M306-C：飞轮改进建议 V13 GET /api/v1/flywheel-recommendation
+  ...flywheelTrendV13Routes, // M306-D：飞轮季度演进趋势 V13 GET /api/v1/flywheel-trend
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
