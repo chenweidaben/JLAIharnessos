@@ -2338,6 +2338,8 @@ export default function AppRoutes() {
           <Route path="rollback" element={<Rollback />} />
           {/* M299-C：评审专家资质与激励 V13 */}
           <Route path="reviewer-roster" element={<ReviewerRoster />} />
+          {/* M299-D：质量门禁总览 V13 */}
+          <Route path="quality-gate" element={<QualityGate />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
