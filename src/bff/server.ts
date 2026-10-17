@@ -1255,6 +1255,8 @@ import { museNurseV5Routes } from './routes/museNurseV5';
 import { musePharmacistV5Routes } from './routes/musePharmacistV5';
 // M283-D：管理者 MUSE 工作台 V5 GET/POST /api/v1/muse-manager
 import { museManagerV5Routes } from './routes/museManagerV5';
+// M284-A：患者 MUSE 助手 V5 GET/POST /api/v1/muse-patient
+import { musePatientV5Routes } from './routes/musePatientV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2125,6 +2127,7 @@ const allRoutes: RouteDef[] = [
   ...museNurseV5Routes, // M283-B：护士 MUSE 工作台 V5 GET/POST /api/v1/muse-nurse
   ...musePharmacistV5Routes, // M283-C：药师 MUSE 工作台 V5 GET/POST /api/v1/muse-pharmacist
   ...museManagerV5Routes, // M283-D：管理者 MUSE 工作台 V5 GET/POST /api/v1/muse-manager
+  ...musePatientV5Routes, // M284-A：患者 MUSE 助手 V5 GET/POST /api/v1/muse-patient
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
