@@ -1034,6 +1034,8 @@ const InsuranceReport = lazy(() => import('@/pages/insurance-report'));
 const CDCANotification = lazy(() => import('@/pages/cdc-notification'));
 // M278-D：医院质量监测 HQMS V5
 const HQMS = lazy(() => import('@/pages/hqms'));
+// M279-A：被服洗涤与织物管理 V5
+const LinenManagement = lazy(() => import('@/pages/linen-management'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2008,6 +2010,8 @@ export default function AppRoutes() {
           <Route path="cdc-notification" element={<CDCANotification />} />
           {/* M278-D：医院质量监测 HQMS V5 */}
           <Route path="hqms" element={<HQMS />} />
+          {/* M279-A：被服洗涤与织物管理 V5 */}
+          <Route path="linen-management" element={<LinenManagement />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
