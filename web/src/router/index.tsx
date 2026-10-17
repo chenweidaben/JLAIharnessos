@@ -1353,6 +1353,14 @@ const PrescriptionAudit = lazy(() => import('@/pages/prescription-audit'));
 const HandHygieneCompliance = lazy(() => import('@/pages/hand-hygiene-compliance'));
 // M318-D：数据访问审计异常 V13
 const DataAccessAudit = lazy(() => import('@/pages/data-access-audit'));
+// M319-A：Doctor MUSE 使用统计 V13
+const DoctorMuseUsage = lazy(() => import('@/pages/doctor-muse-usage'));
+// M319-B：MUSE 建议采纳反馈 V13
+const MuseFeedback = lazy(() => import('@/pages/muse-feedback'));
+// M319-C：病历知识自动关联 V13
+const KnowledgeLink = lazy(() => import('@/pages/knowledge-link'));
+// M319-D：个人智能体训练数据沉淀 V13
+const MuseTrainingData = lazy(() => import('@/pages/muse-training-data'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2647,6 +2655,14 @@ export default function AppRoutes() {
           <Route path="hand-hygiene-compliance" element={<HandHygieneCompliance />} />
           {/* M318-D：数据访问审计异常 V13 */}
           <Route path="data-access-audit" element={<DataAccessAudit />} />
+          {/* M319-A：Doctor MUSE 使用统计 V13 */}
+          <Route path="doctor-muse-usage" element={<DoctorMuseUsage />} />
+          {/* M319-B：MUSE 建议采纳反馈 V13 */}
+          <Route path="muse-feedback" element={<MuseFeedback />} />
+          {/* M319-C：病历知识自动关联 V13 */}
+          <Route path="knowledge-link" element={<KnowledgeLink />} />
+          {/* M319-D：个人智能体训练数据沉淀 V13 */}
+          <Route path="muse-training-data" element={<MuseTrainingData />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
