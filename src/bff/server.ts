@@ -1285,6 +1285,8 @@ import { execDashboardV5Routes } from './routes/execDashboardV5';
 import { deptProfileV5Routes } from './routes/deptProfileV5';
 // M287-C：病种/DRG 经营分析 V5 GET/POST /api/v1/drg-analysis
 import { drgAnalysisV5Routes } from './routes/drgAnalysisV5';
+// M287-D：趋势预测与经营预警 V5 GET/POST /api/v1/trend-forecast
+import { trendForecastV5Routes } from './routes/trendForecastV5';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2170,6 +2172,7 @@ const allRoutes: RouteDef[] = [
   ...execDashboardV5Routes, // M287-A：院长驾驶舱 V5 GET/POST /api/v1/exec-dashboard
   ...deptProfileV5Routes, // M287-B：科室运营画像 V5 GET/POST /api/v1/dept-profile
   ...drgAnalysisV5Routes, // M287-C：病种/DRG 经营分析 V5 GET/POST /api/v1/drg-analysis
+  ...trendForecastV5Routes, // M287-D：趋势预测与经营预警 V5 GET/POST /api/v1/trend-forecast
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
