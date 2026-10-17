@@ -1361,6 +1361,14 @@ const MuseFeedback = lazy(() => import('@/pages/muse-feedback'));
 const KnowledgeLink = lazy(() => import('@/pages/knowledge-link'));
 // M319-D：个人智能体训练数据沉淀 V13
 const MuseTrainingData = lazy(() => import('@/pages/muse-training-data'));
+// M320-A：护士个人智能体使用统计 V13
+const NurseMuseUsage = lazy(() => import('@/pages/nurse-muse-usage'));
+// M320-B：药师个人智能体使用统计 V13
+const PharmacistMuseUsage = lazy(() => import('@/pages/pharmacist-muse-usage'));
+// M320-C：行政个人智能体使用统计 V13
+const AdminMuseUsage = lazy(() => import('@/pages/admin-muse-usage'));
+// M320-D：患者个人智能体使用统计 V13
+const PatientMuseUsage = lazy(() => import('@/pages/patient-muse-usage'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2663,6 +2671,14 @@ export default function AppRoutes() {
           <Route path="knowledge-link" element={<KnowledgeLink />} />
           {/* M319-D：个人智能体训练数据沉淀 V13 */}
           <Route path="muse-training-data" element={<MuseTrainingData />} />
+          {/* M320-A：护士个人智能体使用统计 V13 */}
+          <Route path="nurse-muse-usage" element={<NurseMuseUsage />} />
+          {/* M320-B：药师个人智能体使用统计 V13 */}
+          <Route path="pharmacist-muse-usage" element={<PharmacistMuseUsage />} />
+          {/* M320-C：行政个人智能体使用统计 V13 */}
+          <Route path="admin-muse-usage" element={<AdminMuseUsage />} />
+          {/* M320-D：患者个人智能体使用统计 V13 */}
+          <Route path="patient-muse-usage" element={<PatientMuseUsage />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

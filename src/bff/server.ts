@@ -1545,6 +1545,14 @@ import { museFeedbackV13Routes } from './routes/museFeedbackV13';
 import { knowledgeLinkV13Routes } from './routes/knowledgeLinkV13';
 // M319-D：个人智能体训练数据沉淀 V13 GET /api/v1/muse-training-data
 import { museTrainingDataV13Routes } from './routes/museTrainingDataV13';
+// M320-A：护士个人智能体使用统计 V13 GET /api/v1/nurse-muse-usage
+import { nurseMuseUsageV13Routes } from './routes/nurseMuseUsageV13';
+// M320-B：药师个人智能体使用统计 V13 GET /api/v1/pharmacist-muse-usage
+import { pharmacistMuseUsageV13Routes } from './routes/pharmacistMuseUsageV13';
+// M320-C：行政个人智能体使用统计 V13 GET /api/v1/admin-muse-usage
+import { adminMuseUsageV13Routes } from './routes/adminMuseUsageV13';
+// M320-D：患者个人智能体使用统计 V13 GET /api/v1/patient-muse-usage
+import { patientMuseUsageV13Routes } from './routes/patientMuseUsageV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2560,6 +2568,10 @@ const allRoutes: RouteDef[] = [
   ...museFeedbackV13Routes, // M319-B：MUSE 建议采纳反馈 V13 GET /api/v1/muse-feedback
   ...knowledgeLinkV13Routes, // M319-C：病历知识自动关联 V13 GET /api/v1/knowledge-link
   ...museTrainingDataV13Routes, // M319-D：个人智能体训练数据沉淀 V13 GET /api/v1/muse-training-data
+  ...nurseMuseUsageV13Routes, // M320-A：护士个人智能体使用统计 V13 GET /api/v1/nurse-muse-usage
+  ...pharmacistMuseUsageV13Routes, // M320-B：药师个人智能体使用统计 V13 GET /api/v1/pharmacist-muse-usage
+  ...adminMuseUsageV13Routes, // M320-C：行政个人智能体使用统计 V13 GET /api/v1/admin-muse-usage
+  ...patientMuseUsageV13Routes, // M320-D：患者个人智能体使用统计 V13 GET /api/v1/patient-muse-usage
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
