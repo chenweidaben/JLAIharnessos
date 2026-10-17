@@ -2127,6 +2127,14 @@ import { imagingQualityControlV13Routes } from './routes/imagingQualityControlV1
 import { pathologyQualityControlV13Routes } from './routes/pathologyQualityControlV13';
 // M392-D：输血管理 V13 GET /api/v1/blood-mgmt-detail（M392 收官）
 import { bloodMgmtDetailV13Routes } from './routes/bloodMgmtDetailV13';
+// M393-A：手卫生明细 V13 GET /api/v1/hand-hygiene-detail（避让旧版 handHygieneV13）
+import { handHygieneDetailV13Routes } from './routes/handHygieneDetailV13';
+// M393-B：隔离管理 V13 GET /api/v1/isolation-mgmt
+import { isolationMgmtV13Routes } from './routes/isolationMgmtV13';
+// M393-C：医疗废物 V13 GET /api/v1/medical-waste-mgmt
+import { medicalWasteMgmtV13Routes } from './routes/medicalWasteMgmtV13';
+// M393-D：疫苗接种 V13 GET /api/v1/vaccination-mgmt（M393 收官）
+import { vaccinationMgmtV13Routes } from './routes/vaccinationMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3433,6 +3441,10 @@ const allRoutes: RouteDef[] = [
   ...imagingQualityControlV13Routes, // M392-B：影像质控 V13 GET /api/v1/imaging-quality-control
   ...pathologyQualityControlV13Routes, // M392-C：病理质控 V13 GET /api/v1/pathology-quality-control
   ...bloodMgmtDetailV13Routes, // M392-D：输血管理 V13 GET /api/v1/blood-mgmt-detail（M392 收官）
+  ...handHygieneDetailV13Routes, // M393-A：手卫生明细 V13 GET /api/v1/hand-hygiene-detail（避让旧版 handHygieneV13）
+  ...isolationMgmtV13Routes, // M393-B：隔离管理 V13 GET /api/v1/isolation-mgmt
+  ...medicalWasteMgmtV13Routes, // M393-C：医疗废物 V13 GET /api/v1/medical-waste-mgmt
+  ...vaccinationMgmtV13Routes, // M393-D：疫苗接种 V13 GET /api/v1/vaccination-mgmt（M393 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

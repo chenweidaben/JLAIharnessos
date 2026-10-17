@@ -1943,6 +1943,14 @@ const ImagingQualityControl = lazy(() => import('@/pages/imaging-quality-control
 const PathologyQualityControl = lazy(() => import('@/pages/pathology-quality-control'));
 // M392-D：输血管理 V13（M392 收官）
 const BloodMgmtDetail = lazy(() => import('@/pages/blood-mgmt-detail'));
+// M393-A：手卫生明细 V13（避让旧版 hand-hygiene）
+const HandHygieneDetail = lazy(() => import('@/pages/hand-hygiene-detail'));
+// M393-B：隔离管理 V13
+const IsolationMgmt = lazy(() => import('@/pages/isolation-mgmt'));
+// M393-C：医疗废物 V13
+const MedicalWasteMgmt = lazy(() => import('@/pages/medical-waste-mgmt'));
+// M393-D：疫苗接种 V13（M393 收官）
+const VaccinationMgmt = lazy(() => import('@/pages/vaccination-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3827,6 +3835,14 @@ export default function AppRoutes() {
           <Route path="pathology-quality-control" element={<PathologyQualityControl />} />
           {/* M392-D：输血管理 V13（M392 收官） */}
           <Route path="blood-mgmt-detail" element={<BloodMgmtDetail />} />
+          {/* M393-A：手卫生明细 V13（避让旧版 hand-hygiene） */}
+          <Route path="hand-hygiene-detail" element={<HandHygieneDetail />} />
+          {/* M393-B：隔离管理 V13 */}
+          <Route path="isolation-mgmt" element={<IsolationMgmt />} />
+          {/* M393-C：医疗废物 V13 */}
+          <Route path="medical-waste-mgmt" element={<MedicalWasteMgmt />} />
+          {/* M393-D：疫苗接种 V13（M393 收官） */}
+          <Route path="vaccination-mgmt" element={<VaccinationMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
