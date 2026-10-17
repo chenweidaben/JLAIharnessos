@@ -2135,6 +2135,14 @@ import { isolationMgmtV13Routes } from './routes/isolationMgmtV13';
 import { medicalWasteMgmtV13Routes } from './routes/medicalWasteMgmtV13';
 // M393-D：疫苗接种 V13 GET /api/v1/vaccination-mgmt（M393 收官）
 import { vaccinationMgmtV13Routes } from './routes/vaccinationMgmtV13';
+// M394-A：跌倒预防 V13 GET /api/v1/fall-prevention
+import { fallPreventionV13Routes } from './routes/fallPreventionV13';
+// M394-B：压疮管理 V13 GET /api/v1/pressure-ulcer-mgmt
+import { pressureUlcerMgmtV13Routes } from './routes/pressureUlcerMgmtV13';
+// M394-C：患者身份识别 V13 GET /api/v1/patient-identification
+import { patientIdentificationV13Routes } from './routes/patientIdentificationV13';
+// M394-D：用药安全 V13 GET /api/v1/medication-safety（M394 收官）
+import { medicationSafetyV13Routes } from './routes/medicationSafetyV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3445,6 +3453,10 @@ const allRoutes: RouteDef[] = [
   ...isolationMgmtV13Routes, // M393-B：隔离管理 V13 GET /api/v1/isolation-mgmt
   ...medicalWasteMgmtV13Routes, // M393-C：医疗废物 V13 GET /api/v1/medical-waste-mgmt
   ...vaccinationMgmtV13Routes, // M393-D：疫苗接种 V13 GET /api/v1/vaccination-mgmt（M393 收官）
+  ...fallPreventionV13Routes, // M394-A：跌倒预防 V13 GET /api/v1/fall-prevention
+  ...pressureUlcerMgmtV13Routes, // M394-B：压疮管理 V13 GET /api/v1/pressure-ulcer-mgmt
+  ...patientIdentificationV13Routes, // M394-C：患者身份识别 V13 GET /api/v1/patient-identification
+  ...medicationSafetyV13Routes, // M394-D：用药安全 V13 GET /api/v1/medication-safety（M394 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

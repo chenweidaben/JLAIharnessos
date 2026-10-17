@@ -1951,6 +1951,14 @@ const IsolationMgmt = lazy(() => import('@/pages/isolation-mgmt'));
 const MedicalWasteMgmt = lazy(() => import('@/pages/medical-waste-mgmt'));
 // M393-D：疫苗接种 V13（M393 收官）
 const VaccinationMgmt = lazy(() => import('@/pages/vaccination-mgmt'));
+// M394-A：跌倒预防 V13
+const FallPrevention = lazy(() => import('@/pages/fall-prevention'));
+// M394-B：压疮管理 V13
+const PressureUlcerMgmt = lazy(() => import('@/pages/pressure-ulcer-mgmt'));
+// M394-C：患者身份识别 V13
+const PatientIdentification = lazy(() => import('@/pages/patient-identification'));
+// M394-D：用药安全 V13（M394 收官）
+const MedicationSafety = lazy(() => import('@/pages/medication-safety'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3843,6 +3851,14 @@ export default function AppRoutes() {
           <Route path="medical-waste-mgmt" element={<MedicalWasteMgmt />} />
           {/* M393-D：疫苗接种 V13（M393 收官） */}
           <Route path="vaccination-mgmt" element={<VaccinationMgmt />} />
+          {/* M394-A：跌倒预防 V13 */}
+          <Route path="fall-prevention" element={<FallPrevention />} />
+          {/* M394-B：压疮管理 V13 */}
+          <Route path="pressure-ulcer-mgmt" element={<PressureUlcerMgmt />} />
+          {/* M394-C：患者身份识别 V13 */}
+          <Route path="patient-identification" element={<PatientIdentification />} />
+          {/* M394-D：用药安全 V13（M394 收官） */}
+          <Route path="medication-safety" element={<MedicationSafety />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
