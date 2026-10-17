@@ -1337,6 +1337,14 @@ const ChronicDiseaseMgmt = lazy(() => import('@/pages/chronic-disease-mgmt'));
 const HealthEducationPush = lazy(() => import('@/pages/health-education-push'));
 // M316-D：患者门户使用度 V13
 const PatientPortalUsage = lazy(() => import('@/pages/patient-portal-usage'));
+// M317-A：门诊次均费用 V13
+const OutpatientAvgCost = lazy(() => import('@/pages/outpatient-avg-cost'));
+// M317-B：住院床日成本 V13
+const InpatientBedDayCost = lazy(() => import('@/pages/inpatient-bed-day-cost'));
+// M317-C：采购周期预警 V13
+const ProcurementLeadTime = lazy(() => import('@/pages/procurement-lead-time'));
+// M317-D：人员流失率 V13
+const StaffTurnover = lazy(() => import('@/pages/staff-turnover'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2615,6 +2623,14 @@ export default function AppRoutes() {
           <Route path="health-education-push" element={<HealthEducationPush />} />
           {/* M316-D：患者门户使用度 V13 */}
           <Route path="patient-portal-usage" element={<PatientPortalUsage />} />
+          {/* M317-A：门诊次均费用 V13 */}
+          <Route path="outpatient-avg-cost" element={<OutpatientAvgCost />} />
+          {/* M317-B：住院床日成本 V13 */}
+          <Route path="inpatient-bed-day-cost" element={<InpatientBedDayCost />} />
+          {/* M317-C：采购周期预警 V13 */}
+          <Route path="procurement-lead-time" element={<ProcurementLeadTime />} />
+          {/* M317-D：人员流失率 V13 */}
+          <Route path="staff-turnover" element={<StaffTurnover />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

@@ -1521,6 +1521,14 @@ import { chronicDiseaseMgmtV13Routes } from './routes/chronicDiseaseMgmtV13';
 import { healthEducationPushV13Routes } from './routes/healthEducationPushV13';
 // M316-D：患者门户使用度 V13 GET /api/v1/patient-portal-usage
 import { patientPortalUsageV13Routes } from './routes/patientPortalUsageV13';
+// M317-A：门诊次均费用 V13 GET /api/v1/outpatient-avg-cost
+import { outpatientAvgCostV13Routes } from './routes/outpatientAvgCostV13';
+// M317-B：住院床日成本 V13 GET /api/v1/inpatient-bed-day-cost
+import { inpatientBedDayCostV13Routes } from './routes/inpatientBedDayCostV13';
+// M317-C：采购周期预警 V13 GET /api/v1/procurement-lead-time
+import { procurementLeadTimeV13Routes } from './routes/procurementLeadTimeV13';
+// M317-D：人员流失率 V13 GET /api/v1/staff-turnover
+import { staffTurnoverV13Routes } from './routes/staffTurnoverV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2524,6 +2532,10 @@ const allRoutes: RouteDef[] = [
   ...chronicDiseaseMgmtV13Routes, // M316-B：慢病管理达标率 V13 GET /api/v1/chronic-disease-mgmt
   ...healthEducationPushV13Routes, // M316-C：健教材料推送统计 V13 GET /api/v1/health-education-push
   ...patientPortalUsageV13Routes, // M316-D：患者门户使用度 V13 GET /api/v1/patient-portal-usage
+  ...outpatientAvgCostV13Routes, // M317-A：门诊次均费用 V13 GET /api/v1/outpatient-avg-cost
+  ...inpatientBedDayCostV13Routes, // M317-B：住院床日成本 V13 GET /api/v1/inpatient-bed-day-cost
+  ...procurementLeadTimeV13Routes, // M317-C：采购周期预警 V13 GET /api/v1/procurement-lead-time
+  ...staffTurnoverV13Routes, // M317-D：人员流失率 V13 GET /api/v1/staff-turnover
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
