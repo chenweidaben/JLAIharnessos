@@ -1625,6 +1625,14 @@ const EnergyConsumption = lazy(() => import('@/pages/energy-consumption'));
 const NutritionKitchen = lazy(() => import('@/pages/nutrition-kitchen'));
 // M352-D：车辆管理 V13（M352 收官）
 const ParkingMgmt = lazy(() => import('@/pages/parking-mgmt'));
+// M353-A：信息安全 V13
+const InfoSecurity = lazy(() => import('@/pages/info-security'));
+// M353-B：数据质量 V13（stats 避让已有 dataQualityV13）
+const DataQualityStats = lazy(() => import('@/pages/data-quality-stats'));
+// M353-C：系统可用率 V13（stats 避让已有 systemAvailabilityV13）
+const SystemAvailabilityStats = lazy(() => import('@/pages/system-availability-stats'));
+// M353-D：备份与容灾 V13（M353 收官）
+const BackupDR = lazy(() => import('@/pages/backup-dr'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3191,6 +3199,14 @@ export default function AppRoutes() {
           <Route path="nutrition-kitchen" element={<NutritionKitchen />} />
           {/* M352-D：车辆管理 V13（M352 收官） */}
           <Route path="parking-mgmt" element={<ParkingMgmt />} />
+          {/* M353-A：信息安全 V13 */}
+          <Route path="info-security" element={<InfoSecurity />} />
+          {/* M353-B：数据质量 V13（stats 避让已有 dataQualityV13） */}
+          <Route path="data-quality-stats" element={<DataQualityStats />} />
+          {/* M353-C：系统可用率 V13（stats 避让已有 systemAvailabilityV13） */}
+          <Route path="system-availability-stats" element={<SystemAvailabilityStats />} />
+          {/* M353-D：备份与容灾 V13（M353 收官） */}
+          <Route path="backup-dr" element={<BackupDR />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
