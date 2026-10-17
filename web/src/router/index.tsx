@@ -1983,6 +1983,14 @@ const TalentDevelopment = lazy(() => import('@/pages/talent-development'));
 const ClinicalResearchDetail = lazy(() => import('@/pages/clinical-research-detail'));
 // M397-D：继续教育明细 V13（M397 收官，避让旧版 continuing-education/continuing-education-stats）
 const ContinuingEducationDetail = lazy(() => import('@/pages/continuing-education-detail'));
+// M398-A：投诉管理明细 V13（避让旧版 complaint-mgmt/complaint-mgmt-stats）
+const ComplaintMgmtDetail = lazy(() => import('@/pages/complaint-mgmt-detail'));
+// M398-B：医疗纠纷 V13
+const MedicalDispute = lazy(() => import('@/pages/medical-dispute'));
+// M398-C：医保管理明细 V13
+const MedicalInsuranceDetail = lazy(() => import('@/pages/medical-insurance-detail'));
+// M398-D：公共关系 V13（M398 收官）
+const PublicRelation = lazy(() => import('@/pages/public-relation'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3907,6 +3915,14 @@ export default function AppRoutes() {
           <Route path="clinical-research-detail" element={<ClinicalResearchDetail />} />
           {/* M397-D：继续教育明细 V13（M397 收官，避让旧版 continuing-education/continuing-education-stats） */}
           <Route path="continuing-education-detail" element={<ContinuingEducationDetail />} />
+          {/* M398-A：投诉管理明细 V13（避让旧版 complaint-mgmt/complaint-mgmt-stats） */}
+          <Route path="complaint-mgmt-detail" element={<ComplaintMgmtDetail />} />
+          {/* M398-B：医疗纠纷 V13 */}
+          <Route path="medical-dispute" element={<MedicalDispute />} />
+          {/* M398-C：医保管理明细 V13 */}
+          <Route path="medical-insurance-detail" element={<MedicalInsuranceDetail />} />
+          {/* M398-D：公共关系 V13（M398 收官） */}
+          <Route path="public-relation" element={<PublicRelation />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

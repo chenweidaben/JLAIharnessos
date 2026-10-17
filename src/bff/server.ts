@@ -2167,6 +2167,14 @@ import { talentDevelopmentV13Routes } from './routes/talentDevelopmentV13';
 import { clinicalResearchDetailV13Routes } from './routes/clinicalResearchDetailV13';
 // M397-D：继续教育明细 V13 GET /api/v1/continuing-education-detail（M397 收官，避让旧版 continuingEducationV13/continuingEducationStatsV13）
 import { continuingEducationDetailV13Routes } from './routes/continuingEducationDetailV13';
+// M398-A：投诉管理明细 V13 GET /api/v1/complaint-mgmt-detail（避让旧版 complaintMgmtV13/complaintMgmtStatsV13）
+import { complaintMgmtDetailV13Routes } from './routes/complaintMgmtDetailV13';
+// M398-B：医疗纠纷 V13 GET /api/v1/medical-dispute
+import { medicalDisputeV13Routes } from './routes/medicalDisputeV13';
+// M398-C：医保管理明细 V13 GET /api/v1/medical-insurance-detail
+import { medicalInsuranceDetailV13Routes } from './routes/medicalInsuranceDetailV13';
+// M398-D：公共关系 V13 GET /api/v1/public-relation（M398 收官）
+import { publicRelationV13Routes } from './routes/publicRelationV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3493,6 +3501,10 @@ const allRoutes: RouteDef[] = [
   ...talentDevelopmentV13Routes, // M397-B：人才发展 V13 GET /api/v1/talent-development
   ...clinicalResearchDetailV13Routes, // M397-C：临床研究明细 V13 GET /api/v1/clinical-research-detail（避让旧版 clinicalResearchV13/clinicalResearchStatsV13）
   ...continuingEducationDetailV13Routes, // M397-D：继续教育明细 V13 GET /api/v1/continuing-education-detail（M397 收官，避让旧版 continuingEducationV13/continuingEducationStatsV13）
+  ...complaintMgmtDetailV13Routes, // M398-A：投诉管理明细 V13 GET /api/v1/complaint-mgmt-detail（避让旧版 complaintMgmtV13/complaintMgmtStatsV13）
+  ...medicalDisputeV13Routes, // M398-B：医疗纠纷 V13 GET /api/v1/medical-dispute
+  ...medicalInsuranceDetailV13Routes, // M398-C：医保管理明细 V13 GET /api/v1/medical-insurance-detail
+  ...publicRelationV13Routes, // M398-D：公共关系 V13 GET /api/v1/public-relation（M398 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
