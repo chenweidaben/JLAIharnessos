@@ -1291,6 +1291,8 @@ import { trendForecastV5Routes } from './routes/trendForecastV5';
 import { workflowV6Routes } from './routes/workflowV6';
 // M288-B：通用表单引擎 V6 GET/POST /api/v1/form
 import { formEngineV6Routes } from './routes/formEngineV6';
+// M288-C：工作流节点流转与会签 V6 POST/GET /api/v1/workflow
+import { workflowSignoffV6Routes } from './routes/workflowSignoffV6';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2179,6 +2181,7 @@ const allRoutes: RouteDef[] = [
   ...trendForecastV5Routes, // M287-D：趋势预测与经营预警 V5 GET/POST /api/v1/trend-forecast
   ...workflowV6Routes, // M288-A：智能审批与工作流引擎 V6 GET/POST /api/v1/workflow
   ...formEngineV6Routes, // M288-B：通用表单引擎 V6 GET/POST /api/v1/form
+  ...workflowSignoffV6Routes, // M288-C：工作流节点流转与会签 V6 POST/GET /api/v1/workflow
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
