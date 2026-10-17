@@ -1865,6 +1865,14 @@ const InsuranceAuditStats = lazy(() => import('@/pages/insurance-audit-stats'));
 const DRGGroupStats = lazy(() => import('@/pages/drg-group-stats'));
 // M382-D：价格监控 V13（M382 收官）
 const PriceMonitor = lazy(() => import('@/pages/price-monitor'));
+// M383-A：科研项目统计 V13（stats 避让）
+const ResearchProjectStats = lazy(() => import('@/pages/research-project-stats'));
+// M383-B：教学活动 V13
+const TeachingActivity = lazy(() => import('@/pages/teaching-activity'));
+// M383-C：住培管理统计 V13（stats 避让）
+const ResidentTrainingStats = lazy(() => import('@/pages/resident-training-stats'));
+// M383-D：学术交流统计 V13（stats 避让，M383 收官）
+const AcademicExchangeStats = lazy(() => import('@/pages/academic-exchange-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3671,6 +3679,14 @@ export default function AppRoutes() {
           <Route path="drg-group-stats" element={<DRGGroupStats />} />
           {/* M382-D：价格监控 V13（M382 收官） */}
           <Route path="price-monitor" element={<PriceMonitor />} />
+          {/* M383-A：科研项目统计 V13（stats 避让） */}
+          <Route path="research-project-stats" element={<ResearchProjectStats />} />
+          {/* M383-B：教学活动 V13 */}
+          <Route path="teaching-activity" element={<TeachingActivity />} />
+          {/* M383-C：住培管理统计 V13（stats 避让） */}
+          <Route path="resident-training-stats" element={<ResidentTrainingStats />} />
+          {/* M383-D：学术交流统计 V13（stats 避让，M383 收官） */}
+          <Route path="academic-exchange-stats" element={<AcademicExchangeStats />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
