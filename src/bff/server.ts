@@ -2239,6 +2239,14 @@ import { pharmacyDrugCatalogV13Routes } from './routes/pharmacyDrugCatalogV13';
 import { pharmacyDrugDeliveryV13Routes } from './routes/pharmacyDrugDeliveryV13';
 // M406-D：药品安全 V13 GET /api/v1/pharmacy-drug-safety（M406 收官）
 import { pharmacyDrugSafetyV13Routes } from './routes/pharmacyDrugSafetyV13';
+// M407-A：运营成本管理 V13 GET /api/v1/operating-cost-mgmt
+import { operatingCostMgmtV13Routes } from './routes/operatingCostMgmtV13';
+// M407-B：收入增长 V13 GET /api/v1/revenue-growth
+import { revenueGrowthV13Routes } from './routes/revenueGrowthV13';
+// M407-C：盈亏分析 V13 GET /api/v1/profit-analysis
+import { profitAnalysisV13Routes } from './routes/profitAnalysisV13';
+// M407-D：战略KPI V13 GET /api/v1/strategic-kpi（M407 收官）
+import { strategicKpiV13Routes } from './routes/strategicKpiV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3601,6 +3609,10 @@ const allRoutes: RouteDef[] = [
   ...pharmacyDrugCatalogV13Routes, // M406-B：药品目录 V13 GET /api/v1/pharmacy-drug-catalog
   ...pharmacyDrugDeliveryV13Routes, // M406-C：药品配送 V13 GET /api/v1/pharmacy-drug-delivery
   ...pharmacyDrugSafetyV13Routes, // M406-D：药品安全 V13 GET /api/v1/pharmacy-drug-safety（M406 收官）
+  ...operatingCostMgmtV13Routes, // M407-A：运营成本管理 V13 GET /api/v1/operating-cost-mgmt
+  ...revenueGrowthV13Routes, // M407-B：收入增长 V13 GET /api/v1/revenue-growth
+  ...profitAnalysisV13Routes, // M407-C：盈亏分析 V13 GET /api/v1/profit-analysis
+  ...strategicKpiV13Routes, // M407-D：战略KPI V13 GET /api/v1/strategic-kpi（M407 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -2055,6 +2055,14 @@ const PharmacyDrugCatalog = lazy(() => import('@/pages/pharmacy-drug-catalog'));
 const PharmacyDrugDelivery = lazy(() => import('@/pages/pharmacy-drug-delivery'));
 // M406-D：药品安全 V13（M406 收官）
 const PharmacyDrugSafety = lazy(() => import('@/pages/pharmacy-drug-safety'));
+// M407-A：运营成本管理 V13
+const OperatingCostMgmt = lazy(() => import('@/pages/operating-cost-mgmt'));
+// M407-B：收入增长 V13
+const RevenueGrowth = lazy(() => import('@/pages/revenue-growth'));
+// M407-C：盈亏分析 V13
+const ProfitAnalysis = lazy(() => import('@/pages/profit-analysis'));
+// M407-D：战略KPI V13（M407 收官）
+const StrategicKpi = lazy(() => import('@/pages/strategic-kpi'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4051,6 +4059,14 @@ export default function AppRoutes() {
           <Route path="pharmacy-drug-delivery" element={<PharmacyDrugDelivery />} />
           {/* M406-D：药品安全 V13（M406 收官） */}
           <Route path="pharmacy-drug-safety" element={<PharmacyDrugSafety />} />
+          {/* M407-A：运营成本管理 V13 */}
+          <Route path="operating-cost-mgmt" element={<OperatingCostMgmt />} />
+          {/* M407-B：收入增长 V13 */}
+          <Route path="revenue-growth" element={<RevenueGrowth />} />
+          {/* M407-C：盈亏分析 V13 */}
+          <Route path="profit-analysis" element={<ProfitAnalysis />} />
+          {/* M407-D：战略KPI V13（M407 收官） */}
+          <Route path="strategic-kpi" element={<StrategicKpi />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
