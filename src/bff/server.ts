@@ -1721,6 +1721,14 @@ import { nosocomialInfectionV13Routes } from './routes/nosocomialInfectionV13';
 import { isolationOrderV13Routes } from './routes/isolationOrderV13';
 // M341-D：环境消毒合格率 V13 GET /api/v1/env-disinfection
 import { envDisinfectionV13Routes } from './routes/envDisinfectionV13';
+// M342-A：输血率 V13 GET /api/v1/blood-transfusion
+import { bloodTransfusionV13Routes } from './routes/bloodTransfusionV13';
+// M342-B：病理报告 TAT V13 GET /api/v1/pathology-turnaround
+import { pathologyTurnaroundV13Routes } from './routes/pathologyTurnaroundV13';
+// M342-C：内镜检查量 V13 GET /api/v1/endoscopy-volume
+import { endoscopyVolumeV13Routes } from './routes/endoscopyVolumeV13';
+// M342-D：超声检查量 V13 GET /api/v1/ultrasound-volume
+import { ultrasoundVolumeV13Routes } from './routes/ultrasoundVolumeV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2824,6 +2832,10 @@ const allRoutes: RouteDef[] = [
   ...nosocomialInfectionV13Routes, // M341-B：院感发生率 V13 GET /api/v1/nosocomial-infection
   ...isolationOrderV13Routes, // M341-C：隔离医嘱执行率 V13 GET /api/v1/isolation-order
   ...envDisinfectionV13Routes, // M341-D：环境消毒合格率 V13 GET /api/v1/env-disinfection
+  ...bloodTransfusionV13Routes, // M342-A：输血率 V13 GET /api/v1/blood-transfusion
+  ...pathologyTurnaroundV13Routes, // M342-B：病理报告 TAT V13 GET /api/v1/pathology-turnaround
+  ...endoscopyVolumeV13Routes, // M342-C：内镜检查量 V13 GET /api/v1/endoscopy-volume
+  ...ultrasoundVolumeV13Routes, // M342-D：超声检查量 V13 GET /api/v1/ultrasound-volume
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

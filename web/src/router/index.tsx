@@ -1537,6 +1537,14 @@ const NosocomialInfection = lazy(() => import('@/pages/nosocomial-infection'));
 const IsolationOrder = lazy(() => import('@/pages/isolation-order'));
 // M341-D：环境消毒合格率 V13
 const EnvDisinfection = lazy(() => import('@/pages/env-disinfection'));
+// M342-A：输血率 V13
+const BloodTransfusionStats = lazy(() => import('@/pages/blood-transfusion'));
+// M342-B：病理报告 TAT V13
+const PathologyTurnaround = lazy(() => import('@/pages/pathology-turnaround'));
+// M342-C：内镜检查量 V13
+const EndoscopyVolume = lazy(() => import('@/pages/endoscopy-volume'));
+// M342-D：超声检查量 V13
+const UltrasoundVolume = lazy(() => import('@/pages/ultrasound-volume'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3015,6 +3023,14 @@ export default function AppRoutes() {
           <Route path="isolation-order" element={<IsolationOrder />} />
           {/* M341-D：环境消毒合格率 V13 */}
           <Route path="env-disinfection" element={<EnvDisinfection />} />
+          {/* M342-A：输血率 V13 */}
+          <Route path="blood-transfusion" element={<BloodTransfusionStats />} />
+          {/* M342-B：病理报告 TAT V13 */}
+          <Route path="pathology-turnaround" element={<PathologyTurnaround />} />
+          {/* M342-C：内镜检查量 V13 */}
+          <Route path="endoscopy-volume" element={<EndoscopyVolume />} />
+          {/* M342-D：超声检查量 V13 */}
+          <Route path="ultrasound-volume" element={<UltrasoundVolume />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
