@@ -1473,6 +1473,14 @@ const GuidelineCompliance = lazy(() => import('@/pages/guideline-compliance'));
 const AntibioticUse = lazy(() => import('@/pages/antibiotic-use'));
 // M333-D：用血合理率 V13
 const BloodUse = lazy(() => import('@/pages/blood-use'));
+// M334-A：病案质量 V13
+const MrqQuality = lazy(() => import('@/pages/mrq-quality'));
+// M334-B：ICD 编码准确率 V13
+const IcdCodingAccuracy = lazy(() => import('@/pages/icd-coding-accuracy'));
+// M334-C：DRG 分组 V13
+const DrgGrouping = lazy(() => import('@/pages/drg-grouping'));
+// M334-D：平均住院日 V13
+const AverageLengthOfStay = lazy(() => import('@/pages/average-length-of-stay'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2887,6 +2895,14 @@ export default function AppRoutes() {
           <Route path="antibiotic-use" element={<AntibioticUse />} />
           {/* M333-D：用血合理率 V13 */}
           <Route path="blood-use" element={<BloodUse />} />
+          {/* M334-A：病案质量 V13 */}
+          <Route path="mrq-quality" element={<MrqQuality />} />
+          {/* M334-B：ICD 编码准确率 V13 */}
+          <Route path="icd-coding-accuracy" element={<IcdCodingAccuracy />} />
+          {/* M334-C：DRG 分组 V13 */}
+          <Route path="drg-grouping" element={<DrgGrouping />} />
+          {/* M334-D：平均住院日 V13 */}
+          <Route path="average-length-of-stay" element={<AverageLengthOfStay />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

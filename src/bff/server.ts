@@ -1657,6 +1657,14 @@ import { guidelineComplianceV13Routes } from './routes/guidelineComplianceV13';
 import { antibioticUseV13Routes } from './routes/antibioticUseV13';
 // M333-D：用血合理率 V13 GET /api/v1/blood-use
 import { bloodUseV13Routes } from './routes/bloodUseV13';
+// M334-A：病案质量 V13 GET /api/v1/mrq-quality
+import { mrqQualityV13Routes } from './routes/mrqQualityV13';
+// M334-B：ICD 编码准确率 V13 GET /api/v1/icd-coding-accuracy
+import { icdCodingV13Routes } from './routes/icdCodingV13';
+// M334-C：DRG 分组 V13 GET /api/v1/drg-grouping
+import { drgGroupingV13Routes } from './routes/drgGroupingV13';
+// M334-D：平均住院日 V13 GET /api/v1/average-length-of-stay
+import { averageLengthOfStayV13Routes } from './routes/averageLengthOfStayV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2728,6 +2736,10 @@ const allRoutes: RouteDef[] = [
   ...guidelineComplianceV13Routes, // M333-B：指南依从性 V13 GET /api/v1/guideline-compliance
   ...antibioticUseV13Routes, // M333-C：抗菌药物使用强度 V13 GET /api/v1/antibiotic-use
   ...bloodUseV13Routes, // M333-D：用血合理率 V13 GET /api/v1/blood-use
+  ...mrqQualityV13Routes, // M334-A：病案质量 V13 GET /api/v1/mrq-quality
+  ...icdCodingV13Routes, // M334-B：ICD 编码准确率 V13 GET /api/v1/icd-coding-accuracy
+  ...drgGroupingV13Routes, // M334-C：DRG 分组 V13 GET /api/v1/drg-grouping
+  ...averageLengthOfStayV13Routes, // M334-D：平均住院日 V13 GET /api/v1/average-length-of-stay
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
