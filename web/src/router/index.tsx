@@ -1321,6 +1321,14 @@ const ReadmissionRisk = lazy(() => import('@/pages/readmission-risk'));
 const MedicationReconciliation = lazy(() => import('@/pages/medication-reconciliation'));
 // M314-D：出院小结质量评分 V13
 const DischargeSummaryQuality = lazy(() => import('@/pages/discharge-summary-quality'));
+// M315-A：ICD 编码辅助推荐 V13
+const IcdCodingAssist = lazy(() => import('@/pages/icd-coding-assist'));
+// M315-B：医嘱套餐规范 V13
+const OrderSetCompliance = lazy(() => import('@/pages/order-set-compliance'));
+// M315-C：转科交接单完整度评分 V13
+const TransferSummaryCompleteness = lazy(() => import('@/pages/transfer-summary-completeness'));
+// M315-D：护理交班质量 V13
+const NursingHandover = lazy(() => import('@/pages/nursing-handover'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2583,6 +2591,14 @@ export default function AppRoutes() {
           <Route path="medication-reconciliation" element={<MedicationReconciliation />} />
           {/* M314-D：出院小结质量评分 V13 */}
           <Route path="discharge-summary-quality" element={<DischargeSummaryQuality />} />
+          {/* M315-A：ICD 编码辅助推荐 V13 */}
+          <Route path="icd-coding-assist" element={<IcdCodingAssist />} />
+          {/* M315-B：医嘱套餐规范 V13 */}
+          <Route path="order-set-compliance" element={<OrderSetCompliance />} />
+          {/* M315-C：转科交接单完整度评分 V13 */}
+          <Route path="transfer-summary-completeness" element={<TransferSummaryCompleteness />} />
+          {/* M315-D：护理交班质量 V13 */}
+          <Route path="nursing-handover" element={<NursingHandover />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
