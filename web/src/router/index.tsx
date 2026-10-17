@@ -1273,6 +1273,14 @@ const DeptSop = lazy(() => import('@/pages/dept-sop'));
 const DeptCollabOverview = lazy(() => import('@/pages/dept-collab-overview'));
 // M308-D（新规格）：科室间任务协作总览 V13
 const DeptTaskCollab = lazy(() => import('@/pages/dept-task-collab'));
+// M309-A：改进建议采纳率追踪 V13
+const SuggestionAdoption = lazy(() => import('@/pages/suggestion-adoption'));
+// M309-B：SOP 引用次数回灌飞轮分 V13
+const SopUsage = lazy(() => import('@/pages/sop-usage'));
+// M309-C：跨科协作任务经验双沉淀 V13
+const CrossDeptLearning = lazy(() => import('@/pages/cross-dept-learning'));
+// M309-D：个人学习曲线里程碑 V13
+const LearningMilestone = lazy(() => import('@/pages/learning-milestone'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2487,6 +2495,14 @@ export default function AppRoutes() {
           <Route path="dept-collab-overview" element={<DeptCollabOverview />} />
           {/* M308-D（新规格）：科室间任务协作总览 V13 */}
           <Route path="dept-task-collab" element={<DeptTaskCollab />} />
+          {/* M309-A：改进建议采纳率追踪 V13 */}
+          <Route path="suggestion-adoption" element={<SuggestionAdoption />} />
+          {/* M309-B：SOP 引用次数回灌飞轮分 V13 */}
+          <Route path="sop-usage" element={<SopUsage />} />
+          {/* M309-C：跨科协作任务经验双沉淀 V13 */}
+          <Route path="cross-dept-learning" element={<CrossDeptLearning />} />
+          {/* M309-D：个人学习曲线里程碑 V13 */}
+          <Route path="learning-milestone" element={<LearningMilestone />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

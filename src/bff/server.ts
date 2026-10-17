@@ -1457,6 +1457,14 @@ import { deptSopV13Routes } from './routes/deptSopV13';
 import { deptCollabOverviewV13Routes } from './routes/deptCollabOverviewV13';
 // M308-D（新规格）：科室间任务协作总览 V13 GET /api/v1/dept-task-collab
 import { deptTaskCollabV13Routes } from './routes/deptTaskCollabV13';
+// M309-A：改进建议采纳率追踪 V13 GET /api/v1/suggestion-adoption
+import { suggestionAdoptionV13Routes } from './routes/suggestionAdoptionV13';
+// M309-B：SOP 引用次数回灌飞轮分 V13 GET /api/v1/sop-usage
+import { sopUsageV13Routes } from './routes/sopUsageV13';
+// M309-C：跨科协作任务经验双沉淀 V13 GET /api/v1/cross-dept-learning
+import { crossDeptLearningV13Routes } from './routes/crossDeptLearningV13';
+// M309-D：个人学习曲线里程碑 V13 GET /api/v1/learning-milestone
+import { learningMilestoneV13Routes } from './routes/learningMilestoneV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2428,6 +2436,10 @@ const allRoutes: RouteDef[] = [
   ...deptSopV13Routes, // M308-C：科室经验 SOP 沉淀 V13 GET /api/v1/dept-sop
   ...deptCollabOverviewV13Routes, // M308-D：科际协作与经验共享总览 V13 GET /api/v1/dept-collab-overview
   ...deptTaskCollabV13Routes, // M308-D（新规格）：科室间任务协作总览 V13 GET /api/v1/dept-task-collab
+  ...suggestionAdoptionV13Routes, // M309-A：改进建议采纳率追踪 V13 GET /api/v1/suggestion-adoption
+  ...sopUsageV13Routes, // M309-B：SOP 引用次数回灌飞轮分 V13 GET /api/v1/sop-usage
+  ...crossDeptLearningV13Routes, // M309-C：跨科协作任务经验双沉淀 V13 GET /api/v1/cross-dept-learning
+  ...learningMilestoneV13Routes, // M309-D：个人学习曲线里程碑 V13 GET /api/v1/learning-milestone
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
