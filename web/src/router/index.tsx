@@ -1903,6 +1903,14 @@ const HandoverMgmt = lazy(() => import('@/pages/handover-mgmt'));
 const InformedConsentStats = lazy(() => import('@/pages/informed-consent-stats'));
 // M387-D：不良事件上报 V13（M387 收官）
 const AdverseEventReport = lazy(() => import('@/pages/adverse-event-report'));
+// M388-A：处方点评统计 V13（stats 避让）
+const PrescriptionReviewStats = lazy(() => import('@/pages/prescription-review-stats'));
+// M388-B：抗菌药物使用 V13
+const AntibioticUsage = lazy(() => import('@/pages/antibiotic-usage'));
+// M388-C：药品过敏管理 V13
+const DrugAllergyMgmt = lazy(() => import('@/pages/drug-allergy-mgmt'));
+// M388-D：急救药品管理 V13（M388 收官）
+const EmergencyDrugMgmt = lazy(() => import('@/pages/emergency-drug-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3747,6 +3755,14 @@ export default function AppRoutes() {
           <Route path="informed-consent-stats" element={<InformedConsentStats />} />
           {/* M387-D：不良事件上报 V13（M387 收官） */}
           <Route path="adverse-event-report" element={<AdverseEventReport />} />
+          {/* M388-A：处方点评统计 V13（stats 避让） */}
+          <Route path="prescription-review-stats" element={<PrescriptionReviewStats />} />
+          {/* M388-B：抗菌药物使用 V13 */}
+          <Route path="antibiotic-usage" element={<AntibioticUsage />} />
+          {/* M388-C：药品过敏管理 V13 */}
+          <Route path="drug-allergy-mgmt" element={<DrugAllergyMgmt />} />
+          {/* M388-D：急救药品管理 V13（M388 收官） */}
+          <Route path="emergency-drug-mgmt" element={<EmergencyDrugMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
