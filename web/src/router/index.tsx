@@ -1070,6 +1070,8 @@ const FederatedLearning = lazy(() => import('@/pages/federated-learning'));
 const MuseDoctor = lazy(() => import('@/pages/muse-doctor'));
 // M283-B：护士 MUSE 工作台 V5
 const MuseNurse = lazy(() => import('@/pages/muse-nurse'));
+// M283-C：药师 MUSE 工作台 V5
+const MusePharmacist = lazy(() => import('@/pages/muse-pharmacist'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2080,6 +2082,8 @@ export default function AppRoutes() {
           <Route path="muse-doctor" element={<MuseDoctor />} />
           {/* M283-B：护士 MUSE 工作台 V5 */}
           <Route path="muse-nurse" element={<MuseNurse />} />
+          {/* M283-C：药师 MUSE 工作台 V5 */}
+          <Route path="muse-pharmacist" element={<MusePharmacist />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
