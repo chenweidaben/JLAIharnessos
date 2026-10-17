@@ -2073,6 +2073,12 @@ import { equipmentMaintenanceStatsV13Routes } from './routes/equipmentMaintenanc
 import { energyMgmtDetailV13Routes } from './routes/energyMgmtDetailV13';
 // M385-D：安全生产 V13 GET /api/v1/safety-production（M385 收官）
 import { safetyProductionV13Routes } from './routes/safetyProductionV13';
+// M386-A：患者体验统计 V13 GET /api/v1/patient-experience-stats（stats 避让）
+import { patientExperienceStatsV13Routes } from './routes/patientExperienceStatsV13';
+// M386-B：服务质量 V13 GET /api/v1/service-quality
+import { serviceQualityV13Routes } from './routes/serviceQualityV13';
+// M386-D：临床路径统计 V13 GET /api/v1/clinical-pathway-stats（stats 避让，M386 收官）
+import { clinicalPathwayStatsV13Routes } from './routes/clinicalPathwayStatsV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3352,6 +3358,9 @@ const allRoutes: RouteDef[] = [
   ...equipmentMaintenanceStatsV13Routes, // M385-B：设备维护统计 V13 GET /api/v1/equipment-maintenance-stats（stats 避让）
   ...energyMgmtDetailV13Routes, // M385-C：能源管理明细 V13 GET /api/v1/energy-mgmt-detail
   ...safetyProductionV13Routes, // M385-D：安全生产 V13 GET /api/v1/safety-production（M385 收官）
+  ...patientExperienceStatsV13Routes, // M386-A：患者体验统计 V13 GET /api/v1/patient-experience-stats（stats 避让）
+  ...serviceQualityV13Routes, // M386-B：服务质量 V13 GET /api/v1/service-quality
+  ...clinicalPathwayStatsV13Routes, // M386-D：临床路径统计 V13 GET /api/v1/clinical-pathway-stats（stats 避让，M386 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

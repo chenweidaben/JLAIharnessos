@@ -1889,6 +1889,12 @@ const EquipmentMaintenanceStats = lazy(() => import('@/pages/equipment-maintenan
 const EnergyMgmtDetail = lazy(() => import('@/pages/energy-mgmt-detail'));
 // M385-D：安全生产 V13（M385 收官）
 const SafetyProduction = lazy(() => import('@/pages/safety-production'));
+// M386-A：患者体验统计 V13（stats 避让）
+const PatientExperienceStats = lazy(() => import('@/pages/patient-experience-stats'));
+// M386-B：服务质量 V13
+const ServiceQuality = lazy(() => import('@/pages/service-quality'));
+// M386-D：临床路径统计 V13（stats 避让，M386 收官）
+const ClinicalPathwayStats = lazy(() => import('@/pages/clinical-pathway-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3719,6 +3725,12 @@ export default function AppRoutes() {
           <Route path="energy-mgmt-detail" element={<EnergyMgmtDetail />} />
           {/* M385-D：安全生产 V13（M385 收官） */}
           <Route path="safety-production" element={<SafetyProduction />} />
+          {/* M386-A：患者体验统计 V13（stats 避让） */}
+          <Route path="patient-experience-stats" element={<PatientExperienceStats />} />
+          {/* M386-B：服务质量 V13 */}
+          <Route path="service-quality" element={<ServiceQuality />} />
+          {/* M386-D：临床路径统计 V13（stats 避让，M386 收官） */}
+          <Route path="clinical-pathway-stats" element={<ClinicalPathwayStats />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
