@@ -1959,6 +1959,14 @@ const PressureUlcerMgmt = lazy(() => import('@/pages/pressure-ulcer-mgmt'));
 const PatientIdentification = lazy(() => import('@/pages/patient-identification'));
 // M394-D：用药安全 V13（M394 收官）
 const MedicationSafety = lazy(() => import('@/pages/medication-safety'));
+// M395-A：智慧医院分级 V13（避让旧版 smart-hospital）
+const SmartHospitalGrade = lazy(() => import('@/pages/smart-hospital-grade'));
+// M395-B：等级评审 V13
+const GradeReview = lazy(() => import('@/pages/grade-review'));
+// M395-C：质量管理体系 V13
+const QualityMgmtSystem = lazy(() => import('@/pages/quality-mgmt-system'));
+// M395-D：绩效管理 V13（M395 收官）
+const PerformanceMgmt = lazy(() => import('@/pages/performance-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3859,6 +3867,14 @@ export default function AppRoutes() {
           <Route path="patient-identification" element={<PatientIdentification />} />
           {/* M394-D：用药安全 V13（M394 收官） */}
           <Route path="medication-safety" element={<MedicationSafety />} />
+          {/* M395-A：智慧医院分级 V13（避让旧版 smart-hospital） */}
+          <Route path="smart-hospital-grade" element={<SmartHospitalGrade />} />
+          {/* M395-B：等级评审 V13 */}
+          <Route path="grade-review" element={<GradeReview />} />
+          {/* M395-C：质量管理体系 V13 */}
+          <Route path="quality-mgmt-system" element={<QualityMgmtSystem />} />
+          {/* M395-D：绩效管理 V13（M395 收官） */}
+          <Route path="performance-mgmt" element={<PerformanceMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
