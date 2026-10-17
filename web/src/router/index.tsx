@@ -1120,6 +1120,8 @@ const Review = lazy(() => import('@/pages/review'));
 const CdsLearning = lazy(() => import('@/pages/cds-learning'));
 // M289-D：患者用药教育与依从性随访 V7
 const MedAdherence = lazy(() => import('@/pages/med-adherence'));
+// M290-A：医生 Personal Agent 工作台 V8
+const AgentDoctor = lazy(() => import('@/pages/agent-doctor'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2180,6 +2182,8 @@ export default function AppRoutes() {
           <Route path="cds-learning" element={<CdsLearning />} />
           {/* M289-D：患者用药教育与依从性随访 V7 */}
           <Route path="med-adherence" element={<MedAdherence />} />
+          {/* M290-A：医生 Personal Agent 工作台 V8 */}
+          <Route path="agent-doctor" element={<AgentDoctor />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
