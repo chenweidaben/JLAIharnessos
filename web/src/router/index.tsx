@@ -1481,6 +1481,14 @@ const IcdCodingAccuracy = lazy(() => import('@/pages/icd-coding-accuracy'));
 const DrgGrouping = lazy(() => import('@/pages/drg-grouping'));
 // M334-D：平均住院日 V13
 const AverageLengthOfStay = lazy(() => import('@/pages/average-length-of-stay'));
+// M335-A：急诊分诊 V13
+const EmergencyTriageStats = lazy(() => import('@/pages/emergency-triage-stats'));
+// M335-B：ICU 床位 V13
+const IcuOccupancy = lazy(() => import('@/pages/icu-occupancy'));
+// M335-C：危急值 V13
+const CriticalValueStats = lazy(() => import('@/pages/critical-value-stats'));
+// M335-D：31 天再入院率 V13
+const ReadmissionStats = lazy(() => import('@/pages/readmission-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2903,6 +2911,14 @@ export default function AppRoutes() {
           <Route path="drg-grouping" element={<DrgGrouping />} />
           {/* M334-D：平均住院日 V13 */}
           <Route path="average-length-of-stay" element={<AverageLengthOfStay />} />
+          {/* M335-A：急诊分诊 V13 */}
+          <Route path="emergency-triage-stats" element={<EmergencyTriageStats />} />
+          {/* M335-B：ICU 床位 V13 */}
+          <Route path="icu-occupancy" element={<IcuOccupancy />} />
+          {/* M335-C：危急值 V13 */}
+          <Route path="critical-value-stats" element={<CriticalValueStats />} />
+          {/* M335-D：31 天再入院率 V13 */}
+          <Route path="readmission-stats" element={<ReadmissionStats />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
