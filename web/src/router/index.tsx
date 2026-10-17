@@ -1577,6 +1577,14 @@ const DoctorTitleStructure = lazy(() => import('@/pages/doctor-title-structure')
 const NursePatientRatio = lazy(() => import('@/pages/nurse-patient-ratio'));
 // M346-D：员工培训学时 V13（M346 收官）
 const StaffTrainingHours = lazy(() => import('@/pages/staff-training-hours'));
+// M347-A：患者满意度 V13（stats 避让已有 patientSatisfactionV13）
+const PatientSatisfactionStats = lazy(() => import('@/pages/patient-satisfaction-stats'));
+// M347-B：投诉率 V13
+const ComplaintRate = lazy(() => import('@/pages/complaint-rate'));
+// M347-C：出院随访率 V13
+const FollowUpCompletion = lazy(() => import('@/pages/follow-up-completion'));
+// M347-D：病历完整性 V13（M347 收官）
+const MedicalRecordIntegrity = lazy(() => import('@/pages/medical-record-integrity'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3095,6 +3103,14 @@ export default function AppRoutes() {
           <Route path="nurse-patient-ratio" element={<NursePatientRatio />} />
           {/* M346-D：员工培训学时 V13（M346 收官） */}
           <Route path="staff-training-hours" element={<StaffTrainingHours />} />
+          {/* M347-A：患者满意度 V13（stats 避让已有 patientSatisfactionV13） */}
+          <Route path="patient-satisfaction-stats" element={<PatientSatisfactionStats />} />
+          {/* M347-B：投诉率 V13 */}
+          <Route path="complaint-rate" element={<ComplaintRate />} />
+          {/* M347-C：出院随访率 V13 */}
+          <Route path="follow-up-completion" element={<FollowUpCompletion />} />
+          {/* M347-D：病历完整性 V13（M347 收官） */}
+          <Route path="medical-record-integrity" element={<MedicalRecordIntegrity />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
