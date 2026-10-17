@@ -1108,6 +1108,8 @@ const DrgAnalysis = lazy(() => import('@/pages/drg-analysis'));
 const TrendForecast = lazy(() => import('@/pages/trend-forecast'));
 // M288-A：智能审批与工作流引擎 V6
 const Workflow = lazy(() => import('@/pages/workflow'));
+// M288-B：通用表单引擎 V6
+const FormEngine = lazy(() => import('@/pages/form-engine'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2156,6 +2158,8 @@ export default function AppRoutes() {
           <Route path="trend-forecast" element={<TrendForecast />} />
           {/* M288-A：智能审批与工作流引擎 V6 */}
           <Route path="workflow" element={<Workflow />} />
+          {/* M288-B：通用表单引擎 V6 */}
+          <Route path="form-engine" element={<FormEngine />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
