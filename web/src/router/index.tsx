@@ -1168,6 +1168,14 @@ const ExperiencePush = lazy(() => import('@/pages/experience-push'));
 const PatientTips = lazy(() => import('@/pages/patient-tips'));
 // M295-D：经验复用效果度量 V13
 const ReuseRoi = lazy(() => import('@/pages/reuse-roi'));
+// M296-A：经验时间衰减与新鲜度 V13
+const ExperienceFreshness = lazy(() => import('@/pages/experience-freshness'));
+// M296-B：过期经验复核工作流 V13
+const ExperienceReview = lazy(() => import('@/pages/experience-review'));
+// M296-C：经验更新与版本迭代 V13
+const ExperienceVersions = lazy(() => import('@/pages/experience-versions'));
+// M296-D：知识资产生命周期总览 V13
+const KnowledgeLifecycle = lazy(() => import('@/pages/knowledge-lifecycle'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2276,6 +2284,14 @@ export default function AppRoutes() {
           <Route path="patient-tips" element={<PatientTips />} />
           {/* M295-D：经验复用效果度量 V13 */}
           <Route path="reuse-roi" element={<ReuseRoi />} />
+          {/* M296-A：经验时间衰减与新鲜度 V13 */}
+          <Route path="experience-freshness" element={<ExperienceFreshness />} />
+          {/* M296-B：过期经验复核工作流 V13 */}
+          <Route path="experience-review" element={<ExperienceReview />} />
+          {/* M296-C：经验更新与版本迭代 V13 */}
+          <Route path="experience-versions" element={<ExperienceVersions />} />
+          {/* M296-D：知识资产生命周期总览 V13 */}
+          <Route path="knowledge-lifecycle" element={<KnowledgeLifecycle />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
