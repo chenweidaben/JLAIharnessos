@@ -1585,6 +1585,14 @@ const ComplaintRate = lazy(() => import('@/pages/complaint-rate'));
 const FollowUpCompletion = lazy(() => import('@/pages/follow-up-completion'));
 // M347-D：病历完整性 V13（M347 收官）
 const MedicalRecordIntegrity = lazy(() => import('@/pages/medical-record-integrity'));
+// M348-A：急诊绿色通道 V13
+const EmergencyGreenway = lazy(() => import('@/pages/emergency-greenway'));
+// M348-B：院前急救 V13
+const PreHospitalCare = lazy(() => import('@/pages/pre-hospital-care'));
+// M348-C：胸痛中心 V13
+const ChestPainCenter = lazy(() => import('@/pages/chest-pain-center'));
+// M348-D：卒中中心 V13（M348 收官）
+const StrokeCenter = lazy(() => import('@/pages/stroke-center'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3111,6 +3119,14 @@ export default function AppRoutes() {
           <Route path="follow-up-completion" element={<FollowUpCompletion />} />
           {/* M347-D：病历完整性 V13（M347 收官） */}
           <Route path="medical-record-integrity" element={<MedicalRecordIntegrity />} />
+          {/* M348-A：急诊绿色通道 V13 */}
+          <Route path="emergency-greenway" element={<EmergencyGreenway />} />
+          {/* M348-B：院前急救 V13 */}
+          <Route path="pre-hospital-care" element={<PreHospitalCare />} />
+          {/* M348-C：胸痛中心 V13 */}
+          <Route path="chest-pain-center" element={<ChestPainCenter />} />
+          {/* M348-D：卒中中心 V13（M348 收官） */}
+          <Route path="stroke-center" element={<StrokeCenter />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

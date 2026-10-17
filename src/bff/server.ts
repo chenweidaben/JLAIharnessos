@@ -1769,6 +1769,14 @@ import { complaintRateV13Routes } from './routes/complaintRateV13';
 import { followUpCompletionV13Routes } from './routes/followUpCompletionV13';
 // M347-D：病历完整性 V13 GET /api/v1/medical-record-integrity
 import { medicalRecordIntegrityV13Routes } from './routes/medicalRecordIntegrityV13';
+// M348-A：急诊绿色通道 V13 GET /api/v1/emergency-greenway
+import { emergencyGreenwayV13Routes } from './routes/emergencyGreenwayV13';
+// M348-B：院前急救 V13 GET /api/v1/pre-hospital-care
+import { preHospitalCareV13Routes } from './routes/preHospitalCareV13';
+// M348-C：胸痛中心 V13 GET /api/v1/chest-pain-center
+import { chestPainCenterV13Routes } from './routes/chestPainCenterV13';
+// M348-D：卒中中心 V13 GET /api/v1/stroke-center
+import { strokeCenterV13Routes } from './routes/strokeCenterV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2896,6 +2904,10 @@ const allRoutes: RouteDef[] = [
   ...complaintRateV13Routes, // M347-B：投诉率 V13 GET /api/v1/complaint-rate
   ...followUpCompletionV13Routes, // M347-C：出院随访率 V13 GET /api/v1/follow-up-completion
   ...medicalRecordIntegrityV13Routes, // M347-D：病历完整性 V13 GET /api/v1/medical-record-integrity
+  ...emergencyGreenwayV13Routes, // M348-A：急诊绿色通道 V13 GET /api/v1/emergency-greenway
+  ...preHospitalCareV13Routes, // M348-B：院前急救 V13 GET /api/v1/pre-hospital-care
+  ...chestPainCenterV13Routes, // M348-C：胸痛中心 V13 GET /api/v1/chest-pain-center
+  ...strokeCenterV13Routes, // M348-D：卒中中心 V13 GET /api/v1/stroke-center
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
