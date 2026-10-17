@@ -1262,6 +1262,8 @@ const FlywheelTasks = lazy(() => import('@/pages/flywheel-tasks'));
 const TaskFunnel = lazy(() => import('@/pages/task-funnel'));
 // M307-C：任务验收与效果验证 V13
 const TaskVerification = lazy(() => import('@/pages/task-verification'));
+// M307-D：闭环回灌飞轮 V13
+const ClosedLoopOverview = lazy(() => import('@/pages/closed-loop-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2464,6 +2466,8 @@ export default function AppRoutes() {
           <Route path="task-funnel" element={<TaskFunnel />} />
           {/* M307-C：任务验收与效果验证 V13 */}
           <Route path="task-verification" element={<TaskVerification />} />
+          {/* M307-D：闭环回灌飞轮 V13 */}
+          <Route path="closed-loop-overview" element={<ClosedLoopOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
