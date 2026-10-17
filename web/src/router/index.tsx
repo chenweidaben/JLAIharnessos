@@ -1008,6 +1008,8 @@ const MUSEExperience = lazy(() => import('@/pages/muse-experience'));
 const ExperienceShare = lazy(() => import('@/pages/experience-share'));
 // M275-C：失败案例回灌学习飞轮
 const FailureFlywheel = lazy(() => import('@/pages/failure-flywheel'));
+// M275-D：经验图谱与后继者继承
+const ExperienceGraph = lazy(() => import('@/pages/experience-graph'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1956,6 +1958,8 @@ export default function AppRoutes() {
           <Route path="experience-share" element={<ExperienceShare />} />
           {/* M275-C：失败案例回灌学习飞轮 */}
           <Route path="failure-flywheel" element={<FailureFlywheel />} />
+          {/* M275-D：经验图谱与后继者继承 */}
+          <Route path="experience-graph" element={<ExperienceGraph />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
