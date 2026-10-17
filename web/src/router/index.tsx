@@ -2015,6 +2015,14 @@ const DataGovernanceDetail = lazy(() => import('@/pages/data-governance-detail')
 const StatisticsReport = lazy(() => import('@/pages/statistics-report'));
 // M401-D：编码质量 V13（M401 收官）
 const CodingQuality = lazy(() => import('@/pages/coding-quality'));
+// M402-A：排班管理 V13
+const SchedulingMgmt = lazy(() => import('@/pages/scheduling-mgmt'));
+// M402-B：值班管理 V13
+const DutyRoster = lazy(() => import('@/pages/duty-roster'));
+// M402-C：考勤管理 V13
+const AttendanceMgmt = lazy(() => import('@/pages/attendance-mgmt'));
+// M402-D：绩效考核 V13（避让旧版 performance-eval，M402 收官）
+const PerformanceEvalDetail = lazy(() => import('@/pages/performance-eval-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3971,6 +3979,14 @@ export default function AppRoutes() {
           <Route path="statistics-report" element={<StatisticsReport />} />
           {/* M401-D：编码质量 V13（M401 收官） */}
           <Route path="coding-quality" element={<CodingQuality />} />
+          {/* M402-A：排班管理 V13 */}
+          <Route path="scheduling-mgmt" element={<SchedulingMgmt />} />
+          {/* M402-B：值班管理 V13 */}
+          <Route path="duty-roster" element={<DutyRoster />} />
+          {/* M402-C：考勤管理 V13 */}
+          <Route path="attendance-mgmt" element={<AttendanceMgmt />} />
+          {/* M402-D：绩效考核 V13（避让旧版 performance-eval，M402 收官） */}
+          <Route path="performance-eval-detail" element={<PerformanceEvalDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

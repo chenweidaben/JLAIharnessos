@@ -2199,6 +2199,14 @@ import { dataGovernanceDetailV13Routes } from './routes/dataGovernanceDetailV13'
 import { statisticsReportV13Routes } from './routes/statisticsReportV13';
 // M401-D：编码质量 V13 GET /api/v1/coding-quality（M401 收官）
 import { codingQualityV13Routes } from './routes/codingQualityV13';
+// M402-A：排班管理 V13 GET /api/v1/scheduling-mgmt
+import { schedulingMgmtV13Routes } from './routes/schedulingMgmtV13';
+// M402-B：值班管理 V13 GET /api/v1/duty-roster
+import { dutyRosterV13Routes } from './routes/dutyRosterV13';
+// M402-C：考勤管理 V13 GET /api/v1/attendance-mgmt
+import { attendanceMgmtV13Routes } from './routes/attendanceMgmtV13';
+// M402-D：绩效考核 V13 GET /api/v1/performance-eval-detail（避让旧版 performanceEvalV13 M384，M402 收官）
+import { performanceEvalDetailV13Routes } from './routes/performanceEvalDetailV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3541,6 +3549,10 @@ const allRoutes: RouteDef[] = [
   ...dataGovernanceDetailV13Routes, // M401-B：数据治理明细 V13 GET /api/v1/data-governance-detail（避让旧版 dataGovernanceV13/dataGovernanceStatsV13）
   ...statisticsReportV13Routes, // M401-C：统计报表 V13 GET /api/v1/statistics-report
   ...codingQualityV13Routes, // M401-D：编码质量 V13 GET /api/v1/coding-quality（M401 收官）
+  ...schedulingMgmtV13Routes, // M402-A：排班管理 V13 GET /api/v1/scheduling-mgmt
+  ...dutyRosterV13Routes, // M402-B：值班管理 V13 GET /api/v1/duty-roster
+  ...attendanceMgmtV13Routes, // M402-C：考勤管理 V13 GET /api/v1/attendance-mgmt
+  ...performanceEvalDetailV13Routes, // M402-D：绩效考核 V13 GET /api/v1/performance-eval-detail（避让旧版 performanceEvalV13 M384，M402 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
