@@ -1112,6 +1112,8 @@ const Workflow = lazy(() => import('@/pages/workflow'));
 const FormEngine = lazy(() => import('@/pages/form-engine'));
 // M288-D：流程监控与效率分析 V6
 const WorkflowMonitor = lazy(() => import('@/pages/workflow-monitor'));
+// M289-A：处方前置审核规则引擎 V7
+const Cds = lazy(() => import('@/pages/cds'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2164,6 +2166,8 @@ export default function AppRoutes() {
           <Route path="form-engine" element={<FormEngine />} />
           {/* M288-D：流程监控与效率分析 V6 */}
           <Route path="workflow-monitor" element={<WorkflowMonitor />} />
+          {/* M289-A：处方前置审核规则引擎 V7 */}
+          <Route path="cds" element={<Cds />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
