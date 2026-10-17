@@ -2175,6 +2175,14 @@ const AntibioticUsageMgmt = lazy(() => import('@/pages/antibiotic-usage-mgmt'));
 const BloodTransfusionDetail = lazy(() => import('@/pages/blood-transfusion-detail'));
 // M421-D：临床路径管理 V13（M421 收官，换名避让旧版 clinicalPathwayDetailV13）
 const ClinicalPathwayMgmt = lazy(() => import('@/pages/clinical-pathway-mgmt'));
+// M422-A：VTE 预防管理（细节）V13（detail 避让旧版 vtePreventionMgmtV13）
+const VtePreventionDetail = lazy(() => import('@/pages/vte-prevention-detail'));
+// M422-B：压疮管理（细节）V13（detail 避让旧版 pressureUlcerMgmtV13（M394-B））
+const PressureUlcerDetail = lazy(() => import('@/pages/pressure-ulcer-detail'));
+// M422-C：跌倒管理 V13
+const FallMgmt = lazy(() => import('@/pages/fall-mgmt'));
+// M422-D：身体约束管理 V13（M422 收官）
+const RestraintMgmt = lazy(() => import('@/pages/restraint-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4291,6 +4299,14 @@ export default function AppRoutes() {
           <Route path="blood-transfusion-detail" element={<BloodTransfusionDetail />} />
           {/* M421-D：临床路径管理 V13（M421 收官，换名避让旧版 clinicalPathwayDetailV13） */}
           <Route path="clinical-pathway-mgmt" element={<ClinicalPathwayMgmt />} />
+          {/* M422-A：VTE 预防管理（细节）V13（detail 避让旧版 vtePreventionMgmtV13） */}
+          <Route path="vte-prevention-detail" element={<VtePreventionDetail />} />
+          {/* M422-B：压疮管理（细节）V13（detail 避让旧版 pressureUlcerMgmtV13（M394-B）） */}
+          <Route path="pressure-ulcer-detail" element={<PressureUlcerDetail />} />
+          {/* M422-C：跌倒管理 V13 */}
+          <Route path="fall-mgmt" element={<FallMgmt />} />
+          {/* M422-D：身体约束管理 V13（M422 收官） */}
+          <Route path="restraint-mgmt" element={<RestraintMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
