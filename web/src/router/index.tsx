@@ -1457,6 +1457,14 @@ const OperatingRoom = lazy(() => import('@/pages/operating-room'));
 const ElevatorWaitTime = lazy(() => import('@/pages/elevator-wait-time'));
 // M331-D：停车场使用率 V13
 const Parking = lazy(() => import('@/pages/parking'));
+// M332-A：患者满意度调研 V13
+const PatientSatisfactionSurvey = lazy(() => import('@/pages/patient-satisfaction-survey'));
+// M332-B：医生满意度调研 V13
+const DoctorSatisfaction = lazy(() => import('@/pages/doctor-satisfaction'));
+// M332-C：护士满意度调研 V13
+const NurseSatisfaction = lazy(() => import('@/pages/nurse-satisfaction'));
+// M332-D：员工满意度总览 V13
+const StaffSatisfactionOverview = lazy(() => import('@/pages/staff-satisfaction-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2855,6 +2863,14 @@ export default function AppRoutes() {
           <Route path="elevator-wait-time" element={<ElevatorWaitTime />} />
           {/* M331-D：停车场使用率 V13 */}
           <Route path="parking" element={<Parking />} />
+          {/* M332-A：患者满意度调研 V13 */}
+          <Route path="patient-satisfaction-survey" element={<PatientSatisfactionSurvey />} />
+          {/* M332-B：医生满意度调研 V13 */}
+          <Route path="doctor-satisfaction" element={<DoctorSatisfaction />} />
+          {/* M332-C：护士满意度调研 V13 */}
+          <Route path="nurse-satisfaction" element={<NurseSatisfaction />} />
+          {/* M332-D：员工满意度总览 V13 */}
+          <Route path="staff-satisfaction-overview" element={<StaffSatisfactionOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
