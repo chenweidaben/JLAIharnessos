@@ -1833,6 +1833,14 @@ const GuideService = lazy(() => import('@/pages/guide-service'));
 const VolunteerService = lazy(() => import('@/pages/volunteer-service'));
 // M378-D：便民服务 V13（M378 收官）
 const ConvenienceService = lazy(() => import('@/pages/convenience-service'));
+// M379-A：安全事件统计 V13（stats 避让）
+const SecurityIncidentStats = lazy(() => import('@/pages/security-incident-stats'));
+// M379-B：备份管理 V13
+const BackupMgmt = lazy(() => import('@/pages/backup-mgmt'));
+// M379-C：系统可用性明细 V13（detail 避让）
+const SystemAvailabilityDetail = lazy(() => import('@/pages/system-availability-detail'));
+// M379-D：数据质量明细 V13（detail 避让，M379 收官）
+const DataQualityDetail = lazy(() => import('@/pages/data-quality-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3607,6 +3615,14 @@ export default function AppRoutes() {
           <Route path="volunteer-service" element={<VolunteerService />} />
           {/* M378-D：便民服务 V13（M378 收官） */}
           <Route path="convenience-service" element={<ConvenienceService />} />
+          {/* M379-A：安全事件统计 V13（stats 避让） */}
+          <Route path="security-incident-stats" element={<SecurityIncidentStats />} />
+          {/* M379-B：备份管理 V13 */}
+          <Route path="backup-mgmt" element={<BackupMgmt />} />
+          {/* M379-C：系统可用性明细 V13（detail 避让） */}
+          <Route path="system-availability-detail" element={<SystemAvailabilityDetail />} />
+          {/* M379-D：数据质量明细 V13（detail 避让，M379 收官） */}
+          <Route path="data-quality-detail" element={<DataQualityDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
