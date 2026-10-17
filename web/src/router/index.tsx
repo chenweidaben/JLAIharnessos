@@ -1409,6 +1409,14 @@ const LabAiUsage = lazy(() => import('@/pages/lab-ai-usage'));
 const AiModelDrift = lazy(() => import('@/pages/ai-model-drift'));
 // M325-D：AI 治理台账 V13
 const AiGovernance = lazy(() => import('@/pages/ai-governance'));
+// M326-A：患者等候时长 V13
+const PatientWaitTime = lazy(() => import('@/pages/patient-wait-time'));
+// M326-B：患者投诉处理 V13
+const PatientComplaint = lazy(() => import('@/pages/patient-complaint'));
+// M326-C：随访完成率 V13
+const PatientFollowUp = lazy(() => import('@/pages/patient-follow-up'));
+// M326-D：健教材料推送 V13
+const PatientEducationStats = lazy(() => import('@/pages/patient-education-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2759,6 +2767,14 @@ export default function AppRoutes() {
           <Route path="ai-model-drift" element={<AiModelDrift />} />
           {/* M325-D：AI 治理台账 V13 */}
           <Route path="ai-governance" element={<AiGovernance />} />
+          {/* M326-A：患者等候时长 V13 */}
+          <Route path="patient-wait-time" element={<PatientWaitTime />} />
+          {/* M326-B：患者投诉处理 V13 */}
+          <Route path="patient-complaint" element={<PatientComplaint />} />
+          {/* M326-C：随访完成率 V13 */}
+          <Route path="patient-follow-up" element={<PatientFollowUp />} />
+          {/* M326-D：健教材料推送 V13 */}
+          <Route path="patient-education-stats" element={<PatientEducationStats />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
