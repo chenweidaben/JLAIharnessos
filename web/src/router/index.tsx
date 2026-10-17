@@ -1144,6 +1144,14 @@ const BestPractice = lazy(() => import('@/pages/best-practice'));
 const Knowledge = lazy(() => import('@/pages/knowledge'));
 // M292-D：医院级 AI 知识资产大盘 V10
 const KnowledgeDashboard = lazy(() => import('@/pages/knowledge-dashboard'));
+// M293-A：DOCTOR_MUSE 主动式晨间简报 V11
+const MorningBrief = lazy(() => import('@/pages/morning-brief'));
+// M293-B：NURSE_MUSE 主动式交接班简报 V11
+const ShiftBrief = lazy(() => import('@/pages/shift-brief'));
+// M293-C：PHARMA_MUSE 主动式晨会简报 V11
+const PharmaBrief = lazy(() => import('@/pages/pharma-brief'));
+// M293-D：MANAGER_MUSE 主动式周会简报 V11
+const ManagerBrief = lazy(() => import('@/pages/manager-brief'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2228,6 +2236,14 @@ export default function AppRoutes() {
           <Route path="knowledge" element={<Knowledge />} />
           {/* M292-D：医院级 AI 知识资产大盘 V10 */}
           <Route path="knowledge-dashboard" element={<KnowledgeDashboard />} />
+          {/* M293-A：DOCTOR_MUSE 主动式晨间简报 V11 */}
+          <Route path="morning-brief" element={<MorningBrief />} />
+          {/* M293-B：NURSE_MUSE 主动式交接班简报 V11 */}
+          <Route path="shift-brief" element={<ShiftBrief />} />
+          {/* M293-C：PHARMA_MUSE 主动式晨会简报 V11 */}
+          <Route path="pharma-brief" element={<PharmaBrief />} />
+          {/* M293-D：MANAGER_MUSE 主动式周会简报 V11 */}
+          <Route path="manager-brief" element={<ManagerBrief />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

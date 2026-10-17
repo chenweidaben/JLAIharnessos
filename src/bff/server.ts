@@ -1327,6 +1327,14 @@ import { bestPracticeV10Routes } from './routes/bestPracticeV10';
 import { knowledgeHandoverV10Routes } from './routes/knowledgeHandoverV10';
 // M292-D：医院级 AI 知识资产大盘 V10 GET /api/v1/knowledge
 import { knowledgeAssetV10Routes } from './routes/knowledgeAssetV10';
+// M293-A：DOCTOR_MUSE 主动式晨间简报 V11 GET /api/v1/morning-brief
+import { morningBriefV11Routes } from './routes/morningBriefV11';
+// M293-B：NURSE_MUSE 主动式交接班简报 V11 GET /api/v1/shift-brief
+import { shiftBriefV11Routes } from './routes/shiftBriefV11';
+// M293-C：PHARMA_MUSE 主动式晨会简报 V11 GET /api/v1/pharma-brief
+import { pharmaBriefV11Routes } from './routes/pharmaBriefV11';
+// M293-D：MANAGER_MUSE 主动式周会简报 V11 GET /api/v1/manager-brief
+import { managerBriefV11Routes } from './routes/managerBriefV11';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2233,6 +2241,10 @@ const allRoutes: RouteDef[] = [
   ...bestPracticeV10Routes, // M292-B：成功案例蒸馏与最佳实践库 V10 GET/POST /api/v1/best-practice
   ...knowledgeHandoverV10Routes, // M292-C：个人知识图谱与继任者交接 V10 GET/POST /api/v1/knowledge
   ...knowledgeAssetV10Routes, // M292-D：医院级 AI 知识资产大盘 V10 GET /api/v1/knowledge
+  ...morningBriefV11Routes, // M293-A：DOCTOR_MUSE 主动式晨间简报 V11 GET /api/v1/morning-brief
+  ...shiftBriefV11Routes, // M293-B：NURSE_MUSE 主动式交接班简报 V11 GET /api/v1/shift-brief
+  ...pharmaBriefV11Routes, // M293-C：PHARMA_MUSE 主动式晨会简报 V11 GET /api/v1/pharma-brief
+  ...managerBriefV11Routes, // M293-D：MANAGER_MUSE 主动式周会简报 V11 GET /api/v1/manager-brief
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
