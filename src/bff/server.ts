@@ -1897,6 +1897,14 @@ import { patientPrivacyV13Routes } from './routes/patientPrivacyV13';
 import { networkSecurityV13Routes } from './routes/networkSecurityV13';
 // M363-D：数据治理（统计）V13 GET /api/v1/data-governance-stats（stats避让）
 import { dataGovernanceStatsV13Routes } from './routes/dataGovernanceStatsV13';
+// M364-A：运营管理 V13 GET /api/v1/operation-mgmt
+import { operationMgmtV13Routes } from './routes/operationMgmtV13';
+// M364-B：财务管理 V13 GET /api/v1/finance-mgmt
+import { financeMgmtV13Routes } from './routes/financeMgmtV13';
+// M364-C：患者流量 V13 GET /api/v1/patient-flow
+import { patientFlowV13Routes } from './routes/patientFlowV13';
+// M364-D：资源利用 V13 GET /api/v1/resource-util（M364 收官）
+import { resourceUtilV13Routes } from './routes/resourceUtilV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3088,6 +3096,10 @@ const allRoutes: RouteDef[] = [
   ...patientPrivacyV13Routes, // M363-B：患者隐私保护 V13 GET /api/v1/patient-privacy
   ...networkSecurityV13Routes, // M363-C：网络安全 V13 GET /api/v1/network-security
   ...dataGovernanceStatsV13Routes, // M363-D：数据治理（统计）V13 GET /api/v1/data-governance-stats（stats避让）
+  ...operationMgmtV13Routes, // M364-A：运营管理 V13 GET /api/v1/operation-mgmt
+  ...financeMgmtV13Routes, // M364-B：财务管理 V13 GET /api/v1/finance-mgmt
+  ...patientFlowV13Routes, // M364-C：患者流量 V13 GET /api/v1/patient-flow
+  ...resourceUtilV13Routes, // M364-D：资源利用 V13 GET /api/v1/resource-util（M364 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
