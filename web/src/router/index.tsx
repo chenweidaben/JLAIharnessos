@@ -2111,6 +2111,14 @@ const InformedConsentDetail = lazy(() => import('@/pages/informed-consent-detail
 const HandoverDetail = lazy(() => import('@/pages/handover-detail'));
 // M413-D：不良事件管理（细节）V13（M413 收官，detail 避让旧版 adverseEventReportV13）
 const AdverseEventDetail = lazy(() => import('@/pages/adverse-event-detail'));
+// M414-A：输血管理 V13
+const BloodTransfusionMgmt = lazy(() => import('@/pages/blood-transfusion-mgmt'));
+// M414-B：临床路径管理（细节）V13（detail 避让旧版 clinicalPathwayMgmtV13）
+const ClinicalPathwayDetail = lazy(() => import('@/pages/clinical-pathway-detail'));
+// M414-C：抗菌药物管理（细节）V13（detail 避让旧版 antibioticUseDensityV13）
+const AntibioticMgmtDetail = lazy(() => import('@/pages/antibiotic-mgmt-detail'));
+// M414-D：VTE 预防管理 V13（M414 收官）
+const VtePreventionMgmt = lazy(() => import('@/pages/vte-prevention-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4163,6 +4171,14 @@ export default function AppRoutes() {
           <Route path="handover-detail" element={<HandoverDetail />} />
           {/* M413-D：不良事件管理（细节）V13（M413 收官，detail 避让旧版 adverseEventReportV13） */}
           <Route path="adverse-event-detail" element={<AdverseEventDetail />} />
+          {/* M414-A：输血管理 V13 */}
+          <Route path="blood-transfusion-mgmt" element={<BloodTransfusionMgmt />} />
+          {/* M414-B：临床路径管理（细节）V13（detail 避让旧版 clinicalPathwayMgmtV13） */}
+          <Route path="clinical-pathway-detail" element={<ClinicalPathwayDetail />} />
+          {/* M414-C：抗菌药物管理（细节）V13（detail 避让旧版 antibioticUseDensityV13） */}
+          <Route path="antibiotic-mgmt-detail" element={<AntibioticMgmtDetail />} />
+          {/* M414-D：VTE 预防管理 V13（M414 收官） */}
+          <Route path="vte-prevention-mgmt" element={<VtePreventionMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

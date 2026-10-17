@@ -2295,6 +2295,14 @@ import { informedConsentDetailV13Routes } from './routes/informedConsentDetailV1
 import { handoverDetailV13Routes } from './routes/handoverDetailV13';
 // M413-D：不良事件管理（细节）V13 GET /api/v1/adverse-event-detail（M413 收官，detail 避让旧版 adverseEventReportV13）
 import { adverseEventDetailV13Routes } from './routes/adverseEventDetailV13';
+// M414-A：输血管理 V13 GET /api/v1/blood-transfusion-mgmt
+import { bloodTransfusionMgmtV13Routes } from './routes/bloodTransfusionMgmtV13';
+// M414-B：临床路径管理（细节）V13 GET /api/v1/clinical-pathway-detail（detail 避让旧版 clinicalPathwayMgmtV13）
+import { clinicalPathwayDetailV13Routes } from './routes/clinicalPathwayDetailV13';
+// M414-C：抗菌药物管理（细节）V13 GET /api/v1/antibiotic-mgmt-detail（detail 避让旧版 antibioticUseDensityV13）
+import { antibioticMgmtDetailV13Routes } from './routes/antibioticMgmtDetailV13';
+// M414-D：VTE 预防管理 V13 GET /api/v1/vte-prevention-mgmt（M414 收官）
+import { vtePreventionMgmtV13Routes } from './routes/vtePreventionMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3685,6 +3693,10 @@ const allRoutes: RouteDef[] = [
   ...informedConsentDetailV13Routes, // M413-B：知情同意管理（细节）V13 GET /api/v1/informed-consent-detail（detail 避让旧版 informedConsentStatsV13）
   ...handoverDetailV13Routes, // M413-C：交接班管理（细节）V13 GET /api/v1/handover-detail（detail 避让旧版 handoverMgmtV13）
   ...adverseEventDetailV13Routes, // M413-D：不良事件管理（细节）V13 GET /api/v1/adverse-event-detail（M413 收官，detail 避让旧版 adverseEventReportV13）
+  ...bloodTransfusionMgmtV13Routes, // M414-A：输血管理 V13 GET /api/v1/blood-transfusion-mgmt
+  ...clinicalPathwayDetailV13Routes, // M414-B：临床路径管理（细节）V13 GET /api/v1/clinical-pathway-detail（detail 避让旧版 clinicalPathwayMgmtV13）
+  ...antibioticMgmtDetailV13Routes, // M414-C：抗菌药物管理（细节）V13 GET /api/v1/antibiotic-mgmt-detail（detail 避让旧版 antibioticUseDensityV13）
+  ...vtePreventionMgmtV13Routes, // M414-D：VTE 预防管理 V13 GET /api/v1/vte-prevention-mgmt（M414 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
