@@ -1793,6 +1793,14 @@ const BedManagement = lazy(() => import('@/pages/bed-management'));
 const InpatientQuality = lazy(() => import('@/pages/inpatient-quality'));
 // M373-D：出院随访 V13（M373 收官）
 const DischargeFollowup = lazy(() => import('@/pages/discharge-followup'));
+// M374-A：检查服务 V13
+const ExaminationService = lazy(() => import('@/pages/examination-service'));
+// M374-B：检验服务 V13
+const LabService = lazy(() => import('@/pages/lab-service'));
+// M374-C：病理服务 V13
+const PathologyService = lazy(() => import('@/pages/pathology-service'));
+// M374-D：影像质量 V13（M374 收官）
+const RadiologyQuality = lazy(() => import('@/pages/radiology-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3527,6 +3535,14 @@ export default function AppRoutes() {
           <Route path="inpatient-quality" element={<InpatientQuality />} />
           {/* M373-D：出院随访 V13（M373 收官） */}
           <Route path="discharge-followup" element={<DischargeFollowup />} />
+          {/* M374-A：检查服务 V13 */}
+          <Route path="examination-service" element={<ExaminationService />} />
+          {/* M374-B：检验服务 V13 */}
+          <Route path="lab-service" element={<LabService />} />
+          {/* M374-C：病理服务 V13 */}
+          <Route path="pathology-service" element={<PathologyService />} />
+          {/* M374-D：影像质量 V13（M374 收官） */}
+          <Route path="radiology-quality" element={<RadiologyQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
