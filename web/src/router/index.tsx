@@ -1050,6 +1050,8 @@ const PromptGovernance = lazy(() => import('@/pages/prompt-governance'));
 const RagTuning = lazy(() => import('@/pages/rag-tuning'));
 // M280-D：大模型微调与人在环反馈 V5
 const FinetuneLoop = lazy(() => import('@/pages/finetune-loop'));
+// M281-A：FHIR 资源建模与网关 V5
+const FhirGateway = lazy(() => import('@/pages/fhir-gateway'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2040,6 +2042,8 @@ export default function AppRoutes() {
           <Route path="rag-tuning" element={<RagTuning />} />
           {/* M280-D：大模型微调与人在环反馈 V5 */}
           <Route path="finetune-loop" element={<FinetuneLoop />} />
+          {/* M281-A：FHIR 资源建模与网关 V5 */}
+          <Route path="fhir-gateway" element={<FhirGateway />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
