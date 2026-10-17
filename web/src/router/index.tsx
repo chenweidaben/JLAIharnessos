@@ -1529,6 +1529,14 @@ const MedicalEthics = lazy(() => import('@/pages/medical-ethics'));
 const InformedConsent = lazy(() => import('@/pages/informed-consent'));
 // M340-D：门诊病历书写合格率 V13
 const OutpatientRecord = lazy(() => import('@/pages/outpatient-record'));
+// M341-A：手卫生依从率 V13
+const HandHygiene = lazy(() => import('@/pages/hand-hygiene'));
+// M341-B：院感发生率 V13
+const NosocomialInfection = lazy(() => import('@/pages/nosocomial-infection'));
+// M341-C：隔离医嘱执行率 V13
+const IsolationOrder = lazy(() => import('@/pages/isolation-order'));
+// M341-D：环境消毒合格率 V13
+const EnvDisinfection = lazy(() => import('@/pages/env-disinfection'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2999,6 +3007,14 @@ export default function AppRoutes() {
           <Route path="informed-consent" element={<InformedConsent />} />
           {/* M340-D：门诊病历书写合格率 V13 */}
           <Route path="outpatient-record" element={<OutpatientRecord />} />
+          {/* M341-A：手卫生依从率 V13 */}
+          <Route path="hand-hygiene" element={<HandHygiene />} />
+          {/* M341-B：院感发生率 V13 */}
+          <Route path="nosocomial-infection" element={<NosocomialInfection />} />
+          {/* M341-C：隔离医嘱执行率 V13 */}
+          <Route path="isolation-order" element={<IsolationOrder />} />
+          {/* M341-D：环境消毒合格率 V13 */}
+          <Route path="env-disinfection" element={<EnvDisinfection />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
