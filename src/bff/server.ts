@@ -1961,6 +1961,14 @@ import { medicalSafetyV13Routes } from './routes/medicalSafetyV13';
 import { surgeryQualityV13Routes } from './routes/surgeryQualityV13';
 // M371-D：麻醉质量 V13 GET /api/v1/anesthesia-quality（M371 收官）
 import { anesthesiaQualityV13Routes } from './routes/anesthesiaQualityV13';
+// M372-A：门诊服务 V13 GET /api/v1/outpatient-service
+import { outpatientServiceV13Routes } from './routes/outpatientServiceV13';
+// M372-B：急诊服务 V13 GET /api/v1/emergency-service
+import { emergencyServiceV13Routes } from './routes/emergencyServiceV13';
+// M372-C：门诊质量 V13 GET /api/v1/outpatient-quality
+import { outpatientQualityV13Routes } from './routes/outpatientQualityV13';
+// M372-D：绿色通道 V13 GET /api/v1/green-channel（M372 收官）
+import { greenChannelV13Routes } from './routes/greenChannelV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3184,6 +3192,10 @@ const allRoutes: RouteDef[] = [
   ...medicalSafetyV13Routes, // M371-B：医疗安全 V13 GET /api/v1/medical-safety
   ...surgeryQualityV13Routes, // M371-C：手术质量 V13 GET /api/v1/surgery-quality
   ...anesthesiaQualityV13Routes, // M371-D：麻醉质量 V13 GET /api/v1/anesthesia-quality（M371 收官）
+  ...outpatientServiceV13Routes, // M372-A：门诊服务 V13 GET /api/v1/outpatient-service
+  ...emergencyServiceV13Routes, // M372-B：急诊服务 V13 GET /api/v1/emergency-service
+  ...outpatientQualityV13Routes, // M372-C：门诊质量 V13 GET /api/v1/outpatient-quality
+  ...greenChannelV13Routes, // M372-D：绿色通道 V13 GET /api/v1/green-channel（M372 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

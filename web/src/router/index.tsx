@@ -1777,6 +1777,14 @@ const MedicalSafety = lazy(() => import('@/pages/medical-safety'));
 const SurgeryQuality = lazy(() => import('@/pages/surgery-quality'));
 // M371-D：麻醉质量 V13（M371 收官）
 const AnesthesiaQuality = lazy(() => import('@/pages/anesthesia-quality'));
+// M372-A：门诊服务 V13
+const OutpatientService = lazy(() => import('@/pages/outpatient-service'));
+// M372-B：急诊服务 V13
+const EmergencyService = lazy(() => import('@/pages/emergency-service'));
+// M372-C：门诊质量 V13
+const OutpatientQuality = lazy(() => import('@/pages/outpatient-quality'));
+// M372-D：绿色通道 V13（M372 收官）
+const GreenChannel = lazy(() => import('@/pages/green-channel'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3495,6 +3503,14 @@ export default function AppRoutes() {
           <Route path="surgery-quality" element={<SurgeryQuality />} />
           {/* M371-D：麻醉质量 V13（M371 收官） */}
           <Route path="anesthesia-quality" element={<AnesthesiaQuality />} />
+          {/* M372-A：门诊服务 V13 */}
+          <Route path="outpatient-service" element={<OutpatientService />} />
+          {/* M372-B：急诊服务 V13 */}
+          <Route path="emergency-service" element={<EmergencyService />} />
+          {/* M372-C：门诊质量 V13 */}
+          <Route path="outpatient-quality" element={<OutpatientQuality />} />
+          {/* M372-D：绿色通道 V13（M372 收官） */}
+          <Route path="green-channel" element={<GreenChannel />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
