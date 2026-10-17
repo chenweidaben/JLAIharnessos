@@ -1929,6 +1929,14 @@ import { telemedicineStatsV13Routes } from './routes/telemedicineStatsV13';
 import { onlinePaymentV13Routes } from './routes/onlinePaymentV13';
 // M367-D：健康档案 V13 GET /api/v1/health-record（M367 收官）
 import { healthRecordV13Routes } from './routes/healthRecordV13';
+// M368-A：药品不良反应 V13 GET /api/v1/drug-adverse-reaction
+import { drugAdverseReactionV13Routes } from './routes/drugAdverseReactionV13';
+// M368-B：药物相互作用 V13 GET /api/v1/drug-interaction
+import { drugInteractionV13Routes } from './routes/drugInteractionV13';
+// M368-C：抗菌药物管理（统计）V13 GET /api/v1/antibiotic-mgmt-stats（stats避让）
+import { antibioticMgmtStatsV13Routes } from './routes/antibioticMgmtStatsV13';
+// M368-D：基本药物管理 V13 GET /api/v1/essential-drug（M368 收官）
+import { essentialDrugV13Routes } from './routes/essentialDrugV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3136,6 +3144,10 @@ const allRoutes: RouteDef[] = [
   ...telemedicineStatsV13Routes, // M367-B：远程医疗（统计）V13 GET /api/v1/telemedicine-stats（stats避让）
   ...onlinePaymentV13Routes, // M367-C：在线支付 V13 GET /api/v1/online-payment
   ...healthRecordV13Routes, // M367-D：健康档案 V13 GET /api/v1/health-record（M367 收官）
+  ...drugAdverseReactionV13Routes, // M368-A：药品不良反应 V13 GET /api/v1/drug-adverse-reaction
+  ...drugInteractionV13Routes, // M368-B：药物相互作用 V13 GET /api/v1/drug-interaction
+  ...antibioticMgmtStatsV13Routes, // M368-C：抗菌药物管理（统计）V13 GET /api/v1/antibiotic-mgmt-stats（stats避让）
+  ...essentialDrugV13Routes, // M368-D：基本药物管理 V13 GET /api/v1/essential-drug（M368 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

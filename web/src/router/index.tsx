@@ -1745,6 +1745,14 @@ const TelemedicineStats = lazy(() => import('@/pages/telemedicine-stats'));
 const OnlinePayment = lazy(() => import('@/pages/online-payment'));
 // M367-D：健康档案 V13（M367 收官）
 const HealthRecord = lazy(() => import('@/pages/health-record'));
+// M368-A：药品不良反应 V13
+const DrugAdverseReaction = lazy(() => import('@/pages/drug-adverse-reaction'));
+// M368-B：药物相互作用 V13
+const DrugInteraction = lazy(() => import('@/pages/drug-interaction'));
+// M368-C：抗菌药物管理（统计）V13（stats避让）
+const AntibioticMgmtStats = lazy(() => import('@/pages/antibiotic-mgmt-stats'));
+// M368-D：基本药物管理 V13（M368 收官）
+const EssentialDrug = lazy(() => import('@/pages/essential-drug'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3431,6 +3439,14 @@ export default function AppRoutes() {
           <Route path="online-payment" element={<OnlinePayment />} />
           {/* M367-D：健康档案 V13（M367 收官） */}
           <Route path="health-record" element={<HealthRecord />} />
+          {/* M368-A：药品不良反应 V13 */}
+          <Route path="drug-adverse-reaction" element={<DrugAdverseReaction />} />
+          {/* M368-B：药物相互作用 V13 */}
+          <Route path="drug-interaction" element={<DrugInteraction />} />
+          {/* M368-C：抗菌药物管理（统计）V13（stats避让） */}
+          <Route path="antibiotic-mgmt-stats" element={<AntibioticMgmtStats />} />
+          {/* M368-D：基本药物管理 V13（M368 收官） */}
+          <Route path="essential-drug" element={<EssentialDrug />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
