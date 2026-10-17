@@ -1126,6 +1126,8 @@ const AgentDoctor = lazy(() => import('@/pages/agent-doctor'));
 const AgentNurse = lazy(() => import('@/pages/agent-nurse'));
 // M290-C：药师 Personal Agent（Pharma MUSE）工作台 V8
 const AgentPharma = lazy(() => import('@/pages/agent-pharma'));
+// M290-D：管理者 Personal Agent（Manager MUSE）工作台 V8
+const AgentManager = lazy(() => import('@/pages/agent-manager'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2192,6 +2194,8 @@ export default function AppRoutes() {
           <Route path="agent-nurse" element={<AgentNurse />} />
           {/* M290-C：药师 Personal Agent（Pharma MUSE）工作台 V8 */}
           <Route path="agent-pharma" element={<AgentPharma />} />
+          {/* M290-D：管理者 Personal Agent（Manager MUSE）工作台 V8 */}
+          <Route path="agent-manager" element={<AgentManager />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
