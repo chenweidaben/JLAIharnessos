@@ -1208,6 +1208,14 @@ const EvidenceRules = lazy(() => import('@/pages/evidence-rules'));
 const CircuitBreaker = lazy(() => import('@/pages/circuit-breaker'));
 // M300-D：疗效证据总览 V13
 const EvidenceOverview = lazy(() => import('@/pages/evidence-overview'));
+// M301-A：医生显式反馈闭环 V13
+const Feedback = lazy(() => import('@/pages/feedback'));
+// M301-B：修改点归因与经验补丁 V13
+const ExperiencePatches = lazy(() => import('@/pages/experience-patches'));
+// M301-C：反馈信号看板与趋势 V13
+const FeedbackTrend = lazy(() => import('@/pages/feedback-trend'));
+// M301-D：反馈闭环总览 V13
+const FeedbackLoopOverview = lazy(() => import('@/pages/feedback-loop-overview'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2356,6 +2364,14 @@ export default function AppRoutes() {
           <Route path="circuit-breaker" element={<CircuitBreaker />} />
           {/* M300-D：疗效证据总览 V13 */}
           <Route path="evidence-overview" element={<EvidenceOverview />} />
+          {/* M301-A：医生显式反馈闭环 V13 */}
+          <Route path="feedback" element={<Feedback />} />
+          {/* M301-B：修改点归因与经验补丁 V13 */}
+          <Route path="experience-patches" element={<ExperiencePatches />} />
+          {/* M301-C：反馈信号看板与趋势 V13 */}
+          <Route path="feedback-trend" element={<FeedbackTrend />} />
+          {/* M301-D：反馈闭环总览 V13 */}
+          <Route path="feedback-loop-overview" element={<FeedbackLoopOverview />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

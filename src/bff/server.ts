@@ -1391,6 +1391,14 @@ import { evidenceRulesV13Routes } from './routes/evidenceRulesV13';
 import { circuitBreakerV13Routes } from './routes/circuitBreakerV13';
 // M300-D：疗效证据总览 V13 GET /api/v1/evidence-overview
 import { evidenceOverviewV13Routes } from './routes/evidenceOverviewV13';
+// M301-A：医生显式反馈闭环 V13 POST /api/v1/feedback
+import { doctorFeedbackV13Routes } from './routes/doctorFeedbackV13';
+// M301-B：修改点归因与经验补丁 V13 GET /api/v1/experience-patches
+import { experiencePatchesV13Routes } from './routes/experiencePatchesV13';
+// M301-C：反馈信号看板与趋势 V13 GET /api/v1/feedback-trend
+import { feedbackTrendV13Routes } from './routes/feedbackTrendV13';
+// M301-D：反馈闭环总览 V13 GET /api/v1/feedback-loop-overview
+import { feedbackLoopOverviewV13Routes } from './routes/feedbackLoopOverviewV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2329,6 +2337,10 @@ const allRoutes: RouteDef[] = [
   ...evidenceRulesV13Routes, // M300-B：疗效证据反哺规则权重 V13 GET /api/v1/evidence-rules
   ...circuitBreakerV13Routes, // M300-C：反向证据熔断 V13 GET /api/v1/circuit-breaker
   ...evidenceOverviewV13Routes, // M300-D：疗效证据总览 V13 GET /api/v1/evidence-overview
+  ...doctorFeedbackV13Routes, // M301-A：医生显式反馈闭环 V13 POST /api/v1/feedback
+  ...experiencePatchesV13Routes, // M301-B：修改点归因与经验补丁 V13 GET /api/v1/experience-patches
+  ...feedbackTrendV13Routes, // M301-C：反馈信号看板与趋势 V13 GET /api/v1/feedback-trend
+  ...feedbackLoopOverviewV13Routes, // M301-D：反馈闭环总览 V13 GET /api/v1/feedback-loop-overview
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
