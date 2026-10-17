@@ -2087,6 +2087,14 @@ const IndividualKpi = lazy(() => import('@/pages/individual-kpi'));
 const PerformanceBonus = lazy(() => import('@/pages/performance-bonus'));
 // M410-D：绩效改进 V13（M410 收官）
 const PerformanceImprovement = lazy(() => import('@/pages/performance-improvement'));
+// M411-A：危急值管理 V13
+const CriticalValueMgmt = lazy(() => import('@/pages/critical-value-mgmt'));
+// M411-B：再入院管理 V13
+const ReadmissionMgmt = lazy(() => import('@/pages/readmission-mgmt'));
+// M411-C：转科转院管理 V13
+const InpatientTransferMgmt = lazy(() => import('@/pages/inpatient-transfer-mgmt'));
+// M411-D：出院小结管理 V13（M411 收官）
+const DischargeSummaryMgmt = lazy(() => import('@/pages/discharge-summary-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4115,6 +4123,14 @@ export default function AppRoutes() {
           <Route path="performance-bonus" element={<PerformanceBonus />} />
           {/* M410-D：绩效改进 V13（M410 收官） */}
           <Route path="performance-improvement" element={<PerformanceImprovement />} />
+          {/* M411-A：危急值管理 V13 */}
+          <Route path="critical-value-mgmt" element={<CriticalValueMgmt />} />
+          {/* M411-B：再入院管理 V13 */}
+          <Route path="readmission-mgmt" element={<ReadmissionMgmt />} />
+          {/* M411-C：转科转院管理 V13 */}
+          <Route path="inpatient-transfer-mgmt" element={<InpatientTransferMgmt />} />
+          {/* M411-D：出院小结管理 V13（M411 收官） */}
+          <Route path="discharge-summary-mgmt" element={<DischargeSummaryMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
