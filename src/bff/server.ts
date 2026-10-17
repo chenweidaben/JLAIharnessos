@@ -1801,6 +1801,14 @@ import { equipmentUtilizationV13Routes } from './routes/equipmentUtilizationV13'
 import { oxygenSupplyV13Routes } from './routes/oxygenSupplyV13';
 // M351-D：医疗废物 V13 GET /api/v1/medical-waste（M351 收官）
 import { medicalWasteV13Routes } from './routes/medicalWasteV13';
+// M352-A：消防安全 V13 GET /api/v1/fire-safety
+import { fireSafetyV13Routes } from './routes/fireSafetyV13';
+// M352-B：能耗管理 V13 GET /api/v1/energy-consumption
+import { energyConsumptionV13Routes } from './routes/energyConsumptionV13';
+// M352-C：营养食堂 V13 GET /api/v1/nutrition-kitchen
+import { nutritionKitchenV13Routes } from './routes/nutritionKitchenV13';
+// M352-D：车辆管理 V13 GET /api/v1/parking-mgmt（M352 收官）
+import { parkingMgmtV13Routes } from './routes/parkingMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2944,6 +2952,10 @@ const allRoutes: RouteDef[] = [
   ...equipmentUtilizationV13Routes, // M351-B：大型设备开机率 V13 GET /api/v1/equipment-utilization
   ...oxygenSupplyV13Routes, // M351-C：氧气供应 V13 GET /api/v1/oxygen-supply
   ...medicalWasteV13Routes, // M351-D：医疗废物 V13 GET /api/v1/medical-waste（M351 收官）
+  ...fireSafetyV13Routes, // M352-A：消防安全 V13 GET /api/v1/fire-safety
+  ...energyConsumptionV13Routes, // M352-B：能耗管理 V13 GET /api/v1/energy-consumption
+  ...nutritionKitchenV13Routes, // M352-C：营养食堂 V13 GET /api/v1/nutrition-kitchen
+  ...parkingMgmtV13Routes, // M352-D：车辆管理 V13 GET /api/v1/parking-mgmt（M352 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

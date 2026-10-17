@@ -1617,6 +1617,14 @@ const EquipmentUtilization = lazy(() => import('@/pages/equipment-utilization'))
 const OxygenSupply = lazy(() => import('@/pages/oxygen-supply'));
 // M351-D：医疗废物 V13（M351 收官）
 const MedicalWaste = lazy(() => import('@/pages/medical-waste'));
+// M352-A：消防安全 V13
+const FireSafety = lazy(() => import('@/pages/fire-safety'));
+// M352-B：能耗管理 V13
+const EnergyConsumption = lazy(() => import('@/pages/energy-consumption'));
+// M352-C：营养食堂 V13
+const NutritionKitchen = lazy(() => import('@/pages/nutrition-kitchen'));
+// M352-D：车辆管理 V13（M352 收官）
+const ParkingMgmt = lazy(() => import('@/pages/parking-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3175,6 +3183,14 @@ export default function AppRoutes() {
           <Route path="oxygen-supply" element={<OxygenSupply />} />
           {/* M351-D：医疗废物 V13（M351 收官） */}
           <Route path="medical-waste" element={<MedicalWaste />} />
+          {/* M352-A：消防安全 V13 */}
+          <Route path="fire-safety" element={<FireSafety />} />
+          {/* M352-B：能耗管理 V13 */}
+          <Route path="energy-consumption" element={<EnergyConsumption />} />
+          {/* M352-C：营养食堂 V13 */}
+          <Route path="nutrition-kitchen" element={<NutritionKitchen />} />
+          {/* M352-D：车辆管理 V13（M352 收官） */}
+          <Route path="parking-mgmt" element={<ParkingMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
