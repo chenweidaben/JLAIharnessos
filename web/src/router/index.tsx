@@ -2183,6 +2183,14 @@ const PressureUlcerDetail = lazy(() => import('@/pages/pressure-ulcer-detail'));
 const FallMgmt = lazy(() => import('@/pages/fall-mgmt'));
 // M422-D：身体约束管理 V13（M422 收官）
 const RestraintMgmt = lazy(() => import('@/pages/restraint-mgmt'));
+// M423-A：手卫生督查 V13（换名避让旧版 handHygieneComplianceV13（M418））
+const HandHygieneAudit = lazy(() => import('@/pages/hand-hygiene-audit'));
+// M423-B：隔离管理（细节）V13（detail 避让旧版 isolationMgmtV13（M393-B））
+const IsolationDetail = lazy(() => import('@/pages/isolation-detail'));
+// M423-C：消毒灭菌管理 V13
+const SterilizationMgmt = lazy(() => import('@/pages/sterilization-mgmt'));
+// M423-D：医废追溯管理 V13（M423 收官，换名避让旧版 infectionControlDetailV13（M418））
+const MedicalWasteTracking = lazy(() => import('@/pages/medical-waste-tracking'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4307,6 +4315,14 @@ export default function AppRoutes() {
           <Route path="fall-mgmt" element={<FallMgmt />} />
           {/* M422-D：身体约束管理 V13（M422 收官） */}
           <Route path="restraint-mgmt" element={<RestraintMgmt />} />
+          {/* M423-A：手卫生督查 V13（换名避让旧版 handHygieneComplianceV13（M418）） */}
+          <Route path="hand-hygiene-audit" element={<HandHygieneAudit />} />
+          {/* M423-B：隔离管理（细节）V13（detail 避让旧版 isolationMgmtV13（M393-B）） */}
+          <Route path="isolation-detail" element={<IsolationDetail />} />
+          {/* M423-C：消毒灭菌管理 V13 */}
+          <Route path="sterilization-mgmt" element={<SterilizationMgmt />} />
+          {/* M423-D：医废追溯管理 V13（M423 收官，换名避让旧版 infectionControlDetailV13（M418）） */}
+          <Route path="medical-waste-tracking" element={<MedicalWasteTracking />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
