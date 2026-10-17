@@ -2399,6 +2399,14 @@ import { anesthesiaRecordMgmtV13Routes } from './routes/anesthesiaRecordMgmtV13'
 import { safetyCheckMgmtV13Routes } from './routes/safetyCheckMgmtV13';
 // M426-D：病房环境管理 V13 GET /api/v1/ward-environment-mgmt（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
 import { wardEnvironmentMgmtV13Routes } from './routes/wardEnvironmentMgmtV13';
+// M427-A：出院小结管理（细节）V13 GET /api/v1/discharge-summary-detail（detail 避让旧版 dischargeSummaryMgmtV13（M411））
+import { dischargeSummaryDetailV13Routes } from './routes/dischargeSummaryDetailV13';
+// M427-B：转科管理（细节）V13 GET /api/v1/transfer-detail（detail 避让旧版 transferMgmtV13（M411））
+import { transferDetailV13Routes } from './routes/transferDetailV13';
+// M427-C：再入院分析管理 V13 GET /api/v1/readmission-analysis-mgmt（换名避让旧版 readmissionMgmtV13（M411，-analysis 后缀））
+import { readmissionAnalysisMgmtV13Routes } from './routes/readmissionAnalysisMgmtV13';
+// M427-D：死亡病例管理（细节）V13 GET /api/v1/death-case-detail（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412））
+import { deathCaseDetailV13Routes } from './routes/deathCaseDetailV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3841,6 +3849,10 @@ const allRoutes: RouteDef[] = [
   ...anesthesiaRecordMgmtV13Routes, // M426-B：麻醉记录管理 V13 GET /api/v1/anesthesia-record-mgmt（换名避让旧版 anesthesiaComplicationV13（M339））
   ...safetyCheckMgmtV13Routes, // M426-C：安全核查管理 V13 GET /api/v1/safety-check-mgmt（换名避让旧版 surgeryVolumeV13（M339））
   ...wardEnvironmentMgmtV13Routes, // M426-D：病房环境管理 V13 GET /api/v1/ward-environment-mgmt（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
+  ...dischargeSummaryDetailV13Routes, // M427-A：出院小结管理（细节）V13 GET /api/v1/discharge-summary-detail（detail 避让旧版 dischargeSummaryMgmtV13（M411））
+  ...transferDetailV13Routes, // M427-B：转科管理（细节）V13 GET /api/v1/transfer-detail（detail 避让旧版 transferMgmtV13（M411））
+  ...readmissionAnalysisMgmtV13Routes, // M427-C：再入院分析管理 V13 GET /api/v1/readmission-analysis-mgmt（换名避让旧版 readmissionMgmtV13（M411，-analysis 后缀））
+  ...deathCaseDetailV13Routes, // M427-D：死亡病例管理（细节）V13 GET /api/v1/death-case-detail（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

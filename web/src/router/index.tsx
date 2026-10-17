@@ -2215,6 +2215,14 @@ const AnesthesiaRecordMgmt = lazy(() => import('@/pages/anesthesia-record-mgmt')
 const SafetyCheckMgmt = lazy(() => import('@/pages/safety-check-mgmt'));
 // M426-D：病房环境管理 V13（M426 收官，换名避让旧版 wardMgmtDetailV13（M417））
 const WardEnvironmentMgmt = lazy(() => import('@/pages/ward-environment-mgmt'));
+// M427-A：出院小结管理（细节）V13（detail 避让旧版 dischargeSummaryMgmtV13（M411））
+const DischargeSummaryDetail = lazy(() => import('@/pages/discharge-summary-detail'));
+// M427-B：转科管理（细节）V13（detail 避让旧版 transferMgmtV13（M411））
+const TransferDetail = lazy(() => import('@/pages/transfer-detail'));
+// M427-C：再入院分析管理 V13（换名避让旧版 readmissionMgmtV13（M411，-analysis 后缀））
+const ReadmissionAnalysisMgmt = lazy(() => import('@/pages/readmission-analysis-mgmt'));
+// M427-D：死亡病例管理（细节）V13（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412））
+const DeathCaseDetail = lazy(() => import('@/pages/death-case-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4371,6 +4379,14 @@ export default function AppRoutes() {
           <Route path="safety-check-mgmt" element={<SafetyCheckMgmt />} />
           {/* M426-D：病房环境管理 V13（M426 收官，换名避让旧版 wardMgmtDetailV13（M417）） */}
           <Route path="ward-environment-mgmt" element={<WardEnvironmentMgmt />} />
+          {/* M427-A：出院小结管理（细节）V13（detail 避让旧版 dischargeSummaryMgmtV13（M411）） */}
+          <Route path="discharge-summary-detail" element={<DischargeSummaryDetail />} />
+          {/* M427-B：转科管理（细节）V13（detail 避让旧版 transferMgmtV13（M411）） */}
+          <Route path="transfer-detail" element={<TransferDetail />} />
+          {/* M427-C：再入院分析管理 V13（换名避让旧版 readmissionMgmtV13（M411，-analysis 后缀）） */}
+          <Route path="readmission-analysis-mgmt" element={<ReadmissionAnalysisMgmt />} />
+          {/* M427-D：死亡病例管理（细节）V13（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412）） */}
+          <Route path="death-case-detail" element={<DeathCaseDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
