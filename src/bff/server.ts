@@ -1681,6 +1681,14 @@ import { adverseDrugEventV13Routes } from './routes/adverseDrugEventV13';
 import { antibioticRxV13Routes } from './routes/antibioticRxV13';
 // M336-D：静脉输液率 V13 GET /api/v1/iv-fluid
 import { ivFluidV13Routes } from './routes/ivFluidV13';
+// M337-A：门诊等候时长 V13 GET /api/v1/outpatient-wait
+import { outpatientWaitV13Routes } from './routes/outpatientWaitV13';
+// M337-B：预约诊疗 V13 GET /api/v1/appointment
+import { appointmentV13Routes } from './routes/appointmentV13';
+// M337-C：双向转诊 V13 GET /api/v1/referral-stats
+import { referralV13Routes } from './routes/referralV13';
+// M337-D：慢病管理 V13 GET /api/v1/chronic-disease-stats
+import { chronicDiseaseV13Routes } from './routes/chronicDiseaseV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2764,6 +2772,10 @@ const allRoutes: RouteDef[] = [
   ...adverseDrugEventV13Routes, // M336-B：药品不良反应 V13 GET /api/v1/adverse-drug-event
   ...antibioticRxV13Routes, // M336-C：抗菌药物处方率 V13 GET /api/v1/antibiotic-rx
   ...ivFluidV13Routes, // M336-D：静脉输液率 V13 GET /api/v1/iv-fluid
+  ...outpatientWaitV13Routes, // M337-A：门诊等候时长 V13 GET /api/v1/outpatient-wait
+  ...appointmentV13Routes, // M337-B：预约诊疗 V13 GET /api/v1/appointment
+  ...referralV13Routes, // M337-C：双向转诊 V13 GET /api/v1/referral-stats
+  ...chronicDiseaseV13Routes, // M337-D：慢病管理 V13 GET /api/v1/chronic-disease-stats
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

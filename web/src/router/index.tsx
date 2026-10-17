@@ -1497,6 +1497,14 @@ const AdverseDrugEvent = lazy(() => import('@/pages/adverse-drug-event'));
 const AntibioticRx = lazy(() => import('@/pages/antibiotic-rx'));
 // M336-D：静脉输液率 V13
 const IvFluid = lazy(() => import('@/pages/iv-fluid'));
+// M337-A：门诊等候时长 V13
+const OutpatientWait = lazy(() => import('@/pages/outpatient-wait'));
+// M337-B：预约诊疗 V13
+const Appointment = lazy(() => import('@/pages/appointment'));
+// M337-C：双向转诊 V13
+const ReferralStats = lazy(() => import('@/pages/referral-stats'));
+// M337-D：慢病管理 V13
+const ChronicDiseaseStats = lazy(() => import('@/pages/chronic-disease-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2935,6 +2943,14 @@ export default function AppRoutes() {
           <Route path="antibiotic-rx" element={<AntibioticRx />} />
           {/* M336-D：静脉输液率 V13 */}
           <Route path="iv-fluid" element={<IvFluid />} />
+          {/* M337-A：门诊等候时长 V13 */}
+          <Route path="outpatient-wait" element={<OutpatientWait />} />
+          {/* M337-B：预约诊疗 V13 */}
+          <Route path="appointment" element={<Appointment />} />
+          {/* M337-C：双向转诊 V13 */}
+          <Route path="referral-stats" element={<ReferralStats />} />
+          {/* M337-D：慢病管理 V13 */}
+          <Route path="chronic-disease-stats" element={<ChronicDiseaseStats />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
