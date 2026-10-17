@@ -1881,6 +1881,14 @@ const StaffRetention = lazy(() => import('@/pages/staff-retention'));
 const PerformanceEval = lazy(() => import('@/pages/performance-eval'));
 // M384-D：培训计划 V13（M384 收官）
 const TrainingPlan = lazy(() => import('@/pages/training-plan'));
+// M385-A：后勤保障 V13
+const LogisticsSupport = lazy(() => import('@/pages/logistics-support'));
+// M385-B：设备维护统计 V13（stats 避让）
+const EquipmentMaintenanceStats = lazy(() => import('@/pages/equipment-maintenance-stats'));
+// M385-C：能源管理明细 V13
+const EnergyMgmtDetail = lazy(() => import('@/pages/energy-mgmt-detail'));
+// M385-D：安全生产 V13（M385 收官）
+const SafetyProduction = lazy(() => import('@/pages/safety-production'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3703,6 +3711,14 @@ export default function AppRoutes() {
           <Route path="performance-eval" element={<PerformanceEval />} />
           {/* M384-D：培训计划 V13（M384 收官） */}
           <Route path="training-plan" element={<TrainingPlan />} />
+          {/* M385-A：后勤保障 V13 */}
+          <Route path="logistics-support" element={<LogisticsSupport />} />
+          {/* M385-B：设备维护统计 V13（stats 避让） */}
+          <Route path="equipment-maintenance-stats" element={<EquipmentMaintenanceStats />} />
+          {/* M385-C：能源管理明细 V13 */}
+          <Route path="energy-mgmt-detail" element={<EnergyMgmtDetail />} />
+          {/* M385-D：安全生产 V13（M385 收官） */}
+          <Route path="safety-production" element={<SafetyProduction />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

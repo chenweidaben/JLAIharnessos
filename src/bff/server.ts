@@ -2065,6 +2065,14 @@ import { staffRetentionV13Routes } from './routes/staffRetentionV13';
 import { performanceEvalV13Routes } from './routes/performanceEvalV13';
 // M384-D：培训计划 V13 GET /api/v1/training-plan（M384 收官）
 import { trainingPlanV13Routes } from './routes/trainingPlanV13';
+// M385-A：后勤保障 V13 GET /api/v1/logistics-support
+import { logisticsSupportV13Routes } from './routes/logisticsSupportV13';
+// M385-B：设备维护统计 V13 GET /api/v1/equipment-maintenance-stats（stats 避让）
+import { equipmentMaintenanceStatsV13Routes } from './routes/equipmentMaintenanceStatsV13';
+// M385-C：能源管理明细 V13 GET /api/v1/energy-mgmt-detail
+import { energyMgmtDetailV13Routes } from './routes/energyMgmtDetailV13';
+// M385-D：安全生产 V13 GET /api/v1/safety-production（M385 收官）
+import { safetyProductionV13Routes } from './routes/safetyProductionV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3340,6 +3348,10 @@ const allRoutes: RouteDef[] = [
   ...staffRetentionV13Routes, // M384-B：人员留存 V13 GET /api/v1/staff-retention
   ...performanceEvalV13Routes, // M384-C：绩效考核 V13 GET /api/v1/performance-eval
   ...trainingPlanV13Routes, // M384-D：培训计划 V13 GET /api/v1/training-plan（M384 收官）
+  ...logisticsSupportV13Routes, // M385-A：后勤保障 V13 GET /api/v1/logistics-support
+  ...equipmentMaintenanceStatsV13Routes, // M385-B：设备维护统计 V13 GET /api/v1/equipment-maintenance-stats（stats 避让）
+  ...energyMgmtDetailV13Routes, // M385-C：能源管理明细 V13 GET /api/v1/energy-mgmt-detail
+  ...safetyProductionV13Routes, // M385-D：安全生产 V13 GET /api/v1/safety-production（M385 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
