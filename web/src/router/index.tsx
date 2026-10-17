@@ -1076,6 +1076,8 @@ const MusePharmacist = lazy(() => import('@/pages/muse-pharmacist'));
 const MuseManager = lazy(() => import('@/pages/muse-manager'));
 // M284-A：患者 MUSE 助手 V5
 const MusePatient = lazy(() => import('@/pages/muse-patient'));
+// M284-B：MUSE 跨角色任务流转 V5
+const MuseHandoff = lazy(() => import('@/pages/muse-handoff'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2092,6 +2094,8 @@ export default function AppRoutes() {
           <Route path="muse-manager" element={<MuseManager />} />
           {/* M284-A：患者 MUSE 助手 V5 */}
           <Route path="muse-patient" element={<MusePatient />} />
+          {/* M284-B：MUSE 跨角色任务流转 V5 */}
+          <Route path="muse-handoff" element={<MuseHandoff />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
