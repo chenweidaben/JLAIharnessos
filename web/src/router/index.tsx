@@ -2007,6 +2007,14 @@ const SatisfactionSurveyDetail = lazy(() => import('@/pages/satisfaction-survey-
 const FollowUpMgmt = lazy(() => import('@/pages/follow-up-mgmt'));
 // M400-D：患者教育明细 V13（M400 收官，避让旧版 patient-education-stats）
 const PatientEducationDetail = lazy(() => import('@/pages/patient-education-detail'));
+// M401-A：病案管理 V13
+const MedicalRecord = lazy(() => import('@/pages/medical-record'));
+// M401-B：数据治理明细 V13（避让旧版 data-governance/data-governance-stats）
+const DataGovernanceDetail = lazy(() => import('@/pages/data-governance-detail'));
+// M401-C：统计报表 V13
+const StatisticsReport = lazy(() => import('@/pages/statistics-report'));
+// M401-D：编码质量 V13（M401 收官）
+const CodingQuality = lazy(() => import('@/pages/coding-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3955,6 +3963,14 @@ export default function AppRoutes() {
           <Route path="follow-up-mgmt" element={<FollowUpMgmt />} />
           {/* M400-D：患者教育明细 V13（M400 收官，避让旧版 patient-education-stats） */}
           <Route path="patient-education-detail" element={<PatientEducationDetail />} />
+          {/* M401-A：病案管理 V13 */}
+          <Route path="medical-record" element={<MedicalRecord />} />
+          {/* M401-B：数据治理明细 V13（避让旧版 data-governance/data-governance-stats） */}
+          <Route path="data-governance-detail" element={<DataGovernanceDetail />} />
+          {/* M401-C：统计报表 V13 */}
+          <Route path="statistics-report" element={<StatisticsReport />} />
+          {/* M401-D：编码质量 V13（M401 收官） */}
+          <Route path="coding-quality" element={<CodingQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
