@@ -1176,6 +1176,14 @@ const ExperienceReview = lazy(() => import('@/pages/experience-review'));
 const ExperienceVersions = lazy(() => import('@/pages/experience-versions'));
 // M296-D：知识资产生命周期总览 V13
 const KnowledgeLifecycle = lazy(() => import('@/pages/knowledge-lifecycle'));
+// M297-A：继任者经验传承交接 V13
+const Handover = lazy(() => import('@/pages/handover'));
+// M297-B：交接后继任者学习计划 V13
+const LearningPlan = lazy(() => import('@/pages/learning-plan'));
+// M297-C：离任医生知识资产保留 V13
+const PublicKnowledge = lazy(() => import('@/pages/public-knowledge'));
+// M297-D：传承效果度量与院长报告 V13
+const SuccessionReport = lazy(() => import('@/pages/succession-report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2292,6 +2300,14 @@ export default function AppRoutes() {
           <Route path="experience-versions" element={<ExperienceVersions />} />
           {/* M296-D：知识资产生命周期总览 V13 */}
           <Route path="knowledge-lifecycle" element={<KnowledgeLifecycle />} />
+          {/* M297-A：继任者经验传承交接 V13 */}
+          <Route path="handover" element={<Handover />} />
+          {/* M297-B：交接后继任者学习计划 V13 */}
+          <Route path="learning-plan" element={<LearningPlan />} />
+          {/* M297-C：离任医生知识资产保留 V13 */}
+          <Route path="public-knowledge" element={<PublicKnowledge />} />
+          {/* M297-D：传承效果度量与院长报告 V13 */}
+          <Route path="succession-report" element={<SuccessionReport />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

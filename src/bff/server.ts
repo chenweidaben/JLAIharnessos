@@ -1359,6 +1359,14 @@ import { experienceReviewV13Routes } from './routes/experienceReviewV13';
 import { experienceVersionV13Routes } from './routes/experienceVersionV13';
 // M296-D：知识资产生命周期总览 V13 GET /api/v1/knowledge-lifecycle
 import { knowledgeLifecycleV13Routes } from './routes/knowledgeLifecycleV13';
+// M297-A：继任者经验传承交接 V13 GET /api/v1/handover
+import { handoverV13Routes } from './routes/handoverV13';
+// M297-B：交接后继任者学习计划 V13 GET /api/v1/learning-plan
+import { learningPlanV13Routes } from './routes/learningPlanV13';
+// M297-C：离任医生知识资产保留 V13 GET /api/v1/public-knowledge
+import { publicKnowledgeV13Routes } from './routes/publicKnowledgeV13';
+// M297-D：传承效果度量与院长报告 V13 GET /api/v1/succession-report
+import { successionReportV13Routes } from './routes/successionReportV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2281,6 +2289,10 @@ const allRoutes: RouteDef[] = [
   ...experienceReviewV13Routes, // M296-B：过期经验复核工作流 V13 GET /api/v1/experience-review
   ...experienceVersionV13Routes, // M296-C：经验更新与版本迭代 V13 POST /api/v1/experience/:id/new-version
   ...knowledgeLifecycleV13Routes, // M296-D：知识资产生命周期总览 V13 GET /api/v1/knowledge-lifecycle
+  ...handoverV13Routes, // M297-A：继任者经验传承交接 V13 GET /api/v1/handover
+  ...learningPlanV13Routes, // M297-B：交接后继任者学习计划 V13 GET /api/v1/learning-plan
+  ...publicKnowledgeV13Routes, // M297-C：离任医生知识资产保留 V13 GET /api/v1/public-knowledge
+  ...successionReportV13Routes, // M297-D：传承效果度量与院长报告 V13 GET /api/v1/succession-report
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
