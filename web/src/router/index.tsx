@@ -1809,6 +1809,14 @@ const MedicalCostControl = lazy(() => import('@/pages/medical-cost-control'));
 const DrgManagement = lazy(() => import('@/pages/drg-management'));
 // M375-D：价格管理 V13（M375 收官）
 const PriceManagement = lazy(() => import('@/pages/price-management'));
+// M376-A：护理服务 V13
+const NursingService = lazy(() => import('@/pages/nursing-service'));
+// M376-B：护理文书统计 V13（stats 避让）
+const NursingDocumentStats = lazy(() => import('@/pages/nursing-document-stats'));
+// M376-C：护理敏感指标 V13
+const NursingSensitiveIndex = lazy(() => import('@/pages/nursing-sensitive-index'));
+// M376-D：护理管理 V13（M376 收官）
+const NursingManagement = lazy(() => import('@/pages/nursing-management'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3559,6 +3567,14 @@ export default function AppRoutes() {
           <Route path="drg-management" element={<DrgManagement />} />
           {/* M375-D：价格管理 V13（M375 收官） */}
           <Route path="price-management" element={<PriceManagement />} />
+          {/* M376-A：护理服务 V13 */}
+          <Route path="nursing-service" element={<NursingService />} />
+          {/* M376-B：护理文书统计 V13（stats 避让） */}
+          <Route path="nursing-document-stats" element={<NursingDocumentStats />} />
+          {/* M376-C：护理敏感指标 V13 */}
+          <Route path="nursing-sensitive-index" element={<NursingSensitiveIndex />} />
+          {/* M376-D：护理管理 V13（M376 收官） */}
+          <Route path="nursing-management" element={<NursingManagement />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
