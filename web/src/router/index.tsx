@@ -1927,6 +1927,14 @@ const TriageMgmt = lazy(() => import('@/pages/triage-mgmt'));
 const OutpatientPharmacy = lazy(() => import('@/pages/outpatient-pharmacy'));
 // M390-D：急诊分级 V13（M390 收官）
 const EmergencySeverity = lazy(() => import('@/pages/emergency-severity'));
+// M391-A：手术过程 V13
+const SurgeryProcess = lazy(() => import('@/pages/surgery-process'));
+// M391-B：麻醉质量 V13
+const AnesthesiaDetail = lazy(() => import('@/pages/anesthesia-detail'));
+// M391-C：围手术期 V13
+const PerioperativeMgmt = lazy(() => import('@/pages/perioperative-mgmt'));
+// M391-D：器械管理 V13（M391 收官）
+const InstrumentMgmt = lazy(() => import('@/pages/instrument-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3795,6 +3803,14 @@ export default function AppRoutes() {
           <Route path="outpatient-pharmacy" element={<OutpatientPharmacy />} />
           {/* M390-D：急诊分级 V13（M390 收官） */}
           <Route path="emergency-severity" element={<EmergencySeverity />} />
+          {/* M391-A：手术过程 V13 */}
+          <Route path="surgery-process" element={<SurgeryProcess />} />
+          {/* M391-B：麻醉质量 V13 */}
+          <Route path="anesthesia-detail" element={<AnesthesiaDetail />} />
+          {/* M391-C：围手术期 V13 */}
+          <Route path="perioperative-mgmt" element={<PerioperativeMgmt />} />
+          {/* M391-D：器械管理 V13（M391 收官） */}
+          <Route path="instrument-mgmt" element={<InstrumentMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

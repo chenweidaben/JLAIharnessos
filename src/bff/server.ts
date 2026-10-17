@@ -2111,6 +2111,14 @@ import { triageMgmtV13Routes } from './routes/triageMgmtV13';
 import { outpatientPharmacyV13Routes } from './routes/outpatientPharmacyV13';
 // M390-D：急诊分级 V13 GET /api/v1/emergency-severity（M390 收官）
 import { emergencySeverityV13Routes } from './routes/emergencySeverityV13';
+// M391-A：手术过程 V13 GET /api/v1/surgery-process
+import { surgeryProcessV13Routes } from './routes/surgeryProcessV13';
+// M391-B：麻醉质量 V13 GET /api/v1/anesthesia-detail
+import { anesthesiaDetailV13Routes } from './routes/anesthesiaDetailV13';
+// M391-C：围手术期 V13 GET /api/v1/perioperative-mgmt
+import { perioperativeMgmtV13Routes } from './routes/perioperativeMgmtV13';
+// M391-D：器械管理 V13 GET /api/v1/instrument-mgmt（M391 收官）
+import { instrumentMgmtV13Routes } from './routes/instrumentMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3409,6 +3417,10 @@ const allRoutes: RouteDef[] = [
   ...triageMgmtV13Routes, // M390-B：分诊管理 V13 GET /api/v1/triage-mgmt
   ...outpatientPharmacyV13Routes, // M390-C：门诊药房 V13 GET /api/v1/outpatient-pharmacy
   ...emergencySeverityV13Routes, // M390-D：急诊分级 V13 GET /api/v1/emergency-severity（M390 收官）
+  ...surgeryProcessV13Routes, // M391-A：手术过程 V13 GET /api/v1/surgery-process
+  ...anesthesiaDetailV13Routes, // M391-B：麻醉质量 V13 GET /api/v1/anesthesia-detail
+  ...perioperativeMgmtV13Routes, // M391-C：围手术期 V13 GET /api/v1/perioperative-mgmt
+  ...instrumentMgmtV13Routes, // M391-D：器械管理 V13 GET /api/v1/instrument-mgmt（M391 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
