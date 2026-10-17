@@ -1000,6 +1000,8 @@ const HealthCheckupV5 = lazy(() => import('@/pages/health-checkup-v5/report'));
 const PostpartumCareV5 = lazy(() => import('@/pages/postpartum-care-v5/report'));
 // M274-C：医美口腔健康消费 V5
 const AestheticDentalV5 = lazy(() => import('@/pages/aesthetic-dental-v5/report'));
+// M274-D：健康管理 VIP 服务 V5
+const HealthVIPV5 = lazy(() => import('@/pages/health-vip-v5/report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1940,6 +1942,8 @@ export default function AppRoutes() {
           <Route path="postpartum-care-v5/report" element={<PostpartumCareV5 />} />
           {/* M274-C：医美口腔健康消费 V5 */}
           <Route path="aesthetic-dental-v5/report" element={<AestheticDentalV5 />} />
+          {/* M274-D：健康管理 VIP 服务 V5 */}
+          <Route path="health-vip-v5/report" element={<HealthVIPV5 />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
