@@ -1184,6 +1184,14 @@ const LearningPlan = lazy(() => import('@/pages/learning-plan'));
 const PublicKnowledge = lazy(() => import('@/pages/public-knowledge'));
 // M297-D：传承效果度量与院长报告 V13
 const SuccessionReport = lazy(() => import('@/pages/succession-report'));
+// M298-A：专家经验贡献激励 V13
+const ContributionLeaderboard = lazy(() => import('@/pages/contribution-leaderboard'));
+// M298-B：贡献荣誉墙与月度之星 V13
+const HonorWall = lazy(() => import('@/pages/honor-wall'));
+// M298-C：新手医生孵化与导师匹配 V13
+const MentorMatch = lazy(() => import('@/pages/mentor-match'));
+// M298-D：知识贡献生态总览 V13
+const EcosystemDashboard = lazy(() => import('@/pages/ecosystem-dashboard'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2308,6 +2316,14 @@ export default function AppRoutes() {
           <Route path="public-knowledge" element={<PublicKnowledge />} />
           {/* M297-D：传承效果度量与院长报告 V13 */}
           <Route path="succession-report" element={<SuccessionReport />} />
+          {/* M298-A：专家经验贡献激励 V13 */}
+          <Route path="contribution-leaderboard" element={<ContributionLeaderboard />} />
+          {/* M298-B：贡献荣誉墙与月度之星 V13 */}
+          <Route path="honor-wall" element={<HonorWall />} />
+          {/* M298-C：新手医生孵化与导师匹配 V13 */}
+          <Route path="mentor-match" element={<MentorMatch />} />
+          {/* M298-D：知识贡献生态总览 V13 */}
+          <Route path="ecosystem-dashboard" element={<EcosystemDashboard />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
