@@ -1817,6 +1817,14 @@ const NursingDocumentStats = lazy(() => import('@/pages/nursing-document-stats')
 const NursingSensitiveIndex = lazy(() => import('@/pages/nursing-sensitive-index'));
 // M376-D：护理管理 V13（M376 收官）
 const NursingManagement = lazy(() => import('@/pages/nursing-management'));
+// M377-A：后勤服务 V13
+const LogisticsService = lazy(() => import('@/pages/logistics-service'));
+// M377-B：设备管理 V13
+const EquipmentMgmt = lazy(() => import('@/pages/equipment-mgmt'));
+// M377-C：能源管理 V13
+const EnergyMgmt = lazy(() => import('@/pages/energy-mgmt'));
+// M377-D：环境管理 V13（M377 收官）
+const EnvironmentMgmt = lazy(() => import('@/pages/environment-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3575,6 +3583,14 @@ export default function AppRoutes() {
           <Route path="nursing-sensitive-index" element={<NursingSensitiveIndex />} />
           {/* M376-D：护理管理 V13（M376 收官） */}
           <Route path="nursing-management" element={<NursingManagement />} />
+          {/* M377-A：后勤服务 V13 */}
+          <Route path="logistics-service" element={<LogisticsService />} />
+          {/* M377-B：设备管理 V13 */}
+          <Route path="equipment-mgmt" element={<EquipmentMgmt />} />
+          {/* M377-C：能源管理 V13 */}
+          <Route path="energy-mgmt" element={<EnergyMgmt />} />
+          {/* M377-D：环境管理 V13（M377 收官） */}
+          <Route path="environment-mgmt" element={<EnvironmentMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

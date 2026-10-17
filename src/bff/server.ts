@@ -2001,6 +2001,14 @@ import { nursingDocumentStatsV13Routes } from './routes/nursingDocumentStatsV13'
 import { nursingSensitiveIndexV13Routes } from './routes/nursingSensitiveIndexV13';
 // M376-D：护理管理 V13 GET /api/v1/nursing-management（M376 收官）
 import { nursingManagementV13Routes } from './routes/nursingManagementV13';
+// M377-A：后勤服务 V13 GET /api/v1/logistics-service
+import { logisticsServiceV13Routes } from './routes/logisticsServiceV13';
+// M377-B：设备管理 V13 GET /api/v1/equipment-mgmt
+import { equipmentMgmtV13Routes } from './routes/equipmentMgmtV13';
+// M377-C：能源管理 V13 GET /api/v1/energy-mgmt
+import { energyMgmtV13Routes } from './routes/energyMgmtV13';
+// M377-D：环境管理 V13 GET /api/v1/environment-mgmt（M377 收官）
+import { environmentMgmtV13Routes } from './routes/environmentMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3244,6 +3252,10 @@ const allRoutes: RouteDef[] = [
   ...nursingDocumentStatsV13Routes, // M376-B：护理文书统计 V13 GET /api/v1/nursing-document-stats（stats 避让）
   ...nursingSensitiveIndexV13Routes, // M376-C：护理敏感指标 V13 GET /api/v1/nursing-sensitive-index
   ...nursingManagementV13Routes, // M376-D：护理管理 V13 GET /api/v1/nursing-management（M376 收官）
+  ...logisticsServiceV13Routes, // M377-A：后勤服务 V13 GET /api/v1/logistics-service
+  ...equipmentMgmtV13Routes, // M377-B：设备管理 V13 GET /api/v1/equipment-mgmt
+  ...energyMgmtV13Routes, // M377-C：能源管理 V13 GET /api/v1/energy-mgmt
+  ...environmentMgmtV13Routes, // M377-D：环境管理 V13 GET /api/v1/environment-mgmt（M377 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
