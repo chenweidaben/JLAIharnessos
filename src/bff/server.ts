@@ -1953,6 +1953,14 @@ import { infectionSurveillanceV13Routes } from './routes/infectionSurveillanceV1
 import { environmentalHygieneV13Routes } from './routes/environmentalHygieneV13';
 // M370-D：传染病报告 V13 GET /api/v1/epidemic-report（M370 收官）
 import { epidemicReportV13Routes } from './routes/epidemicReportV13';
+// M371-A：医疗质量 V13 GET /api/v1/medical-quality
+import { medicalQualityV13Routes } from './routes/medicalQualityV13';
+// M371-B：医疗安全 V13 GET /api/v1/medical-safety
+import { medicalSafetyV13Routes } from './routes/medicalSafetyV13';
+// M371-C：手术质量 V13 GET /api/v1/surgery-quality
+import { surgeryQualityV13Routes } from './routes/surgeryQualityV13';
+// M371-D：麻醉质量 V13 GET /api/v1/anesthesia-quality（M371 收官）
+import { anesthesiaQualityV13Routes } from './routes/anesthesiaQualityV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3172,6 +3180,10 @@ const allRoutes: RouteDef[] = [
   ...infectionSurveillanceV13Routes, // M370-B：院感监测 V13 GET /api/v1/infection-surveillance
   ...environmentalHygieneV13Routes, // M370-C：环境卫生学 V13 GET /api/v1/environmental-hygiene
   ...epidemicReportV13Routes, // M370-D：传染病报告 V13 GET /api/v1/epidemic-report（M370 收官）
+  ...medicalQualityV13Routes, // M371-A：医疗质量 V13 GET /api/v1/medical-quality
+  ...medicalSafetyV13Routes, // M371-B：医疗安全 V13 GET /api/v1/medical-safety
+  ...surgeryQualityV13Routes, // M371-C：手术质量 V13 GET /api/v1/surgery-quality
+  ...anesthesiaQualityV13Routes, // M371-D：麻醉质量 V13 GET /api/v1/anesthesia-quality（M371 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

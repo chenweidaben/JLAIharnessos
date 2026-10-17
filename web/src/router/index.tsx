@@ -1769,6 +1769,14 @@ const InfectionSurveillance = lazy(() => import('@/pages/infection-surveillance'
 const EnvironmentalHygiene = lazy(() => import('@/pages/environmental-hygiene'));
 // M370-D：传染病报告 V13（M370 收官）
 const EpidemicReport = lazy(() => import('@/pages/epidemic-report'));
+// M371-A：医疗质量 V13
+const MedicalQuality = lazy(() => import('@/pages/medical-quality'));
+// M371-B：医疗安全 V13
+const MedicalSafety = lazy(() => import('@/pages/medical-safety'));
+// M371-C：手术质量 V13
+const SurgeryQuality = lazy(() => import('@/pages/surgery-quality'));
+// M371-D：麻醉质量 V13（M371 收官）
+const AnesthesiaQuality = lazy(() => import('@/pages/anesthesia-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3479,6 +3487,14 @@ export default function AppRoutes() {
           <Route path="environmental-hygiene" element={<EnvironmentalHygiene />} />
           {/* M370-D：传染病报告 V13（M370 收官） */}
           <Route path="epidemic-report" element={<EpidemicReport />} />
+          {/* M371-A：医疗质量 V13 */}
+          <Route path="medical-quality" element={<MedicalQuality />} />
+          {/* M371-B：医疗安全 V13 */}
+          <Route path="medical-safety" element={<MedicalSafety />} />
+          {/* M371-C：手术质量 V13 */}
+          <Route path="surgery-quality" element={<SurgeryQuality />} />
+          {/* M371-D：麻醉质量 V13（M371 收官） */}
+          <Route path="anesthesia-quality" element={<AnesthesiaQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
