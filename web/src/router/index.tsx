@@ -1297,6 +1297,14 @@ const StaffWorkload = lazy(() => import('@/pages/staff-workload'));
 const QualityEventRca = lazy(() => import('@/pages/quality-event-rca'));
 // M311-D：院长指挥中心一屏总览 V13
 const DeanCommandCenter = lazy(() => import('@/pages/dean-command-center'));
+// M312-A：床位占用预测 V13
+const BedOccupancyForecast = lazy(() => import('@/pages/bed-occupancy-forecast'));
+// M312-B：药房库存预警 V13
+const PharmacyInventoryAlert = lazy(() => import('@/pages/pharmacy-inventory-alert'));
+// M312-C：手术排程冲突检测 V13
+const OtSchedulingConflict = lazy(() => import('@/pages/ot-scheduling-conflict'));
+// M312-D：急诊容量预警 V13
+const EmergencyCapacity = lazy(() => import('@/pages/emergency-capacity'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2535,6 +2543,14 @@ export default function AppRoutes() {
           <Route path="quality-event-rca" element={<QualityEventRca />} />
           {/* M311-D：院长指挥中心一屏总览 V13 */}
           <Route path="dean-command-center" element={<DeanCommandCenter />} />
+          {/* M312-A：床位占用预测 V13 */}
+          <Route path="bed-occupancy-forecast" element={<BedOccupancyForecast />} />
+          {/* M312-B：药房库存预警 V13 */}
+          <Route path="pharmacy-inventory-alert" element={<PharmacyInventoryAlert />} />
+          {/* M312-C：手术排程冲突检测 V13 */}
+          <Route path="ot-scheduling-conflict" element={<OtSchedulingConflict />} />
+          {/* M312-D：急诊容量预警 V13 */}
+          <Route path="emergency-capacity" element={<EmergencyCapacity />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

@@ -1481,6 +1481,14 @@ import { staffWorkloadV13Routes } from './routes/staffWorkloadV13';
 import { qualityEventRcaV13Routes } from './routes/qualityEventRcaV13';
 // M311-D：院长指挥中心一屏总览 V13 GET /api/v1/dean-command-center
 import { deanCommandCenterV13Routes } from './routes/deanCommandCenterV13';
+// M312-A：床位占用预测 V13 GET /api/v1/bed-occupancy-forecast
+import { bedOccupancyForecastV13Routes } from './routes/bedOccupancyForecastV13';
+// M312-B：药房库存预警 V13 GET /api/v1/pharmacy-inventory-alert
+import { pharmacyInventoryAlertV13Routes } from './routes/pharmacyInventoryAlertV13';
+// M312-C：手术排程冲突检测 V13 GET /api/v1/ot-scheduling-conflict
+import { otSchedulingConflictV13Routes } from './routes/otSchedulingConflictV13';
+// M312-D：急诊容量预警 V13 GET /api/v1/emergency-capacity
+import { emergencyCapacityV13Routes } from './routes/emergencyCapacityV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2464,6 +2472,10 @@ const allRoutes: RouteDef[] = [
   ...staffWorkloadV13Routes, // M311-B：医护工作量与疲劳度监测 V13 GET /api/v1/staff-workload
   ...qualityEventRcaV13Routes, // M311-C：不良事件根因分析 RCA 辅助 V13 GET /api/v1/quality-event-rca
   ...deanCommandCenterV13Routes, // M311-D：院长指挥中心一屏总览 V13 GET /api/v1/dean-command-center
+  ...bedOccupancyForecastV13Routes, // M312-A：床位占用预测 V13 GET /api/v1/bed-occupancy-forecast
+  ...pharmacyInventoryAlertV13Routes, // M312-B：药房库存预警 V13 GET /api/v1/pharmacy-inventory-alert
+  ...otSchedulingConflictV13Routes, // M312-C：手术排程冲突检测 V13 GET /api/v1/ot-scheduling-conflict
+  ...emergencyCapacityV13Routes, // M312-D：急诊容量预警 V13 GET /api/v1/emergency-capacity
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
