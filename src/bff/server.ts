@@ -2327,6 +2327,14 @@ import { endoscopyMgmtV13Routes } from './routes/endoscopyMgmtV13';
 import { operationRoomMgmtV13Routes } from './routes/operationRoomMgmtV13';
 // M417-D：病房管理（细节）V13 GET /api/v1/ward-mgmt-detail（M417 收官，detail 避让旧版 inpatientBedMgmtV13）
 import { wardMgmtDetailV13Routes } from './routes/wardMgmtDetailV13';
+// M418-A：药事管理（细节）V13 GET /api/v1/pharmacy-mgmt-detail（detail 避让旧版 prescriptionReview/drugCatalog/drugDelivery/drugSafety）
+import { pharmacyMgmtDetailV13Routes } from './routes/pharmacyMgmtDetailV13';
+// M418-B：医疗设备管理（细节）V13 GET /api/v1/medical-equipment-mgmt-detail（detail 避让旧版 equipmentMgmtV13/consumableSupplyV13）
+import { medicalEquipmentMgmtDetailV13Routes } from './routes/medicalEquipmentMgmtDetailV13';
+// M418-C：院感控制（细节）V13 GET /api/v1/infection-control-detail（detail 避让旧版 handHygieneCompliance/ICUInfectionRate/infectionReportMgmt 等院感系列）
+import { infectionControlDetailV13Routes } from './routes/infectionControlDetailV13';
+// M418-D：患者安全管理 V13 GET /api/v1/patient-safety-mgmt（M418 收官）
+import { patientSafetyMgmtV13Routes } from './routes/patientSafetyMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3733,6 +3741,10 @@ const allRoutes: RouteDef[] = [
   ...endoscopyMgmtV13Routes, // M417-B：内镜管理 V13 GET /api/v1/endoscopy-mgmt
   ...operationRoomMgmtV13Routes, // M417-C：手术室管理 V13 GET /api/v1/operation-room-mgmt
   ...wardMgmtDetailV13Routes, // M417-D：病房管理（细节）V13 GET /api/v1/ward-mgmt-detail（M417 收官，detail 避让旧版 inpatientBedMgmtV13）
+  ...pharmacyMgmtDetailV13Routes, // M418-A：药事管理（细节）V13 GET /api/v1/pharmacy-mgmt-detail（detail 避让旧版 prescriptionReview/drugCatalog/drugDelivery/drugSafety）
+  ...medicalEquipmentMgmtDetailV13Routes, // M418-B：医疗设备管理（细节）V13 GET /api/v1/medical-equipment-mgmt-detail（detail 避让旧版 equipmentMgmtV13/consumableSupplyV13）
+  ...infectionControlDetailV13Routes, // M418-C：院感控制（细节）V13 GET /api/v1/infection-control-detail（detail 避让旧版 handHygieneCompliance/ICUInfectionRate/infectionReportMgmt 等院感系列）
+  ...patientSafetyMgmtV13Routes, // M418-D：患者安全管理 V13 GET /api/v1/patient-safety-mgmt（M418 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

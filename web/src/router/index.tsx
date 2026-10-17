@@ -2143,6 +2143,14 @@ const EndoscopyMgmt = lazy(() => import('@/pages/endoscopy-mgmt'));
 const OperationRoomMgmt = lazy(() => import('@/pages/operation-room-mgmt'));
 // M417-D：病房管理（细节）V13（M417 收官，detail 避让旧版 inpatientBedMgmtV13）
 const WardMgmtDetail = lazy(() => import('@/pages/ward-mgmt-detail'));
+// M418-A：药事管理（细节）V13（detail 避让旧版 prescriptionReview/drugCatalog/drugDelivery/drugSafety）
+const PharmacyMgmtDetail = lazy(() => import('@/pages/pharmacy-mgmt-detail'));
+// M418-B：医疗设备管理（细节）V13（detail 避让旧版 equipmentMgmtV13/consumableSupplyV13）
+const MedicalEquipmentMgmtDetail = lazy(() => import('@/pages/medical-equipment-mgmt-detail'));
+// M418-C：院感控制（细节）V13（detail 避让旧版 handHygieneCompliance/ICUInfectionRate/infectionReportMgmt 等院感系列）
+const InfectionControlDetail = lazy(() => import('@/pages/infection-control-detail'));
+// M418-D：患者安全管理 V13（M418 收官）
+const PatientSafetyMgmt = lazy(() => import('@/pages/patient-safety-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4227,6 +4235,14 @@ export default function AppRoutes() {
           <Route path="operation-room-mgmt" element={<OperationRoomMgmt />} />
           {/* M417-D：病房管理（细节）V13（M417 收官，detail 避让旧版 inpatientBedMgmtV13） */}
           <Route path="ward-mgmt-detail" element={<WardMgmtDetail />} />
+          {/* M418-A：药事管理（细节）V13（detail 避让旧版 prescriptionReview/drugCatalog/drugDelivery/drugSafety） */}
+          <Route path="pharmacy-mgmt-detail" element={<PharmacyMgmtDetail />} />
+          {/* M418-B：医疗设备管理（细节）V13（detail 避让旧版 equipmentMgmtV13/consumableSupplyV13） */}
+          <Route path="medical-equipment-mgmt-detail" element={<MedicalEquipmentMgmtDetail />} />
+          {/* M418-C：院感控制（细节）V13（detail 避让旧版 handHygieneCompliance/ICUInfectionRate/infectionReportMgmt 等院感系列） */}
+          <Route path="infection-control-detail" element={<InfectionControlDetail />} />
+          {/* M418-D：患者安全管理 V13（M418 收官） */}
+          <Route path="patient-safety-mgmt" element={<PatientSafetyMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
