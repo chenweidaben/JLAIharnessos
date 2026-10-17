@@ -1841,6 +1841,14 @@ const BackupMgmt = lazy(() => import('@/pages/backup-mgmt'));
 const SystemAvailabilityDetail = lazy(() => import('@/pages/system-availability-detail'));
 // M379-D：数据质量明细 V13（detail 避让，M379 收官）
 const DataQualityDetail = lazy(() => import('@/pages/data-quality-detail'));
+// M380-A：制剂管理 V13
+const DrugPreparation = lazy(() => import('@/pages/drug-preparation'));
+// M380-B：临床药学 V13
+const ClinicalPharmacy = lazy(() => import('@/pages/clinical-pharmacy'));
+// M380-C：药库管理 V13
+const DrugStorage = lazy(() => import('@/pages/drug-storage'));
+// M380-D：中药房 V13（M380 收官）
+const TCMPharmacy = lazy(() => import('@/pages/tcm-pharmacy'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3623,6 +3631,14 @@ export default function AppRoutes() {
           <Route path="system-availability-detail" element={<SystemAvailabilityDetail />} />
           {/* M379-D：数据质量明细 V13（detail 避让，M379 收官） */}
           <Route path="data-quality-detail" element={<DataQualityDetail />} />
+          {/* M380-A：制剂管理 V13 */}
+          <Route path="drug-preparation" element={<DrugPreparation />} />
+          {/* M380-B：临床药学 V13 */}
+          <Route path="clinical-pharmacy" element={<ClinicalPharmacy />} />
+          {/* M380-C：药库管理 V13 */}
+          <Route path="drug-storage" element={<DrugStorage />} />
+          {/* M380-D：中药房 V13（M380 收官） */}
+          <Route path="tcm-pharmacy" element={<TCMPharmacy />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
