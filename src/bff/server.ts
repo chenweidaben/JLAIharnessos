@@ -2263,6 +2263,14 @@ import { dataQualityMgmtV13Routes } from './routes/dataQualityMgmtV13';
 import { cybersecurityMgmtV13Routes } from './routes/cybersecurityMgmtV13';
 // M409-D：互联互通管理 V13 GET /api/v1/interop-mgmt（M409 收官）
 import { interopMgmtV13Routes } from './routes/interopMgmtV13';
+// M410-A：科室KPI V13 GET /api/v1/department-kpi
+import { departmentKpiV13Routes } from './routes/departmentKpiV13';
+// M410-B：个人KPI V13 GET /api/v1/individual-kpi
+import { individualKpiV13Routes } from './routes/individualKpiV13';
+// M410-C：绩效奖金 V13 GET /api/v1/performance-bonus
+import { performanceBonusV13Routes } from './routes/performanceBonusV13';
+// M410-D：绩效改进 V13 GET /api/v1/performance-improvement（M410 收官）
+import { performanceImprovementV13Routes } from './routes/performanceImprovementV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3637,6 +3645,10 @@ const allRoutes: RouteDef[] = [
   ...dataQualityMgmtV13Routes, // M409-B：数据质量管理 V13 GET /api/v1/data-quality-mgmt
   ...cybersecurityMgmtV13Routes, // M409-C：网络安全管理 V13 GET /api/v1/cybersecurity-mgmt
   ...interopMgmtV13Routes, // M409-D：互联互通管理 V13 GET /api/v1/interop-mgmt（M409 收官）
+  ...departmentKpiV13Routes, // M410-A：科室KPI V13 GET /api/v1/department-kpi
+  ...individualKpiV13Routes, // M410-B：个人KPI V13 GET /api/v1/individual-kpi
+  ...performanceBonusV13Routes, // M410-C：绩效奖金 V13 GET /api/v1/performance-bonus
+  ...performanceImprovementV13Routes, // M410-D：绩效改进 V13 GET /api/v1/performance-improvement（M410 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

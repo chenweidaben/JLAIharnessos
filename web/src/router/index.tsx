@@ -2079,6 +2079,14 @@ const DataQualityMgmt = lazy(() => import('@/pages/data-quality-mgmt'));
 const CybersecurityMgmt = lazy(() => import('@/pages/cybersecurity-mgmt'));
 // M409-D：互联互通管理 V13（M409 收官）
 const InteropMgmt = lazy(() => import('@/pages/interop-mgmt'));
+// M410-A：科室KPI V13
+const DepartmentKpi = lazy(() => import('@/pages/department-kpi'));
+// M410-B：个人KPI V13
+const IndividualKpi = lazy(() => import('@/pages/individual-kpi'));
+// M410-C：绩效奖金 V13
+const PerformanceBonus = lazy(() => import('@/pages/performance-bonus'));
+// M410-D：绩效改进 V13（M410 收官）
+const PerformanceImprovement = lazy(() => import('@/pages/performance-improvement'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4099,6 +4107,14 @@ export default function AppRoutes() {
           <Route path="cybersecurity-mgmt" element={<CybersecurityMgmt />} />
           {/* M409-D：互联互通管理 V13（M409 收官） */}
           <Route path="interop-mgmt" element={<InteropMgmt />} />
+          {/* M410-A：科室KPI V13 */}
+          <Route path="department-kpi" element={<DepartmentKpi />} />
+          {/* M410-B：个人KPI V13 */}
+          <Route path="individual-kpi" element={<IndividualKpi />} />
+          {/* M410-C：绩效奖金 V13 */}
+          <Route path="performance-bonus" element={<PerformanceBonus />} />
+          {/* M410-D：绩效改进 V13（M410 收官） */}
+          <Route path="performance-improvement" element={<PerformanceImprovement />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
