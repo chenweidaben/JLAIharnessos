@@ -26,7 +26,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- 风险模式主表：按 (surgery_type, risk_factor) 唯一沉淀一行
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.surgery_safety_pattern (
-  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   surgery_type        text NOT NULL,
   risk_factor         text NOT NULL,
   occurrence_rate     numeric NOT NULL DEFAULT 0,

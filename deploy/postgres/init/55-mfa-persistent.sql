@@ -15,7 +15,7 @@
 -- （1）登录 2FA 挑战
 -- ----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS iam.mfa_login_challenges (
-  challenge_id     uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  challenge_id     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id          uuid NOT NULL REFERENCES iam.users(id) ON DELETE CASCADE,
   expires_at       timestamptz NOT NULL,
   verified_at      timestamptz,

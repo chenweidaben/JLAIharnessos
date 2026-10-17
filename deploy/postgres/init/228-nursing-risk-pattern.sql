@@ -25,7 +25,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- 风险模式主表：按 (ward_id, risk_type, patient_profile) 唯一沉淀
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.nursing_risk_pattern (
-  id               uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   ward_id          text NOT NULL,
   risk_type        text NOT NULL,
   patient_profile  text NOT NULL,

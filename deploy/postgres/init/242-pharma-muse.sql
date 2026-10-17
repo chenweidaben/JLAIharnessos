@@ -26,7 +26,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- 药师个人审方经验记忆表：一行 = 一次审方拦截/干预事件
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.pharma_audit_memory (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   pharmacist_id text NOT NULL,
   drug_pair     text NOT NULL,
   issue_type    text NOT NULL DEFAULT '',

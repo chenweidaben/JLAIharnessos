@@ -25,7 +25,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- 审方拦截模式主表：按 (drug_code, interaction_type) 唯一沉淀
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.pharmacy_audit_pattern (
-  id               uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   drug_code        text NOT NULL,
   interaction_type text NOT NULL,
   frequency        integer NOT NULL DEFAULT 0,

@@ -25,7 +25,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- AI 合理用药深度审核主表：一张处方一次审核一行
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.ai_drug_review (
-  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   prescription_id    text NOT NULL,
   -- 患者上下文（审核输入快照，脱敏后仅存结构化标签）
   patient_age        integer,

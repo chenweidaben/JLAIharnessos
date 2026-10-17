@@ -25,7 +25,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 -- 转诊知识主表：按 (转诊原因, 转出科室, 转往科室) 唯一沉淀一行
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS medmuse.referral_knowledge (
-  id               uuid PRIMARY KEY DEFAULT gen_random_uuid,
+  id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   from_dept        text,
   to_dept          text,
   referral_reason  text,
