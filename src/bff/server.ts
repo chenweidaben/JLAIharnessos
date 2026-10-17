@@ -1705,6 +1705,14 @@ import { anesthesiaComplicationV13Routes } from './routes/anesthesiaComplication
 import { ssiRateV13Routes } from './routes/ssiRateV13';
 // M339-D：术中冰冻病理与术后石蜡符合率 V13 GET /api/v1/intraop-frozen-section
 import { intraOpFrozenSectionV13Routes } from './routes/intraOpFrozenSectionV13';
+// M340-A：投诉处理 V13 GET /api/v1/complaint-handling
+import { complaintHandlingV13Routes } from './routes/complaintHandlingV13';
+// M340-B：医德医风考评 V13 GET /api/v1/medical-ethics
+import { medicalEthicsV13Routes } from './routes/medicalEthicsV13';
+// M340-C：知情同意书签署率 V13 GET /api/v1/informed-consent
+import { informedConsentV13Routes } from './routes/informedConsentV13';
+// M340-D：门诊病历书写合格率 V13 GET /api/v1/outpatient-record
+import { outpatientRecordV13Routes } from './routes/outpatientRecordV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2800,6 +2808,10 @@ const allRoutes: RouteDef[] = [
   ...anesthesiaComplicationV13Routes, // M339-B：麻醉相关并发症 V13 GET /api/v1/anesthesia-complication
   ...ssiRateV13Routes, // M339-C：手术部位感染率 V13 GET /api/v1/ssi-rate
   ...intraOpFrozenSectionV13Routes, // M339-D：术中冰冻病理与术后石蜡符合率 V13 GET /api/v1/intraop-frozen-section
+  ...complaintHandlingV13Routes, // M340-A：投诉处理 V13 GET /api/v1/complaint-handling
+  ...medicalEthicsV13Routes, // M340-B：医德医风考评 V13 GET /api/v1/medical-ethics
+  ...informedConsentV13Routes, // M340-C：知情同意书签署率 V13 GET /api/v1/informed-consent
+  ...outpatientRecordV13Routes, // M340-D：门诊病历书写合格率 V13 GET /api/v1/outpatient-record
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

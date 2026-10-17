@@ -1521,6 +1521,14 @@ const AnesthesiaComplication = lazy(() => import('@/pages/anesthesia-complicatio
 const SsiRate = lazy(() => import('@/pages/ssi-rate'));
 // M339-D：术中冰冻病理与术后石蜡符合率 V13
 const IntraopFrozenSection = lazy(() => import('@/pages/intraop-frozen-section'));
+// M340-A：投诉处理 V13
+const ComplaintHandling = lazy(() => import('@/pages/complaint-handling'));
+// M340-B：医德医风考评 V13
+const MedicalEthics = lazy(() => import('@/pages/medical-ethics'));
+// M340-C：知情同意书签署率 V13
+const InformedConsent = lazy(() => import('@/pages/informed-consent'));
+// M340-D：门诊病历书写合格率 V13
+const OutpatientRecord = lazy(() => import('@/pages/outpatient-record'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2983,6 +2991,14 @@ export default function AppRoutes() {
           <Route path="ssi-rate" element={<SsiRate />} />
           {/* M339-D：术中冰冻病理与术后石蜡符合率 V13 */}
           <Route path="intraop-frozen-section" element={<IntraopFrozenSection />} />
+          {/* M340-A：投诉处理 V13 */}
+          <Route path="complaint-handling" element={<ComplaintHandling />} />
+          {/* M340-B：医德医风考评 V13 */}
+          <Route path="medical-ethics" element={<MedicalEthics />} />
+          {/* M340-C：知情同意书签署率 V13 */}
+          <Route path="informed-consent" element={<InformedConsent />} />
+          {/* M340-D：门诊病历书写合格率 V13 */}
+          <Route path="outpatient-record" element={<OutpatientRecord />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
