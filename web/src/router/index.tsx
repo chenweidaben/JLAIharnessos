@@ -1060,6 +1060,8 @@ const DataSharing = lazy(() => import('@/pages/data-sharing'));
 const AppStore = lazy(() => import('@/pages/app-store'));
 // M282-A：数据分级分类与动态脱敏 V5
 const DataClassification = lazy(() => import('@/pages/data-classification'));
+// M282-B：零信任访问与权限最小化 V5
+const ZeroTrust = lazy(() => import('@/pages/zero-trust'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2060,6 +2062,8 @@ export default function AppRoutes() {
           <Route path="app-store" element={<AppStore />} />
           {/* M282-A：数据分级分类与动态脱敏 V5 */}
           <Route path="data-classification" element={<DataClassification />} />
+          {/* M282-B：零信任访问与权限最小化 V5 */}
+          <Route path="zero-trust" element={<ZeroTrust />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
