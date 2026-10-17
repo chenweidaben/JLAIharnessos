@@ -1945,6 +1945,14 @@ import { nursingSafetyV13Routes } from './routes/nursingSafetyV13';
 import { nursingStaffV13Routes } from './routes/nursingStaffV13';
 // M369-D：护理培训 V13 GET /api/v1/nursing-training（M369 收官）
 import { nursingTrainingV13Routes } from './routes/nursingTrainingV13';
+// M370-A：院感控制 V13 GET /api/v1/infection-control
+import { infectionControlV13Routes } from './routes/infectionControlV13';
+// M370-B：院感监测 V13 GET /api/v1/infection-surveillance
+import { infectionSurveillanceV13Routes } from './routes/infectionSurveillanceV13';
+// M370-C：环境卫生学 V13 GET /api/v1/environmental-hygiene
+import { environmentalHygieneV13Routes } from './routes/environmentalHygieneV13';
+// M370-D：传染病报告 V13 GET /api/v1/epidemic-report（M370 收官）
+import { epidemicReportV13Routes } from './routes/epidemicReportV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3160,6 +3168,10 @@ const allRoutes: RouteDef[] = [
   ...nursingSafetyV13Routes, // M369-B：护理安全 V13 GET /api/v1/nursing-safety
   ...nursingStaffV13Routes, // M369-C：护理人员配置 V13 GET /api/v1/nursing-staff
   ...nursingTrainingV13Routes, // M369-D：护理培训 V13 GET /api/v1/nursing-training（M369 收官）
+  ...infectionControlV13Routes, // M370-A：院感控制 V13 GET /api/v1/infection-control
+  ...infectionSurveillanceV13Routes, // M370-B：院感监测 V13 GET /api/v1/infection-surveillance
+  ...environmentalHygieneV13Routes, // M370-C：环境卫生学 V13 GET /api/v1/environmental-hygiene
+  ...epidemicReportV13Routes, // M370-D：传染病报告 V13 GET /api/v1/epidemic-report（M370 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

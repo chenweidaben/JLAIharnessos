@@ -1761,6 +1761,14 @@ const NursingSafety = lazy(() => import('@/pages/nursing-safety'));
 const NursingStaff = lazy(() => import('@/pages/nursing-staff'));
 // M369-D：护理培训 V13（M369 收官）
 const NursingTraining = lazy(() => import('@/pages/nursing-training'));
+// M370-A：院感控制 V13
+const InfectionControl = lazy(() => import('@/pages/infection-control'));
+// M370-B：院感监测 V13
+const InfectionSurveillance = lazy(() => import('@/pages/infection-surveillance'));
+// M370-C：环境卫生学 V13
+const EnvironmentalHygiene = lazy(() => import('@/pages/environmental-hygiene'));
+// M370-D：传染病报告 V13（M370 收官）
+const EpidemicReport = lazy(() => import('@/pages/epidemic-report'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3463,6 +3471,14 @@ export default function AppRoutes() {
           <Route path="nursing-staff" element={<NursingStaff />} />
           {/* M369-D：护理培训 V13（M369 收官） */}
           <Route path="nursing-training" element={<NursingTraining />} />
+          {/* M370-A：院感控制 V13 */}
+          <Route path="infection-control" element={<InfectionControl />} />
+          {/* M370-B：院感监测 V13 */}
+          <Route path="infection-surveillance" element={<InfectionSurveillance />} />
+          {/* M370-C：环境卫生学 V13 */}
+          <Route path="environmental-hygiene" element={<EnvironmentalHygiene />} />
+          {/* M370-D：传染病报告 V13（M370 收官） */}
+          <Route path="epidemic-report" element={<EpidemicReport />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
