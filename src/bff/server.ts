@@ -1497,6 +1497,14 @@ import { outpatientFlowForecastV13Routes } from './routes/outpatientFlowForecast
 import { equipmentMaintenanceV13Routes } from './routes/equipmentMaintenanceV13';
 // M313-D：院感暴发早期预警 V13 GET /api/v1/infection-outbreak
 import { infectionOutbreakV13Routes } from './routes/infectionOutbreakV13';
+// M314-A：门诊爽约率分析 V13 GET /api/v1/no-show-rate
+import { noShowRateV13Routes } from './routes/noShowRateV13';
+// M314-B：31 天再入院风险预测 V13 GET /api/v1/readmission-risk
+import { readmissionRiskV13Routes } from './routes/readmissionRiskV13';
+// M314-C：出院用药重整 V13 GET /api/v1/medication-reconciliation
+import { medicationReconciliationV13Routes } from './routes/medicationReconciliationV13';
+// M314-D：出院小结质量评分 V13 GET /api/v1/discharge-summary-quality
+import { dischargeSummaryQualityV13Routes } from './routes/dischargeSummaryQualityV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2488,6 +2496,10 @@ const allRoutes: RouteDef[] = [
   ...outpatientFlowForecastV13Routes, // M313-B：门诊流量预测与分时段建议 V13 GET /api/v1/outpatient-flow-forecast
   ...equipmentMaintenanceV13Routes, // M313-C：医疗设备维保到期提醒 V13 GET /api/v1/equipment-maintenance
   ...infectionOutbreakV13Routes, // M313-D：院感暴发早期预警 V13 GET /api/v1/infection-outbreak
+  ...noShowRateV13Routes, // M314-A：门诊爽约率分析 V13 GET /api/v1/no-show-rate
+  ...readmissionRiskV13Routes, // M314-B：31 天再入院风险预测 V13 GET /api/v1/readmission-risk
+  ...medicationReconciliationV13Routes, // M314-C：出院用药重整 V13 GET /api/v1/medication-reconciliation
+  ...dischargeSummaryQualityV13Routes, // M314-D：出院小结质量评分 V13 GET /api/v1/discharge-summary-quality
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

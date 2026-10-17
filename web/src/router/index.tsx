@@ -1313,6 +1313,14 @@ const OutpatientFlowForecast = lazy(() => import('@/pages/outpatient-flow-foreca
 const EquipmentMaintenance = lazy(() => import('@/pages/equipment-maintenance'));
 // M313-D：院感暴发早期预警 V13
 const InfectionOutbreak = lazy(() => import('@/pages/infection-outbreak'));
+// M314-A：门诊爽约率分析 V13
+const NoShowRate = lazy(() => import('@/pages/no-show-rate'));
+// M314-B：31 天再入院风险预测 V13
+const ReadmissionRisk = lazy(() => import('@/pages/readmission-risk'));
+// M314-C：出院用药重整 V13
+const MedicationReconciliation = lazy(() => import('@/pages/medication-reconciliation'));
+// M314-D：出院小结质量评分 V13
+const DischargeSummaryQuality = lazy(() => import('@/pages/discharge-summary-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2567,6 +2575,14 @@ export default function AppRoutes() {
           <Route path="equipment-maintenance" element={<EquipmentMaintenance />} />
           {/* M313-D：院感暴发早期预警 V13 */}
           <Route path="infection-outbreak" element={<InfectionOutbreak />} />
+          {/* M314-A：门诊爽约率分析 V13 */}
+          <Route path="no-show-rate" element={<NoShowRate />} />
+          {/* M314-B：31 天再入院风险预测 V13 */}
+          <Route path="readmission-risk" element={<ReadmissionRisk />} />
+          {/* M314-C：出院用药重整 V13 */}
+          <Route path="medication-reconciliation" element={<MedicationReconciliation />} />
+          {/* M314-D：出院小结质量评分 V13 */}
+          <Route path="discharge-summary-quality" element={<DischargeSummaryQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
