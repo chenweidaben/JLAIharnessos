@@ -1425,6 +1425,14 @@ const TeachingHospital = lazy(() => import('@/pages/teaching-hospital'));
 const ContinuingEducation = lazy(() => import('@/pages/continuing-education'));
 // M327-D：医学文献检索 V13
 const MedicalLiterature = lazy(() => import('@/pages/medical-literature'));
+// M328-A：设备运维 V13
+const EquipmentOpsOverview = lazy(() => import('@/pages/equipment-ops-overview'));
+// M328-B：耗材库存 V13
+const ConsumableInventory = lazy(() => import('@/pages/consumable-inventory'));
+// M328-C：药品库存 V13
+const PharmacyInventory = lazy(() => import('@/pages/pharmacy-inventory'));
+// M328-D：血库库存 V13
+const BloodInventory = lazy(() => import('@/pages/blood-inventory'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2791,6 +2799,14 @@ export default function AppRoutes() {
           <Route path="continuing-education" element={<ContinuingEducation />} />
           {/* M327-D：医学文献检索 V13 */}
           <Route path="medical-literature" element={<MedicalLiterature />} />
+          {/* M328-A：设备运维 V13 */}
+          <Route path="equipment-ops-overview" element={<EquipmentOpsOverview />} />
+          {/* M328-B：耗材库存 V13 */}
+          <Route path="consumable-inventory" element={<ConsumableInventory />} />
+          {/* M328-C：药品库存 V13 */}
+          <Route path="pharmacy-inventory" element={<PharmacyInventory />} />
+          {/* M328-D：血库库存 V13 */}
+          <Route path="blood-inventory" element={<BloodInventory />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}

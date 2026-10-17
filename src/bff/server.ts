@@ -1609,6 +1609,14 @@ import { teachingHospitalV13Routes } from './routes/teachingHospitalV13';
 import { continuingEducationV13Routes } from './routes/continuingEducationV13';
 // M327-D：医学文献检索 V13 GET /api/v1/medical-literature
 import { medicalLiteratureV13Routes } from './routes/medicalLiteratureV13';
+// M328-A：设备运维 V13 GET /api/v1/equipment-ops-overview
+import { equipmentOpsV13Routes } from './routes/equipmentOpsV13';
+// M328-B：耗材库存 V13 GET /api/v1/consumable-inventory
+import { consumableInventoryV13Routes } from './routes/consumableInventoryV13';
+// M328-C：药品库存 V13 GET /api/v1/pharmacy-inventory
+import { pharmacyInventoryV13Routes } from './routes/pharmacyInventoryV13';
+// M328-D：血库库存 V13 GET /api/v1/blood-inventory
+import { bloodInventoryV13Routes } from './routes/bloodInventoryV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2656,6 +2664,10 @@ const allRoutes: RouteDef[] = [
   ...teachingHospitalV13Routes, // M327-B：教学医院指标 V13 GET /api/v1/teaching-hospital
   ...continuingEducationV13Routes, // M327-C：继续教育学分 V13 GET /api/v1/continuing-education
   ...medicalLiteratureV13Routes, // M327-D：医学文献检索 V13 GET /api/v1/medical-literature
+  ...equipmentOpsV13Routes, // M328-A：设备运维 V13 GET /api/v1/equipment-ops-overview
+  ...consumableInventoryV13Routes, // M328-B：耗材库存 V13 GET /api/v1/consumable-inventory
+  ...pharmacyInventoryV13Routes, // M328-C：药品库存 V13 GET /api/v1/pharmacy-inventory
+  ...bloodInventoryV13Routes, // M328-D：血库库存 V13 GET /api/v1/blood-inventory
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
