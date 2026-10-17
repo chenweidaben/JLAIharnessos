@@ -1441,6 +1441,14 @@ const CostPerPatient = lazy(() => import('@/pages/cost-per-patient'));
 const RevenueStructure = lazy(() => import('@/pages/revenue-structure'));
 // M329-D：医保结算 V13
 const InsuranceSettlement = lazy(() => import('@/pages/insurance-settlement'));
+// M330-A：医生工作量 V13
+const DoctorWorkload = lazy(() => import('@/pages/doctor-workload'));
+// M330-B：护士工作量 V13
+const NurseWorkload = lazy(() => import('@/pages/nurse-workload'));
+// M330-C：员工净流失率 V13
+const StaffTurnoverNet = lazy(() => import('@/pages/staff-turnover-net'));
+// M330-D：培训时长 V13
+const TrainingHours = lazy(() => import('@/pages/training-hours'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2823,6 +2831,14 @@ export default function AppRoutes() {
           <Route path="revenue-structure" element={<RevenueStructure />} />
           {/* M329-D：医保结算 V13 */}
           <Route path="insurance-settlement" element={<InsuranceSettlement />} />
+          {/* M330-A：医生工作量 V13 */}
+          <Route path="doctor-workload" element={<DoctorWorkload />} />
+          {/* M330-B：护士工作量 V13 */}
+          <Route path="nurse-workload" element={<NurseWorkload />} />
+          {/* M330-C：员工净流失率 V13 */}
+          <Route path="staff-turnover-net" element={<StaffTurnoverNet />} />
+          {/* M330-D：培训时长 V13 */}
+          <Route path="training-hours" element={<TrainingHours />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
