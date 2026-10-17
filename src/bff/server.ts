@@ -1673,6 +1673,14 @@ import { icuOccupancyV13Routes } from './routes/icuOccupancyV13';
 import { criticalValueV13Routes } from './routes/criticalValueV13';
 // M335-D：31 天再入院率 V13 GET /api/v1/readmission-stats
 import { readmissionV13Routes } from './routes/readmissionV13';
+// M336-A：药品短缺 V13 GET /api/v1/drug-shortage
+import { drugShortageV13Routes } from './routes/drugShortageV13';
+// M336-B：药品不良反应 V13 GET /api/v1/adverse-drug-event
+import { adverseDrugEventV13Routes } from './routes/adverseDrugEventV13';
+// M336-C：抗菌药物处方率 V13 GET /api/v1/antibiotic-rx
+import { antibioticRxV13Routes } from './routes/antibioticRxV13';
+// M336-D：静脉输液率 V13 GET /api/v1/iv-fluid
+import { ivFluidV13Routes } from './routes/ivFluidV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2752,6 +2760,10 @@ const allRoutes: RouteDef[] = [
   ...icuOccupancyV13Routes, // M335-B：ICU 床位 V13 GET /api/v1/icu-occupancy
   ...criticalValueV13Routes, // M335-C：危急值 V13 GET /api/v1/critical-value-stats
   ...readmissionV13Routes, // M335-D：31 天再入院率 V13 GET /api/v1/readmission-stats
+  ...drugShortageV13Routes, // M336-A：药品短缺 V13 GET /api/v1/drug-shortage
+  ...adverseDrugEventV13Routes, // M336-B：药品不良反应 V13 GET /api/v1/adverse-drug-event
+  ...antibioticRxV13Routes, // M336-C：抗菌药物处方率 V13 GET /api/v1/antibiotic-rx
+  ...ivFluidV13Routes, // M336-D：静脉输液率 V13 GET /api/v1/iv-fluid
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

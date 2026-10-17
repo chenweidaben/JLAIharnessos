@@ -1489,6 +1489,14 @@ const IcuOccupancy = lazy(() => import('@/pages/icu-occupancy'));
 const CriticalValueStats = lazy(() => import('@/pages/critical-value-stats'));
 // M335-D：31 天再入院率 V13
 const ReadmissionStats = lazy(() => import('@/pages/readmission-stats'));
+// M336-A：药品短缺 V13
+const DrugShortage = lazy(() => import('@/pages/drug-shortage'));
+// M336-B：药品不良反应 V13
+const AdverseDrugEvent = lazy(() => import('@/pages/adverse-drug-event'));
+// M336-C：抗菌药物处方率 V13
+const AntibioticRx = lazy(() => import('@/pages/antibiotic-rx'));
+// M336-D：静脉输液率 V13
+const IvFluid = lazy(() => import('@/pages/iv-fluid'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2919,6 +2927,14 @@ export default function AppRoutes() {
           <Route path="critical-value-stats" element={<CriticalValueStats />} />
           {/* M335-D：31 天再入院率 V13 */}
           <Route path="readmission-stats" element={<ReadmissionStats />} />
+          {/* M336-A：药品短缺 V13 */}
+          <Route path="drug-shortage" element={<DrugShortage />} />
+          {/* M336-B：药品不良反应 V13 */}
+          <Route path="adverse-drug-event" element={<AdverseDrugEvent />} />
+          {/* M336-C：抗菌药物处方率 V13 */}
+          <Route path="antibiotic-rx" element={<AntibioticRx />} />
+          {/* M336-D：静脉输液率 V13 */}
+          <Route path="iv-fluid" element={<IvFluid />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
