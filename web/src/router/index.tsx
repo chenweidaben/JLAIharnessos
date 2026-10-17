@@ -1393,6 +1393,14 @@ const Intercon4Level = lazy(() => import('@/pages/intercon4-level'));
 const SmartHospitalRating = lazy(() => import('@/pages/smart-hospital-rating'));
 // M323-D：数据治理成熟度 V13
 const DataGovernanceMaturity = lazy(() => import('@/pages/data-governance-maturity'));
+// M324-A：区域健康数据汇总 V13
+const RegionalHealthData = lazy(() => import('@/pages/regional-health-data'));
+// M324-B：基层医疗协同 V13
+const GrassrootsMedical = lazy(() => import('@/pages/grassroots-medical'));
+// M324-C：远程会诊量 V13
+const TelemedicineOverview = lazy(() => import('@/pages/telemedicine-overview'));
+// M324-D：公共卫生应急 V13
+const PublicHealthEmergency = lazy(() => import('@/pages/public-health-emergency'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2727,6 +2735,14 @@ export default function AppRoutes() {
           <Route path="smart-hospital-rating" element={<SmartHospitalRating />} />
           {/* M323-D：数据治理成熟度 V13 */}
           <Route path="data-governance-maturity" element={<DataGovernanceMaturity />} />
+          {/* M324-A：区域健康数据汇总 V13 */}
+          <Route path="regional-health-data" element={<RegionalHealthData />} />
+          {/* M324-B：基层医疗协同 V13 */}
+          <Route path="grassroots-medical" element={<GrassrootsMedical />} />
+          {/* M324-C：远程会诊量 V13 */}
+          <Route path="telemedicine-overview" element={<TelemedicineOverview />} />
+          {/* M324-D：公共卫生应急 V13 */}
+          <Route path="public-health-emergency" element={<PublicHealthEmergency />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
