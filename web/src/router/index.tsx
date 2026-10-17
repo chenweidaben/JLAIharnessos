@@ -1975,6 +1975,14 @@ const RevenueStructureDetail = lazy(() => import('@/pages/revenue-structure-deta
 const CostControlDetail = lazy(() => import('@/pages/cost-control-detail'));
 // M396-D：效率指标 V13（M396 收官）
 const EfficiencyIndicator = lazy(() => import('@/pages/efficiency-indicator'));
+// M397-A：学科建设 V13
+const DisciplineConstruction = lazy(() => import('@/pages/discipline-construction'));
+// M397-B：人才发展 V13
+const TalentDevelopment = lazy(() => import('@/pages/talent-development'));
+// M397-C：临床研究明细 V13（避让旧版 clinical-research/clinical-research-stats）
+const ClinicalResearchDetail = lazy(() => import('@/pages/clinical-research-detail'));
+// M397-D：继续教育明细 V13（M397 收官，避让旧版 continuing-education/continuing-education-stats）
+const ContinuingEducationDetail = lazy(() => import('@/pages/continuing-education-detail'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3891,6 +3899,14 @@ export default function AppRoutes() {
           <Route path="cost-control-detail" element={<CostControlDetail />} />
           {/* M396-D：效率指标 V13（M396 收官） */}
           <Route path="efficiency-indicator" element={<EfficiencyIndicator />} />
+          {/* M397-A：学科建设 V13 */}
+          <Route path="discipline-construction" element={<DisciplineConstruction />} />
+          {/* M397-B：人才发展 V13 */}
+          <Route path="talent-development" element={<TalentDevelopment />} />
+          {/* M397-C：临床研究明细 V13（避让旧版 clinical-research/clinical-research-stats） */}
+          <Route path="clinical-research-detail" element={<ClinicalResearchDetail />} />
+          {/* M397-D：继续教育明细 V13（M397 收官，避让旧版 continuing-education/continuing-education-stats） */}
+          <Route path="continuing-education-detail" element={<ContinuingEducationDetail />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
