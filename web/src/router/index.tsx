@@ -1465,6 +1465,14 @@ const DoctorSatisfaction = lazy(() => import('@/pages/doctor-satisfaction'));
 const NurseSatisfaction = lazy(() => import('@/pages/nurse-satisfaction'));
 // M332-D：员工满意度总览 V13
 const StaffSatisfactionOverview = lazy(() => import('@/pages/staff-satisfaction-overview'));
+// M333-A：临床路径执行率 V13
+const ClinicalPathwayOverview = lazy(() => import('@/pages/clinical-pathway-overview'));
+// M333-B：指南依从性 V13
+const GuidelineCompliance = lazy(() => import('@/pages/guideline-compliance'));
+// M333-C：抗菌药物使用强度 V13
+const AntibioticUse = lazy(() => import('@/pages/antibiotic-use'));
+// M333-D：用血合理率 V13
+const BloodUse = lazy(() => import('@/pages/blood-use'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2871,6 +2879,14 @@ export default function AppRoutes() {
           <Route path="nurse-satisfaction" element={<NurseSatisfaction />} />
           {/* M332-D：员工满意度总览 V13 */}
           <Route path="staff-satisfaction-overview" element={<StaffSatisfactionOverview />} />
+          {/* M333-A：临床路径执行率 V13 */}
+          <Route path="clinical-pathway-overview" element={<ClinicalPathwayOverview />} />
+          {/* M333-B：指南依从性 V13 */}
+          <Route path="guideline-compliance" element={<GuidelineCompliance />} />
+          {/* M333-C：抗菌药物使用强度 V13 */}
+          <Route path="antibiotic-use" element={<AntibioticUse />} />
+          {/* M333-D：用血合理率 V13 */}
+          <Route path="blood-use" element={<BloodUse />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
