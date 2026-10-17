@@ -2023,6 +2023,14 @@ const DutyRoster = lazy(() => import('@/pages/duty-roster'));
 const AttendanceMgmt = lazy(() => import('@/pages/attendance-mgmt'));
 // M402-D：绩效考核 V13（避让旧版 performance-eval，M402 收官）
 const PerformanceEvalDetail = lazy(() => import('@/pages/performance-eval-detail'));
+// M403-A：重点专科管理 V13
+const KeySpecialtyMgmt = lazy(() => import('@/pages/key-specialty-mgmt'));
+// M403-B：人才团队管理 V13
+const TalentTeamMgmt = lazy(() => import('@/pages/talent-team-mgmt'));
+// M403-C：学科竞赛 V13
+const DisciplineCompetition = lazy(() => import('@/pages/discipline-competition'));
+// M403-D：学术水平 V13（M403 收官）
+const AcademicLevel = lazy(() => import('@/pages/academic-level'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3987,6 +3995,14 @@ export default function AppRoutes() {
           <Route path="attendance-mgmt" element={<AttendanceMgmt />} />
           {/* M402-D：绩效考核 V13（避让旧版 performance-eval，M402 收官） */}
           <Route path="performance-eval-detail" element={<PerformanceEvalDetail />} />
+          {/* M403-A：重点专科管理 V13 */}
+          <Route path="key-specialty-mgmt" element={<KeySpecialtyMgmt />} />
+          {/* M403-B：人才团队管理 V13 */}
+          <Route path="talent-team-mgmt" element={<TalentTeamMgmt />} />
+          {/* M403-C：学科竞赛 V13 */}
+          <Route path="discipline-competition" element={<DisciplineCompetition />} />
+          {/* M403-D：学术水平 V13（M403 收官） */}
+          <Route path="academic-level" element={<AcademicLevel />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

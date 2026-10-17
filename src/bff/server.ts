@@ -2207,6 +2207,14 @@ import { dutyRosterV13Routes } from './routes/dutyRosterV13';
 import { attendanceMgmtV13Routes } from './routes/attendanceMgmtV13';
 // M402-D：绩效考核 V13 GET /api/v1/performance-eval-detail（避让旧版 performanceEvalV13 M384，M402 收官）
 import { performanceEvalDetailV13Routes } from './routes/performanceEvalDetailV13';
+// M403-A：重点专科管理 V13 GET /api/v1/key-specialty-mgmt
+import { keySpecialtyMgmtV13Routes } from './routes/keySpecialtyMgmtV13';
+// M403-B：人才团队管理 V13 GET /api/v1/talent-team-mgmt
+import { talentTeamMgmtV13Routes } from './routes/talentTeamMgmtV13';
+// M403-C：学科竞赛 V13 GET /api/v1/discipline-competition
+import { disciplineCompetitionV13Routes } from './routes/disciplineCompetitionV13';
+// M403-D：学术水平 V13 GET /api/v1/academic-level（M403 收官）
+import { academicLevelV13Routes } from './routes/academicLevelV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3553,6 +3561,10 @@ const allRoutes: RouteDef[] = [
   ...dutyRosterV13Routes, // M402-B：值班管理 V13 GET /api/v1/duty-roster
   ...attendanceMgmtV13Routes, // M402-C：考勤管理 V13 GET /api/v1/attendance-mgmt
   ...performanceEvalDetailV13Routes, // M402-D：绩效考核 V13 GET /api/v1/performance-eval-detail（避让旧版 performanceEvalV13 M384，M402 收官）
+  ...keySpecialtyMgmtV13Routes, // M403-A：重点专科管理 V13 GET /api/v1/key-specialty-mgmt
+  ...talentTeamMgmtV13Routes, // M403-B：人才团队管理 V13 GET /api/v1/talent-team-mgmt
+  ...disciplineCompetitionV13Routes, // M403-C：学科竞赛 V13 GET /api/v1/discipline-competition
+  ...academicLevelV13Routes, // M403-D：学术水平 V13 GET /api/v1/academic-level（M403 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
