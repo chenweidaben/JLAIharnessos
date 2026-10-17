@@ -1012,6 +1012,8 @@ const FailureFlywheel = lazy(() => import('@/pages/failure-flywheel'));
 const ExperienceGraph = lazy(() => import('@/pages/experience-graph'));
 // M276-A：AI 建议全链路审计
 const AIAdviceTrace = lazy(() => import('@/pages/ai-advice-trace'));
+// M276-B：新知识自动入库与指南更新监测
+const KnowledgeIntake = lazy(() => import('@/pages/knowledge-intake'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -1964,6 +1966,8 @@ export default function AppRoutes() {
           <Route path="experience-graph" element={<ExperienceGraph />} />
           {/* M276-A：AI 建议全链路审计 */}
           <Route path="ai-advice-trace" element={<AIAdviceTrace />} />
+          {/* M276-B：新知识自动入库与指南更新监测 */}
+          <Route path="knowledge-intake" element={<KnowledgeIntake />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
