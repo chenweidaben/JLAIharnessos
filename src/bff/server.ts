@@ -1585,6 +1585,14 @@ import { grassrootsMedicalV13Routes } from './routes/grassrootsMedicalV13';
 import { telemedicineV13Routes } from './routes/telemedicineV13';
 // M324-D：公共卫生应急 V13 GET /api/v1/public-health-emergency
 import { publicHealthEmergencyV13Routes } from './routes/publicHealthEmergencyV13';
+// M325-A：影像 AI 使用统计 V13 GET /api/v1/imaging-ai-usage
+import { imagingAiUsageV13Routes } from './routes/imagingAiUsageV13';
+// M325-B：检验 AI 使用统计 V13 GET /api/v1/lab-ai-usage
+import { labAiUsageV13Routes } from './routes/labAiUsageV13';
+// M325-C：AI 模型漂移监控 V13 GET /api/v1/ai-model-drift
+import { aiModelDriftV13Routes } from './routes/aiModelDriftV13';
+// M325-D：AI 治理台账 V13 GET /api/v1/ai-governance
+import { aiGovernanceV13Routes } from './routes/aiGovernanceV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2620,6 +2628,10 @@ const allRoutes: RouteDef[] = [
   ...grassrootsMedicalV13Routes, // M324-B：基层医疗协同 V13 GET /api/v1/grassroots-medical
   ...telemedicineV13Routes, // M324-C：远程会诊量 V13 GET /api/v1/telemedicine-overview
   ...publicHealthEmergencyV13Routes, // M324-D：公共卫生应急 V13 GET /api/v1/public-health-emergency
+  ...imagingAiUsageV13Routes, // M325-A：影像 AI 使用统计 V13 GET /api/v1/imaging-ai-usage
+  ...labAiUsageV13Routes, // M325-B：检验 AI 使用统计 V13 GET /api/v1/lab-ai-usage
+  ...aiModelDriftV13Routes, // M325-C：AI 模型漂移监控 V13 GET /api/v1/ai-model-drift
+  ...aiGovernanceV13Routes, // M325-D：AI 治理台账 V13 GET /api/v1/ai-governance
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

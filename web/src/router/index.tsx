@@ -1401,6 +1401,14 @@ const GrassrootsMedical = lazy(() => import('@/pages/grassroots-medical'));
 const TelemedicineOverview = lazy(() => import('@/pages/telemedicine-overview'));
 // M324-D：公共卫生应急 V13
 const PublicHealthEmergency = lazy(() => import('@/pages/public-health-emergency'));
+// M325-A：影像 AI 使用统计 V13
+const ImagingAiUsage = lazy(() => import('@/pages/imaging-ai-usage'));
+// M325-B：检验 AI 使用统计 V13
+const LabAiUsage = lazy(() => import('@/pages/lab-ai-usage'));
+// M325-C：AI 模型漂移监控 V13
+const AiModelDrift = lazy(() => import('@/pages/ai-model-drift'));
+// M325-D：AI 治理台账 V13
+const AiGovernance = lazy(() => import('@/pages/ai-governance'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2743,6 +2751,14 @@ export default function AppRoutes() {
           <Route path="telemedicine-overview" element={<TelemedicineOverview />} />
           {/* M324-D：公共卫生应急 V13 */}
           <Route path="public-health-emergency" element={<PublicHealthEmergency />} />
+          {/* M325-A：影像 AI 使用统计 V13 */}
+          <Route path="imaging-ai-usage" element={<ImagingAiUsage />} />
+          {/* M325-B：检验 AI 使用统计 V13 */}
+          <Route path="lab-ai-usage" element={<LabAiUsage />} />
+          {/* M325-C：AI 模型漂移监控 V13 */}
+          <Route path="ai-model-drift" element={<AiModelDrift />} />
+          {/* M325-D：AI 治理台账 V13 */}
+          <Route path="ai-governance" element={<AiGovernance />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
