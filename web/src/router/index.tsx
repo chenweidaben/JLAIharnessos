@@ -1084,6 +1084,8 @@ const MuseReminder = lazy(() => import('@/pages/muse-reminder'));
 const MuseSkills = lazy(() => import('@/pages/muse-skills'));
 // M285-A：MUSE 采纳率与使用度量 V5
 const MuseValue = lazy(() => import('@/pages/muse-value'));
+// M285-B：MUSE 错误拦截与风险避免 V5
+const MuseInterception = lazy(() => import('@/pages/muse-interception'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2108,6 +2110,8 @@ export default function AppRoutes() {
           <Route path="muse-skills" element={<MuseSkills />} />
           {/* M285-A：MUSE 采纳率与使用度量 V5 */}
           <Route path="muse-value" element={<MuseValue />} />
+          {/* M285-B：MUSE 错误拦截与风险避免 V5 */}
+          <Route path="muse-interception" element={<MuseInterception />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
