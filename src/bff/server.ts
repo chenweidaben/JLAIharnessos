@@ -1561,6 +1561,14 @@ import { museCrossRoleLearningV13Routes } from './routes/museCrossRoleLearningV1
 import { museModelVersionV13Routes } from './routes/museModelVersionV13';
 // M321-D：MUSE 投入产出报告 V13 GET /api/v1/muse-roi-report
 import { museRoiReportV13Routes } from './routes/museRoiReportV13';
+// M322-A：医疗质量总仪表盘 V13 GET /api/v1/clinical-quality-dashboard
+import { clinicalQualityDashboardV13Routes } from './routes/clinicalQualityDashboardV13';
+// M322-B：患者安全事件总览 V13 GET /api/v1/patient-safety-overview
+import { patientSafetyV13Routes } from './routes/patientSafetyV13';
+// M322-C：员工满意度 V13 GET /api/v1/staff-satisfaction
+import { staffSatisfactionV13Routes } from './routes/staffSatisfactionV13';
+// M322-D：医院运营效率 V13 GET /api/v1/hospital-efficiency
+import { hospitalEfficiencyV13Routes } from './routes/hospitalEfficiencyV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2584,6 +2592,10 @@ const allRoutes: RouteDef[] = [
   ...museCrossRoleLearningV13Routes, // M321-B：跨角色经验互鉴 V13 GET /api/v1/muse-cross-role-learning
   ...museModelVersionV13Routes, // M321-C：模型版本迭代记录 V13 GET /api/v1/muse-model-version
   ...museRoiReportV13Routes, // M321-D：MUSE 投入产出报告 V13 GET /api/v1/muse-roi-report
+  ...clinicalQualityDashboardV13Routes, // M322-A：医疗质量总仪表盘 V13 GET /api/v1/clinical-quality-dashboard
+  ...patientSafetyV13Routes, // M322-B：患者安全事件总览 V13 GET /api/v1/patient-safety-overview
+  ...staffSatisfactionV13Routes, // M322-C：员工满意度 V13 GET /api/v1/staff-satisfaction
+  ...hospitalEfficiencyV13Routes, // M322-D：医院运营效率 V13 GET /api/v1/hospital-efficiency
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

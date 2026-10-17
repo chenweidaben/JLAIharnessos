@@ -1377,6 +1377,14 @@ const MuseCrossRoleLearning = lazy(() => import('@/pages/muse-cross-role-learnin
 const MuseModelVersion = lazy(() => import('@/pages/muse-model-version'));
 // M321-D：MUSE 投入产出报告 V13
 const MuseRoiReport = lazy(() => import('@/pages/muse-roi-report'));
+// M322-A：医疗质量总仪表盘 V13
+const ClinicalQualityDashboard = lazy(() => import('@/pages/clinical-quality-dashboard'));
+// M322-B：患者安全事件总览 V13
+const PatientSafetyOverview = lazy(() => import('@/pages/patient-safety-overview'));
+// M322-C：员工满意度 V13
+const StaffSatisfaction = lazy(() => import('@/pages/staff-satisfaction'));
+// M322-D：医院运营效率 V13
+const HospitalEfficiency = lazy(() => import('@/pages/hospital-efficiency'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2695,6 +2703,14 @@ export default function AppRoutes() {
           <Route path="muse-model-version" element={<MuseModelVersion />} />
           {/* M321-D：MUSE 投入产出报告 V13 */}
           <Route path="muse-roi-report" element={<MuseRoiReport />} />
+          {/* M322-A：医疗质量总仪表盘 V13 */}
+          <Route path="clinical-quality-dashboard" element={<ClinicalQualityDashboard />} />
+          {/* M322-B：患者安全事件总览 V13 */}
+          <Route path="patient-safety-overview" element={<PatientSafetyOverview />} />
+          {/* M322-C：员工满意度 V13 */}
+          <Route path="staff-satisfaction" element={<StaffSatisfaction />} />
+          {/* M322-D：医院运营效率 V13 */}
+          <Route path="hospital-efficiency" element={<HospitalEfficiency />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
