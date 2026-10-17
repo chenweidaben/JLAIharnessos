@@ -1689,6 +1689,14 @@ const ImagingQuality = lazy(() => import('@/pages/imaging-quality'));
 const PathologyQuality = lazy(() => import('@/pages/pathology-quality'));
 // M360-D：输血管理 V13（M360 收官）
 const BloodMgmt = lazy(() => import('@/pages/blood-mgmt'));
+// M361-A：科研管理 V13
+const ResearchMgmt = lazy(() => import('@/pages/research-mgmt'));
+// M361-B：教学管理 V13
+const TeachingMgmt = lazy(() => import('@/pages/teaching-mgmt'));
+// M361-C：继续教育（覆盖率）V13
+const ContinuingEduCoverage = lazy(() => import('@/pages/continuing-edu-coverage'));
+// M361-D：学术交流 V13（M361 收官）
+const AcademicExchange = lazy(() => import('@/pages/academic-exchange'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3319,6 +3327,14 @@ export default function AppRoutes() {
           <Route path="pathology-quality" element={<PathologyQuality />} />
           {/* M360-D：输血管理 V13（M360 收官） */}
           <Route path="blood-mgmt" element={<BloodMgmt />} />
+          {/* M361-A：科研管理 V13 */}
+          <Route path="research-mgmt" element={<ResearchMgmt />} />
+          {/* M361-B：教学管理 V13 */}
+          <Route path="teaching-mgmt" element={<TeachingMgmt />} />
+          {/* M361-C：继续教育（覆盖率）V13 */}
+          <Route path="continuing-edu-coverage" element={<ContinuingEduCoverage />} />
+          {/* M361-D：学术交流 V13（M361 收官） */}
+          <Route path="academic-exchange" element={<AcademicExchange />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

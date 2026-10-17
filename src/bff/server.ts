@@ -1873,6 +1873,14 @@ import { imagingQualityV13Routes } from './routes/imagingQualityV13';
 import { pathologyQualityV13Routes } from './routes/pathologyQualityV13';
 // M360-D：输血管理 V13 GET /api/v1/blood-mgmt（M360 收官）
 import { bloodMgmtV13Routes } from './routes/bloodMgmtV13';
+// M361-A：科研管理 V13 GET /api/v1/research-mgmt
+import { researchMgmtV13Routes } from './routes/researchMgmtV13';
+// M361-B：教学管理 V13 GET /api/v1/teaching-mgmt
+import { teachingMgmtV13Routes } from './routes/teachingMgmtV13';
+// M361-C：继续教育（覆盖率）V13 GET /api/v1/continuing-edu-coverage
+import { continuingEduCoverageV13Routes } from './routes/continuingEduCoverageV13';
+// M361-D：学术交流 V13 GET /api/v1/academic-exchange（M361 收官）
+import { academicExchangeV13Routes } from './routes/academicExchangeV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3052,6 +3060,10 @@ const allRoutes: RouteDef[] = [
   ...imagingQualityV13Routes, // M360-B：影像质量 V13 GET /api/v1/imaging-quality（新规格：报告及时率/阳性率/甲级片率）
   ...pathologyQualityV13Routes, // M360-C：病理质量 V13 GET /api/v1/pathology-quality
   ...bloodMgmtV13Routes, // M360-D：输血管理 V13 GET /api/v1/blood-mgmt（M360 收官）
+  ...researchMgmtV13Routes, // M361-A：科研管理 V13 GET /api/v1/research-mgmt
+  ...teachingMgmtV13Routes, // M361-B：教学管理 V13 GET /api/v1/teaching-mgmt
+  ...continuingEduCoverageV13Routes, // M361-C：继续教育（覆盖率）V13 GET /api/v1/continuing-edu-coverage
+  ...academicExchangeV13Routes, // M361-D：学术交流 V13 GET /api/v1/academic-exchange（M361 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
