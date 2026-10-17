@@ -1657,6 +1657,14 @@ const DipScore = lazy(() => import('@/pages/dip-score'));
 const DrugConsumableRatio = lazy(() => import('@/pages/drug-consumable-ratio'));
 // M356-D：收入结构（支出端） V13（expense 避让已有 revenueStructureV13 / revenueStructureStatsV13，M356 收官）
 const ExpenseStructure = lazy(() => import('@/pages/expense-structure'));
+// M357-A：患者安全目标 V13（stats 避让已有 patientSafetyV13 / M322-B）
+const PatientSafetyStats = lazy(() => import('@/pages/patient-safety-stats'));
+// M357-B：医疗质量核心制度 V13
+const CoreSystem = lazy(() => import('@/pages/core-system'));
+// M357-C：手术部位感染 V13
+const SurgicalInfection = lazy(() => import('@/pages/surgical-infection'));
+// M357-D：抗菌药物管理 V13（M357 收官）
+const AntibioticMgmt = lazy(() => import('@/pages/antibiotic-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3255,6 +3263,14 @@ export default function AppRoutes() {
           <Route path="drug-consumable-ratio" element={<DrugConsumableRatio />} />
           {/* M356-D：收入结构（支出端） V13（expense 避让已有 revenueStructureV13 / revenueStructureStatsV13，M356 收官） */}
           <Route path="expense-structure" element={<ExpenseStructure />} />
+          {/* M357-A：患者安全目标 V13（stats 避让已有 patientSafetyV13 / M322-B） */}
+          <Route path="patient-safety-stats" element={<PatientSafetyStats />} />
+          {/* M357-B：医疗质量核心制度 V13 */}
+          <Route path="core-system" element={<CoreSystem />} />
+          {/* M357-C：手术部位感染 V13 */}
+          <Route path="surgical-infection" element={<SurgicalInfection />} />
+          {/* M357-D：抗菌药物管理 V13（M357 收官） */}
+          <Route path="antibiotic-mgmt" element={<AntibioticMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
