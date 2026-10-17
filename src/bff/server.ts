@@ -1439,6 +1439,12 @@ import { flywheelDrilldownV13Routes } from './routes/flywheelDrilldownV13';
 import { flywheelRecommendationV13Routes } from './routes/flywheelRecommendationV13';
 // M306-D：飞轮季度演进趋势 V13 GET /api/v1/flywheel-trend
 import { flywheelTrendV13Routes } from './routes/flywheelTrendV13';
+// M307-A：飞轮改进任务闭环 V13 GET/POST /api/v1/flywheel-tasks
+import { flywheelTaskV13Routes } from './routes/flywheelTaskV13';
+// M307-B：任务进度追踪与升级 V13 GET /api/v1/task-funnel
+import { taskFunnelV13Routes } from './routes/taskFunnelV13';
+// M307-C：任务验收与效果验证 V13 GET /api/v1/task-verification
+import { taskVerificationV13Routes } from './routes/taskVerificationV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2401,6 +2407,9 @@ const allRoutes: RouteDef[] = [
   ...flywheelDrilldownV13Routes, // M306-B：六维指标明细下钻 V13 GET /api/v1/flywheel-drilldown
   ...flywheelRecommendationV13Routes, // M306-C：飞轮改进建议 V13 GET /api/v1/flywheel-recommendation
   ...flywheelTrendV13Routes, // M306-D：飞轮季度演进趋势 V13 GET /api/v1/flywheel-trend
+  ...flywheelTaskV13Routes, // M307-A：飞轮改进任务闭环 V13 GET/POST /api/v1/flywheel-tasks
+  ...taskFunnelV13Routes, // M307-B：任务进度追踪与升级 V13 GET /api/v1/task-funnel
+  ...taskVerificationV13Routes, // M307-C：任务验收与效果验证 V13 GET /api/v1/task-verification
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

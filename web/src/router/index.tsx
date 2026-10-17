@@ -1256,6 +1256,12 @@ const FlywheelDrilldown = lazy(() => import('@/pages/flywheel-drilldown'));
 const FlywheelRecommendation = lazy(() => import('@/pages/flywheel-recommendation'));
 // M306-D：飞轮季度演进趋势 V13
 const FlywheelTrend = lazy(() => import('@/pages/flywheel-trend'));
+// M307-A：飞轮改进任务闭环 V13
+const FlywheelTasks = lazy(() => import('@/pages/flywheel-tasks'));
+// M307-B：任务进度追踪与升级 V13
+const TaskFunnel = lazy(() => import('@/pages/task-funnel'));
+// M307-C：任务验收与效果验证 V13
+const TaskVerification = lazy(() => import('@/pages/task-verification'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2452,6 +2458,12 @@ export default function AppRoutes() {
           <Route path="flywheel-recommendation" element={<FlywheelRecommendation />} />
           {/* M306-D：飞轮季度演进趋势 V13 */}
           <Route path="flywheel-trend" element={<FlywheelTrend />} />
+          {/* M307-A：飞轮改进任务闭环 V13 */}
+          <Route path="flywheel-tasks" element={<FlywheelTasks />} />
+          {/* M307-B：任务进度追踪与升级 V13 */}
+          <Route path="task-funnel" element={<TaskFunnel />} />
+          {/* M307-C：任务验收与效果验证 V13 */}
+          <Route path="task-verification" element={<TaskVerification />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
