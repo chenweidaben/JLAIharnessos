@@ -1705,6 +1705,14 @@ const TrainingMgmt = lazy(() => import('@/pages/training-mgmt'));
 const LogisticsMgmt = lazy(() => import('@/pages/logistics-mgmt'));
 // M362-D：安全管理 V13（M362 收官）
 const SafetyMgmt = lazy(() => import('@/pages/safety-mgmt'));
+// M363-A：信息安全（统计）V13（stats避让）
+const InfoSecurityStats = lazy(() => import('@/pages/info-security-stats'));
+// M363-B：患者隐私保护 V13
+const PatientPrivacy = lazy(() => import('@/pages/patient-privacy'));
+// M363-C：网络安全 V13
+const NetworkSecurity = lazy(() => import('@/pages/network-security'));
+// M363-D：数据治理（统计）V13（stats避让）
+const DataGovernanceStats = lazy(() => import('@/pages/data-governance-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3351,6 +3359,14 @@ export default function AppRoutes() {
           <Route path="logistics-mgmt" element={<LogisticsMgmt />} />
           {/* M362-D：安全管理 V13（M362 收官） */}
           <Route path="safety-mgmt" element={<SafetyMgmt />} />
+          {/* M363-A：信息安全（统计）V13（stats避让） */}
+          <Route path="info-security-stats" element={<InfoSecurityStats />} />
+          {/* M363-B：患者隐私保护 V13 */}
+          <Route path="patient-privacy" element={<PatientPrivacy />} />
+          {/* M363-C：网络安全 V13 */}
+          <Route path="network-security" element={<NetworkSecurity />} />
+          {/* M363-D：数据治理（统计）V13（stats避让） */}
+          <Route path="data-governance-stats" element={<DataGovernanceStats />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

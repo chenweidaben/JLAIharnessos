@@ -1889,6 +1889,14 @@ import { trainingMgmtV13Routes } from './routes/trainingMgmtV13';
 import { logisticsMgmtV13Routes } from './routes/logisticsMgmtV13';
 // M362-D：安全管理 V13 GET /api/v1/safety-mgmt（M362 收官）
 import { safetyMgmtV13Routes } from './routes/safetyMgmtV13';
+// M363-A：信息安全（统计）V13 GET /api/v1/info-security-stats（stats避让）
+import { infoSecurityStatsV13Routes } from './routes/infoSecurityStatsV13';
+// M363-B：患者隐私保护 V13 GET /api/v1/patient-privacy
+import { patientPrivacyV13Routes } from './routes/patientPrivacyV13';
+// M363-C：网络安全 V13 GET /api/v1/network-security
+import { networkSecurityV13Routes } from './routes/networkSecurityV13';
+// M363-D：数据治理（统计）V13 GET /api/v1/data-governance-stats（stats避让）
+import { dataGovernanceStatsV13Routes } from './routes/dataGovernanceStatsV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3076,6 +3084,10 @@ const allRoutes: RouteDef[] = [
   ...trainingMgmtV13Routes, // M362-B：培训管理 V13 GET /api/v1/training-mgmt
   ...logisticsMgmtV13Routes, // M362-C：后勤管理 V13 GET /api/v1/logistics-mgmt
   ...safetyMgmtV13Routes, // M362-D：安全管理 V13 GET /api/v1/safety-mgmt（M362 收官）
+  ...infoSecurityStatsV13Routes, // M363-A：信息安全（统计）V13 GET /api/v1/info-security-stats（stats避让）
+  ...patientPrivacyV13Routes, // M363-B：患者隐私保护 V13 GET /api/v1/patient-privacy
+  ...networkSecurityV13Routes, // M363-C：网络安全 V13 GET /api/v1/network-security
+  ...dataGovernanceStatsV13Routes, // M363-D：数据治理（统计）V13 GET /api/v1/data-governance-stats（stats避让）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
