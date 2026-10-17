@@ -1106,6 +1106,8 @@ const DeptProfile = lazy(() => import('@/pages/dept-profile'));
 const DrgAnalysis = lazy(() => import('@/pages/drg-analysis'));
 // M287-D：趋势预测与经营预警 V5
 const TrendForecast = lazy(() => import('@/pages/trend-forecast'));
+// M288-A：智能审批与工作流引擎 V6
+const Workflow = lazy(() => import('@/pages/workflow'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -2152,6 +2154,8 @@ export default function AppRoutes() {
           <Route path="drg-analysis" element={<DrgAnalysis />} />
           {/* M287-D：趋势预测与经营预警 V5 */}
           <Route path="trend-forecast" element={<TrendForecast />} />
+          {/* M288-A：智能审批与工作流引擎 V6 */}
+          <Route path="workflow" element={<Workflow />} />
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
           {/* 处方点评系统（M103-B） */}
