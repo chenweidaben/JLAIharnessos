@@ -1793,6 +1793,14 @@ import { rehabilitationStatsV13Routes } from './routes/rehabilitationStatsV13';
 import { geriatricComprehensiveV13Routes } from './routes/geriatricComprehensiveV13';
 // M350-D：安宁疗护 V13 GET /api/v1/palliative-care（M350 收官）
 import { palliativeCareV13Routes } from './routes/palliativeCareV13';
+// M351-A：消毒供应 V13 GET /api/v1/cssd
+import { cssdV13Routes } from './routes/cssdV13';
+// M351-B：大型设备开机率 V13 GET /api/v1/equipment-utilization
+import { equipmentUtilizationV13Routes } from './routes/equipmentUtilizationV13';
+// M351-C：氧气供应 V13 GET /api/v1/oxygen-supply
+import { oxygenSupplyV13Routes } from './routes/oxygenSupplyV13';
+// M351-D：医疗废物 V13 GET /api/v1/medical-waste（M351 收官）
+import { medicalWasteV13Routes } from './routes/medicalWasteV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -2932,6 +2940,10 @@ const allRoutes: RouteDef[] = [
   ...rehabilitationStatsV13Routes, // M350-B：康复医学 V13 GET /api/v1/rehabilitation-stats
   ...geriatricComprehensiveV13Routes, // M350-C：老年综合评估 V13 GET /api/v1/geriatric-comprehensive
   ...palliativeCareV13Routes, // M350-D：安宁疗护 V13 GET /api/v1/palliative-care（M350 收官）
+  ...cssdV13Routes, // M351-A：消毒供应 V13 GET /api/v1/cssd
+  ...equipmentUtilizationV13Routes, // M351-B：大型设备开机率 V13 GET /api/v1/equipment-utilization
+  ...oxygenSupplyV13Routes, // M351-C：氧气供应 V13 GET /api/v1/oxygen-supply
+  ...medicalWasteV13Routes, // M351-D：医疗废物 V13 GET /api/v1/medical-waste（M351 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

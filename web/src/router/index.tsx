@@ -1609,6 +1609,14 @@ const RehabilitationStats = lazy(() => import('@/pages/rehabilitation-stats'));
 const GeriatricComprehensive = lazy(() => import('@/pages/geriatric-comprehensive'));
 // M350-D：安宁疗护 V13（M350 收官）
 const PalliativeCare = lazy(() => import('@/pages/palliative-care'));
+// M351-A：消毒供应 V13
+const Cssd = lazy(() => import('@/pages/cssd'));
+// M351-B：大型设备开机率 V13
+const EquipmentUtilization = lazy(() => import('@/pages/equipment-utilization'));
+// M351-C：氧气供应 V13
+const OxygenSupply = lazy(() => import('@/pages/oxygen-supply'));
+// M351-D：医疗废物 V13（M351 收官）
+const MedicalWaste = lazy(() => import('@/pages/medical-waste'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3159,6 +3167,14 @@ export default function AppRoutes() {
           <Route path="geriatric-comprehensive" element={<GeriatricComprehensive />} />
           {/* M350-D：安宁疗护 V13（M350 收官） */}
           <Route path="palliative-care" element={<PalliativeCare />} />
+          {/* M351-A：消毒供应 V13 */}
+          <Route path="cssd" element={<Cssd />} />
+          {/* M351-B：大型设备开机率 V13 */}
+          <Route path="equipment-utilization" element={<EquipmentUtilization />} />
+          {/* M351-C：氧气供应 V13 */}
+          <Route path="oxygen-supply" element={<OxygenSupply />} />
+          {/* M351-D：医疗废物 V13（M351 收官） */}
+          <Route path="medical-waste" element={<MedicalWaste />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
