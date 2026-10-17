@@ -2009,6 +2009,14 @@ import { equipmentMgmtV13Routes } from './routes/equipmentMgmtV13';
 import { energyMgmtV13Routes } from './routes/energyMgmtV13';
 // M377-D：环境管理 V13 GET /api/v1/environment-mgmt（M377 收官）
 import { environmentMgmtV13Routes } from './routes/environmentMgmtV13';
+// M378-A：预约服务统计 V13 GET /api/v1/appointment-stats（stats 避让）
+import { appointmentStatsV13Routes } from './routes/appointmentStatsV13';
+// M378-B：导医服务 V13 GET /api/v1/guide-service
+import { guideServiceV13Routes } from './routes/guideServiceV13';
+// M378-C：志愿服务 V13 GET /api/v1/volunteer-service
+import { volunteerServiceV13Routes } from './routes/volunteerServiceV13';
+// M378-D：便民服务 V13 GET /api/v1/convenience-service（M378 收官）
+import { convenienceServiceV13Routes } from './routes/convenienceServiceV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3256,6 +3264,10 @@ const allRoutes: RouteDef[] = [
   ...equipmentMgmtV13Routes, // M377-B：设备管理 V13 GET /api/v1/equipment-mgmt
   ...energyMgmtV13Routes, // M377-C：能源管理 V13 GET /api/v1/energy-mgmt
   ...environmentMgmtV13Routes, // M377-D：环境管理 V13 GET /api/v1/environment-mgmt（M377 收官）
+  ...appointmentStatsV13Routes, // M378-A：预约服务统计 V13 GET /api/v1/appointment-stats（stats 避让）
+  ...guideServiceV13Routes, // M378-B：导医服务 V13 GET /api/v1/guide-service
+  ...volunteerServiceV13Routes, // M378-C：志愿服务 V13 GET /api/v1/volunteer-service
+  ...convenienceServiceV13Routes, // M378-D：便民服务 V13 GET /api/v1/convenience-service（M378 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

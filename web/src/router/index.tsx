@@ -1825,6 +1825,14 @@ const EquipmentMgmt = lazy(() => import('@/pages/equipment-mgmt'));
 const EnergyMgmt = lazy(() => import('@/pages/energy-mgmt'));
 // M377-D：环境管理 V13（M377 收官）
 const EnvironmentMgmt = lazy(() => import('@/pages/environment-mgmt'));
+// M378-A：预约服务统计 V13（stats 避让）
+const AppointmentStats = lazy(() => import('@/pages/appointment-stats'));
+// M378-B：导医服务 V13
+const GuideService = lazy(() => import('@/pages/guide-service'));
+// M378-C：志愿服务 V13
+const VolunteerService = lazy(() => import('@/pages/volunteer-service'));
+// M378-D：便民服务 V13（M378 收官）
+const ConvenienceService = lazy(() => import('@/pages/convenience-service'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3591,6 +3599,14 @@ export default function AppRoutes() {
           <Route path="energy-mgmt" element={<EnergyMgmt />} />
           {/* M377-D：环境管理 V13（M377 收官） */}
           <Route path="environment-mgmt" element={<EnvironmentMgmt />} />
+          {/* M378-A：预约服务统计 V13（stats 避让） */}
+          <Route path="appointment-stats" element={<AppointmentStats />} />
+          {/* M378-B：导医服务 V13 */}
+          <Route path="guide-service" element={<GuideService />} />
+          {/* M378-C：志愿服务 V13 */}
+          <Route path="volunteer-service" element={<VolunteerService />} />
+          {/* M378-D：便民服务 V13（M378 收官） */}
+          <Route path="convenience-service" element={<ConvenienceService />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
