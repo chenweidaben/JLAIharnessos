@@ -1633,6 +1633,14 @@ const DataQualityStats = lazy(() => import('@/pages/data-quality-stats'));
 const SystemAvailabilityStats = lazy(() => import('@/pages/system-availability-stats'));
 // M353-D：备份与容灾 V13（M353 收官）
 const BackupDR = lazy(() => import('@/pages/backup-dr'));
+// M354-A：KPI 总览看板 V13
+const KpiDashboard = lazy(() => import('@/pages/kpi-dashboard'));
+// M354-B：病案质量管理 V13
+const MedicalRecordQuality = lazy(() => import('@/pages/medical-record-quality'));
+// M354-C：投诉管理 V13
+const ComplaintMgmt = lazy(() => import('@/pages/complaint-mgmt'));
+// M354-D：继续医学教育 V13（stats 避让已有 continuingEduV13，M354 收官）
+const ContinuingEducationStats = lazy(() => import('@/pages/continuing-education-stats'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -3207,6 +3215,14 @@ export default function AppRoutes() {
           <Route path="system-availability-stats" element={<SystemAvailabilityStats />} />
           {/* M353-D：备份与容灾 V13（M353 收官） */}
           <Route path="backup-dr" element={<BackupDR />} />
+          {/* M354-A：KPI 总览看板 V13 */}
+          <Route path="kpi-dashboard" element={<KpiDashboard />} />
+          {/* M354-B：病案质量管理 V13 */}
+          <Route path="medical-record-quality" element={<MedicalRecordQuality />} />
+          {/* M354-C：投诉管理 V13 */}
+          <Route path="complaint-mgmt" element={<ComplaintMgmt />} />
+          {/* M354-D：继续医学教育 V13（stats 避让已有 continuingEduV13，M354 收官） */}
+          <Route path="continuing-education-stats" element={<ContinuingEducationStats />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
