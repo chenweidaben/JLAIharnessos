@@ -2929,6 +2929,14 @@ import { emrQcDeptCompareV14Routes } from './routes/emrQcDeptCompareV14';
 import { emrQcDeptRankingV14Routes } from './routes/emrQcDeptRankingV14';
 // M493-D：质控科室整改跟踪 V14 GET /api/v1/emr-qc-dept-rectify（EMR 深化四模块，M493 收官，完成率Math.ceil）
 import { emrQcDeptRectifyV14Routes } from './routes/emrQcDeptRectifyV14';
+// M494-A：质控医生评分 V14 GET /api/v1/emr-qc-doctor-score（EMR 深化四模块，医生评分列表+聚合）
+import { emrQcDoctorScoreV14Routes } from './routes/emrQcDoctorScoreV14';
+// M494-B：质控护士评分 V14 GET /api/v1/emr-qc-nurse-score（EMR 深化四模块，护士评分列表+聚合）
+import { emrQcNurseScoreV14Routes } from './routes/emrQcNurseScoreV14';
+// M494-C：质控科室主任评分 V14 GET /api/v1/emr-qc-director-score（EMR 深化四模块，主任评分列表+聚合）
+import { emrQcDirectorScoreV14Routes } from './routes/emrQcDirectorScoreV14';
+// M494-D：质控全院人员排名 V14 GET /api/v1/emr-qc-staff-ranking（EMR 深化四模块，M494 收官，按评分降序排名）
+import { emrQcStaffRankingV14Routes } from './routes/emrQcStaffRankingV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4636,6 +4644,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcDeptCompareV14Routes, // M493-B：质控科室对比 V14 GET /api/v1/emr-qc-dept-compare（EMR 深化四模块，两科室差距对比）
   ...emrQcDeptRankingV14Routes, // M493-C：质控科室排名 V14 GET /api/v1/emr-qc-dept-ranking（EMR 深化四模块，按评分降序排名）
   ...emrQcDeptRectifyV14Routes, // M493-D：质控科室整改跟踪 V14 GET /api/v1/emr-qc-dept-rectify（EMR 深化四模块，M493 收官，完成率Math.ceil）
+  ...emrQcDoctorScoreV14Routes, // M494-A：质控医生评分 V14 GET /api/v1/emr-qc-doctor-score（EMR 深化四模块，医生评分列表+聚合）
+  ...emrQcNurseScoreV14Routes, // M494-B：质控护士评分 V14 GET /api/v1/emr-qc-nurse-score（EMR 深化四模块，护士评分列表+聚合）
+  ...emrQcDirectorScoreV14Routes, // M494-C：质控科室主任评分 V14 GET /api/v1/emr-qc-director-score（EMR 深化四模块，主任评分列表+聚合）
+  ...emrQcStaffRankingV14Routes, // M494-D：质控全院人员排名 V14 GET /api/v1/emr-qc-staff-ranking（EMR 深化四模块，M494 收官，按评分降序排名）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
