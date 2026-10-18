@@ -2709,6 +2709,14 @@ const EmrQcTaskReceivePage = lazy(() => import('@/pages/emr-qc-task-receive'));
 const EmrQcTaskReturnPage = lazy(() => import('@/pages/emr-qc-task-return'));
 // M488-D：质控任务归档 V14（EMR 深化四模块，M488 收官）
 const EmrQcTaskArchivePage = lazy(() => import('@/pages/emr-qc-task-archive'));
+// M489-A：质控知识节点管理 V14（EMR 深化四模块）
+const EmrQcKnowledgeNodePage = lazy(() => import('@/pages/emr-qc-knowledge-node'));
+// M489-B：质控知识关系管理 V14（EMR 深化四模块）
+const EmrQcKnowledgeRelationPage = lazy(() => import('@/pages/emr-qc-knowledge-relation'));
+// M489-C：质控知识推理路径 V14（EMR 深化四模块）
+const EmrQcReasoningPathPage = lazy(() => import('@/pages/emr-qc-reasoning-path'));
+// M489-D：质控知识置信度评估 V14（EMR 深化四模块，M489 收官）
+const EmrQcConfidencePage = lazy(() => import('@/pages/emr-qc-confidence'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5359,6 +5367,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-task-return" element={<EmrQcTaskReturnPage />} />
           {/* M488-D：质控任务归档 V14（EMR 深化四模块，M488 收官） */}
           <Route path="emr-qc-task-archive" element={<EmrQcTaskArchivePage />} />
+          {/* M489-A：质控知识节点管理 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-knowledge-node" element={<EmrQcKnowledgeNodePage />} />
+          {/* M489-B：质控知识关系管理 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-knowledge-relation" element={<EmrQcKnowledgeRelationPage />} />
+          {/* M489-C：质控知识推理路径 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-reasoning-path" element={<EmrQcReasoningPathPage />} />
+          {/* M489-D：质控知识置信度评估 V14（EMR 深化四模块，M489 收官） */}
+          <Route path="emr-qc-confidence" element={<EmrQcConfidencePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
