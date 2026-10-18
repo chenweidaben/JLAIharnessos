@@ -2383,6 +2383,14 @@ const EmergencyResponseMgmt = lazy(() => import('@/pages/emergency-response-mgmt
 const SafetyProductionMgmt = lazy(() => import('@/pages/safety-production-mgmt'));
 // M447-D：消防安全管理 V13（M447 收官，应急管理与安全生产管理组）
 const FireSafetyMgmt = lazy(() => import('@/pages/fire-safety-mgmt'));
+// M448-A：门诊收费管理 V13（财务与收费管理组）
+const OutpatientBillingMgmt = lazy(() => import('@/pages/outpatient-billing-mgmt'));
+// M448-B：住院收费管理 V13（财务与收费管理组）
+const InpatientBillingMgmt = lazy(() => import('@/pages/inpatient-billing-mgmt'));
+// M448-C：财务预算管理 V13（财务与收费管理组）
+const BudgetMgmt = lazy(() => import('@/pages/budget-mgmt'));
+// M448-D：票据管理 V13（M448 收官，财务与收费管理组）
+const InvoiceMgmt = lazy(() => import('@/pages/invoice-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4707,6 +4715,14 @@ export default function AppRoutes() {
           <Route path="safety-production-mgmt" element={<SafetyProductionMgmt />} />
           {/* M447-D：消防安全管理 V13（M447 收官，应急管理与安全生产管理组） */}
           <Route path="fire-safety-mgmt" element={<FireSafetyMgmt />} />
+          {/* M448-A：门诊收费管理 V13（财务与收费管理组） */}
+          <Route path="outpatient-billing-mgmt" element={<OutpatientBillingMgmt />} />
+          {/* M448-B：住院收费管理 V13（财务与收费管理组） */}
+          <Route path="inpatient-billing-mgmt" element={<InpatientBillingMgmt />} />
+          {/* M448-C：财务预算管理 V13（财务与收费管理组） */}
+          <Route path="budget-mgmt" element={<BudgetMgmt />} />
+          {/* M448-D：票据管理 V13（M448 收官，财务与收费管理组） */}
+          <Route path="invoice-mgmt" element={<InvoiceMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
