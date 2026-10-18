@@ -2901,6 +2901,14 @@ const EmrQcPathologyRulesPage = lazy(() => import('@/pages/emr-qc-pathology-rule
 const EmrQcNutritionRulesPage = lazy(() => import('@/pages/emr-qc-nutrition-rules'));
 // M512-D：质控疼痛科专科规则 V14（EMR 深化四模块，M512 收官）
 const EmrQcPainRulesPage = lazy(() => import('@/pages/emr-qc-pain-rules'));
+// M513-A（新规格）：质控-电子签名联动 V14（EMR 深化四模块）
+const EmrQcSignatureLinkPage = lazy(() => import('@/pages/emr-qc-signature-link'));
+// M513-B：质控-医嘱联动 V14（EMR 深化四模块）
+const EmrQcOrderLinkPage = lazy(() => import('@/pages/emr-qc-order-link'));
+// M513-C：质控-护理记录联动 V14（EMR 深化四模块）
+const EmrQcNursingLinkPage = lazy(() => import('@/pages/emr-qc-nursing-link'));
+// M513-D：质控-手术麻醉联动 V14（EMR 深化四模块，M513 收官）
+const EmrQcSurgeryLinkPage = lazy(() => import('@/pages/emr-qc-surgery-link'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5743,6 +5751,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-nutrition-rules" element={<EmrQcNutritionRulesPage />} />
           {/* M512-D：质控疼痛科专科规则 V14（EMR 深化四模块，M512 收官） */}
           <Route path="emr-qc-pain-rules" element={<EmrQcPainRulesPage />} />
+          {/* M513-A（新规格）：质控-电子签名联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-signature-link" element={<EmrQcSignatureLinkPage />} />
+          {/* M513-B：质控-医嘱联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-order-link" element={<EmrQcOrderLinkPage />} />
+          {/* M513-C：质控-护理记录联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-nursing-link" element={<EmrQcNursingLinkPage />} />
+          {/* M513-D：质控-手术麻醉联动 V14（EMR 深化四模块，M513 收官） */}
+          <Route path="emr-qc-surgery-link" element={<EmrQcSurgeryLinkPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

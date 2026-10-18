@@ -3081,6 +3081,14 @@ import { emrQcPathologyRulesV14Routes } from './routes/emrQcPathologyRulesV14';
 import { emrQcNutritionRulesV14Routes } from './routes/emrQcNutritionRulesV14';
 // M512-D：质控疼痛科专科规则 V14 GET/POST /api/v1/emr-qc-pain-rules（EMR 深化四模块，M512 收官，扩展专科规则+病历检查）
 import { emrQcPainRulesV14Routes } from './routes/emrQcPainRulesV14';
+// M513-A（新规格）：质控-电子签名联动 V14 GET/POST /api/v1/emr-qc-signature-link（EMR 深化四模块，质控跨模块联动+签名合规检查）
+import { emrQcSignatureLinkV14Routes } from './routes/emrQcSignatureLinkV14';
+// M513-B：质控-医嘱联动 V14 GET/POST /api/v1/emr-qc-order-link（EMR 深化四模块，质控跨模块联动+医嘱一致性检查）
+import { emrQcOrderLinkV14Routes } from './routes/emrQcOrderLinkV14';
+// M513-C：质控-护理记录联动 V14 GET/POST /api/v1/emr-qc-nursing-link（EMR 深化四模块，质控跨模块联动+护理一致性检查）
+import { emrQcNursingLinkV14Routes } from './routes/emrQcNursingLinkV14';
+// M513-D：质控-手术麻醉联动 V14 GET/POST /api/v1/emr-qc-surgery-link（EMR 深化四模块，M513 收官，质控跨模块联动+手术麻醉一致性检查）
+import { emrQcSurgeryLinkV14Routes } from './routes/emrQcSurgeryLinkV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4864,6 +4872,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcPathologyRulesV14Routes, // M512-B：质控病理科专科规则 V14 GET/POST /api/v1/emr-qc-pathology-rules（EMR 深化四模块，扩展专科规则+病历检查）
   ...emrQcNutritionRulesV14Routes, // M512-C：质控营养科专科规则 V14 GET/POST /api/v1/emr-qc-nutrition-rules（EMR 深化四模块，扩展专科规则+病历检查）
   ...emrQcPainRulesV14Routes, // M512-D：质控疼痛科专科规则 V14 GET/POST /api/v1/emr-qc-pain-rules（EMR 深化四模块，M512 收官，扩展专科规则+病历检查）
+  ...emrQcSignatureLinkV14Routes, // M513-A（新规格）：质控-电子签名联动 V14 GET/POST /api/v1/emr-qc-signature-link（EMR 深化四模块，质控跨模块联动+签名合规检查）
+  ...emrQcOrderLinkV14Routes, // M513-B：质控-医嘱联动 V14 GET/POST /api/v1/emr-qc-order-link（EMR 深化四模块，质控跨模块联动+医嘱一致性检查）
+  ...emrQcNursingLinkV14Routes, // M513-C：质控-护理记录联动 V14 GET/POST /api/v1/emr-qc-nursing-link（EMR 深化四模块，质控跨模块联动+护理一致性检查）
+  ...emrQcSurgeryLinkV14Routes, // M513-D：质控-手术麻醉联动 V14 GET/POST /api/v1/emr-qc-surgery-link（EMR 深化四模块，M513 收官，质控跨模块联动+手术麻醉一致性检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
