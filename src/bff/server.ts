@@ -2415,6 +2415,14 @@ import { maternalCareMgmtV13Routes } from './routes/maternalCareMgmtV13';
 import { emergencyCareMgmtV13Routes } from './routes/emergencyCareMgmtV13';
 // M428-D：ICU 护理管理 V13 GET /api/v1/icu-care-mgmt（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀））
 import { icuCareMgmtV13Routes } from './routes/icuCareMgmtV13';
+// M429-A：透析质量管理 V13 GET /api/v1/dialysis-quality-mgmt（-quality 后缀避让旧版 dialysisMgmtV13（M417））
+import { dialysisQualityMgmtV13Routes } from './routes/dialysisQualityMgmtV13';
+// M429-B：内镜质量管理 V13 GET /api/v1/endoscopy-quality-mgmt（-quality 后缀避让旧版 endoscopyMgmtV13（M417））
+import { endoscopyQualityMgmtV13Routes } from './routes/endoscopyQualityMgmtV13';
+// M429-C：手术室质量管理 V13 GET /api/v1/operating-room-quality-mgmt（-quality 后缀避让旧版 operatingRoomMgmtV13（M417））
+import { operatingRoomQualityMgmtV13Routes } from './routes/operatingRoomQualityMgmtV13';
+// M429-D：病房质量管理 V13 GET /api/v1/ward-quality-mgmt（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417））
+import { wardQualityMgmtV13Routes } from './routes/wardQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3865,6 +3873,10 @@ const allRoutes: RouteDef[] = [
   ...maternalCareMgmtV13Routes, // M428-B：孕产妇护理管理 V13 GET /api/v1/maternal-care-mgmt（换名避让旧版 maternalMgmtV13（M412，-care 后缀））
   ...emergencyCareMgmtV13Routes, // M428-C：急诊护理管理 V13 GET /api/v1/emergency-care-mgmt（换名避让旧版 emergencyMgmtV13（M416，-care 后缀））
   ...icuCareMgmtV13Routes, // M428-D：ICU 护理管理 V13 GET /api/v1/icu-care-mgmt（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀））
+  ...dialysisQualityMgmtV13Routes, // M429-A：透析质量管理 V13 GET /api/v1/dialysis-quality-mgmt（-quality 后缀避让旧版 dialysisMgmtV13（M417））
+  ...endoscopyQualityMgmtV13Routes, // M429-B：内镜质量管理 V13 GET /api/v1/endoscopy-quality-mgmt（-quality 后缀避让旧版 endoscopyMgmtV13（M417））
+  ...operatingRoomQualityMgmtV13Routes, // M429-C：手术室质量管理 V13 GET /api/v1/operating-room-quality-mgmt（-quality 后缀避让旧版 operatingRoomMgmtV13（M417））
+  ...wardQualityMgmtV13Routes, // M429-D：病房质量管理 V13 GET /api/v1/ward-quality-mgmt（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

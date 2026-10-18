@@ -2231,6 +2231,14 @@ const MaternalCareMgmt = lazy(() => import('@/pages/maternal-care-mgmt'));
 const EmergencyCareMgmt = lazy(() => import('@/pages/emergency-care-mgmt'));
 // M428-D：ICU 护理管理 V13（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀））
 const IcuCareMgmt = lazy(() => import('@/pages/icu-care-mgmt'));
+// M429-A：透析质量管理 V13（-quality 后缀避让旧版 dialysisMgmtV13（M417））
+const DialysisQualityMgmt = lazy(() => import('@/pages/dialysis-quality-mgmt'));
+// M429-B：内镜质量管理 V13（-quality 后缀避让旧版 endoscopyMgmtV13（M417））
+const EndoscopyQualityMgmt = lazy(() => import('@/pages/endoscopy-quality-mgmt'));
+// M429-C：手术室质量管理 V13（-quality 后缀避让旧版 operatingRoomMgmtV13（M417））
+const OperatingRoomQualityMgmt = lazy(() => import('@/pages/operating-room-quality-mgmt'));
+// M429-D：病房质量管理 V13（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417））
+const WardQualityMgmt = lazy(() => import('@/pages/ward-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4403,6 +4411,14 @@ export default function AppRoutes() {
           <Route path="emergency-care-mgmt" element={<EmergencyCareMgmt />} />
           {/* M428-D：ICU 护理管理 V13（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀）） */}
           <Route path="icu-care-mgmt" element={<IcuCareMgmt />} />
+          {/* M429-A：透析质量管理 V13（-quality 后缀避让旧版 dialysisMgmtV13（M417）） */}
+          <Route path="dialysis-quality-mgmt" element={<DialysisQualityMgmt />} />
+          {/* M429-B：内镜质量管理 V13（-quality 后缀避让旧版 endoscopyMgmtV13（M417）） */}
+          <Route path="endoscopy-quality-mgmt" element={<EndoscopyQualityMgmt />} />
+          {/* M429-C：手术室质量管理 V13（-quality 后缀避让旧版 operatingRoomMgmtV13（M417）） */}
+          <Route path="operating-room-quality-mgmt" element={<OperatingRoomQualityMgmt />} />
+          {/* M429-D：病房质量管理 V13（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417）） */}
+          <Route path="ward-quality-mgmt" element={<WardQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
