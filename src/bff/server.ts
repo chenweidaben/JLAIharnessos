@@ -3249,6 +3249,14 @@ import { emrArchiveIntegrityV14Routes } from './routes/emrArchiveIntegrityV14';
 import { emrArchiveIndexV14Routes } from './routes/emrArchiveIndexV14';
 // M533-D：病历归档检索 V14 GET/POST /api/v1/emr-archive-search（EMR 深化四模块，M533 收官，病历归档与长期保存系列）
 import { emrArchiveSearchV14Routes } from './routes/emrArchiveSearchV14';
+// M534-A：病历调阅申请审批 V14 GET/POST /api/v1/emr-access-request（EMR 深化四模块，病历调阅与审计系列）
+import { emrAccessRequestV14Routes } from './routes/emrAccessRequestV14';
+// M534-B：病历调阅日志审计 V14 GET/POST /api/v1/emr-access-audit-log（EMR 深化四模块，病历调阅与审计系列，避让 M528-A emrAccessAuditV14）
+import { emrAccessAuditLogV14Routes } from './routes/emrAccessAuditLogV14';
+// M534-C：病历复印申请管理 V14 GET/POST /api/v1/emr-copy-request-manage（EMR 深化四模块，病历调阅与审计系列，避让旧 emrCopyRequestV14）
+import { emrCopyRequestManageV14Routes } from './routes/emrCopyRequestManageV14';
+// M534-D：病历借阅归还管理 V14 GET/POST /api/v1/emr-loan-return（EMR 深化四模块，M534 收官，病历调阅与审计系列）
+import { emrLoanReturnV14Routes } from './routes/emrLoanReturnV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5116,6 +5124,10 @@ const allRoutes: RouteDef[] = [
   ...emrArchiveIntegrityV14Routes, // M533-B：病历归档完整性校验 V14 GET/POST /api/v1/emr-archive-integrity（EMR 深化四模块，病历归档与长期保存系列）
   ...emrArchiveIndexV14Routes, // M533-C：病历归档索引 V14 GET/POST /api/v1/emr-archive-index（EMR 深化四模块，病历归档与长期保存系列）
   ...emrArchiveSearchV14Routes, // M533-D：病历归档检索 V14 GET/POST /api/v1/emr-archive-search（EMR 深化四模块，M533 收官，病历归档与长期保存系列）
+  ...emrAccessRequestV14Routes, // M534-A：病历调阅申请审批 V14 GET/POST /api/v1/emr-access-request（EMR 深化四模块，病历调阅与审计系列）
+  ...emrAccessAuditLogV14Routes, // M534-B：病历调阅日志审计 V14 GET/POST /api/v1/emr-access-audit-log（EMR 深化四模块，病历调阅与审计系列，避让 M528-A）
+  ...emrCopyRequestManageV14Routes, // M534-C：病历复印申请管理 V14 GET/POST /api/v1/emr-copy-request-manage（EMR 深化四模块，病历调阅与审计系列，避让旧 emrCopyRequestV14）
+  ...emrLoanReturnV14Routes, // M534-D：病历借阅归还管理 V14 GET/POST /api/v1/emr-loan-return（EMR 深化四模块，M534 收官，病历调阅与审计系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
