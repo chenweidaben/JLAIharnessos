@@ -2717,6 +2717,14 @@ const EmrQcKnowledgeRelationPage = lazy(() => import('@/pages/emr-qc-knowledge-r
 const EmrQcReasoningPathPage = lazy(() => import('@/pages/emr-qc-reasoning-path'));
 // M489-D：质控知识置信度评估 V14（EMR 深化四模块，M489 收官）
 const EmrQcConfidencePage = lazy(() => import('@/pages/emr-qc-confidence'));
+// M490-A：NLP 病历实体识别 V14（EMR 深化四模块）
+const EmrNlpEntityPage = lazy(() => import('@/pages/emr-nlp-entity'));
+// M490-B：NLP 病历关系抽取 V14（EMR 深化四模块）
+const EmrNlpRelationPage = lazy(() => import('@/pages/emr-nlp-relation'));
+// M490-C：NLP 病历事件提取 V14（EMR 深化四模块）
+const EmrNlpEventPage = lazy(() => import('@/pages/emr-nlp-event'));
+// M490-D：NLP 病历时间线构建 V14（EMR 深化四模块，M490 收官）
+const EmrNlpTimelinePage = lazy(() => import('@/pages/emr-nlp-timeline'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5375,6 +5383,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-reasoning-path" element={<EmrQcReasoningPathPage />} />
           {/* M489-D：质控知识置信度评估 V14（EMR 深化四模块，M489 收官） */}
           <Route path="emr-qc-confidence" element={<EmrQcConfidencePage />} />
+          {/* M490-A：NLP 病历实体识别 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-entity" element={<EmrNlpEntityPage />} />
+          {/* M490-B：NLP 病历关系抽取 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-relation" element={<EmrNlpRelationPage />} />
+          {/* M490-C：NLP 病历事件提取 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-event" element={<EmrNlpEventPage />} />
+          {/* M490-D：NLP 病历时间线构建 V14（EMR 深化四模块，M490 收官） */}
+          <Route path="emr-nlp-timeline" element={<EmrNlpTimelinePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
