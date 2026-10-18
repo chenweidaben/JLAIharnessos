@@ -2945,6 +2945,14 @@ import { emrQcAlertThresholdV14Routes } from './routes/emrQcAlertThresholdV14';
 import { emrQcRiskLevelV14Routes } from './routes/emrQcRiskLevelV14';
 // M495-D：质控干预建议生成 V14 POST /api/v1/emr-qc-intervention（EMR 深化四模块，M495 收官，低保持/中培训/高整改会诊）
 import { emrQcInterventionV14Routes } from './routes/emrQcInterventionV14';
+// M496-A：质控问题反馈闭环 V14 POST /api/v1/emr-qc-feedback-loop（EMR 深化四模块，闭环率Math.ceil）
+import { emrQcFeedbackLoopV14Routes } from './routes/emrQcFeedbackLoopV14';
+// M496-B：质控整改验证 V14 POST /api/v1/emr-qc-rectify-verify（EMR 深化四模块，通过率Math.ceil）
+import { emrQcRectifyVerifyV14Routes } from './routes/emrQcRectifyVerifyV14';
+// M496-C：质控复发预警 V14 GET /api/v1/emr-qc-recurrence（EMR 深化四模块，current>=previous复发）
+import { emrQcRecurrenceV14Routes } from './routes/emrQcRecurrenceV14';
+// M496-D：质控 PDCA 闭环报告 V14 GET /api/v1/emr-qc-pdca-report（EMR 深化四模块，M496 收官，四阶段完成率Math.ceil）
+import { emrQcPdcaReportV14Routes } from './routes/emrQcPdcaReportV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4660,6 +4668,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcAlertThresholdV14Routes, // M495-B：质控科室预警阈值 V14 GET/POST /api/v1/emr-qc-alert-threshold（EMR 深化四模块，actual>threshold触发）
   ...emrQcRiskLevelV14Routes, // M495-C：质控风险等级评估 V14 GET /api/v1/emr-qc-risk-level（EMR 深化四模块，>=90低/70-89中/<70高）
   ...emrQcInterventionV14Routes, // M495-D：质控干预建议生成 V14 POST /api/v1/emr-qc-intervention（EMR 深化四模块，M495 收官，低保持/中培训/高整改会诊）
+  ...emrQcFeedbackLoopV14Routes, // M496-A：质控问题反馈闭环 V14 POST /api/v1/emr-qc-feedback-loop（EMR 深化四模块，闭环率Math.ceil）
+  ...emrQcRectifyVerifyV14Routes, // M496-B：质控整改验证 V14 POST /api/v1/emr-qc-rectify-verify（EMR 深化四模块，通过率Math.ceil）
+  ...emrQcRecurrenceV14Routes, // M496-C：质控复发预警 V14 GET /api/v1/emr-qc-recurrence（EMR 深化四模块，current>=previous复发）
+  ...emrQcPdcaReportV14Routes, // M496-D：质控 PDCA 闭环报告 V14 GET /api/v1/emr-qc-pdca-report（EMR 深化四模块，M496 收官，四阶段完成率Math.ceil）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

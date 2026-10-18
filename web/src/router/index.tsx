@@ -2765,6 +2765,14 @@ const EmrQcAlertThresholdPage = lazy(() => import('@/pages/emr-qc-alert-threshol
 const EmrQcRiskLevelPage = lazy(() => import('@/pages/emr-qc-risk-level'));
 // M495-D：质控干预建议生成 V14（EMR 深化四模块，M495 收官）
 const EmrQcInterventionPage = lazy(() => import('@/pages/emr-qc-intervention'));
+// M496-A：质控问题反馈闭环 V14（EMR 深化四模块）
+const EmrQcFeedbackLoopPage = lazy(() => import('@/pages/emr-qc-feedback-loop'));
+// M496-B：质控整改验证 V14（EMR 深化四模块）
+const EmrQcRectifyVerifyPage = lazy(() => import('@/pages/emr-qc-rectify-verify'));
+// M496-C：质控复发预警 V14（EMR 深化四模块）
+const EmrQcRecurrencePage = lazy(() => import('@/pages/emr-qc-recurrence'));
+// M496-D：质控 PDCA 闭环报告 V14（EMR 深化四模块，M496 收官）
+const EmrQcPdcaReportPage = lazy(() => import('@/pages/emr-qc-pdca-report'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5471,6 +5479,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-risk-level" element={<EmrQcRiskLevelPage />} />
           {/* M495-D：质控干预建议生成 V14（EMR 深化四模块，M495 收官） */}
           <Route path="emr-qc-intervention" element={<EmrQcInterventionPage />} />
+          {/* M496-A：质控问题反馈闭环 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-feedback-loop" element={<EmrQcFeedbackLoopPage />} />
+          {/* M496-B：质控整改验证 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-rectify-verify" element={<EmrQcRectifyVerifyPage />} />
+          {/* M496-C：质控复发预警 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-recurrence" element={<EmrQcRecurrencePage />} />
+          {/* M496-D：质控 PDCA 闭环报告 V14（EMR 深化四模块，M496 收官） */}
+          <Route path="emr-qc-pdca-report" element={<EmrQcPdcaReportPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
