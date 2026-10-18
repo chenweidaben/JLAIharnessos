@@ -3049,6 +3049,14 @@ import { emrQcAiWritingSuggestDetailV14Routes } from './routes/emrQcAiWritingSug
 import { emrQcAiSimilarRecordDetailV14Routes } from './routes/emrQcAiSimilarRecordDetailV14';
 // M508-D：质控 AI 智能问答助手 V14 POST /api/v1/emr-qc-ai-qa-assistant（EMR 深化四模块，M508 收官，关键词问答+置信度）
 import { emrQcAiQaAssistantV14Routes } from './routes/emrQcAiQaAssistantV14';
+// M509-A：质控内科专科规则 V14 GET/POST /api/v1/emr-qc-internal-med-rules（EMR 深化四模块，专科规则+病历检查）
+import { emrQcInternalMedRulesV14Routes } from './routes/emrQcInternalMedRulesV14';
+// M509-B：质控外科专科规则 V14 GET/POST /api/v1/emr-qc-surgery-rules（EMR 深化四模块，专科规则+病历检查）
+import { emrQcSurgeryRulesV14Routes } from './routes/emrQcSurgeryRulesV14';
+// M509-C：质控儿科专科规则 V14 GET/POST /api/v1/emr-qc-pediatrics-rules（EMR 深化四模块，专科规则+病历检查）
+import { emrQcPediatricsRulesV14Routes } from './routes/emrQcPediatricsRulesV14';
+// M509-D：质控妇产科专科规则 V14 GET/POST /api/v1/emr-qc-obgyn-rules（EMR 深化四模块，M509 收官，专科规则+病历检查）
+import { emrQcObgynRulesV14Routes } from './routes/emrQcObgynRulesV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4816,6 +4824,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcAiWritingSuggestDetailV14Routes, // M508-B：质控 AI 辅助书写建议明细 V14 POST /api/v1/emr-qc-ai-writing-suggest-detail（EMR 深化四模块，-detail 避让 M467-B，科室+章节预设建议）
   ...emrQcAiSimilarRecordDetailV14Routes, // M508-C：质控 AI 相似病历推荐明细 V14 POST /api/v1/emr-qc-ai-similar-record-detail（EMR 深化四模块，-detail 避让 M486-D，诊断关键词匹配+相似度）
   ...emrQcAiQaAssistantV14Routes, // M508-D：质控 AI 智能问答助手 V14 POST /api/v1/emr-qc-ai-qa-assistant（EMR 深化四模块，M508 收官，关键词问答+置信度）
+  ...emrQcInternalMedRulesV14Routes, // M509-A：质控内科专科规则 V14 GET/POST /api/v1/emr-qc-internal-med-rules（EMR 深化四模块，专科规则+病历检查）
+  ...emrQcSurgeryRulesV14Routes, // M509-B：质控外科专科规则 V14 GET/POST /api/v1/emr-qc-surgery-rules（EMR 深化四模块，专科规则+病历检查）
+  ...emrQcPediatricsRulesV14Routes, // M509-C：质控儿科专科规则 V14 GET/POST /api/v1/emr-qc-pediatrics-rules（EMR 深化四模块，专科规则+病历检查）
+  ...emrQcObgynRulesV14Routes, // M509-D：质控妇产科专科规则 V14 GET/POST /api/v1/emr-qc-obgyn-rules（EMR 深化四模块，M509 收官，专科规则+病历检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
