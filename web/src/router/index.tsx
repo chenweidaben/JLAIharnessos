@@ -3053,6 +3053,14 @@ const EmrNlpTermStandardizePage = lazy(() => import('@/pages/emr-nlp-term-standa
 const EmrNlpTimeRelationPage = lazy(() => import('@/pages/emr-nlp-time-relation'));
 // M531-D：病历 NLP 否定检测 V14（EMR 深化四模块，M531 收官）
 const EmrNlpNegationDetectPage = lazy(() => import('@/pages/emr-nlp-negation-detect'));
+// M532-A：病历结构化字段查询 V14（EMR 深化四模块）
+const EmrStructQueryPage = lazy(() => import('@/pages/emr-struct-query'));
+// M532-B：病历结构化数据导出 V14（EMR 深化四模块）
+const EmrStructExportPage = lazy(() => import('@/pages/emr-struct-export'));
+// M532-C：病历结构化数据统计 V14（EMR 深化四模块）
+const EmrStructStatsPage = lazy(() => import('@/pages/emr-struct-stats'));
+// M532-D：病历结构化数据对比 V14（EMR 深化四模块，M532 收官）
+const EmrStructComparePage = lazy(() => import('@/pages/emr-struct-compare'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6047,6 +6055,14 @@ export default function AppRoutes() {
           <Route path="emr-nlp-time-relation" element={<EmrNlpTimeRelationPage />} />
           {/* M531-D：病历 NLP 否定检测 V14（EMR 深化四模块，M531 收官） */}
           <Route path="emr-nlp-negation-detect" element={<EmrNlpNegationDetectPage />} />
+          {/* M532-A：病历结构化字段查询 V14（EMR 深化四模块） */}
+          <Route path="emr-struct-query" element={<EmrStructQueryPage />} />
+          {/* M532-B：病历结构化数据导出 V14（EMR 深化四模块） */}
+          <Route path="emr-struct-export" element={<EmrStructExportPage />} />
+          {/* M532-C：病历结构化数据统计 V14（EMR 深化四模块） */}
+          <Route path="emr-struct-stats" element={<EmrStructStatsPage />} />
+          {/* M532-D：病历结构化数据对比 V14（EMR 深化四模块，M532 收官） */}
+          <Route path="emr-struct-compare" element={<EmrStructComparePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

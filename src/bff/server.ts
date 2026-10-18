@@ -3233,6 +3233,14 @@ import { emrNlpTermStandardizeV14Routes } from './routes/emrNlpTermStandardizeV1
 import { emrNlpTimeRelationV14Routes } from './routes/emrNlpTimeRelationV14';
 // M531-D：病历 NLP 否定检测 V14 GET/POST /api/v1/emr-nlp-negation-detect（EMR 深化四模块，M531 收官，病历 NLP 引擎深化系列）
 import { emrNlpNegationDetectV14Routes } from './routes/emrNlpNegationDetectV14';
+// M532-A：病历结构化字段查询 V14 GET/POST /api/v1/emr-struct-query（EMR 深化四模块，病历结构化数据服务系列）
+import { emrStructQueryV14Routes } from './routes/emrStructQueryV14';
+// M532-B：病历结构化数据导出 V14 GET/POST /api/v1/emr-struct-export（EMR 深化四模块，病历结构化数据服务系列）
+import { emrStructExportV14Routes } from './routes/emrStructExportV14';
+// M532-C：病历结构化数据统计 V14 GET/POST /api/v1/emr-struct-stats（EMR 深化四模块，病历结构化数据服务系列）
+import { emrStructStatsV14Routes } from './routes/emrStructStatsV14';
+// M532-D：病历结构化数据对比 V14 GET/POST /api/v1/emr-struct-compare（EMR 深化四模块，M532 收官，病历结构化数据服务系列）
+import { emrStructCompareV14Routes } from './routes/emrStructCompareV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5092,6 +5100,10 @@ const allRoutes: RouteDef[] = [
   ...emrNlpTermStandardizeV14Routes, // M531-B：病历 NLP 术语标准化 V14 GET/POST /api/v1/emr-nlp-term-standardize（EMR 深化四模块，病历 NLP 引擎深化系列）
   ...emrNlpTimeRelationV14Routes, // M531-C：病历 NLP 时间关系提取 V14 GET/POST /api/v1/emr-nlp-time-relation（EMR 深化四模块，病历 NLP 引擎深化系列）
   ...emrNlpNegationDetectV14Routes, // M531-D：病历 NLP 否定检测 V14 GET/POST /api/v1/emr-nlp-negation-detect（EMR 深化四模块，M531 收官，病历 NLP 引擎深化系列）
+  ...emrStructQueryV14Routes, // M532-A：病历结构化字段查询 V14 GET/POST /api/v1/emr-struct-query（EMR 深化四模块，病历结构化数据服务系列）
+  ...emrStructExportV14Routes, // M532-B：病历结构化数据导出 V14 GET/POST /api/v1/emr-struct-export（EMR 深化四模块，病历结构化数据服务系列）
+  ...emrStructStatsV14Routes, // M532-C：病历结构化数据统计 V14 GET/POST /api/v1/emr-struct-stats（EMR 深化四模块，病历结构化数据服务系列）
+  ...emrStructCompareV14Routes, // M532-D：病历结构化数据对比 V14 GET/POST /api/v1/emr-struct-compare（EMR 深化四模块，M532 收官，病历结构化数据服务系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
