@@ -2841,6 +2841,14 @@ import { emrBorrowRegisterV14Routes } from './routes/emrBorrowRegisterV14';
 import { emrSealUnsealV14Routes } from './routes/emrSealUnsealV14';
 // M482-D：病历销毁记录 V14 GET+POST /api/v1/emr-destroy-record（EMR 深化四模块，M482 收官，销毁资格 recordAgeYears>=retentionYears）
 import { emrDestroyRecordV14Routes } from './routes/emrDestroyRecordV14';
+// M483-A：质控指标采集 V14 GET /api/v1/emr-qc-metric-collect（EMR 深化四模块，质控指标系列，采集任务+结果）
+import { emrQcMetricCollectV14Routes } from './routes/emrQcMetricCollectV14';
+// M483-B：质控指标计算 V14 POST /api/v1/emr-qc-metric-calc（EMR 深化四模块，质控指标系列，分子/分母×100 1位小数）
+import { emrQcMetricCalcV14Routes } from './routes/emrQcMetricCalcV14';
+// M483-C：质控指标预警 V14 GET /api/v1/emr-qc-metric-alert（EMR 深化四模块，质控指标系列，阈值 below<above> 触发）
+import { emrQcMetricAlertV14Routes } from './routes/emrQcMetricAlertV14';
+// M483-D：质控指标分析 V14 GET /api/v1/emr-qc-metric-analysis（EMR 深化四模块，M483 收官，趋势对比 current-previous）
+import { emrQcMetricAnalysisV14Routes } from './routes/emrQcMetricAnalysisV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4504,6 +4512,10 @@ const allRoutes: RouteDef[] = [
   ...emrBorrowRegisterV14Routes, // M482-B：病历借阅登记 V14 GET /api/v1/emr-borrow-register（EMR 深化四模块，超期归还检查 borrowDays>maxDays）
   ...emrSealUnsealV14Routes, // M482-C：病历封存解封 V14 POST /api/v1/emr-seal-unseal（EMR 深化四模块，封存/解封状态机 sealed↔unsealed）
   ...emrDestroyRecordV14Routes, // M482-D：病历销毁记录 V14 GET+POST /api/v1/emr-destroy-record（EMR 深化四模块，M482 收官，销毁资格 recordAgeYears>=retentionYears）
+  ...emrQcMetricCollectV14Routes, // M483-A：质控指标采集 V14 GET /api/v1/emr-qc-metric-collect（EMR 深化四模块，质控指标系列，采集任务+结果）
+  ...emrQcMetricCalcV14Routes, // M483-B：质控指标计算 V14 POST /api/v1/emr-qc-metric-calc（EMR 深化四模块，质控指标系列，分子/分母×100 1位小数）
+  ...emrQcMetricAlertV14Routes, // M483-C：质控指标预警 V14 GET /api/v1/emr-qc-metric-alert（EMR 深化四模块，质控指标系列，阈值 below<above> 触发）
+  ...emrQcMetricAnalysisV14Routes, // M483-D：质控指标分析 V14 GET /api/v1/emr-qc-metric-analysis（EMR 深化四模块，M483 收官，趋势对比 current-previous）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
