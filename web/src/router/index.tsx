@@ -3133,6 +3133,14 @@ const EmrDestroyApplyPage = lazy(() => import('@/pages/emr-destroy-apply'));
 const EmrRetentionRemindPage = lazy(() => import('@/pages/emr-retention-remind'));
 // M541-D：病历库房盘点 V14（EMR 深化四模块，M541 收官）
 const EmrWarehouseCheckPage = lazy(() => import('@/pages/emr-warehouse-check'));
+// M542-A：病历质控综合看板（避让版 -comprehensive）V14（EMR 深化四模块）
+const EmrQcComprehensiveDashboardPage = lazy(() => import('@/pages/emr-qc-comprehensive-dashboard'));
+// M542-B：科室质控排名（避让版 -list）V14（EMR 深化四模块）
+const EmrQcDeptRankListPage = lazy(() => import('@/pages/emr-qc-dept-rank-list'));
+// M542-C：医生质控个人档案 V14（EMR 深化四模块）
+const EmrQcDoctorProfilePage = lazy(() => import('@/pages/emr-qc-doctor-profile'));
+// M542-D：质控问题趋势分析（避让版 -analysis）V14（EMR 深化四模块，M542 收官）
+const EmrQcTrendAnalysisPage = lazy(() => import('@/pages/emr-qc-trend-analysis'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6207,6 +6215,14 @@ export default function AppRoutes() {
           <Route path="emr-retention-remind" element={<EmrRetentionRemindPage />} />
           {/* M541-D：病历库房盘点 V14（EMR 深化四模块，M541 收官） */}
           <Route path="emr-warehouse-check" element={<EmrWarehouseCheckPage />} />
+          {/* M542-A：病历质控综合看板（避让版 -comprehensive）V14（EMR 深化四模块） */}
+          <Route path="emr-qc-comprehensive-dashboard" element={<EmrQcComprehensiveDashboardPage />} />
+          {/* M542-B：科室质控排名（避让版 -list）V14（EMR 深化四模块） */}
+          <Route path="emr-qc-dept-rank-list" element={<EmrQcDeptRankListPage />} />
+          {/* M542-C：医生质控个人档案 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-doctor-profile" element={<EmrQcDoctorProfilePage />} />
+          {/* M542-D：质控问题趋势分析（避让版 -analysis）V14（EMR 深化四模块，M542 收官） */}
+          <Route path="emr-qc-trend-analysis" element={<EmrQcTrendAnalysisPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

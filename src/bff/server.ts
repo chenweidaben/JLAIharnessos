@@ -3313,6 +3313,14 @@ import { emrDestroyApplyV14Routes } from './routes/emrDestroyApplyV14';
 import { emrRetentionRemindV14Routes } from './routes/emrRetentionRemindV14';
 // M541-D：病历库房盘点 V14 GET/POST /api/v1/emr-warehouse-check（EMR 深化四模块，M541 收官，病历归档与销毁管理系列）
 import { emrWarehouseCheckV14Routes } from './routes/emrWarehouseCheckV14';
+// M542-A：病历质控综合看板（避让版 -comprehensive）V14 GET/POST /api/v1/emr-qc-comprehensive-dashboard（EMR 深化四模块，病历质控指标看板系列）
+import { emrQcComprehensiveDashboardV14Routes } from './routes/emrQcComprehensiveDashboardV14';
+// M542-B：科室质控排名（避让版 -list）V14 GET/POST /api/v1/emr-qc-dept-rank-list（EMR 深化四模块，病历质控指标看板系列）
+import { emrQcDeptRankListV14Routes } from './routes/emrQcDeptRankListV14';
+// M542-C：医生质控个人档案 V14 GET/POST /api/v1/emr-qc-doctor-profile（EMR 深化四模块，病历质控指标看板系列）
+import { emrQcDoctorProfileV14Routes } from './routes/emrQcDoctorProfileV14';
+// M542-D：质控问题趋势分析（避让版 -analysis）V14 GET/POST /api/v1/emr-qc-trend-analysis（EMR 深化四模块，M542 收官，病历质控指标看板系列）
+import { emrQcTrendAnalysisV14Routes } from './routes/emrQcTrendAnalysisV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5212,6 +5220,10 @@ const allRoutes: RouteDef[] = [
   ...emrDestroyApplyV14Routes, // M541-B：病历销毁登记（避让版 -apply）V14 GET/POST /api/v1/emr-destroy-apply（EMR 深化四模块，病历归档与销毁管理系列）
   ...emrRetentionRemindV14Routes, // M541-C：病历保存期限提醒 V14 GET/POST /api/v1/emr-retention-remind（EMR 深化四模块，病历归档与销毁管理系列）
   ...emrWarehouseCheckV14Routes, // M541-D：病历库房盘点 V14 GET/POST /api/v1/emr-warehouse-check（EMR 深化四模块，M541 收官，病历归档与销毁管理系列）
+  ...emrQcComprehensiveDashboardV14Routes, // M542-A：病历质控综合看板（避让版 -comprehensive）V14 GET/POST /api/v1/emr-qc-comprehensive-dashboard（EMR 深化四模块，病历质控指标看板系列）
+  ...emrQcDeptRankListV14Routes, // M542-B：科室质控排名（避让版 -list）V14 GET/POST /api/v1/emr-qc-dept-rank-list（EMR 深化四模块，病历质控指标看板系列）
+  ...emrQcDoctorProfileV14Routes, // M542-C：医生质控个人档案 V14 GET/POST /api/v1/emr-qc-doctor-profile（EMR 深化四模块，病历质控指标看板系列）
+  ...emrQcTrendAnalysisV14Routes, // M542-D：质控问题趋势分析（避让版 -analysis）V14 GET/POST /api/v1/emr-qc-trend-analysis（EMR 深化四模块，M542 收官，病历质控指标看板系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
