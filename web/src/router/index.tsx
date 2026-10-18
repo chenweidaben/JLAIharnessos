@@ -2327,6 +2327,14 @@ const AntibioticUseQuality = lazy(() => import('@/pages/antibiotic-use-quality')
 const AdrReporting = lazy(() => import('@/pages/adr-reporting'));
 // M440-D：临床药学服务质量管理 V13（M440 收官，药事管理与药学服务组）
 const ClinicalPharmacyQuality = lazy(() => import('@/pages/clinical-pharmacy-quality'));
+// M441-A：院感监测管理 V13（医院感染管理组）
+const HospitalInfectionSurveillance = lazy(() => import('@/pages/hospital-infection-surveillance'));
+// M441-B：手卫生质量管理 V13（医院感染管理组）
+const HandHygieneQuality = lazy(() => import('@/pages/hand-hygiene-quality'));
+// M441-C：消毒灭菌管理 V13（医院感染管理组）
+const DisinfectionSterilization = lazy(() => import('@/pages/disinfection-sterilization'));
+// M441-D：医疗废物质量管理 V13（M441 收官，医院感染管理组）
+const MedicalWasteMgmtQuality = lazy(() => import('@/pages/medical-waste-mgmt-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4595,6 +4603,14 @@ export default function AppRoutes() {
           <Route path="adr-reporting" element={<AdrReporting />} />
           {/* M440-D：临床药学服务质量管理 V13（M440 收官，药事管理与药学服务组） */}
           <Route path="clinical-pharmacy-quality" element={<ClinicalPharmacyQuality />} />
+          {/* M441-A：院感监测管理 V13（医院感染管理组） */}
+          <Route path="hospital-infection-surveillance" element={<HospitalInfectionSurveillance />} />
+          {/* M441-B：手卫生质量管理 V13（医院感染管理组） */}
+          <Route path="hand-hygiene-quality" element={<HandHygieneQuality />} />
+          {/* M441-C：消毒灭菌管理 V13（医院感染管理组） */}
+          <Route path="disinfection-sterilization" element={<DisinfectionSterilization />} />
+          {/* M441-D：医疗废物质量管理 V13（M441 收官，医院感染管理组） */}
+          <Route path="medical-waste-mgmt-quality" element={<MedicalWasteMgmtQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
