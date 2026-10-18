@@ -2471,6 +2471,14 @@ import { procurementQualityMgmtV13Routes } from './routes/procurementQualityMgmt
 import { fixedAssetQualityMgmtV13Routes } from './routes/fixedAssetQualityMgmtV13';
 // M435-D：能耗质量管理 V13 GET /api/v1/energy-quality-mgmt（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
 import { energyQualityMgmtV13Routes } from './routes/energyQualityMgmtV13';
+// M436-A：污水处理质量管理 V13 GET /api/v1/sewage-treatment-quality-mgmt（院感安全环保质量管理深化组）
+import { sewageTreatmentQualityMgmtV13Routes } from './routes/sewageTreatmentQualityMgmtV13';
+// M436-B：辐射安全质量管理 V13 GET /api/v1/radiation-safety-quality-mgmt（院感安全环保质量管理深化组）
+import { radiationSafetyQualityMgmtV13Routes } from './routes/radiationSafetyQualityMgmtV13';
+// M436-C：实验室生物安全质量管理 V13 GET /api/v1/lab-biosafety-quality-mgmt（院感安全环保质量管理深化组）
+import { labBiosafetyQualityMgmtV13Routes } from './routes/labBiosafetyQualityMgmtV13';
+// M436-D：医废追溯质量管理 V13 GET /api/v1/medical-waste-traceability-quality-mgmt（M436 收官，-quality 后缀避让旧版 medicalWasteTraceabilityMgmtV13（M423））
+import { medicalWasteTraceabilityQualityMgmtV13Routes } from './routes/medicalWasteTraceabilityQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3949,6 +3957,10 @@ const allRoutes: RouteDef[] = [
   ...procurementQualityMgmtV13Routes, // M435-B：采购质量管理 V13 GET /api/v1/procurement-quality-mgmt（-quality 后缀避让旧版采购模块（M408 consumableSupplyMgmtV13 等））
   ...fixedAssetQualityMgmtV13Routes, // M435-C：固定资产质量管理 V13 GET /api/v1/fixed-asset-quality-mgmt（-quality 后缀避让旧版固定资产模块（M408 medicalDeviceMgmtV13 等））
   ...energyQualityMgmtV13Routes, // M435-D：能耗质量管理 V13 GET /api/v1/energy-quality-mgmt（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+  ...sewageTreatmentQualityMgmtV13Routes, // M436-A：污水处理质量管理 V13 GET /api/v1/sewage-treatment-quality-mgmt（院感安全环保质量管理深化组）
+  ...radiationSafetyQualityMgmtV13Routes, // M436-B：辐射安全质量管理 V13 GET /api/v1/radiation-safety-quality-mgmt（院感安全环保质量管理深化组）
+  ...labBiosafetyQualityMgmtV13Routes, // M436-C：实验室生物安全质量管理 V13 GET /api/v1/lab-biosafety-quality-mgmt（院感安全环保质量管理深化组）
+  ...medicalWasteTraceabilityQualityMgmtV13Routes, // M436-D：医废追溯质量管理 V13 GET /api/v1/medical-waste-traceability-quality-mgmt（M436 收官，-quality 后缀避让旧版 medicalWasteTraceabilityMgmtV13（M423））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
