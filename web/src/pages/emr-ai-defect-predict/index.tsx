@@ -1,0 +1,141 @@
+/**
+ * 健澜科技 jlmedaios - 病历AI缺陷预测前端页（M543-C，V14，EMR 深化四模块）
+ *
+ * 深海蓝VI：病历AI缺陷预测（病历ID/科室/病历类型/是否签名/是否有出院小结/风险等级/预测缺陷数）。
+ *
+ * Copyright (c) 杭州健澜科技有限公司
+ */
+import { useEffect, useState } from "react";
+import { Button, Card, Col, Input, Layout, Row, Statistic, Switch, Tag, Typography, message } from "antd";
+
+const { Content } = Layout;
+const { Title, Text } = Typography;
+const VI = { deep: "#0A2540", mid: "#1E5F8C", accent: "#4A90D9", bg: "#f5f7fa" };
+
+interface AiDefectPredict {
+  recordId: string;
+  dept: string;
+}
+
+interface PredictResult {
+  riskLevel: string;
+  predictedDefects: number;
+}
+
+interface PredictReport {
+  riskLevel: string;
+  predictedDefects: number;
+}
+
+const riskColor = (level: string): string => {
+  if (level === "高") return "red";
+  if (level === "中") return "orange";
+  return "green";
+};
+
+export default function EmrAiDefectPredictPage() {
+  const [base, setBase] = useState<AiDefectPredict | null>(null);
+  const [recordType, setRecordType] = useState("出院记录");
+  const [hasSignature, setHasSignature] = useState(false);
+  const [hasDischarge, setHasDischarge] = useState(true);
+  const [result, setResult] = useState<PredictResult | null>(null);
+  const [report, setReport] = useState<PredictReport | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchBase = async () => {
+      try {
+        const token = localStorage.getItem("token") ?? "";
+        const resp = await fetch("/api/v1/emr-ai-defect-predict", {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          setBase(data?.data ?? null);
+        }
+      } catch {
+        message.error("加载 AI 缺陷预测基础数据失败");
+      }
+    };
+    void fetchBase();
+  }, []);
+
+  const doPredict = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token") ?? "";
+      const resp = await fetch("/api/v1/emr-ai-defect-predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ recordType, hasSignature, hasDischarge }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setResult(data?.data?.result ?? null);
+        setReport(data?.data?.report ?? null);
+        message.success("预测完成");
+      } else {
+        message.error("预测失败");
+      }
+    } catch {
+      message.error("网络错误");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Layout style={{ minHeight: "100vh", background: VI.bg }}>
+      <Content style={{ padding: 24, maxWidth: 1280, margin: "0 auto" }}>
+        <Title level={3} style={{ color: VI.deep }}>病历AI缺陷预测</Title>
+        {base && (
+          <Card style={{ marginBottom: 16 }} headStyle={{ background: VI.mid, color: "#fff" }} title="基础数据">
+            <div>
+              <Text strong>病历ID：</Text><Text style={{ marginRight: 24 }}>{base.recordId}</Text>
+              <Text strong>科室：</Text><Tag color="blue">{base.dept}</Tag>
+            </div>
+          </Card>
+        )}
+        <Card style={{ marginBottom: 16 }} headStyle={{ background: VI.mid, color: "#fff" }} title="预测输入">
+          <div style={{ display: "flex", gap: 24, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+            <div>
+              <Text strong>病历类型：</Text>
+              <Input value={recordType} onChange={(e) => setRecordType(e.target.value)} style={{ width: 140, marginLeft: 8 }} />
+            </div>
+            <div>
+              <Text strong>是否签名：</Text>
+              <Switch checked={hasSignature} onChange={setHasSignature} style={{ marginLeft: 8 }} />
+            </div>
+            <div>
+              <Text strong>是否有出院小结：</Text>
+              <Switch checked={hasDischarge} onChange={setHasDischarge} style={{ marginLeft: 8 }} />
+            </div>
+          </div>
+          <Button type="primary" style={{ background: VI.accent }} loading={loading} onClick={doPredict}>
+            执行预测
+          </Button>
+        </Card>
+        {result && report && (
+          <Card headStyle={{ background: VI.mid, color: "#fff" }} title="预测结果">
+            <Row gutter={24}>
+              <Col span={12}>
+                <div>
+                  <Text strong style={{ fontSize: 16 }}>风险等级：</Text>
+                  <Tag color={riskColor(report.riskLevel)} style={{ marginLeft: 8, fontSize: 16 }}>
+                    {report.riskLevel}风险
+                  </Tag>
+                </div>
+              </Col>
+              <Col span={12}>
+                <Statistic title="预测缺陷数" value={report.predictedDefects} valueStyle={{ color: "#cf1322" }} />
+              </Col>
+            </Row>
+          </Card>
+        )}
+      </Content>
+    </Layout>
+  );
+}
