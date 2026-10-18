@@ -3137,6 +3137,14 @@ import { emrQcRuleVersionV14Routes } from './routes/emrQcRuleVersionV14';
 import { emrQcRuleSimulatorV14Routes } from './routes/emrQcRuleSimulatorV14';
 // M519-D：质控规则对比分析 V14 GET/POST /api/v1/emr-qc-rule-compare（EMR 深化四模块，M519 收官，病历质控规则配置可视化系列）
 import { emrQcRuleCompareV14Routes } from './routes/emrQcRuleCompareV14';
+// M520-A：质控规则智能推荐 V14 GET/POST /api/v1/emr-qc-rule-recommendation（EMR 深化四模块，病历质控知识库与智能推荐系列）
+import { emrQcRuleRecommendationV14Routes } from './routes/emrQcRuleRecommendationV14';
+// M520-B：质控缺陷案例库 V14 GET/POST /api/v1/emr-qc-defect-case-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
+import { emrQcDefectCaseLibraryV14Routes } from './routes/emrQcDefectCaseLibraryV14';
+// M520-C：质控行业标准库 V14 GET/POST /api/v1/emr-qc-standard-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
+import { emrQcStandardLibraryV14Routes } from './routes/emrQcStandardLibraryV14';
+// M520-D：质控最佳实践库 V14 GET/POST /api/v1/emr-qc-best-practice（EMR 深化四模块，M520 收官，病历质控知识库与智能推荐系列）
+import { emrQcBestPracticeV14Routes } from './routes/emrQcBestPracticeV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4948,6 +4956,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcRuleVersionV14Routes, // M519-B：质控规则版本管理 V14 GET/POST /api/v1/emr-qc-rule-version（EMR 深化四模块，病历质控规则配置可视化系列）
   ...emrQcRuleSimulatorV14Routes, // M519-C：质控规则模拟测试 V14 GET/POST /api/v1/emr-qc-rule-simulator（EMR 深化四模块，病历质控规则配置可视化系列）
   ...emrQcRuleCompareV14Routes, // M519-D：质控规则对比分析 V14 GET/POST /api/v1/emr-qc-rule-compare（EMR 深化四模块，M519 收官，病历质控规则配置可视化系列）
+  ...emrQcRuleRecommendationV14Routes, // M520-A：质控规则智能推荐 V14 GET/POST /api/v1/emr-qc-rule-recommendation（EMR 深化四模块，病历质控知识库与智能推荐系列）
+  ...emrQcDefectCaseLibraryV14Routes, // M520-B：质控缺陷案例库 V14 GET/POST /api/v1/emr-qc-defect-case-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
+  ...emrQcStandardLibraryV14Routes, // M520-C：质控行业标准库 V14 GET/POST /api/v1/emr-qc-standard-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
+  ...emrQcBestPracticeV14Routes, // M520-D：质控最佳实践库 V14 GET/POST /api/v1/emr-qc-best-practice（EMR 深化四模块，M520 收官，病历质控知识库与智能推荐系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
