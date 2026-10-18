@@ -2969,6 +2969,14 @@ import { emrQcAuditLogRecordV14Routes } from './routes/emrQcAuditLogRecordV14';
 import { emrQcDataDictV14Routes } from './routes/emrQcDataDictV14';
 // M498-D：质控权限管理 V14 GET /api/v1/emr-qc-permission-manage（EMR 深化四模块，M498 收官，避让M473-B，角色权限检查）
 import { emrQcPermissionManageV14Routes } from './routes/emrQcPermissionManageV14';
+// M499-A：质控 AI 缺陷自动分类 V14 POST /api/v1/emr-qc-ai-defect-classify（EMR 深化四模块，关键词匹配分类）
+import { emrQcAiDefectClassifyV14Routes } from './routes/emrQcAiDefectClassifyV14';
+// M499-B：质控 AI 书写建议 V14 POST /api/v1/emr-qc-ai-writing-suggest（EMR 深化四模块，关键词匹配建议）
+import { emrQcAiWritingSuggestV14Routes } from './routes/emrQcAiWritingSuggestV14';
+// M499-C：质控 AI 相似病历推荐 V14 GET /api/v1/emr-qc-ai-similar-record（EMR 深化四模块，排除自己按score降序）
+import { emrQcAiSimilarRecordV14Routes } from './routes/emrQcAiSimilarRecordV14';
+// M499-D：质控 AI 知识问答 V14 POST /api/v1/emr-qc-ai-qa（EMR 深化四模块，M499 收官，关键词匹配答案）
+import { emrQcAiQaV14Routes } from './routes/emrQcAiQaV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4696,6 +4704,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcAuditLogRecordV14Routes, // M498-B：质控操作日志审计记录 V14 GET /api/v1/emr-qc-audit-log-record（EMR 深化四模块，避让M467-C，user/action关键词过滤）
   ...emrQcDataDictV14Routes, // M498-C：质控数据字典管理 V14 GET /api/v1/emr-qc-data-dict（EMR 深化四模块，category/items关键词搜索）
   ...emrQcPermissionManageV14Routes, // M498-D：质控权限管理 V14 GET /api/v1/emr-qc-permission-manage（EMR 深化四模块，M498 收官，避让M473-B，角色权限检查）
+  ...emrQcAiDefectClassifyV14Routes, // M499-A：质控 AI 缺陷自动分类 V14 POST /api/v1/emr-qc-ai-defect-classify（EMR 深化四模块，关键词匹配分类）
+  ...emrQcAiWritingSuggestV14Routes, // M499-B：质控 AI 书写建议 V14 POST /api/v1/emr-qc-ai-writing-suggest（EMR 深化四模块，关键词匹配建议）
+  ...emrQcAiSimilarRecordV14Routes, // M499-C：质控 AI 相似病历推荐 V14 GET /api/v1/emr-qc-ai-similar-record（EMR 深化四模块，排除自己按score降序）
+  ...emrQcAiQaV14Routes, // M499-D：质控 AI 知识问答 V14 POST /api/v1/emr-qc-ai-qa（EMR 深化四模块，M499 收官，关键词匹配答案）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

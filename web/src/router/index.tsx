@@ -2789,6 +2789,14 @@ const EmrQcAuditLogRecordPage = lazy(() => import('@/pages/emr-qc-audit-log-reco
 const EmrQcDataDictPage = lazy(() => import('@/pages/emr-qc-data-dict'));
 // M498-D：质控权限管理 V14（EMR 深化四模块，M498 收官，避让 M473-B emr-qc-permission）
 const EmrQcPermissionManagePage = lazy(() => import('@/pages/emr-qc-permission-manage'));
+// M499-A：质控 AI 缺陷自动分类 V14（EMR 深化四模块）
+const EmrQcAiDefectClassifyPage = lazy(() => import('@/pages/emr-qc-ai-defect-classify'));
+// M499-B：质控 AI 书写建议 V14（EMR 深化四模块）
+const EmrQcAiWritingSuggestPage = lazy(() => import('@/pages/emr-qc-ai-writing-suggest'));
+// M499-C：质控 AI 相似病历推荐 V14（EMR 深化四模块）
+const EmrQcAiSimilarRecordPage = lazy(() => import('@/pages/emr-qc-ai-similar-record'));
+// M499-D：质控 AI 知识问答 V14（EMR 深化四模块，M499 收官）
+const EmrQcAiQaPage = lazy(() => import('@/pages/emr-qc-ai-qa'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5519,6 +5527,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-data-dict" element={<EmrQcDataDictPage />} />
           {/* M498-D：质控权限管理 V14（EMR 深化四模块，M498 收官，避让 M473-B emr-qc-permission） */}
           <Route path="emr-qc-permission-manage" element={<EmrQcPermissionManagePage />} />
+          {/* M499-A：质控 AI 缺陷自动分类 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-ai-defect-classify" element={<EmrQcAiDefectClassifyPage />} />
+          {/* M499-B：质控 AI 书写建议 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-ai-writing-suggest" element={<EmrQcAiWritingSuggestPage />} />
+          {/* M499-C：质控 AI 相似病历推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-ai-similar-record" element={<EmrQcAiSimilarRecordPage />} />
+          {/* M499-D：质控 AI 知识问答 V14（EMR 深化四模块，M499 收官） */}
+          <Route path="emr-qc-ai-qa" element={<EmrQcAiQaPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
