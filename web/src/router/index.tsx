@@ -2391,6 +2391,14 @@ const InpatientBillingMgmt = lazy(() => import('@/pages/inpatient-billing-mgmt')
 const BudgetMgmt = lazy(() => import('@/pages/budget-mgmt'));
 // M448-D：票据管理 V13（M448 收官，财务与收费管理组）
 const InvoiceMgmt = lazy(() => import('@/pages/invoice-mgmt'));
+// M449-A：医疗设备采购管理 V13（医疗装备与设备管理组）
+const MedicalEquipmentPurchaseMgmt = lazy(() => import('@/pages/medical-equipment-purchase-mgmt'));
+// M449-B：设备维护保养管理 V13（医疗装备与设备管理组）
+const EquipmentMaintenanceMgmt = lazy(() => import('@/pages/equipment-maintenance-mgmt'));
+// M449-C：设备计量校准管理 V13（医疗装备与设备管理组）
+const EquipmentCalibrationMgmt = lazy(() => import('@/pages/equipment-calibration-mgmt'));
+// M449-D：设备报废处置管理 V13（M449 收官，医疗装备与设备管理组）
+const EquipmentDisposalMgmt = lazy(() => import('@/pages/equipment-disposal-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4723,6 +4731,14 @@ export default function AppRoutes() {
           <Route path="budget-mgmt" element={<BudgetMgmt />} />
           {/* M448-D：票据管理 V13（M448 收官，财务与收费管理组） */}
           <Route path="invoice-mgmt" element={<InvoiceMgmt />} />
+          {/* M449-A：医疗设备采购管理 V13（医疗装备与设备管理组） */}
+          <Route path="medical-equipment-purchase-mgmt" element={<MedicalEquipmentPurchaseMgmt />} />
+          {/* M449-B：设备维护保养管理 V13（医疗装备与设备管理组） */}
+          <Route path="equipment-maintenance-mgmt" element={<EquipmentMaintenanceMgmt />} />
+          {/* M449-C：设备计量校准管理 V13（医疗装备与设备管理组） */}
+          <Route path="equipment-calibration-mgmt" element={<EquipmentCalibrationMgmt />} />
+          {/* M449-D：设备报废处置管理 V13（M449 收官，医疗装备与设备管理组） */}
+          <Route path="equipment-disposal-mgmt" element={<EquipmentDisposalMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
