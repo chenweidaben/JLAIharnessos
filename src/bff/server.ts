@@ -2833,6 +2833,14 @@ import { emrStageQcV14Routes } from './routes/emrStageQcV14';
 import { emrDischargeQcV14Routes } from './routes/emrDischargeQcV14';
 // M481-D：病历质量评分汇总 V14 GET /api/v1/emr-quality-score-summary（EMR 深化四模块，M481 收官，-summary 避让 M465-B emrQualityScoreV14）
 import { emrQualityScoreSummaryV14Routes } from './routes/emrQualityScoreSummaryV14';
+// M482-A：病历复印申请 V14 GET+POST /api/v1/emr-copy-request（EMR 深化四模块，复印申请+审批）
+import { emrCopyRequestV14Routes } from './routes/emrCopyRequestV14';
+// M482-B：病历借阅登记 V14 GET /api/v1/emr-borrow-register（EMR 深化四模块，超期归还检查 borrowDays>maxDays）
+import { emrBorrowRegisterV14Routes } from './routes/emrBorrowRegisterV14';
+// M482-C：病历封存解封 V14 POST /api/v1/emr-seal-unseal（EMR 深化四模块，封存/解封状态机 sealed↔unsealed）
+import { emrSealUnsealV14Routes } from './routes/emrSealUnsealV14';
+// M482-D：病历销毁记录 V14 GET+POST /api/v1/emr-destroy-record（EMR 深化四模块，M482 收官，销毁资格 recordAgeYears>=retentionYears）
+import { emrDestroyRecordV14Routes } from './routes/emrDestroyRecordV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4492,6 +4500,10 @@ const allRoutes: RouteDef[] = [
   ...emrStageQcV14Routes, // M481-B：环节质控 V14 GET /api/v1/emr-stage-qc（EMR 深化四模块，环节质量评分 avg=sum/count 1 位小数）
   ...emrDischargeQcV14Routes, // M481-C：出院病历质控 V14 POST /api/v1/emr-discharge-qc（EMR 深化四模块，就绪度检查，得分 completedCount/total×100）
   ...emrQualityScoreSummaryV14Routes, // M481-D：病历质量评分汇总 V14 GET /api/v1/emr-quality-score-summary（EMR 深化四模块，M481 收官，-summary 避让 M465-B emrQualityScoreV14）
+  ...emrCopyRequestV14Routes, // M482-A：病历复印申请 V14 GET+POST /api/v1/emr-copy-request（EMR 深化四模块，复印申请+审批）
+  ...emrBorrowRegisterV14Routes, // M482-B：病历借阅登记 V14 GET /api/v1/emr-borrow-register（EMR 深化四模块，超期归还检查 borrowDays>maxDays）
+  ...emrSealUnsealV14Routes, // M482-C：病历封存解封 V14 POST /api/v1/emr-seal-unseal（EMR 深化四模块，封存/解封状态机 sealed↔unsealed）
+  ...emrDestroyRecordV14Routes, // M482-D：病历销毁记录 V14 GET+POST /api/v1/emr-destroy-record（EMR 深化四模块，M482 收官，销毁资格 recordAgeYears>=retentionYears）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
