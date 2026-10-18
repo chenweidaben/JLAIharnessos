@@ -2825,6 +2825,14 @@ import { emrClinicalPathQcV14Routes } from './routes/emrClinicalPathQcV14';
 import { emrFrontPageQcV14Routes } from './routes/emrFrontPageQcV14';
 // M480-D：终末质控 V14 GET+POST /api/v1/emr-terminal-qc（EMR 深化四模块，M480 收官，终末质控记录+提交）
 import { emrTerminalQcV14Routes } from './routes/emrTerminalQcV14';
+// M481-A：运行病历质控 V14 GET /api/v1/emr-running-qc（EMR 深化四模块，运行病历更新时限检查）
+import { emrRunningQcV14Routes } from './routes/emrRunningQcV14';
+// M481-B：环节质控 V14 GET /api/v1/emr-stage-qc（EMR 深化四模块，环节质量评分 avg=sum/count 1 位小数）
+import { emrStageQcV14Routes } from './routes/emrStageQcV14';
+// M481-C：出院病历质控 V14 POST /api/v1/emr-discharge-qc（EMR 深化四模块，就绪度检查，得分 completedCount/total×100）
+import { emrDischargeQcV14Routes } from './routes/emrDischargeQcV14';
+// M481-D：病历质量评分汇总 V14 GET /api/v1/emr-quality-score-summary（EMR 深化四模块，M481 收官，-summary 避让 M465-B emrQualityScoreV14）
+import { emrQualityScoreSummaryV14Routes } from './routes/emrQualityScoreSummaryV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4480,6 +4488,10 @@ const allRoutes: RouteDef[] = [
   ...emrClinicalPathQcV14Routes, // M480-B：临床路径质控 V14 GET /api/v1/emr-clinical-path-qc（EMR 深化四模块，变异检测 planned≠actual）
   ...emrFrontPageQcV14Routes, // M480-C：病案首页质控 V14 POST /api/v1/emr-front-page-qc（EMR 深化四模块，必填项校验，得分 filledCount/total×100）
   ...emrTerminalQcV14Routes, // M480-D：终末质控 V14 GET+POST /api/v1/emr-terminal-qc（EMR 深化四模块，M480 收官，终末质控记录+提交）
+  ...emrRunningQcV14Routes, // M481-A：运行病历质控 V14 GET /api/v1/emr-running-qc（EMR 深化四模块，运行病历更新时限检查）
+  ...emrStageQcV14Routes, // M481-B：环节质控 V14 GET /api/v1/emr-stage-qc（EMR 深化四模块，环节质量评分 avg=sum/count 1 位小数）
+  ...emrDischargeQcV14Routes, // M481-C：出院病历质控 V14 POST /api/v1/emr-discharge-qc（EMR 深化四模块，就绪度检查，得分 completedCount/total×100）
+  ...emrQualityScoreSummaryV14Routes, // M481-D：病历质量评分汇总 V14 GET /api/v1/emr-quality-score-summary（EMR 深化四模块，M481 收官，-summary 避让 M465-B emrQualityScoreV14）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
