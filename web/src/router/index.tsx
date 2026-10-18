@@ -2877,6 +2877,14 @@ const EmrQcSurgeryRulesPage = lazy(() => import('@/pages/emr-qc-surgery-rules'))
 const EmrQcPediatricsRulesPage = lazy(() => import('@/pages/emr-qc-pediatrics-rules'));
 // M509-D：质控妇产科专科规则 V14（EMR 深化四模块，M509 收官）
 const EmrQcObgynRulesPage = lazy(() => import('@/pages/emr-qc-obgyn-rules'));
+// M510-A：质控急诊专科规则 V14（EMR 深化四模块）
+const EmrQcEmergencyRulesPage = lazy(() => import('@/pages/emr-qc-emergency-rules'));
+// M510-B：质控重症医学科(ICU)专科规则 V14（EMR 深化四模块）
+const EmrQcIcuRulesPage = lazy(() => import('@/pages/emr-qc-icu-rules'));
+// M510-C：质控中医科专科规则 V14（EMR 深化四模块）
+const EmrQcTcmRulesPage = lazy(() => import('@/pages/emr-qc-tcm-rules'));
+// M510-D：质控康复科专科规则 V14（EMR 深化四模块，M510 收官）
+const EmrQcRehabRulesPage = lazy(() => import('@/pages/emr-qc-rehab-rules'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5695,6 +5703,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-pediatrics-rules" element={<EmrQcPediatricsRulesPage />} />
           {/* M509-D：质控妇产科专科规则 V14（EMR 深化四模块，M509 收官） */}
           <Route path="emr-qc-obgyn-rules" element={<EmrQcObgynRulesPage />} />
+          {/* M510-A：质控急诊专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-emergency-rules" element={<EmrQcEmergencyRulesPage />} />
+          {/* M510-B：质控重症医学科(ICU)专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-icu-rules" element={<EmrQcIcuRulesPage />} />
+          {/* M510-C：质控中医科专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-tcm-rules" element={<EmrQcTcmRulesPage />} />
+          {/* M510-D：质控康复科专科规则 V14（EMR 深化四模块，M510 收官） */}
+          <Route path="emr-qc-rehab-rules" element={<EmrQcRehabRulesPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

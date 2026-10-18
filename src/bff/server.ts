@@ -3057,6 +3057,14 @@ import { emrQcSurgeryRulesV14Routes } from './routes/emrQcSurgeryRulesV14';
 import { emrQcPediatricsRulesV14Routes } from './routes/emrQcPediatricsRulesV14';
 // M509-D：质控妇产科专科规则 V14 GET/POST /api/v1/emr-qc-obgyn-rules（EMR 深化四模块，M509 收官，专科规则+病历检查）
 import { emrQcObgynRulesV14Routes } from './routes/emrQcObgynRulesV14';
+// M510-A：质控急诊专科规则 V14 GET/POST /api/v1/emr-qc-emergency-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcEmergencyRulesV14Routes } from './routes/emrQcEmergencyRulesV14';
+// M510-B：质控重症医学科(ICU)专科规则 V14 GET/POST /api/v1/emr-qc-icu-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcIcuRulesV14Routes } from './routes/emrQcIcuRulesV14';
+// M510-C：质控中医科专科规则 V14 GET/POST /api/v1/emr-qc-tcm-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcTcmRulesV14Routes } from './routes/emrQcTcmRulesV14';
+// M510-D：质控康复科专科规则 V14 GET/POST /api/v1/emr-qc-rehab-rules（EMR 深化四模块，M510 收官，扩展专科规则+病历检查）
+import { emrQcRehabRulesV14Routes } from './routes/emrQcRehabRulesV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4828,6 +4836,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcSurgeryRulesV14Routes, // M509-B：质控外科专科规则 V14 GET/POST /api/v1/emr-qc-surgery-rules（EMR 深化四模块，专科规则+病历检查）
   ...emrQcPediatricsRulesV14Routes, // M509-C：质控儿科专科规则 V14 GET/POST /api/v1/emr-qc-pediatrics-rules（EMR 深化四模块，专科规则+病历检查）
   ...emrQcObgynRulesV14Routes, // M509-D：质控妇产科专科规则 V14 GET/POST /api/v1/emr-qc-obgyn-rules（EMR 深化四模块，M509 收官，专科规则+病历检查）
+  ...emrQcEmergencyRulesV14Routes, // M510-A：质控急诊专科规则 V14 GET/POST /api/v1/emr-qc-emergency-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcIcuRulesV14Routes, // M510-B：质控重症医学科(ICU)专科规则 V14 GET/POST /api/v1/emr-qc-icu-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcTcmRulesV14Routes, // M510-C：质控中医科专科规则 V14 GET/POST /api/v1/emr-qc-tcm-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcRehabRulesV14Routes, // M510-D：质控康复科专科规则 V14 GET/POST /api/v1/emr-qc-rehab-rules（EMR 深化四模块，M510 收官，扩展专科规则+病历检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
