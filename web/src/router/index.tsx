@@ -2781,6 +2781,14 @@ const EmrQcExportPdfPage = lazy(() => import('@/pages/emr-qc-export-pdf'));
 const EmrQcExportCsvPage = lazy(() => import('@/pages/emr-qc-export-csv'));
 // M497-D：质控数据导出区域上报 V14（EMR 深化四模块，M497 收官）
 const EmrQcExportRegionPage = lazy(() => import('@/pages/emr-qc-export-region'));
+// M498-A：质控系统参数配置 V14（EMR 深化四模块）
+const EmrQcSysParamPage = lazy(() => import('@/pages/emr-qc-sys-param'));
+// M498-B：质控操作日志审计记录 V14（EMR 深化四模块，避让 M467-C emr-qc-audit-log）
+const EmrQcAuditLogRecordPage = lazy(() => import('@/pages/emr-qc-audit-log-record'));
+// M498-C：质控数据字典管理 V14（EMR 深化四模块）
+const EmrQcDataDictPage = lazy(() => import('@/pages/emr-qc-data-dict'));
+// M498-D：质控权限管理 V14（EMR 深化四模块，M498 收官，避让 M473-B emr-qc-permission）
+const EmrQcPermissionManagePage = lazy(() => import('@/pages/emr-qc-permission-manage'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5503,6 +5511,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-export-csv" element={<EmrQcExportCsvPage />} />
           {/* M497-D：质控数据导出区域上报 V14（EMR 深化四模块，M497 收官） */}
           <Route path="emr-qc-export-region" element={<EmrQcExportRegionPage />} />
+          {/* M498-A：质控系统参数配置 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-sys-param" element={<EmrQcSysParamPage />} />
+          {/* M498-B：质控操作日志审计记录 V14（EMR 深化四模块，避让 M467-C emr-qc-audit-log） */}
+          <Route path="emr-qc-audit-log-record" element={<EmrQcAuditLogRecordPage />} />
+          {/* M498-C：质控数据字典管理 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-data-dict" element={<EmrQcDataDictPage />} />
+          {/* M498-D：质控权限管理 V14（EMR 深化四模块，M498 收官，避让 M473-B emr-qc-permission） */}
+          <Route path="emr-qc-permission-manage" element={<EmrQcPermissionManagePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

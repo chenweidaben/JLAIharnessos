@@ -2961,6 +2961,14 @@ import { emrQcExportPdfV14Routes } from './routes/emrQcExportPdfV14';
 import { emrQcExportCsvV14Routes } from './routes/emrQcExportCsvV14';
 // M497-D：质控数据导出区域上报 V14 POST /api/v1/emr-qc-export-region（EMR 深化四模块，M497 收官，region/period必填metrics非空）
 import { emrQcExportRegionV14Routes } from './routes/emrQcExportRegionV14';
+// M498-A：质控系统参数配置 V14 GET/POST /api/v1/emr-qc-sys-param（EMR 深化四模块，key/value必填）
+import { emrQcSysParamV14Routes } from './routes/emrQcSysParamV14';
+// M498-B：质控操作日志审计记录 V14 GET /api/v1/emr-qc-audit-log-record（EMR 深化四模块，避让M467-C，user/action关键词过滤）
+import { emrQcAuditLogRecordV14Routes } from './routes/emrQcAuditLogRecordV14';
+// M498-C：质控数据字典管理 V14 GET /api/v1/emr-qc-data-dict（EMR 深化四模块，category/items关键词搜索）
+import { emrQcDataDictV14Routes } from './routes/emrQcDataDictV14';
+// M498-D：质控权限管理 V14 GET /api/v1/emr-qc-permission-manage（EMR 深化四模块，M498 收官，避让M473-B，角色权限检查）
+import { emrQcPermissionManageV14Routes } from './routes/emrQcPermissionManageV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4684,6 +4692,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcExportPdfV14Routes, // M497-B：质控数据导出 PDF V14 GET /api/v1/emr-qc-export-pdf（EMR 深化四模块，标题+正文拼接）
   ...emrQcExportCsvV14Routes, // M497-C：质控数据导出 CSV V14 GET /api/v1/emr-qc-export-csv（EMR 深化四模块，delimiter连接+换行）
   ...emrQcExportRegionV14Routes, // M497-D：质控数据导出区域上报 V14 POST /api/v1/emr-qc-export-region（EMR 深化四模块，M497 收官，region/period必填metrics非空）
+  ...emrQcSysParamV14Routes, // M498-A：质控系统参数配置 V14 GET/POST /api/v1/emr-qc-sys-param（EMR 深化四模块，key/value必填）
+  ...emrQcAuditLogRecordV14Routes, // M498-B：质控操作日志审计记录 V14 GET /api/v1/emr-qc-audit-log-record（EMR 深化四模块，避让M467-C，user/action关键词过滤）
+  ...emrQcDataDictV14Routes, // M498-C：质控数据字典管理 V14 GET /api/v1/emr-qc-data-dict（EMR 深化四模块，category/items关键词搜索）
+  ...emrQcPermissionManageV14Routes, // M498-D：质控权限管理 V14 GET /api/v1/emr-qc-permission-manage（EMR 深化四模块，M498 收官，避让M473-B，角色权限检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
