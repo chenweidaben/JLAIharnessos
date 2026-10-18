@@ -2917,6 +2917,14 @@ const EmrQcTransfusionLinkPage = lazy(() => import('@/pages/emr-qc-transfusion-l
 const EmrQcClinicalPathwayLinkPage = lazy(() => import('@/pages/emr-qc-clinical-pathway-link'));
 // M514-D：质控-抗菌药物管理联动 V14（EMR 深化四模块，M514 收官）
 const EmrQcAntibioticLinkPage = lazy(() => import('@/pages/emr-qc-antibiotic-link'));
+// M515-A：质控-危急值联动 V14（EMR 深化四模块）
+const EmrQcCriticalValueLinkPage = lazy(() => import('@/pages/emr-qc-critical-value-link'));
+// M515-B：质控-VTE预防联动 V14（EMR 深化四模块）
+const EmrQcVteLinkPage = lazy(() => import('@/pages/emr-qc-vte-link'));
+// M515-C：质控-患者投诉联动 V14（EMR 深化四模块）
+const EmrQcComplaintLinkPage = lazy(() => import('@/pages/emr-qc-complaint-link'));
+// M515-D：质控-手术分级授权联动 V14（EMR 深化四模块，M515 收官）
+const EmrQcSurgeryAuthLinkPage = lazy(() => import('@/pages/emr-qc-surgery-auth-link'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5775,6 +5783,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-clinical-pathway-link" element={<EmrQcClinicalPathwayLinkPage />} />
           {/* M514-D：质控-抗菌药物管理联动 V14（EMR 深化四模块，M514 收官） */}
           <Route path="emr-qc-antibiotic-link" element={<EmrQcAntibioticLinkPage />} />
+          {/* M515-A：质控-危急值联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-critical-value-link" element={<EmrQcCriticalValueLinkPage />} />
+          {/* M515-B：质控-VTE预防联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-vte-link" element={<EmrQcVteLinkPage />} />
+          {/* M515-C：质控-患者投诉联动 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-complaint-link" element={<EmrQcComplaintLinkPage />} />
+          {/* M515-D：质控-手术分级授权联动 V14（EMR 深化四模块，M515 收官） */}
+          <Route path="emr-qc-surgery-auth-link" element={<EmrQcSurgeryAuthLinkPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

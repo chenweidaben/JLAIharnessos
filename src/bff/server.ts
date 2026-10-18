@@ -3097,6 +3097,14 @@ import { emrQcTransfusionLinkV14Routes } from './routes/emrQcTransfusionLinkV14'
 import { emrQcClinicalPathwayLinkV14Routes } from './routes/emrQcClinicalPathwayLinkV14';
 // M514-D：质控-抗菌药物管理联动 V14 GET/POST /api/v1/emr-qc-antibiotic-link（EMR 深化四模块，M514 收官，质控跨模块联动第二组+抗菌药物一致性检查）
 import { emrQcAntibioticLinkV14Routes } from './routes/emrQcAntibioticLinkV14';
+// M515-A：质控-危急值联动 V14 GET/POST /api/v1/emr-qc-critical-value-link（EMR 深化四模块，质控跨模块联动第三组+危急值一致性检查）
+import { emrQcCriticalValueLinkV14Routes } from './routes/emrQcCriticalValueLinkV14';
+// M515-B：质控-VTE预防联动 V14 GET/POST /api/v1/emr-qc-vte-link（EMR 深化四模块，质控跨模块联动第三组+VTE一致性检查）
+import { emrQcVteLinkV14Routes } from './routes/emrQcVteLinkV14';
+// M515-C：质控-患者投诉联动 V14 GET/POST /api/v1/emr-qc-complaint-link（EMR 深化四模块，质控跨模块联动第三组+投诉一致性检查）
+import { emrQcComplaintLinkV14Routes } from './routes/emrQcComplaintLinkV14';
+// M515-D：质控-手术分级授权联动 V14 GET/POST /api/v1/emr-qc-surgery-auth-link（EMR 深化四模块，M515 收官，质控跨模块联动第三组+手术授权一致性检查）
+import { emrQcSurgeryAuthLinkV14Routes } from './routes/emrQcSurgeryAuthLinkV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4888,6 +4896,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcTransfusionLinkV14Routes, // M514-B：质控-输血记录联动 V14 GET/POST /api/v1/emr-qc-transfusion-link（EMR 深化四模块，质控跨模块联动第二组+输血一致性检查）
   ...emrQcClinicalPathwayLinkV14Routes, // M514-C：质控-临床路径联动 V14 GET/POST /api/v1/emr-qc-clinical-pathway-link（EMR 深化四模块，质控跨模块联动第二组+临床路径一致性检查）
   ...emrQcAntibioticLinkV14Routes, // M514-D：质控-抗菌药物管理联动 V14 GET/POST /api/v1/emr-qc-antibiotic-link（EMR 深化四模块，M514 收官，质控跨模块联动第二组+抗菌药物一致性检查）
+  ...emrQcCriticalValueLinkV14Routes, // M515-A：质控-危急值联动 V14 GET/POST /api/v1/emr-qc-critical-value-link（EMR 深化四模块，质控跨模块联动第三组+危急值一致性检查）
+  ...emrQcVteLinkV14Routes, // M515-B：质控-VTE预防联动 V14 GET/POST /api/v1/emr-qc-vte-link（EMR 深化四模块，质控跨模块联动第三组+VTE一致性检查）
+  ...emrQcComplaintLinkV14Routes, // M515-C：质控-患者投诉联动 V14 GET/POST /api/v1/emr-qc-complaint-link（EMR 深化四模块，质控跨模块联动第三组+投诉一致性检查）
+  ...emrQcSurgeryAuthLinkV14Routes, // M515-D：质控-手术分级授权联动 V14 GET/POST /api/v1/emr-qc-surgery-auth-link（EMR 深化四模块，M515 收官，质控跨模块联动第三组+手术授权一致性检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
