@@ -2725,6 +2725,14 @@ const EmrNlpRelationPage = lazy(() => import('@/pages/emr-nlp-relation'));
 const EmrNlpEventPage = lazy(() => import('@/pages/emr-nlp-event'));
 // M490-D：NLP 病历时间线构建 V14（EMR 深化四模块，M490 收官）
 const EmrNlpTimelinePage = lazy(() => import('@/pages/emr-nlp-timeline'));
+// M491-A：NLP 病历纠错 V14（EMR 深化四模块）
+const EmrNlpCorrectionPage = lazy(() => import('@/pages/emr-nlp-correction'));
+// M491-B：NLP 病历标准化 V14（EMR 深化四模块）
+const EmrNlpNormalizationPage = lazy(() => import('@/pages/emr-nlp-normalization'));
+// M491-C：NLP 病历去重 V14（EMR 深化四模块）
+const EmrNlpDeduplicationPage = lazy(() => import('@/pages/emr-nlp-deduplication'));
+// M491-D：NLP 病历相似度计算 V14（EMR 深化四模块，M491 收官）
+const EmrNlpSimilarityPage = lazy(() => import('@/pages/emr-nlp-similarity'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5391,6 +5399,14 @@ export default function AppRoutes() {
           <Route path="emr-nlp-event" element={<EmrNlpEventPage />} />
           {/* M490-D：NLP 病历时间线构建 V14（EMR 深化四模块，M490 收官） */}
           <Route path="emr-nlp-timeline" element={<EmrNlpTimelinePage />} />
+          {/* M491-A：NLP 病历纠错 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-correction" element={<EmrNlpCorrectionPage />} />
+          {/* M491-B：NLP 病历标准化 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-normalization" element={<EmrNlpNormalizationPage />} />
+          {/* M491-C：NLP 病历去重 V14（EMR 深化四模块） */}
+          <Route path="emr-nlp-deduplication" element={<EmrNlpDeduplicationPage />} />
+          {/* M491-D：NLP 病历相似度计算 V14（EMR 深化四模块，M491 收官） */}
+          <Route path="emr-nlp-similarity" element={<EmrNlpSimilarityPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

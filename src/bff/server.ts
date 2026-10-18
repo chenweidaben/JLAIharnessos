@@ -2905,6 +2905,14 @@ import { emrNlpRelationV14Routes } from './routes/emrNlpRelationV14';
 import { emrNlpEventV14Routes } from './routes/emrNlpEventV14';
 // M490-D：NLP 病历时间线构建 V14 POST /api/v1/emr-nlp-timeline（EMR 深化四模块，M490 收官，时间线构建+聚合）
 import { emrNlpTimelineV14Routes } from './routes/emrNlpTimelineV14';
+// M491-A：NLP 病历纠错 V14 POST /api/v1/emr-nlp-correction（EMR 深化四模块，错别字纠错+报告）
+import { emrNlpCorrectionV14Routes } from './routes/emrNlpCorrectionV14';
+// M491-B：NLP 病历标准化 V14 POST /api/v1/emr-nlp-normalization（EMR 深化四模块，口语→医学术语+报告）
+import { emrNlpNormalizationV14Routes } from './routes/emrNlpNormalizationV14';
+// M491-C：NLP 病历去重 V14 POST /api/v1/emr-nlp-deduplication（EMR 深化四模块，按内容去重+报告）
+import { emrNlpDeduplicationV14Routes } from './routes/emrNlpDeduplicationV14';
+// M491-D：NLP 病历相似度计算 V14 POST /api/v1/emr-nlp-similarity（EMR 深化四模块，M491 收官，Jaccard 字符匹配）
+import { emrNlpSimilarityV14Routes } from './routes/emrNlpSimilarityV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4600,6 +4608,10 @@ const allRoutes: RouteDef[] = [
   ...emrNlpRelationV14Routes, // M490-B：NLP 病历关系抽取 V14 POST /api/v1/emr-nlp-relation（EMR 深化四模块，医学关系提取+报告）
   ...emrNlpEventV14Routes, // M490-C：NLP 病历事件提取 V14 POST /api/v1/emr-nlp-event（EMR 深化四模块，医学事件提取+报告）
   ...emrNlpTimelineV14Routes, // M490-D：NLP 病历时间线构建 V14 POST /api/v1/emr-nlp-timeline（EMR 深化四模块，M490 收官，时间线构建+聚合）
+  ...emrNlpCorrectionV14Routes, // M491-A：NLP 病历纠错 V14 POST /api/v1/emr-nlp-correction（EMR 深化四模块，错别字纠错+报告）
+  ...emrNlpNormalizationV14Routes, // M491-B：NLP 病历标准化 V14 POST /api/v1/emr-nlp-normalization（EMR 深化四模块，口语→医学术语+报告）
+  ...emrNlpDeduplicationV14Routes, // M491-C：NLP 病历去重 V14 POST /api/v1/emr-nlp-deduplication（EMR 深化四模块，按内容去重+报告）
+  ...emrNlpSimilarityV14Routes, // M491-D：NLP 病历相似度计算 V14 POST /api/v1/emr-nlp-similarity（EMR 深化四模块，M491 收官，Jaccard 字符匹配）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
