@@ -2447,6 +2447,14 @@ const DrugInventoryMgmt = lazy(() => import('@/pages/drug-inventory-mgmt'));
 const DrugExpiryMgmt = lazy(() => import('@/pages/drug-expiry-mgmt'));
 // M455-D：特殊药品管理 V13（M455 收官，药品供应与库存管理组）
 const SpecialDrugMgmt = lazy(() => import('@/pages/special-drug-mgmt'));
+// M456-A：重点学科建设管理 V13（学科建设与科研管理组）
+const DisciplineConstructionMgmt = lazy(() => import('@/pages/discipline-construction-mgmt'));
+// M456-B：科研成果转化管理 V13（学科建设与科研管理组）
+const ResearchAchievementTransformMgmt = lazy(() => import('@/pages/research-achievement-transform-mgmt'));
+// M456-C：学术交流管理 V13（学科建设与科研管理组）
+const AcademicExchangeMgmt = lazy(() => import('@/pages/academic-exchange-mgmt'));
+// M456-D：科研平台管理 V13（M456 收官，学科建设与科研管理组）
+const ResearchPlatformMgmt = lazy(() => import('@/pages/research-platform-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4835,6 +4843,14 @@ export default function AppRoutes() {
           <Route path="drug-expiry-mgmt" element={<DrugExpiryMgmt />} />
           {/* M455-D：特殊药品管理 V13（M455 收官，药品供应与库存管理组） */}
           <Route path="special-drug-mgmt" element={<SpecialDrugMgmt />} />
+          {/* M456-A：重点学科建设管理 V13（学科建设与科研管理组） */}
+          <Route path="discipline-construction-mgmt" element={<DisciplineConstructionMgmt />} />
+          {/* M456-B：科研成果转化管理 V13（学科建设与科研管理组） */}
+          <Route path="research-achievement-transform-mgmt" element={<ResearchAchievementTransformMgmt />} />
+          {/* M456-C：学术交流管理 V13（学科建设与科研管理组） */}
+          <Route path="academic-exchange-mgmt" element={<AcademicExchangeMgmt />} />
+          {/* M456-D：科研平台管理 V13（M456 收官，学科建设与科研管理组） */}
+          <Route path="research-platform-mgmt" element={<ResearchPlatformMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
