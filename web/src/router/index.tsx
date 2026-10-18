@@ -2431,6 +2431,14 @@ const NursingStaffingMgmt = lazy(() => import('@/pages/nursing-staffing-mgmt'));
 const NursingTrainingMgmt = lazy(() => import('@/pages/nursing-training-mgmt'));
 // M453-D：护理服务管理 V13（M453 收官，护理管理组）
 const NursingServiceMgmt = lazy(() => import('@/pages/nursing-service-mgmt'));
+// M454-A：门诊流程管理 V13（门急诊与手术麻醉管理组）
+const OutpatientProcessMgmt = lazy(() => import('@/pages/outpatient-process-mgmt'));
+// M454-B：急诊绿色通道管理 V13（门急诊与手术麻醉管理组）
+const EmergencyGreenChannelMgmt = lazy(() => import('@/pages/emergency-green-channel-mgmt'));
+// M454-C：手术麻醉管理 V13（门急诊与手术麻醉管理组）
+const SurgeryAnesthesiaMgmt = lazy(() => import('@/pages/surgery-anesthesia-mgmt'));
+// M454-D：ICU 管理（统计视角）V13（M454 收官，门急诊与手术麻醉管理组）
+const IcuStatsMgmt = lazy(() => import('@/pages/icu-stats-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4803,6 +4811,14 @@ export default function AppRoutes() {
           <Route path="nursing-training-mgmt" element={<NursingTrainingMgmt />} />
           {/* M453-D：护理服务管理 V13（M453 收官，护理管理组） */}
           <Route path="nursing-service-mgmt" element={<NursingServiceMgmt />} />
+          {/* M454-A：门诊流程管理 V13（门急诊与手术麻醉管理组） */}
+          <Route path="outpatient-process-mgmt" element={<OutpatientProcessMgmt />} />
+          {/* M454-B：急诊绿色通道管理 V13（门急诊与手术麻醉管理组） */}
+          <Route path="emergency-green-channel-mgmt" element={<EmergencyGreenChannelMgmt />} />
+          {/* M454-C：手术麻醉管理 V13（门急诊与手术麻醉管理组） */}
+          <Route path="surgery-anesthesia-mgmt" element={<SurgeryAnesthesiaMgmt />} />
+          {/* M454-D：ICU 管理（统计视角）V13（M454 收官，门急诊与手术麻醉管理组） */}
+          <Route path="icu-stats-mgmt" element={<IcuStatsMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
