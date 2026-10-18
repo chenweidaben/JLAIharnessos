@@ -3109,6 +3109,14 @@ const EmrCourseNodePage = lazy(() => import('@/pages/emr-course-node'));
 const EmrEventTimelinePage = lazy(() => import('@/pages/emr-event-timeline'));
 // M538-D：病历时间线导出 V14（EMR 深化四模块）
 const EmrTimelineExportPage = lazy(() => import('@/pages/emr-timeline-export'));
+// M539-A：病历模板智能推荐 V14（EMR 深化四模块）
+const EmrTemplateRecommendPage = lazy(() => import('@/pages/emr-template-recommend'));
+// M539-B：病历结构化录入辅助 V14（EMR 深化四模块）
+const EmrStructuredInputPage = lazy(() => import('@/pages/emr-structured-input'));
+// M539-C：病历常见用语快捷输入 V14（EMR 深化四模块）
+const EmrQuickPhrasePage = lazy(() => import('@/pages/emr-quick-phrase'));
+// M539-D：病历模板版本管理 V14（EMR 深化四模块）
+const EmrTemplateVersionPage = lazy(() => import('@/pages/emr-template-version'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6159,6 +6167,14 @@ export default function AppRoutes() {
           <Route path="emr-event-timeline" element={<EmrEventTimelinePage />} />
           {/* M538-D：病历时间线导出 V14（EMR 深化四模块） */}
           <Route path="emr-timeline-export" element={<EmrTimelineExportPage />} />
+          {/* M539-A：病历模板智能推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-template-recommend" element={<EmrTemplateRecommendPage />} />
+          {/* M539-B：病历结构化录入辅助 V14（EMR 深化四模块） */}
+          <Route path="emr-structured-input" element={<EmrStructuredInputPage />} />
+          {/* M539-C：病历常见用语快捷输入 V14（EMR 深化四模块） */}
+          <Route path="emr-quick-phrase" element={<EmrQuickPhrasePage />} />
+          {/* M539-D：病历模板版本管理 V14（EMR 深化四模块） */}
+          <Route path="emr-template-version" element={<EmrTemplateVersionPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

@@ -3289,6 +3289,14 @@ import { emrCourseNodeV14Routes } from './routes/emrCourseNodeV14';
 import { emrEventTimelineV14Routes } from './routes/emrEventTimelineV14';
 // M538-D：病历时间线导出 V14 GET/POST /api/v1/emr-timeline-export（EMR 深化四模块，M538 收官，病历时间轴与病程管理系列）
 import { emrTimelineExportV14Routes } from './routes/emrTimelineExportV14';
+// M539-A：病历模板智能推荐 V14 GET/POST /api/v1/emr-template-recommend（EMR 深化四模块，病历模板与结构化输入系列）
+import { emrTemplateRecommendV14Routes } from './routes/emrTemplateRecommendV14';
+// M539-B：病历结构化录入辅助 V14 GET/POST /api/v1/emr-structured-input（EMR 深化四模块，病历模板与结构化输入系列）
+import { emrStructuredInputV14Routes } from './routes/emrStructuredInputV14';
+// M539-C：病历常见用语快捷输入 V14 GET/POST /api/v1/emr-quick-phrase（EMR 深化四模块，病历模板与结构化输入系列）
+import { emrQuickPhraseV14Routes } from './routes/emrQuickPhraseV14';
+// M539-D：病历模板版本管理 V14 GET/POST /api/v1/emr-template-version（EMR 深化四模块，M539 收官，病历模板与结构化输入系列）
+import { emrTemplateVersionV14Routes } from './routes/emrTemplateVersionV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5176,6 +5184,10 @@ const allRoutes: RouteDef[] = [
   ...emrCourseNodeV14Routes, // M538-B：病程关键节点标记 V14 GET/POST /api/v1/emr-course-node（EMR 深化四模块，病历时间轴与病程管理系列）
   ...emrEventTimelineV14Routes, // M538-C：病历关键事件时间线 V14 GET/POST /api/v1/emr-event-timeline（EMR 深化四模块，病历时间轴与病程管理系列）
   ...emrTimelineExportV14Routes, // M538-D：病历时间线导出 V14 GET/POST /api/v1/emr-timeline-export（EMR 深化四模块，M538 收官，病历时间轴与病程管理系列）
+  ...emrTemplateRecommendV14Routes, // M539-A：病历模板智能推荐 V14 GET/POST /api/v1/emr-template-recommend（EMR 深化四模块，病历模板与结构化输入系列）
+  ...emrStructuredInputV14Routes, // M539-B：病历结构化录入辅助 V14 GET/POST /api/v1/emr-structured-input（EMR 深化四模块，病历模板与结构化输入系列）
+  ...emrQuickPhraseV14Routes, // M539-C：病历常见用语快捷输入 V14 GET/POST /api/v1/emr-quick-phrase（EMR 深化四模块，病历模板与结构化输入系列）
+  ...emrTemplateVersionV14Routes, // M539-D：病历模板版本管理 V14 GET/POST /api/v1/emr-template-version（EMR 深化四模块，M539 收官，病历模板与结构化输入系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
