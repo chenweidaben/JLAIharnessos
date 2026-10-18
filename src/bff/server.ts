@@ -2647,6 +2647,14 @@ import { volunteerServiceMgmtV13Routes } from './routes/volunteerServiceMgmtV13'
 import { healthEducationStatsMgmtV13Routes } from './routes/healthEducationStatsMgmtV13';
 // M457-D：社工服务管理 V13 GET /api/v1/social-work-service-mgmt（M457 收官，医院文化与公益管理组）
 import { socialWorkServiceMgmtV13Routes } from './routes/socialWorkServiceMgmtV13';
+// M458-A：日间手术管理 V13 GET /api/v1/day-surgery-mgmt（日间手术与门诊操作管理组）
+import { daySurgeryMgmtV13Routes } from './routes/daySurgeryMgmtV13';
+// M458-B：门诊小手术管理 V13 GET /api/v1/outpatient-minor-surgery-mgmt（日间手术与门诊操作管理组）
+import { outpatientMinorSurgeryMgmtV13Routes } from './routes/outpatientMinorSurgeryMgmtV13';
+// M458-C：门诊治疗室管理 V13 GET /api/v1/outpatient-treatment-room-mgmt（日间手术与门诊操作管理组）
+import { outpatientTreatmentRoomMgmtV13Routes } from './routes/outpatientTreatmentRoomMgmtV13';
+// M458-D：门诊换药管理 V13 GET /api/v1/outpatient-dressing-mgmt（M458 收官，日间手术与门诊操作管理组）
+import { outpatientDressingMgmtV13Routes } from './routes/outpatientDressingMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4213,6 +4221,10 @@ const allRoutes: RouteDef[] = [
   ...volunteerServiceMgmtV13Routes, // M457-B：志愿者服务管理 V13 GET /api/v1/volunteer-service-mgmt（医院文化与公益管理组）
   ...healthEducationStatsMgmtV13Routes, // M457-C：健康宣教管理（统计视角）V13 GET /api/v1/health-education-stats-mgmt（医院文化与公益管理组，-stats 避让）
   ...socialWorkServiceMgmtV13Routes, // M457-D：社工服务管理 V13 GET /api/v1/social-work-service-mgmt（M457 收官，医院文化与公益管理组）
+  ...daySurgeryMgmtV13Routes, // M458-A：日间手术管理 V13 GET /api/v1/day-surgery-mgmt（日间手术与门诊操作管理组）
+  ...outpatientMinorSurgeryMgmtV13Routes, // M458-B：门诊小手术管理 V13 GET /api/v1/outpatient-minor-surgery-mgmt（日间手术与门诊操作管理组）
+  ...outpatientTreatmentRoomMgmtV13Routes, // M458-C：门诊治疗室管理 V13 GET /api/v1/outpatient-treatment-room-mgmt（日间手术与门诊操作管理组）
+  ...outpatientDressingMgmtV13Routes, // M458-D：门诊换药管理 V13 GET /api/v1/outpatient-dressing-mgmt（M458 收官，日间手术与门诊操作管理组）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

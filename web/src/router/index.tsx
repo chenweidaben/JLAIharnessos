@@ -2463,6 +2463,14 @@ const VolunteerServiceMgmt = lazy(() => import('@/pages/volunteer-service-mgmt')
 const HealthEducationStatsMgmt = lazy(() => import('@/pages/health-education-stats-mgmt'));
 // M457-D：社工服务管理 V13（M457 收官，医院文化与公益管理组）
 const SocialWorkServiceMgmt = lazy(() => import('@/pages/social-work-service-mgmt'));
+// M458-A：日间手术管理 V13（日间手术与门诊操作管理组）
+const DaySurgeryMgmt = lazy(() => import('@/pages/day-surgery-mgmt'));
+// M458-B：门诊小手术管理 V13（日间手术与门诊操作管理组）
+const OutpatientMinorSurgeryMgmt = lazy(() => import('@/pages/outpatient-minor-surgery-mgmt'));
+// M458-C：门诊治疗室管理 V13（日间手术与门诊操作管理组）
+const OutpatientTreatmentRoomMgmt = lazy(() => import('@/pages/outpatient-treatment-room-mgmt'));
+// M458-D：门诊换药管理 V13（M458 收官，日间手术与门诊操作管理组）
+const OutpatientDressingMgmt = lazy(() => import('@/pages/outpatient-dressing-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4867,6 +4875,14 @@ export default function AppRoutes() {
           <Route path="health-education-stats-mgmt" element={<HealthEducationStatsMgmt />} />
           {/* M457-D：社工服务管理 V13（M457 收官，医院文化与公益管理组） */}
           <Route path="social-work-service-mgmt" element={<SocialWorkServiceMgmt />} />
+          {/* M458-A：日间手术管理 V13（日间手术与门诊操作管理组） */}
+          <Route path="day-surgery-mgmt" element={<DaySurgeryMgmt />} />
+          {/* M458-B：门诊小手术管理 V13（日间手术与门诊操作管理组） */}
+          <Route path="outpatient-minor-surgery-mgmt" element={<OutpatientMinorSurgeryMgmt />} />
+          {/* M458-C：门诊治疗室管理 V13（日间手术与门诊操作管理组） */}
+          <Route path="outpatient-treatment-room-mgmt" element={<OutpatientTreatmentRoomMgmt />} />
+          {/* M458-D：门诊换药管理 V13（M458 收官，日间手术与门诊操作管理组） */}
+          <Route path="outpatient-dressing-mgmt" element={<OutpatientDressingMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
