@@ -2311,6 +2311,14 @@ const IntegrityQualityMgmt = lazy(() => import('@/pages/integrity-quality-mgmt')
 const CommercialBriberyQualityMgmt = lazy(() => import('@/pages/commercial-bribery-quality-mgmt'));
 // M438-D：行业作风建设质量管理 V13（M438 收官，行风廉洁与职业道德建设组）
 const IndustryStyleQualityMgmt = lazy(() => import('@/pages/industry-style-quality-mgmt'));
+// M439-A：不良事件上报管理 V13（患者安全与医疗风险管理组）
+const AdverseEventReporting = lazy(() => import('@/pages/adverse-event-reporting'));
+// M439-B：跌倒坠床风险管理 V13（患者安全与医疗风险管理组）
+const FallIncident = lazy(() => import('@/pages/fall-incident'));
+// M439-C：压疮风险管理 V13（患者安全与医疗风险管理组）
+const PressureUlcer = lazy(() => import('@/pages/pressure-ulcer'));
+// M439-D：管路滑脱风险管理 V13（M439 收官，患者安全与医疗风险管理组）
+const TubeDislodgement = lazy(() => import('@/pages/tube-dislodgement'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4563,6 +4571,14 @@ export default function AppRoutes() {
           <Route path="commercial-bribery-quality-mgmt" element={<CommercialBriberyQualityMgmt />} />
           {/* M438-D：行业作风建设质量管理 V13（M438 收官，行风廉洁与职业道德建设组） */}
           <Route path="industry-style-quality-mgmt" element={<IndustryStyleQualityMgmt />} />
+          {/* M439-A：不良事件上报管理 V13（患者安全与医疗风险管理组） */}
+          <Route path="adverse-event-reporting" element={<AdverseEventReporting />} />
+          {/* M439-B：跌倒坠床风险管理 V13（患者安全与医疗风险管理组） */}
+          <Route path="fall-incident" element={<FallIncident />} />
+          {/* M439-C：压疮风险管理 V13（患者安全与医疗风险管理组） */}
+          <Route path="pressure-ulcer" element={<PressureUlcer />} />
+          {/* M439-D：管路滑脱风险管理 V13（M439 收官，患者安全与医疗风险管理组） */}
+          <Route path="tube-dislodgement" element={<TubeDislodgement />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
