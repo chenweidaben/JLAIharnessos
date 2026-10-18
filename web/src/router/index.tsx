@@ -2303,6 +2303,14 @@ const LaundryMgmt = lazy(() => import('@/pages/laundry-mgmt'));
 const EnvironmentalHygieneQualityMgmt = lazy(() => import('@/pages/environmental-hygiene-quality-mgmt'));
 // M437-D：会议室管理 V13（M437 收官，后勤保障与环境管理深化组）
 const MeetingRoomMgmt = lazy(() => import('@/pages/meeting-room-mgmt'));
+// M438-A：医德医风质量管理 V13（行风廉洁与职业道德建设组）
+const MedicalEthicsQualityMgmt = lazy(() => import('@/pages/medical-ethics-quality-mgmt'));
+// M438-B：廉洁行医质量管理 V13（行风廉洁与职业道德建设组）
+const IntegrityQualityMgmt = lazy(() => import('@/pages/integrity-quality-mgmt'));
+// M438-C：商业贿赂治理质量管理 V13（行风廉洁与职业道德建设组）
+const CommercialBriberyQualityMgmt = lazy(() => import('@/pages/commercial-bribery-quality-mgmt'));
+// M438-D：行业作风建设质量管理 V13（M438 收官，行风廉洁与职业道德建设组）
+const IndustryStyleQualityMgmt = lazy(() => import('@/pages/industry-style-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4547,6 +4555,14 @@ export default function AppRoutes() {
           <Route path="environmental-hygiene-quality-mgmt" element={<EnvironmentalHygieneQualityMgmt />} />
           {/* M437-D：会议室管理 V13（M437 收官，后勤保障与环境管理深化组） */}
           <Route path="meeting-room-mgmt" element={<MeetingRoomMgmt />} />
+          {/* M438-A：医德医风质量管理 V13（行风廉洁与职业道德建设组） */}
+          <Route path="medical-ethics-quality-mgmt" element={<MedicalEthicsQualityMgmt />} />
+          {/* M438-B：廉洁行医质量管理 V13（行风廉洁与职业道德建设组） */}
+          <Route path="integrity-quality-mgmt" element={<IntegrityQualityMgmt />} />
+          {/* M438-C：商业贿赂治理质量管理 V13（行风廉洁与职业道德建设组） */}
+          <Route path="commercial-bribery-quality-mgmt" element={<CommercialBriberyQualityMgmt />} />
+          {/* M438-D：行业作风建设质量管理 V13（M438 收官，行风廉洁与职业道德建设组） */}
+          <Route path="industry-style-quality-mgmt" element={<IndustryStyleQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
