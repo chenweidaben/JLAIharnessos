@@ -2985,6 +2985,14 @@ import { emrQcPassRateStatV14Routes } from './routes/emrQcPassRateStatV14';
 import { emrQcTimelinessStatV14Routes } from './routes/emrQcTimelinessStatV14';
 // M500-D：质控综合统计大屏 V14 GET /api/v1/emr-qc-stat-dashboard（EMR 深化四模块，M500 收官里程碑，三大指标聚合）
 import { emrQcStatDashboardV14Routes } from './routes/emrQcStatDashboardV14';
+// M501-A：质控科室对比分析 V14 GET /api/v1/emr-qc-dept-compare-analysis（EMR 深化四模块，最高分科室+差距分聚合）
+import { emrQcDeptCompareAnalysisV14Routes } from './routes/emrQcDeptCompareAnalysisV14';
+// M501-B：质控科室趋势分析 V14 GET /api/v1/emr-qc-dept-trend-analysis（EMR 深化四模块，上升科室数+下降科室数聚合）
+import { emrQcDeptTrendAnalysisV14Routes } from './routes/emrQcDeptTrendAnalysisV14';
+// M501-C：质控科室改进建议 V14 POST /api/v1/emr-qc-dept-improve-suggest（EMR 深化四模块，按评分区间生成建议）
+import { emrQcDeptImproveSuggestV14Routes } from './routes/emrQcDeptImproveSuggestV14';
+// M501-D：质控科室考核评分 V14 GET /api/v1/emr-qc-dept-assess-score（EMR 深化四模块，M501 收官，平均分+最高分科室）
+import { emrQcDeptAssessScoreV14Routes } from './routes/emrQcDeptAssessScoreV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4720,6 +4728,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcPassRateStatV14Routes, // M500-B：质控合格率统计 V14 GET /api/v1/emr-qc-pass-rate-stat（EMR 深化四模块，里程碑批次，平均合格率+科室数）
   ...emrQcTimelinessStatV14Routes, // M500-C：质控时效统计 V14 GET /api/v1/emr-qc-timeliness-stat（EMR 深化四模块，里程碑批次，全院平均耗时+科室数）
   ...emrQcStatDashboardV14Routes, // M500-D：质控综合统计大屏 V14 GET /api/v1/emr-qc-stat-dashboard（EMR 深化四模块，M500 收官里程碑，三大指标聚合）
+  ...emrQcDeptCompareAnalysisV14Routes, // M501-A：质控科室对比分析 V14 GET /api/v1/emr-qc-dept-compare-analysis（EMR 深化四模块，最高分科室+差距分聚合）
+  ...emrQcDeptTrendAnalysisV14Routes, // M501-B：质控科室趋势分析 V14 GET /api/v1/emr-qc-dept-trend-analysis（EMR 深化四模块，上升科室数+下降科室数聚合）
+  ...emrQcDeptImproveSuggestV14Routes, // M501-C：质控科室改进建议 V14 POST /api/v1/emr-qc-dept-improve-suggest（EMR 深化四模块，按评分区间生成建议）
+  ...emrQcDeptAssessScoreV14Routes, // M501-D：质控科室考核评分 V14 GET /api/v1/emr-qc-dept-assess-score（EMR 深化四模块，M501 收官，平均分+最高分科室）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
