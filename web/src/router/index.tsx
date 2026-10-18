@@ -2853,6 +2853,14 @@ const EmrQcDeptRadarChartPage = lazy(() => import('@/pages/emr-qc-dept-radar-cha
 const EmrQcMonthlyReportPage = lazy(() => import('@/pages/emr-qc-monthly-report'));
 // M506-D：质控年度总结报告 V14（EMR 深化四模块，M506 收官）
 const EmrQcAnnualSummaryReportPage = lazy(() => import('@/pages/emr-qc-annual-summary-report'));
+// M507-A：质控系统参数配置明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcSysParamDetailPage = lazy(() => import('@/pages/emr-qc-sys-param-detail'));
+// M507-B：质控操作日志查询明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcAuditLogDetailPage = lazy(() => import('@/pages/emr-qc-audit-log-detail'));
+// M507-C：质控数据字典管理明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcDataDictDetailPage = lazy(() => import('@/pages/emr-qc-data-dict-detail'));
+// M507-D：质控权限管理明细 V14（EMR 深化四模块，M507 收官，-detail 避让）
+const EmrQcPermissionDetailPage = lazy(() => import('@/pages/emr-qc-permission-detail'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5647,6 +5655,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-monthly-report" element={<EmrQcMonthlyReportPage />} />
           {/* M506-D：质控年度总结报告 V14（EMR 深化四模块，M506 收官） */}
           <Route path="emr-qc-annual-summary-report" element={<EmrQcAnnualSummaryReportPage />} />
+          {/* M507-A：质控系统参数配置明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-sys-param-detail" element={<EmrQcSysParamDetailPage />} />
+          {/* M507-B：质控操作日志查询明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-audit-log-detail" element={<EmrQcAuditLogDetailPage />} />
+          {/* M507-C：质控数据字典管理明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-data-dict-detail" element={<EmrQcDataDictDetailPage />} />
+          {/* M507-D：质控权限管理明细 V14（EMR 深化四模块，M507 收官，-detail 避让） */}
+          <Route path="emr-qc-permission-detail" element={<EmrQcPermissionDetailPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

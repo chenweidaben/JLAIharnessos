@@ -3033,6 +3033,14 @@ import { emrQcDeptRadarChartV14Routes } from './routes/emrQcDeptRadarChartV14';
 import { emrQcMonthlyReportV14Routes } from './routes/emrQcMonthlyReportV14';
 // M506-D：质控年度总结报告 V14 GET /api/v1/emr-qc-annual-summary-report（EMR 深化四模块，M506 收官，年数+总病历数+平均合格率%）
 import { emrQcAnnualSummaryReportV14Routes } from './routes/emrQcAnnualSummaryReportV14';
+// M507-A：质控系统参数配置明细 V14 GET/POST /api/v1/emr-qc-sys-param-detail（EMR 深化四模块，-detail 避让 M498-A，参数设置+查询）
+import { emrQcSysParamDetailV14Routes } from './routes/emrQcSysParamDetailV14';
+// M507-B：质控操作日志查询明细 V14 GET /api/v1/emr-qc-audit-log-detail（EMR 深化四模块，-detail 避让 M467-C/M498-B，日志搜索 keyword）
+import { emrQcAuditLogDetailV14Routes } from './routes/emrQcAuditLogDetailV14';
+// M507-C：质控数据字典管理明细 V14 GET/POST /api/v1/emr-qc-data-dict-detail（EMR 深化四模块，-detail 避让 M473-A，字典增删管理）
+import { emrQcDataDictDetailV14Routes } from './routes/emrQcDataDictDetailV14';
+// M507-D：质控权限管理明细 V14 GET/POST /api/v1/emr-qc-permission-detail（EMR 深化四模块，M507 收官，-detail 避让 M473-B/M498-D，权限分配+回收）
+import { emrQcPermissionDetailV14Routes } from './routes/emrQcPermissionDetailV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4792,6 +4800,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcDeptRadarChartV14Routes, // M506-B：质控科室对比雷达图 V14 GET /api/v1/emr-qc-dept-radar-chart（EMR 深化四模块，维度平均分+维度数）
   ...emrQcMonthlyReportV14Routes, // M506-C：质控月度报表 V14 GET /api/v1/emr-qc-monthly-report（EMR 深化四模块，月数+总病历数+总缺陷数+缺陷率%）
   ...emrQcAnnualSummaryReportV14Routes, // M506-D：质控年度总结报告 V14 GET /api/v1/emr-qc-annual-summary-report（EMR 深化四模块，M506 收官，年数+总病历数+平均合格率%）
+  ...emrQcSysParamDetailV14Routes, // M507-A：质控系统参数配置明细 V14 GET/POST /api/v1/emr-qc-sys-param-detail（EMR 深化四模块，-detail 避让 M498-A，参数设置+查询）
+  ...emrQcAuditLogDetailV14Routes, // M507-B：质控操作日志查询明细 V14 GET /api/v1/emr-qc-audit-log-detail（EMR 深化四模块，-detail 避让 M467-C/M498-B，日志搜索 keyword）
+  ...emrQcDataDictDetailV14Routes, // M507-C：质控数据字典管理明细 V14 GET/POST /api/v1/emr-qc-data-dict-detail（EMR 深化四模块，-detail 避让 M473-A，字典增删管理）
+  ...emrQcPermissionDetailV14Routes, // M507-D：质控权限管理明细 V14 GET/POST /api/v1/emr-qc-permission-detail（EMR 深化四模块，M507 收官，-detail 避让 M473-B/M498-D，权限分配+回收）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
