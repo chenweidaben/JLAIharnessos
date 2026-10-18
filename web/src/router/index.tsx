@@ -3149,6 +3149,14 @@ const EmrAiScoringPage = lazy(() => import('@/pages/emr-ai-scoring'));
 const EmrAiDefectPredictPage = lazy(() => import('@/pages/emr-ai-defect-predict'));
 // M543-D：病历AI知识推荐 V14（EMR 深化四模块，M543 收官）
 const EmrAiKnowledgeRecoPage = lazy(() => import('@/pages/emr-ai-knowledge-reco'));
+// M544-A：病历AI诊断编码建议 V14（EMR 深化四模块）
+const EmrAiDxCodingPage = lazy(() => import('@/pages/emr-ai-dx-coding'));
+// M544-B：病历AI手术编码建议 V14（EMR 深化四模块）
+const EmrAiOpCodingPage = lazy(() => import('@/pages/emr-ai-op-coding'));
+// M544-C：病历AI病案首页质控 V14（EMR 深化四模块）
+const EmrAiFrontpageQcPage = lazy(() => import('@/pages/emr-ai-frontpage-qc'));
+// M544-D：病历AI DRG分组预测 V14（EMR 深化四模块，M544 收官）
+const EmrAiDrgPredictPage = lazy(() => import('@/pages/emr-ai-drg-predict'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6239,6 +6247,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-defect-predict" element={<EmrAiDefectPredictPage />} />
           {/* M543-D：病历AI知识推荐 V14（EMR 深化四模块，M543 收官） */}
           <Route path="emr-ai-knowledge-reco" element={<EmrAiKnowledgeRecoPage />} />
+          {/* M544-A：病历AI诊断编码建议 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-dx-coding" element={<EmrAiDxCodingPage />} />
+          {/* M544-B：病历AI手术编码建议 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-op-coding" element={<EmrAiOpCodingPage />} />
+          {/* M544-C：病历AI病案首页质控 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-frontpage-qc" element={<EmrAiFrontpageQcPage />} />
+          {/* M544-D：病历AI DRG分组预测 V14（EMR 深化四模块，M544 收官） */}
+          <Route path="emr-ai-drg-predict" element={<EmrAiDrgPredictPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

@@ -3329,6 +3329,14 @@ import { emrAiScoringV14Routes } from './routes/emrAiScoringV14';
 import { emrAiDefectPredictV14Routes } from './routes/emrAiDefectPredictV14';
 // M543-D：病历AI知识推荐 V14 GET/POST /api/v1/emr-ai-knowledge-reco（EMR 深化四模块，M543 收官，病历AI辅助书写系列）
 import { emrAiKnowledgeRecoV14Routes } from './routes/emrAiKnowledgeRecoV14';
+// M544-A：病历AI诊断编码建议 V14 GET/POST /api/v1/emr-ai-dx-coding（EMR 深化四模块，病历AI辅助编码与DRG系列）
+import { emrAiDxCodingV14Routes } from './routes/emrAiDxCodingV14';
+// M544-B：病历AI手术编码建议 V14 GET/POST /api/v1/emr-ai-op-coding（EMR 深化四模块，病历AI辅助编码与DRG系列）
+import { emrAiOpCodingV14Routes } from './routes/emrAiOpCodingV14';
+// M544-C：病历AI病案首页质控 V14 GET/POST /api/v1/emr-ai-frontpage-qc（EMR 深化四模块，病历AI辅助编码与DRG系列）
+import { emrAiFrontpageQcV14Routes } from './routes/emrAiFrontpageQcV14';
+// M544-D：病历AI DRG分组预测 V14 GET/POST /api/v1/emr-ai-drg-predict（EMR 深化四模块，M544 收官，病历AI辅助编码与DRG系列）
+import { emrAiDrgPredictV14Routes } from './routes/emrAiDrgPredictV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5236,6 +5244,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiScoringV14Routes, // M543-B：病历AI质控评分 V14 GET/POST /api/v1/emr-ai-scoring（EMR 深化四模块，病历AI辅助书写系列）
   ...emrAiDefectPredictV14Routes, // M543-C：病历AI缺陷预测 V14 GET/POST /api/v1/emr-ai-defect-predict（EMR 深化四模块，病历AI辅助书写系列）
   ...emrAiKnowledgeRecoV14Routes, // M543-D：病历AI知识推荐 V14 GET/POST /api/v1/emr-ai-knowledge-reco（EMR 深化四模块，M543 收官，病历AI辅助书写系列）
+  ...emrAiDxCodingV14Routes, // M544-A：病历AI诊断编码建议 V14 GET/POST /api/v1/emr-ai-dx-coding（EMR 深化四模块，病历AI辅助编码与DRG系列）
+  ...emrAiOpCodingV14Routes, // M544-B：病历AI手术编码建议 V14 GET/POST /api/v1/emr-ai-op-coding（EMR 深化四模块，病历AI辅助编码与DRG系列）
+  ...emrAiFrontpageQcV14Routes, // M544-C：病历AI病案首页质控 V14 GET/POST /api/v1/emr-ai-frontpage-qc（EMR 深化四模块，病历AI辅助编码与DRG系列）
+  ...emrAiDrgPredictV14Routes, // M544-D：病历AI DRG分组预测 V14 GET/POST /api/v1/emr-ai-drg-predict（EMR 深化四模块，M544 收官，病历AI辅助编码与DRG系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
