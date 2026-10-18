@@ -3361,6 +3361,14 @@ import { emrAiPatientEduV14Routes } from './routes/emrAiPatientEduV14';
 import { emrAiReferralSuggestV14Routes } from './routes/emrAiReferralSuggestV14';
 // M547-D：病历AI复诊提醒 V14 GET/POST /api/v1/emr-ai-followup-remind（EMR 深化四模块，M547 收官，病历AI质量改进与反馈闭环系列）
 import { emrAiFollowupRemindV14Routes } from './routes/emrAiFollowupRemindV14';
+// M548-A：病历AI质控周报生成 V14 GET/POST /api/v1/emr-ai-qc-weekly-report（EMR 深化四模块，病历AI质控报告周期系列）
+import { emrAiQcWeeklyReportV14Routes } from './routes/emrAiQcWeeklyReportV14';
+// M548-B：病历AI质控月报生成 V14 GET/POST /api/v1/emr-ai-qc-monthly-report（EMR 深化四模块，病历AI质控报告周期系列）
+import { emrAiQcMonthlyReportV14Routes } from './routes/emrAiQcMonthlyReportV14';
+// M548-C：病历AI质控季报生成 V14 GET/POST /api/v1/emr-ai-qc-quarterly-report（EMR 深化四模块，病历AI质控报告周期系列）
+import { emrAiQcQuarterlyReportV14Routes } from './routes/emrAiQcQuarterlyReportV14';
+// M548-D：病历AI质控年报生成 V14 GET/POST /api/v1/emr-ai-qc-annual-report（EMR 深化四模块，M548 收官，病历AI质控报告周期系列）
+import { emrAiQcAnnualReportV14Routes } from './routes/emrAiQcAnnualReportV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5284,6 +5292,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiPatientEduV14Routes, // M547-B：病历AI患者教育材料生成 V14 GET/POST /api/v1/emr-ai-patient-edu（EMR 深化四模块，病历AI质量改进与反馈闭环系列）
   ...emrAiReferralSuggestV14Routes, // M547-C：病历AI转诊建议 V14 GET/POST /api/v1/emr-ai-referral-suggest（EMR 深化四模块，病历AI质量改进与反馈闭环系列）
   ...emrAiFollowupRemindV14Routes, // M547-D：病历AI复诊提醒 V14 GET/POST /api/v1/emr-ai-followup-remind（EMR 深化四模块，M547 收官，病历AI质量改进与反馈闭环系列）
+  ...emrAiQcWeeklyReportV14Routes, // M548-A：病历AI质控周报生成 V14 GET/POST /api/v1/emr-ai-qc-weekly-report（EMR 深化四模块，病历AI质控报告周期系列）
+  ...emrAiQcMonthlyReportV14Routes, // M548-B：病历AI质控月报生成 V14 GET/POST /api/v1/emr-ai-qc-monthly-report（EMR 深化四模块，病历AI质控报告周期系列）
+  ...emrAiQcQuarterlyReportV14Routes, // M548-C：病历AI质控季报生成 V14 GET/POST /api/v1/emr-ai-qc-quarterly-report（EMR 深化四模块，病历AI质控报告周期系列）
+  ...emrAiQcAnnualReportV14Routes, // M548-D：病历AI质控年报生成 V14 GET/POST /api/v1/emr-ai-qc-annual-report（EMR 深化四模块，M548 收官，病历AI质控报告周期系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
