@@ -2801,6 +2801,14 @@ import { emrLogicValidationV14Routes } from './routes/emrLogicValidationV14';
 import { emrTerminologyV14Routes } from './routes/emrTerminologyV14';
 // M477-D：病历模板质控联动 V14 GET /api/v1/emr-template-qc-link（EMR 深化四模块，M477 收官，模板-质控规则关联）
 import { emrTemplateQcLinkV14Routes } from './routes/emrTemplateQcLinkV14';
+// M478-A：病历审核工作流 V14 GET+POST /api/v1/emr-review-workflow（EMR 深化四模块，状态机 pending→reviewing→approved/rejected）
+import { emrReviewWorkflowV14Routes } from './routes/emrReviewWorkflowV14';
+// M478-B：病历归档规则 V14 GET /api/v1/emr-archive-rule（EMR 深化四模块，归档条件 daysSinceDischarge>=30 且 reviewed=true）
+import { emrArchiveRuleV14Routes } from './routes/emrArchiveRuleV14';
+// M478-C：病历打印规范 V14 GET /api/v1/emr-print-spec（EMR 深化四模块，合规条件 A4 + 水印）
+import { emrPrintSpecV14Routes } from './routes/emrPrintSpecV14';
+// M478-D：病历质控报表中心 V14 GET+POST /api/v1/emr-qc-report-center（EMR 深化四模块，M478 收官，报表目录+生成）
+import { emrQcReportCenterV14Routes } from './routes/emrQcReportCenterV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4444,6 +4452,10 @@ const allRoutes: RouteDef[] = [
   ...emrLogicValidationV14Routes, // M477-B：病历逻辑校验 V14 POST /api/v1/emr-logic-validation（EMR 深化四模块，诊断-治疗-用药逻辑匹配）
   ...emrTerminologyV14Routes, // M477-C：病历术语规范 V14 POST /api/v1/emr-terminology（EMR 深化四模块，口语化术语识别+标准化转换）
   ...emrTemplateQcLinkV14Routes, // M477-D：病历模板质控联动 V14 GET /api/v1/emr-template-qc-link（EMR 深化四模块，M477 收官，模板-质控规则关联）
+  ...emrReviewWorkflowV14Routes, // M478-A：病历审核工作流 V14 GET+POST /api/v1/emr-review-workflow（EMR 深化四模块，状态机 pending→reviewing→approved/rejected）
+  ...emrArchiveRuleV14Routes, // M478-B：病历归档规则 V14 GET /api/v1/emr-archive-rule（EMR 深化四模块，归档条件 daysSinceDischarge>=30 且 reviewed=true）
+  ...emrPrintSpecV14Routes, // M478-C：病历打印规范 V14 GET /api/v1/emr-print-spec（EMR 深化四模块，合规条件 A4 + 水印）
+  ...emrQcReportCenterV14Routes, // M478-D：病历质控报表中心 V14 GET+POST /api/v1/emr-qc-report-center（EMR 深化四模块，M478 收官，报表目录+生成）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
