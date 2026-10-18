@@ -2673,6 +2673,14 @@ import { emrDefectStatsV14Routes } from './routes/emrDefectStatsV14';
 import { emrTemplateReviewV14Routes } from './routes/emrTemplateReviewV14';
 // M461-D：科室病历质控评分排名 V14 GET /api/v1/emr-qc-ranking（EMR 深化四模块，M461 收官）
 import { emrQcRankingV14Routes } from './routes/emrQcRankingV14';
+// M462-A：病历 AI 草稿生成 V14 POST /api/v1/emr-draft-gen（EMR 深化四模块，模板填充不调 LLM）
+import { emrDraftGenV14Routes } from './routes/emrDraftGenV14';
+// M462-B：病历归档与封存管理 V14 GET/POST /api/v1/emr-archive（EMR 深化四模块，出院满7天可归档）
+import { emrArchiveV14Routes } from './routes/emrArchiveV14';
+// M462-C：病历借阅复印管理 V14 GET/POST /api/v1/emr-borrow（EMR 深化四模块，借阅状态机+应还日期）
+import { emrBorrowV14Routes } from './routes/emrBorrowV14';
+// M462-D：电子病历等级评审仪表盘 V14 GET /api/v1/emr-grade-dashboard（EMR 深化四模块，M462 收官）
+import { emrGradeDashboardV14Routes } from './routes/emrGradeDashboardV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4252,6 +4260,10 @@ const allRoutes: RouteDef[] = [
   ...emrDefectStatsV14Routes, // M461-B：病历缺陷统计分析 V14 GET /api/v1/emr-defect-stats（EMR 深化四模块，按严重度+按科室）
   ...emrTemplateReviewV14Routes, // M461-C：模板版本审核工作流 V14 GET/POST/PUT /api/v1/emr-template-review（EMR 深化四模块，审核状态机）
   ...emrQcRankingV14Routes, // M461-D：科室病历质控评分排名 V14 GET /api/v1/emr-qc-ranking（EMR 深化四模块，M461 收官）
+  ...emrDraftGenV14Routes, // M462-A：病历 AI 草稿生成 V14 POST /api/v1/emr-draft-gen（EMR 深化四模块，模板填充不调 LLM）
+  ...emrArchiveV14Routes, // M462-B：病历归档与封存管理 V14 GET/POST /api/v1/emr-archive（EMR 深化四模块，出院满7天可归档）
+  ...emrBorrowV14Routes, // M462-C：病历借阅复印管理 V14 GET/POST /api/v1/emr-borrow（EMR 深化四模块，借阅状态机+应还日期）
+  ...emrGradeDashboardV14Routes, // M462-D：电子病历等级评审仪表盘 V14 GET /api/v1/emr-grade-dashboard（EMR 深化四模块，M462 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
