@@ -2359,6 +2359,14 @@ const SalaryDistributionMgmt = lazy(() => import('@/pages/salary-distribution-mg
 const RecruitmentMgmt = lazy(() => import('@/pages/recruitment-mgmt'));
 // M444-D：员工培训发展管理 V13（M444 收官，绩效薪酬与人力资源管理组）
 const StaffTrainingDevelopmentMgmt = lazy(() => import('@/pages/staff-training-development-mgmt'));
+// M445-A：医保费用管控 V13（医保物价与费用管理组）
+const InsuranceCostControl = lazy(() => import('@/pages/insurance-cost-control'));
+// M445-B：医疗服务价格管理 V13（医保物价与费用管理组）
+const PriceMgmt = lazy(() => import('@/pages/price-mgmt'));
+// M445-C：医疗费用审核 V13（医保物价与费用管理组）
+const ExpenseAudit = lazy(() => import('@/pages/expense-audit'));
+// M445-D：DRG/DIP 管理 V13（M445 收官，医保物价与费用管理组）
+const DrgDipMgmt = lazy(() => import('@/pages/drg-dip-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4659,6 +4667,14 @@ export default function AppRoutes() {
           <Route path="recruitment-mgmt" element={<RecruitmentMgmt />} />
           {/* M444-D：员工培训发展管理 V13（M444 收官，绩效薪酬与人力资源管理组） */}
           <Route path="staff-training-development-mgmt" element={<StaffTrainingDevelopmentMgmt />} />
+          {/* M445-A：医保费用管控 V13（医保物价与费用管理组） */}
+          <Route path="insurance-cost-control" element={<InsuranceCostControl />} />
+          {/* M445-B：医疗服务价格管理 V13（医保物价与费用管理组） */}
+          <Route path="price-mgmt" element={<PriceMgmt />} />
+          {/* M445-C：医疗费用审核 V13（医保物价与费用管理组） */}
+          <Route path="expense-audit" element={<ExpenseAudit />} />
+          {/* M445-D：DRG/DIP 管理 V13（M445 收官，医保物价与费用管理组） */}
+          <Route path="drg-dip-mgmt" element={<DrgDipMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
