@@ -3273,6 +3273,14 @@ import { emrQualityTrendV14Routes } from './routes/emrQualityTrendV14';
 import { emrQualityCompareV14Routes } from './routes/emrQualityCompareV14';
 // M536-D：病历质量改进建议 V14 GET/POST /api/v1/emr-quality-improve（EMR 深化四模块，M536 收官，病历质量综合评价与持续改进系列）
 import { emrQualityImproveV14Routes } from './routes/emrQualityImproveV14';
+// M537-A：病历合理用药审查 V14 GET/POST /api/v1/emr-medication-review（EMR 深化四模块，病历临床决策支持系列）
+import { emrMedicationReviewV14Routes } from './routes/emrMedicationReviewV14';
+// M537-B：病历临床路径符合性检查 V14 GET/POST /api/v1/emr-pathway-check（EMR 深化四模块，病历临床决策支持系列）
+import { emrPathwayCheckV14Routes } from './routes/emrPathwayCheckV14';
+// M537-C：病历检验异常值提醒 V14 GET/POST /api/v1/emr-lab-alert（EMR 深化四模块，病历临床决策支持系列）
+import { emrLabAlertV14Routes } from './routes/emrLabAlertV14';
+// M537-D：病历诊断完整性检查 V14 GET/POST /api/v1/emr-diagnosis-complete（EMR 深化四模块，M537 收官，病历临床决策支持系列）
+import { emrDiagnosisCompleteV14Routes } from './routes/emrDiagnosisCompleteV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5152,6 +5160,10 @@ const allRoutes: RouteDef[] = [
   ...emrQualityTrendV14Routes, // M536-B：病历质量趋势分析 V14 GET/POST /api/v1/emr-quality-trend（EMR 深化四模块，病历质量综合评价与持续改进系列）
   ...emrQualityCompareV14Routes, // M536-C：病历质量科室对比 V14 GET/POST /api/v1/emr-quality-compare（EMR 深化四模块，病历质量综合评价与持续改进系列）
   ...emrQualityImproveV14Routes, // M536-D：病历质量改进建议 V14 GET/POST /api/v1/emr-quality-improve（EMR 深化四模块，M536 收官，病历质量综合评价与持续改进系列）
+  ...emrMedicationReviewV14Routes, // M537-A：病历合理用药审查 V14 GET/POST /api/v1/emr-medication-review（EMR 深化四模块，病历临床决策支持系列）
+  ...emrPathwayCheckV14Routes, // M537-B：病历临床路径符合性检查 V14 GET/POST /api/v1/emr-pathway-check（EMR 深化四模块，病历临床决策支持系列）
+  ...emrLabAlertV14Routes, // M537-C：病历检验异常值提醒 V14 GET/POST /api/v1/emr-lab-alert（EMR 深化四模块，病历临床决策支持系列）
+  ...emrDiagnosisCompleteV14Routes, // M537-D：病历诊断完整性检查 V14 GET/POST /api/v1/emr-diagnosis-complete（EMR 深化四模块，M537 收官，病历临床决策支持系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
