@@ -3265,6 +3265,14 @@ import { emrHomepageLogicV14Routes } from './routes/emrHomepageLogicV14';
 import { emrDrgPredictV14Routes } from './routes/emrDrgPredictV14';
 // M535-D：DIP分值预测 V14 GET/POST /api/v1/emr-dip-predict（EMR 深化四模块，M535 收官，病案首页与DRG/DIP对接系列）
 import { emrDipPredictV14Routes } from './routes/emrDipPredictV14';
+// M536-A：病历质量综合评分 V14 GET/POST /api/v1/emr-quality-score-comprehensive（EMR 深化四模块，病历质量综合评价与持续改进系列，避让 M465-B -comprehensive）
+import { emrQualityScoreComprehensiveV14Routes } from './routes/emrQualityScoreComprehensiveV14';
+// M536-B：病历质量趋势分析 V14 GET/POST /api/v1/emr-quality-trend（EMR 深化四模块，病历质量综合评价与持续改进系列）
+import { emrQualityTrendV14Routes } from './routes/emrQualityTrendV14';
+// M536-C：病历质量科室对比 V14 GET/POST /api/v1/emr-quality-compare（EMR 深化四模块，病历质量综合评价与持续改进系列）
+import { emrQualityCompareV14Routes } from './routes/emrQualityCompareV14';
+// M536-D：病历质量改进建议 V14 GET/POST /api/v1/emr-quality-improve（EMR 深化四模块，M536 收官，病历质量综合评价与持续改进系列）
+import { emrQualityImproveV14Routes } from './routes/emrQualityImproveV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5140,6 +5148,10 @@ const allRoutes: RouteDef[] = [
   ...emrHomepageLogicV14Routes, // M535-B：病案首页逻辑校验 V14 GET/POST /api/v1/emr-homepage-logic（EMR 深化四模块，病案首页与DRG/DIP对接系列）
   ...emrDrgPredictV14Routes, // M535-C：DRG入组预测 V14 GET/POST /api/v1/emr-drg-predict（EMR 深化四模块，病案首页与DRG/DIP对接系列）
   ...emrDipPredictV14Routes, // M535-D：DIP分值预测 V14 GET/POST /api/v1/emr-dip-predict（EMR 深化四模块，M535 收官，病案首页与DRG/DIP对接系列）
+  ...emrQualityScoreComprehensiveV14Routes, // M536-A：病历质量综合评分 V14 GET/POST /api/v1/emr-quality-score-comprehensive（EMR 深化四模块，病历质量综合评价与持续改进系列，避让 M465-B -comprehensive）
+  ...emrQualityTrendV14Routes, // M536-B：病历质量趋势分析 V14 GET/POST /api/v1/emr-quality-trend（EMR 深化四模块，病历质量综合评价与持续改进系列）
+  ...emrQualityCompareV14Routes, // M536-C：病历质量科室对比 V14 GET/POST /api/v1/emr-quality-compare（EMR 深化四模块，病历质量综合评价与持续改进系列）
+  ...emrQualityImproveV14Routes, // M536-D：病历质量改进建议 V14 GET/POST /api/v1/emr-quality-improve（EMR 深化四模块，M536 收官，病历质量综合评价与持续改进系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

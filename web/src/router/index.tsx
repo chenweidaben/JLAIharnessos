@@ -3085,6 +3085,14 @@ const EmrHomepageLogicPage = lazy(() => import('@/pages/emr-homepage-logic'));
 const EmrDrgPredictPage = lazy(() => import('@/pages/emr-drg-predict'));
 // M535-D：DIP分值预测 V14（EMR 深化四模块）
 const EmrDipPredictPage = lazy(() => import('@/pages/emr-dip-predict'));
+// M536-A：病历质量综合评分 V14（EMR 深化四模块，避让 M465-B -comprehensive）
+const EmrQualityScoreComprehensivePage = lazy(() => import('@/pages/emr-quality-score-comprehensive'));
+// M536-B：病历质量趋势分析 V14（EMR 深化四模块）
+const EmrQualityTrendPage = lazy(() => import('@/pages/emr-quality-trend'));
+// M536-C：病历质量科室对比 V14（EMR 深化四模块）
+const EmrQualityComparePage = lazy(() => import('@/pages/emr-quality-compare'));
+// M536-D：病历质量改进建议 V14（EMR 深化四模块）
+const EmrQualityImprovePage = lazy(() => import('@/pages/emr-quality-improve'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6111,6 +6119,14 @@ export default function AppRoutes() {
           <Route path="emr-drg-predict" element={<EmrDrgPredictPage />} />
           {/* M535-D：DIP分值预测 V14（EMR 深化四模块） */}
           <Route path="emr-dip-predict" element={<EmrDipPredictPage />} />
+          {/* M536-A：病历质量综合评分 V14（EMR 深化四模块，避让 M465-B -comprehensive） */}
+          <Route path="emr-quality-score-comprehensive" element={<EmrQualityScoreComprehensivePage />} />
+          {/* M536-B：病历质量趋势分析 V14（EMR 深化四模块） */}
+          <Route path="emr-quality-trend" element={<EmrQualityTrendPage />} />
+          {/* M536-C：病历质量科室对比 V14（EMR 深化四模块） */}
+          <Route path="emr-quality-compare" element={<EmrQualityComparePage />} />
+          {/* M536-D：病历质量改进建议 V14（EMR 深化四模块） */}
+          <Route path="emr-quality-improve" element={<EmrQualityImprovePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
