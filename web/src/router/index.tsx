@@ -2549,6 +2549,14 @@ const EmrRootCausePage = lazy(() => import('@/pages/emr-root-cause'));
 const EmrTemplateUsagePage = lazy(() => import('@/pages/emr-template-usage'));
 // M468-D：病历质控 PDCA 循环管理 V14（EMR 深化四模块，M468 收官）
 const EmrPdcaPage = lazy(() => import('@/pages/emr-pdca'));
+// M469-A：病历质控指标预警阈值配置 V14（EMR 深化四模块）
+const EmrAlertThresholdPage = lazy(() => import('@/pages/emr-alert-threshold'));
+// M469-B：病历科室质控对比分析 V14（EMR 深化四模块）
+const EmrDeptComparePage = lazy(() => import('@/pages/emr-dept-compare'));
+// M469-C：病历书写规范知识库 V14（EMR 深化四模块）
+const EmrWritingStandardPage = lazy(() => import('@/pages/emr-writing-standard'));
+// M469-D：病历质控满意度调查 V14（EMR 深化四模块，M469 收官）
+const EmrSatisfactionPage = lazy(() => import('@/pages/emr-satisfaction'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5038,6 +5046,14 @@ export default function AppRoutes() {
           <Route path="emr-template-usage" element={<EmrTemplateUsagePage />} />
           {/* M468-D：病历质控 PDCA 循环管理 V14（EMR 深化四模块，M468 收官） */}
           <Route path="emr-pdca" element={<EmrPdcaPage />} />
+          {/* M469-A：病历质控指标预警阈值配置 V14（EMR 深化四模块） */}
+          <Route path="emr-alert-threshold" element={<EmrAlertThresholdPage />} />
+          {/* M469-B：病历科室质控对比分析 V14（EMR 深化四模块） */}
+          <Route path="emr-dept-compare" element={<EmrDeptComparePage />} />
+          {/* M469-C：病历书写规范知识库 V14（EMR 深化四模块） */}
+          <Route path="emr-writing-standard" element={<EmrWritingStandardPage />} />
+          {/* M469-D：病历质控满意度调查 V14（EMR 深化四模块，M469 收官） */}
+          <Route path="emr-satisfaction" element={<EmrSatisfactionPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
