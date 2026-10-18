@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 健澜科技数智医院智能体 - 医疗工具Mock数据
  *
  * 提供真实可信的模拟医疗数据，供工具开发和测试使用。
@@ -1286,232 +1286,19 @@ export const MOCK_DRUG_INTERACTIONS: MockDrugInteraction[] = [
   },
 ];
 
+
 // ============================================================================
-// 病历模板Mock数据
+// 病历模板种子数据（L0 国标 43 类文书）
+// 内容迁移至 src/medical-tools/emr/templates/ 目录，此处 re-export 保持旧导入名兼容。
 // ============================================================================
 
-export interface MockTemplateField {
-  fieldName: string;
-  fieldType: 'text' | 'select' | 'date' | 'number' | 'table';
-  required: boolean;
-  options?: string[];
-  placeholder: string;
-}
+import { NATIONAL_TEMPLATES, type EmrSeedTemplate, type TemplateField } from './emr/templates/index.js';
 
-export interface MockMedicalTemplate {
-  templateId: string;
-  name: string;
-  recordType: string;
-  scope: string;
-  department: string | null;
-  content: string;
-  fields: MockTemplateField[];
-  version: string;
-  updatedAt: string;
-}
+/** @deprecated 使用 ./emr/templates 目录；保留别名兼容旧导入 */
+export type MockTemplateField = TemplateField;
+/** @deprecated 使用 EmrSeedTemplate */
+export type MockMedicalTemplate = EmrSeedTemplate;
 
-export const MOCK_MEDICAL_TEMPLATES: MockMedicalTemplate[] = [
-  {
-    templateId: 'TPL-OP-001',
-    name: '通用门诊病历模板',
-    recordType: '门诊病历',
-    scope: 'hospital',
-    department: null,
-    content: `主诉：[主诉]
-现病史：[现病史，包括起病时间、主要症状、伴随症状、诊疗经过、一般情况]
-既往史：[既往疾病史、手术史、外伤史、输血史、过敏史、预防接种史]
-个人史及家族史：[个人史、婚育史、家族史]
-体格检查：T [体温]℃，P [脉搏]次/分，R [呼吸]次/分，BP [血压]mmHg
-一般情况：[神志、精神、面容]
-皮肤黏膜：[颜色、皮疹、出血点]
-淋巴结：[全身浅表淋巴结]
-头部及其器官：[头颅、眼睑、结膜、瞳孔、耳鼻咽喉]
-颈部：[柔软、抵抗、颈静脉、气管、甲状腺]
-胸部：
-  肺：[视诊、触诊、叩诊、听诊]
-  心：[视诊、触诊、叩诊、听诊]
-腹部：[视诊、触诊、叩诊、听诊]
-肛门直肠及外生殖器：[按需检查]
-脊柱四肢：[脊柱、四肢、关节]
-神经系统：[生理反射、病理反射]
-辅助检查：[相关检查结果]
-初步诊断：[诊断1]；[诊断2]
-处理意见：[治疗方案、用药、检查、随访建议]
-医生签名：[医生姓名]`,
-    fields: [
-      {
-        fieldName: 'chiefComplaint',
-        fieldType: 'text',
-        required: true,
-        placeholder: '主诉（症状+持续时间）',
-      },
-      { fieldName: 'presentIllness', fieldType: 'text', required: true, placeholder: '现病史' },
-      { fieldName: 'pastHistory', fieldType: 'text', required: true, placeholder: '既往史' },
-      { fieldName: 'physicalExam', fieldType: 'text', required: true, placeholder: '体格检查' },
-      { fieldName: 'diagnosis', fieldType: 'text', required: true, placeholder: '初步诊断' },
-      { fieldName: 'treatment', fieldType: 'text', required: true, placeholder: '处理意见' },
-    ],
-    version: 'v2.1',
-    updatedAt: '2026-06-01',
-  },
-  {
-    templateId: 'TPL-AD-001',
-    name: '入院记录模板',
-    recordType: '入院记录',
-    scope: 'hospital',
-    department: null,
-    content: `患者[姓名]，[性别]，[年龄]岁，因"[主诉]"于[入院日期]入院。
-现病史：[详细描述起病情况、主要症状特点、伴随症状、诊疗经过、病情变化、一般情况]
-既往史：[既往健康状况、疾病史、手术史、外伤史、输血史、过敏史、预防接种史]
-个人史：[出生地、居住地、职业、烟酒嗜好、毒物接触史]
-婚育史：[婚姻状况、生育情况、月经史（女性）]
-家族史：[父母、兄弟姐妹健康状况，家族中类似疾病、遗传病史]
-体格检查：
-T [体温]℃，P [脉搏]次/分，R [呼吸]次/分，BP [血压]mmHg，身高[身高]cm，体重[体重]kg
-一般情况：[发育、营养、神志、精神、面容、体位、查体合作度]
-皮肤黏膜：[颜色、温度、湿度、弹性、皮疹、出血点、蜘蛛痣、肝掌]
-淋巴结：[全身浅表淋巴结有无肿大]
-头部及其器官：[头颅、眼睑、结膜、巩膜、瞳孔、耳鼻咽喉、口腔]
-颈部：[柔软/抵抗、颈静脉、气管位置、甲状腺]
-胸部：
-  胸廓：[对称/畸形、呼吸动度]
-  肺：[语颤、叩诊音、呼吸音、啰音、胸膜摩擦音]
-  心：[心前区隆起、心尖搏动、震颤、心界、心率、心律、心音、杂音、心包摩擦音]
-腹部：[视诊、触诊（压痛、反跳痛、包块、肝脾）、叩诊、听诊]
-肛门直肠及外生殖器：[按需检查，未查注明]
-脊柱四肢：[脊柱生理弯曲、活动度、四肢形态、关节、水肿、甲床]
-神经系统：[意识、言语、颅神经、运动、感觉、反射、病理征]
-辅助检查：[入院前及入院后重要检查结果，注明日期和检查机构]
-初步诊断：[主要诊断]
-  [次要诊断1]
-  [次要诊断2]
-诊断依据：[症状、体征、辅助检查依据]
-鉴别诊断：[需鉴别的疾病及鉴别要点]
-诊疗计划：1.[护理级别、饮食]；2.[完善检查]；3.[治疗方案]；4.[病情监测]
-记录者：[住院医师]
-审签者：[上级医师]`,
-    fields: [
-      { fieldName: 'chiefComplaint', fieldType: 'text', required: true, placeholder: '主诉' },
-      {
-        fieldName: 'presentIllness',
-        fieldType: 'text',
-        required: true,
-        placeholder: '现病史（不少于300字）',
-      },
-      { fieldName: 'pastHistory', fieldType: 'text', required: true, placeholder: '既往史' },
-      { fieldName: 'personalHistory', fieldType: 'text', required: false, placeholder: '个人史' },
-      { fieldName: 'familyHistory', fieldType: 'text', required: false, placeholder: '家族史' },
-      {
-        fieldName: 'physicalExam',
-        fieldType: 'text',
-        required: true,
-        placeholder: '体格检查（系统完整）',
-      },
-      { fieldName: 'auxiliaryExam', fieldType: 'text', required: true, placeholder: '辅助检查' },
-      { fieldName: 'diagnosis', fieldType: 'text', required: true, placeholder: '初步诊断' },
-      { fieldName: 'diagnosticBasis', fieldType: 'text', required: true, placeholder: '诊断依据' },
-      {
-        fieldName: 'differentialDiagnosis',
-        fieldType: 'text',
-        required: false,
-        placeholder: '鉴别诊断',
-      },
-      { fieldName: 'treatmentPlan', fieldType: 'text', required: true, placeholder: '诊疗计划' },
-    ],
-    version: 'v3.0',
-    updatedAt: '2026-05-15',
-  },
-  {
-    templateId: 'TPL-PN-001',
-    name: '首次病程记录模板',
-    recordType: '病程记录',
-    scope: 'hospital',
-    department: null,
-    content: `[日期时间] 首次病程记录
-病例特点：
-1.患者[姓名]，[性别]，[年龄]岁，[职业]。因"[主诉]"入院。
-2.病史要点：[简要病史]
-3.体格检查：T [体温]，P [脉搏]，R [呼吸]，BP [血压]。[阳性体征和重要阴性体征]
-4.辅助检查：[重要检查结果]
-拟诊讨论：
-（一）初步诊断：[诊断]
-（二）诊断依据：1.[症状]；2.[体征]；3.[辅助检查]
-（三）鉴别诊断：
-1.[疾病1]：[鉴别要点]
-2.[疾病2]：[鉴别要点]
-诊疗计划：
-1.[护理级别、饮食]
-2.[完善检查项目]
-3.[治疗方案，包括药物、手术、监护等]
-4.[病情监测要点]
-5.[健康教育及注意事项]
-医师签名：[医师姓名]`,
-    fields: [
-      { fieldName: 'caseFeatures', fieldType: 'text', required: true, placeholder: '病例特点' },
-      { fieldName: 'diagnosis', fieldType: 'text', required: true, placeholder: '初步诊断' },
-      { fieldName: 'diagnosticBasis', fieldType: 'text', required: true, placeholder: '诊断依据' },
-      {
-        fieldName: 'differentialDiagnosis',
-        fieldType: 'text',
-        required: true,
-        placeholder: '鉴别诊断',
-      },
-      { fieldName: 'treatmentPlan', fieldType: 'text', required: true, placeholder: '诊疗计划' },
-    ],
-    version: 'v2.0',
-    updatedAt: '2026-04-20',
-  },
-  {
-    templateId: 'TPL-DS-001',
-    name: '出院小结模板',
-    recordType: '出院小结',
-    scope: 'hospital',
-    department: null,
-    content: `入院日期：[入院日期]
-出院日期：[出院日期]
-住院天数：[天数]天
-入院诊断：[入院诊断]
-出院诊断：[出院诊断，按主次排列]
-入院情况：[入院时主要症状、体征、辅助检查]
-诊疗经过：[住院期间主要检查、治疗、手术情况，病情变化]
-出院情况：[出院时症状、体征、重要检查结果]
-出院医嘱：
-1.休息与活动：[建议]
-2.饮食：[饮食建议]
-3.用药：[药品名称、剂量、用法、疗程]
-4.复诊：[复诊时间、科室、注意事项]
-5.其他：[特殊注意事项、健康教育]
-主管医师：[医师姓名]
-主任医师：[主任姓名]`,
-    fields: [
-      {
-        fieldName: 'admissionDiagnosis',
-        fieldType: 'text',
-        required: true,
-        placeholder: '入院诊断',
-      },
-      {
-        fieldName: 'dischargeDiagnosis',
-        fieldType: 'text',
-        required: true,
-        placeholder: '出院诊断',
-      },
-      {
-        fieldName: 'admissionCondition',
-        fieldType: 'text',
-        required: true,
-        placeholder: '入院情况',
-      },
-      { fieldName: 'treatmentCourse', fieldType: 'text', required: true, placeholder: '诊疗经过' },
-      {
-        fieldName: 'dischargeCondition',
-        fieldType: 'text',
-        required: true,
-        placeholder: '出院情况',
-      },
-      { fieldName: 'dischargeOrders', fieldType: 'text', required: true, placeholder: '出院医嘱' },
-    ],
-    version: 'v2.2',
-    updatedAt: '2026-07-10',
-  },
-];
+/** L0 国标全流程模板种子（43 类文书）。 */
+export const MOCK_MEDICAL_TEMPLATES: EmrSeedTemplate[] = NATIONAL_TEMPLATES;
+

@@ -18,6 +18,7 @@ import { generateMedicalRecordTool } from './emr/generateMedicalRecord.js';
 import { getMedicalRecordTool } from './emr/getMedicalRecord.js';
 import { getMedicalTemplateTool } from './emr/getMedicalTemplate.js';
 import { medicalRecordQaTool } from './emr/medicalRecordQA.js';
+import { renderMedicalTemplateTool } from './emr/renderMedicalTemplate.js';
 import { DefaultMedicalToolRegistry } from './framework.js';
 import { fetchFromEmrTool } from './integration/fetchFromEMR.js';
 import { hl7MessageSendTool } from './integration/hl7MessageSend.js';
@@ -68,11 +69,12 @@ export const FIRST_BATCH_TOOLS: MedicalToolDefinition[] = [
   getPatientDetailTool,
   getPatientHistoryTool,
 
-  // 电子病历（4个）
+  // 电子病历（5个）
   getMedicalRecordTool,
   generateMedicalRecordTool,
   medicalRecordQaTool,
   getMedicalTemplateTool,
+  renderMedicalTemplateTool,
 
   // 医嘱管理（2个）
   getOrderListTool,
