@@ -3025,6 +3025,14 @@ import { emrQcPolicyQueryV14Routes } from './routes/emrQcPolicyQueryV14';
 import { emrQcGuidelineLibraryV14Routes } from './routes/emrQcGuidelineLibraryV14';
 // M505-D：质控法律法规 V14 GET /api/v1/emr-qc-regulation（EMR 深化四模块，M505 收官，法规搜索 keyword）
 import { emrQcRegulationV14Routes } from './routes/emrQcRegulationV14';
+// M506-A：质控缺陷趋势图 V14 GET /api/v1/emr-qc-defect-trend-chart（EMR 深化四模块，月度趋势聚合 total/avg/max/min）
+import { emrQcDefectTrendChartV14Routes } from './routes/emrQcDefectTrendChartV14';
+// M506-B：质控科室对比雷达图 V14 GET /api/v1/emr-qc-dept-radar-chart（EMR 深化四模块，维度平均分+维度数）
+import { emrQcDeptRadarChartV14Routes } from './routes/emrQcDeptRadarChartV14';
+// M506-C：质控月度报表 V14 GET /api/v1/emr-qc-monthly-report（EMR 深化四模块，月数+总病历数+总缺陷数+缺陷率%）
+import { emrQcMonthlyReportV14Routes } from './routes/emrQcMonthlyReportV14';
+// M506-D：质控年度总结报告 V14 GET /api/v1/emr-qc-annual-summary-report（EMR 深化四模块，M506 收官，年数+总病历数+平均合格率%）
+import { emrQcAnnualSummaryReportV14Routes } from './routes/emrQcAnnualSummaryReportV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4780,6 +4788,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcPolicyQueryV14Routes, // M505-B：质控制度查询 V14 GET /api/v1/emr-qc-policy-query（EMR 深化四模块，制度搜索 keyword）
   ...emrQcGuidelineLibraryV14Routes, // M505-C：质控指南库 V14 GET /api/v1/emr-qc-guideline-library（EMR 深化四模块，指南专科筛选）
   ...emrQcRegulationV14Routes, // M505-D：质控法律法规 V14 GET /api/v1/emr-qc-regulation（EMR 深化四模块，M505 收官，法规搜索 keyword）
+  ...emrQcDefectTrendChartV14Routes, // M506-A：质控缺陷趋势图 V14 GET /api/v1/emr-qc-defect-trend-chart（EMR 深化四模块，月度趋势聚合 total/avg/max/min）
+  ...emrQcDeptRadarChartV14Routes, // M506-B：质控科室对比雷达图 V14 GET /api/v1/emr-qc-dept-radar-chart（EMR 深化四模块，维度平均分+维度数）
+  ...emrQcMonthlyReportV14Routes, // M506-C：质控月度报表 V14 GET /api/v1/emr-qc-monthly-report（EMR 深化四模块，月数+总病历数+总缺陷数+缺陷率%）
+  ...emrQcAnnualSummaryReportV14Routes, // M506-D：质控年度总结报告 V14 GET /api/v1/emr-qc-annual-summary-report（EMR 深化四模块，M506 收官，年数+总病历数+平均合格率%）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
