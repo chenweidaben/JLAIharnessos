@@ -2431,6 +2431,14 @@ import { pathologyQualityMgmtV13Routes } from './routes/pathologyQualityMgmtV13'
 import { nutritionQualityMgmtV13Routes } from './routes/nutritionQualityMgmtV13';
 // M430-D：输血质量管理 V13 GET /api/v1/blood-transfusion-quality-mgmt（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421））
 import { bloodTransfusionQualityMgmtV13Routes } from './routes/bloodTransfusionQualityMgmtV13';
+// M431-A：药事质量管理 V13 GET /api/v1/medication-quality-mgmt（-quality 后缀避让旧版 pharmacyDetailV13（M418））
+import { medicationQualityMgmtV13Routes } from './routes/medicationQualityMgmtV13';
+// M431-B：设备质量管理 V13 GET /api/v1/device-quality-mgmt（-quality 后缀避让旧版 medicalDeviceDetailV13（M418））
+import { deviceQualityMgmtV13Routes } from './routes/deviceQualityMgmtV13';
+// M431-C：消防安全质量管理 V13 GET /api/v1/fire-safety-quality-mgmt（-quality 后缀避让旧版 fireSafetyDetailV13（M408））
+import { fireSafetyQualityMgmtV13Routes } from './routes/fireSafetyQualityMgmtV13';
+// M431-D：治安保卫质量管理 V13 GET /api/v1/security-quality-mgmt（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408））
+import { securityQualityMgmtV13Routes } from './routes/securityQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3889,6 +3897,10 @@ const allRoutes: RouteDef[] = [
   ...pathologyQualityMgmtV13Routes, // M430-B：病理质量管理 V13 GET /api/v1/pathology-quality-mgmt（-quality 后缀避让旧版 pathologyMgmtV13（M415））
   ...nutritionQualityMgmtV13Routes, // M430-C：营养质量管理 V13 GET /api/v1/nutrition-quality-mgmt（-quality 后缀避让旧版 nutritionMgmtV13（M415））
   ...bloodTransfusionQualityMgmtV13Routes, // M430-D：输血质量管理 V13 GET /api/v1/blood-transfusion-quality-mgmt（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421））
+  ...medicationQualityMgmtV13Routes, // M431-A：药事质量管理 V13 GET /api/v1/medication-quality-mgmt（-quality 后缀避让旧版 pharmacyDetailV13（M418））
+  ...deviceQualityMgmtV13Routes, // M431-B：设备质量管理 V13 GET /api/v1/device-quality-mgmt（-quality 后缀避让旧版 medicalDeviceDetailV13（M418））
+  ...fireSafetyQualityMgmtV13Routes, // M431-C：消防安全质量管理 V13 GET /api/v1/fire-safety-quality-mgmt（-quality 后缀避让旧版 fireSafetyDetailV13（M408））
+  ...securityQualityMgmtV13Routes, // M431-D：治安保卫质量管理 V13 GET /api/v1/security-quality-mgmt（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

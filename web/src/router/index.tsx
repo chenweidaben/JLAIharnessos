@@ -2247,6 +2247,14 @@ const PathologyQualityMgmt = lazy(() => import('@/pages/pathology-quality-mgmt')
 const NutritionQualityMgmt = lazy(() => import('@/pages/nutrition-quality-mgmt'));
 // M430-D：输血质量管理 V13（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421））
 const BloodTransfusionQualityMgmt = lazy(() => import('@/pages/blood-transfusion-quality-mgmt'));
+// M431-A：药事质量管理 V13（-quality 后缀避让旧版 pharmacyDetailV13（M418））
+const MedicationQualityMgmt = lazy(() => import('@/pages/medication-quality-mgmt'));
+// M431-B：设备质量管理 V13（-quality 后缀避让旧版 medicalDeviceDetailV13（M418））
+const DeviceQualityMgmt = lazy(() => import('@/pages/device-quality-mgmt'));
+// M431-C：消防安全质量管理 V13（-quality 后缀避让旧版 fireSafetyDetailV13（M408））
+const FireSafetyQualityMgmt = lazy(() => import('@/pages/fire-safety-quality-mgmt'));
+// M431-D：治安保卫质量管理 V13（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408））
+const SecurityQualityMgmt = lazy(() => import('@/pages/security-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4435,6 +4443,14 @@ export default function AppRoutes() {
           <Route path="nutrition-quality-mgmt" element={<NutritionQualityMgmt />} />
           {/* M430-D：输血质量管理 V13（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421）） */}
           <Route path="blood-transfusion-quality-mgmt" element={<BloodTransfusionQualityMgmt />} />
+          {/* M431-A：药事质量管理 V13（-quality 后缀避让旧版 pharmacyDetailV13（M418）） */}
+          <Route path="medication-quality-mgmt" element={<MedicationQualityMgmt />} />
+          {/* M431-B：设备质量管理 V13（-quality 后缀避让旧版 medicalDeviceDetailV13（M418）） */}
+          <Route path="device-quality-mgmt" element={<DeviceQualityMgmt />} />
+          {/* M431-C：消防安全质量管理 V13（-quality 后缀避让旧版 fireSafetyDetailV13（M408）） */}
+          <Route path="fire-safety-quality-mgmt" element={<FireSafetyQualityMgmt />} />
+          {/* M431-D：治安保卫质量管理 V13（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408）） */}
+          <Route path="security-quality-mgmt" element={<SecurityQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
