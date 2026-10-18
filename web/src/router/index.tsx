@@ -2335,6 +2335,14 @@ const HandHygieneQuality = lazy(() => import('@/pages/hand-hygiene-quality'));
 const DisinfectionSterilization = lazy(() => import('@/pages/disinfection-sterilization'));
 // M441-D：医疗废物质量管理 V13（M441 收官，医院感染管理组）
 const MedicalWasteMgmtQuality = lazy(() => import('@/pages/medical-waste-mgmt-quality'));
+// M442-A：孕产妇系统管理 V13（妇幼健康与计划生育管理组）
+const MaternalHealthMgmt = lazy(() => import('@/pages/maternal-health-mgmt'));
+// M442-B：儿童保健管理 V13（妇幼健康与计划生育管理组）
+const ChildHealthMgmt = lazy(() => import('@/pages/child-health-mgmt'));
+// M442-C：出生缺陷监测 V13（妇幼健康与计划生育管理组）
+const BirthDefectMonitoring = lazy(() => import('@/pages/birth-defect-monitoring'));
+// M442-D：计划生育技术服务 V13（M442 收官，妇幼健康与计划生育管理组）
+const FamilyPlanningMgmt = lazy(() => import('@/pages/family-planning-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4611,6 +4619,14 @@ export default function AppRoutes() {
           <Route path="disinfection-sterilization" element={<DisinfectionSterilization />} />
           {/* M441-D：医疗废物质量管理 V13（M441 收官，医院感染管理组） */}
           <Route path="medical-waste-mgmt-quality" element={<MedicalWasteMgmtQuality />} />
+          {/* M442-A：孕产妇系统管理 V13（妇幼健康与计划生育管理组） */}
+          <Route path="maternal-health-mgmt" element={<MaternalHealthMgmt />} />
+          {/* M442-B：儿童保健管理 V13（妇幼健康与计划生育管理组） */}
+          <Route path="child-health-mgmt" element={<ChildHealthMgmt />} />
+          {/* M442-C：出生缺陷监测 V13（妇幼健康与计划生育管理组） */}
+          <Route path="birth-defect-monitoring" element={<BirthDefectMonitoring />} />
+          {/* M442-D：计划生育技术服务 V13（M442 收官，妇幼健康与计划生育管理组） */}
+          <Route path="family-planning-mgmt" element={<FamilyPlanningMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
