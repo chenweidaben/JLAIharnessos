@@ -2375,6 +2375,14 @@ const DataSecurityMgmt = lazy(() => import('@/pages/data-security-mgmt'));
 const NetworkSecurityMgmt = lazy(() => import('@/pages/network-security-mgmt'));
 // M446-D：信息运维服务管理 V13（M446 收官，信息化建设与数据安全管理组）
 const ItServiceDeskMgmt = lazy(() => import('@/pages/it-service-desk-mgmt'));
+// M447-A：应急演练管理 V13（应急管理与安全生产管理组）
+const EmergencyDrillMgmt = lazy(() => import('@/pages/emergency-drill-mgmt'));
+// M447-B：突发事件处置管理 V13（应急管理与安全生产管理组）
+const EmergencyResponseMgmt = lazy(() => import('@/pages/emergency-response-mgmt'));
+// M447-C：安全生产管理 V13（应急管理与安全生产管理组）
+const SafetyProductionMgmt = lazy(() => import('@/pages/safety-production-mgmt'));
+// M447-D：消防安全管理 V13（M447 收官，应急管理与安全生产管理组）
+const FireSafetyMgmt = lazy(() => import('@/pages/fire-safety-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4691,6 +4699,14 @@ export default function AppRoutes() {
           <Route path="network-security-mgmt" element={<NetworkSecurityMgmt />} />
           {/* M446-D：信息运维服务管理 V13（M446 收官，信息化建设与数据安全管理组） */}
           <Route path="it-service-desk-mgmt" element={<ItServiceDeskMgmt />} />
+          {/* M447-A：应急演练管理 V13（应急管理与安全生产管理组） */}
+          <Route path="emergency-drill-mgmt" element={<EmergencyDrillMgmt />} />
+          {/* M447-B：突发事件处置管理 V13（应急管理与安全生产管理组） */}
+          <Route path="emergency-response-mgmt" element={<EmergencyResponseMgmt />} />
+          {/* M447-C：安全生产管理 V13（应急管理与安全生产管理组） */}
+          <Route path="safety-production-mgmt" element={<SafetyProductionMgmt />} />
+          {/* M447-D：消防安全管理 V13（M447 收官，应急管理与安全生产管理组） */}
+          <Route path="fire-safety-mgmt" element={<FireSafetyMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
