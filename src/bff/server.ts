@@ -3129,6 +3129,14 @@ import { emrQcPersonalProfileV14Routes } from './routes/emrQcPersonalProfileV14'
 import { emrQcRectificationNoticeV14Routes } from './routes/emrQcRectificationNoticeV14';
 // M518-D：质控PDCA报告自动生成 V14 GET/POST /api/v1/emr-qc-pdca-auto-report（EMR 深化四模块，M518 收官，病历质控报告自动化系列，避让 -auto）
 import { emrQcPdcaReportAutoV14Routes } from './routes/emrQcPdcaReportAutoV14';
+// M519-A：质控规则可视化编辑器 V14 GET/POST /api/v1/emr-qc-rule-editor（EMR 深化四模块，病历质控规则配置可视化系列）
+import { emrQcRuleEditorV14Routes } from './routes/emrQcRuleEditorV14';
+// M519-B：质控规则版本管理 V14 GET/POST /api/v1/emr-qc-rule-version（EMR 深化四模块，病历质控规则配置可视化系列）
+import { emrQcRuleVersionV14Routes } from './routes/emrQcRuleVersionV14';
+// M519-C：质控规则模拟测试 V14 GET/POST /api/v1/emr-qc-rule-simulator（EMR 深化四模块，病历质控规则配置可视化系列）
+import { emrQcRuleSimulatorV14Routes } from './routes/emrQcRuleSimulatorV14';
+// M519-D：质控规则对比分析 V14 GET/POST /api/v1/emr-qc-rule-compare（EMR 深化四模块，M519 收官，病历质控规则配置可视化系列）
+import { emrQcRuleCompareV14Routes } from './routes/emrQcRuleCompareV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4936,6 +4944,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcPersonalProfileV14Routes, // M518-B：个人质控档案自动生成 V14 GET/POST /api/v1/emr-qc-personal-profile（EMR 深化四模块，病历质控报告自动化系列）
   ...emrQcRectificationNoticeV14Routes, // M518-C：质控整改通知单自动生成 V14 GET/POST /api/v1/emr-qc-rectification-notice（EMR 深化四模块，病历质控报告自动化系列）
   ...emrQcPdcaReportAutoV14Routes, // M518-D：质控PDCA报告自动生成 V14 GET/POST /api/v1/emr-qc-pdca-auto-report（EMR 深化四模块，M518 收官，病历质控报告自动化系列，避让 -auto）
+  ...emrQcRuleEditorV14Routes, // M519-A：质控规则可视化编辑器 V14 GET/POST /api/v1/emr-qc-rule-editor（EMR 深化四模块，病历质控规则配置可视化系列）
+  ...emrQcRuleVersionV14Routes, // M519-B：质控规则版本管理 V14 GET/POST /api/v1/emr-qc-rule-version（EMR 深化四模块，病历质控规则配置可视化系列）
+  ...emrQcRuleSimulatorV14Routes, // M519-C：质控规则模拟测试 V14 GET/POST /api/v1/emr-qc-rule-simulator（EMR 深化四模块，病历质控规则配置可视化系列）
+  ...emrQcRuleCompareV14Routes, // M519-D：质控规则对比分析 V14 GET/POST /api/v1/emr-qc-rule-compare（EMR 深化四模块，M519 收官，病历质控规则配置可视化系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
