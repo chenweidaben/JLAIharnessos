@@ -3321,6 +3321,14 @@ import { emrQcDeptRankListV14Routes } from './routes/emrQcDeptRankListV14';
 import { emrQcDoctorProfileV14Routes } from './routes/emrQcDoctorProfileV14';
 // M542-D：质控问题趋势分析（避让版 -analysis）V14 GET/POST /api/v1/emr-qc-trend-analysis（EMR 深化四模块，M542 收官，病历质控指标看板系列）
 import { emrQcTrendAnalysisV14Routes } from './routes/emrQcTrendAnalysisV14';
+// M543-A：病历AI生成建议 V14 GET/POST /api/v1/emr-ai-suggestion（EMR 深化四模块，病历AI辅助书写系列）
+import { emrAiSuggestionV14Routes } from './routes/emrAiSuggestionV14';
+// M543-B：病历AI质控评分 V14 GET/POST /api/v1/emr-ai-scoring（EMR 深化四模块，病历AI辅助书写系列）
+import { emrAiScoringV14Routes } from './routes/emrAiScoringV14';
+// M543-C：病历AI缺陷预测 V14 GET/POST /api/v1/emr-ai-defect-predict（EMR 深化四模块，病历AI辅助书写系列）
+import { emrAiDefectPredictV14Routes } from './routes/emrAiDefectPredictV14';
+// M543-D：病历AI知识推荐 V14 GET/POST /api/v1/emr-ai-knowledge-reco（EMR 深化四模块，M543 收官，病历AI辅助书写系列）
+import { emrAiKnowledgeRecoV14Routes } from './routes/emrAiKnowledgeRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5224,6 +5232,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcDeptRankListV14Routes, // M542-B：科室质控排名（避让版 -list）V14 GET/POST /api/v1/emr-qc-dept-rank-list（EMR 深化四模块，病历质控指标看板系列）
   ...emrQcDoctorProfileV14Routes, // M542-C：医生质控个人档案 V14 GET/POST /api/v1/emr-qc-doctor-profile（EMR 深化四模块，病历质控指标看板系列）
   ...emrQcTrendAnalysisV14Routes, // M542-D：质控问题趋势分析（避让版 -analysis）V14 GET/POST /api/v1/emr-qc-trend-analysis（EMR 深化四模块，M542 收官，病历质控指标看板系列）
+  ...emrAiSuggestionV14Routes, // M543-A：病历AI生成建议 V14 GET/POST /api/v1/emr-ai-suggestion（EMR 深化四模块，病历AI辅助书写系列）
+  ...emrAiScoringV14Routes, // M543-B：病历AI质控评分 V14 GET/POST /api/v1/emr-ai-scoring（EMR 深化四模块，病历AI辅助书写系列）
+  ...emrAiDefectPredictV14Routes, // M543-C：病历AI缺陷预测 V14 GET/POST /api/v1/emr-ai-defect-predict（EMR 深化四模块，病历AI辅助书写系列）
+  ...emrAiKnowledgeRecoV14Routes, // M543-D：病历AI知识推荐 V14 GET/POST /api/v1/emr-ai-knowledge-reco（EMR 深化四模块，M543 收官，病历AI辅助书写系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
