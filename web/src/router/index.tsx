@@ -2669,6 +2669,14 @@ const EmrQcMetricCalcPage = lazy(() => import('@/pages/emr-qc-metric-calc'));
 const EmrQcMetricAlertPage = lazy(() => import('@/pages/emr-qc-metric-alert'));
 // M483-D：质控指标分析 V14（EMR 深化四模块，M483 收官）
 const EmrQcMetricAnalysisPage = lazy(() => import('@/pages/emr-qc-metric-analysis'));
+// M484-A（新规格）：质控指标看板 V14（EMR 深化四模块）
+const EmrQcMetricDashboardPage = lazy(() => import('@/pages/emr-qc-metric-dashboard'));
+// M484-B（新规格）：质控指标对标 V14（EMR 深化四模块）
+const EmrQcMetricBenchmarkPage = lazy(() => import('@/pages/emr-qc-metric-benchmark'));
+// M484-C（新规格）：质控指标钻取 V14（EMR 深化四模块）
+const EmrQcMetricDrilldownPage = lazy(() => import('@/pages/emr-qc-metric-drilldown'));
+// M484-D（新规格）：质控指标导出 V14（EMR 深化四模块，M484 收官）
+const EmrQcMetricExportPage = lazy(() => import('@/pages/emr-qc-metric-export'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5279,6 +5287,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-metric-alert" element={<EmrQcMetricAlertPage />} />
           {/* M483-D：质控指标分析 V14（EMR 深化四模块，M483 收官） */}
           <Route path="emr-qc-metric-analysis" element={<EmrQcMetricAnalysisPage />} />
+          {/* M484-A（新规格）：质控指标看板 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-metric-dashboard" element={<EmrQcMetricDashboardPage />} />
+          {/* M484-B（新规格）：质控指标对标 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-metric-benchmark" element={<EmrQcMetricBenchmarkPage />} />
+          {/* M484-C（新规格）：质控指标钻取 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-metric-drilldown" element={<EmrQcMetricDrilldownPage />} />
+          {/* M484-D（新规格）：质控指标导出 V14（EMR 深化四模块，M484 收官） */}
+          <Route path="emr-qc-metric-export" element={<EmrQcMetricExportPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

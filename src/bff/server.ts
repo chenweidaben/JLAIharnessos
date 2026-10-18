@@ -2849,6 +2849,14 @@ import { emrQcMetricCalcV14Routes } from './routes/emrQcMetricCalcV14';
 import { emrQcMetricAlertV14Routes } from './routes/emrQcMetricAlertV14';
 // M483-D：质控指标分析 V14 GET /api/v1/emr-qc-metric-analysis（EMR 深化四模块，M483 收官，趋势对比 current-previous）
 import { emrQcMetricAnalysisV14Routes } from './routes/emrQcMetricAnalysisV14';
+// M484-A（新规格）：质控指标看板 V14 GET /api/v1/emr-qc-metric-dashboard（EMR 深化四模块，-dashboard 避让 M468-A emrQcDashboardV14）
+import { emrQcMetricDashboardV14Routes } from './routes/emrQcMetricDashboardV14';
+// M484-B（新规格）：质控指标对标 V14 GET /api/v1/emr-qc-metric-benchmark（EMR 深化四模块，gap=ourValue-benchmarkValue）
+import { emrQcMetricBenchmarkV14Routes } from './routes/emrQcMetricBenchmarkV14';
+// M484-C（新规格）：质控指标钻取 V14 GET /api/v1/emr-qc-metric-drilldown（EMR 深化四模块，按科室筛选维度）
+import { emrQcMetricDrilldownV14Routes } from './routes/emrQcMetricDrilldownV14';
+// M484-D（新规格）：质控指标导出 V14 POST /api/v1/emr-qc-metric-export（EMR 深化四模块，M484 收官，CSV 表头"科室,指标值"）
+import { emrQcMetricExportV14Routes } from './routes/emrQcMetricExportV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4516,6 +4524,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcMetricCalcV14Routes, // M483-B：质控指标计算 V14 POST /api/v1/emr-qc-metric-calc（EMR 深化四模块，质控指标系列，分子/分母×100 1位小数）
   ...emrQcMetricAlertV14Routes, // M483-C：质控指标预警 V14 GET /api/v1/emr-qc-metric-alert（EMR 深化四模块，质控指标系列，阈值 below<above> 触发）
   ...emrQcMetricAnalysisV14Routes, // M483-D：质控指标分析 V14 GET /api/v1/emr-qc-metric-analysis（EMR 深化四模块，M483 收官，趋势对比 current-previous）
+  ...emrQcMetricDashboardV14Routes, // M484-A（新规格）：质控指标看板 V14 GET /api/v1/emr-qc-metric-dashboard（EMR 深化四模块，-dashboard 避让 M468-A emrQcDashboardV14）
+  ...emrQcMetricBenchmarkV14Routes, // M484-B（新规格）：质控指标对标 V14 GET /api/v1/emr-qc-metric-benchmark（EMR 深化四模块，gap=ourValue-benchmarkValue）
+  ...emrQcMetricDrilldownV14Routes, // M484-C（新规格）：质控指标钻取 V14 GET /api/v1/emr-qc-metric-drilldown（EMR 深化四模块，按科室筛选维度）
+  ...emrQcMetricExportV14Routes, // M484-D（新规格）：质控指标导出 V14 POST /api/v1/emr-qc-metric-export（EMR 深化四模块，M484 收官，CSV 表头"科室,指标值"）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
