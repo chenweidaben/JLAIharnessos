@@ -3177,6 +3177,14 @@ import { emrTemplateDeptPersonalV14Routes } from './routes/emrTemplateDeptPerson
 import { emrTemplateDoctorPrefV14Routes } from './routes/emrTemplateDoctorPrefV14';
 // M524-D：模板审批流程 V14 GET/POST /api/v1/emr-template-approval（EMR 深化四模块，M524 收官，病历模板版本管理与个性化定制系列）
 import { emrTemplateApprovalV14Routes } from './routes/emrTemplateApprovalV14';
+// M525-A：临床路径模板联动 V14 GET/POST /api/v1/emr-template-clinical-path（EMR 深化四模块，病历模板与临床路径联动系列）
+import { emrTemplateClinicalPathV14Routes } from './routes/emrTemplateClinicalPathV14';
+// M525-B：病种模板智能推荐 V14 GET/POST /api/v1/emr-template-disease-recommend（EMR 深化四模块，病历模板与临床路径联动系列）
+import { emrTemplateDiseaseRecommendV14Routes } from './routes/emrTemplateDiseaseRecommendV14';
+// M525-C：模板使用统计分析 V14 GET/POST /api/v1/emr-template-usage-stats（EMR 深化四模块，病历模板与临床路径联动系列）
+import { emrTemplateUsageStatsV14Routes } from './routes/emrTemplateUsageStatsV14';
+// M525-D：模板效果评估 V14 GET/POST /api/v1/emr-template-effect-eval（EMR 深化四模块，M525 收官，病历模板与临床路径联动系列）
+import { emrTemplateEffectEvalV14Routes } from './routes/emrTemplateEffectEvalV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5008,6 +5016,10 @@ const allRoutes: RouteDef[] = [
   ...emrTemplateDeptPersonalV14Routes, // M524-B：模板科室个性化 V14 GET/POST /api/v1/emr-template-dept-personal（EMR 深化四模块，病历模板版本管理与个性化定制系列）
   ...emrTemplateDoctorPrefV14Routes, // M524-C：模板医生个人偏好 V14 GET/POST /api/v1/emr-template-doctor-pref（EMR 深化四模块，病历模板版本管理与个性化定制系列）
   ...emrTemplateApprovalV14Routes, // M524-D：模板审批流程 V14 GET/POST /api/v1/emr-template-approval（EMR 深化四模块，M524 收官，病历模板版本管理与个性化定制系列）
+  ...emrTemplateClinicalPathV14Routes, // M525-A：临床路径模板联动 V14 GET/POST /api/v1/emr-template-clinical-path（EMR 深化四模块，病历模板与临床路径联动系列）
+  ...emrTemplateDiseaseRecommendV14Routes, // M525-B：病种模板智能推荐 V14 GET/POST /api/v1/emr-template-disease-recommend（EMR 深化四模块，病历模板与临床路径联动系列）
+  ...emrTemplateUsageStatsV14Routes, // M525-C：模板使用统计分析 V14 GET/POST /api/v1/emr-template-usage-stats（EMR 深化四模块，病历模板与临床路径联动系列）
+  ...emrTemplateEffectEvalV14Routes, // M525-D：模板效果评估 V14 GET/POST /api/v1/emr-template-effect-eval（EMR 深化四模块，M525 收官，病历模板与临床路径联动系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

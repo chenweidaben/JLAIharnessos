@@ -2997,6 +2997,14 @@ const EmrTemplateDeptPersonalPage = lazy(() => import('@/pages/emr-template-dept
 const EmrTemplateDoctorPrefPage = lazy(() => import('@/pages/emr-template-doctor-pref'));
 // M524-D：模板审批流程 V14（EMR 深化四模块，M524 收官）
 const EmrTemplateApprovalPage = lazy(() => import('@/pages/emr-template-approval'));
+// M525-A：临床路径模板联动 V14（EMR 深化四模块）
+const EmrTemplateClinicalPathPage = lazy(() => import('@/pages/emr-template-clinical-path'));
+// M525-B：病种模板智能推荐 V14（EMR 深化四模块）
+const EmrTemplateDiseaseRecommendPage = lazy(() => import('@/pages/emr-template-disease-recommend'));
+// M525-C：模板使用统计分析 V14（EMR 深化四模块）
+const EmrTemplateUsageStatsPage = lazy(() => import('@/pages/emr-template-usage-stats'));
+// M525-D：模板效果评估 V14（EMR 深化四模块，M525 收官）
+const EmrTemplateEffectEvalPage = lazy(() => import('@/pages/emr-template-effect-eval'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5935,6 +5943,14 @@ export default function AppRoutes() {
           <Route path="emr-template-doctor-pref" element={<EmrTemplateDoctorPrefPage />} />
           {/* M524-D：模板审批流程 V14（EMR 深化四模块，M524 收官） */}
           <Route path="emr-template-approval" element={<EmrTemplateApprovalPage />} />
+          {/* M525-A：临床路径模板联动 V14（EMR 深化四模块） */}
+          <Route path="emr-template-clinical-path" element={<EmrTemplateClinicalPathPage />} />
+          {/* M525-B：病种模板智能推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-template-disease-recommend" element={<EmrTemplateDiseaseRecommendPage />} />
+          {/* M525-C：模板使用统计分析 V14（EMR 深化四模块） */}
+          <Route path="emr-template-usage-stats" element={<EmrTemplateUsageStatsPage />} />
+          {/* M525-D：模板效果评估 V14（EMR 深化四模块，M525 收官） */}
+          <Route path="emr-template-effect-eval" element={<EmrTemplateEffectEvalPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
