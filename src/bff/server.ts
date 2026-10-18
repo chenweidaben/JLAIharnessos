@@ -2977,6 +2977,14 @@ import { emrQcAiWritingSuggestV14Routes } from './routes/emrQcAiWritingSuggestV1
 import { emrQcAiSimilarRecordV14Routes } from './routes/emrQcAiSimilarRecordV14';
 // M499-D：质控 AI 知识问答 V14 POST /api/v1/emr-qc-ai-qa（EMR 深化四模块，M499 收官，关键词匹配答案）
 import { emrQcAiQaV14Routes } from './routes/emrQcAiQaV14';
+// M500-A：质控缺陷统计 V14 GET /api/v1/emr-qc-defect-stat（EMR 深化四模块，里程碑批次，总缺陷数+分类数聚合）
+import { emrQcDefectStatV14Routes } from './routes/emrQcDefectStatV14';
+// M500-B：质控合格率统计 V14 GET /api/v1/emr-qc-pass-rate-stat（EMR 深化四模块，里程碑批次，平均合格率+科室数）
+import { emrQcPassRateStatV14Routes } from './routes/emrQcPassRateStatV14';
+// M500-C：质控时效统计 V14 GET /api/v1/emr-qc-timeliness-stat（EMR 深化四模块，里程碑批次，全院平均耗时+科室数）
+import { emrQcTimelinessStatV14Routes } from './routes/emrQcTimelinessStatV14';
+// M500-D：质控综合统计大屏 V14 GET /api/v1/emr-qc-stat-dashboard（EMR 深化四模块，M500 收官里程碑，三大指标聚合）
+import { emrQcStatDashboardV14Routes } from './routes/emrQcStatDashboardV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4708,6 +4716,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcAiWritingSuggestV14Routes, // M499-B：质控 AI 书写建议 V14 POST /api/v1/emr-qc-ai-writing-suggest（EMR 深化四模块，关键词匹配建议）
   ...emrQcAiSimilarRecordV14Routes, // M499-C：质控 AI 相似病历推荐 V14 GET /api/v1/emr-qc-ai-similar-record（EMR 深化四模块，排除自己按score降序）
   ...emrQcAiQaV14Routes, // M499-D：质控 AI 知识问答 V14 POST /api/v1/emr-qc-ai-qa（EMR 深化四模块，M499 收官，关键词匹配答案）
+  ...emrQcDefectStatV14Routes, // M500-A：质控缺陷统计 V14 GET /api/v1/emr-qc-defect-stat（EMR 深化四模块，里程碑批次，总缺陷数+分类数聚合）
+  ...emrQcPassRateStatV14Routes, // M500-B：质控合格率统计 V14 GET /api/v1/emr-qc-pass-rate-stat（EMR 深化四模块，里程碑批次，平均合格率+科室数）
+  ...emrQcTimelinessStatV14Routes, // M500-C：质控时效统计 V14 GET /api/v1/emr-qc-timeliness-stat（EMR 深化四模块，里程碑批次，全院平均耗时+科室数）
+  ...emrQcStatDashboardV14Routes, // M500-D：质控综合统计大屏 V14 GET /api/v1/emr-qc-stat-dashboard（EMR 深化四模块，M500 收官里程碑，三大指标聚合）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

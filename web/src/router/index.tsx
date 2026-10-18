@@ -2797,6 +2797,14 @@ const EmrQcAiWritingSuggestPage = lazy(() => import('@/pages/emr-qc-ai-writing-s
 const EmrQcAiSimilarRecordPage = lazy(() => import('@/pages/emr-qc-ai-similar-record'));
 // M499-D：质控 AI 知识问答 V14（EMR 深化四模块，M499 收官）
 const EmrQcAiQaPage = lazy(() => import('@/pages/emr-qc-ai-qa'));
+// M500-A：质控缺陷统计 V14（EMR 深化四模块，里程碑批次）
+const EmrQcDefectStatPage = lazy(() => import('@/pages/emr-qc-defect-stat'));
+// M500-B：质控合格率统计 V14（EMR 深化四模块，里程碑批次）
+const EmrQcPassRateStatPage = lazy(() => import('@/pages/emr-qc-pass-rate-stat'));
+// M500-C：质控时效统计 V14（EMR 深化四模块，里程碑批次）
+const EmrQcTimelinessStatPage = lazy(() => import('@/pages/emr-qc-timeliness-stat'));
+// M500-D：质控综合统计大屏 V14（EMR 深化四模块，M500 收官里程碑）
+const EmrQcStatDashboardPage = lazy(() => import('@/pages/emr-qc-stat-dashboard'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5535,6 +5543,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-ai-similar-record" element={<EmrQcAiSimilarRecordPage />} />
           {/* M499-D：质控 AI 知识问答 V14（EMR 深化四模块，M499 收官） */}
           <Route path="emr-qc-ai-qa" element={<EmrQcAiQaPage />} />
+          {/* M500-A：质控缺陷统计 V14（EMR 深化四模块，里程碑批次） */}
+          <Route path="emr-qc-defect-stat" element={<EmrQcDefectStatPage />} />
+          {/* M500-B：质控合格率统计 V14（EMR 深化四模块，里程碑批次） */}
+          <Route path="emr-qc-pass-rate-stat" element={<EmrQcPassRateStatPage />} />
+          {/* M500-C：质控时效统计 V14（EMR 深化四模块，里程碑批次） */}
+          <Route path="emr-qc-timeliness-stat" element={<EmrQcTimelinessStatPage />} />
+          {/* M500-D：质控综合统计大屏 V14（EMR 深化四模块，M500 收官里程碑） */}
+          <Route path="emr-qc-stat-dashboard" element={<EmrQcStatDashboardPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
