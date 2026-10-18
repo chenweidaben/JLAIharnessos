@@ -3185,6 +3185,14 @@ import { emrTemplateDiseaseRecommendV14Routes } from './routes/emrTemplateDiseas
 import { emrTemplateUsageStatsV14Routes } from './routes/emrTemplateUsageStatsV14';
 // M525-D：模板效果评估 V14 GET/POST /api/v1/emr-template-effect-eval（EMR 深化四模块，M525 收官，病历模板与临床路径联动系列）
 import { emrTemplateEffectEvalV14Routes } from './routes/emrTemplateEffectEvalV14';
+// M526-A：质控移动端审批 V14 GET/POST /api/v1/emr-qc-mobile-approval（EMR 深化四模块，病历质控移动端适配系列）
+import { emrQcMobileApprovalV14Routes } from './routes/emrQcMobileApprovalV14';
+// M526-B：质控移动端查看 V14 GET/POST /api/v1/emr-qc-mobile-view（EMR 深化四模块，病历质控移动端适配系列）
+import { emrQcMobileViewV14Routes } from './routes/emrQcMobileViewV14';
+// M526-C：质控移动端通知 V14 GET/POST /api/v1/emr-qc-mobile-notify（EMR 深化四模块，病历质控移动端适配系列）
+import { emrQcMobileNotifyV14Routes } from './routes/emrQcMobileNotifyV14';
+// M526-D：质控移动端整改 V14 GET/POST /api/v1/emr-qc-mobile-rectify（EMR 深化四模块，M526 收官，病历质控移动端适配系列）
+import { emrQcMobileRectifyV14Routes } from './routes/emrQcMobileRectifyV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5020,6 +5028,10 @@ const allRoutes: RouteDef[] = [
   ...emrTemplateDiseaseRecommendV14Routes, // M525-B：病种模板智能推荐 V14 GET/POST /api/v1/emr-template-disease-recommend（EMR 深化四模块，病历模板与临床路径联动系列）
   ...emrTemplateUsageStatsV14Routes, // M525-C：模板使用统计分析 V14 GET/POST /api/v1/emr-template-usage-stats（EMR 深化四模块，病历模板与临床路径联动系列）
   ...emrTemplateEffectEvalV14Routes, // M525-D：模板效果评估 V14 GET/POST /api/v1/emr-template-effect-eval（EMR 深化四模块，M525 收官，病历模板与临床路径联动系列）
+  ...emrQcMobileApprovalV14Routes, // M526-A：质控移动端审批 V14 GET/POST /api/v1/emr-qc-mobile-approval（EMR 深化四模块，病历质控移动端适配系列）
+  ...emrQcMobileViewV14Routes, // M526-B：质控移动端查看 V14 GET/POST /api/v1/emr-qc-mobile-view（EMR 深化四模块，病历质控移动端适配系列）
+  ...emrQcMobileNotifyV14Routes, // M526-C：质控移动端通知 V14 GET/POST /api/v1/emr-qc-mobile-notify（EMR 深化四模块，病历质控移动端适配系列）
+  ...emrQcMobileRectifyV14Routes, // M526-D：质控移动端整改 V14 GET/POST /api/v1/emr-qc-mobile-rectify（EMR 深化四模块，M526 收官，病历质控移动端适配系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
