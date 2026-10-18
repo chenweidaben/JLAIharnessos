@@ -2367,6 +2367,14 @@ const PriceMgmt = lazy(() => import('@/pages/price-mgmt'));
 const ExpenseAudit = lazy(() => import('@/pages/expense-audit'));
 // M445-D：DRG/DIP 管理 V13（M445 收官，医保物价与费用管理组）
 const DrgDipMgmt = lazy(() => import('@/pages/drg-dip-mgmt'));
+// M446-A：信息系统可用性管理 V13（信息化建设与数据安全管理组）
+const SystemAvailabilityMgmt = lazy(() => import('@/pages/system-availability-mgmt'));
+// M446-B：数据安全管理 V13（信息化建设与数据安全管理组）
+const DataSecurityMgmt = lazy(() => import('@/pages/data-security-mgmt'));
+// M446-C：网络安全防护管理 V13（信息化建设与数据安全管理组）
+const NetworkSecurityMgmt = lazy(() => import('@/pages/network-security-mgmt'));
+// M446-D：信息运维服务管理 V13（M446 收官，信息化建设与数据安全管理组）
+const ItServiceDeskMgmt = lazy(() => import('@/pages/it-service-desk-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4675,6 +4683,14 @@ export default function AppRoutes() {
           <Route path="expense-audit" element={<ExpenseAudit />} />
           {/* M445-D：DRG/DIP 管理 V13（M445 收官，医保物价与费用管理组） */}
           <Route path="drg-dip-mgmt" element={<DrgDipMgmt />} />
+          {/* M446-A：信息系统可用性管理 V13（信息化建设与数据安全管理组） */}
+          <Route path="system-availability-mgmt" element={<SystemAvailabilityMgmt />} />
+          {/* M446-B：数据安全管理 V13（信息化建设与数据安全管理组） */}
+          <Route path="data-security-mgmt" element={<DataSecurityMgmt />} />
+          {/* M446-C：网络安全防护管理 V13（信息化建设与数据安全管理组） */}
+          <Route path="network-security-mgmt" element={<NetworkSecurityMgmt />} />
+          {/* M446-D：信息运维服务管理 V13（M446 收官，信息化建设与数据安全管理组） */}
+          <Route path="it-service-desk-mgmt" element={<ItServiceDeskMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
