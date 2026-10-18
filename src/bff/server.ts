@@ -3001,6 +3001,14 @@ import { emrQcExpertOnlineReviewV14Routes } from './routes/emrQcExpertOnlineRevi
 import { emrQcReviewSummaryV14Routes } from './routes/emrQcReviewSummaryV14';
 // M502-D：质控专家绩效统计 V14 GET /api/v1/emr-qc-expert-performance（EMR 深化四模块，M502 收官，总评审数+全院平均分）
 import { emrQcExpertPerformanceV14Routes } from './routes/emrQcExpertPerformanceV14';
+// M503-A：质控培训课程管理 V14 GET/POST /api/v1/emr-qc-training-course（EMR 深化四模块，课程增删管理）
+import { emrQcTrainingCourseV14Routes } from './routes/emrQcTrainingCourseV14';
+// M503-B：质控在线考试 V14 POST /api/v1/emr-qc-online-exam（EMR 深化四模块，等级评定+通过率聚合）
+import { emrQcOnlineExamV14Routes } from './routes/emrQcOnlineExamV14';
+// M503-C：质控考核证书 V14 GET /api/v1/emr-qc-exam-certificate（EMR 深化四模块，证书构建+有效性验证）
+import { emrQcExamCertificateV14Routes } from './routes/emrQcExamCertificateV14';
+// M503-D：质控培训记录 V14 GET /api/v1/emr-qc-training-record（EMR 深化四模块，M503 收官，总记录数+参训人数去重）
+import { emrQcTrainingRecordV14Routes } from './routes/emrQcTrainingRecordV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4744,6 +4752,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcExpertOnlineReviewV14Routes, // M502-B：质控专家在线评审 V14 POST /api/v1/emr-qc-expert-online-review（EMR 深化四模块，总评审数+平均分聚合）
   ...emrQcReviewSummaryV14Routes, // M502-C：质控评审意见汇总 V14 GET /api/v1/emr-qc-review-summary（EMR 深化四模块，总评审数+平均分+好评数聚合）
   ...emrQcExpertPerformanceV14Routes, // M502-D：质控专家绩效统计 V14 GET /api/v1/emr-qc-expert-performance（EMR 深化四模块，M502 收官，总评审数+全院平均分）
+  ...emrQcTrainingCourseV14Routes, // M503-A：质控培训课程管理 V14 GET/POST /api/v1/emr-qc-training-course（EMR 深化四模块，课程增删管理）
+  ...emrQcOnlineExamV14Routes, // M503-B：质控在线考试 V14 POST /api/v1/emr-qc-online-exam（EMR 深化四模块，等级评定+通过率聚合）
+  ...emrQcExamCertificateV14Routes, // M503-C：质控考核证书 V14 GET /api/v1/emr-qc-exam-certificate（EMR 深化四模块，证书构建+有效性验证）
+  ...emrQcTrainingRecordV14Routes, // M503-D：质控培训记录 V14 GET /api/v1/emr-qc-training-record（EMR 深化四模块，M503 收官，总记录数+参训人数去重）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

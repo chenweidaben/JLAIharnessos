@@ -2821,6 +2821,14 @@ const EmrQcExpertOnlineReviewPage = lazy(() => import('@/pages/emr-qc-expert-onl
 const EmrQcReviewSummaryPage = lazy(() => import('@/pages/emr-qc-review-summary'));
 // M502-D：质控专家绩效统计 V14（EMR 深化四模块，M502 收官）
 const EmrQcExpertPerformancePage = lazy(() => import('@/pages/emr-qc-expert-performance'));
+// M503-A：质控培训课程管理 V14（EMR 深化四模块）
+const EmrQcTrainingCoursePage = lazy(() => import('@/pages/emr-qc-training-course'));
+// M503-B：质控在线考试 V14（EMR 深化四模块）
+const EmrQcOnlineExamPage = lazy(() => import('@/pages/emr-qc-online-exam'));
+// M503-C：质控考核证书 V14（EMR 深化四模块）
+const EmrQcExamCertificatePage = lazy(() => import('@/pages/emr-qc-exam-certificate'));
+// M503-D：质控培训记录 V14（EMR 深化四模块，M503 收官）
+const EmrQcTrainingRecordPage = lazy(() => import('@/pages/emr-qc-training-record'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5583,6 +5591,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-review-summary" element={<EmrQcReviewSummaryPage />} />
           {/* M502-D：质控专家绩效统计 V14（EMR 深化四模块，M502 收官） */}
           <Route path="emr-qc-expert-performance" element={<EmrQcExpertPerformancePage />} />
+          {/* M503-A：质控培训课程管理 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-training-course" element={<EmrQcTrainingCoursePage />} />
+          {/* M503-B：质控在线考试 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-online-exam" element={<EmrQcOnlineExamPage />} />
+          {/* M503-C：质控考核证书 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-exam-certificate" element={<EmrQcExamCertificatePage />} />
+          {/* M503-D：质控培训记录 V14（EMR 深化四模块，M503 收官） */}
+          <Route path="emr-qc-training-record" element={<EmrQcTrainingRecordPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
