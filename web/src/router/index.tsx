@@ -2319,6 +2319,14 @@ const FallIncident = lazy(() => import('@/pages/fall-incident'));
 const PressureUlcer = lazy(() => import('@/pages/pressure-ulcer'));
 // M439-D：管路滑脱风险管理 V13（M439 收官，患者安全与医疗风险管理组）
 const TubeDislodgement = lazy(() => import('@/pages/tube-dislodgement'));
+// M440-A：处方点评质量管理 V13（药事管理与药学服务组）
+const PrescriptionReviewQuality = lazy(() => import('@/pages/prescription-review-quality'));
+// M440-B：抗菌药物使用质量管理 V13（药事管理与药学服务组）
+const AntibioticUseQuality = lazy(() => import('@/pages/antibiotic-use-quality'));
+// M440-C：药品不良反应监测 V13（药事管理与药学服务组）
+const AdrReporting = lazy(() => import('@/pages/adr-reporting'));
+// M440-D：临床药学服务质量管理 V13（M440 收官，药事管理与药学服务组）
+const ClinicalPharmacyQuality = lazy(() => import('@/pages/clinical-pharmacy-quality'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4579,6 +4587,14 @@ export default function AppRoutes() {
           <Route path="pressure-ulcer" element={<PressureUlcer />} />
           {/* M439-D：管路滑脱风险管理 V13（M439 收官，患者安全与医疗风险管理组） */}
           <Route path="tube-dislodgement" element={<TubeDislodgement />} />
+          {/* M440-A：处方点评质量管理 V13（药事管理与药学服务组） */}
+          <Route path="prescription-review-quality" element={<PrescriptionReviewQuality />} />
+          {/* M440-B：抗菌药物使用质量管理 V13（药事管理与药学服务组） */}
+          <Route path="antibiotic-use-quality" element={<AntibioticUseQuality />} />
+          {/* M440-C：药品不良反应监测 V13（药事管理与药学服务组） */}
+          <Route path="adr-reporting" element={<AdrReporting />} />
+          {/* M440-D：临床药学服务质量管理 V13（M440 收官，药事管理与药学服务组） */}
+          <Route path="clinical-pharmacy-quality" element={<ClinicalPharmacyQuality />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

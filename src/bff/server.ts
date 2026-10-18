@@ -2503,6 +2503,14 @@ import { fallIncidentV13Routes } from './routes/fallIncidentV13';
 import { pressureUlcerV13Routes } from './routes/pressureUlcerV13';
 // M439-D：管路滑脱风险管理 V13 GET /api/v1/tube-dislodgement（M439 收官，患者安全与医疗风险管理组）
 import { tubeDislodgementV13Routes } from './routes/tubeDislodgementV13';
+// M440-A：处方点评质量管理 V13 GET /api/v1/prescription-review-quality（药事管理与药学服务组）
+import { prescriptionReviewQualityV13Routes } from './routes/prescriptionReviewQualityV13';
+// M440-B：抗菌药物使用质量管理 V13 GET /api/v1/antibiotic-use-quality（药事管理与药学服务组）
+import { antibioticUseQualityV13Routes } from './routes/antibioticUseQualityV13';
+// M440-C：药品不良反应监测 V13 GET /api/v1/adr-reporting（药事管理与药学服务组）
+import { adrReportingV13Routes } from './routes/adrReportingV13';
+// M440-D：临床药学服务质量管理 V13 GET /api/v1/clinical-pharmacy-quality（M440 收官，药事管理与药学服务组）
+import { clinicalPharmacyQualityV13Routes } from './routes/clinicalPharmacyQualityV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3997,6 +4005,10 @@ const allRoutes: RouteDef[] = [
   ...fallIncidentV13Routes, // M439-B：跌倒坠床风险管理 V13 GET /api/v1/fall-incident（患者安全与医疗风险管理组）
   ...pressureUlcerV13Routes, // M439-C：压疮风险管理 V13 GET /api/v1/pressure-ulcer（患者安全与医疗风险管理组）
   ...tubeDislodgementV13Routes, // M439-D：管路滑脱风险管理 V13 GET /api/v1/tube-dislodgement（M439 收官，患者安全与医疗风险管理组）
+  ...prescriptionReviewQualityV13Routes, // M440-A：处方点评质量管理 V13 GET /api/v1/prescription-review-quality（药事管理与药学服务组）
+  ...antibioticUseQualityV13Routes, // M440-B：抗菌药物使用质量管理 V13 GET /api/v1/antibiotic-use-quality（药事管理与药学服务组）
+  ...adrReportingV13Routes, // M440-C：药品不良反应监测 V13 GET /api/v1/adr-reporting（药事管理与药学服务组）
+  ...clinicalPharmacyQualityV13Routes, // M440-D：临床药学服务质量管理 V13 GET /api/v1/clinical-pharmacy-quality（M440 收官，药事管理与药学服务组）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
