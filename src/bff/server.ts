@@ -3121,6 +3121,14 @@ import { emrQcPainAssessmentLinkV14Routes } from './routes/emrQcPainAssessmentLi
 import { emrQcPressureUlcerLinkV14Routes } from './routes/emrQcPressureUlcerLinkV14';
 // M517-D：质控-营养风险筛查联动 V14 GET/POST /api/v1/emr-qc-nutrition-screen-link（EMR 深化四模块，M517 收官，护理评估与风险筛查联动系列+营养筛查一致性检查）
 import { emrQcNutritionScreenLinkV14Routes } from './routes/emrQcNutritionScreenLinkV14';
+// M518-A：科室质控月报自动生成 V14 GET/POST /api/v1/emr-qc-dept-monthly-report（EMR 深化四模块，病历质控报告自动化系列，避让 -dept）
+import { emrQcDeptMonthlyReportV14Routes } from './routes/emrQcDeptMonthlyReportV14';
+// M518-B：个人质控档案自动生成 V14 GET/POST /api/v1/emr-qc-personal-profile（EMR 深化四模块，病历质控报告自动化系列）
+import { emrQcPersonalProfileV14Routes } from './routes/emrQcPersonalProfileV14';
+// M518-C：质控整改通知单自动生成 V14 GET/POST /api/v1/emr-qc-rectification-notice（EMR 深化四模块，病历质控报告自动化系列）
+import { emrQcRectificationNoticeV14Routes } from './routes/emrQcRectificationNoticeV14';
+// M518-D：质控PDCA报告自动生成 V14 GET/POST /api/v1/emr-qc-pdca-auto-report（EMR 深化四模块，M518 收官，病历质控报告自动化系列，避让 -auto）
+import { emrQcPdcaReportAutoV14Routes } from './routes/emrQcPdcaReportAutoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4924,6 +4932,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcPainAssessmentLinkV14Routes, // M517-B：质控-疼痛评估联动 V14 GET/POST /api/v1/emr-qc-pain-assessment-link（EMR 深化四模块，护理评估与风险筛查联动系列+疼痛评估一致性检查）
   ...emrQcPressureUlcerLinkV14Routes, // M517-C：质控-压疮风险评估联动 V14 GET/POST /api/v1/emr-qc-pressure-ulcer-link（EMR 深化四模块，护理评估与风险筛查联动系列+压疮评估一致性检查）
   ...emrQcNutritionScreenLinkV14Routes, // M517-D：质控-营养风险筛查联动 V14 GET/POST /api/v1/emr-qc-nutrition-screen-link（EMR 深化四模块，M517 收官，护理评估与风险筛查联动系列+营养筛查一致性检查）
+  ...emrQcDeptMonthlyReportV14Routes, // M518-A：科室质控月报自动生成 V14 GET/POST /api/v1/emr-qc-dept-monthly-report（EMR 深化四模块，病历质控报告自动化系列，避让 -dept）
+  ...emrQcPersonalProfileV14Routes, // M518-B：个人质控档案自动生成 V14 GET/POST /api/v1/emr-qc-personal-profile（EMR 深化四模块，病历质控报告自动化系列）
+  ...emrQcRectificationNoticeV14Routes, // M518-C：质控整改通知单自动生成 V14 GET/POST /api/v1/emr-qc-rectification-notice（EMR 深化四模块，病历质控报告自动化系列）
+  ...emrQcPdcaReportAutoV14Routes, // M518-D：质控PDCA报告自动生成 V14 GET/POST /api/v1/emr-qc-pdca-auto-report（EMR 深化四模块，M518 收官，病历质控报告自动化系列，避让 -auto）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

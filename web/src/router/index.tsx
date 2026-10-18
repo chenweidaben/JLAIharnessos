@@ -2941,6 +2941,14 @@ const EmrQcPainAssessmentLinkPage = lazy(() => import('@/pages/emr-qc-pain-asses
 const EmrQcPressureUlcerLinkPage = lazy(() => import('@/pages/emr-qc-pressure-ulcer-link'));
 // M517-D：质控-营养风险筛查联动 V14（EMR 深化四模块，M517 收官）
 const EmrQcNutritionScreenLinkPage = lazy(() => import('@/pages/emr-qc-nutrition-screen-link'));
+// M518-A：科室质控月报自动生成 V14（EMR 深化四模块，避让 -dept）
+const EmrQcDeptMonthlyReportPage = lazy(() => import('@/pages/emr-qc-dept-monthly-report'));
+// M518-B：个人质控档案自动生成 V14（EMR 深化四模块）
+const EmrQcPersonalProfilePage = lazy(() => import('@/pages/emr-qc-personal-profile'));
+// M518-C：质控整改通知单自动生成 V14（EMR 深化四模块）
+const EmrQcRectificationNoticePage = lazy(() => import('@/pages/emr-qc-rectification-notice'));
+// M518-D：质控PDCA报告自动生成 V14（EMR 深化四模块，M518 收官，避让 -auto）
+const EmrQcPdcaReportAutoPage = lazy(() => import('@/pages/emr-qc-pdca-auto-report'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5823,6 +5831,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-pressure-ulcer-link" element={<EmrQcPressureUlcerLinkPage />} />
           {/* M517-D：质控-营养风险筛查联动 V14（EMR 深化四模块，M517 收官） */}
           <Route path="emr-qc-nutrition-screen-link" element={<EmrQcNutritionScreenLinkPage />} />
+          {/* M518-A：科室质控月报自动生成 V14（EMR 深化四模块，避让 -dept） */}
+          <Route path="emr-qc-dept-monthly-report" element={<EmrQcDeptMonthlyReportPage />} />
+          {/* M518-B：个人质控档案自动生成 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-personal-profile" element={<EmrQcPersonalProfilePage />} />
+          {/* M518-C：质控整改通知单自动生成 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-rectification-notice" element={<EmrQcRectificationNoticePage />} />
+          {/* M518-D：质控PDCA报告自动生成 V14（EMR 深化四模块，M518 收官，避让 -auto） */}
+          <Route path="emr-qc-pdca-auto-report" element={<EmrQcPdcaReportAutoPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
