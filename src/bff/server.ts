@@ -3377,6 +3377,14 @@ import { emrAiQcAnomalyMonitorV14Routes } from './routes/emrAiQcAnomalyMonitorV1
 import { emrAiQcRiskScoreV14Routes } from './routes/emrAiQcRiskScoreV14';
 // M549-D：病历AI质控趋势预测 V14 GET/POST /api/v1/emr-ai-qc-trend-forecast（EMR 深化四模块，M549 收官，病历AI质控预警与监控系列）
 import { emrAiQcTrendForecastV14Routes } from './routes/emrAiQcTrendForecastV14';
+// M550-A：病历AI临床知识图谱 V14 GET/POST /api/v1/emr-ai-clinical-graph（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+import { emrAiClinicalGraphV14Routes } from './routes/emrAiClinicalGraphV14';
+// M550-B：病历AI鉴别诊断支持 V14 GET/POST /api/v1/emr-ai-diagnosis-diff（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+import { emrAiDiagnosisDiffV14Routes } from './routes/emrAiDiagnosisDiffV14';
+// M550-C：病历AI用药相互作用审查 V14 GET/POST /api/v1/emr-ai-drug-interaction（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+import { emrAiDrugInteractionV14Routes } from './routes/emrAiDrugInteractionV14';
+// M550-D：病历AI检验解读明细 V14 GET/POST /api/v1/emr-ai-lab-interpret-detail（EMR 深化四模块，M550 收官，-detail 后缀避让 M545-D emrAiLabInterpretV14）
+import { emrAiLabInterpretDetailV14Routes } from './routes/emrAiLabInterpretDetailV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5308,6 +5316,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiQcAnomalyMonitorV14Routes, // M549-B：病历AI质控异常监控 V14 GET/POST /api/v1/emr-ai-qc-anomaly-monitor（EMR 深化四模块，病历AI质控预警与监控系列）
   ...emrAiQcRiskScoreV14Routes, // M549-C：病历AI质控风险评分 V14 GET/POST /api/v1/emr-ai-qc-risk-score（EMR 深化四模块，病历AI质控预警与监控系列）
   ...emrAiQcTrendForecastV14Routes, // M549-D：病历AI质控趋势预测 V14 GET/POST /api/v1/emr-ai-qc-trend-forecast（EMR 深化四模块，M549 收官，病历AI质控预警与监控系列）
+  ...emrAiClinicalGraphV14Routes, // M550-A：病历AI临床知识图谱 V14 GET/POST /api/v1/emr-ai-clinical-graph（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+  ...emrAiDiagnosisDiffV14Routes, // M550-B：病历AI鉴别诊断支持 V14 GET/POST /api/v1/emr-ai-diagnosis-diff（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+  ...emrAiDrugInteractionV14Routes, // M550-C：病历AI用药相互作用审查 V14 GET/POST /api/v1/emr-ai-drug-interaction（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
+  ...emrAiLabInterpretDetailV14Routes, // M550-D：病历AI检验解读明细 V14 GET/POST /api/v1/emr-ai-lab-interpret-detail（EMR 深化四模块，M550 收官，-detail 后缀避让 M545-D emrAiLabInterpretV14）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
