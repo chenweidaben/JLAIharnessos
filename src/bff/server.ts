@@ -2463,6 +2463,14 @@ import { researchQualityMgmtV13Routes } from './routes/researchQualityMgmtV13';
 import { continuingEducationQualityMgmtV13Routes } from './routes/continuingEducationQualityMgmtV13';
 // M434-D：学科建设质量管理 V13 GET /api/v1/discipline-construction-quality-mgmt（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
 import { disciplineConstructionQualityMgmtV13Routes } from './routes/disciplineConstructionQualityMgmtV13';
+// M435-A：预算执行质量管理 V13 GET /api/v1/budget-execution-quality-mgmt（-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+import { budgetExecutionQualityMgmtV13Routes } from './routes/budgetExecutionQualityMgmtV13';
+// M435-B：采购质量管理 V13 GET /api/v1/procurement-quality-mgmt（-quality 后缀避让旧版采购模块（M408 consumableSupplyMgmtV13 等））
+import { procurementQualityMgmtV13Routes } from './routes/procurementQualityMgmtV13';
+// M435-C：固定资产质量管理 V13 GET /api/v1/fixed-asset-quality-mgmt（-quality 后缀避让旧版固定资产模块（M408 medicalDeviceMgmtV13 等））
+import { fixedAssetQualityMgmtV13Routes } from './routes/fixedAssetQualityMgmtV13';
+// M435-D：能耗质量管理 V13 GET /api/v1/energy-quality-mgmt（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+import { energyQualityMgmtV13Routes } from './routes/energyQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3937,6 +3945,10 @@ const allRoutes: RouteDef[] = [
   ...researchQualityMgmtV13Routes, // M434-B：科研质量管理 V13 GET /api/v1/research-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
   ...continuingEducationQualityMgmtV13Routes, // M434-C：继续教育质量管理 V13 GET /api/v1/continuing-education-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
   ...disciplineConstructionQualityMgmtV13Routes, // M434-D：学科建设质量管理 V13 GET /api/v1/discipline-construction-quality-mgmt（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+  ...budgetExecutionQualityMgmtV13Routes, // M435-A：预算执行质量管理 V13 GET /api/v1/budget-execution-quality-mgmt（-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+  ...procurementQualityMgmtV13Routes, // M435-B：采购质量管理 V13 GET /api/v1/procurement-quality-mgmt（-quality 后缀避让旧版采购模块（M408 consumableSupplyMgmtV13 等））
+  ...fixedAssetQualityMgmtV13Routes, // M435-C：固定资产质量管理 V13 GET /api/v1/fixed-asset-quality-mgmt（-quality 后缀避让旧版固定资产模块（M408 medicalDeviceMgmtV13 等））
+  ...energyQualityMgmtV13Routes, // M435-D：能耗质量管理 V13 GET /api/v1/energy-quality-mgmt（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

@@ -2279,6 +2279,14 @@ const ResearchQualityMgmt = lazy(() => import('@/pages/research-quality-mgmt'));
 const ContinuingEducationQualityMgmt = lazy(() => import('@/pages/continuing-education-quality-mgmt'));
 // M434-D：学科建设质量管理 V13（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
 const DisciplineConstructionQualityMgmt = lazy(() => import('@/pages/discipline-construction-quality-mgmt'));
+// M435-A：预算执行质量管理 V13（-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+const BudgetExecutionQualityMgmt = lazy(() => import('@/pages/budget-execution-quality-mgmt'));
+// M435-B：采购质量管理 V13（-quality 后缀避让旧版采购模块（M408 consumableSupplyMgmtV13 等））
+const ProcurementQualityMgmt = lazy(() => import('@/pages/procurement-quality-mgmt'));
+// M435-C：固定资产质量管理 V13（-quality 后缀避让旧版固定资产模块（M408 medicalDeviceMgmtV13 等））
+const FixedAssetQualityMgmt = lazy(() => import('@/pages/fixed-asset-quality-mgmt'));
+// M435-D：能耗质量管理 V13（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等））
+const EnergyQualityMgmt = lazy(() => import('@/pages/energy-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4499,6 +4507,14 @@ export default function AppRoutes() {
           <Route path="continuing-education-quality-mgmt" element={<ContinuingEducationQualityMgmt />} />
           {/* M434-D：学科建设质量管理 V13（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等）） */}
           <Route path="discipline-construction-quality-mgmt" element={<DisciplineConstructionQualityMgmt />} />
+          {/* M435-A：预算执行质量管理 V13（-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等）） */}
+          <Route path="budget-execution-quality-mgmt" element={<BudgetExecutionQualityMgmt />} />
+          {/* M435-B：采购质量管理 V13（-quality 后缀避让旧版采购模块（M408 consumableSupplyMgmtV13 等）） */}
+          <Route path="procurement-quality-mgmt" element={<ProcurementQualityMgmt />} />
+          {/* M435-C：固定资产质量管理 V13（-quality 后缀避让旧版固定资产模块（M408 medicalDeviceMgmtV13 等）） */}
+          <Route path="fixed-asset-quality-mgmt" element={<FixedAssetQualityMgmt />} />
+          {/* M435-D：能耗质量管理 V13（M435 收官，-quality 后缀避让旧版运营财务模块（M407 operationCostMgmtV13 等）） */}
+          <Route path="energy-quality-mgmt" element={<EnergyQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
