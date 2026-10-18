@@ -2439,6 +2439,14 @@ const EmergencyGreenChannelMgmt = lazy(() => import('@/pages/emergency-green-cha
 const SurgeryAnesthesiaMgmt = lazy(() => import('@/pages/surgery-anesthesia-mgmt'));
 // M454-D：ICU 管理（统计视角）V13（M454 收官，门急诊与手术麻醉管理组）
 const IcuStatsMgmt = lazy(() => import('@/pages/icu-stats-mgmt'));
+// M455-A：药品采购管理 V13（药品供应与库存管理组）
+const DrugPurchaseMgmt = lazy(() => import('@/pages/drug-purchase-mgmt'));
+// M455-B：药品库存管理 V13（药品供应与库存管理组）
+const DrugInventoryMgmt = lazy(() => import('@/pages/drug-inventory-mgmt'));
+// M455-C：药品效期管理 V13（药品供应与库存管理组）
+const DrugExpiryMgmt = lazy(() => import('@/pages/drug-expiry-mgmt'));
+// M455-D：特殊药品管理 V13（M455 收官，药品供应与库存管理组）
+const SpecialDrugMgmt = lazy(() => import('@/pages/special-drug-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4819,6 +4827,14 @@ export default function AppRoutes() {
           <Route path="surgery-anesthesia-mgmt" element={<SurgeryAnesthesiaMgmt />} />
           {/* M454-D：ICU 管理（统计视角）V13（M454 收官，门急诊与手术麻醉管理组） */}
           <Route path="icu-stats-mgmt" element={<IcuStatsMgmt />} />
+          {/* M455-A：药品采购管理 V13（药品供应与库存管理组） */}
+          <Route path="drug-purchase-mgmt" element={<DrugPurchaseMgmt />} />
+          {/* M455-B：药品库存管理 V13（药品供应与库存管理组） */}
+          <Route path="drug-inventory-mgmt" element={<DrugInventoryMgmt />} />
+          {/* M455-C：药品效期管理 V13（药品供应与库存管理组） */}
+          <Route path="drug-expiry-mgmt" element={<DrugExpiryMgmt />} />
+          {/* M455-D：特殊药品管理 V13（M455 收官，药品供应与库存管理组） */}
+          <Route path="special-drug-mgmt" element={<SpecialDrugMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
