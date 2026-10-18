@@ -3165,6 +3165,14 @@ const EmrAiDiffDxPage = lazy(() => import('@/pages/emr-ai-diff-dx'));
 const EmrAiMedRecoPage = lazy(() => import('@/pages/emr-ai-med-reco'));
 // M545-D：病历AI检验解读 V14（EMR 深化四模块，M545 收官）
 const EmrAiLabInterpretPage = lazy(() => import('@/pages/emr-ai-lab-interpret'));
+// M546-A：病历AI临床路径推荐 V14（EMR 深化四模块）
+const EmrAiPathwayRecoPage = lazy(() => import('@/pages/emr-ai-pathway-reco'));
+// M546-B：病历AI医嘱推荐 V14（EMR 深化四模块）
+const EmrAiOrderRecoPage = lazy(() => import('@/pages/emr-ai-order-reco'));
+// M546-C：病历AI护理建议 V14（EMR 深化四模块，-suggest 后缀避让旧作废 -reco）
+const EmrAiNursingSuggestPage = lazy(() => import('@/pages/emr-ai-nursing-suggest'));
+// M546-D：病历AI随访计划推荐 V14（EMR 深化四模块，M546 收官）
+const EmrAiFollowupPlanRecoPage = lazy(() => import('@/pages/emr-ai-followup-plan-reco'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6271,6 +6279,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-med-reco" element={<EmrAiMedRecoPage />} />
           {/* M545-D：病历AI检验解读 V14（EMR 深化四模块，M545 收官） */}
           <Route path="emr-ai-lab-interpret" element={<EmrAiLabInterpretPage />} />
+          {/* M546-A：病历AI临床路径推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-pathway-reco" element={<EmrAiPathwayRecoPage />} />
+          {/* M546-B：病历AI医嘱推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-order-reco" element={<EmrAiOrderRecoPage />} />
+          {/* M546-C：病历AI护理建议 V14（EMR 深化四模块，-suggest 后缀避让旧作废 -reco） */}
+          <Route path="emr-ai-nursing-suggest" element={<EmrAiNursingSuggestPage />} />
+          {/* M546-D：病历AI随访计划推荐 V14（EMR 深化四模块，M546 收官） */}
+          <Route path="emr-ai-followup-plan-reco" element={<EmrAiFollowupPlanRecoPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

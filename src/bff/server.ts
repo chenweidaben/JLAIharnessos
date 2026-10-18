@@ -3345,6 +3345,14 @@ import { emrAiDiffDxV14Routes } from './routes/emrAiDiffDxV14';
 import { emrAiMedRecoV14Routes } from './routes/emrAiMedRecoV14';
 // M545-D：病历AI检验解读 V14 GET/POST /api/v1/emr-ai-lab-interpret（EMR 深化四模块，M545 收官，病历AI临床辅助决策系列）
 import { emrAiLabInterpretV14Routes } from './routes/emrAiLabInterpretV14';
+// M546-A：病历AI临床路径推荐 V14 GET/POST /api/v1/emr-ai-pathway-reco（EMR 深化四模块，病历AI护理与患者管理系列）
+import { emrAiPathwayRecoV14Routes } from './routes/emrAiPathwayRecoV14';
+// M546-B：病历AI医嘱推荐 V14 GET/POST /api/v1/emr-ai-order-reco（EMR 深化四模块，病历AI护理与患者管理系列）
+import { emrAiOrderRecoV14Routes } from './routes/emrAiOrderRecoV14';
+// M546-C：病历AI护理建议 V14 GET/POST /api/v1/emr-ai-nursing-suggest（EMR 深化四模块，病历AI护理与患者管理系列，-suggest 后缀避让旧作废 -reco）
+import { emrAiNursingSuggestV14Routes } from './routes/emrAiNursingSuggestV14';
+// M546-D：病历AI随访计划推荐 V14 GET/POST /api/v1/emr-ai-followup-plan-reco（EMR 深化四模块，M546 收官，病历AI护理与患者管理系列）
+import { emrAiFollowupPlanRecoV14Routes } from './routes/emrAiFollowupPlanRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5260,6 +5268,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiDiffDxV14Routes, // M545-B：病历AI鉴别诊断 V14 GET/POST /api/v1/emr-ai-diff-dx（EMR 深化四模块，病历AI临床辅助决策系列）
   ...emrAiMedRecoV14Routes, // M545-C：病历AI用药建议 V14 GET/POST /api/v1/emr-ai-med-reco（EMR 深化四模块，病历AI临床辅助决策系列）
   ...emrAiLabInterpretV14Routes, // M545-D：病历AI检验解读 V14 GET/POST /api/v1/emr-ai-lab-interpret（EMR 深化四模块，M545 收官，病历AI临床辅助决策系列）
+  ...emrAiPathwayRecoV14Routes, // M546-A：病历AI临床路径推荐 V14 GET/POST /api/v1/emr-ai-pathway-reco（EMR 深化四模块，病历AI护理与患者管理系列）
+  ...emrAiOrderRecoV14Routes, // M546-B：病历AI医嘱推荐 V14 GET/POST /api/v1/emr-ai-order-reco（EMR 深化四模块，病历AI护理与患者管理系列）
+  ...emrAiNursingSuggestV14Routes, // M546-C：病历AI护理建议 V14 GET/POST /api/v1/emr-ai-nursing-suggest（EMR 深化四模块，病历AI护理与患者管理系列，-suggest 后缀避让旧作废 -reco）
+  ...emrAiFollowupPlanRecoV14Routes, // M546-D：病历AI随访计划推荐 V14 GET/POST /api/v1/emr-ai-followup-plan-reco（EMR 深化四模块，M546 收官，病历AI护理与患者管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
