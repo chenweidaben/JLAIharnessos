@@ -2533,6 +2533,14 @@ const EmrMaskingPage = lazy(() => import('@/pages/emr-masking'));
 const EmrTemplateDiffPage = lazy(() => import('@/pages/emr-template-diff'));
 // M466-D：病历质控月度报告自动生成 V14（EMR 深化四模块，M466 收官）
 const EmrMonthlyReportPage = lazy(() => import('@/pages/emr-monthly-report'));
+// M467-A：病历质控规则引擎可视化对接 V14（EMR 深化四模块）
+const EmrRuleEnginePage = lazy(() => import('@/pages/emr-rule-engine'));
+// M467-B：病历 AI 辅助书写实时建议 V14（EMR 深化四模块）
+const EmrAiAssistantPage = lazy(() => import('@/pages/emr-ai-assistant'));
+// M467-C：病历质控追溯审计日志 V14（EMR 深化四模块）
+const EmrQcAuditLogPage = lazy(() => import('@/pages/emr-qc-audit-log'));
+// M467-D：病历质控培训考核模块 V14（EMR 深化四模块，M467 收官）
+const EmrTrainingPage = lazy(() => import('@/pages/emr-training'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5006,6 +5014,14 @@ export default function AppRoutes() {
           <Route path="emr-template-diff" element={<EmrTemplateDiffPage />} />
           {/* M466-D：病历质控月度报告自动生成 V14（EMR 深化四模块，M466 收官） */}
           <Route path="emr-monthly-report" element={<EmrMonthlyReportPage />} />
+          {/* M467-A：病历质控规则引擎可视化对接 V14（EMR 深化四模块） */}
+          <Route path="emr-rule-engine" element={<EmrRuleEnginePage />} />
+          {/* M467-B：病历 AI 辅助书写实时建议 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-assistant" element={<EmrAiAssistantPage />} />
+          {/* M467-C：病历质控追溯审计日志 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-audit-log" element={<EmrQcAuditLogPage />} />
+          {/* M467-D：病历质控培训考核模块 V14（EMR 深化四模块，M467 收官） */}
+          <Route path="emr-training" element={<EmrTrainingPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
