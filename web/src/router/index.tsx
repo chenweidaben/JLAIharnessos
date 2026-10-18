@@ -2693,6 +2693,14 @@ const EmrAiKeywordPage = lazy(() => import('@/pages/emr-ai-keyword'));
 const EmrAiRiskPredictPage = lazy(() => import('@/pages/emr-ai-risk-predict'));
 // M486-D：AI 病历相似病历推荐 V14（EMR 深化四模块，M486 收官）
 const EmrAiSimilarPage = lazy(() => import('@/pages/emr-ai-similar'));
+// M487-A：质控日报 V14（EMR 深化四模块）
+const EmrQcDailyReportPage = lazy(() => import('@/pages/emr-qc-daily-report'));
+// M487-B：质控周报 V14（EMR 深化四模块）
+const EmrQcWeeklyReportPage = lazy(() => import('@/pages/emr-qc-weekly-report'));
+// M487-C：质控季报 V14（EMR 深化四模块）
+const EmrQcQuarterlyReportPage = lazy(() => import('@/pages/emr-qc-quarterly-report'));
+// M487-D：质控年报 V14（EMR 深化四模块，M487 收官）
+const EmrQcAnnualReportPage = lazy(() => import('@/pages/emr-qc-annual-report'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5327,6 +5335,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-risk-predict" element={<EmrAiRiskPredictPage />} />
           {/* M486-D：AI 病历相似病历推荐 V14（EMR 深化四模块，M486 收官） */}
           <Route path="emr-ai-similar" element={<EmrAiSimilarPage />} />
+          {/* M487-A：质控日报 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-daily-report" element={<EmrQcDailyReportPage />} />
+          {/* M487-B：质控周报 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-weekly-report" element={<EmrQcWeeklyReportPage />} />
+          {/* M487-C：质控季报 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-quarterly-report" element={<EmrQcQuarterlyReportPage />} />
+          {/* M487-D：质控年报 V14（EMR 深化四模块，M487 收官） */}
+          <Route path="emr-qc-annual-report" element={<EmrQcAnnualReportPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
