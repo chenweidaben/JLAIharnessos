@@ -3017,6 +3017,14 @@ import { emrQcQualityProjectV14Routes } from './routes/emrQcQualityProjectV14';
 import { emrQcBenchmarkingV14Routes } from './routes/emrQcBenchmarkingV14';
 // M504-D：质控患者满意度调查 V14 GET/POST /api/v1/emr-qc-patient-satisfaction（EMR 深化四模块，M504 收官，总份数+平均分+满意度%）
 import { emrQcPatientSatisfactionV14Routes } from './routes/emrQcPatientSatisfactionV14';
+// M505-A：质控规范库管理 V14 GET/POST /api/v1/emr-qc-norm-library（EMR 深化四模块，规范增删管理）
+import { emrQcNormLibraryV14Routes } from './routes/emrQcNormLibraryV14';
+// M505-B：质控制度查询 V14 GET /api/v1/emr-qc-policy-query（EMR 深化四模块，制度搜索 keyword）
+import { emrQcPolicyQueryV14Routes } from './routes/emrQcPolicyQueryV14';
+// M505-C：质控指南库 V14 GET /api/v1/emr-qc-guideline-library（EMR 深化四模块，指南专科筛选）
+import { emrQcGuidelineLibraryV14Routes } from './routes/emrQcGuidelineLibraryV14';
+// M505-D：质控法律法规 V14 GET /api/v1/emr-qc-regulation（EMR 深化四模块，M505 收官，法规搜索 keyword）
+import { emrQcRegulationV14Routes } from './routes/emrQcRegulationV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4768,6 +4776,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcQualityProjectV14Routes, // M504-B：质控质量改进项目 V14 GET/POST /api/v1/emr-qc-quality-project（EMR 深化四模块，项目增/关闭状态变更）
   ...emrQcBenchmarkingV14Routes, // M504-C：质控标杆管理 V14 GET /api/v1/emr-qc-benchmarking（EMR 深化四模块，差距对比+达标判定）
   ...emrQcPatientSatisfactionV14Routes, // M504-D：质控患者满意度调查 V14 GET/POST /api/v1/emr-qc-patient-satisfaction（EMR 深化四模块，M504 收官，总份数+平均分+满意度%）
+  ...emrQcNormLibraryV14Routes, // M505-A：质控规范库管理 V14 GET/POST /api/v1/emr-qc-norm-library（EMR 深化四模块，规范增删管理）
+  ...emrQcPolicyQueryV14Routes, // M505-B：质控制度查询 V14 GET /api/v1/emr-qc-policy-query（EMR 深化四模块，制度搜索 keyword）
+  ...emrQcGuidelineLibraryV14Routes, // M505-C：质控指南库 V14 GET /api/v1/emr-qc-guideline-library（EMR 深化四模块，指南专科筛选）
+  ...emrQcRegulationV14Routes, // M505-D：质控法律法规 V14 GET /api/v1/emr-qc-regulation（EMR 深化四模块，M505 收官，法规搜索 keyword）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
