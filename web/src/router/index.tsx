@@ -2255,6 +2255,14 @@ const DeviceQualityMgmt = lazy(() => import('@/pages/device-quality-mgmt'));
 const FireSafetyQualityMgmt = lazy(() => import('@/pages/fire-safety-quality-mgmt'));
 // M431-D：治安保卫质量管理 V13（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408））
 const SecurityQualityMgmt = lazy(() => import('@/pages/security-quality-mgmt'));
+// M432-A：信息系统质量管理 V13（-quality 后缀避让旧版 informationSystemMgmtV13（M409））
+const InformationSystemQualityMgmt = lazy(() => import('@/pages/information-system-quality-mgmt'));
+// M432-B：数据上报质量管理 V13（换名 dataReport + -quality 后缀避让旧版 dataQualityMgmtV13（M409））
+const DataReportQualityMgmt = lazy(() => import('@/pages/data-report-quality-mgmt'));
+// M432-C：网络安全质量管理 V13（-quality 后缀避让旧版 networkSecurityMgmtV13（M409））
+const NetworkSecurityQualityMgmt = lazy(() => import('@/pages/network-security-quality-mgmt'));
+// M432-D：互联互通质量管理 V13（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409））
+const InteroperabilityQualityMgmt = lazy(() => import('@/pages/interoperability-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4451,6 +4459,14 @@ export default function AppRoutes() {
           <Route path="fire-safety-quality-mgmt" element={<FireSafetyQualityMgmt />} />
           {/* M431-D：治安保卫质量管理 V13（M431 收官，-quality 后缀避让旧版 securityMgmtV13（M408）） */}
           <Route path="security-quality-mgmt" element={<SecurityQualityMgmt />} />
+          {/* M432-A：信息系统质量管理 V13（-quality 后缀避让旧版 informationSystemMgmtV13（M409）） */}
+          <Route path="information-system-quality-mgmt" element={<InformationSystemQualityMgmt />} />
+          {/* M432-B：数据上报质量管理 V13（换名 dataReport + -quality 后缀避让旧版 dataQualityMgmtV13（M409）） */}
+          <Route path="data-report-quality-mgmt" element={<DataReportQualityMgmt />} />
+          {/* M432-C：网络安全质量管理 V13（-quality 后缀避让旧版 networkSecurityMgmtV13（M409）） */}
+          <Route path="network-security-quality-mgmt" element={<NetworkSecurityQualityMgmt />} />
+          {/* M432-D：互联互通质量管理 V13（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409）） */}
+          <Route path="interoperability-quality-mgmt" element={<InteroperabilityQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
