@@ -2343,6 +2343,14 @@ const ChildHealthMgmt = lazy(() => import('@/pages/child-health-mgmt'));
 const BirthDefectMonitoring = lazy(() => import('@/pages/birth-defect-monitoring'));
 // M442-D：计划生育技术服务 V13（M442 收官，妇幼健康与计划生育管理组）
 const FamilyPlanningMgmt = lazy(() => import('@/pages/family-planning-mgmt'));
+// M443-A：住院医师规范化培训 V13（教学科研与继续教育管理组）
+const ResidencyTrainingMgmt = lazy(() => import('@/pages/residency-training-mgmt'));
+// M443-B：继续医学教育 V13（教学科研与继续教育管理组）
+const ContinuingEducationMgmt = lazy(() => import('@/pages/continuing-education-mgmt'));
+// M443-C：科研项目管理 V13（教学科研与继续教育管理组）
+const ResearchProjectMgmt = lazy(() => import('@/pages/research-project-mgmt'));
+// M443-D：教学质量评估 V13（M443 收官，教学科研与继续教育管理组）
+const TeachingQualityMgmtAssessment = lazy(() => import('@/pages/teaching-quality-mgmt-assessment'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4627,6 +4635,14 @@ export default function AppRoutes() {
           <Route path="birth-defect-monitoring" element={<BirthDefectMonitoring />} />
           {/* M442-D：计划生育技术服务 V13（M442 收官，妇幼健康与计划生育管理组） */}
           <Route path="family-planning-mgmt" element={<FamilyPlanningMgmt />} />
+          {/* M443-A：住院医师规范化培训 V13（教学科研与继续教育管理组） */}
+          <Route path="residency-training-mgmt" element={<ResidencyTrainingMgmt />} />
+          {/* M443-B：继续医学教育 V13（教学科研与继续教育管理组） */}
+          <Route path="continuing-education-mgmt" element={<ContinuingEducationMgmt />} />
+          {/* M443-C：科研项目管理 V13（教学科研与继续教育管理组） */}
+          <Route path="research-project-mgmt" element={<ResearchProjectMgmt />} />
+          {/* M443-D：教学质量评估 V13（M443 收官，教学科研与继续教育管理组） */}
+          <Route path="teaching-quality-mgmt-assessment" element={<TeachingQualityMgmtAssessment />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

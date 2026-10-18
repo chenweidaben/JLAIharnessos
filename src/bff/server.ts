@@ -2527,6 +2527,14 @@ import { childHealthMgmtV13Routes } from './routes/childHealthMgmtV13';
 import { birthDefectMonitoringV13Routes } from './routes/birthDefectMonitoringV13';
 // M442-D：计划生育技术服务 V13 GET /api/v1/family-planning-mgmt（M442 收官，妇幼健康与计划生育管理组）
 import { familyPlanningMgmtV13Routes } from './routes/familyPlanningMgmtV13';
+// M443-A：住院医师规范化培训 V13 GET /api/v1/residency-training-mgmt（教学科研与继续教育管理组）
+import { residencyTrainingMgmtV13Routes } from './routes/residencyTrainingMgmtV13';
+// M443-B：继续医学教育 V13 GET /api/v1/continuing-education-mgmt（教学科研与继续教育管理组）
+import { continuingEducationMgmtV13Routes } from './routes/continuingEducationMgmtV13';
+// M443-C：科研项目管理 V13 GET /api/v1/research-project-mgmt（教学科研与继续教育管理组）
+import { researchProjectMgmtV13Routes } from './routes/researchProjectMgmtV13';
+// M443-D：教学质量评估 V13 GET /api/v1/teaching-quality-mgmt-assessment（M443 收官，教学科研与继续教育管理组）
+import { teachingQualityMgmtAssessmentV13Routes } from './routes/teachingQualityMgmtAssessmentV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4033,6 +4041,10 @@ const allRoutes: RouteDef[] = [
   ...childHealthMgmtV13Routes, // M442-B：儿童保健管理 V13 GET /api/v1/child-health-mgmt（妇幼健康与计划生育管理组）
   ...birthDefectMonitoringV13Routes, // M442-C：出生缺陷监测 V13 GET /api/v1/birth-defect-monitoring（妇幼健康与计划生育管理组）
   ...familyPlanningMgmtV13Routes, // M442-D：计划生育技术服务 V13 GET /api/v1/family-planning-mgmt（M442 收官，妇幼健康与计划生育管理组）
+  ...residencyTrainingMgmtV13Routes, // M443-A：住院医师规范化培训 V13 GET /api/v1/residency-training-mgmt（教学科研与继续教育管理组）
+  ...continuingEducationMgmtV13Routes, // M443-B：继续医学教育 V13 GET /api/v1/continuing-education-mgmt（教学科研与继续教育管理组）
+  ...researchProjectMgmtV13Routes, // M443-C：科研项目管理 V13 GET /api/v1/research-project-mgmt（教学科研与继续教育管理组）
+  ...teachingQualityMgmtAssessmentV13Routes, // M443-D：教学质量评估 V13 GET /api/v1/teaching-quality-mgmt-assessment（M443 收官，教学科研与继续教育管理组）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
