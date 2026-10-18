@@ -3009,6 +3009,14 @@ import { emrQcOnlineExamV14Routes } from './routes/emrQcOnlineExamV14';
 import { emrQcExamCertificateV14Routes } from './routes/emrQcExamCertificateV14';
 // M503-D：质控培训记录 V14 GET /api/v1/emr-qc-training-record（EMR 深化四模块，M503 收官，总记录数+参训人数去重）
 import { emrQcTrainingRecordV14Routes } from './routes/emrQcTrainingRecordV14';
+// M504-A：质控 PDCA 改进计划 V14 POST /api/v1/emr-qc-pdca-plan（EMR 深化四模块，阶段推进 P→D→C→A→完成）
+import { emrQcPdcaPlanV14Routes } from './routes/emrQcPdcaPlanV14';
+// M504-B：质控质量改进项目 V14 GET/POST /api/v1/emr-qc-quality-project（EMR 深化四模块，项目增/关闭状态变更）
+import { emrQcQualityProjectV14Routes } from './routes/emrQcQualityProjectV14';
+// M504-C：质控标杆管理 V14 GET /api/v1/emr-qc-benchmarking（EMR 深化四模块，差距对比+达标判定）
+import { emrQcBenchmarkingV14Routes } from './routes/emrQcBenchmarkingV14';
+// M504-D：质控患者满意度调查 V14 GET/POST /api/v1/emr-qc-patient-satisfaction（EMR 深化四模块，M504 收官，总份数+平均分+满意度%）
+import { emrQcPatientSatisfactionV14Routes } from './routes/emrQcPatientSatisfactionV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4756,6 +4764,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcOnlineExamV14Routes, // M503-B：质控在线考试 V14 POST /api/v1/emr-qc-online-exam（EMR 深化四模块，等级评定+通过率聚合）
   ...emrQcExamCertificateV14Routes, // M503-C：质控考核证书 V14 GET /api/v1/emr-qc-exam-certificate（EMR 深化四模块，证书构建+有效性验证）
   ...emrQcTrainingRecordV14Routes, // M503-D：质控培训记录 V14 GET /api/v1/emr-qc-training-record（EMR 深化四模块，M503 收官，总记录数+参训人数去重）
+  ...emrQcPdcaPlanV14Routes, // M504-A：质控 PDCA 改进计划 V14 POST /api/v1/emr-qc-pdca-plan（EMR 深化四模块，阶段推进 P→D→C→A→完成）
+  ...emrQcQualityProjectV14Routes, // M504-B：质控质量改进项目 V14 GET/POST /api/v1/emr-qc-quality-project（EMR 深化四模块，项目增/关闭状态变更）
+  ...emrQcBenchmarkingV14Routes, // M504-C：质控标杆管理 V14 GET /api/v1/emr-qc-benchmarking（EMR 深化四模块，差距对比+达标判定）
+  ...emrQcPatientSatisfactionV14Routes, // M504-D：质控患者满意度调查 V14 GET/POST /api/v1/emr-qc-patient-satisfaction（EMR 深化四模块，M504 收官，总份数+平均分+满意度%）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
