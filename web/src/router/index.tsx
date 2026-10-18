@@ -2455,6 +2455,14 @@ const ResearchAchievementTransformMgmt = lazy(() => import('@/pages/research-ach
 const AcademicExchangeMgmt = lazy(() => import('@/pages/academic-exchange-mgmt'));
 // M456-D：科研平台管理 V13（M456 收官，学科建设与科研管理组）
 const ResearchPlatformMgmt = lazy(() => import('@/pages/research-platform-mgmt'));
+// M457-A：医院文化建设管理 V13（医院文化与公益管理组）
+const HospitalCultureMgmt = lazy(() => import('@/pages/hospital-culture-mgmt'));
+// M457-B：志愿者服务管理 V13（医院文化与公益管理组）
+const VolunteerServiceMgmt = lazy(() => import('@/pages/volunteer-service-mgmt'));
+// M457-C：健康宣教管理（统计视角）V13（医院文化与公益管理组，-stats 避让）
+const HealthEducationStatsMgmt = lazy(() => import('@/pages/health-education-stats-mgmt'));
+// M457-D：社工服务管理 V13（M457 收官，医院文化与公益管理组）
+const SocialWorkServiceMgmt = lazy(() => import('@/pages/social-work-service-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4851,6 +4859,14 @@ export default function AppRoutes() {
           <Route path="academic-exchange-mgmt" element={<AcademicExchangeMgmt />} />
           {/* M456-D：科研平台管理 V13（M456 收官，学科建设与科研管理组） */}
           <Route path="research-platform-mgmt" element={<ResearchPlatformMgmt />} />
+          {/* M457-A：医院文化建设管理 V13（医院文化与公益管理组） */}
+          <Route path="hospital-culture-mgmt" element={<HospitalCultureMgmt />} />
+          {/* M457-B：志愿者服务管理 V13（医院文化与公益管理组） */}
+          <Route path="volunteer-service-mgmt" element={<VolunteerServiceMgmt />} />
+          {/* M457-C：健康宣教管理（统计视角）V13（医院文化与公益管理组，-stats 避让） */}
+          <Route path="health-education-stats-mgmt" element={<HealthEducationStatsMgmt />} />
+          {/* M457-D：社工服务管理 V13（M457 收官，医院文化与公益管理组） */}
+          <Route path="social-work-service-mgmt" element={<SocialWorkServiceMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

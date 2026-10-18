@@ -2639,6 +2639,14 @@ import { researchAchievementTransformMgmtV13Routes } from './routes/researchAchi
 import { academicExchangeMgmtV13Routes } from './routes/academicExchangeMgmtV13';
 // M456-D：科研平台管理 V13 GET /api/v1/research-platform-mgmt（M456 收官，学科建设与科研管理组）
 import { researchPlatformMgmtV13Routes } from './routes/researchPlatformMgmtV13';
+// M457-A：医院文化建设管理 V13 GET /api/v1/hospital-culture-mgmt（医院文化与公益管理组）
+import { hospitalCultureMgmtV13Routes } from './routes/hospitalCultureMgmtV13';
+// M457-B：志愿者服务管理 V13 GET /api/v1/volunteer-service-mgmt（医院文化与公益管理组）
+import { volunteerServiceMgmtV13Routes } from './routes/volunteerServiceMgmtV13';
+// M457-C：健康宣教管理（统计视角）V13 GET /api/v1/health-education-stats-mgmt（医院文化与公益管理组，-stats 避让）
+import { healthEducationStatsMgmtV13Routes } from './routes/healthEducationStatsMgmtV13';
+// M457-D：社工服务管理 V13 GET /api/v1/social-work-service-mgmt（M457 收官，医院文化与公益管理组）
+import { socialWorkServiceMgmtV13Routes } from './routes/socialWorkServiceMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4201,6 +4209,10 @@ const allRoutes: RouteDef[] = [
   ...researchAchievementTransformMgmtV13Routes, // M456-B：科研成果转化管理 V13 GET /api/v1/research-achievement-transform-mgmt（学科建设与科研管理组）
   ...academicExchangeMgmtV13Routes, // M456-C：学术交流管理 V13 GET /api/v1/academic-exchange-mgmt（学科建设与科研管理组）
   ...researchPlatformMgmtV13Routes, // M456-D：科研平台管理 V13 GET /api/v1/research-platform-mgmt（M456 收官，学科建设与科研管理组）
+  ...hospitalCultureMgmtV13Routes, // M457-A：医院文化建设管理 V13 GET /api/v1/hospital-culture-mgmt（医院文化与公益管理组）
+  ...volunteerServiceMgmtV13Routes, // M457-B：志愿者服务管理 V13 GET /api/v1/volunteer-service-mgmt（医院文化与公益管理组）
+  ...healthEducationStatsMgmtV13Routes, // M457-C：健康宣教管理（统计视角）V13 GET /api/v1/health-education-stats-mgmt（医院文化与公益管理组，-stats 避让）
+  ...socialWorkServiceMgmtV13Routes, // M457-D：社工服务管理 V13 GET /api/v1/social-work-service-mgmt（M457 收官，医院文化与公益管理组）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
