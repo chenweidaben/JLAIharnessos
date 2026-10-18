@@ -2501,6 +2501,14 @@ const EmrArchivePage = lazy(() => import('@/pages/emr-archive'));
 const EmrBorrowPage = lazy(() => import('@/pages/emr-borrow'));
 // M462-D：电子病历等级评审仪表盘 V14（EMR 深化四模块，M462 收官）
 const EmrGradeDashboardPage = lazy(() => import('@/pages/emr-grade-dashboard'));
+// M463-A：病历电子签名与认证 V14（EMR 深化四模块）
+const EmrSignaturePage = lazy(() => import('@/pages/emr-signature'));
+// M463-B：病历复制痕迹保留 V14（EMR 深化四模块）
+const EmrCopyTracePage = lazy(() => import('@/pages/emr-copy-trace'));
+// M463-C：病历数据导出与区域上报 V14（EMR 深化四模块）
+const EmrExportPage = lazy(() => import('@/pages/emr-export'));
+// M463-D：科室质控员工作台 V14（EMR 深化四模块，M463 收官）
+const EmrQcWorkbenchPage = lazy(() => import('@/pages/emr-qc-workbench'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -4942,6 +4950,14 @@ export default function AppRoutes() {
           <Route path="emr-borrow" element={<EmrBorrowPage />} />
           {/* M462-D：电子病历等级评审仪表盘 V14（EMR 深化四模块，M462 收官） */}
           <Route path="emr-grade-dashboard" element={<EmrGradeDashboardPage />} />
+          {/* M463-A：病历电子签名与认证 V14（EMR 深化四模块） */}
+          <Route path="emr-signature" element={<EmrSignaturePage />} />
+          {/* M463-B：病历复制痕迹保留 V14（EMR 深化四模块） */}
+          <Route path="emr-copy-trace" element={<EmrCopyTracePage />} />
+          {/* M463-C：病历数据导出与区域上报 V14（EMR 深化四模块） */}
+          <Route path="emr-export" element={<EmrExportPage />} />
+          {/* M463-D：科室质控员工作台 V14（EMR 深化四模块，M463 收官） */}
+          <Route path="emr-qc-workbench" element={<EmrQcWorkbenchPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
