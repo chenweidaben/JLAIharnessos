@@ -2885,6 +2885,14 @@ const EmrQcIcuRulesPage = lazy(() => import('@/pages/emr-qc-icu-rules'));
 const EmrQcTcmRulesPage = lazy(() => import('@/pages/emr-qc-tcm-rules'));
 // M510-D：质控康复科专科规则 V14（EMR 深化四模块，M510 收官）
 const EmrQcRehabRulesPage = lazy(() => import('@/pages/emr-qc-rehab-rules'));
+// M511-A：质控皮肤科专科规则 V14（EMR 深化四模块）
+const EmrQcDermatologyRulesPage = lazy(() => import('@/pages/emr-qc-dermatology-rules'));
+// M511-B：质控眼科专科规则 V14（EMR 深化四模块）
+const EmrQcOphthalmologyRulesPage = lazy(() => import('@/pages/emr-qc-ophthalmology-rules'));
+// M511-C：质控口腔科专科规则 V14（EMR 深化四模块）
+const EmrQcDentistryRulesPage = lazy(() => import('@/pages/emr-qc-dentistry-rules'));
+// M511-D：质控耳鼻喉科专科规则 V14（EMR 深化四模块，M511 收官）
+const EmrQcEntRulesPage = lazy(() => import('@/pages/emr-qc-ent-rules'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5711,6 +5719,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-tcm-rules" element={<EmrQcTcmRulesPage />} />
           {/* M510-D：质控康复科专科规则 V14（EMR 深化四模块，M510 收官） */}
           <Route path="emr-qc-rehab-rules" element={<EmrQcRehabRulesPage />} />
+          {/* M511-A：质控皮肤科专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-dermatology-rules" element={<EmrQcDermatologyRulesPage />} />
+          {/* M511-B：质控眼科专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-ophthalmology-rules" element={<EmrQcOphthalmologyRulesPage />} />
+          {/* M511-C：质控口腔科专科规则 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-dentistry-rules" element={<EmrQcDentistryRulesPage />} />
+          {/* M511-D：质控耳鼻喉科专科规则 V14（EMR 深化四模块，M511 收官） */}
+          <Route path="emr-qc-ent-rules" element={<EmrQcEntRulesPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
