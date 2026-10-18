@@ -3077,6 +3077,14 @@ const EmrAccessAuditLogPage = lazy(() => import('@/pages/emr-access-audit-log'))
 const EmrCopyRequestManagePage = lazy(() => import('@/pages/emr-copy-request-manage'));
 // M534-D：病历借阅归还管理 V14（EMR 深化四模块，M534 收官）
 const EmrLoanReturnPage = lazy(() => import('@/pages/emr-loan-return'));
+// M535-A：病案首页完整性校验 V14（EMR 深化四模块）
+const EmrHomepageCompletePage = lazy(() => import('@/pages/emr-homepage-complete'));
+// M535-B：病案首页逻辑校验 V14（EMR 深化四模块）
+const EmrHomepageLogicPage = lazy(() => import('@/pages/emr-homepage-logic'));
+// M535-C：DRG入组预测 V14（EMR 深化四模块）
+const EmrDrgPredictPage = lazy(() => import('@/pages/emr-drg-predict'));
+// M535-D：DIP分值预测 V14（EMR 深化四模块）
+const EmrDipPredictPage = lazy(() => import('@/pages/emr-dip-predict'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6095,6 +6103,14 @@ export default function AppRoutes() {
           <Route path="emr-copy-request-manage" element={<EmrCopyRequestManagePage />} />
           {/* M534-D：病历借阅归还管理 V14（EMR 深化四模块，M534 收官） */}
           <Route path="emr-loan-return" element={<EmrLoanReturnPage />} />
+          {/* M535-A：病案首页完整性校验 V14（EMR 深化四模块） */}
+          <Route path="emr-homepage-complete" element={<EmrHomepageCompletePage />} />
+          {/* M535-B：病案首页逻辑校验 V14（EMR 深化四模块） */}
+          <Route path="emr-homepage-logic" element={<EmrHomepageLogicPage />} />
+          {/* M535-C：DRG入组预测 V14（EMR 深化四模块） */}
+          <Route path="emr-drg-predict" element={<EmrDrgPredictPage />} />
+          {/* M535-D：DIP分值预测 V14（EMR 深化四模块） */}
+          <Route path="emr-dip-predict" element={<EmrDipPredictPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
