@@ -3073,6 +3073,14 @@ import { emrQcOphthalmologyRulesV14Routes } from './routes/emrQcOphthalmologyRul
 import { emrQcDentistryRulesV14Routes } from './routes/emrQcDentistryRulesV14';
 // M511-D：质控耳鼻喉科专科规则 V14 GET/POST /api/v1/emr-qc-ent-rules（EMR 深化四模块，M511 收官，扩展专科规则+病历检查）
 import { emrQcEntRulesV14Routes } from './routes/emrQcEntRulesV14';
+// M512-A：质控麻醉科专科规则 V14 GET/POST /api/v1/emr-qc-anesthesia-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcAnesthesiaRulesV14Routes } from './routes/emrQcAnesthesiaRulesV14';
+// M512-B：质控病理科专科规则 V14 GET/POST /api/v1/emr-qc-pathology-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcPathologyRulesV14Routes } from './routes/emrQcPathologyRulesV14';
+// M512-C：质控营养科专科规则 V14 GET/POST /api/v1/emr-qc-nutrition-rules（EMR 深化四模块，扩展专科规则+病历检查）
+import { emrQcNutritionRulesV14Routes } from './routes/emrQcNutritionRulesV14';
+// M512-D：质控疼痛科专科规则 V14 GET/POST /api/v1/emr-qc-pain-rules（EMR 深化四模块，M512 收官，扩展专科规则+病历检查）
+import { emrQcPainRulesV14Routes } from './routes/emrQcPainRulesV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4852,6 +4860,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcOphthalmologyRulesV14Routes, // M511-B：质控眼科专科规则 V14 GET/POST /api/v1/emr-qc-ophthalmology-rules（EMR 深化四模块，扩展专科规则+病历检查）
   ...emrQcDentistryRulesV14Routes, // M511-C：质控口腔科专科规则 V14 GET/POST /api/v1/emr-qc-dentistry-rules（EMR 深化四模块，扩展专科规则+病历检查）
   ...emrQcEntRulesV14Routes, // M511-D：质控耳鼻喉科专科规则 V14 GET/POST /api/v1/emr-qc-ent-rules（EMR 深化四模块，M511 收官，扩展专科规则+病历检查）
+  ...emrQcAnesthesiaRulesV14Routes, // M512-A：质控麻醉科专科规则 V14 GET/POST /api/v1/emr-qc-anesthesia-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcPathologyRulesV14Routes, // M512-B：质控病理科专科规则 V14 GET/POST /api/v1/emr-qc-pathology-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcNutritionRulesV14Routes, // M512-C：质控营养科专科规则 V14 GET/POST /api/v1/emr-qc-nutrition-rules（EMR 深化四模块，扩展专科规则+病历检查）
+  ...emrQcPainRulesV14Routes, // M512-D：质控疼痛科专科规则 V14 GET/POST /api/v1/emr-qc-pain-rules（EMR 深化四模块，M512 收官，扩展专科规则+病历检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
