@@ -85,6 +85,50 @@ const HOSP_COURSE = sec('hospitalCourse', '诊疗经过', ['hospitalCourse', 'ho
 const DIS_COND = sec('dischargeCondition', '出院情况', ['dischargeCondition', 'discharge_condition', '出院情况']);
 const DIS_ORDERS = sec('dischargeOrders', '出院医嘱', ['dischargeOrders', 'discharge_orders', '出院医嘱']);
 
+/* ----------------------------- M460 大三甲深度升级：新增 9 种病历类型 ----------------------------- */
+
+// 首次病程记录：病例特点 / 初步诊断 / 诊疗计划
+const CASE_FEATURES = sec('caseFeatures', '病例特点', ['caseFeatures', 'case_features', '病例特点'], true, 10);
+const PRELIM_DIAG = sec('preliminaryDiagnosis', '初步诊断', ['preliminaryDiagnosis', 'preliminary_diagnosis', '初步诊断']);
+const TREAT_PLAN = sec('treatmentPlan', '诊疗计划', ['treatmentPlan', 'treatment_plan', '诊疗计划'], true, 5);
+
+// 上级医师查房记录：查房意见 / 病情分析 / 诊疗调整
+const ROUND_OPINION = sec('roundOpinion', '查房意见', ['roundOpinion', 'round_opinion', '查房意见'], true, 5);
+const CONDITION_ANALYSIS = sec('conditionAnalysis', '病情分析', ['conditionAnalysis', 'condition_analysis', '病情分析'], true, 5);
+const TREAT_ADJUST = sec('treatmentAdjustment', '诊疗调整', ['treatmentAdjustment', 'treatment_adjustment', '诊疗调整'], true, 3);
+
+// 交接班记录：交班情况 / 接班注意事项
+const HANDOVER_STATUS = sec('handoverStatus', '交班情况', ['handoverStatus', 'handover_status', '交班情况'], true, 5);
+const TAKEOVER_NOTES = sec('takeoverNotes', '接班注意事项', ['takeoverNotes', 'takeover_notes', '接班注意事项'], true, 5);
+
+// 转科记录：转科原因 / 目前病情 / 转科注意事项
+const TRANSFER_REASON = sec('transferReason', '转科原因', ['transferReason', 'transfer_reason', '转科原因'], true, 3);
+const CURRENT_CONDITION = sec('currentCondition', '目前病情', ['currentCondition', 'current_condition', '目前病情'], true, 5);
+const TRANSFER_NOTES = sec('transferNotes', '转科注意事项', ['transferNotes', 'transfer_notes', '转科注意事项'], true, 3);
+
+// 阶段小结：入院诊断 / 病情演变 / 当前诊疗
+const CONDITION_EVOLUTION = sec('conditionEvolution', '病情演变', ['conditionEvolution', 'condition_evolution', '病情演变'], true, 5);
+const CURRENT_TREAT = sec('currentTreatment', '当前诊疗', ['currentTreatment', 'current_treatment', '当前诊疗'], true, 5);
+
+// 抢救记录：抢救原因 / 抢救措施 / 抢救结果
+const RESCUE_REASON = sec('rescueReason', '抢救原因', ['rescueReason', 'rescue_reason', '抢救原因'], true, 5);
+const RESCUE_MEASURES = sec('rescueMeasures', '抢救措施', ['rescueMeasures', 'rescue_measures', '抢救措施'], true, 10);
+const RESCUE_RESULT = sec('rescueResult', '抢救结果', ['rescueResult', 'rescue_result', '抢救结果'], true, 5);
+
+// 有创操作记录：操作名称 / 操作过程 / 术中情况
+const PROCEDURE_NAME = sec('procedureName', '操作名称', ['procedureName', 'procedure_name', '操作名称']);
+const PROCEDURE_PROCESS = sec('procedureProcess', '操作过程', ['procedureProcess', 'procedure_process', '操作过程'], true, 10);
+const INTRA_OP = sec('intraOpCondition', '术中情况', ['intraOpCondition', 'intra_op_condition', '术中情况'], true, 5);
+
+// 会诊记录：会诊意见 / 会诊诊断 / 建议
+const CONSULT_OPINION = sec('consultationOpinion', '会诊意见', ['consultationOpinion', 'consultation_opinion', '会诊意见'], true, 5);
+const CONSULT_DIAG = sec('consultationDiagnosis', '会诊诊断', ['consultationDiagnosis', 'consultation_diagnosis', '会诊诊断']);
+const CONSULT_SUGGESTION = sec('suggestion', '建议', ['suggestion', 'suggestions', '建议'], true, 3);
+
+// 麻醉记录：麻醉方式 / 麻醉过程 / 麻醉苏醒（麻醉方式复用 ANESTH）
+const ANESTH_PROCESS = sec('anesthesiaProcess', '麻醉过程', ['anesthesiaProcess', 'anesthesia_process', '麻醉过程'], true, 10);
+const ANESTH_RECOVERY = sec('anesthesiaRecovery', '麻醉苏醒', ['anesthesiaRecovery', 'anesthesia_recovery', '麻醉苏醒'], true, 5);
+
 /** 各病历类型的段落规范与全文最低字数 */
 const TYPE_SPECS: Record<string, { sections: SectionSpec[]; minTotal: number }> = {
   outpatient: {
@@ -105,6 +149,44 @@ const TYPE_SPECS: Record<string, { sections: SectionSpec[]; minTotal: number }> 
     minTotal: 120,
   },
   front_page: { sections: [], minTotal: 60 },
+
+  // M460 大三甲深度升级新增 9 种病历类型
+  firstProgressNote: {
+    sections: [CASE_FEATURES, PRELIM_DIAG, TREAT_PLAN],
+    minTotal: 100,
+  },
+  superiorRound: {
+    sections: [ROUND_OPINION, CONDITION_ANALYSIS, TREAT_ADJUST],
+    minTotal: 80,
+  },
+  handover: {
+    sections: [HANDOVER_STATUS, TAKEOVER_NOTES],
+    minTotal: 60,
+  },
+  transferNote: {
+    sections: [TRANSFER_REASON, CURRENT_CONDITION, TRANSFER_NOTES],
+    minTotal: 80,
+  },
+  stageSummary: {
+    sections: [ADM_DIAG, CONDITION_EVOLUTION, CURRENT_TREAT],
+    minTotal: 80,
+  },
+  rescueRecord: {
+    sections: [RESCUE_REASON, RESCUE_MEASURES, RESCUE_RESULT],
+    minTotal: 100,
+  },
+  invasiveProcedure: {
+    sections: [PROCEDURE_NAME, PROCEDURE_PROCESS, INTRA_OP],
+    minTotal: 80,
+  },
+  consultationNote: {
+    sections: [CONSULT_OPINION, CONSULT_DIAG, CONSULT_SUGGESTION],
+    minTotal: 60,
+  },
+  anesthesiaRecord: {
+    sections: [ANESTH, ANESTH_PROCESS, ANESTH_RECOVERY],
+    minTotal: 80,
+  },
 };
 
 /* ----------------------------- 文本工具 ----------------------------- */
@@ -236,4 +318,9 @@ export const TIMELINESS_RULES: Record<string, { deadlineHours: number; label: st
   progress: { deadlineHours: 8, label: '首次病程记录' },
   operative: { deadlineHours: 24, label: '手术记录' },
   discharge: { deadlineHours: 24, label: '出院记录' },
+  // M460 大三甲深度升级新增时限规则
+  firstProgressNote: { deadlineHours: 8, label: '首次病程记录' },
+  superiorRound: { deadlineHours: 24, label: '上级医师查房记录' },
+  transferNote: { deadlineHours: 24, label: '转科记录' },
+  rescueRecord: { deadlineHours: 6, label: '抢救记录' },
 };
