@@ -2407,6 +2407,14 @@ const PartyBuildingMgmt = lazy(() => import('@/pages/party-building-mgmt'));
 const ArchiveMgmt = lazy(() => import('@/pages/archive-mgmt'));
 // M450-D：统计管理 V13（M450 收官，宣传与党建管理组）
 const StatisticsMgmt = lazy(() => import('@/pages/statistics-mgmt'));
+// M451-A：医患沟通管理 V13（医患关系与投诉管理组）
+const DoctorPatientCommunicationMgmt = lazy(() => import('@/pages/doctor-patient-communication-mgmt'));
+// M451-B：投诉处理管理 V13（医患关系与投诉管理组）
+const ComplaintHandlingMgmt = lazy(() => import('@/pages/complaint-handling-mgmt'));
+// M451-C：医疗纠纷调解管理 V13（医患关系与投诉管理组）
+const MedicalDisputeMediationMgmt = lazy(() => import('@/pages/medical-dispute-mediation-mgmt'));
+// M451-D：满意度调查管理 V13（M451 收官，医患关系与投诉管理组）
+const SatisfactionSurveyMgmt = lazy(() => import('@/pages/satisfaction-survey-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4755,6 +4763,14 @@ export default function AppRoutes() {
           <Route path="archive-mgmt" element={<ArchiveMgmt />} />
           {/* M450-D：统计管理 V13（M450 收官，宣传与党建管理组） */}
           <Route path="statistics-mgmt" element={<StatisticsMgmt />} />
+          {/* M451-A：医患沟通管理 V13（医患关系与投诉管理组） */}
+          <Route path="doctor-patient-communication-mgmt" element={<DoctorPatientCommunicationMgmt />} />
+          {/* M451-B：投诉处理管理 V13（医患关系与投诉管理组） */}
+          <Route path="complaint-handling-mgmt" element={<ComplaintHandlingMgmt />} />
+          {/* M451-C：医疗纠纷调解管理 V13（医患关系与投诉管理组） */}
+          <Route path="medical-dispute-mediation-mgmt" element={<MedicalDisputeMediationMgmt />} />
+          {/* M451-D：满意度调查管理 V13（M451 收官，医患关系与投诉管理组） */}
+          <Route path="satisfaction-survey-mgmt" element={<SatisfactionSurveyMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
