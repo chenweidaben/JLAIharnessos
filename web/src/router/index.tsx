@@ -2701,6 +2701,14 @@ const EmrQcWeeklyReportPage = lazy(() => import('@/pages/emr-qc-weekly-report'))
 const EmrQcQuarterlyReportPage = lazy(() => import('@/pages/emr-qc-quarterly-report'));
 // M487-D：质控年报 V14（EMR 深化四模块，M487 收官）
 const EmrQcAnnualReportPage = lazy(() => import('@/pages/emr-qc-annual-report'));
+// M488-A：质控任务派发 V14（EMR 深化四模块）
+const EmrQcTaskDispatchPage = lazy(() => import('@/pages/emr-qc-task-dispatch'));
+// M488-B：质控任务签收 V14（EMR 深化四模块）
+const EmrQcTaskReceivePage = lazy(() => import('@/pages/emr-qc-task-receive'));
+// M488-C：质控任务退回 V14（EMR 深化四模块）
+const EmrQcTaskReturnPage = lazy(() => import('@/pages/emr-qc-task-return'));
+// M488-D：质控任务归档 V14（EMR 深化四模块，M488 收官）
+const EmrQcTaskArchivePage = lazy(() => import('@/pages/emr-qc-task-archive'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5343,6 +5351,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-quarterly-report" element={<EmrQcQuarterlyReportPage />} />
           {/* M487-D：质控年报 V14（EMR 深化四模块，M487 收官） */}
           <Route path="emr-qc-annual-report" element={<EmrQcAnnualReportPage />} />
+          {/* M488-A：质控任务派发 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-task-dispatch" element={<EmrQcTaskDispatchPage />} />
+          {/* M488-B：质控任务签收 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-task-receive" element={<EmrQcTaskReceivePage />} />
+          {/* M488-C：质控任务退回 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-task-return" element={<EmrQcTaskReturnPage />} />
+          {/* M488-D：质控任务归档 V14（EMR 深化四模块，M488 收官） */}
+          <Route path="emr-qc-task-archive" element={<EmrQcTaskArchivePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
