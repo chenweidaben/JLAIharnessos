@@ -3305,6 +3305,14 @@ import { emrBorrowRecordV14Routes } from './routes/emrBorrowRecordV14';
 import { emrReturnRemindV14Routes } from './routes/emrReturnRemindV14';
 // M540-D：病历外审申请 V14 GET/POST /api/v1/emr-external-audit（EMR 深化四模块，M540 收官，病历借阅与复印管理系列）
 import { emrExternalAuditV14Routes } from './routes/emrExternalAuditV14';
+// M541-A：病历归档预约 V14 GET/POST /api/v1/emr-archive-appoint（EMR 深化四模块，病历归档与销毁管理系列）
+import { emrArchiveAppointV14Routes } from './routes/emrArchiveAppointV14';
+// M541-B：病历销毁登记（避让版 -apply）V14 GET/POST /api/v1/emr-destroy-apply（EMR 深化四模块，病历归档与销毁管理系列）
+import { emrDestroyApplyV14Routes } from './routes/emrDestroyApplyV14';
+// M541-C：病历保存期限提醒 V14 GET/POST /api/v1/emr-retention-remind（EMR 深化四模块，病历归档与销毁管理系列）
+import { emrRetentionRemindV14Routes } from './routes/emrRetentionRemindV14';
+// M541-D：病历库房盘点 V14 GET/POST /api/v1/emr-warehouse-check（EMR 深化四模块，M541 收官，病历归档与销毁管理系列）
+import { emrWarehouseCheckV14Routes } from './routes/emrWarehouseCheckV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5200,6 +5208,10 @@ const allRoutes: RouteDef[] = [
   ...emrBorrowRecordV14Routes, // M540-B：病历借阅登记管理 V14 GET/POST /api/v1/emr-borrow-record（EMR 深化四模块，病历借阅与复印管理系列）
   ...emrReturnRemindV14Routes, // M540-C：病历归还提醒 V14 GET/POST /api/v1/emr-return-remind（EMR 深化四模块，病历借阅与复印管理系列）
   ...emrExternalAuditV14Routes, // M540-D：病历外审申请 V14 GET/POST /api/v1/emr-external-audit（EMR 深化四模块，M540 收官，病历借阅与复印管理系列）
+  ...emrArchiveAppointV14Routes, // M541-A：病历归档预约 V14 GET/POST /api/v1/emr-archive-appoint（EMR 深化四模块，病历归档与销毁管理系列）
+  ...emrDestroyApplyV14Routes, // M541-B：病历销毁登记（避让版 -apply）V14 GET/POST /api/v1/emr-destroy-apply（EMR 深化四模块，病历归档与销毁管理系列）
+  ...emrRetentionRemindV14Routes, // M541-C：病历保存期限提醒 V14 GET/POST /api/v1/emr-retention-remind（EMR 深化四模块，病历归档与销毁管理系列）
+  ...emrWarehouseCheckV14Routes, // M541-D：病历库房盘点 V14 GET/POST /api/v1/emr-warehouse-check（EMR 深化四模块，M541 收官，病历归档与销毁管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

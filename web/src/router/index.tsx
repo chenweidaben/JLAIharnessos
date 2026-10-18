@@ -3125,6 +3125,14 @@ const EmrBorrowRecordPage = lazy(() => import('@/pages/emr-borrow-record'));
 const EmrReturnRemindPage = lazy(() => import('@/pages/emr-return-remind'));
 // M540-D：病历外审申请 V14（EMR 深化四模块）
 const EmrExternalAuditPage = lazy(() => import('@/pages/emr-external-audit'));
+// M541-A：病历归档预约 V14（EMR 深化四模块）
+const EmrArchiveAppointPage = lazy(() => import('@/pages/emr-archive-appoint'));
+// M541-B：病历销毁登记（避让版 -apply）V14（EMR 深化四模块）
+const EmrDestroyApplyPage = lazy(() => import('@/pages/emr-destroy-apply'));
+// M541-C：病历保存期限提醒 V14（EMR 深化四模块）
+const EmrRetentionRemindPage = lazy(() => import('@/pages/emr-retention-remind'));
+// M541-D：病历库房盘点 V14（EMR 深化四模块，M541 收官）
+const EmrWarehouseCheckPage = lazy(() => import('@/pages/emr-warehouse-check'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6191,6 +6199,14 @@ export default function AppRoutes() {
           <Route path="emr-return-remind" element={<EmrReturnRemindPage />} />
           {/* M540-D：病历外审申请 V14（EMR 深化四模块） */}
           <Route path="emr-external-audit" element={<EmrExternalAuditPage />} />
+          {/* M541-A：病历归档预约 V14（EMR 深化四模块） */}
+          <Route path="emr-archive-appoint" element={<EmrArchiveAppointPage />} />
+          {/* M541-B：病历销毁登记（避让版 -apply）V14（EMR 深化四模块） */}
+          <Route path="emr-destroy-apply" element={<EmrDestroyApplyPage />} />
+          {/* M541-C：病历保存期限提醒 V14（EMR 深化四模块） */}
+          <Route path="emr-retention-remind" element={<EmrRetentionRemindPage />} />
+          {/* M541-D：病历库房盘点 V14（EMR 深化四模块，M541 收官） */}
+          <Route path="emr-warehouse-check" element={<EmrWarehouseCheckPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
