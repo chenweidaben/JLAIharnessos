@@ -2773,6 +2773,14 @@ const EmrQcRectifyVerifyPage = lazy(() => import('@/pages/emr-qc-rectify-verify'
 const EmrQcRecurrencePage = lazy(() => import('@/pages/emr-qc-recurrence'));
 // M496-D：质控 PDCA 闭环报告 V14（EMR 深化四模块，M496 收官）
 const EmrQcPdcaReportPage = lazy(() => import('@/pages/emr-qc-pdca-report'));
+// M497-A：质控数据导出 Excel V14（EMR 深化四模块）
+const EmrQcExportExcelPage = lazy(() => import('@/pages/emr-qc-export-excel'));
+// M497-B：质控数据导出 PDF V14（EMR 深化四模块）
+const EmrQcExportPdfPage = lazy(() => import('@/pages/emr-qc-export-pdf'));
+// M497-C：质控数据导出 CSV V14（EMR 深化四模块）
+const EmrQcExportCsvPage = lazy(() => import('@/pages/emr-qc-export-csv'));
+// M497-D：质控数据导出区域上报 V14（EMR 深化四模块，M497 收官）
+const EmrQcExportRegionPage = lazy(() => import('@/pages/emr-qc-export-region'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5487,6 +5495,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-recurrence" element={<EmrQcRecurrencePage />} />
           {/* M496-D：质控 PDCA 闭环报告 V14（EMR 深化四模块，M496 收官） */}
           <Route path="emr-qc-pdca-report" element={<EmrQcPdcaReportPage />} />
+          {/* M497-A：质控数据导出 Excel V14（EMR 深化四模块） */}
+          <Route path="emr-qc-export-excel" element={<EmrQcExportExcelPage />} />
+          {/* M497-B：质控数据导出 PDF V14（EMR 深化四模块） */}
+          <Route path="emr-qc-export-pdf" element={<EmrQcExportPdfPage />} />
+          {/* M497-C：质控数据导出 CSV V14（EMR 深化四模块） */}
+          <Route path="emr-qc-export-csv" element={<EmrQcExportCsvPage />} />
+          {/* M497-D：质控数据导出区域上报 V14（EMR 深化四模块，M497 收官） */}
+          <Route path="emr-qc-export-region" element={<EmrQcExportRegionPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

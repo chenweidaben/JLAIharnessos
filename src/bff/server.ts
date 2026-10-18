@@ -2953,6 +2953,14 @@ import { emrQcRectifyVerifyV14Routes } from './routes/emrQcRectifyVerifyV14';
 import { emrQcRecurrenceV14Routes } from './routes/emrQcRecurrenceV14';
 // M496-D：质控 PDCA 闭环报告 V14 GET /api/v1/emr-qc-pdca-report（EMR 深化四模块，M496 收官，四阶段完成率Math.ceil）
 import { emrQcPdcaReportV14Routes } from './routes/emrQcPdcaReportV14';
+// M497-A：质控数据导出 Excel V14 GET /api/v1/emr-qc-export-excel（EMR 深化四模块，按列顺序格式化行）
+import { emrQcExportExcelV14Routes } from './routes/emrQcExportExcelV14';
+// M497-B：质控数据导出 PDF V14 GET /api/v1/emr-qc-export-pdf（EMR 深化四模块，标题+正文拼接）
+import { emrQcExportPdfV14Routes } from './routes/emrQcExportPdfV14';
+// M497-C：质控数据导出 CSV V14 GET /api/v1/emr-qc-export-csv（EMR 深化四模块，delimiter连接+换行）
+import { emrQcExportCsvV14Routes } from './routes/emrQcExportCsvV14';
+// M497-D：质控数据导出区域上报 V14 POST /api/v1/emr-qc-export-region（EMR 深化四模块，M497 收官，region/period必填metrics非空）
+import { emrQcExportRegionV14Routes } from './routes/emrQcExportRegionV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4672,6 +4680,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcRectifyVerifyV14Routes, // M496-B：质控整改验证 V14 POST /api/v1/emr-qc-rectify-verify（EMR 深化四模块，通过率Math.ceil）
   ...emrQcRecurrenceV14Routes, // M496-C：质控复发预警 V14 GET /api/v1/emr-qc-recurrence（EMR 深化四模块，current>=previous复发）
   ...emrQcPdcaReportV14Routes, // M496-D：质控 PDCA 闭环报告 V14 GET /api/v1/emr-qc-pdca-report（EMR 深化四模块，M496 收官，四阶段完成率Math.ceil）
+  ...emrQcExportExcelV14Routes, // M497-A：质控数据导出 Excel V14 GET /api/v1/emr-qc-export-excel（EMR 深化四模块，按列顺序格式化行）
+  ...emrQcExportPdfV14Routes, // M497-B：质控数据导出 PDF V14 GET /api/v1/emr-qc-export-pdf（EMR 深化四模块，标题+正文拼接）
+  ...emrQcExportCsvV14Routes, // M497-C：质控数据导出 CSV V14 GET /api/v1/emr-qc-export-csv（EMR 深化四模块，delimiter连接+换行）
+  ...emrQcExportRegionV14Routes, // M497-D：质控数据导出区域上报 V14 POST /api/v1/emr-qc-export-region（EMR 深化四模块，M497 收官，region/period必填metrics非空）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
