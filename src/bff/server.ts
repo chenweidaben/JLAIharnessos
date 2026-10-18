@@ -3161,6 +3161,14 @@ import { emrAiQualityPredictV14Routes } from './routes/emrAiQualityPredictV14';
 import { emrAiDefectRootCauseV14Routes } from './routes/emrAiDefectRootCauseV14';
 // M522-D：AI病历质控知识图谱推理 V14 GET/POST /api/v1/emr-ai-kgraph-reasoning（EMR 深化四模块，M522 收官，AI 病历质控深度对接系列）
 import { emrAiKGraphReasoningV14Routes } from './routes/emrAiKGraphReasoningV14';
+// M523-A：门诊病历模板库 V14 GET/POST /api/v1/emr-template-outpatient-library（EMR 深化四模块，电子病历模板体系深化系列）
+import { emrTemplateOutpatientLibraryV14Routes } from './routes/emrTemplateOutpatientLibraryV14';
+// M523-B：入院记录模板细化 V14 GET/POST /api/v1/emr-template-admission-detail（EMR 深化四模块，电子病历模板体系深化系列）
+import { emrTemplateAdmissionDetailV14Routes } from './routes/emrTemplateAdmissionDetailV14';
+// M523-C：手术记录模板规范 V14 GET/POST /api/v1/emr-template-surgery-spec（EMR 深化四模块，电子病历模板体系深化系列）
+import { emrTemplateSurgerySpecV14Routes } from './routes/emrTemplateSurgerySpecV14';
+// M523-D：出院小结模板标准化 V14 GET/POST /api/v1/emr-template-discharge-std（EMR 深化四模块，M523 收官，电子病历模板体系深化系列）
+import { emrTemplateDischargeStdV14Routes } from './routes/emrTemplateDischargeStdV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4984,6 +4992,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiQualityPredictV14Routes, // M522-B：AI病历质量预测 V14 GET/POST /api/v1/emr-ai-quality-predict（EMR 深化四模块，AI 病历质控深度对接系列）
   ...emrAiDefectRootCauseV14Routes, // M522-C：AI病历缺陷根因分析 V14 GET/POST /api/v1/emr-ai-defect-root-cause（EMR 深化四模块，AI 病历质控深度对接系列）
   ...emrAiKGraphReasoningV14Routes, // M522-D：AI病历质控知识图谱推理 V14 GET/POST /api/v1/emr-ai-kgraph-reasoning（EMR 深化四模块，M522 收官，AI 病历质控深度对接系列）
+  ...emrTemplateOutpatientLibraryV14Routes, // M523-A：门诊病历模板库 V14 GET/POST /api/v1/emr-template-outpatient-library（EMR 深化四模块，电子病历模板体系深化系列）
+  ...emrTemplateAdmissionDetailV14Routes, // M523-B：入院记录模板细化 V14 GET/POST /api/v1/emr-template-admission-detail（EMR 深化四模块，电子病历模板体系深化系列）
+  ...emrTemplateSurgerySpecV14Routes, // M523-C：手术记录模板规范 V14 GET/POST /api/v1/emr-template-surgery-spec（EMR 深化四模块，电子病历模板体系深化系列）
+  ...emrTemplateDischargeStdV14Routes, // M523-D：出院小结模板标准化 V14 GET/POST /api/v1/emr-template-discharge-std（EMR 深化四模块，M523 收官，电子病历模板体系深化系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

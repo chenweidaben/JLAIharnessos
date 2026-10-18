@@ -2981,6 +2981,14 @@ const EmrAiQualityPredictPage = lazy(() => import('@/pages/emr-ai-quality-predic
 const EmrAiDefectRootCausePage = lazy(() => import('@/pages/emr-ai-defect-root-cause'));
 // M522-D：AI病历质控知识图谱推理 V14（EMR 深化四模块，M522 收官）
 const EmrAiKGraphReasoningPage = lazy(() => import('@/pages/emr-ai-kgraph-reasoning'));
+// M523-A：门诊病历模板库 V14（EMR 深化四模块）
+const EmrTemplateOutpatientLibraryPage = lazy(() => import('@/pages/emr-template-outpatient-library'));
+// M523-B：入院记录模板细化 V14（EMR 深化四模块）
+const EmrTemplateAdmissionDetailPage = lazy(() => import('@/pages/emr-template-admission-detail'));
+// M523-C：手术记录模板规范 V14（EMR 深化四模块）
+const EmrTemplateSurgerySpecPage = lazy(() => import('@/pages/emr-template-surgery-spec'));
+// M523-D：出院小结模板标准化 V14（EMR 深化四模块，M523 收官）
+const EmrTemplateDischargeStdPage = lazy(() => import('@/pages/emr-template-discharge-std'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5903,6 +5911,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-defect-root-cause" element={<EmrAiDefectRootCausePage />} />
           {/* M522-D：AI病历质控知识图谱推理 V14（EMR 深化四模块，M522 收官） */}
           <Route path="emr-ai-kgraph-reasoning" element={<EmrAiKGraphReasoningPage />} />
+          {/* M523-A：门诊病历模板库 V14（EMR 深化四模块） */}
+          <Route path="emr-template-outpatient-library" element={<EmrTemplateOutpatientLibraryPage />} />
+          {/* M523-B：入院记录模板细化 V14（EMR 深化四模块） */}
+          <Route path="emr-template-admission-detail" element={<EmrTemplateAdmissionDetailPage />} />
+          {/* M523-C：手术记录模板规范 V14（EMR 深化四模块） */}
+          <Route path="emr-template-surgery-spec" element={<EmrTemplateSurgerySpecPage />} />
+          {/* M523-D：出院小结模板标准化 V14（EMR 深化四模块，M523 收官） */}
+          <Route path="emr-template-discharge-std" element={<EmrTemplateDischargeStdPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
