@@ -3021,6 +3021,14 @@ const EmrFinalQcScorePage = lazy(() => import('@/pages/emr-final-qc-score'));
 const EmrArchiveAutoCheckPage = lazy(() => import('@/pages/emr-archive-auto-check'));
 // M527-D：病历缺陷闭环跟踪 V14（EMR 深化四模块，M527 收官）
 const EmrDefectClosedLoopPage = lazy(() => import('@/pages/emr-defect-closed-loop'));
+// M528-A：病历访问审计日志 V14（EMR 深化四模块）
+const EmrAccessAuditPage = lazy(() => import('@/pages/emr-access-audit'));
+// M528-B：病历脱敏输出 V14（EMR 深化四模块）
+const EmrDeidentifyOutputPage = lazy(() => import('@/pages/emr-deidentify-output'));
+// M528-C：病历水印追踪 V14（EMR 深化四模块）
+const EmrWatermarkTracePage = lazy(() => import('@/pages/emr-watermark-trace'));
+// M528-D：病历权限细粒度控制 V14（EMR 深化四模块，M528 收官）
+const EmrFineGrainedAuthPage = lazy(() => import('@/pages/emr-fine-grained-auth'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5983,6 +5991,14 @@ export default function AppRoutes() {
           <Route path="emr-archive-auto-check" element={<EmrArchiveAutoCheckPage />} />
           {/* M527-D：病历缺陷闭环跟踪 V14（EMR 深化四模块，M527 收官） */}
           <Route path="emr-defect-closed-loop" element={<EmrDefectClosedLoopPage />} />
+          {/* M528-A：病历访问审计日志 V14（EMR 深化四模块） */}
+          <Route path="emr-access-audit" element={<EmrAccessAuditPage />} />
+          {/* M528-B：病历脱敏输出 V14（EMR 深化四模块） */}
+          <Route path="emr-deidentify-output" element={<EmrDeidentifyOutputPage />} />
+          {/* M528-C：病历水印追踪 V14（EMR 深化四模块） */}
+          <Route path="emr-watermark-trace" element={<EmrWatermarkTracePage />} />
+          {/* M528-D：病历权限细粒度控制 V14（EMR 深化四模块，M528 收官） */}
+          <Route path="emr-fine-grained-auth" element={<EmrFineGrainedAuthPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

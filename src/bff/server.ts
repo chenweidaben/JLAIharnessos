@@ -3201,6 +3201,14 @@ import { emrFinalQcScoreV14Routes } from './routes/emrFinalQcScoreV14';
 import { emrArchiveAutoCheckV14Routes } from './routes/emrArchiveAutoCheckV14';
 // M527-D：病历缺陷闭环跟踪 V14 GET/POST /api/v1/emr-defect-closed-loop（EMR 深化四模块，M527 收官，病历闭环管理系列）
 import { emrDefectClosedLoopV14Routes } from './routes/emrDefectClosedLoopV14';
+// M528-A：病历访问审计日志 V14 GET/POST /api/v1/emr-access-audit（EMR 深化四模块，病历数据安全与隐私保护系列）
+import { emrAccessAuditV14Routes } from './routes/emrAccessAuditV14';
+// M528-B：病历脱敏输出 V14 GET/POST /api/v1/emr-deidentify-output（EMR 深化四模块，病历数据安全与隐私保护系列）
+import { emrDeidentifyOutputV14Routes } from './routes/emrDeidentifyOutputV14';
+// M528-C：病历水印追踪 V14 GET/POST /api/v1/emr-watermark-trace（EMR 深化四模块，病历数据安全与隐私保护系列）
+import { emrWatermarkTraceV14Routes } from './routes/emrWatermarkTraceV14';
+// M528-D：病历权限细粒度控制 V14 GET/POST /api/v1/emr-fine-grained-auth（EMR 深化四模块，M528 收官，病历数据安全与隐私保护系列）
+import { emrFineGrainedAuthV14Routes } from './routes/emrFineGrainedAuthV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5044,6 +5052,10 @@ const allRoutes: RouteDef[] = [
   ...emrFinalQcScoreV14Routes, // M527-B：病历终末质控评分 V14 GET/POST /api/v1/emr-final-qc-score（EMR 深化四模块，病历闭环管理系列）
   ...emrArchiveAutoCheckV14Routes, // M527-C：病历归档自动检查 V14 GET/POST /api/v1/emr-archive-auto-check（EMR 深化四模块，病历闭环管理系列）
   ...emrDefectClosedLoopV14Routes, // M527-D：病历缺陷闭环跟踪 V14 GET/POST /api/v1/emr-defect-closed-loop（EMR 深化四模块，M527 收官，病历闭环管理系列）
+  ...emrAccessAuditV14Routes, // M528-A：病历访问审计日志 V14 GET/POST /api/v1/emr-access-audit（EMR 深化四模块，病历数据安全与隐私保护系列）
+  ...emrDeidentifyOutputV14Routes, // M528-B：病历脱敏输出 V14 GET/POST /api/v1/emr-deidentify-output（EMR 深化四模块，病历数据安全与隐私保护系列）
+  ...emrWatermarkTraceV14Routes, // M528-C：病历水印追踪 V14 GET/POST /api/v1/emr-watermark-trace（EMR 深化四模块，病历数据安全与隐私保护系列）
+  ...emrFineGrainedAuthV14Routes, // M528-D：病历权限细粒度控制 V14 GET/POST /api/v1/emr-fine-grained-auth（EMR 深化四模块，M528 收官，病历数据安全与隐私保护系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
