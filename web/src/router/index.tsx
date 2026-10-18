@@ -2399,6 +2399,14 @@ const EquipmentMaintenanceMgmt = lazy(() => import('@/pages/equipment-maintenanc
 const EquipmentCalibrationMgmt = lazy(() => import('@/pages/equipment-calibration-mgmt'));
 // M449-D：设备报废处置管理 V13（M449 收官，医疗装备与设备管理组）
 const EquipmentDisposalMgmt = lazy(() => import('@/pages/equipment-disposal-mgmt'));
+// M450-A：宣传管理 V13（宣传与党建管理组）
+const PublicityMgmt = lazy(() => import('@/pages/publicity-mgmt'));
+// M450-B：党建管理 V13（宣传与党建管理组）
+const PartyBuildingMgmt = lazy(() => import('@/pages/party-building-mgmt'));
+// M450-C：档案管理 V13（宣传与党建管理组）
+const ArchiveMgmt = lazy(() => import('@/pages/archive-mgmt'));
+// M450-D：统计管理 V13（M450 收官，宣传与党建管理组）
+const StatisticsMgmt = lazy(() => import('@/pages/statistics-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4739,6 +4747,14 @@ export default function AppRoutes() {
           <Route path="equipment-calibration-mgmt" element={<EquipmentCalibrationMgmt />} />
           {/* M449-D：设备报废处置管理 V13（M449 收官，医疗装备与设备管理组） */}
           <Route path="equipment-disposal-mgmt" element={<EquipmentDisposalMgmt />} />
+          {/* M450-A：宣传管理 V13（宣传与党建管理组） */}
+          <Route path="publicity-mgmt" element={<PublicityMgmt />} />
+          {/* M450-B：党建管理 V13（宣传与党建管理组） */}
+          <Route path="party-building-mgmt" element={<PartyBuildingMgmt />} />
+          {/* M450-C：档案管理 V13（宣传与党建管理组） */}
+          <Route path="archive-mgmt" element={<ArchiveMgmt />} />
+          {/* M450-D：统计管理 V13（M450 收官，宣传与党建管理组） */}
+          <Route path="statistics-mgmt" element={<StatisticsMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
