@@ -2263,6 +2263,14 @@ const DataReportQualityMgmt = lazy(() => import('@/pages/data-report-quality-mgm
 const NetworkSecurityQualityMgmt = lazy(() => import('@/pages/network-security-quality-mgmt'));
 // M432-D：互联互通质量管理 V13（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409））
 const InteroperabilityQualityMgmt = lazy(() => import('@/pages/interoperability-quality-mgmt'));
+// M433-A：科室 KPI 质量管理 V13（-quality 后缀避让旧版 deptKpiMgmtV13（M410））
+const DeptKpiQualityMgmt = lazy(() => import('@/pages/dept-kpi-quality-mgmt'));
+// M433-B：个人 KPI 质量管理 V13（-quality 后缀避让旧版 staffKpiMgmtV13（M410））
+const StaffKpiQualityMgmt = lazy(() => import('@/pages/staff-kpi-quality-mgmt'));
+// M433-C：奖金分配质量管理 V13（-quality 后缀避让旧版 bonusMgmtV13（M410））
+const BonusQualityMgmt = lazy(() => import('@/pages/bonus-quality-mgmt'));
+// M433-D：绩效改进质量管理 V13（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
+const PerformanceImprovementQualityMgmt = lazy(() => import('@/pages/performance-improvement-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4467,6 +4475,14 @@ export default function AppRoutes() {
           <Route path="network-security-quality-mgmt" element={<NetworkSecurityQualityMgmt />} />
           {/* M432-D：互联互通质量管理 V13（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409）） */}
           <Route path="interoperability-quality-mgmt" element={<InteroperabilityQualityMgmt />} />
+          {/* M433-A：科室 KPI 质量管理 V13（-quality 后缀避让旧版 deptKpiMgmtV13（M410）） */}
+          <Route path="dept-kpi-quality-mgmt" element={<DeptKpiQualityMgmt />} />
+          {/* M433-B：个人 KPI 质量管理 V13（-quality 后缀避让旧版 staffKpiMgmtV13（M410）） */}
+          <Route path="staff-kpi-quality-mgmt" element={<StaffKpiQualityMgmt />} />
+          {/* M433-C：奖金分配质量管理 V13（-quality 后缀避让旧版 bonusMgmtV13（M410）） */}
+          <Route path="bonus-quality-mgmt" element={<BonusQualityMgmt />} />
+          {/* M433-D：绩效改进质量管理 V13（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410）） */}
+          <Route path="performance-improvement-quality-mgmt" element={<PerformanceImprovementQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

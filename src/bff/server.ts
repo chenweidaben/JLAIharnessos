@@ -2447,6 +2447,14 @@ import { dataReportQualityMgmtV13Routes } from './routes/dataReportQualityMgmtV1
 import { networkSecurityQualityMgmtV13Routes } from './routes/networkSecurityQualityMgmtV13';
 // M432-D：互联互通质量管理 V13 GET /api/v1/interoperability-quality-mgmt（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409））
 import { interoperabilityQualityMgmtV13Routes } from './routes/interoperabilityQualityMgmtV13';
+// M433-A：科室 KPI 质量管理 V13 GET /api/v1/dept-kpi-quality-mgmt（-quality 后缀避让旧版 deptKpiMgmtV13（M410））
+import { deptKpiQualityMgmtV13Routes } from './routes/deptKpiQualityMgmtV13';
+// M433-B：个人 KPI 质量管理 V13 GET /api/v1/staff-kpi-quality-mgmt（-quality 后缀避让旧版 staffKpiMgmtV13（M410））
+import { staffKpiQualityMgmtV13Routes } from './routes/staffKpiQualityMgmtV13';
+// M433-C：奖金分配质量管理 V13 GET /api/v1/bonus-quality-mgmt（-quality 后缀避让旧版 bonusMgmtV13（M410））
+import { bonusQualityMgmtV13Routes } from './routes/bonusQualityMgmtV13';
+// M433-D：绩效改进质量管理 V13 GET /api/v1/performance-improvement-quality-mgmt（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
+import { performanceImprovementQualityMgmtV13Routes } from './routes/performanceImprovementQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3913,6 +3921,10 @@ const allRoutes: RouteDef[] = [
   ...dataReportQualityMgmtV13Routes, // M432-B：数据上报质量管理 V13 GET /api/v1/data-report-quality-mgmt（换名 dataReport + -quality 后缀避让旧版 dataQualityMgmtV13（M409））
   ...networkSecurityQualityMgmtV13Routes, // M432-C：网络安全质量管理 V13 GET /api/v1/network-security-quality-mgmt（-quality 后缀避让旧版 networkSecurityMgmtV13（M409））
   ...interoperabilityQualityMgmtV13Routes, // M432-D：互联互通质量管理 V13 GET /api/v1/interoperability-quality-mgmt（M432 收官，-quality 后缀避让旧版 interoperabilityMgmtV13（M409））
+  ...deptKpiQualityMgmtV13Routes, // M433-A：科室 KPI 质量管理 V13 GET /api/v1/dept-kpi-quality-mgmt（-quality 后缀避让旧版 deptKpiMgmtV13（M410））
+  ...staffKpiQualityMgmtV13Routes, // M433-B：个人 KPI 质量管理 V13 GET /api/v1/staff-kpi-quality-mgmt（-quality 后缀避让旧版 staffKpiMgmtV13（M410））
+  ...bonusQualityMgmtV13Routes, // M433-C：奖金分配质量管理 V13 GET /api/v1/bonus-quality-mgmt（-quality 后缀避让旧版 bonusMgmtV13（M410））
+  ...performanceImprovementQualityMgmtV13Routes, // M433-D：绩效改进质量管理 V13 GET /api/v1/performance-improvement-quality-mgmt（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
