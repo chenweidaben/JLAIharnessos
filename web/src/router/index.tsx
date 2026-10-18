@@ -2481,6 +2481,10 @@ const InternetHospitalMgmt = lazy(() => import('@/pages/internet-hospital-mgmt')
 const MdtConsultationMgmt = lazy(() => import('@/pages/mdt-consultation-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
+// M461-A：EMR 模板管理 V14（EMR 深化四模块，-management 避让基础名已占）
+const EmrTemplateManagement = lazy(() => import('@/pages/emr-template-management'));
+// M461-B：规则质控可视化配置 V14（EMR 深化四模块）
+const QcRuleConfigPage = lazy(() => import('@/pages/qc-rule-config'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -4902,6 +4906,10 @@ export default function AppRoutes() {
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
+          {/* M461-A：EMR 模板管理 V14（EMR 深化四模块，-management 避让基础名已占） */}
+          <Route path="emr-template-management" element={<EmrTemplateManagement />} />
+          {/* M461-B：规则质控可视化配置 V14（EMR 深化四模块） */}
+          <Route path="qc-rule-config" element={<QcRuleConfigPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
