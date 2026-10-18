@@ -2613,6 +2613,14 @@ const EmrConsistencyCheckPage = lazy(() => import('@/pages/emr-consistency-check
 const EmrTimelinessCheckPage = lazy(() => import('@/pages/emr-timeliness-check'));
 // M476-D：病历规范性检查 V14（EMR 深化四模块，病历四大检查系列④规范性，M476 收官）
 const EmrNormativityCheckPage = lazy(() => import('@/pages/emr-normativity-check'));
+// M477-A：病历内涵质控 V14（EMR 深化四模块）
+const EmrIntrinsicQcPage = lazy(() => import('@/pages/emr-intrinsic-qc'));
+// M477-B：病历逻辑校验 V14（EMR 深化四模块）
+const EmrLogicValidationPage = lazy(() => import('@/pages/emr-logic-validation'));
+// M477-C：病历术语规范 V14（EMR 深化四模块）
+const EmrTerminologyPage = lazy(() => import('@/pages/emr-terminology'));
+// M477-D：病历模板质控联动 V14（EMR 深化四模块，M477 收官）
+const EmrTemplateQcLinkPage = lazy(() => import('@/pages/emr-template-qc-link'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5167,6 +5175,14 @@ export default function AppRoutes() {
           <Route path="emr-timeliness-check" element={<EmrTimelinessCheckPage />} />
           {/* M476-D：病历规范性检查 V14（EMR 深化四模块，病历四大检查系列④规范性，M476 收官） */}
           <Route path="emr-normativity-check" element={<EmrNormativityCheckPage />} />
+          {/* M477-A：病历内涵质控 V14（EMR 深化四模块） */}
+          <Route path="emr-intrinsic-qc" element={<EmrIntrinsicQcPage />} />
+          {/* M477-B：病历逻辑校验 V14（EMR 深化四模块） */}
+          <Route path="emr-logic-validation" element={<EmrLogicValidationPage />} />
+          {/* M477-C：病历术语规范 V14（EMR 深化四模块） */}
+          <Route path="emr-terminology" element={<EmrTerminologyPage />} />
+          {/* M477-D：病历模板质控联动 V14（EMR 深化四模块，M477 收官） */}
+          <Route path="emr-template-qc-link" element={<EmrTemplateQcLinkPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

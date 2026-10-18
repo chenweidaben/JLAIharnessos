@@ -2793,6 +2793,14 @@ import { emrConsistencyCheckV14Routes } from './routes/emrConsistencyCheckV14';
 import { emrTimelinessCheckV14Routes } from './routes/emrTimelinessCheckV14';
 // M476-D：病历规范性检查 V14 POST /api/v1/emr-normativity-check（EMR 深化四模块，病历四大检查系列④规范性，M476 收官）
 import { emrNormativityCheckV14Routes } from './routes/emrNormativityCheckV14';
+// M477-A：病历内涵质控 V14 POST /api/v1/emr-intrinsic-qc（EMR 深化四模块，NLP 关键词命中+内涵评分）
+import { emrIntrinsicQcV14Routes } from './routes/emrIntrinsicQcV14';
+// M477-B：病历逻辑校验 V14 POST /api/v1/emr-logic-validation（EMR 深化四模块，诊断-治疗-用药逻辑匹配）
+import { emrLogicValidationV14Routes } from './routes/emrLogicValidationV14';
+// M477-C：病历术语规范 V14 POST /api/v1/emr-terminology（EMR 深化四模块，口语化术语识别+标准化转换）
+import { emrTerminologyV14Routes } from './routes/emrTerminologyV14';
+// M477-D：病历模板质控联动 V14 GET /api/v1/emr-template-qc-link（EMR 深化四模块，M477 收官，模板-质控规则关联）
+import { emrTemplateQcLinkV14Routes } from './routes/emrTemplateQcLinkV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4432,6 +4440,10 @@ const allRoutes: RouteDef[] = [
   ...emrConsistencyCheckV14Routes, // M476-B：病历一致性检查 V14 POST /api/v1/emr-consistency-check（EMR 深化四模块，病历四大检查系列②一致性）
   ...emrTimelinessCheckV14Routes, // M476-C：病历时效性检查 V14 POST /api/v1/emr-timeliness-check（EMR 深化四模块，病历四大检查系列③时效性）
   ...emrNormativityCheckV14Routes, // M476-D：病历规范性检查 V14 POST /api/v1/emr-normativity-check（EMR 深化四模块，病历四大检查系列④规范性，M476 收官）
+  ...emrIntrinsicQcV14Routes, // M477-A：病历内涵质控 V14 POST /api/v1/emr-intrinsic-qc（EMR 深化四模块，NLP 关键词命中+内涵评分）
+  ...emrLogicValidationV14Routes, // M477-B：病历逻辑校验 V14 POST /api/v1/emr-logic-validation（EMR 深化四模块，诊断-治疗-用药逻辑匹配）
+  ...emrTerminologyV14Routes, // M477-C：病历术语规范 V14 POST /api/v1/emr-terminology（EMR 深化四模块，口语化术语识别+标准化转换）
+  ...emrTemplateQcLinkV14Routes, // M477-D：病历模板质控联动 V14 GET /api/v1/emr-template-qc-link（EMR 深化四模块，M477 收官，模板-质控规则关联）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
