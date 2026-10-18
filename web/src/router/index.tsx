@@ -3117,6 +3117,14 @@ const EmrStructuredInputPage = lazy(() => import('@/pages/emr-structured-input')
 const EmrQuickPhrasePage = lazy(() => import('@/pages/emr-quick-phrase'));
 // M539-D：病历模板版本管理 V14（EMR 深化四模块）
 const EmrTemplateVersionPage = lazy(() => import('@/pages/emr-template-version'));
+// M540-A：病历复印申请管理（避让版 -apply）V14（EMR 深化四模块）
+const EmrCopyRequestApplyPage = lazy(() => import('@/pages/emr-copy-request-apply'));
+// M540-B：病历借阅登记管理 V14（EMR 深化四模块）
+const EmrBorrowRecordPage = lazy(() => import('@/pages/emr-borrow-record'));
+// M540-C：病历归还提醒 V14（EMR 深化四模块）
+const EmrReturnRemindPage = lazy(() => import('@/pages/emr-return-remind'));
+// M540-D：病历外审申请 V14（EMR 深化四模块）
+const EmrExternalAuditPage = lazy(() => import('@/pages/emr-external-audit'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6175,6 +6183,14 @@ export default function AppRoutes() {
           <Route path="emr-quick-phrase" element={<EmrQuickPhrasePage />} />
           {/* M539-D：病历模板版本管理 V14（EMR 深化四模块） */}
           <Route path="emr-template-version" element={<EmrTemplateVersionPage />} />
+          {/* M540-A：病历复印申请管理（避让版 -apply）V14（EMR 深化四模块） */}
+          <Route path="emr-copy-request-apply" element={<EmrCopyRequestApplyPage />} />
+          {/* M540-B：病历借阅登记管理 V14（EMR 深化四模块） */}
+          <Route path="emr-borrow-record" element={<EmrBorrowRecordPage />} />
+          {/* M540-C：病历归还提醒 V14（EMR 深化四模块） */}
+          <Route path="emr-return-remind" element={<EmrReturnRemindPage />} />
+          {/* M540-D：病历外审申请 V14（EMR 深化四模块） */}
+          <Route path="emr-external-audit" element={<EmrExternalAuditPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
