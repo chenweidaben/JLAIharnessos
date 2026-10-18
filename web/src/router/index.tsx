@@ -2637,6 +2637,14 @@ const EmrQcWeightConfigPage = lazy(() => import('@/pages/emr-qc-weight-config'))
 const EmrQcGradePage = lazy(() => import('@/pages/emr-qc-grade'));
 // M479-D：病历质控持续改进 V14（EMR 深化四模块，M479 收官）
 const EmrQcContinuousImprovePage = lazy(() => import('@/pages/emr-qc-continuous-improve'));
+// M480-A：DRG 病案质控 V14（EMR 深化四模块）
+const EmrDrgQcPage = lazy(() => import('@/pages/emr-drg-qc'));
+// M480-B：临床路径质控 V14（EMR 深化四模块）
+const EmrClinicalPathQcPage = lazy(() => import('@/pages/emr-clinical-path-qc'));
+// M480-C：病案首页质控 V14（EMR 深化四模块）
+const EmrFrontPageQcPage = lazy(() => import('@/pages/emr-front-page-qc'));
+// M480-D：终末质控 V14（EMR 深化四模块，M480 收官）
+const EmrTerminalQcPage = lazy(() => import('@/pages/emr-terminal-qc'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5215,6 +5223,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-grade" element={<EmrQcGradePage />} />
           {/* M479-D：病历质控持续改进 V14（EMR 深化四模块，M479 收官） */}
           <Route path="emr-qc-continuous-improve" element={<EmrQcContinuousImprovePage />} />
+          {/* M480-A：DRG 病案质控 V14（EMR 深化四模块） */}
+          <Route path="emr-drg-qc" element={<EmrDrgQcPage />} />
+          {/* M480-B：临床路径质控 V14（EMR 深化四模块） */}
+          <Route path="emr-clinical-path-qc" element={<EmrClinicalPathQcPage />} />
+          {/* M480-C：病案首页质控 V14（EMR 深化四模块） */}
+          <Route path="emr-front-page-qc" element={<EmrFrontPageQcPage />} />
+          {/* M480-D：终末质控 V14（EMR 深化四模块，M480 收官） */}
+          <Route path="emr-terminal-qc" element={<EmrTerminalQcPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

@@ -2817,6 +2817,14 @@ import { emrQcWeightConfigV14Routes } from './routes/emrQcWeightConfigV14';
 import { emrQcGradeV14Routes } from './routes/emrQcGradeV14';
 // M479-D：病历质控持续改进 V14 GET /api/v1/emr-qc-continuous-improve（EMR 深化四模块，M479 收官，进度 completedSteps/totalSteps×100）
 import { emrQcContinuousImproveV14Routes } from './routes/emrQcContinuousImproveV14';
+// M480-A：DRG 病案质控 V14 POST /api/v1/emr-drg-qc（EMR 深化四模块，主诊断+手术操作合规校验，权重 baseWeight×complicationFactor）
+import { emrDrgQcV14Routes } from './routes/emrDrgQcV14';
+// M480-B：临床路径质控 V14 GET /api/v1/emr-clinical-path-qc（EMR 深化四模块，变异检测 planned≠actual）
+import { emrClinicalPathQcV14Routes } from './routes/emrClinicalPathQcV14';
+// M480-C：病案首页质控 V14 POST /api/v1/emr-front-page-qc（EMR 深化四模块，必填项校验，得分 filledCount/total×100）
+import { emrFrontPageQcV14Routes } from './routes/emrFrontPageQcV14';
+// M480-D：终末质控 V14 GET+POST /api/v1/emr-terminal-qc（EMR 深化四模块，M480 收官，终末质控记录+提交）
+import { emrTerminalQcV14Routes } from './routes/emrTerminalQcV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4468,6 +4476,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcWeightConfigV14Routes, // M479-B：病历质控权重配置 V14 GET+PUT /api/v1/emr-qc-weight-config（EMR 深化四模块，权重和=100 校验）
   ...emrQcGradeV14Routes, // M479-C：病历质控等级评定 V14 POST /api/v1/emr-qc-grade（EMR 深化四模块，≥90优秀/80-89良好/60-79合格/<60不合格）
   ...emrQcContinuousImproveV14Routes, // M479-D：病历质控持续改进 V14 GET /api/v1/emr-qc-continuous-improve（EMR 深化四模块，M479 收官，进度 completedSteps/totalSteps×100）
+  ...emrDrgQcV14Routes, // M480-A：DRG 病案质控 V14 POST /api/v1/emr-drg-qc（EMR 深化四模块，主诊断+手术操作合规校验，权重 baseWeight×complicationFactor）
+  ...emrClinicalPathQcV14Routes, // M480-B：临床路径质控 V14 GET /api/v1/emr-clinical-path-qc（EMR 深化四模块，变异检测 planned≠actual）
+  ...emrFrontPageQcV14Routes, // M480-C：病案首页质控 V14 POST /api/v1/emr-front-page-qc（EMR 深化四模块，必填项校验，得分 filledCount/total×100）
+  ...emrTerminalQcV14Routes, // M480-D：终末质控 V14 GET+POST /api/v1/emr-terminal-qc（EMR 深化四模块，M480 收官，终末质控记录+提交）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
