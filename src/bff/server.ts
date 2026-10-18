@@ -3113,6 +3113,14 @@ import { emrQcDischargeSummaryLinkV14Routes } from './routes/emrQcDischargeSumma
 import { emrQcTransferLinkV14Routes } from './routes/emrQcTransferLinkV14';
 // M516-D：质控-会诊记录联动 V14 GET/POST /api/v1/emr-qc-consult-link（EMR 深化四模块，M516 收官，病历核心文档质控联动系列+会诊一致性检查）
 import { emrQcConsultLinkV14Routes } from './routes/emrQcConsultLinkV14';
+// M517-A：质控-护理评估单联动 V14 GET/POST /api/v1/emr-qc-nursing-assessment-link（EMR 深化四模块，护理评估与风险筛查联动系列+护理评估一致性检查）
+import { emrQcNursingAssessmentLinkV14Routes } from './routes/emrQcNursingAssessmentLinkV14';
+// M517-B：质控-疼痛评估联动 V14 GET/POST /api/v1/emr-qc-pain-assessment-link（EMR 深化四模块，护理评估与风险筛查联动系列+疼痛评估一致性检查）
+import { emrQcPainAssessmentLinkV14Routes } from './routes/emrQcPainAssessmentLinkV14';
+// M517-C：质控-压疮风险评估联动 V14 GET/POST /api/v1/emr-qc-pressure-ulcer-link（EMR 深化四模块，护理评估与风险筛查联动系列+压疮评估一致性检查）
+import { emrQcPressureUlcerLinkV14Routes } from './routes/emrQcPressureUlcerLinkV14';
+// M517-D：质控-营养风险筛查联动 V14 GET/POST /api/v1/emr-qc-nutrition-screen-link（EMR 深化四模块，M517 收官，护理评估与风险筛查联动系列+营养筛查一致性检查）
+import { emrQcNutritionScreenLinkV14Routes } from './routes/emrQcNutritionScreenLinkV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4912,6 +4920,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcDischargeSummaryLinkV14Routes, // M516-B：质控-出院小结联动 V14 GET/POST /api/v1/emr-qc-discharge-summary-link（EMR 深化四模块，病历核心文档质控联动系列+出院小结一致性检查）
   ...emrQcTransferLinkV14Routes, // M516-C：质控-转科记录联动 V14 GET/POST /api/v1/emr-qc-transfer-link（EMR 深化四模块，病历核心文档质控联动系列+转科一致性检查）
   ...emrQcConsultLinkV14Routes, // M516-D：质控-会诊记录联动 V14 GET/POST /api/v1/emr-qc-consult-link（EMR 深化四模块，M516 收官，病历核心文档质控联动系列+会诊一致性检查）
+  ...emrQcNursingAssessmentLinkV14Routes, // M517-A：质控-护理评估单联动 V14 GET/POST /api/v1/emr-qc-nursing-assessment-link（EMR 深化四模块，护理评估与风险筛查联动系列+护理评估一致性检查）
+  ...emrQcPainAssessmentLinkV14Routes, // M517-B：质控-疼痛评估联动 V14 GET/POST /api/v1/emr-qc-pain-assessment-link（EMR 深化四模块，护理评估与风险筛查联动系列+疼痛评估一致性检查）
+  ...emrQcPressureUlcerLinkV14Routes, // M517-C：质控-压疮风险评估联动 V14 GET/POST /api/v1/emr-qc-pressure-ulcer-link（EMR 深化四模块，护理评估与风险筛查联动系列+压疮评估一致性检查）
+  ...emrQcNutritionScreenLinkV14Routes, // M517-D：质控-营养风险筛查联动 V14 GET/POST /api/v1/emr-qc-nutrition-screen-link（EMR 深化四模块，M517 收官，护理评估与风险筛查联动系列+营养筛查一致性检查）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
