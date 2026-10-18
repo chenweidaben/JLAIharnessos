@@ -2351,6 +2351,14 @@ const ContinuingEducationMgmt = lazy(() => import('@/pages/continuing-education-
 const ResearchProjectMgmt = lazy(() => import('@/pages/research-project-mgmt'));
 // M443-D：教学质量评估 V13（M443 收官，教学科研与继续教育管理组）
 const TeachingQualityMgmtAssessment = lazy(() => import('@/pages/teaching-quality-mgmt-assessment'));
+// M444-A：绩效考核管理 V13（绩效薪酬与人力资源管理组）
+const PerformanceAppraisalMgmt = lazy(() => import('@/pages/performance-appraisal-mgmt'));
+// M444-B：薪酬分配管理 V13（绩效薪酬与人力资源管理组）
+const SalaryDistributionMgmt = lazy(() => import('@/pages/salary-distribution-mgmt'));
+// M444-C：人员招聘与配置 V13（绩效薪酬与人力资源管理组）
+const RecruitmentMgmt = lazy(() => import('@/pages/recruitment-mgmt'));
+// M444-D：员工培训发展管理 V13（M444 收官，绩效薪酬与人力资源管理组）
+const StaffTrainingDevelopmentMgmt = lazy(() => import('@/pages/staff-training-development-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4643,6 +4651,14 @@ export default function AppRoutes() {
           <Route path="research-project-mgmt" element={<ResearchProjectMgmt />} />
           {/* M443-D：教学质量评估 V13（M443 收官，教学科研与继续教育管理组） */}
           <Route path="teaching-quality-mgmt-assessment" element={<TeachingQualityMgmtAssessment />} />
+          {/* M444-A：绩效考核管理 V13（绩效薪酬与人力资源管理组） */}
+          <Route path="performance-appraisal-mgmt" element={<PerformanceAppraisalMgmt />} />
+          {/* M444-B：薪酬分配管理 V13（绩效薪酬与人力资源管理组） */}
+          <Route path="salary-distribution-mgmt" element={<SalaryDistributionMgmt />} />
+          {/* M444-C：人员招聘与配置 V13（绩效薪酬与人力资源管理组） */}
+          <Route path="recruitment-mgmt" element={<RecruitmentMgmt />} />
+          {/* M444-D：员工培训发展管理 V13（M444 收官，绩效薪酬与人力资源管理组） */}
+          <Route path="staff-training-development-mgmt" element={<StaffTrainingDevelopmentMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
