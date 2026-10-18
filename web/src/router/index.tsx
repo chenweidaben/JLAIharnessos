@@ -2471,6 +2471,14 @@ const OutpatientMinorSurgeryMgmt = lazy(() => import('@/pages/outpatient-minor-s
 const OutpatientTreatmentRoomMgmt = lazy(() => import('@/pages/outpatient-treatment-room-mgmt'));
 // M458-D：门诊换药管理 V13（M458 收官，日间手术与门诊操作管理组）
 const OutpatientDressingMgmt = lazy(() => import('@/pages/outpatient-dressing-mgmt'));
+// M459-A：医院运营管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落）
+const HospitalOperationsMgmt = lazy(() => import('@/pages/hospital-operations-mgmt'));
+// M459-B：健康管理体检管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落）
+const HealthCheckupMgmt = lazy(() => import('@/pages/health-checkup-mgmt'));
+// M459-C：互联网医院管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落）
+const InternetHospitalMgmt = lazy(() => import('@/pages/internet-hospital-mgmt'));
+// M459-D：多学科诊疗MDT管理 V13（M459 收官，医院运营与健康管理组，M455 旧文件已删除回滚后重落）
+const MdtConsultationMgmt = lazy(() => import('@/pages/mdt-consultation-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4883,6 +4891,14 @@ export default function AppRoutes() {
           <Route path="outpatient-treatment-room-mgmt" element={<OutpatientTreatmentRoomMgmt />} />
           {/* M458-D：门诊换药管理 V13（M458 收官，日间手术与门诊操作管理组） */}
           <Route path="outpatient-dressing-mgmt" element={<OutpatientDressingMgmt />} />
+          {/* M459-A：医院运营管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落） */}
+          <Route path="hospital-operations-mgmt" element={<HospitalOperationsMgmt />} />
+          {/* M459-B：健康管理体检管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落） */}
+          <Route path="health-checkup-mgmt" element={<HealthCheckupMgmt />} />
+          {/* M459-C：互联网医院管理 V13（医院运营与健康管理组，M455 旧文件已删除回滚后重落） */}
+          <Route path="internet-hospital-mgmt" element={<InternetHospitalMgmt />} />
+          {/* M459-D：多学科诊疗MDT管理 V13（M459 收官，医院运营与健康管理组，M455 旧文件已删除回滚后重落） */}
+          <Route path="mdt-consultation-mgmt" element={<MdtConsultationMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
