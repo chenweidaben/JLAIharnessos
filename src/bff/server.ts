@@ -3041,6 +3041,14 @@ import { emrQcAuditLogDetailV14Routes } from './routes/emrQcAuditLogDetailV14';
 import { emrQcDataDictDetailV14Routes } from './routes/emrQcDataDictDetailV14';
 // M507-D：质控权限管理明细 V14 GET/POST /api/v1/emr-qc-permission-detail（EMR 深化四模块，M507 收官，-detail 避让 M473-B/M498-D，权限分配+回收）
 import { emrQcPermissionDetailV14Routes } from './routes/emrQcPermissionDetailV14';
+// M508-A：质控 AI 缺陷自动分类明细 V14 POST /api/v1/emr-qc-ai-defect-classify-detail（EMR 深化四模块，-detail 避让 M470-C，关键词分类+置信度）
+import { emrQcAiDefectClassifyDetailV14Routes } from './routes/emrQcAiDefectClassifyDetailV14';
+// M508-B：质控 AI 辅助书写建议明细 V14 POST /api/v1/emr-qc-ai-writing-suggest-detail（EMR 深化四模块，-detail 避让 M467-B，科室+章节预设建议）
+import { emrQcAiWritingSuggestDetailV14Routes } from './routes/emrQcAiWritingSuggestDetailV14';
+// M508-C：质控 AI 相似病历推荐明细 V14 POST /api/v1/emr-qc-ai-similar-record-detail（EMR 深化四模块，-detail 避让 M486-D，诊断关键词匹配+相似度）
+import { emrQcAiSimilarRecordDetailV14Routes } from './routes/emrQcAiSimilarRecordDetailV14';
+// M508-D：质控 AI 智能问答助手 V14 POST /api/v1/emr-qc-ai-qa-assistant（EMR 深化四模块，M508 收官，关键词问答+置信度）
+import { emrQcAiQaAssistantV14Routes } from './routes/emrQcAiQaAssistantV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4804,6 +4812,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcAuditLogDetailV14Routes, // M507-B：质控操作日志查询明细 V14 GET /api/v1/emr-qc-audit-log-detail（EMR 深化四模块，-detail 避让 M467-C/M498-B，日志搜索 keyword）
   ...emrQcDataDictDetailV14Routes, // M507-C：质控数据字典管理明细 V14 GET/POST /api/v1/emr-qc-data-dict-detail（EMR 深化四模块，-detail 避让 M473-A，字典增删管理）
   ...emrQcPermissionDetailV14Routes, // M507-D：质控权限管理明细 V14 GET/POST /api/v1/emr-qc-permission-detail（EMR 深化四模块，M507 收官，-detail 避让 M473-B/M498-D，权限分配+回收）
+  ...emrQcAiDefectClassifyDetailV14Routes, // M508-A：质控 AI 缺陷自动分类明细 V14 POST /api/v1/emr-qc-ai-defect-classify-detail（EMR 深化四模块，-detail 避让 M470-C，关键词分类+置信度）
+  ...emrQcAiWritingSuggestDetailV14Routes, // M508-B：质控 AI 辅助书写建议明细 V14 POST /api/v1/emr-qc-ai-writing-suggest-detail（EMR 深化四模块，-detail 避让 M467-B，科室+章节预设建议）
+  ...emrQcAiSimilarRecordDetailV14Routes, // M508-C：质控 AI 相似病历推荐明细 V14 POST /api/v1/emr-qc-ai-similar-record-detail（EMR 深化四模块，-detail 避让 M486-D，诊断关键词匹配+相似度）
+  ...emrQcAiQaAssistantV14Routes, // M508-D：质控 AI 智能问答助手 V14 POST /api/v1/emr-qc-ai-qa-assistant（EMR 深化四模块，M508 收官，关键词问答+置信度）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

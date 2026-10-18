@@ -2861,6 +2861,14 @@ const EmrQcAuditLogDetailPage = lazy(() => import('@/pages/emr-qc-audit-log-deta
 const EmrQcDataDictDetailPage = lazy(() => import('@/pages/emr-qc-data-dict-detail'));
 // M507-D：质控权限管理明细 V14（EMR 深化四模块，M507 收官，-detail 避让）
 const EmrQcPermissionDetailPage = lazy(() => import('@/pages/emr-qc-permission-detail'));
+// M508-A：质控 AI 缺陷自动分类明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcAiDefectClassifyDetailPage = lazy(() => import('@/pages/emr-qc-ai-defect-classify-detail'));
+// M508-B：质控 AI 辅助书写建议明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcAiWritingSuggestDetailPage = lazy(() => import('@/pages/emr-qc-ai-writing-suggest-detail'));
+// M508-C：质控 AI 相似病历推荐明细 V14（EMR 深化四模块，-detail 避让）
+const EmrQcAiSimilarRecordDetailPage = lazy(() => import('@/pages/emr-qc-ai-similar-record-detail'));
+// M508-D：质控 AI 智能问答助手 V14（EMR 深化四模块，M508 收官）
+const EmrQcAiQaAssistantPage = lazy(() => import('@/pages/emr-qc-ai-qa-assistant'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5663,6 +5671,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-data-dict-detail" element={<EmrQcDataDictDetailPage />} />
           {/* M507-D：质控权限管理明细 V14（EMR 深化四模块，M507 收官，-detail 避让） */}
           <Route path="emr-qc-permission-detail" element={<EmrQcPermissionDetailPage />} />
+          {/* M508-A：质控 AI 缺陷自动分类明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-ai-defect-classify-detail" element={<EmrQcAiDefectClassifyDetailPage />} />
+          {/* M508-B：质控 AI 辅助书写建议明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-ai-writing-suggest-detail" element={<EmrQcAiWritingSuggestDetailPage />} />
+          {/* M508-C：质控 AI 相似病历推荐明细 V14（EMR 深化四模块，-detail 避让） */}
+          <Route path="emr-qc-ai-similar-record-detail" element={<EmrQcAiSimilarRecordDetailPage />} />
+          {/* M508-D：质控 AI 智能问答助手 V14（EMR 深化四模块，M508 收官） */}
+          <Route path="emr-qc-ai-qa-assistant" element={<EmrQcAiQaAssistantPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
