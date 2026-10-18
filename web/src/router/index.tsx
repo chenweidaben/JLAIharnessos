@@ -3061,6 +3061,14 @@ const EmrStructExportPage = lazy(() => import('@/pages/emr-struct-export'));
 const EmrStructStatsPage = lazy(() => import('@/pages/emr-struct-stats'));
 // M532-D：病历结构化数据对比 V14（EMR 深化四模块，M532 收官）
 const EmrStructComparePage = lazy(() => import('@/pages/emr-struct-compare'));
+// M533-A：病历自动归档检查 V14（EMR 深化四模块）
+const EmrArchiveCheckPage = lazy(() => import('@/pages/emr-archive-check'));
+// M533-B：病历归档完整性校验 V14（EMR 深化四模块）
+const EmrArchiveIntegrityPage = lazy(() => import('@/pages/emr-archive-integrity'));
+// M533-C：病历归档索引 V14（EMR 深化四模块）
+const EmrArchiveIndexPage = lazy(() => import('@/pages/emr-archive-index'));
+// M533-D：病历归档检索 V14（EMR 深化四模块，M533 收官）
+const EmrArchiveSearchPage = lazy(() => import('@/pages/emr-archive-search'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6063,6 +6071,14 @@ export default function AppRoutes() {
           <Route path="emr-struct-stats" element={<EmrStructStatsPage />} />
           {/* M532-D：病历结构化数据对比 V14（EMR 深化四模块，M532 收官） */}
           <Route path="emr-struct-compare" element={<EmrStructComparePage />} />
+          {/* M533-A：病历自动归档检查 V14（EMR 深化四模块） */}
+          <Route path="emr-archive-check" element={<EmrArchiveCheckPage />} />
+          {/* M533-B：病历归档完整性校验 V14（EMR 深化四模块） */}
+          <Route path="emr-archive-integrity" element={<EmrArchiveIntegrityPage />} />
+          {/* M533-C：病历归档索引 V14（EMR 深化四模块） */}
+          <Route path="emr-archive-index" element={<EmrArchiveIndexPage />} />
+          {/* M533-D：病历归档检索 V14（EMR 深化四模块，M533 收官） */}
+          <Route path="emr-archive-search" element={<EmrArchiveSearchPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
