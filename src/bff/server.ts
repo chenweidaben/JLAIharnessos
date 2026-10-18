@@ -3145,6 +3145,14 @@ import { emrQcDefectCaseLibraryV14Routes } from './routes/emrQcDefectCaseLibrary
 import { emrQcStandardLibraryV14Routes } from './routes/emrQcStandardLibraryV14';
 // M520-D：质控最佳实践库 V14 GET/POST /api/v1/emr-qc-best-practice（EMR 深化四模块，M520 收官，病历质控知识库与智能推荐系列）
 import { emrQcBestPracticeV14Routes } from './routes/emrQcBestPracticeV14';
+// M521-A：病历自动归档触发 V14 GET/POST /api/v1/emr-qc-auto-archive（EMR 深化四模块，病历质控工作流自动化系列）
+import { emrQcAutoArchiveV14Routes } from './routes/emrQcAutoArchiveV14';
+// M521-B：病历质控自动派单 V14 GET/POST /api/v1/emr-qc-auto-dispatch（EMR 深化四模块，病历质控工作流自动化系列）
+import { emrQcAutoDispatchV14Routes } from './routes/emrQcAutoDispatchV14';
+// M521-C：病历缺陷自动分发 V14 GET/POST /api/v1/emr-qc-defect-auto-route（EMR 深化四模块，病历质控工作流自动化系列）
+import { emrQcDefectAutoRouteV14Routes } from './routes/emrQcDefectAutoRouteV14';
+// M521-D：病历整改自动跟踪 V14 GET/POST /api/v1/emr-qc-rectification-tracking（EMR 深化四模块，M521 收官，病历质控工作流自动化系列）
+import { emrQcRectificationTrackingV14Routes } from './routes/emrQcRectificationTrackingV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4960,6 +4968,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcDefectCaseLibraryV14Routes, // M520-B：质控缺陷案例库 V14 GET/POST /api/v1/emr-qc-defect-case-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
   ...emrQcStandardLibraryV14Routes, // M520-C：质控行业标准库 V14 GET/POST /api/v1/emr-qc-standard-library（EMR 深化四模块，病历质控知识库与智能推荐系列）
   ...emrQcBestPracticeV14Routes, // M520-D：质控最佳实践库 V14 GET/POST /api/v1/emr-qc-best-practice（EMR 深化四模块，M520 收官，病历质控知识库与智能推荐系列）
+  ...emrQcAutoArchiveV14Routes, // M521-A：病历自动归档触发 V14 GET/POST /api/v1/emr-qc-auto-archive（EMR 深化四模块，病历质控工作流自动化系列）
+  ...emrQcAutoDispatchV14Routes, // M521-B：病历质控自动派单 V14 GET/POST /api/v1/emr-qc-auto-dispatch（EMR 深化四模块，病历质控工作流自动化系列）
+  ...emrQcDefectAutoRouteV14Routes, // M521-C：病历缺陷自动分发 V14 GET/POST /api/v1/emr-qc-defect-auto-route（EMR 深化四模块，病历质控工作流自动化系列）
+  ...emrQcRectificationTrackingV14Routes, // M521-D：病历整改自动跟踪 V14 GET/POST /api/v1/emr-qc-rectification-tracking（EMR 深化四模块，M521 收官，病历质控工作流自动化系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
