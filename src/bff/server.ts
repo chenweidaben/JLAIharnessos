@@ -2455,6 +2455,14 @@ import { staffKpiQualityMgmtV13Routes } from './routes/staffKpiQualityMgmtV13';
 import { bonusQualityMgmtV13Routes } from './routes/bonusQualityMgmtV13';
 // M433-D：绩效改进质量管理 V13 GET /api/v1/performance-improvement-quality-mgmt（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
 import { performanceImprovementQualityMgmtV13Routes } from './routes/performanceImprovementQualityMgmtV13';
+// M434-A：教学质量管理 V13 GET /api/v1/teaching-quality-mgmt（-quality 后缀避让旧版 trainingMgmtDetailV13（M419））
+import { teachingQualityMgmtV13Routes } from './routes/teachingQualityMgmtV13';
+// M434-B：科研质量管理 V13 GET /api/v1/research-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+import { researchQualityMgmtV13Routes } from './routes/researchQualityMgmtV13';
+// M434-C：继续教育质量管理 V13 GET /api/v1/continuing-education-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+import { continuingEducationQualityMgmtV13Routes } from './routes/continuingEducationQualityMgmtV13';
+// M434-D：学科建设质量管理 V13 GET /api/v1/discipline-construction-quality-mgmt（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+import { disciplineConstructionQualityMgmtV13Routes } from './routes/disciplineConstructionQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3925,6 +3933,10 @@ const allRoutes: RouteDef[] = [
   ...staffKpiQualityMgmtV13Routes, // M433-B：个人 KPI 质量管理 V13 GET /api/v1/staff-kpi-quality-mgmt（-quality 后缀避让旧版 staffKpiMgmtV13（M410））
   ...bonusQualityMgmtV13Routes, // M433-C：奖金分配质量管理 V13 GET /api/v1/bonus-quality-mgmt（-quality 后缀避让旧版 bonusMgmtV13（M410））
   ...performanceImprovementQualityMgmtV13Routes, // M433-D：绩效改进质量管理 V13 GET /api/v1/performance-improvement-quality-mgmt（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
+  ...teachingQualityMgmtV13Routes, // M434-A：教学质量管理 V13 GET /api/v1/teaching-quality-mgmt（-quality 后缀避让旧版 trainingMgmtDetailV13（M419））
+  ...researchQualityMgmtV13Routes, // M434-B：科研质量管理 V13 GET /api/v1/research-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+  ...continuingEducationQualityMgmtV13Routes, // M434-C：继续教育质量管理 V13 GET /api/v1/continuing-education-quality-mgmt（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+  ...disciplineConstructionQualityMgmtV13Routes, // M434-D：学科建设质量管理 V13 GET /api/v1/discipline-construction-quality-mgmt（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

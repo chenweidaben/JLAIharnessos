@@ -2271,6 +2271,14 @@ const StaffKpiQualityMgmt = lazy(() => import('@/pages/staff-kpi-quality-mgmt'))
 const BonusQualityMgmt = lazy(() => import('@/pages/bonus-quality-mgmt'));
 // M433-D：绩效改进质量管理 V13（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410））
 const PerformanceImprovementQualityMgmt = lazy(() => import('@/pages/performance-improvement-quality-mgmt'));
+// M434-A：教学质量管理 V13（-quality 后缀避让旧版 trainingMgmtDetailV13（M419））
+const TeachingQualityMgmt = lazy(() => import('@/pages/teaching-quality-mgmt'));
+// M434-B：科研质量管理 V13（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+const ResearchQualityMgmt = lazy(() => import('@/pages/research-quality-mgmt'));
+// M434-C：继续教育质量管理 V13（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+const ContinuingEducationQualityMgmt = lazy(() => import('@/pages/continuing-education-quality-mgmt'));
+// M434-D：学科建设质量管理 V13（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等））
+const DisciplineConstructionQualityMgmt = lazy(() => import('@/pages/discipline-construction-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4483,6 +4491,14 @@ export default function AppRoutes() {
           <Route path="bonus-quality-mgmt" element={<BonusQualityMgmt />} />
           {/* M433-D：绩效改进质量管理 V13（M433 收官，-quality 后缀避让旧版 performanceImprovementMgmtV13（M410）） */}
           <Route path="performance-improvement-quality-mgmt" element={<PerformanceImprovementQualityMgmt />} />
+          {/* M434-A：教学质量管理 V13（-quality 后缀避让旧版 trainingMgmtDetailV13（M419）） */}
+          <Route path="teaching-quality-mgmt" element={<TeachingQualityMgmt />} />
+          {/* M434-B：科研质量管理 V13（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等）） */}
+          <Route path="research-quality-mgmt" element={<ResearchQualityMgmt />} />
+          {/* M434-C：继续教育质量管理 V13（-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等）） */}
+          <Route path="continuing-education-quality-mgmt" element={<ContinuingEducationQualityMgmt />} />
+          {/* M434-D：学科建设质量管理 V13（M434 收官，-quality 后缀避让教学科研相关旧版模块（M419 trainingMgmtDetailV13 等）） */}
+          <Route path="discipline-construction-quality-mgmt" element={<DisciplineConstructionQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
