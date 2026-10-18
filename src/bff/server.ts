@@ -3281,6 +3281,14 @@ import { emrPathwayCheckV14Routes } from './routes/emrPathwayCheckV14';
 import { emrLabAlertV14Routes } from './routes/emrLabAlertV14';
 // M537-D：病历诊断完整性检查 V14 GET/POST /api/v1/emr-diagnosis-complete（EMR 深化四模块，M537 收官，病历临床决策支持系列）
 import { emrDiagnosisCompleteV14Routes } from './routes/emrDiagnosisCompleteV14';
+// M538-A：病历时间轴生成 V14 GET/POST /api/v1/emr-timeline-generate（EMR 深化四模块，病历时间轴与病程管理系列）
+import { emrTimelineGenerateV14Routes } from './routes/emrTimelineGenerateV14';
+// M538-B：病程关键节点标记 V14 GET/POST /api/v1/emr-course-node（EMR 深化四模块，病历时间轴与病程管理系列）
+import { emrCourseNodeV14Routes } from './routes/emrCourseNodeV14';
+// M538-C：病历关键事件时间线 V14 GET/POST /api/v1/emr-event-timeline（EMR 深化四模块，病历时间轴与病程管理系列）
+import { emrEventTimelineV14Routes } from './routes/emrEventTimelineV14';
+// M538-D：病历时间线导出 V14 GET/POST /api/v1/emr-timeline-export（EMR 深化四模块，M538 收官，病历时间轴与病程管理系列）
+import { emrTimelineExportV14Routes } from './routes/emrTimelineExportV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5164,6 +5172,10 @@ const allRoutes: RouteDef[] = [
   ...emrPathwayCheckV14Routes, // M537-B：病历临床路径符合性检查 V14 GET/POST /api/v1/emr-pathway-check（EMR 深化四模块，病历临床决策支持系列）
   ...emrLabAlertV14Routes, // M537-C：病历检验异常值提醒 V14 GET/POST /api/v1/emr-lab-alert（EMR 深化四模块，病历临床决策支持系列）
   ...emrDiagnosisCompleteV14Routes, // M537-D：病历诊断完整性检查 V14 GET/POST /api/v1/emr-diagnosis-complete（EMR 深化四模块，M537 收官，病历临床决策支持系列）
+  ...emrTimelineGenerateV14Routes, // M538-A：病历时间轴生成 V14 GET/POST /api/v1/emr-timeline-generate（EMR 深化四模块，病历时间轴与病程管理系列）
+  ...emrCourseNodeV14Routes, // M538-B：病程关键节点标记 V14 GET/POST /api/v1/emr-course-node（EMR 深化四模块，病历时间轴与病程管理系列）
+  ...emrEventTimelineV14Routes, // M538-C：病历关键事件时间线 V14 GET/POST /api/v1/emr-event-timeline（EMR 深化四模块，病历时间轴与病程管理系列）
+  ...emrTimelineExportV14Routes, // M538-D：病历时间线导出 V14 GET/POST /api/v1/emr-timeline-export（EMR 深化四模块，M538 收官，病历时间轴与病程管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
