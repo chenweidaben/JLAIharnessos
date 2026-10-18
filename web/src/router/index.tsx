@@ -2685,6 +2685,14 @@ const EmrLogicRelationCheckPage = lazy(() => import('@/pages/emr-logic-relation-
 const EmrTerminologyCheckPage = lazy(() => import('@/pages/emr-terminology-check'));
 // M485-D：病历时效合规检查 V14（EMR 深化四模块，M485 收官）
 const EmrTimelinessCompliancePage = lazy(() => import('@/pages/emr-timeliness-compliance'));
+// M486-A：AI 病历摘要生成 V14（EMR 深化四模块）
+const EmrAiSummaryPage = lazy(() => import('@/pages/emr-ai-summary'));
+// M486-B：AI 病历关键词提取 V14（EMR 深化四模块）
+const EmrAiKeywordPage = lazy(() => import('@/pages/emr-ai-keyword'));
+// M486-C：AI 病历风险预测 V14（EMR 深化四模块）
+const EmrAiRiskPredictPage = lazy(() => import('@/pages/emr-ai-risk-predict'));
+// M486-D：AI 病历相似病历推荐 V14（EMR 深化四模块，M486 收官）
+const EmrAiSimilarPage = lazy(() => import('@/pages/emr-ai-similar'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5311,6 +5319,14 @@ export default function AppRoutes() {
           <Route path="emr-terminology-check" element={<EmrTerminologyCheckPage />} />
           {/* M485-D：病历时效合规检查 V14（EMR 深化四模块，M485 收官） */}
           <Route path="emr-timeliness-compliance" element={<EmrTimelinessCompliancePage />} />
+          {/* M486-A：AI 病历摘要生成 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-summary" element={<EmrAiSummaryPage />} />
+          {/* M486-B：AI 病历关键词提取 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-keyword" element={<EmrAiKeywordPage />} />
+          {/* M486-C：AI 病历风险预测 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-risk-predict" element={<EmrAiRiskPredictPage />} />
+          {/* M486-D：AI 病历相似病历推荐 V14（EMR 深化四模块，M486 收官） */}
+          <Route path="emr-ai-similar" element={<EmrAiSimilarPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
