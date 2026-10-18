@@ -2299,8 +2299,10 @@ const MedicalWasteTraceabilityQualityMgmt = lazy(() => import('@/pages/medical-w
 const CateringQualityMgmt = lazy(() => import('@/pages/catering-quality-mgmt'));
 // M437-B：被服洗涤管理 V13（后勤保障与环境管理深化组）
 const LaundryMgmt = lazy(() => import('@/pages/laundry-mgmt'));
-// M437-C：停车管理质量 V13（-quality 后缀避让旧版 parkingMgmtV13（M352-D 车辆管理））
-const ParkingQualityMgmt = lazy(() => import('@/pages/parking-quality-mgmt'));
+// M437-C：环境卫生质量管理 V13（后勤保障与环境管理深化组）
+const EnvironmentalHygieneQualityMgmt = lazy(() => import('@/pages/environmental-hygiene-quality-mgmt'));
+// M437-D：会议室管理 V13（M437 收官，后勤保障与环境管理深化组）
+const MeetingRoomMgmt = lazy(() => import('@/pages/meeting-room-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4541,8 +4543,10 @@ export default function AppRoutes() {
           <Route path="catering-quality-mgmt" element={<CateringQualityMgmt />} />
           {/* M437-B：被服洗涤管理 V13（后勤保障与环境管理深化组） */}
           <Route path="laundry-mgmt" element={<LaundryMgmt />} />
-          {/* M437-C：停车管理质量 V13（-quality 后缀避让旧版 parkingMgmtV13（M352-D 车辆管理）） */}
-          <Route path="parking-quality-mgmt" element={<ParkingQualityMgmt />} />
+          {/* M437-C：环境卫生质量管理 V13（后勤保障与环境管理深化组） */}
+          <Route path="environmental-hygiene-quality-mgmt" element={<EnvironmentalHygieneQualityMgmt />} />
+          {/* M437-D：会议室管理 V13（M437 收官，后勤保障与环境管理深化组） */}
+          <Route path="meeting-room-mgmt" element={<MeetingRoomMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
