@@ -2239,6 +2239,14 @@ const EndoscopyQualityMgmt = lazy(() => import('@/pages/endoscopy-quality-mgmt')
 const OperatingRoomQualityMgmt = lazy(() => import('@/pages/operating-room-quality-mgmt'));
 // M429-D：病房质量管理 V13（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417））
 const WardQualityMgmt = lazy(() => import('@/pages/ward-quality-mgmt'));
+// M430-A：影像质量管理 V13（-quality 后缀避让旧版 medicalImagingDetailV13（M415））
+const ImagingQualityMgmt = lazy(() => import('@/pages/imaging-quality-mgmt'));
+// M430-B：病理质量管理 V13（-quality 后缀避让旧版 pathologyMgmtV13（M415））
+const PathologyQualityMgmt = lazy(() => import('@/pages/pathology-quality-mgmt'));
+// M430-C：营养质量管理 V13（-quality 后缀避让旧版 nutritionMgmtV13（M415））
+const NutritionQualityMgmt = lazy(() => import('@/pages/nutrition-quality-mgmt'));
+// M430-D：输血质量管理 V13（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421））
+const BloodTransfusionQualityMgmt = lazy(() => import('@/pages/blood-transfusion-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4419,6 +4427,14 @@ export default function AppRoutes() {
           <Route path="operating-room-quality-mgmt" element={<OperatingRoomQualityMgmt />} />
           {/* M429-D：病房质量管理 V13（M429 收官，-quality 后缀避让旧版 wardMgmtDetailV13（M417）） */}
           <Route path="ward-quality-mgmt" element={<WardQualityMgmt />} />
+          {/* M430-A：影像质量管理 V13（-quality 后缀避让旧版 medicalImagingDetailV13（M415）） */}
+          <Route path="imaging-quality-mgmt" element={<ImagingQualityMgmt />} />
+          {/* M430-B：病理质量管理 V13（-quality 后缀避让旧版 pathologyMgmtV13（M415）） */}
+          <Route path="pathology-quality-mgmt" element={<PathologyQualityMgmt />} />
+          {/* M430-C：营养质量管理 V13（-quality 后缀避让旧版 nutritionMgmtV13（M415）） */}
+          <Route path="nutrition-quality-mgmt" element={<NutritionQualityMgmt />} />
+          {/* M430-D：输血质量管理 V13（M430 收官，-quality 后缀避让旧版 bloodTransfusionDetailV13（M421）） */}
+          <Route path="blood-transfusion-quality-mgmt" element={<BloodTransfusionQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
