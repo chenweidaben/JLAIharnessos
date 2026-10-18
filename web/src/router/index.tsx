@@ -2423,6 +2423,14 @@ const SingleDiseaseQualityMgmt = lazy(() => import('@/pages/single-disease-quali
 const ClinicalPathwayCoverageMgmt = lazy(() => import('@/pages/clinical-pathway-coverage-mgmt'));
 // M452-D：病案质量管理 V13（M452 收官，医院评审与临床质量改进组）
 const MedicalRecordQualityMgmt = lazy(() => import('@/pages/medical-record-quality-mgmt'));
+// M453-A：护理质量管理 V13（护理管理组）
+const NursingQualityMgmt = lazy(() => import('@/pages/nursing-quality-mgmt'));
+// M453-B：护理人力配置管理 V13（护理管理组）
+const NursingStaffingMgmt = lazy(() => import('@/pages/nursing-staffing-mgmt'));
+// M453-C：护理培训管理 V13（护理管理组）
+const NursingTrainingMgmt = lazy(() => import('@/pages/nursing-training-mgmt'));
+// M453-D：护理服务管理 V13（M453 收官，护理管理组）
+const NursingServiceMgmt = lazy(() => import('@/pages/nursing-service-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4787,6 +4795,14 @@ export default function AppRoutes() {
           <Route path="clinical-pathway-coverage-mgmt" element={<ClinicalPathwayCoverageMgmt />} />
           {/* M452-D：病案质量管理 V13（M452 收官，医院评审与临床质量改进组） */}
           <Route path="medical-record-quality-mgmt" element={<MedicalRecordQualityMgmt />} />
+          {/* M453-A：护理质量管理 V13（护理管理组） */}
+          <Route path="nursing-quality-mgmt" element={<NursingQualityMgmt />} />
+          {/* M453-B：护理人力配置管理 V13（护理管理组） */}
+          <Route path="nursing-staffing-mgmt" element={<NursingStaffingMgmt />} />
+          {/* M453-C：护理培训管理 V13（护理管理组） */}
+          <Route path="nursing-training-mgmt" element={<NursingTrainingMgmt />} />
+          {/* M453-D：护理服务管理 V13（M453 收官，护理管理组） */}
+          <Route path="nursing-service-mgmt" element={<NursingServiceMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
