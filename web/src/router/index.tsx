@@ -2223,6 +2223,14 @@ const TransferDetail = lazy(() => import('@/pages/transfer-detail'));
 const ReadmissionAnalysisMgmt = lazy(() => import('@/pages/readmission-analysis-mgmt'));
 // M427-D：死亡病例管理（细节）V13（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412））
 const DeathCaseDetail = lazy(() => import('@/pages/death-case-detail'));
+// M428-A：新生儿护理管理 V13（换名避让旧版 neonatalMgmtV13（M412，-care 后缀））
+const NeonatalCareMgmt = lazy(() => import('@/pages/neonatal-care-mgmt'));
+// M428-B：孕产妇护理管理 V13（换名避让旧版 maternalMgmtV13（M412，-care 后缀））
+const MaternalCareMgmt = lazy(() => import('@/pages/maternal-care-mgmt'));
+// M428-C：急诊护理管理 V13（换名避让旧版 emergencyMgmtV13（M416，-care 后缀））
+const EmergencyCareMgmt = lazy(() => import('@/pages/emergency-care-mgmt'));
+// M428-D：ICU 护理管理 V13（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀））
+const IcuCareMgmt = lazy(() => import('@/pages/icu-care-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4387,6 +4395,14 @@ export default function AppRoutes() {
           <Route path="readmission-analysis-mgmt" element={<ReadmissionAnalysisMgmt />} />
           {/* M427-D：死亡病例管理（细节）V13（M427 收官，detail 避让旧版 deathCaseMgmtV13（M412）） */}
           <Route path="death-case-detail" element={<DeathCaseDetail />} />
+          {/* M428-A：新生儿护理管理 V13（换名避让旧版 neonatalMgmtV13（M412，-care 后缀）） */}
+          <Route path="neonatal-care-mgmt" element={<NeonatalCareMgmt />} />
+          {/* M428-B：孕产妇护理管理 V13（换名避让旧版 maternalMgmtV13（M412，-care 后缀）） */}
+          <Route path="maternal-care-mgmt" element={<MaternalCareMgmt />} />
+          {/* M428-C：急诊护理管理 V13（换名避让旧版 emergencyMgmtV13（M416，-care 后缀）） */}
+          <Route path="emergency-care-mgmt" element={<EmergencyCareMgmt />} />
+          {/* M428-D：ICU 护理管理 V13（M428 收官，换名避让旧版 icuMgmtV13（M416，-care 后缀）） */}
+          <Route path="icu-care-mgmt" element={<IcuCareMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />
