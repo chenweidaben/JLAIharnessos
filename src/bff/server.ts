@@ -2857,6 +2857,14 @@ import { emrQcMetricBenchmarkV14Routes } from './routes/emrQcMetricBenchmarkV14'
 import { emrQcMetricDrilldownV14Routes } from './routes/emrQcMetricDrilldownV14';
 // M484-D（新规格）：质控指标导出 V14 POST /api/v1/emr-qc-metric-export（EMR 深化四模块，M484 收官，CSV 表头"科室,指标值"）
 import { emrQcMetricExportV14Routes } from './routes/emrQcMetricExportV14';
+// M485-A：病历书写规范检查 V14 POST /api/v1/emr-writing-standard-check（EMR 深化四模块，模糊用语检测+扣分 100-issueCount×5）
+import { emrWritingStandardCheckV14Routes } from './routes/emrWritingStandardCheckV14';
+// M485-B：病历逻辑关系检查 V14 POST /api/v1/emr-logic-relation-check（EMR 深化四模块，诊断-用药匹配+扣分 100-conflictCount×10）
+import { emrLogicRelationCheckV14Routes } from './routes/emrLogicRelationCheckV14';
+// M485-C：病历术语规范检查 V14 POST /api/v1/emr-terminology-check（EMR 深化四模块，口语化术语检测+扣分 100-issueCount×5）
+import { emrTerminologyCheckV14Routes } from './routes/emrTerminologyCheckV14';
+// M485-D：病历时效合规检查 V14 POST /api/v1/emr-timeliness-compliance（EMR 深化四模块，M485 收官，actual>deadline 超时+合规率 Math.ceil）
+import { emrTimelinessComplianceV14Routes } from './routes/emrTimelinessComplianceV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4528,6 +4536,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcMetricBenchmarkV14Routes, // M484-B（新规格）：质控指标对标 V14 GET /api/v1/emr-qc-metric-benchmark（EMR 深化四模块，gap=ourValue-benchmarkValue）
   ...emrQcMetricDrilldownV14Routes, // M484-C（新规格）：质控指标钻取 V14 GET /api/v1/emr-qc-metric-drilldown（EMR 深化四模块，按科室筛选维度）
   ...emrQcMetricExportV14Routes, // M484-D（新规格）：质控指标导出 V14 POST /api/v1/emr-qc-metric-export（EMR 深化四模块，M484 收官，CSV 表头"科室,指标值"）
+  ...emrWritingStandardCheckV14Routes, // M485-A：病历书写规范检查 V14 POST /api/v1/emr-writing-standard-check（EMR 深化四模块，模糊用语检测+扣分 100-issueCount×5）
+  ...emrLogicRelationCheckV14Routes, // M485-B：病历逻辑关系检查 V14 POST /api/v1/emr-logic-relation-check（EMR 深化四模块，诊断-用药匹配+扣分 100-conflictCount×10）
+  ...emrTerminologyCheckV14Routes, // M485-C：病历术语规范检查 V14 POST /api/v1/emr-terminology-check（EMR 深化四模块，口语化术语检测+扣分 100-issueCount×5）
+  ...emrTimelinessComplianceV14Routes, // M485-D：病历时效合规检查 V14 POST /api/v1/emr-timeliness-compliance（EMR 深化四模块，M485 收官，actual>deadline 超时+合规率 Math.ceil）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
