@@ -2809,6 +2809,14 @@ import { emrArchiveRuleV14Routes } from './routes/emrArchiveRuleV14';
 import { emrPrintSpecV14Routes } from './routes/emrPrintSpecV14';
 // M478-D：病历质控报表中心 V14 GET+POST /api/v1/emr-qc-report-center（EMR 深化四模块，M478 收官，报表目录+生成）
 import { emrQcReportCenterV14Routes } from './routes/emrQcReportCenterV14';
+// M479-A：病历质控评分模型 V14 GET /api/v1/emr-qc-score-model（EMR 深化四模块，加权求和 sum(weight*score)/100）
+import { emrQcScoreModelV14Routes } from './routes/emrQcScoreModelV14';
+// M479-B：病历质控权重配置 V14 GET+PUT /api/v1/emr-qc-weight-config（EMR 深化四模块，权重和=100 校验）
+import { emrQcWeightConfigV14Routes } from './routes/emrQcWeightConfigV14';
+// M479-C：病历质控等级评定 V14 POST /api/v1/emr-qc-grade（EMR 深化四模块，≥90优秀/80-89良好/60-79合格/<60不合格）
+import { emrQcGradeV14Routes } from './routes/emrQcGradeV14';
+// M479-D：病历质控持续改进 V14 GET /api/v1/emr-qc-continuous-improve（EMR 深化四模块，M479 收官，进度 completedSteps/totalSteps×100）
+import { emrQcContinuousImproveV14Routes } from './routes/emrQcContinuousImproveV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4456,6 +4464,10 @@ const allRoutes: RouteDef[] = [
   ...emrArchiveRuleV14Routes, // M478-B：病历归档规则 V14 GET /api/v1/emr-archive-rule（EMR 深化四模块，归档条件 daysSinceDischarge>=30 且 reviewed=true）
   ...emrPrintSpecV14Routes, // M478-C：病历打印规范 V14 GET /api/v1/emr-print-spec（EMR 深化四模块，合规条件 A4 + 水印）
   ...emrQcReportCenterV14Routes, // M478-D：病历质控报表中心 V14 GET+POST /api/v1/emr-qc-report-center（EMR 深化四模块，M478 收官，报表目录+生成）
+  ...emrQcScoreModelV14Routes, // M479-A：病历质控评分模型 V14 GET /api/v1/emr-qc-score-model（EMR 深化四模块，加权求和 sum(weight*score)/100）
+  ...emrQcWeightConfigV14Routes, // M479-B：病历质控权重配置 V14 GET+PUT /api/v1/emr-qc-weight-config（EMR 深化四模块，权重和=100 校验）
+  ...emrQcGradeV14Routes, // M479-C：病历质控等级评定 V14 POST /api/v1/emr-qc-grade（EMR 深化四模块，≥90优秀/80-89良好/60-79合格/<60不合格）
+  ...emrQcContinuousImproveV14Routes, // M479-D：病历质控持续改进 V14 GET /api/v1/emr-qc-continuous-improve（EMR 深化四模块，M479 收官，进度 completedSteps/totalSteps×100）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
