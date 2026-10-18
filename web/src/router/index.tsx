@@ -2573,6 +2573,14 @@ const EmrExpertReviewPage = lazy(() => import('@/pages/emr-expert-review'));
 const EmrBenchmarkPage = lazy(() => import('@/pages/emr-benchmark'));
 // M471-D：病历质控年度总结报告 V14（EMR 深化四模块，M471 收官）
 const EmrAnnualReportPage = lazy(() => import('@/pages/emr-annual-report'));
+// M472-A：病历质控指标字典管理 V14（EMR 深化四模块）
+const EmrIndicatorDictPage = lazy(() => import('@/pages/emr-indicator-dict'));
+// M472-B：病历质控规则版本管理 V14（EMR 深化四模块）
+const EmrRuleVersionPage = lazy(() => import('@/pages/emr-rule-version'));
+// M472-C：病历质控通知公告 V14（EMR 深化四模块）
+const EmrQcNoticePage = lazy(() => import('@/pages/emr-qc-notice'));
+// M472-D：病历质控数据导出中心 V14（EMR 深化四模块，M472 收官）
+const EmrDataExportPage = lazy(() => import('@/pages/emr-data-export'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5086,6 +5094,15 @@ export default function AppRoutes() {
           <Route path="emr-benchmark" element={<EmrBenchmarkPage />} />
           {/* M471-D：病历质控年度总结报告 V14（EMR 深化四模块，M471 收官） */}
           <Route path="emr-annual-report" element={<EmrAnnualReportPage />} />
+          {/* M472-A：病历质控指标字典管理 V14（EMR 深化四模块） */}
+          {/* M472-A 新规格：病历质控指标字典管理 V14（EMR 深化四模块） */}
+          <Route path="emr-indicator-dict" element={<EmrIndicatorDictPage />} />
+          {/* M472-B：病历质控规则版本管理 V14（EMR 深化四模块） */}
+          <Route path="emr-rule-version" element={<EmrRuleVersionPage />} />
+          {/* M472-C：病历质控通知公告 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-notice" element={<EmrQcNoticePage />} />
+          {/* M472-D：病历质控数据导出中心 V14（EMR 深化四模块，M472 收官） */}
+          <Route path="emr-data-export" element={<EmrDataExportPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
