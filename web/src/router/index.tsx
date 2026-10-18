@@ -2757,6 +2757,14 @@ const EmrQcNurseScorePage = lazy(() => import('@/pages/emr-qc-nurse-score'));
 const EmrQcDirectorScorePage = lazy(() => import('@/pages/emr-qc-director-score'));
 // M494-D：质控全院人员排名 V14（EMR 深化四模块，M494 收官）
 const EmrQcStaffRankingPage = lazy(() => import('@/pages/emr-qc-staff-ranking'));
+// M495-A：质控缺陷趋势预测 V14（EMR 深化四模块）
+const EmrQcTrendForecastPage = lazy(() => import('@/pages/emr-qc-trend-forecast'));
+// M495-B：质控科室预警阈值 V14（EMR 深化四模块）
+const EmrQcAlertThresholdPage = lazy(() => import('@/pages/emr-qc-alert-threshold'));
+// M495-C：质控风险等级评估 V14（EMR 深化四模块）
+const EmrQcRiskLevelPage = lazy(() => import('@/pages/emr-qc-risk-level'));
+// M495-D：质控干预建议生成 V14（EMR 深化四模块，M495 收官）
+const EmrQcInterventionPage = lazy(() => import('@/pages/emr-qc-intervention'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -5455,6 +5463,14 @@ export default function AppRoutes() {
           <Route path="emr-qc-director-score" element={<EmrQcDirectorScorePage />} />
           {/* M494-D：质控全院人员排名 V14（EMR 深化四模块，M494 收官） */}
           <Route path="emr-qc-staff-ranking" element={<EmrQcStaffRankingPage />} />
+          {/* M495-A：质控缺陷趋势预测 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-trend-forecast" element={<EmrQcTrendForecastPage />} />
+          {/* M495-B：质控科室预警阈值 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-alert-threshold" element={<EmrQcAlertThresholdPage />} />
+          {/* M495-C：质控风险等级评估 V14（EMR 深化四模块） */}
+          <Route path="emr-qc-risk-level" element={<EmrQcRiskLevelPage />} />
+          {/* M495-D：质控干预建议生成 V14（EMR 深化四模块，M495 收官） */}
+          <Route path="emr-qc-intervention" element={<EmrQcInterventionPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

@@ -2937,6 +2937,14 @@ import { emrQcNurseScoreV14Routes } from './routes/emrQcNurseScoreV14';
 import { emrQcDirectorScoreV14Routes } from './routes/emrQcDirectorScoreV14';
 // M494-D：质控全院人员排名 V14 GET /api/v1/emr-qc-staff-ranking（EMR 深化四模块，M494 收官，按评分降序排名）
 import { emrQcStaffRankingV14Routes } from './routes/emrQcStaffRankingV14';
+// M495-A：质控缺陷趋势预测 V14 GET /api/v1/emr-qc-trend-forecast（EMR 深化四模块，线性外推趋势方向）
+import { emrQcTrendForecastV14Routes } from './routes/emrQcTrendForecastV14';
+// M495-B：质控科室预警阈值 V14 GET/POST /api/v1/emr-qc-alert-threshold（EMR 深化四模块，actual>threshold触发）
+import { emrQcAlertThresholdV14Routes } from './routes/emrQcAlertThresholdV14';
+// M495-C：质控风险等级评估 V14 GET /api/v1/emr-qc-risk-level（EMR 深化四模块，>=90低/70-89中/<70高）
+import { emrQcRiskLevelV14Routes } from './routes/emrQcRiskLevelV14';
+// M495-D：质控干预建议生成 V14 POST /api/v1/emr-qc-intervention（EMR 深化四模块，M495 收官，低保持/中培训/高整改会诊）
+import { emrQcInterventionV14Routes } from './routes/emrQcInterventionV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4648,6 +4656,10 @@ const allRoutes: RouteDef[] = [
   ...emrQcNurseScoreV14Routes, // M494-B：质控护士评分 V14 GET /api/v1/emr-qc-nurse-score（EMR 深化四模块，护士评分列表+聚合）
   ...emrQcDirectorScoreV14Routes, // M494-C：质控科室主任评分 V14 GET /api/v1/emr-qc-director-score（EMR 深化四模块，主任评分列表+聚合）
   ...emrQcStaffRankingV14Routes, // M494-D：质控全院人员排名 V14 GET /api/v1/emr-qc-staff-ranking（EMR 深化四模块，M494 收官，按评分降序排名）
+  ...emrQcTrendForecastV14Routes, // M495-A：质控缺陷趋势预测 V14 GET /api/v1/emr-qc-trend-forecast（EMR 深化四模块，线性外推趋势方向）
+  ...emrQcAlertThresholdV14Routes, // M495-B：质控科室预警阈值 V14 GET/POST /api/v1/emr-qc-alert-threshold（EMR 深化四模块，actual>threshold触发）
+  ...emrQcRiskLevelV14Routes, // M495-C：质控风险等级评估 V14 GET /api/v1/emr-qc-risk-level（EMR 深化四模块，>=90低/70-89中/<70高）
+  ...emrQcInterventionV14Routes, // M495-D：质控干预建议生成 V14 POST /api/v1/emr-qc-intervention（EMR 深化四模块，M495 收官，低保持/中培训/高整改会诊）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
