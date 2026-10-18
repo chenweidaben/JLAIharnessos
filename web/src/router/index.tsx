@@ -2415,6 +2415,14 @@ const ComplaintHandlingMgmt = lazy(() => import('@/pages/complaint-handling-mgmt
 const MedicalDisputeMediationMgmt = lazy(() => import('@/pages/medical-dispute-mediation-mgmt'));
 // M451-D：满意度调查管理 V13（M451 收官，医患关系与投诉管理组）
 const SatisfactionSurveyMgmt = lazy(() => import('@/pages/satisfaction-survey-mgmt'));
+// M452-A：医院评审迎检管理 V13（医院评审与临床质量改进组）
+const HospitalAccreditationMgmt = lazy(() => import('@/pages/hospital-accreditation-mgmt'));
+// M452-B：单病种质量管理 V13（医院评审与临床质量改进组）
+const SingleDiseaseQualityMgmt = lazy(() => import('@/pages/single-disease-quality-mgmt'));
+// M452-C：临床路径管理（覆盖率视角）V13（医院评审与临床质量改进组）
+const ClinicalPathwayCoverageMgmt = lazy(() => import('@/pages/clinical-pathway-coverage-mgmt'));
+// M452-D：病案质量管理 V13（M452 收官，医院评审与临床质量改进组）
+const MedicalRecordQualityMgmt = lazy(() => import('@/pages/medical-record-quality-mgmt'));
 // 电子病历模板管理（M103-A）
 const EmrTemplatePage = lazy(() => import('@/pages/emr/Template'));
 // 处方点评系统（M103-B）
@@ -4771,6 +4779,14 @@ export default function AppRoutes() {
           <Route path="medical-dispute-mediation-mgmt" element={<MedicalDisputeMediationMgmt />} />
           {/* M451-D：满意度调查管理 V13（M451 收官，医患关系与投诉管理组） */}
           <Route path="satisfaction-survey-mgmt" element={<SatisfactionSurveyMgmt />} />
+          {/* M452-A：医院评审迎检管理 V13（医院评审与临床质量改进组） */}
+          <Route path="hospital-accreditation-mgmt" element={<HospitalAccreditationMgmt />} />
+          {/* M452-B：单病种质量管理 V13（医院评审与临床质量改进组） */}
+          <Route path="single-disease-quality-mgmt" element={<SingleDiseaseQualityMgmt />} />
+          {/* M452-C：临床路径管理（覆盖率视角）V13（医院评审与临床质量改进组） */}
+          <Route path="clinical-pathway-coverage-mgmt" element={<ClinicalPathwayCoverageMgmt />} />
+          {/* M452-D：病案质量管理 V13（M452 收官，医院评审与临床质量改进组） */}
+          <Route path="medical-record-quality-mgmt" element={<MedicalRecordQualityMgmt />} />
           {/* 电子病历模板管理（M103-A） */}
           {/* 电子病历模板管理（M103-A） */}
           <Route path="emr/template" element={<EmrTemplatePage />} />

@@ -2599,6 +2599,14 @@ import { complaintHandlingMgmtV13Routes } from './routes/complaintHandlingMgmtV1
 import { medicalDisputeMediationMgmtV13Routes } from './routes/medicalDisputeMediationMgmtV13';
 // M451-D：满意度调查管理 V13 GET /api/v1/satisfaction-survey-mgmt（M451 收官，医患关系与投诉管理组）
 import { satisfactionSurveyMgmtV13Routes } from './routes/satisfactionSurveyMgmtV13';
+// M452-A：医院评审迎检管理 V13 GET /api/v1/hospital-accreditation-mgmt（医院评审与临床质量改进组）
+import { hospitalAccreditationMgmtV13Routes } from './routes/hospitalAccreditationMgmtV13';
+// M452-B：单病种质量管理 V13 GET /api/v1/single-disease-quality-mgmt（医院评审与临床质量改进组）
+import { singleDiseaseQualityMgmtV13Routes } from './routes/singleDiseaseQualityMgmtV13';
+// M452-C：临床路径管理（覆盖率视角）V13 GET /api/v1/clinical-pathway-coverage-mgmt（医院评审与临床质量改进组）
+import { clinicalPathwayCoverageMgmtV13Routes } from './routes/clinicalPathwayCoverageMgmtV13';
+// M452-D：病案质量管理 V13 GET /api/v1/medical-record-quality-mgmt（M452 收官，医院评审与临床质量改进组）
+import { medicalRecordQualityMgmtV13Routes } from './routes/medicalRecordQualityMgmtV13';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4141,6 +4149,10 @@ const allRoutes: RouteDef[] = [
   ...complaintHandlingMgmtV13Routes, // M451-B：投诉处理管理 V13 GET /api/v1/complaint-handling-mgmt（医患关系与投诉管理组）
   ...medicalDisputeMediationMgmtV13Routes, // M451-C：医疗纠纷调解管理 V13 GET /api/v1/medical-dispute-mediation-mgmt（医患关系与投诉管理组）
   ...satisfactionSurveyMgmtV13Routes, // M451-D：满意度调查管理 V13 GET /api/v1/satisfaction-survey-mgmt（M451 收官，医患关系与投诉管理组）
+  ...hospitalAccreditationMgmtV13Routes, // M452-A：医院评审迎检管理 V13 GET /api/v1/hospital-accreditation-mgmt（医院评审与临床质量改进组）
+  ...singleDiseaseQualityMgmtV13Routes, // M452-B：单病种质量管理 V13 GET /api/v1/single-disease-quality-mgmt（医院评审与临床质量改进组）
+  ...clinicalPathwayCoverageMgmtV13Routes, // M452-C：临床路径管理（覆盖率视角）V13 GET /api/v1/clinical-pathway-coverage-mgmt（医院评审与临床质量改进组）
+  ...medicalRecordQualityMgmtV13Routes, // M452-D：病案质量管理 V13 GET /api/v1/medical-record-quality-mgmt（M452 收官，医院评审与临床质量改进组）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
