@@ -2509,6 +2509,14 @@ const EmrCopyTracePage = lazy(() => import('@/pages/emr-copy-trace'));
 const EmrExportPage = lazy(() => import('@/pages/emr-export'));
 // M463-D：科室质控员工作台 V14（EMR 深化四模块，M463 收官）
 const EmrQcWorkbenchPage = lazy(() => import('@/pages/emr-qc-workbench'));
+// M464-A：ICD 编码辅助与校对 V14（EMR 深化四模块）
+const EmrIcdCodingPage = lazy(() => import('@/pages/emr-icd-coding'));
+// M464-B：病历术语标准词库 V14（EMR 深化四模块）
+const EmrTermDictPage = lazy(() => import('@/pages/emr-term-dict'));
+// M464-C：病历时间轴视图 V14（EMR 深化四模块，-detail 避让 EmrTimelinessPage）
+const EmrTimelineDetailPage = lazy(() => import('@/pages/emr-timeline-detail'));
+// M464-D：病历缺陷反馈与整改闭环 V14（EMR 深化四模块，M464 收官）
+const EmrDefectFeedbackPage = lazy(() => import('@/pages/emr-defect-feedback'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -4958,6 +4966,14 @@ export default function AppRoutes() {
           <Route path="emr-export" element={<EmrExportPage />} />
           {/* M463-D：科室质控员工作台 V14（EMR 深化四模块，M463 收官） */}
           <Route path="emr-qc-workbench" element={<EmrQcWorkbenchPage />} />
+          {/* M464-A：ICD 编码辅助与校对 V14（EMR 深化四模块） */}
+          <Route path="emr-icd-coding" element={<EmrIcdCodingPage />} />
+          {/* M464-B：病历术语标准词库 V14（EMR 深化四模块） */}
+          <Route path="emr-term-dict" element={<EmrTermDictPage />} />
+          {/* M464-C：病历时间轴视图 V14（EMR 深化四模块，-detail 避让 EmrTimelinessPage） */}
+          <Route path="emr-timeline-detail" element={<EmrTimelineDetailPage />} />
+          {/* M464-D：病历缺陷反馈与整改闭环 V14（EMR 深化四模块，M464 收官） */}
+          <Route path="emr-defect-feedback" element={<EmrDefectFeedbackPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
