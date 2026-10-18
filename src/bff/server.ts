@@ -2785,6 +2785,14 @@ import { emrDeptQcReportV14Routes } from './routes/emrDeptQcReportV14';
 import { emrPatientSatisfactionV14Routes } from './routes/emrPatientSatisfactionV14';
 // M475-D：病历质控知识库 V14 GET /api/v1/emr-qc-knowledge（EMR 深化四模块，M475 收官，5 条知识条目）
 import { emrQcKnowledgeV14Routes } from './routes/emrQcKnowledgeV14';
+// M476-A：病历完整性检查 V14 POST /api/v1/emr-completeness-check（EMR 深化四模块，病历四大检查系列①完整性）
+import { emrCompletenessCheckV14Routes } from './routes/emrCompletenessCheckV14';
+// M476-B：病历一致性检查 V14 POST /api/v1/emr-consistency-check（EMR 深化四模块，病历四大检查系列②一致性）
+import { emrConsistencyCheckV14Routes } from './routes/emrConsistencyCheckV14';
+// M476-C：病历时效性检查 V14 POST /api/v1/emr-timeliness-check（EMR 深化四模块，病历四大检查系列③时效性）
+import { emrTimelinessCheckV14Routes } from './routes/emrTimelinessCheckV14';
+// M476-D：病历规范性检查 V14 POST /api/v1/emr-normativity-check（EMR 深化四模块，病历四大检查系列④规范性，M476 收官）
+import { emrNormativityCheckV14Routes } from './routes/emrNormativityCheckV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -4420,6 +4428,10 @@ const allRoutes: RouteDef[] = [
   ...emrDeptQcReportV14Routes, // M475-B：病历质控科室质量报告 V14 GET /api/v1/emr-dept-qc-report（EMR 深化四模块，通过率+改进建议）
   ...emrPatientSatisfactionV14Routes, // M475-C：病历质控患者满意度 V14 GET /api/v1/emr-patient-satisfaction（EMR 深化四模块，平均分+按科室分组）
   ...emrQcKnowledgeV14Routes, // M475-D：病历质控知识库 V14 GET /api/v1/emr-qc-knowledge（EMR 深化四模块，M475 收官，5 条知识条目）
+  ...emrCompletenessCheckV14Routes, // M476-A：病历完整性检查 V14 POST /api/v1/emr-completeness-check（EMR 深化四模块，病历四大检查系列①完整性）
+  ...emrConsistencyCheckV14Routes, // M476-B：病历一致性检查 V14 POST /api/v1/emr-consistency-check（EMR 深化四模块，病历四大检查系列②一致性）
+  ...emrTimelinessCheckV14Routes, // M476-C：病历时效性检查 V14 POST /api/v1/emr-timeliness-check（EMR 深化四模块，病历四大检查系列③时效性）
+  ...emrNormativityCheckV14Routes, // M476-D：病历规范性检查 V14 POST /api/v1/emr-normativity-check（EMR 深化四模块，病历四大检查系列④规范性，M476 收官）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
