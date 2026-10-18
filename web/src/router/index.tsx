@@ -2517,6 +2517,14 @@ const EmrTermDictPage = lazy(() => import('@/pages/emr-term-dict'));
 const EmrTimelineDetailPage = lazy(() => import('@/pages/emr-timeline-detail'));
 // M464-D：病历缺陷反馈与整改闭环 V14（EMR 深化四模块，M464 收官）
 const EmrDefectFeedbackPage = lazy(() => import('@/pages/emr-defect-feedback'));
+// M465-A：病历模板可视化编辑器 V14（EMR 深化四模块）
+const EmrTemplateEditorPage = lazy(() => import('@/pages/emr-template-editor'));
+// M465-B：病历质量实时评分仪表盘 V14（EMR 深化四模块）
+const EmrQualityScorePage = lazy(() => import('@/pages/emr-quality-score'));
+// M465-C：患者就诊 360° 全视图 V14（EMR 深化四模块）
+const EmrPatient360Page = lazy(() => import('@/pages/emr-patient-360'));
+// M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
+const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -4974,6 +4982,14 @@ export default function AppRoutes() {
           <Route path="emr-timeline-detail" element={<EmrTimelineDetailPage />} />
           {/* M464-D：病历缺陷反馈与整改闭环 V14（EMR 深化四模块，M464 收官） */}
           <Route path="emr-defect-feedback" element={<EmrDefectFeedbackPage />} />
+          {/* M465-A：病历模板可视化编辑器 V14（EMR 深化四模块） */}
+          <Route path="emr-template-editor" element={<EmrTemplateEditorPage />} />
+          {/* M465-B：病历质量实时评分仪表盘 V14（EMR 深化四模块） */}
+          <Route path="emr-quality-score" element={<EmrQualityScorePage />} />
+          {/* M465-C：患者就诊 360° 全视图 V14（EMR 深化四模块） */}
+          <Route path="emr-patient-360" element={<EmrPatient360Page />} />
+          {/* M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官） */}
+          <Route path="emr-qc-graph" element={<EmrQcGraphPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
