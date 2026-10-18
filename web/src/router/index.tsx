@@ -3037,6 +3037,14 @@ const EmrHpiNlpPage = lazy(() => import('@/pages/emr-hpi-nlp'));
 const EmrDiagnosisNlpPage = lazy(() => import('@/pages/emr-diagnosis-nlp'));
 // M529-D：病历用药自动提取 V14（EMR 深化四模块，M529 收官）
 const EmrMedicationNlpPage = lazy(() => import('@/pages/emr-medication-nlp'));
+// M530-A：病历既往史 NLP 提取 V14（EMR 深化四模块）
+const EmrPastHistoryNlpPage = lazy(() => import('@/pages/emr-past-history-nlp'));
+// M530-B：病历过敏史 NLP 提取 V14（EMR 深化四模块）
+const EmrAllergyHistoryNlpPage = lazy(() => import('@/pages/emr-allergy-history-nlp'));
+// M530-C：病历体格检查 NLP 提取 V14（EMR 深化四模块）
+const EmrPhysicalExamNlpPage = lazy(() => import('@/pages/emr-physical-exam-nlp'));
+// M530-D：病历辅助检查 NLP 提取 V14（EMR 深化四模块，M530 收官）
+const EmrLabExamNlpPage = lazy(() => import('@/pages/emr-lab-exam-nlp'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6015,6 +6023,14 @@ export default function AppRoutes() {
           <Route path="emr-diagnosis-nlp" element={<EmrDiagnosisNlpPage />} />
           {/* M529-D：病历用药自动提取 V14（EMR 深化四模块，M529 收官） */}
           <Route path="emr-medication-nlp" element={<EmrMedicationNlpPage />} />
+          {/* M530-A：病历既往史 NLP 提取 V14（EMR 深化四模块） */}
+          <Route path="emr-past-history-nlp" element={<EmrPastHistoryNlpPage />} />
+          {/* M530-B：病历过敏史 NLP 提取 V14（EMR 深化四模块） */}
+          <Route path="emr-allergy-history-nlp" element={<EmrAllergyHistoryNlpPage />} />
+          {/* M530-C：病历体格检查 NLP 提取 V14（EMR 深化四模块） */}
+          <Route path="emr-physical-exam-nlp" element={<EmrPhysicalExamNlpPage />} />
+          {/* M530-D：病历辅助检查 NLP 提取 V14（EMR 深化四模块，M530 收官） */}
+          <Route path="emr-lab-exam-nlp" element={<EmrLabExamNlpPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
