@@ -3409,6 +3409,14 @@ import { emrAiRecordCompletenessCheckV14Routes } from './routes/emrAiRecordCompl
 import { emrAiRecordConsistencyCheckV14Routes } from './routes/emrAiRecordConsistencyCheckV14';
 // M553-D：病历AI病历同质化对比 V14 GET/POST /api/v1/emr-ai-record-homogeneity-compare（EMR 深化四模块，M553 收官，病历AI病历书写辅助与质量提升系列）
 import { emrAiRecordHomogeneityCompareV14Routes } from './routes/emrAiRecordHomogeneityCompareV14';
+// M554-A：病历AI临床路径推荐 V14 GET/POST /api/v1/emr-ai-clinical-pathway-reco（EMR 深化四模块，病历AI临床路径与合理用药系列）
+import { emrAiClinicalPathwayRecoV14Routes } from './routes/emrAiClinicalPathwayRecoV14';
+// M554-B：病历AI合理用药审查 V14 GET/POST /api/v1/emr-ai-rational-medication-audit（EMR 深化四模块，病历AI临床路径与合理用药系列）
+import { emrAiRationalMedicationAuditV14Routes } from './routes/emrAiRationalMedicationAuditV14';
+// M554-C：病历AI诊疗方案推荐 V14 GET/POST /api/v1/emr-ai-treatment-plan-reco（EMR 深化四模块，病历AI临床路径与合理用药系列）
+import { emrAiTreatmentPlanRecoV14Routes } from './routes/emrAiTreatmentPlanRecoV14';
+// M554-D：病历AI临床指南推荐 V14 GET/POST /api/v1/emr-ai-clinical-guideline-reco（EMR 深化四模块，M554 收官，病历AI临床路径与合理用药系列）
+import { emrAiClinicalGuidelineRecoV14Routes } from './routes/emrAiClinicalGuidelineRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5356,6 +5364,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiRecordCompletenessCheckV14Routes, // M553-B：病历AI病历完整性检查 V14 GET/POST /api/v1/emr-ai-record-completeness-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
   ...emrAiRecordConsistencyCheckV14Routes, // M553-C：病历AI病历逻辑一致性检查 V14 GET/POST /api/v1/emr-ai-record-consistency-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
   ...emrAiRecordHomogeneityCompareV14Routes, // M553-D：病历AI病历同质化对比 V14 GET/POST /api/v1/emr-ai-record-homogeneity-compare（EMR 深化四模块，M553 收官，病历AI病历书写辅助与质量提升系列）
+  ...emrAiClinicalPathwayRecoV14Routes, // M554-A：病历AI临床路径推荐 V14 GET/POST /api/v1/emr-ai-clinical-pathway-reco（EMR 深化四模块，病历AI临床路径与合理用药系列）
+  ...emrAiRationalMedicationAuditV14Routes, // M554-B：病历AI合理用药审查 V14 GET/POST /api/v1/emr-ai-rational-medication-audit（EMR 深化四模块，病历AI临床路径与合理用药系列）
+  ...emrAiTreatmentPlanRecoV14Routes, // M554-C：病历AI诊疗方案推荐 V14 GET/POST /api/v1/emr-ai-treatment-plan-reco（EMR 深化四模块，病历AI临床路径与合理用药系列）
+  ...emrAiClinicalGuidelineRecoV14Routes, // M554-D：病历AI临床指南推荐 V14 GET/POST /api/v1/emr-ai-clinical-guideline-reco（EMR 深化四模块，M554 收官，病历AI临床路径与合理用药系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
