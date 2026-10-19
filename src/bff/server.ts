@@ -3417,6 +3417,14 @@ import { emrAiRationalMedicationAuditV14Routes } from './routes/emrAiRationalMed
 import { emrAiTreatmentPlanRecoV14Routes } from './routes/emrAiTreatmentPlanRecoV14';
 // M554-D：病历AI临床指南推荐 V14 GET/POST /api/v1/emr-ai-clinical-guideline-reco（EMR 深化四模块，M554 收官，病历AI临床路径与合理用药系列）
 import { emrAiClinicalGuidelineRecoV14Routes } from './routes/emrAiClinicalGuidelineRecoV14';
+// M555-A：病历AI术前评估 V14 GET/POST /api/v1/emr-ai-preop-assessment（EMR 深化四模块，病历AI围手术期管理系列）
+import { emrAiPreopAssessmentV14Routes } from './routes/emrAiPreopAssessmentV14';
+// M555-B：病历AI手术记录质控 V14 GET/POST /api/v1/emr-ai-op-record-qc（EMR 深化四模块，病历AI围手术期管理系列）
+import { emrAiOpRecordQcV14Routes } from './routes/emrAiOpRecordQcV14';
+// M555-C：病历AI术后病程跟踪 V14 GET/POST /api/v1/emr-ai-postop-progress-track（EMR 深化四模块，病历AI围手术期管理系列）
+import { emrAiPostopProgressTrackV14Routes } from './routes/emrAiPostopProgressTrackV14';
+// M555-D：病历AI出院小结自动生成 V14 GET/POST /api/v1/emr-ai-discharge-summary-gen（EMR 深化四模块，M555 收官，病历AI围手术期管理系列）
+import { emrAiDischargeSummaryGenV14Routes } from './routes/emrAiDischargeSummaryGenV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5368,6 +5376,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiRationalMedicationAuditV14Routes, // M554-B：病历AI合理用药审查 V14 GET/POST /api/v1/emr-ai-rational-medication-audit（EMR 深化四模块，病历AI临床路径与合理用药系列）
   ...emrAiTreatmentPlanRecoV14Routes, // M554-C：病历AI诊疗方案推荐 V14 GET/POST /api/v1/emr-ai-treatment-plan-reco（EMR 深化四模块，病历AI临床路径与合理用药系列）
   ...emrAiClinicalGuidelineRecoV14Routes, // M554-D：病历AI临床指南推荐 V14 GET/POST /api/v1/emr-ai-clinical-guideline-reco（EMR 深化四模块，M554 收官，病历AI临床路径与合理用药系列）
+  ...emrAiPreopAssessmentV14Routes, // M555-A：病历AI术前评估 V14 GET/POST /api/v1/emr-ai-preop-assessment（EMR 深化四模块，病历AI围手术期管理系列）
+  ...emrAiOpRecordQcV14Routes, // M555-B：病历AI手术记录质控 V14 GET/POST /api/v1/emr-ai-op-record-qc（EMR 深化四模块，病历AI围手术期管理系列）
+  ...emrAiPostopProgressTrackV14Routes, // M555-C：病历AI术后病程跟踪 V14 GET/POST /api/v1/emr-ai-postop-progress-track（EMR 深化四模块，病历AI围手术期管理系列）
+  ...emrAiDischargeSummaryGenV14Routes, // M555-D：病历AI出院小结自动生成 V14 GET/POST /api/v1/emr-ai-discharge-summary-gen（EMR 深化四模块，M555 收官，病历AI围手术期管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
