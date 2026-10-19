@@ -1,5 +1,5 @@
 -- ============================================================================
-# 健澜科技杠OS - pgvector 可选增强（在 40-knowledge.sql 之后执行）
+# 健澜AI原生医院操作系统OS - pgvector 可选增强（在 40-knowledge.sql 之后执行）
 -- 90-pgvector-optional.sql
 --
 -- 若镜像预装了 pgvector（如 pgvector/pgvector:pg16），本脚本为知识分块增加

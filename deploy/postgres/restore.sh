@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# 健澜科技杠OS — PostgreSQL 逻辑恢复脚本（pg_restore，配合 backup.sh）
+# 健澜AI原生医院操作系统OS — PostgreSQL 逻辑恢复脚本（pg_restore，配合 backup.sh）
 #
 # 支持：从 .dump 恢复到指定数据库（默认先 DROP 重建，--clean）。
 # 物理时间点恢复（PITR，基于 WAL 归档）不在本脚本范围，见

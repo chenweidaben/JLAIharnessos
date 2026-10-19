@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — Prometheus 告警规则
+# 健澜AI原生医院操作系统OS — Prometheus 告警规则
 # 指标来源：BFF /metrics（gangos_ 前缀）。exporter（PG/Redis/Kafka/Nginx）
 # 接入后可在本文件追加对应规则。阈值为基线建议，生产请按科室 SLO 调整。
 # 挂载：docker-compose 将本目录只读挂载到 /etc/prometheus/rules（见 prometheus.yml）。

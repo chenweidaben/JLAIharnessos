@@ -1,4 +1,4 @@
-# 健澜科技杠OS 重构方案 —— 性能与可运维性评审报告
+# 健澜AI原生医院操作系统OS 重构方案 —— 性能与可运维性评审报告
 
 > 评审角色：资深 SRE / 性能架构师（三甲医院核心系统运维背景）
 > 评审对象：Java(Spring Cloud) + Python(FastAPI+vLLM) + TS(Bun BFF)，K8s + APISIX + Kafka + PG + Redis，绞杀者 12 个月

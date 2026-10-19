@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - EMPI 患者主索引 API 服务（M5-C）
+ * 健澜AI原生医院操作系统OS - EMPI 患者主索引 API 服务（M5-C）
  *
  * 真实 BFF（src/bff/routes/empi.ts），全部读写 PostgreSQL，无 mock。
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.

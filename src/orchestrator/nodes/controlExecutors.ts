@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 结构化控制节点执行器
+ * 健澜AI原生医院操作系统OS - 结构化控制节点执行器
  *
  * 包含：loop（while / foreach 循环）、parallel（all / any / race 并行）
  * 这两类节点通过 PathRunner.runPath 递归驱动子路径，实现嵌套控制流，

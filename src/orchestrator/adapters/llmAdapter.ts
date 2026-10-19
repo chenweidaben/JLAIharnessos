@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 核心 LLM 客户端适配器
+ * 健澜AI原生医院操作系统OS - 核心 LLM 客户端适配器
  *
  * 将 core/agent/LLMClient（ILLMClient，基于流式 AsyncGenerator 的 Provider 抽象）
  * 适配为编排层的 IWorkflowLlm（一次性 complete 语义）。编排层消费完整结果，

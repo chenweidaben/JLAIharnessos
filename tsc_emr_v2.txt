@@ -1,0 +1,7 @@
+﻿bun.exe : $ tsc --noEmit
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "C:\Users\lenovo\.bun\bin\bun.exe" run typecheck > tsc_ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ($ tsc --noEmit:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

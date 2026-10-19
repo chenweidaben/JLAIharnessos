@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - BFF 可观测性指标入口
+ * 健澜AI原生医院操作系统OS - BFF 可观测性指标入口
  *
  * 指标原语（Counter/Gauge/Histogram/Registry）与业务指标（智能体/工具/CDS/人工任务）
  * 定义在核心层 src/core/observability/metrics.ts，供编排内核与工具运行时埋点；

@@ -1,4 +1,4 @@
-# 健澜科技杠OS (Jianlan Gang-OS) - 发布流水线
+# 健澜AI原生医院操作系统OS (Jianlan AI-Native Hospital OS) - 发布流水线
 # Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
 #
 # 触发：推送 v* 形式的 Git Tag（如 v0.2.0）
@@ -66,7 +66,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
-          name: 健澜科技杠OS ${{ github.event.inputs.tag || github.ref_name }}
+          name: 健澜AI原生医院操作系统OS ${{ github.event.inputs.tag || github.ref_name }}
           body: ${{ steps.changelog.outputs.changelog }}
           files: |
             dist/

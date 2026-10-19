@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 智能体编排层（Orchestration Layer）
+ * 健澜AI原生医院操作系统OS - 智能体编排层（Orchestration Layer）
  *
  * 编排层是"医疗 AI 安卓"的核心：医院信息科与开发者通过声明式 DSL（YAML/JSON）
  * 或低代码画布即可组装智能体，无需编写过程式代码。它提供：

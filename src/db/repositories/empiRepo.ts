@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - EMPI 患者主索引 Repository（M5-C）
+ * 健澜AI原生医院操作系统OS - EMPI 患者主索引 Repository（M5-C）
  *
  * clinical.patient_identifiers / empi_match_candidates / empi_links 表 CRUD。
  * 患者对按 id 字典序归一，避免重复候选；标识登记与链接写入幂等。

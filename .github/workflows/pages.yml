@@ -35,7 +35,7 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>JLAIharnessos - 健澜科技杠OS 文档中心</title>
+            <title>JLAIharnessos - 健澜AI原生医院操作系统OS 文档中心</title>
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
               body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #062a4a; color: #e0e0e0; line-height: 1.6; }
@@ -58,7 +58,7 @@ jobs:
           <body>
             <div class="header">
               <h1>JLAIharnessos</h1>
-              <p>健澜科技杠OS · 数智医院工业级智能体操作系统</p>
+              <p>健澜AI原生医院操作系统OS · 数智医院工业级智能体操作系统</p>
               <div style="margin-top: 16px;">
                 <span class="badge">Apache-2.0</span>
                 <span class="badge">医疗AI</span>

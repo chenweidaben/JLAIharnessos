@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 多因素认证（MFA）模块导出
+ * 健澜AI原生医院操作系统OS - 多因素认证（MFA）模块导出
  *
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
  */

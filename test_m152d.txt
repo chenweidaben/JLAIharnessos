@@ -1,0 +1,36 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/sma ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\smartFollowup.test.ts:
+(pass) M152-D generateFollowupPlan 疾病分型 > 术后 → 3/7/30 天三时间点
+(pass) M152-D generateFollowupPlan 疾病分型 > 糖尿病 → 慢病 14/30 天
+(pass) M152-D generateFollowupPlan 疾病分型 > 肿瘤 → 7/30/90 天 MDT
+(pass) M152-D generateFollowupPlan 疾病分型 > 一般出院 → 10 天单时间点
+(pass) M152-D generateFollowupPlan 疾病分型 > 参数非法 → 抛错
+(pass) M152-D generateFollowupPlan 疾病分型 > 患者授权后 → autoFollowupEnabled 为 true
+(pass) M152-D predictRehospitalizationRisk 风险分层 > 高风险疾病 → high 分层
+(pass) M152-D predictRehospitalizationRisk 风险分层 > 中风险疾病 → medium
+(pass) M152-D predictRehospitalizationRisk 风险分层 > 一般出院 → low
+(pass) M152-D predictRehospitalizationRisk 风险分层 > 共病因素叠加 → 分数叠加
+(pass) M152-D predictRehospitalizationRisk 风险分层 > 分数截断在 [0,100]
+(pass) M152-D sendAutoFollowup 合规闸口 > 未授权 → patient_consent_required（不骚扰）
+(pass) M152-D sendAutoFollowup 合规闸口 > 授权后非法渠道 → invalid_channel
+(pass) M152-D sendAutoFollowup 合规闸口 > 授权后空模板 → invalid_template
+(pass) M152-D sendAutoFollowup 合规闸口 > 授权 + 合法渠道 + 合法模板 → 成功 或 因时段被拒（二选一）
+(pass) M152-D sendAutoFollowup 合规闸口 > 撤回授权后 → 重新变为 patient_consent_required
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 07:59 → false（清晨不打扰）
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 08:00 → true
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 12:00 → true
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 19:59 → true
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 20:00 → false（夜间不打扰）
+(pass) M152-D isWithinSendWindow 08:00–20:00 > 23:30 → false
+
+ 22 pass
+ 0 fail
+ 41 expect() calls
+Ran 22 tests across 1 files. [148.00ms]

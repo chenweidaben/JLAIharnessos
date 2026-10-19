@@ -1,0 +1,4 @@
+﻿src/pages/admin/ApiDocs/index.tsx(119,8): error TS2304: Cannot find name 'Content'.
+src/pages/admin/ApiDocs/index.tsx(201,9): error TS2304: Cannot find name 'Content'.
+src/pages/admin/PharmacyDeep/index.tsx(355,92): error TS7053: Element implicitly has an 'any' type because expression of type '"low" | RiskLevel' can't be used to index type 'Record<RiskLevel, string>'.
+  Property 'low' does not exist on type 'Record<RiskLevel, string>'.

@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - PostgreSQL DDL 静态完整性校验
+ * 健澜AI原生医院操作系统OS - PostgreSQL DDL 静态完整性校验
  *
  * 本机/CI 可能没有 psql 或 Docker，本校验器在不启动数据库的前提下，
  * 对 deploy/postgres/init 下的初始化脚本做结构一致性检查：

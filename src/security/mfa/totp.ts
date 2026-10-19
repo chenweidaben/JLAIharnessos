@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - TOTP（RFC 6238）一次性动态口令
+ * 健澜AI原生医院操作系统OS - TOTP（RFC 6238）一次性动态口令
  *
  * 基于 Node/Bun 内置 crypto 的 HMAC 实现，零第三方依赖；兼容 Google Authenticator、
  * 微软 Authenticator、企业微信/钉钉动态码等主流验证器（默认 SHA-1、6 位、30s 步长）。

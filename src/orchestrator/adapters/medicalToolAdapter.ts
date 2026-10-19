@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 医疗工具适配器
+ * 健澜AI原生医院操作系统OS - 医疗工具适配器
  *
  * 将 medical-tools 的 36 个内置医疗工具（MedicalToolRegistry + MedicalToolContext）
  * 适配为编排层的 IToolInvoker，使工作流的 tool 节点可以像调用普通能力一样

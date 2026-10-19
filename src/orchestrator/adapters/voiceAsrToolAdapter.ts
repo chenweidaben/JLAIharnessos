@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 语音 ASR 工具适配器与组合工具调用器
+ * 健澜AI原生医院操作系统OS - 语音 ASR 工具适配器与组合工具调用器
  *
  * - VoiceAsrToolInvoker：把 src/voice 的 AsrService 适配为编排层工具 `transcribe_voice`；
  * - CompositeToolInvoker：按顺序组合多个 IToolInvoker（医疗工具 + 语音工具 + 未来扩展），

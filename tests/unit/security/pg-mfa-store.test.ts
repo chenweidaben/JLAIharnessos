@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - PgMfaStore 单测
+ * 健澜AI原生医院操作系统OS - PgMfaStore 单测
  *
  * 用内存 Fake SQL 执行器模拟 PostgreSQL，验证：
  *  - 因子持久化往返正确、密钥密文落库
@@ -69,7 +69,7 @@ describe('PgMfaStore', () => {
       userId: 'u1',
       secret,
       enabled: true,
-      issuer: '健澜科技杠OS',
+      issuer: '健澜AI原生医院操作系统OS',
       accountName: 'dr_chen',
       backupHashes: ['h1', 'h2'],
       createdAt: 1000,

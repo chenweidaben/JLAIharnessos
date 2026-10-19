@@ -1,0 +1,28 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 100
++ ... n\bun.exe"; & $bun test tests/unit/imagingAiDeep.test.ts 2>&1 | Tee-O ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\imagingAiDeep.test.ts:
+(pass) M152-A 病灶检测 analyzeLesion > 未检出病灶 -> lesionDetected=false，整体置信度 0.1，无病灶条目
+(pass) M152-A 病灶检测 analyzeLesion > 空特征对象不抛错，按未检出处理
+(pass) M152-A 病灶检测 analyzeLesion > CT 毛刺状结节 -> 鉴别诊断含周围型肺癌，定位/大小落库
+(pass) M152-A 病灶检测 analyzeLesion > MRI 伴瘤周水肿 -> 鉴别诊断含胶质瘤/转移瘤
+(pass) M152-A 病灶检测 analyzeLesion > 超声无回声 -> 鉴别诊断以囊肿为首
+(pass) M152-A 病灶检测 analyzeLesion > X 线不规则骨病变 -> 鉴别诊断含骨肿瘤
+(pass) M152-A 置信度计算 > 基准 0.55 + 毛刺 0.15 + 大小截断 0.15 = 0.85
+(pass) M152-A 置信度计算 > 叠加肿大淋巴结 +0.1 -> 0.95，且严重程度升为 severe
+(pass) M152-A 置信度计算 > 极大病灶大小贡献截断在 0.15，置信度不越界
+(pass) M152-A 置信度计算 > 非法尺寸（NaN/负数）按 0 处理，不抛错
+(pass) M152-A 结构化报告 generateImagingStructuredReport > studyUid 透传并派生 reportId，分节/鉴别诊断/disclaimer 齐全
+(pass) M152-A 结构化报告 generateImagingStructuredReport > MRI 病灶 -> 报告模态识别为 MRI
+(pass) M152-A 结构化报告 generateImagingStructuredReport > 空病灶列表 -> 报告默认未见异常，鉴别诊断为空
+(pass) M152-A 结构化报告 generateImagingStructuredReport > 缺省 studyUid 回退为 UNKNOWN-STUDY
+
+ 14 pass
+ 0 fail
+ 34 expect() calls
+Ran 14 tests across 1 files. [152.00ms]

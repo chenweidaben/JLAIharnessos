@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — BFF 后端（Deployment + Service + HPA + PDB + ServiceAccount）
+# 健澜AI原生医院操作系统OS — BFF 后端（Deployment + Service + HPA + PDB + ServiceAccount）
 #
 # 多副本无状态，水平自动扩缩；启动时自动迁移（多副本并发由迁移表幂等保证）。
 #

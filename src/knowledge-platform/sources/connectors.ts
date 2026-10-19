@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS — 多源知识接入器
+ * 健澜AI原生医院操作系统OS — 多源知识接入器
  *
  * 统一 Connector 接口，五类实现：
  *  - FileConnector：本地文件/目录（txt/md/pdf/docx/xlsx/csv/html/json）

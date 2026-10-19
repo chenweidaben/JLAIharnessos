@@ -1,0 +1,37 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/tal ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\talentDeep.test.ts:
+(pass) 人才画像 talentScoreOf / tierOf > 人才分 = 绩效×0.6 + 潜力×0.4
+(pass) 人才画像 talentScoreOf / tierOf > 继任就绪：人才分 ≥85 且工龄 ≥5
+(pass) 人才画像 talentScoreOf / tierOf > 人才分 ≥85 但工龄不足 5 年，不算继任就绪（不能拔苗助长）
+(pass) 人才画像 talentScoreOf / tierOf > 骨干：人才分 ≥75
+(pass) 人才画像 talentScoreOf / tierOf > 后备：人才分 ≥60
+(pass) 人才画像 talentScoreOf / tierOf > 普通：人才分 <60
+(pass) buildTalentInventory 人才盘点 > 总数与条目数一致
+(pass) buildTalentInventory 人才盘点 > 按人才分降序排列（高潜在前，发展视角）
+(pass) buildTalentInventory 人才盘点 > 四档人数分布正确
+(pass) buildTalentInventory 人才盘点 > 画像四维计数（技能/证书/培训）正确
+(pass) buildTalentInventory 人才盘点 > 空科室兜底：零人盘点不抛错
+(pass) buildTalentInventory 人才盘点 > 不修改入参
+(pass) identifySkillGap 技能缺口 > 统计掌握人数并折算缺口
+(pass) identifySkillGap 技能缺口 > 严重度：不足半数为 medium
+(pass) identifySkillGap 技能缺口 > 缺口大的排前面（发展优先级）
+(pass) identifySkillGap 技能缺口 > 空所需技能返回空数组
+(pass) recommendTraining 培训推荐 > 命中介入课程规则库
+(pass) recommendTraining 培训推荐 > 命中 DRG/DIP 课程规则库
+(pass) recommendTraining 培训推荐 > 未命中规则库走通用课程兜底
+(pass) identifySuccessor 继任者识别 > 排除现任者本人，推荐最高分候选人
+(pass) identifySuccessor 继任者识别 > 技能匹配率与就绪度分档：全技能匹配 → ready
+(pass) identifySuccessor 继任者识别 > 技能只命中一项的候选人就绪度下降
+(pass) identifySuccessor 继任者识别 > 空候选池返回 recommended=null
+
+ 23 pass
+ 0 fail
+ 47 expect() calls
+Ran 23 tests across 1 files. [137.00ms]

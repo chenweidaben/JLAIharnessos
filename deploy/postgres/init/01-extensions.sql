@@ -1,5 +1,5 @@
 -- ============================================================================
--- 健澜科技杠OS - PostgreSQL 扩展
+-- 健澜AI原生医院操作系统OS - PostgreSQL 扩展
 -- 01-extensions.sql
 --
 -- 由官方 postgres:16 镜像的 docker-entrypoint-initdb.d 在首次初始化时按

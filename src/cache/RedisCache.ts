@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - Redis 缓存实现（ioredis）
+ * 健澜AI原生医院操作系统OS - Redis 缓存实现（ioredis）
  *
  * 值统一 JSON 序列化；锁释放/续期与"自增+首次过期"用 Lua 脚本保证原子性；
  * 模式删除使用 SCAN 游标，避免 KEYS 阻塞生产实例。

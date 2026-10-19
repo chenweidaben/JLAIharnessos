@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - Prometheus 指标模块单测
+ * 健澜AI原生医院操作系统OS - Prometheus 指标模块单测
  *
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
  */

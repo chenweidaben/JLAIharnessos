@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - EMPI empiStore 单元测试（M5-C）
+ * 健澜AI原生医院操作系统OS - EMPI empiStore 单元测试（M5-C）
  *
  * mock services/api/empi 与 pharmacy 健康探针，验证：
  *  - 健康门禁（up/down/抛错）；

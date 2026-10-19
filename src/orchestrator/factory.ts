@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 编排层一键装配工厂
+ * 健澜AI原生医院操作系统OS - 编排层一键装配工厂
  *
  * createOrchestrator：用真实运行时（医疗工具/核心 LLM/知识检索）装配完整编排能力；
  * createMockOrchestrator：用确定性 Mock 运行时装配，供离线演示、CI 与单元测试。

@@ -3317,6 +3317,14 @@ const EmrAiDietScriptRecoPage = lazy(() => import('@/pages/emr-ai-diet-script-re
 const EmrAiEnteralNutritionSuggestPage = lazy(() => import('@/pages/emr-ai-enteral-nutrition-suggest'));
 // M564-D：病历AI肠外营养配置推荐 V14（EMR 深化四模块，M564 收官）
 const EmrAiParenteralNutritionRecoPage = lazy(() => import('@/pages/emr-ai-parenteral-nutrition-reco'));
+// M565-A：病历AI处方前置审核 V14（EMR 深化四模块）
+const EmrAiPrePrescriptionReviewPage = lazy(() => import('@/pages/emr-ai-pre-prescription-review'));
+// M565-B：病历AI用药咨询答复 V14（EMR 深化四模块）
+const EmrAiMedicationConsultReplyPage = lazy(() => import('@/pages/emr-ai-medication-consult-reply'));
+// M565-C：病历AI药品相互作用明细审查 V14（EMR 深化四模块，-detail 后缀避让 emrAiDrugInteractionV14）
+const EmrAiDrugInteractionDetailPage = lazy(() => import('@/pages/emr-ai-drug-interaction-detail'));
+// M565-D：病历AI特殊人群用药推荐 V14（EMR 深化四模块，M565 收官）
+const EmrAiSpecialPopulationMedRecoPage = lazy(() => import('@/pages/emr-ai-special-population-med-reco'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6575,6 +6583,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-enteral-nutrition-suggest" element={<EmrAiEnteralNutritionSuggestPage />} />
           {/* M564-D：病历AI肠外营养配置推荐 V14（EMR 深化四模块，M564 收官） */}
           <Route path="emr-ai-parenteral-nutrition-reco" element={<EmrAiParenteralNutritionRecoPage />} />
+          {/* M565-A：病历AI处方前置审核 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-pre-prescription-review" element={<EmrAiPrePrescriptionReviewPage />} />
+          {/* M565-B：病历AI用药咨询答复 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-medication-consult-reply" element={<EmrAiMedicationConsultReplyPage />} />
+          {/* M565-C：病历AI药品相互作用明细审查 V14（EMR 深化四模块，-detail 后缀避让 emrAiDrugInteractionV14） */}
+          <Route path="emr-ai-drug-interaction-detail" element={<EmrAiDrugInteractionDetailPage />} />
+          {/* M565-D：病历AI特殊人群用药推荐 V14（EMR 深化四模块，M565 收官） */}
+          <Route path="emr-ai-special-population-med-reco" element={<EmrAiSpecialPopulationMedRecoPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}

@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS（GangOS / Jianlan OS）— 医疗知识中台
+ * 健澜AI原生医院操作系统OS（GangOS / Jianlan OS）— 医疗知识中台
  *
  * 多源接入 → 加工流水线 → 知识图谱 → 向量/关键词/图谱混合检索（RRF）→
  * 术语标准化 → 多租户 → 版本与质量管理 的完整数据底座。
@@ -40,4 +40,4 @@ export { KnowledgeService, type KnowledgeServiceOptions } from './service/Knowle
 
 /** 医疗辅助免责声明（所有知识服务输出统一附带） */
 export const MEDICAL_DISCLAIMER =
-  '本结果由健澜科技杠OS智能体辅助生成，仅供医务人员参考，不替代医生的诊断、治疗与处方决策。';
+  '本结果由健澜AI原生医院操作系统OS智能体辅助生成，仅供医务人员参考，不替代医生的诊断、治疗与处方决策。';

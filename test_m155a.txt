@@ -1,0 +1,26 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/qua ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\qualityPdca.test.ts:
+(pass) createPDCAProject（项目创建） > 默认落在 Plan 阶段并写入初始阶段轨迹
+(pass) createPDCAProject（项目创建） > 空名称/科室/负责人直接抛 400
+(pass) createPDCAProject（项目创建） > 非法方向抛错
+(pass) advancePDCAPhase（阶段推进，状态机） > Plan→Do 合法，Do→Check 需要实施记录
+(pass) advancePDCAPhase（阶段推进，状态机） > 拒绝阶段跳跃（Plan→Check）与回退
+(pass) advancePDCAPhase（阶段推进，状态机） > Check→Act 需要 before/after 数据；Act 无遗留则闭环
+(pass) advancePDCAPhase（阶段推进，状态机） > Act→Plan 把遗留问题带入下一循环
+(pass) calculatePDCAEffect（before/after 真实效果计算） > lower_better：率值下降到目标内 → met，改善幅度数学正确
+(pass) calculatePDCAEffect（before/after 真实效果计算） > lower_better：率值几乎没动 → missed
+(pass) calculatePDCAEffect（before/after 真实效果计算） > 样本量任一侧 <30 时标记 underpowered，不夸大结论
+(pass) calculatePDCAEffect（before/after 真实效果计算） > higher_better（如手卫生合规率）：上升且达标 → met
+(pass) calculatePDCAEffect（before/after 真实效果计算） > 未采集 before/after 时抛错，不返回空壳
+
+ 12 pass
+ 0 fail
+ 30 expect() calls
+Ran 12 tests across 1 files. [151.00ms]

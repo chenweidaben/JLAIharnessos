@@ -1,0 +1,19 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 110
++ ... bin\bun.exe"; & $bun test tests/unit/milestoneV2.test.ts 2>&1 | Tee-O ...
++                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\milestoneV2.test.ts:
+(pass) generateMilestoneSummaryV2 【300版本里程碑】 > 里程碑关键口径：296 版本（即将 300）/ 288 切片 / 99.5% 覆盖率 / P95 72ms / 200+ 路由 / 370+ 迁
+移
+(pass) generateMilestoneSummaryV2 【300版本里程碑】 > 版本统计：近四版本 v4.94 ~ v4.97，首尾版本与条数正确
+(pass) generateMilestoneSummaryV2 【300版本里程碑】 > 功能模块数：派生总数与清单长度一致，且四个新模块全部纳入
+(pass) generateMilestoneSummaryV2 【300版本里程碑】 > 确定性：同一输入产出等价总结（不含生成时间字段）
+
+ 4 pass
+ 0 fail
+ 39 expect() calls
+Ran 4 tests across 1 files. [146.00ms]

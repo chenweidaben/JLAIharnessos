@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 语音电子病历：ASR 类型定义
+ * 健澜AI原生医院操作系统OS - 语音电子病历：ASR 类型定义
  *
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */

@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - 数据治理类型定义（M5-E）
+ * 健澜AI原生医院操作系统OS - 数据治理类型定义（M5-E）
  *
  * 对应后端 src/bff/aggregators/dataGovernanceAggregator.ts 的视图结构。
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.

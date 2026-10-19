@@ -1,0 +1,30 @@
+﻿src/pages/admin/CDSSDeep/index.tsx(241,81): error TS1127: Invalid character.
+src/pages/admin/CDSSDeep/index.tsx(241,82): error TS1005: ':' expected.
+src/pages/admin/CDSSDeep/index.tsx(241,83): error TS1005: ',' expected.
+src/pages/admin/CDSSDeep/index.tsx(241,83): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/pages/admin/CDSSDeep/index.tsx(241,88): error TS1005: ',' expected.
+src/pages/admin/CDSSDeep/index.tsx(241,92): error TS1002: Unterminated string literal.
+src/pages/admin/CDSSDeep/index.tsx(242,19): error TS1005: ':' expected.
+src/pages/admin/CDSSDeep/index.tsx(243,17): error TS1005: ',' expected.
+src/pages/admin/DataGovernance/index.tsx(203,25): error TS1003: Identifier expected.
+src/pages/admin/DataGovernance/index.tsx(203,26): error TS1002: Unterminated string literal.
+src/pages/admin/DataGovernance/index.tsx(206,16): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/pages/admin/DataGovernance/index.tsx(207,14): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/pages/admin/FinanceDeep/index.tsx(230,64): error TS17002: Expected corresponding JSX closing tag for 'Typography.Text'.
+src/pages/admin/FinanceDeep/index.tsx(235,71): error TS17002: Expected corresponding JSX closing tag for 'Typography.Text'.
+src/pages/admin/FinanceDeep/index.tsx(240,68): error TS17002: Expected corresponding JSX closing tag for 'Typography.Text'.
+src/pages/admin/Import/index.tsx(162,15): error TS17002: Expected corresponding JSX closing tag for 'Upload'.
+src/pages/admin/InfectionDeep/index.tsx(243,19): error TS1005: '}' expected.
+src/pages/admin/InfectionDeep/index.tsx(271,19): error TS1005: '}' expected.
+src/pages/admin/QualityDeep/index.tsx(224,25): error TS1003: Identifier expected.
+src/pages/admin/QualityDeep/index.tsx(224,26): error TS1002: Unterminated string literal.
+src/pages/admin/QualityDeep/index.tsx(227,16): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/pages/admin/QualityDeep/index.tsx(228,14): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/pages/admin/Roadmap/index.tsx(242,27): error TS1003: Identifier expected.
+src/pages/admin/Roadmap/index.tsx(242,33): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/pages/admin/Roadmap/index.tsx(260,19): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/pages/admin/Roadmap/index.tsx(261,16): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/pages/research/ResearchAssistant/index.tsx(257,34): error TS1145: '{' or JSX element expected.
+src/pages/research/ResearchAssistant/index.tsx(257,123): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+src/pages/research/ResearchAssistant/index.tsx(258,34): error TS1145: '{' or JSX element expected.
+src/pages/research/ResearchAssistant/index.tsx(258,119): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?

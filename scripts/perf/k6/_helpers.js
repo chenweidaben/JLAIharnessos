@@ -1,4 +1,4 @@
-// 健澜科技杠OS — k6 压测公共助手
+// 健澜AI原生医院操作系统OS — k6 压测公共助手
 // 运行：k6 run scripts/perf/k6/smoke.js
 //   可选环境变量：
 //     BASE_URL（默认 http://127.0.0.1:8080）

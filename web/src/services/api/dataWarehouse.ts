@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - 数据湖仓 API 服务（M5-D）
+ * 健澜AI原生医院操作系统OS - 数据湖仓 API 服务（M5-D）
  *
  * 真实 BFF（src/bff/routes/dataWarehouse.ts），全部读写 PostgreSQL，无 mock。
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.

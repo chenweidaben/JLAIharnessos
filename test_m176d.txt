@@ -1,0 +1,30 @@
+﻿bun test v1.2.0 (b0c5a765)
+~\.bun\bin\bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; ~\.bun\bin\bun.exe test tests/unit/bloodDeep.test.ts 2>&1 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\bloodDeep.test.ts:
+(pass) buildDeepBloodMgmt > 返回四维度：适应症/前评估/过程/后评价，且差错率下降为正
+(pass) buildDeepBloodMgmt > 确定性：同参两次结果一致
+(pass) assessTransfusionIndication > 活动性大出血 + 休克指数≥1 → urgent，推荐 MTP 成分血
+(pass) assessTransfusionIndication > 慢性贫血 Hb 58 → elective/urgent 红细胞，给出 U 数与预期升幅
+(pass) assessTransfusionIndication > Hb 96 无症状 → none，且给出禁忌提示（不无指征输血）
+(pass) assessTransfusionIndication > 血小板 18×10^9/L → 推荐单采血小板
+(pass) assessTransfusionIndication > 合并冠心病阈值上调：Hb 75 在正常人无指征，在冠心病人触发
+(pass) trackTransfusionReaction > 腰痛+寒战+血压骤降 → 急性溶血，severe + fatal + 立即停血
+(pass) trackTransfusionReaction > 皮疹+瘙痒 → 发热/过敏 mild，不停血只减慢 [16.00ms]
+(pass) trackTransfusionReaction > 呼吸困难+粉红色泡沫痰+端坐呼吸 → TACO（循环超负荷）
+(pass) trackTransfusionReaction > 无症状 → none，继续常规监测
+(pass) trackTransfusionReaction > 确定性：同参两次结果一致
+(pass) evaluateTransfusionEffect > 2U 红细胞 Hb 58→78（+20）→ 显效/有效，命中预期增量
+(pass) evaluateTransfusionEffect > 2U 红细胞 Hb 58→62（+4）→ 无效，提示继续出血/标本问题
+(pass) evaluateTransfusionEffect > 1 治疗量血小板 PLT 18→45 → 有效，给出 PLT 增量
+(pass) evaluateTransfusionEffect > 体重越大每 U 升 Hb 越少（55kg vs 80kg）
+
+ 16 pass
+ 0 fail
+ 51 expect() calls
+Ran 16 tests across 1 files. [201.00ms]

@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS（jlmedaios）- 熔断器（Circuit Breaker）
+ * 健澜AI原生医院操作系统OS（jlmedaios）- 熔断器（Circuit Breaker）
  *
  * 面向医院高并发场景：门诊高峰、LIS/PACS 结果批量回推、危急值扇出、HIS 网关调用等。
  * 当下游（集成适配器、外部接口、大模型网关）持续异常时，熔断可快速失败（fail-fast），

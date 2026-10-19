@@ -1,7 +1,7 @@
 {
   "name": "jianlan-gang-os",
   "version": "0.1.0",
-  "description": "健澜科技杠OS（Jianlan Gang-OS）——开源、免费、工业级的医疗智能体操作系统，让医疗 AI 更简单、更落地",
+  "description": "健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）——开源、免费、工业级的医疗智能体操作系统，让医疗 AI 更简单、更落地",
   "type": "module",
   "private": false,
   "author": "健澜科技（杭州健澜科技有限公司）",

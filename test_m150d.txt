@@ -1,0 +1,54 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/uiC ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\uiConsistency.test.ts:
+(pass) VI 常量基线 > 深海蓝三色板与规范一致
+(pass) VI 常量基线 > 三色板均在白名单内
+(pass) VI 常量基线 > 字号刻度为单调递增的离散值
+(pass) VI 常量基线 > 间距刻度均为 4 的倍数（4px 网格）
+(pass) checkUIConsistency 颜色检查 > 合规 VI 色（含小写 / 3 位缩写）不产生 issue
+(pass) checkUIConsistency 颜色检查 > 违规颜色产出 error 类 issue 并给出三色建议
+(pass) checkUIConsistency 颜色检查 > 未传 color 字段时跳过颜色检查
+(pass) checkUIConsistency 字号检查 > 刻度内字号不产生 issue
+(pass) checkUIConsistency 字号检查 > 刻度外字号产出 warning 并给出就近收敛建议
+(pass) checkUIConsistency 字号检查 > 未传 fontSize 时跳过字号检查
+(pass) checkUIConsistency 间距检查 > 4px 网格内间距不产生 issue
+(pass) checkUIConsistency 间距检查 > 网格外间距产出 warning 并给出就近收敛建议
+(pass) checkUIConsistency 间距检查 > 未传 spacing 时跳过间距检查
+(pass) checkUIConsistency 组合与纯函数行为 > 空入参返回空数组
+(pass) checkUIConsistency 组合与纯函数行为 > 一个组件同时命中颜色 + 字号 + 间距三条 issue
+(pass) checkUIConsistency 组合与纯函数行为 > 结果按入参顺序产出，issue id 在一次调用内唯一
+(pass) checkUIConsistency 组合与纯函数行为 > 同入参重复调用结果一致（确定性）
+(pass) checkUIConsistency 组合与纯函数行为 > 不修改入参对象
+(pass) generateUIIssueList 内置基线 > 返回非空 Issue 数组
+(pass) generateUIIssueList 内置基线 > 每条 issue 结构完整（id/severity/category/component/message/expected/actual/suggestion）
+(pass) generateUIIssueList 内置基线 > 基线中包含颜色类 error（演示违规色）
+(pass) generateUIIssueList 内置基线 > 重复调用返回相同快照（确定性）
+(pass) checkUIConsistency() 无参报告（ConsistencyReport） > 五维度齐全：VI 色值 / 按钮尺寸 / 字体大小 / 间距 / 图标风格
+(pass) checkUIConsistency() 无参报告（ConsistencyReport） > 报告结构完整（维度 / 得分 / 等级 / 汇总） [16.00ms]
+(pass) checkUIConsistency() 无参报告（ConsistencyReport） > 种子基线中确实存在违规色 / 非标按钮 / 混库图标（报告非全绿）
+(pass) checkUIConsistency() 无参报告（ConsistencyReport） > 无参报告与数组重载互不污染：先调报告再调数组仍得 Issue[]
+(pass) checkUIConsistency() 无参报告（ConsistencyReport） > 纯函数确定性：同机两次调用逐字节一致
+(pass) contrastRatio WCAG 对比度公式 > 纯白 on 纯黑 = 21:1（理论极值）
+(pass) contrastRatio WCAG 对比度公式 > 同色 on 同色 = 1:1
+(pass) contrastRatio WCAG 对比度公式 > 前景背景互换结果对称
+(pass) contrastRatio WCAG 对比度公式 > 深海蓝主色 on 白达标，强调蓝 on 白不达标（真实公式结论）
+(pass) contrastRatio WCAG 对比度公式 > 结果落在 1~21 区间
+(pass) checkAccessibility() 无障碍报告 > 四维度齐全：contrast / keyboard / screenReader / formLabel
+(pass) checkAccessibility() 无障碍报告 > 对比度检查为真实计算：ratio 在 1~21，且按 4.5 判定 pass
+(pass) checkAccessibility() 无障碍报告 > 键盘导航基线：缺焦点环 / 焦点陷阱缺失均落成 finding
+(pass) checkAccessibility() 无障碍报告 > 屏幕阅读器基线：缺可访问名称落成 error finding
+(pass) checkAccessibility() 无障碍报告 > 表单 label 基线：未关联字段落成 finding
+(pass) checkAccessibility() 无障碍报告 > 综合得分在 0~100，等级合法
+(pass) checkAccessibility() 无障碍报告 > 纯函数确定性：两次调用逐字节一致
+(pass) checkAccessibility() 无障碍报告 > 与一致性报告组合后整体仍稳定（路由视角）
+
+ 40 pass
+ 0 fail
+ 201 expect() calls
+Ran 40 tests across 1 files. [218.00ms]

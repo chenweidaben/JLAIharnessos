@@ -2,7 +2,7 @@
   "name": "gang-os-web",
   "version": "0.1.0",
   "private": true,
-  "description": "健澜科技杠OS（Jianlan Gang-OS）Web 工作台与低代码智能体工厂",
+  "description": "健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）Web 工作台与低代码智能体工厂",
   "type": "module",
   "author": "健澜科技（杭州健澜科技有限公司）",
   "license": "Apache-2.0",

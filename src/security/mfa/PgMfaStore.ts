@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - MFA PostgreSQL 共享存储（多副本生产实现）
+ * 健澜AI原生医院操作系统OS - MFA PostgreSQL 共享存储（多副本生产实现）
  *
  * 默认 InMemoryMfaStore 仅适用于单机/演示：多副本部署时各实例状态不共享。
  * PgMfaStore 把 MFA 因子持久化到 iam.mfa_factors（DDL 见

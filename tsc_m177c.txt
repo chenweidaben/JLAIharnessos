@@ -1,0 +1,40 @@
+﻿src/bff/aggregators/medicalRecordDeepAggregator.ts(392,21): error TS2551: Property 'completion' does not exist on type 'CompletionResult'. Did you mean 'complete'?
+src/bff/routes/medicalRecordDeep.ts(157,66): error TS2345: Argument of type '{ record: { recordId: string; visitId: string; department: string; dischargeAt: string; archivedAt: string; hasSurgery: boolean; patientId: string; gender?: string | undefined; totalFee?: number | null | undefined; ... 8 more ...; borrowDueAt?: string | ... 1 more ... | undefined; }; diagnoses: ({ ...; } | { ...; })...' is not assignable to parameter of type 'DeepMedicalRecordInput'.
+  Type '{ record: { recordId: string; visitId: string; department: string; dischargeAt: string; archivedAt: string; borrowStatus: string; confidentiality: string; borrowDueAt: string; patientId: string; ... 8 more ...; coderSigned?: boolean | undefined; }; diagnoses: { ...; }[]; surgeries: { ...; }[]; }' is not assignable to type 'DeepMedicalRecordInput'.
+    The types of 'record.borrowStatus' are incompatible between these types.
+      Type 'string' is not assignable to type '"returned" | "none" | "overdue" | "borrowed" | undefined'.
+src/bff/routes/medicalRecordDeep.ts(158,73): error TS2345: Argument of type '({ record: { recordId: string; visitId: string; department: string; dischargeAt: string; archivedAt: string; hasSurgery: boolean; patientId: string; gender?: string | undefined; totalFee?: number | null | undefined; ... 8 more ...; borrowDueAt?: string | ... 1 more ... | undefined; }; diagnoses: ({ ...; } | { ...; }...' is not assignable to parameter of type 'QualityReportInput[]'.
+  Type '{ record: { recordId: string; visitId: string; department: string; dischargeAt: string; archivedAt: string; hasSurgery: boolean; patientId: string; gender?: string | undefined; totalFee?: number | null | undefined; ... 8 more ...; borrowDueAt?: string | ... 1 more ... | undefined; }; diagnoses: ({ ...; } | { ...; })...' is not assignable to type 'QualityReportInput'.
+    Type '{ record: { recordId: string; visitId: string; department: string; dischargeAt: string; archivedAt: string; borrowStatus: string; confidentiality: string; borrowDueAt: string; patientId: string; ... 8 more ...; coderSigned?: boolean | undefined; }; diagnoses: { ...; }[]; surgeries: { ...; }[]; }' is not assignable to type 'QualityReportInput'.
+      The types of 'record.borrowStatus' are incompatible between these types.
+        Type 'string' is not assignable to type '"returned" | "none" | "overdue" | "borrowed" | undefined'.
+tests/unit/qualityGate.test.ts(33,7): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: GateDimensionKey[]): void', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'GateDimensionKey[]'.
+      Type 'string' is not assignable to type 'GateDimensionKey'.
+  Overload 2 of 2, '(expected: NoInfer<GateDimensionKey[]>): void', gave the following error.
+    Argument of type 'string[]' is not assignable to parameter of type 'GateDimensionKey[]'.
+      Type 'string' is not assignable to type 'GateDimensionKey'.
+web/src/pages/agent/MedMuseChatPage.tsx(41,27): error TS2307: Cannot find module '@/components/common/PageContainer' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(42,30): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(54,8): error TS2307: Cannot find module '@/services/medmuseApi' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(55,36): error TS2307: Cannot find module '@/services/medmuseStream' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(276,39): error TS7006: Parameter 'a' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(292,14): error TS7006: Parameter 'list' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(295,15): error TS7006: Parameter 'e' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(303,14): error TS7006: Parameter 'list' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(304,52): error TS7006: Parameter 'a' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(414,23): error TS7006: Parameter 'piece' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(415,22): error TS7006: Parameter 'meta' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(24,38): error TS2307: Cannot find module '@/components/common' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(25,47): error TS2307: Cannot find module '@/components/charts' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(26,30): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(27,40): error TS2307: Cannot find module '@/store/dashboardStatsStore' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(28,37): error TS2307: Cannot find module '@/types/dashboardStats' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(245,39): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(247,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(248,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(259,62): error TS7006: Parameter 'd' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(276,39): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(278,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(279,54): error TS7006: Parameter 't' implicitly has an 'any' type.

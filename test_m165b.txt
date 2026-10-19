@@ -1,0 +1,26 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 58
++ ... ew-chat-1'; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/bud ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\budgetDeep.test.ts:
+(pass) buildDepartmentBudget（驱动因子测算，不拍脑袋） > 人力成本：工资=人数×月薪×12，绩效/社保按比例，培训按人头
+(pass) buildDepartmentBudget（驱动因子测算，不拍脑袋） > 药品耗材：门诊药费拆西药/中成药，耗材按床日
+(pass) buildDepartmentBudget（驱动因子测算，不拍脑袋） > 设备：采购 + 直线折旧 + 维护费
+(pass) buildDepartmentBudget（驱动因子测算，不拍脑袋） > 运营：水电按面积、办公按人头、差旅会议定额
+(pass) buildDepartmentBudget（驱动因子测算，不拍脑袋） > category=all 返回四大类全部明细，total 等于各类之和
+(pass) trackBudgetExecution（执行跟踪，进度基准线） > 截至 6 月：进度基准 = 年预算/12×6 = 600,000
+(pass) trackBudgetExecution（执行跟踪，进度基准线） > 状态分档：按进度花=on_track；超进度>15%=over；进度落后>10%=ahead
+(pass) trackBudgetExecution（执行跟踪，进度基准线） > categoryRollup 按大类汇总，totalBudget = 各线年预算之和
+(pass) predictBudgetOverrun（月均运行率年化外推） > 持续超进度 → red 风险，年末预测 > 年预算，预计超支为正
+(pass) predictBudgetOverrun（月均运行率年化外推） > 按进度花 → green 风险，预计基本不超支
+(pass) optimizeBudgetAllocation（结构优化建议） > 长期结余大类向长期超支大类调剂，只出建议不自动调账
+(pass) optimizeBudgetAllocation（结构优化建议） > 全部按预算执行 → 无可调剂建议
+
+ 12 pass
+ 0 fail
+ 42 expect() calls
+Ran 12 tests across 1 files. [169.00ms]

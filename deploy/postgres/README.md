@@ -1,4 +1,4 @@
-# 健澜科技杠OS · PostgreSQL 部署
+# 健澜AI原生医院操作系统OS · PostgreSQL 部署
 
 PostgreSQL 16，五个分层 schema，容器首次启动自动初始化并导入权威知识种子。
 

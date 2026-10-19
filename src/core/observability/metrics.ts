@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 核心可观测性指标原语（零依赖 Prometheus 文本格式）
+ * 健澜AI原生医院操作系统OS - 核心可观测性指标原语（零依赖 Prometheus 文本格式）
  *
  * 该模块位于核心层，供编排内核、医疗工具、CDS、人工任务等运行时埋点；
  * BFF 层（src/bff/observability/metrics.ts）复用同一进程级注册中心补充

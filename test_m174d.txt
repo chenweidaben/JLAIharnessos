@@ -1,0 +1,43 @@
+﻿bun test v1.2.0 (b0c5a765)
+~\.bun\bin\bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; ~\.bun\bin\bun.exe test tests/unit/satisfactionDeep.test. ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\satisfactionDeep.test.ts:
+(pass) analyzeEmotion · 情感三分类 > 正面评论 → positive，情感分 > 0
+(pass) analyzeEmotion · 情感三分类 > 负面评论 → negative，情感分 < 0
+(pass) analyzeEmotion · 情感三分类 > 无情感词但低分 → 强制 negative（评分交叉验证）
+(pass) analyzeEmotion · 情感三分类 > 空评论无评分 → neutral，情感分 0
+(pass) classifyNps / calcNps · NPS 计算 > 9-10 → promoter，7-8 → passive，0-6 → detractor
+(pass) classifyNps / calcNps · NPS 计算 > NPS = %promoter - %detractor
+(pass) classifyNps / calcNps · NPS 计算 > 空样本 NPS = 0，不除零
+(pass) classifyNps / calcNps · NPS 计算 > 全贬损者 NPS = -100
+(pass) analyzeFiveWhy · 5Why 根因追问 > 输出 5 层追问链，根因编码非空
+(pass) analyzeFiveWhy · 5Why 根因追问 > 排队关键词命中 → staffing_gap 默认根因
+(pass) analyzeFiveWhy · 5Why 根因追问 > 费用关键词命中 → policy_unclear 根因
+(pass) analyzeFiveWhy · 5Why 根因追问 > 无评论但低分 → 兜底 wait_time 类，不崩
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 多渠道收集：total = 10，覆盖多个 channel
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 情感分布：positive/neutral/negative 三类都统计
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 5Why 根因：负面信号至少产出 1 条根因
+(pass) buildDeepSatisfactionLoop · 深化闭环 > PDCA 阶段分布：plan/do/check/act 计数正确
+(pass) buildDeepSatisfactionLoop · 深化闭环 > NPS 汇总：promoter/passive/detractor 三档计数
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 样本量 <10 标记 underpowered
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 空输入不崩，返回零值闭环
+(pass) buildDeepSatisfactionLoop · 深化闭环 > 不修改入参
+(pass) analyzeSatisfactionTrend · 趋势分析 > 均分上升 + 负面占比下降 → falling（问题收敛） [16.00ms]
+(pass) analyzeSatisfactionTrend · 趋势分析 > 均分下降 + 负面占比上升 → rising（恶化）
+(pass) analyzeSatisfactionTrend · 趋势分析 > 波动在区间内 → stable
+(pass) analyzeSatisfactionTrend · 趋势分析 > 空序列不崩，返回 stable 与兜底简评
+(pass) benchmarkSatisfaction · 对标 > 本科室第一 → rank=1，summary 含「位列对标组第 1」
+(pass) benchmarkSatisfaction · 对标 > 本科室落后标杆 0.5+ → 差距为负，summary 含「落后」
+(pass) benchmarkSatisfaction · 对标 > 只对标一个同行 → total=2
+(pass) generatePatientVoiceReport · 患者之声 > 输出高频负面词、正/负面原声、改进建议
+(pass) generatePatientVoiceReport · 患者之声 > 空输入不崩
+
+ 29 pass
+ 0 fail
+ 79 expect() calls
+Ran 29 tests across 1 files. [155.00ms]

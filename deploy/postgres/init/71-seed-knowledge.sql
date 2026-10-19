@@ -1,4 +1,4 @@
--- 健澜科技杠OS - 权威开放医疗知识库种子（由 scripts/db/import-seed.ts 生成，请勿手改）
+-- 健澜AI原生医院操作系统OS - 权威开放医疗知识库种子（由 scripts/db/import-seed.ts 生成，请勿手改）
 -- Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
 BEGIN;
 

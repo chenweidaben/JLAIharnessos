@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 画布模型与 AgentPackage DSL 双向转换
+ * 健澜AI原生医院操作系统OS - 画布模型与 AgentPackage DSL 双向转换
  *
  * 画布内部使用 React Flow 的 nodes/edges（扁平 config 便于表单编辑）；
  * 导出时严格映射为后端编排层期望的 DSL（字段名 mode/branches 等），

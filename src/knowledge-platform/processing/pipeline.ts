@@ -1,5 +1,5 @@
-﻿/**
- * 健澜科技杠OS — 知识加工流水线
+/**
+ * 健澜AI原生医院操作系统OS — 知识加工流水线
  *
  * 阶段：parse → clean → split → normalize → entity → relation → embed → ingest
  * 纯函数/可注入设计：解析器按文件格式分派，实体/关系抽取默认采用「医学词典 + 规则」的离线实现，

@@ -1,6 +1,6 @@
 # 性能压测（k6）
 
-健澜科技杠OS 使用 [Grafana k6](https://k6.io/) 对 BFF 进行 HTTP 层负载与压力测试，
+健澜AI原生医院操作系统OS 使用 [Grafana k6](https://k6.io/) 对 BFF 进行 HTTP 层负载与压力测试，
 验证在门诊高峰等场景下的吞吐、时延与过载保护能力。
 
 ## 前置

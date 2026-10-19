@@ -1,0 +1,28 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 110
++ ... n\bun.exe"; & $bun test tests/unit/emergencyDeep.test.ts 2>&1 | Out-F ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\emergencyDeep.test.ts:
+(pass) 深度应急体系 buildDeepEmergencySystem > 十类情景预案齐全
+(pass) 深度应急体系 buildDeepEmergencySystem > 每套预案动作/物资/通报不空泛——真能用
+(pass) 应急风险评估 calculateEmergencyRisk > 高占用+高脆弱+演练差→高危
+(pass) 应急风险评估 calculateEmergencyRisk > 低占用+演练优秀+物资充足→低危
+(pass) 应急风险评估 calculateEmergencyRisk > 分数截在 0~100
+(pass) 演练排期 optimizeEmergencyDrillSchedule > 上次不及格自动加密周期
+(pass) 演练排期 optimizeEmergencyDrillSchedule > 从未演练的排最前（视同逾期） [15.00ms]
+(pass) 应急物资跟踪 trackEmergencySupply > 库存低于定额 → low_stock
+(pass) 应急物资跟踪 trackEmergencySupply > 30 天内到期 → expiring_soon
+(pass) 应急物资跟踪 trackEmergencySupply > 已过期 → expired
+(pass) 应急物资跟踪 trackEmergencySupply > 库存充足且未到期 → ok
+(pass) 响应自动化 evaluateEmergencyTrigger > 命中火灾信号 → 输出通知链与自动启动动作
+(pass) 响应自动化 evaluateEmergencyTrigger > 信号不满足触发条件 → 不响应（不误启动）
+(pass) 响应自动化 evaluateEmergencyTrigger > 多规则同时命中可并行
+
+ 14 pass
+ 0 fail
+ 73 expect() calls
+Ran 14 tests across 1 files. [237.00ms]

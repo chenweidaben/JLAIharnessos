@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 缓存层统一出口
+ * 健澜AI原生医院操作系统OS - 缓存层统一出口
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
  */
 

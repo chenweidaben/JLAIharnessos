@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - MFA / TOTP 单测
+ * 健澜AI原生医院操作系统OS - MFA / TOTP 单测
  *
  * TOTP 使用 RFC 6238 官方 SHA-1 测试向量（8 位）验证算法正确性。
  *
@@ -75,10 +75,10 @@ describe('TOTP 校验与时间窗口', () => {
   });
 
   it('生成 otpauth URI 含密钥与发行方', () => {
-    const uri = buildOtpauthUri({ secret: 'JBSWY3DP', issuer: '健澜科技杠OS', accountName: 'dr_chen' });
+    const uri = buildOtpauthUri({ secret: 'JBSWY3DP', issuer: '健澜AI原生医院操作系统OS', accountName: 'dr_chen' });
     expect(uri).toContain('otpauth://totp/');
     expect(uri).toContain('secret=JBSWY3DP');
-    expect(uri).toContain(encodeURIComponent('健澜科技杠OS'));
+    expect(uri).toContain(encodeURIComponent('健澜AI原生医院操作系统OS'));
   });
 });
 

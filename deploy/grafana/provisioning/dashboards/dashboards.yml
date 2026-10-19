@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — Grafana 大盘自动装配（dashboard provider）
+# 健澜AI原生医院操作系统OS — Grafana 大盘自动装配（dashboard provider）
 # 只读挂载到容器 /etc/grafana/provisioning/dashboards/，启动即导入 dashboards/ 下 JSON。
 # ============================================================================
 apiVersion: 1
@@ -7,7 +7,7 @@ apiVersion: 1
 providers:
   - name: gangos
     orgId: 1
-    folderName: '健澜科技杠OS'
+    folderName: '健澜AI原生医院操作系统OS'
     folderUid: gangos
     type: file
     disableDeletion: false

@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — PostgreSQL（StatefulSet + Headless Service + PVC）
+# 健澜AI原生医院操作系统OS — PostgreSQL（StatefulSet + Headless Service + PVC）
 #
 # 一体化部署时使用集群内 PostgreSQL；BFF 启动时通过 autoMigrate 自动建表，
 # 因此无需手工初始化。生产环境也可改用云托管 RDS（删除本文件并调整 ConfigMap）。

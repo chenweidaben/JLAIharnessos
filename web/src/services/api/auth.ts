@@ -107,7 +107,7 @@ export async function enrollMfa(): Promise<MfaEnroll> {
     const secret = 'JBSWY3DPK5XXE3DETEST';
     return {
       secret,
-      otpauthUri: `otpauth://totp/${encodeURIComponent('健澜科技杠OS')}:doctor_chen?secret=${secret}&issuer=${encodeURIComponent('健澜科技杠OS')}`,
+      otpauthUri: `otpauth://totp/${encodeURIComponent('健澜AI原生医院操作系统OS')}:doctor_chen?secret=${secret}&issuer=${encodeURIComponent('健澜AI原生医院操作系统OS')}`,
     };
   }
   return post<MfaEnroll>('/auth/mfa/enroll', {});

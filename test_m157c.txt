@@ -1,0 +1,30 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 68
++ ... ew-chat-1"; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/qua ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\qualityGate.test.ts:
+(pass) M157-C 门禁复查 fullQualityGate > 版本号为 200 里程碑
+(pass) M157-C 门禁复查 fullQualityGate > 六维齐全：smoke/security/performance/coverage/tsc/ui [16.00ms]
+(pass) M157-C 门禁复查 fullQualityGate > 每维结论均为三色之一，分值在 0-100
+(pass) M157-C 门禁复查 fullQualityGate > 计数与各维状态一致（pass/warn/risk 求和=6）
+(pass) M157-C 门禁复查 fullQualityGate > 整体三色推导：有 risk 则不放行，否则放行
+(pass) M157-C 门禁复查 fullQualityGate > findings 汇总自各维，且按严重度降序（high > medium > low）
+(pass) M157-C 门禁复查 fullQualityGate > topRisks 至多 3 条且与 findings 前 3 条一致
+(pass) M157-C 门禁复查 fullQualityGate > 每条发现都带整改建议（不只指出问题）
+(pass) M157-C 报告生成 generateQualityGateReport > 结论与门禁结果一致
+(pass) M157-C 报告生成 generateQualityGateReport > VI 卡片 4 张：门禁结论/通过项/警告项/风险项
+(pass) M157-C 报告生成 generateQualityGateReport > 整改计划条数 = findings 数，优先级 1..N
+(pass) M157-C 报告生成 generateQualityGateReport > 红线要点覆盖所有 risk 与 warn 维度
+(pass) M157-C 报告生成 generateQualityGateReport > 总结文案含版本与三色结论
+(pass) M157-C 风险识别不变量 > tsc 维度恒为通过（类型红线）
+(pass) M157-C 风险识别不变量 > smoke 维度来自真实路由探测：路由总数 > 0
+(pass) M157-C 风险识别不变量 > 维度键集合固定，不随运行漂移
+
+ 16 pass
+ 0 fail
+ 90 expect() calls
+Ran 16 tests across 1 files. [153.00ms]

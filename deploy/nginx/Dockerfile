@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — 边缘网关镜像（定制 Nginx，非 root 运行）
+# 健澜AI原生医院操作系统OS — 边缘网关镜像（定制 Nginx，非 root 运行）
 # ----------------------------------------------------------------------------
 # 基础镜像选用官方维护的 nginxinc/nginx-unprivileged（1.28 稳定分支，alpine）：
 #   - 默认即以非 root 用户 nginx(uid=101) 运行，监听 8080/8443 非特权端口；
@@ -21,7 +21,7 @@
 FROM nginxinc/nginx-unprivileged:1.28.0-alpine3.21
 
 LABEL org.opencontainers.image.title="jianlan-gangos-nginx-edge" \
-      org.opencontainers.image.description="健澜科技杠OS 边缘网关（Nginx 非 root 运行）" \
+      org.opencontainers.image.description="健澜AI原生医院操作系统OS 边缘网关（Nginx 非 root 运行）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0" \
       org.opencontainers.image.source="https://git.jianlan.tech/medical/jianlan-medical-agent"

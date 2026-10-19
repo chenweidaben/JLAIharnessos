@@ -1,4 +1,4 @@
-# 健澜科技杠OS — Kubernetes 部署指南
+# 健澜AI原生医院操作系统OS — Kubernetes 部署指南
 
 本目录提供 jlmedaios 在 Kubernetes 上的生产级一体化部署清单。
 

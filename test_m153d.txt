@@ -1,0 +1,32 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 127
++ ... n\bun.exe"; & $bun test tests/unit/satisfactionAi.test.ts 2>&1 | Out- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\satisfactionAi.test.ts:
+(pass) analyzeSatisfactionFeedback > 正面评论（满意/耐心/谢谢）判为 positive
+(pass) analyzeSatisfactionFeedback > 负面评论（等待/态度/费用/排队）判为 negative
+(pass) analyzeSatisfactionFeedback > 无关键词的普通评论落入 neutral
+(pass) analyzeSatisfactionFeedback > 空数组与空白评论兜底为零，overall 仍为 positive
+(pass) analyzeSatisfactionFeedback > 负面占比落在 [0.2, 0.4) → overall=neutral
+(pass) analyzeSatisfactionFeedback > 不修改入参
+(pass) extractKeyIssues > 命中「等待/排队」归入 wait_time 类别
+(pass) extractKeyIssues > 一条评论同时命中多类别时独立计数
+(pass) extractKeyIssues > 严重度分级：≥5 高、≥2 中、其余低
+(pass) extractKeyIssues > 样本评论去重且最多 3 条
+(pass) extractKeyIssues > 正面评论不产生关键问题
+(pass) extractKeyIssues > 负面词典覆盖任务要求的等待/态度/费用/排队四类
+(pass) generateImprovementPlan > 低分（<2.5）或问题数 ≥5 → high 优先级
+(pass) generateImprovementPlan > 均分 [2.5, 3.5) 或问题数 ≥2 → medium
+(pass) generateImprovementPlan > 高优排在最前，同级按均分升序
+(pass) generateImprovementPlan > 每条计划带量化改进目标（30 天提升）
+(pass) generateImprovementPlan > 空输入返回空数组
+(pass) generateImprovementPlan > 不修改入参
+
+ 18 pass
+ 0 fail
+ 47 expect() calls
+Ran 18 tests across 1 files. [141.00ms]

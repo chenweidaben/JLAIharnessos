@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — 前端 Web（Deployment + Service + HPA + PDB）
+# 健澜AI原生医院操作系统OS — 前端 Web（Deployment + Service + HPA + PDB）
 #
 # Nginx 托管静态产物，/api、/ws 反代到 Service 名 app（BFF）；多副本无状态。
 #

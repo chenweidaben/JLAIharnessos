@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - 会话管理 API 服务（M7-F）
+ * 健澜AI原生医院操作系统OS - 会话管理 API 服务（M7-F）
  *
  * 真实 BFF（src/bff/routes/sessions.ts），读写 PostgreSQL，无 mock。
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.

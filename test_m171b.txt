@@ -1,0 +1,36 @@
+﻿bun test v1.2.0 (b0c5a765)
+~\.bun\bin\bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; ~\.bun\bin\bun.exe test tests/unit/teachingOnline.test.ts ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\teachingOnline.test.ts:
+(pass) buildOnlineLearningPlatform > 返回全量平台：六大分类 + 课程目录 + 学员概览 + 学分规则
+(pass) buildOnlineLearningPlatform > 课程覆盖三种形态：录播 / 直播 / 回放
+(pass) buildOnlineLearningPlatform > 按分类筛选：只返回该分类课程，activeCategory 一致
+(pass) buildOnlineLearningPlatform > 未知分类回退全量目录
+(pass) buildOnlineLearningPlatform > 确定性：同分类两次结果课程目录完全一致
+(pass) generateQuizFromContent > 产出四种题型：单选 / 多选 / 判断 / 案例分析
+(pass) generateQuizFromContent > 难度越高，案例题分值占比越大
+(pass) generateQuizFromContent > hard 难度追加一道进阶案例题
+(pass) generateQuizFromContent > 总分 = 100；题干与解析非空
+(pass) generateQuizFromContent > 空正文兜底不抛错
+(pass) generateQuizFromContent > 确定性：同正文同难度两次题目完全一致
+(pass) evaluateStudentAnswer > 单选：答对给满分，答错 0 分
+(pass) evaluateStudentAnswer > 多选：集合全等才给分，漏选/错选均 0 分
+(pass) evaluateStudentAnswer > 判断：布尔全等即正确，支持中文「对/正确」
+(pass) evaluateStudentAnswer > 案例分析：按要点命中比例给分，≥60% 判正确
+(pass) buildLearningPath > 按角色×层级返回 4 个阶段，必修在前、选修在后合理
+(pass) buildLearningPath > 角色/层级越高级，路径阶段标题随之进阶
+(pass) buildLearningPath > 未知角色回退 doctor，未知层级回退 junior，不抛错
+(pass) buildLearningPath > 确定性：同角色同层级两次路径完全一致
+(pass) buildCourseQuizWithAnswers（服务端阅卷闭环） > 按 courseId 重建题库与答案 key，正确答案不下发到前端
+(pass) buildCourseQuizWithAnswers（服务端阅卷闭环） > 未知 courseId 返回 null
+(pass) buildCourseQuizWithAnswers（服务端阅卷闭环） > 整卷：用答案 key 自答必通过且学分入账
+
+ 22 pass
+ 0 fail
+ 96 expect() calls
+Ran 22 tests across 1 files. [146.00ms]

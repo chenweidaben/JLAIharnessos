@@ -1,5 +1,5 @@
 <!--
-  健澜科技杠OS (Jianlan Gang-OS) - Pull Request 模板
+  健澜AI原生医院操作系统OS (Jianlan AI-Native Hospital OS) - Pull Request 模板
   Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
   感谢你的贡献！请完整填写，帮助评审与保障患者安全。
 -->

@@ -1,6 +1,6 @@
 # jlmedaios Helm Chart
 
-> 健澜科技 jlmedaios（健澜科技杠OS）数智医院操作系统 · 参数化 Kubernetes 部署
+> 健澜科技 jlmedaios（健澜AI原生医院操作系统OS）数智医院操作系统 · 参数化 Kubernetes 部署
 
 本 Chart 在 [`deploy/k8s/`](../../k8s/) 一体化清单基础上参数化，支持：
 

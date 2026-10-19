@@ -1,4 +1,4 @@
-# 健澜科技杠OS · Redis 部署
+# 健澜AI原生医院操作系统OS · Redis 部署
 
 Redis 7，作为缓存、分布式锁、限流与会话存储；compose 已挂载 `redis.conf` 并通过 `--requirepass` 注入密码。
 

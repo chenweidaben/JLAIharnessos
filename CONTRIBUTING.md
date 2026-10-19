@@ -1,6 +1,6 @@
-# 贡献指南（Contributing to Jianlan Gang-OS）
+# 贡献指南（Contributing to Jianlan AI-Native Hospital OS）
 
-首先，感谢你愿意为健澜科技杠OS 贡献力量！我们的目标是和全国医院信息科、医疗 IT 厂商、
+首先，感谢你愿意为健澜AI原生医院操作系统OS 贡献力量！我们的目标是和全国医院信息科、医疗 IT 厂商、
 高校与全球开发者一起，把这个免费开源的工业级医疗智能体操作系统，打磨成
 **医疗 AI 的安卓系统**。
 

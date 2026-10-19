@@ -1,7 +1,7 @@
 {
   "manifestVersion": "1.0.0",
   "catalog": "jianlan-medical-agent-marketplace",
-  "name": "健澜科技杠OS · 官方刚需智能体清单",
+  "name": "健澜AI原生医院操作系统OS · 官方刚需智能体清单",
   "description": "医疗智能体操作系统内置的十大刚需智能体，全部以声明式 AgentPackage（agent.yaml + prompts）分发，可在低代码画布中查看、克隆与二次编辑。",
   "vendor": "健澜科技",
   "license": "Apache-2.0",

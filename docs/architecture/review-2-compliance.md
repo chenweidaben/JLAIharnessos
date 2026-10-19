@@ -1,4 +1,4 @@
-# 健澜科技杠OS（jianlan-gang-os）重构方案——合规可落地性评审报告
+# 健澜AI原生医院操作系统OS（jianlan-gang-os）重构方案——合规可落地性评审报告
 
 > 评审对象：Java(Spring Cloud) + Python(FastAPI+vLLM) + TS(Bun BFF) 微服务重构架构
 > 目标场景：大型三甲医院生产环境

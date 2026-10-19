@@ -1,0 +1,32 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 127
++ ... n\bun.exe"; & $bun test tests/unit/groupMultiHospital.test.ts 2>&1 |  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\groupMultiHospital.test.ts:
+(pass) buildGroupDashboard 集团大屏聚合 > 五项核心指标：量类求和、满意度取均值
+(pass) buildGroupDashboard 集团大屏聚合 > 各院指标卡按 hospital_id 一一对应，不串院
+(pass) buildGroupDashboard 集团大屏聚合 > 统一标准分类计数 + 强制项计数
+(pass) buildGroupDashboard 集团大屏聚合 > 冷启动（无院籍）demo 置位、总量为零
+(pass) buildGroupDashboard 集团大屏聚合 > 有院籍但指标全零 → demo 置位
+(pass) buildGroupDashboard 集团大屏聚合 > asOf / groupId 透传
+(pass) compareHospitals 跨院指标对比 > 门诊量对比：排名降序、集团均值、偏离度
+(pass) compareHospitals 跨院指标对比 > 满意度对比：均值 90、协作院 100 分排第一
+(pass) compareHospitals 跨院指标对比 > 非法指标键返回空数组，不抛错
+(pass) compareHospitals 跨院指标对比 > 周期过滤：只对比指定周期的快照
+(pass) compareHospitals 跨院指标对比 > 空快照返回空数组
+(pass) optimizeGroupResource 跨院资源优化 > 专家资源：总院饱和(90) → 协作院闲置(40)，生成调配动作
+(pass) optimizeGroupResource 跨院资源优化 > 床位资源：总院 95 饱和、分院 60 与协作院 50 均在闲置线
+(pass) optimizeGroupResource 跨院资源优化 > 设备资源：无饱和院（最高 80 < 85）→ 无调配动作
+(pass) optimizeGroupResource 跨院资源优化 > 负载全在均衡区间 → 建议「暂无需跨院调配」
+(pass) optimizeGroupResource 跨院资源优化 > 空快照 → demo 标记、空结构
+(pass) optimizeGroupResource 跨院资源优化 > 未知资源类型 → 安全返回空建议，不抛错
+(pass) optimizeGroupResource 跨院资源优化 > 阈值常量与设计口径一致
+
+ 18 pass
+ 0 fail
+ 63 expect() calls
+Ran 18 tests across 1 files. [188.00ms]

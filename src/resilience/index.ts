@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS（jlmedaios）- 韧性层统一出口
+ * 健澜AI原生医院操作系统OS（jlmedaios）- 韧性层统一出口
  *
  * 面向医院高并发环境的生产级韧性原语：
  *   - CircuitBreaker   熔断器（fail-fast，防故障级联）

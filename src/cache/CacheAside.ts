@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 缓存旁路（Cache-Aside）
+ * 健澜AI原生医院操作系统OS - 缓存旁路（Cache-Aside）
  *
  * read-through 封装，并针对三类经典缓存问题做防护：
  *   - 击穿：热点 key 失效瞬间，singleflight 让并发请求只回源一次；

@@ -1,0 +1,70 @@
+﻿src/bff/aggregators/researchDeepAggregator.ts(160,7): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(160,38): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(161,10): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(161,38): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(161,51): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(162,13): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(162,29): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(162,44): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(162,64): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(163,11): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(163,22): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(163,41): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(164,15): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(169,11): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(173,12): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(176,16): error TS1005: ',' expected.
+src/bff/aggregators/researchDeepAggregator.ts(177,3): error TS1137: Expression or comma expected.
+src/bff/aggregators/researchDeepAggregator.ts(177,4): error TS1128: Declaration or statement expected.
+src/bff/aggregators/researchDeepAggregator.ts(179,38): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(180,10): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(180,34): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(180,47): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(181,13): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(181,35): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(181,50): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(181,70): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(182,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(182,22): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(182,40): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(183,15): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(187,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(190,12): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(191,16): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(192,3): error TS1109: Expression expected.
+src/bff/aggregators/researchDeepAggregator.ts(192,4): error TS1128: Declaration or statement expected.
+src/bff/aggregators/researchDeepAggregator.ts(194,38): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(195,10): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(195,33): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(195,46): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(196,13): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(196,34): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(196,48): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(196,71): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(197,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(197,21): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(197,39): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(198,15): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(203,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(206,12): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(209,16): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(210,3): error TS1109: Expression expected.
+src/bff/aggregators/researchDeepAggregator.ts(210,4): error TS1128: Declaration or statement expected.
+src/bff/aggregators/researchDeepAggregator.ts(212,38): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(213,10): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(213,35): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(213,48): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(214,13): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(214,29): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(214,44): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(214,66): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(215,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(215,22): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(215,41): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(216,15): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(223,11): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(227,12): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(232,16): error TS1005: ';' expected.
+src/bff/aggregators/researchDeepAggregator.ts(233,3): error TS1109: Expression expected.
+src/bff/aggregators/researchDeepAggregator.ts(233,4): error TS1128: Declaration or statement expected.
+src/bff/aggregators/researchDeepAggregator.ts(234,1): error TS1128: Declaration or statement expected.

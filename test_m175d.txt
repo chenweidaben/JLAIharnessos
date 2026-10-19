@@ -1,0 +1,46 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$HOME\.bun\bin\bun.exe" test tests/unit/patientMuse.te ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\patientMuse.test.ts:
+(pass) buildPatientMuse - 画像聚合 > chronicConditions 仅收录 chronic=true 的诊断名并去重
+(pass) buildPatientMuse - 画像聚合 > allergies 仅收录 allergy=true 的药物名并去重
+(pass) derivePreferenceTags - 偏好提取 > 关键词命中：糖尿病→血糖管理、高血压→血压监测
+(pass) derivePreferenceTags - 偏好提取 > 复诊次数≥2 → 追加「复诊依从」
+(pass) derivePreferenceTags - 偏好提取 > 活跃用药≥3 → 追加「多药共管」
+(pass) derivePreferenceTags - 偏好提取 > 结果去重保序
+(pass) buildPatientMuse - 健康提醒 > 有过敏史 → 产出 critical 级提醒且排最前
+(pass) buildPatientMuse - 健康提醒 > 有慢病 → 产出 warning 级慢病随访提醒
+(pass) buildPatientMuse - 健康提醒 > 有活跃用药 → 产出 info 级配药提醒
+(pass) buildPatientMuse - 健康提醒 > 距上次就诊超过 FOLLOWUP_DUE_DAYS 天 → 产出复诊预约提醒
+(pass) resolvePatientMuseTarget - 角色差异 > doctor：可查看任意患者
+(pass) resolvePatientMuseTarget - 角色差异 > patient：仅可查看本人
+(pass) resolvePatientMuseTarget - 角色差异 > patient 查看他人：拒绝（403 语义）
+(pass) resolvePatientMuseTarget - 角色差异 > 未知角色：拒绝
+(pass) resolvePatientMuseTarget - 角色差异 > 空 patientId：拒绝
+(pass) buildPatientMuse - 空数据兜底 > 全 null 入参：零值视图 + 一条「完善档案」引导，绝不抛错
+(pass) buildPatientMuse - 空数据兜底 > 空数组入参：与 null 一致兜底
+(pass) buildPatientMuse - 空数据兜底 > 脏数据（无 condition / 非数组字段）：归一为空，不崩
+(pass) buildPatientMUSE（健康画像 / 就医偏好 / 目标 / 提醒 / 洞察） > 缺省演示画像：聚合疾病/用药/检查/过敏/家族史五大块
+(pass) buildPatientMUSE（健康画像 / 就医偏好 / 目标 / 提醒 / 洞察） > 有「经常漏服」药物 → 产出 high 级依从性洞察
+(pass) buildPatientMUSE（健康画像 / 就医偏好 / 目标 / 提醒 / 洞察） > 有异常化验 + 父系糖尿病家族史 → 分别产出 abnormal_lab / family_risk 洞察
+(pass) buildPatientMUSE（健康画像 / 就医偏好 / 目标 / 提醒 / 洞察） > 画像干净（无漏服/无异常/无过敏/无家族史）→ 风险分为 0、总结正面 [16.00ms]
+(pass) recordPatientExperience（患者经验记录：打标 + 随访判定） > 记录「出冷汗、心慌」+ 高分 → 命中低血糖标签且需主动随访
+(pass) recordPatientExperience（患者经验记录：打标 + 随访判定） > 记录「饭后散步」日常 → lifestyle 打运动标签、不随访
+(pass) recordPatientExperience（患者经验记录：打标 + 随访判定） > 严重度归一：超过 5 夹到 5、低于 1 夹到 1
+(pass) recommendPatientService（个性化服务推荐：按优先级） > 异常化验 + 依从性差 + 糖尿病 → 最高优先级为复查门诊，且含饮食/运动推荐
+(pass) recommendPatientService（个性化服务推荐：按优先级） > 红旗症状（口渴/多饮）→ 产出 high 级护士随访
+(pass) recommendPatientService（个性化服务推荐：按优先级） > 干净上下文 → 不推紧急事项，总结平和
+(pass) trackPatientHealthProgress（健康进度：真实进度 vs 时间进度） > 减重目标：已减 2.7/7.5kg≈36%，时间过半（100/183≈55%）→ at_risk
+(pass) trackPatientHealthProgress（健康进度：真实进度 vs 时间进度） > 已达标（当前值 ≤ 目标值，下降型）→ achieved
+(pass) trackPatientHealthProgress（健康进度：真实进度 vs 时间进度） > 运动目标（上升型）：当前已超目标 → achieved，方向自动判定为 up
+(pass) trackPatientHealthProgress（健康进度：真实进度 vs 时间进度） > 进度远落后于时间 → off_track，并建议尽快就诊
+
+ 32 pass
+ 0 fail
+ 70 expect() calls
+Ran 32 tests across 1 files. [231.00ms]

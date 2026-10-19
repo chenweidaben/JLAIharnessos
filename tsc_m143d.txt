@@ -1,0 +1,113 @@
+﻿tests/integration/referral.test.ts(29,3): error TS2724: '"../../src/bff/aggregators/referralAggregator.js"' has no exported member named 'ReferralError'. Did you mean 'ReferralReport'?
+tests/integration/referral.test.ts(31,3): error TS2305: Module '"../../src/bff/aggregators/referralAggregator.js"' has no exported member 'addDocument'.
+tests/integration/referral.test.ts(32,3): error TS2305: Module '"../../src/bff/aggregators/referralAggregator.js"' has no exported member 'cancelReferral'.
+tests/integration/referral.test.ts(35,3): error TS2724: '"../../src/bff/aggregators/referralAggregator.js"' has no exported member named 'getReferral'. Did you mean 'Referral'?
+tests/integration/referral.test.ts(36,3): error TS2305: Module '"../../src/bff/aggregators/referralAggregator.js"' has no exported member 'listReferralQueue'.
+tests/integration/referral.test.ts(37,3): error TS2305: Module '"../../src/bff/aggregators/referralAggregator.js"' has no exported member 'rejectReferral'.
+tests/integration/referral.test.ts(98,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(109,14): error TS2339: Property 'referralNo' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(110,27): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: ReferralStatus): void', gave the following error.
+    Argument of type '"submitted"' is not assignable to parameter of type 'ReferralStatus'.
+  Overload 2 of 2, '(expected: ReferralStatus): void', gave the following error.
+    Argument of type '"submitted"' is not assignable to parameter of type 'ReferralStatus'.
+tests/integration/referral.test.ts(111,30): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: ReferralDirection): void', gave the following error.
+    Argument of type '"incoming"' is not assignable to parameter of type 'ReferralDirection'.
+  Overload 2 of 2, '(expected: ReferralDirection): void', gave the following error.
+    Argument of type '"incoming"' is not assignable to parameter of type 'ReferralDirection'.
+tests/integration/referral.test.ts(115,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(124,30): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: ReferralDirection): void', gave the following error.
+    Argument of type '"outgoing"' is not assignable to parameter of type 'ReferralDirection'.
+  Overload 2 of 2, '(expected: ReferralDirection): void', gave the following error.
+    Argument of type '"outgoing"' is not assignable to parameter of type 'ReferralDirection'.
+tests/integration/referral.test.ts(125,14): error TS2339: Property 'urgency' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(129,45): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(138,45): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(148,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(173,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(185,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(194,54): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(198,19): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(199,19): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(200,19): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(201,16): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(201,63): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(202,16): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(202,59): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(207,22): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(215,51): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(216,12): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(216,55): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(217,32): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(221,22): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(230,51): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(231,12): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(231,55): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(232,15): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(236,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(244,73): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(248,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(256,49): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(257,11): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(257,53): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(258,11): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(258,49): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(259,73): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(263,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(277,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(291,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(299,49): error TS2554: Expected 2 arguments, but got 3.
+tests/integration/referral.test.ts(300,11): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(300,53): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(301,11): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(301,49): error TS2339: Property 'referral' does not exist on type 'Referral'.
+tests/integration/referral.test.ts(302,46): error TS2345: Argument of type 'AuthView' is not assignable to parameter of type 'string'.
+tests/integration/referral.test.ts(303,35): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(expected: ReferralStatus): void', gave the following error.
+    Argument of type '"completed"' is not assignable to parameter of type 'ReferralStatus'.
+  Overload 2 of 2, '(expected: ReferralStatus): void', gave the following error.
+    Argument of type '"completed"' is not assignable to parameter of type 'ReferralStatus'.
+tests/integration/referral.test.ts(307,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(315,62): error TS2345: Argument of type 'AuthView' is not assignable to parameter of type 'string'.
+tests/integration/referral.test.ts(321,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(334,21): error TS2554: Expected 5 arguments, but got 2.
+tests/integration/referral.test.ts(356,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+tests/integration/referral.test.ts(358,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+tests/integration/referral.test.ts(363,34): error TS7006: Parameter 'r' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(41,27): error TS2307: Cannot find module '@/components/common/PageContainer' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(42,30): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(54,8): error TS2307: Cannot find module '@/services/medmuseApi' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(55,36): error TS2307: Cannot find module '@/services/medmuseStream' or its corresponding type declarations.
+web/src/pages/agent/MedMuseChatPage.tsx(276,39): error TS7006: Parameter 'a' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(292,14): error TS7006: Parameter 'list' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(295,15): error TS7006: Parameter 'e' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(303,14): error TS7006: Parameter 'list' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(304,52): error TS7006: Parameter 'a' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(414,23): error TS7006: Parameter 'piece' implicitly has an 'any' type.
+web/src/pages/agent/MedMuseChatPage.tsx(415,22): error TS7006: Parameter 'meta' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(24,38): error TS2307: Cannot find module '@/components/common' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(25,47): error TS2307: Cannot find module '@/components/charts' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(26,30): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(27,40): error TS2307: Cannot find module '@/store/dashboardStatsStore' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(28,37): error TS2307: Cannot find module '@/types/dashboardStats' or its corresponding type declarations.
+web/src/pages/dashboard/index.tsx(245,39): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(247,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(248,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(259,62): error TS7006: Parameter 'd' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(276,39): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(278,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/dashboard/index.tsx(279,54): error TS7006: Parameter 't' implicitly has an 'any' type.
+web/src/pages/login/index.tsx(11,30): error TS2307: Cannot find module '@/store/authStore' or its corresponding type declarations.
+web/src/pages/login/index.tsx(12,28): error TS2307: Cannot find module '@/types/auth' or its corresponding type declarations.
+web/src/pages/login/index.tsx(13,35): error TS2307: Cannot find module '@/types/user' or its corresponding type declarations.
+web/src/pages/login/index.tsx(19,31): error TS7006: Parameter 's' implicitly has an 'any' type.
+web/src/pages/login/index.tsx(31,47): error TS18046: 'e' is of type 'unknown'.
+web/src/pages/medmuse/Approvals/index.tsx(19,8): error TS2307: Cannot find module '@/store/medmuseApprovalStore' or its corresponding type declarations.
+web/src/pages/medmuse/Approvals/index.tsx(20,54): error TS2307: Cannot find module '@/services/api/medmuse' or its corresponding type declarations.
+web/src/pages/patients/Patient360/index.tsx(30,31): error TS2307: Cannot find module '@/components/common' or its corresponding type declarations.
+web/src/pages/patients/Patient360/index.tsx(31,30): error TS2307: Cannot find module '@/hooks' or its corresponding type declarations.
+web/src/pages/patients/Patient360/index.tsx(32,36): error TS2307: Cannot find module '@/store/patient360Store' or its corresponding type declarations.
+web/src/pages/patients/Patient360/index.tsx(33,39): error TS2307: Cannot find module '@/services/api/patient360' or its corresponding type declarations.
+web/src/pages/patients/Patient360/index.tsx(159,36): error TS7006: Parameter 'e' implicitly has an 'any' type.

@@ -1,5 +1,5 @@
 /* ============================================================================
- * 健澜科技杠OS - 数据湖仓类型定义（M5-D）
+ * 健澜AI原生医院操作系统OS - 数据湖仓类型定义（M5-D）
  *
  * 对应后端 src/bff/aggregators/lakehouseAggregator.ts 的视图结构。
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.

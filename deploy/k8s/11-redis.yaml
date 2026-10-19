@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — Redis（StatefulSet + Headless Service + PVC）
+# 健澜AI原生医院操作系统OS — Redis（StatefulSet + Headless Service + PVC）
 #
 # 缓存 / 分布式锁 / 限流 / 会话黑名单。启用 AOF 持久化与密码鉴权。
 # 生产环境也可改用云托管 Redis（删除本文件并调整 BFF 的 REDIS_URL）。

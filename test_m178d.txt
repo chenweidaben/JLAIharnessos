@@ -1,0 +1,28 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 112
++ ... ing]::UTF8; & "$HOME\.bun\bin\bun.exe" test tests/unit/partyCulture.t ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\partyCulture.test.ts:
+(pass) organizePartyActivity 党建活动组织（反形式主义） > 务实达标：议程充实、应到≥3、有落地事项 → organized，校验全过 [16.00ms]
+(pass) organizePartyActivity 党建活动组织（反形式主义） > 议程过简（只写标题）→ 判形式主义风险，needsImprovement
+(pass) organizePartyActivity 党建活动组织（反形式主义） > 应到人数不足（一人讲众人听）→ 形式主义风险
+(pass) organizePartyActivity 党建活动组织（反形式主义） > 没有会后落地事项 → 形式主义风险（学完就散）
+(pass) organizePartyActivity 党建活动组织（反形式主义） > 非法入参抛错（空主题 / 空主持人 / 非法日期）
+(pass) evaluateMedicalEthics 医德考评（证据加权，查实一票否决） > 无证据：按合格基线 C 计，不凭空给 A
+(pass) evaluateMedicalEthics 医德考评（证据加权，查实一票否决） > 表扬+退红包加分，投诉扣分
+(pass) evaluateMedicalEthics 医德考评（证据加权，查实一票否决） > 经查实违规 → 一票否决，等次封顶 C（不能拿优秀/良好）
+(pass) evaluateMedicalEthics 医德考评（证据加权，查实一票否决） > 多起投诉+缺训 → D 不合格
+(pass) evaluateMedicalEthics 医德考评（证据加权，查实一票否决） > 非法入参抛错（空 staffId / 空周期）
+(pass) trackHospitalCultureEvent 文化活动跟踪（问效） > 仅计划信息 → planned，无人均成本
+(pass) trackHospitalCultureEvent 文化活动跟踪（问效） > 已问效：实际覆盖+花费+成效 → closed，人均成本自动算
+(pass) trackHospitalCultureEvent 文化活动跟踪（问效） > 非法入参抛错（空名称 / 非法日期）
+(pass) buildDeepPartyCulture 深度党建文化看板 > 汇总四维度与等次分布，返回院训/医院精神锚点
+
+ 14 pass
+ 0 fail
+ 44 expect() calls
+Ran 14 tests across 1 files. [517.00ms]

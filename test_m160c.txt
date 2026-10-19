@@ -1,0 +1,28 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/gui ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\guideDx.test.ts:
+(pass) M160-C 指南对齐诊断 > 高血压：≥140/90 命中并分级（中国高血压指南2024）
+(pass) M160-C 指南对齐诊断 > 糖尿病：HbA1c≥6.5% / FPG≥7.0 命中（CDS 2024）
+(pass) M160-C 指南对齐诊断 > 冠心病：典型缺血胸痛+≥2危险因素方提示（ESC 2024）
+(pass) M160-C 指南对齐诊断 > 肺炎：呼吸道症状+新发浸润影方诊断，CURB-65 分层（IDSA/ATS 2019） [16.00ms]
+(pass) M160-C 指南对齐诊断 > 首要诊断优先级：冠心病急症优先
+(pass) M160-C 指南对齐诊断 > 血压常量表与指南切点一致
+(pass) M160-C 治疗指南核查 > 冠心病：缺双联抗血小板/他汀 → 不达标
+(pass) M160-C 治疗指南核查 > 冠心病：阿司匹林+替格瑞洛+他汀+β受体阻滞剂 → 合规
+(pass) M160-C 治疗指南核查 > 糖尿病：一线二甲双胍命中 → 合规
+(pass) M160-C 治疗指南核查 > 肺炎：经验性抗感染命中
+(pass) M160-C 治疗指南核查 > 未识别病种返回提示
+(pass) M160-C 指南建议与偏离分析 > 生成指南建议：含一线治疗/目标/监测
+(pass) M160-C 指南建议与偏离分析 > 偏离分析：冠心病缺失P2Y12 → 显著偏离
+(pass) M160-C 指南建议与偏离分析 > 偏离分析：治疗齐全 → 基本对齐
+
+ 14 pass
+ 0 fail
+ 33 expect() calls
+Ran 14 tests across 1 files. [152.00ms]

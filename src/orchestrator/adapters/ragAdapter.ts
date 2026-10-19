@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 知识检索引擎适配器
+ * 健澜AI原生医院操作系统OS - 知识检索引擎适配器
  *
  * 将 knowledge/retrieval/RetrievalEngine（五阶段混合检索：查询理解→向量+BM25→
  * RRF 融合→医疗重排序→上下文构建）适配为编排层的 IRagRetriever。

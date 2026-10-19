@@ -1,0 +1,29 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:1 字符: 56
++ ... new-chat-1; & "$env:USERPROFILE\.bun\bin\bun.exe" test tests/unit/ane ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\unit\anesthesiaDeep.test.ts:
+(pass) assessAnesthesiaRisk 麻醉风险评估 > ASA I + 无心肺合并症 + 小手术 = 低风险（low）
+(pass) assessAnesthesiaRisk 麻醉风险评估 > ASA IV + 心功能重度 + 急诊大手术 = 极高风险（extreme）
+(pass) assessAnesthesiaRisk 麻醉风险评估 > 风险分项守恒：riskScore = breakdown 各项之和
+(pass) assessAnesthesiaRisk 麻醉风险评估 > 重度肺功能差建议气管插管全麻
+(pass) trackIntraopMonitoring 术中监测跟踪 > 平稳手术 = 无告警、stable=true
+(pass) trackIntraopMonitoring 术中监测跟踪 > MAP<60 检出低血压告警
+(pass) trackIntraopMonitoring 术中监测跟踪 > SpO2<95 检出低氧告警 [15.00ms]
+(pass) trackIntraopMonitoring 术中监测跟踪 > BIS<40 过深 / BIS>60 过浅 均检出
+(pass) trackIntraopMonitoring 术中监测跟踪 > 出血量 > 血容量 20% 检出大出血告警
+(pass) evaluateAnesthesiaQuality 麻醉质量评价 > 无并发症 + Aldrete 满分 = excellent
+(pass) evaluateAnesthesiaQuality 麻醉质量评价 > 麻醉并发症 + 二次插管 + PACU 延迟 = poor
+(pass) evaluateAnesthesiaQuality 麻醉质量评价 > 麻醉死亡直接扣到 0 分
+(pass) evaluateAnesthesiaQuality 麻醉质量评价 > PACU 滞留 > 120min 判延迟
+(pass) buildDeepAnesthesiaMgmt 深度看板总装 > 返回四维汇总且 demo=true
+(pass) buildDeepAnesthesiaMgmt 深度看板总装 > 质量率在 [0,100] 区间且与例数一致
+
+ 15 pass
+ 0 fail
+ 42 expect() calls
+Ran 15 tests across 1 files. [142.00ms]

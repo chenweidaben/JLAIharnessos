@@ -1,4 +1,4 @@
-# 健澜科技杠OS · GitHub 开源发布指南
+# 健澜AI原生医院操作系统OS · GitHub 开源发布指南
 
 本指南面向负责发布的维护者，说明如何把本地仓库安全、合规地发布到 GitHub，并完成社区化运营配置。
 **当前仓库已完成开源化改造（Apache-2.0、双语 README、合规文件、CI），但尚未推送远端**（环境无发布凭证）。
@@ -49,7 +49,7 @@ cd web && npx tsc --noEmit && npx vitest run && npm run build
 - [ ] TypeScript 零错误；
 - [ ] 后端 900+、前端 180+ 测试全部通过；
 - [ ] `bun run lint` 无 error；
-- [ ] 文档内的公司名统一为「健澜科技」，产品名为「健澜科技杠OS」。
+- [ ] 文档内的公司名统一为「健澜科技」，产品名为「健澜AI原生医院操作系统OS」。
 
 ### 5. 文档完备
 
@@ -68,7 +68,7 @@ git init
 git branch -M main
 git add .
 git status            # 再次核对没有 .env / data/ / node_modules / dist
-git commit -s -m "chore: 健澜科技杠OS 首次开源发布 (Apache-2.0)"
+git commit -s -m "chore: 健澜AI原生医院操作系统OS 首次开源发布 (Apache-2.0)"
 git tag -a v0.1.0 -m "release: v0.1.0 首个开源版本"
 ```
 

@@ -1,5 +1,5 @@
 /**
- * 健澜科技杠OS - 多因素认证（MFA）服务
+ * 健澜AI原生医院操作系统OS - 多因素认证（MFA）服务
  *
  * 提供 TOTP 绑定（先生成密钥、扫码后用首组动态码确认）、登录/敏感操作二次校验、
  * 一次性备份码、TOTP 重放保护与停用。存储通过 IMfaStore 抽象，默认进程内实现；
@@ -70,7 +70,7 @@ export type VerifyResult =
   | { ok: true; method: 'totp' | 'backup' }
   | { ok: false; error: 'NOT_ENABLED' | 'INVALID_TOKEN' | 'TOKEN_REPLAYED' };
 
-const DEFAULT_ISSUER = '健澜科技杠OS';
+const DEFAULT_ISSUER = '健澜AI原生医院操作系统OS';
 
 export class MfaService {
   private readonly period: number;
