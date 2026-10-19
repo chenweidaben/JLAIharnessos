@@ -9,7 +9,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain, knowledge_graph, ai_scheduling, ai_quality_insight, ai_emergency_triage, monitoring, ai_diagnosis, ai_prescription_review, ai_medical_scribe, ai_medication_adherence, ai_health_brain, ai_resource_optimization, ai_symptom_check, ai_quality_forecast, ai_clinical_notes, ai_risk_score, ai_data_quality, ai_teaching_assistant, ai_patient_satisfaction, ai_disease_prediction, ai_hospital_operation, ai_knowledge_inference, ai_imaging_report, ai_surgery_risk, ai_nursing_decision, ai_infection_warning, ai_discharge_readiness, ai_pain_assessment, ai_workflow_optimizer, ai_dashboard_insight, ai_consent_assistant, ai_medical_quality, ai_system_health, ai_capacity_planning, ai_anomaly_detection, ai_cost_optimization, ai_data_privacy, ai_ehr_assessment, ai_interconnection_assessment, ai_security_monitoring, ai_data_catalog, ai_model_monitoring, ai_patient_cohort, ai_clinical_guideline, ai_medication_safety, ai_revenue_forecast, ai_knowledge_reasoning, ai_data_augmentation, ai_twin_simulation, ai_iot_monitoring, ai_federated_learning, ai_blockchain_verify, ai_doctor_assistant, ai_patient_assistant, ai_executive_insight, ai_nursing_report, ai_doctor_note, ai_lab_quality, ai_radiology_report, ai_or_report, ai_er_triage, ai_icu_monitoring, ai_icu_alert, ai_dialysis_monitoring, ai_rehabilitation_plan
+from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain, knowledge_graph, ai_scheduling, ai_quality_insight, ai_emergency_triage, monitoring, ai_diagnosis, ai_prescription_review, ai_medical_scribe, ai_medication_adherence, ai_health_brain, ai_resource_optimization, ai_symptom_check, ai_quality_forecast, ai_clinical_notes, ai_risk_score, ai_data_quality, ai_teaching_assistant, ai_patient_satisfaction, ai_disease_prediction, ai_hospital_operation, ai_knowledge_inference, ai_imaging_report, ai_surgery_risk, ai_nursing_decision, ai_infection_warning, ai_discharge_readiness, ai_pain_assessment, ai_workflow_optimizer, ai_dashboard_insight, ai_consent_assistant, ai_medical_quality, ai_system_health, ai_capacity_planning, ai_anomaly_detection, ai_cost_optimization, ai_data_privacy, ai_ehr_assessment, ai_interconnection_assessment, ai_security_monitoring, ai_data_catalog, ai_model_monitoring, ai_patient_cohort, ai_clinical_guideline, ai_medication_safety, ai_revenue_forecast, ai_knowledge_reasoning, ai_data_augmentation, ai_twin_simulation, ai_iot_monitoring, ai_federated_learning, ai_blockchain_verify, ai_doctor_assistant, ai_patient_assistant, ai_executive_insight, ai_nursing_report, ai_doctor_note, ai_lab_quality, ai_radiology_report, ai_or_report, ai_er_triage, ai_icu_monitoring, ai_icu_alert, ai_dialysis_monitoring, ai_rehabilitation_plan, ai_nutrition_plan
 from app.core.api_key_auth import API_KEYS, check_rate_limit
 from app.core.audit_middleware import AuditMiddleware
 
@@ -261,6 +261,9 @@ app.include_router(ai_dialysis_monitoring.router)
 
 # AI 康复计划辅助
 app.include_router(ai_rehabilitation_plan.router)
+
+# AI 营养处方辅助
+app.include_router(ai_nutrition_plan.router)
 
 
 @app.on_event("startup")

@@ -6,11 +6,13 @@
 package com.jlmedaios.monolith.pain_management;
 
 import com.jlmedaios.monolith.pain_management.entity.PainAssessment;
+import com.jlmedaios.monolith.pain_management.entity.PainRecord;
 import com.jlmedaios.monolith.pain_management.service.PainManagementService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,5 +47,33 @@ public class PainManagementServiceTest {
         List<PainAssessment> severeList = painManagementService.severePainList();
         assertNotNull(severeList);
         // 应包含 score>=7 的记录
+    }
+
+    // ==================== PainRecord 疼痛评估管理（深化） ====================
+
+    @Test
+    void testPendingFollowUp() {
+        List<PainRecord> list = painManagementService.pendingFollowUp();
+        assertNotNull(list);
+    }
+
+    @Test
+    void testAssessRecord() {
+        PainRecord record = painManagementService.assess(
+                "PR-001", "P001", "腰痛", 6, "慢性");
+        assertNotNull(record.getId());
+    }
+
+    @Test
+    void testRecordTreatment() {
+        PainRecord record = painManagementService.recordTreatment(
+                "PR-001", "物理治疗", LocalDate.now().plusDays(14));
+        assertNotNull(record);
+    }
+
+    @Test
+    void testPainHistory() {
+        List<PainRecord> history = painManagementService.painHistory(1L);
+        assertNotNull(history);
     }
 }
