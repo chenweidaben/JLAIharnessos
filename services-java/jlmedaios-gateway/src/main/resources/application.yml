@@ -1,0 +1,28 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: jlmedaios-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: his-reg
+          uri: http://localhost:9101
+          predicates:
+            - Path=/api/his/register/**
+        - id: his-charge
+          uri: http://localhost:9102
+          predicates:
+            - Path=/api/his/charge/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
