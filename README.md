@@ -25,11 +25,11 @@
 >
 > | 层 | 技术栈 | 模块数 | 端口 |
 > |---|---|---|---|
-> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **120 模块**（从 9 模块 13 倍增长） | 9090 |
-> | Python 智能层 | FastAPI + vLLM | **60 router**（🎉 从 4 端点 15 倍增长） | 8000 |
+> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **126 模块**（从 9 模块 14 倍增长） | 9090 |
+> | Python 智能层 | FastAPI + vLLM | **66 router**（🎉 从 4 端点 16.5 倍增长） | 8000 |
 > | TS BFF 聚合层 | Bun + TypeScript | 1957 路由（保留） | 8080 |
-> | 测试类 | JUnit 5 + H2 | **94 个** | - |
-> | 端点总数 | Java + Python | **520+** | - |
+> | 测试类 | JUnit 5 + H2 | **100 个**（🎉 破百！） | - |
+> | 端点总数 | Java + Python | **580+** | - |
 >
 > 🚀 **快速启动**：
 > ```bash
