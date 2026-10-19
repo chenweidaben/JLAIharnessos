@@ -3489,6 +3489,14 @@ import { emrAiRehabPlanRecoV14Routes } from './routes/emrAiRehabPlanRecoV14';
 import { emrAiDischargeFollowupRecoV14Routes } from './routes/emrAiDischargeFollowupRecoV14';
 // M563-D：病历AI慢病管理计划推荐 V14 GET/POST /api/v1/emr-ai-chronic-care-plan-reco（EMR 深化四模块，M563 收官，病历AI康复与随访管理系列）
 import { emrAiChronicCarePlanRecoV14Routes } from './routes/emrAiChronicCarePlanRecoV14';
+// M564-A：病历AI营养风险筛查 V14 GET/POST /api/v1/emr-ai-nutrition-risk-screen（EMR 深化四模块，病历AI营养与膳食管理系列）
+import { emrAiNutritionRiskScreenV14Routes } from './routes/emrAiNutritionRiskScreenV14';
+// M564-B：病历AI膳食处方推荐 V14 GET/POST /api/v1/emr-ai-diet-script-reco（EMR 深化四模块，病历AI营养与膳食管理系列）
+import { emrAiDietScriptRecoV14Routes } from './routes/emrAiDietScriptRecoV14';
+// M564-C：病历AI肠内营养支持建议 V14 GET/POST /api/v1/emr-ai-enteral-nutrition-suggest（EMR 深化四模块，病历AI营养与膳食管理系列）
+import { emrAiEnteralNutritionSuggestV14Routes } from './routes/emrAiEnteralNutritionSuggestV14';
+// M564-D：病历AI肠外营养配置推荐 V14 GET/POST /api/v1/emr-ai-parenteral-nutrition-reco（EMR 深化四模块，M564 收官，病历AI营养与膳食管理系列）
+import { emrAiParenteralNutritionRecoV14Routes } from './routes/emrAiParenteralNutritionRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5476,6 +5484,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiRehabPlanRecoV14Routes, // M563-B：病历AI康复训练方案推荐 V14 GET/POST /api/v1/emr-ai-rehab-plan-reco（EMR 深化四模块，病历AI康复与随访管理系列）
   ...emrAiDischargeFollowupRecoV14Routes, // M563-C：病历AI出院随访计划推荐 V14 GET/POST /api/v1/emr-ai-discharge-followup-reco（EMR 深化四模块，病历AI康复与随访管理系列）
   ...emrAiChronicCarePlanRecoV14Routes, // M563-D：病历AI慢病管理计划推荐 V14 GET/POST /api/v1/emr-ai-chronic-care-plan-reco（EMR 深化四模块，M563 收官，病历AI康复与随访管理系列）
+  ...emrAiNutritionRiskScreenV14Routes, // M564-A：病历AI营养风险筛查 V14 GET/POST /api/v1/emr-ai-nutrition-risk-screen（EMR 深化四模块，病历AI营养与膳食管理系列）
+  ...emrAiDietScriptRecoV14Routes, // M564-B：病历AI膳食处方推荐 V14 GET/POST /api/v1/emr-ai-diet-script-reco（EMR 深化四模块，病历AI营养与膳食管理系列）
+  ...emrAiEnteralNutritionSuggestV14Routes, // M564-C：病历AI肠内营养支持建议 V14 GET/POST /api/v1/emr-ai-enteral-nutrition-suggest（EMR 深化四模块，病历AI营养与膳食管理系列）
+  ...emrAiParenteralNutritionRecoV14Routes, // M564-D：病历AI肠外营养配置推荐 V14 GET/POST /api/v1/emr-ai-parenteral-nutrition-reco（EMR 深化四模块，M564 收官，病历AI营养与膳食管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
