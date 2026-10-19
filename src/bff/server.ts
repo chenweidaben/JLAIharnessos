@@ -3433,6 +3433,14 @@ import { emrAiRecordQualityScoreV14Routes } from './routes/emrAiRecordQualitySco
 import { emrAiRecordDefectAlertV14Routes } from './routes/emrAiRecordDefectAlertV14';
 // M556-D：病历AI病案利用分析 V14 GET/POST /api/v1/emr-ai-record-utilization-analysis（EMR 深化四模块，M556 收官，病历AI病案管理与质量统计系列）
 import { emrAiRecordUtilizationAnalysisV14Routes } from './routes/emrAiRecordUtilizationAnalysisV14';
+// M557-A：病历AI护理记录生成 V14 GET/POST /api/v1/emr-ai-nursing-note-gen（EMR 深化四模块，病历AI护理文书与病区管理系列）
+import { emrAiNursingNoteGenV14Routes } from './routes/emrAiNursingNoteGenV14';
+// M557-B：病历AI护理计划推荐 V14 GET/POST /api/v1/emr-ai-nursing-plan-reco（EMR 深化四模块，病历AI护理文书与病区管理系列）
+import { emrAiNursingPlanRecoV14Routes } from './routes/emrAiNursingPlanRecoV14';
+// M557-C：病历AI护理风险评估 V14 GET/POST /api/v1/emr-ai-nursing-risk-assess（EMR 深化四模块，病历AI护理文书与病区管理系列）
+import { emrAiNursingRiskAssessV14Routes } from './routes/emrAiNursingRiskAssessV14';
+// M557-D：病历AI病区交班报告生成 V14 GET/POST /api/v1/emr-ai-shift-report-gen（EMR 深化四模块，M557 收官，病历AI护理文书与病区管理系列）
+import { emrAiShiftReportGenV14Routes } from './routes/emrAiShiftReportGenV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5392,6 +5400,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiRecordQualityScoreV14Routes, // M556-B：病历AI病案质量评分 V14 GET/POST /api/v1/emr-ai-record-quality-score（EMR 深化四模块，病历AI病案管理与质量统计系列）
   ...emrAiRecordDefectAlertV14Routes, // M556-C：病历AI病案缺陷预警 V14 GET/POST /api/v1/emr-ai-record-defect-alert（EMR 深化四模块，病历AI病案管理与质量统计系列）
   ...emrAiRecordUtilizationAnalysisV14Routes, // M556-D：病历AI病案利用分析 V14 GET/POST /api/v1/emr-ai-record-utilization-analysis（EMR 深化四模块，M556 收官，病历AI病案管理与质量统计系列）
+  ...emrAiNursingNoteGenV14Routes, // M557-A：病历AI护理记录生成 V14 GET/POST /api/v1/emr-ai-nursing-note-gen（EMR 深化四模块，病历AI护理文书与病区管理系列）
+  ...emrAiNursingPlanRecoV14Routes, // M557-B：病历AI护理计划推荐 V14 GET/POST /api/v1/emr-ai-nursing-plan-reco（EMR 深化四模块，病历AI护理文书与病区管理系列）
+  ...emrAiNursingRiskAssessV14Routes, // M557-C：病历AI护理风险评估 V14 GET/POST /api/v1/emr-ai-nursing-risk-assess（EMR 深化四模块，病历AI护理文书与病区管理系列）
+  ...emrAiShiftReportGenV14Routes, // M557-D：病历AI病区交班报告生成 V14 GET/POST /api/v1/emr-ai-shift-report-gen（EMR 深化四模块，M557 收官，病历AI护理文书与病区管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
