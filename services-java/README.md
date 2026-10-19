@@ -15,24 +15,33 @@ services-java/
 ├── jlmedaios-registry/          # 注册中心（Eureka Server，端口 8761）
 ├── jlmedaios-gateway/          # API 网关（Spring Cloud Gateway，端口 9000）
 ├── jlmedaios-his-reg/           # 挂号微服务（端口 9101）
-└── jlmedaios-his-charge/        # 收费微服务（端口 9102）
+├── jlmedaios-his-charge/        # 收费微服务（端口 9102）
+├── jlmedaios-his-orders/        # 医嘱微服务（端口 9103）
+├── jlmedaios-his-pharmacy/      # 药房微服务（端口 9104）
+├── jlmedaios-his-empi/          # 患者主索引 EMPI（端口 9105）
+├── jlmedaios-his-ward/          # 住院床位微服务（端口 9106）
+└── jlmedaios-his-lis/           # 检验对接微服务（端口 9107，预留 HL7/FHIR）
 ```
 
 ## 端口表
 
-| 模块 | 端口 | 说明 |
-|---|---|---|
-| jlmedaios-registry | 8761 | Eureka 注册中心（单机模式） |
-| jlmedaios-gateway | 9000 | API 网关（统一入口） |
-| jlmedaios-his-reg | 9101 | 挂号微服务 |
-| jlmedaios-his-charge | 9102 | 收费微服务 |
+| 模块 | 端口 | H2 库 | 说明 |
+|---|---|---|---|
+| jlmedaios-registry | 8761 | - | Eureka 注册中心（单机模式） |
+| jlmedaios-gateway | 9000 | - | API 网关（统一入口） |
+| jlmedaios-his-reg | 9101 | hisreg | 挂号微服务 |
+| jlmedaios-his-charge | 9102 | hischarge | 收费微服务 |
+| jlmedaios-his-orders | 9103 | hisorders | 医嘱微服务 |
+| jlmedaios-his-pharmacy | 9104 | hispharmacy | 药房微服务 |
+| jlmedaios-his-empi | 9105 | hisempi | 患者主索引（EMPI） |
+| jlmedaios-his-ward | 9106 | hisward | 住院床位微服务 |
+| jlmedaios-his-lis | 9107 | hislis | 检验对接微服务（预留 HL7 v2.x / FHIR R4） |
 
 ## 启动顺序
 
 1. **registry**（8761）— 先启动注册中心
-2. **his-reg**（9101）— 挂号微服务
-3. **his-charge**（9102）— 收费微服务
-4. **gateway**（9000）— 最后启动网关
+2. **his-reg / his-charge / his-orders / his-pharmacy / his-empi / his-ward / his-lis**（9101-9107）— 各业务微服务
+3. **gateway**（9000）— 最后启动网关
 
 ## Build
 
@@ -50,19 +59,63 @@ mvn clean install -DskipTests
 cd jlmedaios-registry && mvn spring-boot:run
 cd jlmedaios-his-reg && mvn spring-boot:run
 cd jlmedaios-his-charge && mvn spring-boot:run
+cd jlmedaios-his-orders && mvn spring-boot:run
+cd jlmedaios-his-pharmacy && mvn spring-boot:run
+cd jlmedaios-his-empi && mvn spring-boot:run
+cd jlmedaios-his-ward && mvn spring-boot:run
+cd jlmedaios-his-lis && mvn spring-boot:run
 cd jlmedaios-gateway && mvn spring-boot:run
-
-# 方式二：打包后 java -jar
-java -jar jlmedaios-registry/target/jlmedaios-registry-1.0.0-SNAPSHOT.jar
-java -jar jlmedaios-his-reg/target/jlmedaios-his-reg-1.0.0-SNAPSHOT.jar
-java -jar jlmedaios-his-charge/target/jlmedaios-his-charge-1.0.0-SNAPSHOT.jar
-java -jar jlmedaios-gateway/target/jlmedaios-gateway-1.0.0-SNAPSHOT.jar
 ```
+
+## 接口清单
+
+### his-reg（挂号，9101）
+- `POST /api/his/register` — 创建挂号
+- `GET  /api/his/register/{id}` — 查询挂号
+
+### his-charge（收费，9102）
+- `POST /api/his/charge` — 创建收费
+- `GET  /api/his/charge/by-register/{registerId}` — 按挂号 ID 查收费列表
+
+### his-orders（医嘱，9103）
+- `POST /api/his/orders` — 开立医嘱
+- `GET  /api/his/orders/patient/{patientId}` — 按患者查医嘱
+- `PUT  /api/his/orders/{id}/execute` — 执行医嘱（status → EXECUTED）
+- `PUT  /api/his/orders/{id}/cancel` — 取消医嘱（status → CANCELLED）
+
+### his-pharmacy（药房，9104）
+- `GET  /api/his/pharmacy/drugs` — 全部药品
+- `POST /api/his/pharmacy/dispense` — 发药核对（body: orderId/drugCode/operator）
+- `GET  /api/his/pharmacy/stock` — 库存列表
+
+### his-empi（患者主索引，9105）
+- `POST /api/his/empi/register` — 患者建档（body: name/gender/idCard/phone）
+- `GET  /api/his/empi/{empiId}` — 按 EMPI ID 查患者
+- `GET  /api/his/empi/search?idCard=xxx` — 按身份证查患者
+
+### his-ward（住院床位，9106）
+- `GET  /api/his/ward/beds` — 全部床位
+- `POST /api/his/ward/admit` — 入住（body: bedCode/patientId）
+- `POST /api/his/ward/discharge` — 出院（body: bedCode）
+
+### his-lis（检验对接，9107）
+- `POST /api/his/lis/request` — 申请检验（body: patientId/testCode/testName）
+- `GET  /api/his/lis/result/{requestId}` — 查询检验结果
+- TODO: 对接 LIS 系统 HL7 v2.x / FHIR R4 接口
 
 ## H2 Console
 
-- his-reg：http://localhost:9101/h2-console （JDBC URL: `jdbc:h2:mem:hisreg`，用户 `sa`，密码空）
-- his-charge：http://localhost:9102/h2-console （JDBC URL: `jdbc:h2:mem:hischarge`，用户 `sa`，密码空）
+所有业务微服务均开启 H2 Console：`http://localhost:{port}/h2-console`，用户 `sa`，密码空。
+
+| 模块 | 端口 | JDBC URL |
+|---|---|---|
+| his-reg | 9101 | `jdbc:h2:mem:hisreg` |
+| his-charge | 9102 | `jdbc:h2:mem:hischarge` |
+| his-orders | 9103 | `jdbc:h2:mem:hisorders` |
+| his-pharmacy | 9104 | `jdbc:h2:mem:hispharmacy` |
+| his-empi | 9105 | `jdbc:h2:mem:hisempi` |
+| his-ward | 9106 | `jdbc:h2:mem:hisward` |
+| his-lis | 9107 | `jdbc:h2:mem:hislis` |
 
 ## 鉴权说明
 
@@ -74,63 +127,63 @@ java -jar jlmedaios-gateway/target/jlmedaios-gateway-1.0.0-SNAPSHOT.jar
 
 ## 测试 curl 示例
 
-### 1. 创建挂号记录（经网关 9000）
+### 1. 患者建档（经网关 9000）
 
 ```bash
-curl -X POST http://localhost:9000/api/his/register \
+curl -X POST http://localhost:9000/api/his/empi/register \
+  -H "Content-Type: application/json" \
+  -H "X-Auth-Token: test-token" \
+  -d '{"name":"张三","gender":"男","idCard":"330100199001011234","phone":"13800000000"}'
+```
+
+### 2. 开立医嘱
+
+```bash
+curl -X POST http://localhost:9000/api/his/orders \
   -H "Content-Type: application/json" \
   -H "X-Auth-Token: test-token" \
   -d '{
-    "patientName": "张三",
-    "deptCode": "INTERNAL",
-    "doctorName": "李医生",
-    "appointmentDate": "2026-10-20"
+    "patientId": 1,
+    "orderType": "MEDICATION",
+    "content": "阿莫西林胶囊 0.5g tid",
+    "doctorName": "李医生"
   }'
 ```
 
-### 2. 查询挂号记录
+### 3. 执行医嘱
 
 ```bash
-curl http://localhost:9000/api/his/register/1 \
+curl -X PUT http://localhost:9000/api/his/orders/1/execute \
   -H "X-Auth-Token: test-token"
 ```
 
-### 3. 创建收费记录
+### 4. 床位入住
 
 ```bash
-curl -X POST http://localhost:9000/api/his/charge \
+curl -X POST http://localhost:9000/api/his/ward/admit \
+  -H "Content-Type: application/json" \
+  -H "X-Auth-Token: test-token" \
+  -d '{"bedCode":"A01-1","patientId":1}'
+```
+
+### 5. 申请检验
+
+```bash
+curl -X POST http://localhost:9000/api/his/lis/request \
   -H "Content-Type: application/json" \
   -H "X-Auth-Token: test-token" \
   -d '{
-    "registerId": 1,
-    "itemName": "门诊诊查费",
-    "amount": 50.00
+    "patientId": 1,
+    "testCode": "CBC",
+    "testName": "血常规"
   }'
 ```
 
-### 4. 按挂号 ID 查询收费列表
+### 6. 不带 token（应返回 401）
 
 ```bash
-curl http://localhost:9000/api/his/charge/by-register/1 \
-  -H "X-Auth-Token: test-token"
-```
-
-### 5. 不带 token（应返回 401）
-
-```bash
-curl http://localhost:9000/api/his/register/1
+curl http://localhost:9000/api/his/orders
 # → {"code":401,"message":"缺少 X-Auth-Token 请求头","data":null}
-```
-
-## 直接访问微服务（绕过网关，调试用）
-
-```bash
-# 直接调 his-reg（9101，无需 token）
-curl -X POST http://localhost:9101/api/his/register \
-  -H "Content-Type: application/json" \
-  -d '{"patientName":"李四","deptCode":"SURGERY","doctorName":"王医生","appointmentDate":"2026-10-21"}'
-
-curl http://localhost:9101/api/his/register/1
 ```
 
 ## 健康检查
@@ -139,4 +192,9 @@ curl http://localhost:9101/api/his/register/1
 curl http://localhost:9000/actuator/health
 curl http://localhost:9101/actuator/health
 curl http://localhost:9102/actuator/health
+curl http://localhost:9103/actuator/health
+curl http://localhost:9104/actuator/health
+curl http://localhost:9105/actuator/health
+curl http://localhost:9106/actuator/health
+curl http://localhost:9107/actuator/health
 ```

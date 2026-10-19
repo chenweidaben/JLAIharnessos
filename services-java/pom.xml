@@ -23,6 +23,11 @@
         <module>jlmedaios-gateway</module>
         <module>jlmedaios-his-reg</module>
         <module>jlmedaios-his-charge</module>
+        <module>jlmedaios-his-orders</module>
+        <module>jlmedaios-his-pharmacy</module>
+        <module>jlmedaios-his-empi</module>
+        <module>jlmedaios-his-ward</module>
+        <module>jlmedaios-his-lis</module>
     </modules>
 
     <properties>
