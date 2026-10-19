@@ -14,6 +14,12 @@
  */
 
 import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
+import {
+  type HumanTaskRecord,
+} from '@/db/repositories/humanTaskRepo';
+import {
+  type WorkflowInstanceRecord,
+} from '@/db/repositories/agentRuntimeRepo';
 import { buildAuthView, type AuthView } from '../view/userView';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
@@ -28,6 +34,72 @@ import {
   claimMyHumanTask,
   resolveMyHumanTask,
 } from '../aggregators/agentRuntimeAggregator';
+
+// ============================================================================
+// v5.0试点扩展（M183-B）：DEMO_MODE 演示兜底
+// ----------------------------------------------------------------------------
+// 演示模式（DEMO_MODE=1/true）下无 PostgreSQL，聚合器会触发 DB 连接错误并被
+// 本路由自身的 try/catch 转为 500（全局 demo 降级中间件因此看不到该异常）。
+// 这里在进入聚合器之前显式返回结构化默认值：列表返回 []，单对象返回字段
+// 完整的演示占位对象，保证 /agent-runtime 页面不再出现红色 500 报错。
+// 版权所有（c）2026 杭州健澜科技有限公司
+// ============================================================================
+
+/** 是否演示模式（DEMO_MODE=1 / true） */
+const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+/** v5.0试点扩展：构造一条演示运行实例（字段与 WorkflowInstanceRecord 对齐） */
+function demoInstance(overrides: Partial<WorkflowInstanceRecord> = {}): WorkflowInstanceRecord {
+  const now = new Date().toISOString();
+  return {
+    id: 'demo-instance-0001',
+    instanceNo: 'INST-DEMO-0001',
+    agentId: 'demo-agent',
+    agentVersion: '1.0.0',
+    workflowId: 'main',
+    state: 'completed',
+    triggerType: 'manual',
+    traceId: 'demo-trace-0001',
+    input: {},
+    output: { demo: true, note: '（演示）DEMO_MODE 占位结果，未连接数据库，不能替代真实执行' },
+    contextVars: {},
+    errorCode: null,
+    errorMessage: null,
+    actorId: 'demo-admin',
+    patientRef: null,
+    tokensIn: 0,
+    tokensOut: 0,
+    startedAt: now,
+    finishedAt: now,
+    durationMs: 0,
+    ...overrides,
+  };
+}
+
+/** v5.0试点扩展：构造一条演示人工工单（字段与 HumanTaskRecord 对齐） */
+function demoTask(overrides: Partial<HumanTaskRecord> = {}): HumanTaskRecord {
+  const now = new Date().toISOString();
+  return {
+    id: 'demo-task-0001',
+    taskNo: 'TASK-DEMO-0001',
+    instanceId: 'demo-instance-0001',
+    nodeId: 'human_review',
+    title: '（演示）人工复核工单',
+    instructions: '（演示）DEMO_MODE 占位工单，未连接数据库',
+    assigneeRoles: ['admin'],
+    assigneeUsers: [],
+    formSchema: {},
+    reviewData: null,
+    status: 'pending',
+    resolution: null,
+    claimedBy: null,
+    resolvedBy: null,
+    dueAt: null,
+    createdAt: now,
+    resolvedAt: null,
+    ...overrides,
+  };
+}
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -64,6 +136,10 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回占位实例，不触发真实执行与落库
+      if (isDemoMode) {
+        return json(ok({ instance: demoInstance({ agentId: c.params.agentId }), nodes: [] }));
+      }
       try {
         const body = await c.body<{
           version?: string;
@@ -86,6 +162,8 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下实例列表返回空数组
+      if (isDemoMode) return json(ok([]));
       try {
         const url = new URL(c.req.url);
         const agentId = url.searchParams.get('agentId') ?? undefined;
@@ -106,6 +184,13 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回占位实例详情（不抛 404/500）
+      if (isDemoMode) {
+        return json(ok({
+          instance: demoInstance({ id: c.params.instanceId, instanceNo: `INST-${c.params.instanceId}` }),
+          nodes: [],
+        }));
+      }
       try {
         return json(ok(await getAgentRun(view, c.params.instanceId)));
       } catch (err) {
@@ -122,6 +207,20 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回已取消占位实例
+      if (isDemoMode) {
+        return json(ok({
+          instance: demoInstance({
+            id: c.params.instanceId,
+            instanceNo: `INST-${c.params.instanceId}`,
+            state: 'cancelled',
+            finishedAt: new Date().toISOString(),
+            errorCode: 'CANCELLED',
+            errorMessage: '（演示）DEMO_MODE 占位取消，未连接数据库',
+          }),
+          nodes: [],
+        }));
+      }
       try {
         const body = await c.body<{ reason?: string }>();
         return json(ok(await cancelAgentRun(view, c.params.instanceId, body?.reason)));
@@ -139,6 +238,8 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下工单列表返回空数组
+      if (isDemoMode) return json(ok([]));
       try {
         const url = new URL(c.req.url);
         const status = url.searchParams.get('status') ?? 'pending';
@@ -158,6 +259,10 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回占位工单详情（不抛 404/500）
+      if (isDemoMode) {
+        return json(ok({ task: demoTask({ id: c.params.taskId, taskNo: `TASK-${c.params.taskId}` }), instance: null }));
+      }
       try {
         return json(ok(await getHumanTask(view, c.params.taskId)));
       } catch (err) {
@@ -174,6 +279,13 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回已认领占位工单
+      if (isDemoMode) {
+        return json(ok({
+          task: demoTask({ id: c.params.taskId, taskNo: `TASK-${c.params.taskId}`, status: 'claimed', claimedBy: 'demo-admin' }),
+          instance: null,
+        }));
+      }
       try {
         return json(ok(await claimMyHumanTask(view, c.params.taskId)));
       } catch (err) {
@@ -190,6 +302,21 @@ export const agentRuntimeRoutes: RouteDef[] = [
       if (denied) return denied;
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
+      // v5.0试点扩展：DEMO_MODE 下返回已处理占位工单
+      if (isDemoMode) {
+        const now = new Date().toISOString();
+        return json(ok({
+          task: demoTask({
+            id: c.params.taskId,
+            taskNo: `TASK-${c.params.taskId}`,
+            status: 'resolved',
+            resolution: { approved: true, comment: '（演示）DEMO_MODE 占位审批，未连接数据库' },
+            resolvedBy: 'demo-admin',
+            resolvedAt: now,
+          }),
+          instance: null,
+        }));
+      }
       try {
         const body = await c.body<{ approved: boolean; comment?: string; formData?: Record<string, unknown> }>();
         const approved = body?.approved;
