@@ -83,4 +83,37 @@ public class InfectionControlController {
                 .map(Result::ok)
                 .orElseGet(() -> Result.ok(null));
     }
+
+    /**
+     * 开始调查。
+     *
+     * @param id 院感病例 ID
+     * @return Result<InfectionCase>
+     */
+    @PutMapping("/{id}/investigate")
+    public Result<InfectionCase> investigate(@PathVariable Long id) {
+        return infectionControlService.investigate(id)
+                .map(Result::ok)
+                .orElseGet(() -> Result.ok(null));
+    }
+
+    /**
+     * 待处理列表。
+     *
+     * @return Result<List<InfectionCase>>
+     */
+    @GetMapping("/pending")
+    public Result<List<InfectionCase>> pendingList() {
+        return Result.ok(infectionControlService.pendingList());
+    }
+
+    /**
+     * 院感统计（mock）。
+     *
+     * @return Result<Map<String, Object>>
+     */
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> stats() {
+        return Result.ok(infectionControlService.stats());
+    }
 }

@@ -86,4 +86,40 @@ public class ComplaintController {
     public Result<List<Complaint>> pendingList() {
         return Result.ok(complaintService.pendingList());
     }
+
+    /**
+     * 投诉上报。
+     *
+     * @param body {complaintNo, complainantName, complainantPhone, patientId, department, complaintType, description}
+     * @return Result<Complaint>
+     */
+    @PostMapping("/report")
+    public Result<Complaint> report(@RequestBody Map<String, Object> body) {
+        Complaint complaint = complaintService.report(
+                String.valueOf(body.get("complaintNo")),
+                String.valueOf(body.get("complainantName")),
+                String.valueOf(body.get("complainantPhone")),
+                Long.valueOf(String.valueOf(body.get("patientId"))),
+                String.valueOf(body.get("department")),
+                String.valueOf(body.get("complaintType")),
+                String.valueOf(body.get("description"))
+        );
+        return Result.ok(complaint);
+    }
+
+    /**
+     * 处理投诉。
+     *
+     * @param id   投诉 ID
+     * @param body {handlerId, handleResult}
+     * @return Result<Complaint>
+     */
+    @PutMapping("/{id}/handle")
+    public Result<Complaint> handle(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        return complaintService.handle(
+                id,
+                String.valueOf(body.get("handlerId")),
+                String.valueOf(body.get("handleResult"))
+        ).map(Result::ok).orElseGet(() -> Result.ok(null));
+    }
 }

@@ -20,7 +20,7 @@ import java.util.Optional;
 /**
  * 院感管理 Service。
  *
- * <p>append-only: 院感病例上报不可修改</p>
+ * <p>append-only: 院感病例上报不可修改，调查过程留痕</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -88,5 +88,49 @@ public class InfectionControlService {
             infectionCaseRepository.save(ic);
         }
         return opt;
+    }
+
+    /**
+     * 开始调查（设 status=INVESTIGATING）。
+     *
+     * @param id 院感病例 ID
+     * @return 已更新的院感病例
+     */
+    public Optional<InfectionCase> investigate(Long id) {
+        Optional<InfectionCase> opt = infectionCaseRepository.findById(id);
+        if (opt.isPresent()) {
+            InfectionCase ic = opt.get();
+            ic.setStatus("INVESTIGATING");
+            ic.setUpdatedAt(LocalDateTime.now());
+            infectionCaseRepository.save(ic);
+        }
+        return opt;
+    }
+
+    /**
+     * 待处理列表（status=REPORTED）。
+     *
+     * @return 院感病例列表
+     */
+    public List<InfectionCase> pendingList() {
+        return infectionCaseRepository.findByStatus("REPORTED");
+    }
+
+    /**
+     * 院感统计（按科室/类型，mock）。
+     *
+     * @return 统计数据
+     */
+    public Map<String, Object> stats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("byDepartment", List.of(
+                Map.of("dept", "ICU", "count", 5),
+                Map.of("dept", "呼吸科", "count", 3)
+        ));
+        stats.put("byType", List.of(
+                Map.of("type", "呼吸机相关肺炎", "count", 4),
+                Map.of("type", "导管相关血流感染", "count", 2)
+        ));
+        return stats;
     }
 }

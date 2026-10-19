@@ -97,4 +97,51 @@ public class ComplaintService {
     public List<Complaint> pendingList() {
         return complaintRepository.findByStatus("PENDING");
     }
+
+    /**
+     * 投诉上报（别名，与 receive 等价）。
+     *
+     * @param complaintNo     投诉编号
+     * @param complainantName  投诉人姓名
+     * @param complainantPhone 投诉人电话
+     * @param patientId        患者 ID
+     * @param department       科室
+     * @param complaintType    投诉类型
+     * @param description      投诉描述
+     * @return 已持久化的投诉
+     */
+    public Complaint report(String complaintNo, String complainantName, String complainantPhone,
+                            Long patientId, String department, String complaintType,
+                            String description) {
+        Complaint complaint = Complaint.builder()
+                .complaintNo(complaintNo)
+                .patientName(complainantName)
+                .deptCode(department)
+                .complaintType(complaintType)
+                .description(description)
+                .receivedDate(LocalDate.now())
+                .build();
+        return complaintRepository.save(complaint);
+    }
+
+    /**
+     * 处理投诉（设 status=RESOLVED，与 resolve 等价）。
+     *
+     * @param id           投诉 ID
+     * @param handlerId    处理人工号
+     * @param handleResult 处理结果
+     * @return 已更新的投诉
+     */
+    public Optional<Complaint> handle(Long id, String handlerId, String handleResult) {
+        Optional<Complaint> opt = complaintRepository.findById(id);
+        if (opt.isPresent()) {
+            Complaint complaint = opt.get();
+            complaint.setHandlerId(handlerId);
+            complaint.setStatus("RESOLVED");
+            complaint.setResolution(handleResult);
+            complaint.setUpdatedAt(LocalDateTime.now());
+            complaintRepository.save(complaint);
+        }
+        return opt;
+    }
 }

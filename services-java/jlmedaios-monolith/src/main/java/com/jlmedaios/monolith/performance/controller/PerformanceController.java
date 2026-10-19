@@ -6,6 +6,8 @@
 package com.jlmedaios.monolith.performance.controller;
 
 import com.jlmedaios.monolith.common.Result;
+import com.jlmedaios.monolith.performance.entity.PerformanceIndicator;
+import com.jlmedaios.monolith.performance.entity.PerformanceResult;
 import com.jlmedaios.monolith.performance.entity.PerformanceScore;
 import com.jlmedaios.monolith.performance.service.PerformanceService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -69,5 +72,41 @@ public class PerformanceController {
     @GetMapping("/staff/{staffId}/history")
     public Result<List<PerformanceScore>> staffHistory(@PathVariable String staffId) {
         return Result.ok(performanceService.staffHistory(staffId));
+    }
+
+    /**
+     * 全部考核指标。
+     *
+     * @return Result<List<PerformanceIndicator>>
+     */
+    @GetMapping("/indicators")
+    public Result<List<PerformanceIndicator>> allIndicators() {
+        return Result.ok(performanceService.allIndicators());
+    }
+
+    /**
+     * 生成考核结果。
+     *
+     * @param body {departmentCode, period}
+     * @return Result<PerformanceResult>
+     */
+    @PostMapping("/evaluate")
+    public Result<PerformanceResult> evaluate(@RequestBody Map<String, Object> body) {
+        PerformanceResult result = performanceService.evaluate(
+                String.valueOf(body.get("departmentCode")),
+                String.valueOf(body.get("period"))
+        );
+        return Result.ok(result);
+    }
+
+    /**
+     * 科室排名。
+     *
+     * @param period 周期
+     * @return Result<List<PerformanceResult>>
+     */
+    @GetMapping("/ranking")
+    public Result<List<PerformanceResult>> ranking(@RequestParam String period) {
+        return Result.ok(performanceService.ranking(period));
     }
 }
