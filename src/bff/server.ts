@@ -3385,6 +3385,14 @@ import { emrAiDiagnosisDiffV14Routes } from './routes/emrAiDiagnosisDiffV14';
 import { emrAiDrugInteractionV14Routes } from './routes/emrAiDrugInteractionV14';
 // M550-D：病历AI检验解读明细 V14 GET/POST /api/v1/emr-ai-lab-interpret-detail（EMR 深化四模块，M550 收官，-detail 后缀避让 M545-D emrAiLabInterpretV14）
 import { emrAiLabInterpretDetailV14Routes } from './routes/emrAiLabInterpretDetailV14';
+// M551-A：病历AI首页质控检查 V14 GET/POST /api/v1/emr-ai-frontpage-qc-check（EMR 深化四模块，病历AI病案首页与编码辅助系列，-check 后缀避让 M544-C emrAiFrontpageQcV14）
+import { emrAiFrontpageQcCheckV14Routes } from './routes/emrAiFrontpageQcCheckV14';
+// M551-B：病历AI ICD 编码推荐 V14 GET/POST /api/v1/emr-ai-icd-reco（EMR 深化四模块，病历AI病案首页与编码辅助系列）
+import { emrAiIcdRecoV14Routes } from './routes/emrAiIcdRecoV14';
+// M551-C：病历AI手术编码推荐 V14 GET/POST /api/v1/emr-ai-surgery-code-reco（EMR 深化四模块，病历AI病案首页与编码辅助系列）
+import { emrAiSurgeryCodeRecoV14Routes } from './routes/emrAiSurgeryCodeRecoV14';
+// M551-D：病历AI归档校验 V14 GET/POST /api/v1/emr-ai-archive-check（EMR 深化四模块，M551 收官，病历AI病案首页与编码辅助系列）
+import { emrAiArchiveCheckV14Routes } from './routes/emrAiArchiveCheckV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5320,6 +5328,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiDiagnosisDiffV14Routes, // M550-B：病历AI鉴别诊断支持 V14 GET/POST /api/v1/emr-ai-diagnosis-diff（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
   ...emrAiDrugInteractionV14Routes, // M550-C：病历AI用药相互作用审查 V14 GET/POST /api/v1/emr-ai-drug-interaction（EMR 深化四模块，病历AI知识图谱与临床决策支持系列）
   ...emrAiLabInterpretDetailV14Routes, // M550-D：病历AI检验解读明细 V14 GET/POST /api/v1/emr-ai-lab-interpret-detail（EMR 深化四模块，M550 收官，-detail 后缀避让 M545-D emrAiLabInterpretV14）
+  ...emrAiFrontpageQcCheckV14Routes, // M551-A：病历AI首页质控检查 V14 GET/POST /api/v1/emr-ai-frontpage-qc-check（EMR 深化四模块，病历AI病案首页与编码辅助系列，-check 后缀避让 M544-C emrAiFrontpageQcV14）
+  ...emrAiIcdRecoV14Routes, // M551-B：病历AI ICD 编码推荐 V14 GET/POST /api/v1/emr-ai-icd-reco（EMR 深化四模块，病历AI病案首页与编码辅助系列）
+  ...emrAiSurgeryCodeRecoV14Routes, // M551-C：病历AI手术编码推荐 V14 GET/POST /api/v1/emr-ai-surgery-code-reco（EMR 深化四模块，病历AI病案首页与编码辅助系列）
+  ...emrAiArchiveCheckV14Routes, // M551-D：病历AI归档校验 V14 GET/POST /api/v1/emr-ai-archive-check（EMR 深化四模块，M551 收官，病历AI病案首页与编码辅助系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

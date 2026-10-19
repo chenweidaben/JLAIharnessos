@@ -3205,6 +3205,14 @@ const EmrAiDiagnosisDiffPage = lazy(() => import('@/pages/emr-ai-diagnosis-diff'
 const EmrAiDrugInteractionPage = lazy(() => import('@/pages/emr-ai-drug-interaction'));
 // M550-D：病历AI检验解读明细 V14（EMR 深化四模块，M550 收官，-detail 后缀避让）
 const EmrAiLabInterpretDetailPage = lazy(() => import('@/pages/emr-ai-lab-interpret-detail'));
+// M551-A：病历AI首页质控检查 V14（EMR 深化四模块，-check 后缀避让）
+const EmrAiFrontpageQcCheckPage = lazy(() => import('@/pages/emr-ai-frontpage-qc-check'));
+// M551-B：病历AI ICD 编码推荐 V14（EMR 深化四模块）
+const EmrAiIcdRecoPage = lazy(() => import('@/pages/emr-ai-icd-reco'));
+// M551-C：病历AI手术编码推荐 V14（EMR 深化四模块）
+const EmrAiSurgeryCodeRecoPage = lazy(() => import('@/pages/emr-ai-surgery-code-reco'));
+// M551-D：病历AI归档校验 V14（EMR 深化四模块，M551 收官）
+const EmrAiArchiveCheckPage = lazy(() => import('@/pages/emr-ai-archive-check'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6351,6 +6359,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-drug-interaction" element={<EmrAiDrugInteractionPage />} />
           {/* M550-D：病历AI检验解读明细 V14（EMR 深化四模块，M550 收官，-detail 后缀避让） */}
           <Route path="emr-ai-lab-interpret-detail" element={<EmrAiLabInterpretDetailPage />} />
+          {/* M551-A：病历AI首页质控检查 V14（EMR 深化四模块，-check 后缀避让） */}
+          <Route path="emr-ai-frontpage-qc-check" element={<EmrAiFrontpageQcCheckPage />} />
+          {/* M551-B：病历AI ICD 编码推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-icd-reco" element={<EmrAiIcdRecoPage />} />
+          {/* M551-C：病历AI手术编码推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-surgery-code-reco" element={<EmrAiSurgeryCodeRecoPage />} />
+          {/* M551-D：病历AI归档校验 V14（EMR 深化四模块，M551 收官） */}
+          <Route path="emr-ai-archive-check" element={<EmrAiArchiveCheckPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
