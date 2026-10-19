@@ -3473,6 +3473,14 @@ import { emrAiLabApplyAuditV14Routes } from './routes/emrAiLabApplyAuditV14';
 import { emrAiExamReportSummaryV14Routes } from './routes/emrAiExamReportSummaryV14';
 // M561-D：病历AI检验危急值智能提醒 V14 GET/POST /api/v1/emr-ai-lab-critical-alert（EMR 深化四模块，M561 收官，病历AI医技检查与检验管理系列）
 import { emrAiLabCriticalAlertV14Routes } from './routes/emrAiLabCriticalAlertV14';
+// M562-A：病历AI术前风险评估 V14 GET/POST /api/v1/emr-ai-preop-risk-assess（EMR 深化四模块，病历AI手术与麻醉管理系列）
+import { emrAiPreopRiskAssessV14Routes } from './routes/emrAiPreopRiskAssessV14';
+// M562-B：病历AI手术方案推荐 V14 GET/POST /api/v1/emr-ai-surgery-plan-reco（EMR 深化四模块，病历AI手术与麻醉管理系列）
+import { emrAiSurgeryPlanRecoV14Routes } from './routes/emrAiSurgeryPlanRecoV14';
+// M562-C：病历AI麻醉深度监测建议 V14 GET/POST /api/v1/emr-ai-anesthesia-depth-suggest（EMR 深化四模块，病历AI手术与麻醉管理系列）
+import { emrAiAnesthesiaDepthSuggestV14Routes } from './routes/emrAiAnesthesiaDepthSuggestV14';
+// M562-D：病历AI术后镇痛方案推荐 V14 GET/POST /api/v1/emr-ai-postop-analgesia-reco（EMR 深化四模块，M562 收官，病历AI手术与麻醉管理系列）
+import { emrAiPostopAnalgesiaRecoV14Routes } from './routes/emrAiPostopAnalgesiaRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5452,6 +5460,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiLabApplyAuditV14Routes, // M561-B：病历AI检验申请合理性审查 V14 GET/POST /api/v1/emr-ai-lab-apply-audit（EMR 深化四模块，病历AI医技检查与检验管理系列）
   ...emrAiExamReportSummaryV14Routes, // M561-C：病历AI检查报告AI解读摘要 V14 GET/POST /api/v1/emr-ai-exam-report-summary（EMR 深化四模块，病历AI医技检查与检验管理系列）
   ...emrAiLabCriticalAlertV14Routes, // M561-D：病历AI检验危急值智能提醒 V14 GET/POST /api/v1/emr-ai-lab-critical-alert（EMR 深化四模块，M561 收官，病历AI医技检查与检验管理系列）
+  ...emrAiPreopRiskAssessV14Routes, // M562-A：病历AI术前风险评估 V14 GET/POST /api/v1/emr-ai-preop-risk-assess（EMR 深化四模块，病历AI手术与麻醉管理系列）
+  ...emrAiSurgeryPlanRecoV14Routes, // M562-B：病历AI手术方案推荐 V14 GET/POST /api/v1/emr-ai-surgery-plan-reco（EMR 深化四模块，病历AI手术与麻醉管理系列）
+  ...emrAiAnesthesiaDepthSuggestV14Routes, // M562-C：病历AI麻醉深度监测建议 V14 GET/POST /api/v1/emr-ai-anesthesia-depth-suggest（EMR 深化四模块，病历AI手术与麻醉管理系列）
+  ...emrAiPostopAnalgesiaRecoV14Routes, // M562-D：病历AI术后镇痛方案推荐 V14 GET/POST /api/v1/emr-ai-postop-analgesia-reco（EMR 深化四模块，M562 收官，病历AI手术与麻醉管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
