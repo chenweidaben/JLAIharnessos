@@ -9,7 +9,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases
+from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction
 from app.core.api_key_auth import API_KEYS, check_rate_limit
 from app.core.audit_middleware import AuditMiddleware
 
@@ -61,6 +61,11 @@ app.include_router(ai_cds.router)
 # 诊疗沉淀学习闭环
 app.include_router(ai_learning.router)
 app.include_router(ai_similar_cases.router)
+
+# AI 原生核心服务：病历NLP/影像AI/预后预测
+app.include_router(nlp_extract.router)
+app.include_router(imaging_ai.router)
+app.include_router(prediction.router)
 
 
 @app.on_event("startup")
