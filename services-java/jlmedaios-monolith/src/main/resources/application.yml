@@ -27,6 +27,8 @@ spring:
   # Flyway 迁移（H2 阶段关闭，生产 PostgreSQL 开启）
   flyway:
     enabled: false
+  jackson:
+    time-zone: Asia/Shanghai
 
 # 生产环境切换 PostgreSQL 16:
 #   spring.datasource.url=jdbc:postgresql://localhost:5432/monolith
@@ -43,4 +45,9 @@ management:
     web:
       exposure:
         # 生产环境接 Prometheus + Grafana 监控
-        include: health,info,prometheus
+        include: health,info,prometheus,metrics,env
+
+logging:
+  level:
+    root: INFO
+    com.jlmedaios: DEBUG
