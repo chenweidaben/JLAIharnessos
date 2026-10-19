@@ -3481,6 +3481,14 @@ import { emrAiSurgeryPlanRecoV14Routes } from './routes/emrAiSurgeryPlanRecoV14'
 import { emrAiAnesthesiaDepthSuggestV14Routes } from './routes/emrAiAnesthesiaDepthSuggestV14';
 // M562-D：病历AI术后镇痛方案推荐 V14 GET/POST /api/v1/emr-ai-postop-analgesia-reco（EMR 深化四模块，M562 收官，病历AI手术与麻醉管理系列）
 import { emrAiPostopAnalgesiaRecoV14Routes } from './routes/emrAiPostopAnalgesiaRecoV14';
+// M563-A：病历AI康复评估推荐 V14 GET/POST /api/v1/emr-ai-rehab-assess-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+import { emrAiRehabAssessRecoV14Routes } from './routes/emrAiRehabAssessRecoV14';
+// M563-B：病历AI康复训练方案推荐 V14 GET/POST /api/v1/emr-ai-rehab-plan-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+import { emrAiRehabPlanRecoV14Routes } from './routes/emrAiRehabPlanRecoV14';
+// M563-C：病历AI出院随访计划推荐 V14 GET/POST /api/v1/emr-ai-discharge-followup-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+import { emrAiDischargeFollowupRecoV14Routes } from './routes/emrAiDischargeFollowupRecoV14';
+// M563-D：病历AI慢病管理计划推荐 V14 GET/POST /api/v1/emr-ai-chronic-care-plan-reco（EMR 深化四模块，M563 收官，病历AI康复与随访管理系列）
+import { emrAiChronicCarePlanRecoV14Routes } from './routes/emrAiChronicCarePlanRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5464,6 +5472,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiSurgeryPlanRecoV14Routes, // M562-B：病历AI手术方案推荐 V14 GET/POST /api/v1/emr-ai-surgery-plan-reco（EMR 深化四模块，病历AI手术与麻醉管理系列）
   ...emrAiAnesthesiaDepthSuggestV14Routes, // M562-C：病历AI麻醉深度监测建议 V14 GET/POST /api/v1/emr-ai-anesthesia-depth-suggest（EMR 深化四模块，病历AI手术与麻醉管理系列）
   ...emrAiPostopAnalgesiaRecoV14Routes, // M562-D：病历AI术后镇痛方案推荐 V14 GET/POST /api/v1/emr-ai-postop-analgesia-reco（EMR 深化四模块，M562 收官，病历AI手术与麻醉管理系列）
+  ...emrAiRehabAssessRecoV14Routes, // M563-A：病历AI康复评估推荐 V14 GET/POST /api/v1/emr-ai-rehab-assess-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+  ...emrAiRehabPlanRecoV14Routes, // M563-B：病历AI康复训练方案推荐 V14 GET/POST /api/v1/emr-ai-rehab-plan-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+  ...emrAiDischargeFollowupRecoV14Routes, // M563-C：病历AI出院随访计划推荐 V14 GET/POST /api/v1/emr-ai-discharge-followup-reco（EMR 深化四模块，病历AI康复与随访管理系列）
+  ...emrAiChronicCarePlanRecoV14Routes, // M563-D：病历AI慢病管理计划推荐 V14 GET/POST /api/v1/emr-ai-chronic-care-plan-reco（EMR 深化四模块，M563 收官，病历AI康复与随访管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

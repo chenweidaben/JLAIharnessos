@@ -3301,6 +3301,14 @@ const EmrAiSurgeryPlanRecoPage = lazy(() => import('@/pages/emr-ai-surgery-plan-
 const EmrAiAnesthesiaDepthSuggestPage = lazy(() => import('@/pages/emr-ai-anesthesia-depth-suggest'));
 // M562-D：病历AI术后镇痛方案推荐 V14（EMR 深化四模块，M562 收官）
 const EmrAiPostopAnalgesiaRecoPage = lazy(() => import('@/pages/emr-ai-postop-analgesia-reco'));
+// M563-A：病历AI康复评估推荐 V14（EMR 深化四模块）
+const EmrAiRehabAssessRecoPage = lazy(() => import('@/pages/emr-ai-rehab-assess-reco'));
+// M563-B：病历AI康复训练方案推荐 V14（EMR 深化四模块）
+const EmrAiRehabPlanRecoPage = lazy(() => import('@/pages/emr-ai-rehab-plan-reco'));
+// M563-C：病历AI出院随访计划推荐 V14（EMR 深化四模块）
+const EmrAiDischargeFollowupRecoPage = lazy(() => import('@/pages/emr-ai-discharge-followup-reco'));
+// M563-D：病历AI慢病管理计划推荐 V14（EMR 深化四模块，M563 收官）
+const EmrAiChronicCarePlanRecoPage = lazy(() => import('@/pages/emr-ai-chronic-care-plan-reco'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6543,6 +6551,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-anesthesia-depth-suggest" element={<EmrAiAnesthesiaDepthSuggestPage />} />
           {/* M562-D：病历AI术后镇痛方案推荐 V14（EMR 深化四模块，M562 收官） */}
           <Route path="emr-ai-postop-analgesia-reco" element={<EmrAiPostopAnalgesiaRecoPage />} />
+          {/* M563-A：病历AI康复评估推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-rehab-assess-reco" element={<EmrAiRehabAssessRecoPage />} />
+          {/* M563-B：病历AI康复训练方案推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-rehab-plan-reco" element={<EmrAiRehabPlanRecoPage />} />
+          {/* M563-C：病历AI出院随访计划推荐 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-discharge-followup-reco" element={<EmrAiDischargeFollowupRecoPage />} />
+          {/* M563-D：病历AI慢病管理计划推荐 V14（EMR 深化四模块，M563 收官） */}
+          <Route path="emr-ai-chronic-care-plan-reco" element={<EmrAiChronicCarePlanRecoPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
