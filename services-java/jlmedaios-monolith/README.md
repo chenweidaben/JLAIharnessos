@@ -52,6 +52,19 @@ docker compose up -d
 | `com.jlmedaios.monolith.lis` | 检验对接 | LIS 申请/结果（预留 HL7/FHIR） |
 | `com.jlmedaios.monolith.nursing` | 护理执行 | 护理医嘱开立/执行 |
 | `com.jlmedaios.monolith.discharge` | 出院结算 | 出院申请/结算 |
+| `com.jlmedaios.monolith.encounter` | 诊疗沉淀 | 诊疗记录归档（append-only） |
+| `com.jlmedaios.monolith.surgery` | 手术麻醉 | 手术排程/三方核对 |
+| `com.jlmedaios.monolith.transfusion` | 输血管理 | 输血申请/八项核对 |
+| `com.jlmedaios.monolith.antibiotic` | 抗菌药物 | 分级管理/药师审核 |
+| `com.jlmedaios.monolith.emr` | 电子病历 | 病历创建/CA 签名/hash 链校验 |
+| `com.jlmedaios.monolith.critical` | 危急值 | 危急值报告/接收/处置闭环 |
+| `com.jlmedaios.monolith.followup` | 院后随访 | 随访计划/满意度评分 |
+| `com.jlmedaios.monolith.quality` | 医疗质量 | 质量指标录入/评级/汇总 |
+| `com.jlmedaios.monolith.admin` | 医务行政 | 人员档案/职称变更 |
+| `com.jlmedaios.monolith.opdashboard` | 运营看板 | 日 KPI 导入/趋势 |
+| `com.jlmedaios.monolith.nursing_record` | 护理文书 | 体温单/护理记录/交班报告 |
+| `com.jlmedaios.monolith.clinical_pathway` | 临床路径 | 入径/推进/变异/退出 |
+| `com.jlmedaios.monolith.insurance` | 医保 DRG/DIP | 结算申报/分组/汇总 |
 
 ## 合规红线
 

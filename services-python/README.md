@@ -7,6 +7,21 @@
 本服务是健澜科技智慧医疗平台的 AI 能力层，基于 FastAPI 构建，对接本地 vLLM 推理引擎。
 所有 AI 调用统一走本地 vLLM，禁止任何境外大模型 API 调用。
 
+## 模块清单（10 个 router）
+
+| 路由前缀 | 文件 | 端点 |
+|---|---|---|
+| / | health.py | GET /health |
+| /nlp | nlp.py | POST /nlp/medical-correction, POST /nlp/medical-normalize |
+| /cdss | cdss.py | POST /cdss/suggest |
+| /imaging | imaging.py | POST /imaging/report |
+| /memory | encounter_memory.py | POST /memory/feedback, GET /memory/suggestions/{patientId}, POST /memory/similar-cases |
+| /ai/qc | ai_qc.py | POST /ai/qc/full-review, POST /ai/qc/dict-check |
+| /ai/triage | ai_triage.py | POST /ai/triage/symptom, POST /ai/triage/emergency |
+| /ai/cds | ai_cds.py | POST /ai/cds/drug-interaction, POST /ai/cds/dose-check, POST /ai/cds/contraindication |
+| /ai/learning | ai_learning.py | POST /ai/learning/feedback, GET /ai/learning/adoption-rate, GET /ai/learning/high-value |
+| /ai/similar | ai_similar_cases.py | POST /ai/similar/search, GET /ai/similar/outcome-predict |
+
 ## 前置要求
 
 - Python 3.11+
