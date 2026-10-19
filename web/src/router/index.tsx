@@ -3269,6 +3269,14 @@ const EmrAiPrescriptionRationalAuditPage = lazy(() => import('@/pages/emr-ai-pre
 const EmrAiOrderExecTrackPage = lazy(() => import('@/pages/emr-ai-order-exec-track'));
 // M558-D：病历AI出院带药建议 V14（EMR 深化四模块，M558 收官）
 const EmrAiDischargeMedRecoPage = lazy(() => import('@/pages/emr-ai-discharge-med-reco'));
+// M559-A：病历AI不良事件主动识别 V14（EMR 深化四模块）
+const EmrAiAdverseEventDetectPage = lazy(() => import('@/pages/emr-ai-adverse-event-detect'));
+// M559-B：病历AI用药错误预警 V14（EMR 深化四模块）
+const EmrAiMedicationErrorAlertPage = lazy(() => import('@/pages/emr-ai-medication-error-alert'));
+// M559-C：病历AI院内感染风险预警 V14（EMR 深化四模块）
+const EmrAiHaiRiskAlertPage = lazy(() => import('@/pages/emr-ai-hai-risk-alert'));
+// M559-D：病历AI患者跌倒风险评估 V14（EMR 深化四模块，M559 收官）
+const EmrAiFallRiskAssessPage = lazy(() => import('@/pages/emr-ai-fall-risk-assess'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6479,6 +6487,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-order-exec-track" element={<EmrAiOrderExecTrackPage />} />
           {/* M558-D：病历AI出院带药建议 V14（EMR 深化四模块，M558 收官） */}
           <Route path="emr-ai-discharge-med-reco" element={<EmrAiDischargeMedRecoPage />} />
+          {/* M559-A：病历AI不良事件主动识别 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-adverse-event-detect" element={<EmrAiAdverseEventDetectPage />} />
+          {/* M559-B：病历AI用药错误预警 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-medication-error-alert" element={<EmrAiMedicationErrorAlertPage />} />
+          {/* M559-C：病历AI院内感染风险预警 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-hai-risk-alert" element={<EmrAiHaiRiskAlertPage />} />
+          {/* M559-D：病历AI患者跌倒风险评估 V14（EMR 深化四模块，M559 收官） */}
+          <Route path="emr-ai-fall-risk-assess" element={<EmrAiFallRiskAssessPage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
