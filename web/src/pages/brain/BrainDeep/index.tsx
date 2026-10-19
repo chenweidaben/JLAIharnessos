@@ -255,7 +255,8 @@ export default function AIBrainDeepExpandPage() {
           </div>
         </div>
 
-        {data?.dimensions.map((d) => (
+        {/* v5.0试点扩展：空值防护 dimensions 为 null 时不白屏 */}
+        {(data?.dimensions ?? []).map((d) => (
           <div
             key={d.key}
             style={{
@@ -286,13 +287,13 @@ export default function AIBrainDeepExpandPage() {
       <div style={{ marginBottom: 14 }}>
         <Section
           title="大脑洞察（可执行动作 + 量化收益）"
-          extra={`高优先级 ${data?.highInsightCount ?? 0} 条 / 共 ${data?.insights.length ?? 0} 条`}
+          extra={`高优先级 ${data?.highInsightCount ?? 0} 条 / 共 ${data?.insights?.length ?? 0} 条`}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {(!data || data.insights.length === 0) && (
+            {(!data || (data?.insights?.length ?? 0) === 0) && (
               <div style={{ color: C.low, fontSize: 14 }}>✅ 各维度指标健康，暂无待执行洞察。</div>
             )}
-            {data?.insights.map((ins) => (
+            {(data?.insights ?? []).map((ins) => (
               <div
                 key={ins.id}
                 style={{
@@ -310,7 +311,7 @@ export default function AIBrainDeepExpandPage() {
                   <span style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{ins.title}</span>
                 </div>
                 <div style={{ color: C.dim, fontSize: 12, marginTop: 6 }}>
-                  {ins.evidence.map((e, i) => (
+                  {(ins.evidence ?? []).map((e, i) => (
                     <div key={i}>· {e}</div>
                   ))}
                 </div>
@@ -338,8 +339,9 @@ export default function AIBrainDeepExpandPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.forecasts.map((f) => {
-                    const last = f.series[f.series.length - 1];
+                  {(data?.forecasts ?? []).map((f) => {
+                    const series = f.series ?? [];
+                    const last = series[series.length - 1];
                     return (
                       <tr key={f.metric} style={{ borderTop: '1px solid rgba(30,58,138,0.4)' }}>
                         <td style={{ padding: '8px 8px', color: C.text }}>{DIM_LABEL[f.metric] ?? f.metric}</td>
@@ -361,12 +363,12 @@ export default function AIBrainDeepExpandPage() {
         </div>
 
         <div style={{ flex: '1 1 380px' }}>
-          <Section title="跨指标关联分析" extra={`|r| ≥ 0.5，共 ${data?.correlations.length ?? 0} 组`}>
+          <Section title="跨指标关联分析" extra={`|r| ≥ 0.5，共 ${data?.correlations?.length ?? 0} 组`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 380, overflow: 'auto' }}>
-              {(!data || data.correlations.length === 0) && (
+              {(!data || (data?.correlations?.length ?? 0) === 0) && (
                 <div style={{ color: C.dim, fontSize: 13 }}>窗口内无显著关联。</div>
               )}
-              {data?.correlations.map((c) => (
+              {(data?.correlations ?? []).map((c) => (
                 <div
                   key={`${c.a}-${c.b}`}
                   style={{

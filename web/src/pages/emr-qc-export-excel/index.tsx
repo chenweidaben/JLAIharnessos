@@ -48,11 +48,12 @@ export default function EmrQcExportExcelPage() {
     void fetchData();
   }, []);
 
-  const columns = config?.columns.map((col, index) => ({
+  // v5.0试点扩展：空值防护 columns 为 null 时不白屏
+  const columns = (config?.columns ?? []).map((col, index) => ({
     title: col,
     dataIndex: `col${index}`,
     key: `col${index}`,
-  })) ?? [];
+  }));
 
   const dataSource = formattedRow.length > 0
     ? [Object.fromEntries(formattedRow.map((val, i) => [`col${i}`, val]))]

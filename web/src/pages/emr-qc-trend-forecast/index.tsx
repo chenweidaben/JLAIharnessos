@@ -64,7 +64,7 @@ export default function EmrQcTrendForecastPage() {
           </Card>
         )}
         <Card headStyle={{ background: VI.mid, color: "#fff" }} title="历史缺陷数趋势">
-          {result?.history.map((h) => (
+          {(result?.history ?? []).map((h) => (
             <div key={h.month} style={{ marginBottom: 8 }}>
               <Text style={{ width: 100 }}>{h.month}</Text>
               <Progress

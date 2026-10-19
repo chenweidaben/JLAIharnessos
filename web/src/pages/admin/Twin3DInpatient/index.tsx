@@ -238,8 +238,9 @@ export default function Twin3DInpatientPage() {
     void loadFlow(scenario);
   }, [scenario, loadFlow]);
 
+  // v5.0试点扩展：空值防护 floors 为 null 时不白屏
   const currentFloor = useMemo(
-    () => twin?.floors.find((f) => f.floor === floor) ?? twin?.floors[0] ?? null,
+    () => (twin?.floors ?? []).find((f) => f.floor === floor) ?? twin?.floors?.[0] ?? null,
     [twin, floor],
   );
 

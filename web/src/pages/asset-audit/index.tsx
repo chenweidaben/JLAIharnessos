@@ -53,7 +53,7 @@ export default function AssetAuditPage() {
           <>
             <Card style={{ marginBottom: 16 }}>
               {data.needsAudit
-                ? <Tag color="orange" style={{ fontSize: 16 }}>需盘点（>90天）</Tag>
+                ? <Tag color="orange" style={{ fontSize: 16 }}>需盘点（&gt;90天）</Tag>
                 : <Tag color="green" style={{ fontSize: 16 }}>盘点周期内</Tag>}
               <div style={{ marginTop: 12 }}>{data.notice.message}</div>
             </Card>

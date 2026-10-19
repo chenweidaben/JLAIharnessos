@@ -108,6 +108,9 @@ export default function SecurityFixPage() {
 
   const sql = data?.sqlInjection;
   const xss = data?.xss;
+  // v5.0试点扩展：空值防护 findings 为 null 时不白屏
+  const sqlFindings = sql?.findings ?? [];
+  const xssFindings = xss?.findings ?? [];
 
   return (
     <Layout style={{ minHeight: '100vh', background: VI.bg }}>
@@ -190,9 +193,9 @@ export default function SecurityFixPage() {
                 <Card>
                   <Statistic
                     title="残留违规"
-                    value={(sql?.findings.length ?? 0) + (xss?.findings.length ?? 0)}
+                    value={(sqlFindings.length ?? 0) + (xssFindings.length ?? 0)}
                     valueStyle={{
-                      color: (sql?.findings.length ?? 0) + (xss?.findings.length ?? 0) === 0 ? '#3f8600' : '#cf1322',
+                      color: (sqlFindings.length ?? 0) + (xssFindings.length ?? 0) === 0 ? '#3f8600' : '#cf1322',
                     }}
                   />
                 </Card>
@@ -218,21 +221,21 @@ export default function SecurityFixPage() {
                 <Col span={6}>
                   <Statistic
                     title="${} 插值/拼接"
-                    value={sql?.findings.length ?? 0}
-                    valueStyle={{ color: (sql?.findings.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }}
+                    value={sqlFindings.length ?? 0}
+                    valueStyle={{ color: (sqlFindings.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }}
                   />
                 </Col>
               </Row>
               <Progress
                 percent={sql?.score ?? 0}
                 size="small"
-                strokeColor={(sql?.findings.length ?? 0) === 0 ? '#3f8600' : '#cf1322'}
+                strokeColor={(sqlFindings.length ?? 0) === 0 ? '#3f8600' : '#cf1322'}
               />
               <div style={{ marginTop: 8 }}>
-                {(sql?.findings.length ?? 0) === 0 ? (
+                {(sqlFindings.length ?? 0) === 0 ? (
                   <Tag color="success">全部参数化，零 ${} 插值 / 零字符串拼接</Tag>
                 ) : (
-                  <Tag color="error">仍有 {sql?.findings.length} 处 SQL 拼接违规待修复</Tag>
+                  <Tag color="error">仍有 {sqlFindings.length} 处 SQL 拼接违规待修复</Tag>
                 )}
               </div>
             </Card>
@@ -256,32 +259,32 @@ export default function SecurityFixPage() {
                 <Col span={6}>
                   <Statistic
                     title="未转义直出"
-                    value={xss?.findings.length ?? 0}
-                    valueStyle={{ color: (xss?.findings.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }}
+                    value={xssFindings.length ?? 0}
+                    valueStyle={{ color: (xssFindings.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }}
                   />
                 </Col>
               </Row>
               <Progress
                 percent={xss?.score ?? 0}
                 size="small"
-                strokeColor={(xss?.findings.length ?? 0) === 0 ? '#3f8600' : '#cf1322'}
+                strokeColor={(xssFindings.length ?? 0) === 0 ? '#3f8600' : '#cf1322'}
               />
               <div style={{ marginTop: 8 }}>
-                {(xss?.findings.length ?? 0) === 0 ? (
+                {(xssFindings.length ?? 0) === 0 ? (
                   <Tag color="success">全部输出经 escapeHtml / sanitize 转义消毒</Tag>
                 ) : (
-                  <Tag color="error">仍有 {xss?.findings.length} 处未转义直出待修复</Tag>
+                  <Tag color="error">仍有 {xssFindings.length} 处未转义直出待修复</Tag>
                 )}
               </div>
             </Card>
 
             {/* 违规清单（若有） */}
-            {(sql?.findings.length ?? 0) > 0 && (
-              <Card title={`SQL 注入违规清单（${sql?.findings.length}）`} style={{ marginBottom: 16 }}>
+            {(sqlFindings.length ?? 0) > 0 && (
+              <Card title={`SQL 注入违规清单（${sqlFindings.length}）`} style={{ marginBottom: 16 }}>
                 <Table
                   rowKey={(r: SqlInjectionFinding) => `${r.file}:${r.line}`}
                   pagination={{ pageSize: 8, size: 'small' }}
-                  dataSource={sql?.findings ?? []}
+                  dataSource={sqlFindings}
                   columns={[
                     { title: '文件', dataIndex: 'file', render: (v: string) => <Text code style={{ fontSize: 11 }}>{v}</Text> },
                     { title: '行', dataIndex: 'line', width: 60 },
@@ -296,12 +299,12 @@ export default function SecurityFixPage() {
               </Card>
             )}
 
-            {(xss?.findings.length ?? 0) > 0 && (
-              <Card title={`XSS 违规清单（${xss?.findings.length}）`} style={{ marginBottom: 16 }}>
+            {(xssFindings.length ?? 0) > 0 && (
+              <Card title={`XSS 违规清单（${xssFindings.length}）`} style={{ marginBottom: 16 }}>
                 <Table
                   rowKey={(r: XssFinding) => `${r.file}:${r.line}`}
                   pagination={{ pageSize: 8, size: 'small' }}
-                  dataSource={xss?.findings ?? []}
+                  dataSource={xssFindings}
                   columns={[
                     { title: '文件', dataIndex: 'file', render: (v: string) => <Text code style={{ fontSize: 11 }}>{v}</Text> },
                     { title: '行', dataIndex: 'line', width: 60 },

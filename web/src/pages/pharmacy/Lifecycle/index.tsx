@@ -192,7 +192,7 @@ export default function DrugLifecyclePage() {
           </Col>
           <Col span={6}>
             <Card>
-              <Statistic title="近效期预警(≤90天)" value={data?.expiringBatches.length ?? 0}
+              <Statistic title="近效期预警(≤90天)" value={data?.expiringBatches?.length ?? 0}
                 prefix={<WarningOutlined />} valueStyle={{ color: '#d46b08' }} />
             </Card>
           </Col>

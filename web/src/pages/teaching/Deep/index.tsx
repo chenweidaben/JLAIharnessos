@@ -185,8 +185,8 @@ export default function TeachingDeepPage() {
         {[
           { label: '在线课程（录播+直播）', v: typeCount('recorded') + typeCount('live'), tone: C.accent },
           { label: 'OSCE 考核场次', v: typeCount('osce'), tone: C.mid },
-          { label: '规培轮转段数', v: plan?.rotationTracks.length ?? '--', tone: C.low },
-          { label: '年度计划学分', v: plan?.creditSummary.total ?? '--', tone: '#a5b4fc' },
+          { label: '规培轮转段数', v: plan?.rotationTracks?.length ?? '--', tone: C.low },
+          { label: '年度计划学分', v: plan?.creditSummary?.total ?? '--', tone: '#a5b4fc' },
         ].map((it) => (
           <div key={it.label} style={{ background: `linear-gradient(160deg, ${C.panel} 0%, #0a1d42 100%)`, border: `1px solid ${C.panelBorder}`, borderRadius: 12, padding: '14px 22px', flex: 1, minWidth: 160 }}>
             <div style={{ color: C.dim, fontSize: 13 }}>{it.label}</div>
@@ -197,7 +197,7 @@ export default function TeachingDeepPage() {
 
       {/* 教学计划课程表 */}
       <div style={{ marginBottom: 14 }}>
-        <Section title={`年度教学计划（${plan?.courses.length ?? 0} 门）`} extra={plan?.fairnessNote}>
+        <Section title={`年度教学计划（${plan?.courses?.length ?? 0} 门）`} extra={plan?.fairnessNote}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
@@ -208,7 +208,7 @@ export default function TeachingDeepPage() {
                 </tr>
               </thead>
               <tbody>
-                {plan?.courses.map((c) => (
+                {(plan?.courses ?? []).map((c) => (
                   <tr key={c.courseId} style={{ borderTop: '1px solid rgba(30,58,138,0.4)' }}>
                     <td style={{ padding: '8px 10px', color: C.dim }}>{c.courseCode}</td>
                     <td style={{ padding: '8px 10px', color: C.text }}>{c.courseName}</td>
@@ -261,7 +261,7 @@ export default function TeachingDeepPage() {
                   </span>
                   <span style={{ color: C.dim, fontSize: 12 }}>{exam.courseName} · {exam.studentId}</span>
                 </div>
-                {exam.stations.map((s) => (
+                {(exam.stations ?? []).map((s) => (
                   <div key={s.station} style={{ marginBottom: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.dim, marginBottom: 3 }}>
                       <span>{s.station}（权重 {Math.round(s.weight * 100)}%）</span>
@@ -273,7 +273,7 @@ export default function TeachingDeepPage() {
                   </div>
                 ))}
                 <div style={{ marginTop: 10, fontSize: 12 }}>
-                  {exam.fairnessFlags.map((f, i) => (
+                  {(exam.fairnessFlags ?? []).map((f, i) => (
                     <div key={i} style={{ color: f.includes('疑似') || f.includes('不予') || f.includes('贴线') ? C.mid : C.low, marginTop: 3 }}>
                       · {f}
                     </div>
@@ -285,9 +285,9 @@ export default function TeachingDeepPage() {
         </div>
 
         <div style={{ flex: '1 1 300px' }}>
-          <Section title="规培轮转计划" extra={`${plan?.rotationTracks.length ?? 0} 段 · 每段出科考核必过`}>
+          <Section title="规培轮转计划" extra={`${plan?.rotationTracks?.length ?? 0} 段 · 每段出科考核必过`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {plan?.rotationTracks.map((r, i) => (
+              {(plan?.rotationTracks ?? []).map((r, i) => (
                 <div key={r.rotationId} style={{ display: 'flex', alignItems: 'center', gap: 10, border: `1px solid ${C.panelBorder}`, borderRadius: 10, padding: '10px 14px', background: 'rgba(6,20,46,0.5)' }}>
                   <span style={{ color: C.accent, fontWeight: 700, width: 28 }}>Q{i + 1}</span>
                   <span style={{ color: C.text, flex: 1 }}>{r.months} · 带教 {r.mentor}</span>

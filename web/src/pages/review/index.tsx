@@ -62,7 +62,7 @@ export default function ReviewPage() {
             <Row gutter={16}>
               <Col span={8}><Card><Statistic title="点评数" value={reviews.length} /></Card></Col>
               <Col span={8}><Card><Statistic title="全院合理率" value={`${ranking?.overallRate ?? 0}%`} /></Card></Col>
-              <Col span={8}><Card><Statistic title="排名第一" value={ranking?.deptRanking[0]?.dept ?? "—"} /></Card></Col>
+              <Col span={8}><Card><Statistic title="排名第一" value={ranking?.deptRanking?.[0]?.dept ?? "—"} /></Card></Col>
             </Row>
             <Card title="科室合理用药率排名" style={{ marginTop: 16 }}>
               <List

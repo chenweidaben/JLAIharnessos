@@ -246,9 +246,9 @@ export default function TeachingOnlinePage() {
             color: category === '' ? '#fff' : C.dim, border: `1px solid ${C.panelBorder}`,
           }}
         >
-          全部（{platform?.categories.reduce((s, c) => s + c.count, 0) ?? 0}）
+          全部（{(platform?.categories ?? []).reduce((s, c) => s + c.count, 0)}）
         </button>
-        {platform?.categories.map((c) => (
+        {(platform?.categories ?? []).map((c) => (
           <button
             key={c.key}
             onClick={() => pickCategory(c.key)}
@@ -264,9 +264,9 @@ export default function TeachingOnlinePage() {
       </div>
 
       {/* 课程卡片网格 */}
-      <Section title={`课程目录（${platform?.courses.length ?? 0} 门）`} extra={platform?.creditRule}>
+      <Section title={`课程目录（${platform?.courses?.length ?? 0} 门）`} extra={platform?.creditRule}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-          {platform?.courses.map((course) => (
+          {(platform?.courses ?? []).map((course) => (
             <div
               key={course.courseId}
               style={{

@@ -254,7 +254,7 @@ export default function AdminMuseAgentPage() {
               />
             </Col>
             <Col xs={24} sm={12} lg={6}>
-              <StatCard label="验证过的打法" value={String(data?.strengths.length ?? 0)} suffix="条" accent={ACCENT} />
+              <StatCard label="验证过的打法" value={String(data?.strengths?.length ?? 0)} suffix="条" accent={ACCENT} />
             </Col>
 
             {/* 四类沉淀分布 */}

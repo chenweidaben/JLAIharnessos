@@ -214,10 +214,10 @@ export default function AIBrainDeepPage() {
       {/* 概览角标 */}
       <div style={{ display: 'flex', gap: 14, marginBottom: 14, flexWrap: 'wrap' }}>
         {[
-          { label: '异常预警', v: data?.alerts.length ?? '--', tone: C.high },
+          { label: '异常预警', v: data?.alerts?.length ?? '--', tone: C.high },
           { label: '其中高严重度', v: data?.highAlertCount ?? 0, tone: C.high },
-          { label: '决策建议', v: data?.recommendations.length ?? '--', tone: C.accent },
-          { label: '根因分析项', v: data?.rootCauses.length ?? '--', tone: C.mid },
+          { label: '决策建议', v: data?.recommendations?.length ?? '--', tone: C.accent },
+          { label: '根因分析项', v: data?.rootCauses?.length ?? '--', tone: C.mid },
         ].map((it) => (
           <div
             key={it.label}
@@ -239,12 +239,12 @@ export default function AIBrainDeepPage() {
       {/* 智能预警 + 根因分析 */}
       <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 14 }}>
         <div style={{ flex: '1 1 420px' }}>
-          <Section title="智能预警（异常自动发现）" extra={`共 ${data?.alerts.length ?? 0} 条`}>
+          <Section title="智能预警（异常自动发现）" extra={`共 ${data?.alerts?.length ?? 0} 条`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 420, overflow: 'auto' }}>
-              {(!data || data.alerts.length === 0) && (
+              {(!data || (data?.alerts?.length ?? 0) === 0) && (
                 <div style={{ color: C.low, fontSize: 14 }}>✅ 各项指标平稳，未发现异常偏离。</div>
               )}
-              {data?.alerts.map((a) => (
+              {(data?.alerts ?? []).map((a) => (
                 <div
                   key={a.id}
                   style={{
@@ -261,7 +261,7 @@ export default function AIBrainDeepPage() {
                   <div style={{ color: C.dim, fontSize: 13, marginTop: 6 }}>{a.summary}</div>
                   <div style={{ marginTop: 6, fontSize: 12, color: C.accent }}>
                     疑似原因：
-                    {a.likelyCauses.map((c, i) => (
+                    {(a.likelyCauses ?? []).map((c, i) => (
                       <div key={i} style={{ color: C.dim, marginTop: 2, paddingLeft: 8 }}>
                         · {c}
                       </div>
@@ -276,10 +276,10 @@ export default function AIBrainDeepPage() {
         <div style={{ flex: '1 1 380px' }}>
           <Section title="根因分析" extra={`置信度 0~1`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 420, overflow: 'auto' }}>
-              {(!data || data.rootCauses.length === 0) && (
+              {(!data || (data?.rootCauses?.length ?? 0) === 0) && (
                 <div style={{ color: C.low, fontSize: 14 }}>✅ 无显著偏离，暂无需根因分析。</div>
               )}
-              {data?.rootCauses.map((r) => (
+              {(data?.rootCauses ?? []).map((r) => (
                 <div
                   key={r.metric}
                   style={{
@@ -305,7 +305,7 @@ export default function AIBrainDeepPage() {
                     <span style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{r.diagnosis}</span>
                   </div>
                   <div style={{ marginTop: 8, fontSize: 12, color: C.dim }}>
-                    {r.evidence.map((e, i) => (
+                    {(r.evidence ?? []).map((e, i) => (
                       <div key={i}>· {e}</div>
                     ))}
                   </div>
@@ -334,10 +334,10 @@ export default function AIBrainDeepPage() {
       <div style={{ marginBottom: 14 }}>
         <Section title="决策建议（可执行动作）" extra={`高优先级 ${data?.highRecommendationCount ?? 0} 条`}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {(!data || data.recommendations.length === 0) && (
+            {(!data || (data?.recommendations?.length ?? 0) === 0) && (
               <div style={{ color: C.low, fontSize: 14 }}>✅ 运行平稳，暂无待决事项。</div>
             )}
-            {data?.recommendations.map((r) => (
+            {(data?.recommendations ?? []).map((r) => (
               <div
                 key={r.id}
                 style={{

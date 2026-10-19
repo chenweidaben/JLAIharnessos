@@ -144,7 +144,7 @@ export default function HelpManualPage() {
         </div>
 
         {/* 左侧目录 */}
-        {manual?.toc.map((item) => (
+        {(manual?.toc ?? []).map((item) => (
           <div
             key={item.id}
             onClick={() => setActiveChapterId(item.id)}

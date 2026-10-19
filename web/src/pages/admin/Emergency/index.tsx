@@ -352,7 +352,8 @@ export default function AdminEmergencyPage() {
             </Row>
 
             {/* 现场核对表 */}
-            <Card title={`现场处置核对表（${data?.checklist.length ?? 0} 项，关键项已标注）`}>
+            {/* v5.0试点扩展：空值防护 checklist 为 null 时不白屏 */}
+            <Card title={`现场处置核对表（${data?.checklist?.length ?? 0} 项，关键项已标注）`}>
               <List
                 size="small"
                 dataSource={data?.checklist ?? []}

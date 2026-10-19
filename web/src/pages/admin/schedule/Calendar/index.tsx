@@ -239,7 +239,7 @@ export default function SmartScheduleCalendarPage() {
           </Col>
           <Col span={6}>
             <Card size="small">
-              <Statistic title="冲突条数" value={grid?.conflicts.length ?? 0} valueStyle={{ color: (grid?.conflicts.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }} />
+              <Statistic title="冲突条数" value={grid?.conflicts?.length ?? 0} valueStyle={{ color: (grid?.conflicts?.length ?? 0) === 0 ? '#3f8600' : '#cf1322' }} />
             </Card>
           </Col>
         </Row>

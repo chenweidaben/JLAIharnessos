@@ -94,7 +94,8 @@ const LEVEL_TEXT: Record<string, string> = { low: '低', medium: '中', high: '�
 const VERDICT_COLOR: Record<string, string> = { achieved: C.low, partial: C.mid, missed: C.high };
 
 /** 收益字段的可读标签 */
-function benefitText(b: ExpectedBenefit): string {
+function benefitText(b?: ExpectedBenefit | null): string {
+  if (!b) return '—';
   const parts: string[] = [];
   if (b.waitReductionMin) parts.push(`候诊↓${b.waitReductionMin}分钟`);
   if (b.bedRelief) parts.push(`释放床位${b.bedRelief}张`);
@@ -166,23 +167,25 @@ export default function AIDecisionPage() {
 
   /** 演示：上报推荐方案的「实际结果」，看预测 vs 实际闭环 */
   const trackOutcome = useCallback(async () => {
-    if (!data) return;
+    if (!data || !data.recommended || !data.impact) return;
+    const rec = data.recommended;
+    const impact = data.impact;
     const expected =
-      data.recommended.benefit.waitReductionMin ??
-      data.recommended.benefit.bedRelief ??
-      data.recommended.benefit.stockDaysRestored ??
-      data.recommended.benefit.qcDeductionDrop ??
+      rec.benefit?.waitReductionMin ??
+      rec.benefit?.bedRelief ??
+      rec.benefit?.stockDaysRestored ??
+      rec.benefit?.qcDeductionDrop ??
       10;
     try {
       const res = await post<OutcomeResult>('/api/v1/ai-brain/decision', {
         track: {
-          decisionId: data.recommended.optionId,
+          decisionId: rec.optionId,
           outcome: {
             metric: 'effect',
             expected,
             actual: Math.round(expected * 0.85), // 演示：达成约 85%
-            costPlanned: data.impact.estimatedCost,
-            costActual: Math.round(data.impact.estimatedCost * 1.05),
+            costPlanned: impact.estimatedCost,
+            costActual: Math.round(impact.estimatedCost * 1.05),
             executedAt: new Date().toISOString(),
           },
         },
@@ -258,11 +261,11 @@ export default function AIDecisionPage() {
           </Section>
         </div>
         {[
-          { label: '候选方案', v: data?.options.length ?? '--', tone: C.accent },
-          { label: '推荐方案', v: `#${data?.recommended.rank ?? '--'}`, tone: C.low },
-          { label: '预估投入', v: data ? `¥${data.impact.estimatedCost.toLocaleString()}` : '--', tone: C.mid },
-          { label: '预估收益', v: data ? `¥${data.impact.estimatedBenefitValue.toLocaleString()}` : '--', tone: C.low },
-          { label: 'ROI', v: data?.impact.roi != null ? `${data.impact.roi}x` : '成本0', tone: C.accent },
+          { label: '候选方案', v: data?.options?.length ?? '--', tone: C.accent },
+          { label: '推荐方案', v: `#${data?.recommended?.rank ?? '--'}`, tone: C.low },
+          { label: '预估投入', v: data ? `¥${(data?.impact?.estimatedCost ?? 0).toLocaleString()}` : '--', tone: C.mid },
+          { label: '预估收益', v: data ? `¥${(data?.impact?.estimatedBenefitValue ?? 0).toLocaleString()}` : '--', tone: C.low },
+          { label: 'ROI', v: data?.impact?.roi != null ? `${data.impact.roi}x` : '成本0', tone: C.accent },
         ].map((it) => (
           <div
             key={it.label}
@@ -282,25 +285,26 @@ export default function AIDecisionPage() {
       </div>
 
       {/* 推荐方案（第一名） */}
-      {data && (
+      {/* v5.0试点扩展：空值防护 recommended/impact 缺失时不白屏 */}
+      {data && data.recommended && (
         <div style={{ marginBottom: 14 }}>
-          <Section title="🏆 推荐方案（四维加权第一名）" extra={`综合得分 ${data.recommended.totalScore}`}>
+          <Section title="🏆 推荐方案（四维加权第一名）" extra={`综合得分 ${data.recommended?.totalScore ?? 0}`}>
             <div style={{ border: `1px solid ${C.low}`, borderRadius: 10, padding: '14px 16px', background: 'rgba(6,20,46,0.5)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{data.recommended.title}</span>
+                <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{data.recommended?.title ?? '—'}</span>
                 <span style={{ color: '#06142e', background: C.low, fontSize: 11, padding: '1px 8px', borderRadius: 999, fontWeight: 700 }}>
-                  风险 {LEVEL_TEXT[data.recommended.riskLevel]}
+                  风险 {LEVEL_TEXT[data.recommended?.riskLevel ?? 'unknown'] ?? '—'}
                 </span>
-                <span style={{ color: C.dim, fontSize: 12 }}>见效约 {Math.round(data.recommended.timeToEffectMin / 60)} 小时</span>
+                <span style={{ color: C.dim, fontSize: 12 }}>见效约 {Math.round((data.recommended?.timeToEffectMin ?? 0) / 60)} 小时</span>
               </div>
-              <div style={{ color: C.accent, fontSize: 14, marginTop: 8 }}>▶ {data.recommended.action}</div>
-              <div style={{ color: C.dim, fontSize: 13, marginTop: 6 }}>依据：{data.recommended.rationale}</div>
+              <div style={{ color: C.accent, fontSize: 14, marginTop: 8 }}>▶ {data.recommended?.action ?? '—'}</div>
+              <div style={{ color: C.dim, fontSize: 13, marginTop: 6 }}>依据：{data.recommended?.rationale ?? '—'}</div>
               <div style={{ color: C.text, fontSize: 13, marginTop: 6 }}>
-                预期收益：<span style={{ color: C.low }}>{benefitText(data.recommended.benefit)}</span>
-                ｜ 预估投入 ¥{data.recommended.costPerRun.toLocaleString()}
-                ｜ 置信度 {Math.round(data.impact.confidence * 100)}%
+                预期收益：<span style={{ color: C.low }}>{benefitText(data.recommended?.benefit)}</span>
+                ｜ 预估投入 ¥{(data.recommended?.costPerRun ?? 0).toLocaleString()}
+                ｜ 置信度 {Math.round((data.impact?.confidence ?? 0) * 100)}%
               </div>
-              <div style={{ color: C.mid, fontSize: 12, marginTop: 6 }}>⚠ {data.recommended.riskNote}</div>
+              <div style={{ color: C.mid, fontSize: 12, marginTop: 6 }}>⚠ {data.recommended?.riskNote ?? '—'}</div>
             </div>
           </Section>
         </div>

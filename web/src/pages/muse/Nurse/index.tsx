@@ -235,7 +235,7 @@ export default function MuseNursePage() {
                       {tag}
                     </Tag>
                   ))}
-                  {(data?.careSkillTags.length ?? 0) === 0 && (
+                  {(data?.careSkillTags?.length ?? 0) === 0 && (
                     <Text type="secondary">完成护理操作后自动沉淀你的高频技巧标签</Text>
                   )}
                 </div>
@@ -276,7 +276,7 @@ export default function MuseNursePage() {
                     ),
                   }))}
                 />
-                {(data?.recentTimeline.length ?? 0) === 0 && (
+                {(data?.recentTimeline?.length ?? 0) === 0 && (
                   <Empty description="暂无交班经验记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Card>

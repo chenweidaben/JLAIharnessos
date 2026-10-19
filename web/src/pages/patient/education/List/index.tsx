@@ -256,7 +256,8 @@ export default function PatientEducationListPage() {
       </div>
 
       {/* 卡片列表 */}
-      {(data?.list.length ?? 0) === 0 ? (
+      {/* v5.0试点扩展：空值防护 list 为 null 时不白屏 */}
+      {(data?.list?.length ?? 0) === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: VI.sub }}>
           <div style={{ fontSize: 22 }}>还没有科普材料</div>
           <div style={{ fontSize: 16, marginTop: 8 }}>
@@ -264,7 +265,7 @@ export default function PatientEducationListPage() {
           </div>
         </div>
       ) : (
-        data?.list.map((row) => <EducationCard key={row.id} row={row} />)
+        (data?.list ?? []).map((row) => <EducationCard key={row.id} row={row} />)
       )}
 
       <div style={{ fontSize: 13, color: VI.sub, marginTop: 16 }}>

@@ -226,7 +226,7 @@ export default function PatientH5HomePage() {
   /* 快捷入口大按钮：深海蓝 VI */
   const quickActions = [
     { label: '我的预约', badge: d?.appointmentCount ?? 0 },
-    { label: '我的报告', badge: d?.reports.length ?? 0 },
+    { label: '我的报告', badge: d?.reports?.length ?? 0 },
     { label: '我的账单', badge: d?.unpaidCount ?? 0 },
     { label: '智能导诊', badge: 0 },
   ];

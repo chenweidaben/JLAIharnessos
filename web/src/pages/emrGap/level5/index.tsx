@@ -79,7 +79,8 @@ export default function EmrLevel5Page() {
     {
       title: '占比条', key: 'bar',
       render: (_v, record) => {
-        const max = data?.weaknesses[0]?.count ?? 1;
+        // v5.0试点扩展：空值防护 weaknesses 为 null 时不白屏
+        const max = data?.weaknesses?.[0]?.count ?? 1;
         return (
           <div style={{ width: 160, height: 8, background: '#F0F5FA', borderRadius: 4 }}>
             <div
@@ -95,7 +96,8 @@ export default function EmrLevel5Page() {
   ];
 
   const dist = data?.gradeDistribution;
-  const latest = data?.trend[data.trend.length - 1];
+  const trendArr = data?.trend ?? [];
+  const latest = trendArr[trendArr.length - 1];
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -124,17 +126,17 @@ export default function EmrLevel5Page() {
           </Col>
           <Col span={6}>
             <Card>
-              <Statistic title="累计参评份数" value={data?.trend.reduce((s, p) => s + p.total, 0) ?? '-'} />
+              <Statistic title="累计参评份数" value={trendArr.reduce((s, p) => s + p.total, 0) || '-'} />
             </Card>
           </Col>
           <Col span={6}>
             <Card>
-              <Statistic title="在架质控模块" value={data?.modules[0].label ?? 'M90-A'} />
+              <Statistic title="在架质控模块" value={data?.modules?.[0]?.label ?? 'M90-A'} />
             </Card>
           </Col>
           <Col span={6}>
             <Card>
-              <Statistic title="终末质控模块" value={data?.modules[1].label ?? 'M93-B'} />
+              <Statistic title="终末质控模块" value={data?.modules?.[1]?.label ?? 'M93-B'} />
             </Card>
           </Col>
         </Row>
@@ -158,10 +160,10 @@ export default function EmrLevel5Page() {
           {/* 合格率趋势 */}
           <Col span={12}>
             <Card title="全院合格率趋势（≥90 分占比）" loading={loading} style={{ marginBottom: 16 }}>
-              {(data?.trend.length ?? 0) === 0 ? (
+              {trendArr.length === 0 ? (
                 <Empty description="暂无趋势数据" />
               ) : (
-                data?.trend.slice(-14).map((p) => <RateBar key={p.date} point={p} />)
+                trendArr.slice(-14).map((p) => <RateBar key={p.date} point={p} />)
               )}
             </Card>
             <Card title="趋势明细（全部日期）">
@@ -184,15 +186,18 @@ export default function EmrLevel5Page() {
                 locale={{ emptyText: <Empty description="暂无短板，病历质量达标" /> }}
               />
             </Card>
-            {data?.modules.map((m) => (
+            {(data?.modules ?? []).map((m) => {
+              const mTrend = m.trend ?? [];
+              return (
               <Card key={m.key} title={`${m.label} 合格份数`} size="small" style={{ marginBottom: 12 }}>
                 <Statistic
-                  value={m.trend.reduce((s, p) => s + p.passed, 0)}
-                  suffix={`/ ${m.trend.reduce((s, p) => s + p.total, 0)} 份`}
+                  value={mTrend.reduce((s, p) => s + p.passed, 0)}
+                  suffix={`/ ${mTrend.reduce((s, p) => s + p.total, 0)} 份`}
                   valueStyle={{ color: VI_PRIMARY }}
                 />
               </Card>
-            ))}
+              );
+            })}
             {hasPermission('emr_level5:view') && null}
           </Col>
         </Row>

@@ -104,7 +104,7 @@ export default function EmrPhysicalExamNlpPage() {
           <Button type="primary" style={{ background: VI.accent }} loading={loading} onClick={doExtract}>
             执行提取
           </Button>
-        )}
+        </Card>
         {result && report && (
           <Card headStyle={{ background: VI.mid, color: "#fff" }} title="提取结果">
             <div style={{ marginBottom: 16 }}>

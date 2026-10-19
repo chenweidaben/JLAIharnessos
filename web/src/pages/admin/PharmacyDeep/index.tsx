@@ -336,23 +336,23 @@ export default function PharmacyDeepPage() {
                 <Row gutter={16}>
                   <Col xs={24} lg={12}>
                     <Text strong style={{ color: VI.deep }}>命中风险因子：</Text>
-                    {data.adverse.triggers.length === 0
+                    {(data.adverse.triggers ?? []).length === 0
                       ? <Paragraph type="secondary" style={{ fontSize: 12 }}>无（画像与处方无冲突）</Paragraph>
                       : (
                         <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                          {data.adverse.triggers.map((t) => <li key={t} style={{ fontSize: 13 }}>{t}</li>)}
+                          {(data.adverse.triggers ?? []).map((t) => <li key={t} style={{ fontSize: 13 }}>{t}</li>)}
                         </ul>
                       )}
                   </Col>
                   <Col xs={24} lg={12}>
                     <Text strong style={{ color: VI.deep }}>处置建议：</Text>
                     <ul style={{ margin: '4px 0 0 18px', padding: 0 }}>
-                      {data.adverse.suggestions.map((s) => <li key={s} style={{ fontSize: 13 }}>{s}</li>)}
+                      {(data.adverse.suggestions ?? []).map((s) => <li key={s} style={{ fontSize: 13 }}>{s}</li>)}
                     </ul>
-                    {data.adverse.matchedSymptoms.length > 0 && (
+                    {(data.adverse.matchedSymptoms ?? []).length > 0 && (
                       <>
                         <Text strong style={{ color: VI.deep }}>症状匹配：</Text>
-                        <div>{data.adverse?.matchedSymptoms.map((s) => <Tag key={s} color={RISK_COLOR[data.adverse?.level ?? 'none']}>{s}</Tag>)}</div>
+                        <div>{(data.adverse.matchedSymptoms ?? []).map((s) => <Tag key={s} color={RISK_COLOR[data.adverse?.level ?? 'none']}>{s}</Tag>)}</div>
                       </>
                     )}
                   </Col>

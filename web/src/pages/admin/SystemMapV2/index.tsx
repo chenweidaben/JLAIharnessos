@@ -198,9 +198,10 @@ export default function SystemMapV2Page() {
             </Card>
 
             {/* 十大领域卡片 */}
+            {/* v5.0试点扩展：空值防护 domains/byDomain 为 null 时不白屏 */}
             <Row gutter={[16, 16]}>
-              {data.domains.map((domain) => {
-                const dc = coverage.byDomain.find((d) => d.key === domain.key);
+              {(data.domains ?? []).map((domain) => {
+                const dc = (coverage.byDomain ?? []).find((d) => d.key === domain.key);
                 return (
                   <Col xs={24} md={12} xl={8} key={domain.key}>
                     <Card
@@ -251,8 +252,8 @@ export default function SystemMapV2Page() {
 
             {/* 页脚版权 */}
             <Paragraph type="secondary" style={{ marginTop: 24, textAlign: 'center' }}>
-              © {new Date().getFullYear()} {data.company} · 全景图 V2 构建于{' '}
-              {new Date(data.generatedAt).toLocaleString('zh-CN')} · {data.version}
+              © {new Date().getFullYear()} {data.company ?? '杭州健澜科技有限公司'} · 全景图 V2 构建于{' '}
+              {data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-CN') : '—'} · {data.version ?? '—'}
             </Paragraph>
           </>
         )}

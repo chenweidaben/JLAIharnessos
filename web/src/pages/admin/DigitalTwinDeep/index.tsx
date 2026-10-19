@@ -296,11 +296,12 @@ export default function DigitalTwinDeepPage() {
                 <Statistic title="占用率" value={summary.occupancyRate} suffix="%" precision={1} />
               </Col>
               <Col xs={12} sm={4}>
-                <Statistic title="事件数" value={snapshot?.events.length ?? 0} suffix="条" />
+                {/* v5.0试点扩展：空值防护，避免 snapshot.events 为 null 时白屏 */}
+                <Statistic title="事件数" value={snapshot?.events?.length ?? 0} suffix="条" />
               </Col>
               <Col xs={24} sm={8}>
                 <Text strong style={{ color: VI.deep }}>增量事件流：</Text>
-                {snapshot && snapshot.events.length > 0 ? (
+                {snapshot && (snapshot?.events?.length ?? 0) > 0 ? (
                   <Timeline
                     style={{ marginTop: 8 }}
                     items={snapshot.events.slice(0, 5).map((ev) => ({

@@ -309,7 +309,7 @@ export default function NurseMusePage() {
                     </List.Item>
                   )}
                 />
-                {(data?.recommendations.length ?? 0) === 0 && (
+                {(data?.recommendations?.length ?? 0) === 0 && (
                   <Empty description="记录更多护理经历后，智能体会按患者上下文召回你的经验" image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 )}
               </Card>

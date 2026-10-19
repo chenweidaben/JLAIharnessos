@@ -57,7 +57,7 @@ export default function WorkflowPage() {
             <Row gutter={16}>
               <Col span={8}><Card><Statistic title="流程定义" value={defs.length} /></Card></Col>
               <Col span={8}><Card><Statistic title="运行中实例" value={summary?.runningCount ?? 0} /></Card></Col>
-              <Col span={8}><Card><Statistic title="我的待办" value={summary?.instances.length ?? 0} /></Card></Col>
+              <Col span={8}><Card><Statistic title="我的待办" value={summary?.instances?.length ?? 0} /></Card></Col>
             </Row>
             <Card title="流程定义" style={{ marginTop: 16 }}>
               <List

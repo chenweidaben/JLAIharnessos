@@ -233,7 +233,7 @@ export default function DeepAIAlertPage() {
         >
           <div style={{ color: C.dim, fontSize: 13 }}>开放预警总数</div>
           <div style={{ color: C.accent, fontSize: 44, fontWeight: 700, lineHeight: 1.1 }}>
-            {data?.alerts.length ?? 0}
+            {data?.alerts?.length ?? 0}
           </div>
           <div style={{ color: C.dim, fontSize: 12, marginTop: 4 }}>按优先级降序</div>
         </div>
@@ -266,7 +266,7 @@ export default function DeepAIAlertPage() {
           >
             <div style={{ color: C.dim, fontSize: 13 }}>{CATEGORY_LABEL[cat]}</div>
             <div style={{ color: '#fff', fontSize: 34, fontWeight: 700, lineHeight: 1.2 }}>
-              {data?.summary[cat] ?? 0}
+              {data?.summary?.[cat] ?? 0}
             </div>
             <div style={{ color: C.dim, fontSize: 12, marginTop: 4 }}>条预警</div>
           </div>
@@ -276,13 +276,13 @@ export default function DeepAIAlertPage() {
       {/* 预警列表（核心：证据链 + 处置） */}
       <Section
         title="预警清单（按优先级排序）"
-        extra={`共 ${data?.alerts.length ?? 0} 条 / 红线 ${data?.criticalCount ?? 0} 条`}
+        extra={`共 ${data?.alerts?.length ?? 0} 条 / 红线 ${data?.criticalCount ?? 0} 条`}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {(!data || data.alerts.length === 0) && (
+          {(!data || (data?.alerts?.length ?? 0) === 0) && (
             <div style={{ color: C.low, fontSize: 14 }}>✅ 各项指标均在警戒线内，暂无开放预警。</div>
           )}
-          {data?.alerts.map((a) => {
+          {(data?.alerts ?? []).map((a) => {
             const act = actionMap.get(a.id);
             return (
               <div

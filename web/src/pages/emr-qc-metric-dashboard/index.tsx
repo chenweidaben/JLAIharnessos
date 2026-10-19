@@ -57,7 +57,7 @@ export default function EmrQcMetricDashboardPage() {
         <Title level={3} style={{ color: VI.deep }}>{dashboard?.title ?? "质控指标看板"}</Title>
         <Spin spinning={loading}>
           <Row gutter={[16, 16]}>
-            {dashboard?.metrics.map((m) => (
+            {(dashboard?.metrics ?? []).map((m) => (
               <Col span={8} key={m.name}>
                 <Card headStyle={{ background: VI.mid, color: "#fff" }} title={m.name}>
                   <Statistic title={m.name} value={m.value} precision={1} suffix="%" />

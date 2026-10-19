@@ -430,10 +430,10 @@ export default function TwinDeepPage() {
                         <Text strong style={{ color: VI.deep }}>导诊路径：</Text>
                       </Paragraph>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
-                        {data.route.pathNames.map((n, i) => (
+                        {(data.route?.pathNames ?? []).map((n, i) => (
                           <span key={`${n}-${i}`}>
                             <Tag color={VI.accent} style={{ margin: 0 }}>{n}</Tag>
-                            {i < (data.route?.pathNames.length ?? 0) - 1 && <Text type="secondary"> → </Text>}
+                            {i < (data.route?.pathNames?.length ?? 0) - 1 && <Text type="secondary"> → </Text>}
                           </span>
                         ))}
                       </div>

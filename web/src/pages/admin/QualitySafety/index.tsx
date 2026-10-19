@@ -161,8 +161,10 @@ export default function QualitySafetyPage() {
   }, [dept, load]);
 
   const system = data?.system;
-  const trackedRed = data?.tracked.filter((t) => t.severity === 'red').length ?? 0;
-  const trackedYellow = data?.tracked.filter((t) => t.severity === 'yellow').length ?? 0;
+  // v5.0试点扩展：空值防护 tracked/gaps 为 null 时不白屏
+  const trackedList = data?.tracked ?? [];
+  const trackedRed = trackedList.filter((t) => t.severity === 'red').length;
+  const trackedYellow = trackedList.filter((t) => t.severity === 'yellow').length;
 
   return (
     <Layout style={{ minHeight: '100vh', background: VI.bg }}>
@@ -227,13 +229,13 @@ export default function QualitySafetyPage() {
             {/* 结论横幅 */}
             <Card style={{ marginBottom: 16, borderLeft: `4px solid ${VI.accent}` }}>
               <Text strong style={{ fontSize: 16, color: VI.deep }}>
-                {data?.dept} 质量与安全驾驶舱：四大维度体系已就绪（{system.dimensions.length} 维）。
+                {data?.dept ?? '—'} 质量与安全驾驶舱：四大维度体系已就绪（{(system?.dimensions ?? []).length} 维）。
               </Text>
               <div style={{ marginTop: 8 }}>
                 <Tag color="red">红线 {trackedRed}</Tag>
                 <Tag color="orange">黄线 {trackedYellow}</Tag>
-                <Tag color="green">达标 {data?.tracked.length ? data.tracked.length - trackedRed - trackedYellow : 0}</Tag>
-                <Tag>{data?.gaps.summary}</Tag>
+                <Tag color="green">达标 {trackedList.length ? trackedList.length - trackedRed - trackedYellow : 0}</Tag>
+                <Tag>{data?.gaps?.summary ?? '—'}</Tag>
               </div>
               <div style={{ marginTop: 8 }}>
                 <Text type="secondary" style={{ fontSize: 12 }}>依据：{system.nationalStandard}</Text>
@@ -242,7 +244,7 @@ export default function QualitySafetyPage() {
 
             {/* 四大维度体系 */}
             <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-              {system.dimensions.map((dim) => (
+              {(system?.dimensions ?? []).map((dim) => (
                 <Col xs={24} sm={12} lg={6} key={dim.code}>
                   <Card size="small" title={<Text strong style={{ color: VI.deep }}>{dim.name}</Text>}>
                     <Paragraph type="secondary" style={{ fontSize: 12, minHeight: 44 }}>
@@ -290,7 +292,7 @@ export default function QualitySafetyPage() {
                 rowKey="code"
                 size="small"
                 pagination={false}
-                dataSource={data?.gaps.gaps ?? []}
+                dataSource={data?.gaps?.gaps ?? []}
                 columns={[
                   { title: '对照项', dataIndex: 'name', key: 'name' },
                   { title: '标准', dataIndex: 'standard', key: 'standard', render: (v: number, r) => `${v}${r.unit}` },

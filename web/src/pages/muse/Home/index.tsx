@@ -160,7 +160,7 @@ export default function MuseHomePage() {
     grid: { left: 48, right: 24, top: 32, bottom: 32 },
     xAxis: {
       type: 'category',
-      data: data?.growth30d.map((p) => p.date.slice(5)) ?? [],
+      data: (data?.growth30d ?? []).map((p) => p.date.slice(5)),
       axisLine: { lineStyle: { color: 'rgba(255,255,255,0.3)' } },
       axisLabel: { color: 'rgba(255,255,255,0.65)' },
     },
@@ -175,7 +175,7 @@ export default function MuseHomePage() {
         type: 'line',
         smooth: true,
         step: 'end',
-        data: data?.growth30d.map((p) => p.count) ?? [],
+        data: (data?.growth30d ?? []).map((p) => p.count),
         lineStyle: { color: ACCENT, width: 3 },
         itemStyle: { color: ACCENT },
         areaStyle: { color: 'rgba(74,144,217,0.25)' },

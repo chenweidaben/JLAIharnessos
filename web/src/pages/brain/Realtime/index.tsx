@@ -245,10 +245,10 @@ export default function AIBrainRealtimePage() {
         <div style={{ flex: '2 1 480px' }}>
           <Section title={`AI 建议（高优先级 ${data?.highSuggestionCount ?? 0}）`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 360, overflow: 'auto' }}>
-              {(!data || data.suggestions.length === 0) && (
+              {(!data || (data?.suggestions?.length ?? 0) === 0) && (
                 <div style={{ color: C.low, fontSize: 14 }}>✅ 各项运行平稳，暂无高优先级建议。</div>
               )}
-              {data?.suggestions.map((s) => (
+              {(data?.suggestions ?? []).map((s) => (
                 <div
                   key={s.id}
                   style={{
