@@ -76,6 +76,12 @@
 - BFF 500 错误不再向客户端泄露堆栈/SQL/文件路径，统一返回通用文案 + traceId。
 - 修复指标 Histogram 桶计数被重复累加的问题。
 
+### 2026-10 架构重构
+- 新增 services-java/jlmedaios-monolith（Spring Boot 3.5 + JDK 21 + Modulith，9业务模块21端点）
+- 新增 services-python（FastAPI AI层，NLP/CDSS/影像，PHI脱敏+vLLM本地）
+- 新增 docs/architecture 12份架构宪法文档
+- 三层架构：Java核心交易 + Python AI + TS前端BFF
+
 ---
 
 ## [0.2.0-radar] - 2026-09-21

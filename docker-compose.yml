@@ -602,6 +602,33 @@ services:
         max-size: "20m"
         max-file: "3"
 
+  # ==========================================================================
+  # jlmedaios-monolith（Java 模块化单体，Spring Boot 3.5 + JDK 21，端口 9090）
+  # ==========================================================================
+  jlmedaios-monolith:
+    build: ./services-java/jlmedaios-monolith
+    container_name: jlmedaios-monolith
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/jlmedaios
+      SPRING_DATASOURCE_USERNAME: jlmedaios
+      SPRING_DATASOURCE_PASSWORD: changeit
+    restart: unless-stopped
+
+  # ==========================================================================
+  # jlmedaios-ai（Python FastAPI AI 服务，NLP/CDSS/影像，端口 8000）
+  # ==========================================================================
+  jlmedaios-ai:
+    build: ./services-python
+    container_name: jlmedaios-ai
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
 # ==========================================================================
 # 命名卷：有状态数据全部落在 Docker 托管卷，便于备份/迁移，绝不写入容器层。
 # ==========================================================================
