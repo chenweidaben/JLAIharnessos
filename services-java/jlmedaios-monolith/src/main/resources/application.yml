@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: jlmedaios-monolith
+    name: jlmedaios-os
   datasource:
     # H2 内存库，DB_CLOSE_DELAY=-1 保持 JVM 期间不销毁
     url: jdbc:h2:mem:monolith;DB_CLOSE_DELAY=-1
@@ -15,6 +15,7 @@ spring:
       ddl-auto: update
     show-sql: false
     open-in-view: false
+  # encounter_record 表由 JPA 自动创建，append-only 约束由业务层保证
   h2:
     console:
       enabled: true

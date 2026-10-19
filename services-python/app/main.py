@@ -9,10 +9,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging
+from app.api import health, nlp, cdss, imaging, encounter_memory
 
 app = FastAPI(
-    title="健澜科技杠OS AI服务",
+    title="健澜AI原生医院操作系统OS",
     version="0.1.0"
 )
 
@@ -30,6 +30,7 @@ app.include_router(health.router)
 app.include_router(nlp.router)
 app.include_router(cdss.router)
 app.include_router(imaging.router)
+app.include_router(encounter_memory.router)
 
 
 @app.on_event("startup")
