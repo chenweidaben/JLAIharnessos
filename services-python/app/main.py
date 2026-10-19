@@ -6,10 +6,11 @@
 - 所有 PHI 字段必须先过 sensitive.mask_phi 脱敏
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases
+from app.core.api_key_auth import API_KEYS, check_rate_limit
 
 app = FastAPI(
     title="健澜AI原生医院操作系统OS",
@@ -24,6 +25,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# /ai/* 路由鉴权中间件（生产接 Redis 计数 + PostgreSQL 客户表，当前本地 mock）
+@app.middleware("http")
+async def api_key_middleware(request: Request, call_next):
+    path = request.url.path
+    if path.startswith("/ai/"):
+        auth = request.headers.get("Authorization", "")
+        if not auth.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Missing Bearer Token")
+        api_key = auth.replace("Bearer ", "")
+        if api_key not in API_KEYS:
+            raise HTTPException(status_code=401, detail="Invalid API Key")
+        if not check_rate_limit(api_key):
+            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+    return await call_next(request)
 
 # 注册路由
 app.include_router(health.router)
