@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS — Jaeger all-in-one 可观测链路镜像（健康检查增强包装）
+# 健澜AI原生医院操作系统OS — Jaeger all-in-one 可观测链路镜像（健康检查增强包装）
 # ----------------------------------------------------------------------------
 # 背景：官方 jaegertracing/all-in-one 镜像基于 scratch 构建，仅含单个静态二进制，
 #       没有 shell/curl/wget，Docker 原生 HEALTHCHECK 无法执行任何探测命令。
@@ -25,7 +25,7 @@ FROM busybox:1.36.1-uclibc AS tools
 FROM jaegertracing/all-in-one:1.60.0
 
 LABEL org.opencontainers.image.title="jianlan-gangos-jaeger" \
-      org.opencontainers.image.description="健澜科技杠OS 分布式链路追踪（Jaeger all-in-one，含健康检查）" \
+      org.opencontainers.image.description="健澜AI原生医院操作系统OS 分布式链路追踪（Jaeger all-in-one，含健康检查）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="1.60.0"
 

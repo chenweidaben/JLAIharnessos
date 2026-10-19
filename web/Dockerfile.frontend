@@ -1,5 +1,5 @@
 # ============================================================================
-# 健澜科技杠OS（数智医院智能体）— 前端 Web（React 19 + Vite）镜像
+# 健澜AI原生医院操作系统OS— 前端 Web（React 19 + Vite）镜像
 # ----------------------------------------------------------------------------
 # 多阶段构建，共两个阶段：
 #
@@ -33,7 +33,7 @@ FROM node:22.14.0-alpine3.21 AS builder
 
 # OCI 镜像元数据，便于镜像仓库展示与合规审计。
 LABEL org.opencontainers.image.title="jianlan-gangos-web" \
-      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）前端 Web" \
+      org.opencontainers.image.description="健澜AI原生医院操作系统OS前端 Web" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0" \
       org.opencontainers.image.source="https://git.jianlan.tech/medical/jianlan-medical-agent"
@@ -81,7 +81,7 @@ RUN npm run build
 FROM nginx:1.28.0-alpine3.21 AS runtime
 
 LABEL org.opencontainers.image.title="jianlan-gangos-web" \
-      org.opencontainers.image.description="健澜科技杠OS（数智医院智能体）前端 Web（运行时）" \
+      org.opencontainers.image.description="健澜AI原生医院操作系统OS前端 Web（运行时）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0"
 
