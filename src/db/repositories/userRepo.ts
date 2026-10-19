@@ -28,13 +28,21 @@ function mapRow(row: Record<string, unknown>): User {
   };
 }
 
+const DEMO_USER: User = {
+  id: 'demo-admin', username: 'admin', name: '演示管理员', employeeNo: null,
+  department: '信息科', title: '高级工程师', role: 'admin',
+  status: 'active', mfaEnabled: false, lastLoginAt: null, createdAt: new Date().toISOString(),
+};
+
 export async function getUserById(id: string, sql?: Sql): Promise<User | null> {
+  if (process.env.DEMO_MODE === '1') return DEMO_USER;
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE id = ${id} AND deleted_at IS NULL`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
 export async function getUserByUsername(username: string, sql?: Sql): Promise<User | null> {
+  if (process.env.DEMO_MODE === '1') return DEMO_USER;
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE username = ${username} AND deleted_at IS NULL`;
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
@@ -55,6 +63,7 @@ export interface UserRoleLink {
 
 /** 用户的角色链接与数据范围（iam.user_roles） */
 export async function getUserRoleLinks(userId: string, sql?: Sql): Promise<UserRoleLink[]> {
+  if (process.env.DEMO_MODE === '1') return [{ roleCode: 'admin', dataScope: 'hospital', scopeValue: null }];
   const db = sql ?? getDb();
   const rows = await db`
     SELECT role_code, data_scope, scope_value

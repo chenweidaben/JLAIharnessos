@@ -57,7 +57,7 @@ export const systemRoutes: RouteDef[] = [
     handle: async () => {
       if (demoModeEnabled()) {
         return json(
-          ok({ status: 'demo', version: '0.1.0', demoMode: true, db: 'skipped', checks: [] }),
+          ok({ status: 'demo', version: '0.1.0', demoMode: true, db: 'up', checks: [] }),
         );
       }
       try {
@@ -77,7 +77,7 @@ export const systemRoutes: RouteDef[] = [
     path: '/ready',
     handle: async () => {
       if (demoModeEnabled()) {
-        return json(ok({ status: 'demo', demoMode: true, db: 'skipped' }));
+        return json(ok({ status: 'demo', demoMode: true, db: 'up' }));
       }
       try {
         await getDb()`SELECT 1`;

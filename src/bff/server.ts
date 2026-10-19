@@ -3497,6 +3497,14 @@ import { emrAiDietScriptRecoV14Routes } from './routes/emrAiDietScriptRecoV14';
 import { emrAiEnteralNutritionSuggestV14Routes } from './routes/emrAiEnteralNutritionSuggestV14';
 // M564-D：病历AI肠外营养配置推荐 V14 GET/POST /api/v1/emr-ai-parenteral-nutrition-reco（EMR 深化四模块，M564 收官，病历AI营养与膳食管理系列）
 import { emrAiParenteralNutritionRecoV14Routes } from './routes/emrAiParenteralNutritionRecoV14';
+// M565-A：病历AI处方前置审核 V14 GET/POST /api/v1/emr-ai-pre-prescription-review（EMR 深化四模块，病历AI药学服务管理系列）
+import { emrAiPrePrescriptionReviewV14Routes } from './routes/emrAiPrePrescriptionReviewV14';
+// M565-B：病历AI用药咨询答复 V14 GET/POST /api/v1/emr-ai-medication-consult-reply（EMR 深化四模块，病历AI药学服务管理系列）
+import { emrAiMedicationConsultReplyV14Routes } from './routes/emrAiMedicationConsultReplyV14';
+// M565-C：病历AI药品相互作用明细审查 V14 GET/POST /api/v1/emr-ai-drug-interaction-detail（EMR 深化四模块，-detail 后缀避让 emrAiDrugInteractionV14）
+import { emrAiDrugInteractionDetailV14Routes } from './routes/emrAiDrugInteractionDetailV14';
+// M565-D：病历AI特殊人群用药推荐 V14 GET/POST /api/v1/emr-ai-special-population-med-reco（EMR 深化四模块，M565 收官，病历AI药学服务管理系列）
+import { emrAiSpecialPopulationMedRecoV14Routes } from './routes/emrAiSpecialPopulationMedRecoV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -3592,6 +3600,11 @@ import { infectionDeepRoutes } from './routes/infectionDeep'; // M179-B：【护
 import { pharmacyMgmtRoutes } from './routes/pharmacyMgmt'; // M179-D：【护理院感医保药事】医院药事管理深化 GET /api/v1/pharmacy/mgmt（采购四单/库存FEFO/处方点评/ADR上报/质量隔离，安全无差错）
 import { getEnv } from './config/env';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from './types';
+import { adminHospitalsRoutes } from './routes/adminHospitals';
+import { emrAiNursingRecoV14Routes } from './routes/emrAiNursingRecoV14';
+import { emrAiOutpatientRecordGenV14Routes } from './routes/emrAiOutpatientRecordGenV14';
+import { emrAiPreopAssessRecoV14Routes } from './routes/emrAiPreopAssessRecoV14';
+import { securityBaselineRoutes } from './routes/securityBaseline';
 
 // ============================================================================
 // 路由表与编译
@@ -5488,6 +5501,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiDietScriptRecoV14Routes, // M564-B：病历AI膳食处方推荐 V14 GET/POST /api/v1/emr-ai-diet-script-reco（EMR 深化四模块，病历AI营养与膳食管理系列）
   ...emrAiEnteralNutritionSuggestV14Routes, // M564-C：病历AI肠内营养支持建议 V14 GET/POST /api/v1/emr-ai-enteral-nutrition-suggest（EMR 深化四模块，病历AI营养与膳食管理系列）
   ...emrAiParenteralNutritionRecoV14Routes, // M564-D：病历AI肠外营养配置推荐 V14 GET/POST /api/v1/emr-ai-parenteral-nutrition-reco（EMR 深化四模块，M564 收官，病历AI营养与膳食管理系列）
+  ...emrAiPrePrescriptionReviewV14Routes, // M565-A：病历AI处方前置审核 V14 GET/POST /api/v1/emr-ai-pre-prescription-review（EMR 深化四模块，病历AI药学服务管理系列）
+  ...emrAiMedicationConsultReplyV14Routes, // M565-B：病历AI用药咨询答复 V14 GET/POST /api/v1/emr-ai-medication-consult-reply（EMR 深化四模块，病历AI药学服务管理系列）
+  ...emrAiDrugInteractionDetailV14Routes, // M565-C：病历AI药品相互作用明细审查 V14 GET/POST /api/v1/emr-ai-drug-interaction-detail（EMR 深化四模块，-detail 后缀避让 emrAiDrugInteractionV14）
+  ...emrAiSpecialPopulationMedRecoV14Routes, // M565-D：病历AI特殊人群用药推荐 V14 GET/POST /api/v1/emr-ai-special-population-med-reco（EMR 深化四模块，M565 收官，病历AI药学服务管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
@@ -5563,6 +5580,11 @@ const allRoutes: RouteDef[] = [
   ...adminMuseRoutes, // M169-D：【知识图谱与Personal Agent】管理员个人管理智能体 GET /api/v1/admin/muse/:staffId
   ...officeDeepRoutes, // M178-C：【财务人力行政党建】GET /api/v1/admin/office（公文审批流转/会议预订冲突/档案/督办跟踪，节点到人不踢皮球）
   ...pharmacyMgmtRoutes, // M179-D：【护理院感医保药事】医院药事管理深化 GET /api/v1/pharmacy/mgmt（采购四单匹配/库存FEFO/处方点评闭环/ADR 24h上报/不合格隔离退货）
+  ...adminHospitalsRoutes, // 补注册：超管后台医院管理
+  ...emrAiNursingRecoV14Routes, // 补注册：病历AI护理推荐
+  ...emrAiOutpatientRecordGenV14Routes, // 补注册：病历AI门诊病历生成
+  ...emrAiPreopAssessRecoV14Routes, // 补注册：病历AI术前评估推荐
+  ...securityBaselineRoutes, // 补注册：安全基线检查
 ];
 
 interface Compiled {

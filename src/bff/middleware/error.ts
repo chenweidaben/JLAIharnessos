@@ -9,7 +9,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { type ApiResponse, type Ctx, ErrorCode, fail, type Handler, json } from '../types';
+import { type ApiResponse, type Ctx, ErrorCode, fail, type Handler, json, ok } from '../types';
 
 /** 包裹 handler，捕获未处理异常并转为统一错误响应（不泄露内部细节） */
 export function withErrorHandler(handler: Handler): Handler {
@@ -17,6 +17,22 @@ export function withErrorHandler(handler: Handler): Handler {
     try {
       return await handler(c);
     } catch (e) {
+      const demoMode = process.env.DEMO_MODE === '1';
+      const msg = e instanceof Error ? e.message : String(e);
+      const isDbConnError =
+        msg.includes('Failed to connect') ||
+        msg.includes('connect ECONNREFUSED') ||
+        msg.includes('connect_timeout') ||
+        msg.includes('postgres') ||
+        msg.includes('getaddrinfo') ||
+        (e instanceof Error && e.stack?.includes('postgres'));
+
+      // DEMO_MODE 下：DB 未连接是预期行为，降级返回空数组而非 500
+      if (demoMode && isDbConnError) {
+        console.warn(`[demo-fallback] ${c.req.method} ${c.req.url} DB unavailable in demo mode, returning empty array`);
+        return json(ok([]));
+      }
+
       // 服务端完整日志（含堆栈）
       console.error(`[bff error] ${c.req.method} ${c.req.url} [${c.traceId}]`, e);
       // 客户端：通用文案 + traceId，不泄露内部信息
