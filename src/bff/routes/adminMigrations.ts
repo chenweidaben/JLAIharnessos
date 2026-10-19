@@ -144,6 +144,20 @@ export const adminMigrationsRoutes: RouteDef[] = [
       // 【运维工具】业务权限守卫：未登录 401 / admin 放行 / 其余需 system:migrations:view
       const denied = requirePermissionCode(c, 'system:migrations:view');
       if (denied) return denied;
+      // DEMO：DB 不可达时不查 schema_migrations，直接返回演示汇总（避免 503）
+      if (process.env.DEMO_MODE === '1') {
+        const demoSummary: MigrationStatusSummary = {
+          total: 3,
+          executed: 2,
+          pending: 1,
+          recent10: [
+            { version: '002_clinical.sql', filename: '002_clinical.sql', status: 'executed', executedAt: '2026-10-02T00:00:00.000Z' },
+            { version: '001_init.sql', filename: '001_init.sql', status: 'executed', executedAt: '2026-10-01T00:00:00.000Z' },
+          ],
+          failures: [],
+        };
+        return json(ok(demoSummary));
+      }
       try {
         const { summary } = await buildMigrationDescriptors();
         return json(ok(summary));

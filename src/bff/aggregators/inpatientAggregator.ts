@@ -305,6 +305,59 @@ export async function getBedMap(
   auth: AuthView,
   query: { campusCode?: string; department?: string; wardId?: string } = {},
 ): Promise<BedMapResponse> {
+  if (process.env.DEMO_MODE === '1') {
+    // DEMO_MODE：PostgreSQL 未启动，返回示例床位图，避免 ECONNREFUSED → 500
+    const occ = (
+      visitId: string,
+      patientId: string,
+      mrn: string,
+      name: string,
+      gender: string,
+      age: number,
+      diagnosis: string,
+      condition: ConditionLevel,
+    ): BedOccupantSummary => ({
+      visitId,
+      patientId,
+      mrn,
+      nameMasked: name,
+      gender,
+      age,
+      diagnosis,
+      condition,
+      nursingLevel: nursingLevelOf(condition),
+      attendingDoctorId: 'demo-doctor-1',
+      admittedAt: new Date(Date.now() - 3 * 86_400_000).toISOString(),
+      allergies: [],
+      tags: condition === 'critical' ? ['特级护理'] : [],
+    });
+    return {
+      campuses: [{ code: 'main', name: '本部院区' }],
+      wards: [
+        {
+          id: 'demo-ward-1',
+          code: 'W01',
+          name: '心血管内科一病区',
+          department: '心血管内科',
+          campusId: 'demo-campus-1',
+          campusCode: 'main',
+          campusName: '本部院区',
+          floor: '5F',
+          stats: { total: 6, available: 2, occupied: 3, maintenance: 1, isolation: 0 },
+          beds: [
+            { id: 'demo-bed-1', bedNo: '501-1', roomNo: '501', bedType: 'standard', status: 'occupied', occupant: occ('demo-vis-1', 'demo-pat-1', 'PAT001', '张*三', '男', 62, '冠心病 不稳定型心绞痛', 'serious') },
+            { id: 'demo-bed-2', bedNo: '501-2', roomNo: '501', bedType: 'standard', status: 'occupied', occupant: occ('demo-vis-2', 'demo-pat-2', 'PAT002', '李*四', '女', 58, '高血压3级', 'stable') },
+            { id: 'demo-bed-3', bedNo: '502-1', roomNo: '502', bedType: 'icu', status: 'occupied', occupant: occ('demo-vis-3', 'demo-pat-3', 'PAT003', '王*五', '男', 71, '急性心肌梗死 PCI术后', 'critical') },
+            { id: 'demo-bed-4', bedNo: '502-2', roomNo: '502', bedType: 'standard', status: 'available', occupant: null },
+            { id: 'demo-bed-5', bedNo: '503-1', roomNo: '503', bedType: 'standard', status: 'available', occupant: null },
+            { id: 'demo-bed-6', bedNo: '503-2', roomNo: '503', bedType: 'standard', status: 'maintenance', occupant: null },
+          ],
+        },
+      ],
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
   const filter = effectiveFilter(auth, query);
 
   // 病区列表（按过滤）
@@ -371,6 +424,18 @@ export async function listInpatients(
   auth: AuthView,
   query: { campusCode?: string; department?: string; wardId?: string } = {},
 ): Promise<{ items: InpatientListItem[]; total: number }> {
+  if (process.env.DEMO_MODE === '1') {
+    // DEMO_MODE：PostgreSQL 未启动，返回示例在院患者列表，避免 ECONNREFUSED → 500
+    const admit3d = new Date(Date.now() - 3 * 86_400_000).toISOString();
+    const admit1d = new Date(Date.now() - 1 * 86_400_000).toISOString();
+    const admit6d = new Date(Date.now() - 6 * 86_400_000).toISOString();
+    const items: InpatientListItem[] = [
+      { visitId: 'demo-vis-1', visitNo: 'IP000101', patientId: 'demo-pat-1', mrn: 'PAT001', nameMasked: '张*三', gender: '男', age: 62, department: '心血管内科', wardId: 'demo-ward-1', wardName: '心血管内科一病区', bedId: 'demo-bed-1', bedNo: '501-1', roomNo: '501', diagnosis: '冠心病 不稳定型心绞痛', condition: 'serious', nursingLevel: 'level1', attendingDoctorId: 'demo-doctor-1', admittedAt: admit3d, daysInHospital: 3, allergies: [], tags: [] },
+      { visitId: 'demo-vis-2', visitNo: 'IP000102', patientId: 'demo-pat-2', mrn: 'PAT002', nameMasked: '李*四', gender: '女', age: 58, department: '心血管内科', wardId: 'demo-ward-1', wardName: '心血管内科一病区', bedId: 'demo-bed-2', bedNo: '501-2', roomNo: '501', diagnosis: '高血压3级', condition: 'stable', nursingLevel: 'level2', attendingDoctorId: 'demo-doctor-1', admittedAt: admit1d, daysInHospital: 1, allergies: [{ name: '青霉素' }], tags: [] },
+      { visitId: 'demo-vis-3', visitNo: 'IP000103', patientId: 'demo-pat-3', mrn: 'PAT003', nameMasked: '王*五', gender: '男', age: 71, department: '心血管内科', wardId: 'demo-ward-1', wardName: '心血管内科一病区', bedId: 'demo-bed-3', bedNo: '502-1', roomNo: '502', diagnosis: '急性心肌梗死 PCI术后', condition: 'critical', nursingLevel: 'special', attendingDoctorId: 'demo-doctor-1', admittedAt: admit6d, daysInHospital: 6, allergies: [], tags: ['特级护理'] },
+    ];
+    return { items, total: items.length };
+  }
   const filter = effectiveFilter(auth, query);
   const rows = await findCurrentInpatients(filter);
   const items = rows.map(toListItem);

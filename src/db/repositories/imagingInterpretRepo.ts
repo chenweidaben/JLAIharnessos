@@ -238,6 +238,20 @@ export async function listImagingInterpretations(
   audience: Audience | null = null,
   sql?: DbExecutor,
 ): Promise<ImagingInterpListRow[]> {
+  if (process.env.DEMO_MODE === '1') {
+    // DEMO_MODE：PostgreSQL 未启动，返回示例影像解读队列，避免 ECONNREFUSED → 500
+    const now = new Date().toISOString();
+    const demo: ImagingInterpListRow[] = [
+      { id: 'demo-img-1', reportId: 'demo-rpt-1', visitId: 'demo-vis-1', patientId: 'demo-pat-1', department: '放射科', examName: '胸部CT平扫', status: 'pending_review', audience: 'doctor', updatedAt: now },
+      { id: 'demo-img-2', reportId: 'demo-rpt-2', visitId: 'demo-vis-2', patientId: 'demo-pat-2', department: '放射科', examName: '头颅MRI平扫', status: 'pending_review', audience: 'doctor', updatedAt: now },
+      { id: 'demo-img-3', reportId: 'demo-rpt-3', visitId: 'demo-vis-3', patientId: 'demo-pat-3', department: '放射科', examName: '腹部超声', status: 'signed', audience: 'doctor', updatedAt: now },
+    ];
+    return demo.filter(
+      (r) =>
+        (status == null || r.status === status) &&
+        (audience == null || r.audience === audience),
+    );
+  }
   const db = sql ?? getDb();
   const rows = await db`
     SELECT r.id, r.report_id, r.visit_id, r.patient_id, r.department,

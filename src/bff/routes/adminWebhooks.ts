@@ -67,6 +67,30 @@ async function handleList(c: Ctx): Promise<Response> {
   const denied = requireRole(c, 'admin');
   if (denied) return denied;
 
+  if (process.env.DEMO_MODE === '1') {
+    const now = new Date().toISOString();
+    return json(ok({
+      total: 1,
+      items: [
+        {
+          id: 1,
+          url: 'https://demo.example.com/hooks/jlmedaios',
+          events: ['patient.discharged', 'admission.created'],
+          secretMask: 'abcd****wxyz',
+          status: 'active',
+          description: 'DEMO_MODE 演示订阅，未连接数据库',
+          successCount: 12,
+          failureCount: 0,
+          nextRetryAt: null,
+          createdBy: 'demo-admin',
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+      events: WEBHOOK_EVENTS,
+    }));
+  }
+
   try {
     const db = getDb();
     const rows = await db`

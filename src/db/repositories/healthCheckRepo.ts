@@ -23,6 +23,24 @@ function imap(r: Record<string, unknown>): OrderItem {
 }
 
 export async function listPackages(): Promise<Package[]> {
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      {
+        id: 'demo-pkg-0001-0000-0000-0000-000000000001',
+        name: '演示-基础体检套餐',
+        items: ['一般检查', '血常规', '胸片'],
+        priceCents: 39900,
+        active: true,
+      },
+      {
+        id: 'demo-pkg-0002-0000-0000-0000-000000000002',
+        name: '演示-深度体检套餐',
+        items: ['一般检查', '血常规', '生化全项', '腹部超声', '心电图'],
+        priceCents: 129900,
+        active: true,
+      },
+    ];
+  }
   const db = getDb();
   const rows = await db`SELECT ${db.unsafe(PCOLS)} FROM clinical.health_check_packages WHERE active=true ORDER BY name`;
   return rows.map(pmap);

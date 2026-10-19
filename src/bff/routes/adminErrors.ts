@@ -69,6 +69,23 @@ async function handleList(c: Ctx): Promise<Response> {
   const denied = requireRole(c, 'admin');
   if (denied) return denied;
 
+  if (process.env.DEMO_MODE === '1') {
+    const now = new Date().toISOString();
+    const errors: SystemError[] = [
+      {
+        id: 1,
+        errorType: 'DB_DOWN',
+        message: 'DEMO_MODE：PostgreSQL 未启动，本错误为演示占位',
+        stackTrace: '',
+        route: '/api/v1/admin/errors',
+        staffId: 'demo-admin',
+        createdAt: now,
+        resolved: false,
+      },
+    ];
+    return json(ok({ errors, aggregation: aggregateErrors(errors) }));
+  }
+
   try {
     const db = getDb();
     // 只取聚合与明细所需列，按创建时间倒序取近期窗口

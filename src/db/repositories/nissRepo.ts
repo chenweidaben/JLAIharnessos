@@ -34,6 +34,12 @@ export async function reportInfection(inp: {
 }
 
 export async function listActive(): Promise<Infection[]> {
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-niss-1', visitId: 'demo-visit-001', infectionType: '呼吸机相关性肺炎', pathogen: '肺炎克雷伯菌', reportDate: '2026-10-15', status: 'under_investigation', isolationRequired: true, note: '演示数据', reportedBy: 'demo-user', createdAt: '2026-10-15T02:00:00.000Z' },
+      { id: 'demo-niss-2', visitId: 'demo-visit-002', infectionType: '导尿管相关尿路感染', pathogen: '大肠埃希菌', reportDate: '2026-10-16', status: 'reported', isolationRequired: false, note: '演示数据', reportedBy: 'demo-user', createdAt: '2026-10-16T03:30:00.000Z' },
+    ];
+  }
   const db = getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.nosocomial_infections WHERE status IN ('reported','under_investigation') ORDER BY report_date DESC`;
   return rows.map(rmap);

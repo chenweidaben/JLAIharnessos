@@ -25,6 +25,8 @@ function clientIpOf(c: Ctx): string {
 
 /** 简单按 IP 限流：windowMs 内最多 limit 次 */
 export function rateLimit(c: Ctx, limit = 300, windowMs = 60_000): Response | null {
+  // DEMO_MODE 下不限流（本地演示/压测场景）
+  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') return null;
   const ip = clientIpOf(c);
   const now = Date.now();
   const hits = (buckets.get(ip) ?? []).filter((t) => now - t < windowMs);
@@ -49,6 +51,7 @@ export function rateLimit(c: Ctx, limit = 300, windowMs = 60_000): Response | nu
  * @returns 超限返回 429 Response，放行返回 null
  */
 export function loginRateLimit(c: Ctx): Response | null {
+  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') return null;
   const ip = clientIpOf(c);
   const now = Date.now();
   const hits = (loginBuckets.get(ip) ?? []).filter((t) => now - t < LOGIN_WINDOW_MS);

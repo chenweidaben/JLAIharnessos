@@ -301,6 +301,20 @@ export async function listInterpretations(
   audience: Audience | null = null,
   sql?: DbExecutor,
 ): Promise<InterpListRow[]> {
+  if (process.env.DEMO_MODE === '1') {
+    // DEMO_MODE：PostgreSQL 未启动，返回示例队列数据，避免 ECONNREFUSED → 500
+    const now = new Date().toISOString();
+    const demo: InterpListRow[] = [
+      { id: 'demo-lab-1', visitId: 'demo-vis-1', visitNo: 'IP000101', patientName: '张*三', department: '心血管内科', abnormalCount: 3, criticalCount: 0, status: 'pending_review', audience: 'doctor', updatedAt: now },
+      { id: 'demo-lab-2', visitId: 'demo-vis-2', visitNo: 'IP000102', patientName: '李*四', department: '呼吸内科', abnormalCount: 1, criticalCount: 1, status: 'pending_review', audience: 'doctor', updatedAt: now },
+      { id: 'demo-lab-3', visitId: 'demo-vis-3', visitNo: 'IP000103', patientName: '王*五', department: '消化内科', abnormalCount: 0, criticalCount: 0, status: 'signed', audience: 'doctor', updatedAt: now },
+    ];
+    return demo.filter(
+      (r) =>
+        (status == null || r.status === status) &&
+        (audience == null || r.audience === audience),
+    );
+  }
   const db = sql ?? getDb();
   const rows = await db`
     SELECT r.id, r.visit_id, v.visit_no, p.name_masked, r.department,

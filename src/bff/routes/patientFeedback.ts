@@ -90,6 +90,25 @@ async function handleSubmit(c: Ctx): Promise<Response> {
  * 管理员查看科室满意度排名、高频问题与改进方向。
  */
 async function handleAnalysis(): Promise<Response> {
+  if (process.env.DEMO_MODE === '1') {
+    const now = new Date().toISOString();
+    const list: PatientFeedbackItem[] = [
+      {
+        patientId: 'demo-p-001', visitId: 'demo-v-001', doctorId: 'demo-doc-001',
+        deptCode: 'INTERNAL', rating: 5,
+        comment: '医生解释清楚，候诊时间可以接受。',
+        createdAt: now,
+      },
+      {
+        patientId: 'demo-p-002', visitId: 'demo-v-002', doctorId: 'demo-doc-002',
+        deptCode: 'CARDIO', rating: 3,
+        comment: '候诊等待时间偏长，希望改进。',
+        createdAt: now,
+      },
+    ];
+    return json(ok(analyzePatientFeedback(list)));
+  }
+
   try {
     const db = getDb();
     // 只取聚合所需列，按创建时间倒序取近期窗口，配合 idx_patient_feedback_dept_created。

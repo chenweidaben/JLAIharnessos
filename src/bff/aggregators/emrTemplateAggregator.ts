@@ -119,6 +119,14 @@ export function groupTemplatesByCategory(templates: EmrTemplate[]): {
  * @param category 可选，仅返回该分类下的模板
  */
 export async function listView(category?: string | null): Promise<EmrTemplate[]> {
+  if (process.env.DEMO_MODE === '1') {
+    const demo: EmrTemplate[] = [
+      { id: 'demo-emr-1', name: '入院记录模板', category: '住院', content: '主诉：\n现病史：', created_by: null, created_at: '2026-10-01T08:00:00.000Z' },
+      { id: 'demo-emr-2', name: '出院小结模板', category: '出院', content: '入院诊断：\n出院诊断：', created_by: null, created_at: '2026-10-03T08:00:00.000Z' },
+      { id: 'demo-emr-3', name: '门诊病历模板', category: '门诊', content: '主诉：\n处理意见：', created_by: null, created_at: '2026-10-05T08:00:00.000Z' },
+    ];
+    return filterTemplatesByCategory(demo, category);
+  }
   const db = getDb();
   if (category) {
     return db<EmrTemplate[]>`

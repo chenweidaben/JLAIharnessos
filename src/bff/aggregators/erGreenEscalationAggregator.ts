@@ -60,6 +60,12 @@ export async function scanAndEscalate(auth: AuthView): Promise<{ created: number
 }
 
 export async function listOverdue(auth: AuthView): Promise<OverdueRow[]> {
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { visitId: 'V-DEMO-001', level: 'I', chiefComplaint: '急性胸痛', createdAt: new Date(Date.now() - 3600000), triagedBy: 'demo-nurse-01' },
+      { visitId: 'V-DEMO-002', level: 'II', chiefComplaint: '剧烈腹痛', createdAt: new Date(Date.now() - 1800000), triagedBy: 'demo-nurse-02' },
+    ];
+  }
   assertPermission(auth, 'er_triage:view');
   const db = getDb();
   const now = new Date();

@@ -29,6 +29,7 @@ import {
   listApprovals,
   listSessions,
   getApprovalById,
+  type MedmuseApprovalRow,
 } from '../agents/medmuseRepo';
 import { TemplateFallbackProvider } from '../agents/modelProvider';
 import { resolveApprovalTicket, expireStaleApprovals } from '../agents/sentinel';
@@ -269,6 +270,28 @@ export const medmuseRoutes: RouteDef[] = [
     handle: async (c) => {
       const denied = requirePermissionCode(c, 'medmuse:chat');
       if (denied) return denied;
+      // DEMO：不连 PG，直接返回内存审批列表，不调用 expireStaleApprovals / listApprovals
+      if (isDemo) {
+        const url = new URL(c.req.url);
+        const status = (url.searchParams.get('status') ?? 'pending') as
+          | 'pending' | 'approved' | 'rejected' | 'expired';
+        const now = new Date();
+        const demoApprovals: MedmuseApprovalRow[] = [
+          {
+            id: 'demo-appr-1', message_id: 'demo-msg-1', action: { type: 'prescription', drug: '头孢呋辛' },
+            status: 'pending', risk_level: 'warning', requested_by: 'demo-user', approved_by: null,
+            approved_at: null, rejection_reason: null,
+            expires_at: new Date(now.getTime() + 3600000).toISOString(), created_at: new Date(now.getTime() - 600000).toISOString(),
+          },
+          {
+            id: 'demo-appr-2', message_id: 'demo-msg-2', action: { type: 'order', item: '手术排程' },
+            status: 'pending', risk_level: 'critical', requested_by: 'demo-user', approved_by: null,
+            approved_at: null, rejection_reason: null,
+            expires_at: new Date(now.getTime() + 7200000).toISOString(), created_at: new Date(now.getTime() - 1200000).toISOString(),
+          },
+        ];
+        return json(ok(demoApprovals.filter((a) => a.status === status)));
+      }
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或用户不存在', c.traceId), 401);
       try {

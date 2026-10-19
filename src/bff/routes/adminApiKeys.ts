@@ -124,6 +124,28 @@ async function handleList(c: Ctx): Promise<Response> {
   const denied = requireRole(c, 'admin');
   if (denied) return denied;
 
+  if (process.env.DEMO_MODE === '1') {
+    const now = new Date().toISOString();
+    return json(ok({
+      total: 1,
+      items: [
+        {
+          id: 'demo-key-1',
+          keyPrefix: 'jlan_demo_',
+          name: '演示对接方-HIS主索引',
+          permissions: ['patient:read', 'visit:read'],
+          status: 'active',
+          expiresAt: new Date(Date.now() + 90 * 86400000).toISOString(),
+          createdBy: 'demo-admin',
+          createdAt: now,
+          lastUsedAt: now,
+          revokedAt: null,
+          note: 'DEMO_MODE 下的演示数据，未连接数据库',
+        },
+      ],
+    }));
+  }
+
   try {
     const db = getDb();
     const rows = await db`

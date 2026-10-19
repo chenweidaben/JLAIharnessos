@@ -50,6 +50,12 @@ export async function scanDueReminders(auth: AuthView): Promise<{ scanned: numbe
 }
 
 export async function listUpcoming(auth: AuthView): Promise<{ id: string; patientId: string; drug: string; cycleNo: number; plannedDate: string; reminderSent: boolean }[]> {
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-chemo-1', patientId: 'P-DEMO-001', drug: '紫杉醇', cycleNo: 2, plannedDate: new Date(Date.now() + 86400000).toISOString().slice(0, 10), reminderSent: false },
+      { id: 'demo-chemo-2', patientId: 'P-DEMO-002', drug: '顺铂', cycleNo: 4, plannedDate: new Date(Date.now() + 86400000).toISOString().slice(0, 10), reminderSent: false },
+    ];
+  }
   if (!auth.permissions.includes('oncology:view') && !auth.permissions.includes('chemo:remind')) throw forbidden('缺少权限');
   const db = getDb();
   const tomorrow = new Date(Date.now() + 86400000);
