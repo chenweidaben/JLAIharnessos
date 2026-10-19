@@ -3425,6 +3425,14 @@ import { emrAiOpRecordQcV14Routes } from './routes/emrAiOpRecordQcV14';
 import { emrAiPostopProgressTrackV14Routes } from './routes/emrAiPostopProgressTrackV14';
 // M555-D：病历AI出院小结自动生成 V14 GET/POST /api/v1/emr-ai-discharge-summary-gen（EMR 深化四模块，M555 收官，病历AI围手术期管理系列）
 import { emrAiDischargeSummaryGenV14Routes } from './routes/emrAiDischargeSummaryGenV14';
+// M556-A：病历AI病案首页智能编码 V14 GET/POST /api/v1/emr-ai-frontpage-smart-coding（EMR 深化四模块，病历AI病案管理与质量统计系列）
+import { emrAiFrontpageSmartCodingV14Routes } from './routes/emrAiFrontpageSmartCodingV14';
+// M556-B：病历AI病案质量评分 V14 GET/POST /api/v1/emr-ai-record-quality-score（EMR 深化四模块，病历AI病案管理与质量统计系列）
+import { emrAiRecordQualityScoreV14Routes } from './routes/emrAiRecordQualityScoreV14';
+// M556-C：病历AI病案缺陷预警 V14 GET/POST /api/v1/emr-ai-record-defect-alert（EMR 深化四模块，病历AI病案管理与质量统计系列）
+import { emrAiRecordDefectAlertV14Routes } from './routes/emrAiRecordDefectAlertV14';
+// M556-D：病历AI病案利用分析 V14 GET/POST /api/v1/emr-ai-record-utilization-analysis（EMR 深化四模块，M556 收官，病历AI病案管理与质量统计系列）
+import { emrAiRecordUtilizationAnalysisV14Routes } from './routes/emrAiRecordUtilizationAnalysisV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5380,6 +5388,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiOpRecordQcV14Routes, // M555-B：病历AI手术记录质控 V14 GET/POST /api/v1/emr-ai-op-record-qc（EMR 深化四模块，病历AI围手术期管理系列）
   ...emrAiPostopProgressTrackV14Routes, // M555-C：病历AI术后病程跟踪 V14 GET/POST /api/v1/emr-ai-postop-progress-track（EMR 深化四模块，病历AI围手术期管理系列）
   ...emrAiDischargeSummaryGenV14Routes, // M555-D：病历AI出院小结自动生成 V14 GET/POST /api/v1/emr-ai-discharge-summary-gen（EMR 深化四模块，M555 收官，病历AI围手术期管理系列）
+  ...emrAiFrontpageSmartCodingV14Routes, // M556-A：病历AI病案首页智能编码 V14 GET/POST /api/v1/emr-ai-frontpage-smart-coding（EMR 深化四模块，病历AI病案管理与质量统计系列）
+  ...emrAiRecordQualityScoreV14Routes, // M556-B：病历AI病案质量评分 V14 GET/POST /api/v1/emr-ai-record-quality-score（EMR 深化四模块，病历AI病案管理与质量统计系列）
+  ...emrAiRecordDefectAlertV14Routes, // M556-C：病历AI病案缺陷预警 V14 GET/POST /api/v1/emr-ai-record-defect-alert（EMR 深化四模块，病历AI病案管理与质量统计系列）
+  ...emrAiRecordUtilizationAnalysisV14Routes, // M556-D：病历AI病案利用分析 V14 GET/POST /api/v1/emr-ai-record-utilization-analysis（EMR 深化四模块，M556 收官，病历AI病案管理与质量统计系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
