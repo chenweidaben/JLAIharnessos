@@ -12,6 +12,9 @@ LOCAL_VLLM_URL = "http://vllm:8000/v1"
 # 本地记忆存储路径（生产用 Redis/PG，禁止境外存储）
 MEMORY_STORE_PATH = "./data/memory.json"
 
+# 诊疗学习数据本地存储，生产接 Milvus/Qdrant 向量库
+LEARNING_STORE_PATH = "./data/learning.json"
+
 # 禁止使用的境外大模型 endpoint 列表
 FORBIDDEN_ENDPOINTS = [
     "https://api.openai.com",
