@@ -2,9 +2,13 @@
 
 # 健澜AI原生医院操作系统OS
 
-### 健澜科技 · AI 原生未来医院操作系统
+### 让每一次诊疗都沉淀为系统能力
 
+[![Build Status](https://img.shields.io/badge/Build-Passing-0A2540.svg)]()
 [![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.3-0A2540.svg)](https://spring.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-0A2540.svg)](https://fastapi.tiangolo.com/)
+[![JDK](https://img.shields.io/badge/JDK-21-0A2540.svg)](https://openjdk.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
 [![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
 [![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%3A5433-0A2540.svg)](https://www.postgresql.org/)
@@ -21,11 +25,18 @@
 >
 > | 层 | 技术栈 | 模块数 | 端口 |
 > |---|---|---|---|
-> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **28 模块** | 9090 |
-> | Python 智能层 | FastAPI + vLLM | **13 router** | 8000 |
+> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **45 模块** | 9090 |
+> | Python 智能层 | FastAPI + vLLM | **19 router** | 8000 |
 > | TS BFF 聚合层 | Bun + TypeScript | 1957 路由（保留） | 8080 |
 >
-> 🚀 **快速启动**：`make up` 一键启动全栈（postgres + redis + monolith + ai-service）
+> 🚀 **快速启动**：
+> ```bash
+> git clone https://gitcode.com/jlmedaios/jlmedaios-os.git
+> cd jlmedaios-os
+> make up
+> # 访问 http://localhost:9090/actuator/health
+> # 访问 http://localhost:8000/ai/health
+> ```
 
 ---
 
