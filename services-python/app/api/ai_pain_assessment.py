@@ -1,7 +1,7 @@
 # AI 疼痛评估辅助：当前规则 mock，生产接 vLLM + 疼痛管理指南
 from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 
 router = APIRouter()
 
@@ -41,4 +41,23 @@ async def pain_assist(req: PainAssistRequest):
         "expectedRelief": expected,
         "warning": warning,
         "followUpMinutes": followup
+    }
+
+
+class PainAssessRequest(BaseModel):
+    symptoms: Dict[str, object]
+
+
+@router.post("/ai/pain/assess")
+async def pain_assess(req: PainAssessRequest):
+    """
+    AI 疼痛评估（深化：疼痛类型诊断）。
+    生产环境接 vLLM + 疼痛医学 NLP 模型，输出疼痛类型/推荐量表/一线治疗/警告/随访建议。
+    """
+    return {
+        "painType": "慢性神经病理性疼痛",
+        "recommendedScale": "DN4量表",
+        "firstLineTreatment": "加巴喷丁+普瑞巴林",
+        "warning": "注意药物相互作用",
+        "followUp": "2周后复诊评估疗效"
     }

@@ -6,10 +6,13 @@
 package com.jlmedaios.monolith.pain_management.service;
 
 import com.jlmedaios.monolith.pain_management.entity.PainAssessment;
+import com.jlmedaios.monolith.pain_management.entity.PainRecord;
 import com.jlmedaios.monolith.pain_management.repository.PainAssessmentRepository;
+import com.jlmedaios.monolith.pain_management.repository.PainRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -22,6 +25,7 @@ import java.util.List;
 public class PainManagementService {
 
     private final PainAssessmentRepository painAssessmentRepository;
+    private final PainRecordRepository painRecordRepository;
 
     /**
      * 疼痛评估。
@@ -64,5 +68,73 @@ public class PainManagementService {
      */
     public List<PainAssessment> severePainList() {
         return painAssessmentRepository.findByPainScoreGreaterThanEqual(7);
+    }
+
+    // ==================== PainRecord 疼痛评估管理（深化） ====================
+
+    /**
+     * 待随访患者列表。
+     *
+     * @return 疼痛评估记录列表
+     */
+    public List<PainRecord> pendingFollowUp() {
+        return painRecordRepository.findByFollowUpDateBefore(LocalDate.now());
+    }
+
+    /**
+     * 创建疼痛评估。
+     *
+     * @param recordNo   记录编号
+     * @param patientId  患者 ID
+     * @param painSite   疼痛部位
+     * @param painScore  疼痛评分
+     * @param painType   疼痛类型
+     * @return 已创建的疼痛评估记录
+     */
+    public PainRecord assess(String recordNo, String patientId, String painSite,
+                              Integer painScore, String painType) {
+        PainRecord record = PainRecord.builder()
+                .recordNo(recordNo)
+                .patientId(patientId)
+                .painSite(painSite)
+                .painScore(painScore)
+                .painType(painType)
+                .build();
+        return painRecordRepository.save(record);
+    }
+
+    /**
+     * 记录治疗方案。
+     *
+     * @param recordNo      记录编号
+     * @param treatmentType 治疗类型
+     * @param followUpDate  随访日期
+     * @return 已记录治疗的疼痛评估记录
+     */
+    public PainRecord recordTreatment(String recordNo, String treatmentType, LocalDate followUpDate) {
+        PainRecord record = findByRecordNo(recordNo);
+        if (record != null) {
+            record.setTreatmentType(treatmentType);
+            record.setFollowUpDate(followUpDate);
+            return painRecordRepository.save(record);
+        }
+        return null;
+    }
+
+    /**
+     * 患者疼痛史。
+     *
+     * @param patientId 患者 ID
+     * @return 疼痛评估记录列表
+     */
+    public List<PainRecord> painHistory(Long patientId) {
+        return painRecordRepository.findByPatientId(String.valueOf(patientId));
+    }
+
+    private PainRecord findByRecordNo(String recordNo) {
+        return painRecordRepository.findAll().stream()
+                .filter(r -> recordNo.equals(r.getRecordNo()))
+                .findFirst()
+                .orElse(null);
     }
 }
