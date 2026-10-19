@@ -10,6 +10,7 @@ import com.jlmedaios.monolith.mobile_rounds.repository.RoundRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -70,5 +71,47 @@ public class MobileRoundsService {
      */
     public List<RoundRecord> patientHistory(Long patientId) {
         return roundRecordRepository.findByPatientId(patientId);
+    }
+
+    /**
+     * 记录移动查房（含生命体征）。
+     *
+     * @param roundNo      查房编号
+     * @param patientId     患者 ID
+     * @param nurseId       护士工号
+     * @param roundType     查房类型
+     * @param temperature   体温
+     * @param bloodPressure 血压
+     * @param heartRate     心率
+     * @param spo2          血氧
+     * @param nurseNotes    护士记录
+     * @return 已持久化的查房记录
+     */
+    public RoundRecord recordRound(String roundNo, Long patientId, String nurseId,
+                                    String roundType, BigDecimal temperature, String bloodPressure,
+                                    Integer heartRate, Integer spo2, String nurseNotes) {
+        RoundRecord record = RoundRecord.builder()
+                .roundNo(roundNo)
+                .patientId(patientId)
+                .nurseId(nurseId)
+                .roundType(roundType)
+                .temperature(temperature)
+                .bloodPressure(bloodPressure)
+                .heartRate(heartRate)
+                .spo2(spo2)
+                .nurseNotes(nurseNotes)
+                .build();
+        return roundRecordRepository.save(record);
+    }
+
+    /**
+     * 今日查房记录。
+     *
+     * @return 查房记录列表
+     */
+    public List<RoundRecord> todayRounds() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
+        return roundRecordRepository.findByRoundTimeBetween(start, end);
     }
 }

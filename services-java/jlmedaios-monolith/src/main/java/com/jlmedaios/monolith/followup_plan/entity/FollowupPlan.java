@@ -36,17 +36,29 @@ public class FollowupPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "plan_no")
+    private String planNo;
+
     @Column(name = "patient_id")
     private Long patientId;
 
     @Column(name = "visit_id")
     private Long visitId;
 
+    @Column(name = "disease_code")
+    private String diseaseCode;
+
     @Column(name = "followup_type")
     private String followupType;
 
+    @Column(name = "plan_type")
+    private String planType;
+
     @Column(name = "planned_date")
     private LocalDate plannedDate;
+
+    @Column(name = "followup_date")
+    private LocalDate followupDate;
 
     @Column(name = "status")
     @Builder.Default
@@ -54,6 +66,9 @@ public class FollowupPlan {
 
     @Column(name = "channel")
     private String channel;
+
+    @Column(name = "contact_method")
+    private String contactMethod;
 
     @Column(name = "execute_note", columnDefinition = "TEXT")
     private String executeNote;

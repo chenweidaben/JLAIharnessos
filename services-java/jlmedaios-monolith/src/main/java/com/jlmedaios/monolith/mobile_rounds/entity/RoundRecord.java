@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -35,8 +36,15 @@ public class RoundRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "round_no")
+    private String roundNo;
+
     @Column(name = "patient_id")
     private Long patientId;
+
+    // @Sensitive 护士工号，脱敏存储
+    @Column(name = "nurse_id")
+    private String nurseId;
 
     @Column(name = "ward_code")
     private String wardCode;
@@ -57,4 +65,19 @@ public class RoundRecord {
     @Column(name = "round_time")
     @Builder.Default
     private LocalDateTime roundTime = LocalDateTime.now();
+
+    @Column(name = "temperature")
+    private BigDecimal temperature;
+
+    @Column(name = "blood_pressure")
+    private String bloodPressure;
+
+    @Column(name = "heart_rate")
+    private Integer heartRate;
+
+    @Column(name = "spo2")
+    private Integer spo2;
+
+    @Column(name = "nurse_notes", columnDefinition = "TEXT")
+    private String nurseNotes;
 }

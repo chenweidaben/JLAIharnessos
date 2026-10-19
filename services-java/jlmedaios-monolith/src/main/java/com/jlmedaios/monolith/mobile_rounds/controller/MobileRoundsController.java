@@ -9,13 +9,9 @@ import com.jlmedaios.monolith.common.Result;
 import com.jlmedaios.monolith.mobile_rounds.entity.RoundRecord;
 import com.jlmedaios.monolith.mobile_rounds.service.MobileRoundsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +63,49 @@ public class MobileRoundsController {
      */
     @GetMapping("/patient/{patientId}")
     public Result<List<RoundRecord>> patientHistory(@PathVariable Long patientId) {
+        return Result.ok(mobileRoundsService.patientHistory(patientId));
+    }
+
+    /**
+     * 记录移动查房（含生命体征）。
+     *
+     * @param body {roundNo, patientId, nurseId, roundType, temperature, bloodPressure, heartRate, spo2, nurseNotes}
+     * @return Result<RoundRecord>
+     */
+    @PostMapping("/round")
+    public Result<RoundRecord> recordRound(@RequestBody Map<String, Object> body) {
+        RoundRecord record = mobileRoundsService.recordRound(
+                String.valueOf(body.get("roundNo")),
+                Long.valueOf(String.valueOf(body.get("patientId"))),
+                String.valueOf(body.get("nurseId")),
+                String.valueOf(body.get("roundType")),
+                new BigDecimal(String.valueOf(body.get("temperature"))),
+                String.valueOf(body.get("bloodPressure")),
+                Integer.parseInt(String.valueOf(body.get("heartRate"))),
+                Integer.parseInt(String.valueOf(body.get("spo2"))),
+                String.valueOf(body.get("nurseNotes"))
+        );
+        return Result.ok(record);
+    }
+
+    /**
+     * 今日查房记录。
+     *
+     * @return Result<List<RoundRecord>>
+     */
+    @GetMapping("/round/today")
+    public Result<List<RoundRecord>> todayRounds() {
+        return Result.ok(mobileRoundsService.todayRounds());
+    }
+
+    /**
+     * 患者查房历史（新路径）。
+     *
+     * @param patientId 患者 ID
+     * @return Result<List<RoundRecord>>
+     */
+    @GetMapping("/round/patient/{patientId}")
+    public Result<List<RoundRecord>> patientHistoryNew(@PathVariable Long patientId) {
         return Result.ok(mobileRoundsService.patientHistory(patientId));
     }
 }

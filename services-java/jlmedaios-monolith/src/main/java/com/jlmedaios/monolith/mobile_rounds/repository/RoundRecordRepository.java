@@ -29,6 +29,15 @@ public interface RoundRecordRepository extends JpaRepository<RoundRecord, Long> 
     List<RoundRecord> findByWardCodeAndRoundTimeBetween(String wardCode, LocalDateTime start, LocalDateTime end);
 
     /**
+     * 按时间范围查询查房记录。
+     *
+     * @param start 开始时间
+     * @param end   结束时间
+     * @return 查房记录列表
+     */
+    List<RoundRecord> findByRoundTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    /**
      * 按患者 ID 查询查房历史。
      *
      * @param patientId 患者 ID

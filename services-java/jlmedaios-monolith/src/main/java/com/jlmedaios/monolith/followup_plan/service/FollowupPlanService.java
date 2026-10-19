@@ -75,4 +75,56 @@ public class FollowupPlanService {
     public List<FollowupPlan> dueToday() {
         return followupPlanRepository.findByPlannedDateAndStatus(LocalDate.now(), "PENDING");
     }
+
+    /**
+     * 创建随访计划（含 planNo/diseaseCode/planType/followupDate/contactMethod）。
+     *
+     * @param planNo        计划编号
+     * @param patientId     患者 ID
+     * @param diseaseCode   疾病编码
+     * @param planType      计划类型
+     * @param followupDate  随访日期
+     * @param contactMethod  联系方式
+     * @return 已持久化的随访计划
+     */
+    public FollowupPlan createPlan(String planNo, Long patientId, String diseaseCode,
+                                    String planType, LocalDate followupDate, String contactMethod) {
+        FollowupPlan plan = FollowupPlan.builder()
+                .planNo(planNo)
+                .patientId(patientId)
+                .diseaseCode(diseaseCode)
+                .planType(planType)
+                .followupDate(followupDate)
+                .contactMethod(contactMethod)
+                .build();
+        return followupPlanRepository.save(plan);
+    }
+
+    /**
+     * 完成随访（status=COMPLETED）。
+     *
+     * @param id 计划 ID
+     * @return 已更新的随访计划
+     */
+    public Optional<FollowupPlan> complete(Long id) {
+        Optional<FollowupPlan> opt = followupPlanRepository.findById(id);
+        if (opt.isPresent()) {
+            FollowupPlan plan = opt.get();
+            plan.setStatus("COMPLETED");
+            plan.setUpdatedAt(LocalDateTime.now());
+            followupPlanRepository.save(plan);
+        }
+        return opt;
+    }
+
+    /**
+     * 今日待随访列表。
+     *
+     * @return 随访计划列表
+     */
+    public List<FollowupPlan> todayList() {
+        return followupPlanRepository.findByStatus("PENDING").stream()
+                .filter(p -> LocalDate.now().equals(p.getFollowupDate()))
+                .toList();
+    }
 }

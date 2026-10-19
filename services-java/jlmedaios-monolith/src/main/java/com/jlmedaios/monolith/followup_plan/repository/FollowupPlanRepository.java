@@ -34,4 +34,12 @@ public interface FollowupPlanRepository extends JpaRepository<FollowupPlan, Long
      * @return 随访计划列表
      */
     List<FollowupPlan> findByPatientId(Long patientId);
+
+    /**
+     * 按状态查询随访计划。
+     *
+     * @param status 状态
+     * @return 随访计划列表
+     */
+    List<FollowupPlan> findByStatus(String status);
 }

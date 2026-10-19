@@ -72,4 +72,45 @@ public class FollowupPlanController {
     public Result<List<FollowupPlan>> dueToday() {
         return Result.ok(followupPlanService.dueToday());
     }
+
+    /**
+     * 创建随访计划（新路径）。
+     *
+     * @param body {planNo, patientId, diseaseCode, planType, followupDate, contactMethod}
+     * @return Result<FollowupPlan>
+     */
+    @PostMapping("/plan")
+    public Result<FollowupPlan> createPlan(@RequestBody Map<String, Object> body) {
+        FollowupPlan plan = followupPlanService.createPlan(
+                String.valueOf(body.get("planNo")),
+                Long.valueOf(String.valueOf(body.get("patientId"))),
+                String.valueOf(body.get("diseaseCode")),
+                String.valueOf(body.get("planType")),
+                LocalDate.parse(String.valueOf(body.get("followupDate"))),
+                String.valueOf(body.get("contactMethod"))
+        );
+        return Result.ok(plan);
+    }
+
+    /**
+     * 完成随访。
+     *
+     * @param id 计划 ID
+     * @return Result<FollowupPlan>
+     */
+    @PutMapping("/{id}/complete")
+    public Result<FollowupPlan> complete(@PathVariable Long id) {
+        return followupPlanService.complete(id)
+                .map(Result::ok).orElseGet(() -> Result.ok(null));
+    }
+
+    /**
+     * 今日待随访列表。
+     *
+     * @return Result<List<FollowupPlan>>
+     */
+    @GetMapping("/today")
+    public Result<List<FollowupPlan>> todayList() {
+        return Result.ok(followupPlanService.todayList());
+    }
 }
