@@ -9,7 +9,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction
+from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain
 from app.core.api_key_auth import API_KEYS, check_rate_limit
 from app.core.audit_middleware import AuditMiddleware
 
@@ -66,6 +66,9 @@ app.include_router(ai_similar_cases.router)
 app.include_router(nlp_extract.router)
 app.include_router(imaging_ai.router)
 app.include_router(prediction.router)
+
+# AI 健康大脑
+app.include_router(ai_brain.router)
 
 
 @app.on_event("startup")
