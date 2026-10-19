@@ -1,0 +1,25 @@
+# ============================================================
+# 健澜科技 jlmedaios Python AI 服务 - docker-compose.yml
+# ============================================================
+services:
+  ai-service:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - vllm-openai
+
+  # vLLM 推理服务（GPU 节点部署，当前预留）
+  # 本地开发用 mock 即可，不需要真实 GPU 节点
+  vllm-openai:
+    image: vllm/vllm-openai
+    ports:
+      - "8001:8000"
+    # 生产环境需配置 GPU 资源：
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
