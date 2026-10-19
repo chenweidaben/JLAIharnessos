@@ -9,7 +9,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain, knowledge_graph, ai_scheduling, ai_quality_insight, ai_emergency_triage, monitoring, ai_diagnosis, ai_prescription_review, ai_medical_scribe, ai_medication_adherence, ai_health_brain, ai_resource_optimization, ai_symptom_check, ai_quality_forecast, ai_clinical_notes, ai_risk_score, ai_data_quality, ai_teaching_assistant, ai_patient_satisfaction, ai_disease_prediction, ai_hospital_operation, ai_knowledge_inference, ai_imaging_report
+from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain, knowledge_graph, ai_scheduling, ai_quality_insight, ai_emergency_triage, monitoring, ai_diagnosis, ai_prescription_review, ai_medical_scribe, ai_medication_adherence, ai_health_brain, ai_resource_optimization, ai_symptom_check, ai_quality_forecast, ai_clinical_notes, ai_risk_score, ai_data_quality, ai_teaching_assistant, ai_patient_satisfaction, ai_disease_prediction, ai_hospital_operation, ai_knowledge_inference, ai_imaging_report, ai_surgery_risk
 from app.core.api_key_auth import API_KEYS, check_rate_limit
 from app.core.audit_middleware import AuditMiddleware
 
@@ -135,6 +135,9 @@ app.include_router(ai_knowledge_inference.router)
 
 # AI 影像报告辅助
 app.include_router(ai_imaging_report.router)
+
+# AI 手术风险评估
+app.include_router(ai_surgery_risk.router)
 
 
 @app.on_event("startup")
