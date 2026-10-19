@@ -25,8 +25,8 @@
 >
 > | 层 | 技术栈 | 模块数 | 端口 |
 > |---|---|---|---|
-> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **45 模块** | 9090 |
-> | Python 智能层 | FastAPI + vLLM | **19 router** | 8000 |
+> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **80 模块** | 9090 |
+> | Python 智能层 | FastAPI + vLLM | **34 router** | 8000 |
 > | TS BFF 聚合层 | Bun + TypeScript | 1957 路由（保留） | 8080 |
 >
 > 🚀 **快速启动**：
