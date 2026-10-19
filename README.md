@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # jlmedaios · 健澜科技 AI 原生未来医院操作系统
 
@@ -44,6 +44,8 @@
 4. **业务中台一体化**：HIS/EMR/护理/药房/手术/质控/医保共享统一用户权限主数据
 5. **学习引擎**：每个业务模块都有"学习点"——记录→积累→进化→反馈
 6. **生产安全**：RBAC + 脱敏 + 降级 + 幂等 + 熔断
+
+> 📘 **对外产品白皮书**：[docs/PRODUCT_ARCHITECTURE.md](./docs/PRODUCT_ARCHITECTURE.md) —— JLMEDAIOS 产品架构与核心功能（云原生微服务三中台一体 · MEDMUSE 岗位智能体 · DOCTOR_MUSE 经验沉淀 · DAMO-RADAR 影像大模型 18 器官/146 发现）。
 
 ---
 
@@ -482,3 +484,42 @@ jlmedaios/
 **© 杭州健澜科技有限公司 · 让医疗 AI 更简单、更落地**
 
 </div>
+
+---
+
+# 🏗️ 架构重构路线图（2026-10 启动）
+
+> 为大型三甲医院真实生产环境重构。核心交易 Java 化、AI 层 Python 化、前端 BFF 保留 TypeScript，绞杀者模式全速推进。
+
+## 三层架构
+
+| 层 | 技术栈 | 职责 |
+|---|---|---|
+| **体验层** | React 19 + TypeScript + Bun BFF | 医生/护士工作站 UI、AI 对话流式、表单报表 |
+| **核心交易层** | Java 17 + Spring Cloud 2024 + Nacos + Sentinel + Seata | HIS 收费/挂号/医嘱/药房/EMPI/LIS-PACS 对接，强一致事务 |
+| **智能层** | Python 3.11 + FastAPI + vLLM | NLP 病历质控、影像辅诊、CDSS、知识图谱 RAG |
+| **数据层** | PostgreSQL 16 主从 + Redis Cluster + Kafka + MinIO + ES | 读写分离、消息队列、对象存储、日志检索 |
+
+## 为什么这样分
+
+- **钱和处方必须 Java**：挂号/收费/医嘱涉及资金与医疗安全，Seata 分布式事务、Sentinel 熔断、JVM 生态医院信息科熟
+- **AI 推理必须 Python**：transformers/vLLM/MONAI 生态全在 Python，GPU 异步队列不阻塞交易
+- **前端和 BFF 保留 TS**：现有 1957 路由资产不重写，BFF 只做聚合不碰核心交易库
+
+## 工程目录
+
+```
+services-java/       # Spring Cloud 微服务（核心交易）
+services-python/     # FastAPI AI 服务（智能层）
+src/bff/              # 现有 TypeScript BFF（聚合层，保留）
+web/                  # React 前端（保留）
+docs/architecture/    # 架构宪法/PRD/开发指南
+```
+
+## 合规目标
+
+- 等保三级、电子病历六级、互联互通四甲（HL7/FHIR R4）
+- 数据不出院、私有化部署、电子签名 CA
+- 信创适配：达梦/人大金仓 + 麒麟 + 鲲鹏
+
+> 📜 详细宪法见 `docs/architecture/00-架构宪法.md`
