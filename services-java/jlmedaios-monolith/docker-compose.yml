@@ -1,0 +1,33 @@
+# ============================================================
+# 健澜科技 jlmedaios 模块化单体 - docker-compose.yml
+# 生产环境用，H2 开发阶段不需要
+# ============================================================
+services:
+  monolith:
+    build: .
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: monolith
+      POSTGRES_USER: jlmedaios
+      POSTGRES_PASSWORD: changeit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

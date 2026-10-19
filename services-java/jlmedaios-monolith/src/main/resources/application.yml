@@ -19,12 +19,20 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  # H2 启动自动执行 schema.sql + data.sql
+  sql:
+    init:
+      mode: always
+  # Flyway 迁移（H2 阶段关闭，生产 PostgreSQL 开启）
+  flyway:
+    enabled: false
 
 # 生产环境切换 PostgreSQL 16:
 #   spring.datasource.url=jdbc:postgresql://localhost:5432/monolith
 #   spring.datasource.username=postgres
 #   spring.datasource.password=***
 #   spring.datasource.driver-class-name=org.postgresql.Driver
+#   spring.flyway.enabled=true
 # 后续可切达梦信创：
 #   spring.datasource.url=jdbc:dm://localhost:5236/monolith
 #   spring.datasource.driver-class-name=dm.jdbc.driver.DmDriver
@@ -33,4 +41,5 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        # 生产环境接 Prometheus + Grafana 监控
+        include: health,info,prometheus
