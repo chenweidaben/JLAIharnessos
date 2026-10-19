@@ -9,7 +9,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, nlp, cdss, imaging, encounter_memory
+from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds
 
 app = FastAPI(
     title="健澜AI原生医院操作系统OS",
@@ -31,6 +31,11 @@ app.include_router(nlp.router)
 app.include_router(cdss.router)
 app.include_router(imaging.router)
 app.include_router(encounter_memory.router)
+
+# AI 原生核心服务：质控/导诊/CDS
+app.include_router(ai_qc.router)
+app.include_router(ai_triage.router)
+app.include_router(ai_cds.router)
 
 
 @app.on_event("startup")
