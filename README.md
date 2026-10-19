@@ -1,8 +1,8 @@
 ﻿<div align="center">
 
-# jlmedaios · 健澜科技 AI 原生未来医院操作系统
+# 健澜AI原生医院操作系统OS
 
-### MEDMUSE 智能体驱动 · 微服务云原生 HIS·EMR 一体化平台
+### 健澜科技 · AI 原生未来医院操作系统
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
@@ -14,6 +14,18 @@
 > 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`）。
 
 </div>
+
+---
+
+> 🏥 **三层架构模块统计**
+>
+> | 层 | 技术栈 | 模块数 | 端口 |
+> |---|---|---|---|
+> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **28 模块** | 9090 |
+> | Python 智能层 | FastAPI + vLLM | **13 router** | 8000 |
+> | TS BFF 聚合层 | Bun + TypeScript | 1957 路由（保留） | 8080 |
+>
+> 🚀 **快速启动**：`make up` 一键启动全栈（postgres + redis + monolith + ai-service）
 
 ---
 
