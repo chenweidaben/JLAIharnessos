@@ -3465,6 +3465,14 @@ import { emrAiOutpatientPreTriageV14Routes } from './routes/emrAiOutpatientPreTr
 import { emrAiEmergencyObsNoteGenV14Routes } from './routes/emrAiEmergencyObsNoteGenV14';
 // M560-D：病历AI门诊复诊提醒推荐 V14 GET/POST /api/v1/emr-ai-outpatient-followup-reco（EMR 深化四模块，M560 收官，病历AI门诊与急诊管理系列）
 import { emrAiOutpatientFollowupRecoV14Routes } from './routes/emrAiOutpatientFollowupRecoV14';
+// M561-A：病历AI检查申请智能推荐 V14 GET/POST /api/v1/emr-ai-exam-apply-reco（EMR 深化四模块，病历AI医技检查与检验管理系列）
+import { emrAiExamApplyRecoV14Routes } from './routes/emrAiExamApplyRecoV14';
+// M561-B：病历AI检验申请合理性审查 V14 GET/POST /api/v1/emr-ai-lab-apply-audit（EMR 深化四模块，病历AI医技检查与检验管理系列）
+import { emrAiLabApplyAuditV14Routes } from './routes/emrAiLabApplyAuditV14';
+// M561-C：病历AI检查报告AI解读摘要 V14 GET/POST /api/v1/emr-ai-exam-report-summary（EMR 深化四模块，病历AI医技检查与检验管理系列）
+import { emrAiExamReportSummaryV14Routes } from './routes/emrAiExamReportSummaryV14';
+// M561-D：病历AI检验危急值智能提醒 V14 GET/POST /api/v1/emr-ai-lab-critical-alert（EMR 深化四模块，M561 收官，病历AI医技检查与检验管理系列）
+import { emrAiLabCriticalAlertV14Routes } from './routes/emrAiLabCriticalAlertV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5440,6 +5448,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiOutpatientPreTriageV14Routes, // M560-B：病历AI门诊预检分诊 V14 GET/POST /api/v1/emr-ai-outpatient-pre-triage（EMR 深化四模块，病历AI门诊与急诊管理系列）
   ...emrAiEmergencyObsNoteGenV14Routes, // M560-C：病历AI急诊留观病历生成 V14 GET/POST /api/v1/emr-ai-emergency-obs-note-gen（EMR 深化四模块，病历AI门诊与急诊管理系列）
   ...emrAiOutpatientFollowupRecoV14Routes, // M560-D：病历AI门诊复诊提醒推荐 V14 GET/POST /api/v1/emr-ai-outpatient-followup-reco（EMR 深化四模块，M560 收官，病历AI门诊与急诊管理系列）
+  ...emrAiExamApplyRecoV14Routes, // M561-A：病历AI检查申请智能推荐 V14 GET/POST /api/v1/emr-ai-exam-apply-reco（EMR 深化四模块，病历AI医技检查与检验管理系列）
+  ...emrAiLabApplyAuditV14Routes, // M561-B：病历AI检验申请合理性审查 V14 GET/POST /api/v1/emr-ai-lab-apply-audit（EMR 深化四模块，病历AI医技检查与检验管理系列）
+  ...emrAiExamReportSummaryV14Routes, // M561-C：病历AI检查报告AI解读摘要 V14 GET/POST /api/v1/emr-ai-exam-report-summary（EMR 深化四模块，病历AI医技检查与检验管理系列）
+  ...emrAiLabCriticalAlertV14Routes, // M561-D：病历AI检验危急值智能提醒 V14 GET/POST /api/v1/emr-ai-lab-critical-alert（EMR 深化四模块，M561 收官，病历AI医技检查与检验管理系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）
