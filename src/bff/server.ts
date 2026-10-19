@@ -3401,6 +3401,14 @@ import { emrAiDipGroupPredictV14Routes } from './routes/emrAiDipGroupPredictV14'
 import { emrAiCostRationalAuditV14Routes } from './routes/emrAiCostRationalAuditV14';
 // M552-D：病历AI医保结算清单质控 V14 GET/POST /api/v1/emr-ai-settlement-list-qc（EMR 深化四模块，M552 收官，病历AI医保DRG/DIP分组与费用管控系列）
 import { emrAiSettlementListQcV14Routes } from './routes/emrAiSettlementListQcV14';
+// M553-A：病历AI病历书写建议 V14 GET/POST /api/v1/emr-ai-writing-suggest（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+import { emrAiWritingSuggestV14Routes } from './routes/emrAiWritingSuggestV14';
+// M553-B：病历AI病历完整性检查 V14 GET/POST /api/v1/emr-ai-record-completeness-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+import { emrAiRecordCompletenessCheckV14Routes } from './routes/emrAiRecordCompletenessCheckV14';
+// M553-C：病历AI病历逻辑一致性检查 V14 GET/POST /api/v1/emr-ai-record-consistency-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+import { emrAiRecordConsistencyCheckV14Routes } from './routes/emrAiRecordConsistencyCheckV14';
+// M553-D：病历AI病历同质化对比 V14 GET/POST /api/v1/emr-ai-record-homogeneity-compare（EMR 深化四模块，M553 收官，病历AI病历书写辅助与质量提升系列）
+import { emrAiRecordHomogeneityCompareV14Routes } from './routes/emrAiRecordHomogeneityCompareV14';
 // M166-B：【绩效与人才】医院人才管理深化 GET /api/v1/admin/talent/inventory（人才画像/梯队/培训/继任，发展人不监控人）
 import { talentDeepRoutes } from './routes/talentDeep';
 // M172-A：【安全质量与运营】医院应急管理深化 GET /api/v1/admin/emergency/deep（十类预案库/风险评估/演练排期/物资/响应自动化）
@@ -5344,6 +5352,10 @@ const allRoutes: RouteDef[] = [
   ...emrAiDipGroupPredictV14Routes, // M552-B：病历AI DIP 分组预测 V14 GET/POST /api/v1/emr-ai-dip-group-predict（EMR 深化四模块，病历AI医保DRG/DIP分组与费用管控系列）
   ...emrAiCostRationalAuditV14Routes, // M552-C：病历AI费用合理性审查 V14 GET/POST /api/v1/emr-ai-cost-rational-audit（EMR 深化四模块，病历AI医保DRG/DIP分组与费用管控系列）
   ...emrAiSettlementListQcV14Routes, // M552-D：病历AI医保结算清单质控 V14 GET/POST /api/v1/emr-ai-settlement-list-qc（EMR 深化四模块，M552 收官，病历AI医保DRG/DIP分组与费用管控系列）
+  ...emrAiWritingSuggestV14Routes, // M553-A：病历AI病历书写建议 V14 GET/POST /api/v1/emr-ai-writing-suggest（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+  ...emrAiRecordCompletenessCheckV14Routes, // M553-B：病历AI病历完整性检查 V14 GET/POST /api/v1/emr-ai-record-completeness-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+  ...emrAiRecordConsistencyCheckV14Routes, // M553-C：病历AI病历逻辑一致性检查 V14 GET/POST /api/v1/emr-ai-record-consistency-check（EMR 深化四模块，病历AI病历书写辅助与质量提升系列）
+  ...emrAiRecordHomogeneityCompareV14Routes, // M553-D：病历AI病历同质化对比 V14 GET/POST /api/v1/emr-ai-record-homogeneity-compare（EMR 深化四模块，M553 收官，病历AI病历书写辅助与质量提升系列）
   ...talentDeepRoutes, // M166-B：【绩效与人才】人才盘点 GET /api/v1/admin/talent/inventory（画像/缺口/培训/继任）
   ...emergencyDeepRoutes, // M172-A：【安全质量与运营】应急管理深化 GET /api/v1/admin/emergency/deep（十类预案/风险/演练排期/物资/响应自动化）
   ...qualityDeepRoutes, // M172-B：【安全质量与运营】质量与安全深化 GET /api/v1/admin/quality/deep（国家口径指标/趋势外推/风险/改进）

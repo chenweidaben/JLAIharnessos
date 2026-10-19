@@ -3221,6 +3221,14 @@ const EmrAiDipGroupPredictPage = lazy(() => import('@/pages/emr-ai-dip-group-pre
 const EmrAiCostRationalAuditPage = lazy(() => import('@/pages/emr-ai-cost-rational-audit'));
 // M552-D：病历AI医保结算清单质控 V14（EMR 深化四模块，M552 收官）
 const EmrAiSettlementListQcPage = lazy(() => import('@/pages/emr-ai-settlement-list-qc'));
+// M553-A：病历AI病历书写建议 V14（EMR 深化四模块）
+const EmrAiWritingSuggestPage = lazy(() => import('@/pages/emr-ai-writing-suggest'));
+// M553-B：病历AI病历完整性检查 V14（EMR 深化四模块）
+const EmrAiRecordCompletenessCheckPage = lazy(() => import('@/pages/emr-ai-record-completeness-check'));
+// M553-C：病历AI病历逻辑一致性检查 V14（EMR 深化四模块）
+const EmrAiRecordConsistencyCheckPage = lazy(() => import('@/pages/emr-ai-record-consistency-check'));
+// M553-D：病历AI病历同质化对比 V14（EMR 深化四模块，M553 收官）
+const EmrAiRecordHomogeneityComparePage = lazy(() => import('@/pages/emr-ai-record-homogeneity-compare'));
 // 处方点评系统（M103-B）
 const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/PrescriptionReview'));
 // 门诊医生工作站（M105-B）
@@ -6383,6 +6391,14 @@ export default function AppRoutes() {
           <Route path="emr-ai-cost-rational-audit" element={<EmrAiCostRationalAuditPage />} />
           {/* M552-D：病历AI医保结算清单质控 V14（EMR 深化四模块，M552 收官） */}
           <Route path="emr-ai-settlement-list-qc" element={<EmrAiSettlementListQcPage />} />
+          {/* M553-A：病历AI病历书写建议 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-writing-suggest" element={<EmrAiWritingSuggestPage />} />
+          {/* M553-B：病历AI病历完整性检查 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-record-completeness-check" element={<EmrAiRecordCompletenessCheckPage />} />
+          {/* M553-C：病历AI病历逻辑一致性检查 V14（EMR 深化四模块） */}
+          <Route path="emr-ai-record-consistency-check" element={<EmrAiRecordConsistencyCheckPage />} />
+          {/* M553-D：病历AI病历同质化对比 V14（EMR 深化四模块，M553 收官） */}
+          <Route path="emr-ai-record-homogeneity-compare" element={<EmrAiRecordHomogeneityComparePage />} />
           {/* 处方点评系统（M103-B） */}
           <Route path="drug-review/prescription-review" element={<PrescriptionReviewPage />} />
           {/* 门诊医生工作站（M105-B） */}
