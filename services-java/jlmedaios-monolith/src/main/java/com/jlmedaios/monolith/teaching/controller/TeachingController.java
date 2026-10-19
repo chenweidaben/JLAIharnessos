@@ -6,12 +6,15 @@
 package com.jlmedaios.monolith.teaching.controller;
 
 import com.jlmedaios.monolith.common.Result;
+import com.jlmedaios.monolith.teaching.entity.TeachingPlan;
+import com.jlmedaios.monolith.teaching.entity.TeachingRecord;
 import com.jlmedaios.monolith.teaching.entity.TeachingTask;
 import com.jlmedaios.monolith.teaching.service.TeachingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,5 +79,55 @@ public class TeachingController {
     @GetMapping("/teacher/{teacherId}")
     public Result<List<TeachingTask>> teacherHistory(@PathVariable String teacherId) {
         return Result.ok(teachingService.teacherHistory(teacherId));
+    }
+
+    /**
+     * 创建教学计划。
+     *
+     * @param body {planTitle, traineeType, department, startDate, endDate, supervisorId}
+     * @return Result<TeachingPlan>
+     */
+    @PostMapping("/plan")
+    public Result<TeachingPlan> createPlan(@RequestBody Map<String, Object> body) {
+        TeachingPlan plan = teachingService.createPlan(
+                String.valueOf(body.get("planTitle")),
+                String.valueOf(body.get("traineeType")),
+                String.valueOf(body.get("department")),
+                LocalDate.parse(String.valueOf(body.get("startDate"))),
+                LocalDate.parse(String.valueOf(body.get("endDate"))),
+                String.valueOf(body.get("supervisorId"))
+        );
+        return Result.ok(plan);
+    }
+
+    /**
+     * 添加教学记录。
+     *
+     * @param id   计划 ID
+     * @param body {traineeName, courseName, courseDate, courseContent, evaluationScore}
+     * @return Result<TeachingRecord>
+     */
+    @PutMapping("/record/{id}/add")
+    public Result<TeachingRecord> addRecord(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        TeachingRecord record = teachingService.addRecord(
+                id,
+                String.valueOf(body.get("traineeName")),
+                String.valueOf(body.get("courseName")),
+                LocalDate.parse(String.valueOf(body.get("courseDate"))),
+                String.valueOf(body.get("courseContent")),
+                new BigDecimal(String.valueOf(body.get("evaluationScore")))
+        );
+        return Result.ok(record);
+    }
+
+    /**
+     * 学员培训记录。
+     *
+     * @param traineeName 学员姓名
+     * @return Result<List<TeachingRecord>>
+     */
+    @GetMapping("/trainee/{traineeName}")
+    public Result<List<TeachingRecord>> traineeRecords(@PathVariable String traineeName) {
+        return Result.ok(teachingService.traineeRecords(traineeName));
     }
 }

@@ -7,6 +7,7 @@ package com.jlmedaios.monolith.research_data.controller;
 
 import com.jlmedaios.monolith.common.Result;
 import com.jlmedaios.monolith.research_data.entity.ResearchDataExport;
+import com.jlmedaios.monolith.research_data.entity.ResearchDataset;
 import com.jlmedaios.monolith.research_data.entity.ResearchProject;
 import com.jlmedaios.monolith.research_data.service.ResearchDataService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,5 +80,26 @@ public class ResearchDataController {
     @GetMapping("/project/{projectCode}/data")
     public Result<Map<String, Object>> projectDataSummary(@PathVariable String projectCode) {
         return Result.ok(researchDataService.projectDataSummary(projectCode));
+    }
+
+    /**
+     * 全部项目列表。
+     *
+     * @return Result<List<ResearchProject>>
+     */
+    @GetMapping("/projects")
+    public Result<List<ResearchProject>> allProjects() {
+        return Result.ok(researchDataService.allProjects());
+    }
+
+    /**
+     * 项目数据集列表。
+     *
+     * @param code 项目编码
+     * @return Result<List<ResearchDataset>>
+     */
+    @GetMapping("/project/{code}/datasets")
+    public Result<List<ResearchDataset>> projectDatasets(@PathVariable String code) {
+        return Result.ok(researchDataService.projectDatasets(code));
     }
 }

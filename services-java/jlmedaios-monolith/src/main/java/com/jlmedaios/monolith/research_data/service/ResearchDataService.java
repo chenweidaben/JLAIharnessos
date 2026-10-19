@@ -6,8 +6,10 @@
 package com.jlmedaios.monolith.research_data.service;
 
 import com.jlmedaios.monolith.research_data.entity.ResearchDataExport;
+import com.jlmedaios.monolith.research_data.entity.ResearchDataset;
 import com.jlmedaios.monolith.research_data.entity.ResearchProject;
 import com.jlmedaios.monolith.research_data.repository.ResearchDataExportRepository;
+import com.jlmedaios.monolith.research_data.repository.ResearchDatasetRepository;
 import com.jlmedaios.monolith.research_data.repository.ResearchProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ import java.util.Map;
 /**
  * 科研数据 Service。
  *
- * <p>科研数据必须脱敏，禁止导出直接 PHI</p>
+ * <p>科研数据需脱敏视图+伦理审批，禁止直连生产 PHI 库</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class ResearchDataService {
 
     private final ResearchProjectRepository researchProjectRepository;
     private final ResearchDataExportRepository researchDataExportRepository;
+    private final ResearchDatasetRepository researchDatasetRepository;
 
     /**
      * 创建科研项目。
@@ -91,5 +94,24 @@ public class ResearchDataService {
         summary.put("fields", List.of("age", "gender", "diagnosis", "labs"));
         summary.put("ethicsApproved", true);
         return summary;
+    }
+
+    /**
+     * 全部项目列表。
+     *
+     * @return 项目列表
+     */
+    public List<ResearchProject> allProjects() {
+        return researchProjectRepository.findAll();
+    }
+
+    /**
+     * 项目数据集列表。
+     *
+     * @param projectCode 项目编码
+     * @return 数据集列表
+     */
+    public List<ResearchDataset> projectDatasets(String projectCode) {
+        return researchDatasetRepository.findByProjectCode(projectCode);
     }
 }
