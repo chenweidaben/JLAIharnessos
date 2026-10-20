@@ -503,6 +503,7 @@ import { m509Routes } from './routes/m509Routes'; // M509 P0合规重点（电�
 import { m510Routes } from './routes/m510Routes'; // M510 P0合规重点（智慧护理·NQI 深度：不良事件·预防措施·统计）
 import { m510bRoutes } from './routes/m510bRoutes'; // M510b P0合规重点（电子病历五级·护理 NQI 看板：压力性损伤·跌倒坠床·质量统计）
 import { m511Routes } from './routes/m511Routes'; // M511 P0合规重点（互联互通四甲·事件驱动：事件列表·消费者组·总线统计）
+import { m512Routes } from './routes/m512Routes'; // M512 P0合规重点（电子病历五级·多角色工作流：工作流统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4347,6 +4348,7 @@ const allRoutes: RouteDef[] = [
   ...m510Routes, // M510 P0合规重点（智慧护理·NQI 深度：不良事件·预防措施·统计）
   ...m510bRoutes, // M510b P0合规重点（电子病历五级·护理 NQI 看板：压力性损伤·跌倒坠床·质量统计）
   ...m511Routes, // M511 P0合规重点（互联互通四甲·事件驱动：事件列表·消费者组·总线统计）
+  ...m512Routes, // M512 P0合规重点（电子病历五级·多角色工作流：工作流统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
