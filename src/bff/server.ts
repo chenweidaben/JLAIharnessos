@@ -197,6 +197,10 @@ import { recCertM461Routes } from './routes/recordCopyCert';
 import { guideM462Routes } from './routes/guideAi';
 // M463：就诊卡与健康账户
 import { cardM463Routes } from './routes/healthCard';
+// M464：住院费用清单与预交金
+import { billM464Routes } from './routes/inpatientBill';
+// M464 批二：日间手术与留观管理
+import { daySurgM464Routes } from './routes/daySurgObs';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -433,6 +437,8 @@ import { m460Routes } from './routes/m460Routes'; // M460: 临床教学住培深
 import { m461Routes } from './routes/m461Routes'; // M461: 职业暴露与院感风险预警（登记/处理/随访/预警/台账/评估）
 import { m462Routes } from './routes/m462Routes'; // M462: 备份容灾与安全运维（备份/恢复/容灾/密钥/漏扫/基线）
 import { m463Routes } from './routes/m463Routes'; // M463: 后勤能耗与物业（水电/保洁/洗涤/绿化/食堂/巡检）
+import { m464Routes } from './routes/m464Routes'; // M464: 科研课题成果转化（经费/专利/转化/会议）
+import { m464bRoutes } from './routes/m464bRoutes'; // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3974,6 +3980,8 @@ const allRoutes: RouteDef[] = [
   ...recCertM461Routes, // M461：病案证明与复印申请
   ...guideM462Routes, // M462：智能导诊与就医问答
   ...cardM463Routes, // M463：就诊卡与健康账户
+  ...billM464Routes, // M464：住院费用清单与预交金
+  ...daySurgM464Routes, // M464 批二：日间手术与留观管理
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4214,6 +4222,8 @@ const allRoutes: RouteDef[] = [
   ...m461Routes, // M461: 职业暴露与院感风险预警（登记/处理/随访/预警/台账/评估）
   ...m462Routes, // M462: 备份容灾与安全运维（备份/恢复/容灾/密钥/漏扫/基线）
   ...m463Routes, // M463: 后勤能耗与物业（水电/保洁/洗涤/绿化/食堂/巡检）
+  ...m464Routes, // M464: 科研课题成果转化（经费/专利/转化/会议）
+  ...m464bRoutes, // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
