@@ -508,6 +508,8 @@ import { m513Routes } from './routes/m513Routes'; // M513 P0合规重点（智�
 import { m514Routes } from './routes/m514Routes'; // M514 P0合规重点（医疗质量安全·院感深度：发生率深度·院感统计）
 import { m515Routes } from './routes/m515Routes'; // M515 P0合规重点（医疗质量安全·患者安全深度：安全事件·RCA·整改追踪）
 import { m516Routes } from './routes/m516Routes'; // M516 P0合规重点（电子病历五级·单病种深度：过程质控·结局指标·并发症监控）
+import { m517Routes } from './routes/m517Routes'; // M517 P0合规重点（医疗质量安全·麻醉深度：麻醉分级·术中事件·术后镇痛）
+import { m517bRoutes } from './routes/m517bRoutes'; // M517b P0合规重点（医疗质量安全·麻醉深度新方向：术中安全·术后随访）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4357,6 +4359,8 @@ const allRoutes: RouteDef[] = [
   ...m514Routes, // M514 P0合规重点（医疗质量安全·院感深度：发生率深度·院感统计）
   ...m515Routes, // M515 P0合规重点（医疗质量安全·患者安全深度：安全事件·RCA·整改追踪）
   ...m516Routes, // M516 P0合规重点（电子病历五级·单病种深度：过程质控·结局指标·并发症监控）
+  ...m517Routes, // M517 P0合规重点（医疗质量安全·麻醉深度：麻醉分级·术中事件·术后镇痛）
+  ...m517bRoutes, // M517b P0合规重点（医疗质量安全·麻醉深度新方向：术中安全·术后随访）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
