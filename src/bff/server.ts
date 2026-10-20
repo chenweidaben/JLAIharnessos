@@ -301,6 +301,30 @@ import { m392Routes } from './routes/m392Routes'; // M392: 在线问诊/处方/�
 import { m393Routes } from './routes/m393Routes'; // M393: 远程会诊/诊断/监护/手术/培训/设备详情
 import { m394Routes } from './routes/m394Routes'; // M394: 社区随访/家庭病床/健康档案/老年关怀/慢病管理/健康教育详情
 import { m395Routes } from './routes/m395Routes'; // M395: 产前检查/产后访视/婴幼儿保健/儿童接种/妇女保健/出生缺陷筛查详情
+import { m396Routes } from './routes/m396Routes'; // M396: 急诊分诊/抢救记录/救护车调度/灾害救援/中毒救治/创伤救治详情
+import { m397Routes } from './routes/m397Routes'; // M397: 肿瘤筛查/诊断/治疗方案/化疗/放疗/随访详情
+import { m398Routes } from './routes/m398Routes'; // M398: 康复评估/治疗/物理治疗/运动疗法/作业治疗/康复随访详情
+import { m399Routes } from './routes/m399Routes'; // M399: 老年综合评估/照护计划/共病管理/衰弱评估/痴呆管理/跌倒预防详情
+import { m400Routes } from './routes/m400Routes'; // M400: 病历质控/检索/归档/电子签名/版本详情
+import { m401Routes } from './routes/m401Routes'; // M401: 医保政策/申报/结算/审核/病种编码/医保项目详情
+import { m402Routes } from './routes/m402Routes'; // M402: 手术排程/手术记录/手术同意书/麻醉记录/麻醉评估/麻醉复苏详情
+import { m403Routes } from './routes/m403Routes'; // M403: 检验项目/检验结果/检验报告/检查项目/检查结果/检查报告详情
+import { m404Routes } from './routes/m404Routes'; // M404: 门诊排队/门诊就诊/门诊处方/入院管理/出院管理/转科管理详情
+import { m405Routes } from './routes/m405Routes'; // M405: 患者档案/就诊记录/过敏史/用药史/检验汇总/影像汇总详情
+import { m406Routes } from './routes/m406Routes'; // M406: CDS规则/预警/推荐/药物相互作用/禁忌症/临床指南详情
+import { m407Routes } from './routes/m407Routes'; // M407: 任务列表/工作流模板/工作流实例/审批流程/任务调度/工作流通知详情
+import { m408Routes } from './routes/m408Routes'; // M408: 系统配置/菜单管理/数据字典/系统日志/参数管理/缓存管理详情
+import { m409Routes } from './routes/m409Routes'; // M409: 租户列表/租户详情/租户配置/租户配额/数据隔离/租户切换详情
+import { m410Routes } from './routes/m410Routes'; // M410: PHI脱敏/数据加密/审计日志/访问控制/数据留存/合规管理详情
+import { m411Routes } from './routes/m411Routes'; // M411: BI看板/BI报表/BI图表/BI分析/BI导出/BI定时任务详情
+import { m414Routes } from './routes/m414Routes'; // M414: 修复 auth/me+emr/list 缺口 + ICU 6个详情接口
+import { m415Routes } from './routes/m415Routes'; // M415: 预约挂号/排队叫号/移动支付/报告查询/消息通知/意见反馈详情
+import { m416Routes } from './routes/m416Routes'; // M416: 运营看板/运营效率/成本管控/收入分析/质量指标/对标分析详情
+import { m417Routes } from './routes/m417Routes'; // M417: 员工档案/部门管理/考勤管理/绩效考核/薪酬管理/培训发展详情
+import { m418Routes } from './routes/m418Routes'; // M418: 账单管理/支付管理/退款管理/发票管理/预算管理/财务报表详情
+import { m419Routes } from './routes/m419Routes'; // M419: 药品目录/库存管理/采购管理/供应商管理/预警管理/效期管理详情
+import { m423Routes } from './routes/m423Routes'; // M423: 家庭访视详情
+import { m425Routes } from './routes/m425Routes'; // M425: 病历版本对比/回滚/锁定补建
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -755,6 +779,12 @@ import { riskManagementRoutes } from './routes/riskManagement';
 import { userExperienceRoutes } from './routes/userExperience';
 // M199-B：无障碍 GET /api/v1/admin/accessibility/report
 import { accessibilityRoutes } from './routes/accessibility';
+// M416：患者时间线深度 GET /api/v1/timeline/patient-*
+import { patientTimelineRoutes } from './routes/patientTimeline';
+// M417：病历版本管理深度 GET /api/v1/emr/version-*
+// (emrVersionRoutes 已在 line 131 import，此处不再重复)
+// M418：事件总线深度 GET /api/v1/events/*-detail
+import { eventsBusRoutes } from './routes/eventsBus';
 // M199-C：适老化 GET /api/v1/admin/elderly-friendly/report
 import { elderlyFriendlyRoutes } from './routes/elderlyFriendly';
 // M199-D：国际化 GET /api/v1/admin/internationalization/report
@@ -3798,6 +3828,7 @@ const allRoutes: RouteDef[] = [
   ...dashboardRoutes,
   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
+  ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...emrNoteRoutes, // M190-P0: 病历修改痕迹
   ...cdsRoutes, // M191-P0: CDS 临床决策支持
   ...patient360Routes, // M192-P0: 患者360视图
@@ -3973,6 +4004,30 @@ const allRoutes: RouteDef[] = [
   ...m393Routes, // M393: 远程会诊/诊断/监护/手术/培训/设备详情
   ...m394Routes, // M394: 社区随访/家庭病床/健康档案/老年关怀/慢病管理/健康教育详情
   ...m395Routes, // M395: 产前检查/产后访视/婴幼儿保健/儿童接种/妇女保健/出生缺陷筛查详情
+  ...m396Routes, // M396: 急诊分诊/抢救记录/救护车调度/灾害救援/中毒救治/创伤救治详情
+  ...m397Routes, // M397: 肿瘤筛查/诊断/治疗方案/化疗/放疗/随访详情
+  ...m398Routes, // M398: 康复评估/治疗/物理治疗/运动疗法/作业治疗/康复随访详情
+  ...m399Routes, // M399: 老年综合评估/照护计划/共病管理/衰弱评估/痴呆管理/跌倒预防详情
+  ...m400Routes, // M400: 病历质控/检索/归档/电子签名/版本详情
+  ...m401Routes, // M401: 医保政策/申报/结算/审核/病种编码/医保项目详情
+  ...m402Routes, // M402: 手术排程/手术记录/手术同意书/麻醉记录/麻醉评估/麻醉复苏详情
+  ...m403Routes, // M403: 检验项目/检验结果/检验报告/检查项目/检查结果/检查报告详情
+  ...m404Routes, // M404: 门诊排队/门诊就诊/门诊处方/入院管理/出院管理/转科管理详情
+  ...m405Routes, // M405: 患者档案/就诊记录/过敏史/用药史/检验汇总/影像汇总详情
+  ...m406Routes, // M406: CDS规则/预警/推荐/药物相互作用/禁忌症/临床指南详情
+  ...m407Routes, // M407: 任务列表/工作流模板/工作流实例/审批流程/任务调度/工作流通知详情
+  ...m408Routes, // M408: 系统配置/菜单管理/数据字典/系统日志/参数管理/缓存管理详情
+  ...m409Routes, // M409: 租户列表/租户详情/租户配置/租户配额/数据隔离/租户切换详情
+  ...m410Routes, // M410: PHI脱敏/数据加密/审计日志/访问控制/数据留存/合规管理详情
+  ...m411Routes, // M411: BI看板/BI报表/BI图表/BI分析/BI导出/BI定时任务详情
+  ...m414Routes, // M414: 修复 auth/me+emr/list 缺口 + ICU 6个详情接口
+  ...m415Routes, // M415: 预约挂号/排队叫号/移动支付/报告查询/消息通知/意见反馈详情
+  ...m416Routes, // M416: 运营看板/运营效率/成本管控/收入分析/质量指标/对标分析详情
+  ...m417Routes, // M417: 员工档案/部门管理/考勤管理/绩效考核/薪酬管理/培训发展详情
+  ...m418Routes, // M418: 账单管理/支付管理/退款管理/发票管理/预算管理/财务报表详情
+  ...m419Routes, // M419: 药品目录/库存管理/采购管理/供应商管理/预警管理/效期管理详情
+  ...m423Routes, // M423: 家庭访视详情
+  ...m425Routes, // M425: 病历版本对比/回滚/锁定补建
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
@@ -4396,6 +4451,8 @@ const allRoutes: RouteDef[] = [
   ...riskManagementRoutes, // M198-D：风险管理 GET /api/v1/admin/risk-management/report
   ...userExperienceRoutes, // M199-A：用户体验 GET /api/v1/admin/user-experience/report
   ...accessibilityRoutes, // M199-B：无障碍 GET /api/v1/admin/accessibility/report
+  ...patientTimelineRoutes, // M416：患者时间线深度 GET /api/v1/timeline/patient-*
+  // emrVersionRoutes 已在 line 3827 注册，此处不再重复
   ...elderlyFriendlyRoutes, // M199-C：适老化 GET /api/v1/admin/elderly-friendly/report
   ...internationalizationRoutes, // M199-D：国际化 GET /api/v1/admin/internationalization/report
   ...systemAcceptanceRoutes, // M200-A：系统验收 GET /api/v1/admin/acceptance/report
