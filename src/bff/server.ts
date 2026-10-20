@@ -480,6 +480,8 @@ import { m488Routes } from './routes/m488Routes'; // M488: P0合规（病案首�
 import { m488bRoutes } from './routes/m488bRoutes'; // M488b: 补差异（医生首页质量 Top10）
 import { m490Routes } from './routes/m490Routes'; // M490: P0合规（医技工作量汇总/党建·纪检·工会）
 import { m491Routes } from './routes/m491Routes'; // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
+import { m492Routes } from './routes/m492Routes'; // M492: P0合规（护理分级护理/移动护理查房）
+import { m492bRoutes } from './routes/m492bRoutes'; // M492b: P0合规（患者随访汇总/30天再入院/伦理委员会·案例）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4301,6 +4303,8 @@ const allRoutes: RouteDef[] = [
   ...m488bRoutes, // M488b: 补差异（医生首页质量 Top10）
   ...m490Routes, // M490: P0合规（医技工作量汇总/党建·纪检·工会）
   ...m491Routes, // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
+  ...m492Routes, // M492: P0合规（护理分级护理/移动护理查房）
+  ...m492bRoutes, // M492b: P0合规（患者随访汇总/30天再入院/伦理委员会·案例）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
