@@ -498,6 +498,7 @@ import { m505Routes } from './routes/m505Routes'; // M505 P0合规重点（智�
 import { m505bRoutes } from './routes/m505bRoutes'; // M505b P0合规重点（智慧服务三级：投诉列表·处理记录·统计）
 import { m506Routes } from './routes/m506Routes'; // M506 P0合规重点（电子病历五级：版本列表·差异对比·统计）
 import { m507Routes } from './routes/m507Routes'; // M507 P0合规重点（互联互通四甲·FHIR R4：一致性验证）
+import { m508Routes } from './routes/m508Routes'; // M508 P0合规重点（电子病历五级：患者时间线事件·摘要·统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4337,6 +4338,7 @@ const allRoutes: RouteDef[] = [
   ...m505bRoutes, // M505b P0合规重点（智慧服务三级：投诉列表·处理记录·统计）
   ...m506Routes, // M506 P0合规重点（电子病历五级：版本列表·差异对比·统计）
   ...m507Routes, // M507 P0合规重点（互联互通四甲·FHIR R4：一致性验证）
+  ...m508Routes, // M508 P0合规重点（电子病历五级：患者时间线事件·摘要·统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
