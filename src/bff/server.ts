@@ -476,6 +476,8 @@ import { m485Routes } from './routes/m485Routes'; // M485: P0合规（病案统�
 import { m485bRoutes } from './routes/m485bRoutes'; // M485b: P0合规（患者投诉汇总）
 import { m486Routes } from './routes/m486Routes'; // M486: P0合规（设备全生命周期/能耗月度用量·费用·节能改造）
 import { m487Routes } from './routes/m487Routes'; // M487: P0合规（CSSD工作量·质量·库存/营养科菜单·咨询·治疗饮食）
+import { m488Routes } from './routes/m488Routes'; // M488: P0合规（病案首页质量·缺陷项/DRG权重/DIP分值·考核）
+import { m488bRoutes } from './routes/m488bRoutes'; // M488b: 补差异（医生首页质量 Top10）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4293,6 +4295,8 @@ const allRoutes: RouteDef[] = [
   ...m485bRoutes, // M485b: P0合规（患者投诉汇总）
   ...m486Routes, // M486: P0合规（设备全生命周期/能耗月度用量·费用·节能改造）
   ...m487Routes, // M487: P0合规（CSSD工作量·质量·库存/营养科菜单·咨询·治疗饮食）
+  ...m488Routes, // M488: P0合规（病案首页质量·缺陷项/DRG权重/DIP分值·考核）
+  ...m488bRoutes, // M488b: 补差异（医生首页质量 Top10）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
