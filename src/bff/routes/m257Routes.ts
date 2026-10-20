@@ -117,6 +117,6 @@ export const m257Routes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/maternity/records', handle: handleMaternityRecords, auth: true },
   { method: 'GET', path: '/api/v1/fever/clinics', handle: handleFeverClinics, auth: true },
   { method: 'GET', path: '/api/v1/newborn/records', handle: handleNewbornRecords, auth: true },
-  { method: 'GET', path: '/api/v1/outpatient/queue', handle: handleOutpatientQueue, auth: true },
+  // 冲突修复：/outpatient/queue 由 routes/outpatient.ts 主路由提供，此处重复 mock 停用
   { method: 'GET', path: '/api/v1/inpatient/wards', handle: handleInpatientWards, auth: true },
 ];

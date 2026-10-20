@@ -148,7 +148,7 @@ async function handleSurgeryRooms(c: Ctx): Promise<Response> {
 
 export const m210Routes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/outpatient/appointments', handle: handleOutpatientAppointments, auth: true },
-  { method: 'GET', path: '/api/v1/outpatient/queue', handle: handleOutpatientQueue, auth: true },
+  // 冲突修复：/outpatient/queue 由 routes/outpatient.ts 主路由提供（返回含 encounterId 的数组），此处重复的对象式 mock 会遮蔽主路由导致前端 queue.forEach 崩溃，故停用
   { method: 'GET', path: '/api/v1/outpatient/schedule', handle: handleOutpatientSchedule, auth: true },
   { method: 'GET', path: '/api/v1/inpatient/admissions', handle: handleInpatientAdmissions, auth: true },
   { method: 'GET', path: '/api/v1/inpatient/transfers', handle: handleInpatientTransfers, auth: true },
