@@ -1,0 +1,6 @@
+﻿/api/v1/system/config=200
+/api/v1/system/menus=ERR
+/api/v1/system/dict=200
+/api/v1/system/logs=200
+/api/v1/system/params=200
+/api/v1/system/cache=ERR

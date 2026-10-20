@@ -13,7 +13,7 @@ const { Title, Text } = Typography;
 const VI = { deep: "#0A2540", mid: "#1E5F8C", accent: "#4A90D9", bg: "#f5f7fa" };
 
 export default function EmrPrintLayoutPage() {
-  const [templateId, setTemplateId] = useState("TPL-ADM-001");
+  const [templateId] = useState("TPL-ADM-001");
   const [renderedCount, setRenderedCount] = useState<number | null>(null);
 
   const handleTestPrint = async () => {

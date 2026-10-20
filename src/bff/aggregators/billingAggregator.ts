@@ -688,7 +688,44 @@ export async function getSettlementDetail(
 
 const QUEUE_STATUSES: SettlementStatus[] = ['unpaid', 'paid', 'partially_refunded'];
 
+/** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 收费结算队列，确定性固定数据。 */
+function demoSettlements(): Settlement[] {
+  const rows: Array<[string, SettlementStatus, PaymentMethod, string, string]> = [
+    ['心血管内科', 'unpaid', 'cash', '1286.50', '2026-10-19T08:30:00.000Z'],
+    ['呼吸内科', 'paid', 'wechat', '862.00', '2026-10-19T08:55:00.000Z'],
+    ['普外科', 'unpaid', 'alipay', '2340.00', '2026-10-19T09:10:00.000Z'],
+    ['骨科', 'paid', 'insurance', '5680.80', '2026-10-19T09:25:00.000Z'],
+    ['神经内科', 'unpaid', 'bank_card', '1980.00', '2026-10-19T09:40:00.000Z'],
+    ['消化内科', 'partially_refunded', 'wechat', '760.50', '2026-10-19T10:05:00.000Z'],
+    ['内分泌科', 'paid', 'mixed', '1420.00', '2026-10-19T10:20:00.000Z'],
+    ['儿科', 'unpaid', 'cash', '486.30', '2026-10-19T10:45:00.000Z'],
+  ];
+  return rows.map((r, i) => ({
+    id: `demo-stl-${i + 1}`,
+    settlementNo: `ST20261019${String(5000 + i)}`,
+    patientId: `demo-pat-${i + 1}`,
+    visitId: `demo-vis-${i + 1}`,
+    department: r[0],
+    status: r[1],
+    version: 1,
+    paymentMethod: r[2],
+    totalAmount: r[3],
+    paidAmount: r[1] === 'unpaid' ? '0.00' : r[3],
+    refundedAmount: r[1] === 'partially_refunded' ? '120.00' : '0.00',
+    paidBy: r[1] === 'unpaid' ? null : 'demo-cashier-1',
+    paidAt: r[1] === 'unpaid' ? null : r[4],
+    voidedBy: null,
+    voidedAt: null,
+    createdAt: r[4],
+    updatedAt: r[4],
+  }));
+}
+
 export async function getSettlementQueue(auth: AuthView) {
+  if (process.env.DEMO_MODE === '1') {
+    const items = demoSettlements().filter((r) => canAccess(auth, r.department));
+    return { items, total: items.length };
+  }
   const rows = await listSettlements(QUEUE_STATUSES);
   const items = rows.filter((r) => canAccess(auth, r.department));
   return { items, total: items.length };

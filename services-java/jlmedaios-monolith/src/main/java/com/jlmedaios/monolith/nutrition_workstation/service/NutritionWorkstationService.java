@@ -94,9 +94,7 @@ public class NutritionWorkstationService {
     }
 
     private NutritionOrder findByOrderNo(String orderNo) {
-        return nutritionOrderRepository.findAll().stream()
-                .filter(o -> orderNo.equals(o.getOrderNo()))
-                .findFirst()
-                .orElse(null);
+        // P5 性能优化：直接调用 Repository 派生查询
+        return nutritionOrderRepository.findByOrderNo(orderNo);
     }
 }

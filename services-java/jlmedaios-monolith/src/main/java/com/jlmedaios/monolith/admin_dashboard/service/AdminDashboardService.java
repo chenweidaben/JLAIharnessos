@@ -48,10 +48,7 @@ public class AdminDashboardService {
      * @return 院长级 KPI 列表
      */
     public List<ExecutiveKPI> alerts() {
-        return executiveKPIRepository.findAll().stream()
-                .filter(kpi -> kpi.getCurrentValue() != null
-                        && kpi.getTargetValue() != null
-                        && kpi.getCurrentValue().compareTo(kpi.getTargetValue()) < 0)
-                .toList();
+        // P5 性能优化：直接调用 Repository @Query
+        return executiveKPIRepository.findBelowTarget();
     }
 }

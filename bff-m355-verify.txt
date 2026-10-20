@@ -1,0 +1,9 @@
+﻿/api/v1/quality/control=200
+/api/v1/quality/inspection=200
+/api/v1/quality/exception=200
+/api/v1/quality/indicators=ERR
+/api/v1/quality/scores=ERR
+/api/v1/quality/trends=ERR
+/api/v1/quality/benchmarks=ERR
+/api/v1/quality/alerts=ERR
+/api/v1/quality/reports=ERR

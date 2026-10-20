@@ -1,0 +1,6 @@
+﻿BiDashboardPage lazy: True
+BiChartsPage lazy: False
+BiReportsPage lazy: False
+BiAnalysisPage lazy: False
+BiExportPage lazy: False
+BiScheduledPage lazy: False

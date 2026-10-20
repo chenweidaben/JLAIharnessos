@@ -1,0 +1,8 @@
+﻿/api/v1/events/bus-deadletter=200
+/api/v1/security/audit-report=200
+/api/v1/events/audit=200
+/api/v1/events/metrics=200
+/api/v1/events/dead-letter=ERR
+/api/v1/events/retry=ERR
+/api/v1/audit/trail=200
+/api/v1/audit/reports=ERR

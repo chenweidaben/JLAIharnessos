@@ -12,6 +12,310 @@ import { RequireAuth } from './RequireAuth';
 import { RequirePermission, SessionTimeoutWatcher } from './guards';
 import AppLayout from '@/components/layout/AppLayout';
 
+// M371 自动补全缺失 lazy import（tsc 历史债务清理）
+const AuditLogsPage = lazy(() => import('@/pages/audit/logs'));
+const AuditReportsPage = lazy(() => import('@/pages/audit/reports'));
+const AuditTrailsPage = lazy(() => import('@/pages/audit/trails'));
+// M372 角色工作流 lazy 注册
+const WorkflowRolesPage = lazy(() => import('@/pages/workflow/roles'));
+const WorkflowPermissionsPage = lazy(() => import('@/pages/workflow/permissions'));
+const WorkflowApprovePage = lazy(() => import('@/pages/workflow/approve'));
+const WorkflowNotifyPage = lazy(() => import('@/pages/workflow/notify'));
+const WorkflowEscalationPage = lazy(() => import('@/pages/workflow/escalation'));
+const WorkflowSlaPage = lazy(() => import('@/pages/workflow/sla'));
+// M374 事件总线 lazy 注册
+const EventsListPage = lazy(() => import('@/pages/events/list'));
+const EventsTypesPage = lazy(() => import('@/pages/events/types'));
+const EventsSubscribersPage = lazy(() => import('@/pages/events/subscribers'));
+const EventsPublishPage = lazy(() => import('@/pages/events/publish'));
+const EventsConsumersPage = lazy(() => import('@/pages/events/consumers'));
+const EventsMetricsDetailPage = lazy(() => import('@/pages/events/metrics-detail'));
+// M375 患者时间线扩展 lazy 注册
+const PatientTimelineFilterPage = lazy(() => import('@/pages/patient/timeline-filter'));
+const PatientTimelineSummaryPage = lazy(() => import('@/pages/patient/timeline-summary'));
+const PatientTimelineComparePage = lazy(() => import('@/pages/patient/timeline-compare'));
+const PatientTimelineExportPage = lazy(() => import('@/pages/patient/timeline-export'));
+// M377 CDS 深度 lazy 注册
+const CdsRuleEnginePage = lazy(() => import('@/pages/cds/rule-engine'));
+const CdsClinicalEvidencePage = lazy(() => import('@/pages/cds/clinical-evidence'));
+const CdsClinicalTrialsPage = lazy(() => import('@/pages/cds/clinical-trials'));
+const CdsClinicalGuidelinesDetailPage = lazy(() => import('@/pages/cds/clinical-guidelines-detail'));
+const CdsClinicalPathwaysDetailPage = lazy(() => import('@/pages/cds/clinical-pathways-detail'));
+// M378 护理NQI lazy 注册
+const NursingNqiIndicatorsPage = lazy(() => import('@/pages/nursing/nqi-indicators'));
+const NursingNqiTrendsPage = lazy(() => import('@/pages/nursing/nqi-trends'));
+const NursingNqiBenchmarksPage = lazy(() => import('@/pages/nursing/nqi-benchmarks'));
+const NursingNqiAlertsPage = lazy(() => import('@/pages/nursing/nqi-alerts'));
+const NursingNqiReportsPage = lazy(() => import('@/pages/nursing/nqi-reports'));
+// M379 质量控制 lazy 注册
+const QualityIndicatorsPage = lazy(() => import('@/pages/quality/indicators'));
+const QualityScoresPage = lazy(() => import('@/pages/quality/scores'));
+const QualityTrendsPage = lazy(() => import('@/pages/quality/trends'));
+const QualityBenchmarksPage = lazy(() => import('@/pages/quality/benchmarks'));
+const QualityAlertsPage = lazy(() => import('@/pages/quality/alerts'));
+const QualityReportsPage = lazy(() => import('@/pages/quality/reports'));
+// M380 风险管控 lazy 注册
+const RiskIndicatorsPage = lazy(() => import('@/pages/risk/indicators'));
+const RiskScoresPage = lazy(() => import('@/pages/risk/scores'));
+const RiskTrendsPage = lazy(() => import('@/pages/risk/trends'));
+const RiskBenchmarksPage = lazy(() => import('@/pages/risk/benchmarks'));
+const RiskAlertsPage = lazy(() => import('@/pages/risk/alerts'));
+const RiskReportsPage = lazy(() => import('@/pages/risk/reports'));
+// M381 合规审计 lazy 注册
+const AuditComplianceDetailPage = lazy(() => import('@/pages/audit/compliance-detail'));
+const AuditComplianceChecklistPage = lazy(() => import('@/pages/audit/compliance-checklist'));
+const AuditComplianceEvidencePage = lazy(() => import('@/pages/audit/compliance-evidence'));
+const AuditComplianceRemediationPage = lazy(() => import('@/pages/audit/compliance-remediation'));
+const AuditComplianceReportPage = lazy(() => import('@/pages/audit/compliance-report'));
+const AuditComplianceDashboardPage = lazy(() => import('@/pages/audit/compliance-dashboard'));
+// M382 安全合规 lazy 注册
+const SecurityPolicyPage = lazy(() => import('@/pages/security/policy'));
+const SecurityPolicyDetailPage = lazy(() => import('@/pages/security/policy-detail'));
+const SecurityVulnerabilitiesPage = lazy(() => import('@/pages/security/vulnerabilities'));
+const SecurityPatchesPage = lazy(() => import('@/pages/security/patches'));
+// M383 数据安全 lazy 注册
+const SecurityDataAccessPage = lazy(() => import('@/pages/security/data-access'));
+const SecurityDataSharingPage = lazy(() => import('@/pages/security/data-sharing'));
+const SecurityDataExportPage = lazy(() => import('@/pages/security/data-export'));
+const SecurityDataBackupPage = lazy(() => import('@/pages/security/data-backup'));
+const SecurityDataRecoveryPage = lazy(() => import('@/pages/security/data-recovery'));
+// M385 安全事件 lazy 注册
+const SecurityIncidentsPage = lazy(() => import('@/pages/security/incidents'));
+const SecurityIncidentResponsePage = lazy(() => import('@/pages/security/incident-response'));
+const AuthRolesPage = lazy(() => import('@/pages/auth/roles'));
+const BiFunnelPage = lazy(() => import('@/pages/bi/funnel'));
+const BillingInvoicesPage = lazy(() => import('@/pages/billing/invoices'));
+const BiRealtimePage = lazy(() => import('@/pages/bi/realtime'));
+const BiRetentionPage = lazy(() => import('@/pages/bi/retention'));
+const CdsAlertPage = lazy(() => import('@/pages/cds/alert'));
+const CdsAlertsPage = lazy(() => import('@/pages/cds/alerts'));
+const CdsChecklistsPage = lazy(() => import('@/pages/cds/checklists'));
+const CdsClinicalPathwayPage = lazy(() => import('@/pages/cds/clinical-pathway'));
+const CdsDiagnosisSuggestionPage = lazy(() => import('@/pages/cds/diagnosis-suggestion'));
+const CdsDrugDoseAdjustPage = lazy(() => import('@/pages/cds/drug-dose-adjust'));
+const CdsDrugsInteractionPage = lazy(() => import('@/pages/cds/drugs-interaction'));
+const CdsDuplicateTherapyPage = lazy(() => import('@/pages/cds/duplicate-therapy'));
+const CdsGuidelinePage = lazy(() => import('@/pages/cds/guideline'));
+const CdsGuidelinesPage = lazy(() => import('@/pages/cds/guidelines'));
+const CdsImagingHintPage = lazy(() => import('@/pages/cds/imaging-hint'));
+const CdsInterventionsPage = lazy(() => import('@/pages/cds/interventions'));
+const CdsLabCriticalPage = lazy(() => import('@/pages/cds/lab-critical'));
+const CdsPatientSummaryPage = lazy(() => import('@/pages/cds/patient-summary'));
+const CdsRecommendationPage = lazy(() => import('@/pages/cds/recommendation'));
+const CdsTreatmentPlanPage = lazy(() => import('@/pages/cds/treatment-plan'));
+const CommunityChronicManagementPage = lazy(() => import('@/pages/community/chronic-management'));
+const CommunityFamilyDoctorPage = lazy(() => import('@/pages/community/family-doctor'));
+const CommunityHealthEducationPage = lazy(() => import('@/pages/community/health-education'));
+const CommunityResidentsPage = lazy(() => import('@/pages/community/residents'));
+const CommunityVaccinationPage = lazy(() => import('@/pages/community/vaccination'));
+const CommunityVisitsPage = lazy(() => import('@/pages/community/visits'));
+const ComplianceScorePage = lazy(() => import('@/pages/compliance/score'));
+const EducationCoursesPage = lazy(() => import('@/pages/education/courses'));
+const EducationDegreesPage = lazy(() => import('@/pages/education/degrees'));
+const EducationExamsPage = lazy(() => import('@/pages/education/exams'));
+const ElderlyAssessmentPage = lazy(() => import('@/pages/elderly/assessment'));
+const ElderlyComprehensivePage = lazy(() => import('@/pages/elderly/comprehensive'));
+const ElderlyDementiaPage = lazy(() => import('@/pages/elderly/dementia'));
+const ElderlyFallsPage = lazy(() => import('@/pages/elderly/falls'));
+const ElderlyFrailPage = lazy(() => import('@/pages/elderly/frail'));
+const ElderlyNutritionPage = lazy(() => import('@/pages/elderly/nutrition'));
+const EmergencyAmbulancePage = lazy(() => import('@/pages/emergency/ambulance'));
+const EmergencyCallsPage = lazy(() => import('@/pages/emergency/calls'));
+const EmergencyCriticalPage = lazy(() => import('@/pages/emergency/critical'));
+const EmergencyPoisoningPage = lazy(() => import('@/pages/emergency/poisoning'));
+const EmergencyRedboxPage = lazy(() => import('@/pages/emergency/redbox'));
+const EmergencyRescuePage = lazy(() => import('@/pages/emergency/rescue'));
+const EmergencyTraumaPage = lazy(() => import('@/pages/emergency/trauma'));
+const EmrArchivesPage = lazy(() => import('@/pages/emr/archives'));
+const EmrSignaturesPage = lazy(() => import('@/pages/emr/signatures'));
+const EmrSignTemplatesPage = lazy(() => import('@/pages/emr/sign-templates'));
+const EmrSignVerifyPage = lazy(() => import('@/pages/emr/sign-verify'));
+const EmrTemplatesPage = lazy(() => import('@/pages/emr/templates'));
+const EmrVersionAuthorPage = lazy(() => import('@/pages/emr/version-author'));
+const EmrVersionHistoryPage = lazy(() => import('@/pages/emr/version-history'));
+const EmrVersionListPage = lazy(() => import('@/pages/emr/version-list'));
+const EmrVersionReviewPage = lazy(() => import('@/pages/emr/version-review'));
+const EmrVersionRollbackPage = lazy(() => import('@/pages/emr/version-rollback'));
+const EquipmentRepairPage = lazy(() => import('@/pages/equipment/repair'));
+const EventsBusDeadletterPage = lazy(() => import('@/pages/events/bus-deadletter'));
+const EventsBusDetailPage = lazy(() => import('@/pages/events/bus-detail'));
+const EventsBusLogsPage = lazy(() => import('@/pages/events/bus-logs'));
+const EventsBusOverviewPage = lazy(() => import('@/pages/events/bus-overview'));
+const EventsBusPublishersPage = lazy(() => import('@/pages/events/bus-publishers'));
+const EventsBusSubscribersPage = lazy(() => import('@/pages/events/bus-subscribers'));
+const EventsDeadLetterPage = lazy(() => import('@/pages/events/dead-letter'));
+const EventsMetricsPage = lazy(() => import('@/pages/events/metrics'));
+const EventsRetryPage = lazy(() => import('@/pages/events/retry'));
+const FhirAccountPage = lazy(() => import('@/pages/fhir/account'));
+const FhirClaimPage = lazy(() => import('@/pages/fhir/claim'));
+const FhirCommunicationPage = lazy(() => import('@/pages/fhir/communication'));
+const FhirCoveragePage = lazy(() => import('@/pages/fhir/coverage'));
+const FhirDocumentReferencePage = lazy(() => import('@/pages/fhir/documentreference'));
+const FhirMedicationPage = lazy(() => import('@/pages/fhir/medication'));
+const FhirQuestionnairePage = lazy(() => import('@/pages/fhir/questionnaire'));
+const FinanceAssetsPage = lazy(() => import('@/pages/finance/assets'));
+const FinanceExpensesPage = lazy(() => import('@/pages/finance/expenses'));
+const GeriatricsAssessmentPage = lazy(() => import('@/pages/geriatrics/assessment'));
+const GeriatricsDementiaPage = lazy(() => import('@/pages/geriatrics/dementia'));
+const GeriatricsFallsPage = lazy(() => import('@/pages/geriatrics/falls'));
+const HrRecruitmentPage = lazy(() => import('@/pages/hr/recruitment'));
+const HrTrainingsPage = lazy(() => import('@/pages/hr/trainings'));
+const InsuranceBenefitsPage = lazy(() => import('@/pages/insurance/benefits'));
+const InsuranceDirectoryPage = lazy(() => import('@/pages/insurance/directory'));
+const InternetAppointmentsPage = lazy(() => import('@/pages/internet/appointments'));
+const InternetConsultationsPage = lazy(() => import('@/pages/internet/consultations'));
+const InternetFollowupPage = lazy(() => import('@/pages/internet/followup'));
+const InternetHealthRecordsPage = lazy(() => import('@/pages/internet/health-records'));
+const InternetHospitalOrdersPage = lazy(() => import('@/pages/internet/hospital-orders'));
+const InternetPaymentsPage = lazy(() => import('@/pages/internet/payments'));
+const InternetPrescriptionsPage = lazy(() => import('@/pages/internet/prescriptions'));
+const LabOrdersPage = lazy(() => import('@/pages/lab/orders'));
+const LabResultsPage = lazy(() => import('@/pages/lab/results'));
+const MaternalChildHealthPage = lazy(() => import('@/pages/maternal/child-health'));
+const MaternalPostnatalPage = lazy(() => import('@/pages/maternal/postnatal'));
+const MaternalPrenatalPage = lazy(() => import('@/pages/maternal/prenatal'));
+const MaternityDeliveryPage = lazy(() => import('@/pages/maternity/delivery'));
+const MaternityPostpartumPage = lazy(() => import('@/pages/maternity/postpartum'));
+const MaternityPrenatalPage = lazy(() => import('@/pages/maternity/prenatal'));
+const MedicalRecordsArchivePage = lazy(() => import('@/pages/medical-records/archive'));
+const MedicalRecordsCopyPage = lazy(() => import('@/pages/medical-records/copy'));
+const MedicalRecordsPrintPage = lazy(() => import('@/pages/medical-records/print'));
+const MedicalRecordsRetrievePage = lazy(() => import('@/pages/medical-records/retrieve'));
+const MedicalRecordsSealPage = lazy(() => import('@/pages/medical-records/seal'));
+const MedicalRecordsWatermarkPage = lazy(() => import('@/pages/medical-records/watermark'));
+const MobileScanPage = lazy(() => import('@/pages/mobile/scan'));
+const MobileVitalsPage = lazy(() => import('@/pages/mobile/vitals'));
+const NewbornGrowthPage = lazy(() => import('@/pages/newborn/growth'));
+const NewbornPhysicalPage = lazy(() => import('@/pages/newborn/physical'));
+const NewbornScreeningPage = lazy(() => import('@/pages/newborn/screening'));
+const NursingNqiComparisonPage = lazy(() => import('@/pages/nursing/nqi-comparison'));
+const NursingNqiDetailPage = lazy(() => import('@/pages/nursing/nqi-detail'));
+const NursingNqiOverviewPage = lazy(() => import('@/pages/nursing/nqi-overview'));
+const NursingPlansPage = lazy(() => import('@/pages/nursing/plans'));
+const NursingRoundsPage = lazy(() => import('@/pages/nursing/rounds'));
+const OncologyChemotherapyPage = lazy(() => import('@/pages/oncology/chemotherapy'));
+const OncologyMonitorPage = lazy(() => import('@/pages/oncology/monitor'));
+const OncologyPainPage = lazy(() => import('@/pages/oncology/pain'));
+const OncologyPatientsPage = lazy(() => import('@/pages/oncology/patients'));
+const OncologyRadiotherapyPage = lazy(() => import('@/pages/oncology/radiotherapy'));
+const OncologyTreatmentsPage = lazy(() => import('@/pages/oncology/treatments'));
+const OperationAlertsPage = lazy(() => import('@/pages/operation/alerts'));
+const OperationBenchmarkPage = lazy(() => import('@/pages/operation/benchmark'));
+const OrdersActivePage = lazy(() => import('@/pages/orders/active'));
+const OrdersCancelledPage = lazy(() => import('@/pages/orders/cancelled'));
+const OrdersCompletedPage = lazy(() => import('@/pages/orders/completed'));
+const OrdersListPage = lazy(() => import('@/pages/orders/list'));
+const OutpatientPrescriptionsPage = lazy(() => import('@/pages/outpatient/prescriptions'));
+const OutpatientTriagePage = lazy(() => import('@/pages/outpatient/triage'));
+const OutpatientVisitsPage = lazy(() => import('@/pages/outpatient/visits'));
+const PatientAllergiesPage = lazy(() => import('@/pages/patient/allergies'));
+const PatientFamilyPage = lazy(() => import('@/pages/patient/family'));
+const PatientProfilePage = lazy(() => import('@/pages/patient/profile'));
+const PatientTimelineAlertsPage = lazy(() => import('@/pages/patient/timeline-alerts'));
+const PatientTimelineDetailPage = lazy(() => import('@/pages/patient/timeline-detail'));
+const PatientTimelineEncountersPage = lazy(() => import('@/pages/patient/timeline-encounters'));
+const PatientTimelineEventsPage = lazy(() => import('@/pages/patient/timeline-events'));
+const PatientTimelineMedicationsPage = lazy(() => import('@/pages/patient/timeline-medications'));
+const PatientTimelineOverviewPage = lazy(() => import('@/pages/patient/timeline-overview'));
+const PatientTimelinePage = lazy(() => import('@/pages/patient/timeline'));
+const PatientTimelineResultsPage = lazy(() => import('@/pages/patient/timeline-results'));
+const PatientVitalsPage = lazy(() => import('@/pages/patient/vitals'));
+const PharmacyCheckPage = lazy(() => import('@/pages/pharmacy/check'));
+const PharmacyDispensingPage = lazy(() => import('@/pages/pharmacy/dispensing'));
+const PharmacyInventoryPage = lazy(() => import('@/pages/pharmacy/inventory'));
+const PharmacyPurchasePage = lazy(() => import('@/pages/pharmacy/purchase'));
+const PharmacyPurchasingPage = lazy(() => import('@/pages/pharmacy/purchasing'));
+const PrescriptionsEmergencyPage = lazy(() => import('@/pages/prescriptions/emergency'));
+const PrescriptionsInpatientPage = lazy(() => import('@/pages/prescriptions/inpatient'));
+const PrescriptionsOutpatientPage = lazy(() => import('@/pages/prescriptions/outpatient'));
+const QcAuditsPage = lazy(() => import('@/pages/qc/audits'));
+const QcCorrectivePage = lazy(() => import('@/pages/qc/corrective'));
+const QcIndicatorsPage = lazy(() => import('@/pages/qc/indicators'));
+const QualityControlPage = lazy(() => import('@/pages/quality/control'));
+const QualityExceptionPage = lazy(() => import('@/pages/quality/exception'));
+const QualityInspectionPage = lazy(() => import('@/pages/quality/inspection'));
+const RadiologyOrdersPage = lazy(() => import('@/pages/radiology/orders'));
+const RadiologyReportsPage = lazy(() => import('@/pages/radiology/reports'));
+const RadiologyResultsPage = lazy(() => import('@/pages/radiology/results'));
+const RehabAssessmentPage = lazy(() => import('@/pages/rehab/assessment'));
+const RehabAssessmentsPage = lazy(() => import('@/pages/rehab/assessments'));
+const RehabEquipmentPage = lazy(() => import('@/pages/rehab/equipment'));
+const RehabExercisesPage = lazy(() => import('@/pages/rehab/exercises'));
+const RehabProgressPage = lazy(() => import('@/pages/rehab/progress'));
+const RehabRecordsPage = lazy(() => import('@/pages/rehab/records'));
+const RehabTreatmentsPage = lazy(() => import('@/pages/rehab/treatments'));
+const ResearchFundsPage = lazy(() => import('@/pages/research/funds'));
+const ResearchGrantsPage = lazy(() => import('@/pages/research/grants'));
+const ResearchPapersPage = lazy(() => import('@/pages/research/papers'));
+const ResearchProjectsListPage = lazy(() => import('@/pages/research/projects-list'));
+const RiskAssessmentPage = lazy(() => import('@/pages/risk/assessment'));
+const RiskMonitorPage = lazy(() => import('@/pages/risk/monitor'));
+const RiskWarningPage = lazy(() => import('@/pages/risk/warning'));
+const SecurityAuditAnomalyPage = lazy(() => import('@/pages/security/audit-anomaly'));
+const SecurityAuditDetailPage = lazy(() => import('@/pages/security/audit-detail'));
+const SecurityAuditExportPage = lazy(() => import('@/pages/security/audit-export'));
+const SecurityAuditLogsPage = lazy(() => import('@/pages/security/audit-logs'));
+const SecurityAuditReportPage = lazy(() => import('@/pages/security/audit-report'));
+const SecurityAuditWhitelistPage = lazy(() => import('@/pages/security/audit-whitelist'));
+const SecurityComplianceScorePage = lazy(() => import('@/pages/security/compliance-score'));
+const SecurityDashboardPage = lazy(() => import('@/pages/security/dashboard'));
+const SecurityDataAccessLogPage = lazy(() => import('@/pages/security/data-access-log'));
+const SecurityDataClassificationPage = lazy(() => import('@/pages/security/data-classification'));
+const SecurityDataRetentionPage = lazy(() => import('@/pages/security/data-retention'));
+const SecurityEncryptionKeysPage = lazy(() => import('@/pages/security/encryption-keys'));
+const SecurityEncryptionStatusPage = lazy(() => import('@/pages/security/encryption-status'));
+const SecurityLoginHistoryPage = lazy(() => import('@/pages/security/login-history'));
+const SecurityMaskingLogsPage = lazy(() => import('@/pages/security/masking-logs'));
+const SecurityMaskingRulesPage = lazy(() => import('@/pages/security/masking-rules'));
+const SecurityPermissionMatrixPage = lazy(() => import('@/pages/security/permission-matrix'));
+const SecurityPermissionsPage = lazy(() => import('@/pages/security/permissions'));
+const SecurityPrivacyReportPage = lazy(() => import('@/pages/security/privacy-report'));
+const SecurityRoleMappingPage = lazy(() => import('@/pages/security/role-mapping'));
+const SecurityRolesPage = lazy(() => import('@/pages/security/roles'));
+const SecurityUserSessionsPage = lazy(() => import('@/pages/security/user-sessions'));
+const SettlementListPage = lazy(() => import('@/pages/settlement/list'));
+const SmartServiceQueuePage = lazy(() => import('@/pages/smart-service/queue'));
+const SuppliesCheckPage = lazy(() => import('@/pages/supplies/check'));
+const SuppliesPurchasePage = lazy(() => import('@/pages/supplies/purchase'));
+const SuppliesWarningPage = lazy(() => import('@/pages/supplies/warning'));
+const SurgeryOrdersPage = lazy(() => import('@/pages/surgery/orders'));
+const SurgeryRecordsPage = lazy(() => import('@/pages/surgery/records'));
+const SystemConfigsPage = lazy(() => import('@/pages/system/configs'));
+const SystemDictPage = lazy(() => import('@/pages/system/dict'));
+const SystemFeatureFlagsPage = lazy(() => import('@/pages/system/feature-flags'));
+const SystemLogsPage = lazy(() => import('@/pages/system/logs'));
+const SystemVersionPage = lazy(() => import('@/pages/system/version'));
+const TasksDonePage = lazy(() => import('@/pages/tasks/done'));
+const TasksOverduePage = lazy(() => import('@/pages/tasks/overdue'));
+const TasksTodoPage = lazy(() => import('@/pages/tasks/todo'));
+const TeachingTrainingPage = lazy(() => import('@/pages/teaching/training'));
+const TelemedEquipmentPage = lazy(() => import('@/pages/telemed/equipment'));
+const TelemedicineConsultationsPage = lazy(() => import('@/pages/telemedicine/consultations'));
+const TelemedicineDevicesPage = lazy(() => import('@/pages/telemedicine/devices'));
+const TelemedicineRecordsPage = lazy(() => import('@/pages/telemedicine/records'));
+const TelemedRecordsPage = lazy(() => import('@/pages/telemed/records'));
+const TelemedReferralsPage = lazy(() => import('@/pages/telemed/referrals'));
+const TelemedSpecialistsPage = lazy(() => import('@/pages/telemed/specialists'));
+const TelemedVideoPage = lazy(() => import('@/pages/telemed/video'));
+const TenantConfigPage = lazy(() => import('@/pages/tenant/config'));
+const TenantDataIsolationPage = lazy(() => import('@/pages/tenant/data-isolation'));
+const TenantListPage = lazy(() => import('@/pages/tenant/list'));
+const TenantLogsPage = lazy(() => import('@/pages/tenant/logs'));
+const TenantQuotaPage = lazy(() => import('@/pages/tenant/quota'));
+const TenantsBillingPage = lazy(() => import('@/pages/tenants/billing'));
+const TenantsOverviewPage = lazy(() => import('@/pages/tenants/overview'));
+const TenantUsagePage = lazy(() => import('@/pages/tenant/usage'));
+const WorkflowAdminPage = lazy(() => import('@/pages/workflow/admin'));
+const WorkflowAdminTasksPage = lazy(() => import('@/pages/workflow/admin-tasks'));
+const WorkflowDoctorTasksPage = lazy(() => import('@/pages/workflow/doctor-tasks'));
+const WorkflowHistoryPage = lazy(() => import('@/pages/workflow/history'));
+const WorkflowNurseTasksPage = lazy(() => import('@/pages/workflow/nurse-tasks'));
+const WorkflowPharmacistTasksPage = lazy(() => import('@/pages/workflow/pharmacist-tasks'));
+const WorkflowQueuePage = lazy(() => import('@/pages/workflow/queue'));
+const WorkflowTasksPage = lazy(() => import('@/pages/workflow/tasks'));
+const WorkflowTemplatesPage = lazy(() => import('@/pages/workflow/templates'));
+
+
 const Login = lazy(() => import('@/pages/login'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
@@ -89,6 +393,10 @@ const AgentsPage = lazy(() => import('@/pages/system/agents'));
 const IntegrationPage = lazy(() => import('@/pages/system/integration'));
 const NotificationsPage = lazy(() => import('@/pages/system/notifications'));
 const SystemMonitorPage = lazy(() => import('@/pages/system/monitor'));
+const AiCdaSuggestPage = lazy(() => import('@/pages/ai/cda'));
+const AiRiskPredictionPage = lazy(() => import('@/pages/ai/risk'));
+const BiTrendsPage = lazy(() => import('@/pages/bi/trends'));
+const BiComparisonPage = lazy(() => import('@/pages/bi/comparison'));
 const Forbidden = lazy(() => import('@/pages/403'));
 const NotFound = lazy(() => import('@/pages/404'));
 
@@ -112,6 +420,261 @@ const OperationStaff = lazy(() => import('@/pages/operation/staff'));
 const OperationEquipment = lazy(() => import('@/pages/operation/equipment'));
 // 手术麻醉管理（M9-C）
 const SurgeryPage = lazy(() => import('@/pages/surgery'));
+// M257 详情页 lazy 注册
+const OutpatientDetailPage = lazy(() => import('@/pages/outpatient/detail'));
+const InpatientDetailPage = lazy(() => import('@/pages/inpatient/detail'));
+const OrderDetailPage = lazy(() => import('@/pages/order/detail'));
+const MedicationDetailPage = lazy(() => import('@/pages/medication/detail'));
+const DischargeDetailPage = lazy(() => import('@/pages/discharge/detail'));
+// M258 合规/安全深度页 lazy 注册
+const ComplianceAuditPage = lazy(() => import('@/pages/compliance/audit'));
+const ComplianceReportsPage = lazy(() => import('@/pages/compliance/reports'));
+const SecurityDataMaskPage = lazy(() => import('@/pages/security/data-mask'));
+// M261 EMR 版本/审计/租户/脱敏规则/访问日志 lazy 注册
+const EmrVersionsPage = lazy(() => import('@/pages/emr/versions'));
+const EmrAuditTrailPage = lazy(() => import('@/pages/emr/audit-trail'));
+const TenantsListPage = lazy(() => import('@/pages/tenants/list'));
+// M311 麻醉/中医/牙科 lazy 注册
+const AnesthesiaRecordsPage = lazy(() => import('@/pages/anesthesia/records'));
+const AnesthesiaComplicationsPage = lazy(() => import('@/pages/anesthesia/complications'));
+const TcmPrescriptionsPage = lazy(() => import('@/pages/tcm/prescriptions'));
+const TcmFormulasPage = lazy(() => import('@/pages/tcm/formulas'));
+const DentalAppointmentsPage = lazy(() => import('@/pages/dental/appointments'));
+// M312 肿瘤/慢病/ICU lazy 注册
+const OncologyRecordsPage = lazy(() => import('@/pages/oncology/records'));
+const ChronicManagementPage = lazy(() => import('@/pages/chronic/management'));
+const IcuMonitorPage = lazy(() => import('@/pages/icu/monitor'));
+// M316 采购/资产/预防/出院小结 lazy 注册
+const FinancialProcurementPage = lazy(() => import('@/pages/financial/procurement'));
+const FinancialAssetsPage = lazy(() => import('@/pages/financial/assets'));
+const LogisticsPreventivePage = lazy(() => import('@/pages/logistics/preventive'));
+const DischargeSummaryPage = lazy(() => import('@/pages/discharge/summary'));
+// M317 会诊/急诊/ICU/麻醉/出院/CDS诊断 lazy 注册
+const ConsultationListPage = lazy(() => import('@/pages/consultation/list'));
+const EmergencyListPage = lazy(() => import('@/pages/emergency/list'));
+const IcuListPage = lazy(() => import('@/pages/icu/list'));
+const AnesthesiaListPage = lazy(() => import('@/pages/anesthesia/list'));
+const DischargeListPage = lazy(() => import('@/pages/discharge/list'));
+const CdsDiagnosisSuggestPage = lazy(() => import('@/pages/cds/diagnosis-suggest'));
+const TenantsConfigPage = lazy(() => import('@/pages/tenants/config'));
+const SecurityMaskRulesPage = lazy(() => import('@/pages/security/mask-rules'));
+const SecurityAccessLogsPage = lazy(() => import('@/pages/security/access-logs'));
+// M262 EMR 锁定/签名/租户切换/导出审批/保留策略/泄露事件 lazy 注册
+const EmrLockPage = lazy(() => import('@/pages/emr/lock'));
+const EmrSignPage = lazy(() => import('@/pages/emr/sign'));
+const TenantsSwitchPage = lazy(() => import('@/pages/tenants/switch'));
+const SecurityExportAuditPage = lazy(() => import('@/pages/security/export-audit'));
+const SecurityRetentionPage = lazy(() => import('@/pages/security/retention'));
+const SecurityBreachPage = lazy(() => import('@/pages/security/breach'));
+// M263 Auth/会话/权限/登录日志/漏洞/备份/容灾 lazy 注册
+const AuthSessionPage = lazy(() => import('@/pages/auth/session'));
+const AuthPermissionsPage = lazy(() => import('@/pages/auth/permissions'));
+const AuthAuditPage = lazy(() => import('@/pages/auth/audit'));
+const SecurityVulnerabilityPage = lazy(() => import('@/pages/security/vulnerability'));
+const SecurityBackupPage = lazy(() => import('@/pages/security/backup'));
+const SecurityDrPage = lazy(() => import('@/pages/security/dr'));
+// M264 全局审计/合规审计/数据隔离/限流/密钥/证书 lazy 注册
+const AuditTrailPage = lazy(() => import('@/pages/audit/trail'));
+const AuditCompliancePage = lazy(() => import('@/pages/audit/compliance'));
+const TenantsDataIsolationPage = lazy(() => import('@/pages/tenants/data-isolation'));
+const TenantsRateLimitPage = lazy(() => import('@/pages/tenants/rate-limit'));
+const SecurityKeyManagementPage = lazy(() => import('@/pages/security/key-management'));
+const SecurityCertificatesPage = lazy(() => import('@/pages/security/certificates'));
+// M265 EMR 签名验证/水印/患者授权/最小化/匿名化/删除请求 lazy 注册
+const EmrSignaturePage = lazy(() => import('@/pages/emr/signature'));
+const EmrWatermarkPage = lazy(() => import('@/pages/emr/watermark'));
+const SecurityConsentPage = lazy(() => import('@/pages/security/consent'));
+const SecurityMinimizePage = lazy(() => import('@/pages/security/minimize'));
+const SecurityAnonymizationPage = lazy(() => import('@/pages/security/anonymization'));
+const SecurityDeletionPage = lazy(() => import('@/pages/security/deletion'));
+// M266 锁定历史/修订/授权日志/数据流向/DPIA/合规认证 lazy 注册
+const EmrLockHistoryPage = lazy(() => import('@/pages/emr/lock-history'));
+// M319 病历质控规则 lazy 注册
+const EmrQualityRulesPage = lazy(() => import('@/pages/emr/quality-rules'));
+// M320 院感/DRG/DIP/RWD/联邦/数字孪生 lazy 注册
+const InfectionSurveillancePage = lazy(() => import('@/pages/infection/surveillance'));
+const DrgGroupingPage = lazy(() => import('@/pages/drg/grouping'));
+const DipScorePage = lazy(() => import('@/pages/dip/score'));
+const RwdDatasetsPage = lazy(() => import('@/pages/rwd/datasets'));
+const FederatedLearningPage = lazy(() => import('@/pages/federated/learning'));
+const DigitalTwinPatientsPage = lazy(() => import('@/pages/digital-twin/patients'));
+// M321 院感日报/DRG管控/DIP明细/RWD分析/联邦节点/孪生模拟 lazy 注册
+const InfectionDailyReportPage = lazy(() => import('@/pages/infection/daily-report'));
+const DrgCostControlPage = lazy(() => import('@/pages/drg/cost-control'));
+const DipDetailPage = lazy(() => import('@/pages/dip/detail'));
+const RwdAnalysisPage = lazy(() => import('@/pages/rwd/analysis'));
+const FederatedNodesPage = lazy(() => import('@/pages/federated/nodes'));
+const DigitalTwinSimulationPage = lazy(() => import('@/pages/digital-twin/simulation'));
+// M322 智慧服务 lazy 注册
+const SmartServiceQueueStatsPage = lazy(() => import('@/pages/smart-service/queue-stats'));
+const SmartServiceAiTriagePage = lazy(() => import('@/pages/smart-service/ai-triage'));
+const SmartServiceBedRecommendPage = lazy(() => import('@/pages/smart-service/bed-recommend'));
+const SmartServiceMedicationRemindPage = lazy(() => import('@/pages/smart-service/medication-remind'));
+const SmartServiceFollowupPage = lazy(() => import('@/pages/smart-service/followup'));
+const SmartServiceHealthRecordsPage = lazy(() => import('@/pages/smart-service/health-records'));
+// M323 运营管理 lazy 注册
+const OperationDashboardPage = lazy(() => import('@/pages/operation/dashboard'));
+const OperationKpiPage = lazy(() => import('@/pages/operation/kpi'));
+const OperationComparisonPage = lazy(() => import('@/pages/operation/comparison'));
+const OperationEfficiencyPage = lazy(() => import('@/pages/operation/efficiency'));
+const OperationCostPage = lazy(() => import('@/pages/operation/cost'));
+const OperationRevenuePage = lazy(() => import('@/pages/operation/revenue'));
+// M324 HR lazy 注册
+const HrDoctorsPage = lazy(() => import('@/pages/hr/doctors'));
+const HrNursesPage = lazy(() => import('@/pages/hr/nurses'));
+const HrDepartmentsPage = lazy(() => import('@/pages/hr/departments'));
+const HrTrainingPage = lazy(() => import('@/pages/hr/training'));
+const HrLeavePage = lazy(() => import('@/pages/hr/leave'));
+// M325 财务 lazy 注册
+const FinanceBillingPage = lazy(() => import('@/pages/finance/billing'));
+const FinancePaymentPage = lazy(() => import('@/pages/finance/payment'));
+const FinanceRefundPage = lazy(() => import('@/pages/finance/refund'));
+const FinanceInsuranceSettlementPage = lazy(() => import('@/pages/finance/insurance-settlement'));
+const FinanceBudgetPage = lazy(() => import('@/pages/finance/budget'));
+const FinanceAuditPage = lazy(() => import('@/pages/finance/audit'));
+const EmrRevisionPage = lazy(() => import('@/pages/emr/revision'));
+const SecurityConsentLogPage = lazy(() => import('@/pages/security/consent-log'));
+const SecurityDataFlowPage = lazy(() => import('@/pages/security/data-flow'));
+const SecurityDpiPage = lazy(() => import('@/pages/security/dpi'));
+const SecurityAuditCertPage = lazy(() => import('@/pages/security/audit-cert'));
+// M268 病历缺陷/质控统计/租户配额/CVE/WAF/SIEM lazy 注册
+const EmrQualityDefectsPage = lazy(() => import('@/pages/emr/quality-defects'));
+const EmrQualityStatsPage = lazy(() => import('@/pages/emr/quality-stats'));
+const TenantsQuotaPage = lazy(() => import('@/pages/tenants/quota'));
+const SecurityCveFeedPage = lazy(() => import('@/pages/security/cve-feed'));
+const SecurityWafPage = lazy(() => import('@/pages/security/waf'));
+const SecuritySiemPage = lazy(() => import('@/pages/security/siem'));
+// M269 质控趋势/科室排名/租户用量/日志归档/事件时间线/安全 KPI lazy 注册
+const EmrQualityTrendPage = lazy(() => import('@/pages/emr/quality-trend'));
+const EmrQualityDepartmentPage = lazy(() => import('@/pages/emr/quality-department'));
+const TenantsUsageStatsPage = lazy(() => import('@/pages/tenants/usage-stats'));
+const SecurityLogArchivePage = lazy(() => import('@/pages/security/log-archive'));
+const SecurityIncidentTimelinePage = lazy(() => import('@/pages/security/incident-timeline'));
+const SecurityMetricsPage = lazy(() => import('@/pages/security/metrics'));
+// M270 CDS 时间线/相互作用/剂量/禁忌 + 护理 NQI  lazy 注册
+const CdsPatientTimelinePage = lazy(() => import('@/pages/cds/patient-timeline'));
+const CdsInteractionCheckPage = lazy(() => import('@/pages/cds/interaction-check'));
+const CdsDoseRangePage = lazy(() => import('@/pages/cds/dose-range'));
+const CdsContraindicationPage = lazy(() => import('@/pages/cds/contraindication'));
+const NursingNqiScoresPage = lazy(() => import('@/pages/nursing/nqi-scores'));
+const NursingNqiTrendPage = lazy(() => import('@/pages/nursing/nqi-trend'));
+// M271 FHIR Patient/Observation/Condition/MedicationRequest + 事件总线/审计 lazy 注册
+const FhirPatientPage = lazy(() => import('@/pages/fhir/patient'));
+const FhirObservationPage = lazy(() => import('@/pages/fhir/observation'));
+const FhirConditionPage = lazy(() => import('@/pages/fhir/condition'));
+const FhirMedicationRequestPage = lazy(() => import('@/pages/fhir/medicationrequest'));
+const EventsBusPage = lazy(() => import('@/pages/events/bus'));
+const EventsAuditPage = lazy(() => import('@/pages/events/audit'));
+// M272 FHIR Encounter/Procedure/DiagnosticReport + 医生/护士/药师工作流 lazy 注册
+const FhirEncounterPage = lazy(() => import('@/pages/fhir/encounter'));
+const FhirProcedurePage = lazy(() => import('@/pages/fhir/procedure'));
+const FhirDiagnosticReportPage = lazy(() => import('@/pages/fhir/diagnosticreport'));
+const WorkflowDoctorPage = lazy(() => import('@/pages/workflow/doctor'));
+const WorkflowNursePage = lazy(() => import('@/pages/workflow/nurse'));
+const WorkflowPharmacistPage = lazy(() => import('@/pages/workflow/pharmacist'));
+// M273 FHIR DocumentReference/AllergyIntolerance/Immunization + 病历版本 diff/compare/restore lazy 注册
+const FhirDocumentrefPage = lazy(() => import('@/pages/fhir/documentref'));
+const FhirAllergyintolerancePage = lazy(() => import('@/pages/fhir/allergyintolerance'));
+const FhirImmunizationPage = lazy(() => import('@/pages/fhir/immunization'));
+const EmrVersionDiffPage = lazy(() => import('@/pages/emr/version-diff'));
+const EmrVersionComparePage = lazy(() => import('@/pages/emr/version-compare'));
+const EmrVersionRestorePage = lazy(() => import('@/pages/emr/version-restore'));
+// M274 FHIR Location/Practitioner/Organization + 患者360 概览/时间线/风险 lazy 注册
+const FhirLocationPage = lazy(() => import('@/pages/fhir/location'));
+const FhirPractitionerPage = lazy(() => import('@/pages/fhir/practitioner'));
+const FhirOrganizationPage = lazy(() => import('@/pages/fhir/organization'));
+const Patient360OverviewPage = lazy(() => import('@/pages/patient/360-overview'));
+const Patient360TimelinePage = lazy(() => import('@/pages/patient/360-timeline'));
+const Patient360RiskPage = lazy(() => import('@/pages/patient/360-risk'));
+// M275 BI 床位/吞吐/满意度 + 智慧服务 预约/导诊/反馈 lazy 注册
+const BiBedOccupancyPage = lazy(() => import('@/pages/bi/bed-occupancy'));
+const BiThroughputPage = lazy(() => import('@/pages/bi/throughput'));
+const BiSatisfactionPage = lazy(() => import('@/pages/bi/satisfaction'));
+const SmartServiceAppointmentPage = lazy(() => import('@/pages/smart-service/appointment'));
+const SmartServiceGuidePage = lazy(() => import('@/pages/smart-service/guide'));
+const SmartServiceFeedbackPage = lazy(() => import('@/pages/smart-service/feedback'));
+// M276 CDS 医嘱审查/危急值/过敏 + 移动查房/体征/完成率 lazy 注册
+const CdsOrderCheckPage = lazy(() => import('@/pages/cds/order-check'));
+const CdsLabAlertPage = lazy(() => import('@/pages/cds/lab-alert'));
+const CdsAllergyCheckPage = lazy(() => import('@/pages/cds/allergy-check'));
+const MobileNursingRoundsPage = lazy(() => import('@/pages/mobile/nursing-rounds'));
+const MobileVitalsChartPage = lazy(() => import('@/pages/mobile/vitals-chart'));
+const MobileTaskCompletionPage = lazy(() => import('@/pages/mobile/task-completion'));
+// M278 质控看板/远程会诊/社区中心/员工/合同 lazy 注册
+const EmrQualityDashboardPage = lazy(() => import('@/pages/emr/quality-dashboard'));
+const TelemedConsultationsPage = lazy(() => import('@/pages/telemed/consultations'));
+const CommunityCentersPage = lazy(() => import('@/pages/community/centers'));
+const HrEmployeesPage = lazy(() => import('@/pages/hr/employees'));
+const ContractsListPage = lazy(() => import('@/pages/contracts/list'));
+// M279 设备维护/物资库存/病理报告/体检中心/科研项目/教学培训 lazy 注册
+const EquipmentMaintenancePage = lazy(() => import('@/pages/equipment/maintenance'));
+const SuppliesInventoryPage = lazy(() => import('@/pages/supplies/inventory'));
+const PathologyReportsPage = lazy(() => import('@/pages/pathology/reports'));
+const PhysicalCentersPage = lazy(() => import('@/pages/physical/centers'));
+const ResearchProjectsPage = lazy(() => import('@/pages/research/projects'));
+const EducationTrainingsPage = lazy(() => import('@/pages/education/trainings'));
+// M280 医保/产科/发热/新生儿/门诊叫号/住院病区 lazy 注册
+const InsurancePoliciesPage = lazy(() => import('@/pages/insurance/policies'));
+const MaternityRecordsPage = lazy(() => import('@/pages/maternity/records'));
+const FeverClinicsPage = lazy(() => import('@/pages/fever/clinics'));
+const NewbornRecordsPage = lazy(() => import('@/pages/newborn/records'));
+const OutpatientQueuePage = lazy(() => import('@/pages/outpatient/queue'));
+const InpatientWardsPage = lazy(() => import('@/pages/inpatient/wards'));
+// M283 中医/口腔/眼科/皮肤/精神科 lazy 注册
+const TcmDiagnosisPage = lazy(() => import('@/pages/tcm/diagnosis'));
+const DentalTreatmentsPage = lazy(() => import('@/pages/dental/treatments'));
+const OphthalmologyExamsPage = lazy(() => import('@/pages/ophthalmology/exams'));
+const DermatologyRecordsPage = lazy(() => import('@/pages/dermatology/records'));
+const PsychiatryAssessmentsPage = lazy(() => import('@/pages/psychiatry/assessments'));
+// M285 CDS 医嘱套餐/PACS 报告 lazy 注册
+const CdsOrderSetPage = lazy(() => import('@/pages/cds/order-set'));
+const PacsReportsPage = lazy(() => import('@/pages/pacs/reports'));
+// M287 医嘱套餐/LIS结果/药房处方/输血记录 lazy 注册
+const OrderSetsPage = lazy(() => import('@/pages/order/sets'));
+const LisResultsPage = lazy(() => import('@/pages/lis/results'));
+const PharmacyPrescriptionsPage = lazy(() => import('@/pages/pharmacy/prescriptions'));
+const TransfusionRecordsPage = lazy(() => import('@/pages/transfusion/records'));
+// M293 科室/医生排班/入院/出院/医保结算/每日统计 lazy 注册
+const DepartmentListPage = lazy(() => import('@/pages/department/list'));
+const DoctorSchedulePage = lazy(() => import('@/pages/doctor/schedule'));
+const PatientAdmissionPage = lazy(() => import('@/pages/patient/admission'));
+const PatientDischargePage = lazy(() => import('@/pages/patient/discharge'));
+const MedicalInsurancePage = lazy(() => import('@/pages/medical/insurance'));
+const StatisticsDailyPage = lazy(() => import('@/pages/statistics/daily'));
+// M294 收费/财务/考勤 lazy 注册
+const BillingListPage = lazy(() => import('@/pages/billing/list'));
+const BillingDetailPage = lazy(() => import('@/pages/billing/detail'));
+const FinanceRevenuePage = lazy(() => import('@/pages/finance/revenue'));
+const FinanceCostPage = lazy(() => import('@/pages/finance/cost'));
+const HrAttendancePage = lazy(() => import('@/pages/hr/attendance'));
+const HrPerformancePage = lazy(() => import('@/pages/hr/performance'));
+// M297 患者满意度 lazy 注册
+const PatientSatisfactionPage = lazy(() => import('@/pages/patient/satisfaction'));
+// M298 BI 综合大屏 lazy 注册
+const BiDashboardPage = lazy(() => import('@/pages/bi/dashboard'));
+// M301 患者/医生/科室/排班/预约 lazy 注册
+const PatientSearchPage = lazy(() => import('@/pages/patient/search'));
+const PatientDetailPage = lazy(() => import('@/pages/patient/detail'));
+const DoctorListPage = lazy(() => import('@/pages/doctor/list'));
+const DepartmentDetailPage = lazy(() => import('@/pages/department/detail'));
+const ScheduleTodayPage = lazy(() => import('@/pages/schedule/today'));
+const AppointmentListPage = lazy(() => import('@/pages/appointment/list'));
+// M302 医嘱/药品/检验/检查/手术 lazy 注册
+const OrderListPage = lazy(() => import('@/pages/order/list'));
+// M371 removed duplicate: const OrderDetailPage = lazy(() => import('@/pages/order/detail'));
+const MedicationListPage = lazy(() => import('@/pages/medication/list'));
+const LisListPage = lazy(() => import('@/pages/lis/list'));
+const PacsListPage = lazy(() => import('@/pages/pacs/list'));
+const SurgeryListPage = lazy(() => import('@/pages/surgery/list'));
+// M303 护理/发药/输血/同意/归档 lazy 注册
+const NursingWardRoundsPage = lazy(() => import('@/pages/nursing/ward-rounds'));
+const NursingVitalsPage = lazy(() => import('@/pages/nursing/vitals'));
+const PharmacyDispensePage = lazy(() => import('@/pages/pharmacy/dispense'));
+const TransfusionListPage = lazy(() => import('@/pages/transfusion/list'));
+const ConsentListPage = lazy(() => import('@/pages/consent/list'));
+const RecordsArchivePage = lazy(() => import('@/pages/records/archive'));
+// M304 PDA 任务 lazy 注册
+const MobilePdaTasksPage = lazy(() => import('@/pages/mobile/pda-tasks'));
 // 输血管理（M10-A）
 const TransfusionPage = lazy(() => import('@/pages/transfusion'));
 // 临床用血质量（M10-B）
@@ -279,7 +842,7 @@ const AdminAuditLog = lazy(() => import('@/pages/admin/audit-log'));
 // M184-A：护士智能排班优化
 const NurseScheduleOptimize = lazy(() => import('@/pages/scheduling/optimize'));
 // M184-B：智能随访
-const SmartFollowup = lazy(() => import('@/pages/followup/smart'));
+const SmartFollowup = lazy(() => import('@/pages/followUp/smart'));
 // M184-C：设备预测性维护
 const EquipmentPredictive = lazy(() => import('@/pages/equipment/predictive'));
 // M184-D：备份容灾策略
@@ -306,6 +869,8 @@ const PerformanceReportV2 = lazy(() => import('@/pages/admin/performance-v2'));
 const SecurityReportV2 = lazy(() => import('@/pages/admin/security-v2'));
 // M187-C：EMR 五级评审 V2
 const EMRGrade5V2 = lazy(() => import('@/pages/emr/grade5'));
+// v5.0试点扩展（浏览器bug修复）：/emr 总入口占位页（原 /emr 路由缺失导致 404）
+const EmrLanding = lazy(() => import('@/pages/emr/Landing'));
 // M187-D：DRG 智能审核 V2
 const DRGAuditV2 = lazy(() => import('@/pages/drg/audit'));
 // M188-A：临床路径 V2
@@ -2502,7 +3067,7 @@ const EmrBorrowPage = lazy(() => import('@/pages/emr-borrow'));
 // M462-D：电子病历等级评审仪表盘 V14（EMR 深化四模块，M462 收官）
 const EmrGradeDashboardPage = lazy(() => import('@/pages/emr-grade-dashboard'));
 // M463-A：病历电子签名与认证 V14（EMR 深化四模块）
-const EmrSignaturePage = lazy(() => import('@/pages/emr-signature'));
+// M371 removed duplicate (emr-signature variant)
 // M463-B：病历复制痕迹保留 V14（EMR 深化四模块）
 const EmrCopyTracePage = lazy(() => import('@/pages/emr-copy-trace'));
 // M463-C：病历数据导出与区域上报 V14（EMR 深化四模块）
@@ -3088,7 +3653,7 @@ const EmrDipPredictPage = lazy(() => import('@/pages/emr-dip-predict'));
 // M536-A：病历质量综合评分 V14（EMR 深化四模块，避让 M465-B -comprehensive）
 const EmrQualityScoreComprehensivePage = lazy(() => import('@/pages/emr-quality-score-comprehensive'));
 // M536-B：病历质量趋势分析 V14（EMR 深化四模块）
-const EmrQualityTrendPage = lazy(() => import('@/pages/emr-quality-trend'));
+// M371 removed duplicate (emr-quality-trend variant)
 // M536-C：病历质量科室对比 V14（EMR 深化四模块）
 const EmrQualityComparePage = lazy(() => import('@/pages/emr-quality-compare'));
 // M536-D：病历质量改进建议 V14（EMR 深化四模块）
@@ -3331,6 +3896,143 @@ const PrescriptionReviewPage = lazy(() => import('@/pages/drugReview/Prescriptio
 const OpdWorkstationPage = lazy(() => import('@/pages/opd/Workstation'));
 // 手术安全核查表（M105-D）
 const SurgeryChecklistPage = lazy(() => import('@/pages/surgery/Checklist'));
+const ServiceAppointmentsPage = lazy(() => import('@/pages/service/appointments'));
+const ServicePaymentsPage = lazy(() => import('@/pages/service/payments'));
+const ServiceQuerysPage = lazy(() => import('@/pages/service/querys'));
+const ServiceRemindersPage = lazy(() => import('@/pages/service/reminders'));
+const ServiceFeedbackPage = lazy(() => import('@/pages/service/feedback'));
+const ServiceSatisfactionPage = lazy(() => import('@/pages/service/satisfaction'));
+const OperationsDashboardPage = lazy(() => import('@/pages/operations/dashboard'));
+const OperationsKpiPage = lazy(() => import('@/pages/operations/kpi'));
+const OperationsReportsPage = lazy(() => import('@/pages/operations/reports'));
+const OperationsAnalysisPage = lazy(() => import('@/pages/operations/analysis'));
+const OperationsForecastPage = lazy(() => import('@/pages/operations/forecast'));
+const OperationsBenchmarkPage = lazy(() => import('@/pages/operations/benchmark'));
+const HrStaffDashboardPage = lazy(() => import('@/pages/hr/staff-dashboard'));
+const HrStaffRecruitmentPage = lazy(() => import('@/pages/hr/staff-recruitment'));
+const HrStaffTrainingPage = lazy(() => import('@/pages/hr/staff-training'));
+const HrStaffPerformancePage = lazy(() => import('@/pages/hr/staff-performance'));
+const HrStaffSchedulePage = lazy(() => import('@/pages/hr/staff-schedule'));
+const HrStaffAttendancePage = lazy(() => import('@/pages/hr/staff-attendance'));
+const FinanceCostsPage = lazy(() => import('@/pages/finance/costs'));
+const FinanceAnalysisPage = lazy(() => import('@/pages/finance/analysis'));
+const PharmacyDashboardPage = lazy(() => import('@/pages/pharmacy/dashboard'));
+const PharmacyInventoryDetailPage = lazy(() => import('@/pages/pharmacy/inventory-detail'));
+const PharmacySuppliersPage = lazy(() => import('@/pages/pharmacy/suppliers'));
+const PharmacyExpiryPage = lazy(() => import('@/pages/pharmacy/expiry'));
+const ResearchAwardsPage = lazy(() => import('@/pages/research/awards'));
+const TeachingCoursesPage = lazy(() => import('@/pages/teaching/courses'));
+const TelemedPrescriptionsPage = lazy(() => import('@/pages/telemed/prescriptions'));
+const TelemedPaymentsPage = lazy(() => import('@/pages/telemed/payments'));
+const TelemedDeliveryPage = lazy(() => import('@/pages/telemed/delivery'));
+const TelemedFollowupPage = lazy(() => import('@/pages/telemed/followup'));
+const TelemedReportsPage = lazy(() => import('@/pages/telemed/reports'));
+const TelemedRemoteConsultsPage = lazy(() => import('@/pages/telemed/remote-consults'));
+const TelemedRemoteDiagnosisPage = lazy(() => import('@/pages/telemed/remote-diagnosis'));
+const TelemedRemoteMonitoringPage = lazy(() => import('@/pages/telemed/remote-monitoring'));
+const TelemedRemoteSurgeryPage = lazy(() => import('@/pages/telemed/remote-surgery'));
+const TelemedRemoteTrainingPage = lazy(() => import('@/pages/telemed/remote-training'));
+const TelemedRemoteEquipmentPage = lazy(() => import('@/pages/telemed/remote-equipment'));
+const CommunityHealthRecordsPage = lazy(() => import('@/pages/community/health-records'));
+const CommunityElderlyCarePage = lazy(() => import('@/pages/community/elderly-care'));
+const CommunityChronicDiseasePage = lazy(() => import('@/pages/community/chronic-disease'));
+const CommunityEducationPage = lazy(() => import('@/pages/community/education'));
+const MaternityPrenatalCarePage = lazy(() => import('@/pages/maternity/prenatal-care'));
+const MaternityPostnatalCarePage = lazy(() => import('@/pages/maternity/postnatal-care'));
+const MaternityInfantCarePage = lazy(() => import('@/pages/maternity/infant-care'));
+const MaternityChildVaccinationPage = lazy(() => import('@/pages/maternity/child-vaccination'));
+const MaternityWomenHealthPage = lazy(() => import('@/pages/maternity/women-health'));
+const MaternityGeneticScreeningPage = lazy(() => import('@/pages/maternity/genetic-screening'));
+const EmergencyTriagePage = lazy(() => import('@/pages/emergency/triage'));
+const EmergencyDisasterPage = lazy(() => import('@/pages/emergency/disaster'));
+const OncologyScreeningPage = lazy(() => import('@/pages/oncology/screening'));
+const OncologyDiagnosisPage = lazy(() => import('@/pages/oncology/diagnosis'));
+const OncologyTreatmentPlanPage = lazy(() => import('@/pages/oncology/treatment-plan'));
+const OncologyFollowupPage = lazy(() => import('@/pages/oncology/followup'));
+const RehabTherapyPage = lazy(() => import('@/pages/rehab/therapy'));
+const RehabExercisePage = lazy(() => import('@/pages/rehab/exercise'));
+const RehabOccupationalPage = lazy(() => import('@/pages/rehab/occupational'));
+const GeriatricsCarePlanPage = lazy(() => import('@/pages/geriatrics/care-plan'));
+const GeriatricsComorbidityPage = lazy(() => import('@/pages/geriatrics/comorbidity'));
+const GeriatricsFrailPage = lazy(() => import('@/pages/geriatrics/frail'));
+const EmrTemplatesDetailPage = lazy(() => import('@/pages/emr/templates-detail'));
+const EmrQualityCheckPage = lazy(() => import('@/pages/emr/quality-check'));
+const EmrRetrievalPage = lazy(() => import('@/pages/emr/retrieval'));
+const InsurancePolicyPage = lazy(() => import('@/pages/insurance/policy'));
+const InsuranceClaimsPage = lazy(() => import('@/pages/insurance/claims'));
+const InsuranceSettlementPage = lazy(() => import('@/pages/insurance/settlement'));
+const InsuranceAuditPage = lazy(() => import('@/pages/insurance/audit'));
+const InsuranceDiseaseCodesPage = lazy(() => import('@/pages/insurance/disease-codes'));
+const InsuranceItemsPage = lazy(() => import('@/pages/insurance/items'));
+const SurgeryConsentPage = lazy(() => import('@/pages/surgery/consent'));
+const AnesthesiaAssessmentPage = lazy(() => import('@/pages/anesthesia/assessment'));
+const AnesthesiaRecoveryPage = lazy(() => import('@/pages/anesthesia/recovery'));
+const LabItemsPage = lazy(() => import('@/pages/lab/items'));
+const LabReportsPage = lazy(() => import('@/pages/lab/reports'));
+const RadiologyItemsPage = lazy(() => import('@/pages/radiology/items'));
+const InpatientAdmissionsPage = lazy(() => import('@/pages/inpatient/admissions'));
+const InpatientDischargesPage = lazy(() => import('@/pages/inpatient/discharges'));
+const InpatientTransfersPage = lazy(() => import('@/pages/inpatient/transfers'));
+const OrdersDetailPage = lazy(() => import('@/pages/orders/detail'));
+const OrdersTemplatesPage = lazy(() => import('@/pages/orders/templates'));
+const PrescriptionsListPage = lazy(() => import('@/pages/prescriptions/list'));
+const PrescriptionsDetailPage = lazy(() => import('@/pages/prescriptions/detail'));
+const PrescriptionsAuditPage = lazy(() => import('@/pages/prescriptions/audit'));
+const PatientVisitsPage = lazy(() => import('@/pages/patient/visits'));
+const PatientMedicationsPage = lazy(() => import('@/pages/patient/medications'));
+const PatientLabsPage = lazy(() => import('@/pages/patient/labs'));
+const PatientImagingPage = lazy(() => import('@/pages/patient/imaging'));
+const CdsRulesPage = lazy(() => import('@/pages/cds/rules'));
+const CdsRecommendationsPage = lazy(() => import('@/pages/cds/recommendations'));
+const CdsDrugInteractionsPage = lazy(() => import('@/pages/cds/drug-interactions'));
+const CdsContraindicationsPage = lazy(() => import('@/pages/cds/contraindications'));
+const WorkflowInstancesPage = lazy(() => import('@/pages/workflow/instances'));
+const WorkflowApprovalPage = lazy(() => import('@/pages/workflow/approval'));
+const WorkflowSchedulingPage = lazy(() => import('@/pages/workflow/scheduling'));
+const WorkflowNotificationsPage = lazy(() => import('@/pages/workflow/notifications'));
+const SystemMenusPage = lazy(() => import('@/pages/system/menus'));
+const SystemParamsPage = lazy(() => import('@/pages/system/params'));
+const SystemCachePage = lazy(() => import('@/pages/system/cache'));
+const TenantsDetailPage = lazy(() => import('@/pages/tenants/detail'));
+const TenantsIsolationPage = lazy(() => import('@/pages/tenants/isolation'));
+const PhiMaskingPage = lazy(() => import('@/pages/phi/masking'));
+const PhiEncryptionPage = lazy(() => import('@/pages/phi/encryption'));
+const PhiDecryptionPage = lazy(() => import('@/pages/phi/decryption'));
+const PhiAuditPage = lazy(() => import('@/pages/phi/audit'));
+const PhiPoliciesPage = lazy(() => import('@/pages/phi/policies'));
+const PhiConsentPage = lazy(() => import('@/pages/phi/consent'));
+const SignaturesListPage = lazy(() => import('@/pages/signatures/list'));
+const SignaturesVerifyPage = lazy(() => import('@/pages/signatures/verify'));
+const SignaturesTemplatesPage = lazy(() => import('@/pages/signatures/templates'));
+const BiChartsPage = lazy(() => import('@/pages/bi/charts'));
+const BiReportsPage = lazy(() => import('@/pages/bi/reports'));
+const BiAnalysisPage = lazy(() => import('@/pages/bi/analysis'));
+const BiExportPage = lazy(() => import('@/pages/bi/export'));
+const BiScheduledPage = lazy(() => import('@/pages/bi/scheduled'));
+const ResearchProjectsDetailPage = lazy(() => import('@/pages/research/projects-detail'));
+const ResearchPapersDetailPage = lazy(() => import('@/pages/research/papers-detail'));
+const ResearchFundsDetailPage = lazy(() => import('@/pages/research/funds-detail'));
+const ResearchAwardsDetailPage = lazy(() => import('@/pages/research/awards-detail'));
+const TeachingCoursesDetailPage = lazy(() => import('@/pages/teaching/courses-detail'));
+const TeachingTrainingDetailPage = lazy(() => import('@/pages/teaching/training-detail'));
+const TelemedConsultationsDetailPage = lazy(() => import('@/pages/telemed/consultations-detail'));
+const TelemedPrescriptionsDetailPage = lazy(() => import('@/pages/telemed/prescriptions-detail'));
+const TelemedPaymentsDetailPage = lazy(() => import('@/pages/telemed/payments-detail'));
+const TelemedDeliveryDetailPage = lazy(() => import('@/pages/telemed/delivery-detail'));
+const TelemedFollowupDetailPage = lazy(() => import('@/pages/telemed/followup-detail'));
+const TelemedReportsDetailPage = lazy(() => import('@/pages/telemed/reports-detail'));
+const TelemedRemoteConsultsDetailPage = lazy(() => import('@/pages/telemed/remote-consults-detail'));
+const TelemedRemoteDiagnosisDetailPage = lazy(() => import('@/pages/telemed/remote-diagnosis-detail'));
+const TelemedRemoteMonitoringDetailPage = lazy(() => import('@/pages/telemed/remote-monitoring-detail'));
+const TelemedRemoteSurgeryDetailPage = lazy(() => import('@/pages/telemed/remote-surgery-detail'));
+const TelemedRemoteTrainingDetailPage = lazy(() => import('@/pages/telemed/remote-training-detail'));
+const TelemedRemoteEquipmentDetailPage = lazy(() => import('@/pages/telemed/remote-equipment-detail'));
+const CommunityFollowupsDetailPage = lazy(() => import('@/pages/community/followups-detail'));
+const CommunityVisitsDetailPage = lazy(() => import('@/pages/community/visits-detail'));
+const CommunityHealthRecordsDetailPage = lazy(() => import('@/pages/community/health-records-detail'));
+const CommunityElderlyCareDetailPage = lazy(() => import('@/pages/community/elderly-care-detail'));
+const CommunityChronicDiseaseDetailPage = lazy(() => import('@/pages/community/chronic-disease-detail'));
+const CommunityEducationDetailPage = lazy(() => import('@/pages/community/education-detail'));
 // 医学知识图谱可视化（M147-A 知识图谱与患者教育）
 const MedicalGraphVisualizer = lazy(() => import('@/pages/graph/Visualizer'));
 
@@ -3379,10 +4081,17 @@ export default function AppRoutes() {
           }
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="dashboard"
+            element={
+              <RequirePermission permission="dashboard:view">
+                <Dashboard />
+              </RequirePermission>
+            }
+          />
           {/* 院长数据驾驶舱（院长版）：登录即可，六大核心指标大屏 */}
           <Route path="dashboard/ceo-board" element={<CeoBoard />} />
-          <Route path="patients" element={<PatientList />} />
+          <Route path="patients" element={<RequirePermission permission="patient:view"><PatientList /></RequirePermission>} />
           <Route path="patients/:id" element={<PatientDetail />} />
           {/* 患者 360 综合时间线（M96-C） */}
           <Route path="patients/360/:id" element={<Patient360Timeline />} />
@@ -6670,7 +7379,7 @@ export default function AppRoutes() {
           <Route path="emergency" element={<Emergency />} />
           <Route path="emergency/triage/:visitId" element={<EmergencyTriage />} />
           {/* 药房调剂发药工作站（M2-A） */}
-          <Route path="pharmacy" element={<Pharmacy />} />
+          <Route path="pharmacy" element={<RequirePermission permission="pharmacy:view"><Pharmacy /></RequirePermission>} />
           {/* 药品库存预警：低库存标红 + 建议采购量 */}
           <Route path="pharmacy/inventory-alert" element={<InventoryAlert />} />
           {/* 运行病历质控工作站（M2-B） */}
@@ -6694,7 +7403,7 @@ export default function AppRoutes() {
           {/* 会话管理（M7-F）：session:manage 查看在线会话、强制下线 */}
           <Route path="sessions" element={<Sessions />} />
           {/* 收费结算工作站（M3-B）：计费/收款 billing:charge，退费 billing:refund */}
-          <Route path="billing" element={<Billing />} />
+          <Route path="billing" element={<RequirePermission permission="billing:view"><Billing /></RequirePermission>} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}
           <Route path="appt" element={<Appt />} />
           {/* 满意度评价（M3-O）：satisfaction:view 统计，satisfaction:submit 评价 */}
@@ -6718,6 +7427,10 @@ export default function AppRoutes() {
           {/* 临床业务：门诊 / 住院 */}
           <Route path="outpatient" element={<OutpatientPage />} />
           <Route path="outpatient/consult/:encounterId" element={<OutpatientConsultPage />} />
+          {/* v5.0试点扩展（浏览器bug修复）：补 /emr 与 /ai-diagnosis 裸路由，原缺失导致 404。
+              /emr 指向轻量落地占位页；/ai-diagnosis 复用已有专科 AI 诊断组件。 */}
+          <Route path="emr" element={<EmrLanding />} />
+          <Route path="ai-diagnosis" element={<AIDiagnosis />} />
           <Route path="ward" element={<WardWorkbench />} />
           <Route path="quality" element={<QualityWorkbench />} />
           <Route path="quality/record/:recordId" element={<QualityRecordDetail />} />
@@ -6740,7 +7453,787 @@ export default function AppRoutes() {
           <Route path="operation/quality" element={<OperationQuality />} />
           <Route path="operation/staff" element={<OperationStaff />} />
           <Route path="operation/equipment" element={<OperationEquipment />} />
-          <Route path="surgery" element={<SurgeryPage />} />
+          <Route path="surgery" element={<RequirePermission permission="surgery:view"><SurgeryPage /></RequirePermission>} />
+          {/* M257 详情页注册 */}
+          <Route path="outpatient/detail" element={<OutpatientDetailPage />} />
+          <Route path="inpatient/detail" element={<InpatientDetailPage />} />
+          <Route path="order/detail" element={<OrderDetailPage />} />
+          <Route path="medication/detail" element={<MedicationDetailPage />} />
+          <Route path="discharge/detail" element={<DischargeDetailPage />} />
+          {/* M258 合规/安全深度页注册 */}
+          <Route path="compliance/audit" element={<ComplianceAuditPage />} />
+          <Route path="compliance/reports" element={<ComplianceReportsPage />} />
+          <Route path="security/data-mask" element={<SecurityDataMaskPage />} />
+          {/* M261 路由注册 */}
+          <Route path="emr/versions" element={<EmrVersionsPage />} />
+          <Route path="emr/audit-trail" element={<EmrAuditTrailPage />} />
+          <Route path="tenants/list" element={<TenantsListPage />} />
+          {/* M311 路由注册 */}
+          <Route path="anesthesia/records" element={<AnesthesiaRecordsPage />} />
+          <Route path="anesthesia/complications" element={<AnesthesiaComplicationsPage />} />
+          <Route path="tcm/prescriptions" element={<TcmPrescriptionsPage />} />
+          <Route path="tcm/formulas" element={<TcmFormulasPage />} />
+          <Route path="dental/appointments" element={<DentalAppointmentsPage />} />
+          {/* M312 路由注册 */}
+          <Route path="oncology/records" element={<OncologyRecordsPage />} />
+          <Route path="chronic/management" element={<ChronicManagementPage />} />
+          <Route path="icu/monitor" element={<IcuMonitorPage />} />
+          {/* M316 路由注册 */}
+          <Route path="financial/procurement" element={<FinancialProcurementPage />} />
+          <Route path="financial/assets" element={<FinancialAssetsPage />} />
+          <Route path="logistics/preventive" element={<LogisticsPreventivePage />} />
+          <Route path="discharge/summary" element={<DischargeSummaryPage />} />
+          {/* M317 路由注册 */}
+          <Route path="consultation/list" element={<ConsultationListPage />} />
+          <Route path="emergency/list" element={<EmergencyListPage />} />
+          <Route path="icu/list" element={<IcuListPage />} />
+          <Route path="anesthesia/list" element={<AnesthesiaListPage />} />
+          <Route path="discharge/list" element={<DischargeListPage />} />
+          <Route path="cds/diagnosis-suggest" element={<CdsDiagnosisSuggestPage />} />
+          <Route path="tenants/config" element={<TenantsConfigPage />} />
+          <Route path="security/mask-rules" element={<SecurityMaskRulesPage />} />
+          <Route path="security/access-logs" element={<SecurityAccessLogsPage />} />
+          {/* M262 路由注册 */}
+          <Route path="emr/lock" element={<EmrLockPage />} />
+          <Route path="emr/sign" element={<EmrSignPage />} />
+          <Route path="tenants/switch" element={<TenantsSwitchPage />} />
+          <Route path="security/export-audit" element={<SecurityExportAuditPage />} />
+          <Route path="security/retention" element={<SecurityRetentionPage />} />
+          <Route path="security/breach" element={<SecurityBreachPage />} />
+          {/* M263 路由注册 */}
+          <Route path="auth/session" element={<AuthSessionPage />} />
+          <Route path="auth/permissions" element={<AuthPermissionsPage />} />
+          <Route path="auth/audit" element={<AuthAuditPage />} />
+          <Route path="security/vulnerability" element={<SecurityVulnerabilityPage />} />
+          <Route path="security/backup" element={<SecurityBackupPage />} />
+          <Route path="security/dr" element={<SecurityDrPage />} />
+          {/* M264 路由注册 */}
+          <Route path="audit/trail" element={<AuditTrailPage />} />
+          <Route path="audit/compliance" element={<AuditCompliancePage />} />
+          <Route path="tenants/data-isolation" element={<TenantsDataIsolationPage />} />
+          <Route path="tenants/rate-limit" element={<TenantsRateLimitPage />} />
+          <Route path="security/key-management" element={<SecurityKeyManagementPage />} />
+          <Route path="security/certificates" element={<SecurityCertificatesPage />} />
+          {/* M265 路由注册 */}
+          <Route path="emr/signature" element={<EmrSignaturePage />} />
+          <Route path="emr/watermark" element={<EmrWatermarkPage />} />
+          <Route path="security/consent" element={<SecurityConsentPage />} />
+          <Route path="security/minimize" element={<SecurityMinimizePage />} />
+          <Route path="security/anonymization" element={<SecurityAnonymizationPage />} />
+          <Route path="security/deletion" element={<SecurityDeletionPage />} />
+          {/* M266 路由注册 */}
+          <Route path="emr/lock-history" element={<EmrLockHistoryPage />} />
+          {/* M319 路由注册 */}
+          <Route path="emr/quality-rules" element={<EmrQualityRulesPage />} />
+          {/* M320 路由注册 */}
+          <Route path="infection/surveillance" element={<InfectionSurveillancePage />} />
+          <Route path="drg/grouping" element={<DrgGroupingPage />} />
+          <Route path="dip/score" element={<DipScorePage />} />
+          <Route path="rwd/datasets" element={<RwdDatasetsPage />} />
+          <Route path="federated/learning" element={<FederatedLearningPage />} />
+          <Route path="digital-twin/patients" element={<DigitalTwinPatientsPage />} />
+          {/* M321 路由注册 */}
+          <Route path="infection/daily-report" element={<InfectionDailyReportPage />} />
+          <Route path="drg/cost-control" element={<DrgCostControlPage />} />
+          <Route path="dip/detail" element={<DipDetailPage />} />
+          <Route path="rwd/analysis" element={<RwdAnalysisPage />} />
+          <Route path="federated/nodes" element={<FederatedNodesPage />} />
+          <Route path="digital-twin/simulation" element={<DigitalTwinSimulationPage />} />
+          {/* M322 路由注册 */}
+          <Route path="smart-service/queue-stats" element={<SmartServiceQueueStatsPage />} />
+          <Route path="smart-service/ai-triage" element={<SmartServiceAiTriagePage />} />
+          <Route path="smart-service/bed-recommend" element={<SmartServiceBedRecommendPage />} />
+          <Route path="smart-service/medication-remind" element={<SmartServiceMedicationRemindPage />} />
+          <Route path="smart-service/followup" element={<SmartServiceFollowupPage />} />
+          <Route path="smart-service/health-records" element={<SmartServiceHealthRecordsPage />} />
+          {/* M323 路由注册 */}
+          <Route path="operation/dashboard" element={<OperationDashboardPage />} />
+          <Route path="operation/kpi" element={<OperationKpiPage />} />
+          <Route path="operation/comparison" element={<OperationComparisonPage />} />
+          <Route path="operation/efficiency" element={<OperationEfficiencyPage />} />
+          <Route path="operation/cost" element={<OperationCostPage />} />
+          <Route path="operation/revenue" element={<OperationRevenuePage />} />
+          {/* M324 路由注册 */}
+          <Route path="hr/doctors" element={<HrDoctorsPage />} />
+          <Route path="hr/nurses" element={<HrNursesPage />} />
+          <Route path="hr/departments" element={<HrDepartmentsPage />} />
+          <Route path="hr/training" element={<HrTrainingPage />} />
+          <Route path="hr/leave" element={<HrLeavePage />} />
+          {/* M325 路由注册 */}
+          <Route path="finance/billing" element={<FinanceBillingPage />} />
+          <Route path="finance/payment" element={<FinancePaymentPage />} />
+          <Route path="finance/refund" element={<FinanceRefundPage />} />
+          <Route path="finance/insurance-settlement" element={<FinanceInsuranceSettlementPage />} />
+          <Route path="finance/budget" element={<FinanceBudgetPage />} />
+          <Route path="finance/audit" element={<FinanceAuditPage />} />
+          {/* M326 路由注册 */}
+          <Route path="pharmacy/inventory" element={<PharmacyInventoryPage />} />
+          <Route path="pharmacy/purchase" element={<PharmacyPurchasePage />} />
+          <Route path="pharmacy/check" element={<PharmacyCheckPage />} />
+          <Route path="supplies/purchase" element={<SuppliesPurchasePage />} />
+          <Route path="supplies/check" element={<SuppliesCheckPage />} />
+          <Route path="equipment/repair" element={<EquipmentRepairPage />} />
+          {/* M327 路由注册 */}
+          <Route path="supplies/warning" element={<SuppliesWarningPage />} />
+          <Route path="quality/control" element={<QualityControlPage />} />
+          <Route path="quality/inspection" element={<QualityInspectionPage />} />
+          <Route path="quality/exception" element={<QualityExceptionPage />} />
+          <Route path="risk/assessment" element={<RiskAssessmentPage />} />
+          <Route path="risk/monitor" element={<RiskMonitorPage />} />
+          <Route path="risk/warning" element={<RiskWarningPage />} />
+          {/* M328 路由注册 */}
+          <Route path="research/projects-list" element={<ResearchProjectsListPage />} />
+          <Route path="research/papers" element={<ResearchPapersPage />} />
+          <Route path="research/funds" element={<ResearchFundsPage />} />
+          <Route path="education/courses" element={<EducationCoursesPage />} />
+          <Route path="education/exams" element={<EducationExamsPage />} />
+          <Route path="education/degrees" element={<EducationDegreesPage />} />
+          {/* M329 路由注册 */}
+          <Route path="internet/appointments" element={<InternetAppointmentsPage />} />
+          <Route path="internet/health-records" element={<InternetHealthRecordsPage />} />
+          <Route path="internet/followup" element={<InternetFollowupPage />} />
+          {/* M330 路由注册 */}
+          <Route path="telemed/video" element={<TelemedVideoPage />} />
+          <Route path="telemed/equipment" element={<TelemedEquipmentPage />} />
+          <Route path="telemed/records" element={<TelemedRecordsPage />} />
+          <Route path="telemed/specialists" element={<TelemedSpecialistsPage />} />
+          <Route path="telemed/referrals" element={<TelemedReferralsPage />} />
+          {/* M331 路由注册 */}
+          <Route path="community/residents" element={<CommunityResidentsPage />} />
+          <Route path="community/family-doctor" element={<CommunityFamilyDoctorPage />} />
+          <Route path="community/vaccination" element={<CommunityVaccinationPage />} />
+          <Route path="community/chronic-management" element={<CommunityChronicManagementPage />} />
+          <Route path="community/health-education" element={<CommunityHealthEducationPage />} />
+          {/* M332 路由注册 */}
+          <Route path="maternity/prenatal" element={<MaternityPrenatalPage />} />
+          <Route path="maternity/delivery" element={<MaternityDeliveryPage />} />
+          <Route path="maternity/postpartum" element={<MaternityPostpartumPage />} />
+          <Route path="newborn/physical" element={<NewbornPhysicalPage />} />
+          <Route path="newborn/screening" element={<NewbornScreeningPage />} />
+          <Route path="newborn/growth" element={<NewbornGrowthPage />} />
+          {/* M333 路由注册 */}
+          <Route path="emergency/rescue" element={<EmergencyRescuePage />} />
+          <Route path="emergency/ambulance" element={<EmergencyAmbulancePage />} />
+          <Route path="emergency/poisoning" element={<EmergencyPoisoningPage />} />
+          <Route path="emergency/trauma" element={<EmergencyTraumaPage />} />
+          <Route path="emergency/critical" element={<EmergencyCriticalPage />} />
+          {/* M334 路由注册 */}
+          <Route path="oncology/patients" element={<OncologyPatientsPage />} />
+          <Route path="oncology/treatments" element={<OncologyTreatmentsPage />} />
+          <Route path="oncology/chemotherapy" element={<OncologyChemotherapyPage />} />
+          <Route path="oncology/radiotherapy" element={<OncologyRadiotherapyPage />} />
+          <Route path="oncology/monitor" element={<OncologyMonitorPage />} />
+          <Route path="oncology/pain" element={<OncologyPainPage />} />
+          {/* M335 路由注册 */}
+          <Route path="rehab/treatments" element={<RehabTreatmentsPage />} />
+          <Route path="rehab/assessment" element={<RehabAssessmentPage />} />
+          <Route path="rehab/exercises" element={<RehabExercisesPage />} />
+          <Route path="rehab/equipment" element={<RehabEquipmentPage />} />
+          <Route path="rehab/progress" element={<RehabProgressPage />} />
+          {/* M336 路由注册 */}
+          <Route path="elderly/assessment" element={<ElderlyAssessmentPage />} />
+          <Route path="elderly/frail" element={<ElderlyFrailPage />} />
+          <Route path="elderly/falls" element={<ElderlyFallsPage />} />
+          <Route path="elderly/dementia" element={<ElderlyDementiaPage />} />
+          <Route path="elderly/nutrition" element={<ElderlyNutritionPage />} />
+          <Route path="elderly/comprehensive" element={<ElderlyComprehensivePage />} />
+          {/* M337 路由注册 */}
+          <Route path="medical-records/archive" element={<MedicalRecordsArchivePage />} />
+          <Route path="medical-records/retrieve" element={<MedicalRecordsRetrievePage />} />
+          <Route path="medical-records/print" element={<MedicalRecordsPrintPage />} />
+          <Route path="medical-records/copy" element={<MedicalRecordsCopyPage />} />
+          <Route path="medical-records/seal" element={<MedicalRecordsSealPage />} />
+          <Route path="medical-records/watermark" element={<MedicalRecordsWatermarkPage />} />
+          {/* M338 路由注册 */}
+          <Route path="workflow/doctor-tasks" element={<WorkflowDoctorTasksPage />} />
+          <Route path="workflow/nurse-tasks" element={<WorkflowNurseTasksPage />} />
+          <Route path="workflow/pharmacist-tasks" element={<WorkflowPharmacistTasksPage />} />
+          <Route path="workflow/admin-tasks" element={<WorkflowAdminTasksPage />} />
+          <Route path="workflow/queue" element={<WorkflowQueuePage />} />
+          <Route path="workflow/history" element={<WorkflowHistoryPage />} />
+          {/* M339 路由注册 */}
+          <Route path="settlement/list" element={<SettlementListPage />} />
+          <Route path="cds/clinical-pathway" element={<CdsClinicalPathwayPage />} />
+          <Route path="cds/diagnosis-suggestion" element={<CdsDiagnosisSuggestionPage />} />
+          <Route path="cds/treatment-plan" element={<CdsTreatmentPlanPage />} />
+          <Route path="cds/drug-dose-adjust" element={<CdsDrugDoseAdjustPage />} />
+          <Route path="cds/lab-critical" element={<CdsLabCriticalPage />} />
+          <Route path="cds/imaging-hint" element={<CdsImagingHintPage />} />
+          {/* M340 路由注册 */}
+          <Route path="cds/alert" element={<CdsAlertPage />} />
+          <Route path="cds/patient-summary" element={<CdsPatientSummaryPage />} />
+          <Route path="cds/recommendation" element={<CdsRecommendationPage />} />
+          <Route path="patient/timeline" element={<PatientTimelinePage />} />
+          <Route path="patient/timeline-detail" element={<PatientTimelineDetailPage />} />
+          <Route path="patient/timeline-overview" element={<PatientTimelineOverviewPage />} />
+          <Route path="patient/timeline-events" element={<PatientTimelineEventsPage />} />
+          <Route path="patient/timeline-encounters" element={<PatientTimelineEncountersPage />} />
+          <Route path="patient/timeline-medications" element={<PatientTimelineMedicationsPage />} />
+          <Route path="patient/timeline-results" element={<PatientTimelineResultsPage />} />
+          <Route path="patient/timeline-alerts" element={<PatientTimelineAlertsPage />} />
+          <Route path="nursing/nqi-overview" element={<NursingNqiOverviewPage />} />
+          <Route path="nursing/nqi-detail" element={<NursingNqiDetailPage />} />
+          <Route path="nursing/nqi-comparison" element={<NursingNqiComparisonPage />} />
+          {/* M341 路由注册 */}
+          <Route path="emr/version-list" element={<EmrVersionListPage />} />
+          <Route path="emr/version-history" element={<EmrVersionHistoryPage />} />
+          <Route path="emr/version-rollback" element={<EmrVersionRollbackPage />} />
+          <Route path="emr/version-author" element={<EmrVersionAuthorPage />} />
+          <Route path="emr/version-review" element={<EmrVersionReviewPage />} />
+          {/* M342 路由注册 */}
+          <Route path="events/bus-overview" element={<EventsBusOverviewPage />} />
+          <Route path="events/bus-detail" element={<EventsBusDetailPage />} />
+          <Route path="events/bus-logs" element={<EventsBusLogsPage />} />
+          <Route path="events/bus-subscribers" element={<EventsBusSubscribersPage />} />
+          <Route path="events/bus-publishers" element={<EventsBusPublishersPage />} />
+          <Route path="events/bus-deadletter" element={<EventsBusDeadletterPage />} />
+          {/* M343 路由注册 */}
+          <Route path="fhir/patient" element={<FhirPatientPage />} />
+          <Route path="fhir/observation" element={<FhirObservationPage />} />
+          <Route path="fhir/condition" element={<FhirConditionPage />} />
+          <Route path="fhir/medicationrequest" element={<FhirMedicationRequestPage />} />
+          <Route path="fhir/encounter" element={<FhirEncounterPage />} />
+          <Route path="fhir/diagnosticreport" element={<FhirDiagnosticReportPage />} />
+          {/* M344 路由注册 */}
+          <Route path="fhir/practitioner" element={<FhirPractitionerPage />} />
+          <Route path="fhir/organization" element={<FhirOrganizationPage />} />
+          <Route path="fhir/location" element={<FhirLocationPage />} />
+          <Route path="fhir/medication" element={<FhirMedicationPage />} />
+          <Route path="fhir/procedure" element={<FhirProcedurePage />} />
+          <Route path="fhir/allergyintolerance" element={<FhirAllergyintolerancePage />} />
+          {/* M345 路由注册 */}
+          <Route path="security/audit-detail" element={<SecurityAuditDetailPage />} />
+          <Route path="security/audit-export" element={<SecurityAuditExportPage />} />
+          <Route path="security/audit-anomaly" element={<SecurityAuditAnomalyPage />} />
+          <Route path="security/audit-whitelist" element={<SecurityAuditWhitelistPage />} />
+          <Route path="security/audit-report" element={<SecurityAuditReportPage />} />
+          <Route path="security/compliance-score" element={<SecurityComplianceScorePage />} />
+          {/* M346 路由注册 */}
+          <Route path="security/audit-logs" element={<SecurityAuditLogsPage />} />
+          <Route path="security/user-sessions" element={<SecurityUserSessionsPage />} />
+          <Route path="security/login-history" element={<SecurityLoginHistoryPage />} />
+          <Route path="security/permission-matrix" element={<SecurityPermissionMatrixPage />} />
+          <Route path="security/role-mapping" element={<SecurityRoleMappingPage />} />
+          <Route path="security/data-access-log" element={<SecurityDataAccessLogPage />} />
+          <Route path="security/privacy-report" element={<SecurityPrivacyReportPage />} />
+          {/* M347 路由注册 */}
+          <Route path="tenants/overview" element={<TenantsOverviewPage />} />
+          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
+          <Route path="tenants/billing" element={<TenantsBillingPage />} />
+          <Route path="system/config" element={<SystemConfigPage />} />
+          <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
+          <Route path="system/dict" element={<SystemDictPage />} />
+          {/* M348 路由注册 */}
+          <Route path="bi/realtime" element={<BiRealtimePage />} />
+          <Route path="bi/funnel" element={<BiFunnelPage />} />
+          <Route path="bi/retention" element={<BiRetentionPage />} />
+          <Route path="operation/benchmark" element={<OperationBenchmarkPage />} />
+          <Route path="operation/alerts" element={<OperationAlertsPage />} />
+          {/* M349 路由注册 */}
+          <Route path="research/grants" element={<ResearchGrantsPage />} />
+          <Route path="teaching/training" element={<TeachingTrainingPage />} />
+          <Route path="internet/hospital-orders" element={<InternetHospitalOrdersPage />} />
+          {/* M350 路由注册 */}
+          <Route path="telemedicine/consultations" element={<TelemedicineConsultationsPage />} />
+          <Route path="telemedicine/records" element={<TelemedicineRecordsPage />} />
+          <Route path="telemedicine/devices" element={<TelemedicineDevicesPage />} />
+          <Route path="community/visits" element={<CommunityVisitsPage />} />
+          {/* M351 路由注册 */}
+          <Route path="maternal/prenatal" element={<MaternalPrenatalPage />} />
+          <Route path="maternal/postnatal" element={<MaternalPostnatalPage />} />
+          <Route path="maternal/child-health" element={<MaternalChildHealthPage />} />
+          <Route path="emergency/redbox" element={<EmergencyRedboxPage />} />
+          <Route path="emergency/calls" element={<EmergencyCallsPage />} />
+          {/* M352 路由注册 */}
+          <Route path="rehab/assessments" element={<RehabAssessmentsPage />} />
+          <Route path="rehab/records" element={<RehabRecordsPage />} />
+          {/* M353 路由注册 */}
+          <Route path="geriatrics/assessment" element={<GeriatricsAssessmentPage />} />
+          <Route path="geriatrics/falls" element={<GeriatricsFallsPage />} />
+          <Route path="geriatrics/dementia" element={<GeriatricsDementiaPage />} />
+          <Route path="qc/indicators" element={<QcIndicatorsPage />} />
+          <Route path="qc/audits" element={<QcAuditsPage />} />
+          <Route path="qc/corrective" element={<QcCorrectivePage />} />
+          {/* M354 路由注册 */}
+          <Route path="emr/templates" element={<EmrTemplatesPage />} />
+          <Route path="emr/signatures" element={<EmrSignaturesPage />} />
+          <Route path="emr/archives" element={<EmrArchivesPage />} />
+          <Route path="insurance/benefits" element={<InsuranceBenefitsPage />} />
+          <Route path="insurance/directory" element={<InsuranceDirectoryPage />} />
+          {/* M355 路由注册 */}
+          <Route path="pharmacy/purchasing" element={<PharmacyPurchasingPage />} />
+          <Route path="pharmacy/dispensing" element={<PharmacyDispensingPage />} />
+          <Route path="hr/trainings" element={<HrTrainingsPage />} />
+          <Route path="hr/recruitment" element={<HrRecruitmentPage />} />
+          {/* M356 路由注册 */}
+          <Route path="finance/expenses" element={<FinanceExpensesPage />} />
+          <Route path="finance/assets" element={<FinanceAssetsPage />} />
+          <Route path="billing/invoices" element={<BillingInvoicesPage />} />
+          {/* M357 路由注册 */}
+          <Route path="surgery/orders" element={<SurgeryOrdersPage />} />
+          <Route path="surgery/records" element={<SurgeryRecordsPage />} />
+          <Route path="nursing/rounds" element={<NursingRoundsPage />} />
+          <Route path="nursing/plans" element={<NursingPlansPage />} />
+          {/* M358 路由注册 */}
+          <Route path="lab/orders" element={<LabOrdersPage />} />
+          <Route path="lab/results" element={<LabResultsPage />} />
+          <Route path="radiology/orders" element={<RadiologyOrdersPage />} />
+          <Route path="radiology/results" element={<RadiologyResultsPage />} />
+          <Route path="radiology/reports" element={<RadiologyReportsPage />} />
+          {/* M359 路由注册 */}
+          <Route path="outpatient/visits" element={<OutpatientVisitsPage />} />
+          <Route path="outpatient/prescriptions" element={<OutpatientPrescriptionsPage />} />
+          <Route path="outpatient/triage" element={<OutpatientTriagePage />} />
+          {/* M360 路由注册 */}
+          <Route path="orders/list" element={<OrdersListPage />} />
+          <Route path="orders/active" element={<OrdersActivePage />} />
+          <Route path="orders/completed" element={<OrdersCompletedPage />} />
+          <Route path="orders/cancelled" element={<OrdersCancelledPage />} />
+          <Route path="prescriptions/outpatient" element={<PrescriptionsOutpatientPage />} />
+          <Route path="prescriptions/inpatient" element={<PrescriptionsInpatientPage />} />
+          <Route path="prescriptions/emergency" element={<PrescriptionsEmergencyPage />} />
+          {/* M361 路由注册 */}
+          <Route path="patient/profile" element={<PatientProfilePage />} />
+          <Route path="patient/allergies" element={<PatientAllergiesPage />} />
+          <Route path="patient/family" element={<PatientFamilyPage />} />
+          <Route path="patient/vitals" element={<PatientVitalsPage />} />
+          {/* M362 路由注册 */}
+          <Route path="cds/alerts" element={<CdsAlertsPage />} />
+          <Route path="cds/interventions" element={<CdsInterventionsPage />} />
+          <Route path="cds/guidelines" element={<CdsGuidelinesPage />} />
+          <Route path="cds/checklists" element={<CdsChecklistsPage />} />
+          <Route path="cds/drugs-interaction" element={<CdsDrugsInteractionPage />} />
+          <Route path="cds/duplicate-therapy" element={<CdsDuplicateTherapyPage />} />
+          {/* M363 路由注册 */}
+          <Route path="workflow/tasks" element={<WorkflowTasksPage />} />
+          <Route path="workflow/templates" element={<WorkflowTemplatesPage />} />
+          <Route path="tasks/todo" element={<TasksTodoPage />} />
+          <Route path="tasks/done" element={<TasksDonePage />} />
+          <Route path="tasks/overdue" element={<TasksOverduePage />} />
+          {/* M364 路由注册 */}
+          <Route path="security/roles" element={<SecurityRolesPage />} />
+          <Route path="security/permissions" element={<SecurityPermissionsPage />} />
+          <Route path="system/configs" element={<SystemConfigsPage />} />
+          <Route path="system/logs" element={<SystemLogsPage />} />
+          <Route path="system/version" element={<SystemVersionPage />} />
+          <Route path="events/dead-letter" element={<EventsDeadLetterPage />} />
+          <Route path="events/retry" element={<EventsRetryPage />} />
+          <Route path="audit/reports" element={<AuditReportsPage />} />
+          {/* M365 路由注册 */}
+          <Route path="tenant/list" element={<TenantListPage />} />
+          <Route path="tenant/config" element={<TenantConfigPage />} />
+          <Route path="tenant/data-isolation" element={<TenantDataIsolationPage />} />
+          <Route path="tenant/quota" element={<TenantQuotaPage />} />
+          <Route path="tenant/usage" element={<TenantUsagePage />} />
+          <Route path="tenant/logs" element={<TenantLogsPage />} />
+          {/* M366 路由注册 */}
+          <Route path="security/masking-rules" element={<SecurityMaskingRulesPage />} />
+          <Route path="security/masking-logs" element={<SecurityMaskingLogsPage />} />
+          <Route path="security/encryption-keys" element={<SecurityEncryptionKeysPage />} />
+          <Route path="security/encryption-status" element={<SecurityEncryptionStatusPage />} />
+          <Route path="security/data-classification" element={<SecurityDataClassificationPage />} />
+          <Route path="security/data-retention" element={<SecurityDataRetentionPage />} />
+          <Route path="emr/revision" element={<EmrRevisionPage />} />
+          <Route path="security/consent-log" element={<SecurityConsentLogPage />} />
+          <Route path="security/data-flow" element={<SecurityDataFlowPage />} />
+          <Route path="security/dpi" element={<SecurityDpiPage />} />
+          <Route path="security/audit-cert" element={<SecurityAuditCertPage />} />
+          {/* M268 路由注册 */}
+          <Route path="emr/quality-defects" element={<EmrQualityDefectsPage />} />
+          <Route path="emr/quality-stats" element={<EmrQualityStatsPage />} />
+          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
+          <Route path="security/cve-feed" element={<SecurityCveFeedPage />} />
+          <Route path="security/waf" element={<SecurityWafPage />} />
+          <Route path="security/siem" element={<SecuritySiemPage />} />
+          {/* M269 路由注册 */}
+          <Route path="emr/quality-trend" element={<EmrQualityTrendPage />} />
+          <Route path="emr/quality-department" element={<EmrQualityDepartmentPage />} />
+          <Route path="tenants/usage-stats" element={<TenantsUsageStatsPage />} />
+          <Route path="security/log-archive" element={<SecurityLogArchivePage />} />
+          <Route path="security/incident-timeline" element={<SecurityIncidentTimelinePage />} />
+          <Route path="security/metrics" element={<SecurityMetricsPage />} />
+          {/* M270 路由注册 */}
+          <Route path="cds/patient-timeline" element={<CdsPatientTimelinePage />} />
+          <Route path="cds/interaction-check" element={<CdsInteractionCheckPage />} />
+          <Route path="cds/dose-range" element={<CdsDoseRangePage />} />
+          <Route path="cds/contraindication" element={<CdsContraindicationPage />} />
+          <Route path="nursing/nqi-scores" element={<NursingNqiScoresPage />} />
+          <Route path="nursing/nqi-trend" element={<NursingNqiTrendPage />} />
+          {/* M271 路由注册 */}
+          <Route path="fhir/patient" element={<FhirPatientPage />} />
+          <Route path="fhir/observation" element={<FhirObservationPage />} />
+          <Route path="fhir/condition" element={<FhirConditionPage />} />
+          <Route path="fhir/medicationrequest" element={<FhirMedicationRequestPage />} />
+          <Route path="events/bus" element={<EventsBusPage />} />
+          <Route path="events/audit" element={<EventsAuditPage />} />
+          {/* M272 路由注册 */}
+          <Route path="fhir/encounter" element={<FhirEncounterPage />} />
+          <Route path="fhir/procedure" element={<FhirProcedurePage />} />
+          <Route path="fhir/diagnosticreport" element={<FhirDiagnosticReportPage />} />
+          {/* M344 路由注册 */}
+          <Route path="fhir/practitioner" element={<FhirPractitionerPage />} />
+          <Route path="fhir/organization" element={<FhirOrganizationPage />} />
+          <Route path="fhir/location" element={<FhirLocationPage />} />
+          <Route path="fhir/medication" element={<FhirMedicationPage />} />
+          <Route path="fhir/procedure" element={<FhirProcedurePage />} />
+          <Route path="fhir/allergyintolerance" element={<FhirAllergyintolerancePage />} />
+          {/* M345 路由注册 */}
+          <Route path="security/audit-detail" element={<SecurityAuditDetailPage />} />
+          <Route path="security/audit-export" element={<SecurityAuditExportPage />} />
+          <Route path="security/audit-anomaly" element={<SecurityAuditAnomalyPage />} />
+          <Route path="security/audit-whitelist" element={<SecurityAuditWhitelistPage />} />
+          <Route path="security/audit-report" element={<SecurityAuditReportPage />} />
+          <Route path="security/compliance-score" element={<SecurityComplianceScorePage />} />
+          {/* M346 路由注册 */}
+          <Route path="security/audit-logs" element={<SecurityAuditLogsPage />} />
+          <Route path="security/user-sessions" element={<SecurityUserSessionsPage />} />
+          <Route path="security/login-history" element={<SecurityLoginHistoryPage />} />
+          <Route path="security/permission-matrix" element={<SecurityPermissionMatrixPage />} />
+          <Route path="security/role-mapping" element={<SecurityRoleMappingPage />} />
+          <Route path="security/data-access-log" element={<SecurityDataAccessLogPage />} />
+          <Route path="security/privacy-report" element={<SecurityPrivacyReportPage />} />
+          {/* M347 路由注册 */}
+          <Route path="tenants/overview" element={<TenantsOverviewPage />} />
+          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
+          <Route path="tenants/billing" element={<TenantsBillingPage />} />
+          <Route path="system/config" element={<SystemConfigPage />} />
+          <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
+          <Route path="system/dict" element={<SystemDictPage />} />
+          {/* M348 路由注册 */}
+          <Route path="bi/realtime" element={<BiRealtimePage />} />
+          <Route path="bi/funnel" element={<BiFunnelPage />} />
+          <Route path="bi/retention" element={<BiRetentionPage />} />
+          <Route path="operation/benchmark" element={<OperationBenchmarkPage />} />
+          <Route path="operation/alerts" element={<OperationAlertsPage />} />
+          {/* M349 路由注册 */}
+          <Route path="research/grants" element={<ResearchGrantsPage />} />
+          <Route path="teaching/training" element={<TeachingTrainingPage />} />
+          <Route path="internet/hospital-orders" element={<InternetHospitalOrdersPage />} />
+          {/* M350 路由注册 */}
+          <Route path="telemedicine/consultations" element={<TelemedicineConsultationsPage />} />
+          <Route path="telemedicine/records" element={<TelemedicineRecordsPage />} />
+          <Route path="telemedicine/devices" element={<TelemedicineDevicesPage />} />
+          <Route path="community/visits" element={<CommunityVisitsPage />} />
+          {/* M351 路由注册 */}
+          <Route path="maternal/prenatal" element={<MaternalPrenatalPage />} />
+          <Route path="maternal/postnatal" element={<MaternalPostnatalPage />} />
+          <Route path="maternal/child-health" element={<MaternalChildHealthPage />} />
+          <Route path="emergency/redbox" element={<EmergencyRedboxPage />} />
+          <Route path="emergency/calls" element={<EmergencyCallsPage />} />
+          {/* M352 路由注册 */}
+          <Route path="rehab/assessments" element={<RehabAssessmentsPage />} />
+          <Route path="rehab/records" element={<RehabRecordsPage />} />
+          {/* M353 路由注册 */}
+          <Route path="geriatrics/assessment" element={<GeriatricsAssessmentPage />} />
+          <Route path="geriatrics/falls" element={<GeriatricsFallsPage />} />
+          <Route path="geriatrics/dementia" element={<GeriatricsDementiaPage />} />
+          <Route path="qc/indicators" element={<QcIndicatorsPage />} />
+          <Route path="qc/audits" element={<QcAuditsPage />} />
+          <Route path="qc/corrective" element={<QcCorrectivePage />} />
+          {/* M354 路由注册 */}
+          <Route path="emr/templates" element={<EmrTemplatesPage />} />
+          <Route path="emr/signatures" element={<EmrSignaturesPage />} />
+          <Route path="emr/archives" element={<EmrArchivesPage />} />
+          <Route path="insurance/benefits" element={<InsuranceBenefitsPage />} />
+          <Route path="insurance/directory" element={<InsuranceDirectoryPage />} />
+          {/* M355 路由注册 */}
+          <Route path="pharmacy/purchasing" element={<PharmacyPurchasingPage />} />
+          <Route path="pharmacy/dispensing" element={<PharmacyDispensingPage />} />
+          <Route path="hr/trainings" element={<HrTrainingsPage />} />
+          <Route path="hr/recruitment" element={<HrRecruitmentPage />} />
+          {/* M356 路由注册 */}
+          <Route path="finance/expenses" element={<FinanceExpensesPage />} />
+          <Route path="finance/assets" element={<FinanceAssetsPage />} />
+          <Route path="billing/invoices" element={<BillingInvoicesPage />} />
+          {/* M357 路由注册 */}
+          <Route path="surgery/orders" element={<SurgeryOrdersPage />} />
+          <Route path="surgery/records" element={<SurgeryRecordsPage />} />
+          <Route path="nursing/rounds" element={<NursingRoundsPage />} />
+          <Route path="nursing/plans" element={<NursingPlansPage />} />
+          {/* M358 路由注册 */}
+          <Route path="lab/orders" element={<LabOrdersPage />} />
+          <Route path="lab/results" element={<LabResultsPage />} />
+          <Route path="radiology/orders" element={<RadiologyOrdersPage />} />
+          <Route path="radiology/results" element={<RadiologyResultsPage />} />
+          <Route path="radiology/reports" element={<RadiologyReportsPage />} />
+          {/* M359 路由注册 */}
+          <Route path="outpatient/visits" element={<OutpatientVisitsPage />} />
+          <Route path="outpatient/prescriptions" element={<OutpatientPrescriptionsPage />} />
+          <Route path="outpatient/triage" element={<OutpatientTriagePage />} />
+          {/* M360 路由注册 */}
+          <Route path="orders/list" element={<OrdersListPage />} />
+          <Route path="orders/active" element={<OrdersActivePage />} />
+          <Route path="orders/completed" element={<OrdersCompletedPage />} />
+          <Route path="orders/cancelled" element={<OrdersCancelledPage />} />
+          <Route path="prescriptions/outpatient" element={<PrescriptionsOutpatientPage />} />
+          <Route path="prescriptions/inpatient" element={<PrescriptionsInpatientPage />} />
+          <Route path="prescriptions/emergency" element={<PrescriptionsEmergencyPage />} />
+          {/* M361 路由注册 */}
+          <Route path="patient/profile" element={<PatientProfilePage />} />
+          <Route path="patient/allergies" element={<PatientAllergiesPage />} />
+          <Route path="patient/family" element={<PatientFamilyPage />} />
+          <Route path="patient/vitals" element={<PatientVitalsPage />} />
+          {/* M362 路由注册 */}
+          <Route path="cds/alerts" element={<CdsAlertsPage />} />
+          <Route path="cds/interventions" element={<CdsInterventionsPage />} />
+          <Route path="cds/guidelines" element={<CdsGuidelinesPage />} />
+          <Route path="cds/checklists" element={<CdsChecklistsPage />} />
+          <Route path="cds/drugs-interaction" element={<CdsDrugsInteractionPage />} />
+          <Route path="cds/duplicate-therapy" element={<CdsDuplicateTherapyPage />} />
+          {/* M363 路由注册 */}
+          <Route path="workflow/tasks" element={<WorkflowTasksPage />} />
+          <Route path="workflow/templates" element={<WorkflowTemplatesPage />} />
+          <Route path="tasks/todo" element={<TasksTodoPage />} />
+          <Route path="tasks/done" element={<TasksDonePage />} />
+          <Route path="tasks/overdue" element={<TasksOverduePage />} />
+          {/* M364 路由注册 */}
+          <Route path="security/roles" element={<SecurityRolesPage />} />
+          <Route path="security/permissions" element={<SecurityPermissionsPage />} />
+          <Route path="system/configs" element={<SystemConfigsPage />} />
+          <Route path="system/logs" element={<SystemLogsPage />} />
+          <Route path="system/version" element={<SystemVersionPage />} />
+          <Route path="events/dead-letter" element={<EventsDeadLetterPage />} />
+          <Route path="events/retry" element={<EventsRetryPage />} />
+          <Route path="audit/reports" element={<AuditReportsPage />} />
+          {/* M365 路由注册 */}
+          <Route path="tenant/list" element={<TenantListPage />} />
+          <Route path="tenant/config" element={<TenantConfigPage />} />
+          <Route path="tenant/data-isolation" element={<TenantDataIsolationPage />} />
+          <Route path="tenant/quota" element={<TenantQuotaPage />} />
+          <Route path="tenant/usage" element={<TenantUsagePage />} />
+          <Route path="tenant/logs" element={<TenantLogsPage />} />
+          {/* M366 路由注册 */}
+          <Route path="security/masking-rules" element={<SecurityMaskingRulesPage />} />
+          <Route path="security/masking-logs" element={<SecurityMaskingLogsPage />} />
+          <Route path="security/encryption-keys" element={<SecurityEncryptionKeysPage />} />
+          <Route path="security/encryption-status" element={<SecurityEncryptionStatusPage />} />
+          <Route path="security/data-classification" element={<SecurityDataClassificationPage />} />
+          <Route path="security/data-retention" element={<SecurityDataRetentionPage />} />
+          <Route path="workflow/doctor" element={<WorkflowDoctorPage />} />
+          <Route path="workflow/nurse" element={<WorkflowNursePage />} />
+          <Route path="workflow/pharmacist" element={<WorkflowPharmacistPage />} />
+          {/* M273 路由注册 */}
+          <Route path="fhir/documentref" element={<FhirDocumentrefPage />} />
+          <Route path="fhir/allergyintolerance" element={<FhirAllergyintolerancePage />} />
+          <Route path="fhir/immunization" element={<FhirImmunizationPage />} />
+          <Route path="emr/version-diff" element={<EmrVersionDiffPage />} />
+          <Route path="emr/version-compare" element={<EmrVersionComparePage />} />
+          <Route path="emr/version-restore" element={<EmrVersionRestorePage />} />
+          {/* M274 路由注册 */}
+          <Route path="fhir/location" element={<FhirLocationPage />} />
+          <Route path="fhir/practitioner" element={<FhirPractitionerPage />} />
+          <Route path="fhir/organization" element={<FhirOrganizationPage />} />
+          <Route path="patient/360-overview" element={<Patient360OverviewPage />} />
+          <Route path="patient/360-timeline" element={<Patient360TimelinePage />} />
+          <Route path="patient/360-risk" element={<Patient360RiskPage />} />
+          {/* M275 路由注册 */}
+          <Route path="bi/bed-occupancy" element={<BiBedOccupancyPage />} />
+          <Route path="bi/throughput" element={<BiThroughputPage />} />
+          <Route path="bi/satisfaction" element={<BiSatisfactionPage />} />
+          <Route path="smart-service/appointment" element={<SmartServiceAppointmentPage />} />
+          <Route path="smart-service/guide" element={<SmartServiceGuidePage />} />
+          <Route path="smart-service/feedback" element={<SmartServiceFeedbackPage />} />
+          {/* M276 路由注册 */}
+          <Route path="cds/order-check" element={<CdsOrderCheckPage />} />
+          <Route path="cds/lab-alert" element={<CdsLabAlertPage />} />
+          <Route path="cds/allergy-check" element={<CdsAllergyCheckPage />} />
+          <Route path="mobile/nursing-rounds" element={<MobileNursingRoundsPage />} />
+          <Route path="mobile/vitals-chart" element={<MobileVitalsChartPage />} />
+          <Route path="mobile/task-completion" element={<MobileTaskCompletionPage />} />
+          {/* M278 路由注册 */}
+          <Route path="emr/quality-dashboard" element={<EmrQualityDashboardPage />} />
+          <Route path="telemed/consultations" element={<TelemedConsultationsPage />} />
+          <Route path="community/centers" element={<CommunityCentersPage />} />
+          <Route path="hr/employees" element={<HrEmployeesPage />} />
+          <Route path="contracts/list" element={<ContractsListPage />} />
+          {/* M279 路由注册 */}
+          <Route path="equipment/maintenance" element={<EquipmentMaintenancePage />} />
+          <Route path="supplies/inventory" element={<SuppliesInventoryPage />} />
+          <Route path="pathology/reports" element={<PathologyReportsPage />} />
+          <Route path="physical/centers" element={<PhysicalCentersPage />} />
+          <Route path="research/projects" element={<ResearchProjectsPage />} />
+          <Route path="education/trainings" element={<EducationTrainingsPage />} />
+          {/* M280 路由注册 */}
+          <Route path="insurance/policies" element={<InsurancePoliciesPage />} />
+          <Route path="maternity/records" element={<MaternityRecordsPage />} />
+          <Route path="fever/clinics" element={<FeverClinicsPage />} />
+          <Route path="newborn/records" element={<NewbornRecordsPage />} />
+          <Route path="outpatient/queue" element={<OutpatientQueuePage />} />
+          <Route path="inpatient/wards" element={<InpatientWardsPage />} />
+          {/* M283 路由注册 */}
+          <Route path="tcm/diagnosis" element={<TcmDiagnosisPage />} />
+          <Route path="dental/treatments" element={<DentalTreatmentsPage />} />
+          <Route path="ophthalmology/exams" element={<OphthalmologyExamsPage />} />
+          <Route path="dermatology/records" element={<DermatologyRecordsPage />} />
+          <Route path="psychiatry/assessments" element={<PsychiatryAssessmentsPage />} />
+          {/* M285 路由注册 */}
+          <Route path="cds/order-set" element={<CdsOrderSetPage />} />
+          <Route path="pacs/reports" element={<PacsReportsPage />} />
+          {/* M287 路由注册 */}
+          <Route path="order/sets" element={<OrderSetsPage />} />
+          <Route path="lis/results" element={<LisResultsPage />} />
+          <Route path="pharmacy/prescriptions" element={<PharmacyPrescriptionsPage />} />
+          <Route path="transfusion/records" element={<TransfusionRecordsPage />} />
+          {/* M293 路由注册 */}
+          <Route path="department/list" element={<DepartmentListPage />} />
+          <Route path="doctor/schedule" element={<DoctorSchedulePage />} />
+          <Route path="patient/admission" element={<PatientAdmissionPage />} />
+          <Route path="patient/discharge" element={<PatientDischargePage />} />
+          <Route path="medical/insurance" element={<MedicalInsurancePage />} />
+          <Route path="statistics/daily" element={<StatisticsDailyPage />} />
+          {/* M294 路由注册 */}
+          <Route path="billing/list" element={<BillingListPage />} />
+          <Route path="billing/detail" element={<BillingDetailPage />} />
+          <Route path="finance/revenue" element={<FinanceRevenuePage />} />
+          <Route path="finance/cost" element={<FinanceCostPage />} />
+          <Route path="hr/attendance" element={<HrAttendancePage />} />
+          <Route path="hr/performance" element={<HrPerformancePage />} />
+          {/* M297 路由注册 */}
+          <Route path="patient/satisfaction" element={<PatientSatisfactionPage />} />
+          {/* M298 路由注册 */}
+          <Route path="bi/dashboard" element={<BiDashboardPage />} />
+          {/* M301 路由注册 */}
+          <Route path="patient/search" element={<PatientSearchPage />} />
+          <Route path="patient/detail" element={<PatientDetailPage />} />
+          <Route path="doctor/list" element={<DoctorListPage />} />
+          <Route path="department/detail" element={<DepartmentDetailPage />} />
+          <Route path="schedule/today" element={<ScheduleTodayPage />} />
+          <Route path="appointment/list" element={<AppointmentListPage />} />
+          {/* M302 路由注册 */}
+          <Route path="order/list" element={<OrderListPage />} />
+          <Route path="order/detail" element={<OrderDetailPage />} />
+          <Route path="medication/list" element={<MedicationListPage />} />
+          <Route path="lis/list" element={<LisListPage />} />
+          <Route path="pacs/list" element={<PacsListPage />} />
+          <Route path="surgery/list" element={<SurgeryListPage />} />
+          {/* M303 路由注册 */}
+          <Route path="nursing/ward-rounds" element={<NursingWardRoundsPage />} />
+          <Route path="nursing/vitals" element={<NursingVitalsPage />} />
+          <Route path="pharmacy/dispense" element={<PharmacyDispensePage />} />
+          <Route path="transfusion/list" element={<TransfusionListPage />} />
+          <Route path="consent/list" element={<ConsentListPage />} />
+          <Route path="records/archive" element={<RecordsArchivePage />} />
+          {/* M304 路由注册 */}
+          <Route path="mobile/pda-tasks" element={<MobilePdaTasksPage />} />
+          {/* M305 路由注册 */}
+          <Route path="mobile/vitals" element={<MobileVitalsPage />} />
+          <Route path="mobile/scan" element={<MobileScanPage />} />
+          <Route path="smart-service/queue" element={<SmartServiceQueuePage />} />
+          {/* M306 路由注册 */}
+          <Route path="internet/prescriptions" element={<InternetPrescriptionsPage />} />
+          <Route path="internet/payments" element={<InternetPaymentsPage />} />
+          <Route path="internet/consultations" element={<InternetConsultationsPage />} />
+          {/* M307 路由注册 */}
+          <Route path="fhir/medication" element={<FhirMedicationPage />} />
+          <Route path="fhir/coverage" element={<FhirCoveragePage />} />
+          <Route path="fhir/claim" element={<FhirClaimPage />} />
+          <Route path="fhir/account" element={<FhirAccountPage />} />
+          <Route path="fhir/questionnaire" element={<FhirQuestionnairePage />} />
+          <Route path="fhir/communication" element={<FhirCommunicationPage />} />
+          <Route path="fhir/documentreference" element={<FhirDocumentReferencePage />} />
+          {/* M369 路由注册 */}
+          <Route path="emr/sign-verify" element={<EmrSignVerifyPage />} />
+          <Route path="emr/sign-templates" element={<EmrSignTemplatesPage />} />
+          <Route path="audit/trails" element={<AuditTrailsPage />} />
+          {/* M372 路由注册 */}
+          <Route path="workflow/roles" element={<WorkflowRolesPage />} />
+          <Route path="workflow/permissions" element={<WorkflowPermissionsPage />} />
+          <Route path="workflow/approve" element={<WorkflowApprovePage />} />
+          <Route path="workflow/notify" element={<WorkflowNotifyPage />} />
+          <Route path="workflow/escalation" element={<WorkflowEscalationPage />} />
+          <Route path="workflow/sla" element={<WorkflowSlaPage />} />
+          {/* M374 路由注册 */}
+          <Route path="events/list" element={<EventsListPage />} />
+          <Route path="events/types" element={<EventsTypesPage />} />
+          <Route path="events/subscribers" element={<EventsSubscribersPage />} />
+          <Route path="events/publish" element={<EventsPublishPage />} />
+          <Route path="events/consumers" element={<EventsConsumersPage />} />
+          <Route path="events/metrics-detail" element={<EventsMetricsDetailPage />} />
+          {/* M375 路由注册 */}
+          <Route path="patient/timeline-filter" element={<PatientTimelineFilterPage />} />
+          <Route path="patient/timeline-summary" element={<PatientTimelineSummaryPage />} />
+          <Route path="patient/timeline-compare" element={<PatientTimelineComparePage />} />
+          <Route path="patient/timeline-export" element={<PatientTimelineExportPage />} />
+          {/* M377 路由注册 */}
+          <Route path="cds/rule-engine" element={<CdsRuleEnginePage />} />
+          <Route path="cds/clinical-evidence" element={<CdsClinicalEvidencePage />} />
+          <Route path="cds/clinical-trials" element={<CdsClinicalTrialsPage />} />
+          <Route path="cds/clinical-guidelines-detail" element={<CdsClinicalGuidelinesDetailPage />} />
+          <Route path="cds/clinical-pathways-detail" element={<CdsClinicalPathwaysDetailPage />} />
+          {/* M378 路由注册 */}
+          <Route path="nursing/nqi-indicators" element={<NursingNqiIndicatorsPage />} />
+          <Route path="nursing/nqi-trends" element={<NursingNqiTrendsPage />} />
+          <Route path="nursing/nqi-benchmarks" element={<NursingNqiBenchmarksPage />} />
+          <Route path="nursing/nqi-alerts" element={<NursingNqiAlertsPage />} />
+          <Route path="nursing/nqi-reports" element={<NursingNqiReportsPage />} />
+          {/* M379 路由注册 */}
+          <Route path="quality/indicators" element={<QualityIndicatorsPage />} />
+          <Route path="quality/scores" element={<QualityScoresPage />} />
+          <Route path="quality/trends" element={<QualityTrendsPage />} />
+          <Route path="quality/benchmarks" element={<QualityBenchmarksPage />} />
+          <Route path="quality/alerts" element={<QualityAlertsPage />} />
+          <Route path="quality/reports" element={<QualityReportsPage />} />
+          {/* M380 路由注册 */}
+          <Route path="risk/indicators" element={<RiskIndicatorsPage />} />
+          <Route path="risk/scores" element={<RiskScoresPage />} />
+          <Route path="risk/trends" element={<RiskTrendsPage />} />
+          <Route path="risk/benchmarks" element={<RiskBenchmarksPage />} />
+          <Route path="risk/alerts" element={<RiskAlertsPage />} />
+          <Route path="risk/reports" element={<RiskReportsPage />} />
+          {/* M381 路由注册 */}
+          <Route path="audit/compliance-detail" element={<AuditComplianceDetailPage />} />
+          <Route path="audit/compliance-checklist" element={<AuditComplianceChecklistPage />} />
+          <Route path="audit/compliance-evidence" element={<AuditComplianceEvidencePage />} />
+          <Route path="audit/compliance-remediation" element={<AuditComplianceRemediationPage />} />
+          <Route path="audit/compliance-report" element={<AuditComplianceReportPage />} />
+          <Route path="audit/compliance-dashboard" element={<AuditComplianceDashboardPage />} />
+          {/* M382 路由注册 */}
+          <Route path="security/policy" element={<SecurityPolicyPage />} />
+          <Route path="security/policy-detail" element={<SecurityPolicyDetailPage />} />
+          <Route path="security/vulnerabilities" element={<SecurityVulnerabilitiesPage />} />
+          <Route path="security/patches" element={<SecurityPatchesPage />} />
+          {/* M383 路由注册 */}
+          <Route path="security/data-access" element={<SecurityDataAccessPage />} />
+          <Route path="security/data-sharing" element={<SecurityDataSharingPage />} />
+          <Route path="security/data-export" element={<SecurityDataExportPage />} />
+          <Route path="security/data-backup" element={<SecurityDataBackupPage />} />
+          <Route path="security/data-recovery" element={<SecurityDataRecoveryPage />} />
+          {/* M385 路由注册 */}
+          <Route path="security/incidents" element={<SecurityIncidentsPage />} />
+          <Route path="security/incident-response" element={<SecurityIncidentResponsePage />} />
+          <Route path="workflow/admin" element={<WorkflowAdminPage />} />
+          <Route path="events/metrics" element={<EventsMetricsPage />} />
+          <Route path="emr/template" element={<EmrTemplatePage />} />
+          <Route path="cds/guideline" element={<CdsGuidelinePage />} />
+          {/* M309 路由注册 */}
+          <Route path="auth/roles" element={<AuthRolesPage />} />
+          <Route path="auth/permissions" element={<AuthPermissionsPage />} />
+          <Route path="audit/logs" element={<AuditLogsPage />} />
+          <Route path="compliance/score" element={<ComplianceScorePage />} />
+          <Route path="security/dashboard" element={<SecurityDashboardPage />} />
+          <Route path="tenants/list" element={<TenantsListPage />} />
+          {/* M311 路由注册 */}
+          <Route path="anesthesia/records" element={<AnesthesiaRecordsPage />} />
+          <Route path="anesthesia/complications" element={<AnesthesiaComplicationsPage />} />
+          <Route path="tcm/prescriptions" element={<TcmPrescriptionsPage />} />
+          <Route path="tcm/formulas" element={<TcmFormulasPage />} />
+          <Route path="dental/appointments" element={<DentalAppointmentsPage />} />
+          {/* M312 路由注册 */}
+          <Route path="oncology/records" element={<OncologyRecordsPage />} />
+          <Route path="chronic/management" element={<ChronicManagementPage />} />
+          <Route path="icu/monitor" element={<IcuMonitorPage />} />
+          {/* M316 路由注册 */}
+          <Route path="financial/procurement" element={<FinancialProcurementPage />} />
+          <Route path="financial/assets" element={<FinancialAssetsPage />} />
+          <Route path="logistics/preventive" element={<LogisticsPreventivePage />} />
+          <Route path="discharge/summary" element={<DischargeSummaryPage />} />
+          {/* M317 路由注册 */}
+          <Route path="consultation/list" element={<ConsultationListPage />} />
+          <Route path="emergency/list" element={<EmergencyListPage />} />
+          <Route path="icu/list" element={<IcuListPage />} />
+          <Route path="anesthesia/list" element={<AnesthesiaListPage />} />
+          <Route path="discharge/list" element={<DischargeListPage />} />
+          <Route path="cds/diagnosis-suggest" element={<CdsDiagnosisSuggestPage />} />
           <Route path="transfusion" element={<TransfusionPage />} />
           <Route path="blood-quality" element={<BloodQualityPage />} />
           {/* 检验管理 LIS（M11-A）：查看 lab:read，写操作按 lis:* 细分 */}
@@ -7405,6 +8898,11 @@ export default function AppRoutes() {
 
           {/* 认证与权限体系（健澜科技 RBAC） */}
           <Route path="profile" element={<ProfilePage />} />
+          {/* M221：AI/BI 占位页（接口对接中） */}
+          <Route path="ai/cda" element={<AiCdaSuggestPage />} />
+          <Route path="ai/risk" element={<AiRiskPredictionPage />} />
+          <Route path="bi/trends" element={<BiTrendsPage />} />
+          <Route path="bi/comparison" element={<BiComparisonPage />} />
           <Route
             path="system/users"
             element={
@@ -7478,6 +8976,228 @@ export default function AppRoutes() {
           <Route path="me" element={<MobileMe />} />
         </Route>
 
+          {/* M383+M385 路由注册（补登） */}
+          <Route path="security/data-access" element={<SecurityDataAccessPage />} />
+          <Route path="security/data-sharing" element={<SecurityDataSharingPage />} />
+          <Route path="security/data-export" element={<SecurityDataExportPage />} />
+          <Route path="security/data-backup" element={<SecurityDataBackupPage />} />
+          <Route path="security/data-recovery" element={<SecurityDataRecoveryPage />} />
+          <Route path="security/incidents" element={<SecurityIncidentsPage />} />
+          <Route path="security/incident-response" element={<SecurityIncidentResponsePage />} />
+          {/* M386 智慧服务路由 */}
+          <Route path="service/appointments" element={<ServiceAppointmentsPage />} />
+          <Route path="service/payments" element={<ServicePaymentsPage />} />
+          <Route path="service/querys" element={<ServiceQuerysPage />} />
+          <Route path="service/reminders" element={<ServiceRemindersPage />} />
+          <Route path="service/feedback" element={<ServiceFeedbackPage />} />
+          <Route path="service/satisfaction" element={<ServiceSatisfactionPage />} />
+          {/* M387 运营管理路由 */}
+          <Route path="operations/dashboard" element={<OperationsDashboardPage />} />
+          <Route path="operations/kpi" element={<OperationsKpiPage />} />
+          <Route path="operations/reports" element={<OperationsReportsPage />} />
+          <Route path="operations/analysis" element={<OperationsAnalysisPage />} />
+          <Route path="operations/forecast" element={<OperationsForecastPage />} />
+          <Route path="operations/benchmark" element={<OperationsBenchmarkPage />} />
+          {/* M388 人力资源路由 */}
+          <Route path="hr/staff-dashboard" element={<HrStaffDashboardPage />} />
+          <Route path="hr/staff-recruitment" element={<HrStaffRecruitmentPage />} />
+          <Route path="hr/staff-training" element={<HrStaffTrainingPage />} />
+          <Route path="hr/staff-performance" element={<HrStaffPerformancePage />} />
+          <Route path="hr/staff-schedule" element={<HrStaffSchedulePage />} />
+          <Route path="hr/staff-attendance" element={<HrStaffAttendancePage />} />
+          {/* M389 财务路由补登 */}
+          <Route path="finance/costs" element={<FinanceCostsPage />} />
+          <Route path="finance/analysis" element={<FinanceAnalysisPage />} />
+          {/* M390 药品物资路由 */}
+          <Route path="pharmacy/dashboard" element={<PharmacyDashboardPage />} />
+          <Route path="pharmacy/inventory-detail" element={<PharmacyInventoryDetailPage />} />
+          <Route path="pharmacy/suppliers" element={<PharmacySuppliersPage />} />
+          <Route path="pharmacy/purchasing" element={<PharmacyPurchasingPage />} />
+          <Route path="pharmacy/expiry" element={<PharmacyExpiryPage />} />
+          {/* M391 科研教学路由补登 */}
+          <Route path="research/projects" element={<ResearchProjectsPage />} />
+          <Route path="research/papers" element={<ResearchPapersPage />} />
+          <Route path="research/funds" element={<ResearchFundsPage />} />
+          <Route path="research/awards" element={<ResearchAwardsPage />} />
+          <Route path="teaching/courses" element={<TeachingCoursesPage />} />
+          <Route path="teaching/training" element={<TeachingTrainingPage />} />
+          {/* M392 互联网医院路由 */}
+          <Route path="telemed/prescriptions" element={<TelemedPrescriptionsPage />} />
+          <Route path="telemed/payments" element={<TelemedPaymentsPage />} />
+          <Route path="telemed/delivery" element={<TelemedDeliveryPage />} />
+          <Route path="telemed/followup" element={<TelemedFollowupPage />} />
+          <Route path="telemed/reports" element={<TelemedReportsPage />} />
+          {/* M394 远程医疗路由 */}
+          <Route path="telemed/remote-consults" element={<TelemedRemoteConsultsPage />} />
+          <Route path="telemed/remote-diagnosis" element={<TelemedRemoteDiagnosisPage />} />
+          <Route path="telemed/remote-monitoring" element={<TelemedRemoteMonitoringPage />} />
+          <Route path="telemed/remote-surgery" element={<TelemedRemoteSurgeryPage />} />
+          <Route path="telemed/remote-training" element={<TelemedRemoteTrainingPage />} />
+          <Route path="telemed/remote-equipment" element={<TelemedRemoteEquipmentPage />} />
+          {/* M395 社区医疗路由 */}
+          <Route path="community/visits" element={<CommunityVisitsPage />} />
+          <Route path="community/health-records" element={<CommunityHealthRecordsPage />} />
+          <Route path="community/elderly-care" element={<CommunityElderlyCarePage />} />
+          <Route path="community/chronic-disease" element={<CommunityChronicDiseasePage />} />
+          <Route path="community/education" element={<CommunityEducationPage />} />
+          {/* M396 妇幼保健路由 */}
+          <Route path="maternity/prenatal-care" element={<MaternityPrenatalCarePage />} />
+          <Route path="maternity/postnatal-care" element={<MaternityPostnatalCarePage />} />
+          <Route path="maternity/infant-care" element={<MaternityInfantCarePage />} />
+          <Route path="maternity/child-vaccination" element={<MaternityChildVaccinationPage />} />
+          <Route path="maternity/women-health" element={<MaternityWomenHealthPage />} />
+          <Route path="maternity/genetic-screening" element={<MaternityGeneticScreeningPage />} />
+          {/* M397 急诊急救路由补登 */}
+          <Route path="emergency/triage" element={<EmergencyTriagePage />} />
+          <Route path="emergency/rescue" element={<EmergencyRescuePage />} />
+          <Route path="emergency/ambulance" element={<EmergencyAmbulancePage />} />
+          <Route path="emergency/disaster" element={<EmergencyDisasterPage />} />
+          <Route path="emergency/poisoning" element={<EmergencyPoisoningPage />} />
+          <Route path="emergency/trauma" element={<EmergencyTraumaPage />} />
+          {/* M398 肿瘤医学路由 */}
+          <Route path="oncology/screening" element={<OncologyScreeningPage />} />
+          <Route path="oncology/diagnosis" element={<OncologyDiagnosisPage />} />
+          <Route path="oncology/treatment-plan" element={<OncologyTreatmentPlanPage />} />
+          <Route path="oncology/followup" element={<OncologyFollowupPage />} />
+          {/* M399 康复医学路由 */}
+          <Route path="rehab/assessment" element={<RehabAssessmentPage />} />
+          <Route path="rehab/treatment" element={<RehabTreatmentPage />} />
+          <Route path="rehab/therapy" element={<RehabTherapyPage />} />
+          <Route path="rehab/exercise" element={<RehabExercisePage />} />
+          <Route path="rehab/occupational" element={<RehabOccupationalPage />} />
+          {/* M401 老年医学路由补登 */}
+          <Route path="geriatrics/assessment" element={<GeriatricsAssessmentPage />} />
+          <Route path="geriatrics/care-plan" element={<GeriatricsCarePlanPage />} />
+          <Route path="geriatrics/comorbidity" element={<GeriatricsComorbidityPage />} />
+          <Route path="geriatrics/frail" element={<GeriatricsFrailPage />} />
+          <Route path="geriatrics/dementia" element={<GeriatricsDementiaPage />} />
+          <Route path="geriatrics/falls" element={<GeriatricsFallsPage />} />
+          {/* M402 病历管理路由补登 */}
+          <Route path="emr/templates" element={<EmrTemplatesPage />} />
+          <Route path="emr/signatures" element={<EmrSignaturesPage />} />
+          <Route path="emr/templates-detail" element={<EmrTemplatesDetailPage />} />
+          <Route path="emr/quality-check" element={<EmrQualityCheckPage />} />
+          <Route path="emr/retrieval" element={<EmrRetrievalPage />} />
+          <Route path="emr/archive" element={<EmrArchivePage />} />
+          {/* M403 医保管理路由 */}
+          <Route path="insurance/policy" element={<InsurancePolicyPage />} />
+          <Route path="insurance/claims" element={<InsuranceClaimsPage />} />
+          <Route path="insurance/settlement" element={<InsuranceSettlementPage />} />
+          <Route path="insurance/audit" element={<InsuranceAuditPage />} />
+          <Route path="insurance/disease-codes" element={<InsuranceDiseaseCodesPage />} />
+          <Route path="insurance/items" element={<InsuranceItemsPage />} />
+          {/* M404 手术麻醉路由补登 */}
+          <Route path="surgery/schedule" element={<SurgerySchedulePage />} />
+          <Route path="surgery/records" element={<SurgeryRecordsPage />} />
+          <Route path="surgery/consent" element={<SurgeryConsentPage />} />
+          <Route path="anesthesia/records" element={<AnesthesiaRecordsPage />} />
+          <Route path="anesthesia/assessment" element={<AnesthesiaAssessmentPage />} />
+          <Route path="anesthesia/recovery" element={<AnesthesiaRecoveryPage />} />
+          {/* M405 检验检查路由补登 */}
+          <Route path="lab/items" element={<LabItemsPage />} />
+          <Route path="lab/results" element={<LabResultsPage />} />
+          <Route path="lab/reports" element={<LabReportsPage />} />
+          <Route path="radiology/items" element={<RadiologyItemsPage />} />
+          <Route path="radiology/results" element={<RadiologyResultsPage />} />
+          <Route path="radiology/reports" element={<RadiologyReportsPage />} />
+          {/* M406 门诊住院路由补登 */}
+          <Route path="outpatient/queue" element={<OutpatientQueuePage />} />
+          <Route path="outpatient/visits" element={<OutpatientVisitsPage />} />
+          <Route path="outpatient/prescriptions" element={<OutpatientPrescriptionsPage />} />
+          <Route path="inpatient/admissions" element={<InpatientAdmissionsPage />} />
+          <Route path="inpatient/discharges" element={<InpatientDischargesPage />} />
+          <Route path="inpatient/transfers" element={<InpatientTransfersPage />} />
+          {/* M407 医嘱处方路由补登 */}
+          <Route path="orders/list" element={<OrdersListPage />} />
+          <Route path="orders/detail" element={<OrdersDetailPage />} />
+          <Route path="orders/templates" element={<OrdersTemplatesPage />} />
+          <Route path="prescriptions/list" element={<PrescriptionsListPage />} />
+          <Route path="prescriptions/detail" element={<PrescriptionsDetailPage />} />
+          <Route path="prescriptions/audit" element={<PrescriptionsAuditPage />} />
+          {/* M408 患者360路由补登 */}
+          <Route path="patient/profile" element={<PatientProfilePage />} />
+          <Route path="patient/visits" element={<PatientVisitsPage />} />
+          <Route path="patient/allergies" element={<PatientAllergiesPage />} />
+          <Route path="patient/medications" element={<PatientMedicationsPage />} />
+          <Route path="patient/labs" element={<PatientLabsPage />} />
+          <Route path="patient/imaging" element={<PatientImagingPage />} />
+          {/* M409 CDS路由补登 */}
+          <Route path="cds/rules" element={<CdsRulesPage />} />
+          <Route path="cds/alerts" element={<CdsAlertsPage />} />
+          <Route path="cds/recommendations" element={<CdsRecommendationsPage />} />
+          <Route path="cds/drug-interactions" element={<CdsDrugInteractionsPage />} />
+          <Route path="cds/contraindications" element={<CdsContraindicationsPage />} />
+          <Route path="cds/guidelines" element={<CdsGuidelinesPage />} />
+          {/* M410 工作流路由补登 */}
+          <Route path="workflow/tasks" element={<WorkflowTasksPage />} />
+          <Route path="workflow/templates" element={<WorkflowTemplatesPage />} />
+          <Route path="workflow/instances" element={<WorkflowInstancesPage />} />
+          <Route path="workflow/approval" element={<WorkflowApprovalPage />} />
+          <Route path="workflow/scheduling" element={<WorkflowSchedulingPage />} />
+          <Route path="workflow/notifications" element={<WorkflowNotificationsPage />} />
+          {/* M411 系统管理配置路由补登 */}
+          <Route path="system/config" element={<SystemConfigPage />} />
+          <Route path="system/menus" element={<SystemMenusPage />} />
+          <Route path="system/dict" element={<SystemDictPage />} />
+          <Route path="system/logs" element={<SystemLogsPage />} />
+          <Route path="system/params" element={<SystemParamsPage />} />
+          <Route path="system/cache" element={<SystemCachePage />} />
+          {/* M412 多租户路由补登 */}
+          <Route path="tenants/list" element={<TenantsListPage />} />
+          <Route path="tenants/detail" element={<TenantsDetailPage />} />
+          <Route path="tenants/config" element={<TenantsConfigPage />} />
+          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
+          <Route path="tenants/isolation" element={<TenantsIsolationPage />} />
+          <Route path="tenants/switch" element={<TenantsSwitchPage />} />
+          {/* M413 PHI脱敏路由 */}
+          <Route path="phi/masking" element={<PhiMaskingPage />} />
+          <Route path="phi/encryption" element={<PhiEncryptionPage />} />
+          <Route path="phi/decryption" element={<PhiDecryptionPage />} />
+          <Route path="phi/audit" element={<PhiAuditPage />} />
+          <Route path="phi/policies" element={<PhiPoliciesPage />} />
+          <Route path="phi/consent" element={<PhiConsentPage />} />
+          {/* M414 电子签名审计追踪路由补登 */}
+          <Route path="signatures/list" element={<SignaturesListPage />} />
+          <Route path="signatures/verify" element={<SignaturesVerifyPage />} />
+          <Route path="signatures/templates" element={<SignaturesTemplatesPage />} />
+          <Route path="audit/trails" element={<AuditTrailsPage />} />
+          <Route path="audit/logs" element={<AuditLogsPage />} />
+          <Route path="audit/reports" element={<AuditReportsPage />} />
+          {/* M415 BI运营分析路由补登 */}
+          <Route path="bi/dashboard" element={<BiDashboardPage />} />
+          <Route path="bi/charts" element={<BiChartsPage />} />
+          <Route path="bi/reports" element={<BiReportsPage />} />
+          <Route path="bi/analysis" element={<BiAnalysisPage />} />
+          <Route path="bi/export" element={<BiExportPage />} />
+          <Route path="bi/scheduled" element={<BiScheduledPage />} />
+          {/* M416 科研教学详情路由 */}
+          <Route path="research/projects-detail" element={<ResearchProjectsDetailPage />} />
+          <Route path="research/papers-detail" element={<ResearchPapersDetailPage />} />
+          <Route path="research/funds-detail" element={<ResearchFundsDetailPage />} />
+          <Route path="research/awards-detail" element={<ResearchAwardsDetailPage />} />
+          <Route path="teaching/courses-detail" element={<TeachingCoursesDetailPage />} />
+          <Route path="teaching/training-detail" element={<TeachingTrainingDetailPage />} />
+          {/* M417 互联网医院详情路由 */}
+          <Route path="telemed/consultations-detail" element={<TelemedConsultationsDetailPage />} />
+          <Route path="telemed/prescriptions-detail" element={<TelemedPrescriptionsDetailPage />} />
+          <Route path="telemed/payments-detail" element={<TelemedPaymentsDetailPage />} />
+          <Route path="telemed/delivery-detail" element={<TelemedDeliveryDetailPage />} />
+          <Route path="telemed/followup-detail" element={<TelemedFollowupDetailPage />} />
+          <Route path="telemed/reports-detail" element={<TelemedReportsDetailPage />} />
+          {/* M418 远程医疗详情路由 */}
+          <Route path="telemed/remote-consults-detail" element={<TelemedRemoteConsultsDetailPage />} />
+          <Route path="telemed/remote-diagnosis-detail" element={<TelemedRemoteDiagnosisDetailPage />} />
+          <Route path="telemed/remote-monitoring-detail" element={<TelemedRemoteMonitoringDetailPage />} />
+          <Route path="telemed/remote-surgery-detail" element={<TelemedRemoteSurgeryDetailPage />} />
+          <Route path="telemed/remote-training-detail" element={<TelemedRemoteTrainingDetailPage />} />
+          <Route path="telemed/remote-equipment-detail" element={<TelemedRemoteEquipmentDetailPage />} />
+          {/* M419 社区医疗详情路由 */}
+          <Route path="community/followups-detail" element={<CommunityFollowupsDetailPage />} />
+          <Route path="community/visits-detail" element={<CommunityVisitsDetailPage />} />
+          <Route path="community/health-records-detail" element={<CommunityHealthRecordsDetailPage />} />
+          <Route path="community/elderly-care-detail" element={<CommunityElderlyCareDetailPage />} />
+          <Route path="community/chronic-disease-detail" element={<CommunityChronicDiseaseDetailPage />} />
+          <Route path="community/education-detail" element={<CommunityEducationDetailPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />

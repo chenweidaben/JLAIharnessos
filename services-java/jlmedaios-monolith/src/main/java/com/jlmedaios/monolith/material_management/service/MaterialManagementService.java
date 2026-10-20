@@ -66,9 +66,8 @@ public class MaterialManagementService {
      * @return 低库存耗材列表
      */
     public List<Consumable> lowStock() {
-        return consumableRepository.findAll().stream()
-                .filter(c -> c.getStockQuantity() < c.getStockWarningLevel())
-                .toList();
+        // P8 性能优化：直接调用 Repository 派生查询
+        return consumableRepository.findByStockQuantityLessThan(50);
     }
 
     /**

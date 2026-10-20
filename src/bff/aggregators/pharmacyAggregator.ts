@@ -368,6 +368,105 @@ export interface QueueItem {
   department: string | null;
 }
 
+/**
+ * v5.0试点扩展（M183-C demo种子）：构造确定性处方/发药演示记录。
+ * 固定种子、无 Math.random，供 DEMO_MODE 下药房列表页联调。
+ */
+function demoPrescription(
+  idx: number,
+  status: Prescription['status'],
+  patientName: string,
+  department: string,
+  drug: { code: string; name: string; spec: string; qty: number },
+): QueueItem {
+  return {
+    patientName,
+    department,
+    prescription: {
+      id: `demo-rx-${idx}`,
+      visitId: `demo-vis-${idx}`,
+      rxNo: `RX20261019${String(2000 + idx)}`,
+      prescriberId: 'demo-doc-1',
+      status,
+      reviewerId: status === 'approved' || status === 'dispensed' ? 'demo-pharm-1' : null,
+      reviewLevel: status === 'approved' || status === 'dispensed' ? 'normal' : null,
+      riskLevel: 'low',
+      auditResult: {},
+      counsel: '嘱饭后服用，避免辛辣。',
+      totalFee: drug.qty * 35.5,
+      items: [
+        {
+          id: `demo-rxi-${idx}`,
+          drugCode: drug.code,
+          drugName: drug.name,
+          specification: drug.spec,
+          dosage: 1,
+          dosageUnit: '片',
+          frequency: 'bid',
+          route: '口服',
+          daysSupply: 3,
+          quantity: drug.qty,
+          quantityUnit: '盒',
+          skinTest: false,
+          remark: null,
+        },
+      ],
+      createdAt: `2026-10-19T08:${String(10 + idx).padStart(2, '0')}:00.000Z`,
+      updatedAt: `2026-10-19T09:${String(20 + idx).padStart(2, '0')}:00.000Z`,
+    },
+  };
+}
+
+/** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 待发药/待审方队列。 */
+function demoQueue(status: Prescription['status']): QueueItem[] {
+  const rows: Array<[string, string, string, string, string, number]> = [
+    ['演示患者A', '心血管内科', 'RX-MET-500', '盐酸二甲双胍片', '0.5g×20片', 2],
+    ['演示患者B', '呼吸内科', 'RX-AMOX-250', '阿莫西林胶囊', '0.25g×24粒', 1],
+    ['演示患者C', '消化内科', 'RX-OME-20', '奥美拉唑肠溶胶囊', '20mg×14粒', 2],
+    ['演示患者D', '骨科', 'RX-CELE-200', '塞来昔布胶囊', '0.2g×6粒', 1],
+    ['演示患者E', '儿科', 'RX-IBU-100', '布洛芬混悬液', '100ml:2g', 1],
+    ['演示患者F', '神经内科', 'RX-ASP-100', '阿司匹林肠溶片', '100mg×30片', 3],
+    ['演示患者G', '内分泌科', 'RX-GLI-80', '格列美脲片', '2mg×30片', 2],
+    ['演示患者H', '普外科', 'RX-METRO-400', '甲硝唑片', '0.2g×21片', 1],
+  ];
+  return rows.map((r, i) =>
+    demoPrescription(i + 1, status, r[0], r[1], { code: r[2], name: r[3], spec: r[4], qty: r[5] }),
+  );
+}
+
+/** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 发药记录。 */
+function demoDispensings(): Dispensing[] {
+  const drugs: Array<[string, string, string, number]> = [
+    ['RX-MET-500', '盐酸二甲双胍片', '0.5g×20片', 2],
+    ['RX-AMOX-250', '阿莫西林胶囊', '0.25g×24粒', 1],
+    ['RX-OME-20', '奥美拉唑肠溶胶囊', '20mg×14粒', 2],
+    ['RX-CELE-200', '塞来昔布胶囊', '0.2g×6粒', 1],
+    ['RX-IBU-100', '布洛芬混悬液', '100ml:2g', 1],
+    ['RX-ASP-100', '阿司匹林肠溶片', '100mg×30片', 3],
+    ['RX-GLI-80', '格列美脲片', '2mg×30片', 2],
+    ['RX-METRO-400', '甲硝唑片', '0.2g×21片', 1],
+  ];
+  return drugs.map((d, i) => ({
+    id: `demo-disp-${i + 1}`,
+    prescriptionId: `demo-rx-${i + 1}`,
+    itemId: `demo-rxi-${i + 1}`,
+    drugId: `demo-drug-${i + 1}`,
+    drugCode: d[0],
+    drugName: d[1],
+    warehouse: '门诊药房',
+    batchNo: `B2026${String(100 + i)}`,
+    quantity: d[3],
+    unit: '盒',
+    dispensedBy: 'demo-pharm-1',
+    dispensedAt: `2026-10-19T09:${String(15 + i).padStart(2, '0')}:00.000Z`,
+    idempotencyKey: `demo:${i + 1}`,
+    overrideReason: null,
+    overrideBy: null,
+    cdsHits: [],
+    createdAt: `2026-10-19T09:${String(15 + i).padStart(2, '0')}:00.000Z`,
+  }));
+}
+
 /** 按状态加载处方队列（含患者脱敏名/科室）。 */
 async function loadQueueForStatus(
   auth: AuthView,
@@ -401,11 +500,19 @@ async function loadQueueForStatus(
 
 /** 待发药队列（approved 处方，含明细）。 */
 export function getDispenseQueue(auth: AuthView): Promise<QueueItem[]> {
+  if (process.env.DEMO_MODE === '1') {
+    requirePharmacist(auth, '查待发药队列');
+    return Promise.resolve(demoQueue('approved'));
+  }
   return loadQueueForStatus(auth, 'approved', '查待发药队列');
 }
 
 /** 待审方队列（pending_review 处方，含明细）。 */
 export function getReviewQueue(auth: AuthView): Promise<QueueItem[]> {
+  if (process.env.DEMO_MODE === '1') {
+    requirePharmacist(auth, '查待审方队列');
+    return Promise.resolve(demoQueue('pending_review'));
+  }
   return loadQueueForStatus(auth, 'pending_review', '查待审方队列');
 }
 
@@ -506,6 +613,7 @@ export async function getDispensingRecords(
   options?: { prescriptionId?: string; warehouse?: string },
 ): Promise<Dispensing[]> {
   requirePharmacist(auth, '查发药记录');
+  if (process.env.DEMO_MODE === '1') return demoDispensings();
   if (options?.prescriptionId) return listDispensingsByPrescription(options.prescriptionId);
   return listRecentDispensings({ warehouse: options?.warehouse, limit: 200 });
 }

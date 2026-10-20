@@ -39,7 +39,7 @@ const defaultDepts: DeptItem[] = [
 
 export default function EmrQcDeptRankListPage() {
   const [base, setBase] = useState<DeptRank | null>(null);
-  const [depts, setDepts] = useState<DeptItem[]>(defaultDepts);
+  const [depts] = useState<DeptItem[]>(defaultDepts);
   const [result, setResult] = useState<RankResult | null>(null);
   const [report, setReport] = useState<RankReport | null>(null);
   const [loading, setLoading] = useState(false);

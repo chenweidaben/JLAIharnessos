@@ -1,0 +1,4 @@
+﻿OK /api/v1/oncology/screening
+OK /api/v1/oncology/diagnosis
+OK /api/v1/oncology/treatment-plan
+OK /api/v1/oncology/followup

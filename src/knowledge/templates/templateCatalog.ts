@@ -8,6 +8,9 @@
 
 import type { MedicalTemplate, TemplateField } from './templateTypes';
 
+// v5.0试点扩展（tsc清零）：再导出 MedicalTemplate 供前端页面按类型导入
+export type { MedicalTemplate } from './templateTypes';
+
 function f(key: string, label: string, required = true, visibleByDefault = true, icdCode?: string): TemplateField {
   return { key, label, required, visibleByDefault, icdCode };
 }

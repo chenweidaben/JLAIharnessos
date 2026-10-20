@@ -1,0 +1,18 @@
+﻿orders\list exists: True
+orders\detail exists: False
+orders\templates exists: False
+prescriptions\list exists: False
+prescriptions\detail exists: False
+prescriptions\audit exists: False
+OK /api/v1/orders/list
+OK /api/v1/orders/detail
+OK /api/v1/orders/templates
+OK /api/v1/prescriptions/list
+OK /api/v1/prescriptions/detail
+OK /api/v1/prescriptions/audit
+route orders/list : False
+route orders/detail : False
+route orders/templates : False
+route prescriptions/list : False
+route prescriptions/detail : False
+route prescriptions/audit : False

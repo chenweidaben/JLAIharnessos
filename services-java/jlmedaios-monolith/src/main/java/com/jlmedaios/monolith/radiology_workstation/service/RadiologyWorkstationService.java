@@ -80,9 +80,7 @@ public class RadiologyWorkstationService {
     }
 
     private RadiologyWorkItem findByWorkItemNo(String workItemNo) {
-        return radiologyWorkItemRepository.findAll().stream()
-                .filter(i -> workItemNo.equals(i.getWorkItemNo()))
-                .findFirst()
-                .orElse(null);
+        // P3 性能优化：直接调用 Repository 派生查询
+        return radiologyWorkItemRepository.findByWorkItemNo(workItemNo);
     }
 }

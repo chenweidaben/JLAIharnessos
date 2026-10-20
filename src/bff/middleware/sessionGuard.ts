@@ -58,8 +58,19 @@ async function isSessionActive(jti: string): Promise<boolean> {
 /**
  * 校验当前请求令牌的会话状态；已失效则清空 ctx.user。
  * 无 jti 的令牌（演示令牌或 M7-F 前签发的旧令牌）不强制校验。
+ *
+ * v5.0试点扩展（M187登录根因）：演示模式（DEMO_MODE=1）下 registerSession 不落会话台账，
+ * 但登录签发的 JWT 仍带 jti；若仍按 jti 查库一律查不到 → 误判会话失效而清空 c.user，
+ * 导致登录后第一个鉴权请求（如 /dashboard/stats）即返回 401，前端 axios 拦截器随之
+ * tokenStorage.clear() 并 navigate('/login')，表现为“登录成功却跳不进 dashboard、
+ * localStorage 只剩 auth_session_v2 没有 auth_tokens”。演示模式无会话台账可校，直接放行。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
  */
 export async function enforceSession(c: Ctx): Promise<void> {
+  // v5.0试点扩展（M187登录根因）：演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT
+  const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+  if (isDemo) return;
   if (!c.user || !c.user.jti) return;
   const active = await isSessionActive(c.user.jti);
   if (!active) c.user = null;

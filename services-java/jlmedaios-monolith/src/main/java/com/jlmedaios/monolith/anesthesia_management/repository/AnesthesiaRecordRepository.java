@@ -9,6 +9,7 @@ import com.jlmedaios.monolith.anesthesia_management.entity.AnesthesiaRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,4 +33,13 @@ public interface AnesthesiaRecordRepository extends JpaRepository<AnesthesiaReco
      * @return 麻醉记录列表
      */
     List<AnesthesiaRecord> findByPatientId(String patientId);
+
+    /**
+     * 按苏醒时间范围查询（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param start 开始时间
+     * @param end   结束时间
+     * @return 麻醉记录列表
+     */
+    List<AnesthesiaRecord> findByRecoveryTimeBetween(LocalDateTime start, LocalDateTime end);
 }

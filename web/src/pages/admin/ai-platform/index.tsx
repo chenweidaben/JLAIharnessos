@@ -11,12 +11,10 @@ import {
   Col,
   Layout,
   List,
-  Progress,
   Row,
   Spin,
   Statistic,
   Table,
-  Tag,
   Typography,
 } from 'antd';
 import { get } from '@/services/request';

@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>User Management Dialog &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Change Ownership Dialog" href="change_ownership.html" />
+    <link rel="prev" title="Enabling two-factor authentication (2FA)" href="mfa.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="change_ownership.html" title="Change Ownership Dialog"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mfa.html" title="Enabling two-factor authentication (2FA)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" accesskey="U">Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">User Management Dialog</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="user-management-dialog">
+<span id="user-management"></span><h1><span class="target" id="index-0"></span>User Management Dialog<a class="headerlink" href="#user-management-dialog" title="Link to this heading">¶</a></h1>
+<p>When invoking pgAdmin in desktop mode, a password is randomly generated, and
+then ignored. If you install pgAdmin in server mode, you will be prompted for
+an administrator email and password for the pgAdmin client.</p>
+<p>When you authenticate with pgAdmin, the server definitions associated with that
+login role are made available in the tree control.  An administrative user can
+use the <em>User Management</em> dialog to:</p>
+<ul class="simple">
+<li><p>add or delete pgAdmin roles</p></li>
+<li><p>assign privileges</p></li>
+<li><p>manage the password associated with a role</p></li>
+</ul>
+<img alt="pgAdmin user management window" class="align-center" src="_images/user.png" />
+<p>Use the <em>Search</em> field to specify a criteria and review a list of users
+that matches with the specified criteria. You can enter a value that matches
+the following criteria types: <em>Authentication source</em>, <em>Username</em>, or <em>Email</em>.
+For example, you can enter <em>ldap</em> in the search box and only the records having
+<em>ldap</em> as authentication source will be displayed in the <em>User Management</em> table.</p>
+<p>To add a user, click the Add (+) button at the top right corner.</p>
+<img alt="pgAdmin user management window add new user" class="align-center" src="_images/add_user.png" />
+<p>Provide information about the new pgAdmin role in the row:</p>
+<ul>
+<li><p>Use the drop-down list box next to <em>Authentication source</em> field to select the
+type of authentication that should be used for the user. If authentication
+source is only ‘internal’ then <em>Authentication source</em> field
+is disabled. Supported <em>Authentication source</em> are internal, ldap, kerberos,
+oauth2 and webserver.</p></li>
+<li><p>Click in the <em>Username</em> field, and provide a username for the user. This field
+is enabled only when you select authentication source except <em>internal</em>. If you
+select <em>internal</em> as authentication source, your email address is displayed in the
+username field.</p></li>
+<li><p>Click in the <em>Email</em> field, and provide an email address for the user.</p></li>
+<li><p>Use the drop-down list box next to <em>Role</em> to select whether a user is an
+<em>Administrator</em> or a <em>User</em>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Select <em>Administrator</em> if the user will have administrative privileges
+within the pgAdmin client.</p></li>
+<li><p>Select <em>User</em> to create a non-administrative user account.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Move the <em>Active</em> switch to the <em>No</em> position if the account is not currently
+active; the default is <em>Yes</em>. Use this switch to disable account activity
+without deleting an account.</p></li>
+<li><p>Use the <em>New password</em> field to provide the password associated with the user
+specified in the <em>Email</em> field. This field is disabled if you select any
+authentication source except <em>internal</em>.</p></li>
+<li><p>Re-enter the password in the <em>Confirm password</em> field. This field is disabled
+if you select <em>ldap</em> as authentication source.</p></li>
+<li><p><em>Locked</em> switch is disabled by default when set to <em>False</em>. It is only enabled
+when the user is locked by trying unsuccessful login attempts. Move the switch
+to the <em>False</em> position if you want to unlock the account.</p></li>
+</ul>
+<p>To discard a user, and revoke access to pgAdmin, click the trash icon to the
+left of the row and confirm deletion in the <em>Delete user?</em> dialog. If the user
+has created some shared servers, then the <a class="reference internal" href="change_ownership.html#change-ownership"><span class="std std-ref">Change Ownership</span></a>
+dialog will appear to change the ownership of a shared server.</p>
+<p>Users with the <em>Administrator</em> role are able to add, edit and remove pgAdmin
+users, but otherwise have the same capabilities as those with the <em>User</em> role.</p>
+<ul class="simple">
+<li><p>Click the <em>Help</em> button (?) to access online help.</p></li>
+<li><p>Click the <em>Close</em> button to save work. You will be prompted to return to the
+dialog if your selections cannot be saved.</p></li>
+</ul>
+<section id="using-setup-py-command-line-script">
+<h2>Using ‘setup.py’ command line script<a class="headerlink" href="#using-setup-py-command-line-script" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To manage users using <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, you must use
+the Python interpreter that is normally used to run pgAdmin to ensure
+that the required Python packages are available. In most packages, this
+can be found in the Python Virtual Environment that can be found in the
+installation directory. When using platform-native packages, the system
+installation of Python may be the one used by pgAdmin.</p>
+<p>When using PIP wheel package to install pgadmin, all the commands can be used
+without Python interpreter.</p>
+<p>Some of the examples:
+pgadmin4-cli add-user <a class="reference external" href="mailto:user1&#37;&#52;&#48;gmail&#46;com">user1<span>&#64;</span>gmail<span>&#46;</span>com</a> password –role 1
+pgadmin4-cli get-prefs</p>
+</div>
+<section id="manage-users">
+<h3>Manage Users<a class="headerlink" href="#manage-users" title="Link to this heading">¶</a></h3>
+</section>
+<section id="add-user">
+<h3>Add User<a class="headerlink" href="#add-user" title="Link to this heading">¶</a></h3>
+<p>To add user, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">add-user</span></code> command line option, followed by
+email and password. role and active will be optional fields.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password
+
+<span class="c1"># to specify a role, admin and non-admin users:</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--admin
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--nonadmin
+
+<span class="c1"># to specify user&#39;s status</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--active
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--inactive
+</pre></div>
+</div>
+</section>
+<section id="add-external-user">
+<h3>Add External User<a class="headerlink" href="#add-external-user" title="Link to this heading">¶</a></h3>
+<p>To add external authentication user, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">add-external-user</span></code> command line option,
+followed by email, password and authentication source. email, role and status will be optional fields.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>ldap
+
+<span class="c1"># to specify an email:</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>ldapuser<span class="w"> </span>ldap<span class="w"> </span>--email<span class="w"> </span>user1@gmail.com
+
+<span class="c1"># to specify a role, admin and non-admin user:</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>ldapuser<span class="w"> </span>ldap<span class="w">  </span>--admin
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>ldapuser<span class="w"> </span>ldap<span class="w">  </span>--nonadmin
+
+<span class="c1"># to specify user&#39;s status</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>ldap<span class="w"> </span>--active
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>add-external-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>ldap<span class="w"> </span>--inactive
+</pre></div>
+</div>
+</section>
+<section id="update-user">
+<h3>Update User<a class="headerlink" href="#update-user" title="Link to this heading">¶</a></h3>
+<p>To update user, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">update-user</span></code> command line option, followed by
+email address. password, role and active are updatable fields.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>--password<span class="w"> </span>new-password
+
+<span class="w"> </span><span class="c1"># to specify a role, admin and non-admin user:</span>
+
+<span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--role<span class="w"> </span>--admin
+<span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--role<span class="w"> </span>--nonadmin
+
+<span class="w"> </span><span class="c1"># to specify user&#39;s status</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--active
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--inactive
+</pre></div>
+</div>
+</section>
+<section id="update-external-user">
+<h3>Update External User<a class="headerlink" href="#update-external-user" title="Link to this heading">¶</a></h3>
+<p>To update the external user, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">update-external-user</span></code> command line option,
+followed by username and auth source. email, password, role and active are updatable fields.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c1"># to change email address:</span>
+
+<span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-external-user<span class="w"> </span>ldap<span class="w"> </span>ldapuser<span class="w"> </span>--email<span class="w"> </span>newemail@gmail.com
+
+<span class="w"> </span><span class="c1"># to specify a role, admin and non-admin user:</span>
+
+<span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--role<span class="w"> </span>--admin
+<span class="w"> </span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>password<span class="w"> </span>--role<span class="w"> </span>--nonadmin
+
+<span class="w"> </span><span class="c1"># to change user&#39;s status</span>
+
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>ldap<span class="w"> </span>ldapuser<span class="w"> </span>--active
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>update-user<span class="w"> </span>ldap<span class="w"> </span>ldapuser<span class="w"> </span>--inactive
+</pre></div>
+</div>
+</section>
+<section id="delete-user">
+<h3>Delete User<a class="headerlink" href="#delete-user" title="Link to this heading">¶</a></h3>
+<p>To delete the user, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">delete-user</span></code> command line option, followed by
+username and auth_source. For Internal users, email adress will be used instead of username. the option <code class="docutils literal notranslate"><span class="pre">--yes</span></code> is available to skip the confirmation prompt before deleting the user.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>delete-user<span class="w"> </span>user1@gmail.com<span class="w"> </span>--auth-source<span class="w"> </span>internal
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>delete-user<span class="w"> </span>user2@gmail.com<span class="w"> </span>--auth-source<span class="w"> </span>internal<span class="w"> </span>--yes
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>delete-user<span class="w"> </span>ldapuser<span class="w"> </span>--auth-source<span class="w"> </span>ldap
+</pre></div>
+</div>
+</section>
+<section id="get-user">
+<h3>Get User<a class="headerlink" href="#get-user" title="Link to this heading">¶</a></h3>
+<p>To get the user details, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">get-users</span></code> command line option, followed by
+username/email address.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># to list all the users:</span>
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>get-users
+
+<span class="c1"># to get the user&#39;s details:</span>
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>get-users<span class="w"> </span>--username<span class="w"> </span>user1@gmail.com
+</pre></div>
+</div>
+</section>
+<section id="output">
+<h3>Output<a class="headerlink" href="#output" title="Link to this heading">¶</a></h3>
+<p>Each command output can be seen in the json format too by adding –json command line option.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">User Management Dialog</a><ul>
+<li><a class="reference internal" href="#using-setup-py-command-line-script">Using ‘setup.py’ command line script</a><ul>
+<li><a class="reference internal" href="#manage-users">Manage Users</a></li>
+<li><a class="reference internal" href="#add-user">Add User</a></li>
+<li><a class="reference internal" href="#add-external-user">Add External User</a></li>
+<li><a class="reference internal" href="#update-user">Update User</a></li>
+<li><a class="reference internal" href="#update-external-user">Update External User</a></li>
+<li><a class="reference internal" href="#delete-user">Delete User</a></li>
+<li><a class="reference internal" href="#get-user">Get User</a></li>
+<li><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="login.html">Login Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mfa.html">Enabling two-factor authentication (2FA)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">User Management Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_ownership.html">Change Ownership Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_user_password.html">Change User Password Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restore_locked_user.html">Lock/Restore Account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldap.html">Enabling LDAP Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kerberos.html">Enabling Kerberos Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oauth2.html">Enabling OAUTH2 Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webserver.html">Enabling Webserver Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="menu_bar.html">Menu Bar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbar.html">Toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tabbed_browser.html">Tabbed Browser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tree_control.html">Tree Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preferences.html">Preferences Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keyboard_shortcuts.html">Keyboard Shortcuts:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="search_objects.html">Search objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="change_ownership.html" title="Change Ownership Dialog"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mfa.html" title="Enabling two-factor authentication (2FA)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" >Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">User Management Dialog</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="change_ownership.html" title="Change Ownership Dialog">next</a> |</li>
+            <li class="right" ><a href="mfa.html" title="Enabling two-factor authentication (2FA)">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

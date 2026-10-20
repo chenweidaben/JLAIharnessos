@@ -35,7 +35,7 @@ interface SearchReport {
 export default function EmrQuickPhrasePage() {
   const [base, setBase] = useState<QuickPhrase | null>(null);
   const [query, setQuery] = useState("胸闷");
-  const [phrases, setPhrases] = useState<PhraseItem[]>([
+  const [phrases] = useState<PhraseItem[]>([
     { id: "P1", text: "胸闷3天" },
     { id: "P2", text: "胸痛1周" },
     { id: "P3", text: "胸闷伴气短" },

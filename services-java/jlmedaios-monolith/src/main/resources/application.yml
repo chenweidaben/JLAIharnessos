@@ -5,37 +5,65 @@ spring:
   application:
     name: jlmedaios-os
   datasource:
-    # H2 内存库，DB_CLOSE_DELAY=-1 保持 JVM 期间不销毁
-    url: jdbc:h2:mem:monolith;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
+    # P3 生产化：主数据源切换 PostgreSQL 16
+    url: jdbc:postgresql://localhost:5433/jlmedaios
+    driver-class-name: org.postgresql.Driver
+    username: postgres
     password:
+    # HikariCP 连接池调优（P1 性能优化）
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
     open-in-view: false
+    # P3 生产化：PostgreSQL 方言
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   # encounter_record 表由 JPA 自动创建，append-only 约束由业务层保证
   h2:
     console:
-      enabled: true
+      # P0 安全止血：生产环境关闭 H2 Console
+      enabled: false
       path: /h2-console
   # H2 启动自动执行 schema.sql + data.sql
   sql:
     init:
       mode: always
-  # Flyway 迁移（H2 阶段关闭，生产 PostgreSQL 开启）
+  # Flyway 迁移（P2 阶段开启，H2 也兼容）
   flyway:
-    enabled: false
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  # Redis 缓存配置（P2 骨架）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 3000
   jackson:
     time-zone: Asia/Shanghai
 
 # 生产环境切换 PostgreSQL 16:
-#   spring.datasource.url=jdbc:postgresql://localhost:5432/monolith
-#   spring.datasource.username=postgres
-#   spring.datasource.password=***
-#   spring.datasource.driver-class-name=org.postgresql.Driver
-#   spring.flyway.enabled=true
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://localhost:5433/jlmedaios
+#     username: postgres
+#     password: ***
+#     driver-class-name: org.postgresql.Driver
+#     hikari:
+#       maximum-pool-size: 50
+#       minimum-idle: 10
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#   flyway:
+#     enabled: true
 # 后续可切达梦信创：
 #   spring.datasource.url=jdbc:dm://localhost:5236/monolith
 #   spring.datasource.driver-class-name=dm.jdbc.driver.DmDriver
@@ -51,3 +79,11 @@ logging:
   level:
     root: INFO
     com.jlmedaios: DEBUG
+
+# JWT 配置（P0 安全止血）
+jlmedaios:
+  security:
+    jwt:
+      secret: jlmedaios-dev-secret-key-change-in-production-32bytes
+      # token 有效期 24h
+      expiration: 86400000

@@ -1,0 +1,6 @@
+﻿/api/v1/lab/orders=ERR
+/api/v1/lab/results=ERR
+/api/v1/lab/reports=200
+/api/v1/radiology/orders=ERR
+/api/v1/radiology/results=ERR
+/api/v1/radiology/reports=ERR

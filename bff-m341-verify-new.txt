@@ -1,0 +1,6 @@
+﻿/api/v1/cds/alerts=200
+/api/v1/cds/interventions=200
+/api/v1/cds/guidelines=200
+/api/v1/cds/checklists=200
+/api/v1/cds/drugs-interaction=200
+/api/v1/cds/duplicate-therapy=200

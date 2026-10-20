@@ -17,10 +17,6 @@ interface ExportConfig {
   columns: string[];
 }
 
-interface FormattedRow {
-  row: string[];
-}
-
 const availableColumns = ["科室", "缺陷数", "评分", "整改率", "闭环率"];
 
 export default function EmrQcExportExcelPage() {

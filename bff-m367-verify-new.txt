@@ -1,0 +1,5 @@
+﻿/api/v1/pharmacy/dashboard=200
+/api/v1/pharmacy/inventory-detail=200
+/api/v1/pharmacy/suppliers=200
+/api/v1/pharmacy/warning=200
+/api/v1/pharmacy/expiry=200

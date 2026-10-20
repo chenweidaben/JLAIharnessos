@@ -1,0 +1,6 @@
+﻿/api/v1/tenant/list=200
+/api/v1/tenant/config=200
+/api/v1/tenant/data-isolation=200
+/api/v1/tenant/quota=200
+/api/v1/tenant/usage=200
+/api/v1/tenant/logs=200

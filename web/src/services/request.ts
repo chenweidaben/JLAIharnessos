@@ -70,6 +70,12 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
+  // v5.0试点扩展（M188白屏修复）：历史页面误把完整路径 '/api/v1/xxx' 传给 get()，
+  // 与 baseURL '/api/v1' 拼接后变成 '/api/v1/api/v1/xxx' → 404 白屏。
+  // 在此统一剥离重复前缀，避免逐页改动；绝对 URL（http/https）与无 baseURL 场景不动。
+  if (config.url && !/^https?:\/\//i.test(config.url)) {
+    config.url = config.url.replace(/^\/api\/v1(?=\/|$)/, '');
+  }
   const token = tokenStorage.getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

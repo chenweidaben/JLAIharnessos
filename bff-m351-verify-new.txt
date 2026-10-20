@@ -1,0 +1,6 @@
+﻿/api/v1/workflow/roles=200
+/api/v1/workflow/permissions=200
+/api/v1/workflow/approve=200
+/api/v1/workflow/notify=200
+/api/v1/workflow/escalation=200
+/api/v1/workflow/sla=200

@@ -81,9 +81,7 @@ public class LabWorkstationService {
     }
 
     private LabWorkItem findByWorkItemNo(String workItemNo) {
-        return labWorkItemRepository.findAll().stream()
-                .filter(i -> workItemNo.equals(i.getWorkItemNo()))
-                .findFirst()
-                .orElse(null);
+        // P3 性能优化：直接调用 Repository 派生查询
+        return labWorkItemRepository.findByWorkItemNo(workItemNo);
     }
 }

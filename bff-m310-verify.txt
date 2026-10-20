@@ -1,0 +1,2 @@
+﻿/api/v1/maternity/records=200
+/api/v1/newborn/records=200

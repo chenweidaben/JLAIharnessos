@@ -35,11 +35,8 @@ public class NursingAdvancedService {
     public List<NursingTask> todayTasks() {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
-        return nursingTaskRepository.findAll().stream()
-                .filter(t -> t.getPlannedTime() != null &&
-                        !t.getPlannedTime().isBefore(start) &&
-                        !t.getPlannedTime().isAfter(end))
-                .toList();
+        // P5 性能优化：直接调用 Repository 派生查询
+        return nursingTaskRepository.findByPlannedTimeBetween(start, end);
     }
 
     /**

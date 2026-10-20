@@ -1,0 +1,18 @@
+﻿workflow\tasks exists: True
+workflow\templates exists: True
+workflow\instances exists: False
+workflow\approval exists: False
+workflow\scheduling exists: False
+workflow\notifications exists: False
+OK /api/v1/workflow/tasks
+OK /api/v1/workflow/templates
+OK /api/v1/workflow/instances
+OK /api/v1/workflow/approval
+OK /api/v1/workflow/scheduling
+OK /api/v1/workflow/notifications
+route workflow/tasks : False
+route workflow/templates : False
+route workflow/instances : False
+route workflow/approval : False
+route workflow/scheduling : False
+route workflow/notifications : False

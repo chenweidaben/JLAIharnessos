@@ -1,0 +1,4 @@
+﻿/api/v1/finance/dashboard=200
+/api/v1/finance/costs=200
+/api/v1/finance/reports=200
+/api/v1/finance/analysis=200

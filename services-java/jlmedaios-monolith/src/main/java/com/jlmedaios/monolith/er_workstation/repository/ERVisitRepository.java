@@ -32,4 +32,12 @@ public interface ERVisitRepository extends JpaRepository<ERVisit, Long> {
      * @return 急诊就诊记录列表
      */
     List<ERVisit> findByPatientId(String patientId);
+
+    /**
+     * 按就诊编号查询急诊就诊记录（P1 性能优化：替代 findAll().filter()）。
+     *
+     * @param visitNo 就诊编号
+     * @return 急诊就诊记录
+     */
+    ERVisit findByVisitNo(String visitNo);
 }

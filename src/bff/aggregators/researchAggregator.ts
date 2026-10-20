@@ -300,6 +300,17 @@ export async function listResearchCohorts(
   auth: AuthView,
   options?: { status?: string },
 ): Promise<ResearchCohort[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示队列，避免页面「暂无数据」。
+  if (process.env.DEMO_MODE === '1') {
+    const demo: ResearchCohort[] = [
+      { id: 'demo-cohort-01', name: '冠心病稳定型心绞痛队列', disease: '冠心病', diseaseCode: 'I25.101', criteria: { include: ['年龄>=18', '确诊冠心病'], exclude: ['急性心梗<30天'] }, status: 'active', createdBy: 'u_2001', lastRunAt: '2026-10-18 09:00', lastRunAdded: 12, createdAt: '2026-09-01 10:00', updatedAt: '2026-10-18 09:00' } as ResearchCohort,
+      { id: 'demo-cohort-02', name: '2型糖尿病并发症随访队列', disease: '2型糖尿病', diseaseCode: 'E11.900', criteria: { include: ['糖尿病史>=1年'], exclude: ['1型糖尿病'] }, status: 'active', createdBy: 'u_2001', lastRunAt: '2026-10-17 14:00', lastRunAdded: 8, createdAt: '2026-09-05 11:00', updatedAt: '2026-10-17 14:00' } as ResearchCohort,
+      { id: 'demo-cohort-03', name: '社区获得性肺炎预后队列', disease: '肺炎', diseaseCode: 'J18.900', criteria: { include: ['出院诊断=肺炎'], exclude: ['院内获得性肺炎'] }, status: 'draft', createdBy: 'u_2001', lastRunAt: null, lastRunAdded: 0, createdAt: '2026-10-10 16:00', updatedAt: '2026-10-10 16:00' } as ResearchCohort,
+      { id: 'demo-cohort-04', name: '脑卒中二级预防队列', disease: '脑梗死', diseaseCode: 'I63.900', criteria: { include: ['脑梗死出院'], exclude: ['出血性卒中'] }, status: 'archived', createdBy: 'u_2001', lastRunAt: '2026-08-20 10:00', lastRunAdded: 25, createdAt: '2026-06-01 09:00', updatedAt: '2026-08-20 10:00' } as ResearchCohort,
+    ];
+    if (options?.status) return demo.filter((c) => c.status === options.status);
+    return demo;
+  }
   return listCohorts(options?.status ? { status: options.status } : undefined);
 }
 

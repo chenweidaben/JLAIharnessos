@@ -88,10 +88,8 @@ public class IcuWorkstationService {
     }
 
     private ICURecord findByRecordNo(String recordNo) {
-        return icuRecordRepository.findAll().stream()
-                .filter(r -> recordNo.equals(r.getRecordNo()))
-                .findFirst()
-                .orElse(null);
+        // P1 性能优化：直接调用 Repository 派生查询，替代 findAll().stream().filter()
+        return icuRecordRepository.findByRecordNo(recordNo);
     }
 
     // ==================== ICU 床位+评分管理（深化） ====================
@@ -160,9 +158,7 @@ public class IcuWorkstationService {
     }
 
     private ICUWorkItem findByWorkItemNo(String workItemNo) {
-        return icuWorkItemRepository.findAll().stream()
-                .filter(i -> workItemNo.equals(i.getWorkItemNo()))
-                .findFirst()
-                .orElse(null);
+        // P1 性能优化：直接调用 Repository 派生查询，替代 findAll().stream().filter()
+        return icuWorkItemRepository.findByWorkItemNo(workItemNo);
     }
 }

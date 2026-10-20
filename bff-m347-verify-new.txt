@@ -1,0 +1,3 @@
+﻿/api/v1/emr/sign-verify=200
+/api/v1/emr/sign-templates=200
+/api/v1/audit/trails=200

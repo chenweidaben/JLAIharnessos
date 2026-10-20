@@ -32,4 +32,12 @@ public interface RadiologyWorkItemRepository extends JpaRepository<RadiologyWork
      * @return 影像工作项列表
      */
     List<RadiologyWorkItem> findByPatientId(String patientId);
+
+    /**
+     * 按工作项编号查询影像工作项（P3 性能优化：替代 findAll().filter()）。
+     *
+     * @param workItemNo 工作项编号
+     * @return 影像工作项
+     */
+    RadiologyWorkItem findByWorkItemNo(String workItemNo);
 }

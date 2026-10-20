@@ -33,4 +33,12 @@ public interface PainRecordRepository extends JpaRepository<PainRecord, Long> {
      * @return 疼痛评估记录列表
      */
     List<PainRecord> findByPatientId(String patientId);
+
+    /**
+     * 按记录编号查询疼痛评估记录（P3 性能优化：替代 findAll().filter()）。
+     *
+     * @param recordNo 记录编号
+     * @return 疼痛评估记录
+     */
+    PainRecord findByRecordNo(String recordNo);
 }

@@ -1,0 +1,5 @@
+﻿/api/v1/orders/detail=200
+/api/v1/orders/templates=200
+/api/v1/prescriptions/list=200
+/api/v1/prescriptions/detail=200
+/api/v1/prescriptions/audit=200

@@ -60,7 +60,7 @@ export default function EmrQcAiSimilarRecordPage() {
           >
             <List
               dataSource={report.records}
-              renderItem={(item, index) => (
+              renderItem={(item) => (
                 <List.Item>
                   <Text strong style={{ width: 100 }}>{item.id}</Text>
                   <Tag color={VI.accent} style={{ width: 80 }}>{item.dept}</Tag>

@@ -14,4 +14,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface DrugStockRepository extends JpaRepository<DrugStock, Long> {
+
+    /**
+     * 按药品编码查询药品库存（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param drugCode 药品编码
+     * @return 药品库存
+     */
+    DrugStock findByDrugCode(String drugCode);
 }

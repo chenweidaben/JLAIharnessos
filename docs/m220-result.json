@@ -1,0 +1,10 @@
+﻿{
+    "serverErr500":  0,
+    "ok200":  160,
+    "total":  160,
+    "notFound404":  0,
+    "passRate":  100,
+    "failed":  [
+
+               ]
+}

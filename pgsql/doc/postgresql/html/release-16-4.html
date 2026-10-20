@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>E.1. Release 16.4</title><link rel="stylesheet" type="text/css" href="stylesheet.css" /><link rev="made" href="pgsql-docs@lists.postgresql.org" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /><link rel="prev" href="release.html" title="Appendix E. Release Notes" /><link rel="next" href="release-16-3.html" title="E.2. Release 16.3" /></head><body id="docContent" class="container-fluid col-10"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="5" align="center">E.1. Release 16.4</th></tr><tr><td width="10%" align="left"><a accesskey="p" href="release.html" title="Appendix E. Release Notes">Prev</a> </td><td width="10%" align="left"><a accesskey="u" href="release.html" title="Appendix E. Release Notes">Up</a></td><th width="60%" align="center">Appendix E. Release Notes</th><td width="10%" align="right"><a accesskey="h" href="index.html" title="PostgreSQL 16.4 Documentation">Home</a></td><td width="10%" align="right"> <a accesskey="n" href="release-16-3.html" title="E.2. Release 16.3">Next</a></td></tr></table><hr /></div><div class="sect1" id="RELEASE-16-4"><div class="titlepage"><div><div><h2 class="title" style="clear: both">E.1. Release 16.4 <a href="#RELEASE-16-4" class="id_link">#</a></h2></div></div></div><div class="toc"><dl class="toc"><dt><span class="sect2"><a href="release-16-4.html#RELEASE-16-4-MIGRATION">E.1.1. Migration to Version 16.4</a></span></dt><dt><span class="sect2"><a href="release-16-4.html#RELEASE-16-4-CHANGES">E.1.2. Changes</a></span></dt></dl></div><p><strong>Release date: </strong>2024-08-08</p><p>
+   This release contains a variety of fixes from 16.3.
+   For information about new features in major release 16, see
+   <a class="xref" href="release-16.html" title="E.5. Release 16">Section E.5</a>.
+  </p><div class="sect2" id="RELEASE-16-4-MIGRATION"><div class="titlepage"><div><div><h3 class="title">E.1.1. Migration to Version 16.4 <a href="#RELEASE-16-4-MIGRATION" class="id_link">#</a></h3></div></div></div><p>
+    A dump/restore is not required for those running 16.X.
+   </p><p>
+    However, if you are upgrading from a version earlier than 16.3,
+    see <a class="xref" href="release-16-3.html" title="E.2. Release 16.3">Section E.2</a>.
+   </p></div><div class="sect2" id="RELEASE-16-4-CHANGES"><div class="titlepage"><div><div><h3 class="title">E.1.2. Changes <a href="#RELEASE-16-4-CHANGES" class="id_link">#</a></h3></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+      Prevent unauthorized code execution
+      during <span class="application">pg_dump</span> (Masahiko Sawada)
+     </p><p>
+      An attacker able to create and drop non-temporary objects could
+      inject SQL code that would be executed by a
+      concurrent <span class="application">pg_dump</span> session with the
+      privileges of the role running <span class="application">pg_dump</span>
+      (which is often a superuser).  The attack involves replacing a
+      sequence or similar object with a view or foreign table that will
+      execute malicious code.  To prevent this, introduce a new server
+      parameter <code class="varname">restrict_nonsystem_relation_kind</code> that
+      can disable expansion of non-builtin views as well as access to
+      foreign tables, and teach <span class="application">pg_dump</span> to set
+      it when available.  Note that the attack is prevented only if
+      both <span class="application">pg_dump</span> and the server it is dumping
+      from are new enough to have this fix.
+     </p><p>
+      The <span class="productname">PostgreSQL</span> Project thanks
+      Noah Misch for reporting this problem.
+      (CVE-2024-7348)
+     </p></li><li class="listitem"><p>
+      Avoid incorrect results from Merge Right Anti Join plans
+      (Richard Guo)
+     </p><p>
+      If the inner relation is known to have unique join keys, the merge
+      could misbehave when there are duplicated join keys in the outer
+      relation.
+     </p></li><li class="listitem"><p>
+      Prevent infinite loop in <code class="command">VACUUM</code>
+      (Melanie Plageman)
+     </p><p>
+      After a disconnected standby server with an old running transaction
+      reconnected to the primary, it was possible
+      for <code class="command">VACUUM</code> on the primary to get confused about
+      which tuples are removable, resulting in an infinite loop.
+     </p></li><li class="listitem"><p>
+      Fix failure after attaching a table as a partition, if the
+      table had previously had inheritance children
+      (Álvaro Herrera)
+     </p></li><li class="listitem"><p>
+      Fix <code class="command">ALTER TABLE DETACH PARTITION</code> for cases
+      involving inconsistent index-based constraints
+      (Álvaro Herrera, Tender Wang)
+     </p><p>
+      When a partitioned table has an index that is not associated with a
+      constraint, but a partition has an equivalent index that is, then
+      detaching the partition would misbehave, leaving the ex-partition's
+      constraint with an incorrect <code class="structfield">coninhcount</code>
+      value.  This would cause trouble during any further manipulations of
+      that constraint.
+     </p></li><li class="listitem"><p>
+      Fix partition pruning setup during <code class="literal">ALTER TABLE DETACH
+      PARTITION CONCURRENTLY</code> (Álvaro Herrera)
+     </p><p>
+      The executor assumed that no partition could be detached between
+      planning and execution of a query on a partitioned table.  This is
+      no longer true since the introduction of <code class="literal">DETACH
+      PARTITION</code>'s <code class="literal">CONCURRENTLY</code> option, making
+      it possible for query execution to fail transiently when that is
+      used.
+     </p></li><li class="listitem"><p>
+      Correctly update a partitioned table's
+      <code class="structname">pg_class</code>.<code class="structfield">reltuples</code>
+      field to zero after its last child partition is dropped (Noah Misch)
+     </p><p>
+      The first <code class="command">ANALYZE</code> on such a partitioned table
+      must update <code class="structfield">relhassubclass</code> as well, and
+      that caused the <code class="structfield">reltuples</code> update to be
+      lost.
+     </p></li><li class="listitem"><p>
+      Fix handling of polymorphic output arguments for procedures
+      (Tom Lane)
+     </p><p>
+      The SQL <code class="command">CALL</code> statement did not resolve the
+      correct data types for such arguments, leading to errors such
+      as <span class="quote">“<span class="quote">cannot display a value of type anyelement</span>”</span>, or even
+      outright crashes.  (But <code class="command">CALL</code>
+      in <span class="application">PL/pgSQL</span> worked correctly.)
+     </p></li><li class="listitem"><p>
+      Fix behavior of stable functions called from
+      a <code class="command">CALL</code> statement's argument list (Tom Lane)
+     </p><p>
+      If the <code class="command">CALL</code> is within an atomic context
+      (e.g. there's an outer transaction block), such functions were
+      passed the wrong snapshot, causing them to see stale values of rows
+      modified since the start of the outer transaction.
+     </p></li><li class="listitem"><p>
+      Fix input of ISO-8601 <span class="quote">“<span class="quote">extended</span>”</span> time format for
+      types <code class="type">time</code> and <code class="type">timetz</code> (Tom Lane)
+     </p><p>
+      Re-allow cases such as <code class="literal">T12:34:56</code>.
+     </p></li><li class="listitem"><p>
+      Detect integer overflow in <code class="type">money</code> calculations
+      (Joseph Koshakow)
+     </p><p>
+      None of the arithmetic functions for the <code class="type">money</code> type
+      checked for overflow before, so they would silently give wrong
+      answers for overflowing cases.
+     </p></li><li class="listitem"><p>
+      Fix over-aggressive clamping of the scale argument
+      in <code class="function">round(numeric)</code>
+      and <code class="function">trunc(numeric)</code> (Dean Rasheed)
+     </p><p>
+      These functions clamped their scale argument to +/-2000, but there
+      are valid use-cases for it to be larger; the functions returned
+      incorrect results in such cases.  Instead clamp to the actual
+      allowed range of type <code class="type">numeric</code>.
+     </p></li><li class="listitem"><p>
+      Fix result for <code class="function">pg_size_pretty()</code> when applied to
+      the smallest possible <code class="type">bigint</code> value (Joseph Koshakow)
+     </p></li><li class="listitem"><p>
+      Prevent <code class="function">pg_sequence_last_value()</code> from failing
+      on unlogged sequences on standby servers and on temporary sequences
+      of other sessions (Nathan Bossart)
+     </p><p>
+      Make it return NULL in these cases instead of throwing an error.
+     </p></li><li class="listitem"><p>
+      Fix parsing of ignored operators
+      in <code class="function">websearch_to_tsquery()</code> (Tom Lane)
+     </p><p>
+      Per the manual, punctuation in the input
+      of <code class="function">websearch_to_tsquery()</code> is ignored except for
+      the special cases of dashes and quotes.  However, parentheses and a
+      few other characters appearing immediately before
+      an <code class="literal">or</code> could cause <code class="literal">or</code> to be
+      treated as a data word, rather than as an <code class="literal">OR</code>
+      operator as expected.
+     </p></li><li class="listitem"><p>
+      Detect another integer overflow case while computing new array
+      dimensions (Joseph Koshakow)
+     </p><p>
+      Reject applying array
+      dimensions <code class="literal">[-2147483648:2147483647]</code> to an empty
+      array.  This is closely related to CVE-2023-5869, but appears
+      harmless since the array still ends up empty.
+     </p></li><li class="listitem"><p>
+      Fix unportable usage of <code class="function">strnxfrm()</code> (Jeff Davis)
+     </p><p>
+      Some code paths for non-deterministic collations could fail with
+      errors like <span class="quote">“<span class="quote">pg_strnxfrm() returned unexpected result</span>”</span>.
+     </p></li><li class="listitem"><p>
+      Detect another case of a new catalog cache entry becoming stale
+      while detoasting its fields (Noah Misch)
+     </p><p>
+      An in-place update occurring while we expand out-of-line fields in a
+      catalog tuple could be missed, leading to a catalog cache entry that
+      lacks the in-place change but is not known to be stale.  This is
+      only possible in the <code class="structname">pg_database</code> catalog,
+      so the effects are narrow, but misbehavior is possible.
+     </p></li><li class="listitem"><p>
+      Correctly check updatability of view columns targeted
+      by <code class="literal">INSERT</code> ... <code class="literal">DEFAULT</code>
+      (Tom Lane)
+     </p><p>
+      If such a column is non-updatable, we should give an error reporting
+      that.  But the check was missed and then later code would report an
+      unhelpful error such as <span class="quote">“<span class="quote">attribute
+      number <em class="replaceable"><code>N</code></em> not found in view
+      targetlist</span>”</span>.
+     </p></li><li class="listitem"><p>
+      Avoid reporting an unhelpful internal error for incorrect recursive
+      queries (Tom Lane)
+     </p><p>
+      Rearrange the order of error checks so that we throw an on-point
+      error when a <code class="command">WITH RECURSIVE</code> query does not have a
+      self-reference within the second arm of
+      the <code class="literal">UNION</code>, but does have one self-reference in
+      some other place such as <code class="literal">ORDER BY</code>.
+     </p></li><li class="listitem"><p>
+      Lock owned sequences during <code class="literal">ALTER TABLE SET
+      LOGGED|UNLOGGED</code> (Noah Misch)
+     </p><p>
+      These commands change the persistence of a table's owned sequences
+      along with the table, but they failed to acquire lock on the
+      sequences while doing so.  This could result in losing the effects
+      of concurrent <code class="function">nextval()</code> calls.
+     </p></li><li class="listitem"><p>
+      Don't throw an error if a queued <code class="literal">AFTER</code> trigger no
+      longer exists (Tom Lane)
+     </p><p>
+      It's possible for a transaction to execute an operation that queues
+      a deferred <code class="literal">AFTER</code> trigger for later execution, and
+      then to drop the trigger before that happens.  Formerly this led to
+      weird errors such as <span class="quote">“<span class="quote">could not find
+      trigger <em class="replaceable"><code>NNNN</code></em></span>”</span>.  It seems better to
+      silently do nothing if the trigger no longer exists at the time when
+      it would have been executed.
+     </p></li><li class="listitem"><p>
+      Fix failure to remove <code class="structname">pg_init_privs</code> entries
+      for column-level privileges when their table is dropped (Tom Lane)
+     </p><p>
+      If an extension grants some column-level privileges on a table it
+      creates, relevant catalog entries would remain behind after the
+      extension is dropped.  This was harmless until/unless the table's
+      OID was re-used for another relation, when it could interfere with
+      what <span class="application">pg_dump</span> dumps for that relation.
+     </p></li><li class="listitem"><p>
+      Fix selection of an arbiter index for <code class="literal">ON CONFLICT</code>
+      when the desired index has expressions or predicates (Tom Lane)
+     </p><p>
+      If a query using <code class="literal">ON CONFLICT</code> accesses the target
+      table through an updatable view, it could fail with <span class="quote">“<span class="quote">there is
+      no unique or exclusion constraint matching the ON CONFLICT
+      specification</span>”</span>, even though a matching index does exist.
+     </p></li><li class="listitem"><p>
+      Refuse to modify a temporary table of another session
+      with <code class="literal">ALTER TABLE</code> (Tom Lane)
+     </p><p>
+      Permissions checks normally would prevent this case from arising,
+      but it is possible to reach it by altering a parent table whose
+      child is another session's temporary table.  Throw an error if we
+      discover that such a child table belongs to another session.
+     </p></li><li class="listitem"><p>
+      Fix handling of extended statistics on expressions
+      in <code class="literal">CREATE TABLE LIKE STATISTICS</code> (Tom Lane)
+     </p><p>
+      The <code class="literal">CREATE</code> command failed to adjust column
+      references in statistics expressions to the possibly-different
+      column numbering of the new table.  This resulted in invalid
+      statistics objects that would cause problems later.  A typical
+      scenario where renumbering columns is needed is when the source
+      table contains some dropped columns.
+     </p></li><li class="listitem"><p>
+      Fix failure to recalculate sub-queries generated
+      from <code class="function">MIN()</code> or <code class="function">MAX()</code>
+      aggregates (Tom Lane)
+     </p><p>
+      In some cases the aggregate result computed at one row of the outer
+      query could be re-used for later rows when it should not be.  This
+      has only been seen to happen when the outer query uses
+      <code class="literal">DISTINCT</code> that is implemented with hash
+      aggregation, but other cases may exist.
+     </p></li><li class="listitem"><p>
+      Re-forbid underscore in positional parameters (Erik Wienhold)
+     </p><p>
+      As of v16 we allow integer literals to contain underscores.
+      This change caused input such as <code class="literal">$1_234</code>
+      to be taken as a single token, but it did not work correctly.
+      It seems better to revert to the original definition in which a
+      parameter symbol is only <code class="literal">$</code> followed by digits.
+     </p></li><li class="listitem"><p>
+      Avoid crashing when a JIT-inlined backend function throws an error
+      (Tom Lane)
+     </p><p>
+      The error state can include pointers into the dynamically loaded
+      module holding the JIT-compiled code (for error location strings).
+      In some code paths the module could get unloaded before the error
+      report is processed, leading to SIGSEGV when the location strings
+      are accessed.
+     </p></li><li class="listitem"><p>
+      Cope with behavioral changes in <span class="application">libxml2</span>
+      version 2.13.x (Erik Wienhold, Tom Lane)
+     </p><p>
+      Notably, we now suppress <span class="quote">“<span class="quote">chunk is not well balanced</span>”</span>
+      errors from <span class="application">libxml2</span>, unless that is the
+      only reported error.  This is to make error reports consistent
+      between 2.13.x and earlier <span class="application">libxml2</span>
+      versions.  In earlier versions, that message was almost always
+      redundant or outright incorrect, so 2.13.x substantially reduced the
+      number of cases in which it's reported.
+     </p></li><li class="listitem"><p>
+      Fix handling of subtransactions of prepared transactions
+      when starting a hot standby server (Heikki Linnakangas)
+     </p><p>
+      When starting a standby's replay at a shutdown checkpoint WAL
+      record, transactions that had been prepared but not yet committed on
+      the primary are correctly understood as being still in progress.
+      But subtransactions of a prepared transaction (created by savepoints
+      or <span class="application">PL/pgSQL</span> exception blocks) were not
+      accounted for and would be treated as aborted.  That led to
+      inconsistency if the prepared transaction was later committed.
+     </p></li><li class="listitem"><p>
+      Prevent incorrect initialization of logical replication slots
+      (Masahiko Sawada)
+     </p><p>
+      In some cases a replication slot's start point within the WAL stream
+      could be set to a point within a transaction, leading to assertion
+      failures or incorrect decoding results.
+     </p></li><li class="listitem"><p>
+      Avoid <span class="quote">“<span class="quote">can only drop stats once</span>”</span> error during
+      replication slot creation and drop (Floris Van Nee)
+     </p></li><li class="listitem"><p>
+      Fix resource leakage in logical replication WAL sender (Hou Zhijie)
+     </p><p>
+      The walsender process leaked memory when publishing changes to a
+      partitioned table whose partitions have row types physically
+      different from the partitioned table's.
+     </p></li><li class="listitem"><p>
+      Avoid memory leakage after servicing a notify or sinval interrupt
+      (Tom Lane)
+     </p><p>
+      The processing functions for these events could switch the current
+      memory context to TopMemoryContext, resulting in session-lifespan
+      leakage of any data allocated before the incorrect setting gets
+      replaced.  There were observable leaks associated with (at least)
+      encoding conversion of incoming queries and parameters attached to
+      Bind messages.
+     </p></li><li class="listitem"><p>
+      Prevent leakage of reference counts for the shared memory block used
+      for statistics (Anthonin Bonnefoy)
+     </p><p>
+      A new backend process attaching to the statistics shared memory
+      incremented its reference count, but failed to decrement the count
+      when exiting.  After 2<sup>32</sup> sessions had
+      been created, the reference count would overflow to zero, causing
+      failures in all subsequent backend process starts.
+     </p></li><li class="listitem"><p>
+      Prevent deadlocks and assertion failures during truncation of the
+      multixact SLRU log (Heikki Linnakangas)
+     </p><p>
+      A process trying to delete SLRU segments could deadlock with the
+      checkpointer process.
+     </p></li><li class="listitem"><p>
+      Avoid possibly missing end-of-input events on Windows sockets
+      (Thomas Munro)
+     </p><p>
+      Windows reports an FD_CLOSE event only once after the remote end of
+      the connection disconnects.  With unlucky timing, we could miss that
+      report and wait indefinitely, or at least until a timeout elapsed,
+      expecting more input.
+     </p></li><li class="listitem"><p>
+      Fix buffer overread in JSON parse error reports for incomplete byte
+      sequences (Jacob Champion)
+     </p><p>
+      It was possible to walk off the end of the input buffer by a few
+      bytes when the last bytes comprise an incomplete multi-byte
+      character.  While usually harmless, in principle this could cause a
+      crash.
+     </p></li><li class="listitem"><p>
+      Disable creation of stateful TLS session tickets by OpenSSL
+      (Daniel Gustafsson)
+     </p><p>
+      This avoids possible failures with clients that think receipt of
+      a session ticket means that TLS session resumption is supported.
+     </p></li><li class="listitem"><p>
+      When replanning a <span class="application">PL/pgSQL</span> <span class="quote">“<span class="quote">simple
+      expression</span>”</span>, check it's still simple (Tom Lane)
+     </p><p>
+      Certain fairly-artificial cases, such as dropping a referenced
+      function and recreating it as an aggregate, could lead to surprising
+      failures such as <span class="quote">“<span class="quote">unexpected plan node type</span>”</span>.
+     </p></li><li class="listitem"><p>
+      Fix <span class="application">PL/pgSQL</span>'s handling of integer ranges
+      containing underscores (Erik Wienhold)
+     </p><p>
+      As of v16 we allow integer literals to contain underscores,
+      but <span class="application">PL/pgSQL</span> failed to handle examples
+      such as <code class="literal">FOR i IN 1_001..1_003</code>.
+     </p></li><li class="listitem"><p>
+      Fix recursive <code class="type">RECORD</code>-returning
+      <span class="application">PL/Python</span> functions (Tom Lane)
+     </p><p>
+      If we recurse to a new call of the same function that passes a
+      different column definition list (<code class="literal">AS</code> clause), it
+      would fail because the inner call would overwrite the outer call's
+      idea of what rowtype to return.
+     </p></li><li class="listitem"><p>
+      Don't corrupt <span class="application">PL/Python</span>'s
+      <code class="literal">TD</code> dictionary during a recursive trigger call
+      (Tom Lane)
+     </p><p>
+      If a <span class="application">PL/Python</span>-language trigger caused
+      another one to be invoked, the <code class="literal">TD</code> dictionary
+      created for the inner one would overwrite the outer
+      one's <code class="literal">TD</code> dictionary.
+     </p></li><li class="listitem"><p>
+      Fix <span class="application">PL/Tcl</span>'s reporting of invalid list
+      syntax in the result of a function returning tuple (Erik Wienhold,
+      Tom Lane)
+     </p><p>
+      Such a case could result in a crash, or in emission of misleading
+      context information that actually refers to the previous Tcl error.
+     </p></li><li class="listitem"><p>
+      Avoid non-thread-safe usage of <code class="function">strerror()</code>
+      in <span class="application">libpq</span> (Peter Eisentraut)
+     </p><p>
+      Certain error messages returned by OpenSSL could become garbled in
+      multi-threaded applications.
+     </p></li><li class="listitem"><p>
+      Avoid memory leak within <span class="application">pg_dump</span> during a
+      binary upgrade (Daniel Gustafsson)
+     </p></li><li class="listitem"><p>
+      Ensure that <code class="literal">pg_restore</code> <code class="option">-l</code>
+      reports dependent TOC entries correctly (Tom Lane)
+     </p><p>
+      If <code class="option">-l</code> was specified together with selective-restore
+      options such as <code class="option">-n</code> or <code class="option">-N</code>,
+      dependent TOC entries such as comments would be omitted from the
+      listing, even when an actual restore would have selected them.
+     </p></li><li class="listitem"><p>
+      Allow <code class="filename">contrib/pg_stat_statements</code> to distinguish
+      among utility statements appearing within SQL-language functions
+      (Anthonin Bonnefoy)
+     </p><p>
+      The SQL-language function executor failed to pass along the query ID
+      that is computed for a utility
+      (non <code class="command">SELECT</code>/<code class="command">INSERT</code>/<code class="command">UPDATE</code>/<code class="command">DELETE</code>/<code class="command">MERGE</code>)
+      statement.
+     </p></li><li class="listitem"><p>
+      Avoid <span class="quote">“<span class="quote">cursor can only scan forward</span>”</span> error
+      in <code class="filename">contrib/postgres_fdw</code> (Etsuro Fujita)
+     </p><p>
+      This error could occur if the remote server is v15 or later
+      and a foreign table is mapped to a non-trivial remote view.
+     </p></li><li class="listitem"><p>
+      In <code class="filename">contrib/postgres_fdw</code>, do not
+      send <code class="literal">FETCH FIRST WITH TIES</code> clauses to the remote
+      server (Japin Li)
+     </p><p>
+      The remote server might not implement this clause, or might
+      interpret it differently than we would locally, so don't risk
+      attempting remote execution.
+     </p></li><li class="listitem"><p>
+      Avoid clashing with
+      system-provided <code class="filename">&lt;regex.h&gt;</code> headers
+      (Thomas Munro)
+     </p><p>
+      This fixes a compilation failure on macOS version 15 and up.
+     </p></li><li class="listitem"><p>
+      Fix otherwise-harmless assertion failure in Memoize cost estimation
+      (David Rowley)
+     </p></li><li class="listitem"><p>
+      Fix otherwise-harmless assertion failures in <code class="literal">REINDEX
+      CONCURRENTLY</code> applied to an SP-GiST index (Tom Lane)
+     </p></li></ul></div></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="release.html" title="Appendix E. Release Notes">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="release.html" title="Appendix E. Release Notes">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="release-16-3.html" title="E.2. Release 16.3">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Appendix E. Release Notes </td><td width="20%" align="center"><a accesskey="h" href="index.html" title="PostgreSQL 16.4 Documentation">Home</a></td><td width="40%" align="right" valign="top"> E.2. Release 16.3</td></tr></table></div></body></html>

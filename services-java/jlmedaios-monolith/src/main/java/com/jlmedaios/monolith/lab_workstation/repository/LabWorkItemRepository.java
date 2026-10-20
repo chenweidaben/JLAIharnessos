@@ -32,4 +32,12 @@ public interface LabWorkItemRepository extends JpaRepository<LabWorkItem, Long> 
      * @return 检验工作项列表
      */
     List<LabWorkItem> findByPatientId(String patientId);
+
+    /**
+     * 按工作项编号查询检验工作项（P3 性能优化：替代 findAll().filter()）。
+     *
+     * @param workItemNo 工作项编号
+     * @return 检验工作项
+     */
+    LabWorkItem findByWorkItemNo(String workItemNo);
 }

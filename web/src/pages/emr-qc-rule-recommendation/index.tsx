@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, List, Tag, Typography, message } from "antd";
-import type { RuleRecommendationV14, RecommendationContextV14, RecommendationResultV14, RecommendationReportV14 } from "../../src/bff/aggregators/emrQcRuleRecommendationV14Aggregator";
+import type { RuleRecommendationV14, RecommendationContextV14, RecommendationResultV14, RecommendationReportV14 } from "@/bff/aggregators/emrQcRuleRecommendationV14Aggregator";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -23,7 +23,7 @@ const DEFAULT_CANDIDATE_RULES = [
 
 export default function EmrQcRuleRecommendationPage() {
   const [recommendation, setRecommendation] = useState<RuleRecommendationV14 | null>(null);
-  const [context, setContext] = useState<RecommendationContextV14>({ dept: "心内科", recordType: "入院记录" });
+  const [context] = useState<RecommendationContextV14>({ dept: "心内科", recordType: "入院记录" });
   const [candidateRules] = useState<string[]>(DEFAULT_CANDIDATE_RULES);
   const [result, setResult] = useState<RecommendationResultV14 | null>(null);
   const [report, setReport] = useState<RecommendationReportV14 | null>(null);
@@ -112,7 +112,7 @@ export default function EmrQcRuleRecommendationPage() {
                 dataSource={result.recommended}
                 renderItem={(item) => (
                   <List.Item>
-                    <Tag color="blue">{item}</Tag>
+                    <Tag color="blue">{String(item)}</Tag>
                   </List.Item>
                 )}
               />

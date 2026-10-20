@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Col, Layout, Row, Spin, Statistic, Typography } from "antd";
+import { Card, Col, Empty, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
 const { Content } = Layout;
@@ -56,6 +56,28 @@ export default function StatisticsReportPage() {
             </Col>
           </Row>
         )}
+        {/* v5.0试点扩展（M208薄页补表）：近期统计报表 demo */}
+        <Card style={{ marginTop: 16 }} title="近期统计报表">
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={false}
+            dataSource={[
+              { id: 1, name: "门诊工作量月报", period: "2026-09", submitted: "2026-10-05", status: "已上报" },
+              { id: 2, name: "住院死亡率季报", period: "2026Q3", submitted: "2026-10-08", status: "已上报" },
+              { id: 3, name: "DRG 分组分析", period: "2026-09", submitted: "—", status: "编制中" },
+              { id: 4, name: "抗菌药物使用监测", period: "2026-09", submitted: "2026-10-10", status: "已上报" },
+              { id: 5, name: "手术并发症月报", period: "2026-09", submitted: "—", status: "待审核" },
+            ]}
+            columns={[
+              { title: "报表名称", dataIndex: "name" },
+              { title: "周期", dataIndex: "period" },
+              { title: "上报日期", dataIndex: "submitted" },
+              { title: "状态", dataIndex: "status", render: (s: string) => <Tag color={s === "已上报" ? "green" : s === "编制中" ? "orange" : "blue"}>{s}</Tag> },
+            ]}
+            locale={{ emptyText: <Empty description="暂无报表" /> }}
+          />
+        </Card>
       </Content>
     </Layout>
   );

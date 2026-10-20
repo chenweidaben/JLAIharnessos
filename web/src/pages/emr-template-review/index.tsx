@@ -6,7 +6,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Button, Card, Layout, message, Spin, Table, Tag, Typography } from "antd";
+import { Button, Card, Layout, message, Table, Tag, Typography } from "antd";
 import type { ReviewRecordV14 } from "@/bff/aggregators/emrTemplateReviewV14Aggregator";
 
 const { Content } = Layout;

@@ -26,7 +26,7 @@ interface WritingStandardReport {
 
 export default function EmrWritingStandardCheckPage() {
   const [content, setContent] = useState("");
-  const [result, setResult] = useState<WritingStandardResult | null>(null);
+  const [, setResult] = useState<WritingStandardResult | null>(null);
   const [report, setReport] = useState<WritingStandardReport | null>(null);
 
   const check = async () => {

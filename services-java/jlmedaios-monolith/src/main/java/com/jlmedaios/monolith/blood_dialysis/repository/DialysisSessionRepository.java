@@ -32,4 +32,12 @@ public interface DialysisSessionRepository extends JpaRepository<DialysisSession
      * @return 透析记录列表
      */
     List<DialysisSession> findByPatientId(String patientId);
+
+    /**
+     * 按透析编号查询透析记录（P1 性能优化：替代 findAll().filter()）。
+     *
+     * @param sessionNo 透析编号
+     * @return 透析记录
+     */
+    DialysisSession findBySessionNo(String sessionNo);
 }

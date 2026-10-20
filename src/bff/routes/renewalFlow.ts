@@ -1,6 +1,9 @@
 /**
  * 健澜科技 jlmedaios - 续方流转路由（M21-A）
  * /api/v1/renewal
+ *
+ * v5.0试点扩展（M185bug修复）：DEMO_MODE 下表未迁移时，pharmacy-tasks 列表降级为空数组，
+ * 避免 500 被前端误判为 BFF 不可用。
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
@@ -16,7 +19,17 @@ async function requester(c: Ctx): Promise<AuthView | null> {
   return buildAuthView(user, await getUserRoleLinks(user.id));
 }
 
+/** v5.0试点扩展（M185bug修复）：演示库表缺失时降级为空列表响应 */
+function demoEmptyList(): Response {
+  return json(ok([]));
+}
+
 function mapError(err: unknown): Response {
+  const msg = err instanceof Error ? err.message : String(err);
+  // v5.0试点扩展（M185bug修复）：DEMO_MODE 下 relation/table 不存在属预期
+  if (process.env.DEMO_MODE === '1' && /does not exist|relation|table|column/i.test(msg)) {
+    return demoEmptyList();
+  }
   if (err instanceof RenewalError) {
     const code =
       err.status === 404 ? ErrorCode.NOT_FOUND

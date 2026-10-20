@@ -9,10 +9,8 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   Card,
-  Col,
   Layout,
   List,
-  Row,
   Spin,
   Table,
   Tag,

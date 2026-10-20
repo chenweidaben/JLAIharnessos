@@ -1,0 +1,8 @@
+﻿/api/v1/surgery/orders=ERR
+/api/v1/surgery/schedule=200
+/api/v1/surgery/records=ERR
+/api/v1/anesthesia/records=200
+/api/v1/nursing/rounds=ERR
+/api/v1/nursing/plans=ERR
+/api/v1/nursing/records=200
+/api/v1/nursing/quality=200

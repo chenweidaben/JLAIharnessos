@@ -1,0 +1,6 @@
+﻿PatientProfilePage lazy: True
+PatientVisitsPage lazy: False
+PatientAllergiesPage lazy: True
+PatientMedicationsPage lazy: False
+PatientLabsPage lazy: False
+PatientImagingPage lazy: False

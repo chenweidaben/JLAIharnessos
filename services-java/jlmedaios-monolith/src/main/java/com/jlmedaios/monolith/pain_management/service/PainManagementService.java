@@ -132,9 +132,7 @@ public class PainManagementService {
     }
 
     private PainRecord findByRecordNo(String recordNo) {
-        return painRecordRepository.findAll().stream()
-                .filter(r -> recordNo.equals(r.getRecordNo()))
-                .findFirst()
-                .orElse(null);
+        // P3 性能优化：直接调用 Repository 派生查询
+        return painRecordRepository.findByRecordNo(recordNo);
     }
 }

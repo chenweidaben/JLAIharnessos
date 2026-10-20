@@ -1,0 +1,6 @@
+﻿/api/v1/patient/profile=200
+/api/v1/patient/visits=200
+/api/v1/patient/allergies=200
+/api/v1/patient/medications=200
+/api/v1/patient/labs=ERR
+/api/v1/patient/imaging=ERR

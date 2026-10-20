@@ -1,0 +1,4 @@
+﻿/api/v1/emr/templates-detail=200
+/api/v1/emr/quality-check=200
+/api/v1/emr/retrieval=200
+/api/v1/emr/archive=200

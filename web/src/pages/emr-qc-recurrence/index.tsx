@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { Card, Layout, Statistic, Table, Tag, Typography, message } from "antd";
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const VI = { deep: "#0A2540", mid: "#1E5F8C", accent: "#4A90D9", bg: "#f5f7fa" };
 
 interface Detection {

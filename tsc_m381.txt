@@ -1,0 +1,12 @@
+﻿src/pages/audit/compliance-checklist/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-checklist/index.tsx(8,57): error TS1005: ';' expected.
+src/pages/audit/compliance-dashboard/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-dashboard/index.tsx(8,57): error TS1005: ';' expected.
+src/pages/audit/compliance-detail/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-detail/index.tsx(8,54): error TS1005: ';' expected.
+src/pages/audit/compliance-evidence/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-evidence/index.tsx(8,56): error TS1005: ';' expected.
+src/pages/audit/compliance-remediation/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-remediation/index.tsx(8,59): error TS1005: ';' expected.
+src/pages/audit/compliance-report/index.tsx(8,40): error TS1005: '(' expected.
+src/pages/audit/compliance-report/index.tsx(8,54): error TS1005: ';' expected.

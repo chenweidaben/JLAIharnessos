@@ -86,7 +86,7 @@ export default function RiskManagementPage() {
                   { key: 'crit', name: '严重风险', count: data.assessment.critical, color: 'red' },
                 ]}
                 columns={[
-                  { title: '等级', dataIndex: 'name', key: 'name', render: (n: string, r: { color: string }) => <Tag color={r.color}>{n}</Tag> },
+                  { title: '等级', dataIndex: 'name', key: 'name', render: (n: string, r: { color: string; [k: string]: unknown }) => <Tag color={r.color}>{n}</Tag> },
                   { title: '数量', dataIndex: 'count', key: 'count' },
                 ]}
               />

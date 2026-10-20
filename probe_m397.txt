@@ -1,0 +1,18 @@
+﻿emergency\triage exists: False
+emergency\rescue exists: True
+emergency\ambulance exists: True
+emergency\disaster exists: False
+emergency\poisoning exists: True
+emergency\trauma exists: True
+OK /api/v1/emergency/triage
+OK /api/v1/emergency/rescue
+OK /api/v1/emergency/ambulance
+OK /api/v1/emergency/disaster
+OK /api/v1/emergency/poisoning
+OK /api/v1/emergency/trauma
+route emergency/triage : False
+route emergency/rescue : False
+route emergency/ambulance : False
+route emergency/disaster : False
+route emergency/poisoning : False
+route emergency/trauma : False

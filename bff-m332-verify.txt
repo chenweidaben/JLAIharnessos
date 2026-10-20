@@ -1,0 +1,10 @@
+﻿/api/v1/elderly/assessment=200
+/api/v1/elderly/falls=200
+/api/v1/elderly/dementia=200
+/api/v1/geriatrics/assessment=ERR
+/api/v1/geriatrics/falls=ERR
+/api/v1/geriatrics/dementia=ERR
+/api/v1/quality/control=200
+/api/v1/qc/indicators=ERR
+/api/v1/qc/audits=ERR
+/api/v1/qc/corrective=ERR

@@ -34,7 +34,7 @@ interface TimelineReport {
 
 export default function EmrEventTimelinePage() {
   const [timeline, setTimeline] = useState<EventTimeline | null>(null);
-  const [events, setEvents] = useState<TimelineEventItem[]>([
+  const [events] = useState<TimelineEventItem[]>([
     { day: 1, title: "入院" },
     { day: 3, title: "手术" },
     { day: 10, title: "出院" },

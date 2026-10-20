@@ -162,10 +162,64 @@ function mapQueueStatus(v: Visit): 'waiting' | 'in_consult' | 'visited' | 'passe
 }
 
 /**
+ * v5.0试点扩展（浏览器bug修复）：DEMO_MODE 门诊候诊队列确定性种子。
+ * 固定 8 条演示记录（待诊/就诊中/已诊/过号混合），无随机、无 SQL，
+ * 供门诊工作台左栏队列与统计演示；字段与真实 getWaitingQueue 返回结构一致。
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+function buildDemoWaitingQueue(dept: string | null): unknown[] {
+  const now = Date.now();
+  const regTime = (minAgo: number) => new Date(now - minAgo * 60000).toISOString();
+  const rows: Array<{
+    encounterId: string; ticketNo: string; name: string; gender: 'male' | 'female';
+    age: number; chief: string; status: 'waiting' | 'in_consult' | 'visited' | 'passed';
+    waitMin: number; registerMinAgo: number; deptName: string; doctor: string;
+  }> = [
+    { encounterId: 'demo-op-1', ticketNo: 'MZ20261019001', name: '张*', gender: 'male', age: 45, chief: '反复咳嗽咳痰1周', status: 'waiting', waitMin: 12, registerMinAgo: 12, deptName: '呼吸内科', doctor: '王医生' },
+    { encounterId: 'demo-op-2', ticketNo: 'MZ20261019002', name: '李*', gender: 'female', age: 58, chief: '头晕伴血压升高3天', status: 'waiting', waitMin: 9, registerMinAgo: 9, deptName: '心血管内科', doctor: '陈医生' },
+    { encounterId: 'demo-op-3', ticketNo: 'MZ20261019003', name: '王*', gender: 'male', age: 33, chief: '右上腹痛6小时', status: 'waiting', waitMin: 6, registerMinAgo: 6, deptName: '消化内科', doctor: '刘医生' },
+    { encounterId: 'demo-op-4', ticketNo: 'MZ20261019004', name: '赵*', gender: 'female', age: 27, chief: '发热38.6℃伴咽痛', status: 'waiting', waitMin: 4, registerMinAgo: 4, deptName: '呼吸内科', doctor: '王医生' },
+    { encounterId: 'demo-op-5', ticketNo: 'MZ20261019005', name: '陈*', gender: 'male', age: 62, chief: '胸闷气促2天', status: 'in_consult', waitMin: 15, registerMinAgo: 15, deptName: '心血管内科', doctor: '陈医生' },
+    { encounterId: 'demo-op-6', ticketNo: 'MZ20261019006', name: '周*', gender: 'female', age: 8, chief: '发热39℃精神差', status: 'in_consult', waitMin: 7, registerMinAgo: 7, deptName: '儿科', doctor: '孙医生' },
+    { encounterId: 'demo-op-7', ticketNo: 'MZ20261019007', name: '吴*', gender: 'male', age: 51, chief: '体检发现血糖偏高', status: 'visited', waitMin: 0, registerMinAgo: 40, deptName: '内分泌科', doctor: '周医生' },
+    { encounterId: 'demo-op-8', ticketNo: 'MZ20261019008', name: '郑*', gender: 'female', age: 44, chief: '膝关节疼痛2周', status: 'passed', waitMin: 0, registerMinAgo: 55, deptName: '骨科', doctor: '吴医生' },
+  ];
+  return rows
+    .filter((r) => !dept || r.deptName === dept)
+    .map((r, i) => ({
+      encounterId: r.encounterId,
+      queueNo: i + 1,
+      ticketNo: r.ticketNo,
+      patient: {
+        patientId: r.encounterId.replace('demo-op-', 'demo-pat-'),
+        nameMasked: r.name,
+        gender: r.gender,
+        age: r.age,
+        insurance: 'urban_resident',
+        allergies: [],
+        chronicConditions: [],
+        currentMedications: [],
+      },
+      visitType: 'normal' as const,
+      registerTime: regTime(r.registerMinAgo),
+      status: r.status,
+      doctorName: r.doctor,
+      deptName: r.deptName,
+      chiefComplaint: r.chief,
+      waitMinutes: r.waitMin,
+    }));
+}
+
+/**
  * 今日门诊候诊队列。
  * @param dept 科室名；dataScope=all 且 dept 为空时返回全院。
  */
 export async function getWaitingQueue(dept: string | null): Promise<unknown[]> {
+  // v5.0试点扩展（浏览器bug修复）：DEMO_MODE 下直接返回确定性演示队列，
+  // 不再依赖 PostgreSQL 当天就诊数据（原为空导致页面队列空白）。
+  if (process.env.DEMO_MODE === '1') {
+    return buildDemoWaitingQueue(dept);
+  }
   const db = getDb();
   const rows = dept
     ? await db`
@@ -687,6 +741,25 @@ export async function findDrugs(keyword: string): Promise<unknown[]> {
 /* ------------------------------------------------------------------ */
 
 export async function getOutpatientStats(dept: string): Promise<Record<string, number>> {
+  // v5.0试点扩展（浏览器bug修复）：DEMO_MODE 下返回确定性门诊统计种子，
+  // 覆盖今日挂号/已诊/待诊/平均等待/处方/检查/本月工作量，修复页面数据全 0。
+  if (process.env.DEMO_MODE === '1') {
+    void dept;
+    return {
+      todayRegistered: 86,
+      todayVisited: 58,
+      todayWaiting: 28,
+      todayPassed: 4,
+      avgWaitMinutes: 14,
+      avgVisitMinutes: 12,
+      prescriptionCount: 45,
+      orderCount: 32,
+      monthVisits: 2340,
+      monthPrescriptions: 1876,
+      monthRecords: 2103,
+      avgPrescriptionFee: 156.8,
+    };
+  }
   const db = getDb();
   const today = await db`
     SELECT

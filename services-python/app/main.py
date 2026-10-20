@@ -34,6 +34,13 @@ app.add_middleware(AuditMiddleware)
 # /ai/* 路由鉴权中间件（生产接 Redis 计数 + PostgreSQL 客户表，当前本地 mock）
 @app.middleware("http")
 async def api_key_middleware(request: Request, call_next):
+    import time
+    import logging
+    import json
+
+    logger = logging.getLogger("ai_access")
+    start_time = time.time()
+
     path = request.url.path
     if path.startswith("/ai/"):
         auth = request.headers.get("Authorization", "")
@@ -44,7 +51,22 @@ async def api_key_middleware(request: Request, call_next):
             raise HTTPException(status_code=401, detail="Invalid API Key")
         if not check_rate_limit(api_key):
             raise HTTPException(status_code=429, detail="Rate limit exceeded")
-    return await call_next(request)
+
+    response = await call_next(request)
+
+    # P9 安全加固：请求审计日志（JSON 格式）
+    duration_ms = round((time.time() - start_time) * 1000, 2)
+    log_entry = {
+        "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "method": request.method,
+        "path": path,
+        "status": response.status_code,
+        "duration_ms": duration_ms,
+        "client_ip": request.client.host if request.client else "unknown"
+    }
+    logger.info(json.dumps(log_entry))
+
+    return response
 
 # 注册路由
 app.include_router(health.router)

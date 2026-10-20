@@ -1,0 +1,9 @@
+﻿/api/v1/telemed/consultations=200
+/api/v1/telemed/records=200
+/api/v1/telemed/equipment=200
+/api/v1/telemedicine/consultations=ERR
+/api/v1/telemedicine/records=ERR
+/api/v1/telemedicine/devices=ERR
+/api/v1/community/centers=200
+/api/v1/community/residents=200
+/api/v1/community/visits=ERR

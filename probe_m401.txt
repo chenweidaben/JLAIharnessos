@@ -1,0 +1,18 @@
+﻿geriatrics\assessment exists: True
+geriatrics\care-plan exists: False
+geriatrics\comorbidity exists: False
+geriatrics\frail exists: False
+geriatrics\dementia exists: True
+geriatrics\falls exists: True
+OK /api/v1/geriatrics/assessment
+OK /api/v1/geriatrics/care-plan
+OK /api/v1/geriatrics/comorbidity
+OK /api/v1/geriatrics/frail
+OK /api/v1/geriatrics/dementia
+OK /api/v1/geriatrics/falls
+route geriatrics/assessment : False
+route geriatrics/care-plan : False
+route geriatrics/comorbidity : False
+route geriatrics/frail : False
+route geriatrics/dementia : False
+route geriatrics/falls : False

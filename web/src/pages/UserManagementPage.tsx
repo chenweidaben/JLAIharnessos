@@ -115,7 +115,7 @@ export default function UserManagementPage() {
 
   const deptOptions = (() => {
     const map = new Map<string, string>();
-    users.forEach((u) => {
+    (users ?? []).forEach((u) => {
       if (u.deptCode) map.set(u.deptCode, u.deptCode);
     });
     DEPT_OPTIONS.forEach((d) => map.set(d, d));

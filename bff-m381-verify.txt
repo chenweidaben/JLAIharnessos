@@ -1,0 +1,6 @@
+﻿/api/v1/outpatient/queue=200
+/api/v1/outpatient/visits=200
+/api/v1/outpatient/prescriptions=200
+/api/v1/inpatient/admissions=200
+/api/v1/inpatient/discharges=200
+/api/v1/inpatient/transfers=200

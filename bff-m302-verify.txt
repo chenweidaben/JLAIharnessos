@@ -1,0 +1,2 @@
+﻿/api/v1/hr/employees=200
+/api/v1/doctor/list=200

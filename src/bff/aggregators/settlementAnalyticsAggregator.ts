@@ -19,8 +19,27 @@ function assertView(auth: AuthView): void {
   if (!auth.permissions.includes('settlement_analytics:view')) throw forbidden('缺少权限：settlement_analytics:view');
 }
 
+/** DEMO_MODE 结算分析汇总（P7）。 */
+function demoAnalytics(months: number) {
+  const periods = Array.from({ length: Math.min(months, 6) }, (_, i) => `2026-${String(10 - i).padStart(2, '0')}`);
+  return {
+    summary: { totalSettlement: 1250000, avgDRG: 10500, avgDIP: 8200, drgRatio: 0.58, dipRatio: 0.42 },
+    trend: periods.map((p, i) => ({
+      period: p,
+      insuranceSettlement: 800000 + i * 50000,
+      drgCases: 120 + i * 10,
+      dipCases: 85 + i * 8,
+      drugShare: 0.32,
+      materialShare: 0.18,
+      examShare: 0.15,
+    })),
+    demo: true,
+  };
+}
+
 export async function analyticsView(auth: AuthView, months = 12) {
   assertView(auth);
+  if (process.env.DEMO_MODE === '1') return demoAnalytics(months);
   const all = await listAllSummaries();
   const sorted = all.slice().sort((a, b) => a.period.localeCompare(b.period)).slice(-months);
   const points: SummaryPoint[] = [];

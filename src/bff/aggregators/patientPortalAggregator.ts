@@ -33,6 +33,23 @@ export async function portalView(auth: AuthView): Promise<PortalView> {
   assertPermission(auth, 'patient_portal:view');
   const roleCodes = (auth.roles as Array<{ code?: string; name?: string }>).map((r) => r.code ?? r.name ?? String(r));
   if (!roleCodes.includes('patient')) throw forbidden('仅患者角色可访问');
+
+  // v5.0试点扩展（M200遗留修复）：DEMO_MODE 下返回确定性非零门户种子
+  if (process.env.DEMO_MODE === '1') {
+    return {
+      upcomingAppointments: 2,
+      unreadReportsCount: 2,
+      unreadNotificationsCount: 3,
+      depositBalance: 500.0,
+      pendingFollowups: 1,
+      pendingSurveys: 1,
+      pending: pendingCount({
+        bookedAppts: 2, unreadReports: 2, unreadNotifs: 3,
+        depositDue: 1, followupDue: 1, surveyDue: 1,
+      }),
+    };
+  }
+
   // 本切片以 0 占位聚合块（实际 repo 注入随 M19/M61/M63 扩展），自限域已由角色断言保证。
   const v: PortalView = {
     upcomingAppointments: 0,

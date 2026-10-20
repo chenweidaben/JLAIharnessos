@@ -53,6 +53,19 @@ async function handleList(c: Ctx): Promise<Response> {
   const page = Number(c.query.get('page') ?? '1');
   const pageSize = Number(c.query.get('pageSize') ?? '20');
 
+  // DEMO_MODE=1：表未建时短路返回 mock，避免 500
+  if (process.env.DEMO_MODE === '1') {
+    const demoLogs: LogEntry[] = [
+      { id: 1, level: 'info', module: 'auth', message: '管理员登录成功', metadata: { ip: '127.0.0.1' }, staffId: 'admin', createdAt: new Date().toISOString() },
+      { id: 2, level: 'info', module: 'dashboard', message: '看板数据刷新', metadata: { source: 'cache' }, staffId: 'doctor_li', createdAt: new Date(Date.now() - 60000).toISOString() },
+      { id: 3, level: 'warn', module: 'pharmacy', message: '药品库存低于阈值', metadata: { drug: '阿莫西林' }, staffId: 'pharmacist_zhang', createdAt: new Date(Date.now() - 120000).toISOString() },
+      { id: 4, level: 'error', module: 'billing', message: '结算接口超时', metadata: { retry: 3 }, staffId: 'system', createdAt: new Date(Date.now() - 180000).toISOString() },
+      { id: 5, level: 'info', module: 'emergency', message: '急诊分诊完成', metadata: { visitId: 'V001' }, staffId: 'nurse_wang', createdAt: new Date(Date.now() - 240000).toISOString() },
+    ];
+    const result = queryLogs(demoLogs, filters, page, pageSize);
+    return json(ok(result));
+  }
+
   try {
     const db = getDb();
     // 配合 idx_system_log_created：近期窗口倒序拉取

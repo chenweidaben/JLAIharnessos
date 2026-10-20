@@ -32,4 +32,12 @@ public interface CriticalValueRepository extends JpaRepository<CriticalValue, Lo
      * @return 危急值列表
      */
     List<CriticalValue> findByPatientId(Long patientId);
+
+    /**
+     * 查询未闭环危急值（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param status 排除的状态
+     * @return 危急值列表
+     */
+    List<CriticalValue> findByStatusNot(String status);
 }

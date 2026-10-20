@@ -1,0 +1,9 @@
+﻿TOTAL index.tsx: 2512
+API pages: 727
+PageContainer: 597
+Spin: 2026
+Alert: 1009
+Empty: 805
+Router lines: 8929
+Lazy imports: 1096
+Route count: 2434

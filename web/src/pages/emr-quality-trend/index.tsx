@@ -29,7 +29,7 @@ interface TrendReport {
 
 export default function EmrQualityTrendPage() {
   const [trend, setTrend] = useState<QualityTrend | null>(null);
-  const [scores, setScores] = useState<number[]>([85, 88, 92]);
+  const [scores] = useState<number[]>([85, 88, 92]);
   const [result, setResult] = useState<TrendResult | null>(null);
   const [report, setReport] = useState<TrendReport | null>(null);
   const [loading, setLoading] = useState(false);

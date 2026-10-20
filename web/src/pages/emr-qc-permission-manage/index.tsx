@@ -6,7 +6,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Button, Card, Layout, List, Tag, Typography, message } from "antd";
+import { Card, Layout, List, Tag, Typography, message } from "antd";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;

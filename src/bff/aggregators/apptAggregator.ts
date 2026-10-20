@@ -69,6 +69,15 @@ export async function submitAppointment(auth: AuthView, input: {
 }
 
 export async function listAppointments(): Promise<Appointment[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示预约队列。
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-appt-01', appointmentNo: 'APPT-20261019-001', patientId: 'P001', visitId: null, scheduledAt: '2026-10-20 09:00', department: '心血管内科', purpose: '冠心病复诊', status: 'scheduled', cancelReason: null, createdAt: '2026-10-18 10:00', updatedAt: '2026-10-18 10:00' } as Appointment,
+      { id: 'demo-appt-02', appointmentNo: 'APPT-20261019-002', patientId: 'P002', visitId: null, scheduledAt: '2026-10-20 10:30', department: '呼吸内科', purpose: '肺炎复查', status: 'confirmed', cancelReason: null, createdAt: '2026-10-18 11:00', updatedAt: '2026-10-18 11:00' } as Appointment,
+      { id: 'demo-appt-03', appointmentNo: 'APPT-20261019-003', patientId: 'P003', visitId: null, scheduledAt: '2026-10-21 08:30', department: '内分泌科', purpose: '糖尿病随访', status: 'scheduled', cancelReason: null, createdAt: '2026-10-19 09:00', updatedAt: '2026-10-19 09:00' } as Appointment,
+      { id: 'demo-appt-04', appointmentNo: 'APPT-20261019-004', patientId: 'P004', visitId: null, scheduledAt: '2026-10-19 14:00', department: '神经内科', purpose: '脑梗死复诊', status: 'completed', cancelReason: null, createdAt: '2026-10-17 15:00', updatedAt: '2026-10-19 14:30' } as Appointment,
+    ];
+  }
   return listAppts();
 }
 
@@ -140,6 +149,14 @@ export async function createFollowUpPlan(auth: AuthView, input: {
 }
 
 export async function listFollowUpPlans(): Promise<FollowUpPlan[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示随访计划。
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-plan-01', planNo: 'FU-20261018-001', patientId: 'P001', appointmentId: 'demo-appt-01', scheduledDate: '2026-10-25', content: '冠心病出院后 1 周电话随访，评估用药依从性', status: 'pending', assignedTo: 'u_2001', createdAt: '2026-10-18 10:00' } as FollowUpPlan,
+      { id: 'demo-plan-02', planNo: 'FU-20261018-002', patientId: 'P003', appointmentId: 'demo-appt-03', scheduledDate: '2026-10-26', content: '糖尿病患者血糖控制情况随访', status: 'pending', assignedTo: 'u_2001', createdAt: '2026-10-19 09:00' } as FollowUpPlan,
+      { id: 'demo-plan-03', planNo: 'FU-20261015-003', patientId: 'P004', appointmentId: null, scheduledDate: '2026-10-15', content: '脑梗死出院后 3 天随访', status: 'completed', assignedTo: 'u_2001', createdAt: '2026-10-12 14:00' } as FollowUpPlan,
+    ];
+  }
   return listPlans();
 }
 

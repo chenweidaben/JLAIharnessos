@@ -1,0 +1,8 @@
+﻿/api/v1/maternity/prenatal=200
+/api/v1/maternity/postpartum=200
+/api/v1/maternal/prenatal=ERR
+/api/v1/maternal/postnatal=ERR
+/api/v1/maternal/child-health=ERR
+/api/v1/emergency/triage=200
+/api/v1/emergency/redbox=ERR
+/api/v1/emergency/calls=ERR

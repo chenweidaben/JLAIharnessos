@@ -1,0 +1,6 @@
+﻿/api/v1/research/projects-detail=200
+/api/v1/research/papers-detail=200
+/api/v1/research/funds-detail=200
+/api/v1/research/awards-detail=200
+/api/v1/teaching/courses-detail=200
+/api/v1/teaching/training-detail=200

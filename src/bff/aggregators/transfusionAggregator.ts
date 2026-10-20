@@ -173,7 +173,40 @@ export async function applyTransfusion(
   });
 }
 
+/**
+ * v5.0试点扩展（M188空数据修复）：DEMO_MODE 今日输血申请确定性种子。
+ * 固定 5 条今日输血申请（患者/血型/血量/申请状态/交叉配血结果齐全），
+ * 不良反应 0 条；无随机、无 SQL，字段与真实 TransfusionRequest 一致。
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+function buildDemoTransfusionList(): TransfusionRequest[] {
+  const today = '2026-10-19';
+  const rows: Array<Partial<TransfusionRequest> & {
+    id: string; requestNo: string; visitId: string; patientId: string;
+    department: string; applicantId: string; indication: string;
+    bloodType: string; component: string; unitCount: number;
+    urgency: string; status: TransfusionStatus;
+  }> = [
+    { id: 'demo-blood-01', requestNo: 'BLOOD20261019001', visitId: 'demo-visit-b01', patientId: 'demo-pat-b01', department: '普外科', applicantId: 'u_2001', indication: '术后切口渗血 Hb 68 g/L，伴心悸乏力', indicationMeta: { hb: 68, activeBleeding: true, bloodLoss: 400 }, bloodType: 'A', component: 'red_cell', unitCount: 2, urgency: 'urgent', status: 'transfusing', crossmatchResult: '相合', crossmatchNote: '凝聚胺法 相合', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 09:30`, batchNo: 'BATCH20261019-01', dispensedBy: 'u_2003', dispensedAt: `${today} 09:50` },
+    { id: 'demo-blood-02', requestNo: 'BLOOD20261019002', visitId: 'demo-visit-b02', patientId: 'demo-pat-b02', department: '消化内科', applicantId: 'u_2001', indication: '上消化道出血 Hb 55 g/L', indicationMeta: { hb: 55, activeBleeding: true, bloodLoss: 800 }, bloodType: 'O', component: 'red_cell', unitCount: 4, urgency: 'emergency', status: 'dispensed', crossmatchResult: '相合', crossmatchNote: '凝聚胺法 相合', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 10:10`, batchNo: 'BATCH20261019-02', dispensedBy: 'u_2003', dispensedAt: `${today} 10:25` },
+    { id: 'demo-blood-03', requestNo: 'BLOOD20261019003', visitId: 'demo-visit-b03', patientId: 'demo-pat-b03', department: '心血管外科', applicantId: 'u_2001', indication: 'CABG 术中备血小板 PLT 45 ×10^9/L', indicationMeta: { plt: 45 }, bloodType: 'AB', component: 'platelet', unitCount: 1, urgency: 'urgent', status: 'crossmatched', crossmatchResult: '相合', crossmatchNote: 'RhD 同型', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 11:00`, batchNo: null, dispensedBy: null, dispensedAt: null },
+    { id: 'demo-blood-04', requestNo: 'BLOOD20261019004', visitId: 'demo-visit-b04', patientId: 'demo-pat-b04', department: '血液内科', applicantId: 'u_2001', indication: '再生障碍性贫血 Hb 60 g/L', indicationMeta: { hb: 60 }, bloodType: 'B', component: 'red_cell', unitCount: 2, urgency: 'routine', status: 'requested', crossmatchResult: null, crossmatchNote: null, crossmatchedBy: null, crossmatchedAt: null, batchNo: null, dispensedBy: null, dispensedAt: null },
+    { id: 'demo-blood-05', requestNo: 'BLOOD20261019005', visitId: 'demo-visit-b05', patientId: 'demo-pat-b05', department: 'ICU', applicantId: 'u_2001', indication: 'DIC 伴凝血异常 INR 2.8，输注新鲜冰冻血浆', indicationMeta: { inr: 2.8, activeBleeding: true }, bloodType: 'A', component: 'plasma', unitCount: 4, urgency: 'emergency', status: 'completed', crossmatchResult: '相合', crossmatchNote: 'AB 型血浆相容输注', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 06:30`, batchNo: 'BATCH20261019-03', dispensedBy: 'u_2003', dispensedAt: `${today} 06:45` },
+  ];
+  return rows.map((r) => ({
+    rejectReason: null,
+    cancelledBy: null, cancelledAt: null, cancelReason: null,
+    createdAt: `${today} 08:00`, updatedAt: `${today} 12:00`,
+    ...r,
+  } as TransfusionRequest));
+}
+
 export async function listTransfusionsView(): Promise<TransfusionRequest[]> {
+  // v5.0试点扩展（M188空数据修复）：DEMO_MODE 下直接返回确定性演示输血列表，
+  // 不再依赖 PostgreSQL 输血申请主表（原为空导致页面“暂无数据”）。
+  if (process.env.DEMO_MODE === '1') {
+    return buildDemoTransfusionList();
+  }
   return listRequests();
 }
 

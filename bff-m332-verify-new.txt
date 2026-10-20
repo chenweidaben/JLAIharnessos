@@ -1,0 +1,6 @@
+﻿/api/v1/geriatrics/assessment=200
+/api/v1/geriatrics/falls=200
+/api/v1/geriatrics/dementia=200
+/api/v1/qc/indicators=200
+/api/v1/qc/audits=200
+/api/v1/qc/corrective=200

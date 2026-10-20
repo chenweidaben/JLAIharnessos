@@ -76,9 +76,7 @@ public class OrWorkstationService {
     }
 
     private ORWorkItem findByWorkItemNo(String workItemNo) {
-        return orWorkItemRepository.findAll().stream()
-                .filter(i -> workItemNo.equals(i.getWorkItemNo()))
-                .findFirst()
-                .orElse(null);
+        // P3 性能优化：直接调用 Repository 派生查询
+        return orWorkItemRepository.findByWorkItemNo(workItemNo);
     }
 }

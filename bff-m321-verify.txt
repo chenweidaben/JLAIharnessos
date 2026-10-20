@@ -1,0 +1,6 @@
+﻿/api/v1/events/bus-overview=200
+/api/v1/events/bus-detail=200
+/api/v1/events/bus-logs=200
+/api/v1/events/bus-subscribers=200
+/api/v1/events/bus-publishers=200
+/api/v1/events/bus-deadletter=200

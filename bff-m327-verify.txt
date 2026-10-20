@@ -1,0 +1,2 @@
+﻿/api/v1/bi/dashboard=200
+/api/v1/operation/kpi=200

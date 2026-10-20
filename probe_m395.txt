@@ -1,0 +1,10 @@
+﻿community\visits exists: True
+community\health-records exists: False
+community\elderly-care exists: False
+community\chronic-disease exists: False
+community\education exists: False
+OK /api/v1/community/visits
+OK /api/v1/community/health-records
+OK /api/v1/community/elderly-care
+OK /api/v1/community/chronic-disease
+OK /api/v1/community/education

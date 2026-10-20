@@ -1,0 +1,4 @@
+﻿/api/v1/security/policy=200
+/api/v1/security/policy-detail=200
+/api/v1/security/vulnerabilities=200
+/api/v1/security/patches=200

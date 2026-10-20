@@ -84,9 +84,7 @@ public class BloodDialysisService {
     }
 
     private DialysisSession findBySessionNo(String sessionNo) {
-        return dialysisSessionRepository.findAll().stream()
-                .filter(s -> sessionNo.equals(s.getSessionNo()))
-                .findFirst()
-                .orElse(null);
+        // P1 性能优化：直接调用 Repository 派生查询，替代 findAll().stream().filter()
+        return dialysisSessionRepository.findBySessionNo(sessionNo);
     }
 }

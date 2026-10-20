@@ -1,0 +1,3 @@
+﻿/api/v1/internet/consultations=200
+/api/v1/internet/prescriptions=200
+/api/v1/internet/payments=200

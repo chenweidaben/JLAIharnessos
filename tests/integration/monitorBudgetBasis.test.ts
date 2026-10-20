@@ -45,7 +45,7 @@ D('M23-F DIP 事中监控（真实 PG）', () => {
   it('listWard 返回 basis 徽标', async () => {
     const rows = await listWardView(admin);
     expect(Array.isArray(rows)).toBe(true);
-    for (const r of rows) expect(['drg', 'dip']).toContain(r.budgetBasis);
+    for (const r of rows) expect(['drg', 'dip']).toContain((r as any).budgetBasis);
   });
 
   it('越权 403', async () => {

@@ -30,6 +30,18 @@ function assertPermission(auth: AuthView): void {
 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** DEMO_MODE 在院费用监控列表（P7）。 */
+function demoMonitors() {
+  return [
+    { visitId: 'demo-vis-1', patientName: '演示患者A', department: '心血管内科', accumulatedCost: 8500, budget: 10000, level: 'green', days: 5, dischargeReminded: false },
+    { visitId: 'demo-vis-2', patientName: '演示患者B', department: '呼吸内科', accumulatedCost: 12500, budget: 12000, level: 'yellow', days: 7, dischargeReminded: false },
+    { visitId: 'demo-vis-3', patientName: '演示患者C', department: '普外科', accumulatedCost: 22000, budget: 18000, level: 'red', days: 10, dischargeReminded: true },
+    { visitId: 'demo-vis-4', patientName: '演示患者D', department: '骨科', accumulatedCost: 6800, budget: 8000, level: 'green', days: 3, dischargeReminded: false },
+    { visitId: 'demo-vis-5', patientName: '演示患者E', department: '神经内科', accumulatedCost: 15500, budget: 14000, level: 'yellow', days: 8, dischargeReminded: false },
+    { visitId: 'demo-vis-6', patientName: '演示患者F', department: '消化内科', accumulatedCost: 4200, budget: 6000, level: 'green', days: 2, dischargeReminded: false },
+  ];
+}
+
 /** 对某就诊刷新 snapshot：取预算 + 累计费用 → 纯函数定 level。 */
 export async function refreshVisitView(
   auth: AuthView,
@@ -57,6 +69,7 @@ export async function refreshVisitView(
 
 export async function listWardView(auth: AuthView) {
   assertPermission(auth);
+  if (process.env.DEMO_MODE === '1') return demoMonitors();
   return listMonitors();
 }
 

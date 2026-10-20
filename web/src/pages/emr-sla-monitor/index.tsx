@@ -6,7 +6,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Layout, Spin, Table, Tag, Typography } from "antd";
+import { Card, Layout, Table, Tag, Typography } from "antd";
 import type { SlaItemV14 } from "@/bff/aggregators/emrSlaMonitorV14Aggregator";
 
 const { Content } = Layout;

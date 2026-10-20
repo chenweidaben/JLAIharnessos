@@ -1,0 +1,6 @@
+﻿/api/v1/phi/masking=ERR
+/api/v1/phi/encryption=ERR
+/api/v1/phi/decryption=ERR
+/api/v1/phi/audit=ERR
+/api/v1/phi/policies=ERR
+/api/v1/phi/consent=ERR

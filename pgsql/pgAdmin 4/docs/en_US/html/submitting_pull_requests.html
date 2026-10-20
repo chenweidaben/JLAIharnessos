@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Submitting Pull Requests &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code Overview" href="code_overview.html" />
+    <link rel="prev" title="pgAdmin Project Contributions" href="contributions.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="code_overview.html" title="Code Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="contributions.html" title="pgAdmin Project Contributions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="contributions.html" accesskey="U">pgAdmin Project Contributions</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Submitting Pull Requests</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="submitting-pull-requests">
+<span id="id1"></span><h1><span class="target" id="index-0"></span>Submitting Pull Requests<a class="headerlink" href="#submitting-pull-requests" title="Link to this heading">¶</a></h1>
+<p>Before developing a feature or bug fix for pgAdmin you should always contact
+the developers on the mailing list <a class="reference external" href="mailto:pgadmin-hackers&#37;&#52;&#48;postgresql&#46;org">pgadmin-hackers<span>&#64;</span>postgresql<span>&#46;</span>org</a> to discuss
+your plans. This ensures that others know what you are doing and can then
+avoid duplicating your work, and in the case of large changes, gives the
+community the chance to discuss and refine your ideas before investing too
+much time writing code that may later be rejected.</p>
+<p>You should always develop changes against a checkout of the source code from
+the GIT source code repository, and not a release tarball. This ensures that
+you’re working with the latest code on the branch and makes it easier to
+generate Pull Requests correctly.</p>
+<p>As of September 2022, the pgAdmin source repository can found at
+<a class="reference external" href="https://github.com/pgadmin-org/pgadmin4">https://github.com/pgadmin-org/pgadmin4</a>. A typical workflow for a relatively
+simple change might look as follows:</p>
+<ol class="arabic simple">
+<li><p>Visit the pgAdmin 4 project on GitHub, and click the <em>Fork</em> button to create
+your own development repository in your GitHub account.</p></li>
+<li><p>Checkout a local copy of the source code with a command like:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/&lt;your<span class="w"> </span>GitHub<span class="w"> </span>username&gt;/pgadmin4.git
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="3">
+<li><p>Develop and test your change in your local development environment.</p></li>
+<li><p>Review your changes and check them thoroughly to ensure they meet the
+pgAdmin <a class="reference internal" href="coding_standards.html"><span class="doc">Coding Standards</span></a>, and review them against the
+<a class="reference internal" href="code_review.html"><span class="doc">Code Review Notes</span></a> to minimise the chances of them being rejected.</p></li>
+<li><p>Once you’re happy with your change, commit it with a suitable message.
+Include a one-line summary at the top, and if appropriate, further
+paragraphs following a blank line after the summary.</p></li>
+<li><p>Push your changes to your fork of the repository.</p></li>
+<li><p>Back in GitHub, create a new Pull Request against the <em>pgadmin-org/pgadmin4</em>
+<em>master</em> branch.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each Pull Request should encompass a single bug fix or feature as a single
+commit. If necessary, you should squash multiple commits for larger changes
+or features into a single commit before submitting.</p>
+</div>
+</li>
+<li><p>Your Pull Request will be reviewed by one or more members of the development
+team and either accepted or sent back with requested changes. In some cases
+it may be rejected if the change is not considered appropriate - this is
+why it’s important to discuss your work with the team before spending any
+significant time on it.</p></li>
+</ol>
+<p>For more complex changes, you may wish to use a <em>Feature Branch</em> in your fork
+of the pgAdmin repository, and use that to create the Pull Request.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a simple example of a workflow. You may choose to use other
+tools such as the <a class="reference external" href="https://cli.github.com">GitHub CLI</a> instead; documenting
+such tools and workflows is outside the scope of the pgAdmin documentation
+however.</p>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Submitting Pull Requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_overview.html">Code Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coding_standards.html">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_snippets.html">Code Snippets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_review.html">Code Review Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="translations.html">Translations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="code_overview.html" title="Code Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="contributions.html" title="pgAdmin Project Contributions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="contributions.html" >pgAdmin Project Contributions</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Submitting Pull Requests</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="code_overview.html" title="Code Overview">next</a> |</li>
+            <li class="right" ><a href="contributions.html" title="pgAdmin Project Contributions">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

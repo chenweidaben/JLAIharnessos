@@ -106,7 +106,9 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/queue',
     handle: async (c) => {
-      if (isDemo) return json(ok([]));
+      // v5.0试点扩展（浏览器bug修复）：DEMO_MODE 不再返回空队列，改由聚合器
+      // 内建的确定性演示种子提供候诊队列（聚合器自身已短路 DEMO_MODE，不连 PostgreSQL）。
+      if (isDemo) return json(ok(await getWaitingQueue(null)));
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const q = c.query.get('dept');
@@ -273,7 +275,9 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/stats',
     handle: async (c) => {
-      if (isDemo) return json(ok({ demo: true }));
+      // v5.0试点扩展（浏览器bug修复）：DEMO_MODE 不再返回 {demo:true} 空统计，
+      // 改由聚合器内建演示种子提供今日挂号/待诊/平均等待等指标（聚合器已短路 DEMO_MODE）。
+      if (isDemo) return json(ok(await getOutpatientStats('')));
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const dept = c.query.get('dept') ?? view.deptName;

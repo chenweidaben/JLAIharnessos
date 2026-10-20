@@ -68,7 +68,26 @@ async function handleIncoming(c: Ctx): Promise<Response> {
   return json(ok({ list }));
 }
 
+/**
+ * M198 兼容前端 M3-R 列表接口：GET /api/v1/referrals。
+ * 前端 ReferralOrder 与 M143-C 内部 Referral 字段命名不同，这里按前端契约映射，
+ * DEMO_MODE 下返回确定性演示转诊单，避免「路由不存在 / 暂无数据」。
+ */
+function demoReferralOrders() {
+  return [
+    { id: 'demo-ro-01', referralNo: 'RF-20261018-001', direction: 'incoming', patientId: 'P001', profileId: null, patientName: '王*英', gender: '女', birthDate: '1958-03-12', sourceOrg: '临平区社区卫生服务中心', sourceDept: '全科', sourceDoctor: '陈医生', targetOrg: '健澜医院', targetDept: '心血管内科', reason: '胸痛待查，需上级医院冠脉评估', urgency: 'normal', status: 'submitted', encounterId: null, acceptedBy: null, acceptedAt: null, rejectedReason: null, createdBy: 'u_2001', createdAt: '2026-10-18 09:00', updatedAt: '2026-10-18 09:00' },
+    { id: 'demo-ro-02', referralNo: 'RF-20261018-002', direction: 'outgoing', patientId: 'P002', profileId: null, patientName: '刘*梅', gender: '女', birthDate: '1965-07-22', sourceOrg: '健澜医院', sourceDept: '普外科', sourceDoctor: '李医生', targetOrg: '临平康复医院', targetDept: '康复医学科', reason: '术后恢复期康复治疗', urgency: 'normal', status: 'accepted', encounterId: 'V20261017001', acceptedBy: 'u_2001', acceptedAt: '2026-10-18 15:00', rejectedReason: null, createdBy: 'u_2001', createdAt: '2026-10-17 10:00', updatedAt: '2026-10-18 15:00' },
+    { id: 'demo-ro-03', referralNo: 'RF-20261019-003', direction: 'incoming', patientId: 'P004', profileId: null, patientName: '张*华', gender: '男', birthDate: '1970-11-05', sourceOrg: '塘栖镇卫生院', sourceDept: '急诊', sourceDoctor: '赵医生', targetOrg: '健澜医院', targetDept: '神经内科', reason: '突发肢体乏力，疑似脑卒中，需急诊介入', urgency: 'urgent', status: 'submitted', encounterId: null, acceptedBy: null, acceptedAt: null, rejectedReason: null, createdBy: 'u_2002', createdAt: '2026-10-19 08:30', updatedAt: '2026-10-19 08:30' },
+    { id: 'demo-ro-04', referralNo: 'RF-20261015-004', direction: 'outgoing', patientId: 'P005', profileId: null, patientName: '陈*强', gender: '男', birthDate: '1955-01-30', sourceOrg: '健澜医院', sourceDept: '呼吸内科', sourceDoctor: '周医生', targetOrg: '星桥街道社区卫生服务中心', targetDept: '全科', reason: '肺炎出院后社区康复随访', urgency: 'normal', status: 'completed', encounterId: 'V20261012003', acceptedBy: 'u_2003', acceptedAt: '2026-10-15 10:00', rejectedReason: null, createdBy: 'u_2001', createdAt: '2026-10-12 14:00', updatedAt: '2026-10-16 09:00' },
+  ];
+}
+
 export const referralRoutes: RouteDef[] = [
+  // M198 兼容前端列表接口（前端调 /referrals，原 BFF 仅有 /referral/incoming）
+  { method: 'GET', path: '/api/v1/referrals', auth: true, handle: async (c: Ctx): Promise<Response> => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      return json(ok(demoReferralOrders()));
+    } },
   { method: 'POST', path: '/api/v1/referral/create', auth: true, handle: handleCreate },
   { method: 'PUT', path: '/api/v1/referral/:id/accept', auth: true, handle: handleAccept },
   { method: 'GET', path: '/api/v1/referral/incoming', auth: true, handle: handleIncoming },

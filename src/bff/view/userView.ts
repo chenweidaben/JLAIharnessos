@@ -7,6 +7,21 @@
  * 说明：开源库的 iam.role_permissions 未预置映射，故角色的规范权限集合在此统一定义
  * （应用层策略）；院方生产部署可在 iam.role_permissions 中维护并改为以库为准。
  *
+ * v5.0试点扩展（P0安全止血）：
+ *  - nurse 收回 order:write / cds:override / inpatient:bed:manage（职责分离：医嘱开立与 CDS override 归医师，床位维护归护士长/科主任）
+ *  - doctor 收回 agent:build / agent:publish（Agent 搭建与发布收归 admin）
+ *  - 新增 cashier（收费员）与 dept_head（科主任）角色，补齐业务聚合层已引用但授权表缺失的角色
+ *
+ * v5.0试点扩展（P1权限码收敛）：
+ *  - 新增 4 个报表分组码，把 V13 的 1500+ 个 xxx:read/write 明细码按业务域归并：
+ *      report:clinical:read  临床报表（病历/医嘱/手术/护理/医技）
+ *      report:admin:read     管理报表（人员/设备/运营概览）
+ *      report:finance:read  财务报表（DRG/DIP/医保/成本）
+ *      report:quality:read   质控报表（病历质量/不良事件/院感）
+ *  - 角色授予矩阵：doctor/nurse/pharmacist/technician/ams_officer/dept_head → clinical+quality；
+ *    finance/cashier → finance；admin → 全部 4 个；patient/researcher → 不授。
+ *  - requirePermissionCode 在精确匹配失败后按"资源首段"通配命中分组码（见 middleware/auth.ts）。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
@@ -150,15 +165,20 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'drug_review:view',
     'emr_level5:view',
     'system:view',
+    // v5.0试点扩展（P1权限码收敛）：管理员授予全部 4 个报表分组码
+    'report:clinical:read', 'report:admin:read',
+    'report:finance:read', 'report:quality:read',
   ],
   doctor: [
     'dashboard:view', 'patient:view',
+    // v5.0试点扩展（P1权限码收敛）：临床岗位授予临床+质控分组码
+    'report:clinical:read', 'report:quality:read',
     'medical_record:read', 'medical_record:write', 'medical_record:audit',
     'quality:rectify',
     'front_page:read', 'front_page:audit', 'billing:read',
     'order:write', 'order:view', 'prescription:write',
     'lab:read', 'imaging:read', 'imaging:view',
-    'report:view', 'agent:build', 'agent:publish', 'knowledge:manage', 'knowledge:read',
+    'report:view', 'knowledge:manage', 'knowledge:read',
     'ai:chat:use',
     'inpatient:view', 'inpatient:admit', 'inpatient:manage',
     'inpatient:discharge', 'inpatient:bed:manage',
@@ -272,6 +292,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ],
   pharmacist: [
     'dashboard:view', 'patient:view',
+    // v5.0试点扩展（P1权限码收敛）：药师授予临床+质控分组码
+    'report:clinical:read', 'report:quality:read',
     'prescription:review', 'prescription:write',
     'medical_record:read', 'lab:read', 'report:view',
     'pharmacy:view', 'pharmacy:review', 'pharmacy:dispense', 'inventory:view',
@@ -285,8 +307,10 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   ],
   nurse: [
     'dashboard:view', 'patient:view',
-    'medical_record:read', 'lab:read', 'order:write', 'order:view', 'emg:view',
-    'inpatient:view', 'inpatient:admit', 'inpatient:manage', 'inpatient:bed:manage',
+    // v5.0试点扩展（P1权限码收敛）：护理岗位授予临床+质控分组码
+    'report:clinical:read', 'report:quality:read',
+    'medical_record:read', 'lab:read', 'order:view', 'emg:view',
+    'inpatient:view', 'inpatient:admit', 'inpatient:manage',
     'emergency:view', 'emergency:triage', 'emergency:green_channel',
     'emergency:resuscitation', 'emergency:observation',
     'nursing:record', 'nursing:task', 'inpatient_order:administer',
@@ -338,7 +362,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'psych:screen', 'psych:view',
     'infection:report', 'infection:view',
     'vte:anticoagulate', 'vte:view',
-    'cds:read', 'cds:override',
+    'cds:read',
     'nurse_station:read',
     'schedule:book',
     'report:view_patient',
@@ -365,7 +389,11 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'medmuse:chat', 'medmuse:nurse',
     'med_review:view', 'timeliness:view',
   ],
-  technician: ['lab:read', 'imaging:read', 'medical_record:write', 'knowledge:read',
+  technician: [
+    // v5.0试点扩展（P1权限码收敛）：技师授予临床+质控分组码
+    'dashboard:view',
+    'report:clinical:read', 'report:quality:read',
+    'lab:read', 'imaging:read', 'medical_record:write', 'knowledge:read',
     'blood:crossmatch', 'blood:dispense', 'blood:assess', 'blood:audit',
     'vte:read',
     'ams:read',
@@ -373,25 +401,37 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     'lis:catalog', 'lis:receive', 'lis:enter', 'lis:review', 'lis:publish',
     'ris:schedule', 'ris:perform', 'ris:report', 'ris:review', 'ris:publish',
     'imaging:interpret:view', 'imaging:interpret:sign', 'medmuse:chat'],
-  ams_officer: ['dashboard:view', 'patient:view', 'ams:read', 'ams:approve', 'ams:audit', 'medmuse:chat'],
-  researcher: ['medical_record:read', 'lab:read', 'report:view', 'knowledge:read', 'medmuse:chat'],
-  patient: ['satisfaction:view',
-    'satisfaction:notify',
-    'mdt:request', 'mdt:view',
-    'treatment_plan:manage', 'treatment_plan:view',
-    'picc:maintain', 'picc:view',
-    'cdi:review', 'cdi:view',
-    'transfusion:report', 'transfusion:view',
-    'sbar:create', 'sbar:view',
-    'ed_obs:register', 'ed_obs:view',
-    'infection_dash:submit', 'infection_dash:view',
-    'am_dash:submit', 'am_dash:view',
-    'workbench:view',
-    'surgical_check:complete', 'surgical_check:view', 'satisfaction:submit', 'triage:use', 'schedule:book', 'report:view_patient', 'notification:read', 'renewal:pay', 'patient_billing:view',
-    'patient_portal:view', 'medmuse:chat', 'medmuse:patient'],
-  finance: ['dashboard:view', 'drg_budget:view', 'dip:view', 'billing:read',
+  // v5.0试点扩展（P1权限码收敛）：抗菌药物管理专员授予临床+质控分组码
+  ams_officer: ['dashboard:view', 'patient:view',
+    'report:clinical:read', 'report:quality:read',
+    'ams:read', 'ams:approve', 'ams:audit', 'medmuse:chat'],
+  researcher: ['dashboard:view', 'medical_record:read', 'lab:read', 'report:view', 'knowledge:read', 'medmuse:chat'],
+  patient: ['patient_portal:view', 'patient_billing:view', 'satisfaction:view',
+    'notification:read', 'renewal:pay', 'medmuse:patient'],
+  // v5.0试点扩展（P1权限码收敛）：财务/医保授予财务分组码
+  finance: ['dashboard:view',
+    'report:finance:read',
+    'drg_budget:view', 'dip:view', 'billing:read',
     'medmuse:chat', 'medmuse:insurance'],
+  // v5.0试点扩展（P0安全止血）：收费员——门诊/住院收费、退费、票据与结算只读
+  // v5.0试点扩展（P1权限码收敛）：收费员授予财务分组码
+  cashier: [
+    'dashboard:view',
+    'report:finance:read',
+    'patient_billing:read', 'patient_billing:write', 'patient_billing:refund',
+    'patient_billing:report', 'fee:audit:view', 'settlement:view',
+    'medmuse:chat',
+  ],
 };
+
+// v5.0试点扩展（P0安全止血）：科主任——继承医生全部临床权限，叠加科室管理与科室质量审批。
+// 通过展开 doctor 列表构造，避免与 doctor 权限漂移；新增权限时 doctor 列表更新即自动同步。
+ROLE_PERMISSIONS.dept_head = Array.from(
+  new Set([
+    ...(ROLE_PERMISSIONS.doctor ?? []),
+    'dept:manage', 'quality:dept:view', 'quality:dept:approve',
+  ]),
+);
 
 /** 科室名 → 科室编码（缺省退化为拼音无关的固定码） */
 const DEPT_CODE_MAP: Record<string, string> = {
@@ -415,6 +455,9 @@ function toRoleCode(role: string, title: string | null): string {
   if (role === 'admin') return 'system_admin';
   if (role === 'patient') return 'patient';
   if (role === 'researcher') return 'researcher';
+  // v5.0试点扩展（P0安全止血）
+  if (role === 'cashier') return 'cashier';
+  if (role === 'dept_head') return 'dept_head';
   if (role === 'doctor') {
     if (title?.includes('主任') && !title.includes('副')) return 'chief_physician';
     if (title?.includes('副主任')) return 'associate_chief';
@@ -438,6 +481,9 @@ function buildRoleView(roleCode: string, dataScope: FrontDataScope, permissions:
   const nameMap: Record<string, string> = {
     doctor: '医生', pharmacist: '药师', nurse: '护士', technician: '技师',
     admin: '管理员', researcher: '科研人员', patient: '患者',
+    ams_officer: '抗菌药物管理专员', finance: '财务/医保',
+    // v5.0试点扩展（P0安全止血）
+    cashier: '收费员', dept_head: '科主任',
   };
   const frontCode = toRoleCode(roleCode, null);
   return {

@@ -14,7 +14,6 @@ import {
   Row,
   Spin,
   Statistic,
-  Table,
   Tag,
   Typography,
 } from 'antd';

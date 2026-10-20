@@ -27,6 +27,14 @@ public interface ICURecordRepository extends JpaRepository<ICURecord, Long> {
     List<ICURecord> findByPatientId(String patientId);
 
     /**
+     * 按记录编号查询 ICU 监护记录（P1 性能优化：替代 findAll().filter()）。
+     *
+     * @param recordNo 记录编号
+     * @return ICU 监护记录
+     */
+    ICURecord findByRecordNo(String recordNo);
+
+    /**
      * 按记录时间范围查询 ICU 监护记录。
      *
      * @param start 开始时间

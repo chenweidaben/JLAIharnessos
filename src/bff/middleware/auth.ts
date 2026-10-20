@@ -160,8 +160,13 @@ export function attachUser(c: Ctx): void {
   c.user = null;
 }
 
-/** 要求登录，否则 401 */
+/** 要求登录，否则 401（DEMO_MODE=1 时短路放行） */
 export function requireAuth(c: Ctx): Response | null {
+  // M194-P0: DEMO_MODE 下跳过鉴权，直接返回 mock 数据
+  if (process.env.DEMO_MODE === '1') {
+    c.user = c.user ?? { id: 'demo', name: '演示用户', roles: ['admin'], permissions: ['*'] };
+    return null;
+  }
   if (!c.user) {
     return json(fail(ErrorCode.UNAUTHORIZED, '未登录或登录已过期', c.traceId), 401);
   }
@@ -200,12 +205,103 @@ export function requireRoleGuard(
 }
 
 /**
+ * v5.0试点扩展（P1权限码收敛）：报表分组码 → 业务域首段集合。
+ *
+ * 背景：V13 沉淀了 1500+ 个 xxx:read 明细报表码（如 emr:read、nursing-training:read、
+ * drg-budget:read、medical-qc:read…）。逐角色逐码授权已不可维护，故收敛为 4 个分组码。
+ *
+ * 匹配规则（仅作用于 :read 请求，绝不授予 write/审批类能力）：
+ *  1. 取请求码去掉 ":read" 后的资源名（如 "nursing-training"）；
+ *  2. 取资源名 "-" 分隔的首段作为业务域 key（如 "nursing"）；
+ *  3. 用户持有任一 report:* 分组码，且该分组码的集合包含此 key → 视为命中。
+ * 另外用户持有 "report:*" 通配码时放行全部 :read。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+const REPORT_GROUP_DOMAINS: Record<string, ReadonlySet<string>> = {
+  // 临床报表：病历/医嘱/手术/护理/医技/急诊重症/专科
+  'report:clinical:read': new Set([
+    'emr', 'emg', 'medical', 'front', 'archive', 'coding', 'icd', 'death', 'birth',
+    'order', 'prescription', 'medication', 'drug', 'cds',
+    'nursing', 'nurse', 'ward', 'bed', 'mobile', 'handover', 'shift', 'sbar',
+    'operating', 'operation', 'ot', 'surgery', 'surgical', 'anesthesia',
+    'perioperative', 'intraop', 'preop', 'postop', 'pacu', 'postpartum', 'postoperative',
+    'emergency', 'er', 'triage', 'icu', 'critical', 'resuscitation',
+    'observation', 'rescue', 'green', 'acute',
+    'outpatient', 'inpatient', 'patient', 'discharge', 'follow',
+    'appointment', 'referral', 'transfer', 'clinic', 'opd',
+    'lab', 'imaging', 'pathology', 'endoscopy', 'radiology', 'ultrasound',
+    'specimen', 'pharmacy', 'blood', 'transfusion', 'vte', 'antibiotic',
+    'chronic', 'stroke', 'oncology', 'chemo', 'pain', 'palliative',
+    'dialysis', 'rehab', 'rehabilitation', 'geriatric', 'cga',
+    'nutrition', 'tcm', 'maternal', 'maternity', 'newborn', 'neonatal',
+    'pediatric', 'child', 'psych', 'family', 'community',
+    'ai', 'medmuse', 'mdt', 'consult', 'consultation', 'informed', 'consent',
+    'research', 'teaching', 'academic', 'resident', 'doctor', 'mentor',
+    'pressure', 'fall', 'restraint', 'tube', 'infusion', 'iv', 'oxygen',
+    'isolation', 'ssi', 'wound', 'dressing', 'nurse', 'workbench',
+    'dept', 'timeliness', 'emr5', 'dermatology', 'ophthalmology', 'ent',
+  ]),
+  // 管理报表：人员/设备/运营概览/后勤/信息化
+  'report:admin:read': new Set([
+    'hr', 'staff', 'personnel', 'talent', 'recruitment', 'attendance',
+    'succession', 'performance', 'kpi', 'dept', 'department', 'hospital',
+    'admin', 'system', 'data', 'warehouse', 'governance', 'schedule',
+    'roster', 'logistics', 'procurement', 'consumable', 'asset', 'device',
+    'equipment', 'elevator', 'energy', 'environmental', 'environment',
+    'sewage', 'fire', 'security', 'parking', 'laundry', 'catering',
+    'resource', 'ops', 'strategic', 'infra', 'it', 'network',
+    'interoperability', 'intercon4', 'interop', 'integrity',
+    'backup', 'api', 'cybersecurity', 'privacy', 'personal',
+    'information', 'continuing', 'learning', 'training',
+    'service', 'convenience', 'social', 'volunteer', 'publicity', 'public',
+    'party', 'honor', 'contribution', 'meeting', 'administrative',
+    'workload', 'dashboard', 'overview', 'overview', 'flywheel',
+  ]),
+  // 财务报表：DRG/DIP/医保/成本/收费结算
+  'report:finance:read': new Set([
+    'drg', 'dip', 'insurance', 'cost', 'billing', 'payment', 'settlement',
+    'fee', 'revenue', 'expense', 'price', 'invoice', 'budget', 'profit',
+    'salary', 'bonus', 'online', 'operating-cost', 'financial', 'finance',
+    'accounting', 'audit', 'reconciliation', 'refund', 'charge',
+  ]),
+  // 质控报表：病历质量/不良事件/院感/患者安全
+  'report:quality:read': new Set([
+    'medical-qc', 'medical', 'adverse-event', 'adverse', 'event',
+    'infection', 'quality', 'event-review', 'improvement', 'qc',
+    'nosocomial', 'readmission', 'complaint', 'satisfaction', 'safety',
+    'discipline', 'nursing-quality', 'medical-record-quality',
+    'death-review', 'risk', 'jci', 'accreditation', 'grade',
+    'review', 'reviewer', 'sop', 'guideline', 'evidence', 'statistics',
+    'core', 'inspection', 'inspector', 'timeliness', 'emr-assessment',
+  ]),
+};
+
+/**
+ * v5.0试点扩展（P1权限码收敛）：分组码通配判定。
+ * 仅当请求码以 ":read" 结尾时参与通配；精确匹配由调用方先做。
+ */
+function matchReportGroupWildcard(userPerms: string[], code: string): boolean {
+  if (!code.endsWith(':read')) return false;
+  const resource = code.slice(0, -':read'.length);
+  const domainKey = resource.split('-')[0];
+  if (!domainKey) return false;
+  for (const p of userPerms) {
+    if (p === 'report:*') return true;
+    const domains = REPORT_GROUP_DOMAINS[p];
+    if (domains && domains.has(domainKey)) return true;
+  }
+  return false;
+}
+
+/**
  * 业务权限码守卫（如 imaging:view / imaging:ai:analyze / imaging:ai:review）。
  *
  * 与现有 requireRole 同风格：
  *  - 未登录 → 401
  *  - 超级管理员（roles 含 'admin'）一律放行
  *  - 用户显式权限码（JWT permissions 数组）包含该码 → 放行
+ *  - v5.0试点扩展（P1权限码收敛）：:read 请求再按 report:* 分组码通配放行
  *  - 否则 → 403
  */
 export function requirePermissionCode(c: Ctx, code: string): Response | null {
@@ -214,6 +310,8 @@ export function requirePermissionCode(c: Ctx, code: string): Response | null {
   }
   if (c.user.roles.includes('admin')) return null;
   if (c.user.permissions && c.user.permissions.includes(code)) return null;
+  // v5.0试点扩展（P1权限码收敛）：分组码通配（仅 :read）
+  if (c.user.permissions && matchReportGroupWildcard(c.user.permissions, code)) return null;
   return json(
     fail<ApiResponse>(ErrorCode.FORBIDDEN, `权限不足：需要 ${code}`, c.traceId),
     403,

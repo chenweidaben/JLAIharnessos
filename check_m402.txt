@@ -1,0 +1,6 @@
+﻿EmrTemplatesPage lazy: True
+EmrSignaturesPage lazy: True
+EmrTemplatesDetailPage lazy: False
+EmrQualityCheckPage lazy: False
+EmrRetrievalPage lazy: False
+EmrArchivePage lazy: True

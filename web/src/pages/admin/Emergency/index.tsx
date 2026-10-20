@@ -263,13 +263,14 @@ export default function AdminEmergencyPage() {
                 </Descriptions>
                 <Text strong>参演部门：</Text>
                 <Space wrap style={{ marginTop: 8 }}>
-                  {schedule.participants.map((p) => (
+                  {(schedule.participants ?? []).map((p) => (
                     <Tag key={p} color="blue">{p}</Tag>
                   ))}
                 </Space>
                 <br />
                 <Text strong style={{ marginTop: 8, display: 'inline-block' }}>演练目标：</Text>
-                <List size="small" dataSource={schedule.objectives} renderItem={(o) => <List.Item>· {o}</List.Item>} />
+                {/* v5.0试点扩展（M184空壳崩溃修复）：schedule.objectives 为 null 时不白屏 */}
+                <List size="small" dataSource={schedule.objectives ?? []} renderItem={(o) => <List.Item>· {o}</List.Item>} />
               </Card>
             )}
 

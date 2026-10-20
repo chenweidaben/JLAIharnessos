@@ -1,0 +1,6 @@
+﻿/api/v1/fhir/patient=200
+/api/v1/fhir/observation=200
+/api/v1/fhir/condition=200
+/api/v1/fhir/medicationrequest=200
+/api/v1/fhir/encounter=200
+/api/v1/fhir/diagnosticreport=200

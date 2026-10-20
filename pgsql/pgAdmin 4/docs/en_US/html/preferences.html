@@ -1,0 +1,654 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Preferences Dialog &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Keyboard Shortcuts:" href="keyboard_shortcuts.html" />
+    <link rel="prev" title="Tree Control" href="tree_control.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tree_control.html" title="Tree Control"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" accesskey="U">Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preferences Dialog</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="preferences-dialog">
+<span id="preferences"></span><h1><span class="target" id="index-0"></span>Preferences Dialog<a class="headerlink" href="#preferences-dialog" title="Link to this heading">¶</a></h1>
+<p>Use options on the <em>Preferences</em> dialog to customize the behavior of the client.
+To open the <em>Preferences</em> dialog, select <em>Preferences</em> from the <em>File</em> menu.
+The left pane of the <em>Preferences</em> dialog displays a tree control; each node of
+the tree control provides access to options that are related to the node under
+which they are displayed.</p>
+<ul class="simple">
+<li><p>Use the plus sign (+) to the left of a node name to expand a segment of the
+tree control.</p></li>
+<li><p>Use the minus sign (-) to the left of a node name to close that node.</p></li>
+</ul>
+<section id="the-browser-node">
+<h2>The Browser Node<a class="headerlink" href="#the-browser-node" title="Link to this heading">¶</a></h2>
+<p>Use preferences found in the <em>Browser</em> node of the tree control to personalize
+your workspace.</p>
+<img alt="Preferences dialog browser display options" class="align-center" src="_images/preferences_browser_display.png" />
+<p>Use the fields on the <em>Display</em> panel to specify general display preferences:</p>
+<ul class="simple">
+<li><p>When the <em>Auto-expand sole children</em> switch is set to <em>True</em>, child nodes will
+be automatically expanded if a treeview node is expanded and has only a single
+child.</p></li>
+<li><p>Use the <em>Object explorer state saving interval</em> field to set the treeview state
+saving interval. A value of <em>-1</em> will disable the treeview state saving
+functionality.</p></li>
+<li><p>When the <em>Confirm before closing properties with unsaved changes</em> switch is set to <em>True</em>,
+pgAdmin will warn you before closing the properties dialog of an object if there
+are any unsaved changes. On user confirmation, the properties dialog will close.</p></li>
+<li><p>When the <em>Confirm on close or refresh</em> switch is set to <em>True</em>, pgAdmin will
+attempt to catch browser close or refresh events and prompt before allowing
+them to continue.</p></li>
+<li><p>When the <em>Hide shared servers?</em> switch is set to <em>True</em>, the client will hide
+all the shared servers from the object explorer. <strong>Note:</strong> This option is visible only when
+pgAdmin is running in server mode.</p></li>
+<li><p>When the <em>Show empty object collections?</em> switch is turned off, then all object
+collections which are empty will be hidden from browser tree.</p></li>
+<li><p>When the <em>Show system objects?</em> switch is set to <em>True</em>, the client will
+display system objects such as system schemas (for example, <em>pg_temp</em>) or
+system columns (for example,  <em>xmin</em> or <em>ctid</em>) in the tree control.</p></li>
+<li><p>When the <em>Show template databases?</em> switch is set to <em>True</em>, the client will
+display template databases.</p></li>
+</ul>
+<p>Use the fields on the <em>Keyboard shortcuts</em> panel to configure shortcuts for the
+main window navigation:</p>
+<img alt="Preferences dialog browser keyboard shortcuts section" class="align-center" src="_images/preferences_browser_keyboard_shortcuts.png" />
+<ul class="simple">
+<li><p>The panel displays a list of keyboard shortcuts available for the main window;
+select the combination of the modifier keys along with the key to configure
+each shortcut.</p></li>
+</ul>
+<p>Use the fields on the <em>Nodes</em> panel to select the object types that will be
+displayed in the <em>Browser</em> tree control:</p>
+<img alt="Preferences dialog browser nodes section" class="align-center" src="_images/preferences_browser_nodes.png" />
+<ul class="simple">
+<li><p>The panel displays a list of database objects; slide the switch located next
+to each object to <em>Show</em> or <em>Hide</em> the database object. When querying system
+catalogs, you can reduce the number of object types displayed to increase
+speed.</p></li>
+</ul>
+<p>Use the fields on the <em>Object Breadcrumbs</em> panel to change object breadcrumbs
+related settings:</p>
+<img alt="Preferences dialog object breadcrumbs section" class="align-center" src="_images/preferences_browser_breadcrumbs.png" />
+<ul class="simple">
+<li><p>Use <em>Enable object breadcrumbs?</em> to enable or disable object breadcrumbs
+displayed on on object mouse hover.</p></li>
+<li><p>Use <em>Show comment with object breadcrumbs?</em> to enable or disable the
+comment visibility which comes displayed with object breadcrumbs.</p></li>
+</ul>
+<p>Use the fields on the <em>Processes</em> panel to change processes tab
+related settings:</p>
+<img alt="Preferences dialog processes section" class="align-center" src="_images/preferences_browser_processes.png" />
+<ul class="simple">
+<li><p>Change <em>Process details/logs retention days</em> to the number of days,
+the process info and logs will be automatically cleared.</p></li>
+</ul>
+<p>Use fields on the <em>Properties</em> panel to specify browser properties:</p>
+<img alt="Preferences dialog browser properties section" class="align-center" src="_images/preferences_browser_properties.png" />
+<ul class="simple">
+<li><p>Include a value in the <em>Count rows if estimated less than</em> field to perform a
+SELECT count(*) if the estimated number of rows in a table (as read from the
+table statistics) is below the specified limit.  After performing the SELECT
+count(*), pgAdmin will display the row count.  The default is 2000.</p></li>
+<li><p>Provide a value in the <em>Maximum job history rows</em> field to limit the number of
+rows to show on the statistics tab for pgAgent jobs.  The default is 250.</p></li>
+</ul>
+<p>Use field on <em>Tab settings</em> panel to specify the tab related properties.</p>
+<img alt="Preferences dialog browser properties section" class="align-center" src="_images/preferences_browser_tab_settings.png" />
+<ul class="simple">
+<li><p>Use <em>Debugger tab title placeholder</em> field to customize the Debugger tab title.</p></li>
+<li><p>When the <em>Dynamic tab size</em> If set to True, the tabs will take full size as per the title, it will also applicable for already opened tabs</p></li>
+<li><p>When the <em>Open in new browser tab</em> filed is selected for Query tool, Schema Diff or Debugger, it will
+open in a new browser tab when invoked.</p></li>
+<li><p>Use the <em>Query tool tab title placeholder</em> field to customize the query tool tab title.</p></li>
+<li><p>Use <em>View/Edit tab title placeholder</em> field to customize the View/Edit Data tab title.</p></li>
+</ul>
+</section>
+<section id="the-dashboards-node">
+<h2>The Dashboards Node<a class="headerlink" href="#the-dashboards-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Dashboards</em> node to specify your dashboard display preferences.</p>
+<img alt="Preferences dialog dashboard display options" class="align-center" src="_images/preferences_dashboard_display.png" />
+<ul class="simple">
+<li><p>Set the warning and alert threshold value to highlight the long-running
+queries on the dashboard.</p></li>
+<li><p>When the <em>Show activity?</em> switch is set to <em>True</em>, activity tables will be
+displayed on dashboards.</p></li>
+<li><p>When the <em>Show graphs?</em> switch is set to <em>True</em>, graphs will be displayed on
+dashboards.</p></li>
+</ul>
+<img alt="Preferences dialog dashboard refresh options" class="align-center" src="_images/preferences_dashboard_refresh.png" />
+<p>Use the fields on the <em>Refresh rates</em> panel to specify your refersh rates
+preferences for the graphs on the <em>Dashboard</em> tab:</p>
+<ul class="simple">
+<li><p>Use the <em>Average load statistics refresh rate</em> field to specify the number of
+seconds between average load statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Block I/O statistics refresh rate</em> field to specify the number of
+seconds between block I/O statistic samples displayed in graphs.</p></li>
+<li><p>Use the <em>CPU usage per process statistics refresh rate</em> field to specify the number of
+seconds between CPU usage per process statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Handle &amp; Process count statistics refresh rate</em> field to specify the number
+of seconds between handle &amp; process count statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>I/O analysis statistics refresh rate</em> field to specify the number
+of seconds between I/O analysis statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Memory usage per process statistics refresh rate</em> field to specify the number
+of seconds between memory usage per process statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Memory usage statistics refresh rate</em> field to specify the number
+of seconds between memory usage statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Percentage of CPU time used by different process modes statistics refresh rate</em>
+field to specify the number of seconds between Percentage of CPU time used by different
+process modes samples displayed in graphs.</p></li>
+<li><p>Use the <em>Session statistics refresh rate</em> field to specify the number of
+seconds between session statistic samples displayed in graphs.</p></li>
+<li><p>Use the <em>Swap memory usage statistics refresh rate</em> field to specify the number of
+seconds between swap memory usage statistics samples displayed in graphs.</p></li>
+<li><p>Use the <em>Transaction throughput refresh rate</em> field to specify the number of
+seconds between transaction throughput samples displayed in graphs.</p></li>
+<li><p>Use the <em>Tuples in refresh rate</em> field to specify the number of seconds
+between tuples-in samples displayed in graphs.</p></li>
+<li><p>Use the <em>Tuples out refresh rate</em> field to specify the number of seconds
+between tuples-out samples displayed in graphs.</p></li>
+</ul>
+</section>
+<section id="the-debugger-node">
+<h2>The Debugger Node<a class="headerlink" href="#the-debugger-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Debugger</em> node to specify your debugger display preferences.</p>
+<p>Use the fields on the <em>Keyboard shortcuts</em> panel to configure shortcuts for the
+debugger window navigation:</p>
+<img alt="Preferences dialog debugger keyboard shortcuts section" class="align-center" src="_images/preferences_debugger_keyboard_shortcuts.png" />
+</section>
+<section id="the-erd-tool-node">
+<h2>The ERD Tool Node<a class="headerlink" href="#the-erd-tool-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>ERD Tool</em> node to specify your ERD Tool display preferences.</p>
+<p>Use the fields on the <em>Keyboard shortcuts</em> panel to configure shortcuts for the
+ERD Tool window navigation:</p>
+<img alt="Preferences dialog erd keyboard shortcuts section" class="align-center" src="_images/preferences_erd_keyboard_shortcuts.png" />
+<p>Use the fields on the <em>Options</em> panel to manage ERD preferences.</p>
+<img alt="Preferences dialog erd options section" class="align-center" src="_images/preferences_erd_options.png" />
+<ul class="simple">
+<li><p>Use <em>Cardinality Notation</em> to change the cardinality notation format
+used to present relationship links.</p></li>
+<li><p>When the <em>SQL With DROP Table</em> switch is set to <em>True</em>, the SQL
+generated by the ERD Tool will add DROP table DDL before each CREATE
+table DDL.</p></li>
+<li><p><em>Table Relation Depth</em> is useful when generating an ERD for a table.
+It allows to set the limit on the depth level pgAdmin should traverse
+to find the relations. Use -1 to set no limit.</p></li>
+</ul>
+</section>
+<section id="the-graphs-node">
+<h2>The Graphs Node<a class="headerlink" href="#the-graphs-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Graphs</em> node to specify your Graphs display preferences.</p>
+<img alt="Preferences dialog dashboard graph options" class="align-center" src="_images/preferences_dashboard_graphs.png" />
+<ul class="simple">
+<li><p>Use the <em>Chart line width</em> field to specify the width of the lines on the
+line chart.</p></li>
+<li><p>When the <em>Show graph data points?</em> switch is set to <em>True</em>, data points will
+be visible on graph lines.</p></li>
+<li><p>When the <em>Show mouse hover tooltip?</em> switch is set to <em>True</em>, a tooltip will
+appear on mouse hover on the graph lines giving the data point details.</p></li>
+<li><p>When the <em>Use different data point styles?</em> switch is set to <em>True</em>,
+data points will be visible in a different style on each graph lines.</p></li>
+</ul>
+</section>
+<section id="the-miscellaneous-node">
+<h2>The Miscellaneous Node<a class="headerlink" href="#the-miscellaneous-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Miscellaneous</em> node to specify miscellaneous display preferences.</p>
+<img alt="Preferences dialog user language section" class="align-center" src="_images/preferences_misc_user_language.png" />
+<ul class="simple">
+<li><p>Use the <em>User language</em> drop-down listbox to select the display language for
+the client.</p></li>
+</ul>
+<img alt="Preferences dialog themes section" class="align-center" src="_images/preferences_misc_themes.png" />
+<ul class="simple">
+<li><p>Use the <em>Themes</em> drop-down listbox to select the theme for pgAdmin. You’ll also get a preview just below the
+drop down. You can also submit your own themes,
+check <a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/blob/master/README.md">here</a> how.
+Currently we support Standard, Dark and High Contrast and System theme. Selecting System option will follow
+your computer’s settings.</p></li>
+</ul>
+</section>
+<section id="the-paths-node">
+<h2>The Paths Node<a class="headerlink" href="#the-paths-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Paths</em> node to specify the locations of supporting utility and help
+files.</p>
+<img alt="Preferences dialog binary path section" class="align-center" src="_images/preferences_paths_binary.png" />
+<p>Use the fields on the <em>Binary paths</em> panel to specify the path to the directory
+that contains the utility programs (pg_dump, pg_dumpall, pg_restore and psql) for
+monitored databases:</p>
+<ul class="simple">
+<li><p>Use the <em>EDB Advanced Server Binary Path</em> grid to specify the location of the
+EDB Postgres Advanced Server utility programs based on the server version.
+If the respective path is not set, then pgAdmin will pick up the path for which
+‘Set as default’ is checked else pgAdmin will attempt to find the utilities in
+standard locations used by EnterpriseDB.</p></li>
+<li><p>Use the <em>PostgreSQL Binary Path</em> grid to specify the location of the
+PostgreSQL utility programs based on the server version. If the respective
+path is not set, then pgAdmin will pick up the path for which ‘Set as default’
+is checked else pgAdmin will attempt to find the utilities in standard
+locations used by PostgreSQL.</p></li>
+</ul>
+<p><strong>Note:</strong> Use the ‘Validate path’ button to check the existence of the utility
+programs (pg_dump, pg_dumpall, pg_restore and psql) and there respective versions.</p>
+<img alt="Preferences dialog binary path help section" class="align-center" src="_images/preferences_paths_help.png" />
+<p>Use the fields on the <em>Help</em> panel to specify the location of help files.</p>
+<ul class="simple">
+<li><p>Use the <em>PostgreSQL Help Path</em> to specify the path to PostgreSQL
+documentation.</p></li>
+</ul>
+<p>Please note: the default help paths include the <em>VERSION</em> placeholder; the
+$VERSION$ placeholder will be replaced by the current database version.</p>
+</section>
+<section id="the-query-tool-node">
+<h2>The Query Tool Node<a class="headerlink" href="#the-query-tool-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Query Tool</em> node to access panels that allow you to specify your
+preferences for the Query Editor tool.</p>
+<img alt="Preferences dialog sqleditor auto completion option" class="align-center" src="_images/preferences_sql_auto_completion.png" />
+<p>Use the fields on the <em>Auto Completion</em> panel to set the auto completion options.</p>
+<ul class="simple">
+<li><p>When the <em>Autocomplete on key press</em> switch is set to <em>True</em> then autocomplete
+will be available on key press along with CTRL/CMD + Space. If it is set to
+<em>False</em> then autocomplete is only activated when CTRL/CMD + Space is pressed.</p></li>
+<li><p>When the <em>Keywords in uppercase</em> switch is set to <em>True</em> then keywords are
+shown in upper case.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor csv output option" class="align-center" src="_images/preferences_sql_csv_output.png" />
+<p>Use the fields on the <em>CSV/TXT Output</em> panel to control the CSV/TXT output.</p>
+<ul class="simple">
+<li><p>Use the <em>CSV field separator</em> drop-down listbox to specify the separator
+character that will be used in CSV/TXT output.</p></li>
+<li><p>Use the <em>CSV quote character</em> drop-down listbox to specify the quote character
+that will be used in CSV/TXT output.</p></li>
+<li><p>Use the <em>CSV quoting</em> drop-down listbox to select the fields that will be
+quoted in the CSV/TXT output; select <em>Strings</em>, <em>All</em>, or <em>None</em>.</p></li>
+<li><p>Use the <em>Replace null values with</em> option to replace null values with
+specified string in the output file. Default is set to ‘NULL’.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor display options" class="align-center" src="_images/preferences_sql_display.png" />
+<p>Use the fields on the <em>Display</em> panel to specify your preferences for the Query
+Tool display.</p>
+<ul class="simple">
+<li><p>When the <em>Connection status</em> switch is set to <em>True</em>, each new instance of the
+Query Tool will display connection and transaction status.</p></li>
+<li><p>Use the <em>Connection status refresh rate</em> field to specify the number of
+seconds between connection/transaction status updates.</p></li>
+<li><p>When the <em>Show query success notification?</em> switch is set to <em>True</em>, the Query Tool
+will show notifications on successful query execution.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor editor settings" class="align-center" src="_images/preferences_sql_editor.png" />
+<p>Use the fields on the <em>Editor</em> panel to change settings of the query editor.</p>
+<ul class="simple">
+<li><p>When the <em>Brace matching?</em> switch is set to <em>True</em>, the editor will highlight
+pairs of matched braces.</p></li>
+<li><p>When the <em>Code folding?</em> switch is set to <em>False</em>, the editor will disable
+code folding. Disabling will improve editor performance with large files.</p></li>
+<li><p>Use the <em>Font size</em> field to specify the font size that will be used in text
+boxes and editors.</p></li>
+<li><p>When the <em>Insert bracket pairs?</em> switch is set to <em>True</em>, the editor will
+automatically insert paired brackets.</p></li>
+<li><p>When the <em>Line wrapping</em> switch is set to <em>True</em>, the editor will implement
+line-wrapping behavior.</p></li>
+<li><p>When the <em>Plain text mode?</em> switch is set to <em>True</em>, the editor mode will be
+changed to text/plain. Keyword highlighting and code folding will be disabled.
+This will improve editor performance with large files.</p></li>
+<li><p>When the <em>Highlight selection matches?</em> switch is set to <em>True</em>, the editor will
+highlight matched selected text.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor explain options" class="align-center" src="_images/preferences_sql_explain.png" />
+<p>Use the fields on the <em>Explain</em> panel to specify the level of detail included in
+a graphical EXPLAIN.</p>
+<ul class="simple">
+<li><p>When the <em>Show buffers?</em> switch is set to <em>True</em>, graphical explain details
+will include information about buffer usage.</p></li>
+<li><p>When the <em>Show costs?</em> switch is set to <em>True</em>, graphical explain details will
+include information about the estimated startup and total cost of each plan,
+as well as the estimated number of rows and the estimated width of each row.</p></li>
+<li><p>When the <em>Show settings?</em> switch is set to <em>True</em>, graphical explain details
+will include the information on the configuration parameters.</p></li>
+<li><p>When the <em>Show summary?</em> switch is set to <em>True</em>, graphical explain details
+will include the summary information about the query plan.</p></li>
+<li><p>When the <em>Show timing?</em> switch is set to <em>True</em>, graphical explain details
+will include the startup time and time spent in each node in the output.</p></li>
+<li><p>When the <em>Show wal?</em> switch is set to <em>True</em>, graphical explain details
+will include the information on WAL record generation.</p></li>
+<li><p>When the <em>Verbose output?</em> switch is set to <em>True</em>, graphical explain details
+will include extended information about the query execution plan.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor graph visualiser section" class="align-center" src="_images/preferences_graph_visualiser.png" />
+<p>Use the fields on the <em>Graph Visualiser</em> panel to specify the settings
+related to graphs.</p>
+<ul class="simple">
+<li><p>Use the <em>Row Limit</em> field to specify the maximum number of rows that will
+be plotted on a chart.</p></li>
+</ul>
+<img alt="Preferences dialog sqleditor options section" class="align-center" src="_images/preferences_sql_options.png" />
+<p>Use the fields on the <em>Options</em> panel to manage editor preferences.</p>
+<ul class="simple">
+<li><p>When the <em>Auto commit?</em> switch is set to <em>True</em>, each successful query is
+committed after execution.</p></li>
+<li><p>When the <em>Auto rollback on error?</em> switch is set to <em>True</em>, failed queries are rolled
+back.</p></li>
+<li><p>When the <em>Copy SQL from main window to query tool?</em> switch is set to <em>True</em>,
+the CREATE sql of the selected object will be copied to query tool when query tool
+will open.</p></li>
+<li><p>When the <em>Prompt to save unsaved data changes?</em> switch is set to <em>True</em>, the
+editor will prompt the user to saved unsaved data when exiting the data
+editor.</p></li>
+<li><p>When the <em>Prompt to save unsaved query changes?</em> switch is set to <em>True</em>, the
+editor will prompt the user to saved unsaved query modifications when exiting
+the Query Tool.</p></li>
+<li><p>When the <em>Prompt to commit/rollback active transactions?</em> switch is set to
+<em>True</em>, the editor will prompt the user to commit or rollback changes when
+exiting the Query Tool while the current transaction is not committed.</p></li>
+<li><p>When the <em>Sort View Data results by primary key columns?</em> If set to <em>True</em>,
+data returned when using the View/Edit Data - All Rows option will be sorted
+by the Primary Key columns by default. When using the First/Last 100 Rows options,
+data is always sorted.</p></li>
+<li><p>When the <em>Show View/Edit Data Promotion Warning?</em> switch is set to <em>True</em>
+View/Edit Data tool will show promote to Query tool confirm dialog on query edit.</p></li>
+<li><p>When the <em>Underline query at cursor?</em> switch is set to <em>True</em>, query tool will
+parse and underline the query at the cursor position.</p></li>
+<li><p>When the <em>Underlined query execute warning?</em> switch is set to <em>True</em>, query tool
+will warn upon clicking the <em>Execute Query</em> button in the query tool.  The warning
+will appear only if <em>Underline query at cursor?</em> is set to <em>False</em>.</p></li>
+</ul>
+<img alt="Preferences dialog sql results grid section" class="align-center" src="_images/preferences_sql_results_grid.png" />
+<p>Use the fields on the <em>Results grid</em> panel to specify your formatting
+preferences for copied data.</p>
+<ul class="simple">
+<li><p>When the <em>Columns sized by</em> is set to <em>Column data</em>, then data columns will
+auto-size to the maximum width of the data in the column as loaded in the
+first batch. If set to <em>Column name</em>, the column will be sized to the widest
+of the data type or column name.</p></li>
+<li><p>Specify the maximum width of the column in pixels when ‘Columns sized by’ is
+set to <em>Column data</em>. If ‘Columns sized by’ is set to <em>Column name</em> then this
+setting won’t have any effect.</p></li>
+<li><p>Specify the number of records to fetch in one batch in query tool when
+query result set is large. Changing this value will override
+ON_DEMAND_ROW_COUNT setting from config file.</p></li>
+<li><p>Use the <em>Result copy field separator</em> drop-down listbox to select the field
+separator for copied data.</p></li>
+<li><p>Use the <em>Result copy quote character</em> drop-down listbox to select the quote
+character for copied data.</p></li>
+<li><p>Use the <em>Result copy quoting</em> drop-down listbox to select which type of fields
+require quoting; select <em>All</em>, <em>None</em>, or <em>Strings</em>.</p></li>
+</ul>
+<img alt="Preferences dialog sql keyboard shortcuts section" class="align-center" src="_images/preferences_sql_keyboard_shortcuts.png" />
+<p>Use the fields on the <em>Keyboard shortcuts</em> panel to configure shortcuts for the
+Query Tool window navigation.</p>
+<img alt="Preferences dialog SQL Formatting section" class="align-center" src="_images/preferences_sql_formatting.png" />
+<p>Use the fields on the <em>SQL formatting</em> panel to specify your preferences for
+reformatting of SQL.</p>
+<ul class="simple">
+<li><p>Use the <em>Data type case</em> option to specify whether to change data types
+into upper, lower, or preserve case.</p></li>
+<li><p>Use the <em>Expression width</em> option to specify maximum number of characters
+in parenthesized expressions to be kept on single line.</p></li>
+<li><p>Use the <em>Function case</em> option to specify whether to change function
+names into upper, lower, or preserve case.</p></li>
+<li><p>Use the <em>Identifier case</em> option to specify whether to change identifiers
+(object names) into upper, lower, or capitalized case.</p></li>
+<li><p>Use the <em>Keyword case</em> option to specify whether to change keywords into
+upper, lower, or preserve case.</p></li>
+<li><p>Use <em>Lines between queries</em> to specify how many empty lines to leave
+between SQL statements. If set to zero it puts no new line.</p></li>
+<li><p>Use <em>Logical operator new line</em> to specify newline placement before or
+after logical operators (AND, OR, XOR).</p></li>
+<li><p>Use <em>New line before semicolon?</em> to specify whether to place query
+separator (;) on a separate line.</p></li>
+<li><p>Use the <em>Spaces around operators?</em> option to specify whether or not to include
+spaces on either side of operators.</p></li>
+<li><p>Use the <em>Tab size</em> option to specify the number of spaces per tab or indent.</p></li>
+<li><p>Use the <em>Use spaces?</em> option to select whether to use spaces or tabs when
+indenting.</p></li>
+</ul>
+</section>
+<section id="the-schema-diff-node">
+<h2>The Schema Diff Node<a class="headerlink" href="#the-schema-diff-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Schema Diff</em> node to specify your display preferences.</p>
+<img alt="Preferences schema diff" class="align-center" src="_images/preferences_schema_diff.png" />
+<p>Use the <em>Ignore Grant/Revoke</em> switch to ignores the grant and revoke command while comparing the objects.</p>
+<p>Use the <em>Ignore Owner</em> switch to ignores the owner while comparing the objects.</p>
+<p>Use the <em>Ignore Tablespace</em> switch to ignores the tablespace while comparing the objects.</p>
+<p>Use the <em>Ignore Whitespace</em> switch to ignores the whitespace while comparing
+the string objects. Whitespace includes space, tabs, and CRLF.</p>
+</section>
+<section id="the-storage-node">
+<h2>The Storage Node<a class="headerlink" href="#the-storage-node" title="Link to this heading">¶</a></h2>
+<p>Expand the <em>Storage</em> node to specify your storage preferences.</p>
+<img alt="Preferences dialog storage section" class="align-center" src="_images/preferences_storage_options.png" />
+<p>Use the fields on the <em>Options</em> panel to specify storage preferences.</p>
+<ul class="simple">
+<li><p>Use the <em>File dialog view</em> drop-down listbox to select the style of icons and
+display format that will be displayed when you open the file manager; select
+<em>List</em> to display a list view, or <em>Grid</em> to display folder icons.</p></li>
+<li><p>Use the <em>Last directory visited</em> field to specify the name of the folder in
+which the file manager will open.</p></li>
+<li><p>Use the <em>Maximum file upload size(MB)</em> field on the <em>Options</em> panel of the
+<strong>Storage</strong> node to specify the maximum file size for an upload.</p></li>
+<li><p>When the <em>Show hidden files and folders?</em> switch is set to <em>True</em>, the file
+manager will display hidden files and folders.</p></li>
+</ul>
+<section id="using-setup-py-command-line-script">
+<h3>Using ‘setup.py’ command line script<a class="headerlink" href="#using-setup-py-command-line-script" title="Link to this heading">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To manage preferences using <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script, you must use
+the Python interpreter that is normally used to run pgAdmin to ensure
+that the required Python packages are available. In most packages, this
+can be found in the Python Virtual Environment that can be found in the
+installation directory. When using platform-native packages, the system
+installation of Python may be the one used by pgAdmin.</p>
+</div>
+</section>
+</section>
+<section id="manage-preferences">
+<h2>Manage Preferences<a class="headerlink" href="#manage-preferences" title="Link to this heading">¶</a></h2>
+</section>
+<section id="get-preferences">
+<h2>Get Preferences<a class="headerlink" href="#get-preferences" title="Link to this heading">¶</a></h2>
+<p>To get all the preferences listed, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">get-prefs</span></code> command line option.
+You can also get this mapping by hovering the individual preference in the Preference UI dialog.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>get-prefs
+</pre></div>
+</div>
+</section>
+<section id="save-preferences">
+<h2>Save Preferences<a class="headerlink" href="#save-preferences" title="Link to this heading">¶</a></h2>
+<p>To save the preferences, invoke <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> with <code class="docutils literal notranslate"><span class="pre">set-prefs</span></code> command line option, followed by username,
+preference_key=value and auth_source. Multiple preference can be given too by a space separated.
+If auth_source is not given, Internal authentication will be consider by default.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>set-prefs<span class="w"> </span>user1@gmail.com<span class="w"> </span>sqleditor:editor:comma_first<span class="o">=</span><span class="nb">true</span>
+
+<span class="c1"># To specify multiple preferences options</span>
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>set-prefs<span class="w"> </span>user1@gmail.com<span class="w"> </span>sqleditor:editor:comma_first<span class="o">=</span><span class="nb">true</span><span class="w"> </span>sqleditor:keyboard_shortcuts:toggle_case<span class="o">=</span><span class="nb">true</span>
+
+<span class="c1"># to specify an auth_source</span>
+/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>set-prefs<span class="w"> </span>user1@gmail.com<span class="w"> </span>sqleditor:editor:comma_first<span class="o">=</span><span class="nb">true</span><span class="w"> </span>--auth-source<span class="o">=</span>ldap
+</pre></div>
+</div>
+</section>
+<section id="updating-preferences-preferences-json">
+<h2>Updating Preferences preferences.json<a class="headerlink" href="#updating-preferences-preferences-json" title="Link to this heading">¶</a></h2>
+<p>To update preferences defined in json file, simply run <code class="docutils literal notranslate"><span class="pre">setup.py</span> <span class="pre">``</span> <span class="pre">with</span> <span class="pre">``set-prefs</span></code> command followed by username
+and JSON file containing the preferences.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/python<span class="w"> </span>/path/to/setup.py<span class="w"> </span>set-prefs<span class="w"> </span>user1@gmail.com<span class="w"> </span>--input-file<span class="w"> </span>/Users/yogeshmahajan/Desktop/pref.json
+</pre></div>
+</div>
+</section>
+<section id="json-format">
+<h2>JSON format<a class="headerlink" href="#json-format" title="Link to this heading">¶</a></h2>
+<p>The JSON file simply contains preference_key=value. Preference key value mapping can be obtained by hovering the
+individual preference in the Preference UI dialog.</p>
+<p>The following is an typical example for preferences.json :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;preferences&quot;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;browser:display:show_system_objects&quot;</span><span class="p">:</span>  <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;browser:display:show_user_defined_templates&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+            <span class="s2">&quot;browser:display:confirm_on_refresh_close&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+            <span class="s2">&quot;misc:themes:theme&quot;</span><span class="p">:</span> <span class="s2">&quot;dark&quot;</span><span class="p">,</span>
+
+        <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Preferences Dialog</a><ul>
+<li><a class="reference internal" href="#the-browser-node">The Browser Node</a></li>
+<li><a class="reference internal" href="#the-dashboards-node">The Dashboards Node</a></li>
+<li><a class="reference internal" href="#the-debugger-node">The Debugger Node</a></li>
+<li><a class="reference internal" href="#the-erd-tool-node">The ERD Tool Node</a></li>
+<li><a class="reference internal" href="#the-graphs-node">The Graphs Node</a></li>
+<li><a class="reference internal" href="#the-miscellaneous-node">The Miscellaneous Node</a></li>
+<li><a class="reference internal" href="#the-paths-node">The Paths Node</a></li>
+<li><a class="reference internal" href="#the-query-tool-node">The Query Tool Node</a></li>
+<li><a class="reference internal" href="#the-schema-diff-node">The Schema Diff Node</a></li>
+<li><a class="reference internal" href="#the-storage-node">The Storage Node</a><ul>
+<li><a class="reference internal" href="#using-setup-py-command-line-script">Using ‘setup.py’ command line script</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#manage-preferences">Manage Preferences</a></li>
+<li><a class="reference internal" href="#get-preferences">Get Preferences</a></li>
+<li><a class="reference internal" href="#save-preferences">Save Preferences</a></li>
+<li><a class="reference internal" href="#updating-preferences-preferences-json">Updating Preferences preferences.json</a></li>
+<li><a class="reference internal" href="#json-format">JSON format</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="login.html">Login Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mfa.html">Enabling two-factor authentication (2FA)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_ownership.html">Change Ownership Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_user_password.html">Change User Password Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restore_locked_user.html">Lock/Restore Account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldap.html">Enabling LDAP Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kerberos.html">Enabling Kerberos Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oauth2.html">Enabling OAUTH2 Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webserver.html">Enabling Webserver Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="menu_bar.html">Menu Bar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbar.html">Toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tabbed_browser.html">Tabbed Browser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tree_control.html">Tree Control</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Preferences Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keyboard_shortcuts.html">Keyboard Shortcuts:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="search_objects.html">Search objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tree_control.html" title="Tree Control"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" >Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preferences Dialog</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:">next</a> |</li>
+            <li class="right" ><a href="tree_control.html" title="Tree Control">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

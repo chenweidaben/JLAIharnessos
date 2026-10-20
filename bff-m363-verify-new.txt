@@ -1,0 +1,6 @@
+﻿/api/v1/service/appointments=200
+/api/v1/service/payments=200
+/api/v1/service/querys=200
+/api/v1/service/reminders=200
+/api/v1/service/feedback=200
+/api/v1/service/satisfaction=200

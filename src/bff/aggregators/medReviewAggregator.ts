@@ -47,8 +47,45 @@ function runLocalRules(drugName: string, patientAge?: number, allergies?: string
   return alerts;
 }
 
+/**
+ * v5.0试点扩展（M189 EMR/AI种子）：DEMO_MODE 用药审查确定性种子。
+ * 固定 3 条审查结果（药品/类型/相互作用/风险等级 低-中-高），
+ * severity 取 info(低)/warning(中)/critical(高) 三档各一，
+ * 字段与 MedReview（medReviewRepo.mapRow）一致。
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+function buildDemoReviews(visitId: string) {
+  const vid = visitId || 'V2026DEMO001';
+  const now = new Date().toISOString();
+  return [
+    {
+      id: 'demo-mr-1', visitId: vid, orderId: 'ORD-2026101901', drugName: '华法林钠片',
+      reviewType: 'interaction', severity: 'critical',
+      message: '华法林与阿司匹林/NSAIDs 联用显著增加消化道及颅内出血风险',
+      suggestion: '建议监测 INR（目标 2.0-3.0），必要时调整剂量或避免联用',
+      status: 'open', reviewedBy: null, reviewedAt: null, overrideReason: null, createdAt: now,
+    },
+    {
+      id: 'demo-mr-2', visitId: vid, orderId: 'ORD-2026101902', drugName: '布洛芬缓释胶囊',
+      reviewType: 'dose', severity: 'warning',
+      message: '老年患者（>65岁）长期使用 NSAIDs 增加胃肠出血与肾损伤风险',
+      suggestion: '建议短期使用、饭后服用，必要时联用胃黏膜保护剂',
+      status: 'open', reviewedBy: null, reviewedAt: null, overrideReason: null, createdAt: now,
+    },
+    {
+      id: 'demo-mr-3', visitId: vid, orderId: 'ORD-2026101903', drugName: '注射用头孢曲松钠',
+      reviewType: 'info', severity: 'info',
+      message: '抗菌药物使用应符合分级管理要求，建议根据药敏结果调整',
+      suggestion: '用药前完善皮试，疗程一般不超过 7-14 天',
+      status: 'acknowledged', reviewedBy: 'demo-pharmacist', reviewedAt: now, overrideReason: null, createdAt: now,
+    },
+  ];
+}
+
 export async function listView(view: AuthView, visitId: string) {
   if (!view.permissions.includes('med_review:view')) throw new MedReviewError(403, '无查看权限');
+  // v5.0试点扩展（M189 EMR/AI种子）：DEMO_MODE 直接返回确定性演示种子（不强制 visitId）
+  if (process.env.DEMO_MODE === '1') return buildDemoReviews(visitId);
   if (!visitId) throw new MedReviewError(400, 'visitId 必填');
   return repo.listOpenByVisit(visitId);
 }

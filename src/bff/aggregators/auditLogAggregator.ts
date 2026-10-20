@@ -33,26 +33,78 @@ import {
 
 /** 分页查询哈希链审计日志（DB 分页） */
 export async function queryAuditLogPage(filter: AuditLogFilter) {
+  // M199 空数据修复：DEMO_MODE 下返回确定性审计日志种子，不写库、不依赖 PG。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demoItems: AuditLogView[] = [
+      { seq: 10001, traceId: 'demo-trace-001', actorId: 'u-admin', actorName: '系统管理员', actorRole: 'admin', action: 'user.create', resourceType: 'system_user', resourceId: 'demo-pat-01', result: 'success', riskLevel: 'medium', clientIp: '10.8.0.12', userAgent: 'Mozilla/5.0', detail: { username: 'doctor_zhou', dept: '心血管内科' }, createdAt: new Date(now - 1800_000).toISOString() },
+      { seq: 10002, traceId: 'demo-trace-002', actorId: 'u-li', actorName: '李医生', actorRole: 'doctor', action: 'emr.view', resourceType: 'medical_record', resourceId: 'mr-202601', result: 'success', riskLevel: 'low', clientIp: '10.8.1.35', userAgent: 'Mozilla/5.0', detail: { patient: '张*三' }, createdAt: new Date(now - 3600_000).toISOString() },
+      { seq: 10003, traceId: 'demo-trace-003', actorId: 'u-wang', actorName: '王护士', actorRole: 'nurse', action: 'order.med_admin', resourceType: 'order', resourceId: 'ord-8821', result: 'success', riskLevel: 'low', clientIp: '10.8.2.47', userAgent: 'Mozilla/5.0', detail: { drug: '头孢呋辛', route: 'iv' }, createdAt: new Date(now - 7200_000).toISOString() },
+      { seq: 10004, traceId: 'demo-trace-004', actorId: 'u-zhang', actorName: '张药师', actorRole: 'pharmacist', action: 'prescription.review', resourceType: 'prescription', resourceId: 'rx-5521', result: 'failed', riskLevel: 'high', clientIp: '10.8.3.18', userAgent: 'Mozilla/5.0', detail: { reason: '抗菌药物超疗程未授权' }, createdAt: new Date(now - 14400_000).toISOString() },
+      { seq: 10005, traceId: 'demo-trace-005', actorId: 'u-admin', actorName: '系统管理员', actorRole: 'admin', action: 'role.assign', resourceType: 'system_role', resourceId: 'role-doctor', result: 'success', riskLevel: 'high', clientIp: '10.8.0.12', userAgent: 'Mozilla/5.0', detail: { granted: 'emr:write' }, createdAt: new Date(now - 28800_000).toISOString() },
+      { seq: 10006, traceId: 'demo-trace-006', actorId: 'u-li', actorName: '李医生', actorRole: 'doctor', action: 'emr.export', resourceType: 'medical_record', resourceId: 'mr-202602', result: 'success', riskLevel: 'medium', clientIp: '10.8.1.36', userAgent: 'Mozilla/5.0', detail: { format: 'pdf', pages: 12 }, createdAt: new Date(now - 43200_000).toISOString() },
+      { seq: 10007, traceId: 'demo-trace-007', actorId: 'unknown', actorName: '未知', actorRole: 'anonymous', action: 'login.fail', resourceType: 'auth', resourceId: null, result: 'failed', riskLevel: 'medium', clientIp: '203.0.113.77', userAgent: 'curl/8.0', detail: { reason: '密码错误 5 次' }, createdAt: new Date(now - 50000_000).toISOString() },
+    ];
+    const page = filter.page ?? 1;
+    const pageSize = filter.pageSize ?? 20;
+    const start = (page - 1) * pageSize;
+    return { items: demoItems.slice(start, start + pageSize), total: demoItems.length, page, pageSize };
+  }
   return listAuditLogs(filter);
 }
 
 /** 审计日志详情；不存在返回 null */
 export async function getAuditLogDetail(seq: number): Promise<AuditLogView | null> {
+  if (process.env.DEMO_MODE === '1') {
+    return {
+      seq, traceId: 'demo-trace-detail', actorId: 'u-li', actorName: '李医生', actorRole: 'doctor',
+      action: 'emr.view', resourceType: 'medical_record', resourceId: 'mr-202601', result: 'success',
+      riskLevel: 'low', clientIp: '10.8.1.35', userAgent: 'Mozilla/5.0',
+      detail: { patient: '张*三', visit: 'demo-visit-03' }, createdAt: new Date().toISOString(),
+    };
+  }
   return getAuditLog(seq);
 }
 
 /** 概览统计 */
 export async function auditOverview() {
+  if (process.env.DEMO_MODE === '1') {
+    return { total: 1286, today: 46, abnormal: 3, highRisk: 5 };
+  }
   return auditLogOverview();
 }
 
 /** 操作类型分布 */
 export async function auditDistribution() {
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { action: 'emr.view', count: 486 },
+      { action: 'order.med_admin', count: 312 },
+      { action: 'prescription.review', count: 198 },
+      { action: 'user.create', count: 87 },
+      { action: 'emr.export', count: 64 },
+      { action: 'login.fail', count: 13 },
+      { action: 'role.assign', count: 22 },
+    ];
+  }
   return auditActionDistribution();
 }
 
 /** 近 N 天趋势 */
 export async function auditTrend(days = 7) {
+  if (process.env.DEMO_MODE === '1') {
+    const out: Array<{ date: string; total: number; abnormal: number }> = [];
+    const today = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(today.getTime() - i * 86400_000);
+      out.push({
+        date: d.toISOString().slice(0, 10),
+        total: 38 + ((days - i) * 7) % 22,
+        abnormal: (days - i) % 3,
+      });
+    }
+    return out;
+  }
   return auditDailyTrend(days);
 }
 

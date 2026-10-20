@@ -30,9 +30,9 @@ let _shuttingDown = false;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createClient(): Sql {
   const url = process.env.DATABASE_URL;
-  const max = Number(process.env.PG_POOL_MAX ?? 20);
+  const max = Number(process.env.PG_POOL_MAX ?? 10);
   const idleTimeout = Number(process.env.PG_IDLE_TIMEOUT_MS ?? 30_000);
-  const connectTimeout = Number(process.env.PG_CONNECT_TIMEOUT_MS ?? 10_000);
+  const connectTimeout = Number(process.env.PG_CONNECT_TIMEOUT_MS ?? 5_000);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const base: postgres.Options<any> = {

@@ -34,7 +34,7 @@ interface VersionReport {
 
 export default function EmrTemplateVersionPage() {
   const [base, setBase] = useState<TemplateVersion | null>(null);
-  const [versions, setVersions] = useState<VersionItem[]>([
+  const [versions] = useState<VersionItem[]>([
     { version: "v2.0", updatedAt: "2026-09-01" },
     { version: "v1.0", updatedAt: "2026-01-01" },
   ]);

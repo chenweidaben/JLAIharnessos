@@ -6,7 +6,8 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Input, Layout, List, Spin, Star, Tag, Typography } from "antd";
+import { Card, Input, Layout, List, Spin, Tag, Typography } from "antd";
+import { StarFilled } from "@ant-design/icons";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -68,7 +69,7 @@ export default function EmrWritingStandardPage() {
               renderItem={(item: StandardEntry) => (
                 <List.Item>
                   <Tag color="blue">{item.category}</Tag>
-                  {item.required && <Star style={{ color: "#faad14", marginLeft: 8 }} />}
+                  {item.required && <StarFilled style={{ color: "#faad14", marginLeft: 8 }} />}
                   <Text style={{ marginLeft: 8 }}>{item.title}</Text>
                 </List.Item>
               )}

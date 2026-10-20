@@ -169,7 +169,38 @@ export async function aggregateFrontPage(
 
 const QUEUE_ALL: FrontPageStatus[] = ['draft', 'coding', 'qc'];
 
+/** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 病案首页队列，确定性固定数据。 */
+function demoFrontPageQueue(): FrontPageQueueRow[] {
+  const rows: Array<[string, string, string, FrontPageStatus, string | null, string]> = [
+    ['演示患者A', '心血管内科', '冠心病急性发作', 'coding', 'I21.400', '2026-10-19T08:20:00.000Z'],
+    ['演示患者B', '呼吸内科', '社区获得性肺炎', 'coding', 'J15.900', '2026-10-19T08:45:00.000Z'],
+    ['演示患者C', '普外科', '急性阑尾炎', 'draft', null, '2026-10-19T09:05:00.000Z'],
+    ['演示患者D', '骨科', '右股骨粗隆间骨折', 'qc', 'S72.900', '2026-10-19T07:50:00.000Z'],
+    ['演示患者E', '神经内科', '脑梗死', 'coding', 'I63.900', '2026-10-19T09:30:00.000Z'],
+    ['演示患者F', '消化内科', '十二指肠球部溃疡伴出血', 'qc', 'K26.400', '2026-10-19T08:10:00.000Z'],
+    ['演示患者G', '内分泌科', '2型糖尿病伴肾病', 'draft', null, '2026-10-19T10:00:00.000Z'],
+    ['演示患者H', '儿科', '支气管肺炎', 'coding', 'J18.000', '2026-10-19T10:20:00.000Z'],
+  ];
+  return rows.map((r, i) => ({
+    pageId: `demo-fp-${i + 1}`,
+    visitId: `demo-vis-${i + 1}`,
+    visitNo: `V20261019${String(3000 + i)}`,
+    patientId: `demo-pat-${i + 1}`,
+    mrn: `MRN2026${String(1000 + i)}`,
+    patientName: r[0],
+    department: r[1],
+    status: r[3],
+    version: 1,
+    primaryDiagnosis: r[2],
+    updatedAt: r[5],
+  }));
+}
+
 export async function getFrontPageQueue(auth: AuthView) {
+  if (process.env.DEMO_MODE === '1') {
+    const items = demoFrontPageQueue();
+    return { items, total: items.length };
+  }
   const rows = await listFrontPages(QUEUE_ALL);
   const items = rows.filter((r: FrontPageQueueRow) => canAccess(auth, r.department));
   return { items, total: items.length };

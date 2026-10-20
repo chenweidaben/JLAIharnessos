@@ -1,0 +1,33 @@
+﻿src/bff/aggregators/billingAggregator.ts(694,25): error TS2322: Type '"cash"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(694,33): error TS2322: Type '"1286.50"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(695,22): error TS2322: Type '"wechat"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(695,32): error TS2322: Type '"862.00"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(696,23): error TS2322: Type '"alipay"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(696,33): error TS2322: Type '"2340.00"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(697,20): error TS2322: Type '"insurance"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(697,33): error TS2322: Type '"5680.80"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(698,24): error TS2322: Type '"bank_card"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(698,37): error TS2322: Type '"1980.00"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(699,36): error TS2322: Type '"wechat"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(699,46): error TS2322: Type '"760.50"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(700,22): error TS2322: Type '"mixed"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(700,31): error TS2322: Type '"1420.00"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(701,22): error TS2322: Type '"cash"' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/billingAggregator.ts(701,30): error TS2322: Type '"486.30"' is not assignable to type 'PaymentMethod'.
+src/bff/aggregators/billingAggregator.ts(703,3): error TS2322: Type '{ id: string; settlementNo: string; patientId: string; visitId: string; department: string; status: string; version: number; paymentMethod: SettlementStatus; totalAmount: PaymentMethod; ... 7 more ...; updatedAt: string; }[]' is not assignable to type 'Settlement[]'.
+  Type '{ id: string; settlementNo: string; patientId: string; visitId: string; department: string; status: string; version: number; paymentMethod: SettlementStatus; totalAmount: PaymentMethod; ... 7 more ...; updatedAt: string; }' is not assignable to type 'Settlement'.
+    Types of property 'status' are incompatible.
+      Type 'string' is not assignable to type 'SettlementStatus'.
+src/bff/aggregators/frontPageAggregator.ts(177,40): error TS2322: Type 'null' is not assignable to type 'string'.
+src/bff/aggregators/frontPageAggregator.ts(181,44): error TS2322: Type 'null' is not assignable to type 'string'.
+src/bff/aggregators/pharmacyAggregator.ts(423,49): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(424,48): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(425,48): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(426,46): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(427,45): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(428,48): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(429,45): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(430,46): error TS2322: Type 'string' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(433,75): error TS2322: Type 'number' is not assignable to type 'string'.
+src/bff/aggregators/pharmacyAggregator.ts(433,87): error TS2322: Type 'undefined' is not assignable to type 'number'.
+src/bff/aggregators/pharmacyAggregator.ts(433,94): error TS2493: Tuple type '[string, string, string, string, number]' of length '5' has no element at index '5'.

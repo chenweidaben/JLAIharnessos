@@ -42,4 +42,12 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
      * @return 审计日志列表
      */
     List<AuditLog> findByOccurTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    /**
+     * 按操作类型集合查询审计日志（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param actions 操作类型集合
+     * @return 审计日志列表
+     */
+    List<AuditLog> findByActionIn(java.util.Collection<String> actions);
 }

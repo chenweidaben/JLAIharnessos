@@ -1,0 +1,6 @@
+﻿/api/v1/telemed/consultations=200
+/api/v1/telemed/prescriptions=ERR
+/api/v1/telemed/payments=ERR
+/api/v1/telemed/delivery=ERR
+/api/v1/telemed/followup=ERR
+/api/v1/telemed/reports=ERR

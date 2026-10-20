@@ -1,0 +1,6 @@
+﻿/api/v1/medical-records/archive=200
+/api/v1/medical-records/retrieve=200
+/api/v1/medical-records/print=200
+/api/v1/medical-records/copy=200
+/api/v1/medical-records/seal=200
+/api/v1/medical-records/watermark=200

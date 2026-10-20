@@ -1,0 +1,6 @@
+﻿/api/v1/elderly/assessment=200
+/api/v1/elderly/frail=200
+/api/v1/elderly/falls=200
+/api/v1/elderly/dementia=200
+/api/v1/elderly/nutrition=200
+/api/v1/elderly/comprehensive=200

@@ -9,7 +9,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { attachUser, newCtx, requireAuth, verifyJwt } from './middleware/auth';
+import { attachUser, newCtx, requireAuth, requireRole, verifyJwt } from './middleware/auth';
 import { verifyCsrf } from './middleware/csrf';
 import { withErrorHandler } from './middleware/error';
 import { auditOperation } from './middleware/audit';
@@ -126,6 +126,181 @@ import { knowledgeFederationRoutes } from './routes/knowledgeFederation';
 import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
+import { fhirRoutes } from './routes/fhir'; // M190-P0: FHIR 标准 API 网关
+import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
+import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
+import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
+import { patient360Routes } from './routes/patient360'; // M192-P0: 患者360视图
+import { nursingRoutes } from './routes/nursingMetrics'; // M192-P0: 护理NQI+体温单
+import { regionalRoutes, internetRoutes, labCriticalRoutes } from './routes/m194Routes'; // M194-P0: 区域转诊+互联网问诊+危急值
+import { m196Routes } from './routes/m196Routes'; // M196: 修复 lab/reports + visits + pacs + medications
+import { m198Routes } from './routes/m198Routes'; // M198: 核心业务域深度补全（手术/麻醉/出院/会诊/死亡讨论）
+import { m199Routes } from './routes/m199Routes'; // M199: 质控+感染监测+病案管理+运营KPI
+import { m200Routes } from './routes/m200Routes'; // M200: 医保+财务+药品库存核心域
+import { m201Routes } from './routes/m201Routes'; // M201: 患者服务+排班+考勤
+import { m202Routes } from './routes/m202Routes'; // M202: 设备物资+教学+安全审计
+import { m203Routes } from './routes/m203Routes'; // M203: 运营驾驶舱+AI辅诊+体检病理
+import { m204Routes } from './routes/m204Routes'; // M204: 临床报告详情+FHIR扩展+系统管理
+import { m205Routes } from './routes/m205Routes'; // M205: 报表中心+不良事件+合理用药
+import { m206Routes } from './routes/m206Routes'; // M206: 前端聚合接口（医生/护士/药房工作台）
+import { m207Routes } from './routes/m207Routes'; // M207: 急诊+输血+营养管理
+import { m208Routes } from './routes/m208Routes'; // M208: 消息通知+电子签名+数据导出
+import { m209Routes } from './routes/m209Routes'; // M209: FHIR搜索+内涵质控+患者端扩展
+import { m210Routes } from './routes/m210Routes'; // M210: 门诊预约+入出院转科+手术排程
+import { m211Routes } from './routes/m211Routes'; // M211: 临床路径+单病种+绩效+物价
+import { m212Routes } from './routes/m212Routes'; // M212: 消毒供应+ICU+血库+静配中心
+import { m214Routes } from './routes/m214Routes'; // M214: EMR5级+互联互通四甲+BI分析
+import { m215Routes } from './routes/m215Routes'; // M215: 系统管理深度+第三方集成+数据上报
+import { m216Routes } from './routes/m216Routes'; // M216: AI辅助深度+运营分析
+import { m217Routes } from './routes/m217Routes'; // M217: 医院管理深度+后勤保障+区域协同
+import { m218Routes } from './routes/m218Routes'; // M218: 财务管理+采购管理+固定资产
+import { m219Routes } from './routes/m219Routes'; // M219: 人事管理+合同管理+后勤保障
+import { m220Routes } from './routes/m220Routes'; // M220: AI深度+科研教学
+import { m221Routes } from './routes/m221Routes'; // M221: 预防保健+社区卫生+远程医疗
+import { m222Routes } from './routes/m222Routes'; // M222: 移动护理PDA+门诊输液+发热门诊
+import { m223Routes } from './routes/m223Routes'; // M223: 新生儿+产房+手术麻醉深度
+import { m224Routes } from './routes/m224Routes'; // M224: 病理深度+体检深度+科研教学深度
+import { m225Routes } from './routes/m225Routes'; // M225: 设备物资财务深度
+import { m226Routes } from './routes/m226Routes'; // M226: 人事绩效物价深度+合规安全深度
+import { m227Routes } from './routes/m227Routes'; // M227: 护理深度+院感深度+药事管理
+import { m228Routes } from './routes/m228Routes'; // M228: 肿瘤慢病康复深度
+import { m229Routes } from './routes/m229Routes'; // M229: 中医口腔眼科皮肤+精神卫生深度
+import { m230Routes } from './routes/m230Routes'; // M230: 急诊重症手术麻醉深度
+import { m232Routes } from './routes/m232Routes'; // M232: BI大屏深度+患者360深度+CDS临床决策深度
+import { m233Routes } from './routes/m233Routes'; // M233: 处方审核深度
+import { m234Routes } from './routes/m234Routes'; // M234: 互联网医院/智慧服务深度
+import { m235Routes } from './routes/m235Routes'; // M235: PDA新路径+门诊/住院/医嘱/药品/出院详情
+import { m236Routes } from './routes/m236Routes'; // M236: 合规审计/合规报告+数据脱敏配置
+import { m239Routes } from './routes/m239Routes'; // M239: 病历版本/审计追踪+多租户+PHI脱敏补强
+import { m240Routes } from './routes/m240Routes'; // M240: 病历锁定/签名+租户切换+导出审计/保留/泄露
+import { m241Routes } from './routes/m241Routes'; // M241: 会话/权限/登录日志+漏洞扫描/备份/容灾
+import { m242Routes } from './routes/m242Routes'; // M242: 全局审计/合规审计+租户隔离/限流+密钥/证书
+import { m243Routes } from './routes/m243Routes'; // M243: 电子签名/水印+患者授权/最小化/匿名化/删除
+import { m244Routes } from './routes/m244Routes'; // M244: 锁定历史/修订+授权日志/数据流向/DPIA/认证
+import { m245Routes } from './routes/m245Routes'; // M245: 病历质控+租户隔离测试+威胁建模/渗透/事件响应
+import { m246Routes } from './routes/m246Routes'; // M246: 病历缺陷/质控统计+租户配额+CVE/WAF/SIEM
+import { m247Routes } from './routes/m247Routes'; // M247: 质控趋势/科室排名+租户用量+日志归档/事件时间线/安全指标
+import { m248Routes } from './routes/m248Routes'; // M248: CDS 深度（时间线/相互作用/剂量/禁忌）+ 护理 NQI
+import { m249Routes } from './routes/m249Routes'; // M249: FHIR 网关（Patient/Observation/Condition/MedicationRequest）+ 事件总线
+import { m250Routes } from './routes/m250Routes'; // M250: FHIR 扩展（Encounter/Procedure/DiagnosticReport）+ 角色工作流
+import { m251Routes } from './routes/m251Routes'; // M251: FHIR 深化（DocumentRef/Allergy/Immunization）+ 病历版本
+import { m252Routes } from './routes/m252Routes'; // M252: FHIR 扩展（Location/Practitioner/Organization）+ 患者 360
+import { m253Routes } from './routes/m253Routes'; // M253: BI 大屏（床位/吞吐量/满意度）+ 智慧服务
+import { m254Routes } from './routes/m254Routes'; // M254: CDS 深度（医嘱/危急值/过敏）+ 移动护理
+import { m255Routes } from './routes/m255Routes'; // M255: 互联网医院（问诊/处方/支付）+ 财务深化
+import { m256Routes } from './routes/m256Routes'; // M256: 设备/物资/病理/体检/科研/教学
+import { m257Routes } from './routes/m257Routes'; // M257: 医保/产科/发热门诊/新生儿/门诊叫号/住院病区
+import { m260Routes } from './routes/m260Routes'; // M260: 医嘱套餐/CDS套餐审查/LIS/PACS/药房/输血
+import { m265Routes } from './routes/m265Routes'; // M265: FHIR 大写标准路径（Patient/Observation/Condition/MedicationRequest/Encounter/DiagnosticReport）
+import { m269Routes } from './routes/m269Routes'; // M269: 科室/排班/入院/出院/医保/每日统计
+import { m272Routes } from './routes/m272Routes'; // M272: 收费/成本/库存预警/设备故障/护理交班/满意度
+import { m277Routes } from './routes/m277Routes'; // M277: 患者搜索/详情/医生列表/科室详情/今日排班/预约
+import { m278Routes } from './routes/m278Routes'; // M278: 医嘱列表/详情/药品列表/检验申请/检查申请/手术安排
+import { m279Routes } from './routes/m279Routes'; // M279: 护理查房/生命体征/药房发药/输血申请/知情同意/病历归档
+import { m280Routes } from './routes/m280Routes'; // M280: 移动端 PDA 任务
+import { m281Routes } from './routes/m281Routes'; // M281: 移动生命体征/移动扫码/智能服务排队
+import { m283Routes } from './routes/m283Routes'; // M283: FHIR Medication/Coverage + Workflow Admin + Events Metrics + EMR Template + CDS Guideline
+import { m285Routes } from './routes/m285Routes'; // M285: 安全合规域（角色/权限/审计日志/合规评分/安全态势/租户）
+import { m287Routes } from './routes/m287Routes'; // M287: 缺口域补充（麻醉/中医/牙科/眼科）
+import { m288Routes } from './routes/m288Routes'; // M288: 肿瘤/慢病/ICU 监护
+import { m292Routes } from './routes/m292Routes'; // M292: 采购/资产/预防保健/出院小结
+import { m293Routes } from './routes/m293Routes'; // M293: 会诊/急诊/ICU/麻醉/出院列表
+import { m294Routes } from './routes/m294Routes'; // M294: CDS 诊断建议
+import { m296Routes } from './routes/m296Routes'; // M296: 护理NQI趋势/病历锁定历史
+import { m298Routes } from './routes/m298Routes'; // M298: 院感/DRG/DIP/RWD/联邦学习/数字孪生
+import { m299Routes } from './routes/m299Routes'; // M299: 院感日报/DRG成本/DIP明细/RWD分析/联邦节点/数字孪生模拟
+import { m300Routes } from './routes/m300Routes'; // M300: 排队统计/AI分诊/床位推荐/用药提醒/随访/健康档案
+import { m301Routes } from './routes/m301Routes'; // M301: 运营看板/KPI/科室对比/效率/成本/收入分析
+import { m302Routes } from './routes/m302Routes'; // M302: HR 医生/护士/科室/绩效/培训/请假
+import { m303Routes } from './routes/m303Routes'; // M303: 财务收费/支付/退款/医保结算/预算/审计
+import { m304Routes } from './routes/m304Routes'; // M304: 药房库存/采购/盘点/物资采购/盘点/设备维修
+import { m305Routes } from './routes/m305Routes'; // M305: 物资预警/质量控制/检验/异常/风险评估/监测/预警
+import { m306Routes } from './routes/m306Routes'; // M306: 科研项目列表/论文/经费/课程/考试/学位
+import { m307Routes } from './routes/m307Routes'; // M307: 互联网预约/健康档案/随访管理
+import { m308Routes } from './routes/m308Routes'; // M308: 远程视频/设备/记录/专家/转诊
+import { m309Routes } from './routes/m309Routes'; // M309: 居民档案/家庭医生/预防接种/慢病管理/健康教育
+import { m310Routes } from './routes/m310Routes'; // M310: 产前检查/分娩记录/产后访视/新生儿体检/筛查/生长发育
+import { m311Routes } from './routes/m311Routes'; // M311: 急救记录/救护车调度/中毒救治/创伤救治/危重症
+import { m312Routes } from './routes/m312Routes'; // M312: 肿瘤患者/治疗/化疗/放疗/监测/癌痛管理
+import { m313Routes } from './routes/m313Routes'; // M313: 康复治疗/评估/训练/设备/进度
+import { m314Routes } from './routes/m314Routes'; // M314: 老年综合评估/衰弱/跌倒/痴呆/营养/老年综合征
+import { m315Routes } from './routes/m315Routes'; // M315: 病历归档/调阅/打印/复印/盖章/水印
+import { m316Routes } from './routes/m316Routes'; // M316: 医保结算/明细/账户/规则/拒付/审核
+import { m317Routes } from './routes/m317Routes'; // M317: 医生/护士/药师/行政工作台任务+工作流队列/历史
+import { m318Routes } from './routes/m318Routes'; // M318: 结算列表+CDS临床路径/诊断建议/治疗方案/剂量调整/危急值/影像提示
+import { m319Routes } from './routes/m319Routes'; // M319: CDS预警/患者摘要/临床推荐+患者时间线概览/事件/就诊/用药/检验/警示
+import { m319NewRoutes } from './routes/m319NewRoutes'; // M319(新): 患者时间线补建+时间线详情+护理NQI总览/明细/对比/趋势
+import { m320Routes } from './routes/m320Routes'; // M320: 病历版本列表/对比/历史/回滚/作者/审核
+import { m321Routes } from './routes/m321Routes'; // M321: 事件总线概览/详情/日志/订阅者/发布者/死信队列
+import { fhirResourcesRoutes } from './routes/fhirResources'; // M322: FHIR Patient/Observation/Condition/MedicationRequest/Encounter/DiagnosticReport
+import { m324NewRoutes } from './routes/m324NewRoutes'; // M324(新): 审计日志详情/导出/异常/白名单/报告+合规评分
+import { m325Routes } from './routes/m325Routes'; // M325: 审计日志列表补建+用户会话/登录历史/权限矩阵/角色映射/数据访问日志/隐私报告
+import { m326Routes } from './routes/m326Routes'; // M326: 租户概览/配额/计费+系统配置/功能开关/数据字典
+import { m327Routes } from './routes/m327Routes'; // M327: 实时大屏/就诊漏斗/患者留存+对标分析/运营预警
+import { m328Routes } from './routes/m328Routes'; // M328: 科研经费+培训记录+互联网医院处方（补缺失）
+import { m329Routes } from './routes/m329Routes'; // M329: 远程会诊/诊疗记录/远程设备+社区随访（补缺失）
+import { m330Routes } from './routes/m330Routes'; // M330: 产前检查/产后随访/儿童保健+急诊红箱/急救呼叫（补缺失）
+import { m331Routes } from './routes/m331Routes'; // M331: 康复评估（复数路径）+ 康复记录（补缺失）
+import { m332Routes } from './routes/m332Routes'; // M332: 老年综合评估/跌倒风险/认知障碍+质量指标/审核/整改（补缺失）
+import { m333Routes } from './routes/m333Routes'; // M333: 病历模板/电子签名/病历归档+医保待遇/医保目录（补缺失）
+import { m334Routes } from './routes/m334Routes'; // M334: 药品采购/药品发药+员工培训（复数路径）/招聘管理（补缺失）
+import { m335Routes } from './routes/m335Routes'; // M335: 费用支出/资产管理+发票管理（补缺失）
+import { m336Routes } from './routes/m336Routes'; // M336: 手术医嘱/手术记录+护理查房/护理计划（补缺失）
+import { m337Routes } from './routes/m337Routes'; // M337: 检验医嘱/检验结果+检查医嘱/检查结果/检查报告（补缺失）
+import { m338Routes } from './routes/m338Routes'; // M338: 门诊就诊/门诊处方/门诊分诊（补缺失）
+import { m339Routes } from './routes/m339Routes'; // M339: 医嘱列表/有效/已完成/已取消+门诊/住院/急诊处方（补缺失）
+import { m340Routes } from './routes/m340Routes'; // M340: 患者档案/过敏史/家族史/生命体征（补缺失）
+import { m341Routes } from './routes/m341Routes'; // M341: 临床警报/干预/指南/路径/药物相互作用/重复用药（补缺失）
+import { m342Routes } from './routes/m342Routes'; // M342: 工作流任务/模板+待办/已办/逾期任务（补缺失）
+import { m343Routes } from './routes/m343Routes'; // M343: 角色/权限（补缺失）+系统配置/日志/版本（补缺失）
+import { m344Routes } from './routes/m344Routes'; // M344: 死信队列/事件重试+审计报告（补缺失）
+import { m345Routes } from './routes/m345Routes'; // M345: 租户列表/配置/数据隔离策略/配额/用量/日志（补缺失）
+import { m346Routes } from './routes/m346Routes'; // M346: 脱敏规则/日志+加密密钥/状态+数据分类/保留策略（补缺失）
+import { m347Routes } from './routes/m347Routes'; // M347: 签名验证/签名模板+审计追踪（补缺失）
+import { m348Routes } from './routes/m348Routes'; // M348: 版本标签/版本审批（补缺失）
+import { m350Routes } from './routes/m350Routes'; // M350: 事件列表/类型/订阅者/发布/消费者/指标详情（补缺失）
+import { m351Routes } from './routes/m351Routes'; // M351: 角色工作流/权限/审批/通知/升级/SLA（补缺失）
+import { m352Routes } from './routes/m352Routes'; // M352: 规则引擎/临床证据/临床试验/指南详情/路径详情（补缺失）
+import { m353Routes } from './routes/m353Routes'; // M353: 时间线筛选/汇总/对比/导出（补缺失）
+import { m354Routes } from './routes/m354Routes'; // M354: NQI 指标/趋势/基准/预警/报告（补缺失）
+import { m355Routes } from './routes/m355Routes'; // M355: 质控指标/评分/趋势/基准/预警/报告（补缺失）
+import { m356Routes } from './routes/m356Routes'; // M356: 风险指标/评分/趋势/基准/预警/报告（补缺失）
+import { m357Routes } from './routes/m357Routes'; // M357: 合规详情/清单/证据/整改/报告/看板（补缺失）
+import { m358Routes } from './routes/m358Routes'; // M358: 安全策略/策略详情/安全漏洞/安全补丁（补缺失）
+import { m359Routes } from './routes/m359Routes'; // M359: 数据访问/数据共享/数据导出/数据备份/数据恢复（补缺失）
+import { m360Routes } from './routes/m360Routes'; // M360: 隐私政策/隐私同意/隐私权利/隐私通知/隐私违规/隐私投诉（补缺失）
+import { m363Routes } from './routes/m363Routes'; // M363: 预约/支付/查询/提醒/反馈/满意度服务
+import { m364Routes } from './routes/m364Routes'; // M364: 运营看板/KPI/报告/分析/预测/对标
+import { m365Routes } from './routes/m365Routes'; // M365: 人力看板/招聘/培训/绩效/排班/考勤
+import { m366Routes } from './routes/m366Routes'; // M366: 财务看板/成本/报告/分析（补缺失）
+import { m367Routes } from './routes/m367Routes'; // M367: 药品看板/库存详情/供应商/预警/效期（补缺失）
+import { m368Routes } from './routes/m368Routes'; // M368: 科研奖项（补缺失）
+import { m369Routes } from './routes/m369Routes'; // M369: 在线处方/支付/配送/随访/报告（补缺失）
+import { m370Routes } from './routes/m370Routes'; // M370: 远程会诊/诊断/监护/手术/培训/设备
+import { m371Routes } from './routes/m371Routes'; // M371: 社区随访/健康档案/老年关怀/慢病管理/健康教育（补缺失）
+import { m372Routes } from './routes/m372Routes'; // M372: 产前检查/产后访视/婴幼儿保健/儿童预防接种/妇女保健/出生缺陷筛查
+import { m373Routes } from './routes/m373Routes'; // M373: 灾害救援（补缺失）
+import { m374Routes } from './routes/m374Routes'; // M374: 肿瘤筛查/诊断/治疗方案/随访（补缺失）
+import { m375Routes } from './routes/m375Routes'; // M375: 康复治疗/物理治疗/运动疗法/作业治疗/康复随访（补缺失）
+import { m376Routes } from './routes/m376Routes'; // M376: 老年照护计划/共病管理/衰弱评估（补缺失）
+import { m377Routes } from './routes/m377Routes'; // M377: 模板详情/病历质控/病历检索/病历归档（补缺失）
+import { m378Routes } from './routes/m378Routes'; // M378: 医保政策/病种编码（补缺失）
+import { m379Routes } from './routes/m379Routes'; // M379: 手术同意书/麻醉评估/麻醉复苏（补缺失）
+import { m380Routes } from './routes/m380Routes'; // M380: 检验项目/检查项目（补缺失）
+import { m382Routes } from './routes/m382Routes'; // M382: 医嘱详情/医嘱模板/处方列表/处方详情/处方审核（补缺失）
+import { m383Routes } from './routes/m383Routes'; // M383: 检验汇总/影像汇总（补缺失）
+import { m384Routes } from './routes/m384Routes'; // M384: CDS推荐/药物相互作用/禁忌症提示（补缺失）
+import { m385Routes } from './routes/m385Routes'; // M385: 审批流程/任务调度/工作流通知（补缺失）
+import { m386Routes } from './routes/m386Routes'; // M386: 菜单管理/缓存管理（补缺失）
+import { m387Routes } from './routes/m387Routes'; // M387: 租户详情/数据隔离（补缺失）
+import { m388Routes } from './routes/m388Routes'; // M388: PHI脱敏规则/数据加密/数据解密/PHI审计/隐私策略/知情同意
+import { m389Routes } from './routes/m389Routes'; // M389: 签名列表/签名验证/签名模板（补缺失）
+import { m390Routes } from './routes/m390Routes'; // M390: 图表数据/BI报告/BI分析/数据导出/定时报表（补缺失）
+import { m391Routes } from './routes/m391Routes'; // M391: 科研项目/论文/经费/奖项 + 教学课程/培训详情
+import { m392Routes } from './routes/m392Routes'; // M392: 在线问诊/处方/支付/配送/随访/报告详情
+import { m393Routes } from './routes/m393Routes'; // M393: 远程会诊/诊断/监护/手术/培训/设备详情
+import { m394Routes } from './routes/m394Routes'; // M394: 社区随访/家庭病床/健康档案/老年关怀/慢病管理/健康教育详情
+import { m395Routes } from './routes/m395Routes'; // M395: 产前检查/产后访视/婴幼儿保健/儿童接种/妇女保健/出生缺陷筛查详情
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3621,6 +3796,185 @@ const allRoutes: RouteDef[] = [
   ...chatRoutes,
   ...medicalRoutes,
   ...dashboardRoutes,
+  ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
+  ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
+  ...emrNoteRoutes, // M190-P0: 病历修改痕迹
+  ...cdsRoutes, // M191-P0: CDS 临床决策支持
+  ...patient360Routes, // M192-P0: 患者360视图
+  ...nursingRoutes, // M192-P0: 护理NQI+体温单
+  ...regionalRoutes, // M194-P0: 区域转诊
+  ...internetRoutes, // M194-P0: 互联网问诊
+  ...labCriticalRoutes, // M194-P0: 危急值闭环
+  ...m196Routes, // M196: 修复 lab/reports + visits + pacs + medications
+  ...m198Routes, // M198: 核心业务域深度补全
+  ...m199Routes, // M199: 质控+感染+病案+运营
+  ...m200Routes, // M200: 医保+财务+药品库存
+  ...m201Routes, // M201: 患者服务+排班+考勤
+  ...m202Routes, // M202: 设备物资+教学+安全审计
+  ...m203Routes, // M203: 运营驾驶舱+AI辅诊+体检病理
+  ...m204Routes, // M204: 临床报告详情+FHIR扩展+系统管理
+  ...m205Routes, // M205: 报表中心+不良事件+合理用药
+  ...m206Routes, // M206: 前端聚合接口
+  ...m207Routes, // M207: 急诊+输血+营养
+  ...m208Routes, // M208: 消息通知+电子签名+数据导出
+  ...m209Routes, // M209: FHIR搜索+内涵质控+患者端扩展
+  ...m210Routes, // M210: 门诊预约+入出院转科+手术排程
+  ...m211Routes, // M211: 临床路径+单病种+绩效+物价
+  ...m212Routes, // M212: 消毒供应+ICU+血库+静配中心
+  ...m214Routes, // M214: EMR5级+互联互通四甲+BI分析
+  ...m215Routes, // M215: 系统管理深度+第三方集成+数据上报
+  ...m216Routes, // M216: AI辅助深度+运营分析
+  ...m217Routes, // M217: 医院管理深度+后勤保障+区域协同
+  ...m218Routes, // M218: 财务管理+采购管理+固定资产
+  ...m219Routes, // M219: 人事管理+合同管理+后勤保障
+  ...m220Routes, // M220: AI深度+科研教学
+  ...m221Routes, // M221: 预防保健+社区卫生+远程医疗
+  ...m222Routes, // M222: 移动护理PDA+门诊输液+发热门诊
+  ...m223Routes, // M223: 新生儿+产房+手术麻醉深度
+  ...m224Routes, // M224: 病理深度+体检深度+科研教学深度
+  ...m225Routes, // M225: 设备物资财务深度
+  ...m226Routes, // M226: 人事绩效物价深度+合规安全深度
+  ...m227Routes, // M227: 护理深度+院感深度+药事管理
+  ...m228Routes, // M228: 肿瘤慢病康复深度
+  ...m229Routes, // M229: 中医口腔眼科皮肤+精神卫生深度
+  ...m230Routes, // M230: 急诊重症手术麻醉深度
+  ...m232Routes, // M232: BI大屏深度+患者360深度+CDS临床决策深度
+  ...m233Routes, // M233: 处方审核深度
+  ...m234Routes, // M234: 互联网医院/智慧服务深度
+  ...m235Routes, // M235: PDA新路径+门诊/住院/医嘱/药品/出院详情
+  ...m236Routes, // M236: 合规审计/合规报告+数据脱敏配置
+  ...m239Routes, // M239: 病历版本/审计追踪+多租户+PHI脱敏补强
+  ...m240Routes, // M240: 病历锁定/签名+租户切换+导出审计/保留/泄露
+  ...m241Routes, // M241: 会话/权限/登录日志+漏洞扫描/备份/容灾
+  ...m242Routes, // M242: 全局审计/合规审计+租户隔离/限流+密钥/证书
+  ...m243Routes, // M243: 电子签名/水印+患者授权/最小化/匿名化/删除
+  ...m244Routes, // M244: 锁定历史/修订+授权日志/数据流向/DPIA/认证
+  ...m245Routes, // M245: 病历质控+租户隔离测试+威胁建模/渗透/事件响应
+  ...m246Routes, // M246: 病历缺陷/质控统计+租户配额+CVE/WAF/SIEM
+  ...m247Routes, // M247: 质控趋势/科室排名+租户用量+日志归档/事件时间线/安全指标
+  ...m248Routes, // M248: CDS 深度（时间线/相互作用/剂量/禁忌）+ 护理 NQI
+  ...m249Routes, // M249: FHIR 网关（Patient/Observation/Condition/MedicationRequest）+ 事件总线
+  ...m250Routes, // M250: FHIR 扩展（Encounter/Procedure/DiagnosticReport）+ 角色工作流
+  ...m251Routes, // M251: FHIR 深化（DocumentRef/Allergy/Immunization）+ 病历版本
+  ...m252Routes, // M252: FHIR 扩展（Location/Practitioner/Organization）+ 患者 360
+  ...m253Routes, // M253: BI 大屏（床位/吞吐量/满意度）+ 智慧服务
+  ...m254Routes, // M254: CDS 深度（医嘱/危急值/过敏）+ 移动护理
+  ...m255Routes, // M255: 互联网医院（问诊/处方/支付）+ 财务深化
+  ...m256Routes, // M256: 设备/物资/病理/体检/科研/教学
+  ...m257Routes, // M257: 医保/产科/发热门诊/新生儿/门诊叫号/住院病区
+  ...m260Routes, // M260: 医嘱套餐/CDS套餐审查/LIS/PACS/药房/输血
+  ...m265Routes, // M265: FHIR 大写标准路径（Patient/Observation/Condition/MedicationRequest/Encounter/DiagnosticReport）
+  ...m269Routes, // M269: 科室/排班/入院/出院/医保/每日统计
+  ...m272Routes, // M272: 收费/成本/库存预警/设备故障/护理交班/满意度
+  ...m277Routes, // M277: 患者搜索/详情/医生列表/科室详情/今日排班/预约
+  ...m278Routes, // M278: 医嘱列表/详情/药品列表/检验申请/检查申请/手术安排
+  ...m279Routes, // M279: 护理查房/生命体征/药房发药/输血申请/知情同意/病历归档
+  ...m280Routes, // M280: 移动端 PDA 任务
+  ...m281Routes, // M281: 移动生命体征/移动扫码/智能服务排队
+  ...m283Routes, // M283: FHIR Medication/Coverage + Workflow Admin + Events Metrics + EMR Template + CDS Guideline
+  ...m285Routes, // M285: 安全合规域（角色/权限/审计日志/合规评分/安全态势/租户）
+  ...m287Routes, // M287: 缺口域补充（麻醉/中医/牙科/眼科）
+  ...m288Routes, // M288: 肿瘤/慢病/ICU 监护
+  ...m292Routes, // M292: 采购/资产/预防保健/出院小结
+  ...m293Routes, // M293: 会诊/急诊/ICU/麻醉/出院列表
+  ...m294Routes, // M294: CDS 诊断建议
+  ...m296Routes, // M296: 护理NQI趋势/病历锁定历史
+  ...m298Routes, // M298: 院感/DRG/DIP/RWD/联邦学习/数字孪生
+  ...m299Routes, // M299: 院感日报/DRG成本/DIP明细/RWD分析/联邦节点/数字孪生模拟
+  ...m300Routes, // M300: 排队统计/AI分诊/床位推荐/用药提醒/随访/健康档案
+  ...m301Routes, // M301: 运营看板/KPI/科室对比/效率/成本/收入分析
+  ...m302Routes, // M302: HR 医生/护士/科室/绩效/培训/请假
+  ...m303Routes, // M303: 财务收费/支付/退款/医保结算/预算/审计
+  ...m304Routes, // M304: 药房库存/采购/盘点/物资采购/盘点/设备维修
+  ...m305Routes, // M305: 物资预警/质量控制/检验/异常/风险评估/监测/预警
+  ...m306Routes, // M306: 科研项目列表/论文/经费/课程/考试/学位
+  ...m307Routes, // M307: 互联网预约/健康档案/随访管理
+  ...m308Routes, // M308: 远程视频/设备/记录/专家/转诊
+  ...m309Routes, // M309: 居民档案/家庭医生/预防接种/慢病管理/健康教育
+  ...m310Routes, // M310: 产前检查/分娩记录/产后访视/新生儿体检/筛查/生长发育
+  ...m311Routes, // M311: 急救记录/救护车调度/中毒救治/创伤救治/危重症
+  ...m312Routes, // M312: 肿瘤患者/治疗/化疗/放疗/监测/癌痛管理
+  ...m313Routes, // M313: 康复治疗/评估/训练/设备/进度
+  ...m314Routes, // M314: 老年综合评估/衰弱/跌倒/痴呆/营养/老年综合征
+  ...m315Routes, // M315: 病历归档/调阅/打印/复印/盖章/水印
+  ...m316Routes, // M316: 医保结算/明细/账户/规则/拒付/审核
+  ...m317Routes, // M317: 医生/护士/药师/行政工作台任务+工作流队列/历史
+  ...m318Routes, // M318: 结算列表+CDS临床路径/诊断建议/治疗方案/剂量调整/危急值/影像提示
+  ...m319Routes, // M319: CDS预警/患者摘要/临床推荐+患者时间线概览/事件/就诊/用药/检验/警示
+  ...m319NewRoutes, // M319(新): 患者时间线补建+时间线详情+护理NQI总览/明细/对比/趋势
+  ...m320Routes, // M320: 病历版本列表/对比/历史/回滚/作者/审核
+  ...m321Routes, // M321: 事件总线概览/详情/日志/订阅者/发布者/死信队列
+  ...fhirResourcesRoutes, // M322: FHIR Patient/Observation/Condition/MedicationRequest/Encounter/DiagnosticReport
+  ...m324NewRoutes, // M324(新): 审计日志详情/导出/异常/白名单/报告+合规评分
+  ...m325Routes, // M325: 审计日志列表补建+用户会话/登录历史/权限矩阵/角色映射/数据访问日志/隐私报告
+  ...m326Routes, // M326: 租户概览/配额/计费+系统配置/功能开关/数据字典
+  ...m327Routes, // M327: 实时大屏/就诊漏斗/患者留存+对标分析/运营预警
+  ...m328Routes, // M328: 科研经费+培训记录+互联网医院处方（补缺失）
+  ...m329Routes, // M329: 远程会诊/诊疗记录/远程设备+社区随访（补缺失）
+  ...m330Routes, // M330: 产前检查/产后随访/儿童保健+急诊红箱/急救呼叫（补缺失）
+  ...m331Routes, // M331: 康复评估（复数路径）+ 康复记录（补缺失）
+  ...m332Routes, // M332: 老年综合评估/跌倒风险/认知障碍+质量指标/审核/整改（补缺失）
+  ...m333Routes, // M333: 病历模板/电子签名/病历归档+医保待遇/医保目录（补缺失）
+  ...m334Routes, // M334: 药品采购/药品发药+员工培训（复数路径）/招聘管理（补缺失）
+  ...m335Routes, // M335: 费用支出/资产管理+发票管理（补缺失）
+  ...m336Routes, // M336: 手术医嘱/手术记录+护理查房/护理计划（补缺失）
+  ...m337Routes, // M337: 检验医嘱/检验结果+检查医嘱/检查结果/检查报告（补缺失）
+  ...m338Routes, // M338: 门诊就诊/门诊处方/门诊分诊（补缺失）
+  ...m339Routes, // M339: 医嘱列表/有效/已完成/已取消+门诊/住院/急诊处方（补缺失）
+  ...m340Routes, // M340: 患者档案/过敏史/家族史/生命体征（补缺失）
+  ...m341Routes, // M341: 临床警报/干预/指南/路径/药物相互作用/重复用药（补缺失）
+  ...m342Routes, // M342: 工作流任务/模板+待办/已办/逾期任务（补缺失）
+  ...m343Routes, // M343: 角色/权限（补缺失）+系统配置/日志/版本（补缺失）
+  ...m344Routes, // M344: 死信队列/事件重试+审计报告（补缺失）
+  ...m345Routes, // M345: 租户列表/配置/数据隔离策略/配额/用量/日志（补缺失）
+  ...m346Routes, // M346: 脱敏规则/日志+加密密钥/状态+数据分类/保留策略（补缺失）
+  ...m347Routes, // M347: 签名验证/签名模板+审计追踪（补缺失）
+  ...m348Routes, // M348: 版本标签/版本审批（补缺失）
+  ...m350Routes, // M350: 事件列表/类型/订阅者/发布/消费者/指标详情（补缺失）
+  ...m351Routes, // M351: 角色工作流/权限/审批/通知/升级/SLA（补缺失）
+  ...m352Routes, // M352: 规则引擎/临床证据/临床试验/指南详情/路径详情（补缺失）
+  ...m353Routes, // M353: 时间线筛选/汇总/对比/导出（补缺失）
+  ...m354Routes, // M354: NQI 指标/趋势/基准/预警/报告（补缺失）
+  ...m355Routes, // M355: 质控指标/评分/趋势/基准/预警/报告（补缺失）
+  ...m356Routes, // M356: 风险指标/评分/趋势/基准/预警/报告（补缺失）
+  ...m357Routes, // M357: 合规详情/清单/证据/整改/报告/看板（补缺失）
+  ...m358Routes, // M358: 安全策略/策略详情/安全漏洞/安全补丁（补缺失）
+  ...m359Routes, // M359: 数据访问/数据共享/数据导出/数据备份/数据恢复（补缺失）
+  ...m360Routes, // M360: 隐私政策/隐私同意/隐私权利/隐私通知/隐私违规/隐私投诉（补缺失）
+  ...m363Routes, // M363: 预约/支付/查询/提醒/反馈/满意度服务
+  ...m364Routes, // M364: 运营看板/KPI/报告/分析/预测/对标
+  ...m365Routes, // M365: 人力看板/招聘/培训/绩效/排班/考勤
+  ...m366Routes, // M366: 财务看板/成本/报告/分析（补缺失）
+  ...m367Routes, // M367: 药品看板/库存详情/供应商/预警/效期（补缺失）
+  ...m368Routes, // M368: 科研奖项（补缺失）
+  ...m369Routes, // M369: 在线处方/支付/配送/随访/报告（补缺失）
+  ...m370Routes, // M370: 远程会诊/诊断/监护/手术/培训/设备
+  ...m371Routes, // M371: 社区随访/健康档案/老年关怀/慢病管理/健康教育（补缺失）
+  ...m372Routes, // M372: 产前检查/产后访视/婴幼儿保健/儿童预防接种/妇女保健/出生缺陷筛查
+  ...m373Routes, // M373: 灾害救援（补缺失）
+  ...m374Routes, // M374: 肿瘤筛查/诊断/治疗方案/随访（补缺失）
+  ...m375Routes, // M375: 康复治疗/物理治疗/运动疗法/作业治疗/康复随访（补缺失）
+  ...m376Routes, // M376: 老年照护计划/共病管理/衰弱评估（补缺失）
+  ...m377Routes, // M377: 模板详情/病历质控/病历检索/病历归档（补缺失）
+  ...m378Routes, // M378: 医保政策/病种编码（补缺失）
+  ...m379Routes, // M379: 手术同意书/麻醉评估/麻醉复苏（补缺失）
+  ...m380Routes, // M380: 检验项目/检查项目（补缺失）
+  ...m382Routes, // M382: 医嘱详情/医嘱模板/处方列表/处方详情/处方审核（补缺失）
+  ...m383Routes, // M383: 检验汇总/影像汇总（补缺失）
+  ...m384Routes, // M384: CDS推荐/药物相互作用/禁忌症提示（补缺失）
+  ...m385Routes, // M385: 审批流程/任务调度/工作流通知（补缺失）
+  ...m386Routes, // M386: 菜单管理/缓存管理（补缺失）
+  ...m387Routes, // M387: 租户详情/数据隔离（补缺失）
+  ...m388Routes, // M388: PHI脱敏规则/数据加密/数据解密/PHI审计/隐私策略/知情同意
+  ...m389Routes, // M389: 签名列表/签名验证/签名模板（补缺失）
+  ...m390Routes, // M390: 图表数据/BI报告/BI分析/数据导出/定时报表（补缺失）
+  ...m391Routes, // M391: 科研项目/论文/经费/奖项 + 教学课程/培训详情
+  ...m392Routes, // M392: 在线问诊/处方/支付/配送/随访/报告详情
+  ...m393Routes, // M393: 远程会诊/诊断/监护/手术/培训/设备详情
+  ...m394Routes, // M394: 社区随访/家庭病床/健康档案/老年关怀/慢病管理/健康教育详情
+  ...m395Routes, // M395: 产前检查/产后访视/婴幼儿保健/儿童接种/妇女保健/出生缺陷筛查详情
+  ...patientServiceRoutes, // M193-P0: 患者端智慧服务
+  ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
   ...qualityPdcaRoutes, // M155-A：PDCA 持续改进（Plan/Do/Check/Act 闭环）
   ...rectificationRoutes,
@@ -5606,6 +5960,54 @@ function compile(pattern: string): { regex: RegExp; keys: string[] } {
   return { regex: new RegExp(re), keys };
 }
 
+// ============================================================================
+// v5.0试点扩展（P0安全止血）：临床/质控/管理类路由的最小角色白名单
+//
+// 背景：审计发现约 290 个路由仅有 auth:true（登录即可访问），patient/researcher
+// 可触达 EMR/DRG/eSign/处方审核/科研导出/质控/驾驶舱等敏感接口。此处集中在
+// 路由分发层按路径前缀追加 requireRole，避免逐文件修改；patient 自助接口
+// （/api/v1/patient/*、/api/v1/internet/*、/api/v1/satisfaction* 等）不在此列。
+// admin 已在白名单内，既有 requireAdmin / requirePermissionCode 不受影响。
+// ============================================================================
+const STAFF_ONLY_ROLES = [
+  'doctor', 'nurse', 'pharmacist', 'technician',
+  'ams_officer', 'finance', 'admin', 'dept_head', 'cashier',
+] as const;
+
+const STAFF_ONLY_PREFIXES: string[] = [
+  // 病历 / EMR / 五级评审 / 文书
+  '/api/v1/emr/', '/api/v1/emr-level5/', '/api/v1/emr-template/',
+  '/api/v1/emr-assessment/', '/api/v1/emr-rating/',
+  '/api/v1/medical-record/', '/api/v1/medical-headers/',
+  '/api/v1/medical-archives/', '/api/v1/medical-copy-requests/',
+  '/api/v1/admission-notes/', '/api/v1/progress-notes/',
+  '/api/v1/discharge-summaries/', '/api/v1/discharge-plans/',
+  // DRG / DIP / 医保审核
+  '/api/v1/drg/', '/api/v1/drg-budgets/', '/api/v1/drg-attribution/', '/api/v1/drg-dip/',
+  '/api/v1/insurance/',
+  // 电子签名
+  '/api/v1/e-sign/', '/api/v1/esignature/',
+  // 处方审核 / 审方
+  '/api/v1/prescription-review/',
+  // 科研导出（patient/researcher 均挡在临床科研导出之外）
+  '/api/v1/research/',
+  // 质控
+  '/api/v1/medical-qc/', '/api/v1/terminal-qc/', '/api/v1/ai-note-qc/',
+  '/api/v1/mr-quality/', '/api/v1/qc/',
+  // 管理驾驶舱 / 月报 / 科主任
+  '/api/v1/dept/', '/api/v1/ceo-dashboard/', '/api/v1/monthly-report/',
+  // 临床 / 护理 / 药房
+  '/api/v1/clinical/', '/api/v1/nursing/', '/api/v1/nursing-records/',
+  '/api/v1/nursing-io/', '/api/v1/nursing-risk/',
+  '/api/v1/nurse/', '/api/v1/nurse-station/', '/api/v1/medication-admin/',
+  '/api/v1/pharmacy/', '/api/v1/pharmacy-tasks/', '/api/v1/smart-pharmacy/',
+  '/api/v1/drug-inventory/', '/api/v1/drug-supply/',
+];
+
+function isStaffOnlyPath(pathname: string): boolean {
+  return STAFF_ONLY_PREFIXES.some((p) => pathname.startsWith(p));
+}
+
 const compiled: Compiled[] = allRoutes.map((def) => {
   const { regex, keys } = compile(def.path);
   return { method: def.method.toUpperCase(), regex, keys, def };
@@ -5824,6 +6226,14 @@ async function handleFetch(
           status = 401;
           return withSecurityHeaders(denied);
         }
+        // v5.0试点扩展（P0安全止血）：临床/质控/管理类前缀在登录之上追加医护白名单
+        if (isStaffOnlyPath(url.pathname)) {
+          const roleDenied = requireRole(ctx, ...STAFF_ONLY_ROLES);
+          if (roleDenied) {
+            status = roleDenied.status;
+            return withSecurityHeaders(roleDenied);
+          }
+        }
       }
       const handler = r.def.handle;
       // 错误处理在外、幂等在内：beginProcessing �?handler 任何阶段抛错
@@ -5909,7 +6319,27 @@ startSystemMetricSampler();
 const server = Bun.serve({
   port,
   async fetch(req, bunServer) {
-    return (await handleFetch(req, bunServer)) ?? new Response(null, { status: 101 });
+    // P0 修复：全局 10 秒超时保护，防止慢请求阻塞事件循环
+    const timeoutPromise = new Promise<Response>((resolve) => {
+      setTimeout(() => {
+        resolve(new Response(
+          JSON.stringify({ code: 503, message: 'Request timeout (10s)', traceId: 'timeout' }),
+          { status: 503, headers: { 'content-type': 'application/json' } },
+        ));
+      }, 10000);
+    });
+    try {
+      const result = await Promise.race([
+        handleFetch(req, bunServer) as Promise<Response | undefined>,
+        timeoutPromise,
+      ]);
+      return result ?? new Response(null, { status: 101 });
+    } catch (err) {
+      return new Response(
+        JSON.stringify({ code: 500, message: String(err) }),
+        { status: 500, headers: { 'content-type': 'application/json' } },
+      );
+    }
   },
   websocket: {
     open(ws) {

@@ -1,0 +1,6 @@
+﻿SystemConfigPage lazy: True
+SystemMenusPage lazy: False
+SystemDictPage lazy: True
+SystemLogsPage lazy: True
+SystemParamsPage lazy: False
+SystemCachePage lazy: False

@@ -84,8 +84,7 @@ public class AuditService {
      * @return 高风险审计日志列表
      */
     public List<AuditLog> exportRisk() {
-        return auditLogRepository.findAll().stream()
-                .filter(log -> "导出".equals(log.getAction()) || "删除".equals(log.getAction()))
-                .collect(Collectors.toList());
+        // P5 性能优化：直接调用 Repository 派生查询
+        return auditLogRepository.findByActionIn(java.util.Arrays.asList("导出", "删除"));
     }
 }

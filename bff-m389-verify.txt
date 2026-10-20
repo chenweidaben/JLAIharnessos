@@ -1,0 +1,6 @@
+﻿/api/v1/signatures/list=ERR
+/api/v1/signatures/verify=ERR
+/api/v1/signatures/templates=ERR
+/api/v1/audit/trails=200
+/api/v1/audit/logs=200
+/api/v1/audit/reports=200

@@ -30,6 +30,18 @@ function assertAdjust(auth: AuthView): void {
 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** DEMO_MODE 病组选择列表（P7）。 */
+function demoSelections() {
+  return [
+    { visitId: 'demo-vis-1', patientName: '演示患者A', drgCode: 'FR29', drgName: '心衰', drgPayment: 10500, dipCode: null, selectedMode: 'drg', reason: 'DRG 预估高于 DIP' },
+    { visitId: 'demo-vis-2', patientName: '演示患者B', drgCode: 'ES15', drgName: '肺炎', drgPayment: 8200, dipCode: 'DIP-001', dipScore: 850, dipPointValue: 10, dipPayment: 8500, selectedMode: 'drg', reason: 'DRG 略优' },
+    { visitId: 'demo-vis-3', patientName: '演示患者C', drgCode: null, drgName: null, drgPayment: null, dipCode: 'DIP-002', dipScore: 1200, dipPointValue: 10, dipPayment: 12000, selectedMode: 'dip', reason: 'DRG 未入组' },
+    { visitId: 'demo-vis-4', patientName: '演示患者D', drgCode: 'IB29', drgName: '胆囊切除', drgPayment: 15000, dipCode: 'DIP-003', dipScore: 1400, dipPointValue: 10, dipPayment: 14000, selectedMode: 'drg', reason: 'DRG 预估高 1000' },
+    { visitId: 'demo-vis-5', patientName: '演示患者E', drgCode: 'BR25', drgName: '脑卒中', drgPayment: 18000, dipCode: null, selectedMode: 'drg', reason: 'DRG 入组明确' },
+    { visitId: 'demo-vis-6', patientName: '演示患者F', drgCode: 'ET19', drgName: '阑尾炎', drgPayment: 6800, dipCode: 'DIP-004', dipScore: 650, dipPointValue: 10, dipPayment: 6500, selectedMode: 'drg', reason: 'DRG 略优' },
+  ];
+}
+
 export async function evaluateView(
   auth: AuthView,
   visitId: string,
@@ -62,6 +74,7 @@ export async function getView(auth: AuthView, visitId: string) {
 
 export async function listView(auth: AuthView) {
   assertView(auth);
+  if (process.env.DEMO_MODE === '1') return demoSelections();
   return listSelections();
 }
 

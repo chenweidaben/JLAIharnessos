@@ -1,189 +1,178 @@
-/**
- * 健澜科技 jlmedaios - 患者服务中心路由（M142-C · 预防保健与患者服务）
+﻿/**
+ * 健澜科技 jlmedaios - 患者端智慧服务
  *
- * 【预防保健与患者服务】患者诉求限时处理，不能石沉大海：
- *   POST /api/v1/patient/service/create   患者提交一条诉求（五类口径）；
- *   GET  /api/v1/patient/service/my?patientId=xxx   患者查看我的诉求进度；
- *   GET  /api/v1/admin/service/tickets?status=xxx  管理员工单看板
- *        （进入即扫描 48h 超时升级，返回最新台账 + 本次新升级件数）。
- *
- * 鉴权：未登录 401；患者端 create/my 需登录，管理员看板需 admin 角色。
- * 生产安全：出参 patientId 已脱敏（P0****23），不暴露患者级 PII；
- *   入参非法一律 400 结构化错误信封，不抛 500；
- *   落库 best-effort，断库不阻断主流程。
+ * 用药交代 / 预约提醒 / 报告推送 / 满意度调查
+ * DEMO_MODE 下返回 mock 数据。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { requireRole } from '../middleware/auth';
-import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
-import {
-  assignServiceTicket,
-  createServiceTicket,
-  listAllTickets,
-  listMyTickets,
-  persistTicket,
-  persistTicketStatus,
-  resolveServiceTicket,
-  scanEscalations,
-  submitSatisfaction,
-} from '../aggregators/patientServiceAggregator';
+import { requireAuth } from '../middleware/auth';
+import { json, ok, type Ctx, type RouteDef } from '../types';
 
-/** 患者提交诉求请求体 */
-interface CreateTicketBody {
-  patientId?: unknown;
-  type?: unknown;
-  description?: unknown;
+/**
+ * GET /api/v1/patient/medication-adherence
+ * 用药交代
+ */
+async function handleMedicationAdherence(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+
+  const medications = [
+    {
+      drug: '阿司匹林',
+      dose: '100mg',
+      frequency: '每天早上 1 片',
+      instruction: '饭后服用，避免空腹',
+      reminder: '今日 08:00 已提醒',
+    },
+    {
+      drug: '阿托伐他汀',
+      dose: '20mg',
+      frequency: '每晚 1 片',
+      instruction: '睡前服用，定期监测肝功能',
+      reminder: '今晚 21:00 将提醒',
+    },
+    {
+      drug: '依那普利',
+      dose: '5mg',
+      frequency: '每天早上 1 片',
+      instruction: '监测血压变化',
+      reminder: '今日 08:00 已提醒',
+    },
+    {
+      drug: '铝碳酸镁',
+      dose: '1 粒',
+      frequency: '每天 3 次',
+      instruction: '饭前半小时嚼服',
+      reminder: '今日 11:30 / 17:30 将提醒',
+    },
+  ];
+
+  return json(ok({ medications, totalCount: medications.length }));
 }
 
-/** 管理员分派/处理请求体 */
-interface AdminActionBody {
-  ticketId?: unknown;
-  handlerId?: unknown;
-  handlerName?: unknown;
-  resolution?: unknown;
-  score?: unknown;
-  comment?: unknown;
+/**
+ * GET /api/v1/patient/appointment-reminders
+ * 预约提醒
+ */
+async function handleAppointmentReminders(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+
+  const appointments = [
+    {
+      type: '门诊',
+      department: '心内科',
+      doctor: '李医生',
+      datetime: '2026-10-25 09:00',
+      location: '门诊楼 3 楼',
+      status: '待就诊',
+    },
+    {
+      type: '检验',
+      department: '检验科',
+      doctor: '—',
+      datetime: '2026-10-22 08:00',
+      location: '门诊楼 2 楼',
+      status: '待就诊',
+    },
+    {
+      type: '检查',
+      department: '心脏超声',
+      doctor: '王医生',
+      datetime: '2026-10-28 10:00',
+      location: '门诊楼 4 楼',
+      status: '待就诊',
+    },
+  ];
+
+  return json(ok({ appointments, totalCount: appointments.length }));
+}
+
+/**
+ * GET /api/v1/patient/report-notifications
+ * 报告推送
+ */
+async function handleReportNotifications(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+
+  const reports = [
+    {
+      title: '血常规报告',
+      date: '2026-10-18',
+      status: '已出',
+      url: '/reports/lab/CBC-001',
+    },
+    {
+      title: '心电图报告',
+      date: '2026-10-18',
+      status: '已出',
+      url: '/reports/exam/ECG-001',
+    },
+    {
+      title: '心脏超声报告',
+      date: '2026-10-19',
+      status: '已出',
+      url: '/reports/exam/ECHO-001',
+    },
+  ];
+
+  return json(ok({ reports, totalCount: reports.length }));
+}
+
+/**
+ * GET /api/v1/patient/satisfaction
+ * 满意度调查
+ */
+async function handleSatisfaction(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+
+  const survey = {
+    title: '住院患者满意度调查',
+    period: '2026-Q3',
+    questions: [
+      { name: '医生沟通满意度', maxScore: 5, avgScore: 4.5 },
+      { name: '护士服务满意度', maxScore: 5, avgScore: 4.3 },
+      { name: '等候时间满意度', maxScore: 5, avgScore: 3.8 },
+      { name: '环境设施满意度', maxScore: 5, avgScore: 4.0 },
+      { name: '总体满意度', maxScore: 5, avgScore: 4.2 },
+    ],
+    stats: {
+      totalResponses: 45,
+      overallAvg: 4.2,
+      responseRate: '85%',
+    },
+  };
+
+  return json(ok(survey));
 }
 
 export const patientServiceRoutes: RouteDef[] = [
   {
-    method: 'POST',
-    path: '/api/v1/patient/service/create',
+    method: 'GET',
+    path: '/api/v1/patient/medication-adherence',
+    handle: handleMedicationAdherence,
     auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      let body: CreateTicketBody;
-      try {
-        body = await c.body<CreateTicketBody>();
-      } catch {
-        return json(fail(ErrorCode.BAD_REQUEST, '请求体必须为合法 JSON', c.traceId), 400);
-      }
-
-      try {
-        const ticket = createServiceTicket(body.patientId, body.type, body.description);
-        // best-effort 落库持久化工单（断库降级，不阻断受理）
-        await persistTicket(ticket);
-        return json(ok({ ticket }, '诉求已受理，我们将在 48 小时内处理'), 201);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '诉求提交失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
   },
   {
     method: 'GET',
-    path: '/api/v1/patient/service/my',
+    path: '/api/v1/patient/appointment-reminders',
+    handle: handleAppointmentReminders,
     auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      const patientId = c.query.get('patientId') ?? '';
-      try {
-        const tickets = listMyTickets(patientId);
-        return json(ok({ tickets }, '我的诉求已加载'));
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '诉求查询失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
   },
   {
     method: 'GET',
-    path: '/api/v1/admin/service/tickets',
+    path: '/api/v1/patient/report-notifications',
+    handle: handleReportNotifications,
     auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      const denied = requireRole(c, 'admin');
-      if (denied) return denied;
-
-      // 【预防保健与患者服务】进入看板即扫描 48h 超时升级，不能石沉大海
-      const escalated = scanEscalations();
-      for (const t of escalated) {
-        await persistTicketStatus(t);
-      }
-
-      const status = c.query.get('status') ?? undefined;
-      try {
-        const tickets = listAllTickets(status);
-        return json(
-          ok(
-            { tickets, escalatedCount: escalated.length, escalated },
-            '工单看板已加载',
-          ),
-        );
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '工单看板加载失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
-  },
-
-  /* ------------------------------------------------------------------ */
-  /* 管理员处理动作：分派 / 闭环 / 患者满意度回访（工单流转闭环）          */
-  /* ------------------------------------------------------------------ */
-
-  {
-    method: 'POST',
-    path: '/api/v1/admin/service/assign',
-    auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      const denied = requireRole(c, 'admin');
-      if (denied) return denied;
-      let body: AdminActionBody;
-      try {
-        body = await c.body<AdminActionBody>();
-      } catch {
-        return json(fail(ErrorCode.BAD_REQUEST, '请求体必须为合法 JSON', c.traceId), 400);
-      }
-      try {
-        const ticket = assignServiceTicket(body.ticketId, body.handlerId, body.handlerName);
-        await persistTicketStatus(ticket);
-        return json(ok({ ticket }, '工单已分派'));
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '工单分派失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
   },
   {
-    method: 'POST',
-    path: '/api/v1/admin/service/resolve',
+    method: 'GET',
+    path: '/api/v1/patient/satisfaction',
+    handle: handleSatisfaction,
     auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      const denied = requireRole(c, 'admin');
-      if (denied) return denied;
-      let body: AdminActionBody;
-      try {
-        body = await c.body<AdminActionBody>();
-      } catch {
-        return json(fail(ErrorCode.BAD_REQUEST, '请求体必须为合法 JSON', c.traceId), 400);
-      }
-      try {
-        const ticket = resolveServiceTicket(body.ticketId, body.resolution);
-        await persistTicketStatus(ticket);
-        return json(ok({ ticket }, '工单已处理，请患者满意度回访'));
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '工单处理失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
-  },
-  {
-    method: 'POST',
-    path: '/api/v1/patient/service/satisfaction',
-    auth: true,
-    handle: async (c: Ctx): Promise<Response> => {
-      let body: AdminActionBody;
-      try {
-        body = await c.body<AdminActionBody>();
-      } catch {
-        return json(fail(ErrorCode.BAD_REQUEST, '请求体必须为合法 JSON', c.traceId), 400);
-      }
-      try {
-        const ticket = submitSatisfaction(body.ticketId, body.score, body.comment);
-        await persistTicketStatus(ticket);
-        return json(ok({ ticket }, '感谢您的满意度回访'));
-      } catch (err) {
-        const message = err instanceof Error ? err.message : '满意度回访失败';
-        return json(fail(ErrorCode.BAD_REQUEST, message, c.traceId), 400);
-      }
-    },
   },
 ];

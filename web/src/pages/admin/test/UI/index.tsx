@@ -7,6 +7,9 @@
  *
  * 【生产就绪质量门禁】本页与 BFF aggregators/uiConsistencyAggregator.ts 输出对齐。
  *
+ * v5.0试点扩展（M184空壳崩溃修复）：/api/v1/admin/ui-consistency 未上线（404）时，
+ * 前端自动回退 BASELINE_ISSUES 内置基线并展示黄色友好提示，不白屏。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useMemo, useState } from 'react';

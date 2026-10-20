@@ -12,12 +12,17 @@ export default function Forbidden() {
   return (
     <Result
       status="403"
-      title="403"
-      subTitle="抱歉，您没有权限访问该页面。"
+      title="权限不足"
+      subTitle="抱歉，您没有访问此页面的权限。请联系管理员分配权限，或切换其他账号登录。"
       extra={
-        <Button type="primary" onClick={() => navigate('/')}>
-          返回首页
-        </Button>
+        <>
+          <Button type="primary" onClick={() => navigate('/')}>
+            返回首页
+          </Button>
+          <Button style={{ marginLeft: 8 }} onClick={() => navigate('/login')}>
+            重新登录
+          </Button>
+        </>
       }
     />
   );

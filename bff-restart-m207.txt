@@ -1,0 +1,20 @@
+﻿bun.exe : [medmuse-job] DEMO_MODE=1：MEDMUSE 定时任务默认不启动
+所在位置 行:1 字符: 88
++ ... O_MODE='1'; & 'C:\Users\lenovo\.bun\bin\bun.exe' run src/bff/server.t ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([medmuse-job] D...DMUSE 定时任务默认不启动:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[env] DEMO_MODE=1：以演示模式运行，使用内存数据，不持久化
+[jianlan-bff] starting  nodeEnv=development  DEMO_MODE=ON (内存演示数据，不连 PG)
+[db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）
+[jianlan-bff] listening on http://0.0.0.0:8080  (WebSocket /ws/chat [auth required])
+GET http://127.0.0.1:8080/api/v1/outbox/events?after_id=0&limit=100 200 3ms [trc_mvfgv4ca_0mgfod]
+GET http://localhost:8080/api/v1/dashboard/stats 200 1ms [trc_mvfgva8j_qrsekv]
+GET http://localhost:8080/api/v1/dashboard/stats 200 0ms [trc_mvfgvabe_mi6g1t]
+GET http://localhost:8080/api/v1/lis/panels 404 11ms [trc_mvfgvacz_91stro]
+GET http://localhost:8080/api/v1/patient/portal 403 3ms [trc_mvfgvaet_6j1sjb]
+GET http://localhost:8080/api/v1/lab/catalog/panels 200 1ms [trc_mvfgvnp7_f9750x]
+GET http://localhost:8080/api/v1/lab/catalog/panels 200 1ms [trc_mvfgvnqt_vqd6is]
+GET http://localhost:8080/api/v1/lab/catalog/items 200 1ms [trc_mvfgvnt8_p7lu4f]
+GET http://localhost:8080/api/v1/lab/catalog/items 200 0ms [trc_mvfgvntg_wnjf15]

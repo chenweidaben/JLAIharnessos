@@ -1,12 +1,3 @@
+[medmuse-job] DEMO_MODE=1：MEDMUSE 定时任务默认不启动
+[env] DEMO_MODE=1：以演示模式运行，使用内存数据，不持久化
 [db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）
-662 |       } catch {
-663 |         /* ignore */
-664 |       }
-665 |       // 兼容前端事件帧（event）与早期 action �?      const kind = parsed.event ?? parsed.action;
-666 | 
-667 |       if (kind === 'heartbeat' || kind === 'ping') {
-                ^
-ReferenceError: Can't find variable: kind
-      at message (C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\src\bff\server.ts:667:11)
-
-Bun v1.2.0 (Windows x64)

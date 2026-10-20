@@ -26,7 +26,7 @@ import {
 import { recordLoginAttempt } from '@/db/repositories/loginAttemptRepo';
 import { loginRateLimit } from '../middleware/rateLimit';
 import { markSessionRevoked } from '../middleware/sessionGuard';
-import { buildAuthView, type AuthView } from '../view/userView';
+import { buildAuthView, ROLE_PERMISSIONS, type AuthView } from '../view/userView';
 import { getMfaService } from '../mfaRuntime.js';
 import { issueLoginChallenge } from '../aggregators/mfaAggregator.js';
 
@@ -45,26 +45,28 @@ function unauthorized(): Response {
 }
 
 /**
- * 演示模式（DEMO_MODE=1，无 DB）下的静态用户视图；真实模式一律从 iam 加载。
+ * 演示模式多角色测试用户：按用户名返回不同角色视图，用于菜单/权限矩阵测试。
+ * admin/doctor_chen 保留 '*' 通配（全功能），其余走 ROLE_PERMISSIONS 精确权限。
  */
-const DEMO_VIEW: AuthView = {
-  id: 'u_1001',
-  username: 'doctor_chen',
-  realName: '陈**',
-  employeeNo: 'DOC1001',
-  gender: 'unknown',
-  deptCode: 'cardiology',
-  deptName: '心血管内科',
-  title: '主任医师',
-  phone: '',
-  email: '',
-  status: 'active',
-  roles: [],
-  roleCodes: ['admin'],
-  rawRoles: ['admin'],
-  permissions: ['*'],
-  dataScope: 'all',
-};
+function demoViewFor(username: string): AuthView {
+  const base = { phone: '', email: '', status: 'active' as const, roles: [] };
+  switch (username) {
+    case 'doctor_li':
+      return { ...base, id: 'u_2001', username, realName: '李医生', employeeNo: 'DOC2001', gender: 'male', deptCode: 'cardiology', deptName: '心血管内科', title: '主治医师', roleCodes: ['doctor'], rawRoles: ['doctor'], permissions: ROLE_PERMISSIONS.doctor, dataScope: 'dept' };
+    case 'nurse_wang':
+      return { ...base, id: 'u_2002', username, realName: '王护士', employeeNo: 'NUR2002', gender: 'female', deptCode: 'ward_3f', deptName: '三病区', title: '护师', roleCodes: ['nurse'], rawRoles: ['nurse'], permissions: ROLE_PERMISSIONS.nurse, dataScope: 'dept' };
+    case 'pharmacist_zhang':
+      return { ...base, id: 'u_2003', username, realName: '张药师', employeeNo: 'PHA2003', gender: 'male', deptCode: 'pharmacy', deptName: '药学部', title: '主管药师', roleCodes: ['pharmacist'], rawRoles: ['pharmacist'], permissions: ROLE_PERMISSIONS.pharmacist, dataScope: 'dept' };
+    case 'tech_liu':
+      return { ...base, id: 'u_2004', username, realName: '刘技师', employeeNo: 'TEC2004', gender: 'male', deptCode: 'lab', deptName: '检验科', title: '检验技师', roleCodes: ['technician'], rawRoles: ['technician'], permissions: ROLE_PERMISSIONS.technician, dataScope: 'dept' };
+    case 'researcher_zhao':
+      return { ...base, id: 'u_2005', username, realName: '赵研究员', employeeNo: 'RES2005', gender: 'male', deptCode: 'research', deptName: '科研处', title: '副研究员', roleCodes: ['researcher'], rawRoles: ['researcher'], permissions: ROLE_PERMISSIONS.researcher, dataScope: 'all' };
+    case 'patient_test':
+      return { ...base, id: 'u_2006', username, realName: '测试患者', employeeNo: 'PAT2006', gender: 'unknown', deptCode: 'outpatient', deptName: '门诊', title: '', roleCodes: ['patient'], rawRoles: ['patient'], permissions: ROLE_PERMISSIONS.patient, dataScope: 'self' };
+    default:
+      return { ...base, id: 'u_1001', username: 'doctor_chen', realName: '陈**', employeeNo: 'DOC1001', gender: 'unknown', deptCode: 'cardiology', deptName: '心血管内科', title: '主任医师', roleCodes: ['admin'], rawRoles: ['admin'], permissions: ['*'], dataScope: 'all' };
+  }
+}
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -108,7 +110,7 @@ export async function registerSession(
 
 /** 按用户名加载真实用户视图（含角色/权限/数据范围） */
 async function loadViewByUsername(username: string): Promise<AuthView | null> {
-  if (isDemo) return DEMO_VIEW;
+  if (isDemo) return demoViewFor(username);
   const user = await getUserByUsername(username);
   if (!user || user.status !== 'active') return null;
   const links = await getUserRoleLinks(user.id);
@@ -117,7 +119,13 @@ async function loadViewByUsername(username: string): Promise<AuthView | null> {
 
 /** 按用户 ID 加载真实用户视图（导出供 MFA 登录二发令牌使用） */
 export async function loadViewById(id: string): Promise<AuthView | null> {
-  if (isDemo) return DEMO_VIEW;
+  if (isDemo) {
+    const map: Record<string, string> = {
+      u_1001: 'doctor_chen', u_2001: 'doctor_li', u_2002: 'nurse_wang',
+      u_2003: 'pharmacist_zhang', u_2004: 'tech_liu', u_2005: 'researcher_zhao', u_2006: 'patient_test',
+    };
+    return demoViewFor(map[id] ?? 'doctor_chen');
+  }
   const user = await getUserById(id);
   if (!user || user.status !== 'active') return null;
   const links = await getUserRoleLinks(user.id);
@@ -303,19 +311,103 @@ export const authRoutes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/v1/auth/menus',
-    handle: () =>
-      json(
-        ok([
-          { id: 'm1', title: '工作台', path: '/dashboard', sort: 1 },
-          { id: 'm2', title: '智能问诊', path: '/chat', sort: 2 },
-        ]),
-      ),
+    // v5.0试点扩展（P0安全止血）：由硬编码桩改为按当前用户 permissions 动态过滤。
+    // 菜单描述与 web/src/components/layout/SideMenu.tsx 的 navItems 对齐（perm 码一致），
+    // 前端可选择以本接口为准渲染菜单；路由守卫仍由前端 RequirePermission 二次拦截。
+    handle: async (c: Ctx) => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未认证或登录已过期'), 401);
+      const view = await loadViewById(c.user.id);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
+      const perms = new Set(view.permissions);
+      const has = (code?: string | string[]) => {
+        if (!code) return true;
+        const codes = Array.isArray(code) ? code : [code];
+        return codes.some((x) => perms.has(x));
+      };
+      // 与 SideMenu.navItems 对齐的最小菜单描述（分组与顶层项）
+      const menuDef: Array<{
+        id: string; title: string; path?: string; perm?: string | string[];
+        children?: Array<{ id: string; title: string; path: string; perm?: string | string[] }>;
+      }> = [
+        { id: 'dashboard', title: '工作台', path: '/dashboard', perm: 'dashboard:view' },
+        { id: 'patients', title: '患者管理', path: '/patients', perm: 'patient:view' },
+        { id: 'ai-report', title: 'AI 辅诊', path: '/imaging/ai/report', perm: 'imaging:view' },
+        { id: 'outpatient', title: '门诊问诊', path: '/outpatient', perm: 'emr:view' },
+        { id: 'ward', title: '住院查房', path: '/ward', perm: ['emr:view', 'order:view', 'emg:view'] },
+        { id: 'agent', title: 'AI 问诊', path: '/agent', perm: 'ai:chat:use' },
+        { id: 'emergency', title: '急诊分诊', path: '/emergency', perm: 'emg:view' },
+        { id: 'pharmacy', title: '药房发药', path: '/pharmacy', perm: 'pharmacy:view' },
+        { id: 'medical-qc', title: '病历质控', path: '/medical-qc', perm: 'medical_record:read' },
+        { id: 'front-page', title: '病案首页', path: '/front-page', perm: 'front_page:read' },
+        {
+          id: 'grp-emr', title: 'EMR 文书质控', children: [
+            { id: 'emr-terminal-qc', title: '终末质控', path: '/emr/terminal-qc', perm: 'terminal_qc:view' },
+            { id: 'emr-drug-review', title: '合理用药', path: '/emr/drug-review', perm: 'drug_review:view' },
+            { id: 'emr-level5', title: '五级评审', path: '/emr/level5', perm: 'emr_level5:view' },
+          ],
+        },
+        { id: 'research', title: '科研队列', path: '/research', perm: 'research:read' },
+        { id: 'empi', title: '患者主索引', path: '/empi', perm: 'empi:read' },
+        { id: 'data-warehouse', title: '数据湖仓', path: '/data-warehouse', perm: 'data_warehouse:read' },
+        { id: 'data-governance', title: '数据治理', path: '/data-governance', perm: 'data_governance:read' },
+        { id: 'billing', title: '收费结算', path: '/billing', perm: 'billing:read' },
+        { id: 'quality', title: '质量管理', path: '/quality', perm: 'qc:view' },
+        { id: 'patient-portal', title: '患者首页', path: '/patient-portal', perm: 'patient_portal:view' },
+        {
+          id: 'grp-operation', title: '科室运营', children: [
+            { id: 'op-overview', title: '运营概览', path: '/operation', perm: 'ops:view' },
+            { id: 'op-drg', title: 'DRG/DIP 分析', path: '/operation/drg', perm: 'ops:view' },
+            { id: 'op-surgery', title: '手术麻醉', path: '/surgery', perm: 'surgery:view' },
+            { id: 'op-blood', title: '输血管理', path: '/transfusion', perm: 'blood:apply' },
+            { id: 'op-vte', title: 'VTE 防治', path: '/vte', perm: 'vte:read' },
+            { id: 'op-ams', title: '抗菌药物管理', path: '/ams', perm: 'ams:read' },
+            { id: 'op-pathway', title: '临床路径管理', path: '/pathway', perm: 'pathway:read' },
+            { id: 'op-lis', title: '检验管理(LIS)', path: '/lis', perm: 'lab:read' },
+            { id: 'op-ris', title: '检查管理(RIS/PACS)', path: '/ris', perm: 'imaging:read' },
+            { id: 'op-drg-budget', title: 'DRG预算预警', path: '/drg-budget', perm: 'drg_budget:view' },
+            { id: 'op-dip', title: 'DIP点值', path: '/dip', perm: 'dip:view' },
+            { id: 'op-settlement', title: '结算报表', path: '/settlement-report', perm: 'settlement_report:view' },
+          ],
+        },
+        {
+          id: 'grp-system', title: '系统管理', children: [
+            { id: 'sys-config', title: '系统配置', path: '/system/config', perm: 'system:config' },
+            { id: 'sys-users', title: '用户管理', path: '/system/users', perm: 'system:user:view' },
+            { id: 'sys-roles', title: '角色管理', path: '/system/roles', perm: 'system:role:view' },
+            { id: 'sys-perms', title: '权限管理', path: '/system/permissions', perm: 'system:perm:manage' },
+            { id: 'sys-audit', title: '操作审计', path: '/system/audit-logs', perm: 'system:audit:view' },
+          ],
+        },
+      ];
+      const filtered = menuDef
+        .map((m) => {
+          if (m.children) {
+            const children = m.children.filter((ch) => has(ch.perm));
+            return children.length > 0 ? { id: m.id, title: m.title, children } : null;
+          }
+          return has(m.perm) ? { id: m.id, title: m.title, path: m.path } : null;
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+      return json(ok(filtered));
+    },
     auth: true,
   },
   {
     method: 'GET',
     path: '/api/v1/auth/permissions',
-    handle: () => json(ok([{ id: 'p1', code: 'system:admin', name: '系统管理', type: 'api' }])),
+    // v5.0试点扩展（P0安全止血）：由硬编码桩改为返回当前登录用户实际被授予的权限码
+    handle: async (c: Ctx) => {
+      if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未认证或登录已过期'), 401);
+      const view = await loadViewById(c.user.id);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '用户不存在或已停用'), 401);
+      const list = view.permissions.map((code, i) => ({
+        id: `p_${i}`,
+        code,
+        name: code,
+        type: 'api' as const,
+      }));
+      return json(ok(list));
+    },
     auth: true,
   },
 

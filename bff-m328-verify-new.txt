@@ -1,0 +1,3 @@
+﻿/api/v1/research/grants=200
+/api/v1/teaching/training=200
+/api/v1/internet/hospital-orders=200

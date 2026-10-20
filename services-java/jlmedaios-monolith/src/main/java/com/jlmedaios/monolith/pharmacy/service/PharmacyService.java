@@ -37,9 +37,7 @@ public class PharmacyService {
      * @return 药品信息
      */
     public DrugStock dispense(String drugCode) {
-        return drugStockRepository.findAll().stream()
-                .filter(d -> d.getDrugCode().equals(drugCode))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("药品不存在: " + drugCode));
+        // P5 性能优化：直接调用 Repository 派生查询
+        return drugStockRepository.findByDrugCode(drugCode);
     }
 }

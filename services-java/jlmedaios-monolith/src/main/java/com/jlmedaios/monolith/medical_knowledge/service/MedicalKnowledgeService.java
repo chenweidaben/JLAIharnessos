@@ -33,9 +33,8 @@ public class MedicalKnowledgeService {
      * @return 知识节点列表
      */
     public List<KnowledgeNode> search(String keyword) {
-        return knowledgeNodeRepository.findAll().stream()
-                .filter(n -> n.getTitle().contains(keyword))
-                .toList();
+        // P8 性能优化：直接调用 Repository 派生查询
+        return knowledgeNodeRepository.findByTitleContaining(keyword);
     }
 
     /**

@@ -1,0 +1,124 @@
+﻿web/src/pages/admin/ai-platform/index.tsx(14,3): error TS6133: 'Progress' is declared but its value is never read.
+web/src/pages/admin/ai-platform/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/audit/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/big-data/index.tsx(14,3): error TS6133: 'Progress' is declared but its value is never read.
+web/src/pages/admin/big-data/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/cloud-native/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/compliance/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/data-security/index.tsx(83,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/data-security/index.tsx(84,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/data-security/index.tsx(85,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/data-security/index.tsx(86,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/documentation/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/iot-platform/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/labor-union/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/llm/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/microservices/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/operations-analytics/index.tsx(40,54): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+web/src/pages/admin/party-building/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/production-ops/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/publicity/index.tsx(14,3): error TS6133: 'Progress' is declared but its value is never read.
+web/src/pages/admin/release-m200/index.tsx(17,3): error TS6133: 'Table' is declared but its value is never read.
+web/src/pages/admin/risk-management/index.tsx(83,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/risk-management/index.tsx(84,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/risk-management/index.tsx(85,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/risk-management/index.tsx(86,21): error TS2353: Object literal may only specify known properties, and 'key' does not exist in type '{ color: string; }'.
+web/src/pages/admin/security-pen/index.tsx(18,3): error TS6133: 'Table' is declared but its value is never read.
+web/src/pages/admin/sre/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/admin/user-experience/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/agent-adoption/index.tsx(7,29): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/ai-brain/v2/inpatient/index.tsx(10,3): error TS6133: 'Alert' is declared but its value is never read.
+web/src/pages/circuit-breaker/index.tsx(11,16): error TS6133: 'Paragraph' is declared but its value is never read.
+web/src/pages/cross-role-experience/index.tsx(7,29): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/dept-task-board/index.tsx(36,37): error TS2503: Cannot find namespace 'JSX'.
+web/src/pages/ecosystem-dashboard/index.tsx(45,14): error TS2304: Cannot find name 'Row'.
+web/src/pages/ecosystem-dashboard/index.tsx(58,15): error TS2304: Cannot find name 'Row'.
+web/src/pages/emr-access-request/index.tsx(9,47): error TS6133: 'Statistic' is declared but its value is never read.
+web/src/pages/emr-ai-generation-assist/index.tsx(9,39): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-ai-kgraph-reasoning/index.tsx(120,21): error TS2322: Type 'string' is not assignable to type 'boolean | undefined'.
+web/src/pages/emr-ai-risk-predict/index.tsx(31,10): error TS6133: 'result' is declared but its value is never read.
+web/src/pages/emr-ai-writing-suggest/index.tsx(9,29): error TS6133: 'Input' is declared but its value is never read.
+web/src/pages/emr-archive/index.tsx(9,41): error TS6133: 'Spin' is declared but its value is never read.
+web/src/pages/emr-defect-stats/index.tsx(10,59): error TS2307: Cannot find module '@/bff/aggregators/emrDefectStatsV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-event-timeline/index.tsx(37,18): error TS6133: 'setEvents' is declared but its value is never read.
+web/src/pages/emr-grade-dashboard/index.tsx(10,43): error TS2307: Cannot find module '@/bff/aggregators/emrGradeDashboardV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-logic-relation-check/index.tsx(32,10): error TS6133: 'result' is declared but its value is never read.
+web/src/pages/emr-nlp-timeline/index.tsx(28,18): error TS6133: 'setEvents' is declared but its value is never read.
+web/src/pages/emr-patient-360/index.tsx(9,16): error TS6133: 'Col' is declared but its value is never read.
+web/src/pages/emr-patient-360/index.tsx(9,38): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-pdca/index.tsx(9,10): error TS6133: 'Button' is declared but its value is never read.
+web/src/pages/emr-pdca/index.tsx(9,43): error TS6133: 'message' is declared but its value is never read.
+web/src/pages/emr-print-layout/index.tsx(16,22): error TS6133: 'setTemplateId' is declared but its value is never read.
+web/src/pages/emr-qc-ai-similar-record/index.tsx(63,34): error TS6133: 'index' is declared but its value is never read.
+web/src/pages/emr-qc-audit-log-record/index.tsx(12,16): error TS6133: 'Text' is declared but its value is never read.
+web/src/pages/emr-qc-auto-archive/index.tsx(9,39): error TS6133: 'Input' is declared but its value is never read.
+web/src/pages/emr-qc-continuous-improve/index.tsx(9,29): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-qc-dept-rank-list/index.tsx(42,17): error TS6133: 'setDepts' is declared but its value is never read.
+web/src/pages/emr-qc-exam-certificate/index.tsx(11,9): error TS2339: Property 'Content' does not exist on type 'ForwardRefExoticComponent<InternalTypographyProps<keyof IntrinsicElements> & RefAttributes<HTMLElement>> & { ...; }'.
+web/src/pages/emr-qc-expert-performance/index.tsx(12,16): error TS6133: 'Text' is declared but its value is never read.
+web/src/pages/emr-qc-export-excel/index.tsx(20,11): error TS6196: 'FormattedRow' is declared but never used.
+web/src/pages/emr-qc-feedback-loop/index.tsx(12,16): error TS6133: 'Text' is declared but its value is never read.
+web/src/pages/emr-qc-graph/index.tsx(68,14): error TS2304: Cannot find name 'Row'.
+web/src/pages/emr-qc-graph/index.tsx(89,15): error TS2304: Cannot find name 'Row'.
+web/src/pages/emr-qc-mobile-notify/index.tsx(9,32): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-qc-monthly-report/index.tsx(9,24): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-qc-permission-manage/index.tsx(9,10): error TS6133: 'Button' is declared but its value is never read.
+web/src/pages/emr-qc-ranking/index.tsx(9,24): error TS6133: 'Spin' is declared but its value is never read.
+web/src/pages/emr-qc-ranking/index.tsx(10,36): error TS2307: Cannot find module '@/bff/aggregators/emrQcRankingV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-qc-rectify-verify/index.tsx(12,16): error TS6133: 'Text' is declared but its value is never read.
+web/src/pages/emr-qc-recurrence/index.tsx(12,16): error TS6133: 'Text' is declared but its value is never read.
+web/src/pages/emr-qc-report-center/index.tsx(9,37): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-qc-rule-recommendation/index.tsx(10,120): error TS2307: Cannot find module '../../src/bff/aggregators/emrQcRuleRecommendationV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-qc-rule-recommendation/index.tsx(26,19): error TS6133: 'setContext' is declared but its value is never read.
+web/src/pages/emr-qc-rule-recommendation/index.tsx(115,39): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+web/src/pages/emr-qc-rule-simulator/index.tsx(9,24): error TS6133: 'Input' is declared but its value is never read.
+web/src/pages/emr-qc-rule-version/index.tsx(9,34): error TS6133: 'Input' is declared but its value is never read.
+web/src/pages/emr-qc-score-model/index.tsx(9,24): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-qc-score-model/index.tsx(9,43): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/emr-qc-signature-link/index.tsx(9,34): error TS6133: 'Input' is declared but its value is never read.
+web/src/pages/emr-qc-task-dispatch/index.tsx(15,11): error TS6196: 'DispatchTask' is declared but never used.
+web/src/pages/emr-qc-trend-analysis/index.tsx(38,26): error TS6133: 'setMonthlyDefects' is declared but its value is never read.
+web/src/pages/emr-qc-workbench/index.tsx(72,12): error TS2304: Cannot find name 'Row'.
+web/src/pages/emr-qc-workbench/index.tsx(113,13): error TS2304: Cannot find name 'Row'.
+web/src/pages/emr-quality-trend/index.tsx(32,18): error TS6133: 'setScores' is declared but its value is never read.
+web/src/pages/emr-quick-phrase/index.tsx(38,19): error TS6133: 'setPhrases' is declared but its value is never read.
+web/src/pages/emr-sla-monitor/index.tsx(9,24): error TS6133: 'Spin' is declared but its value is never read.
+web/src/pages/emr-sla-monitor/index.tsx(10,33): error TS2307: Cannot find module '@/bff/aggregators/emrSlaMonitorV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-template-management/index.tsx(29,58): error TS2307: Cannot find module '@/knowledge/templates/templateCatalog' or its corresponding type declarations.
+web/src/pages/emr-template-management/index.tsx(100,34): error TS7006: Parameter 'f' implicitly has an 'any' type.
+web/src/pages/emr-template-review/index.tsx(9,41): error TS6133: 'Spin' is declared but its value is never read.
+web/src/pages/emr-template-review/index.tsx(10,38): error TS2307: Cannot find module '@/bff/aggregators/emrTemplateReviewV14Aggregator' or its corresponding type declarations.
+web/src/pages/emr-template-version/index.tsx(37,20): error TS6133: 'setVersions' is declared but its value is never read.
+web/src/pages/emr-terminology-check/index.tsx(29,10): error TS6133: 'result' is declared but its value is never read.
+web/src/pages/emr-timeline-detail/index.tsx(9,16): error TS6133: 'Col' is declared but its value is never read.
+web/src/pages/emr-timeline-detail/index.tsx(9,21): error TS6133: 'Divider' is declared but its value is never read.
+web/src/pages/emr-timeline-detail/index.tsx(9,38): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/emr-training/index.tsx(28,10): error TS6133: 'selected' is declared but its value is never read.
+web/src/pages/emr-training/index.tsx(28,20): error TS6133: 'setSelected' is declared but its value is never read.
+web/src/pages/emr-writing-standard-check/index.tsx(29,10): error TS6133: 'result' is declared but its value is never read.
+web/src/pages/emr-writing-standard/index.tsx(9,43): error TS2305: Module '"antd"' has no exported member 'Star'.
+web/src/pages/followup/smart/index.tsx(14,3): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/honor-wall/index.tsx(50,14): error TS2304: Cannot find name 'Row'.
+web/src/pages/honor-wall/index.tsx(59,15): error TS2304: Cannot find name 'Row'.
+web/src/pages/infection/control/index.tsx(80,15): error TS2322: Type 'string' is not assignable to type '"error" | "success" | "info" | "warning" | undefined'.
+web/src/pages/internet-hospital-v2/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/muse-doctor/index.tsx(46,16): error TS2304: Cannot find name 'Row'.
+web/src/pages/muse-doctor/index.tsx(51,17): error TS2304: Cannot find name 'Row'.
+web/src/pages/ops-dashboard-v3/report/index.tsx(78,42): error TS1312: Did you mean to use a ':'? An '=' can only follow a property name when the containing object literal is part of a destructuring pattern.
+web/src/pages/patient-tips/index.tsx(7,29): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/personal-agent/nurse-muse/index.tsx(18,3): error TS6133: 'Timeline' is declared but its value is never read.
+web/src/pages/personal-agent/patient-muse/index.tsx(12,3): error TS6133: 'Col' is declared but its value is never read.
+web/src/pages/personal-agent/patient-muse/index.tsx(15,3): error TS6133: 'Row' is declared but its value is never read.
+web/src/pages/public-knowledge/index.tsx(50,12): error TS2304: Cannot find name 'Row'.
+web/src/pages/public-knowledge/index.tsx(69,13): error TS2304: Cannot find name 'Row'.
+web/src/pages/qc-rule-config/index.tsx(14,3): error TS6133: 'Select' is declared but its value is never read.
+web/src/pages/qc-rule-config/index.tsx(22,38): error TS2307: Cannot find module '@/bff/aggregators/qcRuleConfigV14Aggregator' or its corresponding type declarations.
+web/src/pages/scheduling/optimize/index.tsx(63,18): error TS6133: 'i' is declared but its value is never read.
+web/src/pages/smart-healthcare/index.tsx(19,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/specialty/index.tsx(18,3): error TS6133: 'Tag' is declared but its value is never read.
+web/src/pages/trend-forecast/index.tsx(7,29): error TS6133: 'List' is declared but its value is never read.
+web/src/pages/twin3d/or/index.tsx(14,3): error TS6133: 'List' is declared but its value is never read.
+web/src/router/index.tsx(282,41): error TS1261: Already included file name 'C:/Users/lenovo/Doubao/chats/2026-09-14/new-chat-1/web/src/pages/followup/smart/index.tsx' differs from file name 'C:/Users/lenovo/Doubao/chats/2026-09-14/new-chat-1/web/src/pages/followUp/smart/index.tsx' only in casing.
+  The file is in the program because:
+    Imported via '@/pages/followup/smart' from file 'C:/Users/lenovo/Doubao/chats/2026-09-14/new-chat-1/web/src/router/index.tsx'
+    Matched by include pattern 'src' in 'web/tsconfig.json'

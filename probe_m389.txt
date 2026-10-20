@@ -1,0 +1,4 @@
+﻿OK /api/v1/finance/budget
+OK /api/v1/finance/costs
+OK /api/v1/finance/revenue
+OK /api/v1/finance/analysis

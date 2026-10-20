@@ -5,6 +5,7 @@
  */
 package com.jlmedaios.monolith.orders_management.entity;
 
+import com.jlmedaios.monolith.common.TenantEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,14 +18,21 @@ import java.time.LocalDate;
  * 医嘱实体。
  *
  * <p>append-only: 医嘱不可修改，执行/停止留痕</p>
+ * <p>P5 多租户：继承 TenantEntity，自动获得 tenantId 字段。</p>
  */
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order")
-public class Order {
+@Table(name = "order", indexes = {
+        @Index(name = "idx_order_no", columnList = "order_no"),
+        @Index(name = "idx_order_patient", columnList = "patient_id"),
+        @Index(name = "idx_order_status", columnList = "status"),
+        @Index(name = "idx_order_doctor", columnList = "doctor_id"),
+        @Index(name = "idx_order_tenant", columnList = "tenant_id")
+})
+public class Order extends TenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

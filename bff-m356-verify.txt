@@ -1,0 +1,9 @@
+﻿/api/v1/risk/assessment=200
+/api/v1/risk/monitor=200
+/api/v1/risk/warning=200
+/api/v1/risk/indicators=ERR
+/api/v1/risk/scores=ERR
+/api/v1/risk/trends=ERR
+/api/v1/risk/benchmarks=ERR
+/api/v1/risk/alerts=ERR
+/api/v1/risk/reports=ERR

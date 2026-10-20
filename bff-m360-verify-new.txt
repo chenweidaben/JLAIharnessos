@@ -1,0 +1,6 @@
+﻿/api/v1/security/privacy-policy=200
+/api/v1/security/privacy-consent=200
+/api/v1/security/privacy-rights=200
+/api/v1/security/privacy-notice=200
+/api/v1/security/privacy-violation=200
+/api/v1/security/privacy-complaint=200

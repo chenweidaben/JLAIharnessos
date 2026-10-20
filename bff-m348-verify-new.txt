@@ -1,0 +1,2 @@
+﻿/api/v1/emr/version-labels=200
+/api/v1/emr/version-approve=200

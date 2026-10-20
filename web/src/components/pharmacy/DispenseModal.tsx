@@ -14,6 +14,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  Button,
+  Card,
   Descriptions,
   Empty,
   Form,
@@ -21,10 +23,13 @@ import {
   Modal,
   Select,
   Space,
+  Steps,
   Table,
   Tag,
   Typography,
+  message,
 } from 'antd';
+import { ScanOutlined } from '@ant-design/icons';
 
 import { usePharmacyStore } from '@/store/pharmacyStore';
 import type {
@@ -70,6 +75,12 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
   const [warehouse, setWarehouse] = useState(DEFAULT_WAREHOUSE);
   const [batchByItem, setBatchByItem] = useState<Record<string, string | null>>({});
   const [overrideReason, setOverrideReason] = useState('');
+  // v5.0试点扩展（M190三角色工作流）：双人核对签字栏 + 发药后用药提醒推送
+  const [checkerA, setCheckerA] = useState('');
+  const [checkerB, setCheckerB] = useState('');
+  const [dispensed, setDispensed] = useState(false);
+  // v5.0试点扩展（M197护士药师工作流）：双人核对 Steps 流程（0=A扫码 1=B确认 2=发药成功）
+  const [checkStep, setCheckStep] = useState(0);
 
   const rx = item?.prescription ?? null;
 
@@ -77,6 +88,12 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
     setWarehouse(DEFAULT_WAREHOUSE);
     setBatchByItem({});
     setOverrideReason('');
+    // v5.0试点扩展（M190三角色工作流）：默认填入双人核对药师（DEMO mock）
+    setCheckerA('周敏（发药药师）');
+    setCheckerB('李娜（复核药师）');
+    setDispensed(false);
+    // v5.0试点扩展（M197护士药师工作流）：双人核对流程重置到步骤 0
+    setCheckStep(0);
     if (rx) void previewCds(rx.id);
   }, [rx?.id, previewCds]);
 
@@ -119,7 +136,12 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
       ...(hasBlock ? { overrideReason: overrideReason.trim() } : {}),
     };
     const result = await dispense(rx.id, payload);
-    if (result) onClose();
+    // v5.0试点扩展（M190三角色工作流）：发药成功后先展示双人核对 + 用药提醒推送结果，再关闭
+    if (result) {
+      setDispensed(true);
+      // v5.0试点扩展（M197护士药师工作流）：双人核对流程推进到"发药成功"
+      setCheckStep(2);
+    }
   };
 
   const columns = [
@@ -166,16 +188,31 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
       open={Boolean(rx)}
       width={860}
       onCancel={onClose}
-      onOk={() => void handleConfirm()}
-      okText="确认发药"
+      onOk={dispensed ? onClose : () => void handleConfirm()}
+      okText={dispensed ? '完 成' : '确认发药'}
       cancelText="取 消"
       okButtonProps={{
-        disabled: !overrideReady || anyOutOfStock,
-        loading: submitting,
+        disabled: dispensed ? false : !overrideReady || anyOutOfStock,
+        loading: dispensed ? false : submitting,
       }}
       destroyOnClose
     >
-      {rx && item ? (
+      {/* v5.0试点扩展（M190三角色工作流）：发药成功 → 双人核对 + 用药提醒推送结果 */}
+      {dispensed && (
+        <Alert
+          type="success"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="发药完成"
+          description={
+            <Space direction="vertical" size={4}>
+              <Typography.Text>双人核对：核对人A（发药药师）{checkerA} ✓ ｜ 核对人B（复核药师）{checkerB} ✓</Typography.Text>
+              <Typography.Text>已推送用药提醒给患者：服药时间、剂量与注意事项已同步至患者端。</Typography.Text>
+            </Space>
+          }
+        />
+      )}
+      {!dispensed && rx && item ? (
         <Space direction="vertical" style={{ width: '100%' }} size="middle">
           <Descriptions size="small" column={3} bordered>
             <Descriptions.Item label="处方号">{rx.rxNo}</Descriptions.Item>
@@ -232,6 +269,78 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
             dataSource={rx.items}
           />
 
+          {/* v5.0试点扩展（M197护士药师工作流）：双人核对发药流程 Steps（A扫码→B确认→发药成功） */}
+          <Card size="small" title="双人核对发药流程（DEMO mock）">
+            <Steps
+              current={checkStep}
+              size="small"
+              items={[
+                { title: '核对人A扫码', description: checkerA || '待发药药师扫码' },
+                { title: '核对人B确认', description: checkerB || '待复核药师确认' },
+                { title: '发药成功', description: '库存扣减 + 发药记录 + 用药提醒推送' },
+              ]}
+            />
+            <Space style={{ marginTop: 12 }}>
+              {checkStep === 0 && (
+                <Button
+                  type="primary"
+                  icon={<ScanOutlined />}
+                  onClick={() => {
+                    if (!checkerA.trim()) {
+                      message.warning('请先填写核对人A（发药药师）签名');
+                      return;
+                    }
+                    setCheckStep(1);
+                    message.success(`核对人A ${checkerA} 扫码完成，待核对人B确认`);
+                  }}
+                >
+                  核对人A 扫码（mock）
+                </Button>
+              )}
+              {checkStep === 1 && (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    if (!checkerB.trim()) {
+                      message.warning('请先填写核对人B（复核药师）签名');
+                      return;
+                    }
+                    if (checkerB.trim() === checkerA.trim()) {
+                      message.warning('核对人B不得与核对人A为同一人');
+                      return;
+                    }
+                    message.success(`核对人B ${checkerB} 确认一致，可点击"确认发药"`);
+                  }}
+                >
+                  核对人B 确认（mock）
+                </Button>
+              )}
+              {checkStep === 2 && (
+                <Tag color="green">双人核对完成，发药成功 ✓</Tag>
+              )}
+            </Space>
+          </Card>
+
+          {/* v5.0试点扩展（M190三角色工作流）：双人核对签字栏（核对人A/B，DEMO mock） */}
+          <Descriptions size="small" title="双人核对发药（核对人A / 核对人B 签字）" column={2} bordered>
+            <Descriptions.Item label="核对人A（发药药师）">
+              <Input
+                aria-label="核对人A"
+                value={checkerA}
+                onChange={(e) => setCheckerA(e.target.value)}
+                placeholder="发药药师签名"
+              />
+            </Descriptions.Item>
+            <Descriptions.Item label="核对人B（复核药师）">
+              <Input
+                aria-label="核对人B"
+                value={checkerB}
+                onChange={(e) => setCheckerB(e.target.value)}
+                placeholder="复核药师签名（≠ 核对人A）"
+              />
+            </Descriptions.Item>
+          </Descriptions>
+
           {hasBlock && (
             <Form layout="vertical" data-testid="override-form">
               <Form.Item
@@ -248,6 +357,8 @@ export function DispenseModal({ item, inventory, onClose }: Props) {
             </Form>
           )}
         </Space>
+      ) : dispensed ? (
+        <Typography.Text type="secondary">双人核对完成，用药提醒已推送至患者端，点击"完成"关闭。</Typography.Text>
       ) : (
         <Empty description="未选择处方" />
       )}

@@ -1,0 +1,6 @@
+﻿SurgerySchedulePage lazy: True
+SurgeryRecordsPage lazy: True
+SurgeryConsentPage lazy: False
+AnesthesiaRecordsPage lazy: True
+AnesthesiaAssessmentPage lazy: False
+AnesthesiaRecoveryPage lazy: False

@@ -1,0 +1,18 @@
+﻿cds\rules exists: False
+cds\alerts exists: True
+cds\recommendations exists: False
+cds\drug-interactions exists: False
+cds\contraindications exists: False
+cds\guidelines exists: True
+OK /api/v1/cds/rules
+OK /api/v1/cds/alerts
+OK /api/v1/cds/recommendations
+OK /api/v1/cds/drug-interactions
+OK /api/v1/cds/contraindications
+OK /api/v1/cds/guidelines
+route cds/rules : False
+route cds/alerts : False
+route cds/recommendations : False
+route cds/drug-interactions : False
+route cds/contraindications : False
+route cds/guidelines : False

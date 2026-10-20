@@ -1,0 +1,6 @@
+﻿OK /api/v1/risk/indicators
+OK /api/v1/risk/scores
+OK /api/v1/risk/trends
+OK /api/v1/risk/benchmarks
+OK /api/v1/risk/alerts
+OK /api/v1/risk/reports

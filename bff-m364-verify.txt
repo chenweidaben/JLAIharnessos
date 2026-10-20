@@ -1,0 +1,9 @@
+﻿/api/v1/dashboard/stats=200
+/api/v1/operation/kpi=200
+/api/v1/operation/benchmark=200
+/api/v1/operations/dashboard=ERR
+/api/v1/operations/kpi=ERR
+/api/v1/operations/reports=ERR
+/api/v1/operations/analysis=ERR
+/api/v1/operations/forecast=ERR
+/api/v1/operations/benchmark=ERR

@@ -1,0 +1,9 @@
+﻿/api/v1/system/config=200
+/api/v1/security/roles=ERR
+/api/v1/security/permissions=ERR
+/api/v1/system/users=200
+/api/v1/system/roles=200
+/api/v1/system/permissions=200
+/api/v1/system/configs=ERR
+/api/v1/system/logs=ERR
+/api/v1/system/version=ERR

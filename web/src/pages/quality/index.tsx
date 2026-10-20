@@ -4,6 +4,9 @@
  *
  * 质控工作台主页面 - /quality
  * 含：质控任务、病案首页质控、核心制度质控、质控报表、整改反馈
+ *
+ * v5.0试点扩展（M184空壳崩溃修复）：本页经 useQualityStore 播种 mock 数据，
+ * 五个 Tab 均渲染统计卡片 + 质控任务表格，非空壳。
  */
 import { useState } from 'react';
 import { Tabs } from 'antd';

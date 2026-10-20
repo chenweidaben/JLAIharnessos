@@ -35,6 +35,20 @@ function assertPermission(auth: AuthView, perm: string): void {
   if (!auth.permissions.includes(perm)) throw forbidden(`缺少权限：${perm}`);
 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** DEMO_MODE 号源排班列表（P7）。 */
+function demoSlots() {
+  return [
+    { id: 'demo-slot-1', department: '心血管内科', doctorName: '演示医生A', date: '2026-10-20', timeSlot: '08:00-08:30', totalQuota: 20, booked: 15, available: 5 },
+    { id: 'demo-slot-2', department: '呼吸内科', doctorName: '演示医生B', date: '2026-10-20', timeSlot: '08:30-09:00', totalQuota: 20, booked: 18, available: 2 },
+    { id: 'demo-slot-3', department: '普外科', doctorName: '演示医生C', date: '2026-10-20', timeSlot: '09:00-09:30', totalQuota: 15, booked: 8, available: 7 },
+    { id: 'demo-slot-4', department: '骨科', doctorName: '演示医生D', date: '2026-10-20', timeSlot: '09:30-10:00', totalQuota: 15, booked: 15, available: 0 },
+    { id: 'demo-slot-5', department: '神经内科', doctorName: '演示医生E', date: '2026-10-21', timeSlot: '08:00-08:30', totalQuota: 20, booked: 10, available: 10 },
+    { id: 'demo-slot-6', department: '消化内科', doctorName: '演示医生F', date: '2026-10-21', timeSlot: '08:30-09:00', totalQuota: 20, booked: 12, available: 8 },
+    { id: 'demo-slot-7', department: '内分泌科', doctorName: '演示医生G', date: '2026-10-21', timeSlot: '09:00-09:30', totalQuota: 15, booked: 5, available: 10 },
+    { id: 'demo-slot-8', department: '儿科', doctorName: '演示医生H', date: '2026-10-21', timeSlot: '09:30-10:00', totalQuota: 25, booked: 20, available: 5 },
+  ];
+}
 function assertUuid(id: string, label: string): void {
   if (!id || !UUID_RE.test(id.trim())) throw badRequest(`${label} 须为 UUID`);
 }
@@ -65,6 +79,10 @@ export async function createScheduleView(
 /** 列可约时段。 */
 export async function listSlotsView(auth: AuthView, department?: string, workDate?: string) {
   assertPermission(auth, 'schedule:book');
+  if (process.env.DEMO_MODE === '1') {
+    const slots = demoSlots();
+    return department ? slots.filter(s => s.department === department) : slots;
+  }
   const rows = await listOpenSlots(department, workDate);
   return rows.map((s) => ({ ...s, remaining: remainingQuota(s), available: isAvailable(s) }));
 }

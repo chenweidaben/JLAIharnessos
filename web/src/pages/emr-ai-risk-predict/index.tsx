@@ -28,7 +28,7 @@ export default function EmrAiRiskPredictPage() {
   const [age, setAge] = useState("30");
   const [diseases, setDiseases] = useState("");
   const [symptoms, setSymptoms] = useState("头痛");
-  const [result, setResult] = useState<AiRiskResult | null>(null);
+  const [, setResult] = useState<AiRiskResult | null>(null);
   const [report, setReport] = useState<AiRiskReport | null>(null);
 
   const predict = async () => {

@@ -1,0 +1,4 @@
+﻿src/router/index.tsx(533,7): error TS2451: Cannot redeclare block-scoped variable 'FinanceBudgetPage'.
+src/router/index.tsx(647,7): error TS2451: Cannot redeclare block-scoped variable 'FinanceRevenuePage'.
+src/router/index.tsx(3917,7): error TS2451: Cannot redeclare block-scoped variable 'FinanceBudgetPage'.
+src/router/index.tsx(3919,7): error TS2451: Cannot redeclare block-scoped variable 'FinanceRevenuePage'.

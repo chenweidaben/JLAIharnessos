@@ -1,0 +1,6 @@
+﻿/api/v1/hr/staff-dashboard=200
+/api/v1/hr/staff-recruitment=200
+/api/v1/hr/staff-training=200
+/api/v1/hr/staff-performance=200
+/api/v1/hr/staff-schedule=200
+/api/v1/hr/staff-attendance=200

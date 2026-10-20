@@ -1,0 +1,6 @@
+﻿/api/v1/emergency/triage=200
+/api/v1/emergency/rescue=200
+/api/v1/emergency/ambulance=200
+/api/v1/emergency/disaster=ERR
+/api/v1/emergency/poisoning=200
+/api/v1/emergency/trauma=200

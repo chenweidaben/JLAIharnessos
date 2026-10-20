@@ -1,0 +1,18 @@
+﻿lab\items exists: False
+lab\results exists: True
+lab\reports exists: False
+radiology\items exists: False
+radiology\results exists: True
+radiology\reports exists: True
+OK /api/v1/lab/items
+OK /api/v1/lab/results
+OK /api/v1/lab/reports
+OK /api/v1/radiology/items
+OK /api/v1/radiology/results
+OK /api/v1/radiology/reports
+route lab/items : False
+route lab/results : False
+route lab/reports : False
+route radiology/items : False
+route radiology/results : False
+route radiology/reports : False

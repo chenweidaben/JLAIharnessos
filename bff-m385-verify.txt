@@ -1,0 +1,6 @@
+﻿/api/v1/workflow/tasks=200
+/api/v1/workflow/templates=200
+/api/v1/workflow/instances=200
+/api/v1/workflow/approval=ERR
+/api/v1/workflow/scheduling=ERR
+/api/v1/workflow/notifications=ERR

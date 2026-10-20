@@ -1,0 +1,6 @@
+﻿/api/v1/community/followups=ERR
+/api/v1/community/visits=200
+/api/v1/community/health-records=ERR
+/api/v1/community/elderly-care=ERR
+/api/v1/community/chronic-disease=ERR
+/api/v1/community/education=ERR

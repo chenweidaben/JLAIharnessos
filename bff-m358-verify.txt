@@ -1,0 +1,6 @@
+﻿/api/v1/security/policy=ERR
+/api/v1/security/policy-detail=ERR
+/api/v1/security/vulnerabilities=ERR
+/api/v1/security/patches=ERR
+/api/v1/security/incidents=200
+/api/v1/security/incident-response=200

@@ -56,6 +56,13 @@ export async function getView(auth: AuthView, period: string) {
 
 export async function listView(auth: AuthView) {
   assertView(auth);
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { period: '2026-09', drgCases: 125, dipCases: 88, insuranceSettlement: 1250000, patientOutOfPocket: 180000 },
+      { period: '2026-08', drgCases: 118, dipCases: 82, insuranceSettlement: 1180000, patientOutOfPocket: 165000 },
+      { period: '2026-07', drgCases: 110, dipCases: 75, insuranceSettlement: 1120000, patientOutOfPocket: 158000 },
+    ];
+  }
   return listSummaries();
 }
 

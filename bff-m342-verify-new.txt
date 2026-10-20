@@ -1,0 +1,5 @@
+﻿/api/v1/workflow/tasks=200
+/api/v1/workflow/templates=200
+/api/v1/tasks/todo=200
+/api/v1/tasks/done=200
+/api/v1/tasks/overdue=200

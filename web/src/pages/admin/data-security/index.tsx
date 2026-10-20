@@ -86,7 +86,7 @@ export default function DataSecurityPage() {
                   { key: 'core', name: '核心', count: data.classification.core, color: 'red' },
                 ]}
                 columns={[
-                  { title: '级别', dataIndex: 'name', key: 'name', render: (n: string, r: { color: string }) => <Tag color={r.color}>{n}</Tag> },
+                  { title: '级别', dataIndex: 'name', key: 'name', render: (n: string, r: { color: string; [k: string]: unknown }) => <Tag color={r.color}>{n}</Tag> },
                   { title: '数量', dataIndex: 'count', key: 'count' },
                 ]}
               />

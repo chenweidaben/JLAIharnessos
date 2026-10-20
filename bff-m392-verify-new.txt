@@ -1,0 +1,6 @@
+﻿/api/v1/telemed/consultations-detail=200
+/api/v1/telemed/prescriptions-detail=200
+/api/v1/telemed/payments-detail=200
+/api/v1/telemed/delivery-detail=200
+/api/v1/telemed/followup-detail=200
+/api/v1/telemed/reports-detail=200

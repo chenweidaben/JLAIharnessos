@@ -1,0 +1,18 @@
+﻿bi\dashboard exists: True
+bi\charts exists: False
+bi\reports exists: False
+bi\analysis exists: False
+bi\export exists: False
+bi\scheduled exists: False
+OK /api/v1/bi/dashboard
+OK /api/v1/bi/charts
+OK /api/v1/bi/reports
+OK /api/v1/bi/analysis
+OK /api/v1/bi/export
+OK /api/v1/bi/scheduled
+route bi/dashboard : False
+route bi/charts : False
+route bi/reports : False
+route bi/analysis : False
+route bi/export : False
+route bi/scheduled : False

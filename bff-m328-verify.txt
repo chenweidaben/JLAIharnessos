@@ -1,0 +1,9 @@
+﻿/api/v1/research/projects=200
+/api/v1/research/papers=200
+/api/v1/research/funds=200
+/api/v1/education/courses=200
+/api/v1/education/trainings=200
+/api/v1/research/grants=ERR
+/api/v1/teaching/courses=200
+/api/v1/teaching/training=ERR
+/api/v1/internet/hospital-orders=ERR

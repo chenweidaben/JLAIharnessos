@@ -1,0 +1,6 @@
+﻿OutpatientQueuePage lazy: True
+OutpatientVisitsPage lazy: True
+OutpatientPrescriptionsPage lazy: True
+InpatientAdmissionsPage lazy: False
+InpatientDischargesPage lazy: False
+InpatientTransfersPage lazy: False

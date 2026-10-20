@@ -1,0 +1,5 @@
+﻿/api/v1/nursing/nqi-indicators=200
+/api/v1/nursing/nqi-trends=200
+/api/v1/nursing/nqi-benchmarks=200
+/api/v1/nursing/nqi-alerts=200
+/api/v1/nursing/nqi-reports=200

@@ -3,10 +3,13 @@
  *
  * 深海蓝VI：病历AI缺陷根因分析（病历ID/科室/缺陷类型/发生频次/根因分析/严重级别）。
  *
+ * v5.0试点扩展（M184空壳崩溃修复）：/api/v1/emr-ai-defect-rootcause 未上线（404）时，
+ * 前端展示友好提示并回退到内置演示数据，避免进入即空白。
+ *
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Button, Card, Col, Input, Layout, Row, Tag, Typography, message } from "antd";
+import { Alert, Button, Card, Col, Input, Layout, Row, Tag, Typography, message } from "antd";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -39,9 +42,15 @@ export default function EmrAiDefectRootcausePage() {
   const [result, setResult] = useState<RootcauseResult | null>(null);
   const [report, setReport] = useState<RootcauseReport | null>(null);
   const [loading, setLoading] = useState(false);
+  // v5.0试点扩展（M184空壳崩溃修复）：API 404/不可达时的友好提示标记
+  const [unreachable, setUnreachable] = useState(false);
+
+  /** 404 兜底演示数据 */
+  const DEMO_BASE: AiDefectRootcause = { recordId: "REC-20261018-001", dept: "心内科" };
+  const DEMO_RESULT: RootcauseResult = { rootCause: "电子签名环节权限未自动绑定，医师跳转后未二次确认签名", level: "高" };
 
   useEffect(() => {
-    const fetchBase = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem("token") ?? "";
         const resp = await fetch("/api/v1/emr-ai-defect-rootcause", {
@@ -50,12 +59,20 @@ export default function EmrAiDefectRootcausePage() {
         if (resp.ok) {
           const data = await resp.json();
           setBase(data?.data ?? null);
+          setUnreachable(false);
+        } else {
+          // v5.0试点扩展（M184空壳崩溃修复）：端点 404 时回退演示数据并提示
+          setUnreachable(true);
+          setBase(DEMO_BASE);
         }
       } catch {
         message.error("加载 AI 缺陷根因分析基础数据失败");
+        setUnreachable(true);
+        setBase(DEMO_BASE);
       }
     };
-    void fetchBase();
+    void fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const doAnalyze = async () => {
@@ -74,12 +91,20 @@ export default function EmrAiDefectRootcausePage() {
         const data = await resp.json();
         setResult(data?.data?.result ?? null);
         setReport(data?.data?.report ?? null);
+        setUnreachable(false);
         message.success("根因分析完成");
       } else {
-        message.error("根因分析失败");
+        // v5.0试点扩展（M184空壳崩溃修复）：端点 404 时回退演示结果并友好提示
+        setUnreachable(true);
+        setResult(DEMO_RESULT);
+        setReport({ rootCause: DEMO_RESULT.rootCause, level: DEMO_RESULT.level });
+        message.warning("根因分析服务暂不可用，已展示演示结果");
       }
     } catch {
-      message.error("网络错误");
+      setUnreachable(true);
+      setResult(DEMO_RESULT);
+      setReport({ rootCause: DEMO_RESULT.rootCause, level: DEMO_RESULT.level });
+      message.error("网络错误，已展示演示结果");
     } finally {
       setLoading(false);
     }
@@ -89,6 +114,14 @@ export default function EmrAiDefectRootcausePage() {
     <Layout style={{ minHeight: "100vh", background: VI.bg }}>
       <Content style={{ padding: 24, maxWidth: 1280, margin: "0 auto" }}>
         <Title level={3} style={{ color: VI.deep }}>病历AI缺陷根因分析</Title>
+        {unreachable && (
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="根因分析接口暂不可用（404），当前展示内置演示数据，接入 BFF 后自动切换真实结果。"
+          />
+        )}
         {base && (
           <Card style={{ marginBottom: 16 }} headStyle={{ background: VI.mid, color: "#fff" }} title="基础数据">
             <div>

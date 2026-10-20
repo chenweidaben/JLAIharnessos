@@ -1,0 +1,3 @@
+﻿/api/v1/insurance/policies=200
+/api/v1/settlement/list=ERR
+/api/v1/finance/insurance-settlement=200

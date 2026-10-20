@@ -1,0 +1,3 @@
+﻿/api/v1/signatures/list=200
+/api/v1/signatures/verify=200
+/api/v1/signatures/templates=200

@@ -1,0 +1,6 @@
+﻿/api/v1/maternity/prenatal=200
+/api/v1/maternity/delivery=200
+/api/v1/maternity/postpartum=200
+/api/v1/newborn/physical=200
+/api/v1/newborn/screening=200
+/api/v1/newborn/growth=200

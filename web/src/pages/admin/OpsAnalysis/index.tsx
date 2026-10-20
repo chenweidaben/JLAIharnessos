@@ -192,31 +192,36 @@ export default function OpsAnalysisPage() {
 
         {data?.hasData && data.trend && (
           <>
+            {/* v5.0试点扩展（M184空壳崩溃修复）：summary 为 null 时不白屏 */}
             <Row gutter={12} style={{ marginBottom: 12 }}>
-              <Col span={8}><Card size="small"><Statistic title="上升指标" value={data.trend.summary.up} valueStyle={{ color: '#3f8600' }} /></Card></Col>
-              <Col span={8}><Card size="small"><Statistic title="下降指标" value={data.trend.summary.down} valueStyle={{ color: '#cf1322' }} /></Card></Col>
-              <Col span={8}><Card size="small"><Statistic title="平稳指标" value={data.trend.summary.flat} /></Card></Col>
+              <Col span={8}><Card size="small"><Statistic title="上升指标" value={data.trend.summary?.up ?? 0} valueStyle={{ color: '#3f8600' }} /></Card></Col>
+              <Col span={8}><Card size="small"><Statistic title="下降指标" value={data.trend.summary?.down ?? 0} valueStyle={{ color: '#cf1322' }} /></Card></Col>
+              <Col span={8}><Card size="small"><Statistic title="平稳指标" value={data.trend.summary?.flat ?? 0} /></Card></Col>
             </Row>
 
             <Card size="small" title="多期趋势分析" style={{ marginBottom: 12 }}>
-              <Table rowKey="metricKey" size="small" columns={trendColumns} dataSource={data.trend.metrics} pagination={false} />
+              <Table rowKey="metricKey" size="small" columns={trendColumns} dataSource={data.trend.metrics ?? []} pagination={false} />
             </Card>
           </>
         )}
 
         {data?.hasData && data.benchmark && (
-          <Card size="small" title={`运营对标（领先 ${data.benchmark.leadingCount} 项 / 落后 ${data.benchmark.laggingCount} 项）`} style={{ marginBottom: 12 }}>
-            <Table rowKey="metricKey" size="small" columns={benchmarkColumns} dataSource={data.benchmark.items} pagination={{ pageSize: 10 }} />
+          <Card size="small" title={`运营对标（领先 ${data.benchmark.leadingCount ?? 0} 项 / 落后 ${data.benchmark.laggingCount ?? 0} 项）`} style={{ marginBottom: 12 }}>
+            <Table rowKey="metricKey" size="small" columns={benchmarkColumns} dataSource={data.benchmark.items ?? []} pagination={{ pageSize: 10 }} />
           </Card>
         )}
 
         {data?.hasData && data.forecast && (
-          <Card size="small" title={`运营预测（未来 ${data.forecast.days} 期，线性回归 + 95% 置信区间）`} style={{ marginBottom: 12 }}>
+          <Card size="small" title={`运营预测（未来 ${data.forecast.days ?? 0} 期，线性回归 + 95% 置信区间）`} style={{ marginBottom: 12 }}>
             <Paragraph type="secondary">{data.forecast.note}</Paragraph>
-            {data.forecast.metrics.slice(0, 6).map((m) => (
+            {(data.forecast.metrics ?? []).slice(0, 6).map((m) => {
+              // v5.0试点扩展（M184空壳崩溃修复）：historyPoints/forecasts 为 null 时不白屏
+              const hp = m.historyPoints ?? [];
+              const fc = m.forecasts ?? [];
+              return (
               <div key={m.metricKey} style={{ marginBottom: 16 }}>
                 <Paragraph strong style={{ marginBottom: 4 }}>
-                  {m.metricName}（拟合优度 R²={m.confidence.toFixed(2)}）
+                  {m.metricName}（拟合优度 R²={(m.confidence ?? 0).toFixed(2)}）
                 </Paragraph>
                 <ReactECharts
                   style={{ height: 220 }}
@@ -224,27 +229,27 @@ export default function OpsAnalysisPage() {
                     tooltip: { trigger: 'axis' },
                     legend: { data: ['历史', '预测', '置信区间'] },
                     grid: { left: 50, right: 20, top: 30, bottom: 30 },
-                    xAxis: { type: 'category', data: [...m.historyPoints.map((p) => p.period), ...m.forecasts.map((f) => f.targetPeriod)] },
+                    xAxis: { type: 'category', data: [...hp.map((p) => p.period), ...fc.map((f) => f.targetPeriod)] },
                     yAxis: { type: 'value', scale: true },
                     series: [
                       {
                         name: '历史', type: 'line', symbol: 'circle',
-                        data: [...m.historyPoints.map((p) => p.value), ...m.forecasts.map(() => null)],
+                        data: [...hp.map((p) => p.value), ...fc.map(() => null)],
                         itemStyle: { color: VI.accent },
                       },
                       {
                         name: '预测', type: 'line', symbol: 'diamond',
-                        data: [...m.historyPoints.map(() => null), ...m.forecasts.map((f) => f.value)],
+                        data: [...hp.map(() => null), ...fc.map((f) => f.value)],
                         itemStyle: { color: '#cf1322' }, lineStyle: { type: 'dashed' },
                       },
                       {
                         name: '置信区间', type: 'line',
-                        data: [...m.historyPoints.map(() => null), ...m.forecasts.map((f) => f.upperBound)],
+                        data: [...hp.map(() => null), ...fc.map((f) => f.upperBound)],
                         lineStyle: { opacity: 0 }, stack: 'band', symbol: 'none',
                       },
                       {
                         name: '置信区间', type: 'line',
-                        data: [...m.historyPoints.map(() => null), ...m.forecasts.map((f) => f.lowerBound - f.upperBound)],
+                        data: [...hp.map(() => null), ...fc.map((f) => f.lowerBound - f.upperBound)],
                         lineStyle: { opacity: 0 }, stack: 'band', symbol: 'none',
                         areaStyle: { color: VI.accentSoft, opacity: 0.25 },
                       },
@@ -252,7 +257,8 @@ export default function OpsAnalysisPage() {
                   }}
                 />
               </div>
-            ))}
+              );
+            })}
           </Card>
         )}
       </Content>

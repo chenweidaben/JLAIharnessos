@@ -95,11 +95,35 @@ function genNo(prefix: string): string {
 // 目录
 // ---------------------------------------------------------------------------
 
+// v5.0试点扩展（M200遗留修复）：检验目录 DEMO 种子
+function buildDemoPanels(): LabPanelDetail[] {
+  const now = new Date().toISOString();
+  const items: LabItem[] = [
+    { id: 'demo-item-001', code: 'WBC', name: '白细胞计数', specimenType: 'EDTA抗凝血', unit: '10^9/L', refLow: 4.0, refHigh: 10.0, critLow: 1.5, critHigh: 30.0, execDepartment: '检验科', price: 5, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-002', code: 'RBC', name: '红细胞计数', specimenType: 'EDTA抗凝血', unit: '10^12/L', refLow: 3.8, refHigh: 5.8, critLow: null, critHigh: null, execDepartment: '检验科', price: 5, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-003', code: 'HGB', name: '血红蛋白', specimenType: 'EDTA抗凝血', unit: 'g/L', refLow: 110, refHigh: 160, critLow: 60, critHigh: null, execDepartment: '检验科', price: 8, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-004', code: 'GLU', name: '空腹血糖', specimenType: '血清', unit: 'mmol/L', refLow: 3.9, refHigh: 6.1, critLow: 2.5, critHigh: 16.7, execDepartment: '生化科', price: 10, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-005', code: 'ALT', name: '丙氨酸氨基转移酶', specimenType: '血清', unit: 'U/L', refLow: 7, refHigh: 40, critLow: null, critHigh: 300, execDepartment: '生化科', price: 12, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-006', code: 'AST', name: '天门冬氨酸氨基转移酶', specimenType: '血清', unit: 'U/L', refLow: 13, refHigh: 35, critLow: null, critHigh: 300, execDepartment: '生化科', price: 12, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-007', code: 'CR', name: '肌酐', specimenType: '血清', unit: 'μmol/L', refLow: 44, refHigh: 133, critLow: null, critHigh: 500, execDepartment: '生化科', price: 10, isActive: true, createdAt: now, updatedAt: now },
+    { id: 'demo-item-008', code: 'UA', name: '尿酸', specimenType: '血清', unit: 'μmol/L', refLow: 155, refHigh: 428, critLow: null, critHigh: null, execDepartment: '生化科', price: 8, isActive: true, createdAt: now, updatedAt: now },
+  ];
+  const panels: LabPanelDetail[] = [
+    { id: 'demo-panel-01', code: 'CBC', name: '血常规', specimenType: 'EDTA抗凝血', execDepartment: '检验科', price: 20, isActive: true, createdAt: now, updatedAt: now, items: [items[0], items[1], items[2]] },
+    { id: 'demo-panel-02', code: 'BIO-CHEM', name: '生化全套', specimenType: '血清', execDepartment: '生化科', price: 80, isActive: true, createdAt: now, updatedAt: now, items: [items[3], items[4], items[5], items[6], items[7]] },
+  ];
+  return panels;
+}
+
 export async function listPanelsView(): Promise<LabPanelDetail[]> {
+  // M200遗留修复：DEMO_MODE 下返回确定性检验面板种子
+  if (process.env.DEMO_MODE === '1') return buildDemoPanels();
   return listPanels();
 }
 
 export async function listItemsView(): Promise<LabItem[]> {
+  // M200遗留修复：DEMO_MODE 下返回确定性检验项目种子
+  if (process.env.DEMO_MODE === '1') return buildDemoPanels().flatMap((p) => p.items);
   return listItems();
 }
 
@@ -242,6 +266,19 @@ export async function createLabRequest(
 export async function listLabRequestsView(filter: {
   status?: string; patientId?: string; visitId?: string;
 }): Promise<LabRequest[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性检验申请种子，不写库、不依赖 PG。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: LabRequest[] = [
+      { id: 'demo-lis-req-0001', requestNo: 'LR20261019001', visitId: 'demo-visit-01', patientId: 'demo-pat-01', orderedBy: null, urgency: 'stat', diagnosis: '急性肺炎待排', note: null, status: 'in_progress', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 3600_000).toISOString(), updatedAt: new Date(now - 1800_000).toISOString() },
+      { id: 'demo-lis-req-0002', requestNo: 'LR20261019002', visitId: 'demo-visit-02', patientId: 'demo-pat-02', orderedBy: null, urgency: 'urgent', diagnosis: '2型糖尿病', note: '空腹采血', status: 'specimen_collected', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 7200_000).toISOString(), updatedAt: new Date(now - 3600_000).toISOString() },
+      { id: 'demo-lis-req-0003', requestNo: 'LR20261019003', visitId: 'demo-visit-03', patientId: 'demo-pat-03', orderedBy: null, urgency: 'routine', diagnosis: '冠心病随访', note: null, status: 'completed', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 86400_000).toISOString(), updatedAt: new Date(now - 43200_000).toISOString() },
+      { id: 'demo-lis-req-0004', requestNo: 'LR20261019004', visitId: 'demo-visit-04', patientId: 'demo-pat-04', orderedBy: null, urgency: 'routine', diagnosis: '健康体检', note: null, status: 'requested', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 1800_000).toISOString(), updatedAt: new Date(now - 1800_000).toISOString() },
+      { id: 'demo-lis-req-0005', requestNo: 'LR20261018005', visitId: 'demo-visit-05', patientId: 'demo-pat-05', orderedBy: null, urgency: 'urgent', diagnosis: '术后感染排查', note: null, status: 'accepted', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 172800_000).toISOString(), updatedAt: new Date(now - 86400_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((r) => r.status === filter.status);
+    return demo;
+  }
   if (filter.patientId) assertUuid(filter.patientId, '患者');
   if (filter.visitId) assertUuid(filter.visitId, '就诊');
   return listRequests(filter);
@@ -341,6 +378,20 @@ export async function generateSpecimens(
 export async function listSpecimensView(filter: {
   status?: string; requestId?: string;
 }): Promise<LabSpecimen[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性标本种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: LabSpecimen[] = [
+      { id: 'demo-lis-spec-01', specimenNo: 'SM20261019001', requestId: 'demo-lis-req-0001', visitId: 'demo-visit-01', patientId: 'demo-pat-01', panelId: null, specimenType: '静脉血', status: 'tested', collectedBy: null, collectedAt: new Date(now - 3000_000).toISOString(), collectionSite: '肘静脉', receivedBy: null, receivedAt: new Date(now - 2700_000).toISOString(), rejectedBy: null, rejectedAt: null, rejectReason: null, createdAt: new Date(now - 3100_000).toISOString(), updatedAt: new Date(now - 1200_000).toISOString() },
+      { id: 'demo-lis-spec-02', specimenNo: 'SM20261019002', requestId: 'demo-lis-req-0002', visitId: 'demo-visit-02', patientId: 'demo-pat-02', panelId: null, specimenType: '静脉血', status: 'received', collectedBy: null, collectedAt: new Date(now - 5400_000).toISOString(), collectionSite: '肘静脉', receivedBy: null, receivedAt: new Date(now - 5000_000).toISOString(), rejectedBy: null, rejectedAt: null, rejectReason: null, createdAt: new Date(now - 5500_000).toISOString(), updatedAt: new Date(now - 5000_000).toISOString() },
+      { id: 'demo-lis-spec-03', specimenNo: 'SM20261019003', requestId: 'demo-lis-req-0003', visitId: 'demo-visit-03', patientId: 'demo-pat-03', panelId: null, specimenType: '尿液', status: 'collected', collectedBy: null, collectedAt: new Date(now - 9000_000).toISOString(), collectionSite: '中段尿', receivedBy: null, receivedAt: null, rejectedBy: null, rejectedAt: null, rejectReason: null, createdAt: new Date(now - 9100_000).toISOString(), updatedAt: new Date(now - 9000_000).toISOString() },
+      { id: 'demo-lis-spec-04', specimenNo: 'SM20261018004', requestId: 'demo-lis-req-0005', visitId: 'demo-visit-05', patientId: 'demo-pat-05', panelId: null, specimenType: '静脉血', status: 'rejected', collectedBy: null, collectedAt: new Date(now - 180000_000).toISOString(), collectionSite: '手背静脉', receivedBy: null, receivedAt: null, rejectedBy: null, rejectedAt: new Date(now - 170000_000).toISOString(), rejectReason: '标本溶血', createdAt: new Date(now - 181000_000).toISOString(), updatedAt: new Date(now - 170000_000).toISOString() },
+      { id: 'demo-lis-spec-05', specimenNo: 'SM20261019005', requestId: 'demo-lis-req-0004', visitId: 'demo-visit-04', patientId: 'demo-pat-04', panelId: null, specimenType: '静脉血', status: 'registered', collectedBy: null, collectedAt: null, collectionSite: null, receivedBy: null, receivedAt: null, rejectedBy: null, rejectedAt: null, rejectReason: null, createdAt: new Date(now - 1500_000).toISOString(), updatedAt: new Date(now - 1500_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((s) => s.status === filter.status);
+    if (filter.requestId) return demo.filter((s) => s.requestId === filter.requestId);
+    return demo;
+  }
   if (filter.requestId) assertUuid(filter.requestId, '检验申请');
   return listSpecimens(filter);
 }
@@ -679,6 +730,19 @@ export async function publishReport(auth: AuthView, reportId: string): Promise<L
 export async function listReportsView(filter: {
   status?: string; patientId?: string; visitId?: string;
 }): Promise<LabReport[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性报告种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: LabReport[] = [
+      { id: 'demo-lis-rep-01', reportNo: 'LRR20261019001', requestId: 'demo-lis-req-0001', visitId: 'demo-visit-01', patientId: 'demo-pat-01', specimenId: null, panelId: null, panelName: '血常规五分类', status: 'published', enteredBy: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: new Date(now - 1500_000).toISOString(), returnedBy: null, returnedAt: null, returnReason: null, reportTime: new Date(now - 1800_000).toISOString(), createdAt: new Date(now - 2400_000).toISOString(), updatedAt: new Date(now - 1500_000).toISOString() },
+      { id: 'demo-lis-rep-02', reportNo: 'LRR20261019002', requestId: 'demo-lis-req-0003', visitId: 'demo-visit-03', patientId: 'demo-pat-03', specimenId: null, panelId: null, panelName: '生化全套', status: 'published', enteredBy: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: new Date(now - 5000_000).toISOString(), returnedBy: null, returnedAt: null, returnReason: null, reportTime: new Date(now - 5400_000).toISOString(), createdAt: new Date(now - 6000_000).toISOString(), updatedAt: new Date(now - 5000_000).toISOString() },
+      { id: 'demo-lis-rep-03', reportNo: 'LRR20261019003', requestId: 'demo-lis-req-0002', visitId: 'demo-visit-02', patientId: 'demo-pat-02', specimenId: null, panelId: null, panelName: '糖化血红蛋白', status: 'reviewing', enteredBy: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: null, returnedBy: null, returnedAt: null, returnReason: null, reportTime: null, createdAt: new Date(now - 4500_000).toISOString(), updatedAt: new Date(now - 4000_000).toISOString() },
+      { id: 'demo-lis-rep-04', reportNo: 'LRR20261018004', requestId: 'demo-lis-req-0005', visitId: 'demo-visit-05', patientId: 'demo-pat-05', specimenId: null, panelId: null, panelName: 'C反应蛋白', status: 'draft', enteredBy: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: null, returnedBy: null, returnedAt: null, returnReason: null, reportTime: null, createdAt: new Date(now - 175000_000).toISOString(), updatedAt: new Date(now - 175000_000).toISOString() },
+      { id: 'demo-lis-rep-05', reportNo: 'LRR20261018005', requestId: 'demo-lis-req-0003', visitId: 'demo-visit-03', patientId: 'demo-pat-03', specimenId: null, panelId: null, panelName: '凝血四项', status: 'returned', enteredBy: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: null, returnedBy: null, returnedAt: new Date(now - 200000_000).toISOString(), returnReason: '结果与临床不符，请复查', reportTime: null, createdAt: new Date(now - 220000_000).toISOString(), updatedAt: new Date(now - 200000_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((r) => r.status === filter.status);
+    return demo;
+  }
   if (filter.patientId) assertUuid(filter.patientId, '患者');
   if (filter.visitId) assertUuid(filter.visitId, '就诊');
   return listReports(filter);

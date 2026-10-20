@@ -8,7 +8,7 @@ import { Alert, Card, Layout, List, Spin, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
 const { Content } = Layout;
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const VI = { deep: "#0A2540", mid: "#1E5F8C", accent: "#4A90D9", bg: "#f5f7fa" };
 
 interface Broken {

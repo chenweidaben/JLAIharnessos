@@ -106,7 +106,8 @@ export default function AiNoteDraftPage() {
             </Card>
           ) : (
             drafts.map((d) => {
-              const st = STATUS_TAG[d.status];
+              // v5.0试点扩展（M184空壳崩溃修复）：未知 status / 缺 id 时不白屏
+              const st = STATUS_TAG[d.status] ?? { color: 'default', text: d.status ?? '未知' };
               return (
                 <Card
                   key={d.id}
@@ -153,7 +154,7 @@ export default function AiNoteDraftPage() {
           open={!!editingDraft}
           onCancel={() => setEditingDraft(null)}
           onOk={async () => {
-            if (editingDraft) await doReview(editingDraft.id, 'modified', doctorEdit);
+            if (editingDraft?.id) await doReview(editingDraft.id, 'modified', doctorEdit);
             setEditingDraft(null);
           }}
           okText="提交修改"

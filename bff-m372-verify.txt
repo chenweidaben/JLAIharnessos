@@ -1,0 +1,6 @@
+﻿/api/v1/maternity/prenatal-care=ERR
+/api/v1/maternity/postnatal-care=ERR
+/api/v1/maternity/infant-care=ERR
+/api/v1/maternity/child-vaccination=ERR
+/api/v1/maternity/women-health=ERR
+/api/v1/maternity/genetic-screening=ERR

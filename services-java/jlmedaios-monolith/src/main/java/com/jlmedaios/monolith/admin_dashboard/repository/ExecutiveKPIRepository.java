@@ -7,6 +7,7 @@ package com.jlmedaios.monolith.admin_dashboard.repository;
 
 import com.jlmedaios.monolith.admin_dashboard.entity.ExecutiveKPI;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,4 +25,12 @@ public interface ExecutiveKPIRepository extends JpaRepository<ExecutiveKPI, Long
      * @return 院长级 KPI 列表
      */
     List<ExecutiveKPI> findByCategory(String category);
+
+    /**
+     * 查询未达目标的 KPI（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @return 未达目标 KPI 列表
+     */
+    @Query("SELECT k FROM ExecutiveKPI k WHERE k.currentValue IS NOT NULL AND k.targetValue IS NOT NULL AND k.currentValue < k.targetValue")
+    List<ExecutiveKPI> findBelowTarget();
 }

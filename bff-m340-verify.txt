@@ -1,0 +1,9 @@
+﻿/api/v1/patient/search=200
+/api/v1/patient/detail=200
+/api/v1/patient/timeline-medications=200
+/api/v1/patient/profile=ERR
+/api/v1/patient/allergies=ERR
+/api/v1/patient/medications=200
+/api/v1/patient/visits=200
+/api/v1/patient/family=ERR
+/api/v1/patient/vitals=ERR

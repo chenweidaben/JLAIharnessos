@@ -214,13 +214,13 @@ export default function TalentDeepPage() {
               style={{ marginBottom: 16, borderLeft: `4px solid ${VI.accent}` }}
             >
               <Text strong style={{ fontSize: 16, color: VI.deep }}>
-                {inv.dept} 人才盘点：共 {inv.total} 人，继任就绪 {inv.tiers.successor_ready} 人，
-                骨干 {inv.tiers.backbone} 人，后备 {inv.tiers.backup} 人。
+                {inv.dept} 人才盘点：共 {inv.total} 人，继任就绪 {inv.tiers?.successor_ready ?? 0} 人，
+                骨干 {inv.tiers?.backbone ?? 0} 人，后备 {inv.tiers?.backup ?? 0} 人。
               </Text>
               <div style={{ marginTop: 8 }}>
-                <Tag color="green">继任就绪率 {(inv.summary.readinessRate * 100).toFixed(0)}%</Tag>
-                <Tag color="blue">平均绩效 {inv.summary.avgPerformance.toFixed(1)}</Tag>
-                <Tag color="geekblue">平均潜力 {inv.summary.avgPotential.toFixed(1)}</Tag>
+                <Tag color="green">继任就绪率 {((inv.summary?.readinessRate ?? 0) * 100).toFixed(0)}%</Tag>
+                <Tag color="blue">平均绩效 {(inv.summary?.avgPerformance ?? 0).toFixed(1)}</Tag>
+                <Tag color="geekblue">平均潜力 {(inv.summary?.avgPotential ?? 0).toFixed(1)}</Tag>
               </div>
             </Card>
 
@@ -232,10 +232,10 @@ export default function TalentDeepPage() {
                     <div style={{ textAlign: 'center', padding: '8px 0' }}>
                       <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)' }}>{TIER_META[t].label}</div>
                       <div style={{ fontSize: 28, fontWeight: 700, color: VI.deep }}>
-                        {inv.tiers[t]}
+                        {inv.tiers?.[t] ?? 0}
                       </div>
                       <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-                        {inv.total === 0 ? 0 : Math.round((inv.tiers[t] / inv.total) * 100)}% 人员
+                        {inv.total === 0 ? 0 : Math.round(((inv.tiers?.[t] ?? 0) / inv.total) * 100)}% 人员
                       </div>
                     </div>
                   </Card>
@@ -248,7 +248,7 @@ export default function TalentDeepPage() {
               <Table
                 rowKey="staffId"
                 pagination={false}
-                dataSource={inv.items}
+                dataSource={inv.items ?? []}
                 size="small"
                 columns={[
                   { title: '姓名', dataIndex: 'name', width: 100 },
@@ -331,7 +331,7 @@ export default function TalentDeepPage() {
                       <Table
                         rowKey="staffId"
                         pagination={false}
-                        dataSource={data.successors.candidates}
+                        dataSource={data.successors?.candidates ?? []}
                         size="small"
                         columns={[
                           { title: '候选人', dataIndex: 'name', width: 100 },

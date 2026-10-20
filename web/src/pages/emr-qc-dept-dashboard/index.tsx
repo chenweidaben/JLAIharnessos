@@ -3,6 +3,9 @@
  *
  * 深海蓝VI：科室质控看板卡片网格（核心指标大数字）。
  *
+ * v5.0试点扩展（M184空壳崩溃修复）：dashboard.dept / dashboard.metrics
+ * 均经 `dashboard?.dept` 与 `dashboard?.metrics ?? []` 空值防护，BFF 未返回时不白屏。
+ *
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";

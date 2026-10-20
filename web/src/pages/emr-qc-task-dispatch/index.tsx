@@ -12,11 +12,6 @@ const { Content } = Layout;
 const { Title } = Typography;
 const VI = { deep: "#0A2540", mid: "#1E5F8C", accent: "#4A90D9", bg: "#f5f7fa" };
 
-interface DispatchTask {
-  recordId: string;
-  reviewer: string;
-}
-
 interface AssignedTask {
   recordId: string;
   reviewer: string;

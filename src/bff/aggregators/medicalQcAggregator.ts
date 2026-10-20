@@ -5,13 +5,45 @@ export class MedicalQcError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
+// ============================================================================
+// v5.0试点扩展（M183-D aggregator stub）：DEMO_MODE 演示兜底
+// ----------------------------------------------------------------------------
+// 演示模式（DEMO_MODE=1/true）下无 PostgreSQL，medicalQcRepo 会触发表不存在 /
+// 连接错误并被路由转为 500。这里在聚合器入口短路：列表返回空数组，创建 / 整改
+// 返回字段完整的内存占位记录（不触库、不写审计、不持久化），保证质控管理页在
+// 无库演示时不红屏。与 agentBuilder / agentRuntime 的 DEMO 兜底同策略。
+// 版权所有（c）2026 杭州健澜科技有限公司
+// ============================================================================
+
+/** 是否演示模式（DEMO_MODE=1 / true） */
+const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+/** 构造一条演示质控记录（形状与 repo.MedicalQc 对齐，checker 固定 demo-admin） */
+function demoRecord(visitId: string, status: repo.MedicalQc['status']): repo.MedicalQc {
+  return {
+    id: `demo-qc-${Date.now()}`,
+    visitId,
+    qcType: 'round',
+    checker: 'demo-admin',
+    checkDate: new Date().toISOString(),
+    score: 95,
+    errors: [],
+    suggestions: '（演示）DEMO_MODE 占位记录，未连接数据库',
+    status,
+  };
+}
+
 export async function listView(view: AuthView, visitId: string) {
+  // v5.0试点扩展（M183-D aggregator stub）：DEMO_MODE 下返回空列表，不触库
+  if (isDemoMode) return [] as repo.MedicalQc[];
   if (!view.permissions.includes('medical_qc:view')) throw new MedicalQcError(403, '无查看权限');
   if (!visitId) throw new MedicalQcError(400, 'visitId 必填');
   return repo.listByVisit(visitId);
 }
 
 export async function createView(view: AuthView, body: Record<string, unknown>) {
+  // v5.0试点扩展（M183-D aggregator stub）：DEMO_MODE 下返回占位记录，不写库
+  if (isDemoMode) return demoRecord(String(body.visitId ?? 'demo-visit'), 'pending');
   if (!view.permissions.includes('medical_qc:check')) throw new MedicalQcError(403, '无质控权限');
   if (!body.visitId) throw new MedicalQcError(400, 'visitId 必填');
   if (typeof body.score !== 'number') throw new MedicalQcError(400, '分数必填');
@@ -24,6 +56,8 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
 }
 
 export async function rectifyView(view: AuthView, id: string) {
+  // v5.0试点扩展（M183-D aggregator stub）：DEMO_MODE 下返回占位整改记录，不写库
+  if (isDemoMode) return demoRecord('demo-visit', 'rectified');
   const r = await repo.rectify(id);
   if (!r) throw new MedicalQcError(409, '仅待整改质控单可整改');
   return r;

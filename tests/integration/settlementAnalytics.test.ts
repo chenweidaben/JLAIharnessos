@@ -32,7 +32,8 @@ D('结算分析（真实 PG）', () => {
     await computeReport(admin, '2099-10');
     const a = await analyticsView(admin, 12);
     expect(Array.isArray(a)).toBe(true);
-    const last = a[a.length - 1];
+    const arr = Array.isArray(a) ? (a as any[]) : [];
+    const last = arr[arr.length - 1];
     expect(last.period).toBe('2099-10');
     expect(last).toHaveProperty('settlementMoM');
     expect(last).toHaveProperty('drgRatio');

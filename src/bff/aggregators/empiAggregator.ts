@@ -254,6 +254,16 @@ export async function listMatchCandidates(
   auth: AuthView,
   options?: { status?: string; patientId?: string },
 ): Promise<MatchCandidate[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示匹配候选。
+  if (process.env.DEMO_MODE === '1') {
+    const demo: MatchCandidate[] = [
+      { id: 'demo-cand-01', patientAId: 'P001', patientBId: 'P101', matchScore: 0.92, matchReasons: ['姓名一致', '身份证末四位一致', '出生日期一致'], status: 'pending', reviewedBy: null, reviewedAt: null, createdAt: '2026-10-18 10:00' } as MatchCandidate,
+      { id: 'demo-cand-02', patientAId: 'P002', patientBId: 'P102', matchScore: 0.85, matchReasons: ['姓名一致', '手机号一致'], status: 'pending', reviewedBy: null, reviewedAt: null, createdAt: '2026-10-18 11:30' } as MatchCandidate,
+      { id: 'demo-cand-03', patientAId: 'P003', patientBId: 'P103', matchScore: 0.78, matchReasons: ['姓名一致', '性别年龄一致'], status: 'confirmed', reviewedBy: 'u_2001', reviewedAt: '2026-10-18 14:00', createdAt: '2026-10-17 09:00' } as MatchCandidate,
+    ];
+    if (options?.status) return demo.filter((c) => c.status === options.status);
+    return demo;
+  }
   return listCandidates({
     status: options?.status,
     patientId: options?.patientId,
@@ -263,6 +273,14 @@ export async function listMatchCandidates(
 export async function listEmpiLinks(
   auth: AuthView,
 ): Promise<EmpiLink[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示主索引链接。
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-link-01', masterPatientId: 'P003', linkedPatientId: 'P103', candidateId: 'demo-cand-03', createdBy: 'u_2001', createdAt: '2026-10-18 14:00' } as EmpiLink,
+      { id: 'demo-link-02', masterPatientId: 'P004', linkedPatientId: 'P104', candidateId: null, createdBy: 'u_2001', createdAt: '2026-10-15 09:30' } as EmpiLink,
+      { id: 'demo-link-03', masterPatientId: 'P005', linkedPatientId: 'P105', candidateId: null, createdBy: 'u_2002', createdAt: '2026-10-12 16:00' } as EmpiLink,
+    ];
+  }
   return listLinks();
 }
 

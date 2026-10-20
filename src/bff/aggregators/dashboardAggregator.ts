@@ -32,6 +32,15 @@ export async function aggregateDashboard(trendDays = 14): Promise<Record<string,
         discharged: 10 + Math.floor(Math.random() * 6),
       };
     });
+    // v5.0试点扩展（M183-C demo种子）：床位占用率必须返回 0-100 的数字，
+    // 与 DB 路径 dashboardStatsRepo.getDashboardOverview 字段对齐，
+    // 避免前端读取 bedOccupancyRate / bedOccupancy / bedUsageRate 得到 undefined。
+    const bedsTotal = 600;
+    const bedsOccupied = 428;
+    const bedsAvailable = Math.max(0, bedsTotal - bedsOccupied);
+    const bedOccupancyRate = bedsTotal > 0
+      ? Math.round((bedsOccupied / bedsTotal) * 1000) / 10
+      : 0;
     return {
       overview: {
         todayOutpatient: 386,
@@ -43,8 +52,12 @@ export async function aggregateDashboard(trendDays = 14): Promise<Record<string,
         activeOrders: 156,
         pendingPrescriptionReview: 3,
         unresolvedCriticalAlerts: 2,
-        bedsTotal: 600,
-        bedsOccupied: 428,
+        bedsTotal,
+        bedsOccupied,
+        bedsAvailable,
+        bedOccupancyRate,
+        bedOccupancy: bedOccupancyRate,
+        bedUsageRate: bedOccupancyRate,
       },
       trend: days,
       departmentLoad: [

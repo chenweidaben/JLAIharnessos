@@ -90,9 +90,7 @@ public class RehabilitationWorkstationService {
     }
 
     private RehabSession findBySessionNo(String sessionNo) {
-        return rehabSessionRepository.findAll().stream()
-                .filter(s -> sessionNo.equals(s.getSessionNo()))
-                .findFirst()
-                .orElse(null);
+        // P5 性能优化：直接调用 Repository 派生查询
+        return rehabSessionRepository.findBySessionNo(sessionNo);
     }
 }

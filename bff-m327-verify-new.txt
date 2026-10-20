@@ -1,0 +1,5 @@
+﻿/api/v1/bi/realtime=200
+/api/v1/bi/funnel=200
+/api/v1/bi/retention=200
+/api/v1/operation/benchmark=200
+/api/v1/operation/alerts=200

@@ -3,6 +3,9 @@
  *
  * 8 维度雷达图 + 评分 + 整改建议 + 三级医院对标。深海蓝 VI。
  *
+ * v5.0试点扩展（M188白屏修复）：对 scores/benchmark/suggestions 做空值保护，
+ * 避免后端字段缺失时 antd List/Table 读 .length 抛错白屏。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from 'react';
@@ -27,12 +30,12 @@ const { Title, Paragraph, Text } = Typography;
 const VI = { deep: '#0A2540', mid: '#1E5F8C', accent: '#4A90D9', bg: '#f5f7fa' };
 
 interface Result {
-  dept: string;
-  timeRange: string;
-  scores: Record<string, number>;
-  totalScore: number;
-  benchmark: { tertiary: number; secondary: number; primary: number };
-  suggestions: string[];
+  dept?: string;
+  timeRange?: string;
+  scores?: Record<string, number>;
+  totalScore?: number;
+  benchmark?: { tertiary?: number; secondary?: number; primary?: number };
+  suggestions?: string[];
 }
 
 const DIM_NAMES: Record<string, string> = {
@@ -57,6 +60,8 @@ export default function EMRGrade5V2Page() {
       try {
         const resp = await get<Result>('/api/v1/emr/grade5/assessment-v2');
         if (!cancelled) setData(resp);
+      } catch {
+        // 全局拦截器已提示；空态由下方空数组兜底
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -64,6 +69,10 @@ export default function EMRGrade5V2Page() {
     void load();
     return () => { cancelled = true; };
   }, []);
+
+  const scores = data?.scores ?? {};
+  const benchmark = data?.benchmark ?? {};
+  const suggestions = data?.suggestions ?? [];
 
   return (
     <Layout style={{ minHeight: '100vh', background: VI.bg }}>
@@ -73,13 +82,13 @@ export default function EMRGrade5V2Page() {
 
         {loading && <Spin size="large" style={{ padding: 48 }} />}
 
-        {!loading && data && (
+        {!loading && (
           <>
             <Row gutter={16} style={{ marginBottom: 16 }}>
-              <Col span={6}><Card><Statistic title="总分" value={data.totalScore} suffix="/100" /></Card></Col>
-              <Col span={6}><Card><Statistic title="三级医院对标" value={data.benchmark.tertiary} suffix="分" /></Card></Col>
-              <Col span={6}><Card><Statistic title="二级医院对标" value={data.benchmark.secondary} suffix="分" /></Card></Col>
-              <Col span={6}><Card><Statistic title="一级医院对标" value={data.benchmark.primary} suffix="分" /></Card></Col>
+              <Col span={6}><Card><Statistic title="总分" value={data?.totalScore ?? 0} suffix="/100" /></Card></Col>
+              <Col span={6}><Card><Statistic title="三级医院对标" value={benchmark.tertiary ?? 0} suffix="分" /></Card></Col>
+              <Col span={6}><Card><Statistic title="二级医院对标" value={benchmark.secondary ?? 0} suffix="分" /></Card></Col>
+              <Col span={6}><Card><Statistic title="一级医院对标" value={benchmark.primary ?? 0} suffix="分" /></Card></Col>
             </Row>
 
             <Card title={<Text strong style={{ color: VI.deep }}>8 维度得分</Text>} style={{ marginBottom: 16 }}>
@@ -87,7 +96,7 @@ export default function EMRGrade5V2Page() {
                 rowKey="key"
                 size="small"
                 pagination={false}
-                dataSource={Object.entries(data.scores).map(([k, v]) => ({ key: k, name: DIM_NAMES[k] ?? k, score: v }))}
+                dataSource={Object.entries(scores).map(([k, v]) => ({ key: k, name: DIM_NAMES[k] ?? k, score: v ?? 0 }))}
                 columns={[
                   { title: '维度', dataIndex: 'name', key: 'name' },
                   {
@@ -109,7 +118,8 @@ export default function EMRGrade5V2Page() {
             <Card title={<Text strong style={{ color: VI.deep }}>整改建议</Text>}>
               <List
                 size="small"
-                dataSource={data.suggestions}
+                dataSource={suggestions}
+                locale={{ emptyText: '暂无整改建议' }}
                 renderItem={(s) => (
                   <List.Item>
                     <Tag color="orange">整改</Tag>

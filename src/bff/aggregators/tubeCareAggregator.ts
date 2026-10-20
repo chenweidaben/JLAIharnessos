@@ -102,6 +102,16 @@ export async function insertTubeView(
 
 export async function listTubesView(auth: AuthView, filter: { visitId?: string; status?: string }) {
   assertPermission(auth, 'tube_care:read');
+  if (process.env.DEMO_MODE === '1') {
+    return [
+      { id: 'demo-tube-1', patientName: '演示患者A', tubeType: '气管插管', site: '经口', status: 'in_place', insertedAt: '2026-10-18T08:00:00Z', days: 2 },
+      { id: 'demo-tube-2', patientName: '演示患者B', tubeType: '中心静脉导管', site: '右颈内静脉', status: 'in_place', insertedAt: '2026-10-17T10:30:00Z', days: 3 },
+      { id: 'demo-tube-3', patientName: '演示患者C', tubeType: '胃管', site: '经鼻', status: 'in_place', insertedAt: '2026-10-19T09:15:00Z', days: 0 },
+      { id: 'demo-tube-4', patientName: '演示患者D', tubeType: '尿管', site: '留置', status: 'removed', insertedAt: '2026-10-15T14:00:00Z', removedAt: '2026-10-18T10:00:00Z', days: 3 },
+      { id: 'demo-tube-5', patientName: '演示患者E', tubeType: '胸腔闭式引流管', site: '左侧胸腔', status: 'in_place', insertedAt: '2026-10-16T11:20:00Z', days: 4 },
+      { id: 'demo-tube-6', patientName: '演示患者F', tubeType: '动脉测压管', site: '桡动脉', status: 'in_place', insertedAt: '2026-10-19T07:45:00Z', days: 0 },
+    ];
+  }
   return listTubes(filter);
 }
 

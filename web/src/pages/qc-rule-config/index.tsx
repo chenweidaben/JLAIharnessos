@@ -11,7 +11,6 @@ import {
   Card,
   Layout,
   message,
-  Select,
   Slider,
   Space,
   Switch,

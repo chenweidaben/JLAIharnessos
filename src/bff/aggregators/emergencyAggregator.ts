@@ -165,6 +165,61 @@ export interface QueueItem {
 /** 急诊分诊台队列（在急诊区内的全部患者） */
 export async function getQueue(actor: EmergencyActor): Promise<QueueItem[]> {
   assertEmergencyDataScope(actor, 'emergency:view');
+
+  // v5.0试点扩展（M183-C demo种子）：DEMO_MODE 下返回确定性分诊台队列，
+  // 固定种子、无 Math.random、无当前时间漂移，供演示环境分诊台列表页使用。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const mk = (
+      idx: number,
+      name: string,
+      gender: string,
+      age: string,
+      chief: string,
+      level: number,
+      emStatus: EmergencyStatus,
+      arriveMinAgo: number,
+      green = false,
+    ): QueueItem => {
+      const arriveMs = now - arriveMinAgo * 60000;
+      const triageMs = arriveMs + 2 * 60000;
+      const resp = RESPONSE_MINUTES[level] ?? 0;
+      const dl = triageMs + resp * 60000;
+      return {
+        visitId: `demo-vis-${idx}`,
+        patientId: `demo-pat-${idx}`,
+        triageNo: `ET20261019${String(1000 + idx)}`,
+        patientName: name,
+        gender,
+        age,
+        chiefComplaint: chief,
+        arriveTime: new Date(arriveMs).toISOString(),
+        triageTime: new Date(triageMs).toISOString(),
+        level,
+        levelLabel: LEVEL_META[level]?.label ?? null,
+        emStatus,
+        greenChannelActive: green,
+        vitals: { heartRate: 80 + idx * 4, systolicBp: 120 + idx * 3, spo2: 97 - (idx % 3) },
+        newsScore: idx % 5,
+        gcsTotal: level === 1 ? 10 : 15,
+        waitMinutes: arriveMinAgo,
+        deadline: new Date(dl).toISOString(),
+        remainingMinutes: Math.round((dl - now) / 60000),
+        overdue: now > dl,
+      };
+    };
+    return [
+      mk(1, '演示患者A', '男', '68岁', '持续胸痛2小时，伴大汗', 1, 'resuscitation', 6, true),
+      mk(2, '演示患者B', '女', '54岁', '呼吸困难，SpO2 88%', 2, 'observation', 12),
+      mk(3, '演示患者C', '男', '37岁', '右下腹痛6小时', 3, 'waiting_triage', 18),
+      mk(4, '演示患者D', '女', '29岁', '发热38.5℃伴咳嗽', 4, 'waiting_triage', 22),
+      mk(5, '演示患者E', '男', '72岁', '突发意识不清10分钟', 1, 'resuscitation', 4, true),
+      mk(6, '演示患者F', '女', '45岁', '车祸外伤，左下肢畸形', 2, 'in_treatment', 15),
+      mk(7, '演示患者G', '男', '61岁', '恶心呕吐，腹泻水样便', 3, 'in_treatment', 25),
+      mk(8, '演示患者H', '女', '8岁', '发热39℃，精神差', 3, 'observation', 9),
+    ];
+  }
+
   const triages = await triageRepo.listTriage({ activeOnly: true });
 
   const patientIds = Array.from(new Set(triages.map((t) => t.patientId)));

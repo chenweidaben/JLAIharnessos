@@ -1,0 +1,6 @@
+﻿/api/v1/insurance/policy=ERR
+/api/v1/insurance/claims=200
+/api/v1/insurance/settlement=200
+/api/v1/insurance/audit=200
+/api/v1/insurance/disease-codes=ERR
+/api/v1/insurance/items=200

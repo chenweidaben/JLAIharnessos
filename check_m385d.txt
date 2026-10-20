@@ -1,0 +1,5 @@
+﻿          <Route path="bed/:visitId" element={<MobileBedSide />} />
+          <Route path="tasks" element={<MobileTasks />} />
+          <Route path="handoff" element={<MobileHandoff />} />
+          <Route path="me" element={<MobileMe />} />
+        <Route path="*" element={<NotFound />} />

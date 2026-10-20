@@ -1,0 +1,6 @@
+﻿/api/v1/oncology/patients=200
+/api/v1/oncology/treatments=200
+/api/v1/oncology/chemotherapy=200
+/api/v1/oncology/radiotherapy=200
+/api/v1/oncology/monitor=200
+/api/v1/oncology/pain=200

@@ -266,6 +266,19 @@ export async function createImagingRequest(
 export async function listImagingRequestsView(filter: {
   status?: string; patientId?: string; visitId?: string;
 }): Promise<ImagingRequest[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性检查申请种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: ImagingRequest[] = [
+      { id: 'demo-ris-req-01', requestNo: 'RQ20261019001', visitId: 'demo-visit-01', patientId: 'demo-pat-01', orderedBy: null, urgency: 'stat', diagnosis: '急性胸痛待查', chiefComplaint: '胸痛2小时', status: 'scheduled', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 2400_000).toISOString(), updatedAt: new Date(now - 1800_000).toISOString() },
+      { id: 'demo-ris-req-02', requestNo: 'RQ20261019002', visitId: 'demo-visit-02', patientId: 'demo-pat-02', orderedBy: null, urgency: 'routine', diagnosis: '2型糖尿病眼底随访', chiefComplaint: null, status: 'performed', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 7200_000).toISOString(), updatedAt: new Date(now - 3600_000).toISOString() },
+      { id: 'demo-ris-req-03', requestNo: 'RQ20261019003', visitId: 'demo-visit-03', patientId: 'demo-pat-03', orderedBy: null, urgency: 'urgent', diagnosis: '脑出血复查', chiefComplaint: '术后复查', status: 'reported', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 86400_000).toISOString(), updatedAt: new Date(now - 43200_000).toISOString() },
+      { id: 'demo-ris-req-04', requestNo: 'RQ20261018004', visitId: 'demo-visit-04', patientId: 'demo-pat-04', orderedBy: null, urgency: 'routine', diagnosis: '健康体检胸部CT', chiefComplaint: null, status: 'cancelled', cancelledBy: null, cancelledAt: new Date(now - 90000_000).toISOString(), cancelReason: '患者改约', createdAt: new Date(now - 172800_000).toISOString(), updatedAt: new Date(now - 90000_000).toISOString() },
+      { id: 'demo-ris-req-05', requestNo: 'RQ20261019005', visitId: 'demo-visit-05', patientId: 'demo-pat-05', orderedBy: null, urgency: 'routine', diagnosis: '腰椎间盘突出', chiefComplaint: '腰痛伴右下肢放射痛', status: 'requested', cancelledBy: null, cancelledAt: null, cancelReason: null, createdAt: new Date(now - 1500_000).toISOString(), updatedAt: new Date(now - 1500_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((r) => r.status === filter.status);
+    return demo;
+  }
   if (filter.patientId) assertUuid(filter.patientId, '患者');
   if (filter.visitId) assertUuid(filter.visitId, '就诊');
   return listRequests(filter);
@@ -382,6 +395,19 @@ export async function bookAppointment(
 export async function listAppointmentsView(filter: {
   status?: string; requestId?: string;
 }): Promise<ImagingAppointment[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性预约种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: ImagingAppointment[] = [
+      { id: 'demo-ris-appt-01', appointmentNo: 'RA20261019001', requestId: 'demo-ris-req-01', examId: 'demo-exam-ct', slotId: 'demo-slot-01', deviceId: 'demo-dev-ct1', scheduledStart: new Date(now + 3600_000).toISOString(), status: 'scheduled', checkedInAt: null, createdBy: null, createdAt: new Date(now - 2000_000).toISOString(), updatedAt: new Date(now - 2000_000).toISOString() },
+      { id: 'demo-ris-appt-02', appointmentNo: 'RA20261019002', requestId: 'demo-ris-req-02', examId: 'demo-exam-us', slotId: 'demo-slot-02', deviceId: 'demo-dev-us1', scheduledStart: new Date(now - 1800_000).toISOString(), status: 'arrived', checkedInAt: new Date(now - 1700_000).toISOString(), createdBy: null, createdAt: new Date(now - 5000_000).toISOString(), updatedAt: new Date(now - 1700_000).toISOString() },
+      { id: 'demo-ris-appt-03', appointmentNo: 'RA20261018003', requestId: 'demo-ris-req-03', examId: 'demo-exam-mr', slotId: 'demo-slot-03', deviceId: 'demo-dev-mr1', scheduledStart: new Date(now - 100000_000).toISOString(), status: 'completed', checkedInAt: new Date(now - 100000_000).toISOString(), createdBy: null, createdAt: new Date(now - 110000_000).toISOString(), updatedAt: new Date(now - 90000_000).toISOString() },
+      { id: 'demo-ris-appt-04', appointmentNo: 'RA20261019004', requestId: 'demo-ris-req-05', examId: 'demo-exam-dr', slotId: 'demo-slot-04', deviceId: 'demo-dev-dr1', scheduledStart: new Date(now + 7200_000).toISOString(), status: 'scheduled', checkedInAt: null, createdBy: null, createdAt: new Date(now - 800_000).toISOString(), updatedAt: new Date(now - 800_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((a) => a.status === filter.status);
+    if (filter.requestId) return demo.filter((a) => a.requestId === filter.requestId);
+    return demo;
+  }
   if (filter.requestId) assertUuid(filter.requestId, '检查申请');
   return listAppointments(filter);
 }
@@ -481,6 +507,16 @@ export async function performExam(
 }
 
 export async function listStudiesView(filter: { requestId?: string }): Promise<ImagingStudy[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性检查执行(study)种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: ImagingStudy[] = [
+      { id: 'demo-ris-study-01', studyUid: '1.2.840.113619.2.1.4.2026.1019.01', appointmentId: 'demo-ris-appt-03', requestId: 'demo-ris-req-03', examId: 'demo-exam-mr', deviceId: 'demo-dev-mr1', modality: 'MR', status: 'reported', performedBy: 'demo-tech-01', performedAt: new Date(now - 90000_000).toISOString(), imageRefs: ['demo://pacs/mr-01.dcm', 'demo://pacs/mr-02.dcm'], createdAt: new Date(now - 90000_000).toISOString(), updatedAt: new Date(now - 80000_000).toISOString() },
+      { id: 'demo-ris-study-02', studyUid: '1.2.840.113619.2.1.4.2026.1019.02', appointmentId: 'demo-ris-appt-02', requestId: 'demo-ris-req-02', examId: 'demo-exam-us', deviceId: 'demo-dev-us1', modality: 'US', status: 'acquired', performedBy: 'demo-tech-02', performedAt: new Date(now - 1700_000).toISOString(), imageRefs: ['demo://pacs/us-01.dcm'], createdAt: new Date(now - 1700_000).toISOString(), updatedAt: new Date(now - 1700_000).toISOString() },
+    ];
+    if (filter.requestId) return demo.filter((s) => s.requestId === filter.requestId);
+    return demo;
+  }
   if (filter.requestId) assertUuid(filter.requestId, '检查申请');
   return listStudies(filter);
 }
@@ -713,6 +749,17 @@ export async function publishImagingReport(auth: AuthView, reportId: string): Pr
 export async function listImagingReportsView(filter: {
   status?: string; patientId?: string; visitId?: string;
 }): Promise<ImagingReport[]> {
+  // M199 空数据修复：DEMO_MODE 下返回确定性影像报告种子。
+  if (process.env.DEMO_MODE === '1') {
+    const now = Date.now();
+    const demo: ImagingReport[] = [
+      { id: 'demo-ris-rpt-01', reportNo: 'RR20261019001', visitId: 'demo-visit-03', patientId: 'demo-pat-03', studyUid: '1.2.840.113619.2.1.4.2026.1019.01', modality: 'MR', examName: '头颅MRI平扫', bodyPart: '头颅', findings: '右侧基底节区可见斑片状稍长T1长T2信号，边界欠清，未见明显占位效应。', impression: '右侧基底节区腔隙性脑梗塞，请结合临床。', aiFindings: null, isCritical: false, reportTime: new Date(now - 80000_000).toISOString(), imageRefs: ['demo://pacs/mr-01.dcm'], status: 'published', requestId: 'demo-ris-req-03', appointmentId: 'demo-ris-appt-03', studyId: 'demo-ris-study-01', examId: 'demo-exam-mr', writtenBy: null, submittedAt: new Date(now - 85000_000).toISOString(), reviewedBy: null, reviewedAt: new Date(now - 82000_000).toISOString(), publishedBy: null, publishedAt: new Date(now - 80000_000).toISOString(), returnedBy: null, returnedAt: null, returnReason: null, createdAt: new Date(now - 86000_000).toISOString() },
+      { id: 'demo-ris-rpt-02', reportNo: 'RR20261019002', visitId: 'demo-visit-01', patientId: 'demo-pat-01', studyUid: null, modality: 'CT', examName: '胸部CT平扫', bodyPart: '胸部', findings: '双肺纹理清晰，右肺下叶可见磨玻璃结节，直径约6mm，边界清。', impression: '右肺下叶磨玻璃结节，建议6个月随访复查。', aiFindings: null, isCritical: false, reportTime: null, imageRefs: [], status: 'reviewing', requestId: 'demo-ris-req-01', appointmentId: 'demo-ris-appt-01', studyId: null, examId: 'demo-exam-ct', writtenBy: null, submittedAt: new Date(now - 1200_000).toISOString(), reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: null, returnedBy: null, returnedAt: null, returnReason: null, createdAt: new Date(now - 1500_000).toISOString() },
+      { id: 'demo-ris-rpt-03', reportNo: 'RR20261018003', visitId: 'demo-visit-02', patientId: 'demo-pat-02', studyUid: null, modality: 'US', examName: '眼底超声', bodyPart: '眼底', findings: '双眼底视网膜动脉稍细，反光增强，动静脉交叉压迹（+）。', impression: '高血压眼底改变Ⅰ级。', aiFindings: null, isCritical: false, reportTime: null, imageRefs: [], status: 'draft', requestId: 'demo-ris-req-02', appointmentId: 'demo-ris-appt-02', studyId: 'demo-ris-study-02', examId: 'demo-exam-us', writtenBy: null, submittedAt: null, reviewedBy: null, reviewedAt: null, publishedBy: null, publishedAt: null, returnedBy: null, returnedAt: null, returnReason: null, createdAt: new Date(now - 1600_000).toISOString() },
+    ];
+    if (filter.status) return demo.filter((r) => r.status === filter.status);
+    return demo;
+  }
   if (filter.patientId) assertUuid(filter.patientId, '患者');
   if (filter.visitId) assertUuid(filter.visitId, '就诊');
   return listImagingReports(filter);

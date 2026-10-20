@@ -1,0 +1,4 @@
+﻿/api/v1/surgery/orders=200
+/api/v1/surgery/records=200
+/api/v1/nursing/rounds=200
+/api/v1/nursing/plans=200

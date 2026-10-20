@@ -1,0 +1,2 @@
+﻿3917: const FinanceBudgetPage = lazy(() => import('@/pages/finance/budget'));
+3919: const FinanceRevenuePage = lazy(() => import('@/pages/finance/revenue'));

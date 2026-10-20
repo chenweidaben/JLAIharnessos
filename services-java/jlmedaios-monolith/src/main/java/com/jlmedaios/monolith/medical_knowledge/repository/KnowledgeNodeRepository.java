@@ -24,4 +24,12 @@ public interface KnowledgeNodeRepository extends JpaRepository<KnowledgeNode, Lo
      * @return 知识节点列表
      */
     List<KnowledgeNode> findByCategory(String category);
+
+    /**
+     * 按标题模糊查询知识节点（P8 性能优化：替代 findAll().filter()）。
+     *
+     * @param keyword 关键词
+     * @return 知识节点列表
+     */
+    List<KnowledgeNode> findByTitleContaining(String keyword);
 }

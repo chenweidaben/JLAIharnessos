@@ -1,0 +1,6 @@
+﻿SignaturesListPage lazy: False
+SignaturesVerifyPage lazy: False
+SignaturesTemplatesPage lazy: False
+AuditTrailsPage lazy: True
+AuditLogsPage lazy: True
+AuditReportsPage lazy: True

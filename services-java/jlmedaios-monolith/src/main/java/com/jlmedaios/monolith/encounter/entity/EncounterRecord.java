@@ -5,12 +5,8 @@
  */
 package com.jlmedaios.monolith.encounter.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.jlmedaios.monolith.common.TenantEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,14 +18,20 @@ import java.time.LocalDateTime;
  * 诊疗记录实体。
  *
  * <p>append-only: 诊疗记录一旦生成不可修改，只能追加 review 记录</p>
+ * <p>P5 多租户：继承 TenantEntity，自动获得 tenantId 字段。</p>
  */
 @Data
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "encounter_record")
-public class EncounterRecord {
+@Table(name = "encounter_record", indexes = {
+        @Index(name = "idx_encounter_patient", columnList = "patient_id"),
+        @Index(name = "idx_encounter_visit", columnList = "visit_id"),
+        @Index(name = "idx_encounter_dept", columnList = "dept_code"),
+        @Index(name = "idx_encounter_tenant", columnList = "tenant_id")
+})
+public class EncounterRecord extends TenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

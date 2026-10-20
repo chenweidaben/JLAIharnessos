@@ -91,7 +91,44 @@ export async function submitRequest(auth: AuthView, input: {
   });
 }
 
+/**
+ * v5.0试点扩展（M188空数据修复）：DEMO_MODE 今日手术确定性种子。
+ * 固定 6 台今日手术（台号/患者/术式/主刀/状态：已排/进行中/已完成混合），
+ * 覆盖 requested/scheduled/prechecked/induction/maintenance/pacu/discharged 多状态，
+ * 使前端 Tabs 各状态计数不再为 0；无随机、无 SQL，字段与真实 SurgeryRequest 一致。
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+function buildDemoSurgeryList(): SurgeryRequest[] {
+  const today = '2026-10-19';
+  const fullPrecheck = {
+    patient: true, procedure: true, anesthesiaMethod: true,
+    surgeon: true, antibiotic: true, skinTest: true,
+  };
+  const rows: Array<Partial<SurgeryRequest> & {
+    id: string; requestNo: string; visitId: string; patientId: string;
+    surgeryType: string; plannedProcedure: string; diagnosis: string | null;
+    plannedDate: string | null; department: string; status: SurgeryStatus;
+  }> = [
+    { id: 'demo-surg-01', requestNo: 'SUR20261019001', visitId: 'demo-visit-s01', patientId: 'demo-pat-s01', surgeryType: 'elective', plannedProcedure: '腹腔镜胆囊切除术', diagnosis: '胆囊结石伴慢性胆囊炎', plannedDate: today, department: '普外科', status: 'discharged', anesthesiaMethod: '全身麻醉', precheck: fullPrecheck, precheckedAt: `${today} 07:30`, startedAt: `${today} 08:00`, endedAt: `${today} 09:40`, surgeonSignedAt: `${today} 09:50`, anesthetistSignedAt: `${today} 09:48` },
+    { id: 'demo-surg-02', requestNo: 'SUR20261019002', visitId: 'demo-visit-s02', patientId: 'demo-pat-s02', surgeryType: 'elective', plannedProcedure: '全髋关节置换术（左侧）', diagnosis: '左股骨颈骨折', plannedDate: today, department: '骨科', status: 'maintenance', anesthesiaMethod: '椎管内麻醉', precheck: fullPrecheck, precheckedAt: `${today} 08:10`, startedAt: `${today} 08:45`, surgeonSignedAt: null, anesthetistSignedAt: null },
+    { id: 'demo-surg-03', requestNo: 'SUR20261019003', visitId: 'demo-visit-s03', patientId: 'demo-pat-s03', surgeryType: 'emergency', plannedProcedure: '剖腹探查+脾切除术', diagnosis: '外伤性脾破裂', plannedDate: today, department: '普外科', status: 'induction', anesthesiaMethod: '全身麻醉', precheck: fullPrecheck, precheckedAt: `${today} 09:20`, startedAt: `${today} 09:55`, surgeonSignedAt: null, anesthetistSignedAt: null },
+    { id: 'demo-surg-04', requestNo: 'SUR20261019004', visitId: 'demo-visit-s04', patientId: 'demo-pat-s04', surgeryType: 'elective', plannedProcedure: '冠状动脉搭桥术（CABG）', diagnosis: '冠状动脉粥样硬化性心脏病 三支病变', plannedDate: today, department: '心血管外科', status: 'prechecked', anesthesiaMethod: '全身麻醉+体外循环', precheck: fullPrecheck, precheckedAt: `${today} 10:30`, startedAt: null, surgeonSignedAt: null, anesthetistSignedAt: null },
+    { id: 'demo-surg-05', requestNo: 'SUR20261019005', visitId: 'demo-visit-s05', patientId: 'demo-pat-s05', surgeryType: 'elective', plannedProcedure: '经尿道前列腺电切术（TURP）', diagnosis: '良性前列腺增生', plannedDate: today, department: '泌尿外科', status: 'scheduled', anesthesiaMethod: '椎管内麻醉', precheck: {}, precheckedAt: null, startedAt: null, surgeonSignedAt: null, anesthetistSignedAt: null },
+    { id: 'demo-surg-06', requestNo: 'SUR20261019006', visitId: 'demo-visit-s06', patientId: 'demo-pat-s06', surgeryType: 'elective', plannedProcedure: '白内障超声乳化+人工晶体植入术（右眼）', diagnosis: '右眼年龄相关性白内障', plannedDate: today, department: '眼科', status: 'pacu', anesthesiaMethod: '表面麻醉', precheck: fullPrecheck, precheckedAt: `${today} 11:00`, startedAt: `${today} 11:20`, endedAt: null, surgeonSignedAt: `${today} 11:45`, anesthetistSignedAt: `${today} 11:46` },
+  ];
+  return rows.map((r) => ({
+    surgeonId: 'demo-surgeon', anesthetistId: 'demo-anesthetist',
+    cancelReason: null, createdAt: `${today} 07:00`, updatedAt: `${today} 12:00`,
+    ...r,
+  } as SurgeryRequest));
+}
+
 export async function listRequestsView(): Promise<SurgeryRequest[]> {
+  // v5.0试点扩展（M188空数据修复）：DEMO_MODE 下直接返回确定性演示手术列表，
+  // 不再依赖 PostgreSQL 手术申请表（原为空导致各状态 Tab 计数全为 0）。
+  if (process.env.DEMO_MODE === '1') {
+    return buildDemoSurgeryList();
+  }
   return listRequests();
 }
 

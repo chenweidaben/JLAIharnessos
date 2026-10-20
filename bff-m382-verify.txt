@@ -1,0 +1,6 @@
+﻿/api/v1/orders/list=200
+/api/v1/orders/detail=ERR
+/api/v1/orders/templates=ERR
+/api/v1/prescriptions/list=ERR
+/api/v1/prescriptions/detail=ERR
+/api/v1/prescriptions/audit=ERR

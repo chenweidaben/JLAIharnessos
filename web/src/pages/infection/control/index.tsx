@@ -41,7 +41,7 @@ interface Result {
   suggestions: string[];
 }
 
-function riskColor(l: string): string {
+function riskColor(l: string): "error" | "warning" | "success" {
   if (l === 'high') return 'error';
   if (l === 'medium') return 'warning';
   return 'success';

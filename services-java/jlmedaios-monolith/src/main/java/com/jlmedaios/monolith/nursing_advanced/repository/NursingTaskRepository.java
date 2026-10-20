@@ -9,6 +9,7 @@ import com.jlmedaios.monolith.nursing_advanced.entity.NursingTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,4 +33,13 @@ public interface NursingTaskRepository extends JpaRepository<NursingTask, Long> 
      * @return 护理任务列表
      */
     List<NursingTask> findByPatientId(String patientId);
+
+    /**
+     * 按计划时间范围查询护理任务（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param start 开始时间
+     * @param end   结束时间
+     * @return 护理任务列表
+     */
+    List<NursingTask> findByPlannedTimeBetween(LocalDateTime start, LocalDateTime end);
 }

@@ -1,0 +1,6 @@
+﻿OK /api/v1/hr/staff-dashboard
+OK /api/v1/hr/staff-recruitment
+OK /api/v1/hr/staff-training
+OK /api/v1/hr/staff-performance
+OK /api/v1/hr/staff-schedule
+OK /api/v1/hr/staff-attendance

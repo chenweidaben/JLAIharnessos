@@ -1,0 +1,18 @@
+﻿tenants\list exists: True
+tenants\detail exists: False
+tenants\config exists: True
+tenants\quota exists: True
+tenants\isolation exists: False
+tenants\switch exists: True
+OK /api/v1/tenants/list
+OK /api/v1/tenants/detail
+OK /api/v1/tenants/config
+OK /api/v1/tenants/quota
+OK /api/v1/tenants/isolation
+OK /api/v1/tenants/switch
+route tenants/list : False
+route tenants/detail : False
+route tenants/config : False
+route tenants/quota : False
+route tenants/isolation : False
+route tenants/switch : False

@@ -1,0 +1,6 @@
+﻿/api/v1/community/followups-detail=200
+/api/v1/community/visits-detail=200
+/api/v1/community/health-records-detail=200
+/api/v1/community/elderly-care-detail=200
+/api/v1/community/chronic-disease-detail=200
+/api/v1/community/education-detail=200

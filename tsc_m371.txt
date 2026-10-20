@@ -1,0 +1,6 @@
+﻿src/router/index.tsx(418,7): error TS2451: Cannot redeclare block-scoped variable 'EmrSignaturePage'.
+src/router/index.tsx(482,7): error TS2451: Cannot redeclare block-scoped variable 'EmrQualityTrendPage'.
+src/router/index.tsx(3004,7): error TS2451: Cannot redeclare block-scoped variable 'EmrSignaturePage'.
+src/router/index.tsx(3590,7): error TS2451: Cannot redeclare block-scoped variable 'EmrQualityTrendPage'.
+src/router/index.tsx(7500,59): error TS2552: Cannot find name 'FhirAllergyIntolerancePage'. Did you mean 'FhirAllergyintolerancePage'?
+src/router/index.tsx(7676,59): error TS2552: Cannot find name 'FhirAllergyIntolerancePage'. Did you mean 'FhirAllergyintolerancePage'?

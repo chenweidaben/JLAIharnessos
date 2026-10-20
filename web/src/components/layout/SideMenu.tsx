@@ -7,8 +7,11 @@
  * 医疗合规：菜单仅展示当前登录角色有权访问的功能，遵循最小权限原则；
  * 路由级仍由 RequirePermission 二次拦截，菜单过滤只负责“不展示无权限入口”，
  * 不能替代路由守卫（用户仍可能直接输入 URL）。
+ *
+ * v5.0试点扩展（P1权限码收敛）：报表类菜单项 perm 统一收敛到 4 个分组码
+ * （report:clinical/admin/finance/quality:read），与后端 ROLE_PERMISSIONS 对齐。
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Menu } from 'antd';
 import type { MenuProps } from 'antd';
@@ -116,7 +119,7 @@ const navItems: NavItem[] = [
   },
   { key: '/emergency', icon: <HeartOutlined />, label: '急诊分诊', perm: 'emg:view' },
   { key: '/pharmacy', icon: <ShopOutlined />, label: '药房发药', perm: 'pharmacy:view' },
-  { key: '/medical-qc', icon: <AuditOutlined />, label: '病历质控', perm: 'medical_record:read' },
+  { key: '/medical-qc', icon: <AuditOutlined />, label: '病历质控', perm: 'report:quality:read' },
   { key: '/voice-medical', icon: <AudioOutlined />, label: '语音病历', perm: 'medical_record:read' },
   { key: '/front-page', icon: <FolderOpenOutlined />, label: '病案首页', perm: 'front_page:read' },
   {
@@ -124,16 +127,16 @@ const navItems: NavItem[] = [
     icon: <FileSearchOutlined />,
     label: 'EMR 文书质控',
     children: [
-      { key: '/emr/terminal-qc', label: '终末质控', perm: 'terminal_qc:view' },
-      { key: '/emr/drug-review', label: '合理用药', perm: 'drug_review:view' },
-      { key: '/emr/level5', label: '五级评审', perm: 'emr_level5:view' },
+      { key: '/emr/terminal-qc', label: '终末质控', perm: 'report:quality:read' },
+      { key: '/emr/drug-review', label: '合理用药', perm: 'report:quality:read' },
+      { key: '/emr/level5', label: '五级评审', perm: 'report:quality:read' },
     ],
   },
   { key: '/research', icon: <ExperimentOutlined />, label: '科研队列', perm: 'research:read' },
   { key: '/empi', icon: <IdcardOutlined />, label: '患者主索引', perm: 'empi:read' },
   { key: '/data-warehouse', icon: <DatabaseOutlined />, label: '数据湖仓', perm: 'data_warehouse:read' },
   { key: '/data-governance', icon: <SafetyCertificateOutlined />, label: '数据治理', perm: 'data_governance:read' },
-  { key: '/sessions', icon: <KeyOutlined />, label: '会话管理', perm: 'session:manage' },
+  { key: '/sessions', icon: <KeyOutlined />, label: '会话管理', perm: 'system:config' },
   { key: '/billing', icon: <MoneyCollectOutlined />, label: '收费结算', perm: 'billing:read' },
   { key: '/rehab-treatment', icon: <FundOutlined />, label: '康复治疗', perm: 'rehab_treatment:view' },
   { key: '/pain-clinic', icon: <AlertOutlined />, label: '疼痛门诊', perm: 'pain_clinic:view' },
@@ -171,25 +174,25 @@ const navItems: NavItem[] = [
   { key: '/digital-companion', icon: <CustomerServiceOutlined />, label: '数字陪诊', perm: 'delegation:view' },
   { key: '/referral', icon: <SwapOutlined />, label: '双向转诊', perm: 'referral:view' },
   { key: '/knowledge-base', icon: <BookOutlined />, label: '知识库', perm: 'knowledge:read' },
-  { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'qc:view' },
+  { key: '/quality', icon: <SafetyCertificateOutlined />, label: '质量管理', perm: 'report:quality:read' },
   {
     key: 'grp-operation',
     icon: <ApartmentOutlined />,
     label: '科室运营',
     children: [
-      { key: '/operation', label: '运营概览', perm: 'ops:view' },
-      { key: '/operation/analysis', label: '运营分析', perm: 'ops:view' },
-      { key: '/operation/drg', label: 'DRG/DIP 分析', perm: 'ops:view' },
-      { key: '/operation/quality', label: '质量指标', perm: 'ops:view' },
-      { key: '/operation/staff', label: '人员管理', perm: 'ops:view' },
-      { key: '/operation/equipment', label: '设备物资', perm: 'ops:view' },
+      { key: '/operation', label: '运营概览', perm: 'report:admin:read' },
+      { key: '/operation/analysis', label: '运营分析', perm: 'report:admin:read' },
+      { key: '/operation/drg', label: 'DRG/DIP 分析', perm: 'report:finance:read' },
+      { key: '/operation/quality', label: '质量指标', perm: 'report:quality:read' },
+      { key: '/operation/staff', label: '人员管理', perm: 'report:admin:read' },
+      { key: '/operation/equipment', label: '设备物资', perm: 'report:admin:read' },
       { key: '/surgery', label: '手术麻醉', perm: 'surgery:view' },
       { key: '/transfusion', label: '输血管理', perm: 'blood:apply' },
       { key: '/blood-quality', label: '用血质量', perm: 'blood:audit' },
       { key: '/vte', label: 'VTE 防治', perm: 'vte:read' },
       { key: '/ams', label: '抗菌药物管理', perm: 'ams:read' },
       { key: '/pathway', label: '临床路径管理', perm: 'pathway:read' },
-      { key: '/nursing-admin', label: '护理管理后台', perm: 'nursing_admin:view' },
+      { key: '/nursing-admin', label: '护理管理后台', perm: 'nursing_admin:schedule:view' },
       { key: '/nursing-risk', label: '压疮/跌倒预警', perm: 'nursing_risk:read' },
       { key: '/med-admin', label: '给药三查七对', perm: 'med_admin:read' },
       { key: '/tube-care', label: '管路护理', perm: 'tube_care:read' },
@@ -220,17 +223,17 @@ const navItems: NavItem[] = [
       { key: '/notifications', label: '通知中心', perm: 'notification:read' },
       { key: '/renewal', label: '续方流转', perm: 'renewal:pay' },
       { key: '/pharmacy-tasks', label: '待配药任务', perm: 'pharmacy:dispense' },
-      { key: '/drg-budget', label: 'DRG预算预警', perm: 'drg_budget:view' },
-      { key: '/inpatient-cost-monitor', label: '在院费用监控', perm: 'inpatient_cost:view' },
-      { key: '/cost-attribution', label: '成本归因', perm: 'drg_attribution:view' },
+      { key: '/drg-budget', label: 'DRG预算预警', perm: 'report:finance:read' },
+      { key: '/inpatient-cost-monitor', label: '在院费用监控', perm: 'report:finance:read' },
+      { key: '/cost-attribution', label: '成本归因', perm: 'report:finance:read' },
       { key: '/improvement-tasks', label: '整改任务', perm: 'improvement_task:handle' },
       { key: '/improvement-outcome', label: '效果回看', perm: 'improvement_outcome:view' },
       { key: '/escalation', label: '升级链', perm: 'improvement_task:handle' },
-      { key: '/dip', label: 'DIP点值', perm: 'dip:view' },
-      { key: '/payment-selection', label: '病组双轨', perm: 'payment_select:view' },
-      { key: '/settlement-report', label: '结算报表', perm: 'settlement_report:view' },
-      { key: '/settlement-analytics', label: '医保驾驶舱', perm: 'settlement_analytics:view' },
-      { key: '/settlement-drilldown', label: '科室医生排名', perm: 'settlement_drilldown:view' },
+      { key: '/dip', label: 'DIP点值', perm: 'report:finance:read' },
+      { key: '/payment-selection', label: '病组双轨', perm: 'report:finance:read' },
+      { key: '/settlement-report', label: '结算报表', perm: 'report:finance:read' },
+      { key: '/settlement-analytics', label: '医保驾驶舱', perm: 'report:finance:read' },
+      { key: '/settlement-drilldown', label: '科室医生排名', perm: 'report:finance:read' },
       { key: '/lis', label: '检验管理(LIS)', perm: 'lab:read' },
       { key: '/ris', label: '检查管理(RIS/PACS)', perm: 'imaging:read' },
     ],
@@ -310,12 +313,26 @@ export default function SideMenu() {
     return location.pathname;
   }, [location.pathname]);
 
+  // v5.0试点扩展（M200遗留修复）：菜单展开/折叠状态持久化到 localStorage
+  const [openKeys, setOpenKeys] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('sideMenu.openKeys');
+      if (saved) return JSON.parse(saved);
+    } catch { /* ignore */ }
+    return ['grp-system', 'grp-operation'];
+  });
+  const handleOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+    try { localStorage.setItem('sideMenu.openKeys', JSON.stringify(keys)); } catch { /* ignore */ }
+  };
+
   return (
     <Menu
       theme="dark"
       mode="inline"
       selectedKeys={[selectedKey]}
-      defaultOpenKeys={['grp-system', 'grp-operation']}
+      openKeys={openKeys}
+      onOpenChange={handleOpenChange}
       items={menuItems}
       onClick={({ key }) => navigate(key)}
       style={{ background: 'transparent', border: 'none' }}

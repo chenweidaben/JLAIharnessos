@@ -6,6 +6,7 @@
 package com.jlmedaios.monolith.empi.repository;
 
 import com.jlmedaios.monolith.empi.entity.Patient;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,10 +19,11 @@ import java.util.Optional;
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     /**
-     * 按身份证号查询患者。
+     * 按身份证号查询患者（P2 缓存骨架：30 分钟 TTL）。
      *
      * @param idCard 身份证号
      * @return 患者 Optional
      */
+    @Cacheable(value = "patients", key = "#idCard")
     Optional<Patient> findByIdCard(String idCard);
 }

@@ -26,7 +26,7 @@ interface TerminologyReport {
 
 export default function EmrTerminologyCheckPage() {
   const [content, setContent] = useState("");
-  const [result, setResult] = useState<TerminologyCheckResult | null>(null);
+  const [, setResult] = useState<TerminologyCheckResult | null>(null);
   const [report, setReport] = useState<TerminologyReport | null>(null);
 
   const check = async () => {

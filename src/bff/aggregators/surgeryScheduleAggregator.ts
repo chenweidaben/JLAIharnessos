@@ -15,6 +15,39 @@
 
 import { listRequests, type SurgeryRequest } from '../../db/repositories/surgeryRepo.js';
 
+/** DEMO_MODE 手术排程演示数据（P7）。v5.0试点扩展（M184空壳崩溃修复）：修正为 ScheduleItem 规范形状。 */
+function demoSchedule(weekStart: string): ScheduleItem[] {
+  const monday = toDate(weekStart);
+  const plan = [
+    { offset: 0, roomIdx: 0, start: 8 * 60, dur: 60, procedure: '腹腔镜胆囊切除', dept: '普外科', surgeon: '张主任' },
+    { offset: 0, roomIdx: 1, start: 8 * 60 + 30, dur: 150, procedure: '全髋关节置换', dept: '骨科', surgeon: '王主任' },
+    { offset: 0, roomIdx: 2, start: 9 * 60, dur: 60, procedure: '白内障超声乳化', dept: '眼科', surgeon: '李主任' },
+    { offset: 0, roomIdx: 3, start: 9 * 60 + 30, dur: 120, procedure: '冠脉支架植入', dept: '心内科', surgeon: '赵主任' },
+    { offset: 0, roomIdx: 4, start: 10 * 60, dur: 60, procedure: '急诊阑尾切除', dept: '急诊外科', surgeon: '张主任' },
+    { offset: 1, roomIdx: 0, start: 13 * 60, dur: 90, procedure: '甲状腺次全切除', dept: '普外科', surgeon: '王主任' },
+    { offset: 1, roomIdx: 1, start: 13 * 60 + 30, dur: 90, procedure: '膝关节镜检', dept: '骨科', surgeon: '李主任' },
+    { offset: 1, roomIdx: 2, start: 14 * 60, dur: 90, procedure: '剖宫产', dept: '妇产科', surgeon: '赵主任' },
+  ];
+    return plan.map((p, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + p.offset);
+    return {
+      id: `demo-surg-${i + 1}`,
+      requestNo: `SR2026102000${i + 1}`,
+      patientLabel: `演示患者${'ABCDEFGH'[i]}`,
+      procedure: p.procedure,
+      department: p.dept,
+      surgeonLabel: p.surgeon,
+      status: 'scheduled',
+      room: ROOMS[p.roomIdx],
+      date: toStr(d),
+      startMinute: p.start,
+      durationMin: p.dur,
+      demo: true,
+    } as any;
+  });
+}
+
 /** 日视图时间轴：08:00 - 17:00，30 分钟一格 */
 export const DAY_START_MIN = 8 * 60;
 export const DAY_END_MIN = 17 * 60;
@@ -278,6 +311,19 @@ function isValidDateStr(s: string): boolean {
  * @param date YYYY-MM-DD，锚定日视图日期与所在自然周
  */
 export async function listView(date: string): Promise<ScheduleBoard> {
+  if (process.env.DEMO_MODE === '1') {
+    // v5.0试点扩展（M184空壳崩溃修复）：返回与真实分支一致的 ScheduleBoard 形状
+    const anchor = isValidDateStr(date) ? date : '2026-10-20';
+    const weekStart = mondayOf(anchor);
+    const items = demoSchedule(weekStart);
+    return {
+      date: anchor,
+      weekStart,
+      day: buildDayView(anchor, items, true),
+      week: buildWeekView(weekStart, items, true),
+      demo: true,
+    } as any;
+  }
   const anchor = isValidDateStr(date) ? date : toStr(new Date());
   const weekStart = mondayOf(anchor);
   const monday = toDate(weekStart);

@@ -7,7 +7,6 @@
  */
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Card,
   Col,
   Layout,

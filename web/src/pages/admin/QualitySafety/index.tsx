@@ -252,7 +252,7 @@ export default function QualitySafetyPage() {
                     </Paragraph>
                     <List
                       size="small"
-                      dataSource={dim.nationalItems.slice(0, 4)}
+                      dataSource={(dim.nationalItems ?? []).slice(0, 4)}
                       renderItem={(item) => (
                         <List.Item style={{ padding: '4px 0' }}>
                           <Text style={{ fontSize: 12 }}>· {item.name}</Text>
@@ -313,8 +313,9 @@ export default function QualitySafetyPage() {
             {data?.improvement && (
               <Card
                 title={
+                  /* v5.0试点扩展（M184空壳崩溃修复）：issue 为 null 时不白屏 */
                   <Text strong style={{ color: VI.deep }}>
-                    根因改进措施 · {data.improvement.issue.slice(0, 24)}…
+                    根因改进措施 · {(data.improvement.issue ?? '').slice(0, 24)}…
                   </Text>
                 }
                 extra={<Tag color={METHOD_COLOR[data.improvement.method]}>{data.improvement.method}</Tag>}
@@ -325,7 +326,7 @@ export default function QualitySafetyPage() {
                 <List
                   size="small"
                   bordered
-                  dataSource={data.improvement.measures}
+                  dataSource={data.improvement.measures ?? []}
                   renderItem={(m, idx) => (
                     <List.Item>
                       <Text strong style={{ marginRight: 8 }}>{idx + 1}.</Text>

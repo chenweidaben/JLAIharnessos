@@ -60,7 +60,7 @@ export default function NurseScheduleOptimizePage() {
     try {
       const staffList = staffText
         .split('\n')
-        .map((s, i) => s.trim())
+        .map((s) => s.trim())
         .filter(Boolean)
         .map((name, i) => ({
           staffId: `nurse-${i + 1}`,

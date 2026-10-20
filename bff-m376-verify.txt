@@ -1,0 +1,6 @@
+﻿/api/v1/geriatrics/assessment=200
+/api/v1/geriatrics/care-plan=ERR
+/api/v1/geriatrics/comorbidity=ERR
+/api/v1/geriatrics/frail=ERR
+/api/v1/geriatrics/dementia=200
+/api/v1/geriatrics/falls=200

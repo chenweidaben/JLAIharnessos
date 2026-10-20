@@ -1,0 +1,2 @@
+﻿/api/v1/emergency/triage=200
+/api/v1/emergency/list=200

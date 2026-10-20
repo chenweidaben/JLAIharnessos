@@ -1,0 +1,6 @@
+﻿/api/v1/security/data-flow=200
+/api/v1/security/data-access=ERR
+/api/v1/security/data-sharing=ERR
+/api/v1/security/data-export=ERR
+/api/v1/security/data-backup=ERR
+/api/v1/security/data-recovery=ERR

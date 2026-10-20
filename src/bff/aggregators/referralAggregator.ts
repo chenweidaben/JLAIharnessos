@@ -88,6 +88,27 @@ const HOUR_MS = 60 * 60 * 1000;
 const referralStore: Referral[] = [];
 let referralSeq = 0;
 
+/**
+ * M198 空数据修复：DEMO_MODE 下播种确定性演示转诊单，避免页面「暂无数据」。
+ * 覆盖三态：待接收 / 已接收 / 已完成，三种方向各一。
+ */
+function seedDemoReferrals(): void {
+  const seeds: Array<Omit<Referral, 'id'>> = [
+    { patientId: 'P001', fromDept: '社区卫生服务中心', toDept: '心血管内科', direction: '上转', reason: '胸痛待查，需上级医院冠脉评估', expectedDate: '2026-10-20', status: '待接收', acceptingDoctor: null, acceptedAt: null, outcome: null, completedAt: null, createdAt: '2026-10-18 09:00' },
+    { patientId: 'P002', fromDept: '普外科', toDept: '康复医学科', direction: '下转', reason: '术后恢复期康复治疗', expectedDate: '2026-10-19', status: '已接收', acceptingDoctor: 'u_2001', acceptedAt: '2026-10-18 15:00', outcome: null, completedAt: null, createdAt: '2026-10-17 10:00' },
+    { patientId: 'P003', fromDept: '呼吸内科', toDept: 'ICU', direction: '院内转科', reason: '呼吸衰竭需转入 ICU 监护', expectedDate: '2026-10-18', status: '已完成', acceptingDoctor: 'u_2002', acceptedAt: '2026-10-18 08:00', outcome: '病情稳定转回普通病房', completedAt: '2026-10-19 10:00', createdAt: '2026-10-17 16:00' },
+    { patientId: 'P004', fromDept: '乡镇卫生院', toDept: '神经内科', direction: '上转', reason: '突发肢体乏力，疑似脑卒中', expectedDate: '2026-10-20', status: '待接收', acceptingDoctor: null, acceptedAt: null, outcome: null, completedAt: null, createdAt: '2026-10-19 08:30' },
+  ];
+  for (const s of seeds) {
+    referralSeq += 1;
+    referralStore.push({ ...s, id: `rf_${String(referralSeq).padStart(4, '0')}` });
+  }
+}
+
+if (process.env.DEMO_MODE === '1') {
+  seedDemoReferrals();
+}
+
 /** 测试辅助：清空台账与计数器，保证用例之间互不污染（不对外暴露为业务 API） */
 export function resetReferralStore(): void {
   referralStore.length = 0;

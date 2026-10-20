@@ -1,0 +1,4 @@
+﻿comparison=200
+efficiency=200
+cost=200
+revenue=200

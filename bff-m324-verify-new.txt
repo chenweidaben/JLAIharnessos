@@ -1,0 +1,6 @@
+﻿/api/v1/fhir/coverage=200
+/api/v1/fhir/claim=200
+/api/v1/fhir/account=200
+/api/v1/fhir/questionnaire=200
+/api/v1/fhir/communication=200
+/api/v1/fhir/documentreference=200

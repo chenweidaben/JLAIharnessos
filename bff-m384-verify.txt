@@ -1,0 +1,6 @@
+﻿/api/v1/cds/rules=200
+/api/v1/cds/alerts=200
+/api/v1/cds/recommendations=ERR
+/api/v1/cds/drug-interactions=ERR
+/api/v1/cds/contraindications=ERR
+/api/v1/cds/guidelines=200

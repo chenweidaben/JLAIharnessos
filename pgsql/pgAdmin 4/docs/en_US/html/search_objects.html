@@ -1,0 +1,167 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Search objects &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="External database for pgAdmin user settings" href="external_database.html" />
+    <link rel="prev" title="Keyboard Shortcuts:" href="keyboard_shortcuts.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="external_database.html" title="External database for pgAdmin user settings"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" accesskey="U">Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Search objects</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="search-objects">
+<span id="id1"></span><h1><span class="target" id="index-0"></span>Search objects<a class="headerlink" href="#search-objects" title="Link to this heading">¶</a></h1>
+<img alt="Search objects dialog" class="align-center" src="_images/search_objects.png" />
+<p>With this dialog, you can search for almost any kind of objects in a
+database.</p>
+<p>You can access it by right clicking a database or any of its child nodes
+and select “Search objects”. You can also access it by hitting the
+shortcut (default ALT+SHIFT+S).</p>
+<p>The minimum pattern length are 3 characters. The search performed is
+non-casesensitive and will find all objets whose name contains the pattern.
+You can only search for object names currently. Examples are: abc,
+%ab%, ab%c, %%%, etc.</p>
+<p>The result is presented in the grid with object name, object type and
+the object path in the <a class="reference internal" href="tree_control.html#tree-control"><span class="std std-ref">object explorer</span></a>. You can double
+click on a result row to select the object in the
+<a class="reference internal" href="tree_control.html#tree-control"><span class="std std-ref">object explorer</span></a>. If the object is greyed out, this means that you
+have not enabled those object types in the <a class="reference internal" href="preferences.html#preferences"><span class="std std-ref">preferences</span></a>,
+so you can’t double click on it. You can click on the ellipsis appended to
+the function and procedure names to see their arguments.</p>
+<p>You can filter based on a particular object type by selecting one from the
+object type dropdown. If the search button is hit when one of the object type
+is selected then only those types will be fetch from the database.
+An object type will not be visible in the dropdown if the database server
+does not support it or if it is not enabled from the
+<a class="reference internal" href="preferences.html#preferences"><span class="std std-ref">preferences</span></a>.</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="login.html">Login Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mfa.html">Enabling two-factor authentication (2FA)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_management.html">User Management Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_ownership.html">Change Ownership Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_user_password.html">Change User Password Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restore_locked_user.html">Lock/Restore Account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ldap.html">Enabling LDAP Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kerberos.html">Enabling Kerberos Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oauth2.html">Enabling OAUTH2 Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="webserver.html">Enabling Webserver Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="menu_bar.html">Menu Bar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbar.html">Toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tabbed_browser.html">Tabbed Browser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tree_control.html">Tree Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preferences.html">Preferences Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keyboard_shortcuts.html">Keyboard Shortcuts:</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Search objects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="external_database.html" title="External database for pgAdmin user settings"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="getting_started.html" >Getting Started</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Search objects</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="external_database.html" title="External database for pgAdmin user settings">next</a> |</li>
+            <li class="right" ><a href="keyboard_shortcuts.html" title="Keyboard Shortcuts:">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

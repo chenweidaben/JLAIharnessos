@@ -32,4 +32,12 @@ public interface NutritionOrderRepository extends JpaRepository<NutritionOrder, 
      * @return 营养医嘱列表
      */
     List<NutritionOrder> findByPatientId(String patientId);
+
+    /**
+     * 按医嘱编号查询营养医嘱（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param orderNo 医嘱编号
+     * @return 营养医嘱
+     */
+    NutritionOrder findByOrderNo(String orderNo);
 }

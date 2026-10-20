@@ -1,0 +1,18 @@
+﻿patient\profile exists: True
+patient\visits exists: False
+patient\allergies exists: True
+patient\medications exists: False
+patient\labs exists: False
+patient\imaging exists: False
+OK /api/v1/patient/profile
+OK /api/v1/patient/visits
+OK /api/v1/patient/allergies
+OK /api/v1/patient/medications
+OK /api/v1/patient/labs
+OK /api/v1/patient/imaging
+route patient/profile : False
+route patient/visits : False
+route patient/allergies : False
+route patient/medications : False
+route patient/labs : False
+route patient/imaging : False

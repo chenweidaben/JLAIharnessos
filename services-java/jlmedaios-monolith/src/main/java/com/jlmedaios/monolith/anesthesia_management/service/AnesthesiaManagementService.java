@@ -92,10 +92,7 @@ public class AnesthesiaManagementService {
     public List<AnesthesiaRecord> todayRecords() {
         LocalDateTime start = LocalDate.now().atStartOfDay();
         LocalDateTime end = LocalDate.now().atTime(LocalTime.MAX);
-        return anesthesiaRecordRepository.findAll().stream()
-                .filter(r -> r.getRecoveryTime() != null &&
-                        !r.getRecoveryTime().isBefore(start) &&
-                        !r.getRecoveryTime().isAfter(end))
-                .toList();
+        // P5 性能优化：直接调用 Repository 派生查询
+        return anesthesiaRecordRepository.findByRecoveryTimeBetween(start, end);
     }
 }

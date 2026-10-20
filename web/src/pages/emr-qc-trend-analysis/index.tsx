@@ -35,7 +35,7 @@ const trendColor = (trend: string): string => {
 
 export default function EmrQcTrendAnalysisPage() {
   const [base, setBase] = useState<TrendAnalysis | null>(null);
-  const [monthlyDefects, setMonthlyDefects] = useState<number[]>([30, 25, 15]);
+  const [monthlyDefects] = useState<number[]>([30, 25, 15]);
   const [result, setResult] = useState<TrendResult | null>(null);
   const [report, setReport] = useState<TrendReport | null>(null);
   const [loading, setLoading] = useState(false);

@@ -32,4 +32,12 @@ public interface ApiContractRepository extends JpaRepository<ApiContract, Long> 
      * @return API 契约列表
      */
     List<ApiContract> findByModuleName(String moduleName);
+
+    /**
+     * 按契约编码查询 API 契约（P8 性能优化：替代 findAll().filter()）。
+     *
+     * @param contractCode 契约编码
+     * @return API 契约
+     */
+    ApiContract findByContractCode(String contractCode);
 }

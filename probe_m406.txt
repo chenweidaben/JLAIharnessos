@@ -1,0 +1,18 @@
+﻿outpatient\queue exists: True
+outpatient\visits exists: True
+outpatient\prescriptions exists: True
+inpatient\admissions exists: False
+inpatient\discharges exists: False
+inpatient\transfers exists: False
+OK /api/v1/outpatient/queue
+OK /api/v1/outpatient/visits
+OK /api/v1/outpatient/prescriptions
+OK /api/v1/inpatient/admissions
+OK /api/v1/inpatient/discharges
+OK /api/v1/inpatient/transfers
+route outpatient/queue : False
+route outpatient/visits : False
+route outpatient/prescriptions : False
+route inpatient/admissions : False
+route inpatient/discharges : False
+route inpatient/transfers : False

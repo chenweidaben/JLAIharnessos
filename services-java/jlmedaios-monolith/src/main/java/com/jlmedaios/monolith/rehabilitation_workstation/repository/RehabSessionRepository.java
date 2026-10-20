@@ -32,4 +32,12 @@ public interface RehabSessionRepository extends JpaRepository<RehabSession, Long
      * @return 康复治疗记录列表
      */
     List<RehabSession> findByPatientId(String patientId);
+
+    /**
+     * 按治疗编号查询康复治疗记录（P5 性能优化：替代 findAll().filter()）。
+     *
+     * @param sessionNo 治疗编号
+     * @return 康复治疗记录
+     */
+    RehabSession findBySessionNo(String sessionNo);
 }

@@ -1,0 +1,6 @@
+﻿/api/v1/emr/version-list=200
+/api/v1/emr/version-diff=200
+/api/v1/emr/version-history=200
+/api/v1/emr/version-rollback=200
+/api/v1/emr/version-author=200
+/api/v1/emr/version-review=200

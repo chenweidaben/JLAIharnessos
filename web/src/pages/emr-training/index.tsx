@@ -25,7 +25,6 @@ interface ExamResult {
 }
 
 export default function EmrTrainingPage() {
-  const [selected, setSelected] = useState<Question | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<ExamResult | null>(null);
 

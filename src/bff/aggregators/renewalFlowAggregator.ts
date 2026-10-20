@@ -33,6 +33,18 @@ function assertPermission(auth: AuthView, perm: string): void {
 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** DEMO_MODE 续方流转列表（P7）。 */
+function demoRenewals() {
+  return [
+    { id: 'demo-rx-1', rxNo: 'RX20261001001', patientName: '演示患者A', drugName: '二甲双胍缓释片', status: 'pending_review', createdAt: '2026-10-18T10:00:00Z' },
+    { id: 'demo-rx-2', rxNo: 'RX20261001002', patientName: '演示患者B', drugName: '氨氯地平片', status: 'approved', createdAt: '2026-10-17T14:30:00Z' },
+    { id: 'demo-rx-3', rxNo: 'RX20261001003', patientName: '演示患者C', drugName: '阿托伐他汀钙片', status: 'dispensed', createdAt: '2026-10-16T09:15:00Z' },
+    { id: 'demo-rx-4', rxNo: 'RX20261001004', patientName: '演示患者D', drugName: '缬沙坦胶囊', status: 'pending_review', createdAt: '2026-10-18T16:45:00Z' },
+    { id: 'demo-rx-5', rxNo: 'RX20261001005', patientName: '演示患者E', drugName: '阿司匹林肠溶片', status: 'rejected', createdAt: '2026-10-15T11:20:00Z' },
+    { id: 'demo-rx-6', rxNo: 'RX20261001006', patientName: '演示患者F', drugName: '奥美拉唑肠溶胶囊', status: 'approved', createdAt: '2026-10-14T08:30:00Z' },
+  ];
+}
+
 /** 医生对已 completed 会话发起续方。 */
 export async function prescribeView(
   auth: AuthView,
@@ -55,6 +67,7 @@ export async function prescribeView(
 
 /** 患者列自己续方处方。 */
 export async function listMineView(auth: AuthView, patientId: string) {
+  if (process.env.DEMO_MODE === '1') return demoRenewals();
   if (!UUID_RE.test(patientId.trim())) throw badRequest('患者 ID 非法');
   return listByPatient(patientId);
 }

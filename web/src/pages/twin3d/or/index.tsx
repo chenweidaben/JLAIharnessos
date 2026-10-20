@@ -11,7 +11,6 @@ import {
   Card,
   Col,
   Layout,
-  List,
   Progress,
   Row,
   Spin,

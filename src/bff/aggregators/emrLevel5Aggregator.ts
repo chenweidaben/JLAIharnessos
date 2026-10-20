@@ -231,6 +231,9 @@ export async function loadTrend(view: AuthView): Promise<EmrLevel5Dashboard> {
     throw new EmrLevel5Error(403, '无权限：需要 emr_level5:view');
   }
 
+  // v5.0试点扩展（M189 EMR/AI种子）：DEMO_MODE 直接返回近 30 日确定性演示序列
+  if (process.env.DEMO_MODE === '1') return demoDashboard();
+
   const [inpatientRows, terminalRows] = await Promise.all([
     loadInpatientRows(),
     loadTerminalRows(),

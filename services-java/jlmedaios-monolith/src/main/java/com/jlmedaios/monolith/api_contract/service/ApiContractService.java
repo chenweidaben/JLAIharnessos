@@ -39,10 +39,8 @@ public class ApiContractService {
      * @return API 契约
      */
     public ApiContract contractDetail(String contractCode) {
-        return apiContractRepository.findAll().stream()
-                .filter(c -> contractCode.equals(c.getContractCode()))
-                .findFirst()
-                .orElse(null);
+        // P8 性能优化：直接调用 Repository 派生查询
+        return apiContractRepository.findByContractCode(contractCode);
     }
 
     /**

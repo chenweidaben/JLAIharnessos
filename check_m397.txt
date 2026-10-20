@@ -1,0 +1,6 @@
+﻿EmergencyTriagePage lazy: False
+EmergencyRescuePage lazy: True
+EmergencyAmbulancePage lazy: True
+EmergencyDisasterPage lazy: False
+EmergencyPoisoningPage lazy: True
+EmergencyTraumaPage lazy: True

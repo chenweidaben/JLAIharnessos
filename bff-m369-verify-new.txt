@@ -1,0 +1,5 @@
+﻿/api/v1/telemed/prescriptions=200
+/api/v1/telemed/payments=200
+/api/v1/telemed/delivery=200
+/api/v1/telemed/followup=200
+/api/v1/telemed/reports=200

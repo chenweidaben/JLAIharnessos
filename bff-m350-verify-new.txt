@@ -1,0 +1,6 @@
+﻿/api/v1/events/list=200
+/api/v1/events/types=200
+/api/v1/events/subscribers=200
+/api/v1/events/publish=200
+/api/v1/events/consumers=200
+/api/v1/events/metrics-detail=200

@@ -24,4 +24,12 @@ public interface ICUWorkItemRepository extends JpaRepository<ICUWorkItem, Long> 
      * @return ICU 床位工作项列表
      */
     List<ICUWorkItem> findByStatus(String status);
+
+    /**
+     * 按工作项编号查询 ICU 床位工作项（P1 性能优化：替代 findAll().filter()）。
+     *
+     * @param workItemNo 工作项编号
+     * @return ICU 床位工作项
+     */
+    ICUWorkItem findByWorkItemNo(String workItemNo);
 }

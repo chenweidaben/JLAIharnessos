@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Backup Server Dialog &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Restore Dialog" href="restore_dialog.html" />
+    <link rel="prev" title="Backup Globals Dialog" href="backup_globals_dialog.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="restore_dialog.html" title="Restore Dialog"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="backup_globals_dialog.html" title="Backup Globals Dialog"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="backup_and_restore.html" accesskey="U">Backup and Restore</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Backup Server Dialog</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="backup-server-dialog">
+<span id="id1"></span><h1><span class="target" id="index-0"></span>Backup Server Dialog<a class="headerlink" href="#backup-server-dialog" title="Link to this heading">¶</a></h1>
+<p>Use the <em>Backup Server</em> dialog to create a plain-text script that will recreate
+the selected server. You can use the pgAdmin <em>Query Tool</em> to play back a
+plain-text script, and recreate the server.</p>
+<img alt="Backup server dialog" class="align-center" src="_images/backup_server_general.png" />
+<p>Use the fields in the <em>General</em> tab to specify the following:</p>
+<ul class="simple">
+<li><p>Enter the name of the backup file in the <em>Filename</em> field.  Optionally, select
+the <em>Browser</em> icon (ellipsis) to the right to navigate into a directory and
+select a file that will contain the archive.</p></li>
+<li><p>Use the <em>Encoding</em> drop-down listbox to select the character encoding method
+that should be used for the archive. <strong>Note:</strong> This option is visible only for
+database server greater than or equal to 11.</p></li>
+<li><p>Use the drop-down listbox next to <em>Role name</em> to specify a role with
+connection privileges on the selected server.  The role will be used for
+authentication during the backup.</p></li>
+</ul>
+<p>Click the <em>Data Options</em> tab to continue. Use the fields in the <em>Data Options</em>
+tab to provide options related to data or pgAdmin objects that correspond to <em>pg_dumpall</em>.</p>
+<img alt="Type of objects option on backup server dialog" class="align-center" src="_images/backup_server_objects.png" />
+<ul>
+<li><p>Move switches in the <strong>Type of objects</strong> field box to specify details about
+the type of objects that will be backed up.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Only data</em> towards right position to limit the back
+up to data.</p></li>
+<li><p>Move the switch next to <em>Only schemas</em> to limit the back up to schema-level
+database objects.</p></li>
+<li><p>Move the switch next to <em>Only tablespaces</em> to limit the back
+up to tablespaces only.</p></li>
+<li><p>Move the switch next to <em>Only roles</em> to limit the back up to roles only.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<img alt="Do not save option on backup server dialog" class="align-center" src="_images/backup_server_do_not_save.png" />
+<ul>
+<li><p>Move switches in the <strong>Do not save</strong> field box to select the objects that will
+not be included in the backup.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Owner</em> towards right position to exclude commands
+that set object ownership.</p></li>
+<li><p>Move the switch next to <em>Role passwords</em> towards right position to exclude
+passwords for roles.</p></li>
+<li><p>Move the switch next to <em>Privileges</em> towards right position to exclude
+commands that create access privileges.</p></li>
+<li><p>Move the switch next to <em>Tablespaces</em> towards right position to exclude
+tablespaces.</p></li>
+<li><p>Move the switch next to <em>Unlogged table data</em> towards right position to
+exclude the contents of unlogged tables.</p></li>
+<li><p>Move the switch next to <em>Comments</em> towards right position to exclude
+commands that set the comments. <strong>Note:</strong> This option is visible only for
+database server greater than or equal to 11.</p></li>
+<li><p>Move the switch next to <em>Publications</em> towards right position to exclude
+publications.</p></li>
+<li><p>Move the switch next to <em>Subscriptions</em> towards right position to exclude
+subscriptions.</p></li>
+<li><p>Move the switch next to <em>Security labels</em> towards right position to exclude
+Security labels.</p></li>
+<li><p>Move the switch next to <em>Toast compressions</em> towards right position to exclude
+Toast compressions. <strong>Note:</strong> This option is visible only for
+database server greater than or equal to 14.</p></li>
+<li><p>Move the switch next to <em>Table access methods</em> towards right position to exclude
+Table access methods. <strong>Note:</strong> This option is visible only for
+database server greater than or equal to 15.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<img alt="Queries option on backup server dialog" class="align-center" src="_images/backup_server_queries.png" />
+<p>Click the <em>Query Options</em> tab to continue. Use these additional fields to specify
+the type of statements that should be included in the backup.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Use INSERT commands</em> towards right position to
+dump the data in the form of INSERT statements rather than using a COPY
+command.  Please note: this may make restoration from backup slow.</p></li>
+<li><p>Use the <em>Maximum rows per INSERT command</em> field to controls the maximum
+number of rows per INSERT command. <strong>Note:</strong> This option is visible only for
+database server greater than or equal to 12.</p></li>
+<li><p>Move the switch next to <em>On conflict do nothing to INSERT command</em> towards
+right position to add ON CONFLICT DO NOTHING to INSERT command.
+This option is not valid unless <em>Use INSERT commands</em>, <em>Use Column INSERTS</em>
+or <em>Maximum rows per INSERT command</em> is also specified.
+<strong>Note:</strong> This option is visible only for database server greater than or
+equal to 12.</p></li>
+<li><p>Move the switch next to <em>Include DROP DATABASE statement</em> towards right
+position to include a command in the backup that will drop any existing
+database object with the same name before recreating the object during a
+backup.</p></li>
+<li><p>Move the switch next to <em>Include IF EXISTS clause</em> towards right
+position to add an IF EXISTS clause to drop databases and other objects.
+This option is not valid unless <em>Include DROP DATABASE statement</em> is also set.</p></li>
+</ul>
+</div></blockquote>
+<img alt="Backup dialog tables section" class="align-center" src="_images/backup_server_table.png" />
+<p>Click the <em>Table Options</em> tab to continue. Use the fields in the <em>Table Options</em>
+tab related to tables that should be included in the backup.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Use Column INSERTS</em> towards right position to dump
+the data in the form of INSERT statements and include explicit column
+names. Please note: this may make restoration from backup slow.</p></li>
+<li><p>Move the switch next to <em>Load via partition root</em> towards right position,
+so when dumping a COPY or INSERT statement for a partitioned table, target
+the root of the partitioning hierarchy which contains it rather than the
+partition itself. <strong>Note:</strong> This option is visible only for database server
+greater than or equal to 11.</p></li>
+</ul>
+</div></blockquote>
+<p>Click the <em>Options</em> tab to continue. Use the fields in the <em>Options</em>
+tab to provide other backup options.</p>
+<img alt="Disable option on backup server dialog" class="align-center" src="_images/backup_server_disable.png" />
+<ul>
+<li><p>Move switches in the <strong>Disable</strong> field box to specify the type of statements
+that should be excluded from the backup.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Triggers</em> (active when creating a data-only backup)
+towards right position to include commands that will disable triggers on the
+target table while the data is being loaded.</p></li>
+<li><p>Move the switch next to <em>$ quoting</em> towards right position to enable dollar
+quoting within function bodies; if disabled, the function body will be
+quoted using SQL standard string syntax.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<img alt="Miscellaneous option on backup server dialog" class="align-center" src="_images/backup_server_miscellaneous.png" />
+<ul>
+<li><p>Move switches in the <strong>Miscellaneous</strong> field box to specify miscellaneous
+backup options.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Move the switch next to <em>Verbose messages</em> towards left position to instruct
+<em>pg_dumpall</em> to exclude verbose messages.</p></li>
+<li><p>Move the switch next to <em>Force double quotes on identifiers</em> towards right
+position to force the quoting of all identifiers.</p></li>
+<li><p>Move the switch next to <em>Use SET SESSION AUTHORIZATION</em> towards right
+position to include a statement that will use a SET SESSION AUTHORIZATION
+command to determine object ownership (instead of an ALTER OWNER command).</p></li>
+<li><p>Use the <em>Exclude database</em> field to not dump databases whose name matches
+pattern.</p></li>
+<li><p>Use the <em>Extra float digits</em> field to use the specified value when dumping
+floating-point data, instead of the maximum available precision.</p></li>
+<li><p>Use the <em>Lock wait timeout</em> field to do not wait forever to acquire shared
+table locks at the beginning of the dump. Instead, fail if unable to lock a
+table within the specified timeout.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>When you’ve specified the details that will be incorporated into the pg_dumpall
+command:</p>
+<ul class="simple">
+<li><p>Click the <em>Backup</em> button to build and execute a command that builds a backup
+based on your selections on the <em>Backup Server</em> dialog.</p></li>
+<li><p>Click the <em>Cancel</em> button to exit without saving work.</p></li>
+</ul>
+<p>pgAdmin will run the backup process in background. You can view all the background
+process with there running status and logs on the <a class="reference internal" href="processes.html#processes"><span class="std std-ref">Processes</span></a>
+tab</p>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="backup_dialog.html">Backup Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backup_globals_dialog.html">Backup Globals Dialog</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Backup Server Dialog</a></li>
+<li class="toctree-l2"><a class="reference internal" href="restore_dialog.html">Restore Dialog</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="restore_dialog.html" title="Restore Dialog"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="backup_globals_dialog.html" title="Backup Globals Dialog"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="backup_and_restore.html" >Backup and Restore</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Backup Server Dialog</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="restore_dialog.html" title="Restore Dialog">next</a> |</li>
+            <li class="right" ><a href="backup_globals_dialog.html" title="Backup Globals Dialog">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

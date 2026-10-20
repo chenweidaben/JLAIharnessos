@@ -75,7 +75,7 @@ export default function OpsDashboardV3Page() {
                 size="small"
                 pagination={false}
                 dataSource={[
-                  { key: "forecast", name="下周预测", value: data.forecast.next7d },
+                  { key: "forecast", name: "下周预测", value: data.forecast.next7d },
                   { key: "alert", name: "容量预警", value: data.forecast.capacityAlert },
                   { key: "rank", name: "国考排名", value: data.benchmark.rank },
                   { key: "meeting", name: "月会自动生成", value: data.meetings.monthly },

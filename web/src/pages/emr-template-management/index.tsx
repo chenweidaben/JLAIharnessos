@@ -97,7 +97,7 @@ export default function EmrTemplateManagementPage() {
     setEditing(record);
     form.setFieldsValue({
       ...record,
-      fields: record.fields.map((f) => `${f.key}:${f.label}`).join("\n"),
+      fields: record.fields.map((f: { key: string; label: string }) => `${f.key}:${f.label}`).join("\n"),
     });
     setModalOpen(true);
   };

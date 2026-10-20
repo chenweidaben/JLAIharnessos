@@ -1,0 +1,6 @@
+﻿/api/v1/tenants/list=200
+/api/v1/tenants/detail=ERR
+/api/v1/tenants/config=200
+/api/v1/tenants/quota=200
+/api/v1/tenants/isolation=ERR
+/api/v1/tenants/switch=200

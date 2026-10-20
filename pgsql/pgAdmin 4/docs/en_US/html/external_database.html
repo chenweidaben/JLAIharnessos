@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>External database for pgAdmin user settings &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Connecting To A Server" href="connecting.html" />
+    <link rel="prev" title="Search objects" href="search_objects.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="connecting.html" title="Connecting To A Server"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="search_objects.html" title="Search objects"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">External database for pgAdmin user settings</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="external-database-for-pgadmin-user-settings">
+<span id="external-database"></span><h1><span class="target" id="index-0"></span>External database for pgAdmin user settings<a class="headerlink" href="#external-database-for-pgadmin-user-settings" title="Link to this heading">¶</a></h1>
+<p>The user settings used by pgAdmin are stored in a SQLite database. In this
+database, many settings are stored, such as preferences, user accounts,
+auto-discovered servers, and many more.</p>
+<p>As SQLite is a file-based database and it can be anywhere in the file system,
+so it is not designed to take care of failures (no HA support). Furthermore,
+it isn’t designed to handle multiple connections concurrently reading/writing
+data to it. Example: In environments such as Kubernetes it may be useful to
+use an alternate backend to avoid using SQLite on non-ephemeral storage and to
+allow HA of the settings database.</p>
+<p>In order to prevent this, pgAdmin now supports storing user settings in an
+external database using the new ‘CONFIG_DATABASE_URI’ parameter in the
+<a class="reference internal" href="config_py.html#config-py"><span class="std std-ref">config.py</span></a> file.</p>
+<section id="use-sqlite-database">
+<h2>Use SQLite Database<a class="headerlink" href="#use-sqlite-database" title="Link to this heading">¶</a></h2>
+<p>In order to use SQLite Database, make sure CONFIG_DATABASE_URI parameter is
+set to an empty string like ‘’. By default it is set to an empty string in the
+config.py so if you would like to use SQLite database then no need to change
+anything.</p>
+</section>
+<section id="use-external-database">
+<h2>Use External Database<a class="headerlink" href="#use-external-database" title="Link to this heading">¶</a></h2>
+<p>In order to use an external database, make sure CONFIG_DATABASE_URI parameter
+is set like “dialect+driver://username:password&#64;host:port/database”.</p>
+<p><strong>Note</strong> It is recommended to create the database in advance.</p>
+</section>
+<section id="use-postgresql-database">
+<h2>Use PostgreSQL Database<a class="headerlink" href="#use-postgresql-database" title="Link to this heading">¶</a></h2>
+<p>Following are the formats to use PostgreSQL as an external database.</p>
+<p>Basic syntax:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>postgresql://username:password@host:port/database
+</pre></div>
+</div>
+<p>Using specific schema (It is recommended to create the schema in advance):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>postgresql://username:password@host:port/database?options<span class="o">=</span>-csearch_path<span class="o">=</span>&lt;schema<span class="w"> </span>name&gt;
+</pre></div>
+</div>
+<p>Using default pgpass path for the service account:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>postgresql://username@host:port?options<span class="o">=</span>-csearch_path<span class="o">=</span>&lt;schema<span class="w"> </span>name&gt;
+</pre></div>
+</div>
+<p>Specifying pgpass file path:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>postgresql://username@host:port?passfile<span class="o">=</span>&lt;path<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>pgpass<span class="w"> </span>file&gt;<span class="p">&amp;</span><span class="nv">options</span><span class="o">=</span>-csearch_path<span class="o">=</span>&lt;schema<span class="w"> </span>name&gt;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">External database for pgAdmin user settings</a><ul>
+<li><a class="reference internal" href="#use-sqlite-database">Use SQLite Database</a></li>
+<li><a class="reference internal" href="#use-external-database">Use External Database</a></li>
+<li><a class="reference internal" href="#use-postgresql-database">Use PostgreSQL Database</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">External database for pgAdmin user settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#use-sqlite-database">Use SQLite Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-external-database">Use External Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-postgresql-database">Use PostgreSQL Database</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="connecting.html" title="Connecting To A Server"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="search_objects.html" title="Search objects"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">External database for pgAdmin user settings</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="connecting.html" title="Connecting To A Server">next</a> |</li>
+            <li class="right" ><a href="search_objects.html" title="Search objects">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

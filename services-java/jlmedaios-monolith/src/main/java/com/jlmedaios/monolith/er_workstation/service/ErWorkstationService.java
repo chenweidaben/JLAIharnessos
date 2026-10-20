@@ -87,9 +87,7 @@ public class ErWorkstationService {
     }
 
     private ERVisit findByVisitNo(String visitNo) {
-        return erVisitRepository.findAll().stream()
-                .filter(v -> visitNo.equals(v.getVisitNo()))
-                .findFirst()
-                .orElse(null);
+        // P1 性能优化：直接调用 Repository 派生查询，替代 findAll().stream().filter()
+        return erVisitRepository.findByVisitNo(visitNo);
     }
 }

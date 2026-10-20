@@ -21,6 +21,7 @@ import {
   Card,
   Col,
   Empty,
+  List,
   Row,
   Space,
   Spin,
@@ -31,7 +32,7 @@ import {
   Watermark,
   message,
 } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined, ClockCircleOutlined, WarningOutlined } from '@ant-design/icons';
 
 import { DispenseModal } from '@/components/pharmacy/DispenseModal';
 import { ReviewModal } from '@/components/pharmacy/ReviewModal';
@@ -54,6 +55,26 @@ const JL = {
   blue: '#1E5F8C', // 辅色
   accent: '#4A90D9', // 强调色
 } as const;
+
+/**
+ * v5.0试点扩展（M197护士药师工作流）：患者用药提醒（DEMO mock 5 条）
+ * 字段：药品名 / 服用时间 / 注意事项（空腹 / 饭后 / 睡前 / 禁忌）
+ */
+interface MedicationReminder {
+  key: string;
+  drugName: string;
+  dosage: string;
+  takeTime: string;
+  timing: '空腹' | '饭后' | '餐中' | '睡前';
+  caution: string;
+}
+const MOCK_MED_REMINDERS: MedicationReminder[] = [
+  { key: '1', drugName: '头孢呋辛酯片', dosage: '0.25g × 1片', takeTime: '08:00 / 20:00', timing: '饭后', caution: '服药期间及停药后 7 日内禁止饮酒（双硫仑样反应）' },
+  { key: '2', drugName: '阿司匹林肠溶片', dosage: '100mg × 1片', takeTime: '07:30', timing: '空腹', caution: '肠溶片须整片吞服，不可嚼碎；胃溃疡活动期禁用' },
+  { key: '3', drugName: '二甲双胍片', dosage: '0.5g × 1片', takeTime: '08:00 / 12:00 / 18:00', timing: '餐中', caution: '造影检查前 48 小时须暂停用药，防乳酸酸中毒' },
+  { key: '4', drugName: '阿托伐他汀钙片', dosage: '20mg × 1片', takeTime: '21:00', timing: '睡前', caution: '避免与西柚汁同服；定期监测肝功能与肌酸激酶' },
+  { key: '5', drugName: '奥美拉唑肠溶胶囊', dosage: '20mg × 1粒', takeTime: '06:30（早餐前 30 分钟）', timing: '空腹', caution: '肠溶胶囊不可打开或嚼碎；长期服用需监测骨密度' },
+];
 
 export default function PharmacyWorkbench() {
   const {
@@ -345,6 +366,53 @@ export default function PharmacyWorkbench() {
                       className="jl-table-hover"
                       columns={dispensingColumns}
                       dataSource={dispensings}
+                    />
+                  ),
+                },
+                {
+                  // v5.0试点扩展（M197护士药师工作流）：患者用药提醒（antd List，DEMO mock 5 条）
+                  key: 'reminders',
+                  label: <Badge count={MOCK_MED_REMINDERS.length} size="small" offset={[10, 0]}>用药提醒</Badge>,
+                  children: (
+                    <List
+                      itemLayout="horizontal"
+                      dataSource={MOCK_MED_REMINDERS}
+                      renderItem={(item) => (
+                        <List.Item>
+                          <List.Item.Meta
+                            title={
+                              <Space>
+                                <Typography.Text strong>{item.drugName}</Typography.Text>
+                                <Typography.Text type="secondary">{item.dosage}</Typography.Text>
+                                <Tag color={
+                                  item.timing === '空腹' ? 'orange'
+                                  : item.timing === '饭后' ? 'green'
+                                  : item.timing === '睡前' ? 'purple'
+                                  : 'blue'
+                                }>
+                                  {item.timing}
+                                </Tag>
+                              </Space>
+                            }
+                            description={
+                              <Space direction="vertical" size={2}>
+                                <Space size={4}>
+                                  <ClockCircleOutlined style={{ color: JL.accent }} />
+                                  <Typography.Text type="secondary">
+                                    服用时间：{item.takeTime}
+                                  </Typography.Text>
+                                </Space>
+                                <Space size={4}>
+                                  <WarningOutlined style={{ color: '#e0432f' }} />
+                                  <Typography.Text type="danger">
+                                    注意事项：{item.caution}
+                                  </Typography.Text>
+                                </Space>
+                              </Space>
+                            }
+                          />
+                        </List.Item>
+                      )}
                     />
                   ),
                 },

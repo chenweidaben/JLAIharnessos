@@ -1,0 +1,5 @@
+﻿/api/v1/cds/rule-engine=200
+/api/v1/cds/clinical-evidence=200
+/api/v1/cds/clinical-trials=200
+/api/v1/cds/clinical-guidelines-detail=200
+/api/v1/cds/clinical-pathways-detail=200

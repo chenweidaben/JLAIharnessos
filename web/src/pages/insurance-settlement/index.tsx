@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Col, Layout, Row, Spin, Statistic, Typography } from "antd";
+import { Card, Col, Empty, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
 const { Content } = Layout;
@@ -56,6 +56,29 @@ export default function InsuranceSettlementPage() {
             </Col>
           </Row>
         )}
+        {/* v5.0试点扩展（M208薄页补表）：近期医保结算 demo */}
+        <Card style={{ marginTop: 16 }} title="近期医保结算明细">
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={false}
+            dataSource={[
+              { id: 1, billNo: "YB20261019001", patient: "张*三", dept: "心内科", amount: 4820.50, status: "已结算" },
+              { id: 2, billNo: "YB20261019002", patient: "李*四", dept: "呼吸科", amount: 3210.00, status: "已结算" },
+              { id: 3, billNo: "YB20261019003", patient: "王*五", dept: "普外科", amount: 12800.00, status: "拒付" },
+              { id: 4, billNo: "YB20261019004", patient: "赵*六", dept: "骨科", amount: 8900.00, status: "已结算" },
+              { id: 5, billNo: "YB20261019005", patient: "钱*七", dept: "神经外科", amount: 21500.00, status: "审核中" },
+            ]}
+            columns={[
+              { title: "结算单号", dataIndex: "billNo" },
+              { title: "患者", dataIndex: "patient" },
+              { title: "科室", dataIndex: "dept" },
+              { title: "金额(元)", dataIndex: "amount", render: (v: number) => v.toFixed(2) },
+              { title: "状态", dataIndex: "status", render: (s: string) => <Tag color={s === "已结算" ? "green" : s === "拒付" ? "red" : "orange"}>{s}</Tag> },
+            ]}
+            locale={{ emptyText: <Empty description="暂无结算记录" /> }}
+          />
+        </Card>
       </Content>
     </Layout>
   );

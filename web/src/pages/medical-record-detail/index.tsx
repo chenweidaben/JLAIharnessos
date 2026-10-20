@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Col, Layout, Row, Spin, Statistic, Typography } from "antd";
+import { Card, Col, Empty, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
 const { Content } = Layout;
@@ -56,6 +56,27 @@ export default function MedicalRecordDetailPage() {
             </Col>
           </Row>
         )}
+        {/* v5.0试点扩展（M208薄页补表）：病案详情 demo */}
+        <Card style={{ marginTop: 16 }} title="病案详情检查项">
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={false}
+            dataSource={[
+              { id: 1, item: "首页诊断完整性", result: "通过", operator: "陈医生" },
+              { id: 2, item: "手术记录签字", result: "通过", operator: "王医生" },
+              { id: 3, item: "出院小结时限", result: "不通过", operator: "质控科" },
+              { id: 4, item: "知情同意书扫描", result: "通过", operator: "李护士" },
+              { id: 5, item: "ICD 编码准确性", result: "通过", operator: "编码员" },
+            ]}
+            columns={[
+              { title: "检查项", dataIndex: "item" },
+              { title: "结果", dataIndex: "result", render: (r: string) => <Tag color={r === "通过" ? "green" : "red"}>{r}</Tag> },
+              { title: "检查人", dataIndex: "operator" },
+            ]}
+            locale={{ emptyText: <Empty description="暂无检查记录" /> }}
+          />
+        </Card>
       </Content>
     </Layout>
   );

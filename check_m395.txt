@@ -1,0 +1,10 @@
+﻿route community/visits : False
+route community/health-records : False
+route community/elderly-care : False
+route community/chronic-disease : False
+route community/education : False
+CommunityVisitsPage lazy: True
+CommunityHealthRecordsPage lazy: False
+CommunityElderlyCarePage lazy: False
+CommunityChronicDiseasePage lazy: False
+CommunityEducationPage lazy: False

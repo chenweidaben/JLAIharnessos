@@ -34,7 +34,9 @@ export default function PatientList() {
     setLoading(true);
     listPatients()
       .then((list) => {
-        if (alive) setPatientList(list);
+        // v5.0试点扩展（浏览器bug修复）：API 返回 null/undefined 时归一为空数组，
+        // 避免下游 patientList.filter 抛错导致整个内容区白屏。
+        if (alive) setPatientList(Array.isArray(list) ? list : []);
       })
       .catch(() => {
         if (alive) message.error('患者列表加载失败，请稍后重试');
@@ -48,10 +50,13 @@ export default function PatientList() {
   }, [setPatientList]);
 
   // 前端关键字过滤：住院号 / 姓名 / 诊断
+  // v5.0试点扩展（浏览器bug修复）：store 中 patientList 可能为 null/undefined（异常态），
+  // 先归一为数组再过滤/渲染，杜绝 .filter 抛错造成白屏。
   const filtered = useMemo(() => {
+    const src = Array.isArray(patientList) ? patientList : [];
     const kw = keyword.trim().toLowerCase();
-    if (!kw) return patientList;
-    return patientList.filter((p) =>
+    if (!kw) return src;
+    return src.filter((p) =>
       [p.patientNo, p.name, p.diagnosis ?? ''].join(' ').toLowerCase().includes(kw),
     );
   }, [patientList, keyword]);

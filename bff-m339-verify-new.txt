@@ -1,0 +1,7 @@
+﻿/api/v1/orders/list=200
+/api/v1/orders/active=200
+/api/v1/orders/completed=200
+/api/v1/orders/cancelled=200
+/api/v1/prescriptions/outpatient=200
+/api/v1/prescriptions/inpatient=200
+/api/v1/prescriptions/emergency=200

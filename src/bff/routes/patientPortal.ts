@@ -11,6 +11,28 @@ import { portalView, PatientPortalError } from '../aggregators/patientPortalAggr
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
+  // demo 模式无 DB，直接用 JWT 中的身份信息构建视图
+  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') {
+    const rawRoles = c.user.roles ?? ['patient'];
+    return {
+      id: c.user.id,
+      username: c.user.name ?? 'patient',
+      realName: c.user.name ?? '测试患者',
+      employeeNo: '',
+      gender: 'unknown',
+      deptCode: 'outpatient',
+      deptName: '门诊',
+      title: '',
+      phone: '',
+      email: '',
+      status: 'active',
+      roles: rawRoles.map((r) => ({ id: `role_${r}`, code: r, name: r, description: r, level: 'dept', dataScope: 'self', status: 'enabled', userCount: 0, permissionCount: 0, permissionCodes: [], createdAt: '', createdBy: 'system' })),
+      roleCodes: rawRoles,
+      rawRoles,
+      permissions: c.user.permissions ?? [],
+      dataScope: 'self',
+    };
+  }
   const user = await getUserById(c.user.id);
   if (!user) return null;
   return buildAuthView(user, await getUserRoleLinks(user.id));

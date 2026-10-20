@@ -1,0 +1,9 @@
+﻿/api/v1/cds/order-check=200
+/api/v1/cds/alert=200
+/api/v1/cds/clinical-pathway=200
+/api/v1/cds/alerts=ERR
+/api/v1/cds/interventions=ERR
+/api/v1/cds/guidelines=ERR
+/api/v1/cds/checklists=ERR
+/api/v1/cds/drugs-interaction=ERR
+/api/v1/cds/duplicate-therapy=ERR

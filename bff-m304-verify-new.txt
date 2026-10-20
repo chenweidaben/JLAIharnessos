@@ -1,0 +1,6 @@
+﻿/api/v1/pharmacy/inventory=200
+/api/v1/pharmacy/purchase=200
+/api/v1/pharmacy/check=200
+/api/v1/supplies/purchase=200
+/api/v1/supplies/check=200
+/api/v1/equipment/repair=200

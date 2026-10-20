@@ -1,0 +1,6 @@
+﻿/api/v1/security/privacy-policy=ERR
+/api/v1/security/privacy-consent=ERR
+/api/v1/security/privacy-rights=ERR
+/api/v1/security/privacy-notice=ERR
+/api/v1/security/privacy-violation=ERR
+/api/v1/security/privacy-complaint=ERR

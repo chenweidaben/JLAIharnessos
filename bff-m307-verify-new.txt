@@ -1,0 +1,3 @@
+﻿/api/v1/internet/appointments=200
+/api/v1/internet/health-records=200
+/api/v1/internet/followup=200

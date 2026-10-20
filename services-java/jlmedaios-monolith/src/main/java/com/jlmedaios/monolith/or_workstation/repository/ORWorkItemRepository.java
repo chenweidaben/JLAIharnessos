@@ -32,4 +32,12 @@ public interface ORWorkItemRepository extends JpaRepository<ORWorkItem, Long> {
      * @return 手术工作项列表
      */
     List<ORWorkItem> findByPatientId(String patientId);
+
+    /**
+     * 按工作项编号查询手术工作项（P3 性能优化：替代 findAll().filter()）。
+     *
+     * @param workItemNo 工作项编号
+     * @return 手术工作项
+     */
+    ORWorkItem findByWorkItemNo(String workItemNo);
 }

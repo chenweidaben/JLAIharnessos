@@ -1,0 +1,4 @@
+﻿src/router/index.tsx(240,7): error TS2451: Cannot redeclare block-scoped variable 'RehabAssessmentPage'.
+src/router/index.tsx(728,7): error TS2451: Cannot redeclare block-scoped variable 'RehabTreatmentPage'.
+src/router/index.tsx(3952,7): error TS2451: Cannot redeclare block-scoped variable 'RehabAssessmentPage'.
+src/router/index.tsx(3953,7): error TS2451: Cannot redeclare block-scoped variable 'RehabTreatmentPage'.

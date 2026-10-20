@@ -1,0 +1,6 @@
+﻿/api/v1/patient/timeline=200
+/api/v1/patient/timeline-detail=200
+/api/v1/nursing/nqi-overview=200
+/api/v1/nursing/nqi-detail=200
+/api/v1/nursing/nqi-comparison=200
+/api/v1/nursing/nqi-trend=200

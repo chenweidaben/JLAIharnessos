@@ -87,8 +87,7 @@ public class CriticalService {
      * @return 未闭环危急值列表
      */
     public List<CriticalValue> openList() {
-        return criticalValueRepository.findAll().stream()
-                .filter(cv -> !"CLOSED".equals(cv.getStatus()))
-                .collect(Collectors.toList());
+        // P5 性能优化：直接调用 Repository 派生查询
+        return criticalValueRepository.findByStatusNot("CLOSED");
     }
 }

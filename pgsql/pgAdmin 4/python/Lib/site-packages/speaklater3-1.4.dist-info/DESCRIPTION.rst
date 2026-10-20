@@ -1,0 +1,66 @@
+speaklater
+~~~~~~~~~~
+
+A module that provides lazy strings for translations.  Basically you
+get an object that appears to be a string but changes the value every
+time the value is evaluated based on a callable you provide.
+
+For example you can have a global `lazy_gettext` function that returns
+a lazy string with the value of the current set language.
+
+Example:
+
+>>> from speaklater import make_lazy_string, text_type
+>>> sval = u'Hello World'
+>>> string = make_lazy_string(lambda: sval)
+
+This lazy string will evaluate to the value of the `sval` variable.
+
+>>> string
+l'Hello World'
+>>> text_type(string) == u'Hello World'
+True
+>>> string.upper() == u'HELLO WORLD'
+True
+
+If you change the value, the lazy string will change as well:
+
+>>> sval = u'Hallo Welt'
+>>> string.upper() == u'HALLO WELT'
+True
+
+This is especially handy when combined with a thread local and gettext
+translations or dicts of translatable strings:
+
+>>> from speaklater import make_lazy_gettext
+>>> from threading import local
+>>> l = local()
+>>> l.translations = {u'Yes': 'Ja'}
+>>> lazy_gettext = make_lazy_gettext(lambda: l.translations.get)
+>>> yes = lazy_gettext(u'Yes')
+>>> print(yes)
+Ja
+>>> l.translations[u'Yes'] = u'Si'
+>>> print(yes)
+Si
+
+Lazy strings are no real strings so if you pass this sort of string to
+a function that performs an instance check, it will fail.  In that case
+you have to explicitly convert it with `unicode` and/or `string` depending
+on what string type the lazy string encapsulates.
+
+To check if a string is lazy, you can use the `is_lazy_string` function:
+
+>>> from speaklater import is_lazy_string
+>>> is_lazy_string(u'yes')
+False
+>>> is_lazy_string(yes)
+True
+
+New in version 1.4: python >= 3.3 (and also 2.6 and 2.7) support,
+                    repr(lazystring) is l"foo" on py2 and py3 - no "u" on py2!
+
+New in version 1.2: It's now also possible to pass keyword arguments to
+the callback used with `make_lazy_string`.
+
+

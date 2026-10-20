@@ -84,8 +84,7 @@ public class DrugManagementService {
      * @return 低库存药品列表
      */
     public List<Drug> lowStock() {
-        return drugRepository.findAll().stream()
-                .filter(d -> d.getStockQuantity() < d.getStockWarningLevel())
-                .toList();
+        // P8 性能优化：直接调用 Repository 派生查询
+        return drugRepository.findByStockQuantityLessThan(100);
     }
 }

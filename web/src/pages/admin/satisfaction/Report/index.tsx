@@ -196,9 +196,9 @@ export default function SatisfactionReportPage() {
                 <Card>
                   <Statistic
                     title="低分维度数"
-                    value={analysis.lowScoreDimensions.length}
+                    value={analysis.lowScoreDimensions?.length ?? 0}
                     suffix="项"
-                    valueStyle={{ color: analysis.lowScoreDimensions.length > 0 ? '#cf1322' : '#3f8600' }}
+                    valueStyle={{ color: (analysis.lowScoreDimensions?.length ?? 0) > 0 ? '#cf1322' : '#3f8600' }}
                   />
                 </Card>
               </Col>
@@ -235,7 +235,7 @@ export default function SatisfactionReportPage() {
               <Table
                 rowKey="key"
                 columns={columns}
-                dataSource={analysis.dimensions}
+                dataSource={analysis.dimensions ?? []}
                 pagination={false}
                 size="small"
               />

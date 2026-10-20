@@ -1,0 +1,3 @@
+﻿/api/v1/finance/expenses=200
+/api/v1/finance/assets=200
+/api/v1/billing/invoices=200

@@ -1,0 +1,3 @@
+﻿/api/v1/surgery/consent=200
+/api/v1/anesthesia/assessment=200
+/api/v1/anesthesia/recovery=200

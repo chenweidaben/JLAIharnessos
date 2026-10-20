@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Version 8.10 &#8212; pgAdmin 4 8.10 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/style.css?v=d36593c3" />
+    
+    <script src="_static/documentation_options.js?v=3a25739e"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <script src="_static/sidebar.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Version 8.9" href="release_notes_8_9.html" />
+    <link rel="prev" title="Release Notes" href="release_notes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="release_notes_8_9.html" title="Version 8.9"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="release_notes.html" title="Release Notes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="release_notes.html" accesskey="U">Release Notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Version 8.10</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="version-8-10">
+<h1>Version 8.10<a class="headerlink" href="#version-8-10" title="Link to this heading">¶</a></h1>
+<p>Release date: 2024-07-29</p>
+<p>This release contains a number of bug fixes and new features since the release of pgAdmin 4 v8.9.</p>
+<section id="supported-database-servers">
+<h2>Supported Database Servers<a class="headerlink" href="#supported-database-servers" title="Link to this heading">¶</a></h2>
+<p><strong>PostgreSQL</strong>: 12, 13, 14, 15, 16 and 17</p>
+<p><strong>EDB Advanced Server</strong>: 12, 13, 14, 15, and 16</p>
+</section>
+<section id="bundled-postgresql-utilities">
+<h2>Bundled PostgreSQL Utilities<a class="headerlink" href="#bundled-postgresql-utilities" title="Link to this heading">¶</a></h2>
+<p><strong>psql</strong>, <strong>pg_dump</strong>, <strong>pg_dumpall</strong>, <strong>pg_restore</strong>: 16.3</p>
+</section>
+<section id="new-features">
+<h2>New features<a class="headerlink" href="#new-features" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/3981">Issue #3981</a> -  Add support for Postgres Server Logs for Text, CSV and JSON format in plain and tabular formats. Upgrade React to version 18.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/6572">Issue #6572</a> -  Add a keyboard shortcut to close active tab panel.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7530">Issue #7530</a> -  Add support for highlighting selection matches in the query editor.</div>
+</div>
+</div></blockquote>
+</section>
+<section id="housekeeping">
+<h2>Housekeeping<a class="headerlink" href="#housekeeping" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7494">Issue #7494</a> -  Replace pgAdmin NW.js container with Electron container.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7501">Issue #7501</a> -  Updated to the latest version of the Notistack library.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7537">Issue #7537</a> -  Ensure that pgAdmin 4 is compatible with PostgreSQL v17.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7607">Issue #7607</a> -  Automatically apply virtualization in the DataGridView of SchemaView if the schema contains only one collection.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7623">Issue #7623</a> -  Add the git commit hash details to the About dialog.</div>
+</div>
+</div></blockquote>
+</section>
+<section id="bug-fixes">
+<h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/3199">Issue #3199</a> -  Fixed an issue where paste operation in query tool data grid should skip bytea columns and put the value as NULL instead.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/4165">Issue #4165</a> -  Fixed an issue where the taskbar icon appeared as a red square for the query tool and schema diff when opened in a new window.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/5345">Issue #5345</a> -  Fix issue with missing new added records in download file.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/5610">Issue #5610</a> -  Fixed an issue where the File Open dialog did not show files without a dot extension.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/6548">Issue #6548</a> -  Ensure pgAdmin never makes network requests to Google etc.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/6571">Issue #6571</a> -  Fixed an issue where pop-up notifications from Object Explorer wouldn’t get dismissed automatically if the Query Tool was opened.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7035">Issue #7035</a> -  Fixed the permission denied issue for functions of the pgstattuple extension when accessing statistics with a non-admin user.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7219">Issue #7219</a> -  Ensure processes related notifiers disappears.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7297">Issue #7297</a> -  Updated entrypoint.sh to utilize the email-validator package for email validation.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7511">Issue #7511</a> -  Fixed an issue where users could not insert characters at the desired location, as it was added to the end of the line.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7554">Issue #7554</a> -  Fixed an issue where sorting the database activity table on the dashboard by any column caused the details to expand in the wrong position.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7618">Issue #7618</a> -  Fix an issue where the preferences JSON file has no effect when an external database is used.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7626">Issue #7626</a> -  Fixed an issue where theme preview under theme options was broken in pgAdmin server mode.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7627">Issue #7627</a> -  Fixed an issue where users could not autofill their saved passwords in the connect server dialog in the browser.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7638">Issue #7638</a> -  Fixed an issue where Generate Script button should be disabled if no objects are selected in the schema diff result.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7639">Issue #7639</a> -  Fixed an issue where ERD Open/Save shorcuts were not working on Windows/Linux.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7660">Issue #7660</a> -  Add a precautionary check for the query tool connection cursor to fix the error ‘NoneType’ object has no attribute ‘_query’.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7662">Issue #7662</a> -  Fixed an issue where boolean values in node details of graphical explain plan were not interpreted correctly.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7663">Issue #7663</a> -  Fixed an issue where Reassign/Drop Owned dialog not opening for Role.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7679">Issue #7679</a> -  Ensure pgadmin does not try to connect to the server if saved password is not available.</div>
+<div class="line"><a class="reference external" href="https://github.com/pgadmin-org/pgadmin4/issues/7681">Issue #7681</a> -  Ensure that pgAdmin works when opened in an iframe.</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Version 8.10</a><ul>
+<li><a class="reference internal" href="#supported-database-servers">Supported Database Servers</a></li>
+<li><a class="reference internal" href="#bundled-postgresql-utilities">Bundled PostgreSQL Utilities</a></li>
+<li><a class="reference internal" href="#new-features">New features</a></li>
+<li><a class="reference internal" href="#housekeeping">Housekeeping</a></li>
+<li><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_database.html">External database for pgAdmin user settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="connecting.html">Connecting To A Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_cluster_objects.html">Managing Cluster Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_database_objects.html">Managing Database Objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modifying_tables.html">Creating or Modifying a Table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_basics.html">Management Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backup_and_restore.html">Backup and Restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_tools.html">Developer Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processes.html">Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pgagent.html">pgAgent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions.html">pgAdmin Project Contributions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="release_notes.html">Release Notes</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Version 8.10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_9.html">Version 8.9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_8.html">Version 8.8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_7.html">Version 8.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_6.html">Version 8.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_5.html">Version 8.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_4.html">Version 8.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_3.html">Version 8.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_2.html">Version 8.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_1.html">Version 8.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_8_0.html">Version 8.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_8.html">Version 7.8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_7.html">Version 7.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_6.html">Version 7.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_5.html">Version 7.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_4.html">Version 7.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_3.html">Version 7.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_2.html">Version 7.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_1.html">Version 7.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_7_0.html">Version 7.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_21.html">Version 6.21</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_20.html">Version 6.20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_19.html">Version 6.19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_18.html">Version 6.18</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_17.html">Version 6.17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_16.html">Version 6.16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_15.html">Version 6.15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_14.html">Version 6.14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_13.html">Version 6.13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_12.html">Version 6.12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_11.html">Version 6.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_10.html">Version 6.10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_9.html">Version 6.9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_8.html">Version 6.8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_7.html">Version 6.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_6.html">Version 6.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_5.html">Version 6.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_4.html">Version 6.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_3.html">Version 6.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_2.html">Version 6.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_1.html">Version 6.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_6_0.html">Version 6.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_7.html">Version 5.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_6.html">Version 5.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_5.html">Version 5.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_4.html">Version 5.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_3.html">Version 5.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_2.html">Version 5.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_1.html">Version 5.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_5_0.html">Version 5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_30.html">Version 4.30</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_29.html">Version 4.29</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_28.html">Version 4.28</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_27.html">Version 4.27</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_26.html">Version 4.26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_25.html">Version 4.25</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_24.html">Version 4.24</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_23.html">Version 4.23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_22.html">Version 4.22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_21.html">Version 4.21</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_20.html">Version 4.20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_19.html">Version 4.19</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_18.html">Version 4.18</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_17.html">Version 4.17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_16.html">Version 4.16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_15.html">Version 4.15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_14.html">Version 4.14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_13.html">Version 4.13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_12.html">Version 4.12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_11.html">Version 4.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_10.html">Version 4.10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_9.html">Version 4.9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_8.html">Version 4.8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_7.html">Version 4.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_6.html">Version 4.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_5.html">Version 4.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_4.html">Version 4.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_3.html">Version 4.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_2.html">Version 4.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_1.html">Version 4.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_4_0.html">Version 4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_6.html">Version 3.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_5.html">Version 3.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_4.html">Version 3.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_3.html">Version 3.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_2.html">Version 3.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_1.html">Version 3.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_3_0.html">Version 3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_2_1.html">Version 2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_2_0.html">Version 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_6.html">Version 1.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_5.html">Version 1.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_4.html">Version 1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_3.html">Version 1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_2.html">Version 1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_1.html">Version 1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release_notes_1_0.html">Version 1.0</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html">Licence</a></li>
+</ul>
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+<div id="sidebarbutton" title="Collapse sidebar">
+<span>«</span>
+</div>
+
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="release_notes_8_9.html" title="Version 8.9"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="release_notes.html" title="Release Notes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">pgAdmin 4 8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="release_notes.html" >Release Notes</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Version 8.10</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        <div class="related" role="navigation" aria-label="related navigation">
+          <ul>
+              <li class="left" style="margin-left: 10px">&#169; Copyright (C) 2013 - 2024, The pgAdmin Development Team.</li>
+            <li class="right" style="margin-right: 10px"><a href="genindex.html" title="General Index">index</a></li>
+            <li class="right" ><a href="release_notes_8_9.html" title="Version 8.9">next</a> |</li>
+            <li class="right" ><a href="release_notes.html" title="Release Notes">previous</a> |</li>
+          </ul>
+        </div>
+    </div>
+  </body>
+</html>

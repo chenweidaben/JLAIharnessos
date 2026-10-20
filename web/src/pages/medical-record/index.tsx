@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useEffect, useState } from "react";
-import { Card, Col, Layout, Row, Spin, Statistic, Typography } from "antd";
+import { Card, Col, Empty, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
 const { Content } = Layout;
@@ -56,6 +56,29 @@ export default function MedicalRecordPage() {
             </Col>
           </Row>
         )}
+        {/* v5.0试点扩展（M208薄页补表）：近期病案列表 demo */}
+        <Card style={{ marginTop: 16 }} title="近期病案列表">
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={false}
+            dataSource={[
+              { id: 1, mrn: "MR20261001", patient: "张*三", dept: "心内科", grade: "甲级", status: "已归档" },
+              { id: 2, mrn: "MR20261002", patient: "李*四", dept: "呼吸科", grade: "乙级", status: "已归档" },
+              { id: 3, mrn: "MR20261003", patient: "王*五", dept: "普外科", grade: "甲级", status: "待质控" },
+              { id: 4, mrn: "MR20261004", patient: "赵*六", dept: "神经外科", grade: "甲级", status: "已归档" },
+              { id: 5, mrn: "MR20261005", patient: "钱*七", dept: "骨科", grade: "丙级", status: "退回修改" },
+            ]}
+            columns={[
+              { title: "病案号", dataIndex: "mrn" },
+              { title: "患者", dataIndex: "patient" },
+              { title: "科室", dataIndex: "dept" },
+              { title: "等级", dataIndex: "grade", render: (g: string) => <Tag color={g === "甲级" ? "green" : g === "乙级" ? "orange" : "red"}>{g}</Tag> },
+              { title: "状态", dataIndex: "status" },
+            ]}
+            locale={{ emptyText: <Empty description="暂无病案数据" /> }}
+          />
+        </Card>
       </Content>
     </Layout>
   );

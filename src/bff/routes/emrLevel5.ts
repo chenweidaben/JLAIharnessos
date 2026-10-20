@@ -7,9 +7,6 @@ import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { EmrLevel5Error, loadTrend } from '../aggregators/emrLevel5Aggregator.js';
 
-/** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
-const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
-
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
   const user = await getUserById(c.user.id);
@@ -28,7 +25,7 @@ export const emrLevel5Routes: RouteDef[] = [
     path: '/api/v1/emr-level5/dashboard',
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
-      if (isDemo) return json(ok({ demo: true }));
+      // v5.0试点扩展（M189 EMR/AI种子）：DEMO 仪表盘由聚合器 loadTrend 内部分支返回完整字段
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {

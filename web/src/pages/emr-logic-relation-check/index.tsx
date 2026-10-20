@@ -29,7 +29,7 @@ export default function EmrLogicRelationCheckPage() {
   const [diagnosis, setDiagnosis] = useState("");
   const [medication, setMedication] = useState("");
   const [procedure, setProcedure] = useState("");
-  const [result, setResult] = useState<LogicRelationResult | null>(null);
+  const [, setResult] = useState<LogicRelationResult | null>(null);
   const [report, setReport] = useState<LogicReport | null>(null);
 
   const check = async () => {

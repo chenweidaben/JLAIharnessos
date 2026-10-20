@@ -1,0 +1,4 @@
+﻿/api/v1/pharmacy/purchasing=200
+/api/v1/pharmacy/dispensing=200
+/api/v1/hr/trainings=200
+/api/v1/hr/recruitment=200

@@ -41,13 +41,29 @@ export async function createFromAttributionView(
   return task;
 }
 
+/** DEMO_MODE 演示整改任务列表（P7）。 */
+function demoTasks() {
+  return [
+    { id: 'demo-task-1', title: 'DRG 超支整改', finding: '心血管内科平均住院日超目标 1.2 天', assigneeId: 'demo-doc-1', status: 'open', category: 'drg_attribution', dueDate: '2026-11-01' },
+    { id: 'demo-task-2', title: '病历书写缺陷整改', finding: '入院记录 24 小时未完成', assigneeId: 'demo-doc-2', status: 'in_progress', category: 'emr_quality', dueDate: '2026-10-25' },
+    { id: 'demo-task-3', title: '合理用药整改', finding: '抗菌药物使用强度超标', assigneeId: 'demo-doc-3', status: 'open', category: 'drug_use', dueDate: '2026-11-15' },
+    { id: 'demo-task-4', title: '院感防控整改', finding: 'ICU 手卫生依从率不足', assigneeId: 'demo-doc-4', status: 'closed', category: 'infection', dueDate: '2026-10-10' },
+    { id: 'demo-task-5', title: '检查检验阳性率整改', finding: 'CT 阳性率低于质控标准', assigneeId: 'demo-doc-5', status: 'in_progress', category: 'lab_quality', dueDate: '2026-10-28' },
+    { id: 'demo-task-6', title: '患者满意度整改', finding: '出院满意度低于 90%', assigneeId: 'demo-doc-6', status: 'open', category: 'satisfaction', dueDate: '2026-11-20' },
+    { id: 'demo-task-7', title: '医保拒付整改', finding: 'DRG 分组错误导致拒付', assigneeId: 'demo-doc-7', status: 'open', category: 'insurance', dueDate: '2026-11-05' },
+    { id: 'demo-task-8', title: '临床路径整改', finding: '路径变异率超 30%', assigneeId: 'demo-doc-8', status: 'closed', category: 'clinical_pathway', dueDate: '2026-10-15' },
+  ];
+}
+
 export async function listMineView(auth: AuthView) {
   if (!auth.permissions.includes('improvement_task:handle')) throw forbidden('缺少权限：improvement_task:handle');
+  if (process.env.DEMO_MODE === '1') return demoTasks();
   return listByAssignee(auth.id);
 }
 
 export async function listBySourceView(auth: AuthView, source = 'drg_attribution') {
   if (!auth.permissions.includes('improvement_task:assign')) throw forbidden('缺少权限：improvement_task:assign');
+  if (process.env.DEMO_MODE === '1') return demoTasks().filter(t => t.category === source || source === 'all');
   return listBySource(source);
 }
 

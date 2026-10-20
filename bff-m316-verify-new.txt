@@ -1,0 +1,6 @@
+﻿/api/v1/insurance/settlement=200
+/api/v1/insurance/details=200
+/api/v1/insurance/accounts=200
+/api/v1/insurance/rules=200
+/api/v1/insurance/rejection=200
+/api/v1/insurance/audit=200

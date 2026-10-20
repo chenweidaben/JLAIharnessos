@@ -1,0 +1,18 @@
+﻿research\projects exists: True
+research\papers exists: True
+research\funds exists: True
+research\awards exists: False
+teaching\courses exists: False
+teaching\training exists: True
+OK /api/v1/research/projects
+OK /api/v1/research/papers
+OK /api/v1/research/funds
+OK /api/v1/research/awards
+OK /api/v1/teaching/courses
+OK /api/v1/teaching/training
+route research/projects : False
+route research/papers : False
+route research/funds : False
+route research/awards : False
+route teaching/courses : False
+route teaching/training : False

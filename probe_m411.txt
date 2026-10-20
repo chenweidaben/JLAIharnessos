@@ -1,0 +1,18 @@
+﻿system\config exists: True
+system\menus exists: False
+system\dict exists: True
+system\logs exists: True
+system\params exists: False
+system\cache exists: False
+OK /api/v1/system/config
+OK /api/v1/system/menus
+OK /api/v1/system/dict
+OK /api/v1/system/logs
+OK /api/v1/system/params
+OK /api/v1/system/cache
+route system/config : False
+route system/menus : False
+route system/dict : False
+route system/logs : False
+route system/params : False
+route system/cache : False

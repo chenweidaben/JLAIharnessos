@@ -49,6 +49,19 @@ async function handleList(c: Ctx): Promise<Response> {
 
   const category = c.query.get('category') ?? '';
 
+  // DEMO_MODE=1：表未建时短路返回 mock，避免 500
+  if (process.env.DEMO_MODE === '1') {
+    const demoItems: SystemConfigEntry[] = [
+      { key: 'hospital.name', value: '杭州健澜科技示范医院', description: '医院名称', category: 'general', updatedAt: new Date().toISOString(), updatedBy: 'admin' },
+      { key: 'system.version', value: 'v5.0.0', description: '系统版本号', category: 'general', updatedAt: new Date().toISOString(), updatedBy: 'admin' },
+      { key: 'feature.ai_brain', value: 'true', description: 'AI 大脑开关', category: 'feature', updatedAt: new Date().toISOString(), updatedBy: 'admin' },
+      { key: 'feature.digital_twin', value: 'false', description: '数字孪生开关', category: 'feature', updatedAt: new Date().toISOString(), updatedBy: 'admin' },
+      { key: 'security.session_timeout', value: '7200', description: '会话超时（秒）', category: 'security', updatedAt: new Date().toISOString(), updatedBy: 'admin' },
+    ];
+    const items = filterByCategory(category, demoItems);
+    return json(ok({ total: items.length, items }));
+  }
+
   try {
     const db = getDb();
     const rows = await db`

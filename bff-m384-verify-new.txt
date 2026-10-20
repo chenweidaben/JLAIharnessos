@@ -1,0 +1,3 @@
+﻿/api/v1/cds/recommendations=200
+/api/v1/cds/drug-interactions=200
+/api/v1/cds/contraindications=200

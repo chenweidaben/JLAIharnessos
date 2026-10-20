@@ -1,0 +1,5 @@
+﻿/api/v1/maternal/prenatal=200
+/api/v1/maternal/postnatal=200
+/api/v1/maternal/child-health=200
+/api/v1/emergency/redbox=200
+/api/v1/emergency/calls=200

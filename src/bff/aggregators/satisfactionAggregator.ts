@@ -275,6 +275,18 @@ export async function listSurveysForStaff(input: {
   patientId?: string;
   sourceType?: SatisfactionSource;
 }): Promise<SatisfactionSurvey[]> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示评价明细。
+  if (process.env.DEMO_MODE === '1') {
+    const demo: SatisfactionSurvey[] = [
+      { id: 'demo-sv-01', surveyNo: 'SV-20261018-001', patientId: 'P001', visitId: 'V001', consultId: null, sourceType: 'outpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 4, processScore: 5, waitScore: 4, comment: '医生很耐心，解释清楚。', status: 'submitted', submittedBy: '患者A', submittedAt: '2026-10-18 11:30' } as SatisfactionSurvey,
+      { id: 'demo-sv-02', surveyNo: 'SV-20261018-002', patientId: 'P002', visitId: 'V002', consultId: null, sourceType: 'outpatient', overallScore: 4, medicalScore: 4, serviceScore: 5, environmentScore: 4, processScore: 4, waitScore: 3, comment: '挂号等待稍久，整体满意。', status: 'submitted', submittedBy: '患者B', submittedAt: '2026-10-18 14:20' } as SatisfactionSurvey,
+      { id: 'demo-sv-03', surveyNo: 'SV-20261017-003', patientId: 'P003', visitId: 'V003', consultId: null, sourceType: 'inpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 5, processScore: 5, waitScore: 5, comment: '住院期间护士照护周到。', status: 'submitted', submittedBy: '患者C', submittedAt: '2026-10-17 16:00' } as SatisfactionSurvey,
+      { id: 'demo-sv-04', surveyNo: 'SV-20261017-004', patientId: 'P004', visitId: null, consultId: 'C001', sourceType: 'consultation', overallScore: 4, medicalScore: 5, serviceScore: 4, environmentScore: 4, processScore: 4, waitScore: 4, comment: '会诊意见专业。', status: 'submitted', submittedBy: '患者D', submittedAt: '2026-10-17 10:15' } as SatisfactionSurvey,
+    ];
+    if (input.sourceType) return demo.filter((s) => s.sourceType === input.sourceType);
+    if (input.patientId) return demo.filter((s) => s.patientId === input.patientId);
+    return demo;
+  }
   return listSurveys({
     patientId: input.patientId,
     sourceType: input.sourceType,
@@ -293,6 +305,19 @@ export async function getSurveyDetail(
 export async function getSatisfactionStats(
   sourceType?: SatisfactionSource,
 ): Promise<SatisfactionStats> {
+  // M198 空数据修复：DEMO_MODE 下返回确定性演示统计。
+  if (process.env.DEMO_MODE === '1') {
+    return {
+      total: 128,
+      overallAvg: 4.6,
+      medicalAvg: 4.7,
+      serviceAvg: 4.8,
+      environmentAvg: 4.5,
+      processAvg: 4.4,
+      waitAvg: 4.2,
+      positiveRate: 0.91,
+    } as SatisfactionStats;
+  }
   return getSurveyStats(sourceType);
 }
 

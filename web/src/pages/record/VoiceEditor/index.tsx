@@ -8,8 +8,8 @@
  */
 
 import { useMemo, useState } from 'react';
-import { Button, Card, Col, Input, Row, Select, Space, Tag, Typography } from 'antd';
-import { AudioOutlined, FileTextOutlined, BulbOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Input, Modal, Row, Select, Space, Tag, Timeline, Typography } from 'antd';
+import { AudioOutlined, FileTextOutlined, BulbOutlined, LoadingOutlined, HistoryOutlined } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -47,6 +47,26 @@ const KIND_COLOR: Record<Completion['kind'], string> = {
   template: 'orange',
 };
 
+/* v5.0试点扩展（M190病历版本）：病历历史版本（与 BFF emrVersionAggregator 字段对齐） */
+interface NoteVersion {
+  /** 病历 ID */
+  noteId: string;
+  /** 版本号（v1 为初稿/新增） */
+  version: number;
+  /** 修改人 */
+  modifiedBy: string;
+  /** 修改时间（ISO 字符串） */
+  modifiedAt: string;
+  /** 修改字段 */
+  field: string;
+  /** 旧值（v1 新增时为空串） */
+  oldValue: string;
+  /** 新值 */
+  newValue: string;
+  /** 修改原因 */
+  reason: string;
+}
+
 export default function VoiceEditorPage() {
   const [recordType, setRecordType] = useState<RecordType>('progress');
   const [dictation, setDictation] = useState('');
@@ -57,6 +77,31 @@ export default function VoiceEditorPage() {
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [completing, setCompleting] = useState(false);
   const [editorText, setEditorText] = useState('');
+  // v5.0试点扩展（M190病历版本）：病历历史版本
+  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [versions, setVersions] = useState<NoteVersion[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+
+  /**
+   * v5.0试点扩展（M190病历版本）：拉取病历历史版本。
+   * 调用真实 BFF GET /api/v1/emr/notes/demo-note-001/versions；失败时清空（不再前端 mock）。
+   */
+  const openVersions = async () => {
+    setVersionsOpen(true);
+    setVersionsLoading(true);
+    setVersions([]);
+    try {
+      const resp = await fetch('/api/v1/emr/notes/demo-note-001/versions');
+      const json = await resp.json();
+      const list = (json?.data?.versions ?? []) as NoteVersion[];
+      setVersions(Array.isArray(list) ? list : []);
+    } catch {
+      // 后端不可达：置空由 Timeline 展示空态，不再伪造版本记录
+      setVersions([]);
+    } finally {
+      setVersionsLoading(false);
+    }
+  };
 
   // 浏览器录音（MediaRecorder）；转写文本以本地占位进入 dictation，真实 ASR 由语音中台完成
   const toggleRecord = () => {
@@ -218,7 +263,19 @@ export default function VoiceEditorPage() {
             <Card
               size="small"
               style={{ marginTop: 16 }}
-              title={<Space><FileTextOutlined style={{ color: NAVY }} />病历编辑区（模板自动填充）</Space>}
+              title={
+                <Space>
+                  <FileTextOutlined style={{ color: NAVY }} />病历编辑区（模板自动填充）
+                  {/* v5.0试点扩展（M190三角色工作流）：历史版本入口 */}
+                  <Button
+                    size="small"
+                    icon={<HistoryOutlined />}
+                    onClick={() => void openVersions()}
+                  >
+                    历史版本
+                  </Button>
+                </Space>
+              }
               headStyle={{ background: NAVY_LIGHT, borderBottom: `1px solid ${NAVY_BORDER}` }}
             >
               <TextArea
@@ -234,6 +291,75 @@ export default function VoiceEditorPage() {
           </Col>
         </Row>
       </div>
+
+      {/* v5.0试点扩展（M190病历版本）：病历历史版本弹窗（antd Timeline + diff 颜色标注） */}
+      <Modal
+        open={versionsOpen}
+        title="病历历史版本（修改痕迹）"
+        onCancel={() => setVersionsOpen(false)}
+        onOk={() => setVersionsOpen(false)}
+        okText="关闭"
+        cancelButtonProps={{ style: { display: 'none' } }}
+        width={720}
+      >
+        {versionsLoading ? (
+          <Space style={{ width: '100%', justifyContent: 'center', padding: '24px 0' }}>
+            <LoadingOutlined /> <Text>加载版本历史…</Text>
+          </Space>
+        ) : versions.length === 0 ? (
+          <Paragraph type="secondary" style={{ padding: '12px 0' }}>暂无版本记录或后端不可达。</Paragraph>
+        ) : (
+          <Timeline
+            style={{ marginTop: 8 }}
+            items={[...versions].reverse().map((v) => {
+              const isNew = !v.oldValue;
+              return {
+                color: isNew ? 'green' : 'blue',
+                children: (
+                  <div style={{ marginBottom: 4 }}>
+                    <Space size={8} wrap>
+                      <Tag color="geekblue">v{v.version}</Tag>
+                      <Text strong>{v.field}</Text>
+                      <Text type="secondary">{v.modifiedBy}</Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {new Date(v.modifiedAt).toLocaleString('zh-CN', { hour12: false })}
+                      </Text>
+                    </Space>
+                    <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.7 }}>
+                      {isNew ? (
+                        <div>
+                          <Text type="secondary" style={{ fontSize: 12 }}>新增内容：</Text>
+                          <div style={{ color: '#389e0d', background: '#f6ffed', padding: '4px 8px', borderRadius: 4, border: '1px solid #b7eb8f' }}>
+                            {v.newValue}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <Text type="secondary" style={{ fontSize: 12 }}>旧值：</Text>
+                            <span style={{ color: '#cf1322', background: '#fff1f0', padding: '2px 6px', borderRadius: 4, textDecoration: 'line-through', marginLeft: 4 }}>
+                              {v.oldValue}
+                            </span>
+                          </div>
+                          <div style={{ marginTop: 4 }}>
+                            <Text type="secondary" style={{ fontSize: 12 }}>新值：</Text>
+                            <span style={{ color: '#389e0d', background: '#f6ffed', padding: '2px 6px', borderRadius: 4, marginLeft: 4 }}>
+                              {v.newValue}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      <div style={{ marginTop: 4, fontSize: 12, color: '#666' }}>
+                        修改原因：{v.reason}
+                      </div>
+                    </div>
+                  </div>
+                ),
+              };
+            })}
+          />
+        )}
+      </Modal>
     </div>
   );
 }

@@ -1,0 +1,6 @@
+﻿/api/v1/bi/dashboard=200
+/api/v1/bi/charts=ERR
+/api/v1/bi/reports=ERR
+/api/v1/bi/analysis=ERR
+/api/v1/bi/export=ERR
+/api/v1/bi/scheduled=ERR

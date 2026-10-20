@@ -25,7 +25,7 @@ interface TimelineAggregate {
 
 export default function EmrNlpTimelinePage() {
   const [patientId, setPatientId] = useState("P001");
-  const [events, setEvents] = useState<TimelineEvent[]>([
+  const [events] = useState<TimelineEvent[]>([
     { date: "2026-01-01", event: "入院" },
     { date: "2026-02-15", event: "手术" },
     { date: "2026-03-01", event: "出院" },

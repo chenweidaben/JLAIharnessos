@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { Card, Col, Layout, List, Row, Spin, Statistic, Tag, Typography } from "antd";
 import { get } from "@/services/request";
 
@@ -33,7 +33,7 @@ interface Resp {
   deptTasks: Task[];
 }
 
-function statusTag(status: string): JSX.Element {
+function statusTag(status: string): ReactElement {
   if (status === "overdue") return <Tag color="red">overdue</Tag>;
   if (status === "open") return <Tag color="orange">open</Tag>;
   if (status === "verifying") return <Tag color="blue">verifying</Tag>;

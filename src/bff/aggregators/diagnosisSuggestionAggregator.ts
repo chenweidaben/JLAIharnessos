@@ -32,8 +32,53 @@ function matchDiagnoses(chiefComplaint: string, symptoms: string[]): Array<{diag
   return results.sort((a, b) => b.confidence - a.confidence);
 }
 
+/**
+ * v5.0试点扩展（M189 EMR/AI种子）：DEMO_MODE 鉴别诊断确定性种子。
+ * 固定 3 条鉴别诊断建议（疾病名/相似度置信度%/匹配症状），覆盖胸痛、发热咳嗽、腹痛三类主诉，
+ * 字段与 DiagnosisSuggestion（diagnosisSuggestionRepo.mapRow）一致。
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+function buildDemoDiagnosisList(visitId: string) {
+  const vid = visitId || 'V2026DEMO001';
+  const now = new Date().toISOString();
+  return [
+    {
+      id: 'demo-dx-1', visitId: vid, chiefComplaint: '反复胸痛 2 小时，伴胸闷大汗',
+      symptoms: ['胸痛', '胸闷', '大汗'],
+      suggestions: [
+        { diagnosis: '冠心病 心绞痛', confidence: 0.78, icd10: 'I20.900' },
+        { diagnosis: '急性心肌梗死', confidence: 0.52, icd10: 'I21.900' },
+      ],
+      confidence: 0.78, status: 'pending',
+      selectedDiagnosis: null, reviewedBy: null, reviewedAt: null,
+    },
+    {
+      id: 'demo-dx-2', visitId: vid, chiefComplaint: '发热咳嗽 3 天，咳黄痰',
+      symptoms: ['发热', '咳嗽', '咳痰'],
+      suggestions: [
+        { diagnosis: '社区获得性肺炎', confidence: 0.72, icd10: 'J18.900' },
+        { diagnosis: '上呼吸道感染', confidence: 0.45, icd10: 'J06.900' },
+      ],
+      confidence: 0.72, status: 'pending',
+      selectedDiagnosis: null, reviewedBy: null, reviewedAt: null,
+    },
+    {
+      id: 'demo-dx-3', visitId: vid, chiefComplaint: '转移性右下腹痛 6 小时，伴恶心呕吐',
+      symptoms: ['右下腹痛', '恶心', '呕吐'],
+      suggestions: [
+        { diagnosis: '急性阑尾炎', confidence: 0.80, icd10: 'K35.900' },
+        { diagnosis: '急性胃肠炎', confidence: 0.35, icd10: 'K52.900' },
+      ],
+      confidence: 0.80, status: 'accepted',
+      selectedDiagnosis: '急性阑尾炎', reviewedBy: 'demo-doctor', reviewedAt: now,
+    },
+  ];
+}
+
 export async function listView(view: AuthView, visitId: string) {
   if (!view.permissions.includes('ai_diagnosis:view')) throw new DiagnosisError(403, '无权限');
+  // v5.0试点扩展（M189 EMR/AI种子）：DEMO_MODE 直接返回确定性演示种子（不强制 visitId）
+  if (process.env.DEMO_MODE === '1') return buildDemoDiagnosisList(visitId);
   if (!visitId) throw new DiagnosisError(400, 'visitId 必填');
   return repo.listByVisit(visitId);
 }

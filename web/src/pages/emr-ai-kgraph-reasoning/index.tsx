@@ -117,7 +117,7 @@ export default function EmrAiKGraphReasoningPage() {
               <Statistic title="边数" value={report.edgeCount} />
             </div>
             <div>
-              <Text strong="true">匹配节点：</Text>
+              <Text strong>匹配节点：</Text>
               <div style={{ marginTop: 8 }}>
                 {result.matchedNodes.map((n) => (
                   <Tag key={n} color="green" style={{ marginBottom: 4 }}>{n}</Tag>

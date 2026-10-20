@@ -1,0 +1,1155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>E.5. Release 16</title><link rel="stylesheet" type="text/css" href="stylesheet.css" /><link rev="made" href="pgsql-docs@lists.postgresql.org" /><meta name="generator" content="DocBook XSL Stylesheets Vsnapshot" /><link rel="prev" href="release-16-1.html" title="E.4. Release 16.1" /><link rel="next" href="release-prior.html" title="E.6. Prior Releases" /></head><body id="docContent" class="container-fluid col-10"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="5" align="center">E.5. Release 16</th></tr><tr><td width="10%" align="left"><a accesskey="p" href="release-16-1.html" title="E.4. Release 16.1">Prev</a> </td><td width="10%" align="left"><a accesskey="u" href="release.html" title="Appendix E. Release Notes">Up</a></td><th width="60%" align="center">Appendix E. Release Notes</th><td width="10%" align="right"><a accesskey="h" href="index.html" title="PostgreSQL 16.4 Documentation">Home</a></td><td width="10%" align="right"> <a accesskey="n" href="release-prior.html" title="E.6. Prior Releases">Next</a></td></tr></table><hr /></div><div class="sect1" id="RELEASE-16"><div class="titlepage"><div><div><h2 class="title" style="clear: both">E.5. Release 16 <a href="#RELEASE-16" class="id_link">#</a></h2></div></div></div><div class="toc"><dl class="toc"><dt><span class="sect2"><a href="release-16.html#RELEASE-16-HIGHLIGHTS">E.5.1. Overview</a></span></dt><dt><span class="sect2"><a href="release-16.html#RELEASE-16-MIGRATION">E.5.2. Migration to Version 16</a></span></dt><dt><span class="sect2"><a href="release-16.html#RELEASE-16-CHANGES">E.5.3. Changes</a></span></dt><dt><span class="sect2"><a href="release-16.html#RELEASE-16-ACKNOWLEDGEMENTS">E.5.4. Acknowledgments</a></span></dt></dl></div><p><strong>Release date: </strong>2023-09-14</p><div class="sect2" id="RELEASE-16-HIGHLIGHTS"><div class="titlepage"><div><div><h3 class="title">E.5.1. Overview <a href="#RELEASE-16-HIGHLIGHTS" class="id_link">#</a></h3></div></div></div><p>
+    <span class="productname">PostgreSQL</span> 16 contains many new features
+    and enhancements, including:
+   </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+      Allow parallelization of <code class="literal">FULL</code> and internal right <code class="literal">OUTER</code> hash joins
+     </p></li><li class="listitem"><p>
+      Allow logical replication from standby servers
+     </p></li><li class="listitem"><p>
+      Allow logical replication subscribers to apply large transactions in parallel
+     </p></li><li class="listitem"><p>
+      Allow monitoring of <acronym class="acronym">I/O</acronym> statistics using the new <code class="structname">pg_stat_io</code> view
+     </p></li><li class="listitem"><p>
+      Add <acronym class="acronym">SQL/JSON</acronym> constructors and identity functions
+     </p></li><li class="listitem"><p>
+      Improve performance of vacuum freezing
+     </p></li><li class="listitem"><p>
+      Add support for regular expression matching of user and database names in <code class="filename">pg_hba.conf</code>, and user names in <code class="filename">pg_ident.conf</code>
+     </p></li></ul></div><p>
+    The above items and other new features of
+    <span class="productname">PostgreSQL</span> 16 are explained in more detail
+    in the sections below.
+   </p></div><div class="sect2" id="RELEASE-16-MIGRATION"><div class="titlepage"><div><div><h3 class="title">E.5.2. Migration to Version 16 <a href="#RELEASE-16-MIGRATION" class="id_link">#</a></h3></div></div></div><p>
+    A dump/restore using <a class="xref" href="app-pg-dumpall.html" title="pg_dumpall"><span class="refentrytitle"><span class="application">pg_dumpall</span></span></a> or use of
+    <a class="xref" href="pgupgrade.html" title="pg_upgrade"><span class="refentrytitle"><span class="application">pg_upgrade</span></span></a> or logical replication is required for
+    those wishing to migrate data from any previous release.  See <a class="xref" href="upgrading.html" title="19.6. Upgrading a PostgreSQL Cluster">Section 19.6</a> for general information on migrating to new
+    major releases.
+   </p><p>
+    Version 16 contains a number of changes that may affect compatibility
+    with previous releases.  Observe the following incompatibilities:
+   </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+      Change assignment rules for <a class="link" href="plpgsql-cursors.html#PLPGSQL-OPEN-BOUND-CURSOR" title="43.7.2.3. Opening a Bound Cursor"><span class="application">PL/pgSQL</span></a>
+      bound cursor variables (Tom Lane)
+     </p><p>
+      Previously, the string value of such variables
+      was set to match the variable name during cursor
+      assignment;  now it will be assigned during <a class="link" href="plpgsql-cursors.html#PLPGSQL-CURSOR-OPENING" title="43.7.2. Opening Cursors"><code class="command">OPEN</code></a>,
+      and will not match the variable name.  To restore the previous
+      behavior, assign the desired portal name to the cursor variable
+      before <code class="command">OPEN</code>.
+     </p></li><li class="listitem"><p>
+      Disallow <a class="link" href="sql-createindex.html" title="CREATE INDEX"><code class="literal">NULLS NOT
+      DISTINCT</code></a> indexes for primary keys (Daniel
+      Gustafsson)
+     </p></li><li class="listitem"><p>
+      Change <a class="link" href="sql-reindex.html" title="REINDEX"><code class="command">REINDEX
+      DATABASE</code></a> and <a class="link" href="app-reindexdb.html" title="reindexdb"><span class="application">reindexdb</span></a>
+      to not process indexes on system catalogs (Simon Riggs)
+     </p><p>
+      Processing such indexes is still possible using <code class="command">REINDEX
+      SYSTEM</code> and <a class="link" href="app-reindexdb.html" title="reindexdb"><code class="command">reindexdb
+      --system</code></a>.
+     </p></li><li class="listitem"><p>
+      Tighten <a class="link" href="ddl-generated-columns.html" title="5.3. Generated Columns"><code class="literal">GENERATED</code></a>
+      expression restrictions on inherited and partitioned tables (Amit
+      Langote, Tom Lane)
+     </p><p>
+      Columns of parent/partitioned and child/partition tables must all
+      have the same generation status, though now the actual generation
+      expressions can be different.
+     </p></li><li class="listitem"><p>
+      Remove <a class="link" href="pgwalinspect.html" title="F.37. pg_walinspect — low-level WAL inspection"><span class="application">pg_walinspect</span></a>
+      functions
+      <code class="function">pg_get_wal_records_info_till_end_of_wal()</code>
+      and <code class="function">pg_get_wal_stats_till_end_of_wal()</code>
+      (Bharath Rupireddy)
+     </p></li><li class="listitem"><p>
+      Rename server variable
+      <code class="varname">force_parallel_mode</code> to <a class="link" href="runtime-config-developer.html#GUC-DEBUG-PARALLEL-QUERY"><code class="varname">debug_parallel_query</code></a>
+      (David Rowley)
+     </p></li><li class="listitem"><p>
+      Remove the ability to <a class="link" href="sql-createview.html" title="CREATE VIEW">create
+      views</a> manually with <code class="literal">ON SELECT</code> rules
+      (Tom Lane)
+     </p></li><li class="listitem"><p>
+      Remove the server variable
+      <code class="varname">vacuum_defer_cleanup_age</code> (Andres Freund)
+     </p><p>
+      This has been unnecessary since <a class="link" href="runtime-config-replication.html#GUC-HOT-STANDBY-FEEDBACK"><code class="varname">hot_standby_feedback</code></a>
+      and <a class="link" href="warm-standby.html#STREAMING-REPLICATION-SLOTS" title="27.2.6. Replication Slots">replication
+      slots</a> were added.
+     </p></li><li class="listitem"><p>
+      Remove server variable <code class="varname">promote_trigger_file</code>
+      (Simon Riggs)
+     </p><p>
+      This was used to promote a standby to primary, but is now more easily
+      accomplished with <a class="link" href="app-pg-ctl.html" title="pg_ctl"><code class="literal">pg_ctl
+      promote</code></a> or <a class="link" href="functions-admin.html#FUNCTIONS-RECOVERY-CONTROL-TABLE" title="Table 9.93. Recovery Control Functions"><code class="function">pg_promote()</code></a>.
+     </p></li><li class="listitem"><p>
+      Remove read-only server variables <code class="varname">lc_collate</code>
+      and <code class="varname">lc_ctype</code> (Peter Eisentraut)
+     </p><p>
+      Collations and locales can vary between databases so having them
+      as read-only server variables was unhelpful.
+     </p></li><li class="listitem"><p>
+      Role inheritance now controls the default
+      inheritance status of member roles added during <a class="link" href="sql-grant.html" title="GRANT"><code class="command">GRANT</code></a> (Robert Haas)
+     </p><p>
+      The role's default inheritance behavior can be overridden with the
+      new <code class="command">GRANT ... WITH INHERIT</code> clause.  This allows
+      inheritance of some roles and not others because the members'
+      inheritance status is set at <code class="command">GRANT</code> time.
+      Previously the inheritance status of member roles was controlled
+      only by the role's inheritance status, and changes to a role's
+      inheritance status affected all previous and future member roles.
+     </p></li><li class="listitem"><p>
+      Restrict the privileges of <a class="link" href="sql-createrole.html" title="CREATE ROLE"><code class="literal">CREATEROLE</code></a>
+      and its ability to modify other roles (Robert Haas)
+     </p><p>
+      Previously roles with <code class="literal">CREATEROLE</code> privileges could
+      change many aspects of any non-superuser role.  Such changes,
+      including adding members, now require the role requesting
+      the change to have <code class="literal">ADMIN OPTION</code> permission.
+      For example, they can now change the <code class="literal">CREATEDB</code>,
+      <code class="literal">REPLICATION</code>, and <code class="literal">BYPASSRLS</code>
+      properties only if they also have those permissions.
+     </p></li><li class="listitem"><p>
+      Remove symbolic links for the <span class="application">postmaster</span>
+      binary (Peter Eisentraut)
+     </p></li></ul></div></div><div class="sect2" id="RELEASE-16-CHANGES"><div class="titlepage"><div><div><h3 class="title">E.5.3. Changes <a href="#RELEASE-16-CHANGES" class="id_link">#</a></h3></div></div></div><p>
+     Below you will find a detailed account of the changes between
+    <span class="productname">PostgreSQL</span> 16 and the previous major
+    release.
+    </p><div class="sect3" id="RELEASE-16-SERVER"><div class="titlepage"><div><div><h4 class="title">E.5.3.1. Server <a href="#RELEASE-16-SERVER" class="id_link">#</a></h4></div></div></div><div class="sect4" id="RELEASE-16-OPTIMIZER"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.1. Optimizer <a href="#RELEASE-16-OPTIMIZER" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Allow incremental sorts in more cases, including
+        <code class="literal">DISTINCT</code> (David Rowley)
+       </p></li><li class="listitem"><p>
+        Add the ability for aggregates having <code class="literal">ORDER BY</code>
+        or <code class="literal">DISTINCT</code> to use pre-sorted data (David
+        Rowley)
+       </p><p>
+        The new server variable <a class="link" href="runtime-config-query.html#GUC-ENABLE-PRESORTED-AGGREGATE"><code class="varname">enable_presorted_aggregate</code></a>
+        can be used to disable this.
+       </p></li><li class="listitem"><p>
+        Allow memoize atop a <code class="literal">UNION ALL</code> (Richard Guo)
+       </p></li><li class="listitem"><p>
+        Allow anti-joins to be performed with the non-nullable input as
+        the inner relation (Richard Guo)
+       </p></li><li class="listitem"><p>
+        Allow parallelization of <a class="link" href="queries-table-expressions.html#QUERIES-JOIN" title="7.2.1.1. Joined Tables"><code class="literal">FULL</code></a> and internal
+        right <code class="literal">OUTER</code> hash joins (Melanie Plageman,
+        Thomas Munro)
+       </p></li><li class="listitem"><p>
+        Improve the accuracy of <a class="link" href="gin.html" title="Chapter 70. GIN Indexes"><code class="literal">GIN</code></a> index access optimizer
+        costs (Ronan Dunklau)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-PERFORMANCE"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.2. General Performance <a href="#RELEASE-16-PERFORMANCE" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Allow more efficient addition of heap and index pages (Andres
+        Freund)
+       </p></li><li class="listitem"><p>
+        During non-freeze operations, perform page <a class="link" href="routine-vacuuming.html#VACUUM-FOR-WRAPAROUND" title="25.1.5. Preventing Transaction ID Wraparound Failures">freezing</a> where appropriate
+        (Peter Geoghegan)
+       </p><p>
+        This makes full-table freeze vacuums less necessary.
+       </p></li><li class="listitem"><p>
+        Allow window functions to use the faster <a class="link" href="sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS" title="4.2.8. Window Function Calls"><code class="literal">ROWS</code></a>
+        mode internally when <code class="literal">RANGE</code> mode is active but
+        unnecessary (David Rowley)
+       </p></li><li class="listitem"><p>
+        Allow optimization of always-increasing window functions <a class="link" href="functions-window.html#FUNCTIONS-WINDOW-TABLE" title="Table 9.64. General-Purpose Window Functions"><code class="function">ntile()</code></a>,
+        <code class="function">cume_dist()</code> and
+        <code class="function">percent_rank()</code> (David Rowley)
+       </p></li><li class="listitem"><p>
+        Allow aggregate functions <a class="link" href="functions-aggregate.html#FUNCTIONS-AGGREGATE-TABLE" title="Table 9.59. General-Purpose Aggregate Functions"><code class="function">string_agg()</code></a>
+        and <code class="function">array_agg()</code> to be parallelized (David
+        Rowley)
+       </p></li><li class="listitem"><p>
+        Improve performance by caching <a class="link" href="ddl-partitioning.html#DDL-PARTITIONING-OVERVIEW" title="5.11.1. Overview"><code class="literal">RANGE</code></a>
+        and <code class="literal">LIST</code> partition lookups (Amit Langote,
+        Hou Zhijie, David Rowley)
+       </p></li><li class="listitem"><p>
+        Allow control of the shared buffer usage by vacuum and analyze
+        (Melanie Plageman)
+       </p><p>
+        The <a class="link" href="sql-vacuum.html" title="VACUUM"><code class="command">VACUUM</code></a>/<a class="link" href="sql-analyze.html" title="ANALYZE"><code class="command">ANALYZE</code></a>
+        option is <code class="literal">BUFFER_USAGE_LIMIT</code>, and the <a class="link" href="app-vacuumdb.html" title="vacuumdb"><span class="application">vacuumdb</span></a>
+        option is <code class="option">--buffer-usage-limit</code>.
+        The default value is set by server variable <a class="link" href="runtime-config-resource.html#GUC-VACUUM-BUFFER-USAGE-LIMIT"><code class="varname">vacuum_buffer_usage_limit</code></a>,
+        which also controls autovacuum.
+       </p></li><li class="listitem"><p>
+        Support <a class="link" href="runtime-config-wal.html#GUC-WAL-SYNC-METHOD"><code class="literal">wal_sync_method=fdatasync</code></a>
+        on <span class="systemitem">Windows</span> (Thomas Munro)
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="storage-hot.html" title="73.7. Heap-Only Tuples (HOT)"><acronym class="acronym">HOT</acronym></a>
+        updates if only <code class="literal">BRIN</code>-indexed columns are updated
+        (Matthias van de Meent, Josef Simanek, Tomas Vondra)
+       </p></li><li class="listitem"><p>
+        Improve the speed of updating the <a class="link" href="runtime-config-logging.html#GUC-UPDATE-PROCESS-TITLE">process title</a> (David
+        Rowley)
+       </p></li><li class="listitem"><p>
+        Allow <code class="type">xid</code>/<code class="type">subxid</code> searches and
+        <acronym class="acronym">ASCII</acronym> string detection to use vector operations
+        (Nathan Bossart, John Naylor)
+       </p><p>
+        <acronym class="acronym">ASCII</acronym> detection is particularly useful for
+        <a class="link" href="sql-copy.html" title="COPY"><code class="command">COPY FROM</code></a>.
+        Vector operations are also used for some C array searches.
+       </p></li><li class="listitem"><p>
+        Reduce overhead of memory allocations (Andres Freund, David Rowley)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-MONITORING"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.3. Monitoring <a href="#RELEASE-16-MONITORING" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Add system view <a class="link" href="monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW" title="28.2.13. pg_stat_io"><code class="structname">pg_stat_io</code></a>
+        view to track <acronym class="acronym">I/O</acronym> statistics (Melanie Plageman)
+       </p></li><li class="listitem"><p>
+        Record statistics on the last sequential and index scans on tables
+        (Dave Page)
+       </p><p>
+        This information appears in <a class="link" href="monitoring-stats.html#PG-STAT-ALL-TABLES-VIEW" title="Table 28.28. pg_stat_all_tables View"><code class="structname">pg_stat_*_tables</code></a>
+        and <a class="link" href="monitoring-stats.html#MONITORING-PG-STAT-ALL-INDEXES-VIEW" title="28.2.19. pg_stat_all_indexes"><code class="structname">pg_stat_*_indexes</code></a>.
+       </p></li><li class="listitem"><p>
+        Record statistics on the occurrence of updated rows moving to
+        new pages (Corey Huinker)
+       </p><p>
+        The <code class="literal">pg_stat_*_tables</code> column is <a class="link" href="monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW" title="28.2.18. pg_stat_all_tables"><code class="structfield">n_tup_newpage_upd</code></a>.
+       </p></li><li class="listitem"><p>
+        Add speculative lock information to the <a class="link" href="view-pg-locks.html" title="54.12. pg_locks"><code class="structname">pg_locks</code></a>
+        system view (Masahiko Sawada, Noriyoshi Shinoda)
+       </p><p>
+        The transaction id is displayed in the
+        <code class="structfield">transactionid</code> column and
+        the speculative insertion token is displayed in the
+        <code class="structfield">objid</code> column.
+       </p></li><li class="listitem"><p>
+        Add the display of prepared statement result types to the <a class="link" href="view-pg-prepared-statements.html" title="54.15. pg_prepared_statements"><code class="structname">pg_prepared_statements</code></a>
+        view (Dagfinn Ilmari Mannsåker)
+       </p></li><li class="listitem"><p>
+        Create subscription statistics
+        entries at subscription creation time so <a class="link" href="monitoring-stats.html#PG-STAT-DATABASE-VIEW" title="Table 28.26. pg_stat_database View"><code class="structfield">stats_reset</code></a>
+        is accurate (Andres Freund)
+       </p><p>
+        Previously entries were created only when the first statistics
+        were reported.
+       </p></li><li class="listitem"><p>
+        Correct the <acronym class="acronym">I/O</acronym>
+        accounting for temp relation writes shown in <a class="link" href="monitoring-stats.html#PG-STAT-DATABASE-VIEW" title="Table 28.26. pg_stat_database View"><code class="structname">pg_stat_database</code></a>
+        (Melanie Plageman)
+       </p></li><li class="listitem"><p>
+        Add function <a class="link" href="monitoring-stats.html#MONITORING-STATS-BACKEND-FUNCS-TABLE" title="Table 28.36. Per-Backend Statistics Functions"><code class="function">pg_stat_get_backend_subxact()</code></a>
+        to report on a session's subtransaction cache (Dilip Kumar)
+       </p></li><li class="listitem"><p>
+        Have <a class="link" href="monitoring-stats.html#MONITORING-STATS-BACKEND-FUNCS-TABLE" title="Table 28.36. Per-Backend Statistics Functions"><code class="function">pg_stat_get_backend_idset()</code></a>,
+        <code class="function">pg_stat_get_backend_activity()</code>, and related
+        functions use the unchanging backend id (Nathan Bossart)
+       </p><p>
+        Previously the index values might change during the lifetime of
+        the session.
+       </p></li><li class="listitem"><p>
+        Report stand-alone backends with a special backend type (Melanie
+        Plageman)
+       </p></li><li class="listitem"><p>
+        Add wait event <a class="link" href="monitoring-stats.html#WAIT-EVENT-TIMEOUT-TABLE" title="Table 28.13. Wait Events of Type Timeout"><code class="literal">SpinDelay</code></a>
+        to report spinlock sleep delays (Andres Freund)
+       </p></li><li class="listitem"><p>
+        Create new wait event <a class="link" href="monitoring-stats.html#WAIT-EVENT-IO-TABLE" title="Table 28.9. Wait Events of Type IO"><code class="literal">DSMAllocate</code></a>
+        to indicate waiting for dynamic shared memory allocation (Thomas
+        Munro)
+       </p><p>
+        Previously this type of wait was reported as
+        <code class="literal">DSMFillZeroWrite</code>, which was also used by
+        <code class="function">mmap()</code> allocations.
+       </p></li><li class="listitem"><p>
+        Add the database name to the <a class="link" href="runtime-config-logging.html#GUC-UPDATE-PROCESS-TITLE">process title</a> of logical
+        <acronym class="acronym">WAL</acronym> senders (Tatsuhiro Nakamori)
+       </p><p>
+        Physical <acronym class="acronym">WAL</acronym> senders do not display a database
+        name.
+       </p></li><li class="listitem"><p>
+        Add checkpoint and <code class="literal">REDO LSN</code> information to <a class="link" href="runtime-config-logging.html#GUC-LOG-CHECKPOINTS"><code class="varname">log_checkpoints</code></a>
+        messages (Bharath Rupireddy, Kyotaro Horiguchi)
+       </p></li><li class="listitem"><p>
+        Provide additional details during client certificate failures
+        (Jacob Champion)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-PRIVILEGES"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.4. Privileges <a href="#RELEASE-16-PRIVILEGES" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Add predefined role <a class="link" href="predefined-roles.html" title="22.5. Predefined Roles"><code class="literal">pg_create_subscription</code></a>
+        with permission to create subscriptions (Robert Haas)
+       </p></li><li class="listitem"><p>
+        Allow subscriptions to not require passwords (Robert Haas)
+       </p><p>
+        This is accomplished with the option <a class="link" href="sql-createsubscription.html" title="CREATE SUBSCRIPTION"><code class="literal">password_required=false</code></a>.
+       </p></li><li class="listitem"><p>
+        Simplify permissions for <a class="link" href="sql-lock.html" title="LOCK"><code class="command">LOCK
+        TABLE</code></a> (Jeff Davis)
+       </p><p>
+        Previously a user's ability to perform <code class="command">LOCK
+        TABLE</code> at various lock levels was limited to the
+        lock levels required by the commands they had permission
+        to execute on the table.  For example, someone with <a class="link" href="sql-update.html" title="UPDATE"><code class="command">UPDATE</code></a>
+        permission could perform all lock levels except <code class="literal">ACCESS
+        SHARE</code>, even though it was a lesser lock level.  Now users
+        can issue lesser lock levels if they already have permission for
+        greater lock levels.
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="sql-altergroup.html" title="ALTER GROUP"><code class="literal">ALTER GROUP group_name
+        ADD USER user_name</code></a> to be performed with <code class="literal">ADMIN
+        OPTION</code> (Robert Haas)
+       </p><p>
+        Previously <code class="literal">CREATEROLE</code> permission was required.
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="sql-grant.html" title="GRANT"><code class="command">GRANT</code></a>
+        to use <code class="literal">WITH ADMIN TRUE</code>/<code class="literal">FALSE</code>
+        syntax (Robert Haas)
+       </p><p>
+        Previously only the <code class="literal">WITH ADMIN OPTION</code> syntax
+        was supported.
+       </p></li><li class="listitem"><p>
+        Allow roles that create other roles to automatically
+        inherit the new role's rights or the ability to <a class="link" href="sql-set-role.html" title="SET ROLE"><code class="command">SET ROLE</code></a> to the
+        new role (Robert Haas, Shi Yu)
+       </p><p>
+        This is controlled by server variable <a class="link" href="runtime-config-client.html#GUC-CREATEROLE-SELF-GRANT"><code class="varname">createrole_self_grant</code></a>.
+       </p></li><li class="listitem"><p>
+        Prevent users from changing the default privileges of non-inherited
+        roles (Robert Haas)
+       </p><p>
+        This is now only allowed for inherited roles.
+       </p></li><li class="listitem"><p>
+        When granting role membership, require the granted-by role to be
+        a role that has appropriate permissions (Robert Haas)
+       </p><p>
+        This is a requirement even when a non-bootstrap superuser is
+        granting role membership.
+       </p></li><li class="listitem"><p>
+        Allow non-superusers to grant permissions using a granted-by user
+        that is not the current user (Robert Haas)
+       </p><p>
+        The current user still must have sufficient permissions given by
+        the specified granted-by user.
+       </p></li><li class="listitem"><p>
+        Add <a class="link" href="sql-grant.html" title="GRANT"><code class="command">GRANT</code></a> to
+        control permission to use <a class="link" href="sql-set-role.html" title="SET ROLE"><code class="command">SET
+        ROLE</code></a> (Robert Haas)
+       </p><p>
+        This is controlled by a new <code class="literal">GRANT ... SET</code>
+        option.
+       </p></li><li class="listitem"><p>
+        Add dependency tracking to roles which have granted privileges
+        (Robert Haas)
+       </p><p>
+        For example, removing <code class="literal">ADMIN OPTION</code> will fail if
+        there are privileges using that option;  <code class="literal">CASCADE</code>
+        must be used to revoke dependent permissions.
+       </p></li><li class="listitem"><p>
+        Add dependency tracking of grantors for <a class="link" href="sql-grant.html" title="GRANT"><code class="command">GRANT</code></a> records
+        (Robert Haas)
+       </p><p>
+        This guarantees that <a class="link" href="catalog-pg-auth-members.html" title="53.9. pg_auth_members"><code class="structname">pg_auth_members</code></a>.<code class="structfield">grantor</code>
+        values are always valid.
+       </p></li><li class="listitem"><p>
+        Allow multiple role membership records (Robert Haas)
+       </p><p>
+        Previously a new membership grant would remove a previous matching
+        membership grant, even if other aspects of the grant did not match.
+       </p></li><li class="listitem"><p>
+        Prevent removal of superuser privileges for the bootstrap user
+        (Robert Haas)
+       </p><p>
+        Restoring such users could lead to errors.
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="functions-info.html#FUNCTIONS-ACLITEM-FN-TABLE" title="Table 9.70. aclitem Functions"><code class="function">makeaclitem()</code></a>
+        to accept multiple privilege names (Robins Tharakan)
+       </p><p>
+        Previously only a single privilege name, like <a class="link" href="sql-select.html" title="SELECT"><code class="command">SELECT</code></a>, was
+        accepted.
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-SERVER-CONFIG"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.5. Server Configuration <a href="#RELEASE-16-SERVER-CONFIG" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Add support for <span class="productname">Kerberos</span> credential
+        delegation (Stephen Frost)
+       </p><p>
+        This is enabled with server variable <a class="link" href="runtime-config-connection.html#GUC-GSS-ACCEPT-DELEGATION"><code class="varname">gss_accept_delegation</code></a>
+        and <span class="application">libpq</span> connection parameter <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-GSSDELEGATION"><code class="literal">gssdelegation</code></a>.
+       </p></li><li class="listitem"><p>
+        Allow the <acronym class="acronym">SCRAM</acronym> iteration
+        count to be set with server variable <a class="link" href="runtime-config-connection.html#GUC-SCRAM-ITERATIONS"><code class="varname">scram_iterations</code></a>
+        (Daniel Gustafsson)
+       </p></li><li class="listitem"><p>
+        Improve performance of server variable management (Tom Lane)
+       </p></li><li class="listitem"><p>
+        Tighten restrictions on which server variables can be reset
+        (Masahiko Sawada)
+       </p><p>
+        Previously, while certain variables, like <a class="link" href="runtime-config-client.html#GUC-DEFAULT-TRANSACTION-ISOLATION"><code class="varname">transaction_isolation</code></a>,
+        were not affected by <a class="link" href="sql-reset.html" title="RESET"><code class="command">RESET
+        ALL</code></a>, they could be individually reset in
+        inappropriate situations.
+       </p></li><li class="listitem"><p>
+        Move various <a class="link" href="config-setting.html#CONFIG-SETTING-CONFIGURATION-FILE" title="20.1.2. Parameter Interaction via the Configuration File"><code class="filename">postgresql.conf</code></a>
+        items into new categories (Shinya Kato)
+       </p><p>
+        This also affects the categories displayed in the <a class="link" href="view-pg-settings.html" title="54.24. pg_settings"><code class="structname">pg_settings</code></a>
+        view.
+       </p></li><li class="listitem"><p>
+        Prevent configuration file recursion beyond 10 levels (Julien
+        Rouhaud)
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="routine-vacuuming.html#AUTOVACUUM" title="25.1.6. The Autovacuum Daemon">autovacuum</a> to more
+        frequently honor changes to delay settings (Melanie Plageman)
+       </p><p>
+        Rather than honor changes only at the start of each relation,
+        honor them at the start of each block.
+       </p></li><li class="listitem"><p>
+        Remove restrictions that archive files be durably renamed
+        (Nathan Bossart)
+       </p><p>
+        The <a class="link" href="runtime-config-wal.html#GUC-ARCHIVE-COMMAND"><code class="varname">archive_command</code></a>
+        command is now more likely to be called with already-archived
+        files after a crash.
+       </p></li><li class="listitem"><p>
+        Prevent <a class="link" href="runtime-config-wal.html#GUC-ARCHIVE-LIBRARY"><code class="varname">archive_library</code></a>
+        and <a class="link" href="runtime-config-wal.html#GUC-ARCHIVE-COMMAND"><code class="varname">archive_command</code></a>
+        from being set at the same time (Nathan Bossart)
+       </p><p>
+        Previously <code class="varname">archive_library</code> would override
+        <code class="varname">archive_command</code>.
+       </p></li><li class="listitem"><p>
+        Allow the postmaster to terminate children with an abort signal
+        (Tom Lane)
+       </p><p>
+        This allows collection of a core dump for a
+        stuck child process.  This is controlled by <a class="link" href="runtime-config-developer.html#GUC-SEND-ABORT-FOR-CRASH"><code class="varname">send_abort_for_crash</code></a>
+        and <a class="link" href="runtime-config-developer.html#GUC-SEND-ABORT-FOR-KILL"><code class="varname">send_abort_for_kill</code></a>.
+        The postmaster's <code class="option">-T</code> switch is now the same as
+        setting <code class="varname">send_abort_for_crash</code>.
+       </p></li><li class="listitem"><p>
+        Remove the non-functional postmaster <code class="option">-n</code> option
+        (Tom Lane)
+       </p></li><li class="listitem"><p>
+        Allow the server to reserve backend slots for roles with <a class="link" href="predefined-roles.html" title="22.5. Predefined Roles"><code class="literal">pg_use_reserved_connections</code></a>
+        membership (Nathan Bossart)
+       </p><p>
+        The number of reserved slots is set by server variable <a class="link" href="runtime-config-connection.html#GUC-RESERVED-CONNECTIONS"><code class="varname">reserved_connections</code></a>.
+       </p></li><li class="listitem"><p>
+        Allow <a class="link" href="runtime-config-resource.html#GUC-HUGE-PAGES">huge pages</a> to
+        work on newer versions of <span class="systemitem">Windows
+        10</span> (Thomas Munro)
+       </p><p>
+        This adds the special handling required to enable huge pages
+        on newer versions of <span class="systemitem">Windows
+        10</span>.
+       </p></li><li class="listitem"><p>
+        Add <a class="link" href="runtime-config-developer.html#GUC-DEBUG-IO-DIRECT"><code class="varname">debug_io_direct</code></a>
+        setting for developer usage (Thomas Munro, Andres Freund,
+        Bharath Rupireddy)
+       </p><p>
+        While primarily for developers, <a class="link" href="runtime-config-wal.html#GUC-WAL-SYNC-METHOD"><code class="literal">wal_sync_method=open_sync</code></a>/<code class="literal">open_datasync</code>
+        has been modified to not use direct <acronym class="acronym">I/O</acronym> with
+        <code class="literal">wal_level=minimal</code>;  this is now enabled with
+        <code class="literal">debug_io_direct=wal</code>.
+       </p></li><li class="listitem"><p>
+        Add function <a class="link" href="functions-admin.html#FUNCTIONS-ADMIN-BACKUP-TABLE" title="Table 9.91. Backup Control Functions"><code class="function">pg_split_walfile_name()</code></a>
+        to report the segment and timeline values of <acronym class="acronym">WAL</acronym>
+        file names (Bharath Rupireddy)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-PG-HBA"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.6. <a class="link" href="auth-pg-hba-conf.html" title="21.1. The pg_hba.conf File">pg_hba.conf</a> <a href="#RELEASE-16-PG-HBA" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Add support for regular expression matching on database and role
+        entries in <code class="filename">pg_hba.conf</code> (Bertrand Drouvot)
+       </p><p>
+        Regular expression patterns are prefixed with a slash.  Database
+        and role names that begin with slashes need to be double-quoted
+        if referenced in <code class="filename">pg_hba.conf</code>.
+       </p></li><li class="listitem"><p>
+        Improve user-column handling of <a class="link" href="runtime-config-file-locations.html" title="20.2. File Locations"><code class="filename">pg_ident.conf</code></a>
+        to match <code class="filename">pg_hba.conf</code> (Jelte Fennema)
+       </p><p>
+        Specifically, add support for <code class="literal">all</code>, role
+        membership with <code class="literal">+</code>, and regular expressions
+        with a leading slash.  Any user name that matches these patterns
+        must be double-quoted.
+       </p></li><li class="listitem"><p>
+        Allow include files in <code class="filename">pg_hba.conf</code> and
+        <code class="filename">pg_ident.conf</code> (Julien Rouhaud)
+       </p><p>
+        These are controlled by <code class="literal">include</code>,
+        <code class="literal">include_if_exists</code>, and
+        <code class="literal">include_dir</code>.  System views <a class="link" href="view-pg-hba-file-rules.html" title="54.9. pg_hba_file_rules"><code class="structname">pg_hba_file_rules</code></a>
+        and <a class="link" href="view-pg-ident-file-mappings.html" title="54.10. pg_ident_file_mappings"><code class="structname">pg_ident_file_mappings</code></a>
+        now display the file name.
+       </p></li><li class="listitem"><p>
+        Allow <code class="filename">pg_hba.conf</code> tokens to be of unlimited
+        length (Tom Lane)
+       </p></li><li class="listitem"><p>
+        Add rule and map numbers to the system view <a class="link" href="view-pg-hba-file-rules.html" title="54.9. pg_hba_file_rules"><code class="structname">pg_hba_file_rules</code></a>
+        (Julien Rouhaud)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-LOCALIZATION"><div class="titlepage"><div><div><h5 class="title">E.5.3.1.7. <a class="link" href="charset.html" title="Chapter 24. Localization">Localization</a> <a href="#RELEASE-16-LOCALIZATION" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Determine the default encoding from the locale when using
+        <acronym class="acronym">ICU</acronym> (Jeff Davis)
+       </p><p>
+        Previously the default was always <code class="literal">UTF-8</code>.
+       </p></li><li class="listitem"><p>
+        Have <a class="link" href="sql-createdatabase.html" title="CREATE DATABASE"><code class="command">CREATE
+        DATABASE</code></a> and <a class="link" href="sql-createcollation.html" title="CREATE COLLATION"><code class="command">CREATE
+        COLLATION</code></a>'s <code class="literal">LOCALE</code> options, and
+        <a class="link" href="app-initdb.html" title="initdb"><span class="application">initdb</span></a>
+        and <a class="link" href="app-createdb.html" title="createdb"><span class="application">createdb</span></a>
+        <code class="option">--locale</code> options, control
+        non-<span class="application">libc</span> collation providers (Jeff
+        Davis)
+       </p><p>
+        Previously they only controlled <span class="application">libc</span>
+        providers.
+       </p></li><li class="listitem"><p>
+        Add predefined collations <code class="literal">unicode</code> and
+        <code class="literal">ucs_basic</code> (Peter Eisentraut)
+       </p><p>
+        This only works if <acronym class="acronym">ICU</acronym> support is enabled.
+       </p></li><li class="listitem"><p>
+        Allow custom <acronym class="acronym">ICU</acronym> collation rules to be created
+        (Peter Eisentraut)
+       </p><p>
+        This is done using <a class="link" href="sql-createcollation.html" title="CREATE COLLATION"><code class="command">CREATE
+        COLLATION</code></a>'s new <code class="literal">RULES</code>
+        clause, as well as new options for <a class="link" href="sql-createdatabase.html" title="CREATE DATABASE"><code class="command">CREATE
+        DATABASE</code></a>, <a class="link" href="app-createdb.html" title="createdb"><span class="application">createdb</span></a>,
+        and <a class="link" href="app-initdb.html" title="initdb"><span class="application">initdb</span></a>.
+       </p></li><li class="listitem"><p>
+        Allow <span class="systemitem">Windows</span> to import
+        system locales automatically (Juan José Santamaría Flecha)
+       </p><p>
+        Previously, only <acronym class="acronym">ICU</acronym> locales could be imported
+        on <span class="systemitem">Windows</span>.
+       </p></li></ul></div></div></div><div class="sect3" id="RELEASE-16-LOGICAL"><div class="titlepage"><div><div><h4 class="title">E.5.3.2. <a class="link" href="logical-replication.html" title="Chapter 31. Logical Replication">Logical Replication</a> <a href="#RELEASE-16-LOGICAL" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Allow <a class="link" href="logicaldecoding.html" title="Chapter 49. Logical Decoding">logical decoding</a>
+       on standbys (Bertrand Drouvot, Andres Freund, Amit Khandekar)
+      </p><p>
+       Snapshot <acronym class="acronym">WAL</acronym> records are
+       required for logical slot creation but cannot be
+       created on standbys.  To avoid delays, the new function <a class="link" href="functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION-TABLE" title="Table 9.94. Snapshot Synchronization Functions"><code class="function">pg_log_standby_snapshot()</code></a>
+       allows creation of such records.
+      </p></li><li class="listitem"><p>
+       Add server variable to control how logical decoding publishers
+       transfer changes and how subscribers apply them (Shi Yu)
+      </p><p>
+       The variable is <a class="link" href="runtime-config-developer.html#GUC-DEBUG-LOGICAL-REPLICATION-STREAMING"><code class="varname">debug_logical_replication_streaming</code></a>.
+      </p></li><li class="listitem"><p>
+       Allow logical replication initial table synchronization to copy
+       rows in binary format (Melih Mutlu)
+      </p><p>
+       This is only possible for subscriptions marked as binary.
+      </p></li><li class="listitem"><p>
+       Allow parallel application of logical replication (Hou Zhijie,
+       Wang Wei, Amit Kapila)
+      </p><p>
+       The <a class="link" href="sql-createsubscription.html" title="CREATE SUBSCRIPTION"><code class="command">CREATE
+       SUBSCRIPTION</code></a> <code class="option">STREAMING</code>
+       option now supports <code class="literal">parallel</code> to enable
+       application of large transactions by parallel workers.  The number
+       of parallel workers is controlled by the new server variable <a class="link" href="runtime-config-replication.html#GUC-MAX-PARALLEL-APPLY-WORKERS-PER-SUBSCRIPTION"><code class="varname">max_parallel_apply_workers_per_subscription</code></a>.
+       Wait events <a class="link" href="monitoring-stats.html#WAIT-EVENT-ACTIVITY-TABLE" title="Table 28.5. Wait Events of Type Activity"><code class="literal">LogicalParallelApplyMain</code></a>,
+       <code class="literal">LogicalParallelApplyStateChange</code>, and
+       <code class="literal">LogicalApplySendData</code> were also added.  Column
+       <code class="structfield">leader_pid</code> was added to system view <a class="link" href="monitoring-stats.html#MONITORING-PG-STAT-SUBSCRIPTION" title="28.2.8. pg_stat_subscription"><code class="structname">pg_stat_subscription</code></a>
+       to track parallel activity.
+      </p></li><li class="listitem"><p>
+       Improve performance for <a class="link" href="logical-replication-architecture.html" title="31.7. Architecture">logical replication
+       apply</a> without a primary key (Onder Kalaci, Amit Kapila)
+      </p><p>
+       Specifically, <code class="literal">REPLICA IDENTITY FULL</code> can now
+       use btree indexes rather than sequentially scanning the table to
+       find matches.
+      </p></li><li class="listitem"><p>
+       Allow logical replication subscribers to process only changes that
+       have no origin (Vignesh C, Amit Kapila)
+      </p><p>
+       This can be used to avoid replication loops.  This is controlled
+       by the new <code class="literal">CREATE SUBSCRIPTION ... ORIGIN</code> option.
+      </p></li><li class="listitem"><p>
+       Perform logical replication <a class="link" href="sql-select.html" title="SELECT"><code class="command">SELECT</code></a> and
+       <acronym class="acronym">DML</acronym> actions as the table owner (Robert Haas)
+      </p><p>
+       This improves security and now requires subscription
+       owners to be either superusers or to have <a class="link" href="sql-set-role.html" title="SET ROLE"><code class="command">SET ROLE</code></a>
+       permission on all roles owning tables in the replication set.
+       The previous behavior of performing all operations as the
+       subscription owner can be enabled with the subscription <a class="link" href="sql-createsubscription.html" title="CREATE SUBSCRIPTION"><code class="option">run_as_owner</code></a>
+       option.
+      </p></li><li class="listitem"><p>
+       Have <a class="link" href="runtime-config-replication.html#GUC-WAL-RETRIEVE-RETRY-INTERVAL"><code class="varname">wal_retrieve_retry_interval</code></a>
+       operate on a per-subscription basis (Nathan Bossart)
+      </p><p>
+       Previously the retry time was applied
+       globally.  This also adds wait events <a class="link" href="monitoring-stats.html#WAIT-EVENT-LWLOCK-TABLE" title="Table 28.12. Wait Events of Type LWLock">&gt;<code class="literal">LogicalRepLauncherDSA</code></a>
+       and <code class="literal">LogicalRepLauncherHash</code>.
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-UTILITY"><div class="titlepage"><div><div><h4 class="title">E.5.3.3. Utility Commands <a href="#RELEASE-16-UTILITY" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Add <a class="link" href="sql-explain.html" title="EXPLAIN"><code class="command">EXPLAIN</code></a>
+       option <code class="literal">GENERIC_PLAN</code> to display the generic plan
+       for a parameterized query (Laurenz Albe)
+      </p></li><li class="listitem"><p>
+       Allow a <a class="link" href="sql-copy.html" title="COPY"><code class="command">COPY FROM</code></a>
+       value to map to a column's <code class="literal">DEFAULT</code> (Israel
+       Barth Rubio)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="sql-copy.html" title="COPY"><code class="command">COPY</code></a>
+       into foreign tables to add rows in batches (Andrey Lepikhov,
+       Etsuro Fujita)
+      </p><p>
+       This is controlled by the <a class="link" href="postgres-fdw.html" title="F.38. postgres_fdw — access data stored in external PostgreSQL servers"><span class="application">postgres_fdw</span></a>
+       option <a class="link" href="postgres-fdw.html#POSTGRES-FDW-OPTIONS-COST-ESTIMATION" title="F.38.1.3. Cost Estimation Options"><code class="option">batch_size</code></a>.
+      </p></li><li class="listitem"><p>
+       Allow the <code class="literal">STORAGE</code> type to be specified by <a class="link" href="sql-createtable.html" title="CREATE TABLE"><code class="command">CREATE TABLE</code></a>
+       (Teodor Sigaev, Aleksander Alekseev)
+      </p><p>
+       Previously only <a class="link" href="sql-altertable.html" title="ALTER TABLE"><code class="command">ALTER
+       TABLE</code></a> could control this.
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="sql-createtrigger.html" title="CREATE TRIGGER">truncate triggers</a>
+       on foreign tables (Yugo Nagata)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="sql-vacuum.html" title="VACUUM"><code class="command">VACUUM</code></a> and <a class="link" href="app-vacuumdb.html" title="vacuumdb"><span class="application">vacuumdb</span></a>
+       to only process <a class="link" href="storage-toast.html" title="73.2. TOAST"><code class="literal">TOAST</code></a> tables
+       (Nathan Bossart)
+      </p><p>
+       This is accomplished by having <a class="link" href="sql-vacuum.html" title="VACUUM"><code class="command">VACUUM</code></a>
+       turn off <code class="literal">PROCESS_MAIN</code> or by <a class="link" href="app-vacuumdb.html" title="vacuumdb"><span class="application">vacuumdb</span></a>
+       using the <code class="option">--no-process-main</code> option.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="sql-vacuum.html" title="VACUUM"><code class="command">VACUUM</code></a>
+       options to skip or update all <a class="link" href="routine-vacuuming.html#VACUUM-FOR-WRAPAROUND" title="25.1.5. Preventing Transaction ID Wraparound Failures">frozen</a> statistics (Tom Lane,
+       Nathan Bossart)
+      </p><p>
+       The options are <code class="literal">SKIP_DATABASE_STATS</code> and
+       <code class="literal">ONLY_DATABASE_STATS</code>.
+      </p></li><li class="listitem"><p>
+       Change <a class="link" href="sql-reindex.html" title="REINDEX"><code class="command">REINDEX
+       DATABASE</code></a> and <a class="link" href="sql-reindex.html" title="REINDEX"><code class="command">REINDEX SYSTEM</code></a>
+       to no longer require an argument (Simon Riggs)
+      </p><p>
+       Previously the database name had to be specified.
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="sql-createstatistics.html" title="CREATE STATISTICS"><code class="command">CREATE
+       STATISTICS</code></a> to generate a statistics name if none
+       is specified (Simon Riggs)
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-DATATYPES"><div class="titlepage"><div><div><h4 class="title">E.5.3.4. Data Types <a href="#RELEASE-16-DATATYPES" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Allow non-decimal <a class="link" href="sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS" title="4.1.2.5. Bit-String Constants">integer
+       literals</a> (Peter Eisentraut)
+      </p><p>
+       For example, <code class="literal">0x42F</code>, <code class="literal">0o273</code>,
+       and <code class="literal">0b100101</code>.
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="datatype-numeric.html" title="8.1. Numeric Types"><code class="type">NUMERIC</code></a>
+       to process hexadecimal, octal, and binary integers of any size
+       (Dean Rasheed)
+      </p><p>
+       Previously only unquoted eight-byte integers were supported with
+       these non-decimal bases.
+      </p></li><li class="listitem"><p>
+       Allow underscores in integer and numeric <a class="link" href="sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS" title="4.1.2.5. Bit-String Constants">constants</a> (Peter Eisentraut,
+       Dean Rasheed)
+      </p><p>
+       This can improve readability for long strings of digits.
+      </p></li><li class="listitem"><p>
+       Accept the spelling <code class="literal">+infinity</code> in datetime input
+       (Vik Fearing)
+      </p></li><li class="listitem"><p>
+       Prevent the specification of <code class="literal">epoch</code> and
+       <code class="literal">infinity</code> together with other fields in datetime
+       strings (Joseph Koshakow)
+      </p></li><li class="listitem"><p>
+       Remove undocumented support for date input in the form
+       <code class="literal">Y<em class="replaceable"><code>year</code></em>M<em class="replaceable"><code>month</code></em>D<em class="replaceable"><code>day</code></em></code>
+       (Joseph Koshakow)
+      </p></li><li class="listitem"><p>
+       Add functions <a class="link" href="functions-info.html#FUNCTIONS-INFO-VALIDITY-TABLE" title="Table 9.79. Data Validity Checking Functions"><code class="function">pg_input_is_valid()</code></a>
+       and <code class="function">pg_input_error_info()</code> to check for type
+       conversion errors (Tom Lane)
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-GENERAL"><div class="titlepage"><div><div><h4 class="title">E.5.3.5. General Queries <a href="#RELEASE-16-GENERAL" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Allow subqueries in the <code class="literal">FROM</code> clause to omit
+       aliases (Dean Rasheed)
+      </p></li><li class="listitem"><p>
+       Add support for enhanced numeric literals in
+       <acronym class="acronym">SQL/JSON</acronym> paths (Peter Eisentraut)
+      </p><p>
+       For example, allow hexadecimal, octal, and binary integers and
+       underscores between digits.
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-FUNCTIONS"><div class="titlepage"><div><div><h4 class="title">E.5.3.6. Functions <a href="#RELEASE-16-FUNCTIONS" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Add <acronym class="acronym">SQL/JSON</acronym> constructors (Nikita Glukhov,
+       Teodor Sigaev, Oleg Bartunov, Alexander Korotkov, Amit Langote)
+      </p><p>
+       The new functions <a class="link" href="functions-json.html#FUNCTIONS-JSON-CREATION-TABLE" title="Table 9.47. JSON Creation Functions"><code class="function">JSON_ARRAY()</code></a>,
+       <a class="link" href="functions-aggregate.html#FUNCTIONS-AGGREGATE-TABLE" title="Table 9.59. General-Purpose Aggregate Functions"><code class="function">JSON_ARRAYAGG()</code></a>,
+       <code class="function">JSON_OBJECT()</code>, and
+       <code class="function">JSON_OBJECTAGG()</code> are part of the
+       <acronym class="acronym">SQL</acronym> standard.
+      </p></li><li class="listitem"><p>
+       Add <acronym class="acronym">SQL/JSON</acronym> object checks (Nikita Glukhov,
+       Teodor Sigaev, Oleg Bartunov, Alexander Korotkov, Amit Langote,
+       Andrew Dunstan)
+      </p><p>
+       The <a class="link" href="functions-json.html#FUNCTIONS-SQLJSON-MISC" title="Table 9.48. SQL/JSON Testing Functions"><code class="literal">IS
+       JSON</code></a> checks include checks for values, arrays,
+       objects, scalars, and unique keys.
+      </p></li><li class="listitem"><p>
+       Allow <acronym class="acronym">JSON</acronym> string parsing to use vector
+       operations (John Naylor)
+      </p></li><li class="listitem"><p>
+       Improve the handling of full text highlighting function <a class="link" href="functions-textsearch.html#TEXTSEARCH-FUNCTIONS-TABLE" title="Table 9.43. Text Search Functions"><code class="function">ts_headline()</code></a>
+       for <code class="literal">OR</code> and <code class="literal">NOT</code> expressions
+       (Tom Lane)
+      </p></li><li class="listitem"><p>
+       Add functions to add, subtract, and generate
+       <code class="type">timestamptz</code> values in a specified time zone (Przemyslaw
+       Sztoch, Gurjeet Singh)
+      </p><p>
+       The functions are <a class="link" href="functions-datetime.html#FUNCTIONS-DATETIME-TABLE" title="Table 9.33. Date/Time Functions"><code class="function">date_add()</code></a>,
+       <code class="function">date_subtract()</code>, and <a class="link" href="functions-srf.html#FUNCTIONS-SRF-SERIES" title="Table 9.65. Series Generating Functions"><code class="function">generate_series()</code></a>.
+      </p></li><li class="listitem"><p>
+       Change <a class="link" href="functions-datetime.html#FUNCTIONS-DATETIME-TABLE" title="Table 9.33. Date/Time Functions"><code class="function">date_trunc(unit,
+       timestamptz, time_zone)</code></a> to be an immutable
+       function (Przemyslaw Sztoch)
+      </p><p>
+       This allows the creation of expression indexes using this function.
+      </p></li><li class="listitem"><p>
+       Add server variable <a class="link" href="functions-info.html#FUNCTIONS-INFO-SESSION-TABLE" title="Table 9.67. Session Information Functions"><code class="literal">SYSTEM_USER</code></a>
+       (Bertrand Drouvot)
+      </p><p>
+       This reports the authentication method and its authenticated user.
+      </p></li><li class="listitem"><p>
+       Add functions <a class="link" href="functions-array.html#ARRAY-FUNCTIONS-TABLE" title="Table 9.54. Array Functions"><code class="function">array_sample()</code></a>
+       and <code class="function">array_shuffle()</code> (Martin Kalcher)
+      </p></li><li class="listitem"><p>
+       Add aggregate function <a class="link" href="functions-aggregate.html#FUNCTIONS-AGGREGATE-TABLE" title="Table 9.59. General-Purpose Aggregate Functions"><code class="function">ANY_VALUE()</code></a>
+       which returns any value from a set (Vik Fearing)
+      </p></li><li class="listitem"><p>
+       Add function <a class="link" href="functions-math.html#FUNCTIONS-MATH-RANDOM-TABLE" title="Table 9.6. Random Functions"><code class="function">random_normal()</code></a>
+       to supply normally-distributed random numbers (Paul Ramsey)
+      </p></li><li class="listitem"><p>
+       Add error function <a class="link" href="functions-math.html#FUNCTIONS-MATH-FUNC-TABLE" title="Table 9.5. Mathematical Functions"><code class="function">erf()</code></a>
+       and its complement <code class="function">erfc()</code> (Dean Rasheed)
+      </p></li><li class="listitem"><p>
+       Improve the accuracy of numeric <a class="link" href="functions-math.html#FUNCTIONS-MATH-FUNC-TABLE" title="Table 9.5. Mathematical Functions"><code class="function">power()</code></a>
+       for integer exponents (Dean Rasheed)
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="datatype-xml.html#DATATYPE-XML-CREATING" title="8.13.1. Creating XML Values"><code class="function">XMLSERIALIZE()</code></a>
+       option <code class="literal">INDENT</code> to pretty-print its output
+       (Jim Jones)
+      </p></li><li class="listitem"><p>
+       Change <a class="link" href="functions-admin.html#FUNCTIONS-ADMIN-COLLATION" title="Table 9.98. Collation Management Functions"><code class="function">pg_collation_actual_version()</code></a>
+       to return a reasonable value for the default collation (Jeff Davis)
+      </p><p>
+       Previously it returned <code class="literal">NULL</code>.
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="functions-admin.html#FUNCTIONS-ADMIN-GENFILE-TABLE" title="Table 9.101. Generic File Access Functions"><code class="function">pg_read_file()</code></a>
+       and <code class="function">pg_read_binary_file()</code> to ignore missing
+       files (Kyotaro Horiguchi)
+      </p></li><li class="listitem"><p>
+       Add byte specification (<code class="literal">B</code>) to <a class="link" href="functions-admin.html#FUNCTIONS-ADMIN-DBSIZE" title="Table 9.96. Database Object Size Functions"><code class="function">pg_size_bytes()</code></a>
+       (Peter Eisentraut)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="functions-info.html#FUNCTIONS-INFO-CATALOG-TABLE" title="Table 9.72. System Catalog Information Functions"><code class="function">to_reg</code></a>*
+       functions to accept numeric <acronym class="acronym">OID</acronym>s as input
+       (Tom Lane)
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-PLPGSQL"><div class="titlepage"><div><div><h4 class="title">E.5.3.7. <a class="link" href="plpgsql.html" title="Chapter 43. PL/pgSQL — SQL Procedural Language">PL/pgSQL</a> <a href="#RELEASE-16-PLPGSQL" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Add the ability to get the current function's <acronym class="acronym">OID</acronym>
+       in <span class="application">PL/pgSQL</span> (Pavel Stehule)
+      </p><p>
+       This is accomplished with <a class="link" href="plpgsql-statements.html#PLPGSQL-STATEMENTS-DIAGNOSTICS" title="43.5.5. Obtaining the Result Status"><code class="command">GET DIAGNOSTICS
+       variable = PG_ROUTINE_OID</code></a>.
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-LIBPQ"><div class="titlepage"><div><div><h4 class="title">E.5.3.8. <a class="link" href="libpq.html" title="Chapter 34. libpq — C Library">libpq</a> <a href="#RELEASE-16-LIBPQ" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Add <span class="application">libpq</span> connection option <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-REQUIRE-AUTH"><code class="option">require_auth</code></a>
+       to specify a list of acceptable authentication methods (Jacob
+       Champion)
+      </p><p>
+       This can also be used to disallow certain authentication methods.
+      </p></li><li class="listitem"><p>
+       Allow multiple <span class="application">libpq</span>-specified hosts
+       to be randomly selected (Jelte Fennema)
+      </p><p>
+       This is enabled with <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-LOAD-BALANCE-HOSTS"><code class="literal">load_balance_hosts=random</code></a>
+       and can be used for load balancing.
+      </p></li><li class="listitem"><p>
+       Add <span class="application">libpq</span> option <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-SSLCERTMODE"><code class="option">sslcertmode</code></a>
+       to control transmission of the client certificate (Jacob Champion)
+      </p><p>
+       The option values are <code class="literal">disable</code>,
+       <code class="literal">allow</code>, and <code class="literal">require</code>.
+      </p></li><li class="listitem"><p>
+       Allow <span class="application">libpq</span> to use the system certificate
+       pool for certificate verification (Jacob Champion, Thomas Habets)
+      </p><p>
+       This is enabled with <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-SSLROOTCERT"><code class="literal">sslrootcert=system</code></a>,
+       which also enables <a class="link" href="libpq-connect.html#LIBPQ-CONNECT-SSLMODE"><code class="literal">sslmode=verify-full</code></a>.
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-CLIENT-APPS"><div class="titlepage"><div><div><h4 class="title">E.5.3.9. Client Applications <a href="#RELEASE-16-CLIENT-APPS" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Allow <a class="link" href="ecpg.html" title="Chapter 36. ECPG — Embedded SQL in C"><code class="command">ECPG</code></a>
+       variable declarations to use typedef names that match unreserved
+       <acronym class="acronym">SQL</acronym> keywords (Tom Lane)
+      </p><p>
+       This change does prevent keywords which match C typedef names from
+       being processed as keywords in later <code class="command">EXEC SQL</code>
+       blocks.
+      </p></li></ul></div><div class="sect4" id="RELEASE-16-PSQL"><div class="titlepage"><div><div><h5 class="title">E.5.3.9.1. <a class="xref" href="app-psql.html" title="psql"><span class="refentrytitle"><span class="application">psql</span></span></a> <a href="#RELEASE-16-PSQL" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Allow <span class="application">psql</span> to control the maximum
+        width of header lines in expanded format (Platon Pronko)
+       </p><p>
+        This is controlled by <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-PSET-XHEADER-WIDTH"><code class="option">xheader_width</code></a>.
+       </p></li><li class="listitem"><p>
+        Add <span class="application">psql</span> command <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-DRG"><code class="command">\drg</code></a>
+        to show role membership details (Pavel Luzanov)
+       </p><p>
+        The <code class="literal">Member of</code> output column has been removed
+        from <code class="command">\du</code> and <code class="command">\dg</code> because
+        this new command displays this information in more detail.
+       </p></li><li class="listitem"><p>
+        Allow <span class="application">psql</span>'s access privilege commands
+        to show system objects (Nathan Bossart)
+       </p><p>
+        The options are <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-DP-LC"><code class="command">\dpS</code></a>
+        and <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-Z"><code class="command">\zS</code></a>.
+       </p></li><li class="listitem"><p>
+        Add <code class="literal">FOREIGN</code> designation
+        to <span class="application">psql</span> <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-D"><code class="command">\d+</code></a>
+        for foreign table children and partitions (Ian Lawrence Barwick)
+       </p></li><li class="listitem"><p>
+        Prevent <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-DF-UC"><code class="command">\df+</code></a>
+        from showing function source code (Isaac Morland)
+       </p><p>
+        Function bodies are more easily viewed with <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-SF"><code class="command">\sf</code></a>.
+       </p></li><li class="listitem"><p>
+        Allow <span class="application">psql</span> to submit queries using
+        the extended query protocol (Peter Eisentraut)
+       </p><p>
+        Passing arguments to such queries is done
+        using the new <span class="application">psql</span> <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-BIND"><code class="command">\bind</code></a>
+        command.
+       </p></li><li class="listitem"><p>
+        Allow <span class="application">psql</span> <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-WATCH"><code class="command">\watch</code></a>
+        to limit the number of executions (Andrey Borodin)
+       </p><p>
+        The <code class="command">\watch</code> options can now be named when
+        specified.
+       </p></li><li class="listitem"><p>
+        Detect invalid values for <span class="application">psql</span> <a class="link" href="app-psql.html#APP-PSQL-META-COMMAND-WATCH"><code class="command">\watch</code></a>,
+        and allow zero to specify no delay (Andrey Borodin)
+       </p></li><li class="listitem"><p>
+        Allow <span class="application">psql</span> scripts to obtain the exit
+        status of shell commands and queries
+       (Corey Huinker, Tom Lane)
+       </p><p>
+        The new <span class="application">psql</span> control variables are <a class="link" href="app-psql.html#APP-PSQL-VARIABLES-SHELL-ERROR"><code class="literal">SHELL_ERROR</code></a>
+        and <a class="link" href="app-psql.html#APP-PSQL-VARIABLES-SHELL-EXIT-CODE"><code class="literal">SHELL_EXIT_CODE</code></a>.
+       </p></li><li class="listitem"><p>
+        Various <span class="application">psql</span> tab completion improvements
+        (Vignesh C, Aleksander Alekseev, Dagfinn Ilmari Mannsåker,
+        Shi Yu, Michael Paquier, Ken Kato, Peter Smith)
+       </p></li></ul></div></div><div class="sect4" id="RELEASE-16-PGDUMP"><div class="titlepage"><div><div><h5 class="title">E.5.3.9.2. <a class="link" href="app-pgdump.html" title="pg_dump"><span class="application">pg_dump</span></a> <a href="#RELEASE-16-PGDUMP" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Add <span class="application">pg_dump</span> control of dumping child
+        tables and partitions (Gilles Darold)
+       </p><p>
+        The new options are <code class="option">--table-and-children</code>,
+        <code class="option">--exclude-table-and-children</code>, and
+        <code class="option">--exclude-table-data-and-children</code>.
+       </p></li><li class="listitem"><p>
+        Add <span class="application">LZ4</span> and
+        <span class="application">Zstandard</span> compression to
+        <span class="application">pg_dump</span> (Georgios Kokolatos, Justin
+        Pryzby)
+       </p></li><li class="listitem"><p>
+        Allow <span class="application">pg_dump</span> and <a class="link" href="app-pgbasebackup.html" title="pg_basebackup"><span class="application">pg_basebackup</span></a>
+        to use <code class="literal">long</code> mode for compression (Justin Pryzby)
+       </p></li><li class="listitem"><p>
+        Improve <span class="application">pg_dump</span> to accept a more
+        consistent compression syntax (Georgios Kokolatos)
+       </p><p>
+        Options like <code class="option">--compress=gzip:5</code>.
+       </p></li></ul></div></div></div><div class="sect3" id="RELEASE-16-SERVER-APPS"><div class="titlepage"><div><div><h4 class="title">E.5.3.10. Server Applications <a href="#RELEASE-16-SERVER-APPS" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Add <a class="link" href="app-initdb.html" title="initdb"><span class="application">initdb</span></a>
+       option to set server variables for the duration of
+       <span class="application">initdb</span> and all future server starts
+       (Tom Lane)
+      </p><p>
+       The option is <code class="option">-c name=value</code>.
+      </p></li><li class="listitem"><p>
+       Add options to <a class="link" href="app-createuser.html" title="createuser"><span class="application">createuser</span></a>
+       to control more user options (Shinya Kato)
+      </p><p>
+       Specifically, the new options control the valid-until date,
+       bypassing of row-level security, and role membership.
+      </p></li><li class="listitem"><p>
+       Deprecate <a class="link" href="app-createuser.html" title="createuser"><span class="application">createuser</span></a>
+       option <code class="option">--role</code> (Nathan Bossart)
+      </p><p>
+       This option could be easily confused with new
+       <span class="application">createuser</span> role membership options,
+       so option <code class="option">--member-of</code> has been added with the
+       same functionality.  The <code class="option">--role</code> option can still
+       be used.
+      </p></li><li class="listitem"><p>
+       Allow control of <a class="link" href="app-vacuumdb.html" title="vacuumdb"><span class="application">vacuumdb</span></a>
+       schema processing (Gilles Darold)
+      </p><p>
+       These are controlled by options <code class="option">--schema</code> and
+       <code class="option">--exclude-schema</code>.
+      </p></li><li class="listitem"><p>
+       Use new <a class="link" href="sql-vacuum.html" title="VACUUM"><code class="command">VACUUM</code></a>
+       options to improve the performance of <a class="link" href="app-vacuumdb.html" title="vacuumdb"><span class="application">vacuumdb</span></a>
+       (Tom Lane, Nathan Bossart)
+      </p></li><li class="listitem"><p>
+       Have <a class="link" href="pgupgrade.html" title="pg_upgrade"><span class="application">pg_upgrade</span></a>
+       set the new cluster's locale and encoding (Jeff Davis)
+      </p><p>
+       This removes the requirement that the new cluster be created with
+       the same locale and encoding settings.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pgupgrade.html" title="pg_upgrade"><span class="application">pg_upgrade</span></a>
+       option to specify the default transfer mode (Peter Eisentraut)
+      </p><p>
+       The option is <code class="option">--copy</code>.
+      </p></li><li class="listitem"><p>
+       Improve <a class="link" href="app-pgbasebackup.html" title="pg_basebackup"><span class="application">pg_basebackup</span></a>
+       to accept numeric compression options (Georgios Kokolatos,
+       Michael Paquier)
+      </p><p>
+       Options like <code class="option">--compress=server-5</code> are now supported.
+      </p></li><li class="listitem"><p>
+       Fix <a class="link" href="app-pgbasebackup.html" title="pg_basebackup"><span class="application">pg_basebackup</span></a>
+       to handle tablespaces stored in the <code class="envar">PGDATA</code> directory
+       (Robert Haas)
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pgwaldump.html" title="pg_waldump"><span class="application">pg_waldump</span></a>
+       option <code class="option">--save-fullpage</code> to dump full page images
+       (David Christensen)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="pgwaldump.html" title="pg_waldump"><span class="application">pg_waldump</span></a>
+       options <code class="option">-t</code>/<code class="option">--timeline</code> to accept
+       hexadecimal values (Peter Eisentraut)
+      </p></li><li class="listitem"><p>
+       Add support for progress reporting to <a class="link" href="app-pgverifybackup.html" title="pg_verifybackup"><span class="application">pg_verifybackup</span></a>
+       (Masahiko Sawada)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="app-pgrewind.html" title="pg_rewind"><span class="application">pg_rewind</span></a>
+       to properly track timeline changes (Heikki Linnakangas)
+      </p><p>
+       Previously if <span class="application">pg_rewind</span> was run after
+       a timeline switch but before a checkpoint was issued, it might
+       incorrectly determine that a rewind was unnecessary.
+      </p></li><li class="listitem"><p>
+       Have <a class="link" href="app-pgreceivewal.html" title="pg_receivewal"><span class="application">pg_receivewal</span></a>
+       and <a class="link" href="app-pgrecvlogical.html" title="pg_recvlogical"><span class="application">pg_recvlogical</span></a>
+       cleanly exit on <code class="literal">SIGTERM</code> (Christoph Berg)
+      </p><p>
+       This signal is often used by <span class="application">systemd</span>.
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-SOURCE-CODE"><div class="titlepage"><div><div><h4 class="title">E.5.3.11. Source Code <a href="#RELEASE-16-SOURCE-CODE" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Build <acronym class="acronym">ICU</acronym> support by default (Jeff Davis)
+      </p><p>
+       This removes <a class="link" href="installation.html" title="Chapter 17. Installation from Source Code">build
+       flag</a> <code class="option">--with-icu</code> and adds flag
+       <code class="option">--without-icu</code>.
+      </p></li><li class="listitem"><p>
+       Add support for SSE2 (Streaming <acronym class="acronym">SIMD</acronym> Extensions
+       2) vector operations on x86-64 architectures (John Naylor)
+      </p></li><li class="listitem"><p>
+       Add support for Advanced <acronym class="acronym">SIMD</acronym> (Single
+       Instruction Multiple Data) (<acronym class="acronym">NEON</acronym>) instructions
+       on <acronym class="acronym">ARM</acronym> architectures (Nathan Bossart)
+      </p></li><li class="listitem"><p>
+       Have <span class="systemitem">Windows</span>
+       binaries built with <span class="productname">MSVC</span> use
+       <code class="literal">RandomizedBaseAddress</code> (<acronym class="acronym">ASLR</acronym>)
+       (Michael Paquier)
+      </p><p>
+       This was already enabled on <span class="productname">MinGW</span> builds.
+      </p></li><li class="listitem"><p>
+       Prevent extension libraries from exporting their symbols by default
+       (Andres Freund, Tom Lane)
+      </p><p>
+       Functions that need to be called from the core backend
+       or other extensions must now be explicitly marked
+       <code class="literal">PGDLLEXPORT</code>.
+      </p></li><li class="listitem"><p>
+       Require <span class="systemitem">Windows 10</span> or
+       newer versions (Michael Paquier, Juan José Santamaría Flecha)
+      </p><p>
+       Previously <span class="systemitem">Windows Vista</span> and
+       <span class="systemitem">Windows XP</span> were supported.
+      </p></li><li class="listitem"><p>
+       Require <span class="productname">Perl</span> version 5.14 or later
+       (John Naylor)
+      </p></li><li class="listitem"><p>
+       Require <span class="productname">Bison</span> version 2.3 or later
+       (John Naylor)
+      </p></li><li class="listitem"><p>
+       Require <span class="productname">Flex</span> version 2.5.35 or later
+       (John Naylor)
+      </p></li><li class="listitem"><p>
+       Require <acronym class="acronym">MIT</acronym> Kerberos for
+       <acronym class="acronym">GSSAPI</acronym> support (Stephen Frost)
+      </p></li><li class="listitem"><p>
+       Remove support for <span class="productname">Visual Studio 2013</span>
+       (Michael Paquier)
+      </p></li><li class="listitem"><p>
+       Remove support for <span class="systemitem">HP-UX</span>
+       (Thomas Munro)
+      </p></li><li class="listitem"><p>
+       Remove support for <span class="productname">HP/Intel Itanium</span>
+       (Thomas Munro)
+      </p></li><li class="listitem"><p>
+       Remove support for <span class="productname">M68K</span>,
+       <span class="productname">M88K</span>, <span class="productname">M32R</span>,
+       and <span class="productname">SuperH</span> <acronym class="acronym">CPU</acronym>
+       architectures (Thomas Munro)
+      </p></li><li class="listitem"><p>
+       Remove <a class="link" href="libpq.html" title="Chapter 34. libpq — C Library"><span class="application">libpq</span></a>
+       support for <acronym class="acronym">SCM</acronym> credential authentication
+       (Michael Paquier)
+      </p><p>
+       Backend support for this authentication method was removed in
+       <span class="productname">PostgresSQL</span> 9.1.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="install-meson.html" title="17.4. Building and Installation with Meson"><span class="application">meson</span></a>
+       build system (Andres Freund, Nazir Bilal Yavuz, Peter Eisentraut)
+      </p><p>
+       This eventually will replace the <span class="productname">Autoconf</span>
+       and <span class="systemitem">Windows</span>-based
+       <span class="productname">MSVC</span> build systems.
+      </p></li><li class="listitem"><p>
+       Allow control of the location of the
+       <span class="application">openssl</span> binary used by the build system
+       (Peter Eisentraut)
+      </p><p>
+       Make finding <span class="application">openssl</span>
+       program a <span class="application">configure</span> or
+       <span class="application">meson</span> option
+      </p></li><li class="listitem"><p>
+       Add build option to allow testing of small table segment sizes
+       (Andres Freund)
+      </p><p>
+       The build options are <a class="link" href="install-make.html#CONFIGURE-OPTION-WITH-SEGSIZE"><code class="option">--with-segsize-blocks</code></a>
+       and <code class="option">-Dsegsize_blocks</code>.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="source.html" title="Chapter 56. PostgreSQL Coding Conventions"><span class="application">pgindent</span></a> options
+       (Andrew Dunstan)
+      </p><p>
+       The new options are <code class="option">--show-diff</code>,
+       <code class="option">--silent-diff</code>, <code class="option">--commit</code>,
+       and <code class="option">--help</code>, and allow multiple
+       <code class="option">--exclude</code> options.  Also require the typedef file
+       to be explicitly specified.  Options <code class="option">--code-base</code>
+       and <code class="option">--build</code> were also removed.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="source.html" title="Chapter 56. PostgreSQL Coding Conventions"><span class="application">pg_bsd_indent</span></a>
+       source code to the main tree (Tom Lane)
+      </p></li><li class="listitem"><p>
+       Improve <span class="application">make_ctags</span> and
+       <span class="application">make_etags</span> (Yugo Nagata)
+      </p></li><li class="listitem"><p>
+       Adjust <a class="link" href="catalog-pg-attribute.html" title="53.7. pg_attribute"><code class="structname">pg_attribute</code></a>
+       columns for efficiency (Peter Eisentraut)
+      </p></li></ul></div></div><div class="sect3" id="RELEASE-16-MODULES"><div class="titlepage"><div><div><h4 class="title">E.5.3.12. Additional Modules <a href="#RELEASE-16-MODULES" class="id_link">#</a></h4></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+       Improve use of extension-based indexes on boolean columns (Zongliang
+       Quan, Tom Lane)
+      </p></li><li class="listitem"><p>
+       Add support for Daitch-Mokotoff Soundex to <a class="link" href="fuzzystrmatch.html" title="F.17. fuzzystrmatch — determine string similarities and distance"><span class="application">fuzzystrmatch</span></a>
+       (Dag Lem)
+      </p></li><li class="listitem"><p>
+       Allow <a class="link" href="auto-explain.html" title="F.4. auto_explain — log execution plans of slow queries"><span class="application">auto_explain</span></a>
+       to log values passed to parameterized statements (Dagfinn Ilmari
+       Mannsåker)
+      </p><p>
+       This affects queries using server-side <a class="link" href="sql-prepare.html" title="PREPARE"><code class="command">PREPARE</code></a>/<a class="link" href="sql-execute.html" title="EXECUTE"><code class="command">EXECUTE</code></a>
+       and client-side parse/bind.  Logging is controlled by <a class="link" href="auto-explain.html#AUTO-EXPLAIN-CONFIGURATION-PARAMETERS-LOG-PARAMETER-MAX-LENGTH"><code class="literal">auto_explain.log_parameter_max_length</code></a>;
+       by default query parameters will be logged with no length
+       restriction.
+      </p></li><li class="listitem"><p>
+       Have <a class="link" href="auto-explain.html" title="F.4. auto_explain — log execution plans of slow queries"><span class="application">auto_explain</span></a>'s
+       <code class="option">log_verbose</code> mode honor the value of <a class="link" href="runtime-config-statistics.html#GUC-COMPUTE-QUERY-ID"><code class="varname">compute_query_id</code></a>
+       (Atsushi Torikoshi)
+      </p><p>
+       Previously even if
+       <code class="varname">compute_query_id</code> was enabled, <a class="link" href="auto-explain.html#AUTO-EXPLAIN-CONFIGURATION-PARAMETERS-LOG-VERBOSE"><code class="option">log_verbose</code></a>
+       was not showing the query identifier.
+      </p></li><li class="listitem"><p>
+       Change the maximum length of <a class="link" href="ltree.html" title="F.23. ltree — hierarchical tree-like data type"><span class="application">ltree</span></a> labels
+       from 256 to 1000 and allow hyphens (Garen Torikian)
+      </p></li><li class="listitem"><p>
+       Have <a class="link" href="pgstatstatements.html" title="F.32. pg_stat_statements — track statistics of SQL planning and execution"><code class="structname">pg_stat_statements</code></a>
+       normalize constants used in utility commands (Michael Paquier)
+      </p><p>
+       Previously constants appeared instead of placeholders, e.g.,
+       <code class="literal">$1</code>.
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pgwalinspect.html" title="F.37. pg_walinspect — low-level WAL inspection"><span class="application">pg_walinspect</span></a>
+       function <a class="link" href="pgwalinspect.html#PGWALINSPECT-FUNCS-PG-GET-WAL-BLOCK-INFO"><code class="function">pg_get_wal_block_info()</code></a>
+       to report <acronym class="acronym">WAL</acronym> block information (Michael Paquier,
+       Melanie Plageman, Bharath Rupireddy)
+      </p></li><li class="listitem"><p>
+       Change how <a class="link" href="pgwalinspect.html" title="F.37. pg_walinspect — low-level WAL inspection"><span class="application">pg_walinspect</span></a>
+       functions <a class="link" href="pgwalinspect.html#PGWALINSPECT-FUNCS-PG-GET-WAL-RECORDS-INFO"><code class="function">pg_get_wal_records_info()</code></a>
+       and <a class="link" href="pgwalinspect.html#PGWALINSPECT-FUNCS-PG-GET-WAL-STATS"><code class="function">pg_get_wal_stats()</code></a>
+       interpret ending <acronym class="acronym">LSN</acronym>s (Bharath Rupireddy)
+      </p><p>
+       Previously ending <acronym class="acronym">LSN</acronym>s which represent
+       nonexistent <acronym class="acronym">WAL</acronym> locations would generate
+       an error, while they will now be interpreted as the end of the
+       <acronym class="acronym">WAL</acronym>.
+      </p></li><li class="listitem"><p>
+       Add detailed descriptions of <acronym class="acronym">WAL</acronym> records in <a class="link" href="pgwalinspect.html" title="F.37. pg_walinspect — low-level WAL inspection"><span class="application">pg_walinspect</span></a>
+       and <a class="link" href="pgwaldump.html" title="pg_waldump"><span class="application">pg_waldump</span></a>
+       (Melanie Plageman, Peter Geoghegan)
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pageinspect.html" title="F.25. pageinspect — low-level inspection of database pages"><span class="application">pageinspect</span></a>
+       function <a class="link" href="pageinspect.html#PAGEINSPECT-B-TREE-FUNCS" title="F.25.3. B-Tree Functions"><code class="function">bt_multi_page_stats()</code></a>
+       to report statistics on multiple pages (Hamid Akhtar)
+      </p><p>
+       This is similar to <code class="function">bt_page_stats()</code> except it
+       can report on a range of pages.
+      </p></li><li class="listitem"><p>
+       Add empty range output column to <a class="link" href="pageinspect.html" title="F.25. pageinspect — low-level inspection of database pages"><span class="application">pageinspect</span></a>
+       function <a class="link" href="pageinspect.html#PAGEINSPECT-BRIN-FUNCS" title="F.25.4. BRIN Functions"><code class="function">brin_page_items()</code></a>
+       (Tomas Vondra)
+      </p></li><li class="listitem"><p>
+       Redesign archive modules to be more flexible (Nathan Bossart)
+      </p><p>
+       Initialization changes will require modules written for older
+       versions of Postgres to be updated.
+      </p></li><li class="listitem"><p>
+       Correct inaccurate <a class="link" href="pgstatstatements.html" title="F.32. pg_stat_statements — track statistics of SQL planning and execution"><span class="application">pg_stat_statements</span></a>
+       row tracking extended query protocol statements (Sami Imseih)
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pgbuffercache.html" title="F.27. pg_buffercache — inspect PostgreSQL buffer cache state"><span class="application">pg_buffercache</span></a>
+       function <code class="function">pg_buffercache_usage_counts()</code> to
+       report usage totals (Nathan Bossart)
+      </p></li><li class="listitem"><p>
+       Add <a class="link" href="pgbuffercache.html" title="F.27. pg_buffercache — inspect PostgreSQL buffer cache state"><span class="application">pg_buffercache</span></a>
+       function <code class="function">pg_buffercache_summary()</code> to report
+       summarized buffer statistics (Melih Mutlu)
+      </p></li><li class="listitem"><p>
+       Allow the schemas of required extensions to be
+       referenced in extension scripts using the new syntax
+       <code class="literal">@extschema:referenced_extension_name@</code>
+       (Regina Obe)
+      </p></li><li class="listitem"><p>
+       Allow required extensions to
+       be marked as non-relocatable using <a class="link" href="extend-extensions.html#EXTEND-EXTENSIONS-FILES-NO-RELOCATE"><code class="literal">no_relocate</code></a>
+       (Regina Obe)
+      </p><p>
+       This allows <code class="literal">@extschema:referenced_extension_name@</code>
+       to be treated as a constant for the lifetime of the extension.
+      </p></li></ul></div><div class="sect4" id="RELEASE-16-PGFDW"><div class="titlepage"><div><div><h5 class="title">E.5.3.12.1. <a class="link" href="postgres-fdw.html" title="F.38. postgres_fdw — access data stored in external PostgreSQL servers"><span class="application">postgres_fdw</span></a> <a href="#RELEASE-16-PGFDW" class="id_link">#</a></h5></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Allow <span class="application">postgres_fdw</span> to do aborts in
+        parallel (Etsuro Fujita)
+       </p><p>
+        This is enabled with
+        <span class="application">postgres_fdw</span> option <a class="link" href="postgres-fdw.html#POSTGRES-FDW-OPTIONS-TRANSACTION-MANAGEMENT" title="F.38.1.6. Transaction Management Options"><code class="option">parallel_abort</code></a>.
+       </p></li><li class="listitem"><p>
+        Make <a class="link" href="sql-analyze.html" title="ANALYZE"><code class="command">ANALYZE</code></a>
+        on foreign <span class="application">postgres_fdw</span> tables more
+        efficient (Tomas Vondra)
+       </p><p>
+        The <span class="application">postgres_fdw</span> option <a class="link" href="postgres-fdw.html#POSTGRES-FDW-OPTIONS-COST-ESTIMATION" title="F.38.1.3. Cost Estimation Options"><code class="option">analyze_sampling</code></a>
+        controls the sampling method.
+       </p></li><li class="listitem"><p>
+        Restrict shipment of <a class="link" href="datatype-oid.html" title="8.19. Object Identifier Types"><code class="type">reg</code></a>* type constants
+        in <span class="application">postgres_fdw</span> to those referencing
+        built-in objects or extensions marked as shippable (Tom Lane)
+       </p></li><li class="listitem"><p>
+        Have <span class="application">postgres_fdw</span> and <a class="link" href="dblink.html" title="F.12. dblink — connect to other PostgreSQL databases"><span class="application">dblink</span></a> handle
+        interrupts during connection establishment (Andres Freund)
+       </p></li></ul></div></div></div></div><div class="sect2" id="RELEASE-16-ACKNOWLEDGEMENTS"><div class="titlepage"><div><div><h3 class="title">E.5.4. Acknowledgments <a href="#RELEASE-16-ACKNOWLEDGEMENTS" class="id_link">#</a></h3></div></div></div><p>
+    The following individuals (in alphabetical order) have contributed
+    to this release as patch authors, committers, reviewers, testers,
+    or reporters of issues.
+   </p><table border="0" summary="Simple list" class="simplelist"><tr><td>Abhijit Menon-Sen</td></tr><tr><td>Adam Mackler</td></tr><tr><td>Adrian Klaver</td></tr><tr><td>Ahsan Hadi</td></tr><tr><td>Ajin Cherian</td></tr><tr><td>Ajit Awekar</td></tr><tr><td>Alan Hodgson</td></tr><tr><td>Aleksander Alekseev</td></tr><tr><td>Alex Denman</td></tr><tr><td>Alex Kozhemyakin</td></tr><tr><td>Alexander Korolev</td></tr><tr><td>Alexander Korotkov</td></tr><tr><td>Alexander Lakhin</td></tr><tr><td>Alexander Pyhalov</td></tr><tr><td>Alexey Borzov</td></tr><tr><td>Alexey Ermakov</td></tr><tr><td>Alexey Makhmutov</td></tr><tr><td>Álvaro Herrera</td></tr><tr><td>Amit Kapila</td></tr><tr><td>Amit Khandekar</td></tr><tr><td>Amit Langote</td></tr><tr><td>Amul Sul</td></tr><tr><td>Anastasia Lubennikova</td></tr><tr><td>Anban Company</td></tr><tr><td>Andreas Dijkman</td></tr><tr><td>Andreas Karlsson</td></tr><tr><td>Andreas Scherbaum</td></tr><tr><td>Andrei Zubkov</td></tr><tr><td>Andres Freund</td></tr><tr><td>Andrew Alsup</td></tr><tr><td>Andrew Bille</td></tr><tr><td>Andrew Dunstan</td></tr><tr><td>Andrew Gierth</td></tr><tr><td>Andrew Kesper</td></tr><tr><td>Andrey Borodin</td></tr><tr><td>Andrey Lepikhov</td></tr><tr><td>Andrey Sokolov</td></tr><tr><td>Ankit Kumar Pandey</td></tr><tr><td>Ante Kresic</td></tr><tr><td>Anton Melnikov</td></tr><tr><td>Anton Sidyakin</td></tr><tr><td>Anton Voloshin</td></tr><tr><td>Antonin Houska</td></tr><tr><td>Arne Roland</td></tr><tr><td>Artem Anisimov</td></tr><tr><td>Arthur Zakirov</td></tr><tr><td>Ashutosh Bapat</td></tr><tr><td>Ashutosh Sharma</td></tr><tr><td>Asim Praveen</td></tr><tr><td>Atsushi Torikoshi</td></tr><tr><td>Ayaki Tachikake</td></tr><tr><td>Balazs Szilfai</td></tr><tr><td>Benoit Lobréau</td></tr><tr><td>Bernd Helmle</td></tr><tr><td>Bertrand Drouvot</td></tr><tr><td>Bharath Rupireddy</td></tr><tr><td>Bilva Sanaba</td></tr><tr><td>Bob Krier</td></tr><tr><td>Boris Zentner</td></tr><tr><td>Brad Nicholson</td></tr><tr><td>Brar Piening</td></tr><tr><td>Bruce Momjian</td></tr><tr><td>Bruno da Silva</td></tr><tr><td>Carl Sopchak</td></tr><tr><td>Cary Huang</td></tr><tr><td>Changhong Fei</td></tr><tr><td>Chris Travers</td></tr><tr><td>Christoph Berg</td></tr><tr><td>Christophe Pettus</td></tr><tr><td>Corey Huinker</td></tr><tr><td>Craig Ringer</td></tr><tr><td>Curt Kolovson</td></tr><tr><td>Dag Lem</td></tr><tr><td>Dagfinn Ilmari Mannsåker</td></tr><tr><td>Daniel Gustafsson</td></tr><tr><td>Daniel Vérité</td></tr><tr><td>Daniel Watzinger</td></tr><tr><td>Daniel Westermann</td></tr><tr><td>Daniele Varrazzo</td></tr><tr><td>Daniil Anisimov</td></tr><tr><td>Danny Shemesh</td></tr><tr><td>Dave Page</td></tr><tr><td>David Christensen</td></tr><tr><td>David G. Johnston</td></tr><tr><td>David Geier</td></tr><tr><td>David Gilman</td></tr><tr><td>David Kimura</td></tr><tr><td>David Rowley</td></tr><tr><td>David Steele</td></tr><tr><td>David Turon</td></tr><tr><td>David Zhang</td></tr><tr><td>Davinder Singh</td></tr><tr><td>Dean Rasheed</td></tr><tr><td>Denis Laxalde</td></tr><tr><td>Dilip Kumar</td></tr><tr><td>Dimos Stamatakis</td></tr><tr><td>Dmitriy Kuzmin</td></tr><tr><td>Dmitry Astapov</td></tr><tr><td>Dmitry Dolgov</td></tr><tr><td>Dmitry Koval</td></tr><tr><td>Dong Wook Lee</td></tr><tr><td>Dongming Liu</td></tr><tr><td>Drew DeVault</td></tr><tr><td>Duncan Sands</td></tr><tr><td>Ed Maste</td></tr><tr><td>Egor Chindyaskin</td></tr><tr><td>Ekaterina Kiryanova</td></tr><tr><td>Elena Indrupskaya</td></tr><tr><td>Emmanuel Quincerot</td></tr><tr><td>Eric Mutta</td></tr><tr><td>Erik Rijkers</td></tr><tr><td>Erki Eessaar</td></tr><tr><td>Erwin Brandstetter</td></tr><tr><td>Etsuro Fujita</td></tr><tr><td>Eugeny Zhuzhnev</td></tr><tr><td>Euler Taveira</td></tr><tr><td>Evan Jones</td></tr><tr><td>Evgeny Morozov</td></tr><tr><td>Fabrízio de Royes Mello</td></tr><tr><td>Farias de Oliveira</td></tr><tr><td>Florin Irion</td></tr><tr><td>Franz-Josef Färber</td></tr><tr><td>Garen Torikian</td></tr><tr><td>Georgios Kokolatos</td></tr><tr><td>Gilles Darold</td></tr><tr><td>Greg Stark</td></tr><tr><td>Guillaume Lelarge</td></tr><tr><td>Gunnar Bluth</td></tr><tr><td>Gunnar Morling</td></tr><tr><td>Gurjeet Singh</td></tr><tr><td>Haiyang Wang</td></tr><tr><td>Haiying Tang</td></tr><tr><td>Hamid Akhtar</td></tr><tr><td>Hans Buschmann</td></tr><tr><td>Hao Wu</td></tr><tr><td>Hayato Kuroda</td></tr><tr><td>Heath Lord</td></tr><tr><td>Heikki Linnakangas</td></tr><tr><td>Himanshu Upadhyaya</td></tr><tr><td>Hisahiro Kauchi</td></tr><tr><td>Hongyu Song</td></tr><tr><td>Hubert Lubaczewski</td></tr><tr><td>Hung Nguyen</td></tr><tr><td>Ian Barwick</td></tr><tr><td>Ibrar Ahmed</td></tr><tr><td>Ilya Gladyshev</td></tr><tr><td>Ilya Nenashev</td></tr><tr><td>Isaac Morland</td></tr><tr><td>Israel Barth Rubio</td></tr><tr><td>Jacob Champion</td></tr><tr><td>Jacob Speidel</td></tr><tr><td>Jaime Casanova</td></tr><tr><td>Jakub Wartak</td></tr><tr><td>James Coleman</td></tr><tr><td>James Inform</td></tr><tr><td>James Vanns</td></tr><tr><td>Jan Wieck</td></tr><tr><td>Japin Li</td></tr><tr><td>Jeevan Ladhe</td></tr><tr><td>Jeff Davis</td></tr><tr><td>Jeff Janes</td></tr><tr><td>Jehan-Guillaume de Rorthais</td></tr><tr><td>Jelte Fennema</td></tr><tr><td>Jian He</td></tr><tr><td>Jim Jones</td></tr><tr><td>Jinbao Chen</td></tr><tr><td>Joe Conway</td></tr><tr><td>Joel Jacobson</td></tr><tr><td>John Naylor</td></tr><tr><td>Jonathan Katz</td></tr><tr><td>Josef Simanek</td></tr><tr><td>Joseph Koshakow</td></tr><tr><td>Juan José Santamaría Flecha</td></tr><tr><td>Julien Rouhaud</td></tr><tr><td>Julien Roze</td></tr><tr><td>Junwang Zhao</td></tr><tr><td>Justin Pryzby</td></tr><tr><td>Justin Zhang</td></tr><tr><td>Karina Litskevich</td></tr><tr><td>Karl O. Pinc</td></tr><tr><td>Keisuke Kuroda</td></tr><tr><td>Ken Kato</td></tr><tr><td>Kevin McKibbin</td></tr><tr><td>Kieran McCusker</td></tr><tr><td>Kirk Wolak</td></tr><tr><td>Konstantin Knizhnik</td></tr><tr><td>Koshi Shibagaki</td></tr><tr><td>Kotaro Kawamoto</td></tr><tr><td>Kui Liu</td></tr><tr><td>Kyotaro Horiguchi</td></tr><tr><td>Lakshmi Narayanan Sreethar</td></tr><tr><td>Laurence Parry</td></tr><tr><td>Laurenz Albe</td></tr><tr><td>Luca Ferrari</td></tr><tr><td>Lukas Fittl</td></tr><tr><td>Maciek Sakrejda</td></tr><tr><td>Magnus Hagander</td></tr><tr><td>Maja Zaloznik</td></tr><tr><td>Marcel Hofstetter</td></tr><tr><td>Marina Polyakova</td></tr><tr><td>Mark Dilger</td></tr><tr><td>Marko Tiikkaja</td></tr><tr><td>Markus Winand</td></tr><tr><td>Martijn van Oosterhout</td></tr><tr><td>Martin Jurca</td></tr><tr><td>Martin Kalcher</td></tr><tr><td>Mary Xu</td></tr><tr><td>Masahiko Sawada</td></tr><tr><td>Masahiro Ikeda</td></tr><tr><td>Masao Fujii</td></tr><tr><td>Mason Sharp</td></tr><tr><td>Matheus Alcantara</td></tr><tr><td>Mats Kindahl</td></tr><tr><td>Matthias van de Meent</td></tr><tr><td>Matthijs van der Vleuten</td></tr><tr><td>Maxim Orlov</td></tr><tr><td>Maxim Yablokov</td></tr><tr><td>Mehmet Emin Karakas</td></tr><tr><td>Melanie Plageman</td></tr><tr><td>Melih Mutlu</td></tr><tr><td>Micah Gates</td></tr><tr><td>Michael Banck</td></tr><tr><td>Michael Paquier</td></tr><tr><td>Michail Nikolaev</td></tr><tr><td>Michel Pelletier</td></tr><tr><td>Mike Oh</td></tr><tr><td>Mikhail Gribkov</td></tr><tr><td>Mingli Zhang</td></tr><tr><td>Miroslav Bendik</td></tr><tr><td>Mitsuru Hinata</td></tr><tr><td>Myo Wai Thant</td></tr><tr><td>Naeem Akhter</td></tr><tr><td>Naoki Okano</td></tr><tr><td>Nathan Bossart</td></tr><tr><td>Nazir Bilal Yavuz</td></tr><tr><td>Neha Sharma</td></tr><tr><td>Nick Babadzhanian</td></tr><tr><td>Nicola Contu</td></tr><tr><td>Nikhil Shetty</td></tr><tr><td>Nikita Glukhov</td></tr><tr><td>Nikolay Samokhvalov</td></tr><tr><td>Nikolay Shaplov</td></tr><tr><td>Nishant Sharma</td></tr><tr><td>Nitin Jadhav</td></tr><tr><td>Noah Misch</td></tr><tr><td>Noboru Saito</td></tr><tr><td>Noriyoshi Shinoda</td></tr><tr><td>Nuko Yokohama</td></tr><tr><td>Oleg Bartunov</td></tr><tr><td>Oleg Tselebrovskiy</td></tr><tr><td>Olly Betts</td></tr><tr><td>Onder Kalaci</td></tr><tr><td>Onur Tirtir</td></tr><tr><td>Pablo Federico</td></tr><tr><td>Palle Girgensohn</td></tr><tr><td>Paul Guo</td></tr><tr><td>Paul Jungwirth</td></tr><tr><td>Paul Ramsey</td></tr><tr><td>Pavel Borisov</td></tr><tr><td>Pavel Kulakov</td></tr><tr><td>Pavel Luzanov</td></tr><tr><td>Pavel Stehule</td></tr><tr><td>Peifeng Qiu</td></tr><tr><td>Peter Eisentraut</td></tr><tr><td>Peter Geoghegan</td></tr><tr><td>Peter Smith</td></tr><tr><td>Phil Florent</td></tr><tr><td>Philippe Godfrin</td></tr><tr><td>Platon Pronko</td></tr><tr><td>Przemyslaw Sztoch</td></tr><tr><td>Rachel Heaton</td></tr><tr><td>Ranier Vilela</td></tr><tr><td>Regina Obe</td></tr><tr><td>Reid Thompson</td></tr><tr><td>Reiner Peterke</td></tr><tr><td>Richard Guo</td></tr><tr><td>Riivo Kolka</td></tr><tr><td>Rishu Bagga</td></tr><tr><td>Robert Haas</td></tr><tr><td>Robert Sjöblom</td></tr><tr><td>Robert Treat</td></tr><tr><td>Roberto Mello</td></tr><tr><td>Robins Tharakan</td></tr><tr><td>Roman Zharkov</td></tr><tr><td>Ronan Dunklau</td></tr><tr><td>Rushabh Lathia</td></tr><tr><td>Ryo Matsumura</td></tr><tr><td>Samay Sharma</td></tr><tr><td>Sami Imseih</td></tr><tr><td>Sandeep Thakkar</td></tr><tr><td>Sandro Santilli</td></tr><tr><td>Sebastien Flaesch</td></tr><tr><td>Sébastien Lardière</td></tr><tr><td>Sehrope Sarkuni</td></tr><tr><td>Sergey Belyashov</td></tr><tr><td>Sergey Pankov</td></tr><tr><td>Sergey Shinderuk</td></tr><tr><td>Shi Yu</td></tr><tr><td>Shinya Kato</td></tr><tr><td>Sho Kato</td></tr><tr><td>Shruthi Gowda</td></tr><tr><td>Shveta Mallik</td></tr><tr><td>Simon Riggs</td></tr><tr><td>Sindy Senorita</td></tr><tr><td>Sirisha Chamarthi</td></tr><tr><td>Sravan Kumar</td></tr><tr><td>Stéphane Tachoires</td></tr><tr><td>Stephen Frost</td></tr><tr><td>Steve Chavez</td></tr><tr><td>Stone Tickle</td></tr><tr><td>Sven Klemm</td></tr><tr><td>Takamichi Osumi</td></tr><tr><td>Takeshi Ideriha</td></tr><tr><td>Tatsuhiro Nakamori</td></tr><tr><td>Tatsuo Ishii</td></tr><tr><td>Teja Mupparti</td></tr><tr><td>Tender Wang</td></tr><tr><td>Teodor Sigaev</td></tr><tr><td>Thiago Nunes</td></tr><tr><td>Thom Brown</td></tr><tr><td>Thomas Habets</td></tr><tr><td>Thomas Mc Kay</td></tr><tr><td>Thomas Munro</td></tr><tr><td>Tim Carey-Smith</td></tr><tr><td>Tim Field</td></tr><tr><td>Timo Stolz</td></tr><tr><td>Tom Lane</td></tr><tr><td>Tomas Vondra</td></tr><tr><td>Tor Erik Linnerud</td></tr><tr><td>Torsten Förtsch</td></tr><tr><td>Tristan Partin</td></tr><tr><td>Troy Frericks</td></tr><tr><td>Tushar Ahuja</td></tr><tr><td>Valerie Woolard</td></tr><tr><td>Vibhor Kumar</td></tr><tr><td>Victor Spirin</td></tr><tr><td>Victoria Shepard</td></tr><tr><td>Vignesh C</td></tr><tr><td>Vik Fearing</td></tr><tr><td>Vitaly Burovoy</td></tr><tr><td>Vitaly Davydov</td></tr><tr><td>Wang Wei</td></tr><tr><td>Wenjing Zeng</td></tr><tr><td>Whale Song</td></tr><tr><td>Will Mortensen</td></tr><tr><td>Wolfgang Walther</td></tr><tr><td>Xin Wen</td></tr><tr><td>Xing Guo</td></tr><tr><td>Xingwang Xu</td></tr><tr><td>XueJing Zhao</td></tr><tr><td>Yanliang Lei</td></tr><tr><td>Youmiu Mo</td></tr><tr><td>Yugo Nagata</td></tr><tr><td>Yura Sokolov</td></tr><tr><td>Yuta Katsuragi</td></tr><tr><td>Zhen Mingyang</td></tr><tr><td>Zheng Li</td></tr><tr><td>Zhihong Yu</td></tr><tr><td>Zhijie Hou</td></tr><tr><td>Zongliang Quan</td></tr><tr><td>Zuming Jiang</td></tr></table></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="release-16-1.html" title="E.4. Release 16.1">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="release.html" title="Appendix E. Release Notes">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="release-prior.html" title="E.6. Prior Releases">Next</a></td></tr><tr><td width="40%" align="left" valign="top">E.4. Release 16.1 </td><td width="20%" align="center"><a accesskey="h" href="index.html" title="PostgreSQL 16.4 Documentation">Home</a></td><td width="40%" align="right" valign="top"> E.6. Prior Releases</td></tr></table></div></body></html>

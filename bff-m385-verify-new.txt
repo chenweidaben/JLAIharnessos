@@ -1,0 +1,3 @@
+﻿/api/v1/workflow/approval=200
+/api/v1/workflow/scheduling=200
+/api/v1/workflow/notifications=200

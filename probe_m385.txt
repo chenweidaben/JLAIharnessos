@@ -1,0 +1,2 @@
+﻿OK /api/v1/security/incidents
+OK /api/v1/security/incident-response
