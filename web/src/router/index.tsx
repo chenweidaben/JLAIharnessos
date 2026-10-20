@@ -3130,6 +3130,14 @@ const ExecBoardM490Page = lazy(() => import('@/pages/exec/board-m490'));
 const ArchiveBoardM491Page = lazy(() => import('@/pages/emr/archive-board-m491'));
 // M492：患者随访看板（/patient/followup-board）
 const FollowupBoardM492Page = lazy(() => import('@/pages/patient/followup-board-m492'));
+// M493：教学管理看板（/edu/board）
+const EduBoardM493Page = lazy(() => import('@/pages/edu/board-m493'));
+// M494：核心制度看板（/quality/core-system-board）
+const CoreSystemBoardM494Page = lazy(() => import('@/pages/quality/core-system-board-m494'));
+// M495：日间手术管理看板（/operation/day-surgery-board）
+const DaySurgeryBoardM495Page = lazy(() => import('@/pages/operation/day-surgery-board-m495'));
+// M496：患者健康教育看板（/patient/health-edu-board）
+const HealthEduBoardM496Page = lazy(() => import('@/pages/patient/health-edu-board-m496'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4324,6 +4332,14 @@ export default function AppRoutes() {
           <Route path="emr/archive-board" element={<ArchiveBoardM491Page />} />
           {/* M492：患者随访看板 */}
           <Route path="patient/followup-board" element={<FollowupBoardM492Page />} />
+          {/* M493：教学管理看板 */}
+          <Route path="edu/board" element={<EduBoardM493Page />} />
+          {/* M494：核心制度看板 */}
+          <Route path="quality/core-system-board" element={<CoreSystemBoardM494Page />} />
+          {/* M495：日间手术管理看板 */}
+          <Route path="operation/day-surgery-board" element={<DaySurgeryBoardM495Page />} />
+          {/* M496：患者健康教育看板 */}
+          <Route path="patient/health-edu-board" element={<HealthEduBoardM496Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"

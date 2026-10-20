@@ -482,6 +482,10 @@ import { m490Routes } from './routes/m490Routes'; // M490: P0合规（医技工�
 import { m491Routes } from './routes/m491Routes'; // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
 import { m492Routes } from './routes/m492Routes'; // M492: P0合规（护理分级护理/移动护理查房）
 import { m492bRoutes } from './routes/m492bRoutes'; // M492b: P0合规（患者随访汇总/30天再入院/伦理委员会·案例）
+import { m493Routes } from './routes/m493Routes'; // M493: P0合规（教学查房·出科考核·进修医师/抗菌药物·注射剂使用率）
+import { m494Routes } from './routes/m494Routes'; // M494: P0合规（核心制度落实率/三级查房交接班/会诊及时率）
+import { m495Routes } from './routes/m495Routes'; // M495: P0合规（日间手术列表·质量指标·非计划再入院）
+import { m496Routes } from './routes/m496Routes'; // M496: P0合规（健康教育讲座·宣教覆盖率）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4305,6 +4309,10 @@ const allRoutes: RouteDef[] = [
   ...m491Routes, // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
   ...m492Routes, // M492: P0合规（护理分级护理/移动护理查房）
   ...m492bRoutes, // M492b: P0合规（患者随访汇总/30天再入院/伦理委员会·案例）
+  ...m493Routes, // M493: P0合规（教学查房·出科考核·进修医师/抗菌药物·注射剂使用率）
+  ...m494Routes, // M494: P0合规（核心制度落实率/三级查房交接班/会诊及时率）
+  ...m495Routes, // M495: P0合规（日间手术列表·质量指标·非计划再入院）
+  ...m496Routes, // M496: P0合规（健康教育讲座·宣教覆盖率）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
