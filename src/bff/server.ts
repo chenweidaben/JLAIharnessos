@@ -475,6 +475,7 @@ import { m484Routes } from './routes/m484Routes'; // M484: P0合规（药学特�
 import { m485Routes } from './routes/m485Routes'; // M485: P0合规（病案统计/病案编码质量·新前缀 medical-record）
 import { m485bRoutes } from './routes/m485bRoutes'; // M485b: P0合规（患者投诉汇总）
 import { m486Routes } from './routes/m486Routes'; // M486: P0合规（设备全生命周期/能耗月度用量·费用·节能改造）
+import { m487Routes } from './routes/m487Routes'; // M487: P0合规（CSSD工作量·质量·库存/营养科菜单·咨询·治疗饮食）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4291,6 +4292,7 @@ const allRoutes: RouteDef[] = [
   ...m485Routes, // M485: P0合规（病案统计/病案编码质量·新前缀 medical-record）
   ...m485bRoutes, // M485b: P0合规（患者投诉汇总）
   ...m486Routes, // M486: P0合规（设备全生命周期/能耗月度用量·费用·节能改造）
+  ...m487Routes, // M487: P0合规（CSSD工作量·质量·库存/营养科菜单·咨询·治疗饮食）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
