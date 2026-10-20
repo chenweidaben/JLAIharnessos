@@ -201,6 +201,8 @@ import { cardM463Routes } from './routes/healthCard';
 import { billM464Routes } from './routes/inpatientBill';
 // M464 批二：日间手术与留观管理
 import { daySurgM464Routes } from './routes/daySurgObs';
+// M465：院内转科与床位调度
+import { wardM465Routes } from './routes/wardTransfer';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -439,6 +441,7 @@ import { m462Routes } from './routes/m462Routes'; // M462: 备份容灾与安全
 import { m463Routes } from './routes/m463Routes'; // M463: 后勤能耗与物业（水电/保洁/洗涤/绿化/食堂/巡检）
 import { m464Routes } from './routes/m464Routes'; // M464: 科研课题成果转化（经费/专利/转化/会议）
 import { m464bRoutes } from './routes/m464bRoutes'; // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
+import { m465Routes } from './routes/m465Routes'; // M465: 设备全生命周期（验收/计量/维保/报废/效益）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3982,6 +3985,7 @@ const allRoutes: RouteDef[] = [
   ...cardM463Routes, // M463：就诊卡与健康账户
   ...billM464Routes, // M464：住院费用清单与预交金
   ...daySurgM464Routes, // M464 批二：日间手术与留观管理
+  ...wardM465Routes, // M465：院内转科与床位调度
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4224,6 +4228,7 @@ const allRoutes: RouteDef[] = [
   ...m463Routes, // M463: 后勤能耗与物业（水电/保洁/洗涤/绿化/食堂/巡检）
   ...m464Routes, // M464: 科研课题成果转化（经费/专利/转化/会议）
   ...m464bRoutes, // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
+  ...m465Routes, // M465: 设备全生命周期（验收/计量/维保/报废/效益）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
