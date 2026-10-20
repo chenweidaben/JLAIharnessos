@@ -3094,6 +3094,10 @@ const PatientTimelineM470Page = lazy(() => import('@/pages/patient/timeline-m470
 const WorkflowTodoCenterM471Page = lazy(() => import('@/pages/workflow/todo-center-m471'));
 // M472：护理 NQI 与互联互通合规看板（/quality/compliance-board）
 const ComplianceBoardM472Page = lazy(() => import('@/pages/quality/compliance-board-m472'));
+// M473：病历质控看板（/quality/emr-quality-board）
+const EmrQualityBoardM473Page = lazy(() => import('@/pages/quality/emr-quality-board-m473'));
+// M474：CDS 临床决策支持看板（/clinical/cds-board）
+const CdsBoardM474Page = lazy(() => import('@/pages/clinical/cds-board-m474'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4252,6 +4256,10 @@ export default function AppRoutes() {
           <Route path="workflow/todo-center" element={<WorkflowTodoCenterM471Page />} />
           {/* M472：护理 NQI 与互联互通合规看板 */}
           <Route path="quality/compliance-board" element={<ComplianceBoardM472Page />} />
+          {/* M473：病历质控看板 */}
+          <Route path="quality/emr-quality-board" element={<EmrQualityBoardM473Page />} />
+          {/* M474：CDS 临床决策支持看板 */}
+          <Route path="clinical/cds-board" element={<CdsBoardM474Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"

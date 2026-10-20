@@ -459,6 +459,8 @@ import { m470Routes } from './routes/m470Routes'; // M470: 角色工作流打磨
 import { m471Routes } from './routes/m471Routes'; // M471: P0合规（NQI发生率/互联互通报文·目录·一致性/五级缺口/不良事件根因）
 import { m472Routes } from './routes/m472Routes'; // M472: P0合规（五级评审条款/互联互通接口清单/病案监管日志）
 import { m473Routes } from './routes/m473Routes'; // M473: FHIR网关（Bundle资源包/术语映射）
+import { m473bRoutes } from './routes/m473bRoutes'; // M473b: P0合规（EMPI主索引/智慧服务报告查询率）
+import { m475Routes } from './routes/m475Routes'; // M475: P0合规（单病种/DRG/DIP/临床路径/AMS/病历甲级率）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4258,6 +4260,9 @@ const allRoutes: RouteDef[] = [
   ...m470Routes, // M470: 角色工作流打磨（菜单/待办/交接/审批链/审计时间线）
   ...m471Routes, // M471: P0合规（NQI发生率/互联互通报文·目录·一致性/五级缺口/不良事件根因）
   ...m472Routes, // M472: P0合规（五级评审条款/互联互通接口清单/病案监管日志）
+  ...m473Routes, // M473: FHIR网关（Bundle资源包/术语映射）
+  ...m473bRoutes, // M473b: P0合规（EMPI主索引/智慧服务报告查询率）
+  ...m475Routes, // M475: P0合规（单病种/DRG/DIP/临床路径/AMS/病历甲级率）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
