@@ -468,6 +468,7 @@ import { m479Routes } from './routes/m479Routes'; // M479: P0合规（院感发�
 import { m480Routes } from './routes/m480Routes'; // M480: P0合规（教学培训·实习·考核/大型设备·使用率）
 import { m481Routes } from './routes/m481Routes'; // M481: P0合规（后勤保障：被服/膳食/保卫/保洁）
 import { m481bRoutes } from './routes/m481bRoutes'; // M481b: P0合规（医保费用审核·DRG/DIP结算/保洁工单）
+import { m482Routes } from './routes/m482Routes'; // M482: P0合规（应急管理：应急预案/应急物资）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4277,6 +4278,7 @@ const allRoutes: RouteDef[] = [
   ...m480Routes, // M480: P0合规（教学培训·实习·考核/大型设备·使用率）
   ...m481Routes, // M481: P0合规（后勤保障：被服/膳食/保卫/保洁）
   ...m481bRoutes, // M481b: P0合规（医保费用审核·DRG/DIP结算/保洁工单）
+  ...m482Routes, // M482: P0合规（应急管理：应急预案/应急物资）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

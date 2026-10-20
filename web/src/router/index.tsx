@@ -3108,6 +3108,8 @@ const SmartServiceBoardM479Page = lazy(() => import('@/pages/smart-service/board
 const OperationDashboardM480Page = lazy(() => import('@/pages/operation/dashboard-m480'));
 // M481：院感与患者安全看板（/quality/infection-board）
 const InfectionBoardM481Page = lazy(() => import('@/pages/quality/infection-board-m481'));
+// M482：全院合规总览驾驶舱（/compliance/hub）
+const ComplianceHubM482Page = lazy(() => import('@/pages/compliance/hub-m482'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4280,6 +4282,8 @@ export default function AppRoutes() {
           <Route path="operation/dashboard" element={<OperationDashboardM480Page />} />
           {/* M481：院感与患者安全看板 */}
           <Route path="quality/infection-board" element={<InfectionBoardM481Page />} />
+          {/* M482：全院合规总览驾驶舱 */}
+          <Route path="compliance/hub" element={<ComplianceHubM482Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
