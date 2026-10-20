@@ -185,6 +185,8 @@ import { healthEduM455Routes } from './routes/healthEdu';
 import { adminOfficeM456Routes } from './routes/adminOffice';
 // M457：门急诊分诊排队叫号
 import { queueM457Routes } from './routes/queueTriage';
+// M458：自助服务终端设备管理
+import { kioskM458Routes } from './routes/kioskTerminal';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -414,6 +416,7 @@ import { m454Routes } from './routes/m454Routes'; // M454: 围术期管理（PAC
 import { m455Routes } from './routes/m455Routes'; // M455: 低值耗材供应链（库存/领用/盘点/供应商/采购/效期）
 import { m456Routes } from './routes/m456Routes'; // M456: 集成运维监控（健康检查/可用性/同步/订阅/ETL/日志采集）
 import { m457Routes } from './routes/m457Routes'; // M457: 医学知识库与编码字典（指南/说明书/ICD/项目/映射）
+import { m458Routes } from './routes/m458Routes'; // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3947,6 +3950,7 @@ const allRoutes: RouteDef[] = [
   ...healthEduM455Routes, // M455：健康教育与患者宣教
   ...adminOfficeM456Routes, // M456：行政办公协同
   ...queueM457Routes, // M457：门急诊分诊排队叫号
+  ...kioskM458Routes, // M458：自助服务终端设备管理
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4180,6 +4184,7 @@ const allRoutes: RouteDef[] = [
   ...m455Routes, // M455: 低值耗材供应链（库存/领用/盘点/供应商/采购/效期）
   ...m456Routes, // M456: 集成运维监控（健康检查/可用性/同步/订阅/ETL/日志采集）
   ...m457Routes, // M457: 医学知识库与编码字典（指南/说明书/ICD/项目/映射）
+  ...m458Routes, // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
