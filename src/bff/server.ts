@@ -326,6 +326,7 @@ import { m419Routes } from './routes/m419Routes'; // M419: 药品目录/库存�
 import { m423Routes } from './routes/m423Routes'; // M423: 家庭访视详情
 import { m425Routes } from './routes/m425Routes'; // M425: 病历版本对比/回滚/锁定补建
 import { m427Routes } from './routes/m427Routes'; // M427: 角色详情/流程节点/流转历史/升级规则
+import { m429Routes } from './routes/m429Routes'; // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -782,6 +783,8 @@ import { userExperienceRoutes } from './routes/userExperience';
 import { accessibilityRoutes } from './routes/accessibility';
 // M416：患者时间线深度 GET /api/v1/timeline/patient-*
 import { patientTimelineRoutes } from './routes/patientTimeline';
+// M428：患者360时间线深度 GET /api/v1/patient-timeline/*
+import { patientTimeline360Routes } from './routes/patientTimeline360';
 // M417：病历版本管理深度 GET /api/v1/emr/version-*
 // (emrVersionRoutes 已在 line 131 import，此处不再重复)
 // M418：事件总线深度 GET /api/v1/events/*-detail
@@ -4033,6 +4036,7 @@ const allRoutes: RouteDef[] = [
   ...m423Routes, // M423: 家庭访视详情
   ...m425Routes, // M425: 病历版本对比/回滚/锁定补建
   ...m427Routes, // M427: 角色详情/流程节点/流转历史/升级规则
+  ...m429Routes, // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
@@ -4457,6 +4461,7 @@ const allRoutes: RouteDef[] = [
   ...userExperienceRoutes, // M199-A：用户体验 GET /api/v1/admin/user-experience/report
   ...accessibilityRoutes, // M199-B：无障碍 GET /api/v1/admin/accessibility/report
   ...patientTimelineRoutes, // M416：患者时间线深度 GET /api/v1/timeline/patient-*
+  ...patientTimeline360Routes, // M428：患者360时间线深度 GET /api/v1/patient-timeline/*
   // emrVersionRoutes 已在 line 3827 注册，此处不再重复
   ...elderlyFriendlyRoutes, // M199-C：适老化 GET /api/v1/admin/elderly-friendly/report
   ...internationalizationRoutes, // M199-D：国际化 GET /api/v1/admin/internationalization/report
