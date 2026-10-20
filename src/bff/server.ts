@@ -511,6 +511,8 @@ import { m516Routes } from './routes/m516Routes'; // M516 P0合规重点（电�
 import { m517Routes } from './routes/m517Routes'; // M517 P0合规重点（医疗质量安全·麻醉深度：麻醉分级·术中事件·术后镇痛）
 import { m517bRoutes } from './routes/m517bRoutes'; // M517b P0合规重点（医疗质量安全·麻醉深度新方向：术中安全·术后随访）
 import { m518Routes } from './routes/m518Routes'; // M518 P0合规重点（智慧服务三级·药品追溯深度：药品追溯·冷链监控）
+import { m519Routes } from './routes/m519Routes'; // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
+import { m520Routes } from './routes/m520Routes'; // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4363,6 +4365,8 @@ const allRoutes: RouteDef[] = [
   ...m517Routes, // M517 P0合规重点（医疗质量安全·麻醉深度：麻醉分级·术中事件·术后镇痛）
   ...m517bRoutes, // M517b P0合规重点（医疗质量安全·麻醉深度新方向：术中安全·术后随访）
   ...m518Routes, // M518 P0合规重点（智慧服务三级·药品追溯深度：药品追溯·冷链监控）
+  ...m519Routes, // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
+  ...m520Routes, // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
