@@ -371,12 +371,27 @@ export const outpatientRoutes: RouteDef[] = [
     auth: true,
   },
 
-  // 药品检索（真实库）
+  // 药品检索
   {
     method: 'GET',
     path: '/api/v1/outpatient/drugs',
     handle: async (c) => {
-      if (isDemo) return json(ok([]));
+      if (isDemo) {
+        const all = [
+          { drugId: 'DRUG-AMOX', name: '阿莫西林胶囊', spec: '0.25g*24粒', unit: '盒', price: 12.5, category: '抗感染' },
+          { drugId: 'DRUG-CEFU', name: '头孢克肟分散片', spec: '100mg*12片', unit: '盒', price: 22.8, category: '抗感染' },
+          { drugId: 'DRUG-IBU', name: '布洛芬缓释胶囊', spec: '0.3g*20粒', unit: '盒', price: 18.0, category: '解热镇痛' },
+          { drugId: 'DRUG-AMBR', name: '氨溴索口服溶液', spec: '100ml:0.6g', unit: '瓶', price: 21.5, category: '呼吸系统' },
+          { drugId: 'DRUG-LORA', name: '氯雷他定片', spec: '10mg*6片', unit: '盒', price: 15.6, category: '抗过敏' },
+          { drugId: 'DRUG-OME', name: '奥美拉唑肠溶胶囊', spec: '20mg*14粒', unit: '盒', price: 26.0, category: '消化系统' },
+          { drugId: 'DRUG-NIFE', name: '硝苯地平控释片', spec: '30mg*7片', unit: '盒', price: 28.4, category: '心血管' },
+          { drugId: 'DRUG-MET', name: '盐酸二甲双胍片', spec: '0.5g*48片', unit: '盒', price: 14.2, category: '内分泌' },
+          { drugId: 'DRUG-COLD', name: '感冒灵颗粒', spec: '10g*9袋', unit: '盒', price: 13.8, category: '呼吸系统' },
+          { drugId: 'DRUG-VC', name: '维生素C片', spec: '100mg*100片', unit: '瓶', price: 8.5, category: '维生素' },
+        ];
+        const kw = (c.query.get('keyword') ?? '').trim();
+        return json(ok(kw ? all.filter((d) => d.name.includes(kw)) : all));
+      }
       const keyword = c.query.get('keyword') ?? '';
       return json(ok(await findDrugs(keyword)));
     },
