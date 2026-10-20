@@ -189,6 +189,8 @@ import { queueM457Routes } from './routes/queueTriage';
 import { kioskM458Routes } from './routes/kioskTerminal';
 // M459：院内导航出行与停车
 import { navM459Routes } from './routes/navParking';
+// M459B：医疗废物与消毒供应中心
+import { wasteCssdM459BRoutes } from './routes/wasteCssd';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -420,6 +422,7 @@ import { m456Routes } from './routes/m456Routes'; // M456: 集成运维监控（
 import { m457Routes } from './routes/m457Routes'; // M457: 医学知识库与编码字典（指南/说明书/ICD/项目/映射）
 import { m458Routes } from './routes/m458Routes'; // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
 import { m459Routes } from './routes/m459Routes'; // M459: 设备维修工单闭环（巡检/工单/维修/保养/折旧）
+import { m459bRoutes } from './routes/m459bRoutes'; // M459b: 监管数据上报（HQMS/DRG-DIP/传染病网报/妇幼/直报/任务台账）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3955,6 +3958,7 @@ const allRoutes: RouteDef[] = [
   ...queueM457Routes, // M457：门急诊分诊排队叫号
   ...kioskM458Routes, // M458：自助服务终端设备管理
   ...navM459Routes, // M459：院内导航出行与停车
+  ...wasteCssdM459BRoutes, // M459B：医疗废物与消毒供应中心
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4190,6 +4194,7 @@ const allRoutes: RouteDef[] = [
   ...m457Routes, // M457: 医学知识库与编码字典（指南/说明书/ICD/项目/映射）
   ...m458Routes, // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
   ...m459Routes, // M459: 设备维修工单闭环（巡检/工单/维修/保养/折旧）
+  ...m459bRoutes, // M459b: 监管数据上报（HQMS/DRG-DIP/传染病网报/妇幼/直报/任务台账）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
