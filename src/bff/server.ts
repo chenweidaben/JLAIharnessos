@@ -205,6 +205,8 @@ import { daySurgM464Routes } from './routes/daySurgObs';
 import { wardM465Routes } from './routes/wardTransfer';
 // M466：门诊预约与号源池管理
 import { quotaM466Routes } from './routes/quotaAppt';
+// M467：医生出诊排班管理
+import { rosterM467Routes } from './routes/doctorRoster';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -445,6 +447,8 @@ import { m464Routes } from './routes/m464Routes'; // M464: 科研课题成果转
 import { m464bRoutes } from './routes/m464bRoutes'; // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
 import { m465Routes } from './routes/m465Routes'; // M465: 设备全生命周期（验收/计量/维保/报废/效益）
 import { m466Routes } from './routes/m466Routes'; // M466: 质控与不良事件（上报/RCA/闭环/通报/分级）
+import { m467Routes } from './routes/m467Routes'; // M467: 急诊急救三大中心（胸痛/卒中/创伤/调度/时间窗）
+import { m467bRoutes } from './routes/m467bRoutes'; // M467b: 院前急救120（调度/病历/车辆/物资/轨迹/质量）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3990,6 +3994,7 @@ const allRoutes: RouteDef[] = [
   ...daySurgM464Routes, // M464 批二：日间手术与留观管理
   ...wardM465Routes, // M465：院内转科与床位调度
   ...quotaM466Routes, // M466：门诊预约与号源池管理
+  ...rosterM467Routes, // M467：医生出诊排班管理
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4234,6 +4239,8 @@ const allRoutes: RouteDef[] = [
   ...m464bRoutes, // M464b: 临床试验GCP（立项/伦理/入组/CRF/AE/结题）
   ...m465Routes, // M465: 设备全生命周期（验收/计量/维保/报废/效益）
   ...m466Routes, // M466: 质控与不良事件（上报/RCA/闭环/通报/分级）
+  ...m467Routes, // M467: 急诊急救三大中心（胸痛/卒中/创伤/调度/时间窗）
+  ...m467bRoutes, // M467b: 院前急救120（调度/病历/车辆/物资/轨迹/质量）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
