@@ -493,6 +493,7 @@ import { m500Routes } from './routes/m500Routes'; // M500里程碑 P0合规（�
 import { m501Routes } from './routes/m501Routes'; // M501 P0合规重点（患者授权·访问日志·违规事件）
 import { m502Routes } from './routes/m502Routes'; // M502 P0合规重点（处方点评·反馈·统计）
 import { m503Routes } from './routes/m503Routes'; // M503 P0合规重点（智慧服务三级：出诊排班·预约统计）
+import { m504Routes } from './routes/m504Routes'; // M504 P0合规重点（智慧服务三级：志愿队伍·活动·统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4327,6 +4328,7 @@ const allRoutes: RouteDef[] = [
   ...m501Routes, // M501 P0合规重点（患者授权·访问日志·违规事件）
   ...m502Routes, // M502 P0合规重点（处方点评·反馈·统计）
   ...m503Routes, // M503 P0合规重点（智慧服务三级：出诊排班·预约统计）
+  ...m504Routes, // M504 P0合规重点（智慧服务三级：志愿队伍·活动·统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
