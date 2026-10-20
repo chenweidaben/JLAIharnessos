@@ -153,6 +153,8 @@ import { outpatientRegisterRoutes } from './routes/outpatientRegister';
 import { inpatientGeneralRoutes } from './routes/inpatientGeneral';
 // M441：传染病与公共卫生深度（别名 publicHealthRoutes 兼容既有 spread 4497）
 import { publicHealthM441Routes as publicHealthRoutes } from './routes/publicHealth';
+// M442：院内药房调剂补建（退药/咨询/毒麻/盘点/处方集）
+import { pharmacyDispenseM442Routes } from './routes/pharmacyDispense';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -366,6 +368,7 @@ import { m438pacsRoutes } from './routes/m438pacsRoutes'; // 影像PACS（登记
 import { m439Routes } from './routes/m439Routes'; // M439: 体检健康管理（预约/报告/总检/异常追踪/档案）
 import { m440Routes } from './routes/m440Routes'; // M440: 互联网医院/远程医疗（电子处方/流转/远程会诊/复诊/咨询）
 import { m441Routes } from './routes/m441Routes'; // M441: 病案管理（编目/ICD编码/归档/借阅/质控/检索）
+import { m442Routes } from './routes/m442Routes'; // M442: 医保管理（参保登记/结算/目录/DRG预分组/稽核）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3883,6 +3886,7 @@ const allRoutes: RouteDef[] = [
   ...outpatientRegisterRoutes, // M439：门诊挂号与分诊深度补建
   ...inpatientGeneralRoutes, // M440：住院通用管理补建（床位/医嘱/在院费用）
   ...publicHealthRoutes, // M441：传染病与公共卫生深度（别名兼容既有 admin spread）
+  ...pharmacyDispenseM442Routes, // M442：院内药房调剂补建
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4100,6 +4104,7 @@ const allRoutes: RouteDef[] = [
   ...m439Routes, // M439: 体检健康管理（预约/报告/总检/异常追踪/档案）
   ...m440Routes, // M440: 互联网医院/远程医疗（电子处方/流转/远程会诊/复诊/咨询）
   ...m441Routes, // M441: 病案管理（编目/ICD编码/归档/借阅/质控/检索）
+  ...m442Routes, // M442: 医保管理（参保登记/结算/目录/DRG预分组/稽核）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
