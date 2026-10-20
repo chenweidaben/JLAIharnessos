@@ -457,6 +457,8 @@ import { m468Routes } from './routes/m468Routes'; // M468: 药品不良反应与
 import { m469Routes } from './routes/m469Routes'; // M469: 科室成本核算与绩效（汇总/项目/病种/得分/计件/预警）
 import { m470Routes } from './routes/m470Routes'; // M470: 角色工作流打磨（菜单/待办/交接/审批链/审计时间线）
 import { m471Routes } from './routes/m471Routes'; // M471: P0合规（NQI发生率/互联互通报文·目录·一致性/五级缺口/不良事件根因）
+import { m472Routes } from './routes/m472Routes'; // M472: P0合规（五级评审条款/互联互通接口清单/病案监管日志）
+import { m473Routes } from './routes/m473Routes'; // M473: FHIR网关（Bundle资源包/术语映射）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4255,6 +4257,7 @@ const allRoutes: RouteDef[] = [
   ...m469Routes, // M469: 科室成本核算与绩效（汇总/项目/病种/得分/计件/预警）
   ...m470Routes, // M470: 角色工作流打磨（菜单/待办/交接/审批链/审计时间线）
   ...m471Routes, // M471: P0合规（NQI发生率/互联互通报文·目录·一致性/五级缺口/不良事件根因）
+  ...m472Routes, // M472: P0合规（五级评审条款/互联互通接口清单/病案监管日志）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

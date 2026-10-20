@@ -3092,6 +3092,8 @@ const EmrPatient360Page = lazy(() => import('@/pages/emr-patient-360'));
 const PatientTimelineM470Page = lazy(() => import('@/pages/patient/timeline-m470'));
 // M471：医生工作台待办中心（/workflow/todo-center）
 const WorkflowTodoCenterM471Page = lazy(() => import('@/pages/workflow/todo-center-m471'));
+// M472：护理 NQI 与互联互通合规看板（/quality/compliance-board）
+const ComplianceBoardM472Page = lazy(() => import('@/pages/quality/compliance-board-m472'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4248,6 +4250,8 @@ export default function AppRoutes() {
           <Route path="patient/:id/timeline" element={<PatientTimelineM470Page />} />
           {/* M471：医生工作台待办中心（workflow 四端点聚合） */}
           <Route path="workflow/todo-center" element={<WorkflowTodoCenterM471Page />} />
+          {/* M472：护理 NQI 与互联互通合规看板 */}
+          <Route path="quality/compliance-board" element={<ComplianceBoardM472Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
