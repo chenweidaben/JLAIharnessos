@@ -23,7 +23,7 @@ import {
   Timeline,
   Typography,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 
@@ -92,9 +92,17 @@ export default function Patient360TimelinePage() {
       title="患者360综合时间线"
       description={summary?.diagnosis}
       extra={
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/patients')}>
-          返回列表
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            icon={<NodeIndexOutlined />}
+            onClick={() => navigate(`/patient/${id ?? ''}/timeline`)}
+          >
+            统一时间线（M470）
+          </Button>
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/patients')}>
+            返回列表
+          </Button>
+        </div>
       }
     >
       {error && <Alert type="warning" showIcon style={{ marginBottom: 16 }} message={error} />}

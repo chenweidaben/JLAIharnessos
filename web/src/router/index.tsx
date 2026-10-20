@@ -3088,6 +3088,8 @@ const EmrTemplateEditorPage = lazy(() => import('@/pages/emr-template-editor'));
 const EmrQualityScorePage = lazy(() => import('@/pages/emr-quality-score'));
 // M465-C：患者就诊 360° 全视图 V14（EMR 深化四模块）
 const EmrPatient360Page = lazy(() => import('@/pages/emr-patient-360'));
+// M470：患者统一时间线 P0 合规（/patient/:id/timeline）
+const PatientTimelineM470Page = lazy(() => import('@/pages/patient/timeline-m470'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4240,6 +4242,8 @@ export default function AppRoutes() {
           <Route path="patients/:id" element={<PatientDetail />} />
           {/* 患者 360 综合时间线（M96-C） */}
           <Route path="patients/360/:id" element={<Patient360Timeline />} />
+          {/* M470：患者统一时间线 P0 合规（跨域事件聚合） */}
+          <Route path="patient/:id/timeline" element={<PatientTimelineM470Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
