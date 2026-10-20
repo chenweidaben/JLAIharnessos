@@ -325,6 +325,7 @@ import { m418Routes } from './routes/m418Routes'; // M418: 账单管理/支付�
 import { m419Routes } from './routes/m419Routes'; // M419: 药品目录/库存管理/采购管理/供应商管理/预警管理/效期管理详情
 import { m423Routes } from './routes/m423Routes'; // M423: 家庭访视详情
 import { m425Routes } from './routes/m425Routes'; // M425: 病历版本对比/回滚/锁定补建
+import { m427Routes } from './routes/m427Routes'; // M427: 角色详情/流程节点/流转历史/升级规则
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -785,6 +786,8 @@ import { patientTimelineRoutes } from './routes/patientTimeline';
 // (emrVersionRoutes 已在 line 131 import，此处不再重复)
 // M418：事件总线深度 GET /api/v1/events/*-detail
 import { eventsBusRoutes } from './routes/eventsBus';
+// M426：事件总线深度 GET /api/v1/events/bus/*
+import { eventsBusDetailRoutes } from './routes/eventsBusDetail';
 // M199-C：适老化 GET /api/v1/admin/elderly-friendly/report
 import { elderlyFriendlyRoutes } from './routes/elderlyFriendly';
 // M199-D：国际化 GET /api/v1/admin/internationalization/report
@@ -3829,6 +3832,7 @@ const allRoutes: RouteDef[] = [
   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
+  ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
   ...emrNoteRoutes, // M190-P0: 病历修改痕迹
   ...cdsRoutes, // M191-P0: CDS 临床决策支持
   ...patient360Routes, // M192-P0: 患者360视图
@@ -4028,6 +4032,7 @@ const allRoutes: RouteDef[] = [
   ...m419Routes, // M419: 药品目录/库存管理/采购管理/供应商管理/预警管理/效期管理详情
   ...m423Routes, // M423: 家庭访视详情
   ...m425Routes, // M425: 病历版本对比/回滚/锁定补建
+  ...m427Routes, // M427: 角色详情/流程节点/流转历史/升级规则
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
