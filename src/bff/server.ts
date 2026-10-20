@@ -423,6 +423,7 @@ import { m457Routes } from './routes/m457Routes'; // M457: 医学知识库与编
 import { m458Routes } from './routes/m458Routes'; // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
 import { m459Routes } from './routes/m459Routes'; // M459: 设备维修工单闭环（巡检/工单/维修/保养/折旧）
 import { m459bRoutes } from './routes/m459bRoutes'; // M459b: 监管数据上报（HQMS/DRG-DIP/传染病网报/妇幼/直报/任务台账）
+import { m460Routes } from './routes/m460Routes'; // M460: 临床教学住培深化（轮转/带教/考核/查房/竞赛/课程）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -609,6 +610,8 @@ import { satisfactionRoutes } from './routes/satisfaction';
 import { satisfactionAiRoutes } from './routes/satisfactionAi'; // M153-D：患者满意度智能化分析 GET /api/v1/admin/satisfaction/ai-report（临床决策支持）
 import { satisfactionLoopRoutes } from './routes/satisfactionLoop'; // M165-C：【CDSS与运营精细化】患者满意度与服务改进闭环 GET /api/v1/patient/satisfaction/loop（收集→分析→改进→验证，真改进不只登记投诉）
 import { satisfactionDeepRoutes } from './routes/satisfactionDeep'; // M174-D：【患者体验深化】满意度闭环 GET /api/v1/patient/satisfaction/deep（多渠道/情感分析/5Why/PDCA/NPS，真改进不只登记）
+// M460：患者满意度评价闭环（静态路径，须先于 /satisfaction/:id 动态路由命中）
+import { satM460Routes } from './routes/satisfactionLoopM460';
 import { emrSmartScoreRoutes } from './routes/emrSmartScore'; // M154-B：电子病历智能化评分 POST /api/v1/emr/score（六维100分，实质内容公平评分）
 import { smartTriageRoutes } from './routes/smartTriage';
 import { delegationRoutes } from './routes/delegation';
@@ -4195,6 +4198,7 @@ const allRoutes: RouteDef[] = [
   ...m458Routes, // M458: 人事薪酬档案（档案/排班/学分/晋升/薪酬）
   ...m459Routes, // M459: 设备维修工单闭环（巡检/工单/维修/保养/折旧）
   ...m459bRoutes, // M459b: 监管数据上报（HQMS/DRG-DIP/传染病网报/妇幼/直报/任务台账）
+  ...m460Routes, // M460: 临床教学住培深化（轮转/带教/考核/查房/竞赛/课程）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
@@ -4380,6 +4384,7 @@ const allRoutes: RouteDef[] = [
   ...internetPrescriptionRoutes,
   ...internetPaymentRoutes,
   ...internetDeliveryRoutes,
+  ...satM460Routes, // M460：患者满意度评价闭环（静态，先于 /satisfaction/:id 动态路由）
   ...satisfactionRoutes,
   ...satisfactionAiRoutes, // M153-D：满意度智能分析报告（临床决策支持）
   ...satisfactionLoopRoutes, // M165-C：【CDSS与运营精细化】满意度改进闭环（收集→分析→改进→验证）
