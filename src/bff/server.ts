@@ -127,6 +127,10 @@ import { tenantService } from '@/tenant';
 import { chatRoutes } from './routes/chat';
 import { dashboardRoutes } from './routes/dashboard';
 import { fhirRoutes } from './routes/fhir'; // M190-P0: FHIR 标准 API 网关
+// M430：FHIR R4 网关深度（资源搜索 Bundle）
+import { fhirGatewayDetailRoutes } from './routes/fhirGatewayDetail';
+// M430：FHIR R4 网关操作端点（CRUD/validate/history）
+import { fhirOperationsRoutes } from './routes/fhirOperationsRoutes';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -327,6 +331,8 @@ import { m423Routes } from './routes/m423Routes'; // M423: 家庭访视详情
 import { m425Routes } from './routes/m425Routes'; // M425: 病历版本对比/回滚/锁定补建
 import { m427Routes } from './routes/m427Routes'; // M427: 角色详情/流程节点/流转历史/升级规则
 import { m429Routes } from './routes/m429Routes'; // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
+import { m431Routes } from './routes/m431Routes'; // M431: 病历留存策略/电子签名历史
+import { m431MedReviewRoutes } from './routes/m431MedReviewRoutes'; // 合理用药/处方审核深度 6 接口
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3833,6 +3839,8 @@ const allRoutes: RouteDef[] = [
   ...medicalRoutes,
   ...dashboardRoutes,
   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
+  ...fhirGatewayDetailRoutes, // M430：FHIR R4 资源搜索 Bundle
+  ...fhirOperationsRoutes, // M430：FHIR R4 操作端点 CRUD/validate/history
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4037,6 +4045,8 @@ const allRoutes: RouteDef[] = [
   ...m425Routes, // M425: 病历版本对比/回滚/锁定补建
   ...m427Routes, // M427: 角色详情/流程节点/流转历史/升级规则
   ...m429Routes, // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
+  ...m431Routes, // M431: 病历留存策略/电子签名历史
+  ...m431MedReviewRoutes, // 合理用药/处方审核深度 6 接口
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
@@ -6017,9 +6027,11 @@ interface Compiled {
 
 function compile(pattern: string): { regex: RegExp; keys: string[] } {
   const keys: string[] = [];
+  // 先转义静态段中的正则元字符（如 FHIR $operation 的 `$`），再替换 :param
+  const escaped = pattern.replace(/\$/g, '\\$');
   const re =
     '^' +
-    pattern.replace(/:([^/]+)/g, (_m, k: string) => {
+    escaped.replace(/:([^/]+)/g, (_m, k: string) => {
       keys.push(k);
       return '([^/]+)';
     }) +
