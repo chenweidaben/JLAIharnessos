@@ -163,6 +163,8 @@ import { careM444Routes } from './routes/patientCare';
 import { fdM445Routes } from './routes/familyDoctor';
 // M446：移动护理PDA床旁闭环
 import { pdaM446Routes } from './routes/pdaNursing';
+// M447：事件总线与通知中心深化
+import { eventNotifyM447Routes } from './routes/eventNotify';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -381,6 +383,7 @@ import { m443Routes } from './routes/m443Routes'; // M443: 科研教学（论文
 import { m444Routes } from './routes/m444Routes'; // M444: 院感质控（手卫生/环境卫生学/抗菌监测/不良事件）
 import { m445Routes } from './routes/m445Routes'; // M445: 临床营养与膳食（膳食医嘱/食谱/特殊膳食/库存/配送）
 import { m446Routes } from './routes/m446Routes'; // M446: 医技检查（超声/心电/内镜/病理诊断/医技预约）
+import { m447Routes } from './routes/m447Routes'; // M447: FHIR网关深化（Bundle/订阅hook/术语/映射/令牌/操作日志）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3903,6 +3906,7 @@ const allRoutes: RouteDef[] = [
   ...careM444Routes, // M444：患者服务与关怀深度
   ...fdM445Routes, // M445：家庭医生签约与健康管理
   ...pdaM446Routes, // M446：移动护理PDA床旁闭环
+  ...eventNotifyM447Routes, // M447：事件总线与通知中心深化
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4125,6 +4129,7 @@ const allRoutes: RouteDef[] = [
   ...m444Routes, // M444: 院感质控（手卫生/环境卫生学/抗菌监测/不良事件）
   ...m445Routes, // M445: 临床营养与膳食（膳食医嘱/食谱/特殊膳食/库存/配送）
   ...m446Routes, // M446: 医技检查（超声/心电/内镜/病理诊断/医技预约）
+  ...m447Routes, // M447: FHIR网关深化（Bundle/订阅hook/术语/映射/令牌/操作日志）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
