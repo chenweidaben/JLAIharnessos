@@ -3164,6 +3164,8 @@ const EmrVersionBoardM506Page = lazy(() => import('@/pages/emr/version-board-m50
 const FhirGatewayBoardM507Page = lazy(() => import('@/pages/integration/fhir-gateway-board-m507'));
 // M508：患者时间线看板（/clinical/timeline-board）
 const PatientTimelineBoardM508Page = lazy(() => import('@/pages/clinical/timeline-board-m508'));
+// M509：CDS 深度规则监控看板（/clinical/cds-deep-board）
+const CdsDeepBoardM509Page = lazy(() => import('@/pages/clinical/cds-deep-board-m509'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4392,6 +4394,8 @@ export default function AppRoutes() {
           <Route path="integration/fhir-gateway-board" element={<FhirGatewayBoardM507Page />} />
           {/* M508：患者时间线看板 */}
           <Route path="clinical/timeline-board" element={<PatientTimelineBoardM508Page />} />
+          {/* M509：CDS 深度规则监控看板 */}
+          <Route path="clinical/cds-deep-board" element={<CdsDeepBoardM509Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
