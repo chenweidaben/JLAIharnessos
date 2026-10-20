@@ -100,6 +100,33 @@ function mapCatalogs() {
 
 /* ----------------------------- 路由 -------------------------------- */
 
+/**
+ * DEMO 内存态 bundle：DEMO_MODE 不连 PostgreSQL，门诊工作台的问诊/诊断/医嘱/处方/病历
+ * 写操作若直连聚合器会失败并导致前端 setState 后内容"保存即丢失"。
+ * 这里按 encounterId 在内存里维护一份可读写 bundle，GET 返回它、POST 更新它，形成闭环。
+ */
+const demoBundles = new Map<string, Record<string, any>>();
+async function seedDemoBundle(id: string): Promise<Record<string, any>> {
+  if (demoBundles.has(id)) return demoBundles.get(id)!;
+  const list = (await getWaitingQueue(null)) as Array<Record<string, any>>;
+  const hit = list.find((x) => x.encounterId === id);
+  const bundle: Record<string, any> = {
+    encounterId: id,
+    patient: hit?.patient ?? {
+      patientId: 'demo-pat-x', nameMasked: '待诊患者', gender: 'male', age: 40,
+      insurance: 'urban_resident', allergies: [], chronicConditions: [], currentMedications: [],
+    },
+    consultation: {
+      encounterId: id, chiefComplaint: hit?.chiefComplaint ?? '',
+      presentIllness: {}, pastHistory: {}, physicalExam: {}, auxiliaryExams: [],
+      updatedAt: new Date().toISOString(),
+    },
+    diagnoses: [], orders: [], prescriptions: [], medicalRecord: null, cdsReminders: [],
+  };
+  demoBundles.set(id, bundle);
+  return bundle;
+}
+
 export const outpatientRoutes: RouteDef[] = [
   // 候诊队列
   {
@@ -123,36 +150,7 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/encounters/:id',
     handle: async (c) => {
-      if (isDemo) {
-        // DEMO：从候诊队列匹配该就诊号的患者，返回完整空 bundle，
-        // 避免前端拿到空壳导致中间问诊面板空白。
-        const list = (await getWaitingQueue(null)) as Array<Record<string, any>>;
-        const hit = list.find((x) => x.encounterId === c.params.id);
-        const patient = hit?.patient ?? {
-          patientId: 'demo-pat-x', nameMasked: '待诊患者', gender: 'male',
-          age: 40, insurance: 'urban_resident', allergies: [],
-          chronicConditions: [], currentMedications: [],
-        };
-        const bundle = {
-          encounterId: c.params.id,
-          patient,
-          consultation: {
-            encounterId: c.params.id,
-            chiefComplaint: hit?.chiefComplaint ?? '',
-            presentIllness: {},
-            pastHistory: {},
-            physicalExam: {},
-            auxiliaryExams: [],
-            updatedAt: new Date().toISOString(),
-          },
-          diagnoses: [],
-          orders: [],
-          prescriptions: [],
-          medicalRecord: null,
-          cdsReminders: [],
-        };
-        return json(ok(bundle));
-      }
+      if (isDemo) return json(ok(await seedDemoBundle(c.params.id)));
       const bundle = await getEncounter(c.params.id);
       if (!bundle) return json(fail(ErrorCode.NOT_FOUND, '就诊不存在'), 404);
       return json(ok(bundle));
@@ -165,9 +163,22 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/consultation',
     handle: async (c) => {
+      const data = await c.body<Parameters<typeof saveConsultation>[1]>();
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.consultation = {
+          encounterId: c.params.id,
+          chiefComplaint: data.chiefComplaint ?? b.consultation.chiefComplaint,
+          presentIllness: data.presentIllness ?? {},
+          pastHistory: data.pastHistory ?? {},
+          physicalExam: data.physicalExam ?? {},
+          auxiliaryExams: data.auxiliaryExams ?? [],
+          updatedAt: new Date().toISOString(),
+        };
+        return json(ok(b));
+      }
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      const data = await c.body<Parameters<typeof saveConsultation>[1]>();
       return json(ok(await saveConsultation(c.params.id, data)));
     },
     auth: true,
@@ -178,10 +189,15 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/diagnoses',
     handle: async (c) => {
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const data = await c.body<{ code?: string; name: string; kind?: 'primary' | 'secondary' | 'differential' }>();
       if (!data.name) return json(fail(ErrorCode.BAD_REQUEST, '诊断名称缺失'), 400);
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.diagnoses.push({ id: 'd-' + Date.now(), code: data.code ?? '', name: data.name, kind: data.kind ?? 'primary', confirmed: false, doctorName: '陈医生' });
+        return json(ok(b));
+      }
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       return json(ok(await addDiagnosis(c.params.id, { ...data, doctorId: view.id })));
     },
     auth: true,
@@ -193,6 +209,12 @@ export const outpatientRoutes: RouteDef[] = [
     path: '/api/v1/outpatient/encounters/:id/diagnoses/:did',
     handle: async (c) => {
       const data = await c.body<{ confirmed: boolean }>();
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        const d = b.diagnoses.find((x: any) => x.id === c.params.did);
+        if (d) d.confirmed = Boolean(data.confirmed);
+        return json(ok(b));
+      }
       return json(ok(await confirmDiagnosis(c.params.id, c.params.did, Boolean(data.confirmed))));
     },
     auth: true,
@@ -202,7 +224,14 @@ export const outpatientRoutes: RouteDef[] = [
   {
     method: 'DELETE',
     path: '/api/v1/outpatient/encounters/:id/diagnoses/:did',
-    handle: async (c) => json(ok(await removeDiagnosis(c.params.id, c.params.did))),
+    handle: async (c) => {
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.diagnoses = b.diagnoses.filter((x: any) => x.id !== c.params.did);
+        return json(ok(b));
+      }
+      return json(ok(await removeDiagnosis(c.params.id, c.params.did)));
+    },
     auth: true,
   },
 
@@ -211,10 +240,15 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/orders',
     handle: async (c) => {
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const data = await c.body<Parameters<typeof addOrder>[1]>();
       if (!data.name || !data.kind) return json(fail(ErrorCode.BAD_REQUEST, '医嘱信息不完整'), 400);
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.orders.push({ id: 'o-' + Date.now(), kind: data.kind, catalogId: data.catalogId ?? '', name: data.name, price: data.price ?? 0, clinicalReason: data.clinicalReason ?? '', status: 'active' });
+        return json(ok(b));
+      }
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       return json(ok(await addOrder(c.params.id, { ...data, doctorId: view.id })));
     },
     auth: true,
@@ -226,6 +260,12 @@ export const outpatientRoutes: RouteDef[] = [
     path: '/api/v1/outpatient/encounters/:id/orders/:oid/cancel',
     handle: async (c) => {
       const data = await c.body<{ reason?: string }>();
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        const o = b.orders.find((x: any) => x.id === c.params.oid);
+        if (o) { o.status = 'cancelled'; o.cancelReason = data.reason ?? '医师撤销'; }
+        return json(ok(b));
+      }
       return json(ok(await cancelVisitOrder(c.params.id, c.params.oid, data.reason ?? '医师撤销')));
     },
     auth: true,
@@ -236,12 +276,17 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/prescriptions',
     handle: async (c) => {
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const data = await c.body<{ lines: Parameters<typeof submitPrescription>[1]['lines']; counsel?: string }>();
       if (!Array.isArray(data.lines) || data.lines.length === 0) {
         return json(fail(ErrorCode.BAD_REQUEST, '处方明细为空'), 400);
       }
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.prescriptions.push({ id: 'rx-' + Date.now(), lines: data.lines, counsel: data.counsel ?? '', status: 'pending_review', warnings: [] });
+        return json(ok(b));
+      }
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       return json(ok(await submitPrescription(c.params.id, { ...data, prescriberId: view.id })));
     },
     auth: true,
@@ -252,12 +297,18 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/prescriptions/:pid/audit',
     handle: async (c) => {
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const data = await c.body<{ decision: 'approved' | 'rejected'; comment?: string }>();
       if (data.decision !== 'approved' && data.decision !== 'rejected') {
         return json(fail(ErrorCode.BAD_REQUEST, '审核结论无效'), 400);
       }
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        const rx = b.prescriptions.find((x: any) => x.id === c.params.pid);
+        if (rx) { rx.status = data.decision === 'approved' ? 'approved' : 'rejected'; rx.auditComment = data.comment ?? ''; }
+        return json(ok(b));
+      }
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       return json(
         ok(await reviewRx(c.params.id, c.params.pid, { ...data, reviewerId: view.id })),
       );
@@ -270,10 +321,15 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/outpatient/encounters/:id/records',
     handle: async (c) => {
-      const view = await requester(c);
-      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       const data = await c.body<{ content: Record<string, string>; signed?: boolean }>();
       if (!data.content) return json(fail(ErrorCode.BAD_REQUEST, '病历内容缺失'), 400);
+      if (isDemo) {
+        const b = await seedDemoBundle(c.params.id);
+        b.medicalRecord = { encounterId: c.params.id, content: data.content, signed: Boolean(data.signed), updatedAt: new Date().toISOString() };
+        return json(ok(b));
+      }
+      const view = await requester(c);
+      if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       return json(ok(await saveRecord(c.params.id, { ...data, authorId: view.id })));
     },
     auth: true,
