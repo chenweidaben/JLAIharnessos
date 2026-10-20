@@ -489,6 +489,7 @@ import { m496Routes } from './routes/m496Routes'; // M496: P0合规（健康教�
 import { m497Routes } from './routes/m497Routes'; // M497: P0合规（医德考评·投诉核查·表彰奖励）
 import { m498Routes } from './routes/m498Routes'; // M498: P0合规（医疗技术目录·医师授权·技术质量监测）
 import { m499Routes } from './routes/m499Routes'; // M499: P0合规（MDT病例列表·排程·效果评估）
+import { m500Routes } from './routes/m500Routes'; // M500里程碑 P0合规（医废处置·追溯·统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4319,6 +4320,7 @@ const allRoutes: RouteDef[] = [
   ...m497Routes, // M497: P0合规（医德考评·投诉核查·表彰奖励）
   ...m498Routes, // M498: P0合规（医疗技术目录·医师授权·技术质量监测）
   ...m499Routes, // M499: P0合规（MDT病例列表·排程·效果评估）
+  ...m500Routes, // M500里程碑 P0合规（医废处置·追溯·统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
