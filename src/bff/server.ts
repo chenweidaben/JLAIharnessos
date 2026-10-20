@@ -131,6 +131,8 @@ import { fhirRoutes } from './routes/fhir'; // M190-P0: FHIR 标准 API 网关
 import { fhirGatewayDetailRoutes } from './routes/fhirGatewayDetail';
 // M430：FHIR R4 网关操作端点（CRUD/validate/history）
 import { fhirOperationsRoutes } from './routes/fhirOperationsRoutes';
+// M432：FHIR R4 第二批资源搜索
+import { fhirGatewayDetail2Routes } from './routes/fhirGatewayDetail2';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -333,6 +335,7 @@ import { m427Routes } from './routes/m427Routes'; // M427: 角色详情/流程�
 import { m429Routes } from './routes/m429Routes'; // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
 import { m431Routes } from './routes/m431Routes'; // M431: 病历留存策略/电子签名历史
 import { m431MedReviewRoutes } from './routes/m431MedReviewRoutes'; // 合理用药/处方审核深度 6 接口
+import { m432Routes } from './routes/m432Routes'; // M432: 互联互通四甲（消息/字典/目录/EMPI/审计/评分）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3841,6 +3844,7 @@ const allRoutes: RouteDef[] = [
   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
   ...fhirGatewayDetailRoutes, // M430：FHIR R4 资源搜索 Bundle
   ...fhirOperationsRoutes, // M430：FHIR R4 操作端点 CRUD/validate/history
+  ...fhirGatewayDetail2Routes, // M432：FHIR R4 第二批资源搜索
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4047,6 +4051,7 @@ const allRoutes: RouteDef[] = [
   ...m429Routes, // M429: 压疮/跌倒/给药错误/导管感染/护患比/质量评分
   ...m431Routes, // M431: 病历留存策略/电子签名历史
   ...m431MedReviewRoutes, // 合理用药/处方审核深度 6 接口
+  ...m432Routes, // M432: 互联互通四甲（消息/字典/目录/EMPI/审计/评分）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
