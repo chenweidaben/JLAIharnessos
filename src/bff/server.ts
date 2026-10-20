@@ -479,6 +479,7 @@ import { m487Routes } from './routes/m487Routes'; // M487: P0合规（CSSD工作
 import { m488Routes } from './routes/m488Routes'; // M488: P0合规（病案首页质量·缺陷项/DRG权重/DIP分值·考核）
 import { m488bRoutes } from './routes/m488bRoutes'; // M488b: 补差异（医生首页质量 Top10）
 import { m490Routes } from './routes/m490Routes'; // M490: P0合规（医技工作量汇总/党建·纪检·工会）
+import { m491Routes } from './routes/m491Routes'; // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4299,6 +4300,7 @@ const allRoutes: RouteDef[] = [
   ...m488Routes, // M488: P0合规（病案首页质量·缺陷项/DRG权重/DIP分值·考核）
   ...m488bRoutes, // M488b: 补差异（医生首页质量 Top10）
   ...m490Routes, // M490: P0合规（医技工作量汇总/党建·纪检·工会）
+  ...m491Routes, // M491: P0合规（病案归档·借阅·复印/医保智能审核·日结算·监管）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

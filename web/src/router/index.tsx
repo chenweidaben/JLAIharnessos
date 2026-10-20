@@ -3126,6 +3126,8 @@ const HomepageBoardM488Page = lazy(() => import('@/pages/emr/homepage-board-m488
 const MedtechBoardM489Page = lazy(() => import('@/pages/medtech/board-m489'));
 // M490：运营总览大屏（/exec/board）
 const ExecBoardM490Page = lazy(() => import('@/pages/exec/board-m490'));
+// M491：病案管理看板（/emr/archive-board）
+const ArchiveBoardM491Page = lazy(() => import('@/pages/emr/archive-board-m491'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4316,6 +4318,8 @@ export default function AppRoutes() {
           <Route path="medtech/board" element={<MedtechBoardM489Page />} />
           {/* M490：运营总览大屏 */}
           <Route path="exec/board" element={<ExecBoardM490Page />} />
+          {/* M491：病案管理看板 */}
+          <Route path="emr/archive-board" element={<ArchiveBoardM491Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
