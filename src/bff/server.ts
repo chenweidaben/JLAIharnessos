@@ -513,6 +513,7 @@ import { m517bRoutes } from './routes/m517bRoutes'; // M517b P0合规重点（�
 import { m518Routes } from './routes/m518Routes'; // M518 P0合规重点（智慧服务三级·药品追溯深度：药品追溯·冷链监控）
 import { m519Routes } from './routes/m519Routes'; // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
 import { m520Routes } from './routes/m520Routes'; // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
+import { m521Routes } from './routes/m521Routes'; // M521 P0合规重点（智慧服务三级·急诊预检分诊：候诊·分诊准确率）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4367,6 +4368,7 @@ const allRoutes: RouteDef[] = [
   ...m518Routes, // M518 P0合规重点（智慧服务三级·药品追溯深度：药品追溯·冷链监控）
   ...m519Routes, // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
   ...m520Routes, // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
+  ...m521Routes, // M521 P0合规重点（智慧服务三级·急诊预检分诊：候诊·分诊准确率）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

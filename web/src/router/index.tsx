@@ -3186,6 +3186,8 @@ const AnesthesiaDeepBoardM517Page = lazy(() => import('@/pages/quality/anesthesi
 const PharmacyTraceBoardM518Page = lazy(() => import('@/pages/pharmacy/trace-board-m518'));
 // M519：输血质控深度监控看板（/quality/transfusion-deep-board）
 const TransfusionDeepBoardM519Page = lazy(() => import('@/pages/quality/transfusion-deep-board-m519'));
+// M520：放射防护监控看板（/integration/radiation-board）
+const RadiationBoardM520Page = lazy(() => import('@/pages/integration/radiation-board-m520'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4436,6 +4438,8 @@ export default function AppRoutes() {
           <Route path="pharmacy/trace-board" element={<PharmacyTraceBoardM518Page />} />
           {/* M519：输血质控深度监控看板 */}
           <Route path="quality/transfusion-deep-board" element={<TransfusionDeepBoardM519Page />} />
+          {/* M520：放射防护监控看板 */}
+          <Route path="integration/radiation-board" element={<RadiationBoardM520Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
