@@ -3168,6 +3168,8 @@ const PatientTimelineBoardM508Page = lazy(() => import('@/pages/clinical/timelin
 const CdsDeepBoardM509Page = lazy(() => import('@/pages/clinical/cds-deep-board-m509'));
 // M510：护理 NQI 敏感质量指标监控看板（/nursing/nqi-board）
 const NursingNqiBoardM510Page = lazy(() => import('@/pages/nursing/nqi-board-m510'));
+// M511：事件总线监控看板（/integration/event-bus-board）
+const EventBusBoardM511Page = lazy(() => import('@/pages/integration/event-bus-board-m511'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4400,6 +4402,8 @@ export default function AppRoutes() {
           <Route path="clinical/cds-deep-board" element={<CdsDeepBoardM509Page />} />
           {/* M510：护理 NQI 敏感质量指标监控看板 */}
           <Route path="nursing/nqi-board" element={<NursingNqiBoardM510Page />} />
+          {/* M511：事件总线监控看板 */}
+          <Route path="integration/event-bus-board" element={<EventBusBoardM511Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
