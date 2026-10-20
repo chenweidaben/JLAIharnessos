@@ -461,6 +461,9 @@ import { m472Routes } from './routes/m472Routes'; // M472: P0合规（五级评�
 import { m473Routes } from './routes/m473Routes'; // M473: FHIR网关（Bundle资源包/术语映射）
 import { m473bRoutes } from './routes/m473bRoutes'; // M473b: P0合规（EMPI主索引/智慧服务报告查询率）
 import { m475Routes } from './routes/m475Routes'; // M475: P0合规（单病种/DRG/DIP/临床路径/AMS/病历甲级率）
+import { m476Routes } from './routes/m476Routes'; // M476: P0合规（手术麻醉/输血/危急值/护理敏感/随访/质控查房）
+import { m477Routes } from './routes/m477Routes'; // M477: P0合规（互联网医院订单·处方流转/数据质量规则·月报）
+import { m478Routes } from './routes/m478Routes'; // M478: P0合规（运营实时看板：今日门急诊/住院实时/手术间实时）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4263,6 +4266,9 @@ const allRoutes: RouteDef[] = [
   ...m473Routes, // M473: FHIR网关（Bundle资源包/术语映射）
   ...m473bRoutes, // M473b: P0合规（EMPI主索引/智慧服务报告查询率）
   ...m475Routes, // M475: P0合规（单病种/DRG/DIP/临床路径/AMS/病历甲级率）
+  ...m476Routes, // M476: P0合规（手术麻醉/输血/危急值/护理敏感/随访/质控查房）
+  ...m477Routes, // M477: P0合规（互联网医院订单·处方流转/数据质量规则·月报）
+  ...m478Routes, // M478: P0合规（运营实时看板：今日门急诊/住院实时/手术间实时）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

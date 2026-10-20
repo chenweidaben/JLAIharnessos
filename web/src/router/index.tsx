@@ -3098,6 +3098,10 @@ const ComplianceBoardM472Page = lazy(() => import('@/pages/quality/compliance-bo
 const EmrQualityBoardM473Page = lazy(() => import('@/pages/quality/emr-quality-board-m473'));
 // M474：CDS 临床决策支持看板（/clinical/cds-board）
 const CdsBoardM474Page = lazy(() => import('@/pages/clinical/cds-board-m474'));
+// M476：DRG/单病种经济运行看板（/quality/drg-board）
+const DrgBoardM476Page = lazy(() => import('@/pages/quality/drg-board-m476'));
+// M478：安全与隐私合规看板（/security/board）
+const SecurityBoardM478Page = lazy(() => import('@/pages/security/board-m478'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4260,6 +4264,10 @@ export default function AppRoutes() {
           <Route path="quality/emr-quality-board" element={<EmrQualityBoardM473Page />} />
           {/* M474：CDS 临床决策支持看板 */}
           <Route path="clinical/cds-board" element={<CdsBoardM474Page />} />
+          {/* M476：DRG/单病种经济运行看板 */}
+          <Route path="quality/drg-board" element={<DrgBoardM476Page />} />
+          {/* M478：安全与隐私合规看板 */}
+          <Route path="security/board" element={<SecurityBoardM478Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
