@@ -179,6 +179,8 @@ import { kpiM452Routes } from './routes/kpiQuality';
 import { nqiM453Routes } from './routes/nqiNursing';
 // M454：患者门户自助服务
 import { portalM454Routes } from './routes/patientPortal';
+// M455：健康教育与患者宣教
+import { healthEduM455Routes } from './routes/healthEdu';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -405,6 +407,7 @@ import { m451Routes } from './routes/m451Routes'; // M451: 出院随访与慢病
 import { m452Routes } from './routes/m452Routes'; // M452: 审计安全日志（操作/登录/导出/敏感操作/异常登录/归档）
 import { m453Routes } from './routes/m453Routes'; // M453: 药事管理（处方点评/合理用药/抗菌分级/ADR/质控）
 import { m454Routes } from './routes/m454Routes'; // M454: 围术期管理（PACU/器械/安全核查/术后随访）
+import { m455Routes } from './routes/m455Routes'; // M455: 低值耗材供应链（库存/领用/盘点/供应商/采购/效期）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3935,6 +3938,7 @@ const allRoutes: RouteDef[] = [
   ...kpiM452Routes, // M452：运营质量指标看板
   ...nqiM453Routes, // M453：护理质量NQI深化
   ...portalM454Routes, // M454：患者门户自助服务
+  ...healthEduM455Routes, // M455：健康教育与患者宣教
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4165,6 +4169,7 @@ const allRoutes: RouteDef[] = [
   ...m452Routes, // M452: 审计安全日志（操作/登录/导出/敏感操作/异常登录/归档）
   ...m453Routes, // M453: 药事管理（处方点评/合理用药/抗菌分级/ADR/质控）
   ...m454Routes, // M454: 围术期管理（PACU/器械/安全核查/术后随访）
+  ...m455Routes, // M455: 低值耗材供应链（库存/领用/盘点/供应商/采购/效期）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
