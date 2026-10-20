@@ -159,6 +159,8 @@ import { pharmacyDispenseM442Routes } from './routes/pharmacyDispense';
 import { logisticsEquipmentM443Routes } from './routes/logisticsEquipment';
 // M444：患者服务与关怀深度
 import { careM444Routes } from './routes/patientCare';
+// M445：家庭医生签约与健康管理
+import { fdM445Routes } from './routes/familyDoctor';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -375,6 +377,7 @@ import { m441Routes } from './routes/m441Routes'; // M441: 病案管理（编目
 import { m442Routes } from './routes/m442Routes'; // M442: 医保管理（参保登记/结算/目录/DRG预分组/稽核）
 import { m443Routes } from './routes/m443Routes'; // M443: 科研教学（论文成果/教学排班/住培考核/继续教育）
 import { m444Routes } from './routes/m444Routes'; // M444: 院感质控（手卫生/环境卫生学/抗菌监测/不良事件）
+import { m445Routes } from './routes/m445Routes'; // M445: 临床营养与膳食（膳食医嘱/食谱/特殊膳食/库存/配送）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3895,6 +3898,7 @@ const allRoutes: RouteDef[] = [
   ...pharmacyDispenseM442Routes, // M442：院内药房调剂补建
   ...logisticsEquipmentM443Routes, // M443：后勤设备与物资补建
   ...careM444Routes, // M444：患者服务与关怀深度
+  ...fdM445Routes, // M445：家庭医生签约与健康管理
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4115,6 +4119,7 @@ const allRoutes: RouteDef[] = [
   ...m442Routes, // M442: 医保管理（参保登记/结算/目录/DRG预分组/稽核）
   ...m443Routes, // M443: 科研教学（论文成果/教学排班/住培考核/继续教育）
   ...m444Routes, // M444: 院感质控（手卫生/环境卫生学/抗菌监测/不良事件）
+  ...m445Routes, // M445: 临床营养与膳食（膳食医嘱/食谱/特殊膳食/库存/配送）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
