@@ -3174,6 +3174,8 @@ const EventBusBoardM511Page = lazy(() => import('@/pages/integration/event-bus-b
 const WorkflowBoardM512Page = lazy(() => import('@/pages/integration/workflow-board-m512'));
 // M513：医保智能审核深度监控看板（/finance/insurance-deep-board）
 const InsuranceDeepBoardM513Page = lazy(() => import('@/pages/finance/insurance-deep-board-m513'));
+// M514：院感监控深度看板（/quality/infection-deep-board）
+const InfectionDeepBoardM514Page = lazy(() => import('@/pages/quality/infection-deep-board-m514'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4412,6 +4414,8 @@ export default function AppRoutes() {
           <Route path="integration/workflow-board" element={<WorkflowBoardM512Page />} />
           {/* M513：医保智能审核深度监控看板 */}
           <Route path="finance/insurance-deep-board" element={<InsuranceDeepBoardM513Page />} />
+          {/* M514：院感监控深度看板 */}
+          <Route path="quality/infection-deep-board" element={<InfectionDeepBoardM514Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
