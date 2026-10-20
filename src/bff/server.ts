@@ -147,6 +147,8 @@ import { surgeryAnesthesiaDetailRoutes } from './routes/surgeryAnesthesiaDetail'
 import { pacsDetailRoutes } from './routes/pacsDetail';
 // M438：输血管理深度
 import { transfusionManagementRoutes } from './routes/transfusionManagement';
+// M439：门诊挂号与分诊深度补建
+import { outpatientRegisterRoutes } from './routes/outpatientRegister';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -357,6 +359,7 @@ import { m436Routes } from './routes/m436Routes'; // M436: 财务收费（在院
 import { m437Routes } from './routes/m437Routes'; // M437: 检验LIS（室内质控/报告审核）
 import { m438Routes } from './routes/m438Routes'; // M438: 护理执行域（记录/评分/医嘱执行/交班/消毒隔离/皮肤护理）
 import { m438pacsRoutes } from './routes/m438pacsRoutes'; // 影像PACS（登记/序列/阳性率/危急发现/质控）
+import { m439Routes } from './routes/m439Routes'; // M439: 体检健康管理（预约/报告/总检/异常追踪/档案）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3873,6 +3876,7 @@ const allRoutes: RouteDef[] = [
   ...surgeryAnesthesiaDetailRoutes, // M437：手术麻醉补建（器械清点/术后随访）
   ...pacsDetailRoutes, // M438：影像PACS深度
   ...transfusionManagementRoutes, // M438：输血管理深度
+  ...outpatientRegisterRoutes, // M439：门诊挂号与分诊深度补建
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4087,6 +4091,7 @@ const allRoutes: RouteDef[] = [
   ...m437Routes, // M437: 检验LIS（室内质控/报告审核）
   ...m438Routes, // M438: 护理执行域（记录/评分/医嘱执行/交班/消毒隔离/皮肤护理）
   ...m438pacsRoutes, // 影像PACS（登记/序列/阳性率/危急发现/质控）
+  ...m439Routes, // M439: 体检健康管理（预约/报告/总检/异常追踪/档案）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
