@@ -171,6 +171,8 @@ import { cdsM448Routes } from './routes/cdsDeep';
 import { timelineM449Routes } from './routes/timelineDeep';
 // M450：权限与组织架构深化
 import { orgPermM450Routes } from './routes/orgPermission';
+// M451：院长驾驶舱BI深化
+import { ceoBoardM451Routes } from './routes/ceoBoard';
 import { emrNoteRoutes } from './routes/emrNotes'; // M190-P0: 病历修改痕迹
 import { emrVersionRoutes } from './routes/emrVersion'; // v5.0试点扩展（M190病历版本）
 import { cdsRoutes } from './routes/cds'; // M191-P0: CDS 临床决策支持
@@ -393,6 +395,7 @@ import { m447Routes } from './routes/m447Routes'; // M447: FHIR网关深化（Bu
 import { m448Routes } from './routes/m448Routes'; // M448: 病历留痕合规（修改痕迹/快照/审计导出/版本策略/锁冲突）
 import { m449Routes } from './routes/m449Routes'; // M449: 角色工作流（审批节点/角色路由/任务流转）
 import { m450Routes } from './routes/m450Routes'; // M450: 互联互通与等保补充（数据上报/接口目录/等保项/基线/备份/密评）
+import { m451Routes } from './routes/m451Routes'; // M451: 出院随访与慢病闭环（计划/执行/失访/达标/家监/知识库）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -3919,6 +3922,7 @@ const allRoutes: RouteDef[] = [
   ...cdsM448Routes, // M448：CDS临床决策支持深化
   ...timelineM449Routes, // M449：患者360时间线深化
   ...orgPermM450Routes, // M450：权限与组织架构深化
+  ...ceoBoardM451Routes, // M451：院长驾驶舱BI深化
   ...emrVersionRoutes, // v5.0试点扩展（M190病历版本）：先于 emrNoteRoutes 命中同路径
   ...eventsBusRoutes, // M418：事件总线深度 GET /api/v1/events/*-detail
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
@@ -4145,6 +4149,7 @@ const allRoutes: RouteDef[] = [
   ...m448Routes, // M448: 病历留痕合规（修改痕迹/快照/审计导出/版本策略/锁冲突）
   ...m449Routes, // M449: 角色工作流（审批节点/角色路由/任务流转）
   ...m450Routes, // M450: 互联互通与等保补充（数据上报/接口目录/等保项/基线/备份/密评）
+  ...m451Routes, // M451: 出院随访与慢病闭环（计划/执行/失访/达标/家监/知识库）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
