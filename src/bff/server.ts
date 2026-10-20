@@ -500,6 +500,8 @@ import { m506Routes } from './routes/m506Routes'; // M506 P0合规重点（电�
 import { m507Routes } from './routes/m507Routes'; // M507 P0合规重点（互联互通四甲·FHIR R4：一致性验证）
 import { m508Routes } from './routes/m508Routes'; // M508 P0合规重点（电子病历五级：患者时间线事件·摘要·统计）
 import { m509Routes } from './routes/m509Routes'; // M509 P0合规重点（电子病历五级·CDS 深度：合理用药审查·检验解读·路径推荐）
+import { m510Routes } from './routes/m510Routes'; // M510 P0合规重点（智慧护理·NQI 深度：不良事件·预防措施·统计）
+import { m510bRoutes } from './routes/m510bRoutes'; // M510b P0合规重点（电子病历五级·护理 NQI 看板：压力性损伤·跌倒坠床·质量统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4341,6 +4343,8 @@ const allRoutes: RouteDef[] = [
   ...m507Routes, // M507 P0合规重点（互联互通四甲·FHIR R4：一致性验证）
   ...m508Routes, // M508 P0合规重点（电子病历五级：患者时间线事件·摘要·统计）
   ...m509Routes, // M509 P0合规重点（电子病历五级·CDS 深度：合理用药审查·检验解读·路径推荐）
+  ...m510Routes, // M510 P0合规重点（智慧护理·NQI 深度：不良事件·预防措施·统计）
+  ...m510bRoutes, // M510b P0合规重点（电子病历五级·护理 NQI 看板：压力性损伤·跌倒坠床·质量统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
