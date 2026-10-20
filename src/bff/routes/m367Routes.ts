@@ -66,16 +66,16 @@ async function handlePharmacyWarning(c: Ctx): Promise<Response> {
   return json(ok({ items, totalCount: items.length }));
 }
 
-/** GET /api/v1/pharmacy/expiry - 效期管理 5 条 */
+/** GET /api/v1/pharmacy/expiry - 近效期预警 5 条（结构化，对齐前端 ExpiryRow） */
 async function handlePharmacyExpiry(c: Ctx): Promise<Response> {
   const denied = requireAuth(c);
   if (denied) return denied;
   const items = [
-    { id: 'PE-001', drugName: '二甲双胍片（降糖药）', batchNo: '20241001A（生产批号）', expiryDate: '2026-12-31（有效期至）', stock: '200 瓶（当前库存）', status: '近效期（3 个月内到期，需优先使用）' },
-    { id: 'PE-002', drugName: '布洛芬缓释胶囊（止痛药）', batchNo: '20241201B（生产批号）', expiryDate: '2027-03-31（有效期至）', stock: '300 盒（当前库存）', status: '正常（6 个月以上到期）' },
-    { id: 'PE-003', drugName: '头孢克肟片（抗生素）', batchNo: '20250101C（生产批号）', expiryDate: '2027-01-31（有效期至）', stock: '50 盒（当前库存）', status: '正常（6 个月以上到期）' },
-    { id: 'PE-004', drugName: '阿莫西林胶囊（抗生素）', batchNo: '20250601D（生产批号）', expiryDate: '2027-06-30（有效期至）', stock: '500 盒（当前库存）', status: '正常（12 个月以上到期）' },
-    { id: 'PE-005', drugName: '生理盐水（输液用）', batchNo: '20250901E（生产批号）', expiryDate: '2027-09-30（有效期至）', stock: '1,000 袋（当前库存）', status: '正常（12 个月以上到期）' },
+    { id: 'PE-001', name: '二甲双胍片', batch: 'B20241001', monthsLeft: 2.4, stockQty: 200, dept: '门诊药房' },
+    { id: 'PE-002', name: '布洛芬缓释胶囊', batch: 'B20241201', monthsLeft: 5.4, stockQty: 300, dept: '门诊药房' },
+    { id: 'PE-003', name: '头孢克肟片', batch: 'B20250101', monthsLeft: 3.4, stockQty: 50, dept: '住院药房' },
+    { id: 'PE-004', name: '阿莫西林胶囊', batch: 'B20250601', monthsLeft: 7.8, stockQty: 500, dept: '中心库房' },
+    { id: 'PE-005', name: '0.9% 氯化钠注射液', batch: 'B20250901', monthsLeft: 11.8, stockQty: 1000, dept: '中心库房' },
   ];
   return json(ok({ items, totalCount: items.length }));
 }
