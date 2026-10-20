@@ -123,7 +123,36 @@ export const outpatientRoutes: RouteDef[] = [
     method: 'GET',
     path: '/api/v1/outpatient/encounters/:id',
     handle: async (c) => {
-      if (isDemo) return json(ok({ demo: true, encounterId: c.params.id }));
+      if (isDemo) {
+        // DEMO：从候诊队列匹配该就诊号的患者，返回完整空 bundle，
+        // 避免前端拿到空壳导致中间问诊面板空白。
+        const list = (await getWaitingQueue(null)) as Array<Record<string, any>>;
+        const hit = list.find((x) => x.encounterId === c.params.id);
+        const patient = hit?.patient ?? {
+          patientId: 'demo-pat-x', nameMasked: '待诊患者', gender: 'male',
+          age: 40, insurance: 'urban_resident', allergies: [],
+          chronicConditions: [], currentMedications: [],
+        };
+        const bundle = {
+          encounterId: c.params.id,
+          patient,
+          consultation: {
+            encounterId: c.params.id,
+            chiefComplaint: hit?.chiefComplaint ?? '',
+            presentIllness: {},
+            pastHistory: {},
+            physicalExam: {},
+            auxiliaryExams: [],
+            updatedAt: new Date().toISOString(),
+          },
+          diagnoses: [],
+          orders: [],
+          prescriptions: [],
+          medicalRecord: null,
+          cdsReminders: [],
+        };
+        return json(ok(bundle));
+      }
       const bundle = await getEncounter(c.params.id);
       if (!bundle) return json(fail(ErrorCode.NOT_FOUND, '就诊不存在'), 404);
       return json(ok(bundle));
