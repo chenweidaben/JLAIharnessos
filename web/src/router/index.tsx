@@ -3188,8 +3188,6 @@ const PharmacyTraceBoardM518Page = lazy(() => import('@/pages/pharmacy/trace-boa
 const TransfusionDeepBoardM519Page = lazy(() => import('@/pages/quality/transfusion-deep-board-m519'));
 // M520：放射防护监控看板（/integration/radiation-board）
 const RadiationBoardM520Page = lazy(() => import('@/pages/integration/radiation-board-m520'));
-// M521-P0 首批：术前访视 ASA 分级评估（/clinical/preop-assessment-m521）
-const PreopAssessmentM521Page = lazy(() => import('@/pages/clinical/preop-assessment-m521'));
 // M521-P0 首批：疼痛 NRS 0–10 评估（/clinical/pain-assessment-m521）
 const PainAssessmentM521Page = lazy(() => import('@/pages/clinical/pain-assessment-m521'));
 // M521-P0 首批：VTE 抗凝疗程（/clinical/vte-anticoag-m521）
@@ -4451,8 +4449,6 @@ export default function AppRoutes() {
           <Route path="quality/transfusion-deep-board" element={<TransfusionDeepBoardM519Page />} />
           {/* M520：放射防护监控看板 */}
           <Route path="integration/radiation-board" element={<RadiationBoardM520Page />} />
-          {/* M521-P0 首批：术前访视 ASA 分级评估 */}
-          <Route path="clinical/preop-assessment-m521" element={<PreopAssessmentM521Page />} />
           {/* M521-P0 首批：疼痛 NRS 0–10 评估 */}
           <Route path="clinical/pain-assessment-m521" element={<PainAssessmentM521Page />} />
           {/* M521-P0 首批：VTE 抗凝疗程 */}
