@@ -542,6 +542,10 @@ import { m546Routes } from './routes/m546Routes'; // M546 新标准 P1（互联�
 import { m547Routes } from './routes/m547Routes'; // M547 新标准 P1（电子病历五级三级查房闭环：ward→residents→attending 状态机·越级/重复/时间倒退 409）
 import { m548Routes } from './routes/m548Routes'; // M548 新标准 P1（智慧服务三级报告查询与推送：6 报告种子·pending→sent→read 推送闭环·409 already_pushed）
 import { m549Routes } from './routes/m549Routes'; // M549 新标准 P1（智慧服务三级满意度调查：4 模板·20 答卷种子·averageScore 自动均值·responseRate 85%）
+import { m550Routes } from './routes/m550Routes'; // M550 新标准 P2（危急值闭环：reported→acknowledged→actionTaken·未 ack>10min 自动 overdue·409 already_acknowledged）
+import { m551Routes } from './routes/m551Routes'; // M551 新标准 P2（手术安全核查闭环：signIn→timeOut→signOut 三阶段状态机·跳阶段/重复/终态 409）
+import { m552Routes } from './routes/m552Routes'; // M552 新标准 P2（药品处方点评：10 条种子·6 有问题·summary.problemRate 后端自动汇总）
+import { m553Routes } from './routes/m553Routes'; // M553 新标准 P2（院感上报闭环：5 类感染·8 条种子·reported→closed 结案状态机·409 already_closed）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4425,6 +4429,10 @@ const allRoutes: RouteDef[] = [
   ...m547Routes, // M547 新标准 P1（电子病历五级三级查房闭环：ward→residents→attending 状态机·越级/重复/时间倒退 409）
   ...m548Routes, // M548 新标准 P1（智慧服务三级报告查询与推送：6 报告种子·pending→sent→read 推送闭环·409 already_pushed）
   ...m549Routes, // M549 新标准 P1（智慧服务三级满意度调查：4 模板·20 答卷种子·averageScore 自动均值·responseRate 85%）
+  ...m550Routes, // M550 新标准 P2（危急值闭环：reported→acknowledged→actionTaken·未 ack>10min 自动 overdue·409 already_acknowledged）
+  ...m551Routes, // M551 新标准 P2（手术安全核查闭环：signIn→timeOut→signOut 三阶段状态机·跳阶段/重复/终态 409）
+  ...m552Routes, // M552 新标准 P2（药品处方点评：10 条种子·6 有问题·summary.problemRate 后端自动汇总）
+  ...m553Routes, // M553 新标准 P2（院感上报闭环：5 类感染·8 条种子·reported→closed 结案状态机·409 already_closed）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
