@@ -586,6 +586,10 @@ import { m590Routes } from './routes/m590Routes'; // M590 新标准 P12（随访
 import { m591Routes } from './routes/m591Routes'; // M591 新标准 P12（健康教育：30 条含 10 已读+5 已反馈·409 already_viewed·rating 1-5 校验 rating_out_of_range）
 import { m592Routes } from './routes/m592Routes'; // M592 新标准 P12（用药指导：40 条含 15 依从性记录·adherent=no 必须配 missedDoses·GET /stats 双维度 byPatient+byMedication）
 import { m593Routes } from './routes/m593Routes'; // M593 新标准 P12（康复评估：20 条含 8 goal+12 progress·score 范围匹配 assessmentType·assessedAt 不能未来）
+import { m594Routes } from './routes/m594Routes'; // M594 新标准 P13（门诊量统计：30 天 8 科室 4 GET 只读·by-dept/by-doctor/peak-hours）
+import { m595Routes } from './routes/m595Routes'; // M595 新标准 P13（住院床位统计：15 病区 2 超 100% 预警·4 GET 只读·by-ward/los-stats/transfers）
+import { m596Routes } from './routes/m596Routes'; // M596 新标准 P13（手术量统计：60 天 10 手术间·4 GET 只读·by-room/by-level/elective-vs-emergency 含 waitOver7Days 预警）
+import { m597Routes } from './routes/m597Routes'; // M597 新标准 P13（医疗质量指标：12 个月 8 科室·5 GET 只读·infection/readmission/mortality/adverse-events 含超阈值 warning）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4513,6 +4517,10 @@ const allRoutes: RouteDef[] = [
   ...m591Routes, // M591 新标准 P12（健康教育：30 条含 10 已读+5 已反馈·409 already_viewed·rating 1-5 校验 rating_out_of_range）
   ...m592Routes, // M592 新标准 P12（用药指导：40 条含 15 依从性记录·adherent=no 必须配 missedDoses·GET /stats 双维度 byPatient+byMedication）
   ...m593Routes, // M593 新标准 P12（康复评估：20 条含 8 goal+12 progress·score 范围匹配 assessmentType·assessedAt 不能未来）
+  ...m594Routes, // M594 新标准 P13（门诊量统计：30 天 8 科室 4 GET 只读·by-dept/by-doctor/peak-hours）
+  ...m595Routes, // M595 新标准 P13（住院床位统计：15 病区 2 超 100% 预警·4 GET 只读·by-ward/los-stats/transfers）
+  ...m596Routes, // M596 新标准 P13（手术量统计：60 天 10 手术间·4 GET 只读·by-room/by-level/elective-vs-emergency 含 waitOver7Days 预警）
+  ...m597Routes, // M597 新标准 P13（医疗质量指标：12 个月 8 科室·5 GET 只读·infection/readmission/mortality/adverse-events 含超阈值 warning）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
