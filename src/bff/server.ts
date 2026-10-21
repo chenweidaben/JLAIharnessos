@@ -558,6 +558,10 @@ import { m562Routes } from './routes/m562Routes'; // M562 新标准 P5（临床�
 import { m563Routes } from './routes/m563Routes'; // M563 新标准 P5（AMS 合理用药点评：15 条种子·antibacterial/anticoagulant/psychotropic·/stats 汇总 passRate/rejectRate/byDept/byCategory）
 import { m564Routes } from './routes/m564Routes'; // M564 新标准 P5（患者随访闭环：12 条种子·3 overdue·GET 自动 overdue 判定·scheduled→executed·重复 409 already_executed）
 import { m565Routes } from './routes/m565Routes'; // M565 新标准 P5（手术麻醉记录：8 条种子·general/regional/local·同 operationId 409 already_recorded·Aldrete<9 出院 400 aldrete_too_low_for_discharge）
+import { m566Routes } from './routes/m566Routes'; // M566 新标准 P6（病历质控：仅新增 POST 新建+GET /stats·score 自动 grade A/B/C·unqualified<60；GET 已有 medicalRecordQualityV13.ts 不重复）
+import { m567Routes } from './routes/m567Routes'; // M567 新标准 P6（病案首页：10 份种子·5 draft+4 verified+1 archived·draft→verified/revise 仍 draft·409 already_verified/already_archived）
+import { m568Routes } from './routes/m568Routes'; // M568 新标准 P6（医疗技术授权：15 条种子·多医生×4 级·2 条已过期 GET 自动 flag·同医生同技术未过期重复 409 already_authorized·revoke 重复 409）
+import { m569Routes } from './routes/m569Routes'; // M569 新标准 P6（急诊转诊：12 条种子·red/yellow/green·2 条 red 30min 未接 overdue·referred→accepted→completed·409 must_accept_first/already_accepted/already_completed）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4457,6 +4461,10 @@ const allRoutes: RouteDef[] = [
   ...m563Routes, // M563 新标准 P5（AMS 合理用药点评：15 条种子·antibacterial/anticoagulant/psychotropic·/stats 汇总 passRate/rejectRate/byDept/byCategory）
   ...m564Routes, // M564 新标准 P5（患者随访闭环：12 条种子·3 overdue·GET 自动 overdue 判定·scheduled→executed·重复 409 already_executed）
   ...m565Routes, // M565 新标准 P5（手术麻醉记录：8 条种子·general/regional/local·同 operationId 409 already_recorded·Aldrete<9 出院 400 aldrete_too_low_for_discharge）
+  ...m566Routes, // M566 新标准 P6（病历质控：仅新增 POST 新建+GET /stats·score 自动 grade A/B/C·unqualified<60；GET 已有 medicalRecordQualityV13.ts 不重复）
+  ...m567Routes, // M567 新标准 P6（病案首页：10 份种子·5 draft+4 verified+1 archived·draft→verified/revise 仍 draft·409 already_verified/already_archived）
+  ...m568Routes, // M568 新标准 P6（医疗技术授权：15 条种子·多医生×4 级·2 条已过期 GET 自动 flag·同医生同技术未过期重复 409 already_authorized·revoke 重复 409）
+  ...m569Routes, // M569 新标准 P6（急诊转诊：12 条种子·red/yellow/green·2 条 red 30min 未接 overdue·referred→accepted→completed·409 must_accept_first/already_accepted/already_completed）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
