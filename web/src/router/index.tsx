@@ -3208,6 +3208,14 @@ const TraumaNissM521Page = lazy(() => import('@/pages/clinical/trauma-niss-m521'
 const ChronicFollowupM521Page = lazy(() => import('@/pages/clinical/chronic-followup-m521'));
 // M521-P0 第三批：心理筛查 PHQ-9/GAD-7（/clinical/psych-screening-m521）
 const PsychScreeningM521Page = lazy(() => import('@/pages/clinical/psych-screening-m521'));
+// M521-P0 第三批：肿瘤随访（/clinical/oncology-followup-m521）
+const OncologyFollowupM521Page = lazy(() => import('@/pages/clinical/oncology-followup-m521'));
+// M521-P0 第三批：产后访视（/clinical/postpartum-visit-m521）
+const PostpartumVisitM521Page = lazy(() => import('@/pages/clinical/postpartum-visit-m521'));
+// M521-P0 第三批：患者在线问诊（/clinical/patient-consult-online-m521）
+const PatientConsultOnlineM521Page = lazy(() => import('@/pages/clinical/patient-consult-online-m521'));
+// M521-P0 第三批：智能预问诊（/clinical/smart-triage-m521）
+const SmartTriageM521Page = lazy(() => import('@/pages/clinical/smart-triage-m521'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4478,6 +4486,10 @@ export default function AppRoutes() {
           <Route path="clinical/trauma-niss-m521" element={<TraumaNissM521Page />} />
           <Route path="clinical/chronic-followup-m521" element={<ChronicFollowupM521Page />} />
           <Route path="clinical/psych-screening-m521" element={<PsychScreeningM521Page />} />
+          <Route path="clinical/oncology-followup-m521" element={<OncologyFollowupM521Page />} />
+          <Route path="clinical/postpartum-visit-m521" element={<PostpartumVisitM521Page />} />
+          <Route path="clinical/patient-consult-online-m521" element={<PatientConsultOnlineM521Page />} />
+          <Route path="clinical/smart-triage-m521" element={<SmartTriageM521Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"

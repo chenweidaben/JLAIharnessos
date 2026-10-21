@@ -529,6 +529,10 @@ import { m533Routes } from './routes/m533Routes'; // M533 新标准 P0（急诊�
 import { m534Routes } from './routes/m534Routes'; // M534 新标准 P0（创伤 NISS：列表·自动 top3 AIS 平方和/分级/severe 联动手术·内存态新建）
 import { m535Routes } from './routes/m535Routes'; // M535 新标准 P0（慢病随访：列表·按病种判定 uncontrolled/needsPhysicianReview·内存态新建）
 import { m536Routes } from './routes/m536Routes'; // M536 新标准 P0（心理筛查 PHQ-9/GAD-7：列表·自动求和分级/中重度转介·内存态新建）
+import { m537Routes } from './routes/m537Routes'; // M537 新标准 P0（肿瘤随访：Ⅳ 期距下次治疗超 30 天自动紧急复核·内存态新建）
+import { m538Routes } from './routes/m538Routes'; // M538 新标准 P0（产后访视：多条件组合判定 needsPhysicianReview + riskTags·内存态新建）
+import { m539Routes } from './routes/m539Routes'; // M539 新标准 P0（在线问诊：按 urgency 自动算 priority + needsNurseTriage·内存态新建）
+import { m540Routes } from './routes/m540Routes'; // M540 新标准 P0（智能预问诊：规则引擎自动算 triageLevel/waitArea/needsUpgrade·内存态新建）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4399,6 +4403,10 @@ const allRoutes: RouteDef[] = [
   ...m534Routes, // M534 新标准 P0（创伤 NISS：列表·自动 top3 AIS 平方和/分级/severe 联动手术·内存态新建）
   ...m535Routes, // M535 新标准 P0（慢病随访：列表·按病种判定 uncontrolled/needsPhysicianReview·内存态新建）
   ...m536Routes, // M536 新标准 P0（心理筛查 PHQ-9/GAD-7：列表·自动求和分级/中重度转介·内存态新建）
+  ...m537Routes, // M537 新标准 P0（肿瘤随访：Ⅳ 期距下次治疗超 30 天自动紧急复核·内存态新建）
+  ...m538Routes, // M538 新标准 P0（产后访视：多条件组合判定 needsPhysicianReview + riskTags·内存态新建）
+  ...m539Routes, // M539 新标准 P0（在线问诊：按 urgency 自动算 priority + needsNurseTriage·内存态新建）
+  ...m540Routes, // M540 新标准 P0（智能预问诊：规则引擎自动算 triageLevel/waitArea/needsUpgrade·内存态新建）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
