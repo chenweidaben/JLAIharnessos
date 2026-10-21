@@ -594,6 +594,10 @@ import { m598Routes } from './routes/m598Routes'; // M598 新标准 P14（药品
 import { m599Routes } from './routes/m599Routes'; // M599 新标准 P14（耗材管理：30 条含 5 implant 双人签字·状态机 requested→approved/rejected→issued·409 already_processed/must_be_approved_first·400 implant_requires_dual_signature）
 import { m600Routes } from './routes/m600Routes'; // M600 新标准 P14（采购申请：20 条含 3 大额>50000·状态机 pending→approved→tendered·400 requires_hospital_director_approval·409 already_tendered）
 import { m601Routes } from './routes/m601Routes'; // M601 新标准 P14（供应商管理：25 家含 3 过期+2 拉黑·businessLicenseNo 唯一·409 license_no_duplicate/already_audited）
+import { m602Routes } from './routes/m602Routes'; // M602 新标准 P15（排班管理：100 条含 10 调班·同员工同班次 409·调班 pending 409）
+import { m603Routes } from './routes/m603Routes'; // M603 新标准 P15（绩效考核：50 条·overallScore 加权校验±5 容差·重复 feedback 409）
+import { m604Routes } from './routes/m604Routes'; // M604 新标准 P15（成本核算：80 条 6 科室·amount 正数/occurredDate 不能未来·床日成本+诊次成本）
+import { m605Routes } from './routes/m605Routes'; // M605 新标准 P15（设备管理：40 台含 8 过保/5 待维护·serialNumber 唯一·重复 maintenance 同日期 409）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4529,6 +4533,10 @@ const allRoutes: RouteDef[] = [
   ...m599Routes, // M599 新标准 P14（耗材管理：30 条含 5 implant 双人签字·状态机 requested→approved/rejected→issued·409 already_processed/must_be_approved_first·400 implant_requires_dual_signature）
   ...m600Routes, // M600 新标准 P14（采购申请：20 条含 3 大额>50000·状态机 pending→approved→tendered·400 requires_hospital_director_approval·409 already_tendered）
   ...m601Routes, // M601 新标准 P14（供应商管理：25 家含 3 过期+2 拉黑·businessLicenseNo 唯一·409 license_no_duplicate/already_audited）
+  ...m602Routes, // M602 新标准 P15（排班管理：100 条含 10 调班·同员工同班次 409·调班 pending 409）
+  ...m603Routes, // M603 新标准 P15（绩效考核：50 条·overallScore 加权校验±5 容差·重复 feedback 409）
+  ...m604Routes, // M604 新标准 P15（成本核算：80 条 6 科室·amount 正数/occurredDate 不能未来·床日成本+诊次成本）
+  ...m605Routes, // M605 新标准 P15（设备管理：40 台含 8 过保/5 待维护·serialNumber 唯一·重复 maintenance 同日期 409）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
