@@ -574,6 +574,10 @@ import { m578Routes } from './routes/m578Routes'; // M578 新标准 P9（MDT 多
 import { m579Routes } from './routes/m579Routes'; // M579 新标准 P9（死亡记录：5 例·猝死/MOF/晚期肿瘤·deathDate<admissionDate 400 death_before_admission·超 24h 400 death_record_must_within_24h·draft→reviewed·409 already_reviewed）
 import { m580Routes } from './routes/m580Routes'; // M580 新标准 P9（手术记录单：0 新增·surgeryRecord.ts 已注册 GET/POST/POST :id/sign·bloodLoss 非负/surgeryEnd>surgeryStart 校验由 DB aggregator 内置）
 import { m581Routes } from './routes/m581Routes'; // M581 新标准 P9（ICU 监护：20 条×3 患者·GCS 3-15/fio2 21-100/peep 0-20 校验·GET /stats 汇总 byPatient avgGCS/totalUrineOutput24h）
+import { m582Routes } from './routes/m582Routes'; // M582 新标准 P10（EMPI：15 患者含 2 对疑似重复·source=target 400·已合并 409 already_merged·GET /:mpi/identities）
+import { m583Routes } from './routes/m583Routes'; // M583 新标准 P10（字典映射：40 条 dept/disease/drug/test 各 10·dictType 枚举校验·draft→verified·409 already_verified）
+import { m584Routes } from './routes/m584Routes'; // M584 新标准 P10（标准数据集上报：8 份·2 submitted+3 generated+3 draft·draft→generated→submitted·409 must_generate_first/already_submitted）
+import { m585Routes } from './routes/m585Routes'; // M585 新标准 P10（互联互通测评：20 项·4 类各 5·passed 必须配 evidenceUrl 400 passed_requires_evidence）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4489,6 +4493,10 @@ const allRoutes: RouteDef[] = [
   ...m579Routes, // M579 新标准 P9（死亡记录：5 例·猝死/MOF/晚期肿瘤·deathDate<admissionDate 400 death_before_admission·超 24h 400 death_record_must_within_24h·draft→reviewed·409 already_reviewed）
   ...m580Routes, // M580 新标准 P9（手术记录单：0 新增·surgeryRecord.ts 已注册 GET/POST/POST :id/sign·bloodLoss 非负/surgeryEnd>surgeryStart 校验由 DB aggregator 内置）
   ...m581Routes, // M581 新标准 P9（ICU 监护：20 条×3 患者·GCS 3-15/fio2 21-100/peep 0-20 校验·GET /stats 汇总 byPatient avgGCS/totalUrineOutput24h）
+  ...m582Routes, // M582 新标准 P10（EMPI：15 患者含 2 对疑似重复·source=target 400·已合并 409 already_merged·GET /:mpi/identities）
+  ...m583Routes, // M583 新标准 P10（字典映射：40 条 dept/disease/drug/test 各 10·dictType 枚举校验·draft→verified·409 already_verified）
+  ...m584Routes, // M584 新标准 P10（标准数据集上报：8 份·2 submitted+3 generated+3 draft·draft→generated→submitted·409 must_generate_first/already_submitted）
+  ...m585Routes, // M585 新标准 P10（互联互通测评：20 项·4 类各 5·passed 必须配 evidenceUrl 400 passed_requires_evidence）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
