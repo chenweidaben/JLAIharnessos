@@ -590,6 +590,10 @@ import { m594Routes } from './routes/m594Routes'; // M594 新标准 P13（门诊
 import { m595Routes } from './routes/m595Routes'; // M595 新标准 P13（住院床位统计：15 病区 2 超 100% 预警·4 GET 只读·by-ward/los-stats/transfers）
 import { m596Routes } from './routes/m596Routes'; // M596 新标准 P13（手术量统计：60 天 10 手术间·4 GET 只读·by-room/by-level/elective-vs-emergency 含 waitOver7Days 预警）
 import { m597Routes } from './routes/m597Routes'; // M597 新标准 P13（医疗质量指标：12 个月 8 科室·5 GET 只读·infection/readmission/mortality/adverse-events 含超阈值 warning）
+import { m598Routes } from './routes/m598Routes'; // M598 新标准 P14（药品库存：仅补 POST receive/issue + GET low-stock/expiring·50 条含 8 低库存+5 近效期·409 batch_duplicate·400 insufficient_stock/expired_batch_cannot_issue）
+import { m599Routes } from './routes/m599Routes'; // M599 新标准 P14（耗材管理：30 条含 5 implant 双人签字·状态机 requested→approved/rejected→issued·409 already_processed/must_be_approved_first·400 implant_requires_dual_signature）
+import { m600Routes } from './routes/m600Routes'; // M600 新标准 P14（采购申请：20 条含 3 大额>50000·状态机 pending→approved→tendered·400 requires_hospital_director_approval·409 already_tendered）
+import { m601Routes } from './routes/m601Routes'; // M601 新标准 P14（供应商管理：25 家含 3 过期+2 拉黑·businessLicenseNo 唯一·409 license_no_duplicate/already_audited）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4521,6 +4525,10 @@ const allRoutes: RouteDef[] = [
   ...m595Routes, // M595 新标准 P13（住院床位统计：15 病区 2 超 100% 预警·4 GET 只读·by-ward/los-stats/transfers）
   ...m596Routes, // M596 新标准 P13（手术量统计：60 天 10 手术间·4 GET 只读·by-room/by-level/elective-vs-emergency 含 waitOver7Days 预警）
   ...m597Routes, // M597 新标准 P13（医疗质量指标：12 个月 8 科室·5 GET 只读·infection/readmission/mortality/adverse-events 含超阈值 warning）
+  ...m598Routes, // M598 新标准 P14（药品库存：仅补 POST receive/issue + GET low-stock/expiring·50 条含 8 低库存+5 近效期·409 batch_duplicate·400 insufficient_stock/expired_batch_cannot_issue）
+  ...m599Routes, // M599 新标准 P14（耗材管理：30 条含 5 implant 双人签字·状态机 requested→approved/rejected→issued·409 already_processed/must_be_approved_first·400 implant_requires_dual_signature）
+  ...m600Routes, // M600 新标准 P14（采购申请：20 条含 3 大额>50000·状态机 pending→approved→tendered·400 requires_hospital_director_approval·409 already_tendered）
+  ...m601Routes, // M601 新标准 P14（供应商管理：25 家含 3 过期+2 拉黑·businessLicenseNo 唯一·409 license_no_duplicate/already_audited）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
