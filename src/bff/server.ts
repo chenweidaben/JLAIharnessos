@@ -537,6 +537,7 @@ import { m541Routes } from './routes/m541Routes'; // M541 新标准 P0（FHIR R4
 import { m542Routes } from './routes/m542Routes'; // M542 新标准 P0（病历版本管理：版本号自增·draft→submitted→locked 状态机·locked 终态 409）
 import { m543Routes } from './routes/m543Routes'; // M543 新标准 P0（CDS 临床决策支持规则引擎：17 条规则·alerts[]·drug/lab/dose/duplicate/contraindication）
 import { m544Routes } from './routes/m544Routes'; // M544 新标准 P0（患者时间线聚合：22 条种子·9 类事件·from/to 区间过滤·eventTime 倒序）
+import { m545Routes } from './routes/m545Routes'; // M545 新标准 P0（护理 NQI 敏感指标：5 指标字典·15 事件种子·上报 id=NQI- 自增）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4415,6 +4416,7 @@ const allRoutes: RouteDef[] = [
   ...m542Routes, // M542 新标准 P0（病历版本管理：版本号自增·draft→submitted→locked 状态机·locked 终态 409）
   ...m543Routes, // M543 新标准 P0（CDS 临床决策支持规则引擎：17 条规则·alerts[]·drug/lab/dose/duplicate/contraindication）
   ...m544Routes, // M544 新标准 P0（患者时间线聚合：22 条种子·9 类事件·from/to 区间过滤·eventTime 倒序）
+  ...m545Routes, // M545 新标准 P0（护理 NQI 敏感指标：5 指标字典·15 事件种子·上报 id=NQI- 自增）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
