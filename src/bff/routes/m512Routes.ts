@@ -25,6 +25,39 @@ async function handleWorkflowStats(c: Ctx): Promise<Response> {
   return json(ok({ items, totalCount: items.length }));
 }
 
+/** GET /api/v1/workflow/metrics - 按角色/部门维度聚合审批时效、逾期率、通过率（8 条：5 角色 + 3 科室） */
+async function handleWorkflowMetrics(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+  const items = [
+    { id: 'MET-001', scopeType: 'role', scopeName: 'doctor', avgMinutes: 12.5, overdueRate: 3.2, passRate: 96.8 },
+    { id: 'MET-002', scopeType: 'role', scopeName: 'nurse', avgMinutes: 6.8, overdueRate: 1.5, passRate: 98.5 },
+    { id: 'MET-003', scopeType: 'role', scopeName: 'pharmacist', avgMinutes: 18.2, overdueRate: 2.1, passRate: 97.9 },
+    { id: 'MET-004', scopeType: 'role', scopeName: 'labTech', avgMinutes: 25.6, overdueRate: 4.8, passRate: 95.2 },
+    { id: 'MET-005', scopeType: 'role', scopeName: 'imagingTech', avgMinutes: 35.2, overdueRate: 5.6, passRate: 94.4 },
+    { id: 'MET-006', scopeType: 'dept', scopeName: '心内科', avgMinutes: 11.8, overdueRate: 2.4, passRate: 97.6 },
+    { id: 'MET-007', scopeType: 'dept', scopeName: '普外科', avgMinutes: 15.3, overdueRate: 3.9, passRate: 96.1 },
+    { id: 'MET-008', scopeType: 'dept', scopeName: '急诊科', avgMinutes: 4.2, overdueRate: 1.1, passRate: 98.9 },
+  ];
+  return json(ok({ items, totalCount: items.length }));
+}
+
+/** GET /api/v1/workflow/queues - 当前待办队列（按角色分组，5 角色 count + avgWaitMinutes） */
+async function handleWorkflowQueues(c: Ctx): Promise<Response> {
+  const denied = requireAuth(c);
+  if (denied) return denied;
+  const items = [
+    { id: 'QUE-001', role: 'doctor', roleLabel: '医生', count: 320, avgWaitMinutes: 8.5 },
+    { id: 'QUE-002', role: 'nurse', roleLabel: '护士', count: 180, avgWaitMinutes: 4.2 },
+    { id: 'QUE-003', role: 'pharmacist', roleLabel: '药师', count: 95, avgWaitMinutes: 12.6 },
+    { id: 'QUE-004', role: 'labTech', roleLabel: '检验师', count: 68, avgWaitMinutes: 16.8 },
+    { id: 'QUE-005', role: 'imagingTech', roleLabel: '技师', count: 45, avgWaitMinutes: 22.4 },
+  ];
+  return json(ok({ items, totalCount: items.length }));
+}
+
 export const m512Routes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/workflow/stats', handle: handleWorkflowStats, auth: true },
+  { method: 'GET', path: '/api/v1/workflow/metrics', handle: handleWorkflowMetrics, auth: true },
+  { method: 'GET', path: '/api/v1/workflow/queues', handle: handleWorkflowQueues, auth: true },
 ];

@@ -3216,6 +3216,16 @@ const PostpartumVisitM521Page = lazy(() => import('@/pages/clinical/postpartum-v
 const PatientConsultOnlineM521Page = lazy(() => import('@/pages/clinical/patient-consult-online-m521'));
 // M521-P0 第三批：智能预问诊（/clinical/smart-triage-m521）
 const SmartTriageM521Page = lazy(() => import('@/pages/clinical/smart-triage-m521'));
+// M542-P0：病历版本历史（/clinical/medical-record-versions）
+const MedicalRecordVersionsPage = lazy(() => import('@/pages/clinical/medical-record-versions'));
+// M541-P0：FHIR R4 Patient 资源预览（/clinical/fhir-patient-view）
+const FhirPatientViewPage = lazy(() => import('@/pages/clinical/fhir-patient-view'));
+// M543-P0：CDS 临床决策支持检查（/clinical/cds-checks）
+const CdsChecksPage = lazy(() => import('@/pages/clinical/cds-checks'));
+// M544-P0：患者诊疗时间线（/clinical/patient-timeline；命名避让旧模块 PatientTimelinePage）
+const PatientTimelineM544Page = lazy(() => import('@/pages/clinical/patient-timeline'));
+// M545-P0：护理 NQI 敏感指标看板（/clinical/nqi-dashboard；命名避让旧模块 NqiDashboardPage）
+const NqiDashboardM545Page = lazy(() => import('@/pages/clinical/nqi-dashboard'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4490,6 +4500,16 @@ export default function AppRoutes() {
           <Route path="clinical/postpartum-visit-m521" element={<PostpartumVisitM521Page />} />
           <Route path="clinical/patient-consult-online-m521" element={<PatientConsultOnlineM521Page />} />
           <Route path="clinical/smart-triage-m521" element={<SmartTriageM521Page />} />
+          {/* M542-P0：病历版本历史 */}
+          <Route path="clinical/medical-record-versions" element={<MedicalRecordVersionsPage />} />
+          {/* M541-P0：FHIR R4 Patient 资源预览 */}
+          <Route path="clinical/fhir-patient-view" element={<FhirPatientViewPage />} />
+          {/* M543-P0：CDS 临床决策支持检查 */}
+          <Route path="clinical/cds-checks" element={<CdsChecksPage />} />
+          {/* M544-P0：患者诊疗时间线 */}
+          <Route path="clinical/patient-timeline" element={<PatientTimelineM544Page />} />
+          {/* M545-P0：护理 NQI 敏感指标看板 */}
+          <Route path="clinical/nqi-dashboard" element={<NqiDashboardM545Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
