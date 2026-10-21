@@ -546,6 +546,10 @@ import { m550Routes } from './routes/m550Routes'; // M550 新标准 P2（危急�
 import { m551Routes } from './routes/m551Routes'; // M551 新标准 P2（手术安全核查闭环：signIn→timeOut→signOut 三阶段状态机·跳阶段/重复/终态 409）
 import { m552Routes } from './routes/m552Routes'; // M552 新标准 P2（药品处方点评：10 条种子·6 有问题·summary.problemRate 后端自动汇总）
 import { m553Routes } from './routes/m553Routes'; // M553 新标准 P2（院感上报闭环：5 类感染·8 条种子·reported→closed 结案状态机·409 already_closed）
+import { m554Routes } from './routes/m554Routes'; // M554 新标准 P3（不良事件上报闭环：5 严重度·10 条种子·reported→under_review→closed 评审·409 already_closed）
+import { m555Routes } from './routes/m555Routes'; // M555 新标准 P3（输血反应调查结案：仅新增 investigate·reported→investigated·409 already_investigated；GET/POST 已有 transfusionReaction.ts DB 注册不重复）
+import { m556Routes } from './routes/m556Routes'; // M556 新标准 P3（跌倒评估与上报：Morse 自动分级·high 必须配 interventions·400 high_risk_requires_interventions·409 fall_event_already_recorded）
+import { m557Routes } from './routes/m557Routes'; // M557 新标准 P3（ADR 闭环：Naranjo 评分 0-13·因果关系 certain/probable/possible/unlikely·reported→assessed·409 already_assessed）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4433,6 +4437,10 @@ const allRoutes: RouteDef[] = [
   ...m551Routes, // M551 新标准 P2（手术安全核查闭环：signIn→timeOut→signOut 三阶段状态机·跳阶段/重复/终态 409）
   ...m552Routes, // M552 新标准 P2（药品处方点评：10 条种子·6 有问题·summary.problemRate 后端自动汇总）
   ...m553Routes, // M553 新标准 P2（院感上报闭环：5 类感染·8 条种子·reported→closed 结案状态机·409 already_closed）
+  ...m554Routes, // M554 新标准 P3（不良事件上报闭环：5 严重度·10 条种子·reported→under_review→closed 评审·409 already_closed）
+  ...m555Routes, // M555 新标准 P3（输血反应调查结案：仅新增 investigate·reported→investigated·409 already_investigated；GET/POST 已有 transfusionReaction.ts DB 注册不重复）
+  ...m556Routes, // M556 新标准 P3（跌倒评估与上报：Morse 自动分级·high 必须配 interventions·400 high_risk_requires_interventions·409 fall_event_already_recorded）
+  ...m557Routes, // M557 新标准 P3（ADR 闭环：Naranjo 评分 0-13·因果关系 certain/probable/possible/unlikely·reported→assessed·409 already_assessed）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
