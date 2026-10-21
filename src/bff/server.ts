@@ -526,6 +526,9 @@ import { m530Routes } from './routes/m530Routes'; // M530 新标准 P0（PACU Al
 import { m531Routes } from './routes/m531Routes'; // M531 新标准 P0（ICU 镇静 RASS/Ramsay：列表·内存态新建）
 import { m532Routes } from './routes/m532Routes'; // M532 新标准 P0（Barthel 指数 ADL：列表·自动汇总总分/分级·内存态新建）
 import { m533Routes } from './routes/m533Routes'; // M533 新标准 P0（急诊四级预检分诊：列表·生命体征二次校验升档·内存态新建）
+import { m534Routes } from './routes/m534Routes'; // M534 新标准 P0（创伤 NISS：列表·自动 top3 AIS 平方和/分级/severe 联动手术·内存态新建）
+import { m535Routes } from './routes/m535Routes'; // M535 新标准 P0（慢病随访：列表·按病种判定 uncontrolled/needsPhysicianReview·内存态新建）
+import { m536Routes } from './routes/m536Routes'; // M536 新标准 P0（心理筛查 PHQ-9/GAD-7：列表·自动求和分级/中重度转介·内存态新建）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4393,6 +4396,9 @@ const allRoutes: RouteDef[] = [
   ...m531Routes, // M531 新标准 P0（ICU 镇静 RASS/Ramsay：列表·内存态新建）
   ...m532Routes, // M532 新标准 P0（Barthel 指数 ADL：列表·自动汇总总分/分级·内存态新建）
   ...m533Routes, // M533 新标准 P0（急诊四级预检分诊：列表·生命体征二次校验升档·内存态新建）
+  ...m534Routes, // M534 新标准 P0（创伤 NISS：列表·自动 top3 AIS 平方和/分级/severe 联动手术·内存态新建）
+  ...m535Routes, // M535 新标准 P0（慢病随访：列表·按病种判定 uncontrolled/needsPhysicianReview·内存态新建）
+  ...m536Routes, // M536 新标准 P0（心理筛查 PHQ-9/GAD-7：列表·自动求和分级/中重度转介·内存态新建）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

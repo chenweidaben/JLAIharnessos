@@ -3202,6 +3202,12 @@ const IcuSedationM521Page = lazy(() => import('@/pages/clinical/icu-sedation-m52
 const BarthelIndexM521Page = lazy(() => import('@/pages/clinical/barthel-index-m521'));
 // M521-P0 第二批：急诊四级预检分诊（/clinical/er-triage-m521）
 const ErTriageM521Page = lazy(() => import('@/pages/clinical/er-triage-m521'));
+// M521-P0 第三批：创伤 NISS 评分（/clinical/trauma-niss-m521）
+const TraumaNissM521Page = lazy(() => import('@/pages/clinical/trauma-niss-m521'));
+// M521-P0 第三批：慢病随访（/clinical/chronic-followup-m521）
+const ChronicFollowupM521Page = lazy(() => import('@/pages/clinical/chronic-followup-m521'));
+// M521-P0 第三批：心理筛查 PHQ-9/GAD-7（/clinical/psych-screening-m521）
+const PsychScreeningM521Page = lazy(() => import('@/pages/clinical/psych-screening-m521'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4469,6 +4475,9 @@ export default function AppRoutes() {
           <Route path="clinical/barthel-index-m521" element={<BarthelIndexM521Page />} />
           {/* M521-P0 第二批：急诊四级预检分诊 */}
           <Route path="clinical/er-triage-m521" element={<ErTriageM521Page />} />
+          <Route path="clinical/trauma-niss-m521" element={<TraumaNissM521Page />} />
+          <Route path="clinical/chronic-followup-m521" element={<ChronicFollowupM521Page />} />
+          <Route path="clinical/psych-screening-m521" element={<PsychScreeningM521Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
