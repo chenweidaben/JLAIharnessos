@@ -514,6 +514,10 @@ import { m518Routes } from './routes/m518Routes'; // M518 P0合规重点（智�
 import { m519Routes } from './routes/m519Routes'; // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
 import { m520Routes } from './routes/m520Routes'; // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
 import { m521Routes } from './routes/m521Routes'; // M521 P0合规重点（智慧服务三级·急诊预检分诊：候诊·分诊准确率）
+import { m522Routes } from './routes/m522Routes'; // M522 新标准 P0（字典与下拉数据源：科室·药品·诊断字典）
+import { m523Routes } from './routes/m523Routes'; // M523 新标准 P0（字典第二批：术式·血型·检验项目字典）
+import { m524Routes } from './routes/m524Routes'; // M524 新标准 P0（医嘱闭环状态机：实例·待审核·闭环统计）
+import { m525Routes } from './routes/m525Routes'; // M525 新标准 P0（护理评估闭环状态机：实例·措施清单·闭环统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4369,6 +4373,10 @@ const allRoutes: RouteDef[] = [
   ...m519Routes, // M519 P0合规重点（医疗质量安全·输血深度：输血申请·输血不良反应）
   ...m520Routes, // M520 P0合规重点（医院管理·放射防护：放射剂量·设备巡检·个人剂量计）
   ...m521Routes, // M521 P0合规重点（智慧服务三级·急诊预检分诊：候诊·分诊准确率）
+  ...m522Routes, // M522 新标准 P0（字典与下拉数据源：科室·药品·诊断字典）
+  ...m523Routes, // M523 新标准 P0（字典第二批：术式·血型·检验项目字典）
+  ...m524Routes, // M524 新标准 P0（医嘱闭环状态机：实例·待审核·闭环统计）
+  ...m525Routes, // M525 新标准 P0（护理评估闭环状态机：实例·措施清单·闭环统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
