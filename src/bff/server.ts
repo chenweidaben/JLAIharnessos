@@ -566,6 +566,10 @@ import { m570Routes } from './routes/m570Routes'; // M570 新标准 P7（医嘱�
 import { m571Routes } from './routes/m571Routes'; // M571 新标准 P7（护理记录单：仅新增 GET /stats·15 条种子·三班多患者·byPatient 出入量平衡 + byShift 均值；GET/POST 已有 nursingRecord.ts DB 不重复）
 import { m572Routes } from './routes/m572Routes'; // M572 新标准 P7（检验检查申请：18 条种子·lab/imaging/pathology·3 条 stat 1h 未报 overdue·requested→reported/cancelled·409 already_reported/already_cancelled）
 import { m573Routes } from './routes/m573Routes'; // M573 新标准 P7（手术知情同意：10 份种子·patient+guardian 至少一签 400 at_least_one_signature_required·有效期早于手术 400 consent_expires_before_surgery·draft→verified pass/revise 仍待修·409 already_verified）
+import { m574Routes } from './routes/m574Routes'; // M574 新标准 P8（入院记录：10 份种子·internal/surgery/pediatrics·4 draft+3 submitted+3 reviewed·单次 submit 直接 reviewed·409 already_reviewed/already_submitted）
+import { m575Routes } from './routes/m575Routes'; // M575 新标准 P8（病程记录：0 新增·progressNote.ts 已注册 GET/POST/POST :id/sign·8h 首次病程/6h 抢救补记校验已在线·400 first_note_must_within_8h/rescue_note_must_within_6h）
+import { m576Routes } from './routes/m576Routes'; // M576 新标准 P8（出院小结：0 新增·dischargeSummary.ts 已注册 GET/POST/POST :id/submit/POST :id/verify·died 必配 deathCause 校验由 DB aggregator 内置）
+import { m577Routes } from './routes/m577Routes'; // M577 新标准 P8（转科记录：8 条种子·internal→surgery/cardiology、pediatrics→neonatology·transferred→acknowledged·409 already_acknowledged）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4473,6 +4477,10 @@ const allRoutes: RouteDef[] = [
   ...m571Routes, // M571 新标准 P7（护理记录单：仅新增 GET /stats·15 条种子·三班多患者·byPatient 出入量平衡 + byShift 均值；GET/POST 已有 nursingRecord.ts DB 不重复）
   ...m572Routes, // M572 新标准 P7（检验检查申请：18 条种子·lab/imaging/pathology·3 条 stat 1h 未报 overdue·requested→reported/cancelled·409 already_reported/already_cancelled）
   ...m573Routes, // M573 新标准 P7（手术知情同意：10 份种子·patient+guardian 至少一签 400 at_least_one_signature_required·有效期早于手术 400 consent_expires_before_surgery·draft→verified pass/revise 仍待修·409 already_verified）
+  ...m574Routes, // M574 新标准 P8（入院记录：10 份种子·internal/surgery/pediatrics·4 draft+3 submitted+3 reviewed·单次 submit 直接 reviewed·409 already_reviewed/already_submitted）
+  ...m575Routes, // M575 新标准 P8（病程记录：0 新增·progressNote.ts 已注册 GET/POST/POST :id/sign·8h 首次病程/6h 抢救补记校验已在线·400 first_note_must_within_8h/rescue_note_must_within_6h）
+  ...m576Routes, // M576 新标准 P8（出院小结：0 新增·dischargeSummary.ts 已注册 GET/POST/POST :id/submit/POST :id/verify·died 必配 deathCause 校验由 DB aggregator 内置）
+  ...m577Routes, // M577 新标准 P8（转科记录：8 条种子·internal→surgery/cardiology、pediatrics→neonatology·transferred→acknowledged·409 already_acknowledged）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
