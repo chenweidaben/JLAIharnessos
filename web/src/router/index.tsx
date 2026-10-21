@@ -3226,6 +3226,16 @@ const CdsChecksPage = lazy(() => import('@/pages/clinical/cds-checks'));
 const PatientTimelineM544Page = lazy(() => import('@/pages/clinical/patient-timeline'));
 // M545-P0：护理 NQI 敏感指标看板（/clinical/nqi-dashboard；命名避让旧模块 NqiDashboardPage）
 const NqiDashboardM545Page = lazy(() => import('@/pages/clinical/nqi-dashboard'));
+// M610-P0：药品库存管理（/management/drug-inventory；命名避让既有 drugInventory 预警模块）
+const DrugInventoryM610Page = lazy(() => import('@/pages/management/drug-inventory'));
+// M611-P0：耗材管理（/management/consumables）
+const ConsumablesM611Page = lazy(() => import('@/pages/management/consumables'));
+// M612-P0：采购申请（/management/purchase-requests）
+const PurchaseRequestsM612Page = lazy(() => import('@/pages/management/purchase-requests'));
+// M613-P0：供应商管理（/management/suppliers）
+const SuppliersM613Page = lazy(() => import('@/pages/management/suppliers'));
+// M614-P0：排班日历（/management/scheduling-calendar）
+const SchedulingCalendarM614Page = lazy(() => import('@/pages/management/scheduling-calendar'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4510,6 +4520,16 @@ export default function AppRoutes() {
           <Route path="clinical/patient-timeline" element={<PatientTimelineM544Page />} />
           {/* M545-P0：护理 NQI 敏感指标看板 */}
           <Route path="clinical/nqi-dashboard" element={<NqiDashboardM545Page />} />
+          {/* M610-P0：药品库存管理 */}
+          <Route path="management/drug-inventory" element={<DrugInventoryM610Page />} />
+          {/* M611-P0：耗材管理 */}
+          <Route path="management/consumables" element={<ConsumablesM611Page />} />
+          {/* M612-P0：采购申请 */}
+          <Route path="management/purchase-requests" element={<PurchaseRequestsM612Page />} />
+          {/* M613-P0：供应商管理 */}
+          <Route path="management/suppliers" element={<SuppliersM613Page />} />
+          {/* M614-P0：排班日历 */}
+          <Route path="management/scheduling-calendar" element={<SchedulingCalendarM614Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
