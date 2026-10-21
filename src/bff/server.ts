@@ -550,6 +550,10 @@ import { m554Routes } from './routes/m554Routes'; // M554 新标准 P3（不良�
 import { m555Routes } from './routes/m555Routes'; // M555 新标准 P3（输血反应调查结案：仅新增 investigate·reported→investigated·409 already_investigated；GET/POST 已有 transfusionReaction.ts DB 注册不重复）
 import { m556Routes } from './routes/m556Routes'; // M556 新标准 P3（跌倒评估与上报：Morse 自动分级·high 必须配 interventions·400 high_risk_requires_interventions·409 fall_event_already_recorded）
 import { m557Routes } from './routes/m557Routes'; // M557 新标准 P3（ADR 闭环：Naranjo 评分 0-13·因果关系 certain/probable/possible/unlikely·reported→assessed·409 already_assessed）
+import { m558Routes } from './routes/m558Routes'; // M558 新标准 P4（会诊管理闭环：仅新增 3 个 POST·requested→accepted→completed·409 must_accept_first/already_accepted/already_completed；GET 已有 m198Routes.ts 不重复）
+import { m559Routes } from './routes/m559Routes'; // M559 新标准 P4（护理排班：3 病房×1 周种子·同天双班 409 duplicate_shift_same_day·night→次日 day 409 night_then_day_rest_required）
+import { m560Routes } from './routes/m560Routes'; // M560 新标准 P4（手术排程：8 台种子·同 OR 时段重叠 409 or_room_time_conflict·emergency 插队豁免·已取消 409 already_cancelled）
+import { m561Routes } from './routes/m561Routes'; // M561 新标准 P4（出院计划闭环：仅新增 approve·draft→executed·409 already_approved；GET/POST/push 已有 dischargePlan.ts DB 注册不重复）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4441,6 +4445,10 @@ const allRoutes: RouteDef[] = [
   ...m555Routes, // M555 新标准 P3（输血反应调查结案：仅新增 investigate·reported→investigated·409 already_investigated；GET/POST 已有 transfusionReaction.ts DB 注册不重复）
   ...m556Routes, // M556 新标准 P3（跌倒评估与上报：Morse 自动分级·high 必须配 interventions·400 high_risk_requires_interventions·409 fall_event_already_recorded）
   ...m557Routes, // M557 新标准 P3（ADR 闭环：Naranjo 评分 0-13·因果关系 certain/probable/possible/unlikely·reported→assessed·409 already_assessed）
+  ...m558Routes, // M558 新标准 P4（会诊管理闭环：仅新增 3 个 POST·requested→accepted→completed·409 must_accept_first/already_accepted/already_completed；GET 已有 m198Routes.ts 不重复）
+  ...m559Routes, // M559 新标准 P4（护理排班：3 病房×1 周种子·同天双班 409 duplicate_shift_same_day·night→次日 day 409 night_then_day_rest_required）
+  ...m560Routes, // M560 新标准 P4（手术排程：8 台种子·同 OR 时段重叠 409 or_room_time_conflict·emergency 插队豁免·已取消 409 already_cancelled）
+  ...m561Routes, // M561 新标准 P4（出院计划闭环：仅新增 approve·draft→executed·409 already_approved；GET/POST/push 已有 dischargePlan.ts DB 注册不重复）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
