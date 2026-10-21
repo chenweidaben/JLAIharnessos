@@ -570,6 +570,10 @@ import { m574Routes } from './routes/m574Routes'; // M574 新标准 P8（入院�
 import { m575Routes } from './routes/m575Routes'; // M575 新标准 P8（病程记录：0 新增·progressNote.ts 已注册 GET/POST/POST :id/sign·8h 首次病程/6h 抢救补记校验已在线·400 first_note_must_within_8h/rescue_note_must_within_6h）
 import { m576Routes } from './routes/m576Routes'; // M576 新标准 P8（出院小结：0 新增·dischargeSummary.ts 已注册 GET/POST/POST :id/submit/POST :id/verify·died 必配 deathCause 校验由 DB aggregator 内置）
 import { m577Routes } from './routes/m577Routes'; // M577 新标准 P8（转科记录：8 条种子·internal→surgery/cardiology、pediatrics→neonatology·transferred→acknowledged·409 already_acknowledged）
+import { m578Routes } from './routes/m578Routes'; // M578 新标准 P9（MDT 多学科会诊：8 例·5 肿瘤+3 疑难·requested/scheduled/finalized 三态·409 must_schedule_first/already_scheduled/already_finalized）
+import { m579Routes } from './routes/m579Routes'; // M579 新标准 P9（死亡记录：5 例·猝死/MOF/晚期肿瘤·deathDate<admissionDate 400 death_before_admission·超 24h 400 death_record_must_within_24h·draft→reviewed·409 already_reviewed）
+import { m580Routes } from './routes/m580Routes'; // M580 新标准 P9（手术记录单：0 新增·surgeryRecord.ts 已注册 GET/POST/POST :id/sign·bloodLoss 非负/surgeryEnd>surgeryStart 校验由 DB aggregator 内置）
+import { m581Routes } from './routes/m581Routes'; // M581 新标准 P9（ICU 监护：20 条×3 患者·GCS 3-15/fio2 21-100/peep 0-20 校验·GET /stats 汇总 byPatient avgGCS/totalUrineOutput24h）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4481,6 +4485,10 @@ const allRoutes: RouteDef[] = [
   ...m575Routes, // M575 新标准 P8（病程记录：0 新增·progressNote.ts 已注册 GET/POST/POST :id/sign·8h 首次病程/6h 抢救补记校验已在线·400 first_note_must_within_8h/rescue_note_must_within_6h）
   ...m576Routes, // M576 新标准 P8（出院小结：0 新增·dischargeSummary.ts 已注册 GET/POST/POST :id/submit/POST :id/verify·died 必配 deathCause 校验由 DB aggregator 内置）
   ...m577Routes, // M577 新标准 P8（转科记录：8 条种子·internal→surgery/cardiology、pediatrics→neonatology·transferred→acknowledged·409 already_acknowledged）
+  ...m578Routes, // M578 新标准 P9（MDT 多学科会诊：8 例·5 肿瘤+3 疑难·requested/scheduled/finalized 三态·409 must_schedule_first/already_scheduled/already_finalized）
+  ...m579Routes, // M579 新标准 P9（死亡记录：5 例·猝死/MOF/晚期肿瘤·deathDate<admissionDate 400 death_before_admission·超 24h 400 death_record_must_within_24h·draft→reviewed·409 already_reviewed）
+  ...m580Routes, // M580 新标准 P9（手术记录单：0 新增·surgeryRecord.ts 已注册 GET/POST/POST :id/sign·bloodLoss 非负/surgeryEnd>surgeryStart 校验由 DB aggregator 内置）
+  ...m581Routes, // M581 新标准 P9（ICU 监护：20 条×3 患者·GCS 3-15/fio2 21-100/peep 0-20 校验·GET /stats 汇总 byPatient avgGCS/totalUrineOutput24h）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
