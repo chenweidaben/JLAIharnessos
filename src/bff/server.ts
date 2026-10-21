@@ -554,6 +554,10 @@ import { m558Routes } from './routes/m558Routes'; // M558 新标准 P4（会诊�
 import { m559Routes } from './routes/m559Routes'; // M559 新标准 P4（护理排班：3 病房×1 周种子·同天双班 409 duplicate_shift_same_day·night→次日 day 409 night_then_day_rest_required）
 import { m560Routes } from './routes/m560Routes'; // M560 新标准 P4（手术排程：8 台种子·同 OR 时段重叠 409 or_room_time_conflict·emergency 插队豁免·已取消 409 already_cancelled）
 import { m561Routes } from './routes/m561Routes'; // M561 新标准 P4（出院计划闭环：仅新增 approve·draft→executed·409 already_approved；GET/POST/push 已有 dischargePlan.ts DB 注册不重复）
+import { m562Routes } from './routes/m562Routes'; // M562 新标准 P5（临床路径管理：6 路径×5 阶段·10 入径·重复入径 409 already_enrolled·deviated/dropped 必配 deviationReason）
+import { m563Routes } from './routes/m563Routes'; // M563 新标准 P5（AMS 合理用药点评：15 条种子·antibacterial/anticoagulant/psychotropic·/stats 汇总 passRate/rejectRate/byDept/byCategory）
+import { m564Routes } from './routes/m564Routes'; // M564 新标准 P5（患者随访闭环：12 条种子·3 overdue·GET 自动 overdue 判定·scheduled→executed·重复 409 already_executed）
+import { m565Routes } from './routes/m565Routes'; // M565 新标准 P5（手术麻醉记录：8 条种子·general/regional/local·同 operationId 409 already_recorded·Aldrete<9 出院 400 aldrete_too_low_for_discharge）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4449,6 +4453,10 @@ const allRoutes: RouteDef[] = [
   ...m559Routes, // M559 新标准 P4（护理排班：3 病房×1 周种子·同天双班 409 duplicate_shift_same_day·night→次日 day 409 night_then_day_rest_required）
   ...m560Routes, // M560 新标准 P4（手术排程：8 台种子·同 OR 时段重叠 409 or_room_time_conflict·emergency 插队豁免·已取消 409 already_cancelled）
   ...m561Routes, // M561 新标准 P4（出院计划闭环：仅新增 approve·draft→executed·409 already_approved；GET/POST/push 已有 dischargePlan.ts DB 注册不重复）
+  ...m562Routes, // M562 新标准 P5（临床路径管理：6 路径×5 阶段·10 入径·重复入径 409 already_enrolled·deviated/dropped 必配 deviationReason）
+  ...m563Routes, // M563 新标准 P5（AMS 合理用药点评：15 条种子·antibacterial/anticoagulant/psychotropic·/stats 汇总 passRate/rejectRate/byDept/byCategory）
+  ...m564Routes, // M564 新标准 P5（患者随访闭环：12 条种子·3 overdue·GET 自动 overdue 判定·scheduled→executed·重复 409 already_executed）
+  ...m565Routes, // M565 新标准 P5（手术麻醉记录：8 条种子·general/regional/local·同 operationId 409 already_recorded·Aldrete<9 出院 400 aldrete_too_low_for_discharge）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
