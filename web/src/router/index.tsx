@@ -3252,6 +3252,16 @@ const HealthEducationM620Page = lazy(() => import('@/pages/patient/health-educat
 const MedicationGuidanceM621Page = lazy(() => import('@/pages/patient/medication-guidance'));
 // P12-M622：康复评估（/patient/rehab-assessment）
 const RehabAssessmentM622Page = lazy(() => import('@/pages/patient/rehab-assessment'));
+// P13-M623：门诊量统计（/management/outpatient-stats）
+const OutpatientStatsM623Page = lazy(() => import('@/pages/management/outpatient-stats'));
+// P13-M624：住院床位统计（/management/inpatient-stats）
+const InpatientStatsM624Page = lazy(() => import('@/pages/management/inpatient-stats'));
+// P13-M625：手术量统计（/management/surgery-stats）
+const SurgeryStatsM625Page = lazy(() => import('@/pages/management/surgery-stats'));
+// P13-M626：医疗质量指标（/management/quality-stats）
+const QualityStatsM626Page = lazy(() => import('@/pages/management/quality-stats'));
+// P13-M627：药占比/耗占比（/management/drug-ratio-stats）
+const DrugRatioStatsM627Page = lazy(() => import('@/pages/management/drug-ratio-stats'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4562,6 +4572,16 @@ export default function AppRoutes() {
           <Route path="patient/medication-guidance" element={<MedicationGuidanceM621Page />} />
           {/* P12-M622：康复评估 */}
           <Route path="patient/rehab-assessment" element={<RehabAssessmentM622Page />} />
+          {/* P13-M623：门诊量统计 */}
+          <Route path="management/outpatient-stats" element={<OutpatientStatsM623Page />} />
+          {/* P13-M624：住院床位统计 */}
+          <Route path="management/inpatient-stats" element={<InpatientStatsM624Page />} />
+          {/* P13-M625：手术量统计 */}
+          <Route path="management/surgery-stats" element={<SurgeryStatsM625Page />} />
+          {/* P13-M626：医疗质量指标 */}
+          <Route path="management/quality-stats" element={<QualityStatsM626Page />} />
+          {/* P13-M627：药占比/耗占比 */}
+          <Route path="management/drug-ratio-stats" element={<DrugRatioStatsM627Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
