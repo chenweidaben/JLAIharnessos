@@ -3188,6 +3188,16 @@ const PharmacyTraceBoardM518Page = lazy(() => import('@/pages/pharmacy/trace-boa
 const TransfusionDeepBoardM519Page = lazy(() => import('@/pages/quality/transfusion-deep-board-m519'));
 // M520：放射防护监控看板（/integration/radiation-board）
 const RadiationBoardM520Page = lazy(() => import('@/pages/integration/radiation-board-m520'));
+// M521-P0 首批：术前访视 ASA 分级评估（/clinical/preop-assessment-m521）
+const PreopAssessmentM521Page = lazy(() => import('@/pages/clinical/preop-assessment-m521'));
+// M521-P0 首批：疼痛 NRS 0–10 评估（/clinical/pain-assessment-m521）
+const PainAssessmentM521Page = lazy(() => import('@/pages/clinical/pain-assessment-m521'));
+// M521-P0 首批：VTE 抗凝疗程（/clinical/vte-anticoag-m521）
+const VteAnticoagM521Page = lazy(() => import('@/pages/clinical/vte-anticoag-m521'));
+// M521-P0 首批：PACU Aldrete 出室评分（/clinical/pacu-record-m521）
+const PacuRecordM521Page = lazy(() => import('@/pages/clinical/pacu-record-m521'));
+// M521-P0 首批：NRS-2002 营养风险筛查（/clinical/nutrition-screening-m521）
+const NutritionScreeningM521Page = lazy(() => import('@/pages/clinical/nutrition-screening-m521'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4290,6 +4300,7 @@ const MobileTasks = lazy(() => import('@/pages/mobile/Tasks'));
 const MobileHandoff = lazy(() => import('@/pages/mobile/Handoff'));
 const MobileMe = lazy(() => import('@/pages/mobile/Me'));
 const MobileQuickActions = lazy(() => import('@/pages/mobile/QuickActions'));
+const PreopAssessmentM521Page = lazy(() => import('@/pages/clinical/preop-assessment-m521'));
 
 function PageLoading() {
   return (
@@ -4440,6 +4451,16 @@ export default function AppRoutes() {
           <Route path="quality/transfusion-deep-board" element={<TransfusionDeepBoardM519Page />} />
           {/* M520：放射防护监控看板 */}
           <Route path="integration/radiation-board" element={<RadiationBoardM520Page />} />
+          {/* M521-P0 首批：术前访视 ASA 分级评估 */}
+          <Route path="clinical/preop-assessment-m521" element={<PreopAssessmentM521Page />} />
+          {/* M521-P0 首批：疼痛 NRS 0–10 评估 */}
+          <Route path="clinical/pain-assessment-m521" element={<PainAssessmentM521Page />} />
+          {/* M521-P0 首批：VTE 抗凝疗程 */}
+          <Route path="clinical/vte-anticoag-m521" element={<VteAnticoagM521Page />} />
+          {/* M521-P0 首批：PACU Aldrete 出室评分 */}
+          <Route path="clinical/pacu-record-m521" element={<PacuRecordM521Page />} />
+          {/* M521-P0 首批：NRS-2002 营养风险筛查 */}
+          <Route path="clinical/nutrition-screening-m521" element={<NutritionScreeningM521Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
@@ -9714,6 +9735,8 @@ export default function AppRoutes() {
           <Route path="pharmacy/suppliers-detail" element={<PharmacySuppliersDetailPage />} />
           <Route path="pharmacy/warnings-detail" element={<PharmacyWarningsDetailPage />} />
           <Route path="pharmacy/expiry-detail" element={<PharmacyExpiryDetailPage />} />
+          {/* M521 P0：术前访视 ASA 分级评估（临床表单专项改造） */}
+          <Route path="clinical/preop-assessment-m521" element={<PreopAssessmentM521Page />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />
