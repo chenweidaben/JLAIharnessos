@@ -3262,6 +3262,16 @@ const SurgeryStatsM625Page = lazy(() => import('@/pages/management/surgery-stats
 const QualityStatsM626Page = lazy(() => import('@/pages/management/quality-stats'));
 // P13-M627：药占比/耗占比（/management/drug-ratio-stats）
 const DrugRatioStatsM627Page = lazy(() => import('@/pages/management/drug-ratio-stats'));
+// P0-M628：病历版本对比 v2（/clinical/medical-record-version-compare-v2）
+const MedicalRecordVersionCompareV2M628Page = lazy(() => import('@/pages/clinical/medical-record-version-compare-v2'));
+// P0-M629：CDS 规则配置 v2（/clinical/cds-rule-config-v2）
+const CdsRuleConfigV2M629Page = lazy(() => import('@/pages/clinical/cds-rule-config-v2'));
+// P0-M630：患者 360 视图 v2（/clinical/patient-360-v2）
+const Patient360V2M630Page = lazy(() => import('@/pages/clinical/patient-360-v2'));
+// P0-M631：护理排班看板 v2（/nursing/schedule-board-v2）
+const ScheduleBoardV2M631Page = lazy(() => import('@/pages/nursing/schedule-board-v2'));
+// P0-M632：不良事件上报 v2（/clinical/adverse-event-report-v2）
+const AdverseEventReportV2M632Page = lazy(() => import('@/pages/clinical/adverse-event-report-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4582,6 +4592,16 @@ export default function AppRoutes() {
           <Route path="management/quality-stats" element={<QualityStatsM626Page />} />
           {/* P13-M627：药占比/耗占比 */}
           <Route path="management/drug-ratio-stats" element={<DrugRatioStatsM627Page />} />
+          {/* P0-M628：病历版本对比 v2 */}
+          <Route path="clinical/medical-record-version-compare-v2" element={<MedicalRecordVersionCompareV2M628Page />} />
+          {/* P0-M629：CDS 规则配置 v2 */}
+          <Route path="clinical/cds-rule-config-v2" element={<CdsRuleConfigV2M629Page />} />
+          {/* P0-M630：患者 360 视图 v2 */}
+          <Route path="clinical/patient-360-v2" element={<Patient360V2M630Page />} />
+          {/* P0-M631：护理排班看板 v2 */}
+          <Route path="nursing/schedule-board-v2" element={<ScheduleBoardV2M631Page />} />
+          {/* P0-M632：不良事件上报 v2 */}
+          <Route path="clinical/adverse-event-report-v2" element={<AdverseEventReportV2M632Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
