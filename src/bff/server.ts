@@ -521,6 +521,8 @@ import { m525Routes } from './routes/m525Routes'; // M525 新标准 P0（护理�
 import { m526Routes } from './routes/m526Routes'; // M526 新标准 P0（患者就诊队列字典 + 评估量表选项字典）
 import { m527Routes } from './routes/m527Routes'; // M527 新标准 P0（存量字典补强 v2：科室·药品·诊断）
 import { m528Routes } from './routes/m528Routes'; // M528 新标准 P0（评估记录统一契约：列表·详情·内存态写入）
+import { m529Routes } from './routes/m529Routes'; // M529 新标准 P0（VTE 抗凝疗程 CRUD：列表·启动·出血评分·停药）
+import { m530Routes } from './routes/m530Routes'; // M530 新标准 P0（PACU Aldrete 出室评分 CRUD：列表·新建·出室申请）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4383,6 +4385,8 @@ const allRoutes: RouteDef[] = [
   ...m526Routes, // M526 新标准 P0（患者就诊队列字典 + 评估量表选项字典）
   ...m527Routes, // M527 新标准 P0（存量字典补强 v2：科室·药品·诊断）
   ...m528Routes, // M528 新标准 P0（评估记录统一契约：列表·详情·内存态写入）
+  ...m529Routes, // M529 新标准 P0（VTE 抗凝疗程 CRUD：列表·启动·出血评分·停药）
+  ...m530Routes, // M530 新标准 P0（PACU Aldrete 出室评分 CRUD：列表·新建·出室申请）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
