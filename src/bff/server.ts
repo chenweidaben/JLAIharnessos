@@ -538,6 +538,10 @@ import { m542Routes } from './routes/m542Routes'; // M542 新标准 P0（病历�
 import { m543Routes } from './routes/m543Routes'; // M543 新标准 P0（CDS 临床决策支持规则引擎：17 条规则·alerts[]·drug/lab/dose/duplicate/contraindication）
 import { m544Routes } from './routes/m544Routes'; // M544 新标准 P0（患者时间线聚合：22 条种子·9 类事件·from/to 区间过滤·eventTime 倒序）
 import { m545Routes } from './routes/m545Routes'; // M545 新标准 P0（护理 NQI 敏感指标：5 指标字典·15 事件种子·上报 id=NQI- 自增）
+import { m546Routes } from './routes/m546Routes'; // M546 新标准 P1（互联互通四甲数据集映射：8 数据集目录·80 字段 WS363 国标编码）
+import { m547Routes } from './routes/m547Routes'; // M547 新标准 P1（电子病历五级三级查房闭环：ward→residents→attending 状态机·越级/重复/时间倒退 409）
+import { m548Routes } from './routes/m548Routes'; // M548 新标准 P1（智慧服务三级报告查询与推送：6 报告种子·pending→sent→read 推送闭环·409 already_pushed）
+import { m549Routes } from './routes/m549Routes'; // M549 新标准 P1（智慧服务三级满意度调查：4 模板·20 答卷种子·averageScore 自动均值·responseRate 85%）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4417,6 +4421,10 @@ const allRoutes: RouteDef[] = [
   ...m543Routes, // M543 新标准 P0（CDS 临床决策支持规则引擎：17 条规则·alerts[]·drug/lab/dose/duplicate/contraindication）
   ...m544Routes, // M544 新标准 P0（患者时间线聚合：22 条种子·9 类事件·from/to 区间过滤·eventTime 倒序）
   ...m545Routes, // M545 新标准 P0（护理 NQI 敏感指标：5 指标字典·15 事件种子·上报 id=NQI- 自增）
+  ...m546Routes, // M546 新标准 P1（互联互通四甲数据集映射：8 数据集目录·80 字段 WS363 国标编码）
+  ...m547Routes, // M547 新标准 P1（电子病历五级三级查房闭环：ward→residents→attending 状态机·越级/重复/时间倒退 409）
+  ...m548Routes, // M548 新标准 P1（智慧服务三级报告查询与推送：6 报告种子·pending→sent→read 推送闭环·409 already_pushed）
+  ...m549Routes, // M549 新标准 P1（智慧服务三级满意度调查：4 模板·20 答卷种子·averageScore 自动均值·responseRate 85%）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
