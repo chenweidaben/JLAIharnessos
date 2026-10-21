@@ -523,6 +523,9 @@ import { m527Routes } from './routes/m527Routes'; // M527 新标准 P0（存量�
 import { m528Routes } from './routes/m528Routes'; // M528 新标准 P0（评估记录统一契约：列表·详情·内存态写入）
 import { m529Routes } from './routes/m529Routes'; // M529 新标准 P0（VTE 抗凝疗程 CRUD：列表·启动·出血评分·停药）
 import { m530Routes } from './routes/m530Routes'; // M530 新标准 P0（PACU Aldrete 出室评分 CRUD：列表·新建·出室申请）
+import { m531Routes } from './routes/m531Routes'; // M531 新标准 P0（ICU 镇静 RASS/Ramsay：列表·内存态新建）
+import { m532Routes } from './routes/m532Routes'; // M532 新标准 P0（Barthel 指数 ADL：列表·自动汇总总分/分级·内存态新建）
+import { m533Routes } from './routes/m533Routes'; // M533 新标准 P0（急诊四级预检分诊：列表·生命体征二次校验升档·内存态新建）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4387,6 +4390,9 @@ const allRoutes: RouteDef[] = [
   ...m528Routes, // M528 新标准 P0（评估记录统一契约：列表·详情·内存态写入）
   ...m529Routes, // M529 新标准 P0（VTE 抗凝疗程 CRUD：列表·启动·出血评分·停药）
   ...m530Routes, // M530 新标准 P0（PACU Aldrete 出室评分 CRUD：列表·新建·出室申请）
+  ...m531Routes, // M531 新标准 P0（ICU 镇静 RASS/Ramsay：列表·内存态新建）
+  ...m532Routes, // M532 新标准 P0（Barthel 指数 ADL：列表·自动汇总总分/分级·内存态新建）
+  ...m533Routes, // M533 新标准 P0（急诊四级预检分诊：列表·生命体征二次校验升档·内存态新建）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

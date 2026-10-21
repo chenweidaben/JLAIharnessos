@@ -3196,6 +3196,12 @@ const VteAnticoagM521Page = lazy(() => import('@/pages/clinical/vte-anticoag-m52
 const PacuRecordM521Page = lazy(() => import('@/pages/clinical/pacu-record-m521'));
 // M521-P0 首批：NRS-2002 营养风险筛查（/clinical/nutrition-screening-m521）
 const NutritionScreeningM521Page = lazy(() => import('@/pages/clinical/nutrition-screening-m521'));
+// M521-P0 第二批：ICU 镇静 RASS/Ramsay（/clinical/icu-sedation-m521）
+const IcuSedationM521Page = lazy(() => import('@/pages/clinical/icu-sedation-m521'));
+// M521-P0 第二批：Barthel 指数 ADL（/clinical/barthel-index-m521）
+const BarthelIndexM521Page = lazy(() => import('@/pages/clinical/barthel-index-m521'));
+// M521-P0 第二批：急诊四级预检分诊（/clinical/er-triage-m521）
+const ErTriageM521Page = lazy(() => import('@/pages/clinical/er-triage-m521'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4457,6 +4463,12 @@ export default function AppRoutes() {
           <Route path="clinical/pacu-record-m521" element={<PacuRecordM521Page />} />
           {/* M521-P0 首批：NRS-2002 营养风险筛查 */}
           <Route path="clinical/nutrition-screening-m521" element={<NutritionScreeningM521Page />} />
+          {/* M521-P0 第二批：ICU 镇静 RASS/Ramsay */}
+          <Route path="clinical/icu-sedation-m521" element={<IcuSedationM521Page />} />
+          {/* M521-P0 第二批：Barthel 指数 ADL */}
+          <Route path="clinical/barthel-index-m521" element={<BarthelIndexM521Page />} />
+          {/* M521-P0 第二批：急诊四级预检分诊 */}
+          <Route path="clinical/er-triage-m521" element={<ErTriageM521Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
