@@ -3236,6 +3236,22 @@ const PurchaseRequestsM612Page = lazy(() => import('@/pages/management/purchase-
 const SuppliersM613Page = lazy(() => import('@/pages/management/suppliers'));
 // M614-P0：排班日历（/management/scheduling-calendar）
 const SchedulingCalendarM614Page = lazy(() => import('@/pages/management/scheduling-calendar'));
+// P11-M615：预约挂号（/patient/appointment-booking）
+const AppointmentBookingM615Page = lazy(() => import('@/pages/patient/appointment-booking'));
+// P11-M616：移动缴费（/patient/mobile-payment）
+const MobilePaymentM616Page = lazy(() => import('@/pages/patient/mobile-payment'));
+// P11-M617：报告推送（/patient/report-delivery）
+const ReportDeliveryM617Page = lazy(() => import('@/pages/patient/report-delivery'));
+// P11-M618：满意度统计（/management/satisfaction-stats）
+const SatisfactionStatsM618Page = lazy(() => import('@/pages/management/satisfaction-stats'));
+// P12-M619：随访计划（/patient/followup-plans）
+const FollowupPlansM619Page = lazy(() => import('@/pages/patient/followup-plans'));
+// P12-M620：健康教育（/patient/health-education）
+const HealthEducationM620Page = lazy(() => import('@/pages/patient/health-education'));
+// P12-M621：用药指导（/patient/medication-guidance）
+const MedicationGuidanceM621Page = lazy(() => import('@/pages/patient/medication-guidance'));
+// P12-M622：康复评估（/patient/rehab-assessment）
+const RehabAssessmentM622Page = lazy(() => import('@/pages/patient/rehab-assessment'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4530,6 +4546,22 @@ export default function AppRoutes() {
           <Route path="management/suppliers" element={<SuppliersM613Page />} />
           {/* M614-P0：排班日历 */}
           <Route path="management/scheduling-calendar" element={<SchedulingCalendarM614Page />} />
+          {/* P11-M615：预约挂号 */}
+          <Route path="patient/appointment-booking" element={<AppointmentBookingM615Page />} />
+          {/* P11-M616：移动缴费 */}
+          <Route path="patient/mobile-payment" element={<MobilePaymentM616Page />} />
+          {/* P11-M617：报告推送 */}
+          <Route path="patient/report-delivery" element={<ReportDeliveryM617Page />} />
+          {/* P11-M618：满意度统计 */}
+          <Route path="management/satisfaction-stats" element={<SatisfactionStatsM618Page />} />
+          {/* P12-M619：随访计划 */}
+          <Route path="patient/followup-plans" element={<FollowupPlansM619Page />} />
+          {/* P12-M620：健康教育 */}
+          <Route path="patient/health-education" element={<HealthEducationM620Page />} />
+          {/* P12-M621：用药指导 */}
+          <Route path="patient/medication-guidance" element={<MedicationGuidanceM621Page />} />
+          {/* P12-M622：康复评估 */}
+          <Route path="patient/rehab-assessment" element={<RehabAssessmentM622Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
