@@ -533,6 +533,8 @@ import { m537Routes } from './routes/m537Routes'; // M537 新标准 P0（肿瘤�
 import { m538Routes } from './routes/m538Routes'; // M538 新标准 P0（产后访视：多条件组合判定 needsPhysicianReview + riskTags·内存态新建）
 import { m539Routes } from './routes/m539Routes'; // M539 新标准 P0（在线问诊：按 urgency 自动算 priority + needsNurseTriage·内存态新建）
 import { m540Routes } from './routes/m540Routes'; // M540 新标准 P0（智能预问诊：规则引擎自动算 triageLevel/waitArea/needsUpgrade·内存态新建）
+import { m541Routes } from './routes/m541Routes'; // M541 新标准 P0（FHIR R4 网关：Patient 资源 GET·互联互通四甲·内存种子）
+import { m542Routes } from './routes/m542Routes'; // M542 新标准 P0（病历版本管理：版本号自增·draft→submitted→locked 状态机·locked 终态 409）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4407,6 +4409,8 @@ const allRoutes: RouteDef[] = [
   ...m538Routes, // M538 新标准 P0（产后访视：多条件组合判定 needsPhysicianReview + riskTags·内存态新建）
   ...m539Routes, // M539 新标准 P0（在线问诊：按 urgency 自动算 priority + needsNurseTriage·内存态新建）
   ...m540Routes, // M540 新标准 P0（智能预问诊：规则引擎自动算 triageLevel/waitArea/needsUpgrade·内存态新建）
+  ...m541Routes, // M541 新标准 P0（FHIR R4 网关：Patient 资源 GET·互联互通四甲·内存种子）
+  ...m542Routes, // M542 新标准 P0（病历版本管理：版本号自增·draft→submitted→locked 状态机·locked 终态 409）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
