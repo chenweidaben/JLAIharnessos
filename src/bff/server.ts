@@ -578,6 +578,10 @@ import { m582Routes } from './routes/m582Routes'; // M582 新标准 P10（EMPI�
 import { m583Routes } from './routes/m583Routes'; // M583 新标准 P10（字典映射：40 条 dept/disease/drug/test 各 10·dictType 枚举校验·draft→verified·409 already_verified）
 import { m584Routes } from './routes/m584Routes'; // M584 新标准 P10（标准数据集上报：8 份·2 submitted+3 generated+3 draft·draft→generated→submitted·409 must_generate_first/already_submitted）
 import { m585Routes } from './routes/m585Routes'; // M585 新标准 P10（互联互通测评：20 项·4 类各 5·passed 必须配 evidenceUrl 400 passed_requires_evidence）
+import { m586Routes } from './routes/m586Routes'; // M586 新标准 P11（预约挂号：20 条·3 checkedIn+2 cancelled+13 booked·同时段同医生同患者重复 409 already_booked·过号 400 too_late_to_checkin）
+import { m587Routes } from './routes/m587Routes'; // M587 新标准 P11（移动缴费：15 条·2 refunded+13 paid·amount<=0 400 amount_must_positive·refundAmount>amount 400 refund_exceeds_amount·409 already_refunded）
+import { m588Routes } from './routes/m588Routes'; // M588 新标准 P11（报告查询推送：仅补 POST /api/v1/reports 新建·reviewingDoctorAt<=reportingDoctorAt 400 review_must_after_report·GET 列表/GET :id/POST :id/push 已由 m548 注册）
+import { m589Routes } from './routes/m589Routes'; // M589 新标准 P11（患者满意度：仅补 GET /stats 汇总·totalSurveys+averageOverall+byDept+byDoctor NPS·GET 列表/POST 提交/GET /ranking 已由 satisfactionSurvey.ts 注册）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4497,6 +4501,10 @@ const allRoutes: RouteDef[] = [
   ...m583Routes, // M583 新标准 P10（字典映射：40 条 dept/disease/drug/test 各 10·dictType 枚举校验·draft→verified·409 already_verified）
   ...m584Routes, // M584 新标准 P10（标准数据集上报：8 份·2 submitted+3 generated+3 draft·draft→generated→submitted·409 must_generate_first/already_submitted）
   ...m585Routes, // M585 新标准 P10（互联互通测评：20 项·4 类各 5·passed 必须配 evidenceUrl 400 passed_requires_evidence）
+  ...m586Routes, // M586 新标准 P11（预约挂号：20 条·3 checkedIn+2 cancelled+13 booked·同时段同医生同患者重复 409 already_booked·过号 400 too_late_to_checkin）
+  ...m587Routes, // M587 新标准 P11（移动缴费：15 条·2 refunded+13 paid·amount<=0 400 amount_must_positive·refundAmount>amount 400 refund_exceeds_amount·409 already_refunded）
+  ...m588Routes, // M588 新标准 P11（报告查询推送：仅补 POST /api/v1/reports 新建·reviewingDoctorAt<=reportingDoctorAt 400 review_must_after_report·GET 列表/GET :id/POST :id/push 已由 m548 注册）
+  ...m589Routes, // M589 新标准 P11（患者满意度：仅补 GET /stats 汇总·totalSurveys+averageOverall+byDept+byDoctor NPS·GET 列表/POST 提交/GET /ranking 已由 satisfactionSurvey.ts 注册）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
