@@ -582,6 +582,10 @@ import { m586Routes } from './routes/m586Routes'; // M586 新标准 P11（预约
 import { m587Routes } from './routes/m587Routes'; // M587 新标准 P11（移动缴费：15 条·2 refunded+13 paid·amount<=0 400 amount_must_positive·refundAmount>amount 400 refund_exceeds_amount·409 already_refunded）
 import { m588Routes } from './routes/m588Routes'; // M588 新标准 P11（报告查询推送：仅补 POST /api/v1/reports 新建·reviewingDoctorAt<=reportingDoctorAt 400 review_must_after_report·GET 列表/GET :id/POST :id/push 已由 m548 注册）
 import { m589Routes } from './routes/m589Routes'; // M589 新标准 P11（患者满意度：仅补 GET /stats 汇总·totalSurveys+averageOverall+byDept+byDoctor NPS·GET 列表/POST 提交/GET /ranking 已由 satisfactionSurvey.ts 注册）
+import { m590Routes } from './routes/m590Routes'; // M590 新标准 P12（随访计划：25 条含 5 overdue·状态机 planned→completed/cancelled·409 already_completed/cannot_reschedule_completed）
+import { m591Routes } from './routes/m591Routes'; // M591 新标准 P12（健康教育：30 条含 10 已读+5 已反馈·409 already_viewed·rating 1-5 校验 rating_out_of_range）
+import { m592Routes } from './routes/m592Routes'; // M592 新标准 P12（用药指导：40 条含 15 依从性记录·adherent=no 必须配 missedDoses·GET /stats 双维度 byPatient+byMedication）
+import { m593Routes } from './routes/m593Routes'; // M593 新标准 P12（康复评估：20 条含 8 goal+12 progress·score 范围匹配 assessmentType·assessedAt 不能未来）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4505,6 +4509,10 @@ const allRoutes: RouteDef[] = [
   ...m587Routes, // M587 新标准 P11（移动缴费：15 条·2 refunded+13 paid·amount<=0 400 amount_must_positive·refundAmount>amount 400 refund_exceeds_amount·409 already_refunded）
   ...m588Routes, // M588 新标准 P11（报告查询推送：仅补 POST /api/v1/reports 新建·reviewingDoctorAt<=reportingDoctorAt 400 review_must_after_report·GET 列表/GET :id/POST :id/push 已由 m548 注册）
   ...m589Routes, // M589 新标准 P11（患者满意度：仅补 GET /stats 汇总·totalSurveys+averageOverall+byDept+byDoctor NPS·GET 列表/POST 提交/GET /ranking 已由 satisfactionSurvey.ts 注册）
+  ...m590Routes, // M590 新标准 P12（随访计划：25 条含 5 overdue·状态机 planned→completed/cancelled·409 already_completed/cannot_reschedule_completed）
+  ...m591Routes, // M591 新标准 P12（健康教育：30 条含 10 已读+5 已反馈·409 already_viewed·rating 1-5 校验 rating_out_of_range）
+  ...m592Routes, // M592 新标准 P12（用药指导：40 条含 15 依从性记录·adherent=no 必须配 missedDoses·GET /stats 双维度 byPatient+byMedication）
+  ...m593Routes, // M593 新标准 P12（康复评估：20 条含 8 goal+12 progress·score 范围匹配 assessmentType·assessedAt 不能未来）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
