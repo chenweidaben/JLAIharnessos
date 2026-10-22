@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 妇科管理（M819）
+ * 健澜科技 jlmedaios - 妇科管理（M849 原地升级 M819 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,20 +19,20 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useGynecologyWorkloadM819Store } from '@/store/gynecologyWorkloadM819Store';
-import type { GynecologyWorkload } from '@/services/api/gynecologyWorkloadM819';
+import { useGynecologyWorkloadM849Store } from '@/store/gynecologyWorkloadM849Store';
+import type { GynecologyWorkloadM849 } from '@/services/api/gynecologyWorkloadM849';
 
 const surgeryColumns: ColumnsType<{ name: string; count: number }> = [
   { title: '手术类型', dataIndex: 'name' },
-  { title: '例数', dataIndex: 'count', align: 'right' },
+  { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
-const buildColumns = (setDetail: (r: GynecologyWorkload) => void): ColumnsType<GynecologyWorkload> => [
+const buildColumns = (setDetail: (r: GynecologyWorkloadM849) => void): ColumnsType<GynecologyWorkloadM849> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '门诊人次', dataIndex: 'outpatient', width: 100, align: 'right' },
-  { title: '住院人次', dataIndex: 'inpatient', width: 100, align: 'right' },
-  { title: '手术数', dataIndex: 'surgeries', width: 90, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
-  { title: '腔镜手术数', dataIndex: 'laparoscopic', width: 120, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '门诊数', dataIndex: 'outpatient', width: 100, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '手术数', dataIndex: 'surgeries', width: 100, align: 'right', render: (v: number) => <Tag color="red">{v}</Tag> },
+  { title: '宫腔镜数', dataIndex: 'hysteroscopy', width: 110, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '腹腔镜数', dataIndex: 'laparoscopy', width: 110, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -45,10 +45,10 @@ const buildColumns = (setDetail: (r: GynecologyWorkload) => void): ColumnsType<G
   },
 ];
 
-export default function GynecologyManagementM819Page() {
+export default function GynecologyManagementM849Page() {
   usePageTitle('妇科管理');
-  const { items, loading, error, demo, load } = useGynecologyWorkloadM819Store();
-  const [detail, setDetail] = useState<GynecologyWorkload | null>(null);
+  const { items, loading, error, demo, load } = useGynecologyWorkloadM849Store();
+  const [detail, setDetail] = useState<GynecologyWorkloadM849 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function GynecologyManagementM819Page() {
   return (
     <PageContainer
       title="妇科管理"
-      description="日期 / 门诊人次 / 住院人次 / 手术数 / 腔镜手术数 / 状态"
+      description="日期 / 门诊数 / 手术数 / 宫腔镜数 / 腹腔镜数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -66,7 +66,7 @@ export default function GynecologyManagementM819Page() {
 
       <Card size="small" title={`妇科工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
         </Spin>
       </Card>
 
@@ -81,13 +81,14 @@ export default function GynecologyManagementM819Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="门诊人次">{detail.outpatient}</Descriptions.Item>
-              <Descriptions.Item label="住院人次">{detail.inpatient}</Descriptions.Item>
+              <Descriptions.Item label="门诊数">{detail.outpatient}</Descriptions.Item>
               <Descriptions.Item label="手术数">{detail.surgeries}</Descriptions.Item>
-              <Descriptions.Item label="腔镜手术数">{detail.laparoscopic}</Descriptions.Item>
+              <Descriptions.Item label="宫腔镜数">{detail.hysteroscopy}</Descriptions.Item>
+              <Descriptions.Item label="腹腔镜数">{detail.laparoscopy}</Descriptions.Item>
               <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
-              <Descriptions.Item label="病理结果" span={2}>{detail.pathology}</Descriptions.Item>
-              <Descriptions.Item label="随访" span={2}>{detail.followup}</Descriptions.Item>
+              <Descriptions.Item label="妇科肿瘤记录" span={2}>{detail.oncology}</Descriptions.Item>
+              <Descriptions.Item label="内分泌疾病管理" span={2}>{detail.endocrine}</Descriptions.Item>
+              <Descriptions.Item label="微创手术记录" span={2}>{detail.minimallyInvasive}</Descriptions.Item>
             </Descriptions>
             <Card size="small" title="手术类型分解">
               <Table rowKey="name" dataSource={detail.surgeryBreakdown} columns={surgeryColumns} size="small" pagination={false} />
