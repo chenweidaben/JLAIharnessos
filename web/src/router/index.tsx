@@ -3498,6 +3498,16 @@ const ComplaintsM755Page = lazy(() => import('@/pages/patient-service/complaints
 const PraisalsM756Page = lazy(() => import('@/pages/patient-service/praisals'));
 // M757：医患沟通记录（/patient-service/communication-records）
 const CommunicationRecordsM757Page = lazy(() => import('@/pages/patient-service/communication-records'));
+// M758：医院评审管理（/accreditation/hospital-review）
+const HospitalReviewM758Page = lazy(() => import('@/pages/accreditation/hospital-review'));
+// M759：智慧服务评级管理（/accreditation/smart-service-rating）
+const SmartServiceRatingM759Page = lazy(() => import('@/pages/accreditation/smart-service-rating'));
+// M760：电子病历评级管理（/accreditation/emr-rating）
+const EmrRatingM760Page = lazy(() => import('@/pages/accreditation/emr-rating'));
+// M761：互联互通测评管理（/accreditation/interop-assessment）
+const InteropAssessmentM761Page = lazy(() => import('@/pages/accreditation/interop-assessment'));
+// M762：三级公立医院绩效考核（/accreditation/national-performance）
+const NationalPerformanceM762Page = lazy(() => import('@/pages/accreditation/national-performance'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5054,6 +5064,16 @@ export default function AppRoutes() {
           <Route path="patient-service/praisals" element={<PraisalsM756Page />} />
           {/* M757：医患沟通记录 */}
           <Route path="patient-service/communication-records" element={<CommunicationRecordsM757Page />} />
+          {/* M758：医院评审管理 */}
+          <Route path="accreditation/hospital-review" element={<HospitalReviewM758Page />} />
+          {/* M759：智慧服务评级管理 */}
+          <Route path="accreditation/smart-service-rating" element={<SmartServiceRatingM759Page />} />
+          {/* M760：电子病历评级管理 */}
+          <Route path="accreditation/emr-rating" element={<EmrRatingM760Page />} />
+          {/* M761：互联互通测评管理 */}
+          <Route path="accreditation/interop-assessment" element={<InteropAssessmentM761Page />} />
+          {/* M762：三级公立医院绩效考核 */}
+          <Route path="accreditation/national-performance" element={<NationalPerformanceM762Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
