@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 病理科管理（M806）
+ * 健澜科技 jlmedaios - 病理科管理（M836 原地升级 M806 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,11 +19,11 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { usePathologyWorkloadM806Store } from '@/store/pathologyWorkloadM806Store';
-import type { PathologyWorkload } from '@/services/api/pathologyWorkloadM806';
+import { usePathologyWorkloadM836Store } from '@/store/pathologyWorkloadM836Store';
+import type { PathologyWorkloadM836 } from '@/services/api/pathologyWorkloadM836';
 
-const typeColumns: ColumnsType<{ name: string; count: number }> = [
-  { title: '标本类型', dataIndex: 'name' },
+const specimenColumns: ColumnsType<{ type: string; count: number }> = [
+  { title: '标本类型', dataIndex: 'type' },
   { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
@@ -32,12 +32,12 @@ const ihcColumns: ColumnsType<{ item: string; count: number }> = [
   { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
-const buildColumns = (setDetail: (r: PathologyWorkload) => void): ColumnsType<PathologyWorkload> => [
+const buildColumns = (setDetail: (r: PathologyWorkloadM836) => void): ColumnsType<PathologyWorkloadM836> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '标本类型', dataIndex: 'specimenType', width: 130 },
-  { title: '标本数', dataIndex: 'specimens', width: 100, align: 'right' },
-  { title: '诊断数', dataIndex: 'diagnoses', width: 100, align: 'right' },
-  { title: '报告时效', dataIndex: 'reportSla', width: 220, ellipsis: true },
+  { title: '活检数', dataIndex: 'biopsy', width: 90, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '细胞学数', dataIndex: 'cytology', width: 100, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '冰冻数', dataIndex: 'frozen', width: 90, align: 'right', render: (v: number) => <Tag color="orange">{v}</Tag> },
+  { title: '特殊染色数', dataIndex: 'specialStain', width: 120, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -50,10 +50,10 @@ const buildColumns = (setDetail: (r: PathologyWorkload) => void): ColumnsType<Pa
   },
 ];
 
-export default function PathologyManagementM806Page() {
+export default function PathologyManagementM836Page() {
   usePageTitle('病理科管理');
-  const { items, loading, error, demo, load } = usePathologyWorkloadM806Store();
-  const [detail, setDetail] = useState<PathologyWorkload | null>(null);
+  const { items, loading, error, demo, load } = usePathologyWorkloadM836Store();
+  const [detail, setDetail] = useState<PathologyWorkloadM836 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function PathologyManagementM806Page() {
   return (
     <PageContainer
       title="病理科管理"
-      description="日期 / 标本类型 / 标本数 / 诊断数 / 报告时效 / 状态"
+      description="日期 / 活检数 / 细胞学数 / 冰冻数 / 特殊染色数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -86,15 +86,17 @@ export default function PathologyManagementM806Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="标本类型">{detail.specimenType}</Descriptions.Item>
-              <Descriptions.Item label="标本数">{detail.specimens}</Descriptions.Item>
-              <Descriptions.Item label="诊断数">{detail.diagnoses}</Descriptions.Item>
-              <Descriptions.Item label="报告时效" span={2}>{detail.reportSla}</Descriptions.Item>
-              <Descriptions.Item label="诊断符合率" span={2}>{detail.concordance}</Descriptions.Item>
-              <Descriptions.Item label="报告时效统计" span={2}>{detail.reportTimeliness}</Descriptions.Item>
+              <Descriptions.Item label="活检数">{detail.biopsy}</Descriptions.Item>
+              <Descriptions.Item label="细胞学数">{detail.cytology}</Descriptions.Item>
+              <Descriptions.Item label="冰冻数">{detail.frozen}</Descriptions.Item>
+              <Descriptions.Item label="特殊染色数">{detail.specialStain}</Descriptions.Item>
+              <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
+              <Descriptions.Item label="制片记录" span={2}>{detail.slideMaking}</Descriptions.Item>
+              <Descriptions.Item label="诊断记录" span={2}>{detail.diagnosisRecords}</Descriptions.Item>
+              <Descriptions.Item label="远程会诊记录" span={2}>{detail.remoteConsult}</Descriptions.Item>
             </Descriptions>
             <Card size="small" title="标本类型分解" style={{ marginBottom: 16 }}>
-              <Table rowKey="name" dataSource={detail.typeBreakdown} columns={typeColumns} size="small" pagination={false} />
+              <Table rowKey="type" dataSource={detail.specimenBreakdown} columns={specimenColumns} size="small" pagination={false} />
             </Card>
             <Card size="small" title="免疫组化记录">
               <Table rowKey="item" dataSource={detail.ihcRecords} columns={ihcColumns} size="small" pagination={false} />

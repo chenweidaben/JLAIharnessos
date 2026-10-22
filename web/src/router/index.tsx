@@ -3648,6 +3648,12 @@ const OperationsDashboardM830Page = lazy(() => import('@/pages/dashboard/operati
 const NursingDashboardM831Page = lazy(() => import('@/pages/dashboard/nursing'));
 // M832：院感管理驾驶舱（/dashboard/infection-control）
 const InfectionControlDashboardM832Page = lazy(() => import('@/pages/dashboard/infection-control'));
+// M833：营养科管理（/nutrition/management）
+const NutritionManagementM833Page = lazy(() => import('@/pages/nutrition/management'));
+// M835：消毒供应中心管理（/cssd/management）
+const CssdManagementM835Page = lazy(() => import('@/pages/cssd/management'));
+// M837：心电生理检查管理（/cardiology-diagnostic/management）
+const CardiologyDiagnosticManagementM837Page = lazy(() => import('@/pages/cardiology-diagnostic/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5354,6 +5360,12 @@ export default function AppRoutes() {
           <Route path="dashboard/nursing" element={<NursingDashboardM831Page />} />
           {/* M832：院感管理驾驶舱 */}
           <Route path="dashboard/infection-control" element={<InfectionControlDashboardM832Page />} />
+          {/* M833：营养科管理 */}
+          <Route path="nutrition/management" element={<NutritionManagementM833Page />} />
+          {/* M835：消毒供应中心管理 */}
+          <Route path="cssd/management" element={<CssdManagementM835Page />} />
+          {/* M837：心电生理检查管理 */}
+          <Route path="cardiology-diagnostic/management" element={<CardiologyDiagnosticManagementM837Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
