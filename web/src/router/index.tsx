@@ -3342,6 +3342,16 @@ const SurgeryScheduleV2M665Page = lazy(() => import('@/pages/clinical/surgery-sc
 const DischargePlanningV2M666Page = lazy(() => import('@/pages/clinical/discharge-planning-v2'));
 // M562-M667：临床路径管理（/clinical/clinical-pathway-v2）
 const ClinicalPathwayV2M667Page = lazy(() => import('@/pages/clinical/clinical-pathway-v2'));
+// M563-M668：AMS 合理用药（/clinical/ams-rational-drug-v2）
+const AmsRationalDrugV2M668Page = lazy(() => import('@/pages/clinical/ams-rational-drug-v2'));
+// M564-M669：患者随访管理（/clinical/patient-followup-v2）
+const PatientFollowupV2M669Page = lazy(() => import('@/pages/clinical/patient-followup-v2'));
+// M566-M670：病历质控（/clinical/medical-record-quality-v2）
+const MedicalRecordQualityV2M670Page = lazy(() => import('@/pages/clinical/medical-record-quality-v2'));
+// M567-M671：病案首页（/clinical/medical-homepage-v2）
+const MedicalHomepageV2M671Page = lazy(() => import('@/pages/clinical/medical-homepage-v2'));
+// M569-M672：急诊转诊（/clinical/emergency-referral-v2）
+const EmergencyReferralV2M672Page = lazy(() => import('@/pages/clinical/emergency-referral-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4742,6 +4752,16 @@ export default function AppRoutes() {
           <Route path="clinical/discharge-planning-v2" element={<DischargePlanningV2M666Page />} />
           {/* M562-M667：临床路径管理 */}
           <Route path="clinical/clinical-pathway-v2" element={<ClinicalPathwayV2M667Page />} />
+          {/* M563-M668：AMS 合理用药 */}
+          <Route path="clinical/ams-rational-drug-v2" element={<AmsRationalDrugV2M668Page />} />
+          {/* M564-M669：患者随访管理 */}
+          <Route path="clinical/patient-followup-v2" element={<PatientFollowupV2M669Page />} />
+          {/* M566-M670：病历质控 */}
+          <Route path="clinical/medical-record-quality-v2" element={<MedicalRecordQualityV2M670Page />} />
+          {/* M567-M671：病案首页 */}
+          <Route path="clinical/medical-homepage-v2" element={<MedicalHomepageV2M671Page />} />
+          {/* M569-M672：急诊转诊 */}
+          <Route path="clinical/emergency-referral-v2" element={<EmergencyReferralV2M672Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
