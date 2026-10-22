@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 疼痛科管理（M817）
+ * 健澜科技 jlmedaios - 疼痛科管理（M847 原地升级 M817 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,20 +19,20 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { usePainWorkloadM817Store } from '@/store/painWorkloadM817Store';
-import type { PainWorkload } from '@/services/api/painWorkloadM817';
+import { usePainWorkloadM847Store } from '@/store/painWorkloadM847Store';
+import type { PainWorkloadM847 } from '@/services/api/painWorkloadM847';
 
 const typeColumns: ColumnsType<{ name: string; count: number }> = [
   { title: '疼痛类型', dataIndex: 'name' },
   { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
-const buildColumns = (setDetail: (r: PainWorkload) => void): ColumnsType<PainWorkload> => [
+const buildColumns = (setDetail: (r: PainWorkloadM847) => void): ColumnsType<PainWorkloadM847> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '门诊人次', dataIndex: 'outpatient', width: 100, align: 'right' },
-  { title: '治疗人次', dataIndex: 'treatment', width: 100, align: 'right' },
-  { title: '神经阻滞', dataIndex: 'nerveBlock', width: 100, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
-  { title: '射频治疗', dataIndex: 'radiofrequency', width: 100, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
+  { title: '疼痛门诊数', dataIndex: 'outpatient', width: 130, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '神经阻滞数', dataIndex: 'nerveBlock', width: 120, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '小针刀数', dataIndex: 'needleKnife', width: 110, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '射频治疗数', dataIndex: 'rf', width: 120, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -45,10 +45,10 @@ const buildColumns = (setDetail: (r: PainWorkload) => void): ColumnsType<PainWor
   },
 ];
 
-export default function PainManagementM817Page() {
+export default function PainManagementM847Page() {
   usePageTitle('疼痛科管理');
-  const { items, loading, error, demo, load } = usePainWorkloadM817Store();
-  const [detail, setDetail] = useState<PainWorkload | null>(null);
+  const { items, loading, error, demo, load } = usePainWorkloadM847Store();
+  const [detail, setDetail] = useState<PainWorkloadM847 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function PainManagementM817Page() {
   return (
     <PageContainer
       title="疼痛科管理"
-      description="日期 / 门诊人次 / 治疗人次 / 神经阻滞 / 射频治疗 / 状态"
+      description="日期 / 疼痛门诊数 / 神经阻滞数 / 小针刀数 / 射频治疗数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -66,7 +66,7 @@ export default function PainManagementM817Page() {
 
       <Card size="small" title={`疼痛工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
         </Spin>
       </Card>
 
@@ -81,17 +81,16 @@ export default function PainManagementM817Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="门诊人次">{detail.outpatient}</Descriptions.Item>
-              <Descriptions.Item label="治疗人次">{detail.treatment}</Descriptions.Item>
-              <Descriptions.Item label="神经阻滞">{detail.nerveBlock}</Descriptions.Item>
-              <Descriptions.Item label="射频治疗">{detail.radiofrequency}</Descriptions.Item>
+              <Descriptions.Item label="疼痛门诊数">{detail.outpatient}</Descriptions.Item>
+              <Descriptions.Item label="神经阻滞数">{detail.nerveBlock}</Descriptions.Item>
+              <Descriptions.Item label="小针刀数">{detail.needleKnife}</Descriptions.Item>
+              <Descriptions.Item label="射频治疗数">{detail.rf}</Descriptions.Item>
               <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
-              <Descriptions.Item label="VAS 评分" span={2}>{detail.vas}</Descriptions.Item>
-              <Descriptions.Item label="治疗记录" span={2}>{detail.records}</Descriptions.Item>
-              <Descriptions.Item label="疗效评估" span={2}>{detail.outcome}</Descriptions.Item>
-              <Descriptions.Item label="随访" span={2}>{detail.followup}</Descriptions.Item>
+              <Descriptions.Item label="VAS 评分记录" span={2}>{detail.vasRecords}</Descriptions.Item>
+              <Descriptions.Item label="治疗记录（药物/神经阻滞/射频）" span={2}>{detail.treatmentRecords}</Descriptions.Item>
+              <Descriptions.Item label="疗效评估" span={2}>{detail.efficacy}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="疼痛类型分解">
+            <Card size="small" title="疼痛类型分解（癌痛/腰腿痛/神经痛）">
               <Table rowKey="name" dataSource={detail.typeBreakdown} columns={typeColumns} size="small" pagination={false} />
             </Card>
           </>

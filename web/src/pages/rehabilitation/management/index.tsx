@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 康复科管理（M816）
+ * 健澜科技 jlmedaios - 康复科管理（M846 原地升级 M816 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,20 +19,20 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useRehabilitationWorkloadM816Store } from '@/store/rehabilitationWorkloadM816Store';
-import type { RehabilitationWorkload } from '@/services/api/rehabilitationWorkloadM816';
+import { useRehabilitationWorkloadM846Store } from '@/store/rehabilitationWorkloadM846Store';
+import type { RehabilitationWorkloadM846 } from '@/services/api/rehabilitationWorkloadM846';
 
 const typeColumns: ColumnsType<{ name: string; count: number }> = [
   { title: '治疗类型', dataIndex: 'name' },
-  { title: '人次', dataIndex: 'count', align: 'right' },
+  { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
-const buildColumns = (setDetail: (r: RehabilitationWorkload) => void): ColumnsType<RehabilitationWorkload> => [
+const buildColumns = (setDetail: (r: RehabilitationWorkloadM846) => void): ColumnsType<RehabilitationWorkloadM846> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '治疗人次', dataIndex: 'sessions', width: 100, align: 'right' },
-  { title: '物理治疗', dataIndex: 'pt', width: 100, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
-  { title: '作业治疗', dataIndex: 'ot', width: 100, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
-  { title: '言语治疗', dataIndex: 'st', width: 100, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '康复评估数', dataIndex: 'assessments', width: 130, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '物理治疗数', dataIndex: 'pt', width: 120, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '作业治疗数', dataIndex: 'ot', width: 120, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '言语治疗数', dataIndex: 'st', width: 120, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -45,10 +45,10 @@ const buildColumns = (setDetail: (r: RehabilitationWorkload) => void): ColumnsTy
   },
 ];
 
-export default function RehabilitationManagementM816Page() {
+export default function RehabilitationManagementM846Page() {
   usePageTitle('康复科管理');
-  const { items, loading, error, demo, load } = useRehabilitationWorkloadM816Store();
-  const [detail, setDetail] = useState<RehabilitationWorkload | null>(null);
+  const { items, loading, error, demo, load } = useRehabilitationWorkloadM846Store();
+  const [detail, setDetail] = useState<RehabilitationWorkloadM846 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function RehabilitationManagementM816Page() {
   return (
     <PageContainer
       title="康复科管理"
-      description="日期 / 治疗人次 / 物理治疗 / 作业治疗 / 言语治疗 / 状态"
+      description="日期 / 康复评估数 / 物理治疗数 / 作业治疗数 / 言语治疗数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -66,7 +66,7 @@ export default function RehabilitationManagementM816Page() {
 
       <Card size="small" title={`康复工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
         </Spin>
       </Card>
 
@@ -81,16 +81,16 @@ export default function RehabilitationManagementM816Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="治疗人次">{detail.sessions}</Descriptions.Item>
-              <Descriptions.Item label="物理治疗">{detail.pt}</Descriptions.Item>
-              <Descriptions.Item label="作业治疗">{detail.ot}</Descriptions.Item>
-              <Descriptions.Item label="言语治疗">{detail.st}</Descriptions.Item>
+              <Descriptions.Item label="康复评估数">{detail.assessments}</Descriptions.Item>
+              <Descriptions.Item label="物理治疗数">{detail.pt}</Descriptions.Item>
+              <Descriptions.Item label="作业治疗数">{detail.ot}</Descriptions.Item>
+              <Descriptions.Item label="言语治疗数">{detail.st}</Descriptions.Item>
               <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
-              <Descriptions.Item label="患者功能评估（FIM/Barthel）" span={2}>{detail.functional}</Descriptions.Item>
-              <Descriptions.Item label="治疗计划" span={2}>{detail.plan}</Descriptions.Item>
-              <Descriptions.Item label="疗效评估" span={2}>{detail.outcome}</Descriptions.Item>
+              <Descriptions.Item label="康复评估（FIM / Barthel / Fugl-Meyer）" span={2}>{detail.functionalScores}</Descriptions.Item>
+              <Descriptions.Item label="治疗记录（ROM / 肌力 / 平衡）" span={2}>{detail.treatmentRecords}</Descriptions.Item>
+              <Descriptions.Item label="疗效评估" span={2}>{detail.efficacy}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="治疗类型分解">
+            <Card size="small" title="治疗类型分解（PT / OT / ST / 工程）">
               <Table rowKey="name" dataSource={detail.typeBreakdown} columns={typeColumns} size="small" pagination={false} />
             </Card>
           </>
