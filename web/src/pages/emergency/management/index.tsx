@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 急诊科管理（M845 原地升级 M815 视图）
+ * 健澜科技 jlmedaios - 急诊科管理（M883 原地升级 M845 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,31 +19,20 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useEmergencyWorkloadM845Store } from '@/store/emergencyWorkloadM845Store';
-import type { EmergencyWorkloadM845 } from '@/services/api/emergencyWorkloadM845';
+import { useEmergencyWorkloadM883Store } from '@/store/emergencyWorkloadM883Store';
+import type { EmergencyWorkloadM883 } from '@/services/api/emergencyWorkloadM883';
 
-const triageColumns: ColumnsType<{ level: string; count: number; color: string }> = [
-  { title: '分诊分级', dataIndex: 'level' },
-  { title: '数量', dataIndex: 'count', align: 'right', render: (v: number, r) => <Tag color={r.color}>{v}</Tag> },
+const triageColumns: ColumnsType<{ name: string; count: number }> = [
+  { title: '急诊分级', dataIndex: 'name' },
+  { title: '人次', dataIndex: 'count', align: 'right' },
 ];
 
-const greenColumns: ColumnsType<{ type: string; count: number }> = [
-  { title: '绿色通道', dataIndex: 'type' },
-  { title: '数量', dataIndex: 'count', align: 'right' },
-];
-
-const critColumns: ColumnsType<{ time: string; patient: string; item: string }> = [
-  { title: '时间', dataIndex: 'time', width: 80 },
-  { title: '患者', dataIndex: 'patient', width: 100 },
-  { title: '危急值项目', dataIndex: 'item' },
-];
-
-const buildColumns = (setDetail: (r: EmergencyWorkloadM845) => void): ColumnsType<EmergencyWorkloadM845> => [
+const buildColumns = (setDetail: (r: EmergencyWorkloadM883) => void): ColumnsType<EmergencyWorkloadM883> => [
   { title: '日期', dataIndex: 'date', width: 120 },
   { title: '急诊人次', dataIndex: 'visits', width: 110, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
-  { title: '抢救数', dataIndex: 'rescue', width: 100, align: 'right', render: (v: number) => <Tag color="red">{v}</Tag> },
-  { title: '留观数', dataIndex: 'observation', width: 100, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
-  { title: '输液数', dataIndex: 'infusion', width: 100, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '抢救人次', dataIndex: 'rescue', width: 110, align: 'right', render: (v: number) => <Tag color="red">{v}</Tag> },
+  { title: '留观人次', dataIndex: 'observation', width: 110, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '急诊手术数', dataIndex: 'emergencySurgery', width: 130, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -56,10 +45,10 @@ const buildColumns = (setDetail: (r: EmergencyWorkloadM845) => void): ColumnsTyp
   },
 ];
 
-export default function EmergencyManagementM845Page() {
+export default function EmergencyManagementM883Page() {
   usePageTitle('急诊科管理');
-  const { items, loading, error, demo, load } = useEmergencyWorkloadM845Store();
-  const [detail, setDetail] = useState<EmergencyWorkloadM845 | null>(null);
+  const { items, loading, error, demo, load } = useEmergencyWorkloadM883Store();
+  const [detail, setDetail] = useState<EmergencyWorkloadM883 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -69,22 +58,22 @@ export default function EmergencyManagementM845Page() {
   return (
     <PageContainer
       title="急诊科管理"
-      description="日期 / 急诊人次 / 抢救数 / 留观数 / 输液数 / 状态"
+      description="日期 / 急诊人次 / 抢救人次 / 留观人次 / 急诊手术数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
       {error && <Alert type="error" showIcon banner style={{ marginBottom: 12 }} message={error} />}
 
-      <Card size="small" title={`急诊工作（${items.length}）`}>
+      <Card size="small" title={`急诊科工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1300 }} />
         </Spin>
       </Card>
 
       <Modal
         open={!!detail}
-        title="急诊工作详情"
-        width={820}
+        title="急诊科工作详情"
+        width={880}
         footer={<Button onClick={() => setDetail(null)}>关闭</Button>}
         onCancel={() => setDetail(null)}
       >
@@ -93,20 +82,17 @@ export default function EmergencyManagementM845Page() {
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
               <Descriptions.Item label="急诊人次">{detail.visits}</Descriptions.Item>
-              <Descriptions.Item label="抢救数">{detail.rescue}</Descriptions.Item>
-              <Descriptions.Item label="留观数">{detail.observation}</Descriptions.Item>
-              <Descriptions.Item label="输液数">{detail.infusion}</Descriptions.Item>
+              <Descriptions.Item label="抢救人次">{detail.rescue}</Descriptions.Item>
+              <Descriptions.Item label="留观人次">{detail.observation}</Descriptions.Item>
+              <Descriptions.Item label="急诊手术数">{detail.emergencySurgery}</Descriptions.Item>
               <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
-              <Descriptions.Item label="抢救记录" span={2}>{detail.rescueRecords}</Descriptions.Item>
+              <Descriptions.Item label="抢救成功率" span={2}>{detail.rescueSuccess}</Descriptions.Item>
+              <Descriptions.Item label="绿色通道（卒中/胸痛/创伤）" span={2}>{detail.greenChannel}</Descriptions.Item>
+              <Descriptions.Item label="留观床位使用" span={2}>{detail.observationBeds}</Descriptions.Item>
+              <Descriptions.Item label="急诊死亡率" span={2}>{detail.mortality}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="分诊分级（I 红 / II 橙 / III 黄 / IV 绿）" style={{ marginBottom: 16 }}>
-              <Table rowKey="level" dataSource={detail.triageBreakdown} columns={triageColumns} size="small" pagination={false} />
-            </Card>
-            <Card size="small" title="绿色通道（卒中/胸痛/创伤）" style={{ marginBottom: 16 }}>
-              <Table rowKey="type" dataSource={detail.greenChannel} columns={greenColumns} size="small" pagination={false} />
-            </Card>
-            <Card size="small" title="危急值记录">
-              <Table rowKey="time" dataSource={detail.criticalValues} columns={critColumns} size="small" pagination={false} />
+            <Card size="small" title="急诊分级（Ⅰ级红/Ⅱ级橙/Ⅲ级黄/Ⅳ级绿）">
+              <Table rowKey="name" dataSource={detail.triageBreakdown} columns={triageColumns} size="small" pagination={false} />
             </Card>
           </>
         )}

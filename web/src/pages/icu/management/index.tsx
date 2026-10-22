@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - ICU 管理（M844 原地升级 M814 视图）
+ * 健澜科技 jlmedaios - ICU 管理（M884 原地升级 M844 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,27 +19,22 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useIcuWorkloadM844Store } from '@/store/icuWorkloadM844Store';
-import type { IcuWorkloadM844 } from '@/services/api/icuWorkloadM844';
+import { useIcuWorkloadM884Store } from '@/store/icuWorkloadM884Store';
+import type { IcuWorkloadM884 } from '@/services/api/icuWorkloadM884';
 
-const procColumns: ColumnsType<{ name: string; count: number }> = [
-  { title: '有创操作', dataIndex: 'name' },
-  { title: '使用数', dataIndex: 'count', align: 'right' },
+const apacheColumns: ColumnsType<{ name: string; count: number }> = [
+  { title: 'APACHE II 分布', dataIndex: 'name' },
+  { title: '人数', dataIndex: 'count', align: 'right' },
 ];
 
-const buildColumns = (setDetail: (r: IcuWorkloadM844) => void): ColumnsType<IcuWorkloadM844> => [
+const buildColumns = (setDetail: (r: IcuWorkloadM884) => void): ColumnsType<IcuWorkloadM884> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '在床数', dataIndex: 'occupied', width: 100, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
-  { title: '新入数', dataIndex: 'admitted', width: 100, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
-  { title: '转出数', dataIndex: 'discharged', width: 100, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
-  {
-    title: '死亡数',
-    dataIndex: 'deaths',
-    width: 100,
-    align: 'right',
-    render: (v: number) => <Tag color={v > 0 ? 'red' : 'default'}>{v}</Tag>,
-  },
-  { title: '状态', dataIndex: 'status', width: 120 },
+  { title: '开放床位', dataIndex: 'openBeds', width: 110, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '实际占用', dataIndex: 'occupiedBeds', width: 110, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: 'APACHE II 均分', dataIndex: 'apacheAvg', width: 140, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
+  { title: '机械通气数', dataIndex: 'vent', width: 120, align: 'right', render: (v: number) => <Tag color="red">{v}</Tag> },
+  { title: 'CRRT 数', dataIndex: 'crrt', width: 110, align: 'right', render: (v: number) => <Tag color="orange">{v}</Tag> },
+  { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
     width: 90,
@@ -51,10 +46,10 @@ const buildColumns = (setDetail: (r: IcuWorkloadM844) => void): ColumnsType<IcuW
   },
 ];
 
-export default function IcuManagementM844Page() {
+export default function IcuManagementM884Page() {
   usePageTitle('ICU 管理');
-  const { items, loading, error, demo, load } = useIcuWorkloadM844Store();
-  const [detail, setDetail] = useState<IcuWorkloadM844 | null>(null);
+  const { items, loading, error, demo, load } = useIcuWorkloadM884Store();
+  const [detail, setDetail] = useState<IcuWorkloadM884 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -64,7 +59,7 @@ export default function IcuManagementM844Page() {
   return (
     <PageContainer
       title="ICU 管理"
-      description="日期 / 在床数 / 新入数 / 转出数 / 死亡数 / 状态"
+      description="日期 / 开放床位 / 实际占用 / APACHE II 评分 / 机械通气 / CRRT / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -72,14 +67,14 @@ export default function IcuManagementM844Page() {
 
       <Card size="small" title={`ICU 工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1500 }} />
         </Spin>
       </Card>
 
       <Modal
         open={!!detail}
         title="ICU 工作详情"
-        width={820}
+        width={880}
         footer={<Button onClick={() => setDetail(null)}>关闭</Button>}
         onCancel={() => setDetail(null)}
       >
@@ -87,17 +82,20 @@ export default function IcuManagementM844Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="在床数">{detail.occupied}</Descriptions.Item>
-              <Descriptions.Item label="新入数">{detail.admitted}</Descriptions.Item>
-              <Descriptions.Item label="转出数">{detail.discharged}</Descriptions.Item>
-              <Descriptions.Item label="死亡数">{detail.deaths}</Descriptions.Item>
+              <Descriptions.Item label="开放床位">{detail.openBeds}</Descriptions.Item>
+              <Descriptions.Item label="实际占用">{detail.occupiedBeds}</Descriptions.Item>
+              <Descriptions.Item label="APACHE II 均分">{detail.apacheAvg}</Descriptions.Item>
+              <Descriptions.Item label="机械通气数">{detail.vent}</Descriptions.Item>
+              <Descriptions.Item label="CRRT 数">{detail.crrt}</Descriptions.Item>
               <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
-              <Descriptions.Item label="床位使用（满床/空床）" span={2}>{detail.bedUsage}</Descriptions.Item>
-              <Descriptions.Item label="危重评分（APACHE II / SOFA）" span={2}>{detail.severityScore}</Descriptions.Item>
-              <Descriptions.Item label="监护指标（HR/MAP/SpO2/T）" span={2}>{detail.monitoring}</Descriptions.Item>
+              <Descriptions.Item label="机械通气（插管/气切）" span={2}>{detail.ventilation}</Descriptions.Item>
+              <Descriptions.Item label="CRRT 明细" span={2}>{detail.crrtDetail}</Descriptions.Item>
+              <Descriptions.Item label="中心静脉导管（CVC）" span={2}>{detail.cvc}</Descriptions.Item>
+              <Descriptions.Item label="VAP/CLABSI/CAUTI 发生率" span={2}>{detail.haiRates}</Descriptions.Item>
+              <Descriptions.Item label="ICU 死亡率" span={2}>{detail.mortality}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="有创操作（插管/CVC/CRRT）">
-              <Table rowKey="name" dataSource={detail.invasiveProcedures} columns={procColumns} size="small" pagination={false} />
+            <Card size="small" title="APACHE II 评分分布">
+              <Table rowKey="name" dataSource={detail.apacheDistribution} columns={apacheColumns} size="small" pagination={false} />
             </Card>
           </>
         )}
