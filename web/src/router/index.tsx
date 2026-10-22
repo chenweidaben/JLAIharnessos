@@ -3726,6 +3726,16 @@ const OutpatientHallM900Page = lazy(() => import('@/pages/patient-service/hall')
 const FollowupManagementM901Page = lazy(() => import('@/pages/patient-service/followup'));
 // M902：投诉管理（/patient-service/complaint）
 const ComplaintManagementM902Page = lazy(() => import('@/pages/patient-service/complaint'));
+// M903：病案统计管理（/medical-records/statistics）
+const MedicalRecordsStatisticsM903Page = lazy(() => import('@/pages/medical-records/statistics'));
+// M904：医保管理（/insurance/management）
+const InsuranceManagementM904Page = lazy(() => import('@/pages/insurance/management'));
+// M905：物价管理（/pricing/management）
+const PricingManagementM905Page = lazy(() => import('@/pages/pricing/management'));
+// M906：合同管理（/contract/management）
+const ContractManagementM906Page = lazy(() => import('@/pages/contract/management'));
+// M907：审计管理（/audit/management）
+const AuditManagementM907Page = lazy(() => import('@/pages/audit/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5510,6 +5520,16 @@ export default function AppRoutes() {
           <Route path="patient-service/followup" element={<FollowupManagementM901Page />} />
           {/* M902：投诉管理 */}
           <Route path="patient-service/complaint" element={<ComplaintManagementM902Page />} />
+          {/* M903：病案统计管理 */}
+          <Route path="medical-records/statistics" element={<MedicalRecordsStatisticsM903Page />} />
+          {/* M904：医保管理 */}
+          <Route path="insurance/management" element={<InsuranceManagementM904Page />} />
+          {/* M905：物价管理 */}
+          <Route path="pricing/management" element={<PricingManagementM905Page />} />
+          {/* M906：合同管理 */}
+          <Route path="contract/management" element={<ContractManagementM906Page />} />
+          {/* M907：审计管理 */}
+          <Route path="audit/management" element={<AuditManagementM907Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
