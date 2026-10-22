@@ -3436,6 +3436,16 @@ const AdrMonitoringM715Page = lazy(() => import('@/pages/pharmacy/adr-monitoring
 const AmsGradingM716Page = lazy(() => import('@/pages/pharmacy/ams-grading'));
 // M717：特殊药品管理（/pharmacy/special-drugs）
 const SpecialDrugM717Page = lazy(() => import('@/pages/pharmacy/special-drugs'));
+// M718：预约挂号管理（/patient-service/appointment-registration）
+const AppointmentRegistrationM718Page = lazy(() => import('@/pages/patient-service/appointment-registration'));
+// M719：门诊排队叫号（/patient-service/queue-number）
+const QueueNumberM719Page = lazy(() => import('@/pages/patient-service/queue-number'));
+// M720：住院预约管理（/patient-service/inpatient-appointment）
+const InpatientAppointmentM720Page = lazy(() => import('@/pages/patient-service/inpatient-appointment'));
+// M721：检查检验预约（/patient-service/exam-appointment）
+const ExamAppointmentM721Page = lazy(() => import('@/pages/patient-service/exam-appointment'));
+// M722：体检预约管理（/patient-service/physical-exam）
+const PhysicalExamM722Page = lazy(() => import('@/pages/patient-service/physical-exam'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4930,6 +4940,16 @@ export default function AppRoutes() {
           <Route path="pharmacy/ams-grading" element={<AmsGradingM716Page />} />
           {/* M717：特殊药品管理 */}
           <Route path="pharmacy/special-drugs" element={<SpecialDrugM717Page />} />
+          {/* M718：预约挂号管理 */}
+          <Route path="patient-service/appointment-registration" element={<AppointmentRegistrationM718Page />} />
+          {/* M719：门诊排队叫号 */}
+          <Route path="patient-service/queue-number" element={<QueueNumberM719Page />} />
+          {/* M720：住院预约管理 */}
+          <Route path="patient-service/inpatient-appointment" element={<InpatientAppointmentM720Page />} />
+          {/* M721：检查检验预约 */}
+          <Route path="patient-service/exam-appointment" element={<ExamAppointmentM721Page />} />
+          {/* M722：体检预约管理 */}
+          <Route path="patient-service/physical-exam" element={<PhysicalExamM722Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
