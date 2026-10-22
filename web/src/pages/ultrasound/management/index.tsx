@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 超声科管理（M805）
+ * 健澜科技 jlmedaios - 超声科管理（M840 原地升级 M805 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,8 +19,8 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useUltrasoundWorkloadM805Store } from '@/store/ultrasoundWorkloadM805Store';
-import type { UltrasoundWorkload } from '@/services/api/ultrasoundWorkloadM805';
+import { useUltrasoundWorkloadM840Store } from '@/store/ultrasoundWorkloadM840Store';
+import type { UltrasoundWorkloadM840 } from '@/services/api/ultrasoundWorkloadM840';
 
 const typeColumns: ColumnsType<{ name: string; count: number; positive: number }> = [
   { title: '检查类型', dataIndex: 'name' },
@@ -28,18 +28,18 @@ const typeColumns: ColumnsType<{ name: string; count: number; positive: number }
   { title: '阳性数', dataIndex: 'positive', align: 'right', render: (v: number) => <Tag color="red">{v}</Tag> },
 ];
 
-const buildColumns = (setDetail: (r: UltrasoundWorkload) => void): ColumnsType<UltrasoundWorkload> => [
+const interColumns: ColumnsType<{ time: string; patient: string; procedure: string }> = [
+  { title: '时间', dataIndex: 'time', width: 80 },
+  { title: '患者', dataIndex: 'patient', width: 100 },
+  { title: '介入操作', dataIndex: 'procedure' },
+];
+
+const buildColumns = (setDetail: (r: UltrasoundWorkloadM840) => void): ColumnsType<UltrasoundWorkloadM840> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '检查类型', dataIndex: 'examType', width: 120 },
-  { title: '检查数', dataIndex: 'studies', width: 100, align: 'right' },
-  {
-    title: '阳性数',
-    dataIndex: 'positive',
-    width: 100,
-    align: 'right',
-    render: (v: number) => <Tag color="red">{v}</Tag>,
-  },
-  { title: '报告时效', dataIndex: 'reportSla', width: 200, ellipsis: true },
+  { title: '腹部超声', dataIndex: 'abdomen', width: 110, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '心血管超声', dataIndex: 'cardiovascular', width: 130, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '妇产超声', dataIndex: 'obstetricsGynecology', width: 110, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '小器官超声', dataIndex: 'smallParts', width: 120, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -52,10 +52,10 @@ const buildColumns = (setDetail: (r: UltrasoundWorkload) => void): ColumnsType<U
   },
 ];
 
-export default function UltrasoundManagementM805Page() {
+export default function UltrasoundManagementM840Page() {
   usePageTitle('超声科管理');
-  const { items, loading, error, demo, load } = useUltrasoundWorkloadM805Store();
-  const [detail, setDetail] = useState<UltrasoundWorkload | null>(null);
+  const { items, loading, error, demo, load } = useUltrasoundWorkloadM840Store();
+  const [detail, setDetail] = useState<UltrasoundWorkloadM840 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export default function UltrasoundManagementM805Page() {
   return (
     <PageContainer
       title="超声科管理"
-      description="日期 / 检查类型 / 检查数 / 阳性数 / 报告时效 / 状态"
+      description="日期 / 腹部超声 / 心血管超声 / 妇产超声 / 小器官超声 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -73,7 +73,7 @@ export default function UltrasoundManagementM805Page() {
 
       <Card size="small" title={`超声工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
         </Spin>
       </Card>
 
@@ -88,16 +88,20 @@ export default function UltrasoundManagementM805Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="检查类型">{detail.examType}</Descriptions.Item>
-              <Descriptions.Item label="检查数">{detail.studies}</Descriptions.Item>
-              <Descriptions.Item label="阳性数">{detail.positive}</Descriptions.Item>
-              <Descriptions.Item label="报告时效" span={2}>{detail.reportSla}</Descriptions.Item>
-              <Descriptions.Item label="阳性率" span={2}>{detail.positivityRate}</Descriptions.Item>
-              <Descriptions.Item label="报告时效统计" span={2}>{detail.reportTimeliness}</Descriptions.Item>
-              <Descriptions.Item label="图文报告质量" span={2}>{detail.imageQuality}</Descriptions.Item>
+              <Descriptions.Item label="腹部超声">{detail.abdomen}</Descriptions.Item>
+              <Descriptions.Item label="心血管超声">{detail.cardiovascular}</Descriptions.Item>
+              <Descriptions.Item label="妇产超声">{detail.obstetricsGynecology}</Descriptions.Item>
+              <Descriptions.Item label="小器官超声">{detail.smallParts}</Descriptions.Item>
+              <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
+              <Descriptions.Item label="报告时效记录" span={2}>{detail.reportTimeliness}</Descriptions.Item>
+              <Descriptions.Item label="阳性率统计" span={2}>{detail.positivity}</Descriptions.Item>
+              <Descriptions.Item label="图像质量评级" span={2}>{detail.imageQuality}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="检查类型分解">
+            <Card size="small" title="检查类型分解" style={{ marginBottom: 16 }}>
               <Table rowKey="name" dataSource={detail.typeBreakdown} columns={typeColumns} size="small" pagination={false} />
+            </Card>
+            <Card size="small" title="介入超声记录">
+              <Table rowKey="time" dataSource={detail.interventional} columns={interColumns} size="small" pagination={false} />
             </Card>
           </>
         )}

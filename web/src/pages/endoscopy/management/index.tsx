@@ -1,5 +1,5 @@
 /**
- * 健澜科技 jlmedaios - 内镜中心管理（M808）
+ * 健澜科技 jlmedaios - 内镜中心管理（M841 原地升级 M808 视图）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
@@ -19,29 +19,27 @@ import type { ColumnsType } from 'antd/es/table';
 import { PageContainer } from '@/components/common';
 import DemoModeBanner from '@/components/common/DemoModeBanner';
 import { usePageTitle } from '@/hooks';
-import { useEndoscopyWorkloadM808Store } from '@/store/endoscopyWorkloadM808Store';
-import type { EndoscopyWorkload } from '@/services/api/endoscopyWorkloadM808';
+import { useEndoscopyWorkloadM841Store } from '@/store/endoscopyWorkloadM841Store';
+import type { EndoscopyWorkloadM841 } from '@/services/api/endoscopyWorkloadM841';
 
-const typeColumns: ColumnsType<{ name: string; exams: number; treatments: number; biopsies: number }> = [
-  { title: '内镜类型', dataIndex: 'name' },
-  { title: '检查数', dataIndex: 'exams', align: 'right' },
-  { title: '治疗数', dataIndex: 'treatments', align: 'right' },
-  { title: '活检数', dataIndex: 'biopsies', align: 'right' },
+const typeColumns: ColumnsType<{ name: string; count: number }> = [
+  { title: '检查类型', dataIndex: 'name' },
+  { title: '数量', dataIndex: 'count', align: 'right' },
 ];
 
 const compColumns: ColumnsType<{ time: string; patient: string; type: string; action: string }> = [
   { title: '时间', dataIndex: 'time', width: 80 },
   { title: '患者', dataIndex: 'patient', width: 100 },
-  { title: '并发症类型', dataIndex: 'type' },
+  { title: '并发症', dataIndex: 'type' },
   { title: '处置', dataIndex: 'action' },
 ];
 
-const buildColumns = (setDetail: (r: EndoscopyWorkload) => void): ColumnsType<EndoscopyWorkload> => [
+const buildColumns = (setDetail: (r: EndoscopyWorkloadM841) => void): ColumnsType<EndoscopyWorkloadM841> => [
   { title: '日期', dataIndex: 'date', width: 120 },
-  { title: '内镜类型', dataIndex: 'scopeType', width: 120 },
-  { title: '检查数', dataIndex: 'exams', width: 100, align: 'right' },
-  { title: '治疗数', dataIndex: 'treatments', width: 100, align: 'right' },
-  { title: '活检数', dataIndex: 'biopsies', width: 100, align: 'right' },
+  { title: '胃镜数', dataIndex: 'gastroscopy', width: 100, align: 'right', render: (v: number) => <Tag color="blue">{v}</Tag> },
+  { title: '肠镜数', dataIndex: 'colonoscopy', width: 100, align: 'right', render: (v: number) => <Tag color="cyan">{v}</Tag> },
+  { title: '支气管镜数', dataIndex: 'bronchoscopy', width: 120, align: 'right', render: (v: number) => <Tag color="green">{v}</Tag> },
+  { title: '超声内镜数', dataIndex: 'eus', width: 110, align: 'right', render: (v: number) => <Tag color="purple">{v}</Tag> },
   { title: '状态', dataIndex: 'status', width: 110 },
   {
     title: '操作',
@@ -54,10 +52,10 @@ const buildColumns = (setDetail: (r: EndoscopyWorkload) => void): ColumnsType<En
   },
 ];
 
-export default function EndoscopyManagementM808Page() {
+export default function EndoscopyManagementM841Page() {
   usePageTitle('内镜中心管理');
-  const { items, loading, error, demo, load } = useEndoscopyWorkloadM808Store();
-  const [detail, setDetail] = useState<EndoscopyWorkload | null>(null);
+  const { items, loading, error, demo, load } = useEndoscopyWorkloadM841Store();
+  const [detail, setDetail] = useState<EndoscopyWorkloadM841 | null>(null);
   const columns = buildColumns(setDetail);
 
   useEffect(() => {
@@ -67,7 +65,7 @@ export default function EndoscopyManagementM808Page() {
   return (
     <PageContainer
       title="内镜中心管理"
-      description="日期 / 内镜类型 / 检查数 / 治疗数 / 活检数 / 状态"
+      description="日期 / 胃镜数 / 肠镜数 / 支气管镜数 / 超声内镜数 / 状态"
       extra={<Tag color={demo ? 'orange' : 'green'}>{demo ? '演示数据（DEMO）' : 'BFF 真实数据'}</Tag>}
     >
       <DemoModeBanner />
@@ -75,7 +73,7 @@ export default function EndoscopyManagementM808Page() {
 
       <Card size="small" title={`内镜工作（${items.length}）`}>
         <Spin spinning={loading}>
-          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1100 }} />
+          <Table rowKey="id" dataSource={items} columns={columns} size="small" pagination={false} scroll={{ x: 1200 }} />
         </Spin>
       </Card>
 
@@ -90,17 +88,19 @@ export default function EndoscopyManagementM808Page() {
           <>
             <Descriptions column={2} bordered size="small" style={{ marginBottom: 16 }}>
               <Descriptions.Item label="日期">{detail.date}</Descriptions.Item>
-              <Descriptions.Item label="内镜类型">{detail.scopeType}</Descriptions.Item>
-              <Descriptions.Item label="检查数">{detail.exams}</Descriptions.Item>
-              <Descriptions.Item label="治疗数">{detail.treatments}</Descriptions.Item>
-              <Descriptions.Item label="活检数">{detail.biopsies}</Descriptions.Item>
-              <Descriptions.Item label="息肉切除数">{detail.polypectomy}</Descriptions.Item>
-              <Descriptions.Item label="洗消记录" span={2}>{detail.disinfection}</Descriptions.Item>
+              <Descriptions.Item label="胃镜数">{detail.gastroscopy}</Descriptions.Item>
+              <Descriptions.Item label="肠镜数">{detail.colonoscopy}</Descriptions.Item>
+              <Descriptions.Item label="支气管镜数">{detail.bronchoscopy}</Descriptions.Item>
+              <Descriptions.Item label="超声内镜数">{detail.eus}</Descriptions.Item>
+              <Descriptions.Item label="状态">{detail.status}</Descriptions.Item>
+              <Descriptions.Item label="活检记录" span={2}>{detail.biopsyRecords}</Descriptions.Item>
+              <Descriptions.Item label="息肉切除记录" span={2}>{detail.polypectomyRecords}</Descriptions.Item>
+              <Descriptions.Item label="麻醉记录" span={2}>{detail.anesthesia}</Descriptions.Item>
             </Descriptions>
-            <Card size="small" title="内镜类型分解" style={{ marginBottom: 16 }}>
+            <Card size="small" title="检查类型分解" style={{ marginBottom: 16 }}>
               <Table rowKey="name" dataSource={detail.typeBreakdown} columns={typeColumns} size="small" pagination={false} />
             </Card>
-            <Card size="small" title="并发症记录">
+            <Card size="small" title="术后并发症记录">
               <Table rowKey="time" dataSource={detail.complications} columns={compColumns} size="small" pagination={false} />
             </Card>
           </>
