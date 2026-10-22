@@ -3302,6 +3302,16 @@ const LabRadiologyOrderV2M645Page = lazy(() => import('@/pages/clinical/lab-radi
 const SurgeryConsentV2M646Page = lazy(() => import('@/pages/clinical/surgery-consent-v2'));
 // M574-M647：入院记录（/clinical/admission-record-v2）
 const AdmissionRecordV2M647Page = lazy(() => import('@/pages/clinical/admission-record-v2'));
+// M575-M648：病程记录（/clinical/progress-note-v2）
+const ProgressNoteV2M648Page = lazy(() => import('@/pages/clinical/progress-note-v2'));
+// M576-M649：出院小结（/clinical/discharge-summary-v2）
+const DischargeSummaryV2M649Page = lazy(() => import('@/pages/clinical/discharge-summary-v2'));
+// M577-M650：转科记录（/clinical/transfer-note-v2）
+const TransferNoteV2M650Page = lazy(() => import('@/pages/clinical/transfer-note-v2'));
+// M578-M651：MDT 多学科会诊（/clinical/mdt-consult-v2）
+const MdtConsultV2M651Page = lazy(() => import('@/pages/clinical/mdt-consult-v2'));
+// M579-M652：死亡记录（/clinical/death-record-v2）
+const DeathRecordV2M652Page = lazy(() => import('@/pages/clinical/death-record-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4662,6 +4672,16 @@ export default function AppRoutes() {
           <Route path="clinical/surgery-consent-v2" element={<SurgeryConsentV2M646Page />} />
           {/* M574-M647：入院记录 */}
           <Route path="clinical/admission-record-v2" element={<AdmissionRecordV2M647Page />} />
+          {/* M575-M648：病程记录 */}
+          <Route path="clinical/progress-note-v2" element={<ProgressNoteV2M648Page />} />
+          {/* M576-M649：出院小结 */}
+          <Route path="clinical/discharge-summary-v2" element={<DischargeSummaryV2M649Page />} />
+          {/* M577-M650：转科记录 */}
+          <Route path="clinical/transfer-note-v2" element={<TransferNoteV2M650Page />} />
+          {/* M578-M651：MDT 多学科会诊 */}
+          <Route path="clinical/mdt-consult-v2" element={<MdtConsultV2M651Page />} />
+          {/* M579-M652：死亡记录 */}
+          <Route path="clinical/death-record-v2" element={<DeathRecordV2M652Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
