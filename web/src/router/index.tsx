@@ -3378,6 +3378,16 @@ const AnesthesiaRecordM684Page = lazy(() => import('@/pages/anesthesia/record'))
 const IcuMonitorRecordM685Page = lazy(() => import('@/pages/icu/monitor-record'));
 // M686：急诊分诊台（/er/triage）
 const ErTriageM686Page = lazy(() => import('@/pages/er/triage'));
+// M688：输血管理（/transfusion/management）
+const TransfusionManagementM688Page = lazy(() => import('@/pages/transfusion/management'));
+// M689：消毒供应中心（/cswd/workflow）
+const CswdWorkflowM689Page = lazy(() => import('@/pages/cswd/workflow'));
+// M690：病理科工作流程（/pathology/workflow）
+const PathologyWorkflowM690Page = lazy(() => import('@/pages/pathology/workflow'));
+// M691：药剂科处方审核（/pharmacy/review）
+const PharmacyReviewM691Page = lazy(() => import('@/pages/pharmacy/review'));
+// M692：营养科膳食管理（/nutrition/meal-order）
+const NutritionMealOrderM692Page = lazy(() => import('@/pages/nutrition/meal-order'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4814,6 +4824,16 @@ export default function AppRoutes() {
           <Route path="icu/monitor-record" element={<IcuMonitorRecordM685Page />} />
           {/* M686：急诊分诊台 */}
           <Route path="er/triage" element={<ErTriageM686Page />} />
+          {/* M688：输血管理 */}
+          <Route path="transfusion/management" element={<TransfusionManagementM688Page />} />
+          {/* M689：消毒供应中心 */}
+          <Route path="cswd/workflow" element={<CswdWorkflowM689Page />} />
+          {/* M690：病理科工作流程 */}
+          <Route path="pathology/workflow" element={<PathologyWorkflowM690Page />} />
+          {/* M691：药剂科处方审核 */}
+          <Route path="pharmacy/review" element={<PharmacyReviewM691Page />} />
+          {/* M692：营养科膳食管理 */}
+          <Route path="nutrition/meal-order" element={<NutritionMealOrderM692Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
