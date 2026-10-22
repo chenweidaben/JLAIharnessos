@@ -3528,6 +3528,16 @@ const SmartAuditM770Page = lazy(() => import('@/pages/insurance/smart-audit'));
 const FundSupervisionM771Page = lazy(() => import('@/pages/insurance/fund-supervision'));
 // M772：医保谈判药品管理（/insurance/negotiated-drugs）
 const NegotiatedDrugsM772Page = lazy(() => import('@/pages/insurance/negotiated-drugs'));
+// M773：康复医学科管理（/clinical/rehabilitation）
+const RehabilitationM773Page = lazy(() => import('@/pages/clinical/rehabilitation'));
+// M774：疼痛科管理（/clinical/pain）
+const PainM774Page = lazy(() => import('@/pages/clinical/pain'));
+// M775：心理科管理（/clinical/psychology）
+const PsychologyM775Page = lazy(() => import('@/pages/clinical/psychology'));
+// M776：中医科管理（/clinical/tcm）
+const TcmM776Page = lazy(() => import('@/pages/clinical/tcm'));
+// M777：皮肤科管理（/clinical/dermatology）
+const DermatologyM777Page = lazy(() => import('@/pages/clinical/dermatology'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5114,6 +5124,16 @@ export default function AppRoutes() {
           <Route path="insurance/fund-supervision" element={<FundSupervisionM771Page />} />
           {/* M772：医保谈判药品管理 */}
           <Route path="insurance/negotiated-drugs" element={<NegotiatedDrugsM772Page />} />
+          {/* M773：康复医学科管理 */}
+          <Route path="clinical/rehabilitation" element={<RehabilitationM773Page />} />
+          {/* M774：疼痛科管理 */}
+          <Route path="clinical/pain" element={<PainM774Page />} />
+          {/* M775：心理科管理 */}
+          <Route path="clinical/psychology" element={<PsychologyM775Page />} />
+          {/* M776：中医科管理 */}
+          <Route path="clinical/tcm" element={<TcmM776Page />} />
+          {/* M777：皮肤科管理 */}
+          <Route path="clinical/dermatology" element={<DermatologyM777Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
