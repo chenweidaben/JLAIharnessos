@@ -3312,6 +3312,16 @@ const TransferNoteV2M650Page = lazy(() => import('@/pages/clinical/transfer-note
 const MdtConsultV2M651Page = lazy(() => import('@/pages/clinical/mdt-consult-v2'));
 // M579-M652：死亡记录（/clinical/death-record-v2）
 const DeathRecordV2M652Page = lazy(() => import('@/pages/clinical/death-record-v2'));
+// M580-M653：手术记录（/clinical/surgery-record-v2）
+const SurgeryRecordV2M653Page = lazy(() => import('@/pages/clinical/surgery-record-v2'));
+// M581-M654：ICU 监护记录（/clinical/icu-monitor-v2）
+const IcuMonitorV2M654Page = lazy(() => import('@/pages/clinical/icu-monitor-v2'));
+// M582-M655：EMPI 患者主索引（/clinical/empi-master-index）
+const EmpiMasterIndexM655Page = lazy(() => import('@/pages/clinical/empi-master-index'));
+// M583-M656：字典映射（/clinical/dictionary-mapping）
+const DictionaryMappingM656Page = lazy(() => import('@/pages/clinical/dictionary-mapping'));
+// M585-M657：互联互通测评清单（/clinical/interop-checklist）
+const InteropChecklistM657Page = lazy(() => import('@/pages/clinical/interop-checklist'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4682,6 +4692,16 @@ export default function AppRoutes() {
           <Route path="clinical/mdt-consult-v2" element={<MdtConsultV2M651Page />} />
           {/* M579-M652：死亡记录 */}
           <Route path="clinical/death-record-v2" element={<DeathRecordV2M652Page />} />
+          {/* M580-M653：手术记录 */}
+          <Route path="clinical/surgery-record-v2" element={<SurgeryRecordV2M653Page />} />
+          {/* M581-M654：ICU 监护记录 */}
+          <Route path="clinical/icu-monitor-v2" element={<IcuMonitorV2M654Page />} />
+          {/* M582-M655：EMPI 患者主索引 */}
+          <Route path="clinical/empi-master-index" element={<EmpiMasterIndexM655Page />} />
+          {/* M583-M656：字典映射 */}
+          <Route path="clinical/dictionary-mapping" element={<DictionaryMappingM656Page />} />
+          {/* M585-M657：互联互通测评清单 */}
+          <Route path="clinical/interop-checklist" element={<InteropChecklistM657Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
