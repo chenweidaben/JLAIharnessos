@@ -3360,6 +3360,16 @@ const DoctorWorkbenchM674Page = lazy(() => import('@/pages/doctor/workbench'));
 const OutpatientDoctorStationM675Page = lazy(() => import('@/pages/outpatient/doctor-station'));
 // M677：检验报告中心（/lab/report-center）
 const LabReportCenterM677Page = lazy(() => import('@/pages/lab/report-center'));
+// M678：影像报告中心（/radiology/report-center）
+const RadiologyReportCenterM678Page = lazy(() => import('@/pages/radiology/report-center'));
+// M679：病理报告中心（/pathology/report-center）
+const PathologyReportCenterM679Page = lazy(() => import('@/pages/pathology/report-center'));
+// M680：超声报告中心（/ultrasound/report-center）
+const UltrasoundReportCenterM680Page = lazy(() => import('@/pages/ultrasound/report-center'));
+// M681：内镜报告中心（/endoscopy/report-center）
+const EndoscopyReportCenterM681Page = lazy(() => import('@/pages/endoscopy/report-center'));
+// M682：心电检查报告中心（/ecg/report-center）
+const EcgReportCenterM682Page = lazy(() => import('@/pages/ecg/report-center'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4778,6 +4788,16 @@ export default function AppRoutes() {
           <Route path="outpatient/doctor-station" element={<OutpatientDoctorStationM675Page />} />
           {/* M677：检验报告中心 */}
           <Route path="lab/report-center" element={<LabReportCenterM677Page />} />
+          {/* M678：影像报告中心 */}
+          <Route path="radiology/report-center" element={<RadiologyReportCenterM678Page />} />
+          {/* M679：病理报告中心 */}
+          <Route path="pathology/report-center" element={<PathologyReportCenterM679Page />} />
+          {/* M680：超声报告中心 */}
+          <Route path="ultrasound/report-center" element={<UltrasoundReportCenterM680Page />} />
+          {/* M681：内镜报告中心 */}
+          <Route path="endoscopy/report-center" element={<EndoscopyReportCenterM681Page />} />
+          {/* M682：心电检查报告中心 */}
+          <Route path="ecg/report-center" element={<EcgReportCenterM682Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
