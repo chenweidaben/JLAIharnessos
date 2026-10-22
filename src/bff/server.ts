@@ -598,6 +598,10 @@ import { m602Routes } from './routes/m602Routes'; // M602 新标准 P15（排班
 import { m603Routes } from './routes/m603Routes'; // M603 新标准 P15（绩效考核：50 条·overallScore 加权校验±5 容差·重复 feedback 409）
 import { m604Routes } from './routes/m604Routes'; // M604 新标准 P15（成本核算：80 条 6 科室·amount 正数/occurredDate 不能未来·床日成本+诊次成本）
 import { m605Routes } from './routes/m605Routes'; // M605 新标准 P15（设备管理：40 台含 8 过保/5 待维护·serialNumber 唯一·重复 maintenance 同日期 409）
+import { m606Routes } from './routes/m606Routes'; // M606 院感暴发预警（5 条预警含 2 已核实+1 暴发确认·监测趋势 7 天）
+import { m607Routes } from './routes/m607Routes'; // M607 DRG 分组（8 病例含 3 超支+2 结余·6 个 DRG 组目录）
+import { m608Routes } from './routes/m608Routes'; // M608 医保结算（10 条含 3 拒付+2 部分支付·3 条预授权）
+import { m609Routes } from './routes/m609Routes'; // M609 CDR 临床数据中心（患者全景概览+通用查询+数据量统计）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4537,6 +4541,10 @@ const allRoutes: RouteDef[] = [
   ...m603Routes, // M603 新标准 P15（绩效考核：50 条·overallScore 加权校验±5 容差·重复 feedback 409）
   ...m604Routes, // M604 新标准 P15（成本核算：80 条 6 科室·amount 正数/occurredDate 不能未来·床日成本+诊次成本）
   ...m605Routes, // M605 新标准 P15（设备管理：40 台含 8 过保/5 待维护·serialNumber 唯一·重复 maintenance 同日期 409）
+  ...m606Routes, // M606 院感暴发预警（5 条预警含 2 已核实+1 暴发确认·监测趋势 7 天）
+  ...m607Routes, // M607 DRG 分组（8 病例含 3 超支+2 结余·6 个 DRG 组目录）
+  ...m608Routes, // M608 医保结算（10 条含 3 拒付+2 部分支付·3 条预授权）
+  ...m609Routes, // M609 CDR 临床数据中心（患者全景概览+通用查询+数据量统计）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,
