@@ -3464,6 +3464,10 @@ const EquipmentCalibrationM730Page = lazy(() => import('@/pages/equipment/calibr
 const MaterialInventoryM731Page = lazy(() => import('@/pages/materials/inventory'));
 // M732：耗材采购申请管理（/materials/purchase）
 const MaterialPurchaseM732Page = lazy(() => import('@/pages/materials/purchase'));
+// M733：员工档案管理（/hr/employee-records）
+const EmployeeRecordsM733Page = lazy(() => import('@/pages/hr/employee-records'));
+// M734：排班管理（/hr/scheduling）
+const SchedulingM734Page = lazy(() => import('@/pages/hr/scheduling'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4986,6 +4990,10 @@ export default function AppRoutes() {
           <Route path="materials/inventory" element={<MaterialInventoryM731Page />} />
           {/* M732：耗材采购申请管理 */}
           <Route path="materials/purchase" element={<MaterialPurchaseM732Page />} />
+          {/* M733：员工档案管理 */}
+          <Route path="hr/employee-records" element={<EmployeeRecordsM733Page />} />
+          {/* M734：排班管理 */}
+          <Route path="hr/scheduling" element={<SchedulingM734Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
