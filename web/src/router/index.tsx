@@ -3282,6 +3282,16 @@ const InsuranceSettlementV2M635Page = lazy(() => import('@/pages/clinical/insura
 const CdrQueryV2M636Page = lazy(() => import('@/pages/clinical/cdr-query-v2'));
 // M606-M637：院感监测趋势（/clinical/infection-monitor-v2）
 const InfectionMonitorV2M637Page = lazy(() => import('@/pages/clinical/infection-monitor-v2'));
+// M562-M638：手术麻醉记录（/clinical/anesthesia-record-v2）
+const AnesthesiaRecordV2M638Page = lazy(() => import('@/pages/clinical/anesthesia-record-v2'));
+// M555-M639：输血反应记录（/clinical/transfusion-reaction-v2）
+const TransfusionReactionV2M639Page = lazy(() => import('@/pages/clinical/transfusion-reaction-v2'));
+// M556-M640：跌倒评估 Morse（/clinical/fall-assessment-v2）
+const FallAssessmentV2M640Page = lazy(() => import('@/pages/clinical/fall-assessment-v2'));
+// M557-M641：ADR 药品不良反应（/clinical/adr-report-v2）
+const AdrReportV2M641Page = lazy(() => import('@/pages/clinical/adr-report-v2'));
+// M558-M642：会诊管理（/clinical/consultation-v2）
+const ConsultationV2M642Page = lazy(() => import('@/pages/clinical/consultation-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4622,6 +4632,16 @@ export default function AppRoutes() {
           <Route path="clinical/cdr-query-v2" element={<CdrQueryV2M636Page />} />
           {/* M606-M637：院感监测趋势 */}
           <Route path="clinical/infection-monitor-v2" element={<InfectionMonitorV2M637Page />} />
+          {/* M562-M638：手术麻醉记录 */}
+          <Route path="clinical/anesthesia-record-v2" element={<AnesthesiaRecordV2M638Page />} />
+          {/* M555-M639：输血反应记录 */}
+          <Route path="clinical/transfusion-reaction-v2" element={<TransfusionReactionV2M639Page />} />
+          {/* M556-M640：跌倒评估 Morse */}
+          <Route path="clinical/fall-assessment-v2" element={<FallAssessmentV2M640Page />} />
+          {/* M557-M641：ADR 药品不良反应 */}
+          <Route path="clinical/adr-report-v2" element={<AdrReportV2M641Page />} />
+          {/* M558-M642：会诊管理 */}
+          <Route path="clinical/consultation-v2" element={<ConsultationV2M642Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
