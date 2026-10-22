@@ -3558,6 +3558,16 @@ const GastroenterologyM785Page = lazy(() => import('@/pages/clinical/gastroenter
 const NeurologyM786Page = lazy(() => import('@/pages/clinical/neurology'));
 // M787：内分泌科管理（/clinical/endocrinology）
 const EndocrinologyM787Page = lazy(() => import('@/pages/clinical/endocrinology'));
+// M788：肾内科管理（/clinical/nephrology）
+const NephrologyM788Page = lazy(() => import('@/pages/clinical/nephrology'));
+// M789：血液科管理（/clinical/hematology）
+const HematologyM789Page = lazy(() => import('@/pages/clinical/hematology'));
+// M790：风湿免疫科管理（/clinical/rheumatology）
+const RheumatologyM790Page = lazy(() => import('@/pages/clinical/rheumatology'));
+// M791：感染科管理（/clinical/infectious-disease）
+const InfectiousDiseaseM791Page = lazy(() => import('@/pages/clinical/infectious-disease'));
+// M792：肿瘤科管理（/clinical/oncology）
+const OncologyM792Page = lazy(() => import('@/pages/clinical/oncology'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5174,6 +5184,16 @@ export default function AppRoutes() {
           <Route path="clinical/neurology" element={<NeurologyM786Page />} />
           {/* M787：内分泌科管理 */}
           <Route path="clinical/endocrinology" element={<EndocrinologyM787Page />} />
+          {/* M788：肾内科管理 */}
+          <Route path="clinical/nephrology" element={<NephrologyM788Page />} />
+          {/* M789：血液科管理 */}
+          <Route path="clinical/hematology" element={<HematologyM789Page />} />
+          {/* M790：风湿免疫科管理 */}
+          <Route path="clinical/rheumatology" element={<RheumatologyM790Page />} />
+          {/* M791：感染科管理 */}
+          <Route path="clinical/infectious-disease" element={<InfectiousDiseaseM791Page />} />
+          {/* M792：肿瘤科管理 */}
+          <Route path="clinical/oncology" element={<OncologyM792Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
