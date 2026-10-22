@@ -3518,6 +3518,16 @@ const EmergencySuppliesM765Page = lazy(() => import('@/pages/public-health/suppl
 const GeneralDutyM766Page = lazy(() => import('@/pages/admin/general-duty'));
 // M767：应急演练管理（/public-health/drills）
 const DrillsM767Page = lazy(() => import('@/pages/public-health/drills'));
+// M768：DRG 分组管理（/insurance/drg-grouping）
+const DrgGroupingM768Page = lazy(() => import('@/pages/insurance/drg-grouping'));
+// M769：DIP 分组管理（/insurance/dip-grouping）
+const DipGroupingM769Page = lazy(() => import('@/pages/insurance/dip-grouping'));
+// M770：医保智能审核（/insurance/smart-audit）
+const SmartAuditM770Page = lazy(() => import('@/pages/insurance/smart-audit'));
+// M771：医保基金监管（/insurance/fund-supervision）
+const FundSupervisionM771Page = lazy(() => import('@/pages/insurance/fund-supervision'));
+// M772：医保谈判药品管理（/insurance/negotiated-drugs）
+const NegotiatedDrugsM772Page = lazy(() => import('@/pages/insurance/negotiated-drugs'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5094,6 +5104,16 @@ export default function AppRoutes() {
           <Route path="admin/general-duty" element={<GeneralDutyM766Page />} />
           {/* M767：应急演练管理 */}
           <Route path="public-health/drills" element={<DrillsM767Page />} />
+          {/* M768：DRG 分组管理 */}
+          <Route path="insurance/drg-grouping" element={<DrgGroupingM768Page />} />
+          {/* M769：DIP 分组管理 */}
+          <Route path="insurance/dip-grouping" element={<DipGroupingM769Page />} />
+          {/* M770：医保智能审核 */}
+          <Route path="insurance/smart-audit" element={<SmartAuditM770Page />} />
+          {/* M771：医保基金监管 */}
+          <Route path="insurance/fund-supervision" element={<FundSupervisionM771Page />} />
+          {/* M772：医保谈判药品管理 */}
+          <Route path="insurance/negotiated-drugs" element={<NegotiatedDrugsM772Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
