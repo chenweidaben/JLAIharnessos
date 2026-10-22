@@ -3568,6 +3568,16 @@ const RheumatologyM790Page = lazy(() => import('@/pages/clinical/rheumatology'))
 const InfectiousDiseaseM791Page = lazy(() => import('@/pages/clinical/infectious-disease'));
 // M792：肿瘤科管理（/clinical/oncology）
 const OncologyM792Page = lazy(() => import('@/pages/clinical/oncology'));
+// M793：普外科管理（/clinical/general-surgery）
+const GeneralSurgeryM793Page = lazy(() => import('@/pages/clinical/general-surgery'));
+// M794：心胸外科管理（/clinical/cardiothoracic）
+const CardiothoracicM794Page = lazy(() => import('@/pages/clinical/cardiothoracic'));
+// M795：神经外科管理（/clinical/neurosurgery）
+const NeurosurgeryM795Page = lazy(() => import('@/pages/clinical/neurosurgery'));
+// M796：骨科管理（/clinical/orthopedics）
+const OrthopedicsM796Page = lazy(() => import('@/pages/clinical/orthopedics'));
+// M797：泌尿外科管理（/clinical/urology）
+const UrologyM797Page = lazy(() => import('@/pages/clinical/urology'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5194,6 +5204,16 @@ export default function AppRoutes() {
           <Route path="clinical/infectious-disease" element={<InfectiousDiseaseM791Page />} />
           {/* M792：肿瘤科管理 */}
           <Route path="clinical/oncology" element={<OncologyM792Page />} />
+          {/* M793：普外科管理 */}
+          <Route path="clinical/general-surgery" element={<GeneralSurgeryM793Page />} />
+          {/* M794：心胸外科管理 */}
+          <Route path="clinical/cardiothoracic" element={<CardiothoracicM794Page />} />
+          {/* M795：神经外科管理 */}
+          <Route path="clinical/neurosurgery" element={<NeurosurgeryM795Page />} />
+          {/* M796：骨科管理 */}
+          <Route path="clinical/orthopedics" element={<OrthopedicsM796Page />} />
+          {/* M797：泌尿外科管理 */}
+          <Route path="clinical/urology" element={<UrologyM797Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
