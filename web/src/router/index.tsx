@@ -3352,6 +3352,14 @@ const MedicalRecordQualityV2M670Page = lazy(() => import('@/pages/clinical/medic
 const MedicalHomepageV2M671Page = lazy(() => import('@/pages/clinical/medical-homepage-v2'));
 // M569-M672：急诊转诊（/clinical/emergency-referral-v2）
 const EmergencyReferralV2M672Page = lazy(() => import('@/pages/clinical/emergency-referral-v2'));
+// M673：护士站工作台（/nurse/workbench）
+const NurseWorkbenchM673Page = lazy(() => import('@/pages/nurse/workbench'));
+// M674：医生站工作台（/doctor/workbench）
+const DoctorWorkbenchM674Page = lazy(() => import('@/pages/doctor/workbench'));
+// M675：门诊医生站（/outpatient/doctor-station）
+const OutpatientDoctorStationM675Page = lazy(() => import('@/pages/outpatient/doctor-station'));
+// M677：检验报告中心（/lab/report-center）
+const LabReportCenterM677Page = lazy(() => import('@/pages/lab/report-center'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4762,6 +4770,14 @@ export default function AppRoutes() {
           <Route path="clinical/medical-homepage-v2" element={<MedicalHomepageV2M671Page />} />
           {/* M569-M672：急诊转诊 */}
           <Route path="clinical/emergency-referral-v2" element={<EmergencyReferralV2M672Page />} />
+          {/* M673：护士站工作台 */}
+          <Route path="nurse/workbench" element={<NurseWorkbenchM673Page />} />
+          {/* M674：医生站工作台 */}
+          <Route path="doctor/workbench" element={<DoctorWorkbenchM674Page />} />
+          {/* M675：门诊医生站 */}
+          <Route path="outpatient/doctor-station" element={<OutpatientDoctorStationM675Page />} />
+          {/* M677：检验报告中心 */}
+          <Route path="lab/report-center" element={<LabReportCenterM677Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
