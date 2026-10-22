@@ -3488,6 +3488,16 @@ const SealsM750Page = lazy(() => import('@/pages/admin/seals'));
 const VehiclesM751Page = lazy(() => import('@/pages/admin/vehicles'));
 // M752：后勤报修管理（/admin/maintenance-requests）
 const MaintenanceRequestsM752Page = lazy(() => import('@/pages/admin/maintenance-requests'));
+// M753：健康教育管理（/patient-service/health-education）
+const HealthEducationM753Page = lazy(() => import('@/pages/patient-service/health-education'));
+// M754：满意度调查管理（/patient-service/satisfaction-survey）
+const SatisfactionSurveysM754Page = lazy(() => import('@/pages/patient-service/satisfaction-survey'));
+// M755：投诉管理（/patient-service/complaints）
+const ComplaintsM755Page = lazy(() => import('@/pages/patient-service/complaints'));
+// M756：表扬管理（/patient-service/praisals）
+const PraisalsM756Page = lazy(() => import('@/pages/patient-service/praisals'));
+// M757：医患沟通记录（/patient-service/communication-records）
+const CommunicationRecordsM757Page = lazy(() => import('@/pages/patient-service/communication-records'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5034,6 +5044,16 @@ export default function AppRoutes() {
           <Route path="admin/vehicles" element={<VehiclesM751Page />} />
           {/* M752：后勤报修管理 */}
           <Route path="admin/maintenance-requests" element={<MaintenanceRequestsM752Page />} />
+          {/* M753：健康教育管理 */}
+          <Route path="patient-service/health-education" element={<HealthEducationM753Page />} />
+          {/* M754：满意度调查管理 */}
+          <Route path="patient-service/satisfaction-survey" element={<SatisfactionSurveysM754Page />} />
+          {/* M755：投诉管理 */}
+          <Route path="patient-service/complaints" element={<ComplaintsM755Page />} />
+          {/* M756：表扬管理 */}
+          <Route path="patient-service/praisals" element={<PraisalsM756Page />} />
+          {/* M757：医患沟通记录 */}
+          <Route path="patient-service/communication-records" element={<CommunicationRecordsM757Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
