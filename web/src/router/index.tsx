@@ -3292,6 +3292,16 @@ const FallAssessmentV2M640Page = lazy(() => import('@/pages/clinical/fall-assess
 const AdrReportV2M641Page = lazy(() => import('@/pages/clinical/adr-report-v2'));
 // M558-M642：会诊管理（/clinical/consultation-v2）
 const ConsultationV2M642Page = lazy(() => import('@/pages/clinical/consultation-v2'));
+// M570-M643：医嘱闭环（/clinical/order-closure-v2）
+const OrderClosureV2M643Page = lazy(() => import('@/pages/clinical/order-closure-v2'));
+// M571-M644：护理记录单（/clinical/nursing-record-v2）
+const NursingRecordV2M644Page = lazy(() => import('@/pages/clinical/nursing-record-v2'));
+// M572-M645：检验检查申请（/clinical/lab-radiology-order-v2）
+const LabRadiologyOrderV2M645Page = lazy(() => import('@/pages/clinical/lab-radiology-order-v2'));
+// M573-M646：手术知情同意（/clinical/surgery-consent-v2）
+const SurgeryConsentV2M646Page = lazy(() => import('@/pages/clinical/surgery-consent-v2'));
+// M574-M647：入院记录（/clinical/admission-record-v2）
+const AdmissionRecordV2M647Page = lazy(() => import('@/pages/clinical/admission-record-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4642,6 +4652,16 @@ export default function AppRoutes() {
           <Route path="clinical/adr-report-v2" element={<AdrReportV2M641Page />} />
           {/* M558-M642：会诊管理 */}
           <Route path="clinical/consultation-v2" element={<ConsultationV2M642Page />} />
+          {/* M570-M643：医嘱闭环 */}
+          <Route path="clinical/order-closure-v2" element={<OrderClosureV2M643Page />} />
+          {/* M571-M644：护理记录单 */}
+          <Route path="clinical/nursing-record-v2" element={<NursingRecordV2M644Page />} />
+          {/* M572-M645：检验检查申请 */}
+          <Route path="clinical/lab-radiology-order-v2" element={<LabRadiologyOrderV2M645Page />} />
+          {/* M573-M646：手术知情同意 */}
+          <Route path="clinical/surgery-consent-v2" element={<SurgeryConsentV2M646Page />} />
+          {/* M574-M647：入院记录 */}
+          <Route path="clinical/admission-record-v2" element={<AdmissionRecordV2M647Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
