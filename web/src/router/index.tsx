@@ -3598,6 +3598,16 @@ const UltrasoundManagementM805Page = lazy(() => import('@/pages/ultrasound/manag
 const PathologyManagementM806Page = lazy(() => import('@/pages/pathology/management'));
 // M807：心电图科管理（/cardiology/ecg-management）
 const EcgManagementM807Page = lazy(() => import('@/pages/cardiology/ecg-management'));
+// M808：内镜中心管理（/endoscopy/management）
+const EndoscopyManagementM808Page = lazy(() => import('@/pages/endoscopy/management'));
+// M809：放疗科管理（/radiation-oncology/management）
+const RadiationOncologyManagementM809Page = lazy(() => import('@/pages/radiation-oncology/management'));
+// M810：核医学科管理（/nuclear-medicine/management）
+const NuclearMedicineManagementM810Page = lazy(() => import('@/pages/nuclear-medicine/management'));
+// M811：超声介入管理（/ultrasound/interventional）
+const UltrasoundInterventionalM811Page = lazy(() => import('@/pages/ultrasound/interventional'));
+// M812：肺功能室管理（/pulmonary/function-room）
+const PulmonaryFunctionRoomM812Page = lazy(() => import('@/pages/pulmonary/function-room'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5254,6 +5264,16 @@ export default function AppRoutes() {
           <Route path="pathology/management" element={<PathologyManagementM806Page />} />
           {/* M807：心电图科管理 */}
           <Route path="cardiology/ecg-management" element={<EcgManagementM807Page />} />
+          {/* M808：内镜中心管理 */}
+          <Route path="endoscopy/management" element={<EndoscopyManagementM808Page />} />
+          {/* M809：放疗科管理 */}
+          <Route path="radiation-oncology/management" element={<RadiationOncologyManagementM809Page />} />
+          {/* M810：核医学科管理 */}
+          <Route path="nuclear-medicine/management" element={<NuclearMedicineManagementM810Page />} />
+          {/* M811：超声介入管理 */}
+          <Route path="ultrasound/interventional" element={<UltrasoundInterventionalM811Page />} />
+          {/* M812：肺功能室管理 */}
+          <Route path="pulmonary/function-room" element={<PulmonaryFunctionRoomM812Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
