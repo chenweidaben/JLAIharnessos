@@ -3272,6 +3272,16 @@ const Patient360V2M630Page = lazy(() => import('@/pages/clinical/patient-360-v2'
 const ScheduleBoardV2M631Page = lazy(() => import('@/pages/nursing/schedule-board-v2'));
 // P0-M632：不良事件上报 v2（/clinical/adverse-event-report-v2）
 const AdverseEventReportV2M632Page = lazy(() => import('@/pages/clinical/adverse-event-report-v2'));
+// M606-M633：院感暴发预警（/clinical/infection-outbreak-v2）
+const InfectionOutbreakV2M633Page = lazy(() => import('@/pages/clinical/infection-outbreak-v2'));
+// M607-M634：DRG 分组看板（/clinical/drg-grouping-v2）
+const DrgGroupingV2M634Page = lazy(() => import('@/pages/clinical/drg-grouping-v2'));
+// M608-M635：医保结算看板（/clinical/insurance-settlement-v2）
+const InsuranceSettlementV2M635Page = lazy(() => import('@/pages/clinical/insurance-settlement-v2'));
+// M609-M636：CDR 临床数据中心（/clinical/cdr-query-v2）
+const CdrQueryV2M636Page = lazy(() => import('@/pages/clinical/cdr-query-v2'));
+// M606-M637：院感监测趋势（/clinical/infection-monitor-v2）
+const InfectionMonitorV2M637Page = lazy(() => import('@/pages/clinical/infection-monitor-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4602,6 +4612,16 @@ export default function AppRoutes() {
           <Route path="nursing/schedule-board-v2" element={<ScheduleBoardV2M631Page />} />
           {/* P0-M632：不良事件上报 v2 */}
           <Route path="clinical/adverse-event-report-v2" element={<AdverseEventReportV2M632Page />} />
+          {/* M606-M633：院感暴发预警 */}
+          <Route path="clinical/infection-outbreak-v2" element={<InfectionOutbreakV2M633Page />} />
+          {/* M607-M634：DRG 分组看板 */}
+          <Route path="clinical/drg-grouping-v2" element={<DrgGroupingV2M634Page />} />
+          {/* M608-M635：医保结算看板 */}
+          <Route path="clinical/insurance-settlement-v2" element={<InsuranceSettlementV2M635Page />} />
+          {/* M609-M636：CDR 临床数据中心 */}
+          <Route path="clinical/cdr-query-v2" element={<CdrQueryV2M636Page />} />
+          {/* M606-M637：院感监测趋势 */}
+          <Route path="clinical/infection-monitor-v2" element={<InfectionMonitorV2M637Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
