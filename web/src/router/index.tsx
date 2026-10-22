@@ -3456,6 +3456,14 @@ const CostAuditM725Page = lazy(() => import('@/pages/insurance/cost-audit'));
 const ReconciliationM726Page = lazy(() => import('@/pages/insurance/reconciliation'));
 // M727：医疗服务价格管理（/pricing/service-items）
 const ServicePriceItemM727Page = lazy(() => import('@/pages/pricing/service-items'));
+// M728：医疗设备台账管理（/equipment/ledger）
+const EquipmentLedgerM728Page = lazy(() => import('@/pages/equipment/ledger'));
+// M730：设备计量检定管理（/equipment/calibration）
+const EquipmentCalibrationM730Page = lazy(() => import('@/pages/equipment/calibration'));
+// M731：耗材库存管理（/materials/inventory）
+const MaterialInventoryM731Page = lazy(() => import('@/pages/materials/inventory'));
+// M732：耗材采购申请管理（/materials/purchase）
+const MaterialPurchaseM732Page = lazy(() => import('@/pages/materials/purchase'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4970,6 +4978,14 @@ export default function AppRoutes() {
           <Route path="insurance/reconciliation" element={<ReconciliationM726Page />} />
           {/* M727：医疗服务价格管理 */}
           <Route path="pricing/service-items" element={<ServicePriceItemM727Page />} />
+          {/* M728：医疗设备台账管理 */}
+          <Route path="equipment/ledger" element={<EquipmentLedgerM728Page />} />
+          {/* M730：设备计量检定管理 */}
+          <Route path="equipment/calibration" element={<EquipmentCalibrationM730Page />} />
+          {/* M731：耗材库存管理 */}
+          <Route path="materials/inventory" element={<MaterialInventoryM731Page />} />
+          {/* M732：耗材采购申请管理 */}
+          <Route path="materials/purchase" element={<MaterialPurchaseM732Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
