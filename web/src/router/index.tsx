@@ -3736,6 +3736,16 @@ const PricingManagementM905Page = lazy(() => import('@/pages/pricing/management'
 const ContractManagementM906Page = lazy(() => import('@/pages/contract/management'));
 // M907：审计管理（/audit/management）
 const AuditManagementM907Page = lazy(() => import('@/pages/audit/management'));
+// M908：院感防控（/infection/prevention）
+const InfectionPreventionM908Page = lazy(() => import('@/pages/infection/prevention'));
+// M909：放射防护（/radiation/protection）
+const RadiationProtectionM909Page = lazy(() => import('@/pages/radiation/protection'));
+// M910：职业健康（/occupational/health）
+const OccupationalHealthM910Page = lazy(() => import('@/pages/occupational/health'));
+// M911：安全生产（/safety/production）
+const SafetyProductionM911Page = lazy(() => import('@/pages/safety/production'));
+// M912：后勤保障（/logistics/management）
+const LogisticsManagementM912Page = lazy(() => import('@/pages/logistics/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5530,6 +5540,16 @@ export default function AppRoutes() {
           <Route path="contract/management" element={<ContractManagementM906Page />} />
           {/* M907：审计管理 */}
           <Route path="audit/management" element={<AuditManagementM907Page />} />
+          {/* M908：院感防控 */}
+          <Route path="infection/prevention" element={<InfectionPreventionM908Page />} />
+          {/* M909：放射防护 */}
+          <Route path="radiation/protection" element={<RadiationProtectionM909Page />} />
+          {/* M910：职业健康 */}
+          <Route path="occupational/health" element={<OccupationalHealthM910Page />} />
+          {/* M911：安全生产 */}
+          <Route path="safety/production" element={<SafetyProductionM911Page />} />
+          {/* M912：后勤保障 */}
+          <Route path="logistics/management" element={<LogisticsManagementM912Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
