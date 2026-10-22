@@ -3406,6 +3406,16 @@ const CopyRequestM700Page = lazy(() => import('@/pages/medical-records/copy-requ
 const DeathDiscussionM701Page = lazy(() => import('@/pages/medical-records/death-discussion'));
 // M702：疑难病例讨论（/medical-records/difficult-case-discussion）
 const DifficultDiscussionM702Page = lazy(() => import('@/pages/medical-records/difficult-case-discussion'));
+// M703：院感病例监测（/infection/case-monitoring）
+const InfectionCaseM703Page = lazy(() => import('@/pages/infection/case-monitoring'));
+// M704：手卫生依从性监测（/infection/hand-hygiene）
+const HandHygieneM704Page = lazy(() => import('@/pages/infection/hand-hygiene'));
+// M705：消毒灭菌效果监测（/infection/disinfection-monitoring）
+const DisinfectionTestM705Page = lazy(() => import('@/pages/infection/disinfection-monitoring'));
+// M706：医疗不良事件上报（/quality/adverse-events）
+const QualityAdverseEventM706Page = lazy(() => import('@/pages/quality/adverse-events'));
+// M707：护理质量指标监测（/quality/nursing-indicators）
+const NursingIndicatorM707Page = lazy(() => import('@/pages/quality/nursing-indicators'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4870,6 +4880,16 @@ export default function AppRoutes() {
           <Route path="medical-records/death-discussion" element={<DeathDiscussionM701Page />} />
           {/* M702：疑难病例讨论 */}
           <Route path="medical-records/difficult-case-discussion" element={<DifficultDiscussionM702Page />} />
+          {/* M703：院感病例监测 */}
+          <Route path="infection/case-monitoring" element={<InfectionCaseM703Page />} />
+          {/* M704：手卫生依从性监测 */}
+          <Route path="infection/hand-hygiene" element={<HandHygieneM704Page />} />
+          {/* M705：消毒灭菌效果监测 */}
+          <Route path="infection/disinfection-monitoring" element={<DisinfectionTestM705Page />} />
+          {/* M706：医疗不良事件上报 */}
+          <Route path="quality/adverse-events" element={<QualityAdverseEventM706Page />} />
+          {/* M707：护理质量指标监测 */}
+          <Route path="quality/nursing-indicators" element={<NursingIndicatorM707Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
