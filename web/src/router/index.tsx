@@ -3446,6 +3446,16 @@ const InpatientAppointmentM720Page = lazy(() => import('@/pages/patient-service/
 const ExamAppointmentM721Page = lazy(() => import('@/pages/patient-service/exam-appointment'));
 // M722：体检预约管理（/patient-service/physical-exam）
 const PhysicalExamM722Page = lazy(() => import('@/pages/patient-service/physical-exam'));
+// M723：门诊收费管理（/billing/outpatient）
+const OutpatientBillingM723Page = lazy(() => import('@/pages/billing/outpatient'));
+// M724：住院结算管理（/billing/inpatient）
+const InpatientBillingM724Page = lazy(() => import('@/pages/billing/inpatient'));
+// M725：医保费用审核（/insurance/cost-audit）
+const CostAuditM725Page = lazy(() => import('@/pages/insurance/cost-audit'));
+// M726：医保结算对账（/insurance/reconciliation）
+const ReconciliationM726Page = lazy(() => import('@/pages/insurance/reconciliation'));
+// M727：医疗服务价格管理（/pricing/service-items）
+const ServicePriceItemM727Page = lazy(() => import('@/pages/pricing/service-items'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4950,6 +4960,16 @@ export default function AppRoutes() {
           <Route path="patient-service/exam-appointment" element={<ExamAppointmentM721Page />} />
           {/* M722：体检预约管理 */}
           <Route path="patient-service/physical-exam" element={<PhysicalExamM722Page />} />
+          {/* M723：门诊收费管理 */}
+          <Route path="billing/outpatient" element={<OutpatientBillingM723Page />} />
+          {/* M724：住院结算管理 */}
+          <Route path="billing/inpatient" element={<InpatientBillingM724Page />} />
+          {/* M725：医保费用审核 */}
+          <Route path="insurance/cost-audit" element={<CostAuditM725Page />} />
+          {/* M726：医保结算对账 */}
+          <Route path="insurance/reconciliation" element={<ReconciliationM726Page />} />
+          {/* M727：医疗服务价格管理 */}
+          <Route path="pricing/service-items" element={<ServicePriceItemM727Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
