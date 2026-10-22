@@ -1,0 +1,42 @@
+/**
+ * 健澜科技 jlmedaios - 烧伤科 Zustand store（M798）
+ *
+ * Copyright (c) 杭州健澜科技有限公司. Licensed under Apache-2.0.
+ */
+import { create } from 'zustand';
+
+import {
+  fetchBurnPatients,
+  type BurnPatient,
+} from '@/services/api/burnPatientM798';
+
+interface BurnPatientM798State {
+  items: BurnPatient[];
+  loading: boolean;
+  error: string | null;
+  demo: boolean;
+  load: () => Promise<void>;
+  clearError: () => void;
+}
+
+const errMsg = (e: unknown, fallback: string): string =>
+  e instanceof Error ? e.message : fallback;
+
+export const useBurnPatientM798Store = create<BurnPatientM798State>((set) => ({
+  items: [],
+  loading: false,
+  error: null,
+  demo: false,
+
+  load: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetchBurnPatients();
+      set({ items: res.items, demo: res.demo, loading: false });
+    } catch (e) {
+      set({ loading: false, error: errMsg(e, '烧伤患者加载失败') });
+    }
+  },
+
+  clearError: () => set({ error: null }),
+}));
