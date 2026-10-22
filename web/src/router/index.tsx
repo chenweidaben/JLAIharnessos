@@ -3332,6 +3332,16 @@ const SurgeryChecklistV2M660Page = lazy(() => import('@/pages/clinical/surgery-c
 const PrescriptionReviewV2M661Page = lazy(() => import('@/pages/clinical/prescription-review-v2'));
 // M553-M662：院感监测（/clinical/infection-monitoring-v2）
 const InfectionMonitoringV2M662Page = lazy(() => import('@/pages/clinical/infection-monitoring-v2'));
+// M554-M663：不良事件上报（/clinical/adverse-event-v2）
+const AdverseEventV2M663Page = lazy(() => import('@/pages/clinical/adverse-event-v2'));
+// M559-M664：护理排班（/clinical/nursing-schedule-v2）
+const NursingScheduleV2M664Page = lazy(() => import('@/pages/clinical/nursing-schedule-v2'));
+// M560-M665：手术排程（/clinical/surgery-schedule-v2）
+const SurgeryScheduleV2M665Page = lazy(() => import('@/pages/clinical/surgery-schedule-v2'));
+// M561-M666：出院计划（/clinical/discharge-planning-v2）
+const DischargePlanningV2M666Page = lazy(() => import('@/pages/clinical/discharge-planning-v2'));
+// M562-M667：临床路径管理（/clinical/clinical-pathway-v2）
+const ClinicalPathwayV2M667Page = lazy(() => import('@/pages/clinical/clinical-pathway-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4722,6 +4732,16 @@ export default function AppRoutes() {
           <Route path="clinical/prescription-review-v2" element={<PrescriptionReviewV2M661Page />} />
           {/* M553-M662：院感监测 */}
           <Route path="clinical/infection-monitoring-v2" element={<InfectionMonitoringV2M662Page />} />
+          {/* M554-M663：不良事件上报 */}
+          <Route path="clinical/adverse-event-v2" element={<AdverseEventV2M663Page />} />
+          {/* M559-M664：护理排班 */}
+          <Route path="clinical/nursing-schedule-v2" element={<NursingScheduleV2M664Page />} />
+          {/* M560-M665：手术排程 */}
+          <Route path="clinical/surgery-schedule-v2" element={<SurgeryScheduleV2M665Page />} />
+          {/* M561-M666：出院计划 */}
+          <Route path="clinical/discharge-planning-v2" element={<DischargePlanningV2M666Page />} />
+          {/* M562-M667：临床路径管理 */}
+          <Route path="clinical/clinical-pathway-v2" element={<ClinicalPathwayV2M667Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
