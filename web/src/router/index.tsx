@@ -3468,6 +3468,12 @@ const MaterialPurchaseM732Page = lazy(() => import('@/pages/materials/purchase')
 const EmployeeRecordsM733Page = lazy(() => import('@/pages/hr/employee-records'));
 // M734：排班管理（/hr/scheduling）
 const SchedulingM734Page = lazy(() => import('@/pages/hr/scheduling'));
+// M738：教学管理（/education/teaching）
+const TeachingM738Page = lazy(() => import('@/pages/education/teaching'));
+// M741：进修医生管理（/education/fellows）
+const FellowsM741Page = lazy(() => import('@/pages/education/fellows'));
+// M742：实习管理（/education/interns）
+const InternsM742Page = lazy(() => import('@/pages/education/interns'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4994,6 +5000,12 @@ export default function AppRoutes() {
           <Route path="hr/employee-records" element={<EmployeeRecordsM733Page />} />
           {/* M734：排班管理 */}
           <Route path="hr/scheduling" element={<SchedulingM734Page />} />
+          {/* M738：教学管理 */}
+          <Route path="education/teaching" element={<TeachingM738Page />} />
+          {/* M741：进修医生管理 */}
+          <Route path="education/fellows" element={<FellowsM741Page />} />
+          {/* M742：实习管理 */}
+          <Route path="education/interns" element={<InternsM742Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
