@@ -3660,6 +3660,8 @@ const LaboratoryManagementM838Page = lazy(() => import('@/pages/laboratory/manag
 const PulmonaryFunctionManagementM842Page = lazy(() => import('@/pages/pulmonary-function/management'));
 // M843：麻醉科管理（/anesthesiology/management）
 const AnesthesiologyManagementM843Page = lazy(() => import('@/pages/anesthesiology/management'));
+// M854：口腔科管理（/dentistry/management）
+const DentistryManagementM854Page = lazy(() => import('@/pages/dentistry/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5378,6 +5380,8 @@ export default function AppRoutes() {
           <Route path="pulmonary-function/management" element={<PulmonaryFunctionManagementM842Page />} />
           {/* M843：麻醉科管理 */}
           <Route path="anesthesiology/management" element={<AnesthesiologyManagementM843Page />} />
+          {/* M854：口腔科管理 */}
+          <Route path="dentistry/management" element={<DentistryManagementM854Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
