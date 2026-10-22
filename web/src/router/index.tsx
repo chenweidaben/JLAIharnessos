@@ -3684,6 +3684,16 @@ const ThoracicSurgeryManagementM866Page = lazy(() => import('@/pages/thoracic-su
 const UrologyManagementM867Page = lazy(() => import('@/pages/urology/management'));
 // M872：药剂科管理（/pharmacy/management）
 const PharmacyManagementM872Page = lazy(() => import('@/pages/pharmacy/management'));
+// M873：手术室管理（/operating-room/management）
+const OperatingRoomManagementM873Page = lazy(() => import('@/pages/operating-room/management'));
+// M874：PACU 管理（/pacu/management）
+const PacuManagementM874Page = lazy(() => import('@/pages/pacu/management'));
+// M875：门诊管理（/outpatient/management）
+const OutpatientManagementM875Page = lazy(() => import('@/pages/outpatient/management'));
+// M876：住院管理（/inpatient/management）
+const InpatientManagementM876Page = lazy(() => import('@/pages/inpatient/management'));
+// M877：病案管理（/medical-records/management）
+const MedicalRecordsManagementM877Page = lazy(() => import('@/pages/medical-records/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5426,6 +5436,16 @@ export default function AppRoutes() {
           <Route path="urology/management" element={<UrologyManagementM867Page />} />
           {/* M872：药剂科管理 */}
           <Route path="pharmacy/management" element={<PharmacyManagementM872Page />} />
+          {/* M873：手术室管理 */}
+          <Route path="operating-room/management" element={<OperatingRoomManagementM873Page />} />
+          {/* M874：PACU 管理 */}
+          <Route path="pacu/management" element={<PacuManagementM874Page />} />
+          {/* M875：门诊管理 */}
+          <Route path="outpatient/management" element={<OutpatientManagementM875Page />} />
+          {/* M876：住院管理 */}
+          <Route path="inpatient/management" element={<InpatientManagementM876Page />} />
+          {/* M877：病案管理 */}
+          <Route path="medical-records/management" element={<MedicalRecordsManagementM877Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
