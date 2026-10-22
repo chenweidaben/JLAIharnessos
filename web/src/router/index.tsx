@@ -3716,6 +3716,16 @@ const EquipmentManagementM895Page = lazy(() => import('@/pages/equipment/managem
 const MaterialsManagementM896Page = lazy(() => import('@/pages/materials/management'));
 // M897：信息科管理（/it/management）
 const ItManagementM897Page = lazy(() => import('@/pages/it/management'));
+// M898：患者服务中心管理（/patient-service/center）
+const PatientServiceCenterM898Page = lazy(() => import('@/pages/patient-service/center'));
+// M899：预约挂号管理（/patient-service/appointment）
+const AppointmentManagementM899Page = lazy(() => import('@/pages/patient-service/appointment'));
+// M900：门诊大厅管理（/patient-service/hall）
+const OutpatientHallM900Page = lazy(() => import('@/pages/patient-service/hall'));
+// M901：出院随访管理（/patient-service/followup）
+const FollowupManagementM901Page = lazy(() => import('@/pages/patient-service/followup'));
+// M902：投诉管理（/patient-service/complaint）
+const ComplaintManagementM902Page = lazy(() => import('@/pages/patient-service/complaint'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5490,6 +5500,16 @@ export default function AppRoutes() {
           <Route path="materials/management" element={<MaterialsManagementM896Page />} />
           {/* M897：信息科管理 */}
           <Route path="it/management" element={<ItManagementM897Page />} />
+          {/* M898：患者服务中心管理 */}
+          <Route path="patient-service/center" element={<PatientServiceCenterM898Page />} />
+          {/* M899：预约挂号管理 */}
+          <Route path="patient-service/appointment" element={<AppointmentManagementM899Page />} />
+          {/* M900：门诊大厅管理 */}
+          <Route path="patient-service/hall" element={<OutpatientHallM900Page />} />
+          {/* M901：出院随访管理 */}
+          <Route path="patient-service/followup" element={<FollowupManagementM901Page />} />
+          {/* M902：投诉管理 */}
+          <Route path="patient-service/complaint" element={<ComplaintManagementM902Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
