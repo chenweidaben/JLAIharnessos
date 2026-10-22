@@ -3370,6 +3370,14 @@ const UltrasoundReportCenterM680Page = lazy(() => import('@/pages/ultrasound/rep
 const EndoscopyReportCenterM681Page = lazy(() => import('@/pages/endoscopy/report-center'));
 // M682：心电检查报告中心（/ecg/report-center）
 const EcgReportCenterM682Page = lazy(() => import('@/pages/ecg/report-center'));
+// M683：手术排程管理列表视图（/surgery/schedule-list；与既有 /surgery/schedule 日周看板并存）
+const SurgeryScheduleListM683Page = lazy(() => import('@/pages/surgery/schedule-list'));
+// M684：麻醉记录单（/anesthesia/record）
+const AnesthesiaRecordM684Page = lazy(() => import('@/pages/anesthesia/record'));
+// M685：ICU 监护记录（/icu/monitor-record）
+const IcuMonitorRecordM685Page = lazy(() => import('@/pages/icu/monitor-record'));
+// M686：急诊分诊台（/er/triage）
+const ErTriageM686Page = lazy(() => import('@/pages/er/triage'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4798,6 +4806,14 @@ export default function AppRoutes() {
           <Route path="endoscopy/report-center" element={<EndoscopyReportCenterM681Page />} />
           {/* M682：心电检查报告中心 */}
           <Route path="ecg/report-center" element={<EcgReportCenterM682Page />} />
+          {/* M683：手术排程管理列表视图 */}
+          <Route path="surgery/schedule-list" element={<SurgeryScheduleListM683Page />} />
+          {/* M684：麻醉记录单 */}
+          <Route path="anesthesia/record" element={<AnesthesiaRecordM684Page />} />
+          {/* M685：ICU 监护记录 */}
+          <Route path="icu/monitor-record" element={<IcuMonitorRecordM685Page />} />
+          {/* M686：急诊分诊台 */}
+          <Route path="er/triage" element={<ErTriageM686Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
