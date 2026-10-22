@@ -3426,6 +3426,16 @@ const HomepageQualityM710Page = lazy(() => import('@/pages/medical-records/homep
 const TechAdmissionM711Page = lazy(() => import('@/pages/tech/admission'));
 // M712：手术分级授权管理（/surgery/grading）
 const SurgeryGradingM712Page = lazy(() => import('@/pages/surgery/grading'));
+// M713：门诊药房发药管理（/pharmacy/outpatient-dispensing）
+const OutpatientDispensingM713Page = lazy(() => import('@/pages/pharmacy/outpatient-dispensing'));
+// M714：住院药房摆药管理（/pharmacy/inpatient-dispensing）
+const InpatientDispensingM714Page = lazy(() => import('@/pages/pharmacy/inpatient-dispensing'));
+// M715：药品不良反应监测（/pharmacy/adr-monitoring）
+const AdrMonitoringM715Page = lazy(() => import('@/pages/pharmacy/adr-monitoring'));
+// M716：抗菌药物分级管理（/pharmacy/ams-grading）
+const AmsGradingM716Page = lazy(() => import('@/pages/pharmacy/ams-grading'));
+// M717：特殊药品管理（/pharmacy/special-drugs）
+const SpecialDrugM717Page = lazy(() => import('@/pages/pharmacy/special-drugs'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4910,6 +4920,16 @@ export default function AppRoutes() {
           <Route path="tech/admission" element={<TechAdmissionM711Page />} />
           {/* M712：手术分级授权管理 */}
           <Route path="surgery/grading" element={<SurgeryGradingM712Page />} />
+          {/* M713：门诊药房发药管理 */}
+          <Route path="pharmacy/outpatient-dispensing" element={<OutpatientDispensingM713Page />} />
+          {/* M714：住院药房摆药管理 */}
+          <Route path="pharmacy/inpatient-dispensing" element={<InpatientDispensingM714Page />} />
+          {/* M715：药品不良反应监测 */}
+          <Route path="pharmacy/adr-monitoring" element={<AdrMonitoringM715Page />} />
+          {/* M716：抗菌药物分级管理 */}
+          <Route path="pharmacy/ams-grading" element={<AmsGradingM716Page />} />
+          {/* M717：特殊药品管理 */}
+          <Route path="pharmacy/special-drugs" element={<SpecialDrugM717Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
