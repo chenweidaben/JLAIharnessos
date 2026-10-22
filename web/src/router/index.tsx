@@ -3682,6 +3682,8 @@ const NeurosurgeryManagementM865Page = lazy(() => import('@/pages/neurosurgery/m
 const ThoracicSurgeryManagementM866Page = lazy(() => import('@/pages/thoracic-surgery/management'));
 // M867：泌尿外科管理（/urology/management）
 const UrologyManagementM867Page = lazy(() => import('@/pages/urology/management'));
+// M872：药剂科管理（/pharmacy/management）
+const PharmacyManagementM872Page = lazy(() => import('@/pages/pharmacy/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5422,6 +5424,8 @@ export default function AppRoutes() {
           <Route path="thoracic-surgery/management" element={<ThoracicSurgeryManagementM866Page />} />
           {/* M867：泌尿外科管理 */}
           <Route path="urology/management" element={<UrologyManagementM867Page />} />
+          {/* M872：药剂科管理 */}
+          <Route path="pharmacy/management" element={<PharmacyManagementM872Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
