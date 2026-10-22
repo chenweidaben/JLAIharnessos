@@ -3322,6 +3322,16 @@ const EmpiMasterIndexM655Page = lazy(() => import('@/pages/clinical/empi-master-
 const DictionaryMappingM656Page = lazy(() => import('@/pages/clinical/dictionary-mapping'));
 // M585-M657：互联互通测评清单（/clinical/interop-checklist）
 const InteropChecklistM657Page = lazy(() => import('@/pages/clinical/interop-checklist'));
+// M584-M658：标准数据集上报（/clinical/standard-dataset-report）
+const StandardDatasetReportM658Page = lazy(() => import('@/pages/clinical/standard-dataset-report'));
+// M550-M659：危急值管理（/clinical/critical-value-v2）
+const CriticalValueV2M659Page = lazy(() => import('@/pages/clinical/critical-value-v2'));
+// M551-M660：手术核查表（/clinical/surgery-checklist-v2）
+const SurgeryChecklistV2M660Page = lazy(() => import('@/pages/clinical/surgery-checklist-v2'));
+// M552-M661：处方点评（/clinical/prescription-review-v2）
+const PrescriptionReviewV2M661Page = lazy(() => import('@/pages/clinical/prescription-review-v2'));
+// M553-M662：院感监测（/clinical/infection-monitoring-v2）
+const InfectionMonitoringV2M662Page = lazy(() => import('@/pages/clinical/infection-monitoring-v2'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4702,6 +4712,16 @@ export default function AppRoutes() {
           <Route path="clinical/dictionary-mapping" element={<DictionaryMappingM656Page />} />
           {/* M585-M657：互联互通测评清单 */}
           <Route path="clinical/interop-checklist" element={<InteropChecklistM657Page />} />
+          {/* M584-M658：标准数据集上报 */}
+          <Route path="clinical/standard-dataset-report" element={<StandardDatasetReportM658Page />} />
+          {/* M550-M659：危急值管理 */}
+          <Route path="clinical/critical-value-v2" element={<CriticalValueV2M659Page />} />
+          {/* M551-M660：手术核查表 */}
+          <Route path="clinical/surgery-checklist-v2" element={<SurgeryChecklistV2M660Page />} />
+          {/* M552-M661：处方点评 */}
+          <Route path="clinical/prescription-review-v2" element={<PrescriptionReviewV2M661Page />} />
+          {/* M553-M662：院感监测 */}
+          <Route path="clinical/infection-monitoring-v2" element={<InfectionMonitoringV2M662Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
