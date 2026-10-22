@@ -3608,6 +3608,16 @@ const NuclearMedicineManagementM810Page = lazy(() => import('@/pages/nuclear-med
 const UltrasoundInterventionalM811Page = lazy(() => import('@/pages/ultrasound/interventional'));
 // M812：肺功能室管理（/pulmonary/function-room）
 const PulmonaryFunctionRoomM812Page = lazy(() => import('@/pages/pulmonary/function-room'));
+// M813：麻醉科管理（/anesthesia/management）
+const AnesthesiaManagementM813Page = lazy(() => import('@/pages/anesthesia/management'));
+// M814：ICU 管理（/icu/management）
+const IcuManagementM814Page = lazy(() => import('@/pages/icu/management'));
+// M815：急诊科管理（/emergency/management）
+const EmergencyManagementM815Page = lazy(() => import('@/pages/emergency/management'));
+// M816：康复科管理（/rehabilitation/management）
+const RehabilitationManagementM816Page = lazy(() => import('@/pages/rehabilitation/management'));
+// M817：疼痛科管理（/pain/management）
+const PainManagementM817Page = lazy(() => import('@/pages/pain/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5274,6 +5284,16 @@ export default function AppRoutes() {
           <Route path="ultrasound/interventional" element={<UltrasoundInterventionalM811Page />} />
           {/* M812：肺功能室管理 */}
           <Route path="pulmonary/function-room" element={<PulmonaryFunctionRoomM812Page />} />
+          {/* M813：麻醉科管理 */}
+          <Route path="anesthesia/management" element={<AnesthesiaManagementM813Page />} />
+          {/* M814：ICU 管理 */}
+          <Route path="icu/management" element={<IcuManagementM814Page />} />
+          {/* M815：急诊科管理 */}
+          <Route path="emergency/management" element={<EmergencyManagementM815Page />} />
+          {/* M816：康复科管理 */}
+          <Route path="rehabilitation/management" element={<RehabilitationManagementM816Page />} />
+          {/* M817：疼痛科管理 */}
+          <Route path="pain/management" element={<PainManagementM817Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
