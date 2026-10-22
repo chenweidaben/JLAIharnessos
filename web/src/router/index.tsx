@@ -3628,6 +3628,16 @@ const PediatricsManagementM820Page = lazy(() => import('@/pages/pediatrics/manag
 const NeonatologyManagementM821Page = lazy(() => import('@/pages/neonatology/management'));
 // M822：眼科管理（/ophthalmology/management）
 const OphthalmologyManagementM822Page = lazy(() => import('@/pages/ophthalmology/management'));
+// M823：耳鼻喉科管理（/ent/management）
+const EntManagementM823Page = lazy(() => import('@/pages/ent/management'));
+// M824：口腔科管理（/stomatology/management）
+const StomatologyManagementM824Page = lazy(() => import('@/pages/stomatology/management'));
+// M825：皮肤科管理（/dermatology/management）
+const DermatologyManagementM825Page = lazy(() => import('@/pages/dermatology/management'));
+// M826：中医科管理（/tcm/management）
+const TcmManagementM826Page = lazy(() => import('@/pages/tcm/management'));
+// M827：心理科管理（/psychology/management）
+const PsychologyManagementM827Page = lazy(() => import('@/pages/psychology/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5314,6 +5324,16 @@ export default function AppRoutes() {
           <Route path="neonatology/management" element={<NeonatologyManagementM821Page />} />
           {/* M822：眼科管理 */}
           <Route path="ophthalmology/management" element={<OphthalmologyManagementM822Page />} />
+          {/* M823：耳鼻喉科管理 */}
+          <Route path="ent/management" element={<EntManagementM823Page />} />
+          {/* M824：口腔科管理 */}
+          <Route path="stomatology/management" element={<StomatologyManagementM824Page />} />
+          {/* M825：皮肤科管理 */}
+          <Route path="dermatology/management" element={<DermatologyManagementM825Page />} />
+          {/* M826：中医科管理 */}
+          <Route path="tcm/management" element={<TcmManagementM826Page />} />
+          {/* M827：心理科管理 */}
+          <Route path="psychology/management" element={<PsychologyManagementM827Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
