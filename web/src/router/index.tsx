@@ -3706,6 +3706,16 @@ const TeachingManagementM890Page = lazy(() => import('@/pages/teaching/managemen
 const ResearchManagementM891Page = lazy(() => import('@/pages/research/management'));
 // M892：医院感染管理（/infection/management）
 const InfectionManagementM892Page = lazy(() => import('@/pages/infection/management'));
+// M893：人力资源管理（/hr/management）
+const HrManagementM893Page = lazy(() => import('@/pages/hr/management'));
+// M894：财务管理（/finance/management）
+const FinanceManagementM894Page = lazy(() => import('@/pages/finance/management'));
+// M895：设备管理（/equipment/management）
+const EquipmentManagementM895Page = lazy(() => import('@/pages/equipment/management'));
+// M896：物资管理（/materials/management）
+const MaterialsManagementM896Page = lazy(() => import('@/pages/materials/management'));
+// M897：信息科管理（/it/management）
+const ItManagementM897Page = lazy(() => import('@/pages/it/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5470,6 +5480,16 @@ export default function AppRoutes() {
           <Route path="research/management" element={<ResearchManagementM891Page />} />
           {/* M892：医院感染管理 */}
           <Route path="infection/management" element={<InfectionManagementM892Page />} />
+          {/* M893：人力资源管理 */}
+          <Route path="hr/management" element={<HrManagementM893Page />} />
+          {/* M894：财务管理 */}
+          <Route path="finance/management" element={<FinanceManagementM894Page />} />
+          {/* M895：设备管理 */}
+          <Route path="equipment/management" element={<EquipmentManagementM895Page />} />
+          {/* M896：物资管理 */}
+          <Route path="materials/management" element={<MaterialsManagementM896Page />} />
+          {/* M897：信息科管理 */}
+          <Route path="it/management" element={<ItManagementM897Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
