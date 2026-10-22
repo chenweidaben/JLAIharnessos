@@ -3398,6 +3398,14 @@ const AdmissionAssessmentM695Page = lazy(() => import('@/pages/nurse/admission-a
 const SurgeryHandoverM696Page = lazy(() => import('@/pages/nurse/surgery-handover'));
 // M697：危重患者护理记录（/nurse/critical-care-record）
 const CriticalCareRecordM697Page = lazy(() => import('@/pages/nurse/critical-care-record'));
+// M699：病案借阅管理（/medical-records/borrow）
+const MedicalRecordBorrowM699Page = lazy(() => import('@/pages/medical-records/borrow'));
+// M700：病历复印申请（/medical-records/copy-request）
+const CopyRequestM700Page = lazy(() => import('@/pages/medical-records/copy-request'));
+// M701：死亡病例讨论（/medical-records/death-discussion）
+const DeathDiscussionM701Page = lazy(() => import('@/pages/medical-records/death-discussion'));
+// M702：疑难病例讨论（/medical-records/difficult-case-discussion）
+const DifficultDiscussionM702Page = lazy(() => import('@/pages/medical-records/difficult-case-discussion'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -4854,6 +4862,14 @@ export default function AppRoutes() {
           <Route path="nurse/surgery-handover" element={<SurgeryHandoverM696Page />} />
           {/* M697：危重患者护理记录 */}
           <Route path="nurse/critical-care-record" element={<CriticalCareRecordM697Page />} />
+          {/* M699：病案借阅管理 */}
+          <Route path="medical-records/borrow" element={<MedicalRecordBorrowM699Page />} />
+          {/* M700：病历复印申请 */}
+          <Route path="medical-records/copy-request" element={<CopyRequestM700Page />} />
+          {/* M701：死亡病例讨论 */}
+          <Route path="medical-records/death-discussion" element={<DeathDiscussionM701Page />} />
+          {/* M702：疑难病例讨论 */}
+          <Route path="medical-records/difficult-case-discussion" element={<DifficultDiscussionM702Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
