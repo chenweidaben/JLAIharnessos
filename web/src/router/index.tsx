@@ -3478,6 +3478,16 @@ const InternsM742Page = lazy(() => import('@/pages/education/interns'));
 const DepartmentsM745Page = lazy(() => import('@/pages/system/departments'));
 // M746：字典管理（/system/dictionaries）
 const DictionariesM746Page = lazy(() => import('@/pages/system/dictionaries'));
+// M748：会议管理（/admin/meetings）
+const MeetingsM748Page = lazy(() => import('@/pages/admin/meetings'));
+// M749：公文管理（/admin/documents）
+const AdminDocumentsM749Page = lazy(() => import('@/pages/admin/documents'));
+// M750：印章管理（/admin/seals）
+const SealsM750Page = lazy(() => import('@/pages/admin/seals'));
+// M751：车辆管理（/admin/vehicles）
+const VehiclesM751Page = lazy(() => import('@/pages/admin/vehicles'));
+// M752：后勤报修管理（/admin/maintenance-requests）
+const MaintenanceRequestsM752Page = lazy(() => import('@/pages/admin/maintenance-requests'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5014,6 +5024,16 @@ export default function AppRoutes() {
           <Route path="system/departments" element={<DepartmentsM745Page />} />
           {/* M746：字典管理 */}
           <Route path="system/dictionaries" element={<DictionariesM746Page />} />
+          {/* M748：会议管理 */}
+          <Route path="admin/meetings" element={<MeetingsM748Page />} />
+          {/* M749：公文管理 */}
+          <Route path="admin/documents" element={<AdminDocumentsM749Page />} />
+          {/* M750：印章管理 */}
+          <Route path="admin/seals" element={<SealsM750Page />} />
+          {/* M751：车辆管理 */}
+          <Route path="admin/vehicles" element={<VehiclesM751Page />} />
+          {/* M752：后勤报修管理 */}
+          <Route path="admin/maintenance-requests" element={<MaintenanceRequestsM752Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
