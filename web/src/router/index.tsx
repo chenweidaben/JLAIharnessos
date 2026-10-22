@@ -3672,6 +3672,16 @@ const GastroenterologyManagementM860Page = lazy(() => import('@/pages/gastroente
 const NeurologyManagementM861Page = lazy(() => import('@/pages/neurology/management'));
 // M862：内分泌科管理（/endocrinology/management）
 const EndocrinologyManagementM862Page = lazy(() => import('@/pages/endocrinology/management'));
+// M863：普外科管理（/general-surgery/management）
+const GeneralSurgeryManagementM863Page = lazy(() => import('@/pages/general-surgery/management'));
+// M864：骨科管理（/orthopedics/management）
+const OrthopedicsManagementM864Page = lazy(() => import('@/pages/orthopedics/management'));
+// M865：神经外科管理（/neurosurgery/management）
+const NeurosurgeryManagementM865Page = lazy(() => import('@/pages/neurosurgery/management'));
+// M866：胸外科管理（/thoracic-surgery/management）
+const ThoracicSurgeryManagementM866Page = lazy(() => import('@/pages/thoracic-surgery/management'));
+// M867：泌尿外科管理（/urology/management）
+const UrologyManagementM867Page = lazy(() => import('@/pages/urology/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5402,6 +5412,16 @@ export default function AppRoutes() {
           <Route path="neurology/management" element={<NeurologyManagementM861Page />} />
           {/* M862：内分泌科管理 */}
           <Route path="endocrinology/management" element={<EndocrinologyManagementM862Page />} />
+          {/* M863：普外科管理 */}
+          <Route path="general-surgery/management" element={<GeneralSurgeryManagementM863Page />} />
+          {/* M864：骨科管理 */}
+          <Route path="orthopedics/management" element={<OrthopedicsManagementM864Page />} />
+          {/* M865：神经外科管理 */}
+          <Route path="neurosurgery/management" element={<NeurosurgeryManagementM865Page />} />
+          {/* M866：胸外科管理 */}
+          <Route path="thoracic-surgery/management" element={<ThoracicSurgeryManagementM866Page />} />
+          {/* M867：泌尿外科管理 */}
+          <Route path="urology/management" element={<UrologyManagementM867Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
