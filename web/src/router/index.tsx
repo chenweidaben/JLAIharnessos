@@ -3694,6 +3694,8 @@ const OutpatientManagementM875Page = lazy(() => import('@/pages/outpatient/manag
 const InpatientManagementM876Page = lazy(() => import('@/pages/inpatient/management'));
 // M877：病案管理（/medical-records/management）
 const MedicalRecordsManagementM877Page = lazy(() => import('@/pages/medical-records/management'));
+// M878：输血科管理（/blood-bank/management）
+const BloodBankManagementM878Page = lazy(() => import('@/pages/blood-bank/management'));
 // M465-D：病历质控知识图谱 V14（EMR 深化四模块，M465 收官）
 const EmrQcGraphPage = lazy(() => import('@/pages/emr-qc-graph'));
 // M466-A：病历打印版式与套打 V14（EMR 深化四模块）
@@ -5446,6 +5448,8 @@ export default function AppRoutes() {
           <Route path="inpatient/management" element={<InpatientManagementM876Page />} />
           {/* M877：病案管理 */}
           <Route path="medical-records/management" element={<MedicalRecordsManagementM877Page />} />
+          {/* M878：输血科管理 */}
+          <Route path="blood-bank/management" element={<BloodBankManagementM878Page />} />
           {/* 影像 AI 辅诊（DAMO-RADAR）：查看需 imaging:view，复核签名需 imaging:ai:review */}
           <Route
             path="imaging/ai/report/:studyUid?"
