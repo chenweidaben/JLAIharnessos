@@ -1,9 +1,0 @@
-﻿/api/v1/events/bus-subscribers=200
-/api/v1/events/bus-publishers=200
-/api/v1/events/metrics=200
-/api/v1/events/list=ERR
-/api/v1/events/types=ERR
-/api/v1/events/subscribers=ERR
-/api/v1/events/publish=ERR
-/api/v1/events/consumers=ERR
-/api/v1/events/metrics-detail=ERR

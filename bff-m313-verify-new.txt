@@ -1,5 +1,0 @@
-﻿/api/v1/rehab/treatments=200
-/api/v1/rehab/assessment=200
-/api/v1/rehab/exercises=200
-/api/v1/rehab/equipment=200
-/api/v1/rehab/progress=200

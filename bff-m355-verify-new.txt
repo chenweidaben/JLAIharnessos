@@ -1,6 +1,0 @@
-﻿/api/v1/quality/indicators=200
-/api/v1/quality/scores=200
-/api/v1/quality/trends=200
-/api/v1/quality/benchmarks=200
-/api/v1/quality/alerts=200
-/api/v1/quality/reports=200

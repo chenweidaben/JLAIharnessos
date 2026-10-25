@@ -1,2 +1,0 @@
-﻿/api/v1/patient/labs=200
-/api/v1/patient/imaging=200

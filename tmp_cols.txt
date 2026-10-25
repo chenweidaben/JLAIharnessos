@@ -1,1 +1,0 @@
-﻿id,plan_no,patient_id,appointment_id,scheduled_date,content,status,assigned_to,created_by,created_at,updated_at

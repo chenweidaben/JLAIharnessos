@@ -1,3 +1,0 @@
-﻿/api/v1/geriatrics/care-plan=200
-/api/v1/geriatrics/comorbidity=200
-/api/v1/geriatrics/frail=200

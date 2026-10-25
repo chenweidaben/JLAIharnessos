@@ -1,6 +1,0 @@
-﻿/api/v1/emr/templates=200
-/api/v1/emr/signatures=200
-/api/v1/emr/templates-detail=ERR
-/api/v1/emr/quality-check=ERR
-/api/v1/emr/retrieval=ERR
-/api/v1/emr/archive=ERR

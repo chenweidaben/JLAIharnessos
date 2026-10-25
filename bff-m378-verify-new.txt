@@ -1,2 +1,0 @@
-﻿/api/v1/insurance/policy=200
-/api/v1/insurance/disease-codes=200

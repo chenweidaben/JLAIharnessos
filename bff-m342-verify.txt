@@ -1,9 +1,0 @@
-﻿/api/v1/workflow/doctor-tasks=200
-/api/v1/workflow/nurse-tasks=200
-/api/v1/workflow/queue=200
-/api/v1/workflow/tasks=ERR
-/api/v1/workflow/instances=200
-/api/v1/workflow/templates=ERR
-/api/v1/tasks/todo=ERR
-/api/v1/tasks/done=ERR
-/api/v1/tasks/overdue=ERR

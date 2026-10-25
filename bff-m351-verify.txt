@@ -1,6 +1,0 @@
-﻿/api/v1/workflow/roles=ERR
-/api/v1/workflow/permissions=ERR
-/api/v1/workflow/approve=ERR
-/api/v1/workflow/notify=ERR
-/api/v1/workflow/escalation=ERR
-/api/v1/workflow/sla=ERR

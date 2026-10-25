@@ -1,6 +1,0 @@
-﻿WorkflowTasksPage lazy: True
-WorkflowTemplatesPage lazy: True
-WorkflowInstancesPage lazy: False
-WorkflowApprovalPage lazy: False
-WorkflowSchedulingPage lazy: False
-WorkflowNotificationsPage lazy: False

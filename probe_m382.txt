@@ -1,4 +1,0 @@
-﻿OK /api/v1/security/policy
-OK /api/v1/security/policy-detail
-OK /api/v1/security/vulnerabilities
-OK /api/v1/security/patches

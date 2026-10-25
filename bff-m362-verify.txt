@@ -1,2 +1,0 @@
-﻿/api/v1/security/incidents=200
-/api/v1/security/incident-response=200

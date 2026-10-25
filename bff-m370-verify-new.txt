@@ -1,6 +1,0 @@
-﻿/api/v1/telemed/remote-consults=200
-/api/v1/telemed/remote-diagnosis=200
-/api/v1/telemed/remote-monitoring=200
-/api/v1/telemed/remote-surgery=200
-/api/v1/telemed/remote-training=200
-/api/v1/telemed/remote-equipment=200

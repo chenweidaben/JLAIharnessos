@@ -1,5 +1,0 @@
-﻿OK /api/v1/rehab/assessment
-OK /api/v1/rehab/treatment
-OK /api/v1/rehab/therapy
-OK /api/v1/rehab/exercise
-OK /api/v1/rehab/occupational

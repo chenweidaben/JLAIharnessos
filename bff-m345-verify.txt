@@ -1,8 +1,0 @@
-﻿/api/v1/tenants/list=200
-/api/v1/tenants/quota=200
-/api/v1/tenant/list=ERR
-/api/v1/tenant/config=ERR
-/api/v1/tenant/data-isolation=ERR
-/api/v1/tenant/quota=ERR
-/api/v1/tenant/usage=ERR
-/api/v1/tenant/logs=ERR

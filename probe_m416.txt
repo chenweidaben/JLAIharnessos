@@ -1,6 +1,0 @@
-﻿OK /api/v1/research/projects-detail
-OK /api/v1/research/papers-detail
-OK /api/v1/research/funds-detail
-OK /api/v1/research/awards-detail
-OK /api/v1/teaching/courses-detail
-OK /api/v1/teaching/training-detail

@@ -1,6 +1,0 @@
-﻿/api/v1/audit/compliance-detail=200
-/api/v1/audit/compliance-checklist=200
-/api/v1/audit/compliance-evidence=200
-/api/v1/audit/compliance-remediation=200
-/api/v1/audit/compliance-report=200
-/api/v1/audit/compliance-dashboard=200

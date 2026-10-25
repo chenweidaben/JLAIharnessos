@@ -1,7 +1,0 @@
-﻿/api/v1/finance/budget=200
-/api/v1/finance/cost=200
-/api/v1/finance/dashboard=ERR
-/api/v1/finance/costs=ERR
-/api/v1/finance/revenue=200
-/api/v1/finance/reports=ERR
-/api/v1/finance/analysis=ERR

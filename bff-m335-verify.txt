@@ -1,7 +1,0 @@
-﻿/api/v1/finance/budget=200
-/api/v1/billing/list=200
-/api/v1/finance/expenses=ERR
-/api/v1/finance/assets=ERR
-/api/v1/billing/orders=200
-/api/v1/billing/refunds=200
-/api/v1/billing/invoices=ERR

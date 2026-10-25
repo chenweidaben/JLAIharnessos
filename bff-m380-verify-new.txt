@@ -1,2 +1,0 @@
-﻿/api/v1/lab/items=200
-/api/v1/radiology/items=200

@@ -1,6 +1,0 @@
-﻿/api/v1/research/projects=200
-/api/v1/research/papers=200
-/api/v1/research/funds=200
-/api/v1/research/awards=ERR
-/api/v1/teaching/courses=200
-/api/v1/teaching/training=200

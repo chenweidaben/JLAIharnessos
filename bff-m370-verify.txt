@@ -1,7 +1,0 @@
-﻿/api/v1/telemed/remote-equipment=ERR
-/api/v1/telemed/remote-experts=ERR
-/api/v1/telemed/remote-consults=ERR
-/api/v1/telemed/remote-diagnosis=ERR
-/api/v1/telemed/remote-monitoring=ERR
-/api/v1/telemed/remote-surgery=ERR
-/api/v1/telemed/remote-training=ERR

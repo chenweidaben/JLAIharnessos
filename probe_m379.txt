@@ -1,6 +1,0 @@
-﻿OK /api/v1/quality/indicators
-OK /api/v1/quality/scores
-OK /api/v1/quality/trends
-OK /api/v1/quality/benchmarks
-OK /api/v1/quality/alerts
-OK /api/v1/quality/reports

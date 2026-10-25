@@ -1,6 +1,0 @@
-﻿/api/v1/risk/indicators=200
-/api/v1/risk/scores=200
-/api/v1/risk/trends=200
-/api/v1/risk/benchmarks=200
-/api/v1/risk/alerts=200
-/api/v1/risk/reports=200

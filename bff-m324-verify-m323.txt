@@ -1,6 +1,0 @@
-﻿/api/v1/fhir/practitioner=200
-/api/v1/fhir/organization=200
-/api/v1/fhir/location=200
-/api/v1/fhir/medication=200
-/api/v1/fhir/procedure=200
-/api/v1/fhir/allergyintolerance=200

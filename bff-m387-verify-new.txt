@@ -1,2 +1,0 @@
-﻿/api/v1/tenants/detail=200
-/api/v1/tenants/isolation=200

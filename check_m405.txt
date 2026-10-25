@@ -1,6 +1,0 @@
-﻿LabItemsPage lazy: False
-LabResultsPage lazy: True
-LabReportsPage lazy: False
-RadiologyItemsPage lazy: False
-RadiologyResultsPage lazy: True
-RadiologyReportsPage lazy: True

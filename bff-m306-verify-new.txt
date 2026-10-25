@@ -1,6 +1,0 @@
-﻿/api/v1/research/projects-list=200
-/api/v1/research/papers=200
-/api/v1/research/funds=200
-/api/v1/education/courses=200
-/api/v1/education/exams=200
-/api/v1/education/degrees=200

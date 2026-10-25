@@ -35,3 +35,11 @@ lerna-debug.log*
 # 缓存
 .eslintcache
 *.tsbuildinfo
+
+# 源码内业务日志页面目录（非运行日志目录，必须提交；admin/Logs 为无路由引用孤儿页，仍保持忽略待人工复核）
+!src/pages/audit/logs/
+!src/pages/audit/logs/**
+!src/pages/system/logs/
+!src/pages/system/logs/**
+!src/pages/tenant/logs/
+!src/pages/tenant/logs/**

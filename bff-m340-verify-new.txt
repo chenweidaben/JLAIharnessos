@@ -1,4 +1,0 @@
-﻿/api/v1/patient/profile=200
-/api/v1/patient/allergies=200
-/api/v1/patient/family=200
-/api/v1/patient/vitals=200

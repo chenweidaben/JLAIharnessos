@@ -1,9 +1,0 @@
-﻿/api/v1/cds/alert=200
-/api/v1/cds/patient-summary=200
-/api/v1/cds/recommendation=200
-/api/v1/patient/timeline-overview=200
-/api/v1/patient/timeline-events=200
-/api/v1/patient/timeline-encounters=200
-/api/v1/patient/timeline-medications=200
-/api/v1/patient/timeline-results=200
-/api/v1/patient/timeline-alerts=200

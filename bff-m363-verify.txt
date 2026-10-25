@@ -1,6 +1,0 @@
-﻿/api/v1/service/appointments=ERR
-/api/v1/service/payments=ERR
-/api/v1/service/querys=ERR
-/api/v1/service/reminders=ERR
-/api/v1/service/feedback=ERR
-/api/v1/service/satisfaction=ERR

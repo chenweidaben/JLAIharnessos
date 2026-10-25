@@ -1,8 +1,0 @@
-﻿/api/v1/audit/compliance=200
-/api/v1/security/compliance-score=200
-/api/v1/audit/compliance-detail=ERR
-/api/v1/audit/compliance-checklist=ERR
-/api/v1/audit/compliance-evidence=ERR
-/api/v1/audit/compliance-remediation=ERR
-/api/v1/audit/compliance-report=ERR
-/api/v1/audit/compliance-dashboard=ERR

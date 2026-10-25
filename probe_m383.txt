@@ -1,5 +1,0 @@
-﻿OK /api/v1/security/data-access
-OK /api/v1/security/data-sharing
-OK /api/v1/security/data-export
-OK /api/v1/security/data-backup
-OK /api/v1/security/data-recovery

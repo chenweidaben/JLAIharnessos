@@ -1,7 +1,0 @@
-﻿/api/v1/supplies/warning=200
-/api/v1/quality/control=200
-/api/v1/quality/inspection=200
-/api/v1/quality/exception=200
-/api/v1/risk/assessment=200
-/api/v1/risk/monitor=200
-/api/v1/risk/warning=200

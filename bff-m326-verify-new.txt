@@ -1,6 +1,0 @@
-﻿/api/v1/tenants/overview=200
-/api/v1/tenants/quota=200
-/api/v1/tenants/billing=200
-/api/v1/system/config=200
-/api/v1/system/feature-flags=200
-/api/v1/system/dict=200

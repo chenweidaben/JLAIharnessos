@@ -1,9 +1,0 @@
-﻿/api/v1/oncology/patients=200
-/api/v1/oncology/chemotherapy=200
-/api/v1/oncology/radiotherapy=200
-/api/v1/oncology/chemo=200
-/api/v1/oncology/radiation=200
-/api/v1/rehab/plans=200
-/api/v1/rehab/assessment=200
-/api/v1/rehab/assessments=ERR
-/api/v1/rehab/records=ERR

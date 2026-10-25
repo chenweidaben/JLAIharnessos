@@ -1,6 +1,0 @@
-﻿OK /api/v1/service/appointments
-OK /api/v1/service/payments
-OK /api/v1/service/querys
-OK /api/v1/service/reminders
-OK /api/v1/service/feedback
-OK /api/v1/service/satisfaction

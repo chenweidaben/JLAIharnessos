@@ -1,8 +1,0 @@
-﻿psql.exe : 注意:  递归删除 在表 clinical.follow_up_records上的约束follow_up_records_plan_id_fkey 
-所在位置 行:1 字符: 1
-+ & "C:\postgres\pgsql\bin\psql.exe" -U postgres -h 127.0.0.1 -p 5433 - ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (注意:  递归删除 在表 cl...s_plan_id_fkey :String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-DROP TABLE

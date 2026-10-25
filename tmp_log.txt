@@ -1,6 +1,0 @@
-﻿cab38d24 feat(iv-fluid-v13): iv-fluid V13 - outpatient + inpatient IV rate, GET /api/v1/iv-fluid (M336-D)
-46d5ed5c feat(antibiotic-rx-v13): antibiotic-rx V13 - outpatient rx rate + inpatient use rate + type I preventive rate, GET /api/v1/antibiotic-rx (M336-C)
-bcf388d3 feat(adverse-drug-event-v13): adverse-drug-event V13 - total + serious rate + timely report rate, GET /api/v1/adverse-drug-event (M336-B)
-21aa0db6 feat(drug-shortage-v13): drug-shortage V13 - count + avg shortage days + affected patients, GET /api/v1/drug-shortage (M336-A)
-be0db286 feat(readmission-stats-v13): readmission-stats V13 - overall + disease-level 31d readmission rate, GET /api/v1/readmission-stats (M335-D)
-492fa3a8 feat(critical-value-stats-v13): critical-value-stats V13 - count + timely handling + missed report rate, GET /api/v1/critical-value-stats (M335-C)

@@ -1,6 +1,0 @@
-﻿/api/v1/patient/timeline=200
-/api/v1/patient/timeline-events=200
-/api/v1/patient/timeline-filter=ERR
-/api/v1/patient/timeline-summary=ERR
-/api/v1/patient/timeline-compare=ERR
-/api/v1/patient/timeline-export=ERR

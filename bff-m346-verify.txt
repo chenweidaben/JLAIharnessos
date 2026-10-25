@@ -1,6 +1,0 @@
-﻿/api/v1/security/masking-rules=ERR
-/api/v1/security/masking-logs=ERR
-/api/v1/security/encryption-keys=ERR
-/api/v1/security/encryption-status=ERR
-/api/v1/security/data-classification=ERR
-/api/v1/security/data-retention=ERR

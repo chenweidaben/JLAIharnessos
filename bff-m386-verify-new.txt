@@ -1,2 +1,0 @@
-﻿/api/v1/system/menus=200
-/api/v1/system/cache=200

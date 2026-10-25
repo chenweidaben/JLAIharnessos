@@ -1,6 +1,0 @@
-﻿OrdersListPage lazy: True
-OrdersDetailPage lazy: False
-OrdersTemplatesPage lazy: False
-PrescriptionsListPage lazy: False
-PrescriptionsDetailPage lazy: False
-PrescriptionsAuditPage lazy: False

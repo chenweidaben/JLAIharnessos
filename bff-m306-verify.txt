@@ -1,2 +1,0 @@
-﻿/api/v1/research/projects=200
-/api/v1/education/trainings=200

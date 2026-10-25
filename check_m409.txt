@@ -1,6 +1,0 @@
-﻿CdsRulesPage lazy: False
-CdsAlertsPage lazy: True
-CdsRecommendationsPage lazy: False
-CdsDrugInteractionsPage lazy: False
-CdsContraindicationsPage lazy: False
-CdsGuidelinesPage lazy: True

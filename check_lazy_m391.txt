@@ -1,6 +1,0 @@
-﻿ResearchProjectsPage lazy: True
-ResearchPapersPage lazy: True
-ResearchFundsPage lazy: True
-ResearchAwardsPage lazy: False
-TeachingCoursesPage lazy: False
-TeachingTrainingPage lazy: True

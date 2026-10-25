@@ -1,5 +1,0 @@
-﻿src/router/index.tsx(8050,56): error TS2552: Cannot find name 'SecurityDataAccessPage'. Did you mean 'SecurityDataAccessLogPage'?
-src/router/index.tsx(8051,57): error TS2552: Cannot find name 'SecurityDataSharingPage'. Did you mean 'SecurityDashboardPage'?
-src/router/index.tsx(8052,56): error TS2552: Cannot find name 'SecurityDataExportPage'. Did you mean 'SecurityAuditExportPage'?
-src/router/index.tsx(8053,56): error TS2552: Cannot find name 'SecurityDataBackupPage'. Did you mean 'SecurityBackupPage'?
-src/router/index.tsx(8054,58): error TS2304: Cannot find name 'SecurityDataRecoveryPage'.

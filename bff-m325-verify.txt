@@ -1,7 +1,0 @@
-﻿/api/v1/security/audit-logs=200
-/api/v1/security/user-sessions=200
-/api/v1/security/login-history=200
-/api/v1/security/permission-matrix=200
-/api/v1/security/role-mapping=200
-/api/v1/security/data-access-log=200
-/api/v1/security/privacy-report=200

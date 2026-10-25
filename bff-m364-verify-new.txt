@@ -1,6 +1,0 @@
-﻿/api/v1/operations/dashboard=200
-/api/v1/operations/kpi=200
-/api/v1/operations/reports=200
-/api/v1/operations/analysis=200
-/api/v1/operations/forecast=200
-/api/v1/operations/benchmark=200

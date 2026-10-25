@@ -1,4 +1,0 @@
-﻿/api/v1/oncology/screening=200
-/api/v1/oncology/diagnosis=200
-/api/v1/oncology/treatment-plan=200
-/api/v1/oncology/followup=200

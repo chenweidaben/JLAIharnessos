@@ -1,6 +1,0 @@
-﻿/api/v1/surgery/schedule=200
-/api/v1/surgery/records=200
-/api/v1/surgery/consent=ERR
-/api/v1/anesthesia/records=200
-/api/v1/anesthesia/assessment=ERR
-/api/v1/anesthesia/recovery=ERR

@@ -1,8 +1,0 @@
-﻿bun.exe : $ tsc --noEmit
-所在位置 行:1 字符: 60
-+ ... chat-1\web; & "$env:USERPROFILE\.bun\bin\bun.exe" run typecheck > ..\ ...
-+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ($ tsc --noEmit:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-src/pages/admin/Import/index.tsx(162,15): error TS17002: Expected corresponding JSX closing tag for 'Upload'.

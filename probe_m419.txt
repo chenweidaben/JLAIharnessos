@@ -1,6 +1,0 @@
-﻿OK /api/v1/community/followups-detail
-OK /api/v1/community/visits-detail
-OK /api/v1/community/health-records-detail
-OK /api/v1/community/elderly-care-detail
-OK /api/v1/community/chronic-disease-detail
-OK /api/v1/community/education-detail

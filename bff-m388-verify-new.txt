@@ -1,6 +1,0 @@
-﻿/api/v1/phi/masking=200
-/api/v1/phi/encryption=200
-/api/v1/phi/decryption=200
-/api/v1/phi/audit=200
-/api/v1/phi/policies=200
-/api/v1/phi/consent=200

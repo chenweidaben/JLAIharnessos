@@ -1,5 +1,0 @@
-﻿/api/v1/telemed/video=200
-/api/v1/telemed/equipment=200
-/api/v1/telemed/records=200
-/api/v1/telemed/specialists=200
-/api/v1/telemed/referrals=200

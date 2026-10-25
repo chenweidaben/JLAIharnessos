@@ -1,6 +1,0 @@
-﻿dashboard exists: False
-OK /api/v1/operations/kpi
-OK /api/v1/operations/reports
-OK /api/v1/operations/analysis
-OK /api/v1/operations/forecast
-OK /api/v1/operations/benchmark

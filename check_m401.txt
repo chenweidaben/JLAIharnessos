@@ -1,6 +1,0 @@
-﻿GeriatricsAssessmentPage lazy: True
-GeriatricsCarePlanPage lazy: False
-GeriatricsComorbidityPage lazy: False
-GeriatricsFrailPage lazy: False
-GeriatricsDementiaPage lazy: True
-GeriatricsFallsPage lazy: True

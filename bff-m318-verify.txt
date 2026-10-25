@@ -1,4 +1,0 @@
-﻿/api/v1/cds/order-check=200
-/api/v1/cds/alert=ERR
-/api/v1/cds/patient-summary=ERR
-/api/v1/cds/recommendation=ERR

@@ -1,6 +1,0 @@
-﻿/api/v1/pharmacy/prescriptions=200
-/api/v1/pharmacy/dispense=200
-/api/v1/supplies/inventory=200
-/api/v1/supplies/warning=ERR
-/api/v1/equipment/maintenance=200
-/api/v1/equipment/fault=200

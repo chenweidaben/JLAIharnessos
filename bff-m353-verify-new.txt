@@ -1,4 +1,0 @@
-﻿/api/v1/patient/timeline-filter=200
-/api/v1/patient/timeline-summary=200
-/api/v1/patient/timeline-compare=200
-/api/v1/patient/timeline-export=200

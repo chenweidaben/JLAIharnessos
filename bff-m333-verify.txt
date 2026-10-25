@@ -1,7 +1,0 @@
-﻿/api/v1/medical-records/archive=200
-/api/v1/emr/templates=ERR
-/api/v1/emr/signatures=ERR
-/api/v1/emr/archives=ERR
-/api/v1/insurance/benefits=ERR
-/api/v1/insurance/directory=ERR
-/api/v1/insurance/settlement=200

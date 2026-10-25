@@ -1,4 +1,0 @@
-﻿/api/v1/telemedicine/consultations=200
-/api/v1/telemedicine/records=200
-/api/v1/telemedicine/devices=200
-/api/v1/community/visits=200

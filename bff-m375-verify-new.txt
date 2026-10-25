@@ -1,5 +1,0 @@
-﻿/api/v1/rehab/treatment=200
-/api/v1/rehab/therapy=200
-/api/v1/rehab/exercise=200
-/api/v1/rehab/occupational=200
-/api/v1/rehab/followup=200

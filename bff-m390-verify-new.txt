@@ -1,5 +1,0 @@
-﻿/api/v1/bi/charts=200
-/api/v1/bi/reports=200
-/api/v1/bi/analysis=200
-/api/v1/bi/export=200
-/api/v1/bi/scheduled=200

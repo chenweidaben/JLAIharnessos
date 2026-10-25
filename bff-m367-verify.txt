@@ -1,7 +1,0 @@
-﻿/api/v1/pharmacy/inventory=200
-/api/v1/pharmacy/purchasing=200
-/api/v1/pharmacy/dashboard=ERR
-/api/v1/pharmacy/inventory-detail=ERR
-/api/v1/pharmacy/suppliers=ERR
-/api/v1/pharmacy/warning=ERR
-/api/v1/pharmacy/expiry=ERR

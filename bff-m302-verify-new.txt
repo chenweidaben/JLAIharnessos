@@ -1,6 +1,0 @@
-﻿/api/v1/hr/doctors=200
-/api/v1/hr/nurses=200
-/api/v1/hr/departments=200
-/api/v1/hr/performance=200
-/api/v1/hr/training=200
-/api/v1/hr/leave=200

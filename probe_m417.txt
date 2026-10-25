@@ -1,6 +1,0 @@
-﻿OK /api/v1/telemed/consultations-detail
-OK /api/v1/telemed/prescriptions-detail
-OK /api/v1/telemed/payments-detail
-OK /api/v1/telemed/delivery-detail
-OK /api/v1/telemed/followup-detail
-OK /api/v1/telemed/reports-detail

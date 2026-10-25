@@ -1,6 +1,0 @@
-﻿/api/v1/outpatient/visits=ERR
-/api/v1/outpatient/prescriptions=ERR
-/api/v1/outpatient/triage=ERR
-/api/v1/inpatient/admissions=200
-/api/v1/inpatient/discharges=200
-/api/v1/inpatient/transfers=200

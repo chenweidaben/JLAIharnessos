@@ -1,3 +1,0 @@
-﻿src/pages/assistant/Surgery/index.tsx(14,3): error TS6133: 'AlertOutlined' is declared but its value is never read.
-src/pages/muse/SystemIntelligence/index.tsx(39,7): error TS6133: 'MID_BLUE' is declared but its value is never read.
-src/pages/patient/Muse/index.tsx(74,21): error TS6133: 'setPatientId' is declared but its value is never read.

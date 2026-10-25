@@ -1,5 +1,0 @@
-﻿/api/v1/community/residents=200
-/api/v1/community/family-doctor=200
-/api/v1/community/vaccination=200
-/api/v1/community/chronic-management=200
-/api/v1/community/health-education=200

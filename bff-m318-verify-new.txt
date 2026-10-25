@@ -1,7 +1,0 @@
-﻿/api/v1/settlement/list=200
-/api/v1/cds/clinical-pathway=200
-/api/v1/cds/diagnosis-suggestion=200
-/api/v1/cds/treatment-plan=200
-/api/v1/cds/drug-dose-adjust=200
-/api/v1/cds/lab-critical=200
-/api/v1/cds/imaging-hint=200

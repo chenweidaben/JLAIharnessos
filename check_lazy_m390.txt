@@ -1,5 +1,0 @@
-﻿PharmacyDashboardPage lazy: False
-PharmacyInventoryDetailPage lazy: False
-PharmacySuppliersPage lazy: False
-PharmacyPurchasingPage lazy: True
-PharmacyExpiryPage lazy: False

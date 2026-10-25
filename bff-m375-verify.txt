@@ -1,6 +1,0 @@
-﻿/api/v1/rehab/assessment=200
-/api/v1/rehab/treatment=ERR
-/api/v1/rehab/therapy=ERR
-/api/v1/rehab/exercise=ERR
-/api/v1/rehab/occupational=ERR
-/api/v1/rehab/followup=ERR

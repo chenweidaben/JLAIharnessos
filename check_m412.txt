@@ -1,6 +1,0 @@
-﻿TenantsListPage lazy: True
-TenantsDetailPage lazy: False
-TenantsConfigPage lazy: True
-TenantsQuotaPage lazy: True
-TenantsIsolationPage lazy: False
-TenantsSwitchPage lazy: True

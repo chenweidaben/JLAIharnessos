@@ -1,6 +1,0 @@
-﻿OK /api/v1/audit/compliance-detail
-OK /api/v1/audit/compliance-checklist
-OK /api/v1/audit/compliance-evidence
-OK /api/v1/audit/compliance-remediation
-OK /api/v1/audit/compliance-report
-OK /api/v1/audit/compliance-dashboard

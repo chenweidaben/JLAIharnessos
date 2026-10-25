@@ -1,6 +1,0 @@
-﻿OK /api/v1/telemed/remote-consults
-OK /api/v1/telemed/remote-diagnosis
-OK /api/v1/telemed/remote-monitoring
-OK /api/v1/telemed/remote-surgery
-OK /api/v1/telemed/remote-training
-OK /api/v1/telemed/remote-equipment

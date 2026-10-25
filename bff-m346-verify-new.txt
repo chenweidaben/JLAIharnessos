@@ -1,6 +1,0 @@
-﻿/api/v1/security/masking-rules=200
-/api/v1/security/masking-logs=200
-/api/v1/security/encryption-keys=200
-/api/v1/security/encryption-status=200
-/api/v1/security/data-classification=200
-/api/v1/security/data-retention=200

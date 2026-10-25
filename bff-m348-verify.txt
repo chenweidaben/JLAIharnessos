@@ -1,7 +1,0 @@
-﻿/api/v1/emr/version-list=200
-/api/v1/emr/version-diff=200
-/api/v1/emr/version-history=200
-/api/v1/emr/versions=200
-/api/v1/emr/version-restore=200
-/api/v1/emr/version-labels=ERR
-/api/v1/emr/version-approve=ERR

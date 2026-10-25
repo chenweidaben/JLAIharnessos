@@ -1,5 +1,0 @@
-﻿/api/v1/billing/list=200
-/api/v1/finance/cost=200
-/api/v1/financial/billing=200
-/api/v1/financial/insurance=200
-/api/v1/financial/refunds=200

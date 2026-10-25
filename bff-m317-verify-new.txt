@@ -1,6 +1,0 @@
-﻿/api/v1/workflow/doctor-tasks=200
-/api/v1/workflow/nurse-tasks=200
-/api/v1/workflow/pharmacist-tasks=200
-/api/v1/workflow/admin-tasks=200
-/api/v1/workflow/queue=200
-/api/v1/workflow/history=200

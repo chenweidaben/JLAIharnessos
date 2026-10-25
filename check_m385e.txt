@@ -1,7 +1,0 @@
-﻿data-access: False
-data-sharing: False
-data-export: False
-data-backup: False
-data-recovery: False
-incidents: False
-incident-response: False

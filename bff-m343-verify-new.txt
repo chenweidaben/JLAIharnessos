@@ -1,5 +1,0 @@
-﻿/api/v1/security/roles=200
-/api/v1/security/permissions=200
-/api/v1/system/configs=200
-/api/v1/system/logs=200
-/api/v1/system/version=200

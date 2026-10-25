@@ -1,4 +1,0 @@
-﻿incidents lazy: True
-incident-response lazy: True
-incidents route: False
-incident-response route: False

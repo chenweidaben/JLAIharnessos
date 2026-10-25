@@ -1,6 +1,0 @@
-﻿/api/v1/lab/items=ERR
-/api/v1/lab/results=200
-/api/v1/lab/reports=200
-/api/v1/radiology/items=ERR
-/api/v1/radiology/results=200
-/api/v1/radiology/reports=200

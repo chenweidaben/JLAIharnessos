@@ -1,6 +1,0 @@
-﻿/api/v1/oncology/screening=ERR
-/api/v1/oncology/diagnosis=ERR
-/api/v1/oncology/treatment-plan=ERR
-/api/v1/oncology/chemotherapy=200
-/api/v1/oncology/radiotherapy=200
-/api/v1/oncology/followup=ERR

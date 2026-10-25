@@ -1,5 +1,5 @@
-# 健澜科技杠OS (Jianlan Gang-OS) - Git 忽略清单
-# Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
+# 健澜AI原生医院操作系统OS (Jianlan AI-Native Hospital OS) - Git 忽略清单
+# Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
 
 # 依赖
 node_modules/
@@ -108,3 +108,31 @@ artifacts/*.log
 # 临时提交信息文件（git commit -F 用，禁止入库）
 .commitmsg*.txt
 .commitmsg*.tmp
+
+# 根目录历史批次取证/探针临时文本（仅锚定根目录散落 *.txt；docs/reports/src 等子目录内文本不受影响；已跟踪文件由收口环节 git rm --cached 取消跟踪）
+/*.txt
+# web 根目录历史探针/构建/覆盖率/e2e 输出文本（仅 web 根目录，web/src、web/tests 不受影响）
+/web/*.txt
+/web/build_out.txt
+/web/coverage_out.txt
+# 根目录历史探针导出 CSV（正式数据报表放 reports/ 子目录，不锚定子目录）
+/*.csv
+
+# scripts 历史探针产物（本地保留，不入库；源码 .ts 不受影响）
+/scripts/demo-token.txt
+/scripts/probe-results*.csv
+/scripts/probe-v2-output.txt
+
+# reports 根目录本地取证文本/表格（正式报告放 reports/ 子目录 .md；已跟踪历史文件不受本规则影响）
+reports/*.txt
+reports/*.csv
+
+# 源码内业务目录与运行时目录同名误伤豁免（仅放行下列具体源码路径，不放宽日志/覆盖率/运行时规则本身；
+# 规则写在对应忽略规则之后以保证优先级）
+!web/src/pages/fhir/coverage/
+!web/src/pages/fhir/coverage/**
+!src/core/agent/consult/runtime/
+!src/core/agent/consult/runtime/**
+# radar 服务随源码打包的内嵌契约兜底数据（根契约缺失时的回退；Dockerfile COPY app/data 依赖本目录）
+!services/radar-inference/app/data/
+!services/radar-inference/app/data/**

@@ -1,3 +1,0 @@
-﻿/api/v1/events/dead-letter=200
-/api/v1/events/retry=200
-/api/v1/audit/reports=200

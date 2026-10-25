@@ -1,8 +1,0 @@
-﻿total index.tsx: 2619
-API pages: 1244
-DEMO pages: 119
-no-api pages: 1256
-no-PageContainer: 1915
-router lines: 9206
-lazy count: 1202
-Route count: 2580

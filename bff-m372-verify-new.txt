@@ -1,6 +1,0 @@
-﻿/api/v1/maternity/prenatal-care=200
-/api/v1/maternity/postnatal-care=200
-/api/v1/maternity/infant-care=200
-/api/v1/maternity/child-vaccination=200
-/api/v1/maternity/women-health=200
-/api/v1/maternity/genetic-screening=200

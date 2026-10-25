@@ -1,9 +1,0 @@
-﻿/api/v1/hr/recruitment=200
-/api/v1/hr/training=200
-/api/v1/hr/positions=200
-/api/v1/hr/staff-dashboard=ERR
-/api/v1/hr/staff-recruitment=ERR
-/api/v1/hr/staff-training=ERR
-/api/v1/hr/staff-performance=ERR
-/api/v1/hr/staff-schedule=ERR
-/api/v1/hr/staff-attendance=ERR

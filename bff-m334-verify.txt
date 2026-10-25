@@ -1,7 +1,0 @@
-﻿/api/v1/pharmacy/inventory=200
-/api/v1/pharmacy/purchasing=ERR
-/api/v1/pharmacy/dispensing=ERR
-/api/v1/hr/trainings=ERR
-/api/v1/hr/recruitment=ERR
-/api/v1/hr/training=200
-/api/v1/hr/positions=200

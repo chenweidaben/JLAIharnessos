@@ -1,6 +1,0 @@
-﻿/api/v1/security/audit-detail=200
-/api/v1/security/audit-export=200
-/api/v1/security/audit-anomaly=200
-/api/v1/security/audit-whitelist=200
-/api/v1/security/audit-report=200
-/api/v1/security/compliance-score=200

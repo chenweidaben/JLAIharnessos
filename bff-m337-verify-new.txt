@@ -1,5 +1,0 @@
-﻿/api/v1/lab/orders=200
-/api/v1/lab/results=200
-/api/v1/radiology/orders=200
-/api/v1/radiology/results=200
-/api/v1/radiology/reports=200

@@ -1,2 +1,0 @@
-﻿web/src/pages/bi/trends/index.tsx(23,60): error TS6133: 'color' is declared but its value is never read.
-EXIT=2

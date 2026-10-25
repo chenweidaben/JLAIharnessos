@@ -1,5 +1,0 @@
-﻿/api/v1/security/data-access=200
-/api/v1/security/data-sharing=200
-/api/v1/security/data-export=200
-/api/v1/security/data-backup=200
-/api/v1/security/data-recovery=200

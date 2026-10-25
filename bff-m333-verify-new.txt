@@ -1,5 +1,0 @@
-﻿/api/v1/emr/templates=200
-/api/v1/emr/signatures=200
-/api/v1/emr/archives=200
-/api/v1/insurance/benefits=200
-/api/v1/insurance/directory=200

@@ -1,6 +1,0 @@
-﻿OK /api/v1/maternity/prenatal-care
-OK /api/v1/maternity/postnatal-care
-OK /api/v1/maternity/infant-care
-OK /api/v1/maternity/child-vaccination
-OK /api/v1/maternity/women-health
-OK /api/v1/maternity/genetic-screening

@@ -1,6 +1,0 @@
-﻿/api/v1/finance/billing=200
-/api/v1/finance/payment=200
-/api/v1/finance/refund=200
-/api/v1/finance/insurance-settlement=200
-/api/v1/finance/budget=200
-/api/v1/finance/audit=200
