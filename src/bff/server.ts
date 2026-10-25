@@ -6676,7 +6676,7 @@ async function handleAgentStart(
   const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   let conversationId = frame.conversationId ?? frame.payload?.conversationId ?? '';
   // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问候，避免空消息报错
-  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜数智医院智能体可以为我提供哪些临床辅助能力。';
+  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜AI原生医院操作系统OS可以为我提供哪些临床辅助能力。';
 
   const send = (event: string, payload: unknown): void => {
     try {
