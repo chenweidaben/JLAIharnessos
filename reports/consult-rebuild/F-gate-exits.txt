@@ -26,3 +26,20 @@ WEB_LOCAL_PRETTIER_POSTCOMMIT_EXIT=0
 F1_ONLINECONSULT_POSTCOMMIT_EXIT=1; 9 pass / 1 fail / 38 expect
 F2_DDL_POSTCOMMIT_EXIT=1; 5 pass / 1 fail / 2360 expect
 CHECK_SQL_POSTCOMMIT_EXIT=1; 12 historical SQL bracket false positives; 380-385 absent
+
+# === latest snapshot rerun (pre-G10 closure, §2.8) ===
+TSC_LATEST_EXIT=0
+ESLINT_BACKEND_LATEST_EXIT=0
+PRETTIER_BACKEND_LATEST_EXIT=1; only sessionRuntime.ts warn (G10)
+F_TESTS_PRETTIER_LATEST_EXIT=0
+BUN_CONSULT_LATEST_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files
+BUN_BCLASS_LATEST_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files
+PERMISSIONS_LATEST_EXIT=0; 69 pass / 0 fail / 177 expect
+FLOW_LATEST_EXIT=0; 7 pass / 0 fail / 181 expect
+ROOT_WEB_ESLINT_LATEST_EXIT=1; 9 problems (7 errors / 2 warnings), E debt
+WEB_LOCAL_ESLINT_LATEST_EXIT=0
+WEB_LOCAL_PRETTIER_LATEST_EXIT=0
+
+--- G10 closure (§2.9) ---
+PRETTIER_BACKEND_G10_CLOSED_EXIT=0; src/core/agent/consult/**/*.ts prettier --check all pass
+ROOT_TSC_G10_CLOSED_EXIT=0; 0 bytes diagnostics

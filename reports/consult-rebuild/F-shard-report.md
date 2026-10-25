@@ -205,7 +205,7 @@ $env:DEMO_MODE='1'; & "C:\Users\lenovo\.bun\bin\bun.exe" test tests/unit/consult
 
 ### 2.7 提交后现场复跑（对照 HEAD `db3ace9f`，五组提交落地后）
 
-五组提交落地后，F 在当前工作区复跑以下门禁，退出码与统计取自真实运行（日志 `F-*-postcommit.log`）；其后 `65802b20` / `ea1fe58f` / `256cbcdd` / 收口 docs 提交仅调整忽略规则、探针去索引与 `reports/` 底稿归档（不含 `src/` 后端改动，见 §3.6 阶段二），本节门禁结论对收口 HEAD 仍然成立。
+五组提交落地后，F 在当前工作区复跑以下门禁，退出码与统计取自真实运行（日志 `F-*-postcommit.log`）；其后 `65802b20` / `ea1fe58f` / `256cbcdd` 与收口 docs 提交仅调整忽略规则、探针去索引与 `reports/` 底稿归档（不含 `src/` 后端改动，见 §3.6 阶段二），本节门禁结论对收口 HEAD 仍然成立；收口前一轮复跑证据见 §2.8，G10 收口证据见 §2.9。
 
 | 命令（仓库根 / `web/`） | 退出码 | 结果 | 证据 |
 |---|---:|---|---|
@@ -219,6 +219,36 @@ $env:DEMO_MODE='1'; & "C:\Users\lenovo\.bun\bin\bun.exe" test tests/unit/consult
 | `web/` 本地 `prettier --check` 同两文件 | **0** | `All matched files use Prettier code style!` | `F-prettier-webE-postcommit.log`、`WEB_LOCAL_PRETTIER_POSTCOMMIT_EXIT=0` |
 
 > 说明：提交前 §2.1–§2.4 的后端 Prettier 为 exit 0；提交后 `sessionRuntime.ts` 格式告警来自 `42c98a3d` 入库版本，与 F 新增测试无关。F 未对该文件执行 `--write`。
+
+### 2.8 收口前一轮终轮复跑（交付前收口证据，对照当时收口 docs 提交）
+
+收口 docs 提交落地后（仅 `reports/` 底稿，无 `src/` 后端改动），F 在交付前对当时现场再跑一轮门禁，退出码与统计取自真实运行（日志 `F-*-latest.log`、`F-*-final.log`）；本轮 Prettier 仍仅 `sessionRuntime.ts` 告警（G10，时间点证据，收口情况见 §2.9）：
+
+| 命令（仓库根 / `web/`） | 退出码 | 结果 | 证据 |
+|---|---:|---|---|
+| `node_modules\.bin\tsc.cmd --noEmit` | **0** | 0 字节输出；类型检查通过 | `F-tsc-final.log`、`TSC_LATEST_EXIT=0` |
+| `node_modules\.bin\eslint.cmd <后端 consult 六路径> --max-warnings 0` | **0** | 0 问题；仅 `.eslintignore` 弃用提示 | `F-eslint-backend-latest.log`、`ESLINT_BACKEND_LATEST_EXIT=0` |
+| `node_modules\.bin\prettier.cmd --check <后端 consult 六路径>` | **1** | 仍仅 `sessionRuntime.ts` 1 个文件告警（G10）；F 两个新测试文件单独 `--check` **exit 0** | `F-prettier-backend-latest.log`、`F-prettier-f-tests-latest.log`、`PRETTIER_BACKEND_LATEST_EXIT=1`、`F_TESTS_PRETTIER_LATEST_EXIT=0` |
+| `bun test tests/security/consult-agent/permissions.test.ts` | **0** | **69 pass / 0 fail / 177 expect / 1 文件 / 1.40s** | `F-permissions-final.log`、`PERMISSIONS_LATEST_EXIT=0` |
+| `bun test tests/integration/consult-agent/consultFlow.test.ts` | **0** | **7 pass / 0 fail / 181 expect / 1 文件 / 11.22s** | `F-flow-final.log`、`FLOW_LATEST_EXIT=0` |
+| `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect / 15 文件 / 11.76s** | `F-bun-consult-latest.log`、`BUN_CONSULT_LATEST_EXIT=0` |
+| `bun test` B 类 8 个既有测试文件 | **0** | **140 pass / 0 fail / 1143 expect / 8 文件 / 1.53s** | `F-bun-bclass-latest.log`、`BUN_BCLASS_LATEST_EXIT=0` |
+| 根配置 `eslint web/src/services/api/consultAgent.ts web/src/pages/consult-agent --max-warnings 0` | **1** | 9 问题（7 errors / 2 warnings），规则与位置同 §2.2(b)，E 分片债务未消化 | `F-eslint-webE-latest.log`、`ROOT_WEB_ESLINT_LATEST_EXIT=1` |
+| `web/` 本地 `eslint` 同两文件 | **0** | 0 问题 | `F-eslint-webE-local-latest.log`、`WEB_LOCAL_ESLINT_LATEST_EXIT=0` |
+| `web/` 本地 `prettier --check` 同两文件 | **0** | `All matched files use Prettier code style!` | `F-prettier-webE-latest.log`、`WEB_LOCAL_PRETTIER_LATEST_EXIT=0` |
+
+> 终轮口径（§2.8 快照）：consult 专项后端门禁（tsc、后端 ESLint、consult 测试、B 类回归）在当时现场复跑均 exit 0；唯一后端 Prettier 告警为 G10 单列项；web 根口径 ESLint 9 问题归属 E 分片，web 本地口径 exit 0。G10 后续已收口，证据见 §2.9。
+
+### 2.9 G10 收口复跑（`sessionRuntime.ts` Prettier 格式）
+
+收口动作仅对 `src/core/agent/consult/runtime/sessionRuntime.ts` 的 `listAudit` 单行 `localeCompare` 表达式按 Prettier 规则折行（diff 3 插入 / 1 删除），无逻辑变更、无接口与签名改动；其余 consult 后端文件格式此前即合规。
+
+| 命令 | 退出码 | 结果 |
+|---|---:|---|
+| `node_modules\.bin\prettier.cmd --check 'src/core/agent/consult/**/*.ts'` | **0** | `All matched files use Prettier code style!`；G10 告警清零 |
+| 根 `node_modules\.bin\tsc.cmd --noEmit` | **0** | 0 字节诊断；折行未引入类型错误 |
+
+G10 闭环，状态同步至 §5.1 与 §7.2。
 
 ---
 
@@ -459,7 +489,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 | G3 | `src/bff/routes/health.ts` 信封包装 | `ok()` 信封 + `traceId` 包装无专属路由测试 | 无 |
 | G4 | `src/bff/routes/imaging.ts` 409 语义 | 重复签名 409/CONFLICT 分支无专属路由测试 | 无 |
 | G5 | `src/bff/routes/twin3DInpatient.ts` handler | 路由 handler 无测试；`twin3DInpatient.test.ts` 18 例仅覆盖聚合器纯函数 | 聚合器层 18 例 |
-| G10 | `src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 格式 | 提交后 `prettier --check` 唯一告警文件（A 类已提交核心源码，`42c98a3d` 入库版本）；F 红线禁止改写 `src/core/agent/consult/**`，未执行 `--write`；提交前快照中该文件格式合规 | 无；交对应源码分片在门禁收口前 `--write` 修复 |
+| G10 | ~~`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 格式~~ **已闭环（§2.9）** | 提交后 `prettier --check` 唯一告警文件（A 类已提交核心源码，`42c98a3d` 入库版本）；收口时仅对折行告警修复，无逻辑变更；`src/core/agent/consult/**/*.ts` `prettier --check` exit 0、根 tsc exit 0 | consult 两新测试文件此前 `--check` exit 0；G10 不再列入未闭环缺口 |
 
 ### 5.2 环境依赖未跑范围
 
@@ -539,7 +569,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 ### 7.2 交付时点待收口事项（对照收口 HEAD）
 
 1. **残留工作区（收口终态）**：产品类、B 类、consult 源码与前端零残留、未跟踪文件数 = 0；此前仅剩的 2 个 `reports/**` 底稿工作区修改已由收口 docs 提交入库；`F-gate-exits.txt` 提交后记录同批入库。阶段一曾残留的 `.gitignore`、`web/.gitignore`、`probe_m416.txt` 已由 `65802b20` 入库；`web/src/store/cdrQueryV2M636Store.ts` 当前与 HEAD 一致。
-2. **G10**：`src/core/agent/consult/runtime/sessionRuntime.ts` 提交后 Prettier 唯一告警（§2.7、§5.1），需对应源码分片 `--write` 修复后复跑后端 Prettier 门禁；F 红线禁止改写该文件。
+2. **G10（已闭环）**：`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 折行收口（§2.9），`src/core/agent/consult/**/*.ts` `prettier --check` exit 0、根 tsc exit 0；无逻辑变更。
 3. **§5.4 web 根口径 ESLint**：提交后仍 exit 1、9 问题（7 errors / 2 warnings），归属 E 分片；web 本地 ESLint/Prettier 口径 exit 0。
 4. **§5.5 文档残留**：4 处旧文件名引用仍在已入库的 `docs/` 与 `CHANGELOG.md`，待 B 类文档组替换为 `jlmedaios.yml`、`jlmedaios-overview.json`。
-5. **不阻塞项**：§5.1 G1–G5、§5.2 G6–G9 为环境与覆盖缺口；consult 专项后端门禁（tsc、后端 ESLint、consult 测试、B 类回归）提交后复跑均 exit 0，唯一后端 Prettier 告警为 G10 单列项，需随对应源码分片收口。
+5. **不阻塞项**：§5.1 G1–G5、§5.2 G6–G9 为环境与覆盖缺口；consult 专项后端门禁（tsc、后端 ESLint、consult 测试、B 类回归）提交后复跑均 exit 0；G10 已在 §2.9 收口。

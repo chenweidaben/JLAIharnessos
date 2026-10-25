@@ -118,7 +118,9 @@ export class SessionRuntime implements ConsultAgentPort {
   // ---- 审计 ----
 
   async listAudit(threadId: string): Promise<ConsultAuditEntry[]> {
-    return [...(this.audits.get(threadId) ?? [])].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    return [...(this.audits.get(threadId) ?? [])].sort((a, b) =>
+      a.createdAt.localeCompare(b.createdAt),
+    );
   }
 
   async saveAudit(entry: ConsultAuditEntry): Promise<void> {
