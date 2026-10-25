@@ -1,0 +1,37 @@
+﻿('app', '127.0.0.1:${APP_PORT:-8080}:8080', None, ['backend'], True)
+('postgres', '127.0.0.1:${POSTGRES_PORT:-5432}:5432', None, ['backend'], True)
+('redis', '127.0.0.1:${REDIS_PORT:-6379}:6379', None, ['backend'], True)
+('kafka', '127.0.0.1:${KAFKA_PORT:-9092}:9092', None, ['backend'], True)
+('nginx', '${HTTP_PORT:-80}:8080', None, ['frontend', 'backend'], True)
+('nginx', '${HTTPS_PORT:-443}:8443', None, ['frontend', 'backend'], True)
+('prometheus', '127.0.0.1:${PROMETHEUS_PORT:-9090}:9090', None, ['backend', 'monitoring'], True)
+('grafana', '127.0.0.1:${GRAFANA_PORT:-3000}:3000', None, ['monitoring'], True)
+('alertmanager', '127.0.0.1:${ALERTMANAGER_PORT:-9093}:9093', None, ['monitoring'], True)
+('postgres-exporter', '127.0.0.1:${PG_EXPORTER_PORT:-9187}:9187', None, ['backend', 'monitoring'], True)
+('redis-exporter', '127.0.0.1:${REDIS_EXPORTER_PORT:-9121}:9121', None, ['backend', 'monitoring'], True)
+('elasticsearch', '127.0.0.1:${ES_PORT:-9200}:9200', None, ['monitoring'], True)
+('kibana', '127.0.0.1:${KIBANA_PORT:-5601}:5601', None, ['monitoring'], True)
+('jaeger', '127.0.0.1:${JAEGER_PORT:-16686}:16686', None, ['backend', 'monitoring'], True)
+('jlmedaios-monolith', '127.0.0.1:19090:9090', ['legacy'], ['backend'], False)
+('jlmedaios-ai', '127.0.0.1:8000:8000', ['legacy'], ['backend'], True)
+===== host port holders =====
+19090 ['jlmedaios-monolith']
+8000 ['jlmedaios-ai']
+===== network membership =====
+app -> ['backend']
+web -> ['frontend']
+radar-inference -> ['backend']
+postgres -> ['backend']
+redis -> ['backend']
+kafka -> ['backend']
+nginx -> ['frontend', 'backend']
+prometheus -> ['backend', 'monitoring']
+grafana -> ['monitoring']
+alertmanager -> ['monitoring']
+postgres-exporter -> ['backend', 'monitoring']
+redis-exporter -> ['backend', 'monitoring']
+elasticsearch -> ['monitoring']
+kibana -> ['monitoring']
+jaeger -> ['backend', 'monitoring']
+jlmedaios-monolith -> ['backend']
+jlmedaios-ai -> ['backend']

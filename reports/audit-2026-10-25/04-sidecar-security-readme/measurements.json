@@ -1,0 +1,76 @@
+{
+  "java": {
+    "declared_modules": [
+      "jlmedaios-registry",
+      "jlmedaios-gateway",
+      "jlmedaios-his-reg",
+      "jlmedaios-his-charge",
+      "jlmedaios-his-orders",
+      "jlmedaios-his-pharmacy",
+      "jlmedaios-his-empi",
+      "jlmedaios-his-ward",
+      "jlmedaios-his-lis",
+      "jlmedaios-his-exam",
+      "jlmedaios-his-nursing",
+      "jlmedaios-his-discharge",
+      "jlmedaios-his-report",
+      "jlmedaios-his-message"
+    ],
+    "declared_module_count": 14,
+    "pom_files": 16,
+    "java_files": 842,
+    "spring_boot": "3.3.5",
+    "spring_cloud": "2024.0.0",
+    "java_version": "17"
+  },
+  "services_python": {
+    "py_total": 94,
+    "py_src": 92,
+    "py_tests": 2,
+    "include_router": 83,
+    "routes": {
+      "router": 84,
+      "decor": 103,
+      "get": 16,
+      "post": 87,
+      "put": 0,
+      "delete": 0,
+      "patch": 0,
+      "ws": 0
+    }
+  },
+  "radar": {
+    "py_all": 107,
+    "py_venv": 0,
+    "py_vendor": 89,
+    "py_own": 18,
+    "py_app": 10,
+    "py_tests": 8,
+    "routes": {
+      "router": 0,
+      "decor": 5,
+      "get": 4,
+      "post": 1,
+      "put": 0,
+      "delete": 0,
+      "patch": 0,
+      "ws": 0
+    }
+  },
+  "frontend": {
+    "route_mounts": 3052,
+    "distinct_paths": 2847
+  },
+  "sql": {
+    "files": 354,
+    "min": 1,
+    "max": 385,
+    "duplicate_sequence_numbers": {
+      "209": 2,
+      "228": 2,
+      "229": 2,
+      "230": 2,
+      "90": 2
+    }
+  }
+}

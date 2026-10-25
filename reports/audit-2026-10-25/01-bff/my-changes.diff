@@ -1,0 +1,422 @@
+﻿diff --git a/src/bff/middleware/audit.ts b/src/bff/middleware/audit.ts
+index 883e9dd2..d0b6ded6 100644
+--- a/src/bff/middleware/audit.ts
++++ b/src/bff/middleware/audit.ts
+@@ -8,12 +8,13 @@
+  *  - 表不存在时自动 CREATE TABLE IF NOT EXISTS（幂等，启动后首次写自愈）；
+  *  - 请求体经 maskBody 脱敏后再落库，避免 PII 明文入库；
+  *  - 审计写库为 fire-and-forget：任何异常都不阻断主请求；
+- *  - 演示模式（DEMO_MODE=1，无 DB）直接跳过。
++ *  - 演示模式（DEMO_MODE=1，无 DB）跳过落库仅限非生产环境；生产环境不得跳过。
+  *
+  * Copyright (c) 2026 杭州健澜科技有限公司
+  */
+ 
+ import { getDb, type DbExecutor } from '../../db/pool.js';
++import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
+ import type { Ctx } from '../types';
+ import { maskBody } from '../utils/mask.js';
+ 
+@@ -81,8 +82,16 @@ export async function recordOperationLog(c: Ctx, db: DbExecutor = getDb()): Prom
+  *
+  * @param c 请求上下文
+  */
++/**
++ * 是否因演示模式跳过审计落库。
++ * 演示模式跳过仅限非生产环境；生产环境即使误配 DEMO_MODE=1 也必须留痕。
++ */
++export function shouldSkipAuditForDemo(): boolean {
++  return !isProductionEnv() && isDemoModeEnabled();
++}
++
+ export function auditOperation(c: Ctx): void {
+-  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') return;
++  if (shouldSkipAuditForDemo()) return;
+   const method = c.req.method.toUpperCase();
+   if (!AUDITED_METHODS.has(method)) return;
+   recordOperationLog(c).catch((err: unknown) => {
+diff --git a/src/bff/middleware/auth.ts b/src/bff/middleware/auth.ts
+index 50b26315..238c4955 100644
+--- a/src/bff/middleware/auth.ts
++++ b/src/bff/middleware/auth.ts
+@@ -12,6 +12,7 @@
+ 
+ import * as crypto from 'node:crypto';
+ 
++import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
+ import { type ApiResponse, type Ctx, ErrorCode, fail, json, newTraceId } from '../types';
+ 
+ /* ------------------------------------------------------------------ */
+@@ -46,11 +47,13 @@ interface JwtPayload {
+ function getJwtSecret(): string {
+   // 生产环境必须由环境变量注入；开发态提供默认值但打印警告
+   const secret = process.env.JWT_SECRET;
+-  if (!secret) {
+-    console.warn('[security] JWT_SECRET 未设置，使用开发态默认密钥（仅限本地开发）');
+-    return 'dev-only-insecure-jwt-secret-change-me';
++  if (secret) return secret;
++  if (isProductionEnv()) {
++    // 失效关闭：生产环境禁止回落到公开的开发态默认密钥，直接拒绝签发/验签
++    throw new Error('[security] 生产环境必须通过 JWT_SECRET 环境变量注入 JWT 密钥');
+   }
+-  return secret;
++  console.warn('[security] JWT_SECRET 未设置，使用开发态默认密钥（仅限本地开发）');
++  return 'dev-only-insecure-jwt-secret-change-me';
+ }
+ 
+ /** 生成 JWT 唯一标识（jti），供会话管理与令牌吊销使用 */
+@@ -84,8 +87,13 @@ export function verifyJwt(token: string): JwtPayload | null {
+   const [headerB64, bodyB64, sigB64] = parts;
+   const data = `${headerB64}.${bodyB64}`;
+ 
+-  // 时序安全签名校验
+-  const expectedSig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
++  // 时序安全签名校验；生产未配置 JWT_SECRET 时按验签失败处理（拒绝令牌）
++  let expectedSig: Buffer;
++  try {
++    expectedSig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
++  } catch {
++    return null;
++  }
+   const providedSig = b64urlDecode(sigB64);
+   if (
+     expectedSig.length !== providedSig.length ||
+@@ -148,9 +156,8 @@ export function attachUser(c: Ctx): void {
+   }
+ 
+   // 2) 开发态演示 token（jt-/jr- 前缀），仅非生产环境
+-  const isProd = (process.env.NODE_ENV ?? 'development') === 'production';
+   if (
+-    !isProd &&
++    !isProductionEnv() &&
+     (token.startsWith('jt-') || token.startsWith('jr-') || token === 'bff-access-token')
+   ) {
+     c.user = MOCK_USER;
+@@ -160,10 +167,10 @@ export function attachUser(c: Ctx): void {
+   c.user = null;
+ }
+ 
+-/** 要求登录，否则 401（DEMO_MODE=1 时短路放行） */
++/** 要求登录，否则 401；演示模式短路放行仅限非生产环境 */
+ export function requireAuth(c: Ctx): Response | null {
+-  // M194-P0: DEMO_MODE 下跳过鉴权，直接返回 mock 数据
+-  if (process.env.DEMO_MODE === '1') {
++  // 演示模式短路授予 demo admin 仅限非生产环境；生产环境即使误配 DEMO_MODE=1 也不授予演示身份
++  if (!isProductionEnv() && isDemoModeEnabled()) {
+     c.user = c.user ?? { id: 'demo', name: '演示用户', roles: ['admin'], permissions: ['*'] };
+     return null;
+   }
+diff --git a/src/bff/middleware/sessionGuard.ts b/src/bff/middleware/sessionGuard.ts
+index b56cfe52..827fed65 100644
+--- a/src/bff/middleware/sessionGuard.ts
++++ b/src/bff/middleware/sessionGuard.ts
+@@ -8,14 +8,18 @@
+  * 性能：进程内缓存 jti 状态（短 TTL），吊销动作主动写入缓存，
+  * 使单实例吊销即时生效，避免每请求都查库。
+  *
+- * 断库容错：缓存未命中且数据库不可用时放行（fail-open），
+- * 由健康检查与各 handler 暴露真实错误，避免连带健康检查失效。
++ * 断库容错：缓存未命中且数据库不可用时按未登录拒绝（fail-closed），
++ * 避免吊销/过期会话在断库期间继续访问；DB 抖动期间合法会话会收到 401，
++ * 需 DB 恢复后重试，告警日志由本中间件输出。
++ *
++ * 演示模式：跳过 jti 查库仅限非生产环境；生产环境不得跳过会话校验。
+  *
+  * Copyright (c) 2026 杭州健澜科技有限公司
+  */
+ 
+ import { getActiveByJti } from '@/db/repositories/sessionRepo';
+ 
++import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
+ import type { Ctx } from '../types';
+ 
+ interface CacheEntry {
+@@ -39,7 +43,11 @@ export function clearSessionCache(jti: string): void {
+   cache.delete(jti);
+ }
+ 
+-async function isSessionActive(jti: string): Promise<boolean> {
++/**
++ * 查询 jti 对应会话是否有效（导出供单元测试直接驱动 fail-closed 分支）。
++ * 进程内短 TTL 缓存命中直接返回；未命中查库，DB 异常按未登录拒绝。
++ */
++export async function checkSessionActive(jti: string): Promise<boolean> {
+   const now = Date.now();
+   const hit = cache.get(jti);
+   if (hit && hit.expires > now) return hit.active;
+@@ -49,9 +57,12 @@ async function isSessionActive(jti: string): Promise<boolean> {
+     const active = session !== null;
+     cache.set(jti, { active, expires: now + CACHE_TTL_MS });
+     return active;
+-  } catch {
+-    // 数据库不可用：缓存未命中时放行，由健康检查/handler 暴露真实错误
+-    return true;
++  } catch (err) {
++    // fail-closed：数据库不可用不视为会话有效，按未登录拒绝（后续 requireAuth 返回 401），
++    // 避免吊销/过期会话在断库期间继续访问；不写入"有效"缓存，防止故障窗口内被复用。
++    // eslint-disable-next-line no-console
++    console.warn(`[session] 会话状态查询失败，按未登录拒绝（fail-closed）: ${String(err)}`);
++    return false;
+   }
+ }
+ 
+@@ -59,19 +70,15 @@ async function isSessionActive(jti: string): Promise<boolean> {
+  * 校验当前请求令牌的会话状态；已失效则清空 ctx.user。
+  * 无 jti 的令牌（演示令牌或 M7-F 前签发的旧令牌）不强制校验。
+  *
+- * v5.0试点扩展（M187登录根因）：演示模式（DEMO_MODE=1）下 registerSession 不落会话台账，
+- * 但登录签发的 JWT 仍带 jti；若仍按 jti 查库一律查不到 → 误判会话失效而清空 c.user，
+- * 导致登录后第一个鉴权请求（如 /dashboard/stats）即返回 401，前端 axios 拦截器随之
+- * tokenStorage.clear() 并 navigate('/login')，表现为“登录成功却跳不进 dashboard、
+- * localStorage 只剩 auth_session_v2 没有 auth_tokens”。演示模式无会话台账可校，直接放行。
++ * 演示模式（DEMO_MODE=1）下 registerSession 不落会话台账，跳过 jti 查库仅限非生产环境；
++ * 生产环境即使误配 DEMO_MODE=1 也必须执行会话吊销校验。
+  *
+  * Copyright (c) 2026 杭州健澜科技有限公司
+  */
+ export async function enforceSession(c: Ctx): Promise<void> {
+-  // v5.0试点扩展（M187登录根因）：演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT
+-  const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+-  if (isDemo) return;
++  // 非生产演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT；生产环境不得跳过
++  if (!isProductionEnv() && isDemoModeEnabled()) return;
+   if (!c.user || !c.user.jti) return;
+-  const active = await isSessionActive(c.user.jti);
++  const active = await checkSessionActive(c.user.jti);
+   if (!active) c.user = null;
+ }
+diff --git a/src/bff/routes/health.ts b/src/bff/routes/health.ts
+index e7c065aa..b2149707 100644
+--- a/src/bff/routes/health.ts
++++ b/src/bff/routes/health.ts
+@@ -34,13 +34,19 @@ export const healthRoutes: RouteDef[] = [
+     auth: false,
+     handle(_c: Ctx): Response {
+       const cfg = getEnv();
+-      return json({
+-        status: 'ok' as const,
+-        /** 进程已运行秒数（保留一位小数） */
+-        uptime: Math.round(process.uptime() * 10) / 10,
+-        db: cfg.demoMode ? ('demo' as const) : ('connected' as const),
+-        version: VERSION,
+-      });
++      return json(
++        ok(
++          {
++            status: 'ok' as const,
++            /** 进程已运行秒数（保留一位小数） */
++            uptime: Math.round(process.uptime() * 10) / 10,
++            db: cfg.demoMode ? ('demo' as const) : ('connected' as const),
++            version: VERSION,
++          },
++          'ok',
++          _c.traceId,
++        ),
++      );
+     },
+   },
+   {
+diff --git a/src/bff/routes/imaging.ts b/src/bff/routes/imaging.ts
+index 2213c9bf..4d41b4ea 100644
+--- a/src/bff/routes/imaging.ts
++++ b/src/bff/routes/imaging.ts
+@@ -311,10 +311,10 @@ export const imagingRoutes: RouteDef[] = [
+       if (!parsed.signer_id || !parsed.signer_name) {
+         return json(fail(ErrorCode.BAD_REQUEST, '缺少 signer_id / signer_name', c.traceId), 400);
+       }
+-      // 禁止重复签名
++      // 禁止重复签名：资源已被复核，语义为冲突（409 / CONFLICT）
+       if (rec.review) {
+         return json(
+-          fail(ErrorCode.BAD_REQUEST, `任务已由 ${rec.review.signer_name} 复核，禁止重复提交`, c.traceId),
++          fail(ErrorCode.CONFLICT, `任务已由 ${rec.review.signer_name} 复核，禁止重复提交`, c.traceId),
+           409,
+         );
+       }
+diff --git a/src/bff/routes/twin3DInpatient.ts b/src/bff/routes/twin3DInpatient.ts
+index 0b6bd8b7..7a0d1c57 100644
+--- a/src/bff/routes/twin3DInpatient.ts
++++ b/src/bff/routes/twin3DInpatient.ts
+@@ -42,7 +42,7 @@ async function handleInpatientTwin(c: Ctx): Promise<Response> {
+ 
+   if (action === 'beds') {
+     if (!floor) {
+-      return json(fail(ErrorCode.BAD_REQUEST, 'action=beds 必须提供 floor 参数（7 / 8）'));
++      return json(fail(ErrorCode.BAD_REQUEST, 'action=beds 必须提供 floor 参数（7 / 8）', c.traceId), 400);
+     }
+     return json(ok(trackBedStatus3D(building, floor)));
+   }
+diff --git a/src/bff/server.ts b/src/bff/server.ts
+index df9fca6d..70ea63ce 100644
+--- a/src/bff/server.ts
++++ b/src/bff/server.ts
+@@ -19,6 +19,7 @@ import { withSecurityHeaders } from './middleware/securityHeaders';
+ import { tenantContextMiddleware } from './middleware/tenant';
+ import { withIdempotency } from './middleware/idempotency';
+ import { enforceSession } from './middleware/sessionGuard';
++import { assertProductionNotDemoMode } from './config/runtimeEnv';
+ import { runChatTurn } from './aggregators/chatAggregator';
+ import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
+ import { setCriticalAlertSink } from './alertBus';
+@@ -4091,6 +4092,7 @@ import { emrAiNursingRecoV14Routes } from './routes/emrAiNursingRecoV14';
+ import { emrAiOutpatientRecordGenV14Routes } from './routes/emrAiOutpatientRecordGenV14';
+ import { emrAiPreopAssessRecoV14Routes } from './routes/emrAiPreopAssessRecoV14';
+ import { securityBaselineRoutes } from './routes/securityBaseline';
++import { consultAgentRoutes } from './routes/consultAgentRoutes'; // M86-D：【AI 原生在线咨询智能体】12 端点 /api/v1/consult-agent/*（SSE 实时流 + 回放，急症旁路，草稿待医师复核）
+ 
+ // ============================================================================
+ // 路由表与编译
+@@ -4107,6 +4109,7 @@ const allRoutes: RouteDef[] = [
+   ...chatRoutes,
+   ...medicalRoutes,
+   ...dashboardRoutes,
++  ...m209Routes, // M209: FHIR 静态样例 /api/fhir/Encounter/P001 等须先于 fhirRoutes 动态 :id 注册，避免被动态段遮蔽
+   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
+   ...fhirGatewayDetailRoutes, // M430：FHIR R4 资源搜索 Bundle
+   ...fhirOperationsRoutes, // M430：FHIR R4 操作端点 CRUD/validate/history
+@@ -4155,6 +4158,7 @@ const allRoutes: RouteDef[] = [
+   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
+   ...emrNoteRoutes, // M190-P0: 病历修改痕迹
+   ...cdsRoutes, // M191-P0: CDS 临床决策支持
++  ...m232Routes, // M232: /patient/360/full、/summary 静态段须先于 patient360Routes 的 :patientId 动态段注册，避免被遮蔽
+   ...patient360Routes, // M192-P0: 患者360视图
+   ...nursingRoutes, // M192-P0: 护理NQI+体温单
+   ...regionalRoutes, // M194-P0: 区域转诊
+@@ -4172,7 +4176,6 @@ const allRoutes: RouteDef[] = [
+   ...m206Routes, // M206: 前端聚合接口
+   ...m207Routes, // M207: 急诊+输血+营养
+   ...m208Routes, // M208: 消息通知+电子签名+数据导出
+-  ...m209Routes, // M209: FHIR搜索+内涵质控+患者端扩展
+   ...m210Routes, // M210: 门诊预约+入出院转科+手术排程
+   ...m211Routes, // M211: 临床路径+单病种+绩效+物价
+   ...m212Routes, // M212: 消毒供应+ICU+血库+静配中心
+@@ -4193,7 +4196,6 @@ const allRoutes: RouteDef[] = [
+   ...m228Routes, // M228: 肿瘤慢病康复深度
+   ...m229Routes, // M229: 中医口腔眼科皮肤+精神卫生深度
+   ...m230Routes, // M230: 急诊重症手术麻醉深度
+-  ...m232Routes, // M232: BI大屏深度+患者360深度+CDS临床决策深度
+   ...m233Routes, // M233: 处方审核深度
+   ...m234Routes, // M234: 互联网医院/智慧服务深度
+   ...m235Routes, // M235: PDA新路径+门诊/住院/医嘱/药品/出院详情
+@@ -4576,12 +4578,12 @@ const allRoutes: RouteDef[] = [
+   ...researchLitRoutes, // M159-C【集团与科研】科研智能化深化：文献/论文/基金
+   ...empiRoutes,
+   ...dataWarehouseRoutes,
++  ...dataMartDeepRoutes, // M164-A: /data-mart/catalog、/lineage 静态段须先于 dataMartRoutes 的 :name 动态段注册，避免被遮蔽
+   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
+   ...i18nRoutes, // M151-C：多语言支持框架（GET /api/v1/i18n，中文/英文，可扩展）
+   ...i18nDeepRoutes, // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
+   ...dataGovernanceRoutes,
+   ...dataQualityRoutes, // M159-D：数据质量五维报告
+-  ...dataMartDeepRoutes, // M164-A：数据资产治理（资产目录/血缘追踪）
+   ...cdssDeepRoutes, // M165-A：CDSS 临床决策支持（POST /api/v1/cdss/evaluate，防告警疲劳）
+   ...outboxRoutes,
+   ...sessionAdminRoutes,
+@@ -4598,6 +4600,7 @@ const allRoutes: RouteDef[] = [
+   ...reconRoutes,
+   ...surgeryRoutes,
+   ...surgeryScheduleRoutes,
++  ...adminSurgeryOptimizeRoutes, // M130-D：POST /api/v1/admin/surgery/schedule/optimize（此前仅导入未挂载，本次补挂）
+   ...surgeryChecklistRoutes,
+   ...transfusionRoutes,
+   ...bloodQualityRoutes,
+@@ -4778,6 +4781,10 @@ const allRoutes: RouteDef[] = [
+   ...codeQualityDeepRoutes, // M173-B：【质量提升与新场景】GET /api/v1/admin/code/deep-quality（圈复杂度拆分/重复块/命名/JSDoc/死代码 深度扫描）
+   ...adminDeptPerformanceRoutes,
+   ...operationAnalysisRoutes, // M163-B：GET /api/v1/admin/operation/analysis（运营四维分析 + 成本效益 + 对标 + 问题识别）
++  ...performanceReportRoutes, // M187-A: /performance/report 静态段须先于 :period 动态段注册，避免被遮蔽
++  ...performanceStressRoutes, // M193-A: /performance/stress-test 静态段先于 :period
++  ...performanceBenchmarkRoutes, // /performance/benchmark 静态段先于 :period
++  ...performanceDeepRoutes, // M166-A: /performance/kpi 静态段先于 :period
+   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
+   ...adminHealthRoutes,
+   ...adminDashboardRoutes,
+@@ -4918,7 +4925,6 @@ const allRoutes: RouteDef[] = [
+   ...patientMUSEV2Routes, // M186-B：Patient MUSE V2 GET /api/v1/personal-agent/patient-muse-v2
+   ...regionalCollaborationRoutes, // M186-C：区域协同 GET /api/v1/regional/collaboration
+   ...selfLearningLoopRoutes, // M186-D：自学习闭环 GET /api/v1/learning/self-loop
+-  ...performanceReportRoutes, // M187-A：性能报告 GET /api/v1/admin/performance/report
+   ...securityReportV2Routes, // M187-B：安全报告 V2 GET /api/v1/admin/security/report-v2
+   ...emrGrade5V2Routes, // M187-C：EMR 五级评审 V2 GET /api/v1/emr/grade5/assessment-v2
+   ...drgAuditV2Routes, // M187-D：DRG 审核 V2 GET /api/v1/drg/audit/report-v2
+@@ -4941,7 +4947,6 @@ const allRoutes: RouteDef[] = [
+   ...financeBillingRoutes, // M192-A：财务收费管理 GET /api/v1/admin/finance/report
+   ...insuranceManagementRoutes, // M192-B：医保管理深化 GET /api/v1/admin/insurance/report
+   ...logisticsManagementRoutes, // M192-D：后勤管理 GET /api/v1/admin/logistics/report
+-  ...performanceStressRoutes, // M193-A：性能压测 GET /api/v1/admin/performance/stress-test
+   ...securityPenTestRoutes, // M193-B：安全渗透测试 GET /api/v1/admin/security/pen-test
+   ...qualitySystemRoutes, // M193-C：质量管理体系 GET /api/v1/admin/quality-system/report
+   ...patientSafetyRoutes, // M193-D：患者安全 GET /api/v1/admin/patient-safety/report
+@@ -6467,7 +6472,6 @@ const allRoutes: RouteDef[] = [
+   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
+   ...partyCultureRoutes, // M178-D：【财务人力行政党建】党建与文化深化 GET /api/v1/party/culture
+   ...jciReviewRoutes, // M141-A：三甲评审准备 GET /api/v1/admin/review/checklist
+-  ...performanceBenchmarkRoutes,
+   ...museOnboardingRoutes,
+   ...onboardingRoutes,
+   ...museNurseRoutes,
+@@ -6496,7 +6500,6 @@ const allRoutes: RouteDef[] = [
+   ...researchPipelineRoutes, // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
+   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
+   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
+-  ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
+   ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
+   ...opsDeepRoutes, // M172-C：【安全质量与运营】GET /api/v1/admin/ops/deep?dept=&period=（四域效率评分/标杆对标/瓶颈识别）
+   ...opsAnalysisRoutes, // M180-B：【质量与体验】GET /api/v1/admin/ops/analysis?dept=&period=（多期趋势/对标/未来N期线性回归预测）
+@@ -6514,6 +6517,7 @@ const allRoutes: RouteDef[] = [
+   ...emrAiOutpatientRecordGenV14Routes, // 补注册：病历AI门诊病历生成
+   ...emrAiPreopAssessRecoV14Routes, // 补注册：病历AI术前评估推荐
+   ...securityBaselineRoutes, // 补注册：安全基线检查
++  ...consultAgentRoutes, // M86-D：在线咨询智能体（read / write / audit 三权限码，SSE 实时流 + 回放）
+ ];
+ 
+ interface Compiled {
+@@ -6825,7 +6829,7 @@ async function handleFetch(
+     status = 404;
+     return withSecurityHeaders(
+       json(
+-        fail(ErrorCode.NOT_FOUND, `路由不存在： `, ctx.traceId),
++        fail(ErrorCode.NOT_FOUND, '路由不存在：', ctx.traceId),
+         404,
+       ),
+     );
+@@ -6877,6 +6881,9 @@ async function initDatabase(): Promise<void> {
+ 
+ const port = Number(process.env.HTTP_PORT ?? 8080);
+ 
++// P0 启动期 fail-closed：生产环境禁止开启演示模式，命中即抛错退出，不绑定端口、不进入请求循环
++assertProductionNotDemoMode();
++
+ // 启动横幅：明确打印 DEMO_MODE 状态，便于运维在日志第一行识别运行模式
+ // eslint-disable-next-line no-console
+ console.log(
+diff --git a/src/db/pool.ts b/src/db/pool.ts
+index bf588b46..e7ebe142 100644
+--- a/src/db/pool.ts
++++ b/src/db/pool.ts
+@@ -48,6 +48,10 @@ function createClient(): Sql {
+   if (url) {
+     return postgres(url, base);
+   }
++  // 生产环境禁止回落到本地默认主机/账号/口令；必须显式注入 DATABASE_URL
++  if ((process.env.NODE_ENV ?? 'development') === 'production') {
++    throw new Error('[db] 生产环境必须配置 DATABASE_URL 环境变量，禁止回退本地默认账号口令');
++  }
+   return postgres({
+     ...base,
+     host: process.env.PGHOST ?? 'localhost',
+diff --git a/src/security/encryption/FieldCipher.ts b/src/security/encryption/FieldCipher.ts
+index 1b1692b6..63199daa 100644
+--- a/src/security/encryption/FieldCipher.ts
++++ b/src/security/encryption/FieldCipher.ts
+@@ -19,6 +19,10 @@ function getKey(): Buffer {
+   if (_key) return _key;
+   const secret = process.env.FIELD_ENCRYPTION_KEY ?? process.env.JWT_SECRET;
+   if (!secret) {
++    // 失效关闭：生产环境禁止回落到公开的开发态字段密钥
++    if ((process.env.NODE_ENV ?? 'development') === 'production') {
++      throw new Error('[security] 生产环境必须配置 FIELD_ENCRYPTION_KEY（或复用 JWT_SECRET）');
++    }
+     console.warn('[security] FIELD_ENCRYPTION_KEY 未设置，使用开发态字段密钥（仅限本地开发）');
+     _key = crypto.scryptSync('dev-only-insecure-field-key-change-me', SALT, 32);
+     return _key;

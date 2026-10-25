@@ -1,0 +1,30 @@
+﻿===== docker-compose.yml  services=17 =====
+  app: profiles=None hc=True nets=['backend'] ports=['127.0.0.1:${APP_PORT:-8080}:8080']
+  web: profiles=None hc=True nets=['frontend'] ports=None
+  radar-inference: profiles=['demo', 'gpu'] hc=True nets=['backend'] ports=None
+  postgres: profiles=None hc=True nets=['backend'] ports=['127.0.0.1:${POSTGRES_PORT:-5432}:5432']
+  redis: profiles=None hc=True nets=['backend'] ports=['127.0.0.1:${REDIS_PORT:-6379}:6379']
+  kafka: profiles=None hc=True nets=['backend'] ports=['127.0.0.1:${KAFKA_PORT:-9092}:9092']
+  nginx: profiles=None hc=True nets=['frontend', 'backend'] ports=['${HTTP_PORT:-80}:8080', '${HTTPS_PORT:-443}:8443']
+  prometheus: profiles=None hc=True nets=['backend', 'monitoring'] ports=['127.0.0.1:${PROMETHEUS_PORT:-9090}:9090']
+  grafana: profiles=None hc=True nets=['monitoring'] ports=['127.0.0.1:${GRAFANA_PORT:-3000}:3000']
+  alertmanager: profiles=None hc=True nets=['monitoring'] ports=['127.0.0.1:${ALERTMANAGER_PORT:-9093}:9093']
+  postgres-exporter: profiles=None hc=True nets=['backend', 'monitoring'] ports=['127.0.0.1:${PG_EXPORTER_PORT:-9187}:9187']
+  redis-exporter: profiles=None hc=True nets=['backend', 'monitoring'] ports=['127.0.0.1:${REDIS_EXPORTER_PORT:-9121}:9121']
+  elasticsearch: profiles=None hc=True nets=['monitoring'] ports=['127.0.0.1:${ES_PORT:-9200}:9200']
+  kibana: profiles=None hc=True nets=['monitoring'] ports=['127.0.0.1:${KIBANA_PORT:-5601}:5601']
+  jaeger: profiles=None hc=True nets=['backend', 'monitoring'] ports=['127.0.0.1:${JAEGER_PORT:-16686}:16686']
+  jlmedaios-monolith: profiles=['legacy'] hc=False nets=['backend'] ports=['127.0.0.1:19090:9090']
+  jlmedaios-ai: profiles=['legacy'] hc=True nets=['backend'] ports=['127.0.0.1:8000:8000']
+===== docker-compose.prod.yml  services=15 =====
+  app: profiles=None hc=False nets=None ports=None
+  web: profiles=None hc=False nets=None ports=None
+  radar-inference: profiles=None hc=False nets=None ports=None
+  postgres: profiles=None hc=False nets=None ports=None
+  redis: profiles=None hc=False nets=None ports=None
+  kafka: profiles=None hc=False nets=None ports=None
+  nginx: profiles=None hc=False nets=None ports=None
+  prometheus: profiles=None hc=False nets=None ports=None
+  grafana: profiles=None hc=False nets=None ports=None
+  alertmanager: profiles=None hc=False nets=None ports=None
+  postgres-exporter: profiles=None hc=False nets=None ports=None

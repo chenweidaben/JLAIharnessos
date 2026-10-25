@@ -1,0 +1,679 @@
+{
+  "counts": {
+    "spreadGroups": 2415,
+    "inlineRoutes": 0,
+    "registeredEntries": 5211,
+    "uniqueMethodPath": 5084,
+    "routeFiles": 2402,
+    "aggregatorFiles": 1945
+  },
+  "unresolved": [
+    {
+      "ident": "m575Routes",
+      "reason": "empty placeholder array",
+      "file": "C:\\Users\\lenovo\\Doubao\\chats\\2026-09-14\\new-chat-1\\src\\bff\\routes\\m575Routes.ts"
+    },
+    {
+      "ident": "m576Routes",
+      "reason": "empty placeholder array",
+      "file": "C:\\Users\\lenovo\\Doubao\\chats\\2026-09-14\\new-chat-1\\src\\bff\\routes\\m576Routes.ts"
+    },
+    {
+      "ident": "m580Routes",
+      "reason": "empty placeholder array",
+      "file": "C:\\Users\\lenovo\\Doubao\\chats\\2026-09-14\\new-chat-1\\src\\bff\\routes\\m580Routes.ts"
+    }
+  ],
+  "unresolvedByReason": {
+    "empty placeholder array": 3
+  },
+  "importedNotSpread": [],
+  "spreadNotImported": [],
+  "dupes": [
+    {
+      "key": "GET /api/v1/fhir/Patient/search",
+      "first": "fhirGatewayDetail.ts:27",
+      "later": "fhirOperationsRoutes.ts:29"
+    },
+    {
+      "key": "GET /api/v1/regional/referrals",
+      "first": "m194Routes.ts:67",
+      "later": "m194Routes.ts:67"
+    },
+    {
+      "key": "GET /api/v1/internet/consultations",
+      "first": "m194Routes.ts:71",
+      "later": "m194Routes.ts:71"
+    },
+    {
+      "key": "GET /api/v1/lab/critical-values",
+      "first": "m194Routes.ts:75",
+      "later": "m194Routes.ts:75"
+    },
+    {
+      "key": "GET /api/v1/regional/referrals",
+      "first": "m194Routes.ts:67",
+      "later": "m194Routes.ts:67"
+    },
+    {
+      "key": "GET /api/v1/internet/consultations",
+      "first": "m194Routes.ts:71",
+      "later": "m194Routes.ts:71"
+    },
+    {
+      "key": "GET /api/v1/lab/critical-values",
+      "first": "m194Routes.ts:75",
+      "later": "m194Routes.ts:75"
+    },
+    {
+      "key": "GET /api/v1/emr/version-compare",
+      "first": "emrVersion.ts:22",
+      "later": "m214Routes.ts:242"
+    },
+    {
+      "key": "GET /api/v1/emr/versions",
+      "first": "emrVersion.ts:21",
+      "later": "m239Routes.ts:116"
+    },
+    {
+      "key": "GET /api/v1/auth/permissions",
+      "first": "auth.ts:395",
+      "later": "m241Routes.ts:111"
+    },
+    {
+      "key": "GET /api/v1/emr/quality-dashboard",
+      "first": "m221Routes.ts:152",
+      "later": "m245Routes.ts:117"
+    },
+    {
+      "key": "GET /api/v1/emr/quality-rules",
+      "first": "m209Routes.ts:156",
+      "later": "m245Routes.ts:118"
+    },
+    {
+      "key": "GET /api/v1/cds/interaction-check",
+      "first": "cds.ts:179",
+      "later": "m248Routes.ts:122"
+    },
+    {
+      "key": "GET /api/v1/emr/version-diff",
+      "first": "emrVersion.ts:24",
+      "later": "m251Routes.ts:122"
+    },
+    {
+      "key": "GET /api/v1/emr/version-compare",
+      "first": "emrVersion.ts:22",
+      "later": "m251Routes.ts:123"
+    },
+    {
+      "key": "GET /api/v1/emr/version-restore",
+      "first": "emrVersion.ts:23",
+      "later": "m251Routes.ts:124"
+    },
+    {
+      "key": "GET /api/v1/cds/allergy-check",
+      "first": "cds.ts:173",
+      "later": "m254Routes.ts:115"
+    },
+    {
+      "key": "GET /api/v1/internet/consultations",
+      "first": "m194Routes.ts:71",
+      "later": "m255Routes.ts:114"
+    },
+    {
+      "key": "GET /api/v1/internet/prescriptions",
+      "first": "m234Routes.ts:75",
+      "later": "m255Routes.ts:115"
+    },
+    {
+      "key": "GET /api/v1/internet/payments",
+      "first": "m234Routes.ts:76",
+      "later": "m255Routes.ts:116"
+    },
+    {
+      "key": "GET /api/v1/equipment/maintenance",
+      "first": "m202Routes.ts:167",
+      "later": "m256Routes.ts:116"
+    },
+    {
+      "key": "GET /api/v1/supplies/inventory",
+      "first": "m202Routes.ts:169",
+      "later": "m256Routes.ts:117"
+    },
+    {
+      "key": "GET /api/v1/pathology/reports",
+      "first": "m203Routes.ts:178",
+      "later": "m256Routes.ts:118"
+    },
+    {
+      "key": "GET /api/v1/research/projects",
+      "first": "m202Routes.ts:172",
+      "later": "m256Routes.ts:120"
+    },
+    {
+      "key": "GET /api/v1/education/trainings",
+      "first": "m202Routes.ts:171",
+      "later": "m256Routes.ts:121"
+    },
+    {
+      "key": "GET /api/v1/cds/order-set",
+      "first": "m232Routes.ts:246",
+      "later": "m260Routes.ts:117"
+    },
+    {
+      "key": "GET /api/v1/pacs/reports",
+      "first": "m196Routes.ts:90",
+      "later": "m260Routes.ts:119"
+    },
+    {
+      "key": "GET /api/v1/order/detail",
+      "first": "m235Routes.ts:164",
+      "later": "m278Routes.ts:111"
+    },
+    {
+      "key": "GET /api/v1/mobile/pda-tasks",
+      "first": "m235Routes.ts:160",
+      "later": "m280Routes.ts:28"
+    },
+    {
+      "key": "GET /api/v1/mobile/vitals",
+      "first": "m222Routes.ts:126",
+      "later": "m281Routes.ts:56"
+    },
+    {
+      "key": "GET /api/v1/mobile/scan",
+      "first": "m235Routes.ts:161",
+      "later": "m281Routes.ts:57"
+    },
+    {
+      "key": "GET /api/v1/smart-service/queue",
+      "first": "m234Routes.ts:77",
+      "later": "m281Routes.ts:58"
+    },
+    {
+      "key": "GET /api/v1/auth/permissions",
+      "first": "auth.ts:395",
+      "later": "m285Routes.ts:109"
+    },
+    {
+      "key": "GET /api/v1/tenants/list",
+      "first": "m239Routes.ts:118",
+      "later": "m285Routes.ts:113"
+    },
+    {
+      "key": "GET /api/v1/anesthesia/records",
+      "first": "m198Routes.ts:107",
+      "later": "m287Routes.ts:98"
+    },
+    {
+      "key": "GET /api/v1/ophthalmology/exams",
+      "first": "m229Routes.ts:181",
+      "later": "m287Routes.ts:103"
+    },
+    {
+      "key": "GET /api/v1/cds/diagnosis-suggest",
+      "first": "m232Routes.ts:245",
+      "later": "m294Routes.ts:28"
+    },
+    {
+      "key": "GET /api/v1/nursing/nqi-trend",
+      "first": "m248Routes.ts:126",
+      "later": "m296Routes.ts:42"
+    },
+    {
+      "key": "GET /api/v1/emr/lock-history",
+      "first": "m244Routes.ts:109",
+      "later": "m296Routes.ts:43"
+    },
+    {
+      "key": "GET /api/v1/infection/surveillance",
+      "first": "m199Routes.ts:119",
+      "later": "m298Routes.ts:98"
+    },
+    {
+      "key": "GET /api/v1/operation/kpi",
+      "first": "m199Routes.ts:122",
+      "later": "m301Routes.ts:98"
+    },
+    {
+      "key": "GET /api/v1/hr/performance",
+      "first": "m226Routes.ts:146",
+      "later": "m302Routes.ts:107"
+    },
+    {
+      "key": "GET /api/v1/hr/training",
+      "first": "m219Routes.ts:144",
+      "later": "m302Routes.ts:108"
+    },
+    {
+      "key": "GET /api/v1/finance/budget",
+      "first": "m218Routes.ts:146",
+      "later": "m303Routes.ts:102"
+    },
+    {
+      "key": "GET /api/v1/pharmacy/inventory",
+      "first": "m200Routes.ts:170",
+      "later": "m304Routes.ts:98"
+    },
+    {
+      "key": "GET /api/v1/research/papers",
+      "first": "m224Routes.ts:168",
+      "later": "m306Routes.ts:99"
+    },
+    {
+      "key": "GET /api/v1/education/courses",
+      "first": "m220Routes.ts:105",
+      "later": "m306Routes.ts:101"
+    },
+    {
+      "key": "GET /api/v1/education/exams",
+      "first": "m224Routes.ts:170",
+      "later": "m306Routes.ts:102"
+    },
+    {
+      "key": "GET /api/v1/telemed/records",
+      "first": "m221Routes.ts:150",
+      "later": "m308Routes.ts:86"
+    },
+    {
+      "key": "GET /api/v1/maternity/delivery",
+      "first": "m223Routes.ts:151",
+      "later": "m310Routes.ts:99"
+    },
+    {
+      "key": "GET /api/v1/oncology/patients",
+      "first": "m228Routes.ts:128",
+      "later": "m312Routes.ts:98"
+    },
+    {
+      "key": "GET /api/v1/nursing/nqi-trend",
+      "first": "m248Routes.ts:126",
+      "later": "m319NewRoutes.ts:103"
+    },
+    {
+      "key": "GET /api/v1/emr/version-diff",
+      "first": "emrVersion.ts:24",
+      "later": "m320Routes.ts:99"
+    },
+    {
+      "key": "GET /api/v1/fhir/patient",
+      "first": "m249Routes.ts:114",
+      "later": "fhirResources.ts:266"
+    },
+    {
+      "key": "GET /api/v1/fhir/observation",
+      "first": "m249Routes.ts:115",
+      "later": "fhirResources.ts:267"
+    },
+    {
+      "key": "GET /api/v1/fhir/condition",
+      "first": "m249Routes.ts:116",
+      "later": "fhirResources.ts:268"
+    },
+    {
+      "key": "GET /api/v1/fhir/medicationrequest",
+      "first": "m249Routes.ts:117",
+      "later": "fhirResources.ts:269"
+    },
+    {
+      "key": "GET /api/v1/fhir/encounter",
+      "first": "m250Routes.ts:130",
+      "later": "fhirResources.ts:270"
+    },
+    {
+      "key": "GET /api/v1/fhir/diagnosticreport",
+      "first": "m250Routes.ts:132",
+      "later": "fhirResources.ts:271"
+    },
+    {
+      "key": "GET /api/v1/fhir/practitioner",
+      "first": "m252Routes.ts:131",
+      "later": "fhirResources.ts:272"
+    },
+    {
+      "key": "GET /api/v1/fhir/organization",
+      "first": "m252Routes.ts:132",
+      "later": "fhirResources.ts:273"
+    },
+    {
+      "key": "GET /api/v1/fhir/location",
+      "first": "m252Routes.ts:130",
+      "later": "fhirResources.ts:274"
+    },
+    {
+      "key": "GET /api/v1/fhir/procedure",
+      "first": "m250Routes.ts:131",
+      "later": "fhirResources.ts:276"
+    },
+    {
+      "key": "GET /api/v1/fhir/allergyintolerance",
+      "first": "m251Routes.ts:120",
+      "later": "fhirResources.ts:277"
+    },
+    {
+      "key": "GET /api/v1/tenants/quota",
+      "first": "m246Routes.ts:115",
+      "later": "m326Routes.ts:99"
+    },
+    {
+      "key": "GET /api/v1/events/metrics-detail",
+      "first": "eventsBus.ts:26",
+      "later": "m350Routes.ts:103"
+    },
+    {
+      "key": "GET /api/v1/infection/surveillance",
+      "first": "m199Routes.ts:119",
+      "later": "m606Routes.ts:88"
+    },
+    {
+      "key": "GET /api/v1/drg/groups",
+      "first": "m475Routes.ts:100",
+      "later": "m607Routes.ts:96"
+    },
+    {
+      "key": "GET /api/v1/insurance/settlements",
+      "first": "m442Routes.ts:86",
+      "later": "m608Routes.ts:51"
+    },
+    {
+      "key": "GET /api/v1/patient/satisfaction",
+      "first": "m272Routes.ts:106",
+      "later": "patientService.ts:172"
+    },
+    {
+      "key": "GET /api/v1/emergency/resuscitation",
+      "first": "m207Routes.ts:141",
+      "later": "emergency.ts:190"
+    },
+    {
+      "key": "GET /api/v1/pharmacy/inventory",
+      "first": "m200Routes.ts:170",
+      "later": "pharmacy.ts:144"
+    },
+    {
+      "key": "GET /api/v1/pharmacy/prescriptions",
+      "first": "m260Routes.ts:120",
+      "later": "pharmacy.ts:169"
+    },
+    {
+      "key": "GET /api/v1/research/export",
+      "first": "researchExport.ts:55",
+      "later": "researchExport.ts:55"
+    },
+    {
+      "key": "GET /api/v1/surgery/schedule",
+      "first": "m210Routes.ts:156",
+      "later": "surgerySchedule.ts:25"
+    },
+    {
+      "key": "GET /api/v1/nursing/nqi",
+      "first": "nursingMetrics.ts:94",
+      "later": "nursingNqi.ts:24"
+    },
+    {
+      "key": "GET /api/v1/medical-qc/queue",
+      "first": "medicalQc.ts:89",
+      "later": "medicalQc.ts:89"
+    },
+    {
+      "key": "GET /api/v1/medical-qc",
+      "first": "medicalQc.ts:96",
+      "later": "medicalQc.ts:96"
+    },
+    {
+      "key": "POST /api/v1/medical-qc",
+      "first": "medicalQc.ts:102",
+      "later": "medicalQc.ts:102"
+    },
+    {
+      "key": "POST /api/v1/medical-qc/:id/rectify",
+      "first": "medicalQc.ts:107",
+      "later": "medicalQc.ts:107"
+    },
+    {
+      "key": "GET /api/v1/timeliness",
+      "first": "timeliness.ts:21",
+      "later": "timeliness.ts:21"
+    },
+    {
+      "key": "POST /api/v1/timeliness/scan",
+      "first": "timeliness.ts:26",
+      "later": "timeliness.ts:26"
+    },
+    {
+      "key": "POST /api/v1/timeliness",
+      "first": "timeliness.ts:31",
+      "later": "timeliness.ts:31"
+    },
+    {
+      "key": "GET /api/v1/emr-assessment",
+      "first": "emrAssessment.ts:21",
+      "later": "emrAssessment.ts:21"
+    },
+    {
+      "key": "POST /api/v1/emr-assessment/:code/measure",
+      "first": "emrAssessment.ts:27",
+      "later": "emrAssessment.ts:27"
+    },
+    {
+      "key": "GET /api/v1/ai-note-drafts",
+      "first": "aiNoteDraft.ts:22",
+      "later": "aiNoteDraft.ts:22"
+    },
+    {
+      "key": "POST /api/v1/ai-note-drafts/generate",
+      "first": "aiNoteDraft.ts:28",
+      "later": "aiNoteDraft.ts:28"
+    },
+    {
+      "key": "POST /api/v1/ai-note-drafts/:id/review",
+      "first": "aiNoteDraft.ts:33",
+      "later": "aiNoteDraft.ts:33"
+    },
+    {
+      "key": "GET /api/v1/med-reviews",
+      "first": "medReview.ts:22",
+      "later": "medReview.ts:22"
+    },
+    {
+      "key": "POST /api/v1/med-reviews/run",
+      "first": "medReview.ts:28",
+      "later": "medReview.ts:28"
+    },
+    {
+      "key": "POST /api/v1/med-reviews/:id/override",
+      "first": "medReview.ts:33",
+      "later": "medReview.ts:33"
+    },
+    {
+      "key": "GET /api/v1/diagnosis-suggestions",
+      "first": "diagnosisSuggestion.ts:22",
+      "later": "diagnosisSuggestion.ts:22"
+    },
+    {
+      "key": "POST /api/v1/diagnosis-suggestions/suggest",
+      "first": "diagnosisSuggestion.ts:28",
+      "later": "diagnosisSuggestion.ts:28"
+    },
+    {
+      "key": "POST /api/v1/diagnosis-suggestions/:id/review",
+      "first": "diagnosisSuggestion.ts:33",
+      "later": "diagnosisSuggestion.ts:33"
+    },
+    {
+      "key": "GET /api/v1/pathway-recommendations",
+      "first": "pathwayRecommendation.ts:25",
+      "later": "pathwayRecommendation.ts:25"
+    },
+    {
+      "key": "POST /api/v1/pathway-recommendations/recommend",
+      "first": "pathwayRecommendation.ts:31",
+      "later": "pathwayRecommendation.ts:31"
+    },
+    {
+      "key": "POST /api/v1/pathway-recommendations/:id/accept",
+      "first": "pathwayRecommendation.ts:36",
+      "later": "pathwayRecommendation.ts:36"
+    },
+    {
+      "key": "GET /api/v1/los-predictions/latest",
+      "first": "losPrediction.ts:22",
+      "later": "losPrediction.ts:22"
+    },
+    {
+      "key": "POST /api/v1/los-predictions/predict",
+      "first": "losPrediction.ts:28",
+      "later": "losPrediction.ts:28"
+    },
+    {
+      "key": "GET /api/v1/patient/portal",
+      "first": "patientPortal.ts:63",
+      "later": "patientPortal.ts:63"
+    },
+    {
+      "key": "GET /api/v1/portal/appointments",
+      "first": "patientPortal.ts:84",
+      "later": "patientPortal.ts:84"
+    },
+    {
+      "key": "GET /api/v1/portal/reports",
+      "first": "patientPortal.ts:90",
+      "later": "patientPortal.ts:90"
+    },
+    {
+      "key": "GET /api/v1/portal/bills",
+      "first": "patientPortal.ts:96",
+      "later": "patientPortal.ts:96"
+    },
+    {
+      "key": "GET /api/v1/portal/guide",
+      "first": "patientPortal.ts:102",
+      "later": "patientPortal.ts:102"
+    },
+    {
+      "key": "GET /api/v1/portal/reminders",
+      "first": "patientPortal.ts:108",
+      "later": "patientPortal.ts:108"
+    },
+    {
+      "key": "GET /api/v1/portal/health-archive",
+      "first": "patientPortal.ts:114",
+      "later": "patientPortal.ts:114"
+    },
+    {
+      "key": "GET /api/v1/alerts",
+      "first": "alerts.ts:101",
+      "later": "alerts.ts:101"
+    },
+    {
+      "key": "GET /api/v1/admin/alerts",
+      "first": "alerts.ts:192",
+      "later": "alerts.ts:192"
+    },
+    {
+      "key": "GET /api/v1/patient/medication-adherence",
+      "first": "patientService.ts:154",
+      "later": "patientService.ts:154"
+    },
+    {
+      "key": "GET /api/v1/patient/appointment-reminders",
+      "first": "patientService.ts:160",
+      "later": "patientService.ts:160"
+    },
+    {
+      "key": "GET /api/v1/patient/report-notifications",
+      "first": "patientService.ts:166",
+      "later": "patientService.ts:166"
+    },
+    {
+      "key": "GET /api/v1/patient/satisfaction",
+      "first": "m272Routes.ts:106",
+      "later": "patientService.ts:172"
+    },
+    {
+      "key": "GET /api/v1/dip/points",
+      "first": "m488Routes.ts:89",
+      "later": "dip.ts:48"
+    },
+    {
+      "key": "GET /api/v1/lab/reports",
+      "first": "m196Routes.ts:88",
+      "later": "lis.ts:211"
+    },
+    {
+      "key": "GET /api/v1/satisfaction/stats",
+      "first": "m549Routes.ts:201",
+      "later": "satisfaction.ts:99"
+    },
+    {
+      "key": "GET /api/v1/system/config",
+      "first": "m326Routes.ts:101",
+      "later": "system.ts:20"
+    },
+    {
+      "key": "POST /api/v1/ai/diagnose/expand-v2",
+      "first": "diagnoseV2.ts:46",
+      "later": "diagnoseDeep.ts:47"
+    },
+    {
+      "key": "GET /api/v1/teaching/courses",
+      "first": "teachingOnline.ts:155",
+      "later": "teachingDeep.ts:83"
+    },
+    {
+      "key": "GET /api/v1/admin/finance/report",
+      "first": "finance.ts:47",
+      "later": "financeBilling.ts:16"
+    },
+    {
+      "key": "GET /api/v1/admin/research/report",
+      "first": "researchManagement.ts:16",
+      "later": "clinicalResearch.ts:16"
+    },
+    {
+      "key": "GET /api/v1/emergency/report-v2",
+      "first": "emergencyDeepeningV2.ts:16",
+      "later": "emergencyMgmtReportV2.ts:16"
+    },
+    {
+      "key": "GET /api/v1/finance/report-v2",
+      "first": "financeReportV2.ts:16",
+      "later": "financeMgmtReportV2.ts:16"
+    },
+    {
+      "key": "GET /api/v1/performance/report-v2",
+      "first": "performanceReportV2.ts:16",
+      "later": "performanceMgmtReportV2.ts:16"
+    },
+    {
+      "key": "GET /api/v1/patient/education",
+      "first": "m201Routes.ts:115",
+      "later": "patientEducation.ts:193"
+    },
+    {
+      "key": "GET /api/v1/admin/test/coverage",
+      "first": "coverageReport.ts:26",
+      "later": "testCoverage.ts:57"
+    },
+    {
+      "key": "GET /api/v1/research/projects",
+      "first": "m202Routes.ts:172",
+      "later": "researchDeep.ts:42"
+    },
+    {
+      "key": "GET /api/v1/admin/test/security",
+      "first": "errorSanitizer.ts:68",
+      "later": "securityBaseline.ts:39"
+    }
+  ],
+  "shadows": [],
+  "style": {
+    "ok": 4964,
+    "fail": 1274,
+    "rawCodeEnvelope": 362,
+    "rawObject": 0,
+    "newResponse": 12,
+    "filesRaw": {}
+  },
+  "errStatusMismatch": []
+}
