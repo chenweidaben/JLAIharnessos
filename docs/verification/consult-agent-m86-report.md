@@ -84,7 +84,7 @@
 | consult 功能源码 | `42c98a3d` feat、`44fe568b` style | 62 + 4 | +10519 / −9 | feat 提交零删除；style 提交源码仅 `sessionRuntime.ts` 一处折行格式收口，同组夹带 3 份 reports 底稿（分组纯度小瑕疵，见 §11.1） |
 | 另一路架构/品牌整改 | `b5ecf42e`、`3985342a`、`378f9928`、`db3ace9f`、`73a2b2ae`、`749d529d` | 99 | +2356 / −403 | 独立分组、独立回归验证（§6.2），不混入 consult 功能提交 |
 | 仓库卫生 | `65802b20` | 658 | +38 / −35171 | 656 个历史探针/过程 txt/csv/构建日志取消跟踪；零 consult 路径 |
-| 审计/简报/底稿留档 | 其余 19 个 docs 提交 | 122 | +8353 / −335 | 仅 `reports/` 留档与巡检简报，无产品源码 |
+| 审计/简报/底稿留档 | 其余 19 个 docs 提交 | 61 | +7902 / −340 | 仅 `reports/` 留档与巡检简报，无产品源码 |
 
 ### 2.4 分支累计 diff（`git diff --shortstat 3f019078 ece20607` 实测，主推送快照）
 
@@ -117,7 +117,7 @@
 |---|---:|---|
 | `types.ts` | 236 | 实体/草稿/状态类型与 zod 红线字面量（`needsPhysicianReview: true`、`isOutOfHospitalPrescription: false`、`status: 'pending_review'`） |
 | `ports.ts` | 78 | 仓储/记忆/LLM/工具等端口接口定义 |
-| `stateMachine.ts` | 32 | 会话状态机（created → active → escalated / finished / exited） |
+| `stateMachine.ts` | 32 | 会话状态机（`idle → collecting → clarifying → drafting → review_pending`；`escalated` 急症旁路；`closed` / `aborted` 终态；非法转移显式抛错） |
 | `intentClassifier.ts` | 106 | 用户意图分类（问诊/急症/追问/退出/转写等） |
 | `draftHash.ts` | 78 | 草稿稳定业务字段 SHA-256，剔除审核状态/时间戳/记录 ID |
 | `roleSupport.ts` | 60 | 角色共享工具函数 |
@@ -176,7 +176,7 @@
 |---|---:|---|
 | `tests/security/consult-agent/permissions.test.ts` | 417 | 69 用例 / 177 断言：未登录 401、缺码 403 覆盖全部 12 端点；read/write/audit 三码互相隔离；admin 直通；拒绝路径不落库 |
 | `tests/integration/consult-agent/consultFlow.test.ts` | 371 | 7 用例 / 181 断言 E2E：创建会话 → 普通问诊 → 急症旁路 → 用药草稿 → 审计轨迹 → 事件回放（`[DONE]`、重复回放幂等一致）→ 终态 409 |
-| `tests/unit/consult-agent/` 13 个测试文件 + `helpers.ts`（84 行） | 合计 979 | 101 用例 / 301 断言：急症词表、演示种子、免责声明、草稿稳定哈希、意图分类、双层记忆、编排器、四角色、安全门、Sentinel、状态机、工具注册表、schema 红线字面量 |
+| `tests/unit/consult-agent/` 13 个测试文件 + `helpers.ts`（84 行） | 1077 + 84 | 101 用例 / 301 断言：急症词表、演示种子、免责声明、草稿稳定哈希、意图分类、双层记忆、编排器、四角色、安全门、Sentinel、状态机、工具注册表、schema 红线字面量 |
 
 ### 3.6 文档与 OpenAPI
 
@@ -340,7 +340,7 @@ cwd=根目录、加载根 `eslint.config.js`（`recommendedTypeChecked` + `styli
 
 ### 8.4 follow-up 推送安排
 
-主推送 `ece20607` 完成后，follow-up docs 提交分两轮推送：第二轮推送 `d81efc69`、`38a11cd8`、`92c5a416`（二次推送终态 `92c5a416`，核验见 §8.5）；第三轮推送 `f6b33c41` 与本报告终稿回填提交。gitcode `master` 全程普通 fast-forward 不 force；HEAGENTOS `main` 维持 force-main 覆盖口径；GitHub mirror 本轮始终不推送、只读核对。
+主推送 `ece20607` 完成后，follow-up docs 提交按轮推送、逐轮 `git ls-remote` 核对（第二轮终态 `92c5a416`，第三至八轮终态见 §8.5、§8.6）。gitcode `master` 全程普通 fast-forward 不 force；HEAGENTOS `main` 维持 force-main 覆盖口径；GitHub mirror 本轮始终不推送、只读核对。
 
 ### 8.5 二次推送 SHA 逐位核对（推送后实测）
 
