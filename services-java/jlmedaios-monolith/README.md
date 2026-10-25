@@ -1,11 +1,28 @@
 # jlmedaios-monolith
 
-健澜科技智慧医疗模块化单体（Spring Boot 3.5.3 + JDK 21 + Spring Modulith）。
+健澜科技 jlmedaios 模块化单体旁路/参考实现（Spring Boot 3.5.3 + JDK 21 + Spring Modulith）。
+
+## 角色边界
+
+- 本工程为 **Java 旁路/参考**，不进入主线默认 compose 编排；主线为 Bun + TypeScript BFF（`src/bff/`）+ React 工作台（`web/`）。
+- 主仓库 `docker-compose.yml` 中对应服务 `jlmedaios-monolith` 归入 `legacy` profile，需显式 `--profile legacy` 启动；容器内端口 **9090**，宿主映射 `127.0.0.1:19090`（避免与 Prometheus 回环 9090 冲突）。
+- 本机未安装 Maven，本工程**未能在本机独立构建/测试**；需在具备 JDK 21 + Maven 3.9+ 的环境执行 `mvn clean install`。
 
 ## 项目简介
 
-本工程是健澜科技智慧医疗核心交易层的模块化单体起步版本，端口 **9090**。
-9 个业务模块通过包路径隔离（Spring Modulith 规则），模块间不互相 import，只通过 Controller 暴露 HTTP 接口。
+本工程是核心交易层模块化单体的参考起步版本：各业务模块通过包路径隔离（Spring Modulith 规则），模块间不互相 import，只通过 Controller 暴露 HTTP 接口。
+
+实测规模（2026-10 本机命令统计，仅作规模参考）：
+
+| 口径 | 数值 |
+|---|---|
+| 主源码 `.java` | 650 |
+| 测试 `.java` | 117 |
+| `.java` 合计 | 767 |
+| 一级包目录（`com.jlmedaios.monolith.*`） | 143（含 `common`/`config`/`security`/`openapi` 等基础设施包） |
+| `*Controller.java` | 142 |
+
+> 下表为**代表性模块清单**，不是全量包清单；全量包结构以 `src/main/java/com/jlmedaios/monolith/` 目录为准。
 
 ## 前置要求
 
@@ -18,7 +35,7 @@
 mvn spring-boot:run
 ```
 
-访问健康检查：http://localhost:9090/actuator/health
+本地开发健康检查：http://localhost:9090/actuator/health
 
 H2 Console：http://localhost:9090/h2-console
 - JDBC URL: `jdbc:h2:mem:monolith;DB_CLOSE_DELAY=-1`
@@ -31,15 +48,16 @@ H2 Console：http://localhost:9090/h2-console
 mvn test
 ```
 
-## Docker 启动（生产环境）
+## Docker 构建与编排
+
+`Dockerfile` 为单阶段 `COPY target/*.jar`：必须先在宿主机完成 `mvn -DskipTests package` 生成 `target/*.jar`，镜像构建依赖该产物；多阶段 Maven 构建列入待办。
 
 ```bash
-docker compose up -d
+# 仓库根目录，随主线 legacy 旁路启动（依赖主线 postgres / redis 健康状态）
+docker compose --profile legacy up -d jlmedaios-monolith
 ```
 
-包含 monolith + PostgreSQL 16 + Redis 7。
-
-## 模块清单
+## 代表模块清单
 
 | 包名 | 模块 | 说明 |
 |---|---|---|
@@ -78,3 +96,4 @@ docker compose up -d
 - 生产阶段 1：切 PostgreSQL 16（Flyway 迁移脚本 `V1__init.sql` 已备好，`spring.flyway.enabled=false` 改 true）
 - 生产阶段 2：切达梦信创（application.yml 已预留注释切换点）
 - 监控：actuator 暴露 `health,info,prometheus`，生产接 Prometheus + Grafana
+- 待办：temurin 21-jre 运行镜像未内置 wget/curl，compose 单体健康检查探针命令待镜像补齐工具后落地；当前以 `depends_on(postgres/redis healthy)` 作为启动前置条件

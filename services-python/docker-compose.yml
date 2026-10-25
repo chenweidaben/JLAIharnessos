@@ -1,20 +1,41 @@
 # ============================================================
-# 健澜科技 jlmedaios Python AI 服务 - docker-compose.yml
+# 健澜科技 jlmedaios Python AI 服务 — 独立样例编排（旁路/参考，非主线默认编排）
+# ----------------------------------------------------------------------------
+# 说明：
+#   - 本文件仅用于本机单独拉起 Python AI 旁路 + vLLM 预留节点；
+#     主线为根目录 docker-compose.yml（Bun TS BFF + React web）。
+#   - 宿主端口仅绑定 127.0.0.1；样例默认内置 mock API Key，禁止在局域网/公网直接发布。
+#   - 生产接入时必须配置环境变量 AI_API_KEYS（见 services-python/README.md），
+#     并将限流/审计落库替换为 Redis + PostgreSQL 实现。
+# 用法：
+#   docker compose --profile standalone up -d
 # ============================================================
 services:
   ai-service:
     build: .
+    profiles:
+      - standalone
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
+    networks:
+      - backend
+    environment:
+      AI_API_KEYS: ${AI_API_KEYS:?请在 .env 中设置 AI_API_KEYS（多个以逗号分隔）}
     depends_on:
-      - vllm-openai
+      vllm-openai:
+        condition: service_started
+    restart: unless-stopped
 
   # vLLM 推理服务（GPU 节点部署，当前预留）
   # 本地开发用 mock 即可，不需要真实 GPU 节点
   vllm-openai:
     image: vllm/vllm-openai
+    profiles:
+      - standalone
     ports:
-      - "8001:8000"
+      - "127.0.0.1:8001:8000"
+    networks:
+      - backend
     # 生产环境需配置 GPU 资源：
     # deploy:
     #   resources:
@@ -23,3 +44,7 @@ services:
     #         - driver: nvidia
     #           count: 1
     #           capabilities: [gpu]
+
+networks:
+  backend:
+    name: jlmedaios-python-backend

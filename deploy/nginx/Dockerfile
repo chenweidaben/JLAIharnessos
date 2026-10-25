@@ -8,23 +8,23 @@
 #
 # 构建上下文为 deploy/nginx/（注意上下文路径）：
 #   docker build -f deploy/nginx/Dockerfile \
-#     -t registry.jianlan.tech/jianlan/nginx-edge:0.1.0 deploy/nginx
+#     -t registry.jianlan.tech/jlmedaios/nginx-edge:0.1.0 deploy/nginx
 #
 # 运行（生产证书以只读挂载注入，镜像内不含任何私钥）：
 #   docker run --rm -p 80:8080 -p 443:8443 \
-#     -v /etc/jianlan/certs:/etc/nginx/certs:ro \
-#     registry.jianlan.tech/jianlan/nginx-edge:0.1.0
+#     -v /etc/jlmedaios/certs:/etc/nginx/certs:ro \
+#     registry.jianlan.tech/jlmedaios/nginx-edge:0.1.0
 # 未挂载证书时（仅开发自测），入口脚本会自动生成临时自签名证书使网关可启动。
 # ============================================================================
 
 # 固定具体版本与 alpine 基线，严禁 latest / 1 等浮动 tag，保证可复现与可审计。
 FROM nginxinc/nginx-unprivileged:1.28.0-alpine3.21
 
-LABEL org.opencontainers.image.title="jianlan-gangos-nginx-edge" \
+LABEL org.opencontainers.image.title="jlmedaios-nginx-edge" \
       org.opencontainers.image.description="健澜AI原生医院操作系统OS 边缘网关（Nginx 非 root 运行）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0" \
-      org.opencontainers.image.source="https://git.jianlan.tech/medical/jianlan-medical-agent"
+      org.opencontainers.image.source="https://github.com/chenweidaben/JLAIharnessos"
 
 ENV TZ=Asia/Shanghai
 

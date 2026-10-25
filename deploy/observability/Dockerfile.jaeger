@@ -9,7 +9,7 @@
 #
 # 构建（上下文为 deploy/observability/）：
 #   docker build -f deploy/observability/Dockerfile.jaeger \
-#     -t registry.jianlan.tech/jianlan/jaeger-all-in-one:1.60.0 \
+#     -t registry.jianlan.tech/jlmedaios/jaeger-all-in-one:1.60.0 \
 #     deploy/observability
 #
 # 安全说明：
@@ -24,7 +24,7 @@ FROM busybox:1.36.1-uclibc AS tools
 # 固定具体补丁版本的官方 Jaeger all-in-one，严禁浮动 tag。
 FROM jaegertracing/all-in-one:1.60.0
 
-LABEL org.opencontainers.image.title="jianlan-gangos-jaeger" \
+LABEL org.opencontainers.image.title="jlmedaios-jaeger" \
       org.opencontainers.image.description="健澜AI原生医院操作系统OS 分布式链路追踪（Jaeger all-in-one，含健康检查）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="1.60.0"

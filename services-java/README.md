@@ -1,17 +1,21 @@
-# jlmedaios Java 核心交易层（Spring Cloud 微服务骨架）
+# jlmedaios Java 旁路/参考实现（Spring Cloud 微服务骨架 + 独立模块化单体）
 
-> 健澜科技 jlmedaios - HIS 核心交易层 Java 微服务骨架。替代 Nacos（用 Eureka Server）+ APISIX（用 Spring Cloud Gateway），H2 内存数据库，零外部依赖即可跑通。
+> 健澜科技 jlmedaios — HIS 核心交易层 Java 旁路/参考骨架。注册中心用 Eureka Server、网关用 Spring Cloud Gateway（代码库当前未使用 Nacos、Sentinel、Seata），业务模块默认 H2 内存数据库，零外部依赖即可跑通。
+>
+> **角色边界**：本目录为旁路/参考实现，不进入主线默认 compose 编排（`legacy` profile 显式启动）；主线为 Bun + TypeScript BFF（`src/bff/`）+ React 工作台（`web/`）。本机未安装 Maven，聚合工程与单体均**未能在本机独立构建**，需在具备 JDK 17/21 + Maven 3.9+ 的环境执行 `mvn clean install -DskipTests`。
+>
+> 实测规模（2026-10 本机命令统计）：聚合工程 14 个模块、`pom.xml` 15 个、`.java` 文件 75 个；独立单体 `jlmedaios-monolith` 1 个 `pom.xml`、`.java` 文件 767 个（main 650 + test 117）；两部分合计 `.java` 842 个、`pom.xml` 16 个。聚合父 POM Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17；`jlmedaios-monolith` 为独立 parent（Spring Boot 3.5.3 + JDK 21），不纳入本聚合。
 
 ## 前置要求
 
-- JDK 17
+- JDK 17（聚合工程各微服务）；独立单体 `jlmedaios-monolith` 需 JDK 21
 - Maven 3.9+
 
 ## 模块结构
 
 ```
 services-java/
-├── pom.xml                      # 父 POM（Spring Boot 3.3.5 + Spring Cloud 2024.0.0）
+├── pom.xml                      # 父 POM（Spring Boot 3.3.5 + Spring Cloud 2024.0.0，JDK 17）
 ├── jlmedaios-registry/          # 注册中心（Eureka Server，端口 8761）
 ├── jlmedaios-gateway/          # API 网关（Spring Cloud Gateway，端口 9000）
 ├── jlmedaios-his-reg/           # 挂号微服务（端口 9101）
@@ -20,7 +24,13 @@ services-java/
 ├── jlmedaios-his-pharmacy/      # 药房微服务（端口 9104）
 ├── jlmedaios-his-empi/          # 患者主索引 EMPI（端口 9105）
 ├── jlmedaios-his-ward/          # 住院床位微服务（端口 9106）
-└── jlmedaios-his-lis/           # 检验对接微服务（端口 9107，预留 HL7/FHIR）
+├── jlmedaios-his-lis/           # 检验对接微服务（端口 9107，预留 HL7/FHIR）
+├── jlmedaios-his-nursing/       # 护理微服务（端口 9108）
+├── jlmedaios-his-exam/           # 检查对接微服务（端口 9109）
+├── jlmedaios-his-discharge/     # 出院结算微服务（端口 9110）
+├── jlmedaios-his-report/        # 运营报表微服务（端口 9111，只读查询，无 H2 库）
+├── jlmedaios-his-message/       # 院内消息微服务（端口 9112）
+└── jlmedaios-monolith/          # 独立模块化单体（Boot 3.5.3 / JDK 21，端口 9090，独立 parent，不进聚合）
 ```
 
 ## 端口表
@@ -36,11 +46,17 @@ services-java/
 | jlmedaios-his-empi | 9105 | hisempi | 患者主索引（EMPI） |
 | jlmedaios-his-ward | 9106 | hisward | 住院床位微服务 |
 | jlmedaios-his-lis | 9107 | hislis | 检验对接微服务（预留 HL7 v2.x / FHIR R4） |
+| jlmedaios-his-nursing | 9108 | hisnursing | 护理记录微服务 |
+| jlmedaios-his-exam | 9109 | hisexam | 检查申请/结果微服务 |
+| jlmedaios-his-discharge | 9110 | hisdischarge | 出院申请/结算/小结微服务 |
+| jlmedaios-his-report | 9111 | - | 运营报表只读查询微服务 |
+| jlmedaios-his-message | 9112 | hismessage | 院内消息收发微服务 |
+| jlmedaios-monolith | 9090 | H2 内存库 | 独立模块化单体（JDK 21，独立 parent；compose 宿主映射 127.0.0.1:19090） |
 
 ## 启动顺序
 
 1. **registry**（8761）— 先启动注册中心
-2. **his-reg / his-charge / his-orders / his-pharmacy / his-empi / his-ward / his-lis**（9101-9107）— 各业务微服务
+2. **his-reg / his-charge / his-orders / his-pharmacy / his-empi / his-ward / his-lis / his-nursing / his-exam / his-discharge / his-report / his-message**（9101–9112）— 各业务微服务
 3. **gateway**（9000）— 最后启动网关
 
 ## Build
@@ -64,6 +80,11 @@ cd jlmedaios-his-pharmacy && mvn spring-boot:run
 cd jlmedaios-his-empi && mvn spring-boot:run
 cd jlmedaios-his-ward && mvn spring-boot:run
 cd jlmedaios-his-lis && mvn spring-boot:run
+cd jlmedaios-his-nursing && mvn spring-boot:run
+cd jlmedaios-his-exam && mvn spring-boot:run
+cd jlmedaios-his-discharge && mvn spring-boot:run
+cd jlmedaios-his-report && mvn spring-boot:run
+cd jlmedaios-his-message && mvn spring-boot:run
 cd jlmedaios-gateway && mvn spring-boot:run
 ```
 
@@ -103,6 +124,29 @@ cd jlmedaios-gateway && mvn spring-boot:run
 - `GET  /api/his/lis/result/{requestId}` — 查询检验结果
 - TODO: 对接 LIS 系统 HL7 v2.x / FHIR R4 接口
 
+### his-nursing（护理，9108）
+- `POST /api/his/nursing/orders` — 提交护理记录/医嘱执行记录
+- `GET  /api/his/nursing/orders/patient/{patientId}` — 按患者查护理记录
+
+### his-exam（检查对接，9109）
+- `POST /api/his/exam/request` — 申请检查
+- `GET  /api/his/exam/result/{requestId}` — 查询检查结果
+- `GET  /api/his/exam/schedule` — 检查排班查询
+
+### his-discharge（出院，9110）
+- `POST /api/his/discharge/apply` — 出院申请
+- `POST /api/his/discharge/settle` — 出院结算
+- `GET  /api/his/discharge/summary/{visitId}` — 出院小结查询
+
+### his-report（运营报表，9111，只读）
+- `GET /api/his/report/outpatient/daily` — 门诊日报表
+- `GET /api/his/report/inpatient/occupancy` — 住院床位占用
+- `GET /api/his/report/pharmacy/sales` — 药房销售汇总
+
+### his-message（院内消息，9112）
+- `POST /api/his/message/send` — 发送院内消息
+- `GET  /api/his/message/inbox/{receiverId}` — 收件箱查询
+
 ## H2 Console
 
 所有业务微服务均开启 H2 Console：`http://localhost:{port}/h2-console`，用户 `sa`，密码空。
@@ -116,6 +160,11 @@ cd jlmedaios-gateway && mvn spring-boot:run
 | his-empi | 9105 | `jdbc:h2:mem:hisempi` |
 | his-ward | 9106 | `jdbc:h2:mem:hisward` |
 | his-lis | 9107 | `jdbc:h2:mem:hislis` |
+| his-nursing | 9108 | `jdbc:h2:mem:hisnursing` |
+| his-exam | 9109 | `jdbc:h2:mem:hisexam` |
+| his-discharge | 9110 | `jdbc:h2:mem:hisdischarge` |
+| his-report | 9111 | 无 H2 库（只读报表查询） |
+| his-message | 9112 | `jdbc:h2:mem:hismessage` |
 
 ## 鉴权说明
 
@@ -197,4 +246,11 @@ curl http://localhost:9104/actuator/health
 curl http://localhost:9105/actuator/health
 curl http://localhost:9106/actuator/health
 curl http://localhost:9107/actuator/health
+curl http://localhost:9108/actuator/health
+curl http://localhost:9109/actuator/health
+curl http://localhost:9110/actuator/health
+curl http://localhost:9111/actuator/health
+curl http://localhost:9112/actuator/health
 ```
+
+> 独立单体 `jlmedaios-monolith`（端口 9090，compose 宿主映射 `127.0.0.1:19090`）的启动方式、H2 Console 与健康检查见其目录下 [README.md](./jlmedaios-monolith/README.md)。

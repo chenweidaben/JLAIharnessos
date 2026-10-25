@@ -1,8 +1,10 @@
 <div align="center">
 
-# jlmedaios · Jianlan Tech AI-Native Future Hospital Operating System
+# jlmedaios · Jianlan AI-Native Hospital OS
 
 ### Microservice Cloud-Native HIS·EMR Integrated Platform — The New Engine for High-Quality Smart-Hospital Development for the Next Fifteen Years
+
+> Formal Chinese name: **健澜AI原生医院操作系统OS** · English name: **Jianlan AI-Native Hospital OS** · repository code name `jlmedaios`.
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
@@ -24,7 +26,7 @@
 
 ## 🧭 Positioning
 
-**jlmedaios** is the **AI-Native Future Hospital Operating System** built by Jianlan Tech (Hangzhou Jianlan Technology Co., Ltd.) for the next fifteen years of high-quality smart-hospital development: an open-source, free, production-grade hospital agent operating system on a microservice cloud-native architecture with integrated HIS·EMR.
+**jlmedaios** (Jianlan AI-Native Hospital OS) is the AI-native hospital operating system built by Hangzhou Jianlan Technology Co., Ltd. for the next fifteen years of high-quality smart-hospital development: an open-source, production-grade hospital agent operating system on a microservice cloud-native architecture with integrated HIS·EMR.
 
 It is not another point AI assistant. It deeply integrates the **core clinical transaction system** (outpatient, inpatient ADT, ED, orders, notes, pharmacy, billing, lab/imaging, surgery & anesthesia) with an **AI-native capability platform** (agent orchestration / skill marketplace / knowledge platform / CDS / RAG):
 
@@ -83,32 +85,74 @@ It is not another point AI assistant. It deeply integrates the **core clinical t
 
 ---
 
+## 🧩 Architecture & Measured Inventory (local command statistics, reviewed 2026-10)
+
+The mainline is the **Bun + TypeScript BFF (`src/bff/`, port 8080) + React workbench (`web/`)**. `services-java/`, `services-python/`, `services/radar-inference/` and `miniprogram/` are **sidecar / reference implementations**: they are kept in the repository, are not merged into the mainline, and are not started by the default compose orchestration.
+
+| Component | Role | Stack | Measured scale | Port (container / host) |
+|---|---|---|---|---|
+| TS BFF | **Mainline** | Bun + TypeScript (`src/bff/`) | 5084 registered REST routes (unique method+path; 5211 expanded entries incl. 127 duplicate registrations pending cleanup); 2402 route files, 1945 aggregator pure-function modules (`audit-bff.mjs` static audit, snapshot 2026-10-25) | 8080 / `127.0.0.1:8080` |
+| React workbench | **Mainline** | React 19 + Vite + AntD 5 (`web/`) | 3048 `<Route path=` mounts after closure dedup, 2847 distinct paths (`web/src/router/index.tsx`, snapshot 2026-10-25; pre-dedup snapshot 3052; mount count ≠ page count) | Container 8080; Vite dev 5173 |
+| Java microservices | Sidecar / reference, excluded from default mainline orchestration | Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17 (aggregator); standalone monolith Boot 3.5.3 / JDK 21 | Aggregator: 14 modules, 15 `pom.xml`, 75 `.java`; standalone monolith: 1 `pom`, 767 `.java` (main 650 + tests 117); combined: 842 `.java`, 16 `pom.xml` | registry 8761, gateway 9000, services 9101–9112; monolith 9090 (host `127.0.0.1:19090`, `legacy` profile) |
+| Python FastAPI | Sidecar / reference, `legacy` profile | FastAPI + Uvicorn (`services-python/`) | 92 source `.py` + 2 tests; 84 `APIRouter()` declarations, 103 route decorators (GET 16 / POST 87), 83 `include_router` mounts | 8000 / `127.0.0.1:8000` |
+| Radar inference | Sidecar / reference, `demo` / `gpu` profile | FastAPI (`services/radar-inference/`) | 18 own `.py` (app 10 + tests 8); 5 endpoints (GET 4 / POST 1) | 8090 (internal expose only, not published to host) |
+| WeChat mini-program | Sidecar / reference, native mini-program, not part of compose | Native mini-program (`miniprogram/`) | 8 pages; AppID placeholder `touristappid` | — |
+| SQL migrations | Mainline companion | `deploy/postgres/init/**` | 354 scripts, sequence 01–385 (historical gaps and 5 duplicate sequence numbers remain cleanup backlog) | — |
+
+**Standalone build prerequisites for sidecars**: Java aggregator needs Maven + JDK 17; the standalone monolith needs Maven + JDK 21; `services-python` needs a Python 3.11 virtualenv with `requirements.txt` installed; `radar-inference` demo mode needs the CPU requirements, production mode additionally needs `requirements-prod.txt` (GPU weights); the mini-program is built with WeChat DevTools. On this machine Maven and Docker are absent, the `services-python` dependencies are not installed, and no sidecar Docker image was built; the radar demo virtualenv exists locally for an import-level smoke check only.
+
+---
+
 ## 🏃 Quick Start
 
-**Requirements**: Bun ≥ 1.3, Node.js ≥ 18, Docker (optional, for one-command PostgreSQL/Redis).
+**Requirements (verified on this machine, 2026-10)**: Node.js ≥ 18 (local v22.23.2), Bun ≥ 1.3 (note: the locally installed Bun 1.2.0 is below the `package.json` engines floor; upgrade before development), PostgreSQL 16 (compose default loopback port **5432**, database `jlmedaios`). Maven and Docker CLI are **not** installed on this machine: the Java/Python/radar sidecars cannot be built standalone locally, and `docker compose` cannot be executed locally. The mainline BFF and frontend commands below do not require Maven or Docker.
 
 ```bash
-git clone <repo-url>.git
-cd jlmedaios
+git clone https://gitcode.com/jlmedaios/jlmedaios-os.git   # GitHub mirror: https://github.com/chenweidaben/JLAIharnessos
+cd jlmedaios-os
 bun install
-cp .env.example .env          # set JWT_SECRET, DATABASE_URL, LLM_API_KEY etc.
+cp .env.example .env          # fill JWT_SECRET, DATABASE_URL, LLM_API_KEY etc.; sample values are never real secrets
 
-docker compose up -d postgres redis   # dependencies
+docker compose up -d postgres redis   # dependencies (Docker required)
 bun run db:seed                       # drug/ICD/lab/clinical-pathway seeds
 
-bun run bff                           # BFF: REST 8080 + WebSocket
+bun run bff:watch                     # BFF dev watch mode: REST 8080 + WebSocket
 cd web && bun install && bun run dev  # workbench at http://localhost:5173
 ```
 
-**Container deployment**:
+**Mainline health probes** (BFF on port 8080):
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `http://localhost:8080/health` | GET | Liveness probe (always returns `ok`, no sensitive detail leaked) |
+| `http://localhost:8080/ready` | GET | Readiness probe (checks database connectivity; returns 503 when dependencies are not ready) |
+| `http://localhost:8080/metrics` | GET | Prometheus metrics |
+| `http://localhost:8080/api/v1/system/health` | GET | Detailed system health |
+
+**Key environment variables** (BFF runtime `.env`; full list and defaults in [`.env.example`](./.env.example)):
+
+| Variable | Sample | Purpose |
+|---|---|---|
+| `DATABASE_URL` | `postgres://postgres@127.0.0.1:5432/jlmedaios` | Local PostgreSQL connection string |
+| `HTTP_PORT` | `8080` | BFF port |
+| `DEMO_MODE` | `0` | `0` = real database; `1` = in-memory demo only (must be `0` in production) |
+| `JWT_SECRET` | `CHANGE_ME_jwt_secret_...` | HS256 signing secret (≥32 random bytes, required in production) |
+| `ENCRYPTION_MASTER_KEY` | `CHANGE_ME_encryption_master_key_...` | Field-level AES-256-GCM master key (issued by KMS in production) |
+| `REDIS_URL` / `KAFKA_BROKERS` / `ES_URL` | see `.env.example` | Internal cache / message bus / log-search connection placeholders |
+| `LLM_PROVIDER` / `LLM_API_KEY` / `LLM_BASE_URL` | `deepseek` / `sk-placeholder-...` | LLM provider (OpenAI-compatible protocol; prefer on-prem endpoints) |
+| `RADAR_INFERENCE_URL` / `RADAR_INTERNAL_TOKEN` | `http://localhost:8090` / `CHANGE_ME_...` | Radar sidecar address and internal auth token |
+
+**Container deployment** (Docker Engine + Compose plugin required; orchestration variables: see `.env.compose.example`):
 
 ```bash
-docker compose up -d                      # full stack (gateway+BFF+web+PG+Redis)
+docker compose up -d                      # mainline only; legacy/demo/gpu sidecars are NOT started by default
+# sidecars are launched explicitly by profile, e.g.:
+# docker compose --profile legacy up -d jlmedaios-monolith jlmedaios-ai
 kubectl apply -f deploy/k8s/             # Kubernetes manifests
 helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 ```
 
-> Zero-DB demo: start the BFF with `DEMO_MODE=1` to use in-memory data with a demo watermark (non-persistent) — demonstration only.
+> Zero-DB demo: start the BFF with `DEMO_MODE=1` to use in-memory data with a demo watermark (non-persistent) — demonstration only; this mode short-circuits authentication and must never be used for production or any externally exposed environment.
 
 ---
 
@@ -128,7 +172,7 @@ helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 
 | Milestone | Latest progress |
 |---|---|
-| **M89 Role-agent system** | 8 role-based agent personas (admin / doctor / nurse / pharmacist / finance / patient, etc.) with 14+ built-in role tools: pre-prescription review, DRG/DIP over-spend summary, follow-up reminders, nursing records, ward-round handoff reports; Sentinel approval guardrail — critical-level items prohibit self-approval and require cross-role sign-off |
+| **M89 Role-agent system** | 8 role-based agent personas (admin / doctor / nurse / pharmacist / finance / patient, etc.) with 14+ built-in role tools: pre-prescription review, DRG/DIP over-spend summary, follow-up reminders, nursing records, ward-round handoff reports; RBAC role/permission guards enforce the approval guardrail — critical-level items prohibit self-approval and require cross-role sign-off |
 | **M90 Real data wired in** | AI note QC and nursing-plan recommendation now run on real visit / diagnosis data — no longer demo mock data |
 | **M91 Deep-sea-blue VI** | Dashboard, patient, prescription and pharmacy UIs unified on the Deep Sea Blue palette `#0A2540` / `#1E5F8C` / `#4A90D9` |
 | **/medmuse workbench** | The role-agent chat page embeds approval cards — clinicians and pharmacists can approve or reject pending items directly in the conversation flow |

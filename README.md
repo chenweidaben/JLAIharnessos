@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 健澜AI原生医院操作系统OS
 
@@ -6,38 +6,41 @@
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-0A2540.svg)]()
 [![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.3-0A2540.svg)](https://spring.io/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-0A2540.svg)](https://fastapi.tiangolo.com/)
-[![JDK](https://img.shields.io/badge/JDK-21-0A2540.svg)](https://openjdk.org/)
 [![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
 [![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
-[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%3A5433-0A2540.svg)](https://www.postgresql.org/)
+[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%3A5432-0A2540.svg)](https://www.postgresql.org/)
 [![Agent](https://img.shields.io/badge/Agent-MEDMUSE-1B4F8B.svg)
 [![Copyright](https://img.shields.io/badge/%C2%A9-%E6%9D%AD%E5%B7%9E%E5%81%A5%E6%BE%9C%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8-0A2540.svg)
 
 > 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`）。
+>
+> 主线运行时为 **Bun + TypeScript BFF（`src/`，端口 8080）+ React 前端（`web/`）**；`services-java/`、`services-python/`、`services/radar-inference/`、`miniprogram/` 为旁路/参考实现，不进入主线默认编排，详见下方「架构与实测清单」。
 
 </div>
 
 ---
 
-> 🏥 **三层架构模块统计**
+> 🏥 **架构分层与实测清单（本机命令统计，2026-10 复核）**
 >
-> | 层 | 技术栈 | 模块数 | 端口 |
-> |---|---|---|---|
-> | Java 核心交易 | Spring Boot 3.5 + JDK 21 + Modulith | **130 模块**（从 9 模块 14.4 倍增长） | 9090 |
-> | Python 智能层 | FastAPI + vLLM | **70 router**（🎉 从 4 端点 17.5 倍增长） | 8000 |
-> | TS BFF 聚合层 | Bun + TypeScript | 1957 路由（保留） | 8080 |
-> | 测试类 | JUnit 5 + H2 | **104 个** | - |
-> | 端点总数 | Java + Python | **620+** | - |
+> | 层 / 组件 | 角色 | 技术栈 | 实测规模 | 端口（容器 / 宿主） |
+> |---|---|---|---|---|
+> | TS BFF 聚合层 | **主线** | Bun + TypeScript（`src/bff/`） | 已注册 REST 路由 **5084** 条（method+path 去重；展开条目 5211，含 **127** 条重复注册待收敛）；路由文件 **2402**、聚合器纯函数模块 **1945**（`audit-bff.mjs` 静态审计，2026-10-25 快照） | 8080 / `127.0.0.1:8080` |
+> | React 工作台 | **主线** | React 19 + Vite + AntD 5（`web/`） | 前端路由挂载 **3048** 处、去重路径 **2847** 条（`web/src/router/index.tsx`，2026-10-25 收口去重后快照；口径为 `<Route path=` 挂载数，不等同页面数；去重前快照 3052） | 容器内 8080；Vite 开发 5173 |
+> | Java 微服务旁路 | 旁路/参考，不进主线默认编排 | Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17（聚合工程）；独立单体 Boot 3.5.3 / JDK 21 | 聚合 **14** 模块 / **15** 个 `pom.xml` / **75** 个 `.java`；独立单体 **1** 个 `pom` / **767** 个 `.java`（main 650 + test 117）；合计 `.java` **842**、`pom.xml` **16** | registry 8761、gateway 9000、各微服务 9101–9112；单体 9090（宿主 `127.0.0.1:19090`，`legacy` profile） |
+> | Python FastAPI 旁路 | 旁路/参考，`legacy` profile | FastAPI + Uvicorn（`services-python/`） | 源码 `.py` **92** + 测试 **2**；`APIRouter()` 声明 **84**、路由装饰器 **103**（GET 16 / POST 87）、已 `include_router` **83** | 8000 / `127.0.0.1:8000` |
+> | 雷达影像推理旁路 | 旁路/参考，`demo` / `gpu` profile | FastAPI（`services/radar-inference/`） | 自研 `.py` **18**（app 10 + tests 8）；端点 **5** 条（GET 4 / POST 1） | 8090（仅内网 expose，不发布宿主端口） |
+> | 微信小程序 | 旁路/参考，原生小程序，不参与 compose 编排 | 原生小程序（`miniprogram/`） | 8 个页面，AppID 为 `touristappid` 占位 | — |
+> | 数据迁移 | 主线配套 | `deploy/postgres/init/**` SQL | **354** 个脚本，编号区间 **01–385**（含历史缺号与 5 个重复编号，列入清理待办） | — |
 >
-> 🚀 **快速启动**：
+> 🚀 **快速启动（容器编排，需本机安装 Docker Engine + Compose 插件）**：
 > ```bash
 > git clone https://gitcode.com/jlmedaios/jlmedaios-os.git
+> # GitHub 镜像：https://github.com/chenweidaben/JLAIharnessos
 > cd jlmedaios-os
-> make up
-> # 访问 http://localhost:9090/actuator/health
-> # 访问 http://localhost:8000/ai/health
+> cp .env.compose.example .env        # 按文件注释填写 JWT_SECRET、DATABASE 口令等，示例值均非真实口令
+> docker compose up -d
+> # 主线健康检查：GET http://localhost:8080/ready 、GET http://localhost:8080/health 、GET http://localhost:8080/metrics
+> # 容器默认编排不拉起 legacy/demo/gpu 旁路；需要时显式带 profile 启动，见 docker-compose.yml 头部注释
 > ```
 
 ---
@@ -124,8 +127,8 @@
 | 累计开发切片 | **176** | 每个切片为一次可独立验证的最小交付（纯函数 + 路由 + 测试 + 文档） |
 | 测试覆盖率 | **97.92%** | 单测对核心领域与 BFF 聚合器的覆盖口径 |
 | P95 响应时延 | **72 ms** | BFF 接口 P95 响应（生产目标口径） |
-| 路由数 | **173+** | `src/bff/routes` 已注册 REST 路由（下限） |
-| 数据库迁移数 | **319+** | Schema 演进以迁移脚本版本化管理（下限） |
+| 路由数 | **5084** | `src/bff/routes` 已注册 REST 路由 method+path 去重数（2026-10-25 静态审计快照，非里程碑期历史口径；展开条目 5211，含 127 条重复注册待收敛） |
+| 数据库迁移数 | **354** | `deploy/postgres/init/**` SQL 脚本（编号 01–385，含历史缺号与重复编号待清理） |
 
 > 该里程碑同时由 BFF 接口对外暴露：`GET /api/v1/admin/milestone/summary`（仅 admin），由纯函数 `generateMilestoneSummary()` 驱动，口径与上表一致。
 
@@ -141,8 +144,8 @@
 | 累计开发切片 | **288** | 每个切片为一次可独立验证的最小交付（纯函数 + 路由 + 测试 + 文档） |
 | 测试覆盖率 | **99.5%** | 单测对核心领域与 BFF 聚合器的覆盖口径 |
 | P95 响应时延 | **72 ms** | BFF 接口 P95 响应（生产目标口径，未因版本扩张劣化） |
-| 路由数 | **200+** | `src/bff/routes` 已注册 REST 路由（下限） |
-| 数据库迁移数 | **370+** | Schema 演进以迁移脚本版本化管理（下限） |
+| 路由数 | **5084** | `src/bff/routes` 已注册 REST 路由 method+path 去重数（2026-10-25 静态审计快照，非里程碑期历史口径；展开条目 5211，含 127 条重复注册待收敛） |
+| 数据库迁移数 | **354** | `deploy/postgres/init/**` SQL 脚本（编号 01–385，含历史缺号与重复编号待清理） |
 
 > 本批（v4.94 ~ v4.97）功能全景新增四个模块域：**质量安全 / 运营分析 / 患者体验 / 性能优化**。
 >
@@ -165,7 +168,7 @@
 │           orchestrator / knowledge / security / tenant /     │
 │           emergency / internet-hospital / data-platform ...  │
 ├──────────────────────────────────────────────────────────────┤
-│  数据层    PostgreSQL 16  (localhost:5433 / jlmedaios)        │
+│  数据层    PostgreSQL 16  (localhost:5432 / jlmedaios)        │
 │           Redis · pgvector · 湖仓分层                        │
 ├──────────────────────────────────────────────────────────────┤
 │  模型层    LLM 可插拔（OpenAI 兼容协议，默认 DeepSeek）       │
@@ -178,9 +181,9 @@
 | 层 | 技术 |
 |---|---|
 | 运行时 | Bun ≥ 1.3（单一 TypeScript 栈） |
-| 前端 | React 19 + Vite 6 + AntD 5 + TailwindCSS + Zustand + ECharts |
+| 前端 | React 19 + Vite + AntD 5 + TailwindCSS + Zustand + ECharts |
 | BFF | Bun HTTP + WebSocket + Zod 校验 |
-| 数据库 | PostgreSQL 16（本地开发端口 **5433**，库名 **jlmedaios**）+ Redis |
+| 数据库 | PostgreSQL 16（compose 默认回环端口 **5432**，库名 **jlmedaios**）+ Redis |
 | 智能体 | MEDMUSE 编排引擎 + MCP SDK + OpenAI 兼容 LLM |
 | 部署 | Docker / docker-compose / K8s / Helm |
 
@@ -188,43 +191,60 @@
 
 ## 🏃 快速启动指南（Windows）
 
-**环境要求**：Bun ≥ 1.3、Node.js ≥ 18、本地 PostgreSQL 16（端口 5433）。
+**环境要求（本机 2026-10 实测）**：Node.js ≥ 18（本机 v22.23.2）、Bun ≥ 1.3（`bun --version`；本机安装的 1.2.0 低于 `package.json` engines 下限，正式开发前请先升级）、本地 PostgreSQL 16（compose 默认回环端口 **5432**，库名 `jlmedaios`）。
+
+> 本机未安装 Maven 与 Docker CLI：**Java/Python/radar 旁路无法在本机独立构建，docker compose 亦无法在本机执行**；以下主线 BFF + 前端开发命令不依赖 Maven/Docker。旁路独立构建前提见本文件「架构与实测清单」与各自目录 README。
 
 ```powershell
-# 1. 克隆并安装依赖
-cd C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1
+# 1. 克隆并安装依赖（克隆完成后进入仓库根目录）
+cd jlmedaios-os
 bun install
 
-# 2. 准备 PostgreSQL（5433 端口，库名 jlmedaios）
-#    连接串：postgres://postgres@127.0.0.1:5433/jlmedaios
+# 2. 准备 PostgreSQL（5432 端口，库名 jlmedaios）
+#    连接串：postgres://postgres@127.0.0.1:5432/jlmedaios
 #    首次启动可执行种子数据：
 bun run db:seed
 
-# 3. 启动后端 BFF（开发模式）
-bun run dev
+# 3. 启动 BFF 服务端（开发监听模式）
+bun run bff:watch
 
 # 4. 启动前端工作台（另开一个 PowerShell 窗口）
 cd web
 bun install
 bun run dev
-# 前端默认地址：http://localhost:5173
+# 前端开发地址：http://localhost:5173
 ```
 
-**关键环境变量**（`.env`）：
+**主线健康检查**（BFF 监听 8080）：
 
-| 变量 | 值 | 说明 |
+| 端点 | 方法 | 说明 |
 |---|---|---|
-| `DATABASE_URL` | `postgres://postgres@127.0.0.1:5433/jlmedaios` | 本地 PG 连接串 |
+| `http://localhost:8080/health` | GET | 存活探针（liveness，固定返回 `ok`，不泄露敏感信息） |
+| `http://localhost:8080/ready` | GET | 就绪探针（readiness，校验数据库连通性，依赖未就绪返回 503） |
+| `http://localhost:8080/metrics` | GET | Prometheus 指标 |
+| `http://localhost:8080/api/v1/system/health` | GET | 系统健康详情（`system.ts`） |
+
+**关键环境变量**（BFF 运行时 `.env`，完整清单与默认值见 [`.env.example`](./.env.example)）：
+
+| 变量 | 示例 | 说明 |
+|---|---|---|
+| `DATABASE_URL` | `postgres://postgres@127.0.0.1:5432/jlmedaios` | 本地 PG 连接串 |
 | `HTTP_PORT` | `8080` | BFF 端口 |
-| `DEMO_MODE` | `0` | 0 = 真实数据库模式；1 = 无 DB 演示模式 |
-| `LLM_PROVIDER` | `deepseek` | LLM 提供商（OpenAI 兼容协议） |
+| `DEMO_MODE` | `0` | 0 = 真实数据库模式；1 = 无 DB 演示模式（仅限演示，生产必须为 0） |
+| `JWT_SECRET` | `CHANGE_ME_jwt_secret_...` | HS256 签名密钥（≥32 字节随机值，生产必填） |
+| `ENCRYPTION_MASTER_KEY` | `CHANGE_ME_encryption_master_key_...` | 字段级 AES-256-GCM 主密钥（生产由 KMS 下发） |
+| `REDIS_URL` / `KAFKA_BROKERS` / `ES_URL` | 见 `.env.example` | 内网缓存 / 消息队列 / 日志检索连接占位 |
+| `LLM_PROVIDER` / `LLM_API_KEY` / `LLM_BASE_URL` | `deepseek` / `sk-placeholder-...` | LLM 提供商（OpenAI 兼容协议，私有化端点优先） |
+| `RADAR_INFERENCE_URL` / `RADAR_INTERNAL_TOKEN` | `http://localhost:8090` / `CHANGE_ME_...` | 影像推理旁路地址与内部鉴权 token |
 
-> 💡 **无数据库体验**：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示。
+> 💡 **无数据库体验**：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示；演示模式下鉴权短路，**严禁用于任何对外或生产环境**。
 
-**容器化部署**：
+**容器化部署**（需本机 Docker Engine + Compose 插件；编排插值变量见 [`.env.compose.example`](./.env.compose.example)）：
 
 ```powershell
-docker compose up -d                      # 全栈一键
+docker compose up -d                      # 主线默认编排（不含 legacy/demo/gpu 旁路）
+# 旁路按 profile 显式启动，例如：
+# docker compose --profile legacy up -d jlmedaios-monolith jlmedaios-ai
 kubectl apply -f deploy/k8s/              # Kubernetes
 helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
 ```
@@ -248,7 +268,7 @@ jlmedaios/
 │   ├── emergency/               # 急诊绿色通道
 │   ├── internet-hospital/      # 互联网医院
 │   ├── voice/                   # 语音 ASR
-│   ├── db/                      # 数据库迁移与 Schema
+│   ├── db/                      # 数据访问层（repositories / 连接池；迁移脚本见 deploy/postgres/init/）
 │   ├── entrypoints/            # CLI / Server 入口
 │   ├── integration/            # HIS/LIS/PACS 适配器
 │   ├── saga/                    # 分布式事务
@@ -262,9 +282,12 @@ jlmedaios/
 │       ├── store/               # Zustand 状态
 │       ├── router/              # 路由与守卫
 │       └── hooks/               # 自定义 Hooks
-├── miniprogram/                # 微信小程序患者端
+├── miniprogram/                # 微信小程序患者端（旁路/参考，原生小程序，不参与 compose 编排）
+├── services-java/              # Java 旁路/参考：Spring Cloud 微服务骨架 + 独立模块化单体（legacy profile）
+├── services-python/            # Python FastAPI 旁路/参考：NLP / CDSS / 影像辅助（legacy profile）
+├── services/radar-inference/   # 雷达影像推理旁路/参考：demo / production 双模式（demo、gpu profile）
 ├── scripts/                    # 工具脚本（DB seed / 知识下载）
-├── deploy/                     # Docker / K8s / Helm 部署清单
+├── deploy/                     # Docker / K8s / Helm 部署清单（含 postgres 迁移脚本 init/）
 ├── docs/                       # 项目文档
 ├── tests/                      # 单元 / 集成 / E2E 测试
 ├── config/                     # 配置文件
@@ -401,10 +424,10 @@ jlmedaios/
 | 维度 | 状态 | 说明 |
 |---|---|---|
 | **TypeScript 检查（后端）** | ✅ 0 报错 | BFF / src 后端严格类型检查通过，零阻断错误 |
-| **TypeScript 检查（前端）** | ⚠️ 既有别名问题 | 存在历史路径别名（alias）相关告警，不阻塞 Vite 构建与运行，列入后续清理 |
-| **单元测试** | ✅ 约 200+ | 核心领域与 BFF 单测覆盖，可持续回归 |
-| **数据库迁移** | ✅ 232+ | Schema 演进以迁移脚本版本化管理，可重复执行、可追溯 |
-| **数据库连接** | ✅ PostgreSQL 16 | `postgres://postgres@127.0.0.1:5433/jlmedaios`（本地开发端口 **5433**，库名 **jlmedaios**） |
+| **TypeScript 检查（前端）** | ✅ 0 报错 | `web` 严格类型检查通过，零阻断错误（2026-10 基线 `tsc --noEmit` exit 0） |
+| **单元测试** | 见测试实测 | 核心领域与 BFF 单测以 `bun test` 实测结果为准，本文件不写死用例数量 |
+| **数据库迁移** | ✅ 354 个脚本 | `deploy/postgres/init/**` SQL（编号 01–385，含历史缺号与重复编号待清理），可重复执行、可追溯 |
+| **数据库连接** | ✅ PostgreSQL 16 | `postgres://postgres@127.0.0.1:5432/jlmedaios`（compose 默认回环端口 **5432**，库名 **jlmedaios**） |
 | **部署形态** | ✅ 就绪 | Docker / docker-compose / K8s / Helm 清单齐备，支持私有化、数据不出院 |
 
 > 生产安全红线不变：断库即显式报错并显示演示水印，不白屏、不静默返回假数据；越权一律 403。
@@ -455,10 +478,10 @@ jlmedaios/
 | **M200** | **v2.74-v2.77** | **系统验收/文档交付/部署准备/版本发布** |
 
 ### 关键数据
-- **功能模块**：68 个 aggregator 纯函数模块
-- **API 端点**：500+ BFF 路由
-- **前端页面**：200+ React 管理页面
-- **单测覆盖**：800+ Bun 单测，覆盖率 85%
+- **功能模块**：M200 里程碑自报 68 个 aggregator；2026-10-25 静态审计实测 `src/bff/aggregators/` 纯函数模块 **1945** 个（无直返 `new Response`）
+- **API 端点**：BFF REST 路由 method+path 去重 **5084** 条（展开条目 5211，含 127 条重复注册待收敛；2026-10-25 静态审计快照）
+- **前端路由**：`web/src/router/index.tsx` 路由挂载 **3048** 处、去重路径 **2847** 条（2026-10-25 收口去重后快照；`<Route path=` 挂载口径，不等同页面数；去重前快照 3052）
+- **单测覆盖**：用例数量与覆盖率以 `bun test` / `vitest run` 实测为准，本文件不写死
 - **三端同步**：origin (GitCode HTTPS) + gitcode (GitCode SSH) + mirror (GitHub)
 
 ### 技术沉淀
@@ -512,33 +535,38 @@ jlmedaios/
 
 ---
 
-# 🏗️ 架构重构路线图（2026-10 启动）
+# 🏗️ 分层现状与演进方向（2026-10 复核）
 
-> 为大型三甲医院真实生产环境重构。核心交易 Java 化、AI 层 Python 化、前端 BFF 保留 TypeScript，绞杀者模式全速推进。
+> 主线为 **Bun + TypeScript BFF（`src/bff/`）+ React 工作台（`web/`）**；`services-java/`、`services-python/`、`services/radar-inference/`、`miniprogram/` 为旁路/参考实现，本轮不物理删除、不强行合并，仅厘清调用链、标注角色与独立构建前提。
 
-## 三层架构
+## 分层与技术栈（实测口径）
 
-| 层 | 技术栈 | 职责 |
+| 层 | 技术栈 | 职责 / 现状 |
 |---|---|---|
-| **体验层** | React 19 + TypeScript + Bun BFF | 医生/护士工作站 UI、AI 对话流式、表单报表 |
-| **核心交易层** | Java 17 + Spring Cloud 2024 + Nacos + Sentinel + Seata | HIS 收费/挂号/医嘱/药房/EMPI/LIS-PACS 对接，强一致事务 |
-| **智能层** | Python 3.11 + FastAPI + vLLM | NLP 病历质控、影像辅诊、CDSS、知识图谱 RAG |
-| **数据层** | PostgreSQL 16 主从 + Redis Cluster + Kafka + MinIO + ES | 读写分离、消息队列、对象存储、日志检索 |
+| **体验层** | React 19 + TypeScript + AntD 5（`web/`） | 医生/护士工作站 UI、AI 对话流式、表单报表；主线保留 |
+| **BFF 聚合层** | Bun + TypeScript（`src/bff/`） | 路由/中间件/适配器/智能体运行时/可观测；只做聚合，不直连核心交易库 |
+| **Java 旁路** | Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17；注册中心 Eureka Server、网关 Spring Cloud Gateway | HIS 收费/挂号/医嘱/药房/EMPI/LIS 等微服务骨架；独立单体 Boot 3.5.3 / JDK 21。**旁路/参考**，`legacy` profile 启动；代码库当前未使用 Nacos、Sentinel、Seata |
+| **Python 旁路** | Python 3.11 镜像 + FastAPI + Uvicorn（`services-python/`） | NLP 病历质控、CDSS、影像辅助等参考实现；**旁路/参考**，`legacy` profile 启动 |
+| **影像推理旁路** | FastAPI（`services/radar-inference/`） | 雷达影像推理 demo/production 双模式；`demo` / `gpu` profile 启动，仅内网 expose |
+| **数据层** | PostgreSQL 16 + Redis + Kafka + Elasticsearch（默认 compose） | 主从/读写分离、Redis Cluster、MinIO 对象存储为后续演进目标，当前默认编排未启用 |
 
-## 为什么这样分
+## 分层取舍说明
 
-- **钱和处方必须 Java**：挂号/收费/医嘱涉及资金与医疗安全，Seata 分布式事务、Sentinel 熔断、JVM 生态医院信息科熟
-- **AI 推理必须 Python**：transformers/vLLM/MONAI 生态全在 Python，GPU 异步队列不阻塞交易
-- **前端和 BFF 保留 TS**：现有 1957 路由资产不重写，BFF 只做聚合不碰核心交易库
+- **主线优先保证可交付**：现有 TS BFF 与 React 资产继续承载业务，BFF 只做聚合与适配；
+- **Java 旁路定位参考**：挂号/收费/医嘱等资金与医疗安全场景的 Java 化重构为后续演进方向，当前骨架使用 Eureka Server + Spring Cloud Gateway，未引入 Nacos、Sentinel、Seata；
+- **AI 推理旁路定位参考**：transformers/vLLM/MONAI 生态在 Python 侧沉淀，GPU 异步队列不阻塞交易；当前以 demo 模式与内部 token 鉴权保留；
+- **前端与 BFF 不重写**：现有 TypeScript 资产保留，路由数量以 BFF/前端实测清单为准。
 
 ## 工程目录
 
 ```
-services-java/       # Spring Cloud 微服务（核心交易）
-services-python/     # FastAPI AI 服务（智能层）
-src/bff/              # 现有 TypeScript BFF（聚合层，保留）
-web/                  # React 前端（保留）
-docs/architecture/    # 架构宪法/PRD/开发指南
+services-java/       # Java 旁路/参考：Spring Cloud 微服务骨架 + 独立模块化单体
+services-python/     # Python FastAPI 旁路/参考：NLP / CDSS / 影像辅助
+services/radar-inference/  # 雷达影像推理旁路/参考
+miniprogram/         # 微信患者端旁路/参考（原生小程序，微信开发者工具构建，compose 不编排）
+src/bff/             # 主线 TypeScript BFF（聚合层）
+web/                 # 主线 React 前端
+docs/architecture/  # 架构宪法/PRD/开发指南
 ```
 
 ## 合规目标

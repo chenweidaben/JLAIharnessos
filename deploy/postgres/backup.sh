@@ -6,12 +6,12 @@
 #       deploy/postgres/README.md 与《04-备份恢复手册》《07-容灾演练手册》。
 #
 # 用法（在部署了 postgres 容器的主机上，由 cron 每日低峰调用）：
-#   PG_CONTAINER=gangos-postgres PGDB=gangos ./backup.sh
+#   PG_CONTAINER=jlmedaios-postgres PGDB=jlmedaios ./backup.sh
 #
 # 环境变量：
-#   PG_CONTAINER  postgres 容器名（默认 gangos-postgres）
+#   PG_CONTAINER  postgres 容器名（默认 jlmedaios-postgres；compose 生成名通常为 <project>-postgres-1）
 #   PGUSER        备份账号（默认 postgres）
-#   PGDB          数据库名（默认 gangos）
+#   PGDB          数据库名（默认 jlmedaios）
 #   BACKUP_DIR    宿主机备份目录（默认 ./backups；建议挂载到容器外/对象存储）
 #   RETENTION_DAYS 保留天数（默认 14）
 #
@@ -19,9 +19,9 @@
 # ============================================================================
 set -euo pipefail
 
-PG_CONTAINER="${PG_CONTAINER:-gangos-postgres}"
+PG_CONTAINER="${PG_CONTAINER:-jlmedaios-postgres}"
 PGUSER="${PGUSER:-postgres}"
-PGDB="${PGDB:-gangos}"
+PGDB="${PGDB:-jlmedaios}"
 BACKUP_DIR="${BACKUP_DIR:-./backups}"
 RETENTION_DAYS="${RETENTION_DAYS:-14}"
 

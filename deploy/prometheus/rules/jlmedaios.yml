@@ -1,15 +1,17 @@
 # ============================================================================
 # 健澜AI原生医院操作系统OS — Prometheus 告警规则
-# 指标来源：BFF /metrics（gangos_ 前缀）。exporter（PG/Redis/Kafka/Nginx）
-# 接入后可在本文件追加对应规则。阈值为基线建议，生产请按科室 SLO 调整。
+# 指标来源：BFF /metrics。注意：当前指标名仍带 gangos_ 前缀（由 src BFF 上报，
+# 与前端监控表达式耦合；指标前缀统一改名随 src 侧重构一并处理，本文件不单独替换 expr）。
+# exporter（PG/Redis/Kafka/Nginx）接入后可在本文件追加对应规则。阈值为基线建议，
+# 生产请按科室 SLO 调整。
 # 挂载：docker-compose 将本目录只读挂载到 /etc/prometheus/rules（见 prometheus.yml）。
 # ============================================================================
 
 groups:
   # ---- 可用性 -------------------------------------------------------------
-  - name: gangos-availability
+  - name: jlmedaios-availability
     rules:
-      - alert: GangosBFFDown
+      - alert: JlmedaiosBFFDown
         expr: absent(up{job="bff"}) or up{job="bff"} == 0
         for: 2m
         labels:
@@ -19,7 +21,7 @@ groups:
           summary: 'BFF 实例不可达（{{ $labels.instance }}）'
           description: 'Prometheus 连续 2 分钟无法抓取 BFF /metrics，请检查 Pod/容器、网络与发布状态。'
 
-      - alert: GangosBFFRestarted
+      - alert: JlmedaiosBFFRestarted
         expr: resets(gangos_up[1h]) > 0
         for: 0m
         labels:
@@ -30,9 +32,9 @@ groups:
           description: '进程 up 序列出现重置，可能为崩溃或滚动发布；请结合错误日志与告警确认。'
 
   # ---- HTTP 错误与时延（RED） ----------------------------------------------
-  - name: gangos-http-red
+  - name: jlmedaios-http-red
     rules:
-      - alert: GangosHighErrorRate
+      - alert: JlmedaiosHighErrorRate
         expr: |
           (
             sum(rate(gangos_http_requests_total{job="bff",code=~"5.."}[5m]))
@@ -47,7 +49,7 @@ groups:
           summary: 'BFF 5xx 错误率超过 5%'
           description: '近 5 分钟服务端错误率 {{ $value | humanizePercentage }}，超过 SLO，需排查后端依赖与异常。'
 
-      - alert: GangosHighLatencyP95
+      - alert: JlmedaiosHighLatencyP95
         expr: |
           histogram_quantile(0.95,
             sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job="bff"}[5m]))
@@ -60,7 +62,7 @@ groups:
           summary: 'BFF P95 时延超过 1s'
           description: '近 5 分钟 P95={{ $value }}s，关注 HIS/LIS 聚合接口、数据库与缓存。'
 
-      - alert: GangosRateLimited
+      - alert: JlmedaiosRateLimited
         expr: sum(rate(gangos_http_requests_total{job="bff",code="429"}[5m])) > 0.5
         for: 10m
         labels:
@@ -71,9 +73,9 @@ groups:
           description: '近 10 分钟持续有请求被限流，确认是否异常调用方或需要调整配额。'
 
   # ---- 智能体与工具 --------------------------------------------------------
-  - name: gangos-agents-tools
+  - name: jlmedaios-agents-tools
     rules:
-      - alert: GangosAgentFailureRate
+      - alert: JlmedaiosAgentFailureRate
         expr: |
           (
             sum(rate(gangos_agent_runs_total{status="failed"}[10m]))
@@ -88,7 +90,7 @@ groups:
           summary: '智能体运行失败率超过 10%'
           description: '近 10 分钟失败率 {{ $value | humanizePercentage }}，检查编排依赖、LLM/RAG/工具与人工任务超时。'
 
-      - alert: GangosAgentRunTooLong
+      - alert: JlmedaiosAgentRunTooLong
         expr: |
           histogram_quantile(0.95,
             sum by (le) (rate(gangos_agent_run_duration_seconds_bucket[10m]))
@@ -101,7 +103,7 @@ groups:
           summary: '智能体 P95 运行时长超过 30s'
           description: '可能存在人工任务堆积、外部依赖变慢或循环上限过大。'
 
-      - alert: GangosToolFailureRate
+      - alert: JlmedaiosToolFailureRate
         expr: |
           (
             sum(rate(gangos_tool_calls_total{result!="success"}[10m]))
@@ -117,9 +119,9 @@ groups:
           description: '工具适配器（HIS/EMR/LIS/PACS）可能异常，结合熔断器与集成监控排查。'
 
   # ---- 临床安全（信息级，提醒值班关注） --------------------------------------
-  - name: gangos-clinical-safety
+  - name: jlmedaios-clinical-safety
     rules:
-      - alert: GangosCriticalValueBurst
+      - alert: JlmedaiosCriticalValueBurst
         expr: sum(increase(gangos_cds_alerts_total{severity="critical"}[15m])) > 20
         for: 0m
         labels:

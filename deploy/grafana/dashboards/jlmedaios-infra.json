@@ -1,10 +1,12 @@
 {
-  "uid": "gangos-overview",
-  "title": "健澜AI原生医院操作系统OS · 平台总览",
+  "annotations": {
+    "list": []
+  },
+  "title": "健澜AI原生医院操作系统OS · 基础设施（PostgreSQL / Redis）",
+  "uid": "jlmedaios-infra",
   "tags": [
-    "gangos",
-    "medical-ai",
-    "overview"
+    "jlmedaios",
+    "infrastructure"
   ],
   "timezone": "browser",
   "schemaVersion": 39,
@@ -14,35 +16,19 @@
     "from": "now-1h",
     "to": "now"
   },
-  "timepicker": {},
+  "fiscalYearStartMonth": 0,
+  "liveNow": false,
+  "editable": false,
+  "graphTooltip": 1,
+  "style": "dark",
   "templating": {
-    "list": []
-  },
-  "annotations": {
     "list": []
   },
   "panels": [
     {
       "id": 1,
-      "type": "row",
-      "title": "总览 Overview",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "collapsed": false,
-      "panels": []
-    },
-    {
-      "id": 2,
       "type": "stat",
-      "title": "请求 QPS",
+      "title": "PostgreSQL 存活",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -51,14 +37,24 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 1
+        "y": 0
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#0A4D8C"
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
         "overrides": []
@@ -68,12 +64,12 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
-          "values": false
+          "values": false,
+          "fields": ""
         },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "value_and_name"
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto_and_value"
       },
       "targets": [
         {
@@ -81,15 +77,15 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "sum(rate(gangos_http_requests_total{job=\"bff\"}[5m]))",
+          "expr": "pg_up{job=\"postgres\"}",
           "refId": "A"
         }
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "type": "stat",
-      "title": "5xx 错误率",
+      "title": "Redis 存活",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -98,14 +94,24 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 1
+        "y": 0
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percentunit",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#0A4D8C"
+          "unit": "none",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
           }
         },
         "overrides": []
@@ -115,12 +121,12 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
-          "values": false
+          "values": false,
+          "fields": ""
         },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "value_and_name"
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto_and_value"
       },
       "targets": [
         {
@@ -128,109 +134,15 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "sum(rate(gangos_http_requests_total{job=\"bff\",code=~\"5..\"}[5m])) / clamp_min(sum(rate(gangos_http_requests_total{job=\"bff\"}[5m])), 1e-9)",
+          "expr": "redis_up{job=\"redis\"}",
           "refId": "A"
         }
       ]
     },
     {
-      "id": 4,
-      "type": "stat",
-      "title": "P95 时延",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#0A4D8C"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "value_and_name"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job=\"bff\"}[5m])))",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "type": "stat",
-      "title": "WS 连接数",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 1
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#0A4D8C"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "value_and_name"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "gangos_ws_connections",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 6,
+      "id": 3,
       "type": "row",
-      "title": "HTTP RED（请求 / 错误 / 时延）",
+      "title": "PostgreSQL",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -239,15 +151,15 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 4
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 7,
+      "id": 4,
       "type": "timeseries",
-      "title": "各路由 QPS",
+      "title": "连接数",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -256,14 +168,16 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 6
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
+          "unit": "short",
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth"
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
           }
         },
         "overrides": []
@@ -273,7 +187,6 @@
           "displayMode": "table",
           "placement": "bottom",
           "calcs": [
-            "mean",
             "lastNotNull"
           ]
         },
@@ -287,16 +200,16 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "sum by (route) (rate(gangos_http_requests_total{job=\"bff\"}[5m]))",
-          "refId": "A",
-          "legendFormat": "{{route}}"
+          "expr": "sum(pg_stat_activity_count{job=\"postgres\"})",
+          "legendFormat": "总连接",
+          "refId": "A"
         }
       ]
     },
     {
-      "id": 8,
+      "id": 5,
       "type": "timeseries",
-      "title": "状态码速率",
+      "title": "事务 TPS（提交/回滚）",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -305,14 +218,16 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 6
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "reqps",
+          "unit": "ops",
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth"
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
           }
         },
         "overrides": []
@@ -322,7 +237,6 @@
           "displayMode": "table",
           "placement": "bottom",
           "calcs": [
-            "mean",
             "lastNotNull"
           ]
         },
@@ -336,16 +250,25 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "sum by (code) (rate(gangos_http_requests_total{job=\"bff\"}[5m]))",
-          "refId": "A",
-          "legendFormat": "{{code}}"
+          "expr": "sum(rate(pg_stat_database_xact_commit{job=\"postgres\"}[5m]))",
+          "legendFormat": "提交",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "sum(rate(pg_stat_database_xact_rollback{job=\"postgres\"}[5m]))",
+          "legendFormat": "回滚",
+          "refId": "B"
         }
       ]
     },
     {
-      "id": 9,
+      "id": 6,
       "type": "timeseries",
-      "title": "时延分位 P50 / P95 / P99",
+      "title": "缓存命中率",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -354,14 +277,16 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 6
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "s",
+          "unit": "percentunit",
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth"
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
           }
         },
         "overrides": []
@@ -371,7 +296,6 @@
           "displayMode": "table",
           "placement": "bottom",
           "calcs": [
-            "mean",
             "lastNotNull"
           ]
         },
@@ -385,34 +309,175 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job=\"bff\"}[5m])))",
-          "refId": "A",
-          "legendFormat": "P50"
+          "expr": "sum(rate(pg_stat_database_blks_hit{job=\"postgres\"}[5m])) / (sum(rate(pg_stat_database_blks_hit{job=\"postgres\"}[5m])) + sum(rate(pg_stat_database_blks_read{job=\"postgres\"}[5m])))",
+          "legendFormat": "命中率",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "数据库大小",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 13
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "sum(pg_database_size_bytes{job=\"postgres\"})",
+          "legendFormat": "{{datname}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "死锁速率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 13
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "sum(rate(pg_stat_database_deadlocks{job=\"postgres\"}[5m]))",
+          "legendFormat": "死锁/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "慢查询/全表扫描",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 13
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "sum(rate(pg_stat_database_tup_fetched{job=\"postgres\"}[5m]))",
+          "legendFormat": "tup fetched",
+          "refId": "A"
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job=\"bff\"}[5m])))",
-          "refId": "B",
-          "legendFormat": "P95"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "histogram_quantile(0.99, sum by (le) (rate(gangos_http_request_duration_seconds_bucket{job=\"bff\"}[5m])))",
-          "refId": "C",
-          "legendFormat": "P99"
+          "expr": "sum(rate(pg_stat_database_seq_scan{job=\"postgres\"}[5m]))",
+          "legendFormat": "seq scan",
+          "refId": "B"
         }
       ]
     },
     {
       "id": 10,
       "type": "row",
-      "title": "智能体编排 Orchestration",
+      "title": "Redis",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
@@ -421,7 +486,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 21
       },
       "collapsed": false,
       "panels": []
@@ -429,334 +494,25 @@
     {
       "id": 11,
       "type": "timeseries",
-      "title": "智能体运行速率（按智能体）",
+      "title": "连接客户端",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
+        "w": 8,
         "x": 0,
-        "y": 15
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "sum by (agent) (rate(gangos_agent_runs_total[10m]))",
-          "refId": "A",
-          "legendFormat": "{{agent}}"
-        }
-      ]
-    },
-    {
-      "id": 12,
-      "type": "timeseries",
-      "title": "智能体失败率",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 15
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "sum(rate(gangos_agent_runs_total{status=\"failed\"}[10m])) / clamp_min(sum(rate(gangos_agent_runs_total[10m])), 1e-9)",
-          "refId": "A",
-          "legendFormat": "失败率"
-        }
-      ]
-    },
-    {
-      "id": 13,
-      "type": "timeseries",
-      "title": "智能体运行时长 P95",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 15
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(gangos_agent_run_duration_seconds_bucket[10m])))",
-          "refId": "A",
-          "legendFormat": "P95"
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "type": "timeseries",
-      "title": "人工任务处理（按结果）",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 15
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "sum by (outcome) (rate(gangos_human_tasks_total[10m]))",
-          "refId": "A",
-          "legendFormat": "{{outcome}}"
-        }
-      ]
-    },
-    {
-      "id": 15,
-      "type": "row",
-      "title": "医疗工具 · 临床决策 · 可用性",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 23
-      },
-      "collapsed": false,
-      "panels": []
-    },
-    {
-      "id": 16,
-      "type": "timeseries",
-      "title": "工具调用速率（按分类）",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 24
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "ops",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "sum by (category) (rate(gangos_tool_calls_total[10m]))",
-          "refId": "A",
-          "legendFormat": "{{category}}"
-        }
-      ]
-    },
-    {
-      "id": 17,
-      "type": "timeseries",
-      "title": "工具失败率",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 24
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": [
-            "mean",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "jianlan-prometheus"
-          },
-          "expr": "sum(rate(gangos_tool_calls_total{result!=\"success\"}[10m])) / clamp_min(sum(rate(gangos_tool_calls_total[10m])), 1e-9)",
-          "refId": "A",
-          "legendFormat": "失败率"
-        }
-      ]
-    },
-    {
-      "id": 18,
-      "type": "timeseries",
-      "title": "CDS 提醒（按级别）",
-      "datasource": {
-        "type": "prometheus",
-        "uid": "jianlan-prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 24
+        "y": 22
       },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth"
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
           }
         },
         "overrides": []
@@ -766,7 +522,6 @@
           "displayMode": "table",
           "placement": "bottom",
           "calcs": [
-            "mean",
             "lastNotNull"
           ]
         },
@@ -780,47 +535,49 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "sum by (severity) (increase(gangos_cds_alerts_total[15m]))",
-          "refId": "A",
-          "legendFormat": "{{severity}}"
+          "expr": "redis_connected_clients{job=\"redis\"}",
+          "legendFormat": "clients",
+          "refId": "A"
         }
       ]
     },
     {
-      "id": 19,
-      "type": "stat",
-      "title": "BFF 存活",
+      "id": 12,
+      "type": "timeseries",
+      "title": "内存使用",
       "datasource": {
         "type": "prometheus",
         "uid": "jianlan-prometheus"
       },
       "gridPos": {
         "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 24
+        "w": 8,
+        "x": 8,
+        "y": 22
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "none",
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#0A4D8C"
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
           }
         },
         "overrides": []
       },
       "options": {
-        "reduceOptions": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
           "calcs": [
             "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
+          ]
         },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "value_and_name"
+        "tooltip": {
+          "mode": "multi"
+        }
       },
       "targets": [
         {
@@ -828,7 +585,226 @@
             "type": "prometheus",
             "uid": "jianlan-prometheus"
           },
-          "expr": "up{job=\"bff\"}",
+          "expr": "redis_memory_used_bytes{job=\"redis\"}",
+          "legendFormat": "used",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "redis_memory_max_bytes{job=\"redis\"}",
+          "legendFormat": "max",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "命令 OPS",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 22
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "rate(redis_commands_processed_total{job=\"redis\"}[5m])",
+          "legendFormat": "ops",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Keyspace 命中率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 30
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "rate(redis_keyspace_hits_total{job=\"redis\"}[5m]) / (rate(redis_keyspace_hits_total{job=\"redis\"}[5m]) + rate(redis_keyspace_misses_total{job=\"redis\"}[5m]))",
+          "legendFormat": "命中率",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "Key 淘汰/过期速率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 30
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "rate(redis_evicted_keys_total{job=\"redis\"}[5m])",
+          "legendFormat": "evicted",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "rate(redis_expired_keys_total{job=\"redis\"}[5m])",
+          "legendFormat": "expired",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "内存碎片率",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "jianlan-prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 30
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "fillOpacity": 10,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "jianlan-prometheus"
+          },
+          "expr": "redis_memory_fragmentation_ratio{job=\"redis\"}",
+          "legendFormat": "frag ratio",
           "refId": "A"
         }
       ]

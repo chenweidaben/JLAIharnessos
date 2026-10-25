@@ -5,10 +5,10 @@
 apiVersion: 1
 
 providers:
-  - name: gangos
+  - name: jlmedaios
     orgId: 1
     folderName: '健澜AI原生医院操作系统OS'
-    folderUid: gangos
+    folderUid: jlmedaios
     type: file
     disableDeletion: false
     updateIntervalSeconds: 30

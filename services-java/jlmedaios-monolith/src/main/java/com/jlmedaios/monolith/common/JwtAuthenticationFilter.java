@@ -42,10 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
-    @Value("${jlmedaios.security.jwt.secret:jlmedaios-dev-secret-key-change-in-production-32bytes}")
+    // 密钥必须由环境变量 JLMEDAIOS_SECURITY_JWT_SECRET 注入；未配置时启动即失败（fail-closed），不内置开发默认口令。
+    @Value("${jlmedaios.security.jwt.secret}")
     private String jwtSecret;
 
     private SecretKey getSigningKey() {
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            throw new IllegalStateException("JWT secret 未配置：请设置环境变量 JLMEDAIOS_SECURITY_JWT_SECRET");
+        }
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 

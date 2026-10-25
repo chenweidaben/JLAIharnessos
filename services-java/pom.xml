@@ -28,6 +28,13 @@
         <module>jlmedaios-his-empi</module>
         <module>jlmedaios-his-ward</module>
         <module>jlmedaios-his-lis</module>
+        <module>jlmedaios-his-exam</module>
+        <module>jlmedaios-his-nursing</module>
+        <module>jlmedaios-his-discharge</module>
+        <module>jlmedaios-his-report</module>
+        <module>jlmedaios-his-message</module>
+        <!-- jlmedaios-monolith 使用独立 parent（spring-boot-starter-parent 3.5.3 / JDK 21），
+             不属于本聚合工程，由 services-java/jlmedaios-monolith 目录单独构建。 -->
     </modules>
 
     <properties>

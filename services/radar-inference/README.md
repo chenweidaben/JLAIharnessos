@@ -9,6 +9,8 @@ Science 393(6817):eaec6129, 2026）封装为可被 BFF 调用的 HTTP 服务。
 > Second-reader / decision-support only. Final diagnosis requires a
 > radiologist review-and-signature loop. This service does not auto-diagnose.
 
+> **角色边界**：本服务为旁路/参考实现，不进入主线默认 compose 编排；主仓库 `docker-compose.yml` 中对应 `radar-inference` 服务归入 `demo` / `gpu` profile，仅内网 expose 8090，不发布宿主端口。主线为 Bun + TypeScript BFF（`src/bff/`）+ React 工作台（`web/`）。本机未安装 Python 依赖，本服务未能在本机独立构建；demo/CPU 模式前置条件见第 2 节，production 模式额外依赖 `requirements-prod.txt` 与 GPU 权重。
+
 ---
 
 ## 1. 双模式（Dual mode）
@@ -28,16 +30,16 @@ Science 393(6817):eaec6129, 2026）封装为可被 BFF 调用的 HTTP 服务。
 cd services/radar-inference
 pip install -r requirements.txt
 
-# 开发启动（端口 8090）
-uvicorn app.main:app --host 0.0.0.0 --port 8090
+# 开发启动（端口 8090，仅回环绑定；容器内经内部网络暴露，不在宿主对外发布）
+uvicorn app.main:app --host 127.0.0.1 --port 8090
 ```
 
 Windows：
 
 ```powershell
 cd services\radar-inference
-C:\Python314\python.exe -m pip install -r requirements.txt
-C:\Python314\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8090
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8090
 ```
 
 ---

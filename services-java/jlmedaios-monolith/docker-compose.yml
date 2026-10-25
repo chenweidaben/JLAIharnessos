@@ -1,33 +1,80 @@
 # ============================================================
-# 健澜科技 jlmedaios 模块化单体 - docker-compose.yml
-# 生产环境用，H2 开发阶段不需要
+# 健澜科技 jlmedaios 模块化单体 — 独立样例编排（旁路/参考，非主线默认编排）
+# ----------------------------------------------------------------------------
+# 说明：
+#   - 本文件仅用于本机单独拉起单体 + PostgreSQL + Redis 的参考样例；
+#     主线为根目录 docker-compose.yml（Bun TS BFF + React web）。
+#   - 口令全部由 .env / 环境变量注入，仓库内不固化真实口令；
+#   - 宿主端口仅绑定 127.0.0.1，避免旁路直接暴露到局域网/公网。
+# 用法：
+#   cp .env.example .env 并填写 POSTGRES_PASSWORD / JLMEDAIOS_SECURITY_JWT_SECRET
+#   docker compose --profile standalone up -d
 # ============================================================
 services:
   monolith:
     build: .
+    profiles:
+      - standalone
     ports:
-      - "9090:9090"
+      - "127.0.0.1:19090:9090"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:jlmedaios}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:jlmedaios}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?请在 .env 中设置 SPRING_DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: "6379"
+      JLMEDAIOS_SECURITY_JWT_SECRET: ${JLMEDAIOS_SECURITY_JWT_SECRET:?请在 .env 中设置 JLMEDAIOS_SECURITY_JWT_SECRET}
+    restart: unless-stopped
+    # 注：运行镜像未内置 wget/curl，actuator 探针命令待镜像补齐工具后落地。
 
   postgres:
     image: postgres:16
+    profiles:
+      - standalone
     environment:
-      POSTGRES_DB: monolith
-      POSTGRES_USER: jlmedaios
-      POSTGRES_PASSWORD: changeit
+      POSTGRES_DB: ${POSTGRES_DB:jlmedaios}
+      POSTGRES_USER: ${POSTGRES_USER:jlmedaios}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
+    networks:
+      - backend
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
+    profiles:
+      - standalone
+    command: ["sh", "-c", "exec redis-server --requirepass \"$${REDIS_PASSWORD}\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?请在 .env 中设置 REDIS_PASSWORD}
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" --no-auth-warning ping | grep -q PONG"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+networks:
+  backend:
+    name: jlmedaios-monolith-backend
 
 volumes:
   postgres_data:

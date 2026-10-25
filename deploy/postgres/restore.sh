@@ -7,10 +7,10 @@
 # 《04-备份恢复手册》《07-容灾演练手册》，需在隔离的恢复实例上操作。
 #
 # 用法：
-#   PG_CONTAINER=gangos-postgres PGDB=gangos ./restore.sh ./backups/gangos-xxxx.dump
+#   PG_CONTAINER=jlmedaios-postgres PGDB=jlmedaios ./restore.sh ./backups/jlmedaios-xxxx.dump
 #
-# 环境变量：PG_CONTAINER（默认 gangos-postgres）、PGUSER（默认 postgres）、
-#           PGDB（默认 gangos）、NO_DROP=1 时不删除既有对象（叠加恢复）。
+# 环境变量：PG_CONTAINER（默认 jlmedaios-postgres）、PGUSER（默认 postgres）、
+#           PGDB（默认 jlmedaios）、NO_DROP=1 时不删除既有对象（叠加恢复）。
 #
 # 警告：恢复会覆盖目标数据库，生产执行前必须二次确认并先做一次当前态备份。
 #
@@ -18,9 +18,9 @@
 # ============================================================================
 set -euo pipefail
 
-PG_CONTAINER="${PG_CONTAINER:-gangos-postgres}"
+PG_CONTAINER="${PG_CONTAINER:-jlmedaios-postgres}"
 PGUSER="${PGUSER:-postgres}"
-PGDB="${PGDB:-gangos}"
+PGDB="${PGDB:-jlmedaios}"
 DUMP="${1:?用法: restore.sh <backup.dump>}"
 
 [ -f "${DUMP}" ] || { echo "找不到备份文件: ${DUMP}" >&2; exit 1; }

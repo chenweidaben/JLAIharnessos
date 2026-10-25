@@ -15,7 +15,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    cluster: 'jianlan-gangos'
+    cluster: 'jlmedaios'
     env: 'production'
 
 # 告警/记录规则目录（由监控化批次挂载 rules 文件，目录为空时 Prometheus 正常启动）。

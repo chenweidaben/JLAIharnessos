@@ -1,8 +1,13 @@
 # ============================================================================
-# 健澜AI原生医院操作系统OS — 生产环境 Compose 覆盖文件
+# 健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）— 生产环境 Compose 覆盖文件
 # ----------------------------------------------------------------------------
 # 本文件不单独使用，必须与基础文件叠加（合并规则遵循 Compose Merge Spec）：
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# 旁路服务隔离说明：
+#   - jlmedaios-monolith、jlmedaios-ai 在基础文件中归入 legacy profile，
+#     生产默认启动（不含 --profile legacy）时不被拉起；禁止在生产环境追加 --profile legacy。
+#   - radar-inference 归入 demo/gpu profile，生产仅在确需影像辅诊时显式启用对应 profile。
 #
 # 相对基础文件，本覆盖提供：
 #   1. CPU/内存的 reservations（保底）与 limits（上限），按 8C16G 主机档位给出，
@@ -19,7 +24,7 @@
 #   16C32G：app×3、ES 堆 2g、Prom 留存 30d+、Kafka 三节点（另用集群编排）。
 # ============================================================================
 
-name: jianlan-gangos
+name: jlmedaios
 
 services:
   # --------------------------------------------------------------------------
@@ -448,4 +453,4 @@ services:
 # ----------------------------------------------------------------------------
 volumes:
   certbot-www:
-    name: jianlan-certbot-www
+    name: jlmedaios-certbot-www

@@ -16,8 +16,8 @@ global:
   resolve_timeout: 5m
   # SMTP（邮件通知，部署方填写）
   # smtp_smarthost: 'smtp.your-hospital.com:587'
-  # smtp_from: 'gangos-alert@your-hospital.com'
-  # smtp_auth_username: 'gangos-alert@your-hospital.com'
+  # smtp_from: 'jlmedaios-alert@your-hospital.com'
+  # smtp_auth_username: 'jlmedaios-alert@your-hospital.com'
   # smtp_auth_password: '<请用 secret 注入，不要写死>'
   # smtp_require_tls: true
 
@@ -54,6 +54,6 @@ inhibit_rules:
     target_matchers: ['severity="warning"']
     equal: ['alertname']
   # 目标宕机时抑制其下游症状告警
-  - source_matchers: ['alertname="GangosBFFDown"']
+  - source_matchers: ['alertname="JlmedaiosBFFDown"']
     target_matchers: ['severity=~"warning|critical"']
     equal: ['cluster']

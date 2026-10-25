@@ -5,11 +5,11 @@ spring:
   application:
     name: jlmedaios-os
   datasource:
-    # P3 生产化：主数据源切换 PostgreSQL 16
-    url: jdbc:postgresql://localhost:5433/jlmedaios
+    # P3 生产化：主数据源切换 PostgreSQL 16（容器/部署环境通过 SPRING_DATASOURCE_URL 覆盖）
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jlmedaios}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password:
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     # HikariCP 连接池调优（P1 性能优化）
     hikari:
       maximum-pool-size: 20
@@ -51,7 +51,7 @@ spring:
 # 生产环境切换 PostgreSQL 16:
 # spring:
 #   datasource:
-#     url: jdbc:postgresql://localhost:5433/jlmedaios
+#     url: jdbc:postgresql://localhost:5432/jlmedaios
 #     username: postgres
 #     password: ***
 #     driver-class-name: org.postgresql.Driver
@@ -80,10 +80,10 @@ logging:
     root: INFO
     com.jlmedaios: DEBUG
 
-# JWT 配置（P0 安全止血）
+# JWT 配置（P0 安全止血）：生产必须由环境变量 JLMEDAIOS_SECURITY_JWT_SECRET 注入 ≥32 字节随机值，禁止在配置文件固化口令
 jlmedaios:
   security:
     jwt:
-      secret: jlmedaios-dev-secret-key-change-in-production-32bytes
+      secret: ${JLMEDAIOS_SECURITY_JWT_SECRET:}
       # token 有效期 24h
       expiration: 86400000

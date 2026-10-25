@@ -1,7 +1,7 @@
 # ============================================================================
-# 健澜AI原生医院操作系统OS（数智医院智能体）— 全栈容器编排（基础/开发联调档）
+# 健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）— 全栈容器编排（基础/开发联调档）
 # ----------------------------------------------------------------------------
-# 服务拓扑：
+# 主线服务拓扑（默认 profile 启动）：
 #   nginx（边缘网关，唯一对外入口）
 #     ├─ web（前端静态站点，React19+Vite 产物，frontend 网络）
 #     └─ app（后端 BFF，Bun，backend 网络）
@@ -11,10 +11,17 @@
 #          └─ jaeger（链路追踪）
 #   monitoring 网络：prometheus / grafana / elasticsearch / kibana / jaeger
 #
+# 旁路/参考服务（不随默认编排启动）：
+#   - radar-inference：demo / gpu profile，影像辅诊第二阅片（见对应服务注释）；
+#   - jlmedaios-monolith：legacy profile，Java 模块化单体参考实现；
+#   - jlmedaios-ai：legacy profile，Python FastAPI 旁路参考实现。
+#   启动旁路：docker compose --profile legacy up -d jlmedaios-monolith jlmedaios-ai
+#
 # 网络分层（最小访问面）：
 #   frontend   边缘 ↔ 前端
 #   backend    边缘/应用 ↔ 数据库/缓存/消息（不对网关之外暴露）
 #   monitoring 监控/日志组件互通；prometheus 同时接入 backend 以便抓取应用指标
+#   数据库 / Redis / Kafka / Elasticsearch 均不接入 frontend 网络。
 #
 # 使用方式：
 #   1) cp .env.compose.example .env  并修改其中所有口令/密钥（占位符必须替换）；
@@ -31,14 +38,14 @@
 #   - 基础设施管理端口仅绑定宿主机回环 127.0.0.1，不对局域网/公网开放。
 # ============================================================================
 
-name: jianlan-gangos
+name: jlmedaios
 
 services:
   # ==========================================================================
   # 后端 BFF（Bun 运行时，镜像由根 Dockerfile.backend 构建）
   # ==========================================================================
   app:
-    image: registry.jianlan.tech/jianlan/backend:${APP_VERSION:-0.1.0}
+    image: registry.jianlan.tech/jlmedaios/backend:${APP_VERSION:-0.1.0}
     build:
       context: .
       dockerfile: Dockerfile.backend
@@ -60,7 +67,7 @@ services:
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:?请在 .env 中设置 ENCRYPTION_MASTER_KEY}
       # OpenTelemetry：将链路数据以 OTLP/gRPC?http 发送到 jaeger collector。
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
-      OTEL_SERVICE_NAME: jianlan-bff
+      OTEL_SERVICE_NAME: jlmedaios-bff
       # AI 影像辅诊（DAMO-RADAR）：推理服务地址与内部鉴权 token。
       # radar-inference 未随 profile 启动时，BFF 自动降级为内置确定性 mock（前端不白屏）。
       RADAR_INFERENCE_URL: http://radar-inference:8090
@@ -95,7 +102,7 @@ services:
   # 前端 Web（nginx 托管 Vite 静态产物，镜像由 web/Dockerfile.frontend 构建）
   # ==========================================================================
   web:
-    image: registry.jianlan.tech/jianlan/web:${APP_VERSION:-0.1.0}
+    image: registry.jianlan.tech/jlmedaios/web:${APP_VERSION:-0.1.0}
     build:
       context: web
       dockerfile: Dockerfile.frontend
@@ -137,7 +144,7 @@ services:
   #   - 权重 checkpoint_radar_pretrain.pth（CC BY-NC-SA 4.0 非商业）严禁入库，由部署方自行下载。
   # ==========================================================================
   radar-inference:
-    image: registry.jianlan.tech/jianlan/radar-inference:${APP_VERSION:-0.1.0}
+    image: registry.jianlan.tech/jlmedaios/radar-inference:${APP_VERSION:-0.1.0}
     build:
       context: services/radar-inference
       dockerfile: Dockerfile
@@ -309,7 +316,7 @@ services:
   # 边缘网关（唯一对外入口；80→8080 明文跳转，443→8443 TLS 业务）
   # ==========================================================================
   nginx:
-    image: registry.jianlan.tech/jianlan/nginx-edge:${APP_VERSION:-0.1.0}
+    image: registry.jianlan.tech/jlmedaios/nginx-edge:${APP_VERSION:-0.1.0}
     build:
       context: deploy/nginx
       dockerfile: Dockerfile
@@ -445,7 +452,7 @@ services:
     image: quay.io/prometheuscommunity/postgres-exporter:v0.15.0
     environment:
       TZ: Asia/Shanghai
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:?请在 .env 中设置 POSTGRES_USER}:${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:?请在 .env 中设置 POSTGRES_DB}?sslmode=disable"
     networks:
       - backend
       - monitoring
@@ -455,6 +462,12 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:${PG_EXPORTER_PORT:-9187}:9187"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9187/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     logging:
       driver: json-file
       options:
@@ -469,7 +482,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       REDIS_ADDR: "redis://redis:6379"
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?请在 .env 中设置 REDIS_PASSWORD}
     networks:
       - backend
       - monitoring
@@ -479,6 +492,12 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:${REDIS_EXPORTER_PORT:-9121}:9121"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9121/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     logging:
       driver: json-file
       options:
@@ -492,7 +511,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     environment:
       TZ: Asia/Shanghai
-      cluster.name: jianlan-logs
+      cluster.name: jlmedaios-logs
       discovery.type: single-node
       xpack.security.enabled: "true"
       xpack.security.transport.ssl.enabled: "false"
@@ -534,7 +553,7 @@ services:
     image: docker.elastic.co/kibana/kibana:8.15.0
     environment:
       TZ: Asia/Shanghai
-      SERVER_NAME: jianlan-kibana
+      SERVER_NAME: jlmedaios-kibana
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
       ELASTICSEARCH_USERNAME: elastic
       ELASTICSEARCH_PASSWORD: ${ES_PASSWORD:?请在 .env 中设置 ES_PASSWORD}
@@ -566,7 +585,7 @@ services:
   # Jaeger all-in-one（链路追踪：collector/query/agent 一体，badger 持久化）
   # ==========================================================================
   jaeger:
-    image: registry.jianlan.tech/jianlan/jaeger-all-in-one:1.60.0
+    image: registry.jianlan.tech/jlmedaios/jaeger-all-in-one:1.60.0
     build:
       context: deploy/observability
       dockerfile: Dockerfile.jaeger
@@ -603,30 +622,68 @@ services:
         max-file: "3"
 
   # ==========================================================================
-  # jlmedaios-monolith（Java 模块化单体，Spring Boot 3.5 + JDK 21，端口 9090）
+  # jlmedaios-monolith（Java 模块化单体旁路/参考实现，Spring Boot 3.5.3 + JDK 21，端口 9090）
+  #   - 角色：旁路保留，不进入主线默认编排；需手动 --profile legacy 启动。
+  #   - 构建前置：先在宿主机执行 mvn -DskipTests package 生成 target/*.jar
+  #     （当前 Dockerfile 为单阶段 COPY target/*.jar，多阶段 Maven 构建列入待办）。
+  #   - 数据源口令独立于主线 POSTGRES_PASSWORD，由 .env 的 SPRING_DATASOURCE_PASSWORD 注入。
   # ==========================================================================
   jlmedaios-monolith:
-    build: ./services-java/jlmedaios-monolith
+    build:
+      context: ./services-java/jlmedaios-monolith
+      dockerfile: Dockerfile
     container_name: jlmedaios-monolith
+    profiles:
+      - legacy
+    # 仅绑定回环；宿主 19090 → 容器 9090，避免与 prometheus 回环 9090 共启动冲突。
     ports:
-      - "9090:9090"
+      - "127.0.0.1:19090:9090"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/jlmedaios
-      SPRING_DATASOURCE_USERNAME: jlmedaios
-      SPRING_DATASOURCE_PASSWORD: changeit
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:?请在 .env 中设置 POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:?请在 .env 中设置 POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?请在 .env 中设置 SPRING_DATASOURCE_PASSWORD（Java 旁路数据源口令，可与 POSTGRES_PASSWORD 同值）}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: "6379"
+      JLMEDAIOS_SECURITY_JWT_SECRET: ${JLMEDAIOS_SECURITY_JWT_SECRET:?请在 .env 中设置 JLMEDAIOS_SECURITY_JWT_SECRET（Java 旁路 JWT 密钥，≥32 字节随机）}
+      TZ: Asia/Shanghai
     restart: unless-stopped
+    # 注：temurin 21-jre 运行镜像未内置 wget/curl，actuator 探针命令待镜像补齐工具后落地；
+    # 当前以 depends_on(postgres/redis healthy) 作为启动前置条件。
 
   # ==========================================================================
-  # jlmedaios-ai（Python FastAPI AI 服务，NLP/CDSS/影像，端口 8000）
+  # jlmedaios-ai（Python FastAPI AI 旁路/参考实现，NLP/CDSS/影像，端口 8000）
+  #   - 角色：旁路保留，不进入主线默认编排；需手动 --profile legacy 启动。
+  #   - 鉴权为本地 mock（AI_API_KEYS 未配置时使用内置示例 key），禁止对外网暴露。
   # ==========================================================================
   jlmedaios-ai:
-    build: ./services-python
+    build:
+      context: ./services-python
+      dockerfile: Dockerfile
     container_name: jlmedaios-ai
+    profiles:
+      - legacy
+    # 仅绑定回环，避免旁路 8000 端口直接暴露到局域网/公网。
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
+    networks:
+      - backend
+    environment:
+      AI_API_KEYS: ${AI_API_KEYS:-}
+      LOCAL_VLLM_URL: ${LOCAL_VLLM_URL:-http://vllm:8000/v1}
+      TZ: Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     restart: unless-stopped
 
 # ==========================================================================
@@ -634,23 +691,23 @@ services:
 # ==========================================================================
 volumes:
   pg-data:
-    name: jianlan-pg-data
+    name: jlmedaios-pg-data
   pg-wal-archive:
-    name: jianlan-pg-wal-archive
+    name: jlmedaios-pg-wal-archive
   redis-data:
-    name: jianlan-redis-data
+    name: jlmedaios-redis-data
   kafka-data:
-    name: jianlan-kafka-data
+    name: jlmedaios-kafka-data
   es-data:
-    name: jianlan-es-data
+    name: jlmedaios-es-data
   prometheus-data:
-    name: jianlan-prometheus-data
+    name: jlmedaios-prometheus-data
   grafana-data:
-    name: jianlan-grafana-data
+    name: jlmedaios-grafana-data
   alertmanager-data:
-    name: jianlan-alertmanager-data
+    name: jlmedaios-alertmanager-data
   jaeger-badger:
-    name: jianlan-jaeger-badger
+    name: jlmedaios-jaeger-badger
 
 # ==========================================================================
 # 网络：frontend / backend / monitoring 三层桥接网络，默认不开启 internal
@@ -658,11 +715,11 @@ volumes:
 # ==========================================================================
 networks:
   frontend:
-    name: jianlan-frontend
+    name: jlmedaios-frontend
     driver: bridge
   backend:
-    name: jianlan-backend
+    name: jlmedaios-backend
     driver: bridge
   monitoring:
-    name: jianlan-monitoring
+    name: jlmedaios-monitoring
     driver: bridge
