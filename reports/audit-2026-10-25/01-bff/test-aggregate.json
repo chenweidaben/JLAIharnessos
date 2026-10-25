@@ -1,73 +1,169 @@
 {
-  "unit": {
-    "root": {
-      "files": 1920,
-      "pass": 13724,
-      "fail": 2,
-      "skip": 0,
-      "batches": 48,
-      "note": "fail 标记=onlineConsult.test.ts:94 重复打印两次（1 个真实失败用例）"
-    },
-    "subRan": {
-      "files": 69,
-      "pass": 686,
-      "fail": 0,
-      "skip": 0,
-      "batches": 3,
-      "note": "sub 共 5 批，b2/b4 挂起后由 s2/s4 二分重跑；挂起前 10+136 个 pass 标记未计入本口径"
-    },
-    "s2": {
-      "files": 24,
-      "pass": 285,
-      "fail": 1,
-      "skip": 0,
-      "batches": 24,
-      "note": "fail=db/ddl.test.ts:25"
-    },
-    "s4Clean": {
-      "files": 24,
-      "pass": 373,
-      "fail": 0,
-      "skip": 0,
-      "batches": 24,
-      "note": "s4 共 25 批，1 批 bulkhead 挂起（2 个挂起前标记未计入）"
-    },
-    "incomplete": [
-      {
-        "file": "tests/unit/core/DeepSeekProvider.test.ts",
-        "partialPass": 5,
-        "note": "5 pass 后挂起于重试/鉴权/factory 描述块，30s 隔离复现，0 fail"
-      },
-      {
-        "file": "tests/unit/resilience/bulkhead.test.ts",
-        "partialPass": 2,
-        "note": "2 pass 后挂起于「获取超时抛受控错误」用例，20s 隔离复现，0 fail"
+  "final": {
+    "source": "终稿权威计数，取本目录 bff-audit-report.md §4.3（单元）/§4.4（集成）；batchSnapshotV2 为分批复跑中间快照，仅留证过程，不计入终稿口径",
+    "unit": {
+      "diskFiles": 2040,
+      "cleanFiles": 2038,
+      "cleanPassMarkers": 15086,
+      "cleanFailMarkers": 4,
+      "realFailCases": 2,
+      "cleanSkip": 0,
+      "realFail": [
+        {
+          "file": "tests/unit/onlineConsult.test.ts:94",
+          "pass": 9,
+          "fail": 1,
+          "expect": 38,
+          "note": "夹具 acceptedAt 日期耦合，稳定复现，P1-5",
+          "status": "open"
+        },
+        {
+          "file": "tests/unit/db/ddl.test.ts:25",
+          "pass": 5,
+          "fail": 1,
+          "expect": 2360,
+          "note": "12 个 deploy/** SQL 括号纯文本计数告警，deploy 超本轮可改范围，P1-6",
+          "status": "open"
+        }
+      ],
+      "incomplete": [
+        {
+          "file": "tests/unit/core/DeepSeekProvider.test.ts",
+          "partialPass": 5,
+          "note": "5 pass 后挂起（mock Response body 流或 unref 定时器 Bun 1.2/Windows 不收尾），0 fail，未计入通过",
+          "status": "open-P1-7"
+        },
+        {
+          "file": "tests/unit/resilience/bulkhead.test.ts",
+          "partialPass": 2,
+          "note": "2 pass 后挂起于「获取超时抛受控错误」用例，超时定时器 unref() 未触发 reject，0 fail，未计入通过",
+          "status": "open-P1-7"
+        }
+      ],
+      "targetedRegression": {
+        "prodDemoFailClosed.test.ts": "18 pass（新增生产 DEMO_MODE fail-closed 安全测试）",
+        "tests/unit/bff/": "34 pass",
+        "首轮修复面": "106 pass",
+        "twin3D + apiDocs": "52 pass（apiDocs 204 个 expect 断言）"
       }
-    ],
-    "cleanFiles": 2037,
-    "cleanPassMarkers": 15068,
-    "cleanFailMarkers": 3,
-    "cleanSkip": 0,
-    "diskFiles": 2039,
-    "coverage": "2037/2039 干净执行；core 首跑 10 个进程级 FAIL（fail=0，挂起/超时）文件已在 s2/s4 干净重跑，仅 DeepSeekProvider 未重跑成功"
-  },
-  "integration": {
-    "files": 135,
-    "pass": 203,
-    "fail": 0,
-    "skip": 1025,
-    "batches": 6,
-    "skipBuckets": {
-      "dbOrRealModeGuard": 622,
-      "llmMissingGuard": 0,
-      "conditionalDescribeSkip": 403,
-      "note": "M12-A(10 用例) 属 dbAvailable/realMode 守卫（ai-interpretation.test.ts:155），套件内主动删除 LLM_API_KEY 验证降级，非 LLM 缺失跳过；全集成目录无 LLM_API_KEY 缺失型 skipIf"
     },
-    "guardFalsePass": {
-      "file": "tests/integration/real-persistence.test.ts",
-      "count": 8,
-      "lines": [57, 81, 92, 145, 191, 225, 262, 310],
-      "note": "无 DATABASE_URL、5432 关闭，dbAvailable=false，用例早退未断言被 bun 计为 pass；非真实 PG 校验"
+    "integration": {
+      "files": 136,
+      "pass": 210,
+      "fail": 0,
+      "skip": 1025,
+      "hung": 0,
+      "skipBuckets": {
+        "dbOrRealModeGuard": 612,
+        "conditionalDescribeSkip": 413,
+        "llmMissingGuard": 0,
+        "note": "M12-A AI 智能解读套件 10 用例同样由 DB 守卫控制；全集成目录无 LLM_API_KEY 缺失型 skipIf"
+      },
+      "consultFlow": {
+        "file": "tests/integration/consult-agent/consultFlow.test.ts",
+        "files": 1,
+        "pass": 7,
+        "note": "清单快照后新增隔离补测，7 用例真实断言通过，非 DB 守卫早退、非 skip"
+      },
+      "guardFalsePass": {
+        "file": "tests/integration/real-persistence.test.ts",
+        "count": 8,
+        "lines": [
+          57,
+          81,
+          92,
+          145,
+          191,
+          225,
+          262,
+          310
+        ],
+        "note": "无 DATABASE_URL、5432 关闭时守卫早退未断言即被 bun 计为 pass，非真实 PostgreSQL 校验，P2-8",
+        "status": "open-P2-8"
+      },
+      "blocker": "本机无 PostgreSQL/Redis、非 TEST_REAL=1，bunfig.toml preload 强制 DEMO_MODE=1；真实持久化链路须在配好凭证、种子库并置 TEST_REAL=1 环境复跑"
+    }
+  },
+  "batchSnapshotV2": {
+    "unit": {
+      "root": {
+        "files": 1920,
+        "pass": 13724,
+        "fail": 2,
+        "skip": 0,
+        "batches": 48,
+        "note": "fail 标记=onlineConsult.test.ts:94 重复打印两次（1 个真实失败用例）"
+      },
+      "subRan": {
+        "files": 69,
+        "pass": 686,
+        "fail": 0,
+        "skip": 0,
+        "batches": 3,
+        "note": "sub 共 5 批，b2/b4 挂起后由 s2/s4 二分重跑；挂起前 10+136 个 pass 标记未计入本口径"
+      },
+      "s2": {
+        "files": 24,
+        "pass": 285,
+        "fail": 1,
+        "skip": 0,
+        "batches": 24,
+        "note": "fail=db/ddl.test.ts:25"
+      },
+      "s4Clean": {
+        "files": 24,
+        "pass": 373,
+        "fail": 0,
+        "skip": 0,
+        "batches": 24,
+        "note": "s4 共 25 批，1 批 bulkhead 挂起（2 个挂起前标记未计入）"
+      },
+      "incomplete": [
+        {
+          "file": "tests/unit/core/DeepSeekProvider.test.ts",
+          "partialPass": 5,
+          "note": "5 pass 后挂起于重试/鉴权/factory 描述块，30s 隔离复现，0 fail"
+        },
+        {
+          "file": "tests/unit/resilience/bulkhead.test.ts",
+          "partialPass": 2,
+          "note": "2 pass 后挂起于「获取超时抛受控错误」用例，20s 隔离复现，0 fail"
+        }
+      ],
+      "cleanFiles": 2037,
+      "cleanPassMarkers": 15068,
+      "cleanFailMarkers": 3,
+      "cleanSkip": 0,
+      "diskFiles": 2039,
+      "coverage": "2037/2039 干净执行；core 首跑 10 个进程级 FAIL（fail=0，挂起/超时）文件已在 s2/s4 干净重跑，仅 DeepSeekProvider 未重跑成功"
+    },
+    "integration": {
+      "files": 135,
+      "pass": 203,
+      "fail": 0,
+      "skip": 1025,
+      "batches": 6,
+      "skipBuckets": {
+        "dbOrRealModeGuard": 622,
+        "llmMissingGuard": 0,
+        "conditionalDescribeSkip": 403,
+        "note": "M12-A(10 用例) 属 dbAvailable/realMode 守卫（ai-interpretation.test.ts:155），套件内主动删除 LLM_API_KEY 验证降级，非 LLM 缺失跳过；全集成目录无 LLM_API_KEY 缺失型 skipIf"
+      },
+      "guardFalsePass": {
+        "file": "tests/integration/real-persistence.test.ts",
+        "count": 8,
+        "lines": [
+          57,
+          81,
+          92,
+          145,
+          191,
+          225,
+          262,
+          310
+        ],
+        "note": "无 DATABASE_URL、5432 关闭，dbAvailable=false，用例早退未断言被 bun 计为 pass；非真实 PG 校验"
+      }
     }
   }
 }
