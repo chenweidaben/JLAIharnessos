@@ -23,6 +23,12 @@ consult-agent 在会话内完成意图分诊、信息采集、诊断建议草稿
 | [05-state-machine.md](./05-state-machine.md) | 状态枚举、完整转移表、急症旁路规则、终态规则、五条典型时序 |
 | [06-test-strategy.md](./06-test-strategy.md) | 测试分层、用例清单、权限矩阵、E2E 流程、门禁顺序与环境边界 |
 | [07-milestone-m86.md](./07-milestone-m86.md) | M86 里程碑范围、A–G 分片计划、验收门禁清单、遗留旧称说明 |
+| [08-adr.md](./08-adr.md) | 架构决策记录（ADR-001 起）：DEMO 仓储短路与生产接口分离、无凭证离线引导、四角色注册表、哨兵三红线、审计脱敏、SSE 契约、三权限码、幂等全局装配、状态机纯函数、画像合并规则、工具白名单、前端二次判权、置信度与 messageId 回填、急症旁路前置 |
+| [09-permission-matrix.md](./09-permission-matrix.md) | 三权限码定义与角色映射、12 端点权限 / 幂等 / 审计 / SSE 矩阵、前端二次判权说明、错误码对照与边界归属 |
+| [10-fmea.md](./10-fmea.md) | 故障模式与降级矩阵：失效模式、触发条件、业务影响、S/O/D 评分与 RPN、现有缓解措施、残余风险与责任层 |
+| [11-test-coverage-matrix.md](./11-test-coverage-matrix.md) | 测试分层口径、源码模块 → 测试文件覆盖对照、Funcs% / Lines% 逐字口径、未覆盖行可达性裁决、边界文件与环境缺口 |
+| [12-runbook.md](./12-runbook.md) | 运行与排障手册：环境变量、依赖与目录速览、一键门禁八段日志（3a / 3b 拆分）、单独测试 / 覆盖率命令、症状排查表、环境硬约束与日志归档 |
+| [13-contract-reconciliation.md](./13-contract-reconciliation.md) | OpenAPI / BFF / 前端服务三端契约复核：12 端点逐项比对、SSE 八类事件三处对照、结束帧口径、已知口径与残余偏差清单 |
 | [../api/consult-agent-openapi.yaml](../api/consult-agent-openapi.yaml) | OpenAPI 3.0 规范：12 端点、类型 schema、SSE 事件扩展、错误信封 |
 
 ## 3. 代码落点导航
@@ -44,16 +50,18 @@ consult-agent 在会话内完成意图分诊、信息采集、诊断建议草稿
 
 - **DEMO_MODE=1**：仓储短路到 `runtime/sessionRuntime` 进程内存，不连库；演示种子提供引导文案、示例工具返回与规则快照基线。
 - **LLM 凭证**：仅读取 `process.env` 的 `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY`；当前实现不联网，无凭证或有凭证均走确定性模板，`degraded=true`，文案带免责声明。
-- **静态门禁**（仓库根执行，契约 §16）：
+- **静态门禁**（仓库根执行；正式装配、文件清单与分段口径见 `scripts/consult-agent/gate.ps1` 与 [12-runbook.md](./12-runbook.md) §5、§6；tsc / eslint / prettier 走 `node` 直调 bin，不经 `.cmd` 包装器，文件清单显式枚举，前端 service 与 page 拆 3a / 3b 两段）：
 
 ```powershell
-node_modules\.bin\tsc.cmd --noEmit
-node_modules\.bin\eslint.cmd <新增文件...> --max-warnings 0
-node_modules\.bin\prettier.cmd --check docs/consult-agent docs/api/consult-agent-openapi.yaml
+node node_modules/typescript/lib/tsc.js --noEmit
+node node_modules/eslint/bin/eslint.js <显式文件清单> --max-warnings 0
+node node_modules/prettier/bin/prettier.cjs --check <显式文件清单>
 & "C:\Users\lenovo\.bun\bin\bun.exe" test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent
 ```
 
 - **SSE 帧格式**：`data: {json}\n\n`，结束帧 `data: [DONE]\n\n`；流路由不消费 `Idempotency-Key`。
+- **覆盖率报告**：`reports/consult-deepen/coverage-round1.md`（本轮 326 pass / 0 fail / 2090 expect / 26 文件；All files 88.81% Funcs、91.20% Lines；statements / branches 本环境 reporter 未提供该维度）；基线档案 `reports/consult-deepen/baseline-round0.md`。
+- **一键门禁脚本**：`scripts/consult-agent/gate.ps1`（八段：1 根 tsc → 2 后端 ESLint → 3a 前端 service → 3b 前端 page → 4 前端本地 ESLint → 5 Prettier → 6 bun 三目录测试 → 7 覆盖率；2026-10-26 02:26:53 复跑八段 `EXIT=0`、`FAILURE_SECTIONS=0`、`ANOMALY_SECTIONS=0`；分段日志与归档规则见 [12-runbook.md](./12-runbook.md) §5、§6、§10）。
 
 ## 5. 安全提示（开发与评审必读）
 
@@ -78,4 +86,6 @@ node_modules\.bin\prettier.cmd --check docs/consult-agent docs/api/consult-agent
 
 - 冻结契约：`reports/consult-rebuild/CONTRACT-m86.md`
 - 基线勘查档案：`reports/consult-rebuild/baseline-survey.md`
+- 本轮覆盖率实测报告：`reports/consult-deepen/coverage-round1.md`；基线覆盖率档案：`reports/consult-deepen/baseline-round0.md`
+- consult 一键门禁脚本：`scripts/consult-agent/gate.ps1`
 - 既有 BFF 范式：`src/bff/routes/academicExchangeV13.ts`、`src/bff/routes/medmuseStream.ts`、`src/db/repositories/consultRequestRepo.ts`、`deploy/postgres/init/99-nursing-risk-warning.sql`
