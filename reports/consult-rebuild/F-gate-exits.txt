@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 TSC_EXIT=0
 ESLINT_BACKEND_EXIT=0
 PRETTIER_BACKEND_EXIT=0
@@ -43,3 +43,19 @@ WEB_LOCAL_PRETTIER_LATEST_EXIT=0
 --- G10 closure (§2.9) ---
 PRETTIER_BACKEND_G10_CLOSED_EXIT=0; src/core/agent/consult/**/*.ts prettier --check all pass
 ROOT_TSC_G10_CLOSED_EXIT=0; 0 bytes diagnostics
+
+# === final2: G10 working-tree fix (pre-commit) ===
+TSC_FINAL2_EXIT=0
+ESLINT_BACKEND_FINAL2_EXIT=0
+PRETTIER_BACKEND_FINAL2_EXIT=0; G10 cleared after --write
+BUN_CONSULT_FINAL2_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files
+BUN_BCLASS_FINAL2_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files
+# === final3: clean HEAD at G10 closure commit (§2.10) ===
+TSC_FINAL3_EXIT=0
+ESLINT_BACKEND_FINAL3_EXIT=0
+PRETTIER_BACKEND_FINAL3_EXIT=0
+BUN_CONSULT_FINAL3_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.85s
+BUN_BCLASS_FINAL3_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.80s
+ROOT_WEB_ESLINT_FINAL3_EXIT=1; 9 problems (7 errors / 2 warnings), E debt
+WEB_LOCAL_ESLINT_FINAL3_EXIT=0
+WEB_LOCAL_PRETTIER_FINAL3_EXIT=0
