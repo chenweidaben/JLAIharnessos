@@ -11,10 +11,11 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { get, post } from '../request';
 import { tokenStorage } from '@/utils/auth';
-import { getCsrfToken } from '@/utils/cookie';
 import { env } from '@/utils/config';
+import { getCsrfToken } from '@/utils/cookie';
+
+import { get, post } from '../request';
 
 // ---------------------------------------------------------------------------
 // 契约 §1.1 枚举（前后端一致，禁止另立字面量）
