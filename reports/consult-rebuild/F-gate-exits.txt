@@ -103,3 +103,13 @@ WEB_LOCAL_PRETTIER_POST5_EXIT=0
 BUN_CONSULT_POST5_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.22s
 BUN_BCLASS_POST5_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.67s
 ROOT_WEB_ESLINT_POST5_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
+# === finalc: post-commit certification rerun on HEAD 219c29b4 (§7.3 final committed evidence) ===
+TSC_FINALC_EXIT=0
+ESLINT_BACKEND_FINALC_EXIT=0
+PRETTIER_BACKEND_FINALC_EXIT=0
+WEB_TSC_FINALC_EXIT=0
+WEB_LOCAL_ESLINT_FINALC_EXIT=0
+WEB_LOCAL_PRETTIER_FINALC_EXIT=0
+BUN_CONSULT_FINALC_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.28s
+BUN_BCLASS_FINALC_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.69s
+ROOT_WEB_ESLINT_FINALC_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
