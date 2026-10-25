@@ -7,7 +7,7 @@
 | 仓库分支 | `consult-agent-m86` |
 | 基线提交 | `3f0190788ce05fd7231bbefb68618cecccbc470e`（与 GitCode JLMEDAIOS master、GitHub mirror master 一致） |
 | 主推送基线 HEAD | `ece20607e12b03618d77e1b8e33671eb9343e94e`（28 个本地提交，详见 §2） |
-| 终态 HEAD（第十轮推送后实测） | `9329be291191ab594f6c9fd7ffeef92718c6d30f`（两仓 `git ls-remote` 逐位一致；各轮中间 SHA 见 §8.5、§8.6） |
+| 终态 HEAD（第十二轮推送后实测） | `83fbb4309d3f25058d34864371be328d60d350e9`（两仓 `git ls-remote` 逐位一致；各轮中间 SHA 见 §8.5、§8.6） |
 | 提交身份 | `chenweidaben <chenweidaben@users.noreply.github.com>`（全部分支提交单一作者，已 `git log --format="%an <%ae>" | Sort-Object -Unique` 复核） |
 | 报告日期 | 2026-10-25（Asia/Shanghai） |
 | 测试环境 | Windows 本机；node v22.23.2、npm 10.9.8、bun 1.2.0；`DEMO_MODE=1`；无 LLM 凭证走确定性引导文案，不联网、不产生临床结论 |
@@ -108,8 +108,12 @@
 | `72022371` | `docs(audit)` 谱系与并发清单最终对齐收口 | 1 | +11 / −8 | 另一路审计留档 |
 | `98da53b6` | `docs(consult-agent)` 交付验证报告终态谱系与第七八轮 SHA 核对表回填 | 1 | +13 / −7 | consult 交付文档 |
 | `9329be29` | `docs(consult-agent)` 交付验证报告分组规模与状态机/单测行数实测口径校正 | 1 | +4 / −4 | consult 交付文档 |
+| `027db3b1` | `docs(consult-agent)` 报告终态 SHA 第九十轮核对表与终轮测试时长口径回填 | 1 | +17 / −5 | consult 交付文档 |
+| `83fbb430` | `docs(patrol)` 22:51 第 8 轮审计终态收口复核简报归档（双 tsc 双零、consult 177 绿、BFF 静态复核 shadows=0） | 2 | +470 / −0 | 巡检留档 |
+| `9fe0d1cd` | `docs(consult-rebuild)` 终轮分支 diff 与凭据/旧称扫描取证快照归档 | 2 | +126577 / −0 | 组织者取证留档 |
+| `ba21209c` | `docs(patrol)` 23:12 第 7 轮巡检简报归档（门禁/测试/合规/SHA 复核留证） | 1 | +227 / −0 | 巡检留档 |
 
-> 以上十三个 follow-up 提交仅触及 `reports/` 留档与本报告，未改 `src/`、`web/`、`tests/`、`deploy/` 任何产品源码；`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 实测为空（docs-only 已复核）。
+> 以上十七个 follow-up 提交仅触及 `reports/` 留档与本报告，未改 `src/`、`web/`、`tests/`、`deploy/` 任何产品源码；`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 实测为空（docs-only 已复核）。
 
 ## 3. consult-agent 交付物清单（feat 提交 `42c98a3d`，62 文件 +10459/0）
 
@@ -254,7 +258,7 @@
 
 | 套件 | 命令 | 退出码 | 统计 |
 |---|---|---:|---|
-| consult 三目录 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect()，15 文件，11.89s** |
+| consult 三目录 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect()，15 文件，11.86s** |
 | 另一路 B 类既有测试回归（8 文件） | `bun test tests/unit/apiDocs.test.ts tests/unit/twin3DInpatient.test.ts tests/unit/bff/demoModeGuard.test.ts tests/unit/bff/prodDemoFailClosed.test.ts tests/unit/core/SystemPromptBuilder.test.ts tests/unit/security/audit-report.test.ts tests/unit/security/audit.test.ts tests/unit/security/encryption.test.ts` | **0** | **140 pass / 0 fail / 1143 expect()，8 文件，1.53s** |
 
 ### 5.3 前端根配置严格口径（债务单列，不计入 consult 新增）
@@ -400,6 +404,20 @@ cwd=根目录、加载根 `eslint.config.js`（`recommendedTypeChecked` + `styli
 | GitCode HEAGENTOS `main` | `9329be291191ab594f6c9fd7ffeef92718c6d30f` | `9329be291191ab594f6c9fd7ffeef92718c6d30f` | **一致** |
 | GitHub mirror `master` | `3f0190788ce05fd7231bbefb68618cecccbc470e` | — | 保持基线未变 |
 
+#### 第十一、十二轮终态核对（推送后实测）
+
+第十一轮 `9329be29..027db3b1`、第十二轮 `027db3b1..83fbb430` 均为 gitcode `master` 普通 fast-forward（无 force）、HEAGENTOS `main` force-main；两轮 dry-run EXIT=0，实际推送两仓 Hook PASSED。
+
+| 轮次 | 仓库 / 分支 | 远端 SHA（`git ls-remote` 实测） | 本地 HEAD | 逐位比对 |
+|---|---|---|---|---|
+| 第十一轮 | GitCode JLMEDAIOS `master` | `027db3b1244d3bd2b3312d729b76197514ff7bb6` | `027db3b1244d3bd2b3312d729b76197514ff7bb6` | **一致** |
+| 第十一轮 | GitCode HEAGENTOS `main` | `027db3b1244d3bd2b3312d729b76197514ff7bb6` | `027db3b1244d3bd2b3312d729b76197514ff7bb6` | **一致** |
+| 第十二轮 | GitCode JLMEDAIOS `master` | `83fbb4309d3f25058d34864371be328d60d350e9` | `83fbb4309d3f25058d34864371be328d60d350e9` | **一致** |
+| 第十二轮 | GitCode HEAGENTOS `main` | `83fbb4309d3f25058d34864371be328d60d350e9` | `83fbb4309d3f25058d34864371be328d60d350e9` | **一致** |
+| 两轮 | GitHub mirror `master` | `3f0190788ce05fd7231bbefb68618cecccbc470e` | — | 保持基线未变 |
+
+> 第十二轮同批 fast-forward 随附组织者取证快照、23:12 简报归档与本报告打包提交（纯 docs/留档，零源码改动）；其自身打包 SHA 无法在报告内自指，终态 SHA 以推送后 `git ls-remote` 实测为准并记入交付汇总。
+
 ## 9. 未闭环环境缺口（如实标注，未伪造通过）
 
 ### 9.1 数据库未真实库演练
@@ -493,4 +511,4 @@ cwd=根目录、加载根 `eslint.config.js`（`recommendedTypeChecked` + `styli
 
 ## 12. 结论
 
-consult-agent 多角色医疗问诊智能体 M86 全套规格已在本机重建落地并通过终轮静态门禁与专项测试：根 `tsc --noEmit` EXIT=0、后端/前端 consult ESLint 与 Prettier 全绿、consult 专项 **177 pass / 0 fail / 659 expect / 15 文件**、另一路 B 类回归 **140 pass / 0 fail / 1143 expect / 8 文件**；合规红线（旧称零命中、三档权限码、急症旁路、待医师复核草稿、非院外处方、免责声明常驻、审计脱敏、凭据零命中）逐项留证。主推送已完成并逐位核对：GitCode JLMEDAIOS `master` 与 HEAGENTOS `main` 主推送基线均为 `ece20607e12b03618d77e1b8e33671eb9343e94e`；二次至第十轮 follow-up 推送后终态 `9329be291191ab594f6c9fd7ffeef92718c6d30f` 在两仓逐位核对一致（§8.5、§8.6 各轮 SHA 留档）；GitHub mirror 保持基线 `3f019078` 未推送。环境未闭环项（数据库演练、LLM 联调、全量构建与覆盖率、前端规则债等）已在 §9 如实列示，不阻塞本轮 consult 交付收口。
+consult-agent 多角色医疗问诊智能体 M86 全套规格已在本机重建落地并通过终轮静态门禁与专项测试：根 `tsc --noEmit` EXIT=0、后端/前端 consult ESLint 与 Prettier 全绿、consult 专项 **177 pass / 0 fail / 659 expect / 15 文件**、另一路 B 类回归 **140 pass / 0 fail / 1143 expect / 8 文件**；合规红线（旧称零命中、三档权限码、急症旁路、待医师复核草稿、非院外处方、免责声明常驻、审计脱敏、凭据零命中）逐项留证。主推送已完成并逐位核对：GitCode JLMEDAIOS `master` 与 HEAGENTOS `main` 主推送基线均为 `ece20607e12b03618d77e1b8e33671eb9343e94e`；二次至第十二轮 follow-up 推送后终态 `83fbb4309d3f25058d34864371be328d60d350e9` 在两仓逐位核对一致（§8.5、§8.6 各轮 SHA 留档）；GitHub mirror 保持基线 `3f019078` 未推送。环境未闭环项（数据库演练、LLM 联调、全量构建与覆盖率、前端规则债等）已在 §9 如实列示，不阻塞本轮 consult 交付收口。
