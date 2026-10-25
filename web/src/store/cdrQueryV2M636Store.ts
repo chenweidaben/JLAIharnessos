@@ -31,7 +31,7 @@ interface CdrQueryV2M636State {
 const errMsg = (e: unknown, fallback: string): string =>
   e instanceof Error ? e.message : fallback;
 
-export const useCdrQueryV2M636Store = create<CdrQueryV2M636State>((set) => ({
+export const useCdrQueryV2M636Store = create<CdrQueryV2M636State>((set, get) => ({
   patientId: 'P10001',
   overview: null,
   queryRows: [],

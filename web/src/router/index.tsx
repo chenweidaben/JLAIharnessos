@@ -332,9 +332,10 @@ const PatientList = lazy(() => import('@/pages/patients'));
 const PatientDetail = lazy(() => import('@/pages/patients/detail'));
 const AgentChat = lazy(() => import('@/pages/agent'));
 const MedMuseChatPage = lazy(() => import('@/pages/agent/MedMuseChatPage'));
+// AI 咨询助手（M86-E）：分诊 / 医师 / 药师辅助建议，AI 草稿待执业医师复核
+const ConsultAgentChatPage = lazy(() => import('@/pages/consult-agent/ConsultAgentChatPage'));
 const Alerts = lazy(() => import('@/pages/alerts'));
 const Emergency = lazy(() => import('@/pages/emergency'));
-const EmergencyTriage = lazy(() => import('@/pages/emergency/triage-detail'));
 // 药房调剂发药工作站（M2-A）
 const Pharmacy = lazy(() => import('@/pages/pharmacy'));
 // 药品库存预警（低库存 + 建议采购量）
@@ -384,7 +385,6 @@ const QualityRecordDetail = lazy(() => import('@/pages/quality/RecordDetail'));
 const QualityRulesPage = lazy(() => import('@/pages/quality/Rules'));
 // 系统管理
 const SystemConfigPage = lazy(() => import('@/pages/system/config'));
-const DictManagementPage = lazy(() => import('@/pages/system/dict'));
 const OrganizationPage = lazy(() => import('@/pages/system/organization'));
 const KnowledgePage = lazy(() => import('@/pages/system/knowledge'));
 const CDSRulesPage = lazy(() => import('@/pages/system/cds-rules'));
@@ -691,7 +691,7 @@ const VtePage = lazy(() => import('@/pages/vte'));
 const AmsPage = lazy(() => import('@/pages/ams'));
 // 临床路径管理闭环（M15-A）：查看 pathway:read，入径/执行/变异/出径 pathway:manage/execute，质控 pathway:audit
 const PathwayPage = lazy(() => import('@/pages/pathway'));
-// 护理管理后台（M16-B）：查看 nursing_admin:view，排班/指标写操作按 nursing_admin:schedule/indicator 细分
+// 护理管理后台（M16-B）：查看 nursing_admin:schedule:view，排班/指标写操作按 nursing_admin:schedule/indicator 细分
 const NursingAdminPage = lazy(() => import('@/pages/nursingAdmin'));
 // 压疮/跌倒风险预警（M17-A）：查看 nursing_risk:read，评估 assess/预防 execute 按权限细分
 const NursingRiskPage = lazy(() => import('@/pages/nursingRisk'));
@@ -1151,8 +1151,6 @@ const OccupationalHealth = lazy(() => import('@/pages/occupational-health/report
 const RehabilitationV2 = lazy(() => import('@/pages/rehabilitation/report-v2'));
 // M222-B：健康管理 V2
 const HealthManagementV2 = lazy(() => import('@/pages/health-management/report-v2'));
-// M222-C：急救体系 V2
-const EmergencyV2 = lazy(() => import('@/pages/emergency/report-v2'));
 // M222-D：疼痛管理
 const PainReport = lazy(() => import('@/pages/pain/report'));
 // M223-A：检验中心 V2
@@ -6013,8 +6011,6 @@ export default function AppRoutes() {
           <Route path="rehabilitation/report-v2" element={<RehabilitationV2 />} />
           {/* M222-B：健康管理 V2 */}
           <Route path="health-management/report-v2" element={<HealthManagementV2 />} />
-          {/* M222-C：急救体系 V2 */}
-          <Route path="emergency/report-v2" element={<EmergencyV2 />} />
           {/* M222-D：疼痛管理 */}
           <Route path="pain/report" element={<PainReport />} />
           {/* M223-A：检验中心 V2 */}
@@ -8804,6 +8800,15 @@ export default function AppRoutes() {
           <Route path="agent" element={<AgentChat />} />
           {/* MEDMUSE 多岗位智能体聊天（M89-H）：confidence + 免责声明 + 审批卡片 */}
           <Route path="medmuse" element={<MedMuseChatPage />} />
+          {/* AI 咨询助手（M86-E）：分诊 / 医师 / 药师辅助建议，权限码 consult-agent:read */}
+          <Route
+            path="consult-agent/chat"
+            element={
+              <RequirePermission permission="consult-agent:read">
+                <ConsultAgentChatPage />
+              </RequirePermission>
+            }
+          />
           {/* MEDMUSE 审批中心（M93-A）：待审批工单列表 + approve/reject */}
           <Route path="medmuse/approvals" element={<MedmuseApprovalsPage />} />
           {/* 全院知识检索 Hospital Muse 搜索（M115-D） */}
@@ -8832,7 +8837,7 @@ export default function AppRoutes() {
           <Route path="skills/studio" element={<SkillStudio />} />
           <Route path="alerts" element={<Alerts />} />
           <Route path="emergency" element={<Emergency />} />
-          <Route path="emergency/triage/:visitId" element={<EmergencyTriage />} />
+          <Route path="emergency/triage/:visitId" element={<EmergencyTriageDetailPage />} />
           {/* 药房调剂发药工作站（M2-A） */}
           <Route path="pharmacy" element={<RequirePermission permission="pharmacy:view"><Pharmacy /></RequirePermission>} />
           {/* 药品库存预警：低库存标红 + 建议采购量 */}
@@ -8857,8 +8862,8 @@ export default function AppRoutes() {
           <Route path="data-governance" element={<DataGovernance />} />
           {/* 会话管理（M7-F）：session:manage 查看在线会话、强制下线 */}
           <Route path="sessions" element={<Sessions />} />
-          {/* 收费结算工作站（M3-B）：计费/收款 billing:charge，退费 billing:refund */}
-          <Route path="billing" element={<RequirePermission permission="billing:view"><Billing /></RequirePermission>} />
+          {/* 收费结算工作站（M3-B）：查看 billing:read，计费/收款 billing:charge，退费 billing:refund */}
+          <Route path="billing" element={<RequirePermission permission="billing:read"><Billing /></RequirePermission>} />
           {/* 预约随访工作站（M3-I）：appt:view 查看，appt:confirm 确认，appt:followup 随访 */}
           <Route path="appt" element={<Appt />} />
           {/* 满意度评价（M3-O）：satisfaction:view 统计，satisfaction:submit 评价 */}
@@ -8892,7 +8897,7 @@ export default function AppRoutes() {
           <Route path="quality/rules" element={<QualityRulesPage />} />
           {/* 系统管理 */}
           <Route path="system/config" element={<SystemConfigPage />} />
-          <Route path="system/dict" element={<DictManagementPage />} />
+          <Route path="system/dict" element={<SystemDictPage />} />
           <Route path="system/organization" element={<OrganizationPage />} />
           <Route path="system/knowledge" element={<KnowledgePage />} />
           <Route path="system/cds-rules" element={<CDSRulesPage />} />
@@ -8912,7 +8917,6 @@ export default function AppRoutes() {
           {/* M257 详情页注册 */}
           <Route path="outpatient/detail" element={<OutpatientDetailPage />} />
           <Route path="inpatient/detail" element={<InpatientDetailPage />} />
-          <Route path="order/detail" element={<OrderDetailPage />} />
           <Route path="medication/detail" element={<MedicationDetailPage />} />
           <Route path="discharge/detail" element={<DischargeDetailPage />} />
           {/* M258 合规/安全深度页注册 */}
@@ -9177,7 +9181,6 @@ export default function AppRoutes() {
           <Route path="tenants/billing" element={<TenantsBillingPage />} />
           <Route path="system/config" element={<SystemConfigPage />} />
           <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
-          <Route path="system/dict" element={<SystemDictPage />} />
           {/* M348 路由注册 */}
           <Route path="bi/realtime" element={<BiRealtimePage />} />
           <Route path="bi/funnel" element={<BiFunnelPage />} />
@@ -9353,7 +9356,6 @@ export default function AppRoutes() {
           <Route path="tenants/billing" element={<TenantsBillingPage />} />
           <Route path="system/config" element={<SystemConfigPage />} />
           <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
-          <Route path="system/dict" element={<SystemDictPage />} />
           {/* M348 路由注册 */}
           <Route path="bi/realtime" element={<BiRealtimePage />} />
           <Route path="bi/funnel" element={<BiFunnelPage />} />
@@ -9445,7 +9447,6 @@ export default function AppRoutes() {
           <Route path="security/roles" element={<SecurityRolesPage />} />
           <Route path="security/permissions" element={<SecurityPermissionsPage />} />
           <Route path="system/configs" element={<SystemConfigsPage />} />
-          <Route path="system/logs" element={<SystemLogsPage />} />
           <Route path="system/version" element={<SystemVersionPage />} />
           <Route path="events/dead-letter" element={<EventsDeadLetterPage />} />
           <Route path="events/retry" element={<EventsRetryPage />} />
@@ -9456,7 +9457,6 @@ export default function AppRoutes() {
           <Route path="tenant/data-isolation" element={<TenantDataIsolationPage />} />
           <Route path="tenant/quota" element={<TenantQuotaPage />} />
           <Route path="tenant/usage" element={<TenantUsagePage />} />
-          <Route path="tenant/logs" element={<TenantLogsPage />} />
           {/* M366 路由注册 */}
           <Route path="security/masking-rules" element={<SecurityMaskingRulesPage />} />
           <Route path="security/masking-logs" element={<SecurityMaskingLogsPage />} />
@@ -9703,11 +9703,11 @@ export default function AppRoutes() {
           <Route path="ams" element={<AmsPage />} />
           {/* 临床路径管理（M15-A）：查看 pathway:read，入径/执行/变异/出径按权限细分 */}
           <Route path="pathway" element={<PathwayPage />} />
-          {/* 护理管理后台（M16-B）：查看 nursing_admin:view，排班/指标写操作按权限细分 */}
+          {/* 护理管理后台（M16-B）：查看 nursing_admin:schedule:view，排班/指标写操作按权限细分 */}
           <Route
             path="nursing-admin"
             element={
-              <RequirePermission permission="nursing_admin:view">
+              <RequirePermission permission="nursing_admin:schedule:view">
                 <NursingAdminPage />
               </RequirePermission>
             }
@@ -10593,8 +10593,6 @@ export default function AppRoutes() {
           {/* M411 系统管理配置路由补登 */}
           <Route path="system/config" element={<SystemConfigPage />} />
           <Route path="system/menus" element={<SystemMenusPage />} />
-          <Route path="system/dict" element={<SystemDictPage />} />
-          <Route path="system/logs" element={<SystemLogsPage />} />
           <Route path="system/params" element={<SystemParamsPage />} />
           <Route path="system/cache" element={<SystemCachePage />} />
           {/* M412 多租户路由补登 */}
@@ -10616,7 +10614,6 @@ export default function AppRoutes() {
           <Route path="signatures/verify" element={<SignaturesVerifyPage />} />
           <Route path="signatures/templates" element={<SignaturesTemplatesPage />} />
           <Route path="audit/trails" element={<AuditTrailsPage />} />
-          <Route path="audit/logs" element={<AuditLogsPage />} />
           <Route path="audit/reports" element={<AuditReportsPage />} />
           {/* M415 BI运营分析路由补登 */}
           <Route path="bi/dashboard" element={<BiDashboardPage />} />
