@@ -8,7 +8,8 @@
 | 基线提交 | `3f0190788ce05fd7231bbefb68618cecccbc470e`（与 GitCode JLMEDAIOS master、GitHub mirror master 一致） |
 | 主推送基线 HEAD | `ece20607e12b03618d77e1b8e33671eb9343e94e`（28 个本地提交，详见 §2） |
 | 二次推送终态 HEAD | `92c5a4169ee7e239cdc3e2951352ef27f116f907`（主推送之上 follow-up docs 提交，§8.5 逐位核对一致） |
-| 第三轮终态 HEAD | `c83379c51e73b0fe9648b0e76deb9f4c14644fd6`（§8.6 两仓 `git ls-remote` 逐位核对一致；其后仅本报告 §8.6 文字打包提交随第四轮推送同步） |
+| 第三轮终态 HEAD | `c83379c51e73b0fe9648b0e76deb9f4c14644fd6`（§8.6 两仓 `git ls-remote` 逐位核对一致） |
+| 第四轮终态 HEAD | `fc7fd956dfc6cd167a6739aebc3824db7100ff1d`（本报告 §8.6 文字打包提交，§8.6 注记两仓 `git ls-remote` 实测一致） |
 | 提交身份 | `chenweidaben <chenweidaben@users.noreply.github.com>`（全部分支提交单一作者，已 `git log --format="%an <%ae>" | Sort-Object -Unique` 复核） |
 | 报告日期 | 2026-10-25（Asia/Shanghai） |
 | 测试环境 | Windows 本机；node v22.23.2、npm 10.9.8、bun 1.2.0；`DEMO_MODE=1`；无 LLM 凭证走确定性引导文案，不联网、不产生临床结论 |
@@ -356,7 +357,17 @@ cwd=根目录、加载根 `eslint.config.js`（`recommendedTypeChecked` + `styli
 | GitCode HEAGENTOS `main` | `c83379c51e73b0fe9648b0e76deb9f4c14644fd6` | `c83379c51e73b0fe9648b0e76deb9f4c14644fd6` | **一致** |
 | GitHub mirror `master` | `3f0190788ce05fd7231bbefb68618cecccbc470e` | — | 保持基线未变 |
 
-> 本表回填提交（§8.6 文字落盘）为紧随其后的 `docs(consult-agent)` 打包提交，随第四轮推送同步至两仓；其远端 SHA 以第四轮 `git ls-remote` 实测为准，见交付汇报记录。
+> 本表回填提交（§8.6 文字落盘）为第四轮 `docs(consult-agent)` 打包提交 `fc7fd956dfc6cd167a6739aebc3824db7100ff1d`，第四轮推送后两仓 `git ls-remote` 实测均为该 SHA，逐位一致（见下表第四轮核对记录）。
+
+#### 第四轮推送核对（`c83379c5..fc7fd956`，推送后实测）
+
+第四轮 dry-run（EXIT=0）：gitcode `master` `c83379c5..fc7fd956` fast-forward（无 force）；HEAGENTOS `main` `c83379c5..fc7fd956` force-main。实际推送两仓 Hook PASSED。
+
+| 仓库 / 分支 | 远端 SHA（`git ls-remote` 实测） | 本地 HEAD | 逐位比对 |
+|---|---|---|---|
+| GitCode JLMEDAIOS `master` | `fc7fd956dfc6cd167a6739aebc3824db7100ff1d` | `fc7fd956dfc6cd167a6739aebc3824db7100ff1d` | **一致** |
+| GitCode HEAGENTOS `main` | `fc7fd956dfc6cd167a6739aebc3824db7100ff1d` | `fc7fd956dfc6cd167a6739aebc3824db7100ff1d` | **一致** |
+| GitHub mirror `master` | `3f0190788ce05fd7231bbefb68618cecccbc470e` | — | 保持基线未变 |
 
 ## 9. 未闭环环境缺口（如实标注，未伪造通过）
 
@@ -451,4 +462,4 @@ cwd=根目录、加载根 `eslint.config.js`（`recommendedTypeChecked` + `styli
 
 ## 12. 结论
 
-consult-agent 多角色医疗问诊智能体 M86 全套规格已在本机重建落地并通过终轮静态门禁与专项测试：根 `tsc --noEmit` EXIT=0、后端/前端 consult ESLint 与 Prettier 全绿、consult 专项 **177 pass / 0 fail / 659 expect / 15 文件**、另一路 B 类回归 **140 pass / 0 fail / 1143 expect / 8 文件**；合规红线（旧称零命中、三档权限码、急症旁路、待医师复核草稿、非院外处方、免责声明常驻、审计脱敏、凭据零命中）逐项留证。主推送已完成并逐位核对：GitCode JLMEDAIOS `master` 与 HEAGENTOS `main` 主推送基线均为 `ece20607e12b03618d77e1b8e33671eb9343e94e`；二次推送终态 `92c5a4169ee7e239cdc3e2951352ef27f116f907`、第三轮终态 `c83379c51e73b0fe9648b0e76deb9f4c14644fd6` 均在两仓逐位核对一致（§8.5、§8.6）；GitHub mirror 保持基线 `3f019078` 未推送。环境未闭环项（数据库演练、LLM 联调、全量构建与覆盖率、前端规则债等）已在 §9 如实列示，不阻塞本轮 consult 交付收口。
+consult-agent 多角色医疗问诊智能体 M86 全套规格已在本机重建落地并通过终轮静态门禁与专项测试：根 `tsc --noEmit` EXIT=0、后端/前端 consult ESLint 与 Prettier 全绿、consult 专项 **177 pass / 0 fail / 659 expect / 15 文件**、另一路 B 类回归 **140 pass / 0 fail / 1143 expect / 8 文件**；合规红线（旧称零命中、三档权限码、急症旁路、待医师复核草稿、非院外处方、免责声明常驻、审计脱敏、凭据零命中）逐项留证。主推送已完成并逐位核对：GitCode JLMEDAIOS `master` 与 HEAGENTOS `main` 主推送基线均为 `ece20607e12b03618d77e1b8e33671eb9343e94e`；二次推送终态 `92c5a4169ee7e239cdc3e2951352ef27f116f907`、第三轮终态 `c83379c51e73b0fe9648b0e76deb9f4c14644fd6`、第四轮终态 `fc7fd956dfc6cd167a6739aebc3824db7100ff1d` 均在两仓逐位核对一致（§8.5、§8.6）；GitHub mirror 保持基线 `3f019078` 未推送。环境未闭环项（数据库演练、LLM 联调、全量构建与覆盖率、前端规则债等）已在 §9 如实列示，不阻塞本轮 consult 交付收口。
