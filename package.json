@@ -1,22 +1,23 @@
 {
-  "name": "jianlan-gang-os",
+  "name": "jlmedaios",
   "version": "0.1.0",
   "description": "健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）——开源、免费、工业级的医疗智能体操作系统，让医疗 AI 更简单、更落地",
   "type": "module",
   "private": false,
   "author": "健澜科技（杭州健澜科技有限公司）",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/jianlan-tech/gang-os#readme",
+  "homepage": "https://github.com/chenweidaben/JLAIharnessos#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jianlan-tech/gang-os.git"
+    "url": "git+https://github.com/chenweidaben/JLAIharnessos.git"
   },
   "bugs": {
-    "url": "https://github.com/jianlan-tech/gang-os/issues"
+    "url": "https://github.com/chenweidaben/JLAIharnessos/issues"
   },
   "keywords": [
     "健澜科技",
-    "杠OS",
+    "AI原生医院操作系统",
+    "hospital-os",
     "医疗AI",
     "医疗智能体操作系统",
     "智慧医院",

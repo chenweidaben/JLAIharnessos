@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "jianlan-gang-os",
+      "name": "jlmedaios",
       "dependencies": {
         "@anthropic-ai/sdk": "0.80.0",
         "@modelcontextprotocol/sdk": "1.29.0",

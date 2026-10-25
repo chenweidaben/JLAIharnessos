@@ -27,7 +27,7 @@ const heroValues = ['智能决策', '全流程协同', '安全合规'];
 
 export default function HomePage() {
   useEffect(() => {
-    document.title = '健澜科技 · 数智医院智能体';
+    document.title = '健澜AI原生医院操作系统OS';
   }, []);
 
   return (
@@ -52,7 +52,7 @@ export default function HomePage() {
             </FadeInOnScroll>
             <FadeInOnScroll delay={80}>
               <h1 className="m-0 text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-                健澜科技数智医院智能体
+                健澜AI原生医院操作系统OS
               </h1>
             </FadeInOnScroll>
             <FadeInOnScroll delay={160}>
@@ -272,7 +272,7 @@ export default function HomePage() {
         <FadeInOnScroll className="mx-auto max-w-3xl px-4 text-center sm:px-6">
           <h2 className="m-0 text-3xl font-bold text-white sm:text-4xl">开启智慧医院新时代</h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/80">
-            立即体验健澜科技数智医院智能体，让 AI 成为每位医生的专业副驾。
+            立即体验健澜AI原生医院操作系统OS，让 AI 成为每位医生的专业副驾。
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link to="/demo/chat">

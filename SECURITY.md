@@ -16,7 +16,7 @@
 请通过以下方式私下报告：
 
 - 邮件：`security@jianlan.tech`（占位地址，正式发布前以官网公布为准）
-- 邮件标题以 `[Security] Gang-OS: ` 开头
+- 邮件标题以 `[Security] Jianlan AI-Native Hospital OS: ` 开头
 - 建议包含：影响版本、复现步骤（PoC）、预期与实际结果、影响评估、您的联系方式
 
 ### 响应 SLA

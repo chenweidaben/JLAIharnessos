@@ -47,7 +47,7 @@ const archLayers = [
 
 export default function ArchitecturePage() {
   useEffect(() => {
-    document.title = '技术架构 · 健澜科技数智医院智能体';
+    document.title = '技术架构 · 健澜AI原生医院操作系统OS';
   }, []);
 
   return (

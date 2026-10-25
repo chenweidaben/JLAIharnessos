@@ -1,4 +1,4 @@
-# 健澜科技 Gang-OS（jlmedaios）部署运维指南
+# 健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）部署运维指南
 
 > 版本：v1.0　|　适用对象：首次接手本系统的运维工程师
 > 配套清单：`src/bff/aggregators/deploymentDocAggregator.ts`（`generateDeploymentChecklist()`）
@@ -164,7 +164,7 @@ bun dist/server.js
 
 ```ini
 [Unit]
-Description=Jianlan Gang-OS BFF
+Description=Jianlan AI-Native Hospital OS BFF
 After=network.target postgresql.service
 
 [Service]

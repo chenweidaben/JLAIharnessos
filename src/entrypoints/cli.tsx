@@ -24,9 +24,9 @@ import { getTerminalSize } from '../ui/utils/layout';
 // 应用版本信息
 // ============================================================================
 
-const APP_NAME = '健澜科技数智医院智能体';
+const APP_NAME = '健澜AI原生医院操作系统OS';
 const APP_VERSION = '1.0.0';
-const APP_COPYRIGHT = 'Copyright (c) 2026 健澜科技. All rights reserved.';
+const APP_COPYRIGHT = 'Copyright (c) 2026 杭州健澜科技有限公司. All rights reserved.';
 
 // ============================================================================
 // 主应用组件

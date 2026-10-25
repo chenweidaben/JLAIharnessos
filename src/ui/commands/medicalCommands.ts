@@ -711,11 +711,11 @@ const COMMAND_OUTPUTS: Record<string, (args: string) => string> = {
     `HL7 消息${a ? ` (${a})` : ''}:\n  今日出站 ADT^A04 32 条 · 入站 ORU^R01 128 条\n  MLLP 连接: 已建立，无积压。`,
   help: (a) => (a ? getCommandHelp(a) : generateHelpText()),
   clear: () => '对话已清空。',
-  exit: () => '正在退出健澜科技数智医院智能体...',
+  exit: () => '正在退出健澜AI原生医院操作系统OS...',
   settings: () =>
     `设置面板:\n  主题: jianlan-dark  流式速度: 12ms/字\n  CDS 拦截强度: 严格  审计日志: 开启`,
   about: () =>
-    `健澜科技数智医院智能体 v1.0.0\n  基于 claude-code 2.1.88 架构定制\n  Copyright (c) 2026 健澜科技. All rights reserved.`,
+    `健澜AI原生医院操作系统OS v1.0.0\n  基于 claude-code 2.1.88 架构定制\n  Copyright (c) 2026 杭州健澜科技有限公司. All rights reserved.`,
 };
 
 /**
@@ -782,7 +782,7 @@ export function getCommandHelp(name: string): string {
  * @returns 格式化的帮助文本
  */
 export function generateHelpText(): string {
-  const lines: string[] = ['健澜科技数智医院智能体 - 可用命令\n'];
+  const lines: string[] = ['健澜AI原生医院操作系统OS - 可用命令\n'];
   for (const category of COMMAND_CATEGORIES) {
     const cmds = getCommandsByCategory(category);
     if (cmds.length === 0) continue;

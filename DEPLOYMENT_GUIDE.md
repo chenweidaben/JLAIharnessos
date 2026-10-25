@@ -1,6 +1,6 @@
 # jlmedaios 生产部署运维指南（DEPLOYMENT_GUIDE）
 
-> 健澜科技 Gang-OS（jlmedaios）· AI 原生未来医院操作系统
+> 健澜AI原生医院操作系统OS（Jianlan AI-Native Hospital OS）· 未来医院操作系统
 >
 > 适用对象：首次接手本系统的运维 / 实施工程师。按本文顺序照做，即可在一台干净 Linux
 > 服务器上把生产环境跑起来，并完成 HTTPS、备份、日志轮转与监控告警的闭环。

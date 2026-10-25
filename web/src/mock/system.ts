@@ -5,7 +5,7 @@
  * 系统管理 Mock
  */
 export const mockSystemConfig = {
-  siteName: '健澜科技数智医院智能体',
+  siteName: '健澜AI原生医院操作系统OS',
   version: '0.1.0',
   enableDesensitization: true,
   enableCds: true,

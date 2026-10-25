@@ -502,7 +502,7 @@ export function generateApiDocs(): OpenApi3 {
   return {
     openapi: '3.0.3',
     info: {
-      title: '健澜数智医院智能体（Gang-OS）BFF API',
+      title: '健澜AI原生医院操作系统OS BFF API',
       version: '1.0.0',
       description: [
         '统一 BFF HTTP 接口文档【系统集成】。所有业务接口前缀 `/api/v1`。',

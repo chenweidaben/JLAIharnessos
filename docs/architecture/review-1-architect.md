@@ -1,4 +1,4 @@
-# 健澜杠OS（jianlan-gang-os）重构方案 · 首席架构师评审意见
+# 健澜AI原生医院操作系统OS 重构方案 · 首席架构师评审意见
 
 - 评审对象：初始提议「Java 核心交易 + Python AI + TS BFF + K8s/APISIX/Kafka/PG16/Redis7 + 绞杀者模式 12 个月」
 - 评审人：首席架构师（20 年三甲核心系统重构经验）

@@ -371,7 +371,7 @@ export default function LoginPage() {
               </div>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 600 }}>健澜科技</div>
-                <div style={{ fontSize: 13, opacity: 0.8 }}>数智医院智能体</div>
+                <div style={{ fontSize: 13, opacity: 0.8 }}>健澜AI原生医院操作系统OS</div>
               </div>
             </div>
             <h1
@@ -413,7 +413,7 @@ export default function LoginPage() {
           {isMobile && (
             <div style={{ textAlign: 'center', marginBottom: 16 }}>
               <div style={{ fontSize: 20, fontWeight: 600, color: '#0A4D8C' }}>
-                健澜科技数智医院智能体
+                健澜AI原生医院操作系统OS
               </div>
             </div>
           )}

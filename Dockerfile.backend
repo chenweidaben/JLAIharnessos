@@ -41,7 +41,7 @@
 FROM oven/bun:1.4.2 AS builder
 
 # 以下元数据遵循 OCI image spec 约定，便于镜像仓库展示与合规审计。
-LABEL org.opencontainers.image.title="jianlan-gangos-backend" \
+LABEL org.opencontainers.image.title="jlmedaios-backend" \
       org.opencontainers.image.description="健澜AI原生医院操作系统OS后端 BFF 服务" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0" \
@@ -87,7 +87,7 @@ RUN bun run build
 # ----------------------------------------------------------------------------
 FROM oven/bun:1.4.2-slim AS runtime
 
-LABEL org.opencontainers.image.title="jianlan-gangos-backend" \
+LABEL org.opencontainers.image.title="jlmedaios-backend" \
       org.opencontainers.image.description="健澜AI原生医院操作系统OS后端 BFF 服务（运行时）" \
       org.opencontainers.image.vendor="健澜科技" \
       org.opencontainers.image.version="0.1.0"

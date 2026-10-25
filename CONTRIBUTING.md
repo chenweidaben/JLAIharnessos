@@ -14,8 +14,8 @@
 - 推荐 VS Code（ESLint + Prettier 插件）
 
 ```bash
-git clone https://github.com/jianlan-tech/gang-os.git
-cd gang-os
+git clone https://github.com/chenweidaben/JLAIharnessos.git
+cd JLAIharnessos
 bun install
 bun run typecheck     # 类型检查
 bun test              # 后端测试

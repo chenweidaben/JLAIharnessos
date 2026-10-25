@@ -39,7 +39,7 @@ function FeaturePreview({ feature }: { feature: DemoFeature }) {
 
 export default function FeaturesPage() {
   useEffect(() => {
-    document.title = '核心功能 · 健澜科技数智医院智能体';
+    document.title = '核心功能 · 健澜AI原生医院操作系统OS';
   }, []);
 
   return (

@@ -241,8 +241,8 @@ export default function AgentChat() {
       title="AI 问诊"
       description={
         isDemoMode
-          ? '健澜数智医院智能体 · 演示模式（本地 Mock，不持久化）'
-          : '健澜数智医院智能体 · 临床决策辅助（连接 BFF 实时对话）'
+          ? '健澜AI原生医院操作系统OS · 演示模式（本地 Mock，不持久化）'
+          : '健澜AI原生医院操作系统OS · 临床决策辅助（连接 BFF 实时对话）'
       }
     >
       <div className="flex gap-3" style={{ height: 'calc(100vh - 220px)' }}>

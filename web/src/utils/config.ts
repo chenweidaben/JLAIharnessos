@@ -5,7 +5,7 @@
  * 运行时环境变量统一读取
  */
 export const env = {
-  appTitle: import.meta.env.VITE_APP_TITLE ?? '健澜科技数智医院智能体',
+  appTitle: import.meta.env.VITE_APP_TITLE ?? '健澜AI原生医院操作系统OS',
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
   wsUrl: import.meta.env.VITE_WS_URL ?? 'ws://127.0.0.1:5173/ws/chat',
   appEnv: import.meta.env.VITE_APP_ENV ?? 'development',

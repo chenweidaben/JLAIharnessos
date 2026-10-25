@@ -52,7 +52,7 @@ import { rand } from './utils';
 /* ============================== 系统配置 ============================== */
 
 export const mockSystemConfig: SystemConfig = {
-  systemName: '健澜科技数智医院智能体',
+  systemName: '健澜AI原生医院操作系统OS',
   systemLogo: '/logo.svg',
   hospitalName: '健澜科技示范医院',
   hospitalLevel: '三级甲等',
@@ -1339,7 +1339,7 @@ export const mockAgents: AgentConfig[] = [
       contextWindow: 200000,
     },
     systemPrompt:
-      '你是健澜科技数智医院智能体的主Agent，负责理解医生意图并调度合适的子Agent完成任务。',
+      '你是健澜AI原生医院操作系统OS的主Agent，负责理解医生意图并调度合适的子Agent完成任务。',
     rolePrompt: '医疗AI助手',
     specialtyPrompt: '',
     availableTools: ['query_patient', 'query_visits', 'query_lab_results', 'query_imaging'],

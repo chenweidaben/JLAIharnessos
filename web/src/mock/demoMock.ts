@@ -251,7 +251,7 @@ export const testimonials: Testimonial[] = [
     name: '王主任',
     title: '医务部主任',
     content:
-      '健澜数智医院智能体上线后，门诊医生平均问诊时间缩短了约两成，病历质控缺陷率明显下降，医生终于把时间还给了患者。',
+      '健澜AI原生医院操作系统OS上线后，门诊医生平均问诊时间缩短了约两成，病历质控缺陷率明显下降，医生终于把时间还给了患者。',
   },
   {
     hospital: '某区域医疗集团',
@@ -995,8 +995,8 @@ export const companyMilestones = [
   { year: '2022', title: '首款产品落地', desc: '智能问诊助手在多家试点医院上线验证。' },
   {
     year: '2023',
-    title: '数智医院智能体',
-    desc: '发布数智医院智能体 1.0，整合 CDS 与患者 360 能力。',
+    title: '健澜AI原生医院操作系统OS',
+    desc: '发布健澜AI原生医院操作系统OS 1.0，整合 CDS 与患者 360 能力。',
   },
   { year: '2024', title: '多 Agent 架构', desc: '推出多 Agent 编排与 RAG 知识库，覆盖 8 大科室。' },
   { year: '2025', title: '云原生中台', desc: '四中台微服务架构落地，完成等保三级测评。' },

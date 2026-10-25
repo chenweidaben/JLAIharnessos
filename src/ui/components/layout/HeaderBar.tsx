@@ -44,7 +44,7 @@ export interface HeaderBarProps {
  * ```
  */
 export function HeaderBar({
-  title = '健澜科技数智医院智能体',
+  title = '健澜AI原生医院操作系统OS',
   subtitle,
   rightStatus,
   showBrand = true,

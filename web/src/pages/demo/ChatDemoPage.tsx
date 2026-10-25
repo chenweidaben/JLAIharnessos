@@ -71,7 +71,7 @@ export default function ChatDemoPage() {
       id: msgId++,
       role: 'assistant',
       content:
-        '您好，我是健澜数智医院智能体 AI 助手。您可以让我分析患者检验结果、开具处方、查询诊疗指南或查看危急值。试试下方预设问题吧。',
+        '您好，我是健澜AI原生医院操作系统OS AI 助手。您可以让我分析患者检验结果、开具处方、查询诊疗指南或查看危急值。试试下方预设问题吧。',
       status: 'done',
     },
   ]);
@@ -168,7 +168,7 @@ export default function ChatDemoPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h1 className="m-0 text-3xl font-bold text-white sm:text-4xl">智能对话 Demo</h1>
           <p className="mt-3 text-base text-white/80">
-            与数智医院智能体实时对话，观察思考、工具调用与流式回复全过程（前端 Mock 数据）
+            与健澜AI原生医院操作系统OS实时对话，观察思考、工具调用与流式回复全过程（前端 Mock 数据）
           </p>
         </div>
       </GradientBackground>

@@ -195,7 +195,7 @@ async function executeGenerateMedicalRecord(
     sections.push('');
   }
 
-  sections.push(`[本病历由健澜科技数智医院智能体AI辅助生成，需医生审核确认后归档]`);
+  sections.push(`[本病历由健澜AI原生医院操作系统OS AI辅助生成，需医生审核确认后归档]`);
   sections.push(`生成时间：${now}`);
 
   const content = sections.join('\n');

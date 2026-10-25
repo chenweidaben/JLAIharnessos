@@ -62,7 +62,7 @@ export default function TopHeader() {
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </span>
         </Tooltip>
-        <Breadcrumb items={[{ title: '健澜科技' }, { title: '数智医院智能体' }]} />
+        <Breadcrumb items={[{ title: '健澜科技' }, { title: '健澜AI原生医院操作系统OS' }]} />
       </div>
 
       <div className="flex items-center gap-3">

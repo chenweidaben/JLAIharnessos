@@ -66,7 +66,7 @@ export default function Navbar() {
           <span
             className={`hidden text-xs sm:inline ${dark ? 'text-white/60' : 'text-ink-secondary'}`}
           >
-            数智医院智能体
+            健澜AI原生医院操作系统OS
           </span>
         </Link>
 

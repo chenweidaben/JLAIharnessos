@@ -19,7 +19,7 @@ export default function ScenariosPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = '场景演示 · 健澜科技数智医院智能体';
+    document.title = '场景演示 · 健澜AI原生医院操作系统OS';
   }, []);
 
   const items = scenarios.map((s) => ({
@@ -86,7 +86,7 @@ export default function ScenariosPage() {
           <SectionTitle
             dark
             title="场景演示"
-            subtitle="四大核心医疗场景，端到端展示数智医院智能体的真实工作流"
+            subtitle="四大核心医疗场景，端到端展示健澜AI原生医院操作系统OS的真实工作流"
           />
         </div>
       </GradientBackground>

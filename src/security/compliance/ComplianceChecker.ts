@@ -345,7 +345,7 @@ export class ComplianceChecker {
   private readonly systemName: string;
 
   constructor(config?: ComplianceCheckerConfig) {
-    this.systemName = config?.systemName ?? '健澜科技数智医院智能体';
+    this.systemName = config?.systemName ?? '健澜AI原生医院操作系统OS';
   }
 
   /**

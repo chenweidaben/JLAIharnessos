@@ -1,4 +1,4 @@
-# 健澜AI原生医院操作系统OS（jianlan-gang-os）重构方案——合规可落地性评审报告
+# 健澜AI原生医院操作系统OS 重构方案——合规可落地性评审报告
 
 > 评审对象：Java(Spring Cloud) + Python(FastAPI+vLLM) + TS(Bun BFF) 微服务重构架构
 > 目标场景：大型三甲医院生产环境
@@ -258,7 +258,7 @@
 
 ## 6. 必须写进架构宪法的合规条款
 
-以下条款建议作为 jianlan-gang-os 架构宪法（Architecture Constitution）的强制条目，任何 PR 违反须 reject：
+以下条款建议作为健澜AI原生医院操作系统OS 架构宪法（Architecture Constitution）的强制条目，任何 PR 违反须 reject：
 
 1. **PHI 不出安全域原则**：任何包含直接标识符（姓名、身份证、手机、住址、病案号、医保号）的数据流，不得离开医院安全域；AI 服务、第三方集成、数据分析均通过脱敏视图访问。
 2. **禁止境外 API 原则**：禁止在生产环境调用任何境外大模型 API（OpenAI/Claude/Gemini 等）处理患者数据；AI 推理一律 vLLM 本地部署开源模型。

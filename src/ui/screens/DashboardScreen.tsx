@@ -108,7 +108,7 @@ export function DashboardScreen({
   return (
     <Box flexDirection="column" flexGrow={1}>
       <HeaderBar
-        title="健澜科技数智医院智能体 v1.0"
+        title="健澜AI原生医院操作系统OS v1.0"
         subtitle="AI-Native Hospital Intelligence Platform"
         rightStatus={`欢迎，${userName}医生`}
       />

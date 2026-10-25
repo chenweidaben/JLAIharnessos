@@ -20,7 +20,7 @@ function renderSwaggerUiHtml(): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>健澜科技 Gang-OS · API 文档</title>
+  <title>健澜AI原生医院操作系统OS · API 文档</title>
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
   <style>
     body { margin: 0; background: #f5f7fa; }
@@ -35,7 +35,7 @@ function renderSwaggerUiHtml(): string {
 </head>
 <body>
   <div class="topbar">
-    <h1>健澜数智医院智能体（Gang-OS）· 统一 API 文档</h1>
+    <h1>健澜AI原生医院操作系统OS · 统一 API 文档</h1>
     <p>系统集成 · OpenAPI 3.0 · JWT Bearer 认证 · 杭州健澜科技有限公司</p>
   </div>
   <div id="swagger-ui"></div>

@@ -3,7 +3,7 @@
 本指南面向负责发布的维护者，说明如何把本地仓库安全、合规地发布到 GitHub，并完成社区化运营配置。
 **当前仓库已完成开源化改造（Apache-2.0、双语 README、合规文件、CI），但尚未推送远端**（环境无发布凭证）。
 
-> 目标仓库（占位，发布前替换为真实组织）：`https://github.com/jianlan-tech/gang-os`
+> 目标仓库（真实镜像）：`https://github.com/chenweidaben/JLAIharnessos`
 
 ---
 
@@ -76,7 +76,7 @@ git tag -a v0.1.0 -m "release: v0.1.0 首个开源版本"
 
 ## 三、创建 GitHub 仓库并推送
 
-1. 在 GitHub 创建组织（如 `jianlan-tech`）与**空仓库** `gang-os`（不要勾选自动生成 README/LICENSE，避免冲突）；
+1. 在 GitHub 账号 `chenweidaben` 下创建**空仓库** `JLAIharnessos`（不要勾选自动生成 README/LICENSE，避免冲突）；
 2. 配置仓库元信息：
    - **Topics**：`healthcare`、`medical-ai`、`agent`、`orchestration`、`low-code`、`llm`、`his`、`fhir`、`hl7`、`dicom`、`cdss`、`typescript`、`bun`、`react`；
    - Description：`开源·免费·工业级的医疗智能体操作系统 —— 让医疗 AI 更简单、更落地`；
@@ -84,7 +84,7 @@ git tag -a v0.1.0 -m "release: v0.1.0 首个开源版本"
 3. 推送：
 
 ```bash
-git remote add origin https://github.com/jianlan-tech/gang-os.git
+git remote add origin https://github.com/chenweidaben/JLAIharnessos.git
 git push -u origin main
 git push origin v0.1.0
 ```
@@ -132,6 +132,6 @@ git push origin v0.1.0
 
 ## 附：商标与商业化边界
 
-- “健澜科技”“杠OS/Gang-OS”名称与标识为公司商标，Apache-2.0 授予代码许可但**不授予商标权**；
+- “健澜科技”“健澜AI原生医院操作系统OS”“Jianlan AI-Native Hospital OS”名称与标识为公司商标，Apache-2.0 授予代码许可但**不授予商标权**；
 - 第三方基于本项目提供 SaaS/云服务时，须自行评估 Redis（RSAL/SSPL）、Elastic（Elastic License）、Grafana（AGPL）等组件许可，建议使用 ValKey/OpenSearch 等开源替代并遵守商标与 NOTICE 要求；
 - 受限医学数据的获取与合规由使用方负责。

@@ -77,7 +77,7 @@ export default function EmergencyPage() {
   return (
     <PageContainer
       title="急诊分诊工作台"
-      description="四级分诊 · 绿色通道 · 抢救室 · 留观 · 急诊统计 —— 健澜科技数智医院智能体"
+      description="四级分诊 · 绿色通道 · 抢救室 · 留观 · 急诊统计 —— 健澜AI原生医院操作系统OS"
     >
       <DemoModeBanner />
 

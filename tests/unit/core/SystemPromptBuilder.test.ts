@@ -32,7 +32,7 @@ describe('SystemPromptBuilder', () => {
   it('应恒定包含医疗伦理层与品牌标识', () => {
     const prompt = builder.build({ user: makeUser() });
     expect(prompt).toContain('医疗伦理与安全约束');
-    expect(prompt).toContain('健澜科技数智医院智能体');
+    expect(prompt).toContain('健澜AI原生医院操作系统OS');
     expect(prompt).toContain('不得'); // 安全约束
   });
 

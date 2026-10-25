@@ -45,7 +45,7 @@ describe('M129-A generateApiDocs 文档生成', () => {
 
   it('OpenAPI 版本与 info/许可证正确', () => {
     expect(docs.openapi).toMatch(/^3\./);
-    expect(docs.info.title).toContain('Gang-OS');
+    expect(docs.info.title).toContain('健澜AI原生医院操作系统OS');
     expect(docs.info.license.name).toContain('杭州健澜科技有限公司');
   });
 
