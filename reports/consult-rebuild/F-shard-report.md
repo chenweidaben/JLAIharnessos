@@ -1,14 +1,14 @@
 # consult-agent M86 重建 · F 分片汇总报告（安全/集成测试补齐 + 全量静态门禁收口 + B 类改动独立验证）
 
 - 仓库根：`C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1`
-- 分支：`consult-agent-m86`；任务书基线 HEAD：`3f0190788ce05fd7231bbefb68618cecccbc470e`；报告撰写期间分支经 G 收口阶段十组提交演进至收口 HEAD（SHA 以 `git log -1` 为准，演进留证见 §0）；备份分支 `backup/pre-m86-rebuild`
+- 分支：`consult-agent-m86`；任务书基线 HEAD：`3f0190788ce05fd7231bbefb68618cecccbc470e`；报告撰写期间分支经 G 十组提交演进至 HEAD `44fe568b`，收口三组提交（F 授权两组 + 并发品牌组）SHA 见 §7.2 / §7.3（演进留证见 §0）；备份分支 `backup/pre-m86-rebuild`
 - 执行时间：2026-10-25 19:38（Asia/Shanghai）
 - 环境：PowerShell 5.1（禁 bash）；node v22.23.2；bun 1.2.0，绝对路径 `C:\Users\lenovo\.bun\bin\bun.exe`；`node_modules\.bin\tsc.cmd/eslint.cmd/prettier.cmd` 在位；`tests/support/testEnv.ts` 经 bunfig preload 全局置 `DEMO_MODE=1`；本机无运行中 PostgreSQL；无 LLM 凭证，走确定性引导文案。
 - 口径依据：`CONTRACT-m86.md` §1 类型 / §11 SSE 帧 / §12 十二端点 / §15 红线 / §16 门禁 / §17 提交纪律；`STAGING-DISCIPLINE.md` §0、§1、§3.1 混合文件 hunk 归属；`baseline-survey.md` §4 范式 / §7 验收门禁。
 
 ## 0. 红线遵守声明（F 分片自证）
 
-1. **编写阶段** F 未自行执行任何 `git add` / `git commit` / `git push` / `git reset`；收口阶段两组授权提交（§7.2）由 F 按 Organizer 指令显式分组 `git add` 与 `git commit` 完成，身份固定 `chenweidaben <chenweidaben@users.noreply.github.com>`，全程未 `git push`、未修改 origin 配置；除授权两组外，工作区与索引保持现场。
+1. **编写阶段** F 未自行执行任何 `git add` / `git commit` / `git push` / `git reset`；收口阶段 F 授权两组提交（`73a2b2ae`、`d3d4b696`，§7.2）按 Organizer 指令显式分组 `git add` 与 `git commit` 完成，身份固定 `chenweidaben <chenweidaben@users.noreply.github.com>`；`749d529d` 为并发品牌组（§7.2 留档）；全程未 `git push`、未修改 origin 配置；除授权分组外，工作区与索引保持现场。
 2. F 未改写 `src/core/agent/consult/**`、BFF 路由/仓储、`web/**`、`docs/**`、`deploy/**` 既有 consult 产物；除两个新测试目录外**未新增任何源码**；收口授权提交不触碰 consult 源码/测试/前端/SQL/文档。
 3. F 新增测试仅落在 `tests/security/consult-agent/` 与 `tests/integration/consult-agent/` 两个目录；测试不连库、不联网、无 LLM 凭证依赖。
 4. 两个新测试文件版权头均为 `Copyright (c) 2026 杭州健澜科技有限公司`；consult 新增树旧称扫描 `TOTAL_HITS=0`，提交后复扫仍为 0（见 §6 证据索引 `F-brand-grep.log`、`F-brand-grep-postcommit.log`）。
@@ -29,9 +29,12 @@
 > | `ea1fe58f` | `docs(audit)` 2026-10-25 架构与全栈审计整改报告及取证归档 | 审计报告、`reports/audit-2026-10-25/`、`reports/patrol/` 与首批 F 底稿入库；另含一组与 F 无关的 `web/src/pages/medical-record-version-compare` 审计页面；无 `src/` 后端改动 |
 > | `256cbcdd` | `docs(consult-rebuild)` 补录五组提交落地后现场复核留证 | 仅 `reports/consult-rebuild/F-gate-exits.txt`、`F-shard-report.md` 两份底稿增量；无 `src/` 后端改动 |
 > | `f238cbba` | `docs(audit)` 终轮门禁口径回填与 F1/F2 基线失败提交后留证 | 审计报告、`F-gate-exits.txt` 提交后 F1/F2 记录与 `F-shard-report.md` 旧稿回填；仅 `reports/` 三份底稿，无 `src/` 后端改动 |
-> | 本组 G10 收口提交（HEAD，SHA 见 `git log -1`） | `style(consult-agent)` G10 Prettier 格式收口 `sessionRuntime.ts` 并回填留证 | `sessionRuntime.ts` 折行修复（3 插入 / 1 删除，无逻辑变更）+ 三份 `reports/` 底稿回填；G10 闭环 |
+> | `44fe568b` | `style(consult-agent)` G10 Prettier 格式收口 `sessionRuntime.ts` 并回填留证 | `sessionRuntime.ts` 折行修复（3 插入 / 1 删除，无逻辑变更）+ 三份 `reports/` 底稿回填；G10 闭环 |
+> | `73a2b2ae` | `fix(brand)` 在线问候兜底文案产品名收口（server.ts 单 hunk，非 consult 改动） | 仅 `src/bff/server.ts`，1 插入 / 1 删除；F 授权 `fix(brand)` 组 |
+> | `d3d4b696` | `docs(consult-rebuild)` F 分片报告、门禁留证与 20:09 巡检记录回填 | 3 份 `reports/` 底稿，+240 / −38；F 授权 docs 组 |
+> | `749d529d` | `fix(brand)` .dockerignore 构建上下文忽略清单头部旧称收口 | `.dockerignore`、`web/.dockerignore` 各 1/1；并发品牌组，非 F 授权清单，留档不混入 consult 交付 |
 >
-> F 编写阶段未自行执行 `git add / commit / push / reset`；上述十组提交由 G 分片按纪律 §17 完成；收口阶段另有两组授权提交（品牌兜底文案 + docs 底稿回填）按 §7.2 执行，身份固定 `chenweidaben <chenweidaben@users.noreply.github.com>`，全程未 `git push`、未改 origin。F 两个新测试文件经 `git show 42c98a3d --stat` 核实已被该提交纳入。§2.7 提交后门禁复跑以 `db3ace9f` 为现场对照；其后 `65802b20`、`ea1fe58f`、`256cbcdd`、`f238cbba` 仅涉及忽略规则、探针去索引与 `reports/` 底稿归档，未触碰 `src/` 后端 consult 源码；G10 收口提交仅含 `sessionRuntime.ts` 折行修复与底稿回填；收口现场状态见 §3.6。§3 B 类盘点与基线对比均为**提交前对照 `3f019078` 的实测快照**。
+> F 编写阶段未自行执行 `git add / commit / push / reset`；上述十组产品/housekeeping 提交由 G 分片按纪律 §17 完成；收口阶段 `73a2b2ae`、`d3d4b696` 两组授权提交按 §7.2 执行，`749d529d` 为并发品牌组；提交身份统一 `chenweidaben <chenweidaben@users.noreply.github.com>`，全程未 `git push`、未改 origin。F 两个新测试文件经 `git show 42c98a3d --stat` 核实已被该提交纳入。§2.7 提交后门禁复跑以 `db3ace9f` 为现场对照；其后 `65802b20`、`ea1fe58f`、`256cbcdd`、`f238cbba` 仅涉及忽略规则、探针去索引与 `reports/` 底稿归档，未触碰 `src/` 后端 consult 源码；`44fe568b` 仅含 G10 折行修复与底稿回填；收口现场状态见 §3.6。§3 B 类盘点与基线对比均为**提交前对照 `3f019078` 的实测快照**。
 
 ---
 
@@ -206,7 +209,7 @@ $env:DEMO_MODE='1'; & "C:\Users\lenovo\.bun\bin\bun.exe" test tests/unit/consult
 
 ### 2.7 提交后现场复跑（对照 HEAD `db3ace9f`，五组提交落地后）
 
-五组提交落地后，F 在当前工作区复跑以下门禁，退出码与统计取自真实运行（日志 `F-*-postcommit.log`）；其后 `65802b20` / `ea1fe58f` / `256cbcdd` / `f238cbba` 仅调整忽略规则、探针去索引与 `reports/` 底稿归档（不含 `src/` 后端改动，见 §3.6 阶段二），本节门禁结论对收口 HEAD 仍然成立；G10 修复前一轮复跑证据见 §2.8，G10 收口证据见 §2.9，G10 入库后干净现场终轮复跑见 §2.10。
+五组提交落地后，F 在当前工作区复跑以下门禁，退出码与统计取自真实运行（日志 `F-*-postcommit.log`）；其后 `65802b20` / `ea1fe58f` / `256cbcdd` / `f238cbba` 仅调整忽略规则、探针去索引与 `reports/` 底稿归档（不含 `src/` 后端改动，见 §3.6 阶段二），本节门禁结论对 HEAD `44fe568b` 仍然成立；G10 修复前一轮复跑证据见 §2.8，G10 收口证据见 §2.9，G10 入库后干净现场终轮复跑见 §2.10。
 
 | 命令（仓库根 / `web/`） | 退出码 | 结果 | 证据 |
 |---|---:|---|---|
@@ -254,15 +257,15 @@ $env:DEMO_MODE='1'; & "C:\Users\lenovo\.bun\bin\bun.exe" test tests/unit/consult
 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | 177 pass / 0 fail / 659 expect / 15 文件 | `F-bun-consult-final2.log`、`BUN_CONSULT_FINAL2_EXIT=0` |
 | `bun test` B 类 8 个既有测试文件 | **0** | 140 pass / 0 fail / 1143 expect / 8 文件 | `F-bun-bclass-final2.log`、`BUN_BCLASS_FINAL2_EXIT=0` |
 
-**(b) 入库闭环**：折行 hunk 随 G10 收口提交（`style(consult-agent)`）入库（同提交含三份 `reports/` 底稿回填，无其他源码改动）；入库后干净现场终轮复跑见 §2.10。G10 闭环状态同步至 §5.1 与 §7.2。
+**(b) 入库闭环**：折行 hunk 随 `44fe568b style(consult-agent)` 入库（同提交含三份 `reports/` 底稿回填，无其他源码改动）；入库后干净现场终轮复跑见 §2.10。G10 闭环状态同步至 §5.1 与 §7.2。
 
-### 2.10 收口 HEAD 干净现场终轮复跑（交付口径证据）
+### 2.10 HEAD `44fe568b` 干净现场终轮复跑（交付口径证据）
 
-G10 收口提交入库后（§2.10 时点快照）工作区干净（`git status --short` 为空），F 对当时现场再跑一轮门禁，退出码与统计取自真实运行（日志 `F-*-final3.log`）：
+`44fe568b` 入库后（§2.10 时点快照）工作区干净（`git status --short` 为空），F 对当时现场再跑一轮门禁，退出码与统计取自真实运行（日志 `F-*-final3.log`）：
 
 | 命令（仓库根 / `web/`） | 退出码 | 结果 | 证据 |
 |---|---:|---|---|
-| `node_modules\.bin\tsc.cmd --noEmit` | **0** | 0 字节输出；类型检查通过 | `TSC_FINAL3_EXIT=0`（`F-gate-exits.txt`；根 tsc 终轮留证见主报告 §7.4） |
+| `node_modules\.bin\tsc.cmd --noEmit` | **0** | 0 字节输出；类型检查通过 | `TSC_FINAL3_EXIT=0`（`F-gate-exits.txt`；`F-tsc-final3.log`） |
 | `node_modules\.bin\eslint.cmd <后端 consult 六路径> --max-warnings 0` | **0** | 0 问题；仅 `.eslintignore` 弃用提示 | `F-eslint-backend-final3.log`、`ESLINT_BACKEND_FINAL3_EXIT=0` |
 | `node_modules\.bin\prettier.cmd --check <后端 consult 六路径>` | **0** | `All matched files use Prettier code style!`；G10 告警清零、后端 consult 格式全绿 | `F-prettier-backend-final3.log`、`PRETTIER_BACKEND_FINAL3_EXIT=0` |
 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect / 15 文件 / 12.85s** | `F-bun-consult-final3.log`、`BUN_CONSULT_FINAL3_EXIT=0` |
@@ -271,7 +274,7 @@ G10 收口提交入库后（§2.10 时点快照）工作区干净（`git status 
 | `web/` 本地 `eslint` 同两文件 | **0** | 0 问题 | `F-eslint-webE-local-final3.log`、`WEB_LOCAL_ESLINT_FINAL3_EXIT=0` |
 | `web/` 本地 `prettier --check` 同两文件 | **0** | `All matched files use Prettier code style!` | `F-prettier-webE-final3.log`、`WEB_LOCAL_PRETTIER_FINAL3_EXIT=0` |
 
-> 交付口径：收口 HEAD 上，consult 专项后端门禁（tsc、后端 ESLint、后端 Prettier、consult 测试、B 类回归）全部 exit 0；唯一未消化项为 web 根口径 ESLint 9 问题（E 分片债务，§5.4）；web 本地 ESLint/Prettier exit 0。
+> 交付口径：HEAD `44fe568b` 上，consult 专项后端门禁（tsc、后端 ESLint、后端 Prettier、consult 测试、B 类回归）全部 exit 0；唯一未消化项为 web 根口径 ESLint 9 问题（E 分片债务，§5.4）；web 本地 ESLint/Prettier exit 0。
 
 ---
 
@@ -465,7 +468,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 - `reports/consult-rebuild/` 底稿不纳入测试断言与产物清单；
 - 本轮未对 `node_modules` 执行重装，变更仅核对 diff 摘要。
 
-### 3.6 提交后现场复核（分三阶段，最终对照收口 HEAD 与收口两组授权提交）
+### 3.6 提交后现场复核（分三阶段，最终对照 HEAD `44fe568b` 与收口三组提交）
 
 **阶段一：五组提交落地后（对照 `db3ace9f`）**，`git diff HEAD --numstat` 跟踪改动仅剩 3 个文件，B 类产品类改动已分别由 `b5ecf42e`（安全加固）、`3985342a`（品牌）、`378f9928`（路由）、`db3ace9f`（部署/配置/README）吸收入库：
 
@@ -475,24 +478,23 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 | `web/.gitignore` | 8 | 0 | B 类忽略规则追加；后由 `65802b20` 入库 |
 | `probe_m416.txt` | 11 | 6 | 历史探针日志被后续探测覆写（`ERR 404 /api/v1/timeline/...` 11 行替换原 6 行 OK 记录）；`chore(housekeeping)` 排除项，后由 `65802b20` 去索引 |
 
-**阶段二：最终现场（`65802b20` / `ea1fe58f` / `256cbcdd` / `f238cbba` 与 G10 收口提交落地后，对照收口 HEAD）**：产品类、B 类、consult 源码与前端零残留，未跟踪文件数 = 0；`git status --short` 为空（干净工作树，§2.10 时点快照）。期间一度仅剩 `reports/**` 底稿工作区修改，已由 `f238cbba` 与 G10 收口提交分批入库；G10 折行 hunk 随 G10 收口提交一并提交。
+**阶段二：最终现场（`65802b20` / `ea1fe58f` / `256cbcdd` / `f238cbba` / `44fe568b` 落地后，对照 HEAD `44fe568b`）**：产品类、B 类、consult 源码与前端零残留，未跟踪文件数 = 0；`git status --short` 为空（干净工作树，§2.10 时点快照）。期间一度仅剩 `reports/**` 底稿工作区修改，已由 `f238cbba`、`44fe568b` 分批入库；G10 折行 hunk 随 `44fe568b` 一并提交。
 
-- `reports/consult-rebuild/F-gate-exits.txt` 提交后 F1/F2 基线记录与终轮退出码已由 `f238cbba` 与 G10 收口提交吸收入库；
+- `reports/consult-rebuild/F-gate-exits.txt` 提交后 F1/F2 基线记录与终轮退出码已由 `f238cbba`、`44fe568b` 吸收入库；
 - `web/src/store/cdrQueryV2M636Store.ts` 在后续提交中已被 G 处理，当前工作区与 HEAD 一致；阶段一记录的 `reports/archive/`、`reports/audit-2026-10-25/`、`reports/patrol/`、`miniprogram/README.md`、`services/radar-inference/app/data/` 等未跟踪项均已由 `ea1fe58f` / `65802b20` 归档或忽略；
-- 提交后 B 类 8 个既有测试文件复跑 **140 pass / 0 fail / 1143 expect**（§2.7 对照 `db3ace9f`、§2.10 对照收口 HEAD），证明入库后的 B 类改动与其既有测试相容；§3.3 的 ESLint/Prettier 基线对比结论（B diff 零新增问题）以提交前快照为准；
-- `65802b20`、`ea1fe58f`、`256cbcdd`、`f238cbba` 经 `git show --name-only` 复核均不含 `src/` 后端改动；G10 收口提交仅含 `sessionRuntime.ts` G10 折行修复与底稿回填；`ea1fe58f` 另含一组与 F 无关的 `web/src/pages/medical-record-version-compare` 审计页面，不计入 consult 交付。
+- 提交后 B 类 8 个既有测试文件复跑 **140 pass / 0 fail / 1143 expect**（§2.7 对照 `db3ace9f`、§2.10 对照 HEAD `44fe568b`、§7.3 对照 `73a2b2ae`），证明入库后的 B 类改动与其既有测试相容；§3.3 的 ESLint/Prettier 基线对比结论（B diff 零新增问题）以提交前快照为准；
+- `65802b20`、`ea1fe58f`、`256cbcdd`、`f238cbba` 经 `git show --name-only` 复核均不含 `src/` 后端改动；`44fe568b` 仅含 `sessionRuntime.ts` G10 折行修复与底稿回填；`ea1fe58f` 另含一组与 F 无关的 `web/src/pages/medical-record-version-compare` 审计页面，不计入 consult 交付。
 
-**阶段三：收口授权提交前现场（G10 收口提交时点，待两组提交落地）**，`git status --short` 实测残留仅下列四项，不含 consult 源码/测试/前端/SQL/文档改动：
+**阶段三：收口授权提交落地（基线 HEAD `44fe568b`，实测 `git show --numstat`）**。提交前现场残留与原指令清单一致：`server.ts` 6676 行品牌文案单 hunk、两份 `reports/` 底稿修改、20:09 巡检记录未跟踪；落地分组如下：
 
-| 状态 | 路径 | 规模 / 性质 | 归口 |
+| 提交 | 分组 | 文件 / 增删 | 性质 |
 |---|---|---|---|
-| ` M` | `src/bff/server.ts` | 6676 行兜底问候文案品牌改名单 hunk，1 插入 / 1 删除（「健澜数智医院智能体」→「健澜AI原生医院操作系统OS」），非 consult 改动 | `fix(brand)` 独立提交（§3.2.6、§7.2） |
-| ` M` | `reports/consult-rebuild/F-gate-exits.txt` | 16 插入 / 0 删除：终轮退出码回填 | `docs(consult-rebuild)` 提交 |
-| ` M` | `reports/consult-rebuild/F-shard-report.md` | 45 插入 / 22 删除：本报告定稿回填 | `docs(consult-rebuild)` 提交 |
-| `??` | `reports/patrol/patrol-20261025-2009.md` | 20:09 第 4 轮巡检记录，按既有 `patrol-20261025-1758.md` / `-1825.md` / `-1920.md` 同口径 | `docs(consult-rebuild)` 提交 |
+| `73a2b2ae` | `fix(brand)` | `src/bff/server.ts`，1 插入 / 1 删除 | 6676 行兜底问候文案品牌改名（「健澜数智医院智能体」→「健澜AI原生医院操作系统OS」），非 consult；F 授权组 |
+| `d3d4b696` | `docs(consult-rebuild)` | `F-gate-exits.txt` 17/1、`F-shard-report.md` 97/37、`patrol-20261025-2009.md` 126/0；合计 +240 / −38 | F 底稿与 20:09 巡检记录回填；F 授权组 |
+| `749d529d` | `fix(brand)`（并发，非 F 授权清单） | `.dockerignore` 1/1、`web/.dockerignore` 1/1 | 仅构建上下文忽略清单头部注释旧称替换，无逻辑改动；留档不混入 consult 交付 |
 
-- 两组提交严格分组成：`fix(brand)` 仅 `git add src/bff/server.ts`；`docs(consult-rebuild)` 仅 add 上述三份 `reports/` 底稿；`web/src/store/cdrQueryV2M636Store.ts` 保持已提交状态不动；根目录 `*.txt` / `*.csv` 探针与 `web/build_out.txt` / `coverage_out.txt` 一律不 `git add`；
-- 阶段三提交后 `git status --short` 应为空（除未跟踪探针 txt/csv 外）；提交身份 `chenweidaben <chenweidaben@users.noreply.github.com>`；不执行 `git push`、不改 origin。
+- 提交纪律执行：`fix(brand)` 与 `docs(consult-rebuild)` 物理分组，未混组；`web/src/store/cdrQueryV2M636Store.ts` 保持已提交状态不动；根目录 `*.txt` / `*.csv` 探针与 `web/build_out.txt` / `coverage_out.txt` 一律未 `git add`；提交身份统一 `chenweidaben <chenweidaben@users.noreply.github.com>`；未执行 `git push`、未修改 origin；
+- 阶段三 F 授权两组落地后，除并发品牌组 `749d529d` 外无产品类残留；F 终稿回填（§7.3 表内 post2 证据行）仅涉及两份 `reports/` 底稿，归入 docs 组。
 
 ---
 
@@ -524,7 +526,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 | G3 | `src/bff/routes/health.ts` 信封包装 | `ok()` 信封 + `traceId` 包装无专属路由测试 | 无 |
 | G4 | `src/bff/routes/imaging.ts` 409 语义 | 重复签名 409/CONFLICT 分支无专属路由测试 | 无 |
 | G5 | `src/bff/routes/twin3DInpatient.ts` handler | 路由 handler 无测试；`twin3DInpatient.test.ts` 18 例仅覆盖聚合器纯函数 | 聚合器层 18 例 |
-| ~~G10~~ | ~~`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 格式~~ **已闭环（§2.9、§2.10，随 G10 收口提交入库）** | 提交后 `prettier --check` 唯一告警文件（A 类已提交核心源码，`42c98a3d` 入库版本）；收口仅对折行告警修复（3 插入 / 1 删除），无逻辑变更、无接口签名改动；收口 HEAD 上后端 consult 六路径 `prettier --check` exit 0、根 tsc exit 0、后端 ESLint exit 0 | consult 两新测试文件 `--check` exit 0；终轮证据 `F-prettier-backend-final3.log`、`F-eslint-backend-final3.log`，根 tsc 留证见主报告 §7.4；G10 不再列入未闭环缺口 |
+| ~~G10~~ | ~~`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 格式~~ **已闭环（§2.9、§2.10，随 `44fe568b` 入库）** | 提交后 `prettier --check` 唯一告警文件（A 类已提交核心源码，`42c98a3d` 入库版本）；收口仅对折行告警修复（3 插入 / 1 删除），无逻辑变更、无接口签名改动；HEAD `44fe568b` 上后端 consult 六路径 `prettier --check` exit 0、根 tsc exit 0、后端 ESLint exit 0 | consult 两新测试文件 `--check` exit 0；终轮证据 `F-prettier-backend-final3.log`、`F-tsc-final3.log`、`F-eslint-backend-final3.log`；G10 不再列入未闭环缺口 |
 
 ### 5.2 环境依赖未跑范围
 
@@ -545,7 +547,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 ### 5.4 web consult 前端根配置 ESLint 债务（归属 E 分片，红线禁止 F 改写 `web/**`）
 
 - 根配置 `--max-warnings 0` 退出码 1：9 问题（7 errors / 2 warnings），明细见 §2.2(b)；web 本地配置口径退出码 0、Prettier 退出码 0；
-- **提交后复核**（§2.7）：五组提交落地后根口径仍为 exit 1、9 问题（7 errors / 2 warnings），规则与位置未变，G 提交未消化该债务；**终轮复核**（§2.10，收口 HEAD，`F-eslint-webE-final3.log`）：根口径仍 exit 1、同 9 问题同位置，web 本地 ESLint / Prettier 仍 exit 0；
+- **提交后复核**（§2.7）：五组提交落地后根口径仍为 exit 1、9 问题（7 errors / 2 warnings），规则与位置未变，G 提交未消化该债务；**终轮复核**（§2.10，HEAD `44fe568b`，`F-eslint-webE-final3.log`）：根口径仍 exit 1、同 9 问题同位置，web 本地 ESLint / Prettier 仍 exit 0；
 - 待 E 分片在不违反根配置口径前提下修复：2 处 `prefer-nullish-coalescing`、5 处 `no-misused-promises`、2 处 import 排序；
 - F 未对 `web/src/pages/consult-agent`、`web/src/services/api/consultAgent.ts` 执行任何 `--fix` 或 `--write`。
 
@@ -565,7 +567,7 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 
 | 文件 | 内容 |
 |---|---|
-| `F-gate-exits.txt` | 门禁退出码汇总：提交前 10 条 + 交付前复跑 4 条 `*_FINAL_EXIT=0` + 提交后复跑 8 条 `*_POSTCOMMIT_EXIT`（含后端 Prettier exit 1 单列说明）+ 提交后 F1/F2 基线失败 3 条 + G10 修复轮 `*_FINAL2_EXIT` 5 条 + 干净 HEAD `*_FINAL3_EXIT` 9 条 |
+| `F-gate-exits.txt` | 门禁退出码汇总：提交前 10 条 + 交付前复跑 4 条 `*_FINAL_EXIT=0` + 提交后复跑 8 条 `*_POSTCOMMIT_EXIT`（含后端 Prettier exit 1 单列说明）+ 提交后 F1/F2 基线失败 3 条 + G10 修复轮 `*_FINAL2_EXIT` 5 条 + 干净 HEAD `*_FINAL3_EXIT` 9 条 + 收口 `*_POST2_EXIT` 8 条（§7.3） |
 | `F-tsc.log` | 根 `tsc --noEmit` 输出（0 字节，退出码 0） |
 | `F-eslint-backend.log` | 后端 consult 路径 ESLint 输出（0 问题；仅 `.eslintignore` 弃用提示） |
 | `F-eslint-consult.log` | 编写中途的合并口径快照（3 处 `non-nullable-type-assertion-style` 与 web 9 问题，均已修复/归属 E 分片）；最终状态以 `F-eslint-backend.log` 与 `F-eslint-webE.log` 为准 |
@@ -576,7 +578,8 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 | `F-permissions-final.log`、`F-flow-final.log` | G10 修复前单文件独立复跑：permissions 69 pass / 0 fail / 177 expect / 1 文件 / 1.40s；consultFlow 7 pass / 0 fail / 181 expect / 1 文件 / 11.22s，均 exit 0 |
 | `F-tsc-latest.log`、`F-eslint-backend-latest.log`、`F-prettier-backend-latest.log`、`F-prettier-f-tests-latest.log`、`F-bun-consult-latest.log`、`F-bun-bclass-latest.log`、`F-eslint-webE-latest.log`、`F-eslint-webE-local-latest.log`、`F-prettier-webE-latest.log` | 对照 HEAD `f238cbba`（G10 尚开放时点，§2.8）：tsc 0、后端 ESLint 0、后端 Prettier 仅 `sessionRuntime.ts` 告警（G10）、F 两测试文件单独 Prettier 0、consult 177 pass / 0 fail / 659 expect / 15 文件 / 11.76s、B 类 140 pass / 0 fail / 1143 expect / 8 文件 / 1.53s、根口径 web ESLint 9 问题、web 本地 ESLint/Prettier 0 |
 | `F-tsc-final2.log`、`F-eslint-backend-final2.log`、`F-prettier-backend-final2.log`、`F-bun-consult-final2.log`、`F-bun-bclass-final2.log` | G10 工作树修复后未提交时点复跑（§2.9(a)）：tsc 0、后端 ESLint 0、后端 Prettier 0（G10 清零）、consult 177 pass / 0 fail / 659 expect / 15 文件、B 类 140 pass / 0 fail / 1143 expect / 8 文件 |
-| `F-eslint-backend-final3.log`、`F-prettier-backend-final3.log`、`F-bun-consult-final3.log`、`F-bun-bclass-final3.log`、`F-eslint-webE-final3.log`、`F-eslint-webE-local-final3.log`、`F-prettier-webE-final3.log` | 收口 HEAD 终轮复跑（§2.10）；根 tsc 0 字节诊断留证见主报告 §7.4 |：tsc 0、后端 ESLint 0、后端 Prettier 0、consult 177 pass / 0 fail / 659 expect / 15 文件 / 12.85s、B 类 140 pass / 0 fail / 1143 expect / 8 文件 / 1.80s、根口径 web ESLint 仍 9 问题（7 errors / 2 warnings）、web 本地 ESLint/Prettier 0 |
+| `F-tsc-final3.log`、`F-eslint-backend-final3.log`、`F-prettier-backend-final3.log`、`F-bun-consult-final3.log`、`F-bun-bclass-final3.log`、`F-eslint-webE-final3.log`、`F-eslint-webE-local-final3.log`、`F-prettier-webE-final3.log` | 干净 HEAD `44fe568b` 终轮复跑（§2.10）：tsc 0、后端 ESLint 0、后端 Prettier 0、consult 177 pass / 0 fail / 659 expect / 15 文件 / 12.85s、B 类 140 pass / 0 fail / 1143 expect / 8 文件 / 1.80s、根口径 web ESLint 仍 9 问题（7 errors / 2 warnings）、web 本地 ESLint/Prettier 0 |
+| `F-tsc-post2.log`、`F-eslint-backend-post2.log`、`F-prettier-backend-post2.log`、`F-tsc-web-post2.log`、`F-eslint-webE-local-post2.log`、`F-prettier-webE-post2.log`、`F-bun-consult-post2.log`、`F-bun-bclass-post2.log` | 收口 `fix(brand)` 提交 `73a2b2ae` 后终轮复跑（§7.3）：根 tsc 0、后端 ESLint 0、后端 Prettier 0、web 本地 tsc 0、web 本地 ESLint 0、web 本地 Prettier 0、consult 177 pass / 0 fail / 659 expect / 15 文件 / 12.04s、B 类 140 pass / 0 fail / 1143 expect / 8 文件 / 1.67s |
 | `F-bun-apidocs.log` | `tests/unit/apiDocs.test.ts` 独立单跑 13 pass / 0 fail / 204 expect |
 | `F-bclass.log`、`F-bun-bclass.log` | B 类回归 8 文件 140 pass / 0 fail / 1143 expect 逐用例输出 |
 | `F-eslint-bclass.log` | B 类当前 17 问题（12 errors / 5 warnings）逐文件逐规则输出 |
@@ -603,16 +606,17 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 
 1. A 类提交仅显式纳入 `STAGING-DISCIPLINE.md` §0.2 清单的 61 个新增文件与 `permissions.ts` 整文件、`server.ts` 2 行 consult hunk、`web/src/router/index.tsx` 两段 consult hunk；混合文件其余 hunk 与 §3.2 全部 B 类文件物理分开。
 2. 提交前先 `git reset` 清掉暂存区既有 656 个历史删除；`.env.example` 整体归 B，不得纳入 `feat(consult-agent)`。
-3. 上述口径已由 `42c98a3d`（consult A 全链路）、`b5ecf42e`（B 安全加固）、`3985342a`（B 品牌）、`378f9928`（B 路由）、`db3ace9f`（B 部署/配置/README）五组产品提交落地；其后 `65802b20`（忽略规则/探针去索引）、`ea1fe58f`（审计归档与无关审计页面）、`256cbcdd`（F 底稿增量）、`f238cbba`（终轮门禁口径回填与 F1/F2 留证）、G10 收口提交（Prettier 收口与底稿回填）为 housekeeping / docs / style 提交；其中 `f238cbba` 与 G10 收口提交不含 consult 产品源码改动。F 两个新测试文件经 `git show 42c98a3d --stat` 核实已纳入（423 + 475 行）。收口阶段另两组授权提交（`fix(brand)` 兜底文案、`docs(consult-rebuild)` 底稿回填）见 §7.2，不含 consult 源码/测试/前端/SQL/文档改动。
+3. 上述口径已由 `42c98a3d`（consult A 全链路）、`b5ecf42e`（B 安全加固）、`3985342a`（B 品牌）、`378f9928`（B 路由）、`db3ace9f`（B 部署/配置/README）五组产品提交落地；其后 `65802b20`（忽略规则/探针去索引）、`ea1fe58f`（审计归档与无关审计页面）、`256cbcdd`（F 底稿增量）、`f238cbba`（终轮门禁口径回填与 F1/F2 留证）、`44fe568b`（G10 Prettier 收口与底稿回填）为 housekeeping / docs / style 提交；其中 `f238cbba`、`44fe568b` 不含 consult 产品源码改动。F 两个新测试文件经 `git show 42c98a3d --stat` 核实已纳入（423 + 475 行）。收口阶段 `73a2b2ae`（`fix(brand)` 兜底文案）、`d3d4b696`（`docs(consult-rebuild)` 底稿回填）为 F 授权两组，`749d529d` 为并发品牌组（§7.2），均不含 consult 源码/测试/前端/SQL/文档改动。
 
-### 7.2 收口两组授权提交（基线为 G10 收口提交，本报告定稿时待执行）
+### 7.2 收口提交实测（基线 HEAD `44fe568b`，身份统一 `chenweidaben <chenweidaben@users.noreply.github.com>`）
 
-1. **分组与暂存范围（禁止混组）**：
-   - `fix(brand): 在线问候兜底文案产品名收口（server.ts 单 hunk，非 consult 改动）`：仅 `git add src/bff/server.ts`（6676 行兜底问候文案 1 插入 / 1 删除，品牌「健澜数智医院智能体」→「健澜AI原生医院操作系统OS」）；
-   - `docs(consult-rebuild): F 分片报告、门禁留证与 20:09 巡检记录回填`：仅 `git add reports/consult-rebuild/F-gate-exits.txt reports/consult-rebuild/F-shard-report.md reports/patrol/patrol-20261025-2009.md`。
-2. **禁止事项**：不改动 consult 源码/测试/前端/SQL/文档；不 `git add` 根目录任何 `*.txt` / `*.csv` 探针、`web/build_out.txt`、`coverage_out.txt`；`web/src/store/cdrQueryV2M636Store.ts` 保持已提交状态不动；提交身份固定 `chenweidaben <chenweidaben@users.noreply.github.com>`；不执行 `git push`；不修改 origin 远端配置。
-3. **提交后终态**：`git status --short` 为空（未跟踪探针 txt/csv 除外）；两组提交 SHA、文件清单与增删行数回填 §7.3 表；提交后门禁复跑退出码与测试统计同表回填。
-4. **G10（已闭环）**：`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 折行收口（§2.9），无逻辑变更、无接口签名改动；§2.10 终轮复跑后端 consult 六路径 `prettier --check` exit 0、根 tsc exit 0、后端 ESLint exit 0。
+1. **F 授权两组（指令原口径，禁止混组）**：
+   - `73a2b2ae fix(brand): 在线问候兜底文案产品名收口（server.ts 单 hunk，非 consult 改动）`：仅 `src/bff/server.ts`，6676 行兜底问候文案 1 插入 / 1 删除（「健澜数智医院智能体」→「健澜AI原生医院操作系统OS」）；
+   - `d3d4b696 docs(consult-rebuild): F 分片报告、门禁留证与 20:09 巡检记录回填`：仅 `reports/consult-rebuild/F-gate-exits.txt`、`reports/consult-rebuild/F-shard-report.md`、`reports/patrol/patrol-20261025-2009.md` 三份底稿（numstat 17/1、97/37、126/0）。
+2. **并发追加组（非 F 授权清单，同身份同纪律，留档备查、不计入 consult 交付）**：
+   - `749d529d fix(brand): .dockerignore 构建上下文忽略清单头部旧称收口`：`.dockerignore`、`web/.dockerignore` 各 1 插入 / 1 删除，仅头部注释旧称替换，无逻辑改动；由并发流程按品牌组落地，F 未暂存、未改写该两文件。
+3. **禁止事项执行记录**：未 `git add` 根目录任何 `*.txt` / `*.csv` 探针、`web/build_out.txt`、`coverage_out.txt`；`web/src/store/cdrQueryV2M636Store.ts` 保持已提交状态未动；未改动 consult 源码/测试/前端/SQL/文档；全程未 `git push`、未修改 origin 远端配置。
+4. **G10（已闭环，`44fe568b`）**：`src/core/agent/consult/runtime/sessionRuntime.ts` Prettier 折行收口（§2.9），无逻辑变更、无接口签名改动；§2.10 终轮复跑后端 consult 六路径 `prettier --check` exit 0、根 tsc exit 0、后端 ESLint exit 0。
 5. **§5.4 web 根口径 ESLint**：终轮仍 exit 1、9 问题（7 errors / 2 warnings），归属 E 分片；web 本地 ESLint / Prettier 口径 exit 0。
 6. **§5.5 文档残留**：4 处旧文件名引用仍在已入库的 `docs/` 与 `CHANGELOG.md`，待 B 类文档组替换为 `jlmedaios.yml`、`jlmedaios-overview.json`。
 7. **不阻塞项**：§5.1 G1–G5、§5.2 G6–G9 为环境与覆盖缺口；consult 专项后端门禁（tsc、后端 ESLint、后端 Prettier、consult 测试、B 类回归）终轮复跑均 exit 0。
@@ -621,15 +625,19 @@ web 前端代码（16 文件，26 / 26，含 `web/Dockerfile.frontend` 文案；
 
 | 项 | 内容 / 退出码 | 证据 |
 |---|---|---|
-| `fix(brand)` 提交 SHA | 待回填 | `git log -1 --format=%H` |
-| `fix(brand)` 文件清单与增删 | 待回填（预期仅 `src/bff/server.ts`，1 / 1） | `git show --stat` |
-| `docs(consult-rebuild)` 提交 SHA | 待回填 | `git log -1 --format=%H` |
-| `docs(consult-rebuild)` 文件清单与增删 | 待回填（预期 3 份 reports 底稿） | `git show --stat` |
-| 根 `tsc.cmd --noEmit` | 待回填退出码 | 终轮日志 |
-| 后端 consult `eslint --max-warnings 0` | 待回填退出码 | 终轮日志 |
-| 后端 consult `prettier --check` | 待回填退出码 | 终轮日志 |
-| `web/` 本地 `npx tsc --noEmit` | 待回填退出码 | 终轮日志 |
-| `web/` 本地 `eslint src/pages/consult-agent src/services/api/consultAgent.ts --max-warnings 0` | 待回填退出码 | 终轮日志 |
-| `web/` 本地 `prettier --check` 两文件 | 待回填退出码 | 终轮日志 |
-| `bun test` consult 三目录 | 待回填（预期 177 pass / 0 fail / 659 expect / 15 文件） | 终轮日志 |
-| 提交后 `git status --short` | 待回填（预期空，未跟踪探针除外） | 终端实测 |
+| `fix(brand)` 提交 SHA | `73a2b2aedd6e7602c2f66632017b4474e5b0e519` | `git show --stat 73a2b2ae` |
+| `fix(brand)` 文件清单与增删 | 仅 `src/bff/server.ts`，1 插入 / 1 删除（6676 行兜底问候文案品牌改名，非 consult） | `git show --stat 73a2b2ae` |
+| `docs(consult-rebuild)` 提交 SHA | `d3d4b69686a9b9474024c8771403ae7f62b92910` | `git show --stat d3d4b696` |
+| `docs(consult-rebuild)` 文件清单与增删 | `reports/consult-rebuild/F-gate-exits.txt` 17/1；`reports/consult-rebuild/F-shard-report.md` 97/37；`reports/patrol/patrol-20261025-2009.md` 126/0；合计 3 文件，240 插入 / 38 删除 | `git show --numstat d3d4b696` |
+| 并发 `fix(brand)`（非 F 授权，留档） | `749d529d38c306c8954b25d1f0c0068742ffa93e`；`.dockerignore` 1/1、`web/.dockerignore` 1/1，仅头部注释旧称替换 | `git show --stat 749d529d` |
+| F 终稿回填 docs 提交 SHA | 本提交（SHA 以 `git log -1 --format=%H` 实测为准，见回报消息） | `git show --stat` |
+| 根 `tsc.cmd --noEmit` | **exit 0**（0 字节诊断） | `F-tsc-post2.log` |
+| 后端 consult `eslint --max-warnings 0` | **exit 0**（仅 `.eslintignore` 弃用提示，非代码告警） | `F-eslint-backend-post2.log` |
+| 后端 consult `prettier --check` | **exit 0**（`All matched files use Prettier code style!`） | `F-prettier-backend-post2.log` |
+| `web/` 本地 `npx tsc --noEmit` | **exit 0**（0 字节诊断） | `F-tsc-web-post2.log` |
+| `web/` 本地 `eslint src/pages/consult-agent src/services/api/consultAgent.ts --max-warnings 0` | **exit 0**（仅 `.eslintignore` 弃用提示） | `F-eslint-webE-local-post2.log` |
+| `web/` 本地 `prettier --check` 两文件 | **exit 0**（`All matched files use Prettier code style!`） | `F-prettier-webE-post2.log` |
+| `bun test` consult 三目录 | **exit 0**；**177 pass / 0 fail / 659 expect() calls / 15 文件 / 12.04s** | `F-bun-consult-post2.log` |
+| B 类既有测试回归（补充证据） | **exit 0**；**140 pass / 0 fail / 1143 expect() calls / 8 文件 / 1.67s** | `F-bun-bclass-post2.log` |
+| 根配置 web ESLint（E 分片债务，非本轮门禁口径） | 本轮未复跑；终轮 `F-eslint-webE-final3.log` exit 1、9 问题（7 errors / 2 warnings），归属 E 分片，未消化 | §5.4 |
+| 提交后 `git status --short` | 除被忽略探针 txt/csv、构建产物与 `.env` 外为空（终轮实测，主报告 §7.4） | 终端实测 |

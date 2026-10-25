@@ -59,3 +59,14 @@ BUN_BCLASS_FINAL3_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.80s
 ROOT_WEB_ESLINT_FINAL3_EXIT=1; 9 problems (7 errors / 2 warnings), E debt
 WEB_LOCAL_ESLINT_FINAL3_EXIT=0
 WEB_LOCAL_PRETTIER_FINAL3_EXIT=0
+
+# === post2: after fix(brand) 73a2b2ae, closing authorized gate rerun (§7.3) ===
+TSC_POST2_EXIT=0
+ESLINT_BACKEND_POST2_EXIT=0
+PRETTIER_BACKEND_POST2_EXIT=0
+WEB_TSC_POST2_EXIT=0
+WEB_LOCAL_ESLINT_POST2_EXIT=0
+WEB_LOCAL_PRETTIER_POST2_EXIT=0
+BUN_CONSULT_POST2_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.04s
+BUN_BCLASS_POST2_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.67s
+ROOT_WEB_ESLINT_POST2_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
