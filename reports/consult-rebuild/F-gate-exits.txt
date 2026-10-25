@@ -70,3 +70,36 @@ WEB_LOCAL_PRETTIER_POST2_EXIT=0
 BUN_CONSULT_POST2_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.04s
 BUN_BCLASS_POST2_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.67s
 ROOT_WEB_ESLINT_POST2_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
+
+# === post3: final HEAD rerun after 73a2b2ae / d3d4b696 / 749d529d (§7.3 final evidence) ===
+TSC_POST3_EXIT=0
+ESLINT_BACKEND_POST3_EXIT=0
+PRETTIER_BACKEND_POST3_EXIT=0
+WEB_TSC_POST3_EXIT=0
+WEB_LOCAL_ESLINT_POST3_EXIT=0
+WEB_LOCAL_PRETTIER_POST3_EXIT=0
+BUN_CONSULT_POST3_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.01s
+BUN_BCLASS_POST3_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.53s
+ROOT_WEB_ESLINT_POST3_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
+
+# === post4: final HEAD delivery-certifying rerun (§7.3 final evidence; SHA 以 git log -1 实测为准) ===
+TSC_POST4_EXIT=0
+ESLINT_BACKEND_POST4_EXIT=0
+PRETTIER_BACKEND_POST4_EXIT=0
+WEB_TSC_POST4_EXIT=0
+WEB_LOCAL_ESLINT_POST4_EXIT=0
+WEB_LOCAL_PRETTIER_POST4_EXIT=0
+BUN_CONSULT_POST4_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.79s
+BUN_BCLASS_POST4_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.74s
+ROOT_WEB_ESLINT_POST4_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
+
+# === post5: final HEAD delivery certification rerun (§7.3 final committed evidence) ===
+TSC_POST5_EXIT=0
+ESLINT_BACKEND_POST5_EXIT=0
+PRETTIER_BACKEND_POST5_EXIT=0
+WEB_TSC_POST5_EXIT=0
+WEB_LOCAL_ESLINT_POST5_EXIT=0
+WEB_LOCAL_PRETTIER_POST5_EXIT=0
+BUN_CONSULT_POST5_EXIT=0; 177 pass / 0 fail / 659 expect / 15 files / 12.22s
+BUN_BCLASS_POST5_EXIT=0; 140 pass / 0 fail / 1143 expect / 8 files / 1.67s
+ROOT_WEB_ESLINT_POST5_NOT_RERUN; root-config E debt unchanged, final3 evidence F-eslint-webE-final3.log (exit 1, 9 problems)
