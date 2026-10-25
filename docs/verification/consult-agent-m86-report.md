@@ -101,8 +101,11 @@
 | `38a11cd8` | `docs(consult-agent)` M86 交付验证报告归档（本报告首版） | 1 | +427 / −0 | consult 交付文档 |
 | `92c5a416` | `docs(audit)` 22:10 第六轮巡检简报归档（门禁/测试/合规/SHA 复核留证） | 1 | +209 / −0 | 巡检留档 |
 | `f6b33c41` | `docs(audit)` HEAD 谱系与远端实测口径终轮回填 | 1 | +13 / −10 | 另一路审计留档 |
+| `c83379c5` | `docs(consult-agent)` 交付验证报告二次推送 SHA 核对与 follow-up 清单回填 | 1 | +33 / −11 | consult 交付文档 |
+| `fc7fd956` | `docs(consult-agent)` 报告 §8.6 第三轮终态 SHA 核对表回填 | 1 | +11 / −6 | consult 交付文档 |
+| `40783060` | `docs(consult-agent)` 报告 §8.6 第四轮终态 SHA 核对记录回填 | 1 | +14 / −3 | consult 交付文档 |
 
-> 四个 follow-up 提交仅触及 `reports/` 留档与本报告，未改 `src/`、`web/`、`tests/`、`deploy/` 任何产品源码；`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 在本报告提交前为空（docs-only 已复核）。
+> 七个 follow-up 提交仅触及 `reports/` 留档与本报告，未改 `src/`、`web/`、`tests/`、`deploy/` 任何产品源码；`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 实测为空（docs-only 已复核）。
 
 ## 3. consult-agent 交付物清单（feat 提交 `42c98a3d`，62 文件 +10459/0）
 
@@ -230,7 +233,7 @@
 
 ## 5. 门禁命令与退出码（终轮实测，未沿用旧口径）
 
-源码树在主推送 `ece20607` 之后的全部 follow-up docs 提交中逐字节未变（`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 为空）；下列退出码为二次推送前在干净现场实跑记录，日志留档 `reports/consult-rebuild/G-final-*.log`（tsc / eslint / prettier / web 三件套 / consult bun / B 类 bun）。
+源码树在主推送 `ece20607` 之后的全部 follow-up docs 提交中逐字节未变（`git diff ece20607 HEAD -- src web tests deploy package.json bun.lock` 为空）；下列退出码为终态 HEAD 干净现场实跑记录，日志留档 `reports/consult-rebuild/G-final2-*.log`（tsc / eslint / prettier / web 三件套 / consult bun / B 类 bun）。
 
 ### 5.1 静态门禁
 
@@ -247,8 +250,8 @@
 
 | 套件 | 命令 | 退出码 | 统计 |
 |---|---|---:|---|
-| consult 三目录 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect()，15 文件，12.19s** |
-| 另一路 B 类既有测试回归（8 文件） | `bun test tests/unit/apiDocs.test.ts tests/unit/twin3DInpatient.test.ts tests/unit/bff/demoModeGuard.test.ts tests/unit/bff/prodDemoFailClosed.test.ts tests/unit/core/SystemPromptBuilder.test.ts tests/unit/security/audit-report.test.ts tests/unit/security/audit.test.ts tests/unit/security/encryption.test.ts` | **0** | **140 pass / 0 fail / 1143 expect()，8 文件，1.69s** |
+| consult 三目录 | `bun test tests/unit/consult-agent tests/security/consult-agent tests/integration/consult-agent` | **0** | **177 pass / 0 fail / 659 expect()，15 文件，12.41s** |
+| 另一路 B 类既有测试回归（8 文件） | `bun test tests/unit/apiDocs.test.ts tests/unit/twin3DInpatient.test.ts tests/unit/bff/demoModeGuard.test.ts tests/unit/bff/prodDemoFailClosed.test.ts tests/unit/core/SystemPromptBuilder.test.ts tests/unit/security/audit-report.test.ts tests/unit/security/audit.test.ts tests/unit/security/encryption.test.ts` | **0** | **140 pass / 0 fail / 1143 expect()，8 文件，1.74s** |
 
 ### 5.3 前端根配置严格口径（债务单列，不计入 consult 新增）
 
