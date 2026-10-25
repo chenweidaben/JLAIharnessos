@@ -8,14 +8,18 @@
  * 性能：进程内缓存 jti 状态（短 TTL），吊销动作主动写入缓存，
  * 使单实例吊销即时生效，避免每请求都查库。
  *
- * 断库容错：缓存未命中且数据库不可用时放行（fail-open），
- * 由健康检查与各 handler 暴露真实错误，避免连带健康检查失效。
+ * 断库容错：缓存未命中且数据库不可用时按未登录拒绝（fail-closed），
+ * 避免吊销/过期会话在断库期间继续访问；DB 抖动期间合法会话会收到 401，
+ * 需 DB 恢复后重试，告警日志由本中间件输出。
+ *
+ * 演示模式：跳过 jti 查库仅限非生产环境；生产环境不得跳过会话校验。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
 import { getActiveByJti } from '@/db/repositories/sessionRepo';
 
+import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
 import type { Ctx } from '../types';
 
 interface CacheEntry {
@@ -39,7 +43,11 @@ export function clearSessionCache(jti: string): void {
   cache.delete(jti);
 }
 
-async function isSessionActive(jti: string): Promise<boolean> {
+/**
+ * 查询 jti 对应会话是否有效（导出供单元测试直接驱动 fail-closed 分支）。
+ * 进程内短 TTL 缓存命中直接返回；未命中查库，DB 异常按未登录拒绝。
+ */
+export async function checkSessionActive(jti: string): Promise<boolean> {
   const now = Date.now();
   const hit = cache.get(jti);
   if (hit && hit.expires > now) return hit.active;
@@ -49,9 +57,12 @@ async function isSessionActive(jti: string): Promise<boolean> {
     const active = session !== null;
     cache.set(jti, { active, expires: now + CACHE_TTL_MS });
     return active;
-  } catch {
-    // 数据库不可用：缓存未命中时放行，由健康检查/handler 暴露真实错误
-    return true;
+  } catch (err) {
+    // fail-closed：数据库不可用不视为会话有效，按未登录拒绝（后续 requireAuth 返回 401），
+    // 避免吊销/过期会话在断库期间继续访问；不写入"有效"缓存，防止故障窗口内被复用。
+    // eslint-disable-next-line no-console
+    console.warn(`[session] 会话状态查询失败，按未登录拒绝（fail-closed）: ${String(err)}`);
+    return false;
   }
 }
 
@@ -59,19 +70,15 @@ async function isSessionActive(jti: string): Promise<boolean> {
  * 校验当前请求令牌的会话状态；已失效则清空 ctx.user。
  * 无 jti 的令牌（演示令牌或 M7-F 前签发的旧令牌）不强制校验。
  *
- * v5.0试点扩展（M187登录根因）：演示模式（DEMO_MODE=1）下 registerSession 不落会话台账，
- * 但登录签发的 JWT 仍带 jti；若仍按 jti 查库一律查不到 → 误判会话失效而清空 c.user，
- * 导致登录后第一个鉴权请求（如 /dashboard/stats）即返回 401，前端 axios 拦截器随之
- * tokenStorage.clear() 并 navigate('/login')，表现为“登录成功却跳不进 dashboard、
- * localStorage 只剩 auth_session_v2 没有 auth_tokens”。演示模式无会话台账可校，直接放行。
+ * 演示模式（DEMO_MODE=1）下 registerSession 不落会话台账，跳过 jti 查库仅限非生产环境；
+ * 生产环境即使误配 DEMO_MODE=1 也必须执行会话吊销校验。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 export async function enforceSession(c: Ctx): Promise<void> {
-  // v5.0试点扩展（M187登录根因）：演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT
-  const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
-  if (isDemo) return;
+  // 非生产演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT；生产环境不得跳过
+  if (!isProductionEnv() && isDemoModeEnabled()) return;
   if (!c.user || !c.user.jti) return;
-  const active = await isSessionActive(c.user.jti);
+  const active = await checkSessionActive(c.user.jti);
   if (!active) c.user = null;
 }

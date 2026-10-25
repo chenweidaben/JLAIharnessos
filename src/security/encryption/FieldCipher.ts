@@ -19,6 +19,10 @@ function getKey(): Buffer {
   if (_key) return _key;
   const secret = process.env.FIELD_ENCRYPTION_KEY ?? process.env.JWT_SECRET;
   if (!secret) {
+    // 失效关闭：生产环境禁止回落到公开的开发态字段密钥
+    if ((process.env.NODE_ENV ?? 'development') === 'production') {
+      throw new Error('[security] 生产环境必须配置 FIELD_ENCRYPTION_KEY（或复用 JWT_SECRET）');
+    }
     console.warn('[security] FIELD_ENCRYPTION_KEY 未设置，使用开发态字段密钥（仅限本地开发）');
     _key = crypto.scryptSync('dev-only-insecure-field-key-change-me', SALT, 32);
     return _key;

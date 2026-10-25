@@ -34,13 +34,19 @@ export const healthRoutes: RouteDef[] = [
     auth: false,
     handle(_c: Ctx): Response {
       const cfg = getEnv();
-      return json({
-        status: 'ok' as const,
-        /** 进程已运行秒数（保留一位小数） */
-        uptime: Math.round(process.uptime() * 10) / 10,
-        db: cfg.demoMode ? ('demo' as const) : ('connected' as const),
-        version: VERSION,
-      });
+      return json(
+        ok(
+          {
+            status: 'ok' as const,
+            /** 进程已运行秒数（保留一位小数） */
+            uptime: Math.round(process.uptime() * 10) / 10,
+            db: cfg.demoMode ? ('demo' as const) : ('connected' as const),
+            version: VERSION,
+          },
+          'ok',
+          _c.traceId,
+        ),
+      );
     },
   },
   {

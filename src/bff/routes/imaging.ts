@@ -311,10 +311,10 @@ export const imagingRoutes: RouteDef[] = [
       if (!parsed.signer_id || !parsed.signer_name) {
         return json(fail(ErrorCode.BAD_REQUEST, '缺少 signer_id / signer_name', c.traceId), 400);
       }
-      // 禁止重复签名
+      // 禁止重复签名：资源已被复核，语义为冲突（409 / CONFLICT）
       if (rec.review) {
         return json(
-          fail(ErrorCode.BAD_REQUEST, `任务已由 ${rec.review.signer_name} 复核，禁止重复提交`, c.traceId),
+          fail(ErrorCode.CONFLICT, `任务已由 ${rec.review.signer_name} 复核，禁止重复提交`, c.traceId),
           409,
         );
       }

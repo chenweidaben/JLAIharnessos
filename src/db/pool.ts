@@ -48,6 +48,10 @@ function createClient(): Sql {
   if (url) {
     return postgres(url, base);
   }
+  // 生产环境禁止回落到本地默认主机/账号/口令；必须显式注入 DATABASE_URL
+  if ((process.env.NODE_ENV ?? 'development') === 'production') {
+    throw new Error('[db] 生产环境必须配置 DATABASE_URL 环境变量，禁止回退本地默认账号口令');
+  }
   return postgres({
     ...base,
     host: process.env.PGHOST ?? 'localhost',

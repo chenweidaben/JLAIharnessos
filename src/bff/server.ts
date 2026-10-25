@@ -19,6 +19,7 @@ import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
 import { withIdempotency } from './middleware/idempotency';
 import { enforceSession } from './middleware/sessionGuard';
+import { assertProductionNotDemoMode } from './config/runtimeEnv';
 import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
@@ -4091,6 +4092,7 @@ import { emrAiNursingRecoV14Routes } from './routes/emrAiNursingRecoV14';
 import { emrAiOutpatientRecordGenV14Routes } from './routes/emrAiOutpatientRecordGenV14';
 import { emrAiPreopAssessRecoV14Routes } from './routes/emrAiPreopAssessRecoV14';
 import { securityBaselineRoutes } from './routes/securityBaseline';
+import { consultAgentRoutes } from './routes/consultAgentRoutes'; // M86-D：【AI 原生在线咨询智能体】12 端点 /api/v1/consult-agent/*（SSE 实时流 + 回放，急症旁路，草稿待医师复核）
 
 // ============================================================================
 // 路由表与编译
@@ -4107,6 +4109,7 @@ const allRoutes: RouteDef[] = [
   ...chatRoutes,
   ...medicalRoutes,
   ...dashboardRoutes,
+  ...m209Routes, // M209: FHIR 静态样例 /api/fhir/Encounter/P001 等须先于 fhirRoutes 动态 :id 注册，避免被动态段遮蔽
   ...fhirRoutes, // M190-P0: FHIR 标准 API 网关
   ...fhirGatewayDetailRoutes, // M430：FHIR R4 资源搜索 Bundle
   ...fhirOperationsRoutes, // M430：FHIR R4 操作端点 CRUD/validate/history
@@ -4155,6 +4158,7 @@ const allRoutes: RouteDef[] = [
   ...eventsBusDetailRoutes, // M426：事件总线深度 GET /api/v1/events/bus/*
   ...emrNoteRoutes, // M190-P0: 病历修改痕迹
   ...cdsRoutes, // M191-P0: CDS 临床决策支持
+  ...m232Routes, // M232: /patient/360/full、/summary 静态段须先于 patient360Routes 的 :patientId 动态段注册，避免被遮蔽
   ...patient360Routes, // M192-P0: 患者360视图
   ...nursingRoutes, // M192-P0: 护理NQI+体温单
   ...regionalRoutes, // M194-P0: 区域转诊
@@ -4172,7 +4176,6 @@ const allRoutes: RouteDef[] = [
   ...m206Routes, // M206: 前端聚合接口
   ...m207Routes, // M207: 急诊+输血+营养
   ...m208Routes, // M208: 消息通知+电子签名+数据导出
-  ...m209Routes, // M209: FHIR搜索+内涵质控+患者端扩展
   ...m210Routes, // M210: 门诊预约+入出院转科+手术排程
   ...m211Routes, // M211: 临床路径+单病种+绩效+物价
   ...m212Routes, // M212: 消毒供应+ICU+血库+静配中心
@@ -4193,7 +4196,6 @@ const allRoutes: RouteDef[] = [
   ...m228Routes, // M228: 肿瘤慢病康复深度
   ...m229Routes, // M229: 中医口腔眼科皮肤+精神卫生深度
   ...m230Routes, // M230: 急诊重症手术麻醉深度
-  ...m232Routes, // M232: BI大屏深度+患者360深度+CDS临床决策深度
   ...m233Routes, // M233: 处方审核深度
   ...m234Routes, // M234: 互联网医院/智慧服务深度
   ...m235Routes, // M235: PDA新路径+门诊/住院/医嘱/药品/出院详情
@@ -4576,12 +4578,12 @@ const allRoutes: RouteDef[] = [
   ...researchLitRoutes, // M159-C【集团与科研】科研智能化深化：文献/论文/基金
   ...empiRoutes,
   ...dataWarehouseRoutes,
+  ...dataMartDeepRoutes, // M164-A: /data-mart/catalog、/lineage 静态段须先于 dataMartRoutes 的 :name 动态段注册，避免被遮蔽
   ...dataMartRoutes, // M150-C：医院数据中台·数据集市（可刷新）
   ...i18nRoutes, // M151-C：多语言支持框架（GET /api/v1/i18n，中文/英文，可扩展）
   ...i18nDeepRoutes, // M158-A：【多语言深化·v4.x近期】英文界面完善 GET /api/v1/i18n/translations + POST /api/v1/i18n/translate
   ...dataGovernanceRoutes,
   ...dataQualityRoutes, // M159-D：数据质量五维报告
-  ...dataMartDeepRoutes, // M164-A：数据资产治理（资产目录/血缘追踪）
   ...cdssDeepRoutes, // M165-A：CDSS 临床决策支持（POST /api/v1/cdss/evaluate，防告警疲劳）
   ...outboxRoutes,
   ...sessionAdminRoutes,
@@ -4598,6 +4600,7 @@ const allRoutes: RouteDef[] = [
   ...reconRoutes,
   ...surgeryRoutes,
   ...surgeryScheduleRoutes,
+  ...adminSurgeryOptimizeRoutes, // M130-D：POST /api/v1/admin/surgery/schedule/optimize（此前仅导入未挂载，本次补挂）
   ...surgeryChecklistRoutes,
   ...transfusionRoutes,
   ...bloodQualityRoutes,
@@ -4778,6 +4781,10 @@ const allRoutes: RouteDef[] = [
   ...codeQualityDeepRoutes, // M173-B：【质量提升与新场景】GET /api/v1/admin/code/deep-quality（圈复杂度拆分/重复块/命名/JSDoc/死代码 深度扫描）
   ...adminDeptPerformanceRoutes,
   ...operationAnalysisRoutes, // M163-B：GET /api/v1/admin/operation/analysis（运营四维分析 + 成本效益 + 对标 + 问题识别）
+  ...performanceReportRoutes, // M187-A: /performance/report 静态段须先于 :period 动态段注册，避免被遮蔽
+  ...performanceStressRoutes, // M193-A: /performance/stress-test 静态段先于 :period
+  ...performanceBenchmarkRoutes, // /performance/benchmark 静态段先于 :period
+  ...performanceDeepRoutes, // M166-A: /performance/kpi 静态段先于 :period
   ...performanceReviewRoutes, // M140-A：/api/v1/admin/performance/:period
   ...adminHealthRoutes,
   ...adminDashboardRoutes,
@@ -4918,7 +4925,6 @@ const allRoutes: RouteDef[] = [
   ...patientMUSEV2Routes, // M186-B：Patient MUSE V2 GET /api/v1/personal-agent/patient-muse-v2
   ...regionalCollaborationRoutes, // M186-C：区域协同 GET /api/v1/regional/collaboration
   ...selfLearningLoopRoutes, // M186-D：自学习闭环 GET /api/v1/learning/self-loop
-  ...performanceReportRoutes, // M187-A：性能报告 GET /api/v1/admin/performance/report
   ...securityReportV2Routes, // M187-B：安全报告 V2 GET /api/v1/admin/security/report-v2
   ...emrGrade5V2Routes, // M187-C：EMR 五级评审 V2 GET /api/v1/emr/grade5/assessment-v2
   ...drgAuditV2Routes, // M187-D：DRG 审核 V2 GET /api/v1/drg/audit/report-v2
@@ -4941,7 +4947,6 @@ const allRoutes: RouteDef[] = [
   ...financeBillingRoutes, // M192-A：财务收费管理 GET /api/v1/admin/finance/report
   ...insuranceManagementRoutes, // M192-B：医保管理深化 GET /api/v1/admin/insurance/report
   ...logisticsManagementRoutes, // M192-D：后勤管理 GET /api/v1/admin/logistics/report
-  ...performanceStressRoutes, // M193-A：性能压测 GET /api/v1/admin/performance/stress-test
   ...securityPenTestRoutes, // M193-B：安全渗透测试 GET /api/v1/admin/security/pen-test
   ...qualitySystemRoutes, // M193-C：质量管理体系 GET /api/v1/admin/quality-system/report
   ...patientSafetyRoutes, // M193-D：患者安全 GET /api/v1/admin/patient-safety/report
@@ -6467,7 +6472,6 @@ const allRoutes: RouteDef[] = [
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
   ...partyCultureRoutes, // M178-D：【财务人力行政党建】党建与文化深化 GET /api/v1/party/culture
   ...jciReviewRoutes, // M141-A：三甲评审准备 GET /api/v1/admin/review/checklist
-  ...performanceBenchmarkRoutes,
   ...museOnboardingRoutes,
   ...onboardingRoutes,
   ...museNurseRoutes,
@@ -6496,7 +6500,6 @@ const allRoutes: RouteDef[] = [
   ...researchPipelineRoutes, // M171-A：【科研教学后勤】科研全流程辅助 POST /api/v1/research/full-pipeline（七步/样本量/统计推荐/偏倚识别）
   ...apiGatewayRoutes, // M164-D：【数据中台与AI大脑】API 网关 POST /api/v1/api-gateway/route + /external
   ...budgetDeepRoutes, // M165-B：【CDSS与运营精细化】GET /api/v1/admin/budget?dept=&year=（预算编制/执行跟踪/超支预测/结构优化）
-  ...performanceDeepRoutes, // M166-A：【绩效与人才】GET /api/v1/admin/performance/kpi?dept=&period=（五维十三项加权百分制/全院对标/差距识别）
   ...opsPredictRoutes, // M168-B：【AI深化与智能运营】GET /api/v1/admin/ops/predict（门诊/床位预测含95%置信区间）+ POST /api/v1/admin/ops/schedule-optimize（手术排程+资源调配）
   ...opsDeepRoutes, // M172-C：【安全质量与运营】GET /api/v1/admin/ops/deep?dept=&period=（四域效率评分/标杆对标/瓶颈识别）
   ...opsAnalysisRoutes, // M180-B：【质量与体验】GET /api/v1/admin/ops/analysis?dept=&period=（多期趋势/对标/未来N期线性回归预测）
@@ -6514,6 +6517,7 @@ const allRoutes: RouteDef[] = [
   ...emrAiOutpatientRecordGenV14Routes, // 补注册：病历AI门诊病历生成
   ...emrAiPreopAssessRecoV14Routes, // 补注册：病历AI术前评估推荐
   ...securityBaselineRoutes, // 补注册：安全基线检查
+  ...consultAgentRoutes, // M86-D：在线咨询智能体（read / write / audit 三权限码，SSE 实时流 + 回放）
 ];
 
 interface Compiled {
@@ -6825,7 +6829,7 @@ async function handleFetch(
     status = 404;
     return withSecurityHeaders(
       json(
-        fail(ErrorCode.NOT_FOUND, `路由不存在： `, ctx.traceId),
+        fail(ErrorCode.NOT_FOUND, '路由不存在：', ctx.traceId),
         404,
       ),
     );
@@ -6876,6 +6880,9 @@ async function initDatabase(): Promise<void> {
 // ============================================================================
 
 const port = Number(process.env.HTTP_PORT ?? 8080);
+
+// P0 启动期 fail-closed：生产环境禁止开启演示模式，命中即抛错退出，不绑定端口、不进入请求循环
+assertProductionNotDemoMode();
 
 // 启动横幅：明确打印 DEMO_MODE 状态，便于运维在日志第一行识别运行模式
 // eslint-disable-next-line no-console

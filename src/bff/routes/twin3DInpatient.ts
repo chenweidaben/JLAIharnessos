@@ -42,7 +42,7 @@ async function handleInpatientTwin(c: Ctx): Promise<Response> {
 
   if (action === 'beds') {
     if (!floor) {
-      return json(fail(ErrorCode.BAD_REQUEST, 'action=beds 必须提供 floor 参数（7 / 8）'));
+      return json(fail(ErrorCode.BAD_REQUEST, 'action=beds 必须提供 floor 参数（7 / 8）', c.traceId), 400);
     }
     return json(ok(trackBedStatus3D(building, floor)));
   }

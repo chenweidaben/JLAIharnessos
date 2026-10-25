@@ -12,6 +12,7 @@
 
 import * as crypto from 'node:crypto';
 
+import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
 import { type ApiResponse, type Ctx, ErrorCode, fail, json, newTraceId } from '../types';
 
 /* ------------------------------------------------------------------ */
@@ -46,11 +47,13 @@ interface JwtPayload {
 function getJwtSecret(): string {
   // 生产环境必须由环境变量注入；开发态提供默认值但打印警告
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    console.warn('[security] JWT_SECRET 未设置，使用开发态默认密钥（仅限本地开发）');
-    return 'dev-only-insecure-jwt-secret-change-me';
+  if (secret) return secret;
+  if (isProductionEnv()) {
+    // 失效关闭：生产环境禁止回落到公开的开发态默认密钥，直接拒绝签发/验签
+    throw new Error('[security] 生产环境必须通过 JWT_SECRET 环境变量注入 JWT 密钥');
   }
-  return secret;
+  console.warn('[security] JWT_SECRET 未设置，使用开发态默认密钥（仅限本地开发）');
+  return 'dev-only-insecure-jwt-secret-change-me';
 }
 
 /** 生成 JWT 唯一标识（jti），供会话管理与令牌吊销使用 */
@@ -84,8 +87,13 @@ export function verifyJwt(token: string): JwtPayload | null {
   const [headerB64, bodyB64, sigB64] = parts;
   const data = `${headerB64}.${bodyB64}`;
 
-  // 时序安全签名校验
-  const expectedSig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
+  // 时序安全签名校验；生产未配置 JWT_SECRET 时按验签失败处理（拒绝令牌）
+  let expectedSig: Buffer;
+  try {
+    expectedSig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
+  } catch {
+    return null;
+  }
   const providedSig = b64urlDecode(sigB64);
   if (
     expectedSig.length !== providedSig.length ||
@@ -148,9 +156,8 @@ export function attachUser(c: Ctx): void {
   }
 
   // 2) 开发态演示 token（jt-/jr- 前缀），仅非生产环境
-  const isProd = (process.env.NODE_ENV ?? 'development') === 'production';
   if (
-    !isProd &&
+    !isProductionEnv() &&
     (token.startsWith('jt-') || token.startsWith('jr-') || token === 'bff-access-token')
   ) {
     c.user = MOCK_USER;
@@ -160,10 +167,10 @@ export function attachUser(c: Ctx): void {
   c.user = null;
 }
 
-/** 要求登录，否则 401（DEMO_MODE=1 时短路放行） */
+/** 要求登录，否则 401；演示模式短路放行仅限非生产环境 */
 export function requireAuth(c: Ctx): Response | null {
-  // M194-P0: DEMO_MODE 下跳过鉴权，直接返回 mock 数据
-  if (process.env.DEMO_MODE === '1') {
+  // 演示模式短路授予 demo admin 仅限非生产环境；生产环境即使误配 DEMO_MODE=1 也不授予演示身份
+  if (!isProductionEnv() && isDemoModeEnabled()) {
     c.user = c.user ?? { id: 'demo', name: '演示用户', roles: ['admin'], permissions: ['*'] };
     return null;
   }

@@ -8,12 +8,13 @@
  *  - 表不存在时自动 CREATE TABLE IF NOT EXISTS（幂等，启动后首次写自愈）；
  *  - 请求体经 maskBody 脱敏后再落库，避免 PII 明文入库；
  *  - 审计写库为 fire-and-forget：任何异常都不阻断主请求；
- *  - 演示模式（DEMO_MODE=1，无 DB）直接跳过。
+ *  - 演示模式（DEMO_MODE=1，无 DB）跳过落库仅限非生产环境；生产环境不得跳过。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
 import { getDb, type DbExecutor } from '../../db/pool.js';
+import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
 import type { Ctx } from '../types';
 import { maskBody } from '../utils/mask.js';
 
@@ -81,8 +82,16 @@ export async function recordOperationLog(c: Ctx, db: DbExecutor = getDb()): Prom
  *
  * @param c 请求上下文
  */
+/**
+ * 是否因演示模式跳过审计落库。
+ * 演示模式跳过仅限非生产环境；生产环境即使误配 DEMO_MODE=1 也必须留痕。
+ */
+export function shouldSkipAuditForDemo(): boolean {
+  return !isProductionEnv() && isDemoModeEnabled();
+}
+
 export function auditOperation(c: Ctx): void {
-  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') return;
+  if (shouldSkipAuditForDemo()) return;
   const method = c.req.method.toUpperCase();
   if (!AUDITED_METHODS.has(method)) return;
   recordOperationLog(c).catch((err: unknown) => {
