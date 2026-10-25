@@ -1,0 +1,10 @@
+﻿=== static gate 2026-10-26 02:14:15 ===
+beCoreFiles=26 testFiles=26 prettyFiles=56
+TSC_ROOT_EXIT=0 | log=patrol-tsc.log
+ESLINT_BE_EXIT=0 | log=patrol-eslint-be.log
+ESLINT_FE_ROOT_SERVICE_EXIT=0 | log=patrol-eslint-be.log
+ESLINT_FE_ROOT_PAGE_EXIT=0 | log=patrol-eslint-be.log
+ESLINT_FE_LOCAL_EXIT=0 | log=patrol-eslint-fe-local.log
+TSC_WEB_EXIT=0 | log=patrol-tsc-web.log
+PRETTIER_EXIT=0 | log=patrol-prettier.log
+=== static done 2026-10-26 02:16:37 ===

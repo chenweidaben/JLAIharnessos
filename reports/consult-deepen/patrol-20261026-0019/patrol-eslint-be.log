@@ -1,0 +1,9 @@
+﻿eslint.cmd : (node:36880) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ig
+nores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:4 字符: 1
++ & node_modules\.bin\eslint.cmd "src/core/agent/consult" "src/bff/rout ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:36880) ES...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)

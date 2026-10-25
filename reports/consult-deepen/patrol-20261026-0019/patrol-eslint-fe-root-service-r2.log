@@ -1,0 +1,17 @@
+﻿eslint.cmd : (node:30512) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ig
+nores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:7 字符: 1
++ & node_modules\.bin\eslint.cmd "web/src/services/api/consultAgent.ts" ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:30512) ES...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\src\services\api\consultAgent.ts
+  14:1  warning  Run autofix to sort these imports!  simple-import-sort/imports
+
+✖ 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+ESLint found too many warnings (maximum: 0).

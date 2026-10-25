@@ -1,0 +1,461 @@
+﻿bun test v1.2.0 (b0c5a765)
+bun.exe : 
+所在位置 行:4 字符: 1
++ & $bun test --coverage --coverage-reporter text tests/unit/consult-ag ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+tests\integration\consult-agent\consultFlow.test.ts:
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 1. 创建会话：初始 idle、消息列表为空，免责声明随后续产物附着 [16.00ms]
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 2. 普通问诊：编排完成、回复落库附免责声明、审计留痕、草稿恒需复核 [31.00ms]
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 3. 急症旁路：escalated + safety:acute 引导，不产草稿，acute_bypass 留痕
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 4. 草稿链路：用药咨询生成处方草稿，非院外处方、待医师复核 [15.00ms]
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 5. 审计轨迹：升序排列、actorRole/traceId/action 齐全；工具记录字段白名单、无原始入参
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 6. 事件回放：帧类型集合与顺序符合契约 §11，末尾 [DONE]，重复回放幂等一致 [10172.00ms]
+(pass) consult-agent 集成 E2E 主链路（DEMO 进程内仓储） > 7. 终态：关闭会话后再发消息 → 409 THREAD_CLOSED 语义
+
+tests\integration\consult-agent\consultRouteErrors.test.ts:
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > threadCreateSchema：标题超 120 字符 → 400 / 40000，拒绝后不落库
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > threadCreateSchema：patientId 非 UUID → 400 / 40000 [16.00ms]
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > threadCreateSchema：initialMessage 超 2000 字符 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（发送消息）：空串 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（流式问诊）：空串 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（发送消息）：纯空格 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（流式问诊）：纯空格 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（发送消息）：超 4000 字符 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > messageSendSchema（流式问诊）：超 4000 字符 → 400 / 40000
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > transcribeSchema：transcript 与 audioText 皆空 → 400 / 40000（归属校验之后
+做 schema 校验）
+(pass) consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403） > 草稿 kind 非法 → 400 / 40000（kind 校验先于线程归属校验）
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 历史消息（GET）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 审计轨迹（GET）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 事件回放（GET）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 诊断草稿（GET）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 处方草稿（GET）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 语音转写（POST）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 退出会话（POST）：线程不存在 → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 发送消息：线程不存在 → 编排器 THREAD_NOT_FOUND → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 流式问诊：线程不存在 → 编排器 THREAD_NOT_FOUND → 404 / 40400
+(pass) consult-agent 错误分支 · 404 线程不存在与归属隔离 > 归属隔离：他人线程对当前用户返回 404，他人会话消息 / 审计不被改动
+(pass) consult-agent 创建会话编排分支（首条消息走编排，返回 thread/messages/draft） > 无 initialMessage：返回 idle 线程与空消息列表
+(pass) consult-agent 创建会话编排分支（首条消息走编排，返回 thread/messages/draft） > 带症状 initialMessage：走完编排，返回线程 / 消息 / 草稿，草稿红线成立
+(pass) consult-agent 创建会话编排分支（首条消息走编排，返回 thread/messages/draft） > 带急症 initialMessage：escalated 旁路，不产草稿，落 acute_bypass 审
+计
+(pass) consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径 > 流式问诊成功路径：200 SSE，帧序列完整，草稿红线成立 [4625.00ms]
+(pass) consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径 > aborted 会话：发送消息 / 流式问诊 / 退出 → 409 / 40900，线程状态保持 aborted
+(pass) consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径 > closed 会话：流式问诊 / 发送消息 / 重复退出 → 409 / 40900
+(pass) consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径 > 源码口径：语音转写端点不做终态校验，closed 会话转写仍返回 200（该端点无 409 分支）
+(pass) consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 不回显堆栈 > THREAD_NOT_FOUND → 404 / 40400，固定文案，traceId 透传
+(pass) consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 不回显堆栈 > THREAD_CLOSED → 409 / 40900，固定文案，traceId 透传
+(pass) consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 不回显堆栈 > 未知编排异常 → 500 / 50000，固定文案，不回显堆栈与内部状态名
+(pass) consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 / 无原始入参明文） > 常规问诊：actorRole / traceId / action / threadId 齐全，工具审计字段白名单
+(pass) consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 / 无原始入参明文） > 退出审计：actorRole=user、action=thread_exit、traceId 透传，detail 仅留 via 
+白名单
+(pass) consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 / 无原始入参明文） > 急症旁路审计：actorRole=system、action=acute_bypass，detail 仅留 level/matc
+hed 白名单
+(pass) consult-agent 急症旁路互补场景（草稿端点为空 / 回放无草稿帧 / READ 端点可用） > 急症线程：草稿查询两端均返回 null，持久化无草稿
+(pass) consult-agent 急症旁路互补场景（草稿端点为空 / 回放无草稿帧 / READ 端点可用） > 急症线程回放：仅重放持久化消息 / 免责声明 / meta / done，不重放 live safety:acute
+ 与草稿帧 [1125.00ms]
+(pass) consult-agent 急症旁路互补场景（草稿端点为空 / 回放无草稿帧 / READ 端点可用） > 急症线程 READ 端点：规则快照 / 画像 / 历史消息可用
+(pass) consult-agent 草稿红线（路由响应层） > 医师诊断草稿：响应与查询两端红线三字段成立，kind=diagnosis
+(pass) consult-agent 草稿红线（路由响应层） > 药师处方草稿：红线三字段成立，kind=prescription [16.00ms]
+(pass) consult-agent 草稿红线（路由响应层） > 无草稿线程：草稿端点返回 null
+
+tests\security\consult-agent\permissions.test.ts:
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 会话列表（GET /api/v1/consult-agent/threads）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 会话列表（GET /api/v1/consult-agent/threads）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 历史消息（GET /api/v1/consult-agent/threads/:threadId/messages）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 历史消息（GET /api/v1/consult-agent/threads/:threadId/messages）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 事件回放（GET /api/v1/consult-agent/threads/:threadId/stream/replay）：未登录 → 401 / 4010
+0
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 事件回放（GET /api/v1/consult-agent/threads/:threadId/stream/replay）：已登录缺码 → 403 / 40
+300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 规则快照（GET /api/v1/consult-agent/rules/snapshot）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 规则快照（GET /api/v1/consult-agent/rules/snapshot）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 草稿查询（GET /api/v1/consult-agent/threads/:threadId/drafts/:kind）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 草稿查询（GET /api/v1/consult-agent/threads/:threadId/drafts/:kind）：已登录缺码 → 403 / 403
+00
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 用户画像（GET /api/v1/consult-agent/profile）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 用户画像（GET /api/v1/consult-agent/profile）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 创建会话（POST /api/v1/consult-agent/threads）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 创建会话（POST /api/v1/consult-agent/threads）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 发送消息（POST /api/v1/consult-agent/threads/:threadId/messages）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 发送消息（POST /api/v1/consult-agent/threads/:threadId/messages）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 语音转写（POST /api/v1/consult-agent/threads/:threadId/transcribe）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 语音转写（POST /api/v1/consult-agent/threads/:threadId/transcribe）：已登录缺码 → 403 / 4030
+0
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 流式问诊（POST /api/v1/consult-agent/threads/:threadId/stream）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 流式问诊（POST /api/v1/consult-agent/threads/:threadId/stream）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 退出会话（POST /api/v1/consult-agent/threads/:threadId/exit）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 退出会话（POST /api/v1/consult-agent/threads/:threadId/exit）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 审计轨迹（GET /api/v1/consult-agent/threads/:threadId/audit）：未登录 → 401 / 40100
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 审计轨迹（GET /api/v1/consult-agent/threads/:threadId/audit）：已登录缺码 → 403 / 40300
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 拒绝路径不执行仓储写操作：缺码创建会话不落库
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 拒绝路径不执行仓储写操作：缺码发送消息不产生新消息 / 草稿
+(pass) consult-agent 权限门禁 · 未登录与越权拒绝 > 未登录创建会话不落库（空用户名下无会话）
+(pass) consult-agent 权限门禁 · read 码隔离 > 会话列表：持有 read 码通过权限闸（非 401/403）
+(pass) consult-agent 权限门禁 · read 码隔离 > 历史消息：持有 read 码通过权限闸（非 401/403）
+(pass) consult-agent 权限门禁 · read 码隔离 > 事件回放：持有 read 码通过权限闸（非 401/403） [375.00ms]
+(pass) consult-agent 权限门禁 · read 码隔离 > 规则快照：持有 read 码通过权限闸（非 401/403）
+(pass) consult-agent 权限门禁 · read 码隔离 > 草稿查询：持有 read 码通过权限闸（非 401/403）
+(pass) consult-agent 权限门禁 · read 码隔离 > 用户画像：持有 read 码通过权限闸（非 401/403）
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码读取规则快照：三条权限码与免责声明完整返回
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码读取画像：返回事实数组
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问写端点「创建会话」→ 403
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问写端点「发送消息」→ 403
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问写端点「语音转写」→ 403
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问写端点「流式问诊」→ 403
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问写端点「退出会话」→ 403
+(pass) consult-agent 权限门禁 · read 码隔离 > read 码访问审计轨迹 → 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码创建会话：通过权限闸返回空闲会话
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码发送消息：通过权限闸进入编排（非 401/403）
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码语音转写：通过权限闸返回归一化文本
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码流式问诊：入参非法在权限闸之后返回 400（非 401/403）
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码退出会话：通过权限闸关闭线程
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「会话列表」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「历史消息」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「事件回放」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「规则快照」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「草稿查询」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问读端点「用户画像」→ 403
+(pass) consult-agent 权限门禁 · write 码隔离 > write 码访问审计轨迹 → 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问审计轨迹：通过权限闸返回条目数组
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「会话列表」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「历史消息」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「事件回放」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「规则快照」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「草稿查询」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问读端点「用户画像」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问写端点「创建会话」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问写端点「发送消息」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问写端点「语音转写」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问写端点「流式问诊」→ 403
+(pass) consult-agent 权限门禁 · audit 码隔离 > audit 码访问写端点「退出会话」→ 403
+(pass) requirePermissionCode 守卫语义 > admin 角色直通所有 consult 权限码
+(pass) requirePermissionCode 守卫语义 > 持有精确权限码放行；持有其他 consult 码不放行
+(pass) requirePermissionCode 守卫语义 > 未登录返回 401 响应（40100）
+(pass) requirePermissionCode 守卫语义 > 缺码返回 403 响应（40300）
+
+tests\unit\consult-agent\acuteVocabulary.test.ts:
+(pass) acuteVocabulary 急症词表 > 冻结词表覆盖契约所列急症条目且不得为空
+(pass) acuteVocabulary 急症词表 > 命中胸痛 / 呼吸困难应判定为急症并返回命中词
+(pass) acuteVocabulary 急症词表 > 中风 / 口角歪斜等神经急症应命中
+(pass) acuteVocabulary 急症词表 > 普通症状文本不应判定为急症
+(pass) acuteVocabulary 急症词表 > 空文本不命中
+(pass) acuteVocabulary 急症词表 > 命中词保持词表顺序去重
+
+tests\unit\consult-agent\audit.test.ts:
+(pass) audit redactRawArgs 顶层原始入参类键剔除 > args / raw / body 等原始入参类键（大小写不敏感）被剔除，安全键原样保留
+(pass) audit redactRawArgs 嵌套递归脱敏（基线 27、38 行） > 嵌套对象内的原始入参类键被递归剔除，安全字段保留（27 行分支）
+(pass) audit redactRawArgs 嵌套递归脱敏（基线 27、38 行） > 数组元素为对象时递归脱敏，嵌套数组内对象同样剔除原始入参类键（38 行分支）
+(pass) audit createAuditEntry 条目构造与默认值 > 未提供工具字段时默认 null；threadId / actorRole / action / traceId 原样透传 [16.00ms]
+(pass) audit createAuditEntry 条目构造与默认值 > detail 先经脱敏再落条目；原始入参明文不进入序列化结果
+(pass) audit createToolCallRecord 工具调用记录构造 > callId / name / status / durationMs / evidenceCount / errorClass / summary
+ 字段一一映射
+(pass) audit createToolCallRecord 工具调用记录构造 > 失败记录允许 errorClass 与 summary 为 null 之外的错误分类落痕
+
+tests\unit\consult-agent\consultAgentRepo.test.ts:
+(pass) PostgresConsultRepo.findThread > 查询 consult.threads（id + user_id + LIMIT 1），完整行蛇形 -> 驼峰映射 [15.00ms]
+(pass) PostgresConsultRepo.findThread > 缺失可空列时 mapThreadRow 走 null / 默认值兜底，meta 缺失回退 {}
+(pass) PostgresConsultRepo.findThread > 空结果返回 null（不映射、不抛错）
+(pass) PostgresConsultRepo.findThread > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.listThreads > 查询 consult.threads（user_id，updated_at DESC），多行映射
+(pass) PostgresConsultRepo.listThreads > 空结果返回 []
+(pass) PostgresConsultRepo.listThreads > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveThread > INSERT consult.threads，ON CONFLICT (id) DO UPDATE，RETURNING *，meta 走 json 参数
+(pass) PostgresConsultRepo.saveThread > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.listMessages > 查询 consult.messages（thread_id，created_at ASC），完整行映射含 toolCalls JSONB
+(pass) PostgresConsultRepo.listMessages > 缺失可空列时 mapMessageRow 走 null / 默认值兜底
+(pass) PostgresConsultRepo.listMessages > 空结果返回 []
+(pass) PostgresConsultRepo.listMessages > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveMessage > INSERT consult.messages，RETURNING *，toolCalls 走 json 参数，无冲突键
+(pass) PostgresConsultRepo.saveMessage > toolCalls 为 null 时 json 参数回退为空数组（toolCalls ?? []）
+(pass) PostgresConsultRepo.saveMessage > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.listDrafts > 查询 consult.diagnosis_prescription_drafts（thread_id + kind，created_at DESC），映射含 
+evidence
+(pass) PostgresConsultRepo.listDrafts > 缺失可空列时 mapDraftRow 走 null / 默认值兜底，红线字面量仍强制在位
+(pass) PostgresConsultRepo.listDrafts > 空结果返回 []
+(pass) PostgresConsultRepo.listDrafts > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveDraft > INSERT consult.diagnosis_prescription_drafts，ON CONFLICT (id) DO UPDATE，RETURNIN
+G *
+(pass) PostgresConsultRepo.saveDraft > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.listAudit > 查询 consult.audit_trail（thread_id，created_at ASC），detail JSONB 透传，数值列 Number 转换 [
+16.00ms]
+(pass) PostgresConsultRepo.listAudit > 缺失可空列时 mapAuditRow 走 null / 默认值兜底，detail 缺失回退 {}
+(pass) PostgresConsultRepo.listAudit > 空结果返回 []
+(pass) PostgresConsultRepo.listAudit > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveAudit > INSERT consult.audit_trail，无 RETURNING、无冲突键，方法返回 void（不映射行）
+(pass) PostgresConsultRepo.saveAudit > db reject 时以同一错误透传，不吞错、不回退行映射 [16.00ms]
+(pass) PostgresConsultRepo.getProfile > 查询 consult.profile_memory（user_id + LIMIT 1），完整行映射含 facts JSONB
+(pass) PostgresConsultRepo.getProfile > 缺失可空列时 mapProfileRow 走 null / 默认值兜底，facts 缺失回退 []
+(pass) PostgresConsultRepo.getProfile > 空结果返回 createProfileMemory(userId) 空白画像（facts=[]、threadId=null）
+(pass) PostgresConsultRepo.getProfile > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveProfile > INSERT consult.profile_memory，ON CONFLICT (user_id) DO UPDATE，RETURNING *，fact
+s 走 json 参数
+(pass) PostgresConsultRepo.saveProfile > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.listDocuments > 查询 consult.documents（thread_id，created_at ASC），extractedEvidence JSONB 透传，si
+zeBytes Number 转换
+(pass) PostgresConsultRepo.listDocuments > 缺失可空列时 mapDocumentRow 走 null / 默认值兜底，extractedEvidence 缺失回退 []
+(pass) PostgresConsultRepo.listDocuments > 空结果返回 []
+(pass) PostgresConsultRepo.listDocuments > db reject 时以同一错误透传，不吞错
+(pass) PostgresConsultRepo.saveDocument > INSERT consult.documents，RETURNING *，extractedEvidence 走 json 参数，无冲突键
+(pass) PostgresConsultRepo.saveDocument > db reject 时以同一错误透传，不吞错
+
+tests\unit\consult-agent\ddlSchema.test.ts:
+(pass) 380–385 迁移文件与 consult schema 存在性（静态文本） > 六份迁移文件均可读取，且每份均声明 CREATE SCHEMA IF NOT EXISTS consult
+(pass) 380–385 迁移文件与 consult schema 存在性（静态文本） > 六张表均以 CREATE TABLE IF NOT EXISTS consult.<表> 建表，表名与源码声明一致
+(pass) 表列与类型族静态自洽 > 预期列全部存在，主类型 token 与 DDL 一致
+(pass) 表列与类型族静态自洽 > DDL 列清单与预期清单双向一致：无遗漏列、无预期外新增列
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > 二级索引名称、UNIQUE 标志与列顺序与 DDL 一致
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > 外键声明列、引用 schema.table(col) 与 ON DELETE 动作与 DDL 一致
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > consult 内部外键目标列存在于被引用表 DDL；iam/clinical 外部目标仅校验声明文本
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > 主键 id 在位；草稿三列唯一索引、画像 user_id 内联唯一约束在位
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > 六份迁移 SQL 中未声明独立序列（uuid 由 gen_random_uuid() 默认值提供）
+(pass) 索引 / 外键 / 主键 / 唯一约束 / 序列 / 触发器存在性校验 > 更新触发器在位；不可变表（messages/documents/audit_trail）无 BEFORE UPDATE 触发器
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > mapRow 读取的每个蛇形列均存在于对应 DDL 表（仓储列 ⊆ DDL 列）
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > INSERT 列清单每个列均存在于对应 DDL 表（仓储列 ⊆ DDL 列）
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > WHERE / ORDER BY 引用列均存在于对应 DDL 表
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > DDL 列全部被仓储 mapRow 或 INSERT 覆盖（DDL 列 ⊆ mapRow ∪ INSERT，无孤儿列）
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > ON CONFLICT 冲突键对应主键或唯一约束（可被 upsert 锁定）
+(pass) consultAgentRepo.ts 仓储列 ↔ DDL 双向对齐 > 仓储 SQL 仅引用 consult schema 内六张已建表，无预期外表名
+(pass) 红线 CHECK 约束静态存在性（383 草稿三红线 + 枚举字典） > 草稿三红线 CHECK 锁定：需医师复核 = true、非院外处方 = false、状态 = pending_review
+(pass) 红线 CHECK 约束静态存在性（383 草稿三红线 + 枚举字典） > 会话状态机 / 消息角色 / 意图 / 安全等级 / 审计角色枚举 CHECK 在位
+(pass) 静态校验边界声明与计数汇总 > 说明性用例：如实标注静态文本自洽校验边界，禁止伪造“真实建表通过”结论
+[ddlSchema 静态校验汇总] {
+  "表数": 6,
+  "列数": 66,
+  "索引数": 7,
+  "外键数": 9,
+  "主键数": 6,
+  "唯一约束额外数": 2,
+  "序列数": 0,
+  "触发器数": 3,
+  "仓储mapRow列": 63,
+  "仓储INSERT列": 66,
+  "仓储WHERE列": 8,
+  "仓储ORDER列": 5,
+}
+(pass) 静态校验边界声明与计数汇总 > 汇总校验计数（仅供交付报告引用，不替代终态运行时实测） [15.00ms]
+
+tests\unit\consult-agent\demoSeed.test.ts:
+(pass) demoSeed DEMO 种子 > 规则快照包含版本号、免责声明、急症引导与急症词表
+(pass) demoSeed DEMO 种子 > 规则快照登记五个内置工具且与注册表清单一致 [16.00ms]
+(pass) demoSeed DEMO 种子 > 规则快照登记三条权限码
+(pass) demoSeed DEMO 种子 > DEMO 欢迎语非空且不产生临床结论
+(pass) demoSeed DEMO 种子 > 四角色引导文案齐全
+(pass) demoSeed DEMO 种子 > 知识库与药品 DEMO 条目齐全且不构成处方结论
+
+tests\unit\consult-agent\disclaimer.test.ts:
+(pass) 免责声明常驻 > DISCLAIMER 常量包含 120 急救提示与替代医师面诊声明
+(pass) 免责声明常驻 > Supervisor 回复末尾常驻免责声明
+(pass) 免责声明常驻 > Examiner 追问回复常驻免责声明
+(pass) 免责声明常驻 > Doctor 回复与诊断草稿正文均常驻免责声明
+(pass) 免责声明常驻 > Pharmacist 回复与用药草稿正文均常驻免责声明
+(pass) 免责声明常驻 > 急症引导文案不含确诊结论，仅提示急诊
+
+tests\unit\consult-agent\draftHash.test.ts:
+(pass) draftHash 稳定字段哈希 > 相同稳定业务字段计算出相同哈希
+(pass) draftHash 稳定字段哈希 > 易变字段（id / 状态 / 时间戳 / 审核人 / 审核备注）不影响哈希
+(pass) draftHash 稳定字段哈希 > 正文内容变化导致哈希不同
+(pass) draftHash 稳定字段哈希 > 证据条目顺序交换不影响哈希（规范化排序）
+(pass) draftHash 稳定字段哈希 > 空白排版差异不影响哈希
+(pass) draftHash 稳定字段哈希 > extractStableFields 剔除易变字段
+
+tests\unit\consult-agent\intentClassifier.test.ts:
+(pass) intentClassifier 意图分类 > 问候意图命中问候词
+(pass) intentClassifier 意图分类 > 退出意图命中退出词
+(pass) intentClassifier 意图分类 > 文档上传意图命中报告 / 化验单等词
+(pass) intentClassifier 意图分类 > 用药咨询意图命中药 / 剂量 / 能否同服
+(pass) intentClassifier 意图分类 > 慢病管理意图命中随访 / 血压 / 血糖 / 复查
+(pass) intentClassifier 意图分类 > 症状主诉意图命中头晕 / 乏力等主诉词
+(pass) intentClassifier 意图分类 > 急症词直接归类为 acute_emergency，优先于症状主诉
+(pass) intentClassifier 意图分类 > 上一轮 Examiner 追问后的补充回答归为 clarification_answer
+(pass) intentClassifier 意图分类 > 无关键词命中且不在追问上下文时兜底为 unknown
+(pass) intentClassifier 意图分类 > 置信度始终处于 0 到 1 区间 [16.00ms]
+(pass) intentClassifier 意图分类 > 空文本返回 unknown 低置信度
+
+tests\unit\consult-agent\memory.test.ts:
+(pass) shortTermMemory 短期记忆 > recentMessages 保留最近 n 条并保持时间顺序
+(pass) shortTermMemory 短期记忆 > n 为 0 时返回空数组
+(pass) shortTermMemory 短期记忆 > checkpoint 记录线程 ID、消息条数与快照
+(pass) profileMemory 长期画像 > mergeFacts 同键以更新者为准，新事实追加末尾
+(pass) profileMemory 长期画像 > 旧事实 updatedAt 更旧时不覆盖新事实
+(pass) profileMemory 长期画像 > upsertFact 不可变更新画像事实 [15.00ms]
+(pass) profileMemory 长期画像 > extractFactsFromText 确定性抽取过敏史与慢性病事实
+(pass) profileMemory 长期画像 > 无特征文本返回空事实列表
+(pass) profileMemory 长期画像 > listFacts 返回事实副本，修改返回值不影响画像
+
+tests\unit\consult-agent\orchestrator.test.ts:
+(pass) consultOrchestrator 编排器 > 普通问诊：信息充分 -> 医师草稿 -> review_pending，事件序列完整
+(pass) consultOrchestrator 编排器 > 急症旁路：优先于角色编排，状态 escalated，不产草稿，下发 safety:acute 事件
+(pass) consultOrchestrator 编排器 > 退出意图：关闭线程，返回退出确认，不产草稿
+(pass) consultOrchestrator 编排器 > 哨兵去重：同一业务草稿二次提交命中 duplicate，不重复落库 [16.00ms]
+(pass) consultOrchestrator 编排器 > 信息不足：Supervisor 转 Examiner 追问，状态 clarifying，不产草稿
+(pass) consultOrchestrator 编排器 > 终态线程拒绝新消息并抛出错误
+(pass) consultOrchestrator 编排器 > 工具审计只保留脱敏摘要，不记录原始入参明文
+(pass) consultOrchestrator 编排器 > 画像事实随本轮对话合并并持久化到运行时
+
+tests\unit\consult-agent\orchestratorBranches.test.ts:
+(pass) consultOrchestrator 哨兵驳回分支（基线 292-307 行） > 证据不足的草稿被哨兵驳回：不产草稿、不落库、落 sentinel_rejected 审计并下发错误事件
+(pass) consultOrchestrator 问候收集态分支（基线 343-346 行） > 问候意图：supervisor 不转角色、不产草稿，线程由 idle 进入 collecting
+(pass) consultOrchestrator 未知线程抛错（131 行可达分支） > 线程不存在时抛出 THREAD_NOT_FOUND，不写入任何消息 / 草稿 / 审计
+
+tests\unit\consult-agent\profileMemoryBranches.test.ts:
+(pass) profileMemory 药物不耐受事实抽取（基线 127-132 行） > “不耐受”表述抽取 drug_intolerance 事实，source 透传、updatedAt 落痕
+(pass) profileMemory 药物不耐受事实抽取（基线 127-132 行） > “不能服用”表述同样归入 drug_intolerance，不产生过敏史事实
+(pass) profileMemory 药物不耐受事实抽取（基线 127-132 行） > “服用后不适”表述归入 drug_intolerance 事实
+(pass) profileMemory 药物不耐受事实抽取（基线 127-132 行） > 过敏史与不耐受同时出现时两条事实独立落库、互不覆盖
+(pass) profileMemory 偏好语言事实抽取（135-137 行补充覆盖） > 英文提示抽取 preferred_language=en 事实
+
+tests\unit\consult-agent\roles.test.ts:
+(pass) SupervisorRole 分诊主管 > 用药问题分诊到药师角色，不产草稿，审计透传 traceId
+(pass) SupervisorRole 分诊主管 > 问候不切换角色并给出急症提示引导
+(pass) SupervisorRole 分诊主管 > 信息不足的症状主诉分诊到追问角色
+(pass) ExaminerRole 问诊追问 > 输出 2–4 个结构化追问，不产草稿、不切换角色
+(pass) ExaminerRole 问诊追问 > 用药咨询场景给出药品相关追问
+(pass) DoctorRole 医师角色 > 生成诊断建议草稿并遵守红线字面量
+(pass) PharmacistRole 药师角色 > 生成用药建议草稿并遵守院外处方 / 在院医嘱红线
+
+tests\unit\consult-agent\roleSupport.test.ts:
+(pass) roleSupport 证据构造 makeEvidence（基线 31-36 行） > kind / label / source / snippet 四字段按入参原样透传
+(pass) roleSupport 证据构造 makeEvidence（基线 31-36 行） > 六种证据分类均可经 makeEvidence 构造并保持 kind 不被改写
+(pass) roleSupport 角色展示名 roleDisplayName（基线 41-53 行） > 四角色展示名与系统 / 用户标识按契约中文映射正确
+
+tests\unit\consult-agent\safeLlm.test.ts:
+(pass) safeLlm 凭证探测 isAvailable（基线 43-45 行） > 三项凭证均未配置时返回 false
+(pass) safeLlm 凭证探测 isAvailable（基线 43-45 行） > 任一项凭证为非空字符串时返回 true；空白字符串视为未配置
+(pass) safeLlm 降级补全 complete（契约 §9 离线确定性引导） > 无凭证时四角色均返回 degraded=true 的离线确定性文案，不抛异常
+(pass) safeLlm 降级补全 complete（契约 §9 离线确定性引导） > supervisor 空 prompt 走兜底文案，不嵌入主题；非空 prompt 把主题带入引号
+(pass) safeLlm 降级补全 complete（契约 §9 离线确定性引导） > 即使检测到在线模型凭证，当前阶段仍返回离线确定性模板（不联网）
+(pass) safeLlm 降级补全 complete（契约 §9 离线确定性引导） > 确定性输出：同角色同 prompt 两次调用文案逐字一致
+(pass) safeLlm 降级补全 complete（契约 §9 离线确定性引导） > 医生 / 药师文案仅为复核提示，不含确诊病名、处方剂量等肯定式临床结论
+
+tests\unit\consult-agent\safetyGate.test.ts:
+(pass) safetyGate 安全门 > 命中急症词表返回 acute 并列出命中词
+(pass) safetyGate 安全门 > 长期慢病急性加重表述返回 caution
+(pass) safetyGate 安全门 > 普通咨询返回 normal 且无命中词
+(pass) safetyGate 安全门 > 急症判定优先于 caution 关键词
+(pass) safetyGate 安全门 > 空文本返回 normal
+
+tests\unit\consult-agent\sentinel.test.ts:
+(pass) sentinel 审批网关 > 证据齐全且红线满足 -> approved，并把哈希写入审批表
+(pass) sentinel 审批网关 > 同线程同哈希已审批 -> duplicate 并返回既有草稿 ID，不重复审批
+(pass) sentinel 审批网关 > 缺少证据支撑 -> rejected
+(pass) sentinel 审批网关 > 安全等级 acute 状态下不产出草稿 -> rejected
+(pass) sentinel 审批网关 > 未强制医师复核（红线突破）-> rejected
+(pass) sentinel 审批网关 > 被标记为院外处方（红线突破）-> rejected
+(pass) sentinel 审批网关 > 状态非 pending_review（红线突破）-> rejected
+
+tests\unit\consult-agent\sessionRuntime.test.ts:
+(pass) sessionRuntime isDemoMode（基线 27 行） > DEMO_MODE=1 时判定为演示模式
+(pass) sessionRuntime isDemoMode（基线 27 行） > DEMO_MODE=0 或未设置时判定为非演示模式
+(pass) sessionRuntime 画像持久化（基线 141 行） > saveProfile 返回同一画像本体，getProfile 可读回已合并事实
+(pass) sessionRuntime 文档读写（基线 147、151-153 行） > 空线程 listDocuments 返回空数组；saveDocument 后读回完整文档
+(pass) sessionRuntime 文档读写（基线 147、151-153 行） > listDocuments 返回副本，修改返回数组不影响内部存储
+(pass) sessionRuntime 短期记忆 checkpoint（基线 160-161、165-166 行） > saveCheckpoint 写入后 getCheckpoint 读回同一快照
+(pass) sessionRuntime 短期记忆 checkpoint（基线 160-161、165-166 行） > 未写入 checkpoint 的线程 getCheckpoint 返回 null
+(pass) sessionRuntime clear 全量清空（基线 170-177 行） > 七类内存数据清空后均回到初始空态，且可新建线程继续使用
+
+tests\unit\consult-agent\stateMachine.test.ts:
+(pass) stateMachine 状态机 > 合法转移应返回 true
+(pass) stateMachine 状态机 > 非法转移应返回 false
+(pass) stateMachine 状态机 > assertTransition 合法转移不抛错，非法转移显式抛错
+(pass) stateMachine 状态机 > closed / aborted 为终态且无出边
+(pass) stateMachine 状态机 > 急症旁路可从采集 / 澄清 / 草稿状态进入 escalated（冻结转移表）
+
+tests\unit\consult-agent\supervisorBranch.test.ts:
+(pass) supervisor routeNextRole 意图路由（基线 41-43 行） > 慢病管理意图路由到医师角色（41-42 行）
+(pass) supervisor routeNextRole 意图路由（基线 41-43 行） > 追问补充回答意图路由到医师角色（43-44 行）
+(pass) supervisor routeNextRole 意图路由（基线 41-43 行） > 文档上传与未知意图路由到追问角色（47-50 行）
+(pass) supervisor routeNextRole 意图路由（基线 41-43 行） > 急症 / 退出 / 问候意图停留分诊主管，不切换角色（51-55 行）
+(pass) supervisor routeNextRole 意图路由（基线 41-43 行） > 症状主诉信息充分路由医师；信息不足路由追问（46 行双分支）
+(pass) supervisor isSufficientForDoctor 信息充分性阈值 > 文本长度达到 12 字即视为信息充分
+(pass) supervisor isSufficientForDoctor 信息充分性阈值 > 长度达到 8 字且包含病程时长词时视为信息充分；缺时长词则不足
+(pass) supervisor isSufficientForDoctor 信息充分性阈值 > 长度不足 8 字时即使含时长词也视为信息不足；空文本不足
+
+tests\unit\consult-agent\toolRegistry.test.ts:
+(pass) toolRegistry 工具注册表 > 规范驼峰名与下划线别名均可解析
+(pass) toolRegistry 工具注册表 > 参数归一化：下划线键转驼峰
+(pass) toolRegistry 工具注册表 > invoke 阶段按 knownArgs 白名单剔除未知键
+(pass) toolRegistry 工具注册表 > 内置知识库工具返回确定性科普证据
+(pass) toolRegistry 工具注册表 > 内置药品工具命中布洛芬说明书摘要
+(pass) toolRegistry 工具注册表 > checkAllergy 读取画像过敏事实并归入 allergy 证据
+(pass) toolRegistry 工具注册表 > checkInteraction 对多药联用给出相互作用风险提示
+(pass) toolRegistry 工具注册表 > retrievePatientHistory 读取画像慢性病事实
+(pass) toolRegistry 工具注册表 > 未知工具返回 ToolNotFound 错误分类且不抛异常
+(pass) toolRegistry 工具注册表 > list 返回五个内置工具清单
+
+tests\unit\consult-agent\toolRegistryBranches.test.ts:
+(pass) toolRegistry 注册与解析补充分支 > 同名规范名重复注册时覆盖旧条目，清单长度保持 1（188-190 行）
+(pass) toolRegistry 注册与解析补充分支 > resolve 对名称首尾空白做归一后命中（194 行）
+(pass) toolRegistry 参数归一化补充分支 > 描述符未声明 knownArgs 时保留全部归一化参数（220-221 行）
+(pass) toolRegistry invoke 异常安全降级（253-259 行） > 工具执行抛错时捕获为 errorClass，返回空证据与降级摘要，不向调用方抛异常
+(pass) toolRegistry 内置工具未覆盖分支 > searchKnowledgeBase 空 query 返回全部知识库 DEMO 条目（76 行）
+(pass) toolRegistry 内置工具未覆盖分支 > lookupDrug 未命中药品时返回空证据与未命中提示摘要（109 行）
+(pass) toolRegistry 内置工具未覆盖分支 > checkInteraction 单药给出单药使用提示；零药与非数组标量均返回空证据（145-150 行）
+(pass) toolRegistry 内置工具未覆盖分支 > readStringArrayArg：混合类型数组剔除非字符串；字符串按逗号 / 顿号 / 空白拆分（57-68 行）
+
+tests\unit\consult-agent\typesSchema.test.ts:
+(pass) draftSchema 草稿红线字面量 > 合法草稿通过校验
+(pass) draftSchema 草稿红线字面量 > needsPhysicianReview=false 被拒绝（红线反例）
+(pass) draftSchema 草稿红线字面量 > isOutOfHospitalPrescription=true 被拒绝（红线反例）
+(pass) draftSchema 草稿红线字面量 > status=approved 被拒绝（AI 草稿恒为待复核）
+(pass) draftSchema 草稿红线字面量 > status=rejected 被拒绝
+(pass) draftSchema 草稿红线字面量 > evidence 为空数组属于业务可通过 schema、哨兵阶段驳回（schema 层不阻断）
+(pass) threadCreateSchema 创建会话入参 > 合法入参通过：标题可选、patientId 可空
+(pass) threadCreateSchema 创建会话入参 > 标题超过 120 字符被拒绝
+(pass) threadCreateSchema 创建会话入参 > patientId 非 UUID 被拒绝
+(pass) messageSendSchema 发送消息入参 > 非空去空格文本通过
+(pass) messageSendSchema 发送消息入参 > 空串 / 纯空格被拒绝
+(pass) messageSendSchema 发送消息入参 > 超过 4000 字符被拒绝
+(pass) transcribeSchema 语音转写入参 > transcript 非空通过
+(pass) transcribeSchema 语音转写入参 > audioText 非空通过
+(pass) transcribeSchema 语音转写入参 > 两者皆空被拒绝
+----------------------------------------------------|---------|---------|-------------------
+File                                                | % Funcs | % Lines | Uncovered Line #s
+----------------------------------------------------|---------|---------|-------------------
+All files                                           |   88.81 |   91.20 |
+ src\bff\config\runtimeEnv.ts                       |    0.00 |   20.00 | 17,22-23,31-35
+ src\bff\middleware\auth.ts                         |   33.33 |   46.78 | 22-26,30-31,47-55,60,68-79,84-114,132-166,171
+-179,184-195,203-209
+ src\bff\permissions.ts                             |  100.00 |  100.00 | 
+ src\bff\routes\consultAgentRoutes.ts               |   94.87 |   98.14 | 150-154,160-161
+ src\bff\types.ts                                   |  100.00 |  100.00 | 
+ src\core\agent\consult\audit\index.ts              |  100.00 |  100.00 | 
+ src\core\agent\consult\consultOrchestrator.ts      |  100.00 |   98.98 | 67,257
+ src\core\agent\consult\demo\demoSeed.ts            |  100.00 |  100.00 | 
+ src\core\agent\consult\draftHash.ts                |  100.00 |  100.00 | 
+ src\core\agent\consult\index.ts                    |  100.00 |  100.00 | 
+ src\core\agent\consult\intentClassifier.ts         |  100.00 |   98.59 | 
+ src\core\agent\consult\llm\safeLlm.ts              |   85.71 |  100.00 | 
+ src\core\agent\consult\memory\profileMemory.ts     |  100.00 |  100.00 | 
+ src\core\agent\consult\memory\shortTermMemory.ts   |  100.00 |  100.00 | 
+ src\core\agent\consult\roleSupport.ts              |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\doctorRole.ts         |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\examinerRole.ts       |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\index.ts              |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\internal.ts           |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\pharmacistRole.ts     |  100.00 |  100.00 | 
+ src\core\agent\consult\roles\supervisorRole.ts     |  100.00 |  100.00 | 
+ src\core\agent\consult\runtime\sessionRuntime.ts   |   92.11 |  100.00 | 
+ src\core\agent\consult\safety\acuteVocabulary.ts   |  100.00 |  100.00 | 
+ src\core\agent\consult\safety\safetyGate.ts        |  100.00 |  100.00 | 
+ src\core\agent\consult\sentinel\sentinelGateway.ts |  100.00 |  100.00 | 
+ src\core\agent\consult\stateMachine.ts             |  100.00 |  100.00 | 
+ src\core\agent\consult\supervisor.ts               |  100.00 |  100.00 | 
+ src\core\agent\consult\tools\evidenceExtractor.ts  |  100.00 |  100.00 | 
+ src\core\agent\consult\tools\toolRegistry.ts       |   97.30 |  100.00 | 
+ src\core\agent\consult\types.ts                    |  100.00 |  100.00 | 
+ src\db\pool.ts                                     |    0.00 |    8.03 | 31-61,65-68,72-90,94-95,99-103,107-108,120-12
+4,143-180,192-211
+ src\db\repositories\consultAgentRepo.ts            |   94.00 |   99.05 | 98
+ src\db\repositories\helpers.ts                     |   11.11 |   22.58 | 18-23,28-29,33,37,41,66-80,85-106
+ tests\support\testEnv.ts                           |  100.00 |  100.00 | 
+ tests\unit\consult-agent\helpers.ts                |  100.00 |  100.00 | 
+----------------------------------------------------|---------|---------|-------------------
+
+ 326 pass
+ 0 fail
+ 2090 expect() calls
+Ran 326 tests across 26 files. [19.68s]

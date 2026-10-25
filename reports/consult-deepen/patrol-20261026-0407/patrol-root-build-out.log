@@ -1,0 +1,19 @@
+============================================================
+健澜科技数智医院智能体 - 生产构建
+============================================================
+环境: development
+入口数: 2
+
+[build] → ./src/entrypoints/cli.tsx  ==>  dist/cli.js
+[build] ✓ dist/cli.js 构建成功 (2 文件)
+       - C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\dist\cli.js
+       - C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\dist\cli.js.map
+
+[build] → ./src/bff/server.ts  ==>  dist/server.js
+[build] ✓ dist/server.js 构建成功 (2 文件)
+       - C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\dist\server.js
+       - C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\dist\server.js.map
+
+============================================================
+[build] 全部构建完成
+============================================================

@@ -1,0 +1,178 @@
+﻿=== 0407 backend compliance evidence ===
+--- ORCH ACUTE/DISCLAIMER ---
+ORCH 8: * 2. evaluateSafety：acute -> escalated 旁路，发急症引导、审计 acute_bypass、
+ORCH 9: *    事件 safety:acute，不进角色、不产草稿；
+ORCH 24: import { appendDisclaimer, confidenceLevel, newId, nowIso } from './roleSupport';
+ORCH 43: import { ACUTE_GUIDANCE, DISCLAIMER } from './types';
+ORCH 142: transitionTo(thread, 'escalated');
+ORCH 151: action: 'acute_bypass',
+ORCH 159: content: ACUTE_GUIDANCE,
+ORCH 165: disclaimer: DISCLAIMER,
+ORCH 170: { type: 'safety:acute', matched: safety.matched, guidance: ACUTE_GUIDANCE },
+ORCH 171: { type: 'disclaimer', text: DISCLAIMER },
+ORCH 207: const reply = appendDisclaimer('会话已结束，感谢您的咨询。如需再次咨询可新建会话。');
+ORCH 218: disclaimer: DISCLAIMER,
+ORCH 223: { type: 'disclaimer', text: DISCLAIMER },
+ORCH 301: replyParts.push(appendDisclaimer(`草稿未通过安全校验：${decision.reason ?? '未知原因'}`));
+ORCH 372: disclaimer: DISCLAIMER,
+ORCH 381: events.push({ type: 'disclaimer', text: DISCLAIMER });
+ORCH 385: disclaimer: DISCLAIMER,
+--- SERVER IDEMPOTENCY/AUDIT ---
+SERVER 15: import { auditOperation } from './middleware/audit';
+SERVER 20: import { withIdempotency } from './middleware/idempotency';
+SERVER 6823: withIdempotency(c, () => handler(c)));
+SERVER 6839: auditOperation(ctx);
+--- TYPES DRAFT REDLINE ---
+TYPES 52: export type DraftStatus = 'pending_review';
+TYPES 135: needsPhysicianReview: true;
+TYPES 137: isOutOfHospitalPrescription: false;
+TYPES 222: * - needsPhysicianReview 必须为 true；
+TYPES 223: * - isOutOfHospitalPrescription 必须为 false；
+TYPES 224: * - status 必须为 pending_review。
+TYPES 234: needsPhysicianReview: z.literal(true),
+TYPES 235: isOutOfHospitalPrescription: z.literal(false),
+TYPES 236: status: z.literal('pending_review'),
+--- DDL383 CHECK ---
+DDL383 8: --  - AI 草稿恒需执业医师复核：needs_physician_review = true（CHECK 锁定，禁止写 false）；
+DDL383 9: --  - 处方草稿恒为非院外处方：is_out_of_hospital_prescription = false（CHECK 锁定，
+DDL383 11: --  - 草稿状态恒为待复核：status = 'pending_review'（CHECK 锁定，不存在 AI 自主 approved 态）；
+DDL383 12: --  - kind 仅限 diagnosis（诊断建议）/ prescription（用药审方建议）；
+DDL383 14: --  - evidence 为脱敏后证据条目（kind/label/source/snippet），禁止原始入参明文入库。
+DDL383 32: kind                            text NOT NULL CHECK (kind IN ('diagnosis','prescription')),
+DDL383 37: needs_physician_review          boolean NOT NULL DEFAULT true
+DDL383 38: CHECK (needs_physician_review = true),
+DDL383 39: is_out_of_hospital_prescription boolean NOT NULL DEFAULT false
+DDL383 40: CHECK (is_out_of_hospital_prescription = false),
+DDL383 41: status                          text NOT NULL DEFAULT 'pending_review'
+DDL383 42: CHECK (status = 'pending_review'),
+DDL383 50: CREATE UNIQUE INDEX IF NOT EXISTS uq_consult_drafts_thread_kind_hash
+DDL383 51: ON consult.diagnosis_prescription_drafts(thread_id, kind, draft_hash);
+DDL383 52: CREATE INDEX IF NOT EXISTS idx_consult_drafts_thread_kind
+DDL383 53: ON consult.diagnosis_prescription_drafts(thread_id, kind);
+--- DDL380 PERMISSION SEED AND GRANTS ---
+DDL380 20: --   consult-agent:read   只读（会话列表/历史消息/草稿/画像/规则快照；护士/医生/admin）
+DDL380 21: --   consult-agent:write  对话写操作（创建会话/发消息/转写/退出关闭；医生/admin）
+DDL380 22: --   consult-agent:audit  审计轨迹查看（仅 admin；doctor/nurse 不授予）
+DDL380 66: ('consult-agent:read',  'AI 咨询助手只读', 'consult_agent',
+DDL380 68: ('consult-agent:write', 'AI 咨询助手对话', 'consult_agent',
+DDL380 70: ('consult-agent:audit',  'AI 咨询助手审计', 'consult_agent',
+DDL380 78: SELECT 'admin', 'consult-agent:read'
+DDL380 80: WHERE role_code='admin' AND permission_code='consult-agent:read');
+DDL380 82: SELECT 'admin', 'consult-agent:write'
+DDL380 84: WHERE role_code='admin' AND permission_code='consult-agent:write');
+DDL380 86: SELECT 'admin', 'consult-agent:audit'
+DDL380 88: WHERE role_code='admin' AND permission_code='consult-agent:audit');
+DDL380 91: SELECT 'doctor', 'consult-agent:read'
+DDL380 93: WHERE role_code='doctor' AND permission_code='consult-agent:read');
+DDL380 95: SELECT 'doctor', 'consult-agent:write'
+DDL380 97: WHERE role_code='doctor' AND permission_code='consult-agent:write');
+DDL380 100: SELECT 'nurse', 'consult-agent:read'
+DDL380 102: WHERE role_code='nurse' AND permission_code='consult-agent:read');
+--- PERMISSIONS THREE CODES ---
+PERM 200: *  - consult-agent:read    查看会话 / 历史消息 / 草稿 / 画像 / 规则快照 / 事件回放
+PERM 201: *  - consult-agent:write   创建会话 / 发送消息 / 语音转写 / 流式问诊 / 退出会话
+PERM 202: *  - consult-agent:audit   查看会话审计轨迹
+PERM 208: READ: 'consult-agent:read',
+PERM 209: WRITE: 'consult-agent:write',
+PERM 210: AUDIT: 'consult-agent:audit',
+--- EP CORRECTED ---
+METHOD_LINES=12 PATH_LINES=12 GUARD_COUNT=12
+EP m175 p176 g179 |  'POST' | path: '/api/v1/consult-agent/threads', | WRITE
+EP m235 p236 g239 |  'GET' | path: '/api/v1/consult-agent/threads', | READ
+EP m248 p249 g252 |  'POST' | path: '/api/v1/consult-agent/threads/:threadId/messages', | WRITE
+EP m292 p293 g296 |  'GET' | path: '/api/v1/consult-agent/threads/:threadId/messages', | READ
+EP m309 p310 g313 |  'POST' | path: '/api/v1/consult-agent/threads/:threadId/transcribe', | WRITE
+EP m336 p337 g340 |  'GET' | path: '/api/v1/consult-agent/threads/:threadId/audit', | AUDIT
+EP m353 p354 g357 |  'GET' | path: '/api/v1/consult-agent/rules/snapshot', | READ
+EP m378 p379 g382 |  'POST' | path: '/api/v1/consult-agent/threads/:threadId/stream', | WRITE
+EP m413 p414 g417 |  'GET' | path: '/api/v1/consult-agent/threads/:threadId/stream/replay', | READ
+EP m511 p512 g515 |  'GET' | path: '/api/v1/consult-agent/threads/:threadId/drafts/:kind', | READ
+EP m536 p537 g540 |  'GET' | path: '/api/v1/consult-agent/profile', | READ
+EP m549 p550 g553 |  'POST' | path: '/api/v1/consult-agent/threads/:threadId/exit', | WRITE
+--- SERVICE EXPORTS ---
+SERVICE_EXPORT_COUNT=12
+SVC 317: createThread
+SVC 322: listThreads
+SVC 328: sendMessage
+SVC 333: listMessages
+SVC 341: transcribe
+SVC 349: listAudit
+SVC 357: getRulesSnapshot
+SVC 362: getDraft
+SVC 370: getProfile
+SVC 376: exitThread
+SVC 536: streamReply
+SVC 551: replayEvents
+SERVICE_LINES=562
+--- PAGE EVIDENCE ---
+PAGE_LINES=1425
+PAGE 9: *   - 急症 safety:acute：红色 Alert 常驻展示急症引导与命中词；
+PAGE 54: type ConsultAcutePayload,
+PAGE 82: /** 常驻免责声明（契约 §1.4 DISCLAIMER，与后端字面量一致） */
+PAGE 83: const DISCLAIMER =
+PAGE 86: /** 急症旁路引导（契约 §1.4 ACUTE_GUIDANCE） */
+PAGE 87: const ACUTE_GUIDANCE =
+PAGE 126: acute: '急症旁路',
+PAGE 133: acute: 'red',
+PAGE 137: type ConfidenceLevel = 'high' | 'medium' | 'low';
+PAGE 140: const CONFIDENCE_TEXT: Record<ConfidenceLevel, string> = {
+PAGE 147: const CONFIDENCE_COLOR: Record<ConfidenceLevel, string> = {
+PAGE 162: function ConfidenceTag({ level }: { level?: ConfidenceLevel }) {
+PAGE 165: <Tag color={CONFIDENCE_COLOR[level]} style={{ fontSize: 11, margin: 0 }}>
+PAGE 166: {CONFIDENCE_TEXT[level]}
+PAGE 309: const [acute, setAcute] = useState<ConsultAcutePayload | null>(null);
+PAGE 352: const [confidenceMap, setConfidenceMap] = useState<Record<string, ConfidenceLevel>>({});
+PAGE 390: setAcute(null);
+PAGE 391: setConfidenceMap({});
+PAGE 396: setAcute(null);
+PAGE 398: setConfidenceMap({});
+PAGE 437: setAcute(null);
+PAGE 485: disclaimer: '',
+PAGE 505: disclaimer: '',
+PAGE 549: disclaimer: '',
+PAGE 555: onAcute: (payload) => setAcute(payload),
+PAGE 557: onDisclaimer: (disclaimer) => patchStream((m) => ({ ...m, disclaimer })),
+PAGE 559: patchStream((m) => ({ ...m, disclaimer: meta.disclaimer || m.disclaimer }));
+PAGE 560: setConfidenceMap((prev) => ({ ...prev, [streamId]: meta.confidence }));
+PAGE 569: setConfidenceMap((prev) => {
+PAGE 739: onAcute: (payload) => pushEvent('acute', payload.guidance),
+PAGE 741: onDisclaimer: () => undefined,
+PAGE 742: onMeta: (meta) => pushEvent('meta', `置信度：${meta.confidence}`),
+PAGE 758: /* 历史线程处于急症旁路时，横幅在加载后仍常驻展示；SSE acute 帧优先覆盖引导语 */
+PAGE 759: const threadAcute = currentThread?.safetyLevel === 'acute';
+PAGE 760: const acuteGuidance = acute?.guidance ?? ACUTE_GUIDANCE;
+PAGE 761: const acuteMatched = acute?.matched ?? [];
+PAGE 964: {/* 急症旁路 Alert：会话处于 acute 状态或收到 safety:acute 帧时常驻展示 */}
+PAGE 965: {(acute ?? threadAcute) && (
+PAGE 978: <div>{acuteGuidance}</div>
+PAGE 979: {acuteMatched.length > 0 && (
+PAGE 981: {acuteMatched.map((word) => (
+PAGE 1092: <ConfidenceTag level={confidenceMap[message.id]} />
+PAGE 1110: {message.disclaimer || DISCLAIMER}
+PAGE 1173: {DISCLAIMER}
+PAGE 1300: <Descriptions.Item label="免责声明">{rulesSnapshot.disclaimer}</Descriptions.Item>
+PAGE 1302: {rulesSnapshot.acuteKeywords.map((word) => (
+--- CREDENTIAL SCAN ---
+WIDE_FILE_COUNT=72
+REAL_TOKEN_HITS=0
+--- LEGACY NAME SCAN (inline) ---
+LEGACY_NAME_TOTAL_HITS=0
+--- BRAND NAME SCAN (inline) ---
+BRAND_TOTAL=22
+BRAND src\core\agent\consult\demo\demoSeed.ts x1
+BRAND tests\unit\consult-agent\ddlSchema.test.ts x1
+BRAND docs\consult-agent\01-requirements.md x3
+BRAND docs\consult-agent\02-architecture.md x1
+BRAND docs\consult-agent\03-contract.md x1
+BRAND docs\consult-agent\04-data-model.md x1
+BRAND docs\consult-agent\05-state-machine.md x1
+BRAND docs\consult-agent\06-test-strategy.md x1
+BRAND docs\consult-agent\07-milestone-m86.md x2
+BRAND docs\consult-agent\08-adr.md x1
+BRAND docs\consult-agent\09-permission-matrix.md x1
+BRAND docs\consult-agent\10-fmea.md x1
+BRAND docs\consult-agent\11-test-coverage-matrix.md x1
+BRAND docs\consult-agent\12-runbook.md x1
+BRAND docs\consult-agent\13-contract-reconciliation.md x1
+BRAND docs\consult-agent\README.md x2
+BRAND docs\api\consult-agent-openapi.yaml x2

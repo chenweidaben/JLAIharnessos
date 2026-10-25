@@ -1,0 +1,23 @@
+﻿eslint.cmd : (node:3856) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ign
+ores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:14 字符: 1
++ & node_modules\.bin\eslint.cmd "web/src/pages/consult-agent/ConsultAg ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:3856) ESL...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\src\pages\consult-agent\ConsultAgentChatPage.tsx
+   19:1   warning  Run autofix to sort these imports!                                                                         simple-import-sort/imports
+  540:41  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  586:19  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  596:21  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  632:23  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  691:21  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  854:28  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  863:23  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+
+✖ 8 problems (7 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

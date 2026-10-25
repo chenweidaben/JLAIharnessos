@@ -1,0 +1,32 @@
+﻿eslint.cmd : (node:19368) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ig
+nores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:4 字符: 1
++ & node_modules\.bin\eslint.cmd "src/services/api/consultAgent.ts" "sr ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:19368) ES...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\src\pages\consult-agent\ConsultAgentChatPage.tsx
+   25:3   error  'Descriptions' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+   26:3   error  'Drawer' is defined but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+   36:3   error  'AudioOutlined' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+   37:3   error  'AuditOutlined' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+   38:3   error  'FileProtectOutlined' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   42:3   error  'ProfileOutlined' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   43:3   error  'ReloadOutlined' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   56:3   error  'getProfile' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   57:3   error  'getRulesSnapshot' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   58:3   error  'listAudit' is defined but never used. Allowed unused vars must match /^_/u            @typescript-eslint/no-unused-vars
+   61:3   error  'replayEvents' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+   64:3   error  'transcribe' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+   66:8   error  'ConsultAuditEntry' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+   70:8   error  'ProfileFact' is defined but never used. Allowed unused vars must match /^_/u          @typescript-eslint/no-unused-vars
+   72:8   error  'RulesSnapshot' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+   76:10  error  'useAuthStore' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+  153:11  error  'ReplayEventItem' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+  161:10  error  'ConfidenceTag' is defined but never used. Allowed unused vars must match /^_/u        @typescript-eslint/no-unused-vars
+
+✖ 18 problems (18 errors, 0 warnings)
+

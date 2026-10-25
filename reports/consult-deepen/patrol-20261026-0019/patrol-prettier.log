@@ -1,0 +1,14 @@
+﻿Checking formatting...
+prettier.cmd : [[33mwarn[39m] tests/unit/consult-agent/audit.test.ts
+所在位置 行:8 字符: 1
++ & node_modules\.bin\prettier.cmd --check "src/core/agent/consult" "sr ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([[33mwarn[39m...t/audit.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[[33mwarn[39m] tests/unit/consult-agent/consultAgentRepo.test.ts
+[[33mwarn[39m] tests/unit/consult-agent/orchestratorBranches.test.ts
+[[33mwarn[39m] tests/unit/consult-agent/profileMemoryBranches.test.ts
+[[33mwarn[39m] tests/unit/consult-agent/sessionRuntime.test.ts
+[[33mwarn[39m] tests/unit/consult-agent/supervisorBranch.test.ts
+[[33mwarn[39m] Code style issues found in 6 files. Run Prettier with --write to fix.

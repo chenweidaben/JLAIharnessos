@@ -1,0 +1,66 @@
+﻿eslint.cmd : (node:33692) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ig
+nores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:7 字符: 1
++ & node_modules\.bin\eslint.cmd "web/src/pages/consult-agent/ConsultAg ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:33692) ES...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1\web\src\pages\consult-agent\ConsultAgentChatPage.tsx
+   19:1   warning  Run autofix to sort these imports!                                                                         simple-import-sort/imports
+   25:3   warning  'Descriptions' is defined but never used. Allowed unused vars must match /^_/u                             @typescript-eslint/no-unused-vars
+   26:3   warning  'Drawer' is defined but never used. Allowed unused vars must match /^_/u                                   @typescript-eslint/no-unused-vars
+   36:3   warning  'AudioOutlined' is defined but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+   37:3   warning  'AuditOutlined' is defined but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+   38:3   warning  'FileProtectOutlined' is defined but never used. Allowed unused vars must match /^_/u                      @typescript-eslint/no-unused-vars
+   42:3   warning  'ProfileOutlined' is defined but never used. Allowed unused vars must match /^_/u                          @typescript-eslint/no-unused-vars
+   43:3   warning  'ReloadOutlined' is defined but never used. Allowed unused vars must match /^_/u                           @typescript-eslint/no-unused-vars
+   56:3   warning  'getProfile' is defined but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+   57:3   warning  'getRulesSnapshot' is defined but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+   58:3   warning  'listAudit' is defined but never used. Allowed unused vars must match /^_/u                                @typescript-eslint/no-unused-vars
+   61:3   warning  'replayEvents' is defined but never used. Allowed unused vars must match /^_/u                             @typescript-eslint/no-unused-vars
+   64:3   warning  'transcribe' is defined but never used. Allowed unused vars must match /^_/u                               @typescript-eslint/no-unused-vars
+  161:10  warning  'ConfidenceTag' is defined but never used. Allowed unused vars must match /^_/u                            @typescript-eslint/no-unused-vars
+  322:9   warning  'canWrite' is assigned a value but never used. Allowed unused vars must match /^_/u                        @typescript-eslint/no-unused-vars
+  323:9   warning  'canAudit' is assigned a value but never used. Allowed unused vars must match /^_/u                        @typescript-eslint/no-unused-vars
+  324:9   warning  'canRead' is assigned a value but never used. Allowed unused vars must match /^_/u                         @typescript-eslint/no-unused-vars
+  327:10  warning  'transcribing' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  327:24  warning  'setTranscribing' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  330:10  warning  'auditOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+  330:21  warning  'setAuditOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  331:10  warning  'auditLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  331:24  warning  'setAuditLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  332:10  warning  'auditEntries' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  332:24  warning  'setAuditEntries' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  335:10  warning  'rulesOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+  335:21  warning  'setRulesOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  336:10  warning  'rulesLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  336:24  warning  'setRulesLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  337:10  warning  'rulesSnapshot' is assigned a value but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  337:25  warning  'setRulesSnapshot' is assigned a value but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  340:10  warning  'replayOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                      @typescript-eslint/no-unused-vars
+  340:22  warning  'setReplayOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  341:10  warning  'replayLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  341:25  warning  'setReplayLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  342:10  warning  'replayLog' is assigned a value but never used. Allowed unused vars must match /^_/u                       @typescript-eslint/no-unused-vars
+  342:21  warning  'setReplayLog' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  346:10  warning  'profileOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                     @typescript-eslint/no-unused-vars
+  346:23  warning  'setProfileOpen' is assigned a value but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+  347:10  warning  'profileLoading' is assigned a value but never used. Allowed unused vars must match /^_/u                  @typescript-eslint/no-unused-vars
+  347:26  warning  'setProfileLoading' is assigned a value but never used. Allowed unused vars must match /^_/u               @typescript-eslint/no-unused-vars
+  348:10  warning  'profileFacts' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+  348:24  warning  'setProfileFacts' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+  351:10  warning  'confidenceMap' is assigned a value but never used. Allowed unused vars must match /^_/u                   @typescript-eslint/no-unused-vars
+  643:41  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  689:19  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  699:21  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  735:23  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  794:21  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  957:28  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+  966:23  error    Promise-returning function provided to attribute where a void return was expected                          @typescript-eslint/no-misused-promises
+
+✖ 51 problems (7 errors, 44 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

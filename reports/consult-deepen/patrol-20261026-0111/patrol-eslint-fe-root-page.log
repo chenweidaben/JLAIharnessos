@@ -1,0 +1,9 @@
+﻿node.exe : (node:9296) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignor
+es" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+所在位置 行:1 字符: 237
++ ... size=8192"; & node node_modules/eslint/bin/eslint.js "web/src/pages/c ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:9296) ESL...#ignoring-files:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)

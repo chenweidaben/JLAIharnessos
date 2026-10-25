@@ -1,0 +1,18 @@
+﻿=== consult static gate 03:11:00 ===
+TSC_ROOT EXIT=0 health=ok args=1
+ESLINT_BE EXIT=0 health=ok args=30
+ESLINT_FE_ROOT_SERVICE EXIT=0 health=ok args=3
+ESLINT_FE_ROOT_PAGE EXIT=0 health=ok args=3
+ESLINT_FE_LOCAL EXIT=1 health=FAIL args=2
+TSC_WEB EXIT=1 health=FAIL args=1
+PRETTIER EXIT=0 health=ok args=58
+=== sections: 7 | failures: 7 ===
+TSC_ROOT=TSC_ROOT EXIT=0 health=ok args=1 0
+ESLINT_BE=ESLINT_BE EXIT=0 health=ok args=30 0
+ESLINT_FE_ROOT_SERVICE=ESLINT_FE_ROOT_SERVICE EXIT=0 health=ok args=3 0
+ESLINT_FE_ROOT_PAGE=ESLINT_FE_ROOT_PAGE EXIT=0 health=ok args=3 0
+ESLINT_FE_LOCAL=ESLINT_FE_LOCAL EXIT=1 health=FAIL args=2 1
+TSC_WEB=TSC_WEB EXIT=1 health=FAIL args=1 1
+PRETTIER=PRETTIER EXIT=0 health=ok args=58 0
+ESLINT_FE_LOCAL EXIT=0 health=ok args=2 (recheck)
+TSC_WEB EXIT=0 health=ok args=1 (recheck)

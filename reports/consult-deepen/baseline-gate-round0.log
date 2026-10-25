@@ -1,0 +1,8 @@
+﻿=== consult-agent deepen round0 baseline gate 2026-10-26 00:00:01 ===
+TSC_EXIT=0 | root tsc --noEmit
+ESLINT_BE_EXIT=0 | backend consult root eslint --max-warnings 0
+ESLINT_FE_LOCAL_EXIT=0 | web local eslint consult (cwd=web, relative paths, web/eslint.config.js; manual 实测零问题；脚本化口径待 #36 门禁脚本固化)
+ESLINT_FE_ROOT_SERVICE_EXIT=0 | root strict eslint consultAgent.ts
+ESLINT_FE_ROOT_PAGE_EXIT=1 | root strict eslint ConsultAgentChatPage.tsx (debt baseline)
+PRETTIER_EXIT=0 | prettier --check consult all files
+=== round0 gate done 2026-10-26 00:02:00 ===
