@@ -194,3 +194,25 @@ export type NursingAdminPermissionCode =
 /** 全部已登记的护理管理权限码（便于自检遍历） */
 export const ALL_NURSING_ADMIN_PERMISSION_CODES: readonly string[] =
   Object.values(NURSING_ADMIN_PERMISSIONS);
+
+/* ===========================================================================
+ * 在线咨询智能体权限码（M86 consult-agent）
+ *  - consult-agent:read    查看会话 / 历史消息 / 草稿 / 画像 / 规则快照 / 事件回放
+ *  - consult-agent:write   创建会话 / 发送消息 / 语音转写 / 流式问诊 / 退出会话
+ *  - consult-agent:audit   查看会话审计轨迹
+ *
+ * 医疗安全：AI 仅辅助健康科普与分诊参考，不替代执业医师 / 药师面诊与处方决策；
+ * 诊断 / 处方草稿恒需执业医师复核，AI 不自主开具在院医嘱。
+ * ========================================================================= */
+export const CONSULT_AGENT_PERMISSIONS = {
+  READ: 'consult-agent:read',
+  WRITE: 'consult-agent:write',
+  AUDIT: 'consult-agent:audit',
+} as const;
+
+export type ConsultAgentPermissionCode =
+  (typeof CONSULT_AGENT_PERMISSIONS)[keyof typeof CONSULT_AGENT_PERMISSIONS];
+
+/** 全部已登记的咨询智能体权限码（便于种子 / 自检遍历） */
+export const ALL_CONSULT_AGENT_PERMISSION_CODES: readonly string[] =
+  Object.values(CONSULT_AGENT_PERMISSIONS);

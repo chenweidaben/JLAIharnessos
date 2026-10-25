@@ -1,0 +1,817 @@
+# consult-agent M86 OpenAPI 3.0 接口规范
+# Copyright (c) 2026 杭州健澜科技有限公司
+#
+# 所属产品：健澜AI原生医院操作系统OS。
+# 路径、方法、权限码、幂等/审计要求、类型与 SSE 事件逐字对齐冻结契约
+# reports/consult-rebuild/CONTRACT-m86.md §1、§11、§12、§14；契约未定义字段不得自行发明。
+#
+# 约定：
+#   - 业务端点挂在 /api/v1/consult-agent 下（servers.url 已含前缀，paths 内为相对路径）
+#   - 统一响应信封 ApiResponse<T>：{ code, message, data, timestamp, traceId? }
+#   - code=0 成功；非 0 见 ErrorCode
+#   - 鉴权：Bearer JWT；写操作携带 Idempotency-Key（8–200 字符；无头不改变行为）
+#   - SSE 端点帧格式：data: {json}\n\n；结束帧 data: [DONE]\n\n；流路由不消费 Idempotency-Key
+
+openapi: 3.0.3
+info:
+  title: consult-agent（AI 辅助问诊助手）BFF API
+  version: M86
+  description: >
+    健澜AI原生医院操作系统OS consult-agent 子系统接口：会话管理、消息问诊、语音转写 DEMO、
+    审计轨迹、规则快照、SSE 实时流式与回放、草稿查询、画像读取、退出会话。
+    AI 仅产出待执业医师复核的草稿，不自主确诊、不开具在院医嘱、不签发院外处方。
+  contact:
+    name: 杭州健澜科技有限公司
+servers:
+  - url: /api/v1/consult-agent
+    description: BFF 前缀（baseURL 已含 /api/v1）
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Threads
+  - name: Messages
+  - name: Transcribe
+  - name: Audit
+  - name: Rules
+  - name: Stream
+  - name: Drafts
+  - name: Profile
+  - name: Exit
+
+x-permission-codes:
+  read: consult-agent:read
+  write: consult-agent:write
+  audit: consult-agent:audit
+
+x-sse-events:
+  - type: delta
+    ref: '#/components/schemas/SseEventDelta'
+    description: 文本增量帧
+  - type: tool
+    ref: '#/components/schemas/SseEventTool'
+    description: 工具调用起止帧（仅工具名+摘要，不含原始入参）
+  - type: safety:acute
+    ref: '#/components/schemas/SseEventSafetyAcute'
+    description: 急症旁路帧；命中即不进入角色编排、不产草稿
+  - type: draft
+    ref: '#/components/schemas/SseEventDraft'
+    description: 草稿产出帧
+  - type: disclaimer
+    ref: '#/components/schemas/SseEventDisclaimer'
+    description: 免责声明帧
+  - type: meta
+    ref: '#/components/schemas/SseEventMeta'
+    description: 置信度与免责声明元信息帧
+  - type: done
+    ref: '#/components/schemas/SseEventDone'
+    description: 会话处理结束帧
+  - type: error
+    ref: '#/components/schemas/SseEventError'
+    description: 错误帧
+
+paths:
+  /threads:
+    post:
+      tags: [Threads]
+      summary: 创建会话（可带首条消息）
+      description: >
+        权限码 consult-agent:write；幂等（Idempotency-Key，8–200 字符；无头不改变行为）；
+        审计留痕。返回 { thread, messages, draft? }。
+      x-permission-code: consult-agent:write
+      x-idempotent: true
+      x-audit: true
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ThreadCreateRequest' }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ThreadCreateData' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    get:
+      tags: [Threads]
+      summary: 会话列表
+      description: "权限码 consult-agent:read；返回 { threads: ConsultThread[] }。"
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ThreadListData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/messages:
+    post:
+      tags: [Messages]
+      summary: 发送消息（非流式快照）
+      description: >
+        权限码 consult-agent:write；幂等；审计留痕。返回 { thread, message, draft?, events? }。
+        终态会话拒绝新消息（409/400 由 BFF 判定）。
+      x-permission-code: consult-agent:write
+      x-idempotent: true
+      x-audit: true
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MessageSendRequest' }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/MessageSendData' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+    get:
+      tags: [Messages]
+      summary: 历史消息
+      description: "权限码 consult-agent:read；返回 { messages: ConsultMessage[] }，按 created_at ASC 排序。"
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/MessageListData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/transcribe:
+    post:
+      tags: [Transcribe]
+      summary: 语音转写 DEMO
+      description: >
+        权限码 consult-agent:write；幂等；审计留痕。transcript / audioText 至少其一非空；
+        归一化文本后返回 { text, message? }。DEMO 确定性返回，不联网。
+      x-permission-code: consult-agent:write
+      x-idempotent: true
+      x-audit: true
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TranscribeRequest' }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/TranscribeData' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/audit:
+    get:
+      tags: [Audit]
+      summary: 审计轨迹
+      description: "权限码 consult-agent:audit（仅 admin）；返回 { entries: ConsultAuditEntry[] }。"
+      x-permission-code: consult-agent:audit
+      x-idempotent: false
+      x-audit: false
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/AuditListData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /rules/snapshot:
+    get:
+      tags: [Rules]
+      summary: 规则快照
+      description: >
+        权限码 consult-agent:read；返回 { version, disclaimer, acuteKeywords, tools, permissions }，
+        供前端渲染引导文案、急症提示、工具清单与权限说明。
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/RulesSnapshotData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/stream:
+    post:
+      tags: [Stream]
+      summary: SSE 实时流式问诊
+      description: >
+        权限码 consult-agent:write；审计留痕；不做幂等校验（流路由不消费 Idempotency-Key）。
+        body { content }；逐帧下发 delta / tool / safety:acute / draft / disclaimer / meta / done；
+        异常下发 error；结束帧 data: [DONE]\n\n。
+      x-permission-code: consult-agent:write
+      x-idempotent: false
+      x-audit: true
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StreamRequest' }
+      responses:
+        '200':
+          description: SSE 事件流
+          headers:
+            Content-Type:
+              schema: { type: string, example: 'text/event-stream; charset=utf-8' }
+            Cache-Control:
+              schema: { type: string, example: 'no-cache, no-transform' }
+            Connection:
+              schema: { type: string, example: 'keep-alive' }
+            X-Accel-Buffering:
+              schema: { type: string, example: 'no' }
+          content:
+            text/event-stream:
+              schema: { $ref: '#/components/schemas/SseStream' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /threads/{threadId}/stream/replay:
+    get:
+      tags: [Stream]
+      summary: SSE 回放历史事件
+      description: "权限码 consult-agent:read；按时间顺序重放持久化事件；结束帧 data: [DONE]\\n\\n。"
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '200':
+          description: SSE 事件回放流
+          headers:
+            Content-Type:
+              schema: { type: string, example: 'text/event-stream; charset=utf-8' }
+            Cache-Control:
+              schema: { type: string, example: 'no-cache, no-transform' }
+            Connection:
+              schema: { type: string, example: 'keep-alive' }
+            X-Accel-Buffering:
+              schema: { type: string, example: 'no' }
+          content:
+            text/event-stream:
+              schema: { $ref: '#/components/schemas/SseStream' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/drafts/{kind}:
+    get:
+      tags: [Drafts]
+      summary: 草稿查询
+      description: "权限码 consult-agent:read；返回 { draft: ConsultDraft | null }，kind ∈ diagnosis/prescription。"
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - name: kind
+          in: path
+          required: true
+          description: 草稿类型
+          schema: { $ref: '#/components/schemas/DraftKind' }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/DraftGetData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /profile:
+    get:
+      tags: [Profile]
+      summary: 画像读取
+      description: "权限码 consult-agent:read；返回 { facts: ProfileFact[] }。"
+      x-permission-code: consult-agent:read
+      x-idempotent: false
+      x-audit: false
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ProfileData' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /threads/{threadId}/exit:
+    post:
+      tags: [Exit]
+      summary: 退出 / 关闭会话
+      description: "权限码 consult-agent:write；幂等；审计留痕。返回 { thread }。"
+      x-permission-code: consult-agent:write
+      x-idempotent: true
+      x-audit: true
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data: { $ref: '#/components/schemas/ExitData' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ThreadId:
+      name: threadId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: 幂等键（8–200 字符，推荐 UUID）；无头不改变行为；同键复用到不同请求体返回冲突错误。
+      schema: { type: string, minLength: 8, maxLength: 200 }
+
+  responses:
+    BadRequest:
+      description: 入参非法（400 BAD_REQUEST）
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Unauthorized:
+      description: 未登录（401 UNAUTHORIZED）
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Forbidden:
+      description: 权限不足（403 FORBIDDEN）
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: 资源不存在（404 NOT_FOUND）
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Conflict:
+      description: 状态冲突（409 CONFLICT，如终态会话新消息、幂等键复用冲突）
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    # ---------- 枚举（契约 §1.1） ----------
+    RoleKind:
+      type: string
+      enum: [supervisor, examiner, doctor, pharmacist]
+    ThreadStatus:
+      type: string
+      enum: [idle, collecting, clarifying, drafting, review_pending, escalated, closed, aborted]
+    IntentKind:
+      type: string
+      enum: [greeting, symptom_report, clarification_answer, medication_question, chronic_management, acute_emergency, document_upload, exit, unknown]
+    SafetyLevel:
+      type: string
+      enum: [normal, caution, acute]
+    MessageRole:
+      type: string
+      enum: [user, assistant, tool, system]
+    DraftKind:
+      type: string
+      enum: [diagnosis, prescription]
+    DraftStatus:
+      type: string
+      enum: [pending_review]
+      description: AI 草稿恒为待医师复核，不产生 approved/rejected AI 态
+    ToolStatus:
+      type: string
+      enum: [success, error, skipped]
+    ActorRole:
+      type: string
+      description: "契约 §1.2 ConsultAuditEntry.actorRole 取值为 RoleKind | 'system' | 'user'；本 schema 为该联合取值的文档化枚举，非契约新增枚举类型。"
+      enum: [supervisor, examiner, doctor, pharmacist, system, user]
+    SseConfidence:
+      type: string
+      enum: [high, medium, low]
+
+    # ---------- 实体（契约 §1.2） ----------
+    EvidenceItem:
+      type: object
+      required: [kind, label, source, snippet]
+      properties:
+        kind:
+          type: string
+          description: knowledge | drug | allergy | interaction | history | document
+          enum: [knowledge, drug, allergy, interaction, history, document]
+        label: { type: string }
+        source: { type: string }
+        snippet: { type: string }
+
+    ConsultThread:
+      type: object
+      required: [id, userId, patientId, title, status, intent, safetyLevel, currentRole, meta, closedAt, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        patientId: { type: string, format: uuid, nullable: true }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/ThreadStatus' }
+        intent: { $ref: '#/components/schemas/IntentKind' }
+        safetyLevel: { $ref: '#/components/schemas/SafetyLevel' }
+        currentRole: { $ref: '#/components/schemas/RoleKind', nullable: true }
+        meta: { type: object, additionalProperties: true }
+        closedAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ToolCallRecord:
+      type: object
+      required: [callId, name, status, durationMs, evidenceCount, errorClass, summary]
+      description: 禁止保存/回显原始入参明文
+      properties:
+        callId: { type: string }
+        name: { type: string, description: 工具规范驼峰名 }
+        status: { $ref: '#/components/schemas/ToolStatus' }
+        durationMs: { type: integer, format: int64 }
+        evidenceCount: { type: integer, format: int32 }
+        errorClass: { type: string, nullable: true }
+        summary: { type: string, nullable: true }
+
+    ConsultMessage:
+      type: object
+      required: [id, threadId, role, content, intent, roleKind, toolCalls, toolName, safetyLevel, disclaimer, traceId, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        threadId: { type: string, format: uuid }
+        role: { $ref: '#/components/schemas/MessageRole' }
+        content: { type: string }
+        intent: { $ref: '#/components/schemas/IntentKind', nullable: true }
+        roleKind: { $ref: '#/components/schemas/RoleKind', nullable: true }
+        toolCalls: { type: array, nullable: true, items: { $ref: '#/components/schemas/ToolCallRecord' } }
+        toolName: { type: string, nullable: true }
+        safetyLevel: { $ref: '#/components/schemas/SafetyLevel' }
+        disclaimer: { type: string }
+        traceId: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ConsultDocument:
+      type: object
+      required: [id, threadId, messageId, fileName, mimeType, sizeBytes, evidenceSummary, extractedEvidence, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        threadId: { type: string, format: uuid }
+        messageId: { type: string, format: uuid, nullable: true }
+        fileName: { type: string }
+        mimeType: { type: string }
+        sizeBytes: { type: integer, format: int64, nullable: true }
+        evidenceSummary: { type: string, nullable: true }
+        extractedEvidence: { type: array, items: { $ref: '#/components/schemas/EvidenceItem' } }
+        createdAt: { type: string, format: date-time }
+
+    ConsultDraft:
+      type: object
+      required: [id, threadId, kind, title, summary, content, evidence, needsPhysicianReview, isOutOfHospitalPrescription, status, draftHash, reviewerId, reviewedAt, reviewNote, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        threadId: { type: string, format: uuid }
+        kind: { $ref: '#/components/schemas/DraftKind' }
+        title: { type: string }
+        summary: { type: string }
+        content: { type: string }
+        evidence: { type: array, items: { $ref: '#/components/schemas/EvidenceItem' } }
+        needsPhysicianReview:
+          type: boolean
+          const: true
+          description: zod literal true 强制
+        isOutOfHospitalPrescription:
+          type: boolean
+          const: false
+          description: zod literal false 强制
+        status: { $ref: '#/components/schemas/DraftStatus' }
+        draftHash: { type: string, description: 稳定业务字段 SHA-256 十六进制 }
+        reviewerId: { type: string, nullable: true }
+        reviewedAt: { type: string, format: date-time, nullable: true }
+        reviewNote: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ConsultAuditEntry:
+      type: object
+      required: [id, threadId, actorRole, action, toolName, toolStatus, durationMs, evidenceCount, errorClass, traceId, detail, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        threadId: { type: string, format: uuid }
+        actorRole: { $ref: '#/components/schemas/ActorRole' }
+        action: { type: string }
+        toolName: { type: string, nullable: true }
+        toolStatus: { $ref: '#/components/schemas/ToolStatus', nullable: true }
+        durationMs: { type: integer, format: int64, nullable: true }
+        evidenceCount: { type: integer, format: int32, nullable: true }
+        errorClass: { type: string, nullable: true }
+        traceId: { type: string }
+        detail:
+          type: object
+          additionalProperties: true
+          description: 脱敏后的结构化摘要，禁止原始入参
+        createdAt: { type: string, format: date-time }
+
+    ProfileFact:
+      type: object
+      required: [key, value, source, updatedAt]
+      properties:
+        key: { type: string, description: 例：allergy / chronic_condition / drug_intolerance / preferred_language }
+        value: { type: string }
+        source: { type: string }
+        updatedAt: { type: string, format: date-time }
+
+    ConsultProfileMemory:
+      type: object
+      required: [id, userId, threadId, facts, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        userId: { type: string }
+        threadId: { type: string, format: uuid, nullable: true }
+        facts: { type: array, items: { $ref: '#/components/schemas/ProfileFact' } }
+        updatedAt: { type: string, format: date-time }
+
+    # ---------- 请求体（契约 §1.3 zod schema） ----------
+    ThreadCreateRequest:
+      type: object
+      properties:
+        title: { type: string, maxLength: 120 }
+        patientId: { type: string, format: uuid, nullable: true }
+        initialMessage: { type: string, maxLength: 2000 }
+    MessageSendRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 4000, description: 入库前 trim }
+    TranscribeRequest:
+      type: object
+      description: transcript / audioText 至少其一非空
+      properties:
+        transcript: { type: string, maxLength: 4000 }
+        audioText: { type: string, maxLength: 4000 }
+    StreamRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 4000 }
+
+    # ---------- 响应数据载荷（契约 §12） ----------
+    ThreadCreateData:
+      type: object
+      required: [thread, messages]
+      properties:
+        thread: { $ref: '#/components/schemas/ConsultThread' }
+        messages: { type: array, items: { $ref: '#/components/schemas/ConsultMessage' } }
+        draft: { $ref: '#/components/schemas/ConsultDraft' }
+    ThreadListData:
+      type: object
+      required: [threads]
+      properties:
+        threads: { type: array, items: { $ref: '#/components/schemas/ConsultThread' } }
+    MessageSendData:
+      type: object
+      required: [thread, message]
+      properties:
+        thread: { $ref: '#/components/schemas/ConsultThread' }
+        message: { $ref: '#/components/schemas/ConsultMessage' }
+        draft: { $ref: '#/components/schemas/ConsultDraft' }
+        events: { type: array, items: { $ref: '#/components/schemas/SseEventUnion' } }
+    MessageListData:
+      type: object
+      required: [messages]
+      properties:
+        messages: { type: array, items: { $ref: '#/components/schemas/ConsultMessage' } }
+    TranscribeData:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        message: { $ref: '#/components/schemas/ConsultMessage' }
+    AuditListData:
+      type: object
+      required: [entries]
+      properties:
+        entries: { type: array, items: { $ref: '#/components/schemas/ConsultAuditEntry' } }
+    RulesSnapshotData:
+      type: object
+      required: [version, disclaimer, acuteKeywords, tools, permissions]
+      properties:
+        version: { type: string }
+        disclaimer: { type: string }
+        acuteKeywords: { type: array, items: { type: string } }
+        tools:
+          type: array
+          description: "工具注册表快照，形状对齐契约 §6 ToolRegistry.list() 返回的 Array<{ name, description, aliases }>"
+          items:
+            type: object
+            required: [name, description, aliases]
+            properties:
+              name: { type: string, description: 规范驼峰名 }
+              description: { type: string }
+              aliases: { type: array, items: { type: string }, description: 下划线别名兼容列表 }
+        permissions: { type: array, items: { type: string } }
+    DraftGetData:
+      type: object
+      required: [draft]
+      properties:
+        draft: { $ref: '#/components/schemas/ConsultDraft', nullable: true }
+    ProfileData:
+      type: object
+      required: [facts]
+      properties:
+        facts: { type: array, items: { $ref: '#/components/schemas/ProfileFact' } }
+    ExitData:
+      type: object
+      required: [thread]
+      properties:
+        thread: { $ref: '#/components/schemas/ConsultThread' }
+
+    # ---------- SSE 事件（契约 §11） ----------
+    SseEventDelta:
+      type: object
+      required: [type, text]
+      properties:
+        type: { type: string, const: delta }
+        text: { type: string }
+    SseEventTool:
+      type: object
+      required: [type, stage, callId, toolName, success]
+      properties:
+        type: { type: string, const: tool }
+        stage: { type: string, enum: [start, end] }
+        callId: { type: string }
+        toolName: { type: string }
+        success: { type: boolean }
+        summary: { type: string }
+        evidenceCount: { type: integer, format: int32 }
+    SseEventSafetyAcute:
+      type: object
+      required: [type, matched, guidance]
+      properties:
+        type: { type: string, const: 'safety:acute' }
+        matched: { type: array, items: { type: string } }
+        guidance: { type: string }
+    SseEventDraft:
+      type: object
+      required: [type, draft]
+      properties:
+        type: { type: string, const: draft }
+        draft: { $ref: '#/components/schemas/ConsultDraft' }
+    SseEventDisclaimer:
+      type: object
+      required: [type, text]
+      properties:
+        type: { type: string, const: disclaimer }
+        text: { type: string }
+    SseEventMeta:
+      type: object
+      required: [type, confidence, disclaimer]
+      properties:
+        type: { type: string, const: meta }
+        confidence: { $ref: '#/components/schemas/SseConfidence' }
+        disclaimer: { type: string }
+    SseEventDone:
+      type: object
+      required: [type, messageId]
+      properties:
+        type: { type: string, const: done }
+        messageId: { type: string }
+    SseEventError:
+      type: object
+      required: [type, code, message]
+      properties:
+        type: { type: string, const: error }
+        code: { type: string }
+        message: { type: string }
+    SseEventUnion:
+      type: object
+      description: SSE 事件联合类型；前端按 type 分派 handler
+      oneOf:
+        - $ref: '#/components/schemas/SseEventDelta'
+        - $ref: '#/components/schemas/SseEventTool'
+        - $ref: '#/components/schemas/SseEventSafetyAcute'
+        - $ref: '#/components/schemas/SseEventDraft'
+        - $ref: '#/components/schemas/SseEventDisclaimer'
+        - $ref: '#/components/schemas/SseEventMeta'
+        - $ref: '#/components/schemas/SseEventDone'
+        - $ref: '#/components/schemas/SseEventError'
+    SseStream:
+      type: string
+      description: >
+        事件流；每帧 data: {json}\n\n，结束帧 data: [DONE]\n\n。
+        响应头：Content-Type: text/event-stream; charset=utf-8；Cache-Control: no-cache, no-transform；
+        Connection: keep-alive；X-Accel-Buffering: no。
+
+    # ---------- 响应信封（契约 §12 / src/bff/types.ts） ----------
+    ApiResponse:
+      type: object
+      required: [code, message, data, timestamp]
+      properties:
+        code: { type: integer, description: 0 成功；非 0 见 ErrorCode 枚举 }
+        message: { type: string }
+        data: { type: object, nullable: true }
+        timestamp: { type: string, format: date-time }
+        traceId: { type: string }
+    ErrorResponse:
+      type: object
+      required: [code, message, data, timestamp]
+      properties:
+        code: { type: integer, description: ErrorCode：40000 BAD_REQUEST / 40100 UNAUTHORIZED / 40300 FORBIDDEN / 40400 NOT_FOUND / 40900 CONFLICT / 50000 INTERNAL_ERROR 等 }
+        message: { type: string }
+        data: { type: object, nullable: true, example: null }
+        timestamp: { type: string, format: date-time }
+        traceId: { type: string, description: 可选；沿统一信封 `traceId?` 约定 }
