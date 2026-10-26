@@ -38,6 +38,15 @@ export {
 export { JsonFileStore, MemoryStore, type KVStore } from './store/FileStore';
 export { KnowledgeService, type KnowledgeServiceOptions } from './service/KnowledgeService';
 
+// ===== S-11 RAG 知识生命周期基础（六域台账 / 六要素拦截 / 状态机 / 评审周期） =====
+export * from './lifecycle';
+
+// ===== S-12 引用编号协议与检索质量闭环（后端协议先行） =====
+export * from './citation';
+
+// ===== S-13 患者级隔离索引与越权审计（分区强制过滤 / 阻断入审计链） =====
+export * from './isolation';
+
 /** 医疗辅助免责声明（所有知识服务输出统一附带） */
 export const MEDICAL_DISCLAIMER =
   '本结果由健澜AI原生医院操作系统OS智能体辅助生成，仅供医务人员参考，不替代医生的诊断、治疗与处方决策。';
