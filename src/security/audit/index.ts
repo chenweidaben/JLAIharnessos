@@ -32,3 +32,6 @@ export {
   type LogReadOptions,
   MemoryLogStorage,
 } from './LogStorage';
+
+// ===== S-08 AI 专项审计事件与四维留痕 =====
+export * from './aiAudit.js';

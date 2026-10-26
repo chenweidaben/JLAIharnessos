@@ -98,7 +98,25 @@ export {
 
 // ===== 审计日志模块 =====
 export {
+  type AiActor,
+  type AiAuditEvent,
+  type AiAuditEventInput,
+  AiAuditService,
+  type AiAuditQuery,
+  type AiChainVerification,
+  type AiGuardLevel,
+  type AiHumanAction,
+  type AiTraceExport,
+  type AiVersionSnapshot,
   type AnomalyDetectionResult,
+  AUDIT_GENESIS_HASH,
+  AUD_ERROR_INVALID_ACTOR,
+  AUD_ERROR_INVALID_ENUM,
+  AUD_ERROR_INVALID_KNOWLEDGE_VERSIONS,
+  AUD_ERROR_INVALID_NUMBER,
+  AUD_ERROR_INVALID_VERSIONS,
+  AUD_ERROR_MISSING_FIELD,
+  AUD_ERROR_TRACE_NOT_FOUND,
   AUDIT_EVENT_METADATA,
   type AuditEventMetadata,
   AuditEventType,
@@ -107,7 +125,9 @@ export {
   AuditReportGenerator,
   FileLogStorage,
   FileWormStorage,
+  getAiAuditService,
   getAuditEventMetadata,
+  hashToolPayload,
   type ILogStorage,
   type IWormStorage,
   type LogContext,
@@ -115,7 +135,10 @@ export {
   type LogReadOptions,
   MemoryLogStorage,
   type OperationReportOptions,
+  type ToolCallRecord,
   type UserOperationStat,
+  validateAiAuditInput,
+  _resetAiAuditService,
 } from './audit';
 
 // ===== 权限管理模块 =====
