@@ -1,0 +1,46 @@
+{
+  "traceId": "trace-demo-outpatient-001",
+  "agentId": "medical-record-outpatient",
+  "agentVersion": "1.0.0",
+  "actor": {
+    "userId": "doctor-demo-001",
+    "role": "doctor",
+    "department": "内科"
+  },
+  "patientId": "patient-demo-001",
+  "visitId": "visit-demo-001",
+  "encounterDate": "2026-10-26",
+  "department": "内科",
+  "queryText": "头痛三天，昨天开始加重",
+  "consentConfirmed": true,
+  "dialogue": [
+    {
+      "speaker": "patient",
+      "text": "头痛三天了，昨天下午开始加重，感觉昏沉沉的。",
+      "order": 1,
+      "timestamp": "2026-10-26 09:12:05"
+    },
+    {
+      "speaker": "doctor",
+      "text": "还有其他不舒服吗？既往有没有慢性病或者药物过敏？",
+      "order": 2,
+      "timestamp": "2026-10-26 09:12:28"
+    },
+    {
+      "speaker": "patient",
+      "text": "没有其他不舒服，以前身体还好，没有过敏史。",
+      "order": 3,
+      "timestamp": "2026-10-26 09:12:41"
+    }
+  ],
+  "facts": {
+    "patientId": "patient-demo-001",
+    "visitId": "visit-demo-001",
+    "patientName": "演示患者",
+    "age": 45,
+    "gender": "男",
+    "diagnoses": [],
+    "medications": [],
+    "keyVitals": {}
+  }
+}

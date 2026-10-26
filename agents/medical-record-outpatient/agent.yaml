@@ -1,0 +1,277 @@
+# 健澜AI原生医院操作系统OS - 门诊病历智能体声明包
+# 版权所有 (c) 2026 杭州健澜科技有限公司
+# 说明：本包为 S-09 独立声明包，catalog 挂载归后续 BFF / 前端批次；
+#       当前清单未登记前，目录加载器不会将其挂接进运行时注册表。
+id: medical-record-outpatient
+name: 门诊病历智能体
+nameEn: Outpatient Medical Record Agent
+version: 1.0.0
+category: 电子病历
+tags:
+  - 门诊病历
+  - 意图分流
+  - 实时质控
+  - 人工复核
+description: >-
+  面向门诊初诊 / 复诊 / 复诊续方 / 检验解读四类场景，依据患者实时资料、对话归一时间线
+  与权威知识检索结果，分节生成结构化门诊病历；实时质控规则自检，经输出侧防护与执业医师
+  人工确认后回写 EMR 草稿。诊断方向与检查、用药建议必须挂载引用编号，不使用确定性表述。
+allowedRoles:
+  - doctor
+riskLevel: medium
+humanInLoop: true
+tools:
+  - get_patient_profile
+  - get_visit_history
+  - get_recent_exams
+  - get_medication_list
+  - kb_search
+  - icd_lookup
+  - submit_outpatient_draft
+  - raise_qc_alert
+knowledgeBases:
+  - writing-standard
+  - clinical-guide
+  - data-standard
+  - hospital-policy
+model:
+  provider: local-demo
+  model: outpatient-draft-v1
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: outpatient-main
+disclaimer: >-
+  本门诊病历由 AI 辅助生成，仅供临床参考；诊断方向、检查与用药建议均须由执业医师结合
+  实时资料核实确认，并经人工签名后方可作为正式医疗文书。AI 不承担诊疗责任。
+
+workflows:
+  - meta:
+      id: outpatient-main
+      name: 门诊病历生成-质控-人工复核-回写主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    # 事件预留：write_record 成功后由运行时发出 outpatient-record-completed；
+    # 事件总线真实挂载归后续批次，本声明包不接真实事件通道。
+    nodes:
+      - id: start
+        type: start
+        name: 开始
+        config: {}
+
+      - id: intent_classify
+        type: code
+        name: 门诊意图分流
+        config:
+          assignments:
+            intent: classifyIntent(input.dialogue, input.facts).intent
+            encounterKind: classifyIntent(input.dialogue, input.facts).encounterKind
+          # 规则信号（既往就诊 / 续方 / 检验解读 / 首诊主诉）+ 模型判定占位；
+          # renewal、lab-review 文书流归入 follow-up。
+
+      - id: fetch_patient
+        type: tool
+        name: 调取患者档案
+        config:
+          toolName: get_patient_profile
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: fetch_records
+        type: parallel
+        name: 调取既往就诊与近期资料
+        config:
+          mode: all
+          concurrency: 3
+          branches:
+            - name: visit_history
+              entryNode: fetch_visit_history
+            - name: recent_exams
+              entryNode: fetch_recent_exams
+            - name: medication_list
+              entryNode: fetch_medication_list
+
+      - id: fetch_visit_history
+        type: tool
+        name: 调取既往就诊记录
+        config:
+          toolName: get_visit_history
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            days: 365
+
+      - id: fetch_recent_exams
+        type: tool
+        name: 调取近期检验检查
+        config:
+          toolName: get_recent_exams
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            days: 90
+
+      - id: fetch_medication_list
+        type: tool
+        name: 调取在用药物清单
+        config:
+          toolName: get_medication_list
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: rag_guidelines
+        type: rag
+        name: 检索门诊规范与指南知识
+        config:
+          knowledgeBases:
+            - writing-standard
+            - clinical-guide
+            - data-standard
+            - hospital-policy
+          query: input.chiefComplaint
+          topK: 5
+          scoreThreshold: 0.35
+          strategy: hybrid
+          outputVariable: evidence
+
+      - id: dialogue_normalize
+        type: code
+        name: 对话归一与要素链挂起
+        config:
+          assignments:
+            normalized: normalizeDialogue(input.dialogue, facts)
+            missingElements: normalized.missingElements
+          # 去口语化、术语展示归一、相对时间解析挂入时间线；缺失要素进入 missingInfo。
+
+      - id: outline
+        type: llm
+        name: 文书大纲生成
+        config:
+          model: outpatient-draft-v1
+          systemPrompt: prompts/system.md
+          userTemplate: >-
+            按就诊类型生成病历大纲。初诊：主诉 / 现病史 / 既往史 / 查体 / 辅助检查 /
+            初步诊断 / 处理意见；复诊：诊疗经过 / 病情变化 / 查体 / 辅助检查 /
+            诊断调整 / 后续处理。仅依据所给资料，资料不足处标注待补充。
+          jsonMode: true
+
+      - id: draft_sections
+        type: llm
+        name: 分节生成病历初稿
+        config:
+          model: outpatient-draft-v1
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            依据大纲、归一对话、患者资料与检索依据生成分节病历。
+            诊断方向、检查建议、用药建议必须在句末标注引用编号 [n]；
+            资料不足处标注「（待核实）」，不得使用确定性诊断表述。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              chiefComplaint: { type: string }
+              presentIllness: { type: string }
+              historyIllness: { type: string }
+              physicalExam: { type: string }
+              auxiliaryExams: { type: string }
+              diagnosis: { type: array, items: { type: object } }
+              suggestions: { type: array, items: { type: object } }
+              missingInfo: { type: array, items: { type: string } }
+
+      - id: qc_realtime
+        type: code
+        name: 门诊实时质控
+        config:
+          assignments:
+            qcFindings: runQcRealtime(draft, context)
+          # 规则：主诉-现病史对应、时间线一致性、ICD-诊断-用药匹配、复制粘贴检测、
+          # 要素完整性。阻断项回退 revise；最多 2 次，超限转人工队列或阻断出稿。
+
+      - id: revise_loop
+        type: loop
+        name: 质控问题修订循环（最多 2 次）
+        config:
+          mode: times
+          maxIterations: 2
+          bodyEntry: revise_draft
+          # 超限口径：两次修订后仍存在阻断 / Schema 问题，转人工队列或阻断出稿，不强行成稿。
+          onExhaust: manual-queue
+
+      - id: revise_draft
+        type: code
+        name: 按质控问题修订草稿
+        config:
+          assignments:
+            revisionRound: vars.revisionRound + 1
+            revisionNote: qcFindings 汇总问题清单
+
+      - id: output_guard
+        type: code
+        name: 输出侧防护校验
+        config:
+          assignments:
+            guardVerdict: guardOutbound(guardContext)
+          # 复用 S-01 guardOutbound：虚构身份 / 事实矛盾 / 确定性红线 / 敏感承诺 /
+          # Schema 结构 / 无依据结论 / 要素完整性；BLOCK 直接终止，CAUTION 留痕后继续。
+
+      - id: human_review
+        type: human
+        name: 执业医师人工复核
+        config:
+          title: 门诊病历复核与签名确认
+          instructions: 请核对主诉、现病史、诊断方向与处理建议；可采纳、修改、拒绝或退回修订。
+          assigneeRoles:
+            - doctor
+          formSchema:
+            decision: { type: string, enum: ['adopted', 'modified', 'rejected', 'returned-for-revision'] }
+            comment: { type: string }
+            modifiedDraft: { type: object }
+          timeoutMs: 86400000
+
+      - id: write_record
+        type: tool
+        name: 回写门诊草稿并留痕
+        config:
+          toolName: submit_outpatient_draft
+          requireConfirmation: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            draft: draft
+            reviewer: human_review.reviewerRole
+          # 存在 caution / block 质控发现时调用 raise_qc_alert 生成质控告警；
+          # 写路径须校验调用者角色为 doctor 且知情同意确认，否则阻断并记审计台账。
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            draft: draft
+            qcFindings: qcFindings
+            guardLevel: guardVerdict.level
+            review: human_review.decision
+
+    edges:
+      - { id: e1, source: start, target: intent_classify }
+      - { id: e2, source: intent_classify, target: fetch_patient }
+      - { id: e3, source: fetch_patient, target: fetch_records }
+      - { id: e4, source: fetch_records, target: rag_guidelines }
+      - { id: e5, source: rag_guidelines, target: dialogue_normalize }
+      - { id: e6, source: dialogue_normalize, target: outline }
+      - { id: e7, source: outline, target: draft_sections }
+      - { id: e8, source: draft_sections, target: qc_realtime }
+      - { id: e9, source: qc_realtime, target: output_guard, sourcePort: pass }
+      - { id: e10, source: qc_realtime, target: revise_loop, sourcePort: revise }
+      - { id: e11, source: revise_loop, target: output_guard }
+      - { id: e12, source: output_guard, target: human_review }
+      - { id: e13, source: human_review, target: write_record }
+      - { id: e14, source: write_record, target: end }
