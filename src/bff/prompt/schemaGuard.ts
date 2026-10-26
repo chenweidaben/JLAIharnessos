@@ -89,53 +89,118 @@ function checkType(value: unknown, type: string, path: string, errors: string[])
 }
 
 /**
- * 轻量 Schema 子集校验：`type`、`required`、`properties` 对应字段类型、`enum`；
+ * 递归校验单个节点：`type`、`required`、`properties`、`enum`、`pattern`、
+ * `minimum / maximum`、`minLength / maxLength`、`items`、`oneOf`；
  * `additionalProperties` 不阻断；结构无法判定时收集错误但不抛异常。
+ *
+ * 路径口径：根节点 = `根节点`；对象属性 = `字段「x」`；数组元素 = `字段「x」[i]`；
+ * 既有 type / required / enum 错误文案保持不变，新增关键字走同一路径前缀。
  */
-export function validateSchema(output: unknown, schema: Record<string, unknown>): SchemaCheckResult {
-  const errors: string[] = [];
+function validateNode(value: unknown, schema: Record<string, unknown>, path: string, errors: string[]): void {
+  const root = path === '根节点';
   const rootType = schema.type;
 
-  if (typeof rootType !== 'string' || rootType.trim().length === 0) {
+  if (typeof rootType === 'string' && rootType.trim().length > 0) {
+    checkType(value, rootType, path, errors);
+  } else if (root) {
     errors.push('schema 缺少 type 声明，结构无法判定');
-  } else {
-    checkType(output, rootType, '根节点', errors);
   }
 
-  if (isPlainObject(output) && rootType === 'object') {
+  // 枚举校验（根节点与子节点共用；既有根节点文案保持不变）
+  if (Array.isArray(schema.enum) && schema.enum.length > 0) {
+    const allowed = schema.enum as unknown[];
+    if (!allowed.includes(value)) {
+      errors.push(root ? '根节点取值不在枚举范围内' : `${path} 取值不在枚举范围内`);
+    }
+  }
+
+  // 字符串关键字：正则格式与长度边界
+  if (typeof value === 'string') {
+    if (typeof schema.pattern === 'string' && schema.pattern.trim().length > 0) {
+      try {
+        if (!new RegExp(schema.pattern).test(value)) {
+          errors.push(`${path} 不符合格式要求`);
+        }
+      } catch {
+        errors.push(`${path} 的 pattern 表达式非法，跳过格式校验`);
+      }
+    }
+    if (typeof schema.minLength === 'number' && Number.isFinite(schema.minLength) && value.length < schema.minLength) {
+      errors.push(`${path} 长度不得少于 ${schema.minLength} 个字符`);
+    }
+    if (typeof schema.maxLength === 'number' && Number.isFinite(schema.maxLength) && value.length > schema.maxLength) {
+      errors.push(`${path} 长度不得超过 ${schema.maxLength} 个字符`);
+    }
+  }
+
+  // 数值关键字：取值上下界
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    if (typeof schema.minimum === 'number' && Number.isFinite(schema.minimum) && value < schema.minimum) {
+      errors.push(`${path} 不得小于 ${schema.minimum}`);
+    }
+    if (typeof schema.maximum === 'number' && Number.isFinite(schema.maximum) && value > schema.maximum) {
+      errors.push(`${path} 不得大于 ${schema.maximum}`);
+    }
+  }
+
+  // 对象节点：必填字段与属性递归
+  if (isPlainObject(value)) {
     const required = Array.isArray(schema.required) ? (schema.required as unknown[]) : [];
     for (const field of required) {
-      if (typeof field === 'string' && !(field in output)) {
-        errors.push(`缺少必填字段「${field}」`);
+      if (typeof field === 'string' && !(field in value)) {
+        errors.push(root ? `缺少必填字段「${field}」` : `${path} 缺少必填字段「${field}」`);
       }
     }
     const properties = schema.properties;
     if (isPlainObject(properties)) {
       for (const [field, subSchema] of Object.entries(properties)) {
-        if (!(field in output)) continue;
+        if (!(field in value)) continue;
         if (!isPlainObject(subSchema)) {
           errors.push(`字段「${field}」schema 结构非法，跳过校验`);
           continue;
         }
-        const subType = subSchema.type;
-        if (typeof subType === 'string') {
-          checkType(output[field], subType, `字段「${field}」`, errors);
-        }
-        if (Array.isArray(subSchema.enum)) {
-          const allowed = subSchema.enum as unknown[];
-          if (!allowed.includes(output[field])) {
-            errors.push(`字段「${field}」取值不在枚举范围内`);
-          }
-        }
+        const propertyPath = root ? `字段「${field}」` : `${path}.字段「${field}」`;
+        validateNode(value[field], subSchema, propertyPath, errors);
       }
     }
   }
 
-  if (Array.isArray(schema.enum)) {
-    const allowed = schema.enum as unknown[];
-    if (!allowed.includes(output)) errors.push('根节点取值不在枚举范围内');
+  // 数组节点：items 子 Schema 逐元素递归复用同一校验口径
+  if (Array.isArray(value) && isPlainObject(schema.items)) {
+    value.forEach((item, index) => {
+      validateNode(item, schema.items as Record<string, unknown>, `${path}[${index}]`, errors);
+    });
   }
 
+  // oneOf：候选 Schema 恰好命中一条；命中 0 条或多于 1 条均报错
+  if (Array.isArray(schema.oneOf)) {
+    let matches = 0;
+    for (const candidate of schema.oneOf) {
+      if (!isPlainObject(candidate)) continue;
+      const candidateErrors: string[] = [];
+      validateNode(value, candidate, path, candidateErrors);
+      if (candidateErrors.length === 0) matches += 1;
+    }
+    if (matches === 0) {
+      errors.push(`${path} 未命中 oneOf 中任何候选 Schema`);
+    } else if (matches > 1) {
+      errors.push(`${path} 同时命中 oneOf 中 ${matches} 个候选 Schema，应恰好命中一条`);
+    }
+  }
+}
+
+/**
+ * 轻量 Schema 子集校验：`type`、`required`、`properties`、`enum`、`pattern`、
+ * `minimum / maximum`、`minLength / maxLength`、`items`、`oneOf`；
+ * `additionalProperties` 不阻断；结构无法判定时收集错误但不抛异常。
+ */
+export function validateSchema(output: unknown, schema: Record<string, unknown>): SchemaCheckResult {
+  const errors: string[] = [];
+  if (!isPlainObject(schema)) {
+    errors.push('schema 结构非法，跳过校验');
+    return { valid: false, errors, output };
+  }
+  validateNode(output, schema, '根节点', errors);
   return { valid: errors.length === 0, errors, output };
 }
 

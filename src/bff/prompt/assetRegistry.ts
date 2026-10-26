@@ -13,6 +13,8 @@
  * @module bff/prompt/assetRegistry
  */
 
+import { ETHICS_LAYER_TEXT } from '@/core/agent/SystemPromptBuilder.js';
+
 // ============================================================================
 // 类型契约（对齐技术文档 3.4.2）
 // ============================================================================
@@ -459,4 +461,80 @@ export function getPromptAssetRegistry(): PromptAssetRegistry {
 /** 测试专用：重置资产台账单例 */
 export function _resetPromptAssetRegistry(): void {
   _registry = null;
+}
+
+// ============================================================================
+// 系统种子资产（A07：ETHICS_LAYER 六条红线迁入 system 资产库，版本化留痕）
+// ============================================================================
+
+/** 系统伦理红线种子资产保留 ID（system 层不可被智能体包引用覆盖） */
+export const SYSTEM_ETHICS_ASSET_ID = 'prompt-system-ethics-001';
+
+/** 种子资产元信息注入项（时间戳 / 责任人可入参，便于单测确定性校验；不写院方实名） */
+export interface SystemEthicsSeedMeta {
+  /** 登记时间（ISO 8601）；缺省取当前系统时间 */
+  now?: string;
+  /** 登记责任人；缺省平台治理标识 */
+  operator?: string;
+  /** 审批人；缺省沿用岗位提示词台账合成角色标识 */
+  approver?: string;
+}
+
+/** 判定资产 ID 是否为 system 层保留种子 ID（智能体包 systemPrompt 引用不得占用） */
+export function isReservedSystemAssetId(id: string): boolean {
+  return id === SYSTEM_ETHICS_ASSET_ID;
+}
+
+/**
+ * 构造系统伦理红线种子资产（纯工厂，不触碰台账）。
+ * 六条红线文本与既有 `SystemPromptBuilder.ETHICS_LAYER` 同源；version=1.0.0、
+ * riskLevel='high'、status='active'，变更记录留痕首版审批。
+ */
+export function buildSystemEthicsSeedAsset(meta?: SystemEthicsSeedMeta): PromptAsset {
+  const now = meta?.now ?? new Date().toISOString();
+  const operator = meta?.operator ?? 'platform-governance';
+  const approver = meta?.approver ?? '医务部-王主任';
+  return {
+    id: SYSTEM_ETHICS_ASSET_ID,
+    level: 'system',
+    name: '系统医疗伦理红线（种子资产）',
+    scope: {},
+    version: '1.0.0',
+    content: ETHICS_LAYER_TEXT,
+    variables: [],
+    fewShotRefs: [],
+    riskLevel: 'high',
+    status: 'active',
+    owner: operator,
+    approver,
+    approvedAt: now,
+    changeLog: [
+      {
+        version: '1.0.0',
+        changedAt: now,
+        operator,
+        summary: '系统医疗伦理六条红线迁入 system 资产库首版',
+        diffRef: 'seed-system-ethics-1.0.0',
+        reviewResult: 'approved',
+      },
+    ],
+    metrics: createEmptyMetrics('platform', 'system', '1.0.0'),
+    encrypted: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+/**
+ * 幂等登记系统伦理红线种子资产：已登记则直接回读现有资产深拷贝，不重复登记、
+ * 不覆盖既有内容；未登记则构造种子资产并登记。函数不自动写入模块单例，
+ * 由调用方显式传入台账实例；空台账回退 `SystemPromptBuilder.build()` 的既有路径不受影响。
+ */
+export function registerSystemEthicsSeed(
+  registry: PromptAssetRegistry,
+  meta?: SystemEthicsSeedMeta,
+): PromptAsset {
+  const existing = registry.getAsset(SYSTEM_ETHICS_ASSET_ID);
+  if (existing) return structuredClone(existing);
+  return registry.register(buildSystemEthicsSeedAsset(meta));
 }

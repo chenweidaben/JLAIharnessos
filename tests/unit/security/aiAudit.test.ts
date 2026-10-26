@@ -13,10 +13,16 @@ import { AuditLogger, MemoryLogStorage, AuditEventType } from '@/security/audit/
 import {
   AiAuditService,
   AUDIT_GENESIS_HASH,
+  AUD_ERROR_BINDING_FAILED,
   validateAiAuditInput,
+  validateVersionBinding,
+  createModelBindingProvider,
+  createPromptBindingProvider,
+  createKnowledgeBindingProvider,
   getAiAuditService,
   _resetAiAuditService,
   type AiAuditEventInput,
+  type AiVersionSnapshot,
 } from '@/security/audit/aiAudit.js';
 
 /** 构造合法测试事件入参 */
@@ -413,5 +419,163 @@ describe('AiAuditService - 留痕字段回读', () => {
     const stored = service.listEvents()[0];
     expect(stored.outputSummary).not.toBe('外部篡改');
     expect(stored.toolCalls).toHaveLength(0);
+  });
+});
+
+// ============================================================================
+// A22 模型 / 知识 / 提示词 / 平台发布四元组绑定校验
+// ============================================================================
+
+describe('validateVersionBinding - 四元组离线绑定校验', () => {
+  const validVersions: AiVersionSnapshot = makeInput().versions;
+
+  function modelStub(cards: Array<[string, { version: string; status: string }]>) {
+    const map = new Map(cards);
+    return { getCard: (id: string) => map.get(id) };
+  }
+
+  function promptStub(assets: Array<{ version: string; status: string }>) {
+    return { findActiveByVersion: (version: string) => assets.find((asset) => asset.version === version) };
+  }
+
+  function knowledgeStub(entries: Array<[string, { version: string; status: string }]>) {
+    const map = new Map(entries);
+    return { getEntryByVersion: (ref: string) => map.get(ref) };
+  }
+
+  const validProviders = {
+    model: modelStub([[validVersions.modelId, { version: validVersions.modelVersion, status: 'active' }]]),
+    prompt: promptStub([{ version: validVersions.promptVersion, status: 'active' }]),
+    knowledge: knowledgeStub(
+      validVersions.knowledgeVersion.map((ref) => [ref, { version: ref, status: 'approved' }] as const),
+    ),
+    platformRelease: validVersions.platformRelease,
+  };
+
+  it('四维齐全且台账有效时通过，错误清单为空', () => {
+    const report = validateVersionBinding(validVersions, validProviders);
+    expect(report.valid).toBe(true);
+    expect(report.errors).toEqual([]);
+  });
+
+  it('未注入台账时跳过台账解析，结构完整即通过', () => {
+    const report = validateVersionBinding(validVersions, {});
+    expect(report.valid).toBe(true);
+    expect(report.errors).toEqual([]);
+  });
+
+  it('模型 ID 未登记 / 已退役 / 版本不一致分别阻断并附 AUD-008', () => {
+    const missing = validateVersionBinding(
+      { ...validVersions, modelId: 'model-unknown' },
+      validProviders,
+    );
+    expect(missing.valid).toBe(false);
+    expect(missing.errors.some((e) => e.includes('model-unknown') && e.includes('未在模型台账登记'))).toBe(true);
+
+    const retired = validateVersionBinding(validVersions, {
+      ...validProviders,
+      model: modelStub([[validVersions.modelId, { version: validVersions.modelVersion, status: 'deprecated' }]]),
+    });
+    expect(retired.valid).toBe(false);
+    expect(retired.errors.some((e) => e.includes('状态为 deprecated'))).toBe(true);
+
+    const mismatch = validateVersionBinding(validVersions, {
+      ...validProviders,
+      model: modelStub([[validVersions.modelId, { version: 'other-version', status: 'active' }]]),
+    });
+    expect(mismatch.valid).toBe(false);
+    expect(mismatch.errors.some((e) => e.includes('版本') && e.includes('不一致'))).toBe(true);
+  });
+
+  it('提示词版本未登记 / 未生效分别阻断', () => {
+    const missing = validateVersionBinding(
+      { ...validVersions, promptVersion: 'prompt-unknown' },
+      validProviders,
+    );
+    expect(missing.valid).toBe(false);
+    expect(missing.errors.some((e) => e.includes('prompt-unknown') && e.includes('未登记或未生效'))).toBe(true);
+
+    const draft = validateVersionBinding(validVersions, {
+      ...validProviders,
+      prompt: promptStub([{ version: validVersions.promptVersion, status: 'draft' }]),
+    });
+    expect(draft.valid).toBe(false);
+    expect(draft.errors.some((e) => e.includes('状态为 draft'))).toBe(true);
+  });
+
+  it('知识条目未登记 / 状态未批准 / 版本不一致逐条阻断', () => {
+    const missing = validateVersionBinding(
+      { ...validVersions, knowledgeVersion: ['kb-missing'] },
+      validProviders,
+    );
+    expect(missing.valid).toBe(false);
+    expect(missing.errors.some((e) => e.includes('kb-missing') && e.includes('未在知识台账登记'))).toBe(true);
+
+    const expired = validateVersionBinding(validVersions, {
+      ...validProviders,
+      knowledge: knowledgeStub([
+        [validVersions.knowledgeVersion[0], { version: validVersions.knowledgeVersion[0], status: 'approved' }],
+        [validVersions.knowledgeVersion[1], { version: validVersions.knowledgeVersion[1], status: 'expired' }],
+      ]),
+    });
+    expect(expired.valid).toBe(false);
+    expect(expired.errors.some((e) => e.includes('状态为 expired'))).toBe(true);
+
+    const versionMismatch = validateVersionBinding(
+      { ...validVersions, knowledgeVersion: ['kb-ref-a'] },
+      {
+        ...validProviders,
+        knowledge: knowledgeStub([['kb-ref-a', { version: 'kb-ref-b', status: 'approved' }]]),
+      },
+    );
+    expect(versionMismatch.valid).toBe(false);
+    expect(versionMismatch.errors.some((e) => e.includes('不一致'))).toBe(true);
+  });
+
+  it('平台发布版本缺失或与当前发布版本不一致时阻断，一致时通过', () => {
+    const empty = validateVersionBinding(
+      { ...validVersions, platformRelease: '' },
+      validProviders,
+    );
+    expect(empty.valid).toBe(false);
+    expect(empty.errors.some((e) => e.includes('平台发布版本缺失'))).toBe(true);
+
+    const mismatch = validateVersionBinding(validVersions, {
+      ...validProviders,
+      platformRelease: 'jlai-os-2026.10.99',
+    });
+    expect(mismatch.valid).toBe(false);
+    expect(mismatch.errors.some((e) => e.includes('平台发布版本') && e.includes('不一致'))).toBe(true);
+
+    const aligned = validateVersionBinding(validVersions, {
+      ...validProviders,
+      platformRelease: validVersions.platformRelease,
+    });
+    expect(aligned.valid).toBe(true);
+  });
+
+  it('错误信息不泄露台账内部表结构与仓储路径', () => {
+    const report = validateVersionBinding(
+      { ...validVersions, modelId: 'model-unknown', knowledgeVersion: ['kb-missing'] },
+      validProviders,
+    );
+    for (const error of report.errors) {
+      expect(error).toContain(AUD_ERROR_BINDING_FAILED);
+      expect(error).not.toMatch(/postgres|mysql|table|schema|repository|db\./i);
+    }
+  });
+
+  it('适配器工厂只读转发既有台账方法，不暴露写操作', () => {
+    const modelRegistry = { getCard: (id: string) => ({ version: 'v-1', status: 'active' }) };
+    const modelProvider = createModelBindingProvider(modelRegistry);
+    expect(modelProvider?.getCard('x')?.version).toBe('v-1');
+
+    const promptRegistry = { listAssets: () => [{ version: 'p-1', status: 'active' }] };
+    const promptProvider = createPromptBindingProvider(promptRegistry);
+    expect(promptProvider?.findActiveByVersion('p-1')?.status).toBe('active');
+
+    const knowledgeRegistry = { getEntryByVersion: (ref: string) => ({ version: ref, status: 'approved' }) };
+    const knowledgeProvider = createKnowledgeBindingProvider(knowledgeRegistry);
+    expect(knowledgeProvider?.getEntryByVersion('kb-1')?.status).toBe('approved');
   });
 });

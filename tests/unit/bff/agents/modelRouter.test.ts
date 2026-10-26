@@ -21,6 +21,11 @@ import {
   listRouteEvents,
   _resetRouteEvents,
   validateRouteRule,
+  deriveContextLength,
+  deriveCostTier,
+  deriveLatencyTier,
+  deriveBudgetProfile,
+  TOKEN_BUDGET_BANDS,
   type ModelRouteRule,
   type RouteRequest,
 } from '@/bff/agents/modelRouter.js';
@@ -502,5 +507,90 @@ describe('selectModel - 路由事件留痕', () => {
     expect(listRouteEvents()).toHaveLength(1);
     _resetRouteEvents();
     expect(listRouteEvents()).toHaveLength(0);
+  });
+});
+
+// ============================================================================
+// A03 token 预算与成本 / 时延档推导纯函数
+// ============================================================================
+
+describe('deriveContextLength - token 预算分档', () => {
+  it('边界值归入上界所在档：4000/16000 含边界，4001/16001 入中档 / 长档', () => {
+    expect(deriveContextLength(4_000)).toBe('short');
+    expect(deriveContextLength(3_999)).toBe('short');
+    expect(deriveContextLength(4_001)).toBe('medium');
+    expect(deriveContextLength(16_000)).toBe('medium');
+    expect(deriveContextLength(16_001)).toBe('long');
+    expect(deriveContextLength(128_000)).toBe('long');
+  });
+
+  it('未给预算 / 非有限 / 非正值返回 unknown，不默认高配', () => {
+    expect(deriveContextLength(undefined)).toBe('unknown');
+    expect(deriveContextLength(NaN)).toBe('unknown');
+    expect(deriveContextLength(0)).toBe('unknown');
+    expect(deriveContextLength(-1)).toBe('unknown');
+  });
+
+  it('规则表可由入参覆盖；末档未命中返回 unknown', () => {
+    const custom = [
+      { maxTokens: 2_000, contextLength: 'short' as const },
+      { maxTokens: Number.POSITIVE_INFINITY, contextLength: 'long' as const },
+    ];
+    expect(deriveContextLength(1_500, custom)).toBe('short');
+    expect(deriveContextLength(4_000, custom)).toBe('long');
+    expect(TOKEN_BUDGET_BANDS).toHaveLength(3);
+  });
+});
+
+describe('deriveCostTier - 成本档推导', () => {
+  it('默认阈值：0.5 以内 low，2 以内 medium，超出 high；边界含等号', () => {
+    expect(deriveCostTier(0.2)).toBe('low');
+    expect(deriveCostTier(0.5)).toBe('low');
+    expect(deriveCostTier(1)).toBe('medium');
+    expect(deriveCostTier(2)).toBe('medium');
+    expect(deriveCostTier(3)).toBe('high');
+  });
+
+  it('未给值 / 非有限 / 负值返回 unknown；自定义阈值覆盖默认口径', () => {
+    expect(deriveCostTier(undefined)).toBe('unknown');
+    expect(deriveCostTier(NaN)).toBe('unknown');
+    expect(deriveCostTier(-1)).toBe('unknown');
+    expect(deriveCostTier(1, { lowMax: 1, mediumMax: 5 })).toBe('low');
+    expect(deriveCostTier(3, { lowMax: 1, mediumMax: 5 })).toBe('medium');
+    expect(deriveCostTier(6, { lowMax: 1, mediumMax: 5 })).toBe('high');
+  });
+});
+
+describe('deriveLatencyTier - 时延档推导', () => {
+  it('默认阈值：300ms 以内 low，800ms 以内 medium，超出 high；边界含等号', () => {
+    expect(deriveLatencyTier(100)).toBe('low');
+    expect(deriveLatencyTier(300)).toBe('low');
+    expect(deriveLatencyTier(301)).toBe('medium');
+    expect(deriveLatencyTier(800)).toBe('medium');
+    expect(deriveLatencyTier(801)).toBe('high');
+  });
+
+  it('未给值 / 非有限 / 负值返回 unknown；自定义阈值覆盖默认口径', () => {
+    expect(deriveLatencyTier(undefined)).toBe('unknown');
+    expect(deriveLatencyTier(NaN)).toBe('unknown');
+    expect(deriveLatencyTier(-10)).toBe('unknown');
+    expect(deriveLatencyTier(250, { fastMax: 200, mediumMax: 500 })).toBe('medium');
+    expect(deriveLatencyTier(600, { fastMax: 200, mediumMax: 500 })).toBe('high');
+  });
+});
+
+describe('deriveBudgetProfile - 汇总推导', () => {
+  it('各维独立判定，缺失维度记 unknown，不互相兜底', () => {
+    const profile = deriveBudgetProfile({});
+    expect(profile.contextLength).toBe('unknown');
+    expect(profile.costTier).toBe('unknown');
+    expect(profile.latencyTier).toBe('unknown');
+  });
+
+  it('给定预算与成本 / 时延标签时三档同时推导', () => {
+    const profile = deriveBudgetProfile({ tokenBudget: 8_000, costPer1kInput: 1.2, latencyMs: 420 });
+    expect(profile.contextLength).toBe('medium');
+    expect(profile.costTier).toBe('medium');
+    expect(profile.latencyTier).toBe('medium');
   });
 });

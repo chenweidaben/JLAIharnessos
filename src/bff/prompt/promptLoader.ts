@@ -18,6 +18,7 @@ import type { BuiltMedicalTool, MedicalUser } from '@/types';
 import { SystemPromptBuilder, type MedicalTaskType } from '@/core/agent/SystemPromptBuilder.js';
 
 import type { PromptAsset, PromptAssetRegistry, PromptScope } from './assetRegistry.js';
+import { SYSTEM_ETHICS_ASSET_ID, isReservedSystemAssetId } from './assetRegistry.js';
 import type { SchemaGuard } from './schemaGuard.js';
 import type { PromptMetricsAggregator } from './metricsAggregator.js';
 
@@ -35,6 +36,11 @@ export interface SystemPromptContext {
   variables?: Record<string, string>;
   scenario?: string;
   agentId?: string;
+  /**
+   * 智能体包携带的 system 文本（A07 保护口径：system 层由平台统一维护，
+   * 智能体包传入即拒绝，加载器不提供覆盖入口；缺省不传 = 无覆盖意图）。
+   */
+  packageSystemPrompt?: string;
 }
 
 /** 加载依赖注入；schemaGuard / metrics 预留接入，本切片不在加载阶段调用 */
@@ -92,6 +98,25 @@ export function listSecurityEvents(): PromptSecurityEvent[] {
 export function _resetPromptSecurityEvents(): void {
   _events = [];
   _eventSeq = 0;
+}
+
+// ============================================================================
+// 系统种子资产查询（A07：system 红线版本留痕只读引用，不自动登记）
+// ============================================================================
+
+/**
+ * 回读台账中已登记的系统伦理红线种子资产（active 状态）；未登记返回 undefined。
+ * 纯只读引用：不触发登记、不回退 `SystemPromptBuilder.build()`，供审计链与加载链
+ * 核对 system 层版本号留痕使用。
+ */
+export function findSystemEthicsSeed(registry: PromptAssetRegistry): PromptAsset | undefined {
+  const seed = registry.getAsset(SYSTEM_ETHICS_ASSET_ID);
+  return seed && seed.status === 'active' && seed.level === 'system' ? structuredClone(seed) : undefined;
+}
+
+/** 判定资产 ID 是否为 system 层保留种子 ID（透传自资产台账口径） */
+export function isSystemReservedAsset(id: string): boolean {
+  return isReservedSystemAssetId(id);
 }
 
 // ============================================================================
@@ -173,6 +198,17 @@ export function loadSystemPrompt(context: SystemPromptContext, deps: PromptLoade
     department: context.department,
     agentId: context.agentId,
   };
+
+  // A07 保护口径：智能体包携带 system 文本即拒绝，system 层不可被覆盖；
+  // 与空台账回退路径无关，传入覆盖意图一律留安全事件并抛错。
+  if (typeof context.packageSystemPrompt === 'string' && context.packageSystemPrompt.trim().length > 0) {
+    pushSecurityEvent(
+      'prompt-system-override-rejected',
+      '智能体包尝试覆盖 system 层红线文本，已拒绝拼装',
+      context,
+    );
+    throw new Error('[PL-004] system 层由平台统一维护，智能体包禁止传入 systemPrompt 覆盖');
+  }
 
   // 无资产库配置：回退既有默认文本，保证既有岗位提示词行为不回归
   if (registry.listAssets({ level: 'system' }).length === 0) {

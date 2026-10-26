@@ -189,3 +189,108 @@ export function _resetProbeLoop(): void {
   stopLoop();
   openedAtByCard.clear();
 }
+
+// ============================================================================
+// A01：滑动窗口健康聚合纯函数（M-02 成功率 / 错误率 / 时延 / 连续失败）
+// ============================================================================
+
+/** 窗口内单次探测事件（时间戳入参注入；不含密钥与患者明文） */
+export interface HealthWindowEvent {
+  /** 模型卡片 ID */
+  cardId: string;
+  /** 探测是否成功 */
+  available: boolean;
+  /** 本次探测时延（毫秒，成功时填写） */
+  latencyMs?: number;
+  /** 事件时间戳（epoch 毫秒，由调用方注入，不依赖系统时钟） */
+  at: number;
+}
+
+/** 滑动窗口聚合结果（空台账比率记 0，不抛错） */
+export interface HealthWindowSummary {
+  cardId: string;
+  /** 窗口时长（毫秒，入参给定） */
+  windowMs: number;
+  /** 窗口内纳入统计的样本数 */
+  sampleCount: number;
+  successCount: number;
+  failureCount: number;
+  /** 成功率 0~1；空台账记 0 */
+  successRate: number;
+  /** 错误率 0~1；空台账记 0 */
+  errorRate: number;
+  /** 成功样本平均时延（毫秒）；无成功样本记 0 */
+  avgLatencyMs: number;
+  /** 从最近一次事件向前累计的连续失败次数 */
+  consecutiveFailures: number;
+  /** 连续失败达到既有熔断阈值时为 true（与 probeOnce 熔断口径一致） */
+  circuitOpen: boolean;
+}
+
+/** 纯函数：构造窗口事件入参，不触碰台账与时钟 */
+export function buildHealthWindowEvent(
+  cardId: string,
+  outcome: ProbeOutcome,
+  at: number,
+): HealthWindowEvent {
+  return { cardId, available: outcome.available, latencyMs: outcome.latencyMs, at };
+}
+
+/**
+ * 按滑动窗口聚合指定卡片探测事件。
+ *
+ * 口径：
+ *  - 仅统计 `[now - windowMs, now]` 闭区间内、cardId 匹配的事件；窗口外事件不计入；
+ *  - 空台账：successRate / errorRate / avgLatencyMs 记 0，consecutiveFailures=0、circuitOpen=false；
+ *  - 平均时延仅取成功样本中有限时延值；无成功样本记 0；
+ *  - consecutiveFailures 为时间倒序尾部连续失败数；达到默认熔断阈值（3 次）置 circuitOpen=true；
+ *  - 纯函数：不发起 HTTP、不持久化、不读取进程外指标，时间戳与窗口长度均由入参给定。
+ */
+export function aggregateHealthWindow(
+  events: readonly HealthWindowEvent[],
+  cardId: string,
+  now: number,
+  windowMs: number,
+  options?: { failureThreshold?: number },
+): HealthWindowSummary {
+  const threshold = options?.failureThreshold ?? DEFAULT_PROBE_FAILURE_THRESHOLD;
+  const lower = now - windowMs;
+
+  const inWindow = events
+    .filter((event) => event.cardId === cardId && Number.isFinite(event.at) && event.at >= lower && event.at <= now)
+    .slice()
+    .sort((a, b) => a.at - b.at);
+
+  const sampleCount = inWindow.length;
+  const successCount = inWindow.filter((event) => event.available).length;
+  const failureCount = sampleCount - successCount;
+  const successRate = sampleCount > 0 ? successCount / sampleCount : 0;
+  const errorRate = sampleCount > 0 ? failureCount / sampleCount : 0;
+
+  const latencySamples = inWindow
+    .filter((event) => event.available && typeof event.latencyMs === 'number' && Number.isFinite(event.latencyMs) && event.latencyMs >= 0)
+    .map((event) => event.latencyMs as number);
+  const avgLatencyMs =
+    latencySamples.length > 0
+      ? Math.round((latencySamples.reduce((sum, value) => sum + value, 0) / latencySamples.length) * 10) / 10
+      : 0;
+
+  let consecutiveFailures = 0;
+  for (let index = inWindow.length - 1; index >= 0; index -= 1) {
+    if (!inWindow[index].available) consecutiveFailures += 1;
+    else break;
+  }
+
+  return {
+    cardId,
+    windowMs,
+    sampleCount,
+    successCount,
+    failureCount,
+    successRate: Math.round(successRate * 1000) / 1000,
+    errorRate: Math.round(errorRate * 1000) / 1000,
+    avgLatencyMs,
+    consecutiveFailures,
+    circuitOpen: consecutiveFailures >= threshold,
+  };
+}

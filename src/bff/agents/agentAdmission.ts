@@ -604,6 +604,105 @@ function emptyAbnormalCounts(): Record<AbnormalKind, number> {
 }
 
 // ============================================================================
+// A16：人工干预点指标类型与内存聚合（对齐 S-05 monitoringEvents 事件字段）
+// ============================================================================
+
+/** 人工干预动作（与 S-05 事件负载 `humanAction`、S-08 `AiHumanAction` 口径一致） */
+export type InterventionAction = 'adopted' | 'modified' | 'rejected' | 'escalated' | 'pending';
+
+/** 干预动作枚举清单（供三类动作独立计数初始化复用） */
+export const INTERVENTION_ACTIONS: readonly InterventionAction[] = [
+  'adopted',
+  'modified',
+  'rejected',
+  'escalated',
+  'pending',
+];
+
+/** 人工干预点指标记录（字段与 S-05 monitoringEvents 负载一一映射） */
+export interface HumanInterventionMetric {
+  /** 干预动作类型 */
+  humanAction: InterventionAction;
+  /** 节点位置（对应事件 `humanInterventionPoint` / `nodeId`）；缺失显式记 `unknown` */
+  nodeId: string;
+  agentId: string;
+  agentVersion: string;
+  reviewerId?: string;
+  comment?: string;
+  /** 事件时间戳（epoch 毫秒，入参注入，不依赖系统时钟） */
+  at: number;
+  scenario?: string;
+}
+
+/** 干预指标查询过滤器（AND 组合；时间戳闭区间） */
+export interface InterventionFilter {
+  agentId?: string;
+  agentVersion?: string;
+  nodeId?: string;
+  action?: InterventionAction;
+  scenario?: string;
+  from?: number;
+  to?: number;
+}
+
+/** 干预指标分组聚合结果 */
+export interface InterventionAggregate {
+  total: number;
+  /** 五类动作计数独立可查（未出现动作记 0） */
+  byAction: Record<InterventionAction, number>;
+  /** 按节点位置分组计数；`unknown` 为缺失位置归组 */
+  byNode: Record<string, number>;
+  /** 按智能体分组计数 */
+  byAgent: Record<string, number>;
+}
+
+/** 动作计数零值台账（五类动作独立初始化） */
+export function emptyInterventionCounts(): Record<InterventionAction, number> {
+  return { adopted: 0, modified: 0, rejected: 0, escalated: 0, pending: 0 };
+}
+
+/** 节点位置归一化：空串 / 非字符串显式记 `unknown`，不静默丢弃干预点记录 */
+export function normalizeInterventionNodeId(nodeId: unknown): string {
+  return typeof nodeId === 'string' && nodeId.trim().length > 0 ? nodeId.trim() : 'unknown';
+}
+
+/** 纯函数：追加一条干预指标记录，返回新数组；不修改入参台账 */
+export function appendInterventionMetric(
+  records: readonly HumanInterventionMetric[],
+  metric: HumanInterventionMetric,
+): HumanInterventionMetric[] {
+  return [...records, structuredClone(metric)];
+}
+
+/** 纯函数：按过滤器筛选并分组聚合；无记录时各分组计数记 0；不订阅事件总线、不消费进程外事件流 */
+export function aggregateInterventions(
+  records: readonly HumanInterventionMetric[],
+  filter: InterventionFilter = {},
+): InterventionAggregate {
+  const byAction = emptyInterventionCounts();
+  const byNode: Record<string, number> = {};
+  const byAgent: Record<string, number> = {};
+  let total = 0;
+
+  for (const record of records) {
+    if (filter.agentId && record.agentId !== filter.agentId) continue;
+    if (filter.agentVersion && record.agentVersion !== filter.agentVersion) continue;
+    if (filter.nodeId && record.nodeId !== normalizeInterventionNodeId(filter.nodeId)) continue;
+    if (filter.action && record.humanAction !== filter.action) continue;
+    if (filter.scenario && record.scenario !== filter.scenario) continue;
+    if (typeof filter.from === 'number' && Number.isFinite(filter.from) && record.at < filter.from) continue;
+    if (typeof filter.to === 'number' && Number.isFinite(filter.to) && record.at > filter.to) continue;
+
+    total += 1;
+    byAction[record.humanAction] += 1;
+    byNode[record.nodeId] = (byNode[record.nodeId] ?? 0) + 1;
+    byAgent[record.agentId] = (byAgent[record.agentId] ?? 0) + 1;
+  }
+
+  return { total, byAction, byNode, byAgent };
+}
+
+// ============================================================================
 // 准入注册表（进程内存，深拷贝隔离）
 // ============================================================================
 
@@ -614,6 +713,7 @@ function emptyAbnormalCounts(): Record<AbnormalKind, number> {
 export class AgentAdmissionRegistry {
   private readonly agents = new Map<string, AgentRecord>();
   private readonly metrics = new Map<string, MetricsGroup>();
+  private readonly interventions: HumanInterventionMetric[] = [];
 
   // --------------------------------------------------------------------------
   // 元数据登记与查询
@@ -918,6 +1018,63 @@ export class AgentAdmissionRegistry {
         abnormalCounts: structuredClone(group.abnormalCounts),
       };
     });
+  }
+
+  // --------------------------------------------------------------------------
+  // 人工干预点指标（A16；进程内存，不订阅事件总线）
+  // --------------------------------------------------------------------------
+
+  /**
+   * 记录一条人工干预点指标；agentId / agentVersion / 动作 / 时间戳必填；
+   * 节点位置缺失归一为 `unknown`；动作枚举非法抛中文错误。
+   */
+  recordInterventionMetric(input: {
+    humanAction: InterventionAction;
+    nodeId?: string;
+    agentId: string;
+    agentVersion: string;
+    reviewerId?: string;
+    comment?: string;
+    at: number;
+    scenario?: string;
+  }): void {
+    if (!isNonEmptyString(input.agentId)) throw new Error('[ADM-008] 干预指标缺少 agentId');
+    if (!isNonEmptyString(input.agentVersion)) throw new Error('[ADM-008] 干预指标缺少 agentVersion');
+    if (!INTERVENTION_ACTIONS.includes(input.humanAction))
+      throw new Error(`[ADM-008] humanAction 必须为 ${INTERVENTION_ACTIONS.join(' / ')} 之一`);
+    if (!Number.isFinite(input.at)) throw new Error('[ADM-008] 干预指标时间戳必须为有限数值');
+    const metric: HumanInterventionMetric = {
+      humanAction: input.humanAction,
+      nodeId: normalizeInterventionNodeId(input.nodeId),
+      agentId: input.agentId,
+      agentVersion: input.agentVersion,
+      reviewerId: input.reviewerId,
+      comment: input.comment,
+      at: input.at,
+      scenario: input.scenario,
+    };
+    this.interventions.push(metric);
+  }
+
+  /** 按过滤器回读干预指标深拷贝；不过滤时返回全部记录深拷贝 */
+  queryInterventionMetrics(filter: InterventionFilter = {}): HumanInterventionMetric[] {
+    return this.interventions
+      .filter((record) => {
+        if (filter.agentId && record.agentId !== filter.agentId) return false;
+        if (filter.agentVersion && record.agentVersion !== filter.agentVersion) return false;
+        if (filter.nodeId && record.nodeId !== normalizeInterventionNodeId(filter.nodeId)) return false;
+        if (filter.action && record.humanAction !== filter.action) return false;
+        if (filter.scenario && record.scenario !== filter.scenario) return false;
+        if (typeof filter.from === 'number' && Number.isFinite(filter.from) && record.at < filter.from) return false;
+        if (typeof filter.to === 'number' && Number.isFinite(filter.to) && record.at > filter.to) return false;
+        return true;
+      })
+      .map((record) => structuredClone(record));
+  }
+
+  /** 按过滤器聚合干预指标：动作 / 节点 / 智能体三维分组计数，动作计数独立可查 */
+  aggregateInterventionMetrics(filter: InterventionFilter = {}): InterventionAggregate {
+    return aggregateInterventions(this.interventions, filter);
   }
 
   // --------------------------------------------------------------------------

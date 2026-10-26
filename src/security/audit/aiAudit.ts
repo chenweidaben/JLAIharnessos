@@ -38,6 +38,8 @@ export const AUD_ERROR_INVALID_ACTOR = 'AUD-005';
 export const AUD_ERROR_INVALID_VERSIONS = 'AUD-006';
 /** traceId 不存在 */
 export const AUD_ERROR_TRACE_NOT_FOUND = 'AUD-007';
+/** 四维版本绑定校验失败（A22） */
+export const AUD_ERROR_BINDING_FAILED = 'AUD-008';
 
 // ============================================================================
 // 类型契约（对齐技术文档 3.6.5 AiAuditEvent）
@@ -514,4 +516,154 @@ export function getAiAuditService(options?: { logger?: AuditLogger }): AiAuditSe
 /** 测试专用：重置模块级单例 */
 export function _resetAiAuditService(): void {
   _service = null;
+}
+
+// ============================================================================
+// A22：模型 / 知识 / 提示词 / 平台发布四元组离线绑定校验
+// ============================================================================
+
+/** 台账条目只读投影（结构化口径，不反向依赖各台账内部类型与仓储） */
+export interface BindingEntry {
+  version: string;
+  status: string;
+}
+
+/**
+ * 三个内存台账的只读适配器接口；审计链接线处在入链前注入真实台账实例。
+ * 校验只读引用，不触发登记 / 发布 / 归档等写操作；不解析 DB 仓储。
+ */
+export interface VersionBindingProviders {
+  /** 模型台账只读引用：按模型 ID 回读卡片版本与状态 */
+  model?: { getCard(id: string): BindingEntry | undefined };
+  /** 提示词台账只读引用：按版本号回读已生效提示词条目 */
+  prompt?: { findActiveByVersion(version: string): BindingEntry | undefined };
+  /** 知识台账只读引用：按知识版本号回读条目版本与状态 */
+  knowledge?: { getEntryByVersion(versionRef: string): BindingEntry | undefined };
+  /** 当前平台发布版本；传入时与快照 platformRelease 比对一致 */
+  platformRelease?: string;
+}
+
+/** 四元组绑定校验报告 */
+export interface VersionBindingReport {
+  valid: boolean;
+  /** 中文错误清单；不暴露台账内部表结构、私有字段与仓储路径 */
+  errors: string[];
+}
+
+function isNonEmptyBindingText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * 审计入链前四元组强绑定校验（纯函数）。
+ *
+ * 校验口径：
+ *  - 模型：台账可读时，modelId 必须登记、状态 active、台账版本与快照 modelVersion 一致；
+ *  - 提示词：台账可读时，promptVersion 必须存在于已生效提示词条目且状态 active；
+ *  - 知识：knowledgeVersion 清单逐条必须在知识台账登记、状态 approved、版本号一致；
+ *  - 平台发布：快照版本号非空；传入当前发布版本时必须一致；
+ *  - 对应台账未注入时跳过该维台账解析（入参结构非空性仍由 `validateAiAuditInput` 把关）；
+ *  - 任一不一致返回结构化错误清单并阻断入链；错误信息仅含引用标识与判定结论。
+ */
+export function validateVersionBinding(
+  versions: AiVersionSnapshot | undefined,
+  providers: VersionBindingProviders = {},
+): VersionBindingReport {
+  const errors: string[] = [];
+
+  if (typeof versions !== 'object' || versions === null) {
+    errors.push(`[${AUD_ERROR_BINDING_FAILED}] 四维版本快照缺失，无法完成绑定校验`);
+    return { valid: false, errors };
+  }
+
+  // 模型维度
+  if (providers.model) {
+    const card = providers.model.getCard(versions.modelId);
+    if (!card) {
+      errors.push(`[${AUD_ERROR_BINDING_FAILED}] 模型引用「${versions.modelId}」未在模型台账登记`);
+    } else if (card.status !== 'active') {
+      errors.push(`[${AUD_ERROR_BINDING_FAILED}] 模型「${versions.modelId}」状态为 ${card.status}，不可入链`);
+    } else if (card.version !== versions.modelVersion) {
+      errors.push(
+        `[${AUD_ERROR_BINDING_FAILED}] 模型「${versions.modelId}」台账版本 ${card.version} 与快照版本 ${versions.modelVersion} 不一致`,
+      );
+    }
+  }
+
+  // 提示词维度
+  if (providers.prompt) {
+    const asset = providers.prompt.findActiveByVersion(versions.promptVersion);
+    if (!asset) {
+      errors.push(`[${AUD_ERROR_BINDING_FAILED}] 提示词版本「${versions.promptVersion}」未登记或未生效`);
+    } else if (asset.status !== 'active') {
+      errors.push(`[${AUD_ERROR_BINDING_FAILED}] 提示词版本「${versions.promptVersion}」状态为 ${asset.status}，不可入链`);
+    } else if (asset.version !== versions.promptVersion) {
+      errors.push(
+        `[${AUD_ERROR_BINDING_FAILED}] 提示词台账版本 ${asset.version} 与快照版本 ${versions.promptVersion} 不一致`,
+      );
+    }
+  }
+
+  // 知识维度：逐条校验
+  if (providers.knowledge) {
+    for (const ref of versions.knowledgeVersion ?? []) {
+      if (!isNonEmptyBindingText(ref)) {
+        errors.push(`[${AUD_ERROR_BINDING_FAILED}] 知识版本清单存在空条目`);
+        continue;
+      }
+      const entry = providers.knowledge.getEntryByVersion(ref);
+      if (!entry) {
+        errors.push(`[${AUD_ERROR_BINDING_FAILED}] 知识条目「${ref}」未在知识台账登记`);
+      } else if (entry.status !== 'approved') {
+        errors.push(`[${AUD_ERROR_BINDING_FAILED}] 知识条目「${ref}」状态为 ${entry.status}，不可入链`);
+      } else if (entry.version !== ref) {
+        errors.push(`[${AUD_ERROR_BINDING_FAILED}] 知识台账版本 ${entry.version} 与引用版本 ${ref} 不一致`);
+      }
+    }
+  }
+
+  // 平台发布版本维度
+  if (!isNonEmptyBindingText(versions.platformRelease)) {
+    errors.push(`[${AUD_ERROR_BINDING_FAILED}] 平台发布版本缺失，不可入链`);
+  } else if (
+    providers.platformRelease !== undefined &&
+    providers.platformRelease !== versions.platformRelease
+  ) {
+    errors.push(
+      `[${AUD_ERROR_BINDING_FAILED}] 平台发布版本快照 ${versions.platformRelease} 与当前发布版本 ${providers.platformRelease} 不一致`,
+    );
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * 模型台账只读适配器：转发 `getCard` 只读调用，不暴露台账写方法。
+ * 入参为结构化模型（模型台账实例 duck-typed），避免审计模块反向导入 BFF 层类型。
+ */
+export function createModelBindingProvider(registry: {
+  getCard(id: string): BindingEntry | undefined;
+}): VersionBindingProviders['model'] {
+  return { getCard: (id: string) => registry.getCard(id) };
+}
+
+/**
+ * 提示词台账只读适配器：在已生效资产中按版本号检索；不触发登记 / 发布写操作。
+ */
+export function createPromptBindingProvider(registry: {
+  listAssets(filter?: { status?: string }): BindingEntry[];
+}): VersionBindingProviders['prompt'] {
+  return {
+    findActiveByVersion: (version: string) =>
+      registry.listAssets({ status: 'active' }).find((asset) => asset.version === version),
+  };
+}
+
+/**
+ * 知识台账只读适配器：转发 `getEntryByVersion` 只读调用，不暴露台账写方法。
+ */
+export function createKnowledgeBindingProvider(registry: {
+  getEntryByVersion(versionRef: string): BindingEntry | undefined;
+}): VersionBindingProviders['knowledge'] {
+  return { getEntryByVersion: (versionRef: string) => registry.getEntryByVersion(versionRef) };
 }

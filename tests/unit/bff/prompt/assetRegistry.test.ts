@@ -14,8 +14,13 @@ import {
   _resetPromptAssetRegistry,
   validatePromptAsset,
   createEmptyMetrics,
+  registerSystemEthicsSeed,
+  buildSystemEthicsSeedAsset,
+  SYSTEM_ETHICS_ASSET_ID,
+  isReservedSystemAssetId,
   type PromptAsset,
 } from '@/bff/prompt/assetRegistry.js';
+import { ETHICS_LAYER_TEXT } from '@/core/agent/SystemPromptBuilder.js';
 
 const NOW = '2026-10-26T08:00:00.000Z';
 
@@ -339,5 +344,51 @@ describe('PromptAssetRegistry - Few-shot 引用校验', () => {
   it('resolveFewShot 未登记主资产抛中文错误', () => {
     const registry = getPromptAssetRegistry();
     expect(() => registry.resolveFewShot('missing', registry)).toThrow(/PA-003/);
+  });
+});
+
+// ============================================================================
+// A07 系统伦理红线种子资产
+// ============================================================================
+
+describe('PromptAssetRegistry - A07 系统种子资产', () => {
+  it('种子资产字段合规：system 层、version=1.0.0、riskLevel=high、status=active、变更留痕', () => {
+    const seed = buildSystemEthicsSeedAsset({ now: NOW, operator: 'platform-governance', approver: '医务部-王主任' });
+    expect(seed.id).toBe(SYSTEM_ETHICS_ASSET_ID);
+    expect(seed.level).toBe('system');
+    expect(seed.version).toBe('1.0.0');
+    expect(seed.riskLevel).toBe('high');
+    expect(seed.status).toBe('active');
+    expect(seed.variables).toEqual([]);
+    expect(seed.fewShotRefs).toEqual([]);
+    expect(seed.changeLog).toHaveLength(1);
+    expect(seed.changeLog[0].reviewResult).toBe('approved');
+    expect(validatePromptAsset(seed)).toEqual([]);
+  });
+
+  it('种子资产文本与既有 ETHICS_LAYER 六条红线同源，不出现双份口径漂移', () => {
+    const seed = buildSystemEthicsSeedAsset({ now: NOW });
+    expect(seed.content).toBe(ETHICS_LAYER_TEXT);
+    expect(seed.content).toContain('医疗伦理与安全约束');
+    expect(seed.content).toContain('健澜AI原生医院操作系统OS');
+  });
+
+  it('registerSystemEthicsSeed 幂等：重复登记不抛 PA-002，回读同一版本资产', () => {
+    const registry = getPromptAssetRegistry();
+    const first = registerSystemEthicsSeed(registry, { now: NOW });
+    const second = registerSystemEthicsSeed(registry, { now: NOW });
+    expect(second.id).toBe(first.id);
+    expect(second.version).toBe(first.version);
+    expect(registry.listAssets({ level: 'system' })).toHaveLength(1);
+  });
+
+  it('种子资产在库可查且版本号留痕；保留 ID 判定口径正确', () => {
+    const registry = getPromptAssetRegistry();
+    registerSystemEthicsSeed(registry, { now: NOW });
+    const seed = registry.getAsset(SYSTEM_ETHICS_ASSET_ID);
+    expect(seed?.status).toBe('active');
+    expect(seed?.changeLog[0].version).toBe('1.0.0');
+    expect(isReservedSystemAssetId(SYSTEM_ETHICS_ASSET_ID)).toBe(true);
+    expect(isReservedSystemAssetId('prompt-scenario-001')).toBe(false);
   });
 });

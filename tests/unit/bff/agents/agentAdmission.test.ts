@@ -19,8 +19,13 @@ import {
   buildMappingView,
   EXPERT_REVIEW_ROLE,
   PHYSICIAN_CONFIRM_ROLE,
+  aggregateInterventions,
+  appendInterventionMetric,
+  normalizeInterventionNodeId,
+  emptyInterventionCounts,
   type AgentRecord,
   type EvaluationReport,
+  type HumanInterventionMetric,
 } from '@/bff/agents/agentAdmission.js';
 
 const NOW = '2026-10-26T08:00:00.000Z';
@@ -560,5 +565,166 @@ describe('AgentAdmissionRegistry - 深拷贝隔离', () => {
     const log = registry.getChangeLog('medical-record-writer');
     log[0].summary = '被外部篡改';
     expect(registry.getChangeLog('medical-record-writer')[0].summary).toBe('提交评审');
+  });
+});
+
+// ============================================================================
+// A16 人工干预点指标与内存聚合（对齐 S-05 monitoringEvents 事件字段）
+// ============================================================================
+
+describe('AgentAdmissionRegistry - A16 人工干预点指标', () => {
+  const T0 = 1_761_000_000_000;
+
+  function seedInterventions(registry: ReturnType<typeof getAgentAdmissionRegistry>): void {
+    registry.recordInterventionMetric({
+      humanAction: 'adopted',
+      nodeId: 'review',
+      agentId: 'medical-record-writer',
+      agentVersion: '1.0.0',
+      reviewerId: 'doctor-demo-001',
+      at: T0,
+      scenario: 'outpatient-record',
+    });
+    registry.recordInterventionMetric({
+      humanAction: 'modified',
+      nodeId: 'review',
+      agentId: 'medical-record-writer',
+      agentVersion: '1.0.0',
+      reviewerId: 'doctor-demo-001',
+      comment: '人工修改草稿',
+      at: T0 + 1_000,
+      scenario: 'outpatient-record',
+    });
+    registry.recordInterventionMetric({
+      humanAction: 'rejected',
+      agentId: 'medical-record-writer',
+      agentVersion: '1.0.0',
+      at: T0 + 2_000,
+      scenario: 'outpatient-record',
+    });
+    registry.recordInterventionMetric({
+      humanAction: 'escalated',
+      nodeId: 'qc-review',
+      agentId: 'qc-guardian',
+      agentVersion: '0.9.0',
+      at: T0 + 3_000,
+      scenario: 'admission-note',
+    });
+  }
+
+  it('三类动作计数独立可查，节点 / 智能体分组聚合正确', () => {
+    const registry = getAgentAdmissionRegistry();
+    seedInterventions(registry);
+
+    const aggregate = registry.aggregateInterventionMetrics();
+    expect(aggregate.total).toBe(4);
+    expect(aggregate.byAction).toEqual({ adopted: 1, modified: 1, rejected: 1, escalated: 1, pending: 0 });
+    expect(aggregate.byNode['review']).toBe(2);
+    expect(aggregate.byNode['unknown']).toBe(1);
+    expect(aggregate.byNode['qc-review']).toBe(1);
+    expect(aggregate.byAgent['medical-record-writer']).toBe(3);
+    expect(aggregate.byAgent['qc-guardian']).toBe(1);
+  });
+
+  it('节点位置缺失显式记 unknown；按 unknown 节点筛选可回读', () => {
+    const registry = getAgentAdmissionRegistry();
+    seedInterventions(registry);
+    const unknown = registry.queryInterventionMetrics({ nodeId: 'unknown' });
+    expect(unknown).toHaveLength(1);
+    expect(unknown[0].nodeId).toBe('unknown');
+
+    expect(normalizeInterventionNodeId(undefined)).toBe('unknown');
+    expect(normalizeInterventionNodeId('')).toBe('unknown');
+    expect(normalizeInterventionNodeId('   ')).toBe('unknown');
+    expect(normalizeInterventionNodeId('review')).toBe('review');
+  });
+
+  it('按动作 / 智能体 / 版本 / 场景 / 时间窗组合过滤', () => {
+    const registry = getAgentAdmissionRegistry();
+    seedInterventions(registry);
+
+    expect(registry.queryInterventionMetrics({ action: 'modified' })).toHaveLength(1);
+    expect(registry.queryInterventionMetrics({ agentId: 'qc-guardian' })).toHaveLength(1);
+    expect(registry.queryInterventionMetrics({ agentVersion: '1.0.0' })).toHaveLength(3);
+    expect(registry.queryInterventionMetrics({ scenario: 'admission-note' })).toHaveLength(1);
+    expect(registry.queryInterventionMetrics({ from: T0 + 1_500, to: T0 + 3_000 })).toHaveLength(2);
+
+    const modified = registry.aggregateInterventionMetrics({ action: 'modified' });
+    expect(modified.byAction.modified).toBe(1);
+    expect(modified.total).toBe(1);
+  });
+
+  it('非法动作 / 缺失智能体标识 / 非有限时间戳拒绝并抛 ADM-008', () => {
+    const registry = getAgentAdmissionRegistry();
+    expect(() =>
+      registry.recordInterventionMetric({ humanAction: 'approved' as never, agentId: 'a', agentVersion: '1', at: T0 }),
+    ).toThrow(/ADM-008/);
+    expect(() =>
+      registry.recordInterventionMetric({ humanAction: 'adopted', agentId: '', agentVersion: '1', at: T0 }),
+    ).toThrow(/ADM-008/);
+    expect(() =>
+      registry.recordInterventionMetric({ humanAction: 'adopted', agentId: 'a', agentVersion: '', at: T0 }),
+    ).toThrow(/ADM-008/);
+    expect(() =>
+      registry.recordInterventionMetric({ humanAction: 'adopted', agentId: 'a', agentVersion: '1', at: NaN }),
+    ).toThrow(/ADM-008/);
+  });
+
+  it('记录字段与 S-05 monitoringEvents 负载口径一一映射', () => {
+    const registry = getAgentAdmissionRegistry();
+    registry.recordInterventionMetric({
+      humanAction: 'modified',
+      nodeId: 'review',
+      agentId: 'medical-record-writer',
+      agentVersion: '1.0.0',
+      reviewerId: 'doctor-demo-001',
+      comment: '人工修改草稿',
+      at: T0 + 1_000,
+      scenario: 'outpatient-record',
+    });
+    const record = registry.queryInterventionMetrics()[0];
+    expect(record.humanAction).toBe('modified');
+    expect(record.nodeId).toBe('review');
+    expect(record.agentId).toBe('medical-record-writer');
+    expect(record.agentVersion).toBe('1.0.0');
+    expect(record.reviewerId).toBe('doctor-demo-001');
+    expect(record.comment).toBe('人工修改草稿');
+    expect(record.at).toBe(T0 + 1_000);
+  });
+
+  it('查询结果为深拷贝，外部修改不影响台账', () => {
+    const registry = getAgentAdmissionRegistry();
+    registry.recordInterventionMetric({
+      humanAction: 'adopted',
+      nodeId: 'review',
+      agentId: 'a',
+      agentVersion: '1',
+      at: T0,
+    });
+    const list = registry.queryInterventionMetrics();
+    list[0].humanAction = 'rejected';
+    list.push({
+      humanAction: 'pending',
+      nodeId: 'x',
+      agentId: 'b',
+      agentVersion: '1',
+      at: T0,
+    });
+    expect(registry.queryInterventionMetrics()).toHaveLength(1);
+    expect(registry.queryInterventionMetrics()[0].humanAction).toBe('adopted');
+  });
+
+  it('纯函数 appendInterventionMetric 不改入参台账；空记录聚合计数为零', () => {
+    const existing: HumanInterventionMetric[] = [];
+    const next = appendInterventionMetric(existing, {
+      humanAction: 'pending',
+      nodeId: 'review',
+      agentId: 'a',
+      agentVersion: '1',
+      at: T0,
+    });
+    expect(existing).toEqual([]);
+    expect(next).toHaveLength(1);
+    expect(aggregateInterventions([]).byAction).toEqual(emptyInterventionCounts());
   });
 });

@@ -182,3 +182,97 @@ describe('SchemaGuard - 判定事件台账', () => {
     expect(listSchemaEvents()).toHaveLength(0);
   });
 });
+
+// ============================================================================
+// A09 扩展关键字：pattern / minimum / maximum / minLength / maxLength / items / oneOf
+// ============================================================================
+
+describe('validateSchema - A09 扩展关键字', () => {
+  it('pattern 正则：匹配通过，不匹配报错且错误含字段路径', () => {
+    const schema: Record<string, unknown> = {
+      type: 'object',
+      properties: { code: { type: 'string', pattern: '^[A-Z]{2}-\\d{3}$' } },
+    };
+    expect(validateSchema({ code: 'AB-123' }, schema).valid).toBe(true);
+    const bad = validateSchema({ code: 'ab-123' }, schema);
+    expect(bad.valid).toBe(false);
+    expect(bad.errors.some((e) => e.includes('code') && e.includes('格式要求'))).toBe(true);
+  });
+
+  it('minimum / maximum：越界分别报错，边界值本身通过', () => {
+    const schema: Record<string, unknown> = {
+      type: 'object',
+      properties: { age: { type: 'number', minimum: 18, maximum: 120 } },
+    };
+    expect(validateSchema({ age: 18 }, schema).valid).toBe(true);
+    expect(validateSchema({ age: 120 }, schema).valid).toBe(true);
+    const low = validateSchema({ age: 17 }, schema);
+    expect(low.valid).toBe(false);
+    expect(low.errors.some((e) => e.includes('age') && e.includes('不得小于 18'))).toBe(true);
+    const high = validateSchema({ age: 130 }, schema);
+    expect(high.valid).toBe(false);
+    expect(high.errors.some((e) => e.includes('age') && e.includes('不得大于 120'))).toBe(true);
+  });
+
+  it('minLength / maxLength：空串与超长分别报错，长度边界通过', () => {
+    const schema: Record<string, unknown> = {
+      type: 'object',
+      properties: { remark: { type: 'string', minLength: 2, maxLength: 10 } },
+    };
+    expect(validateSchema({ remark: '胸痛' }, schema).valid).toBe(true);
+    const short = validateSchema({ remark: '' }, schema);
+    expect(short.valid).toBe(false);
+    expect(short.errors.some((e) => e.includes('remark') && e.includes('不得少于 2'))).toBe(true);
+    const long = validateSchema({ remark: '一二三四五六七八九十十一' }, schema);
+    expect(long.valid).toBe(false);
+    expect(long.errors.some((e) => e.includes('remark') && e.includes('不得超过 10'))).toBe(true);
+  });
+
+  it('items：数组逐元素递归校验，错误定位到元素下标；嵌套 properties + items 路径可达字段', () => {
+    const schema: Record<string, unknown> = {
+      type: 'object',
+      properties: {
+        list: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['code'],
+            properties: { code: { type: 'string' } },
+          },
+        },
+      },
+    };
+    expect(validateSchema({ list: [{ code: 'AB-1' }, { code: 'CD-2' }] }, schema).valid).toBe(true);
+    const bad = validateSchema({ list: [{ code: 'AB-1' }, { code: 1 }] }, schema);
+    expect(bad.valid).toBe(false);
+    expect(bad.errors.some((e) => e.includes('list') && e.includes('[1]'))).toBe(true);
+    expect(bad.errors.some((e) => e.includes('code') && e.includes('string'))).toBe(true);
+  });
+
+  it('items：根节点数组类型错误与元素类型错误均被捕获', () => {
+    const schema: Record<string, unknown> = { type: 'array', items: { type: 'number' } };
+    expect(validateSchema([1, 2], schema).valid).toBe(true);
+    const bad = validateSchema([1, 'x'], schema);
+    expect(bad.valid).toBe(false);
+    expect(bad.errors.some((e) => e.includes('[1]') && e.includes('number'))).toBe(true);
+    expect(validateSchema('not-an-array', schema).valid).toBe(false);
+  });
+
+  it('oneOf：恰好命中一条通过；命中 0 条与多于 1 条均报错', () => {
+    const schema: Record<string, unknown> = {
+      type: 'object',
+      oneOf: [
+        { type: 'object', required: ['role'], properties: { role: { type: 'string' } } },
+        { type: 'object', required: ['count'], properties: { count: { type: 'number' } } },
+      ],
+    };
+    expect(validateSchema({ role: 'doctor' }, schema).valid).toBe(true);
+    expect(validateSchema({ count: 3 }, schema).valid).toBe(true);
+    const none = validateSchema({ other: true }, schema);
+    expect(none.valid).toBe(false);
+    expect(none.errors.some((e) => e.includes('oneOf') && e.includes('未命中'))).toBe(true);
+    const both = validateSchema({ role: 'doctor', count: 3 }, schema);
+    expect(both.valid).toBe(false);
+    expect(both.errors.some((e) => e.includes('oneOf') && e.includes('同时命中'))).toBe(true);
+  });
+});

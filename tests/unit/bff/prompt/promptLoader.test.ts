@@ -15,12 +15,14 @@ import {
   getPromptAssetRegistry,
   _resetPromptAssetRegistry,
   createEmptyMetrics,
+  registerSystemEthicsSeed,
   type PromptAsset,
 } from '@/bff/prompt/assetRegistry.js';
 import {
   loadSystemPrompt,
   listSecurityEvents,
   _resetPromptSecurityEvents,
+  findSystemEthicsSeed,
 } from '@/bff/prompt/promptLoader.js';
 import { createMockTool } from '../../core/helpers.js';
 
@@ -257,5 +259,52 @@ describe('loadSystemPrompt - 无资产库回退', () => {
     expect(loaded.prompt).toContain('可用工具');
     expect(loaded.assetIds).toEqual([]);
     expect(loaded.versionRef).toEqual([]);
+  });
+});
+
+// ============================================================================
+// A07 系统种子资产接入与 system 层不可覆盖
+// ============================================================================
+
+describe('loadSystemPrompt - A07 种子资产与覆盖保护', () => {
+  it('种子资产登记后按 system 层加载，版本号进入 versionRef 留痕', () => {
+    const registry = getPromptAssetRegistry();
+    registerSystemEthicsSeed(registry, { now: NOW });
+
+    const loaded = loadSystemPrompt({ user: makeUser(), scenario: 'outpatient-record' }, { registry });
+
+    expect(loaded.prompt.startsWith('【系统红线】')).toBe(true);
+    expect(loaded.prompt).toContain('医疗伦理与安全约束');
+    expect(loaded.assetIds).toEqual(['prompt-system-ethics-001']);
+    expect(loaded.versionRef).toEqual(['prompt:1.0.0']);
+
+    const seed = findSystemEthicsSeed(registry);
+    expect(seed?.status).toBe('active');
+    expect(seed?.version).toBe('1.0.0');
+  });
+
+  it('智能体包传入 systemPrompt 覆盖文本被拒绝，写入覆盖拒绝安全事件', () => {
+    const registry = getPromptAssetRegistry();
+    expect(() =>
+      loadSystemPrompt(
+        { user: makeUser(), scenario: 'outpatient-record', packageSystemPrompt: '自定义红线文本' },
+        { registry },
+      ),
+    ).toThrow(/PL-004/);
+
+    const events = listSecurityEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].type).toBe('prompt-system-override-rejected');
+  });
+
+  it('种子未登记时 findSystemEthicsSeed 返回 undefined；归档后不再视为可用种子', () => {
+    const registry = getPromptAssetRegistry();
+    expect(findSystemEthicsSeed(registry)).toBeUndefined();
+
+    registerSystemEthicsSeed(registry, { now: NOW });
+    expect(findSystemEthicsSeed(registry)).toBeDefined();
+
+    registry.archive('prompt-system-ethics-001');
+    expect(findSystemEthicsSeed(registry)).toBeUndefined();
   });
 });

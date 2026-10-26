@@ -275,6 +275,113 @@ export function _resetRouteEvents(): void {
 }
 
 // ============================================================================
+// A03：token 预算 → 上下文长度 / 成本档 / 时延档推导纯函数（M-05 六维路由补全）
+// ============================================================================
+
+/** 档位未命中或入参未给定时的显式未知档（不默认高配、不回退默认值） */
+export type TierUnknown = 'unknown';
+
+/** token 预算分档规则表（上界含边界；超出末档上界归长文本档） */
+export interface BudgetTierRule {
+  /** 区间上界（tokens，含边界）；Infinity 表示末档 */
+  maxTokens: number;
+  contextLength: ContextLength;
+}
+
+/** tokenBudget → contextLength 规则表（阈值口径可由入参覆盖，规则本身为纯数据） */
+export const TOKEN_BUDGET_BANDS: readonly BudgetTierRule[] = [
+  { maxTokens: 4_000, contextLength: 'short' },
+  { maxTokens: 16_000, contextLength: 'medium' },
+  { maxTokens: Number.POSITIVE_INFINITY, contextLength: 'long' },
+];
+
+/** 成本档分档阈值（每 1k 输入 token 口径数值；不含供应商凭证） */
+export interface CostTierBounds {
+  /** 不超过该值为 low；缺省 0.5 */
+  lowMax?: number;
+  /** 不超过该值为 medium；缺省 2 */
+  mediumMax?: number;
+}
+
+/** 时延档分档阈值（毫秒；缺省 300ms / 800ms） */
+export interface LatencyTierBounds {
+  fastMax?: number;
+  mediumMax?: number;
+}
+
+/**
+ * token 预算 → 上下文长度档。
+ * - 未给预算 / 非有限非正值 / 规则表未命中：返回 `unknown`（该维不约束，不默认高配）；
+ * - 边界值归入上界所在档：4000 → short，4001 → medium；16000 → medium，16001 → long；
+ * - 纯函数，不读取进程外指标。
+ */
+export function deriveContextLength(
+  tokenBudget?: number,
+  bands: readonly BudgetTierRule[] = TOKEN_BUDGET_BANDS,
+): ContextLength | TierUnknown {
+  if (tokenBudget === undefined || !Number.isFinite(tokenBudget) || tokenBudget <= 0) return 'unknown';
+  for (const band of bands) {
+    if (tokenBudget <= band.maxTokens) return band.contextLength;
+  }
+  return 'unknown';
+}
+
+/**
+ * 成本 → 成本档（low / medium / high）。未给值或非有限值返回 `unknown`；
+ * 阈值可由入参覆盖，不发起供应商报价读取。
+ */
+export function deriveCostTier(
+  costPer1kInput?: number,
+  bounds?: CostTierBounds,
+): PerformanceTier | TierUnknown {
+  if (costPer1kInput === undefined || !Number.isFinite(costPer1kInput) || costPer1kInput < 0) return 'unknown';
+  const lowMax = bounds?.lowMax ?? 0.5;
+  const mediumMax = bounds?.mediumMax ?? 2;
+  if (costPer1kInput <= lowMax) return 'low';
+  if (costPer1kInput <= mediumMax) return 'medium';
+  return 'high';
+}
+
+/**
+ * 时延 → 时延档（low=快 / medium / high=慢）。未给值或非有限值返回 `unknown`；
+ * 阈值可由入参覆盖，不采集进程外实时时延。
+ */
+export function deriveLatencyTier(
+  latencyMs?: number,
+  bounds?: LatencyTierBounds,
+): PerformanceTier | TierUnknown {
+  if (latencyMs === undefined || !Number.isFinite(latencyMs) || latencyMs < 0) return 'unknown';
+  const fastMax = bounds?.fastMax ?? 300;
+  const mediumMax = bounds?.mediumMax ?? 800;
+  if (latencyMs <= fastMax) return 'low';
+  if (latencyMs <= mediumMax) return 'medium';
+  return 'high';
+}
+
+/** 预算推导汇总输入（各维均可选；缺省维返回 unknown，不参与规则匹配约束） */
+export interface BudgetProfileInput {
+  tokenBudget?: number;
+  costPer1kInput?: number;
+  latencyMs?: number;
+}
+
+/** 预算推导汇总结果 */
+export interface BudgetProfile {
+  contextLength: ContextLength | TierUnknown;
+  costTier: PerformanceTier | TierUnknown;
+  latencyTier: PerformanceTier | TierUnknown;
+}
+
+/** 一次性推导上下文长度 / 成本档 / 时延档；各维独立判定，未给值维记 unknown。 */
+export function deriveBudgetProfile(input: BudgetProfileInput): BudgetProfile {
+  return {
+    contextLength: deriveContextLength(input.tokenBudget),
+    costTier: deriveCostTier(input.costPer1kInput),
+    latencyTier: deriveLatencyTier(input.latencyMs),
+  };
+}
+
+// ============================================================================
 // 匹配与分流内部纯函数
 // ============================================================================
 
