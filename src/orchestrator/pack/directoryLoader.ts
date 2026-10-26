@@ -80,12 +80,24 @@ export async function loadAgentPackageFromDir(dir: string): Promise<LoadedAgentD
   return { agentId: agent.id, dir, agent, pkg };
 }
 
-/** 扫描智能体根目录下全部智能体并加载 */
+/** 读取 manifest.json 目录清单中的智能体 id；清单缺失时返回 null（回退全量扫描） */
+async function loadCatalogIds(rootDir: string): Promise<Set<string> | null> {
+  try {
+    const text = await readFile(join(rootDir, 'manifest.json'), 'utf8');
+    const manifest = JSON.parse(text) as { agents?: Array<{ id: string }> };
+    return new Set((manifest.agents ?? []).map((agent) => agent.id));
+  } catch {
+    return null;
+  }
+}
+
+/** 扫描智能体根目录下全部智能体并加载；清单内未登记的独立包暂不挂接（catalog 挂载归后续批次） */
 export async function loadAllAgentsFromDir(
   rootDir: string,
 ): Promise<{ loaded: LoadedAgentDir[]; errors: { dir: string; error: string }[] }> {
   const loaded: LoadedAgentDir[] = [];
   const errors: { dir: string; error: string }[] = [];
+  const catalog = await loadCatalogIds(rootDir);
   let entries: string[];
   try {
     entries = await readdir(rootDir);
@@ -94,6 +106,7 @@ export async function loadAllAgentsFromDir(
   }
   for (const name of entries) {
     if (name.startsWith('.') || name.startsWith('_')) continue;
+    if (catalog && !catalog.has(name)) continue;
     const dir = join(rootDir, name);
     try {
       const s = await stat(dir);
