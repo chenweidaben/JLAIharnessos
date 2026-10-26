@@ -17,3 +17,4 @@ export * from './modelRouter.js';
 export * from './agentAdmission.js';
 export * from './outpatient/index.js';
 export * from './shared/index.js';
+export * from './inpatient/index.js';
