@@ -46,6 +46,12 @@ export enum WorkflowNodeType {
   CODE = 'code',
   /** 延时节点：等待指定时长，常用于定时/节流场景 */
   DELAY = 'delay',
+  /** 独立格式校验节点：白名单结构校验，不与 LLM 节点 jsonSchema 混写 */
+  FORMAT_VALIDATE = 'format-validate',
+  /** 独立通知节点：组装离线/外接渠道通知载荷，不直接投递真实短信/邮件 */
+  NOTIFY = 'notify',
+  /** 独立写回节点：经确认后向 EMR 草稿/审计/状态/病历目标写回 */
+  WRITEBACK = 'writeback',
 }
 
 /** 工作流运行状态机 */
@@ -286,6 +292,48 @@ export interface DelayNodeConfig {
   durationMs: number;
 }
 
+/** 格式校验节点配置（白名单结构，不引用任意代码） */
+export interface FormatValidateNodeConfig {
+  /** 独立声明的校验结构：字段级 type/required/范围/enum 白名单 */
+  schema: Record<string, unknown>;
+  /** 表达式或变量路径；缺省取上游节点输出/工作流 input */
+  source?: string;
+  /** 严格模式：未知字段拒绝 */
+  strict?: boolean;
+  /** 校验通过端口，缺省 out */
+  validPort?: string;
+  /** 校验失败端口，缺省 invalid */
+  invalidPort?: string;
+}
+
+/** 通知节点配置（离线桩位渠道，未注入 sink 时不真正投递） */
+export interface NotifyNodeConfig {
+  /** 通知渠道 */
+  channel: 'in-app' | 'sms' | 'wechat' | 'email';
+  /** 接收人表达式 */
+  recipientExpression: string;
+  /** 通知模板 */
+  template: string;
+  /** 模板变量映射 */
+  variables?: Record<string, string>;
+  /** 是否需要人工确认后再发出 */
+  requireConfirmation?: boolean;
+}
+
+/** 写回节点配置 */
+export interface WritebackNodeConfig {
+  /** 写回目标 */
+  target: 'emr-draft' | 'audit-log' | 'workflow-state' | 'patient-record';
+  /** 字段映射：目标字段 -> 安全表达式 */
+  mapping: Record<string, string>;
+  /** 风险等级 */
+  riskLevel: AgentRiskLevel;
+  /** 是否需要人工确认 */
+  requireConfirmation?: boolean;
+  /** 只读标记：本节点恒为 false */
+  readOnly?: false;
+}
+
 /** 节点配置联合类型（按 type 索引） */
 export interface NodeConfigMap {
   [WorkflowNodeType.START]: Record<string, never>;
@@ -303,6 +351,9 @@ export interface NodeConfigMap {
   [WorkflowNodeType.RAG]: RagNodeConfig;
   [WorkflowNodeType.CODE]: CodeNodeConfig;
   [WorkflowNodeType.DELAY]: DelayNodeConfig;
+  [WorkflowNodeType.FORMAT_VALIDATE]: FormatValidateNodeConfig;
+  [WorkflowNodeType.NOTIFY]: NotifyNodeConfig;
+  [WorkflowNodeType.WRITEBACK]: WritebackNodeConfig;
 }
 
 // ============================================================================
@@ -544,4 +595,7 @@ export const DslIssueCode = {
   PARALLEL_NO_BRANCH: 'PARALLEL_NO_BRANCH',
   WORKFLOW_NOT_FOUND: 'WORKFLOW_NOT_FOUND',
   VERSION_INCOMPATIBLE: 'VERSION_INCOMPATIBLE',
+  FORMAT_SCHEMA_MISSING: 'FORMAT_SCHEMA_MISSING',
+  NOTIFY_CONFIG_MISSING: 'NOTIFY_CONFIG_MISSING',
+  WRITEBACK_CONFIG_MISSING: 'WRITEBACK_CONFIG_MISSING',
 } as const;

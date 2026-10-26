@@ -84,6 +84,8 @@ export class WorkflowContext {
   private readonly records = new Map<string, NodeRecord>();
   /** 循环/分支产生的局部作用域（栈），foreach 当前元素等 */
   private readonly scopeStack: Record<string, unknown>[] = [];
+  /** 待人工处理任务 ID 台账（断点恢复时随上下文回填，不重放已完成节点） */
+  private readonly pendingHumanTasks: string[] = [];
 
   constructor(init: WorkflowContextInit) {
     this.input = init.input ?? {};
@@ -160,6 +162,53 @@ export class WorkflowContext {
   /** 获取全部记录（用于执行轨迹/回放） */
   getAllRecords(): NodeRecord[] {
     return Array.from(this.records.values());
+  }
+
+  /** 断点恢复：回填已完成节点记录，不重新执行对应节点 */
+  restoreCompletedRecords(records: Record<string, NodeRecord>): void {
+    for (const [nodeId, record] of Object.entries(records)) {
+      this.records.set(nodeId, { ...record });
+    }
+  }
+
+  /** 登记待人工任务 ID（幂等，不重复登记） */
+  addPendingHumanTask(taskId: string): void {
+    if (!this.pendingHumanTasks.includes(taskId)) this.pendingHumanTasks.push(taskId);
+  }
+
+  /** 移除待人工任务 ID */
+  removePendingHumanTask(taskId: string): void {
+    const index = this.pendingHumanTasks.indexOf(taskId);
+    if (index >= 0) this.pendingHumanTasks.splice(index, 1);
+  }
+
+  /** 获取待人工任务 ID 台账（只读副本） */
+  getPendingHumanTasks(): string[] {
+    return [...this.pendingHumanTasks];
+  }
+
+  /** 断点恢复：回填待人工任务台账 */
+  restorePendingHumanTasks(taskIds: string[]): void {
+    this.pendingHumanTasks.length = 0;
+    for (const taskId of taskIds) {
+      if (!this.pendingHumanTasks.includes(taskId)) this.pendingHumanTasks.push(taskId);
+    }
+  }
+
+  /** 断点恢复：回填工作流入参（已完成节点不重放） */
+  restoreInput(input: Record<string, unknown>): void {
+    Object.assign(this.input, input);
+  }
+
+  /** 断点恢复：回填患者与用户上下文 */
+  restoreActorContext(patient: Record<string, unknown>, user: Record<string, unknown>): void {
+    Object.assign(this.patient, patient);
+    Object.assign(this.user, user);
+  }
+
+  /** 读取全局变量只读副本 */
+  getVariables(): Record<string, unknown> {
+    return { ...this.vars };
   }
 
   // --------------------------------------------------------------------------

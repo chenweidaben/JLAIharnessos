@@ -26,6 +26,9 @@ import { validateWorkflow, type ReferenceResolver } from './validator.js';
 import { WorkflowContext, type TriggerInfo } from './context.js';
 import { WorkflowStateMachine, IllegalStateTransitionError } from './state.js';
 import { ExecutionRecorder, ExecutionEventType } from './recorder.js';
+import { SnapshotService, type SnapshotBoundaryDeps } from './snapshotService.js';
+import { hydrateContext, validateSnapshotTransition, type StateSnapshot } from './snapshotStore.js';
+import type { AiVersionSnapshot } from '@/security/audit/aiAudit.js';
 import { getDefaultNodeExecutorRegistry, type NodeExecutorRegistry } from '../nodes/registry.js';
 import type {
   NodeExecutorContext,
@@ -57,6 +60,12 @@ export interface WorkflowRunOptions {
   runtimeOverride?: Partial<WorkflowRuntime>;
   timeoutMs?: number;
   instanceId?: string;
+  /** 断点快照仓储（可选；未注入时由 SnapshotService 使用内置内存实现） */
+  snapshotStore?: import('./snapshotStore.js').SnapshotStore;
+  /** 四维版本台账，随快照归档 */
+  versions?: AiVersionSnapshot;
+  /** 续跑快照；传入后从 currentNodeId 恢复，不重放已完成节点 */
+  resumeSnapshot?: StateSnapshot;
 }
 
 /** 工作流运行结果 */
@@ -95,6 +104,8 @@ interface PathDeps {
   stateMachine: WorkflowStateMachine;
   ncBase: Omit<NodeExecutorContext, 'signal'>;
   gateIfPaused: () => Promise<void>;
+  snapshotService: SnapshotService;
+  boundaryDeps: (currentNodeId: string | null, state: WorkflowState) => SnapshotBoundaryDeps;
 }
 
 /** 节点执行内部结果（带降级跳转） */
@@ -181,12 +192,16 @@ export class WorkflowEngine {
     }
 
     // ---- 运行态初始化 ----
+    const resumeSnapshot = options.resumeSnapshot;
+    if (resumeSnapshot) {
+      validateSnapshotTransition(resumeSnapshot, WorkflowState.RUNNING);
+    }
     const stateMachine = new WorkflowStateMachine(WorkflowState.VALIDATED);
     const ctx = new WorkflowContext({
-      input: options.input ?? {},
-      variables: wf.variables ?? {},
-      patient: options.patient,
-      user: options.user,
+      input: (options.input ?? resumeSnapshot?.context.input ?? {}) as Record<string, unknown>,
+      variables: { ...(wf.variables ?? {}), ...(resumeSnapshot?.context.vars ?? {}) },
+      patient: resumeSnapshot?.context.patient ?? options.patient,
+      user: resumeSnapshot?.context.user ?? options.user,
       trigger: {
         type: options.trigger?.type ?? 'manual',
         source: options.trigger?.source,
@@ -195,9 +210,38 @@ export class WorkflowEngine {
       },
       instanceId,
     });
+    if (resumeSnapshot) {
+      hydrateContext(ctx, resumeSnapshot);
+    }
+
+    const snapshotService = new SnapshotService({
+      store: options.snapshotStore,
+      versions: options.versions,
+    });
 
     const abortController = new AbortController();
     let pauseGate: { promise: Promise<void>; release: () => void } | null = null;
+
+    const patientIdOf = (): string | undefined => {
+      const value = ctx.patient.patientId ?? ctx.getVariables().patientId ?? options.patient?.patientId;
+      return value === undefined || value === null || value === '' ? undefined : String(value);
+    };
+    const visitIdOf = (): string | undefined => {
+      const value = ctx.patient.visitId ?? ctx.getVariables().visitId ?? options.patient?.visitId;
+      return value === undefined || value === null || value === '' ? undefined : String(value);
+    };
+    const boundaryDeps = (currentNodeId: string | null, state: WorkflowState): SnapshotBoundaryDeps => ({
+      instanceId,
+      workflowId: wf.meta.id,
+      workflowVersion: wf.meta.version,
+      state,
+      currentNodeId,
+      context: ctx,
+      traceId,
+      patientId: patientIdOf(),
+      visitId: visitIdOf(),
+      pendingHumanTasks: ctx.getPendingHumanTasks(),
+    });
 
     const runtime: WorkflowRuntime = {
       ...this.baseRuntime,
@@ -207,12 +251,43 @@ export class WorkflowEngine {
         options.runtimeOverride?.sleep ?? this.baseRuntime.sleep ?? defaultSleep,
       ),
       onEvent: (event: unknown) => {
-        const e = event as { type?: string };
+        const e = event as {
+          type?: string;
+          task?: { taskId?: string };
+          taskId?: string;
+          nodeId?: string;
+          resolution?: { approved?: boolean; comment?: string; reviewerId?: string };
+        };
         try {
           if (e?.type === 'human_waiting' && stateMachine.state === WorkflowState.RUNNING) {
+            const taskId = e.task?.taskId ?? e.taskId;
+            if (taskId) ctx.addPendingHumanTask(taskId);
             stateMachine.transition(WorkflowState.WAITING_HUMAN);
+            recorder.record(
+              ExecutionEventType.HUMAN_TASK_CREATED,
+              {
+                humanInterventionPoint: e.nodeId,
+                humanAction: 'pending',
+                taskId,
+              },
+              e.nodeId,
+            );
+            snapshotService.onHumanWaiting(taskId ?? 'unknown', boundaryDeps(e.nodeId ?? null, WorkflowState.WAITING_HUMAN));
           } else if (e?.type === 'human_resolved' && stateMachine.state === WorkflowState.WAITING_HUMAN) {
+            const taskId = e.taskId;
+            if (taskId) ctx.removePendingHumanTask(taskId);
             stateMachine.transition(WorkflowState.RUNNING);
+            recorder.record(
+              ExecutionEventType.HUMAN_TASK_RESOLVED,
+              {
+                humanInterventionPoint: e.nodeId,
+                humanAction: e.resolution?.approved ? 'adopted' : 'rejected',
+                taskId,
+                reviewerId: e.resolution?.reviewerId,
+                comment: e.resolution?.comment,
+              },
+              e.nodeId,
+            );
           }
         } catch {
           /* 以主流程状态为准 */
@@ -228,6 +303,7 @@ export class WorkflowEngine {
       outgoing.get(edge.source)?.push(edge);
     }
     const startNode = wf.nodes.find((n) => n.type === WorkflowNodeType.START)!;
+    const entryNodeId = resumeSnapshot?.currentNodeId ?? startNode.id;
 
     const gateIfPaused = async (): Promise<void> => {
       if (pauseGate) {
@@ -254,6 +330,8 @@ export class WorkflowEngine {
       stateMachine,
       ncBase,
       gateIfPaused,
+      snapshotService,
+      boundaryDeps,
     };
 
     const runner: PathRunner = {
@@ -270,7 +348,7 @@ export class WorkflowEngine {
           version: wf.meta.version,
         });
 
-        const runMain = this.runPath(startNode.id, deps);
+        const runMain = this.runPath(entryNodeId, deps);
         const workflowTimeout = options.timeoutMs ?? wf.timeoutMs;
         let timer: ReturnType<typeof setTimeout> | undefined;
         const finalPath = await (workflowTimeout
@@ -330,6 +408,7 @@ export class WorkflowEngine {
       pause(): void {
         if (stateMachine.state === WorkflowState.RUNNING) {
           stateMachine.transition(WorkflowState.PAUSED);
+          snapshotService.onPaused(boundaryDeps(null, WorkflowState.PAUSED));
           let release: () => void = () => {};
           const promise = new Promise<void>((r) => {
             release = r;
@@ -423,7 +502,7 @@ export class WorkflowEngine {
 
   /** 选择出边：条件节点按端口，其余取唯一 out 边 */
   private selectEdge(node: NodeDefinition, edges: EdgeDefinition[], port: string): EdgeDefinition | undefined {
-    if (node.type === WorkflowNodeType.CONDITION) {
+    if (node.type === WorkflowNodeType.CONDITION || node.type === WorkflowNodeType.FORMAT_VALIDATE) {
       return edges.find((e) => (e.sourcePort ?? 'out') === port);
     }
     return edges.find((e) => !e.sourcePort || e.sourcePort === 'out') ?? edges[0];
@@ -459,11 +538,41 @@ export class WorkflowEngine {
 
       if (outcome.status === 'completed') {
         d.ctx.markNodeCompleted(node.id, outcome.output, outcome.tokens);
+        const record = d.ctx.getRecord(node.id);
+        const cfg = node.config as Record<string, unknown>;
         d.recorder.record(
           ExecutionEventType.NODE_COMPLETED,
-          { output: this.summarize(outcome.output), tokens: outcome.tokens },
+          {
+            output: this.summarize(outcome.output),
+            tokens: outcome.tokens,
+            durationMs: record?.durationMs,
+            modelId: typeof cfg.modelId === 'string'
+              ? cfg.modelId
+              : typeof cfg.model === 'string'
+                ? cfg.model
+                : '',
+            modelVersion: typeof cfg.modelVersion === 'string' ? cfg.modelVersion : '',
+            knowledgeVersion: Array.isArray(cfg.knowledgeVersion) ? cfg.knowledgeVersion : [],
+            promptVersion: typeof cfg.promptVersion === 'string' ? cfg.promptVersion : '',
+          },
           node.id,
         );
+        d.snapshotService.onNodeCompleted(d.boundaryDeps(node.id, d.stateMachine.state));
+        return outcome;
+      }
+
+      if (outcome.status === 'waiting_human') {
+        d.ctx.markNodeCompleted(node.id, outcome.output, outcome.tokens);
+        d.recorder.record(
+          ExecutionEventType.NODE_COMPLETED,
+          {
+            output: outcome.output,
+            tokens: outcome.tokens,
+            waitingHuman: true,
+          },
+          node.id,
+        );
+        d.snapshotService.onNodeCompleted(d.boundaryDeps(node.id, d.stateMachine.state));
         return outcome;
       }
 
@@ -472,12 +581,22 @@ export class WorkflowEngine {
       }
 
       d.ctx.markNodeFailed(node.id, outcome.error ?? '未知错误');
-      d.recorder.record(ExecutionEventType.NODE_FAILED, { error: outcome.error, attempt }, node.id);
+      d.recorder.record(
+        ExecutionEventType.NODE_FAILED,
+        { error: outcome.error, attempt, anomalyCode: 'node_failed' },
+        node.id,
+      );
+      d.snapshotService.onFailedPendingRetry(d.boundaryDeps(node.id, WorkflowState.FAILED));
 
       const canRetry = attempt < maxAttempts && this.isRetryable(outcome.error, policy);
       if (canRetry) {
         const delay = this.backoffDelay(attempt, policy!);
-        d.recorder.record(ExecutionEventType.NODE_RETRYING, { attempt, nextDelayMs: delay }, node.id);
+        d.recorder.record(
+          ExecutionEventType.NODE_RETRYING,
+          { attempt, nextDelayMs: delay, anomalyCode: 'node_retrying' },
+          node.id,
+        );
+        d.snapshotService.onNodeRetrying(node.id, d.boundaryDeps(node.id, d.stateMachine.state));
         await (d.runtime.sleep ?? defaultSleep)(delay);
         if (d.abortController.signal.aborted) throw new WorkflowCancelledError();
         continue;

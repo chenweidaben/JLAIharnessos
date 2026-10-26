@@ -1,7 +1,7 @@
 /**
  * 健澜AI原生医院操作系统OS - 节点执行器注册中心
  *
- * 汇总内置 12 类节点执行器，并支持注册自定义节点类型（低代码平台扩展点）。
+ * 汇总内置 15 类节点执行器，并支持注册自定义节点类型（低代码平台扩展点）。
  *
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
@@ -23,6 +23,11 @@ import {
   ToolNodeExecutor,
 } from './serviceExecutors.js';
 import { LoopNodeExecutor, ParallelNodeExecutor } from './controlExecutors.js';
+import {
+  FormatValidateNodeExecutor,
+  NotifyNodeExecutor,
+  WritebackNodeExecutor,
+} from './specialExecutors.js';
 
 /**
  * 节点执行器注册中心
@@ -48,6 +53,9 @@ export class NodeExecutorRegistry {
     this.register(new RagNodeExecutor());
     this.register(new CodeNodeExecutor());
     this.register(new DelayNodeExecutor());
+    this.register(new FormatValidateNodeExecutor());
+    this.register(new NotifyNodeExecutor());
+    this.register(new WritebackNodeExecutor());
   }
 
   /** 注册（或覆盖）节点执行器 */

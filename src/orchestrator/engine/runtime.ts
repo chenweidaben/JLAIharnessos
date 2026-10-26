@@ -192,6 +192,36 @@ export interface ISubAgentInvoker {
 // 运行时服务集合
 // ============================================================================
 
+/** 通知载荷（离线桩位，未注入 sink 时不真正投递） */
+export interface NotifyMessage {
+  channel: 'in-app' | 'sms' | 'wechat' | 'email';
+  recipient: string;
+  template: string;
+  variables: Record<string, unknown>;
+  preview: string;
+  requireConfirmation: boolean;
+  pendingConfirmation: boolean;
+}
+
+/** 写回结果（未注入适配器时返回离线桩位） */
+export interface WritebackResult {
+  persisted: boolean;
+  target: string;
+  recordId?: string;
+  payload?: Record<string, unknown>;
+  error?: string;
+}
+
+/** 写回适配器接口（后续接真实 EMR/审计/状态仓储；阶段①不直写 DB） */
+export interface WritebackAdapter {
+  (payload: {
+    target: string;
+    patientId?: string;
+    visitId?: string;
+    data: Record<string, unknown>;
+  }): Promise<WritebackResult>;
+}
+
 /** 工作流引擎运行时依赖 */
 export interface WorkflowRuntime {
   llm: IWorkflowLlm;
@@ -205,6 +235,10 @@ export interface WorkflowRuntime {
   onEvent?: (event: unknown) => void;
   /** 提示词资源加载器：将 "prompts/system.md" 这类引用解析为正文 */
   promptLoader?: (ref: string) => Promise<string> | string;
+  /** 可选通知投递器；未注入时节点输出离线桩位，不发短信/邮件/微信 */
+  notifySink?: (message: NotifyMessage) => void | Promise<void>;
+  /** 可选写回适配器；未注入时节点输出离线桩位，不直写 DB */
+  writebackAdapter?: WritebackAdapter;
 }
 
 /** 默认休眠（真实延时） */

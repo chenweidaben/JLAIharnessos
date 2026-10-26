@@ -124,3 +124,31 @@ export type { MockLlmResponder, MockRagDoc, MockToolHandler } from './adapters/m
 // 一键装配
 export { createOrchestrator, createMockOrchestrator } from './factory.js';
 export type { Orchestrator, OrchestratorDeps, MockOrchestrator } from './factory.js';
+
+// S-05 阶段①：断点快照、监控桥接、隔离相似病例适配器与独立节点执行器（纯追加）
+export * from './engine/snapshotStore.js';
+export { SnapshotService } from './engine/snapshotService.js';
+export type {
+  SnapshotServiceOptions,
+  SnapshotBoundaryDeps,
+  SnapshotResumePlan,
+} from './engine/snapshotService.js';
+export { OrchestratorAuditBridge, buildAuditInput } from './engine/auditBatchBridge.js';
+export type {
+  OrchestratorAuditEvent,
+} from './engine/auditBatchBridge.js';
+export {
+  buildSimilarCaseQuery,
+  invokeSimilarCaseQuery,
+  SIMILAR_CASE_TOOL_ID,
+} from './adapters/similarCaseAdapter.js';
+export type {
+  SimilarCaseActorInput,
+  SimilarCaseQueryDeps,
+} from './adapters/similarCaseAdapter.js';
+export {
+  FormatValidateNodeExecutor,
+  NotifyNodeExecutor,
+  WritebackNodeExecutor,
+} from './nodes/specialExecutors.js';
+export type { NotifyMessage, WritebackResult, WritebackAdapter } from './engine/runtime.js';

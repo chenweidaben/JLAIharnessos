@@ -278,6 +278,22 @@ function validateNodePorts(node: NodeDefinition, outgoing: EdgeDefinition[], iss
       }
       break;
     }
+    case WorkflowNodeType.FORMAT_VALIDATE: {
+      const cfg = node.config as { validPort?: string; invalidPort?: string };
+      const declaredPorts = new Set<string>([cfg.validPort ?? 'out', cfg.invalidPort ?? 'invalid']);
+      for (const e of outgoing) {
+        const port = e.sourcePort ?? 'out';
+        if (!declaredPorts.has(port)) {
+          issues.push(
+            issue('error', DslIssueCode.MISSING_PORT, `格式校验节点 ${node.id} 的出口端口未定义: ${port}`, {
+              nodeId: node.id,
+              edgeId: e.id,
+            }),
+          );
+        }
+      }
+      break;
+    }
     case WorkflowNodeType.END: {
       if (outgoing.length > 0) {
         issues.push(issue('warning', 'END_HAS_OUTGOING', `end 节点 ${node.id} 不应有出边`, { nodeId: node.id }));
@@ -338,6 +354,52 @@ function validateNodeReferences(
         issues.push(
           issue('error', DslIssueCode.SUBAGENT_NOT_FOUND, `子智能体节点 ${node.id} 引用了不存在的智能体: ${cfg.agentId}`,
             { nodeId: node.id }),
+        );
+      }
+      break;
+    }
+    case WorkflowNodeType.FORMAT_VALIDATE: {
+      const cfg = node.config as { schema?: Record<string, unknown> };
+      if (!cfg.schema || typeof cfg.schema !== 'object' || Array.isArray(cfg.schema) || Object.keys(cfg.schema).length === 0) {
+        issues.push(
+          issue('error', DslIssueCode.FORMAT_SCHEMA_MISSING, `格式校验节点 ${node.id} 缺少非空 schema 白名单结构`, { nodeId: node.id }),
+        );
+      }
+      break;
+    }
+    case WorkflowNodeType.NOTIFY: {
+      const cfg = node.config as {
+        channel?: string;
+        recipientExpression?: string;
+        template?: string;
+      };
+      const allowedChannels = ['in-app', 'sms', 'wechat', 'email'];
+      const missing: string[] = [];
+      if (!cfg.channel || !allowedChannels.includes(cfg.channel)) missing.push('channel');
+      if (!cfg.recipientExpression || typeof cfg.recipientExpression !== 'string') missing.push('recipientExpression');
+      if (!cfg.template || typeof cfg.template !== 'string') missing.push('template');
+      if (missing.length > 0) {
+        issues.push(
+          issue('error', DslIssueCode.NOTIFY_CONFIG_MISSING, `通知节点 ${node.id} 缺少或非法配置: ${missing.join('、')}`, { nodeId: node.id }),
+        );
+      }
+      break;
+    }
+    case WorkflowNodeType.WRITEBACK: {
+      const cfg = node.config as {
+        target?: string;
+        mapping?: Record<string, string>;
+        riskLevel?: string;
+      };
+      const allowedTargets = ['emr-draft', 'audit-log', 'workflow-state', 'patient-record'];
+      const allowedRiskLevels = ['low', 'medium', 'high'];
+      const missing: string[] = [];
+      if (!cfg.target || !allowedTargets.includes(cfg.target)) missing.push('target');
+      if (!cfg.mapping || typeof cfg.mapping !== 'object' || Array.isArray(cfg.mapping) || Object.keys(cfg.mapping).length === 0) missing.push('mapping');
+      if (!cfg.riskLevel || !allowedRiskLevels.includes(cfg.riskLevel)) missing.push('riskLevel');
+      if (missing.length > 0) {
+        issues.push(
+          issue('error', DslIssueCode.WRITEBACK_CONFIG_MISSING, `写回节点 ${node.id} 缺少或非法配置: ${missing.join('、')}`, { nodeId: node.id }),
         );
       }
       break;

@@ -24,6 +24,9 @@ export const nodeTypeEnum = z.enum([
   'rag',
   'code',
   'delay',
+  'format-validate',
+  'notify',
+  'writeback',
 ]);
 
 /** 风险等级 */
