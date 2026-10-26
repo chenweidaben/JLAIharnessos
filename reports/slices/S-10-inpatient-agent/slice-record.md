@@ -103,7 +103,7 @@
 | 新增 | `tests/unit/bff/agents/inpatient/dischargeSchema.test.ts` | 234 | 10080 | 出院对照关系、枚举拦截、引用闭环、证据级别、长住院关键节点保留与待核实标记 |
 | 新增 | `tests/unit/bff/agents/inpatient/inpatientWorkflow.test.ts` | 306 | 13232 | 主路径、S-01 红线、Schema 降级、high/medium 角色、越权写、人工四决策与共用组件委派 |
 | 新增 | `tests/unit/bff/agents/inpatient/agentPackage.test.ts` | 137 | 5729 | 声明包元数据、工具/知识绑定、七类条件分支、DAG 边集合、DSL 校验和、README/提示词/示例齐全性 |
-| 新增 | `reports/slices/S-10-inpatient-agent/slice-record.md` | 190 | 32291 | 本切片记录 |
+| 新增 | `reports/slices/S-10-inpatient-agent/slice-record.md` | 193 | 33061 | 本切片记录 |
 
 > 未改动：`agents/manifest.json`、`src/orchestrator/dsl/*`、既有 `agents/*` 包、既有 BFF 路由、既有前端页面、S-01/S-06/S-11/S-12/S-13/S-09 共用组件源码与既有测试断言、40 份基线回归测试；未新增第三方依赖，`package.json` 与锁文件无差异。
 
@@ -253,3 +253,11 @@
 - 密钥与端点扫描：实现、测试、声明包扫描命中 5 处，均为 README 否定句声明或本地双字词变量名；未发现明文口令、凭据、密钥、认证凭据长值或明文服务端点；本记录自身审计说明不纳入秘密判定。
 - 本切片未执行 `git add`、`git commit`、`git push`、`git tag`；未删除用户源码；未移动、重命名既有文件；未改动未点名既有路由、页面、挂载、权限码与函数签名。
 - 代码、测试、日志与文档无真实院方实名；测试患者/就诊/医生标识使用 `patient-demo-001`、`visit-demo-001`、`doctor-demo-001` 类合成夹具；日志不落患者正文大段文本。
+
+### 7.4 交付校验留痕
+
+- 记录格式校验：`logs/s10-verifier-slice-record-20261027.log`，`result.passed=true`。
+- 关键章节与锚点校验：`logs/s10-verifier-must-contain-20261027.log`，`result.passed=true`，必需术语 20/20 命中。
+- 占位符审计：`logs/s10-verifier-placeholder-20261027.log`，`result.passed=true`，残留占位符 0 个。
+- 品牌禁用词校验：`logs/s10-verifier-brand-20261027.log`，`result.passed=true`，禁用词 0 命中。
+- 声明包格式、工具/知识绑定与占位符校验：`logs/s10-verifier-agent-yaml-format-20261027.log`、`logs/s10-verifier-agent-yaml-contains-20261027.log`、`logs/s10-verifier-agent-yaml-placeholder-20261027.log`，均 `result.passed=true`，YAML 必需术语 15/15 命中。
