@@ -177,6 +177,24 @@ export {
 // ===== 输入安全模块 =====
 export { InputValidator, PromptInjectionGuard, type PromptInjectionGuardConfig } from './input';
 
+// ===== AI 专项安全模块（输出侧校验器，五道防线第四道） =====
+export {
+  OutboundGuard,
+  guardOutbound,
+  type OutboundGuardConfig,
+  type AgentRiskLevel,
+  type AgentRole,
+  type EvidenceLevel,
+  type OutboundLevel,
+  type FindingSeverity,
+  type GuardRuleId,
+  type FactSnapshot,
+  type CitationRef,
+  type OutboundContext,
+  type GuardFinding,
+  type OutboundVerdict,
+} from './ai';
+
 // ===== 数据分级分类模块 =====
 export {
   type ClassificationAuditRecord,
