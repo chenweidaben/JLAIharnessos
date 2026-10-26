@@ -1,0 +1,178 @@
+{
+  "batchId": "S-phase1-P1-A22-Batch",
+  "product": "健澜AI原生医院操作系统OS",
+  "organization": "杭州健澜科技有限公司",
+  "repo": "C:\\Users\\lenovo\\Doubao\\chats\\2026-09-14\\new-chat-1",
+  "branch": "consult-agent-m86",
+  "baselineHead": "f4eef73993e74180dccdc7a04c649f780389bb71",
+  "completedAt": "2026-10-27T03:05:00+08:00",
+  "environment": "DEMO_MODE=1; offline; no DB / network / real LLM / ASR / Embedding / OCR / event bus",
+  "gitDiscipline": "no git add / commit / push / tag executed; commit grouping and dual-repo push handled by main session",
+  "implemented": [
+    {
+      "code": "A20",
+      "matrix": "S-03",
+      "slice": "S-12/S-05",
+      "priority": "P1",
+      "sourceFiles": ["src/knowledge-platform/citation/evidenceGuard.ts"],
+      "testFiles": ["tests/unit/knowledge-platform/citation/evidenceGuard.test.ts"],
+      "pass": 8,
+      "fail": 0,
+      "expect": 42
+    },
+    {
+      "code": "A22",
+      "matrix": "S-05",
+      "slice": "S-08/S-11",
+      "priority": "P1",
+      "sourceFiles": ["src/security/audit/aiAudit.ts"],
+      "testFiles": ["tests/unit/security/aiAudit.test.ts"],
+      "pass": 29,
+      "fail": 0,
+      "expect": 117,
+      "baseline": { "pass": 21, "fail": 0, "expect": 85 }
+    },
+    {
+      "code": "A07",
+      "matrix": "P-01",
+      "slice": "S-04",
+      "priority": "P1",
+      "sourceFiles": [
+        "src/core/agent/SystemPromptBuilder.ts",
+        "src/bff/prompt/assetRegistry.ts",
+        "src/bff/prompt/promptLoader.ts"
+      ],
+      "testFiles": [
+        "tests/unit/bff/prompt/assetRegistry.test.ts",
+        "tests/unit/bff/prompt/promptLoader.test.ts"
+      ],
+      "pass": 40,
+      "fail": 0,
+      "expect": 120,
+      "baseline": { "pass": 33, "fail": 0, "expect": 88 }
+    },
+    {
+      "code": "A09",
+      "matrix": "P-05",
+      "slice": "S-04",
+      "priority": "P1",
+      "sourceFiles": ["src/bff/prompt/schemaGuard.ts"],
+      "testFiles": ["tests/unit/bff/prompt/schemaGuard.test.ts"],
+      "pass": 19,
+      "fail": 0,
+      "expect": 75,
+      "baseline": { "pass": 13, "fail": 0, "expect": 47 }
+    },
+    {
+      "code": "A01",
+      "matrix": "M-02",
+      "slice": "S-02",
+      "priority": "P1",
+      "sourceFiles": ["src/bff/agents/modelHealthProbe.ts"],
+      "testFiles": ["tests/unit/bff/agents/modelHealthProbeWindow.test.ts"],
+      "pass": 7,
+      "fail": 0,
+      "expect": 26
+    },
+    {
+      "code": "A03",
+      "matrix": "M-05",
+      "slice": "S-03",
+      "priority": "P1",
+      "sourceFiles": ["src/bff/agents/modelRouter.ts"],
+      "testFiles": ["tests/unit/bff/agents/modelRouter.test.ts"],
+      "pass": 45,
+      "fail": 0,
+      "expect": 149,
+      "baseline": { "pass": 36, "fail": 0, "expect": 109 }
+    },
+    {
+      "code": "A16",
+      "matrix": "A-04",
+      "slice": "S-06/S-05",
+      "priority": "P1",
+      "sourceFiles": ["src/bff/agents/agentAdmission.ts"],
+      "testFiles": ["tests/unit/bff/agents/agentAdmission.test.ts"],
+      "pass": 34,
+      "fail": 0,
+      "expect": 155,
+      "baseline": { "pass": 27, "fail": 0, "expect": 119 }
+    },
+    {
+      "code": "A27",
+      "matrix": "R-06",
+      "slice": "S-12",
+      "priority": "P1",
+      "sourceFiles": ["src/knowledge-platform/citation/retrievalAdapter.ts"],
+      "testFiles": ["tests/unit/knowledge-platform/citation/retrievalAdapter.test.ts"],
+      "pass": 6,
+      "fail": 0,
+      "expect": 41
+    },
+    {
+      "code": "A34",
+      "matrix": "O-03",
+      "slice": "S-05/S-06",
+      "priority": "P1",
+      "sourceFiles": ["src/orchestrator/engine/toolQuota.ts"],
+      "testFiles": ["tests/unit/orchestrator/toolQuota.test.ts"],
+      "pass": 11,
+      "fail": 0,
+      "expect": 39
+    }
+  ],
+  "gates": {
+    "rootTsc": { "command": "node node_modules/typescript/bin/tsc --noEmit", "exitCode": 0, "log": "logs/a22-p1-tsc-root-20261027-p1.log", "diagnosticsBytes": 0 },
+    "webTsc": { "command": "bun x tsc --noEmit (cwd=web)", "exitCode": 0, "log": "logs/a22-p1-tsc-web-20261027-p1.log", "diagnosticsBytes": 0 }
+  },
+  "testTotals": {
+    "roundFiles": 10,
+    "roundPass": 199,
+    "roundFail": 0,
+    "roundExpect": 764,
+    "regressionFiles": 26,
+    "regressionPass": 317,
+    "regressionFail": 0,
+    "regressionExpect": 992,
+    "regressionSummaryCsv": "logs/a22-p1-regression-summary.csv"
+  },
+  "compliance": {
+    "thirdPartyDependenciesAdded": 0,
+    "protectedFilesClean": [
+      "package.json",
+      "package-lock.json",
+      "bun.lock",
+      "bun.lockb",
+      "agents/manifest.json",
+      "src/bff/agents/index.ts",
+      "src/orchestrator/index.ts",
+      "src/bff/index.ts"
+    ],
+    "brandForbiddenHits": 0,
+    "secretHits": 0,
+    "placeholderHits": 0,
+    "fixtureIdentifiers": ["patient-demo-001", "visit-demo-001", "doctor-demo-001"],
+    "brandScanLogs": [
+      "logs/a22-p1-scan-20261027-p1.log",
+      "logs/a22-p1-chinese-scan-20261027-p1.log"
+    ]
+  },
+  "notStarted": {
+    "p2ACount": 35,
+    "bClassCount": 78,
+    "phase2": ["S-05 remainder O-02", "O-05", "O-06", "O-08", "S-07", "S-14", "S-15", "S-16", "S-17"],
+    "phase3": ["S-21", "S-22", "S-23"]
+  },
+  "unresolved": [
+    "A01 probe event ledger persistence and cross-process recovery (B-class)",
+    "A03 real vendor price / latency metric collection and runtime route integration",
+    "A07 runtime startup seeding policy and remaining post prompt migration",
+    "A09 full JSON Schema keywords (format, const, if/then) not implemented; no third-party validator",
+    "A16 threshold alerting and suspend suggestion events (P2 A17); real deferral execution and persistence (B31)",
+    "A20 runtime mounting into model output pipeline and S-08 audit event writeback",
+    "A22 runtime provider injection wiring and cross-record snapshot consistency inspection",
+    "A27 real vector recall and similarity scoring model (B19); hybrid.ts unchanged",
+    "A34 persistent quota counters, external quota service, BFF tool admin route and frontend (B48)",
+    "P2 batch 35 A-class items and B-class 78 items not started; phase 2 and phase 3 slices not started"
+  ]
+}
