@@ -15,3 +15,5 @@ export * from './modelRegistry.js';
 export * from './modelHealthProbe.js';
 export * from './modelRouter.js';
 export * from './agentAdmission.js';
+export * from './outpatient/index.js';
+export * from './shared/index.js';
