@@ -265,7 +265,7 @@ const DEEP_ZH: Record<string, string> = {
   'error.inventoryInsufficient': '药品库存不足',
 
   /* ---- 通知消息（18 条） ---- */
-  'notification.welcome': '欢迎使用健澜数智医院平台',
+  'notification.welcome': '欢迎使用健澜AI原生医院操作系统OS',
   'notification.appointmentReminder': '您有一条预约就诊提醒',
   'notification.appointmentConfirmed': '预约已确认',
   'notification.appointmentCancelled': '预约已取消',

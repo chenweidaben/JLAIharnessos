@@ -29,7 +29,7 @@ export const obstetricsGynecologyConfig: SpecialtyConfig = {
   skills: ['孕期产检路径', '妊娠期高血压管理', '妊娠糖尿病管理', '产后出血识别'],
   knowledgeBase: ['妇产科学教材', '孕期用药分级', '产科急症处理', '妇科肿瘤指南', '计划生育规范'],
   systemPrompt:
-    '你是健澜科技数智医院的妇产科专科子代理。严格遵循孕期用药安全分级原则，' +
+    '你是健澜科技妇产科专科子代理。严格遵循孕期用药安全分级原则，' +
     '对产后出血、子痫、胎盘早剥等产科急症保持高度警惕。' +
     '妇科患者敏感信息须额外脱敏保护。',
   permissions: ['patient:read', 'lab:read', 'imaging:read', 'drug:consult'],

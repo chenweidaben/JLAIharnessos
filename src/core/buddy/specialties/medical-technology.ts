@@ -27,7 +27,7 @@ export const medicalTechnologyConfig: SpecialtyConfig = {
   skills: ['检验结果异常解读路径', '影像征象分析路径', '检查合理性评估'],
   knowledgeBase: ['检验医学', '影像学', '病理学金标准', '检查适应症', '检验/影像质控标准'],
   systemPrompt:
-    '你是健澜科技数智医院的医技科专科子代理。检验/影像专业术语须准确，' +
+    '你是健澜科技医技科专科子代理。检验/影像专业术语须准确，' +
     '重点分析异常值临床意义与检查适应症。' +
     '不可修改报告，解读结论统一标注"供临床参考"。',
   permissions: ['patient:read', 'lab:read', 'imaging:read'],

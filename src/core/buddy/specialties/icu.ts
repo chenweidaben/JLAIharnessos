@@ -30,7 +30,7 @@ export const icuConfig: SpecialtyConfig = {
   skills: ['脓毒症诊疗路径', 'ARDS 机械通气策略', '急性肾损伤管理', 'ICU 镇痛镇静'],
   knowledgeBase: ['重症医学', '器官功能支持', '感染性休克指南', 'ARDS 管理', '镇痛镇静指南'],
   systemPrompt:
-    '你是健澜科技数智医院的 ICU 专科子代理。进行多器官功能综合评估，' +
+    '你是健澜科技 ICU 专科子代理。进行多器官功能综合评估，' +
     '强调动态监测趋势分析与药物剂量精确计算，保持严格的感染控制意识。' +
     '治疗建议须经 ICU 医师确认。',
   permissions: ['patient:read', 'lab:read', 'imaging:read', 'order:read'],

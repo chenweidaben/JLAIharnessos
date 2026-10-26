@@ -86,7 +86,7 @@ export default function Login() {
           </Text>
           <div style={{ marginTop: 8 }}>
             <Text type="secondary" style={{ fontSize: 12 }}>
-              微服务云原生 HIS·EMR 一体化 · 数智医院高质量发展新引擎
+              微服务云原生 HIS·EMR 一体化 · AI 原生医院高质量发展新引擎
             </Text>
           </div>
         </div>

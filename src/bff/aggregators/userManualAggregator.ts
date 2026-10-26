@@ -729,7 +729,7 @@ export function getUserManual(
   }));
   const totalSteps = chapters.reduce((n, c) => n + c.steps.length, 0);
   return {
-    title: '健澜数智医院 · 用户操作手册',
+    title: '健澜AI原生医院操作系统OS · 用户操作手册',
     version: MANUAL_VERSION,
     role,
     roleLabel: ROLE_LABELS[role],

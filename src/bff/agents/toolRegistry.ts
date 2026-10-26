@@ -1205,7 +1205,7 @@ export class DefaultToolExecutor implements ToolExecutor {
         visitId,
         timepoint: timepoint || null,
         guidance:
-          '您好，这里是健澜数智医院随访专员。本次随访主要了解您出院后的恢复情况与用药依从性，' +
+          '您好，这里是健澜科技随访专员。本次随访主要了解您出院后的恢复情况与用药依从性，' +
           '请您按提示逐项反馈；如出现发热、剧痛、伤口异常等情况，请立即联系主管医生或返院就诊。',
         disclaimer:
           '本话术为 AI 生成的沟通模板，不构成诊疗建议，不得据此调整用药；任何病情变化请联系主管医生。',

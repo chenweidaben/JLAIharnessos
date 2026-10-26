@@ -134,7 +134,7 @@ export default function EmergencyRecordView() {
             <div>
               <h2 className="text-center text-xl font-bold">急诊档案</h2>
               <div className="text-center text-xs text-ink-secondary">
-                健澜科技数智医院 · 急诊科
+                健澜科技 · 急诊科
               </div>
             </div>
             <Divider style={{ margin: '8px 0' }} />

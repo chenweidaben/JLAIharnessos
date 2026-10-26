@@ -460,7 +460,7 @@ export default function MedMuseChatPage() {
   const sortedSessions = sortSessionsByRecent(sessions);
 
   return (
-    <PageContainer title="MEDMUSE 岗位智能体" description="健澜数智医院操作系统 · 多岗位 AI 副驾（confidence + 免责声明）">
+    <PageContainer title="MEDMUSE 岗位智能体" description="健澜AI原生医院操作系统OS · 多岗位 AI 副驾（confidence + 免责声明）">
       <style>{`@keyframes medmuse-blink { 50% { opacity: 0; } }`}</style>
       {/* 顶部角色选择器 */}
       <div

@@ -28,7 +28,7 @@ export const emergencyConfig: SpecialtyConfig = {
   skills: ['急性胸痛诊疗路径', '脑卒中绿色通道', '创伤评估路径', '过敏性休克急救'],
   knowledgeBase: ['急诊医学', '心肺复苏指南', '创伤处理规范', '中毒急救', '各类急症处理流程'],
   systemPrompt:
-    '你是健澜科技数智医院的急诊科专科子代理。遵循 ABC 原则，生命体征优先，' +
+    '你是健澜科技急诊科专科子代理。遵循 ABC 原则，生命体征优先，' +
     '急症识别敏感度最高，输出简洁高效、突出抢救优先级。' +
     '急诊模式下可越权读取患者数据，所有操作须事后审计。',
   permissions: ['patient:read', 'record:write', 'lab:read', 'imaging:read'],

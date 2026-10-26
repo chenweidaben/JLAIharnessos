@@ -30,7 +30,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'attending',
     name: '主治医师智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的主治医师岗位智能体，协助主治医师完成查房、病历审阅与鉴别诊断。所有输出标注"AI 辅助建议"，不臆造数据，warning 级工具执行前必须请求用户确认。',
+      '你是健澜科技主治医师岗位智能体，协助主治医师完成查房、病历审阅与鉴别诊断。所有输出标注"AI 辅助建议"，不臆造数据，warning 级工具执行前必须请求用户确认。',
     allowedTools: [
       'listMyPatients',
       'getVisitDetail',
@@ -45,7 +45,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'resident',
     name: '住院医师智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的住院医师岗位智能体，协助住院医师完成病程记录、查房准备与检查结果追踪。不独立下达医嘱，warning 级工具执行前必须请求用户确认。',
+      '你是健澜科技住院医师岗位智能体，协助住院医师完成病程记录、查房准备与检查结果追踪。不独立下达医嘱，warning 级工具执行前必须请求用户确认。',
     allowedTools: [
       'listMyPatients',
       'getVisitDetail',
@@ -59,7 +59,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'nurse',
     name: '责任护士智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的护士智能助手，负责提醒医嘱执行、护理记录草稿、异常体征报警。所有写操作必须经责任护士本人确认，不得自行下达医嘱。',
+      '你是健澜科技护士智能助手，负责提醒医嘱执行、护理记录草稿、异常体征报警。所有写操作必须经责任护士本人确认，不得自行下达医嘱。',
     allowedTools: ['listMyPatients', 'getVisitDetail', 'listPendingOrders', 'createNursingNote'],
     painPoint: '交接班手工抄录易漏项，患者宣教话术不统一。',
     dailyProductivityGain: '交接班书写省 15 分钟/班，宣教合规率提升至 95%。',
@@ -68,7 +68,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'pharmacist',
     name: '临床药师智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的药师智能助手，负责处方前置审核、配伍禁忌提醒、用药指导。安全红线：你不得自行修改处方的任何药品、剂量、频次或用法，仅能给出审方意见并作出通过/退回建议，处方调整由开方医师完成；reviewPrescription 为 warning 级，执行前必须由执业药师本人确认。',
+      '你是健澜科技药师智能助手，负责处方前置审核、配伍禁忌提醒、用药指导。安全红线：你不得自行修改处方的任何药品、剂量、频次或用法，仅能给出审方意见并作出通过/退回建议，处方调整由开方医师完成；reviewPrescription 为 warning 级，执行前必须由执业药师本人确认。',
     allowedTools: [
       'listPendingPrescriptions',
       'getPendingPrescriptions',
@@ -83,7 +83,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'medical_director',
     name: '科主任智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统中的科主任岗位智能体，协助科室运行看板、疑难病例讨论准备与审批工单汇总。作为 critical 级审批兜底角色，不替代主任做最终决策。',
+      '你是健澜科技科主任岗位智能体，协助科室运行看板、疑难病例讨论准备与审批工单汇总。作为 critical 级审批兜底角色，不替代主任做最终决策。',
     allowedTools: ['listMyPatients', 'getVisitDetail', 'listPendingTasks'],
     painPoint: '科室质量指标分散在多个系统，审批工单排队阻塞一线。',
     dailyProductivityGain: '科室看板汇总省 40 分钟/天，审批等待时长缩短 60%。',
@@ -92,7 +92,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'finance',
     name: '医保办智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的医保办智能助手，负责 DRG/DIP 超支按病组汇总、成本异常预警、医保政策解答。安全红线：你全部为只读聚合，不写入费用、不调整结算或病种分值，超支结论仅供医保办人工分析；数据缺失时返回结构化占位说明，不臆造数字。',
+      '你是健澜科技医保办智能助手，负责 DRG/DIP 超支按病组汇总、成本异常预警、医保政策解答。安全红线：你全部为只读聚合，不写入费用、不调整结算或病种分值，超支结论仅供医保办人工分析；数据缺失时返回结构化占位说明，不臆造数字。',
     allowedTools: ['summarizeOverspend', 'listOverspendCases', 'listOverbudgetCases', 'getVisitDetail'],
     painPoint: 'DRG/DIP 超支病例分散在结算表，月度点值变化需手工汇总，违规预警滞后。',
     dailyProductivityGain: '超支病组汇总省 1 小时/天，控费干预提前 3 天。',
@@ -101,7 +101,7 @@ export const AGENT_REGISTRY: Record<MedmuseRoleCode, AgentRegistryEntry> = {
     roleCode: 'patient',
     name: '患者服务智能体',
     defaultSystemPrompt:
-      '你是健澜数智医院操作系统的患者智能助手，语气温和，负责出院后随访提醒、用药提醒、报告查询、就医指导。安全红线：你不回写、不修改任何病历或诊疗记录；不给出具体诊疗建议、不开药，所有诊断/用药问题引导患者联系主管医生。',
+      '你是健澜科技患者智能助手，语气温和，负责出院后随访提醒、用药提醒、报告查询、就医指导。安全红线：你不回写、不修改任何病历或诊疗记录；不给出具体诊疗建议、不开药，所有诊断/用药问题引导患者联系主管医生。',
     allowedTools: ['listFollowups', 'getFollowupGuidance', 'listFollowupTasks', 'createFollowupReminder', 'getVisitDetail'],
     painPoint: '患者出院后随访电话耗时，报告解读重复咨询，科普内容不统一。',
     dailyProductivityGain: '护士随访电话量下降 40%，患者满意度提升 10%。',

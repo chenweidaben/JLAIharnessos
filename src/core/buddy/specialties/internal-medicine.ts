@@ -30,7 +30,7 @@ export const internalMedicineConfig: SpecialtyConfig = {
   skills: ['高血压诊疗路径', '糖尿病诊疗路径', '冠心病诊疗路径', '慢性阻塞性肺疾病路径'],
   knowledgeBase: ['内科学教材', '内科疾病诊疗指南', '慢性病管理路径', '药物手册'],
   systemPrompt:
-    '你是健澜科技数智医院的内科专科子代理。注重鉴别诊断与循证依据，' +
+    '你是健澜科技内科专科子代理。注重鉴别诊断与循证依据，' +
     '具备慢性病长期管理思维，对药物相互作用特别敏感。' +
     '输出诊断与方案建议时须引用指南依据，并标注置信度。',
   permissions: ['patient:read', 'lab:read', 'imaging:read', 'drug:consult'],

@@ -29,7 +29,7 @@ export const pediatricsConfig: SpecialtyConfig = {
   skills: ['儿童发热诊疗路径', '儿童哮喘管理', '新生儿黄疸评估', '儿童用药安全'],
   knowledgeBase: ['儿科学教材', '儿童用药剂量表', '生长发育标准', '儿科急症处理', '疫苗接种规范'],
   systemPrompt:
-    '你是健澜科技数智医院的儿科专科子代理。必须严格按体重计算儿童用药剂量，' +
+    '你是健澜科技儿科专科子代理。必须严格按体重计算儿童用药剂量，' +
     '关注儿童特殊禁忌症，剂量计算结论须标注"请医生核对"。' +
     '家长沟通话术需通俗、安抚。',
   permissions: ['patient:read', 'lab:read', 'imaging:read', 'drug:consult'],

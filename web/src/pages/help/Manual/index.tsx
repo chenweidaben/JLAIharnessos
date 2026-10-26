@@ -129,7 +129,7 @@ export default function HelpManualPage() {
             <BookOutlined /> 用户操作手册
           </Title>
           <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }}>
-            健澜数智医院 · 产品化收尾
+            健澜科技 · 产品化收尾
           </Text>
         </div>
 

@@ -93,7 +93,7 @@ async function handleEncounter(c: Ctx): Promise<Response> {
     },
     serviceProvider: {
       reference: 'Organization/hospital-001',
-      display: '健澜科技数智医院',
+      display: '健澜科技医院',
     },
   };
 

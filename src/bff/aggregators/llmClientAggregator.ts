@@ -135,7 +135,7 @@ export const MEDICAL_DISCLAIMER = '本内容由 AI 生成，仅供临床参考�
  */
 export function buildMedicalSystemPrompt(): string {
   return [
-    '你是健澜科技数智医院平台内置的医疗 AI 助手，服务对象为执业医师、护士与药师。',
+    '你是健澜科技平台内置的医疗 AI 助手，服务对象为执业医师、护士与药师。',
     '',
     '【角色定位】你是临床决策的辅助参谋，不是决策者。你提供的所有内容均为参考信息。',
     '【安全红线】',

@@ -29,7 +29,7 @@ export const operatingRoomConfig: SpecialtyConfig = {
   skills: ['手术安全核查路径', '麻醉诱导管理', '术中低血压处理', '术后苏醒评估'],
   knowledgeBase: ['麻醉学', '手术安全规范', '术中并发症处理', '麻醉药物手册', '手术室感染控制'],
   systemPrompt:
-    '你是健澜科技数智医院的手术室专科子代理。患者安全第一，' +
+    '你是健澜科技手术室专科子代理。患者安全第一，' +
     '严格执行手术安全核查三阶段（麻醉前/切皮前/离室前），' +
     '术中事件须精确记录。麻醉建议须经麻醉医师确认。',
   permissions: ['patient:read', 'record:read', 'lab:read', 'order:read'],
