@@ -1,0 +1,54 @@
+{
+  "traceId": "trace-demo-inpatient-001",
+  "agentId": "medical-record-inpatient",
+  "agentVersion": "1.0.0",
+  "actor": {
+    "userId": "doctor-demo-001",
+    "role": "doctor",
+    "department": "internal-medicine"
+  },
+  "patientId": "patient-demo-001",
+  "visitId": "visit-demo-001",
+  "department": "内科",
+  "documentType": "daily-progress",
+  "admissionTime": "2026-10-25T09:00:00+08:00",
+  "currentTime": "2026-10-26T08:30:00+08:00",
+  "dischargeTime": null,
+  "severityLevel": "stable",
+  "lastProgressTime": "2026-10-25T17:30:00+08:00",
+  "chiefComplaint": "反复咳嗽咳痰 3 天，加重 1 天。",
+  "presentIllness": "患者 3 天前出现咳嗽咳痰，昨日起自觉症状加重，今日入院观察。",
+  "queryText": "依据入院资料与今日查房记录生成日常病程草稿。",
+  "vitalsText": "血压 138/86、心率 82、体温 36.8℃、呼吸 18、血氧 96%",
+  "facts": {
+    "patientName": null,
+    "age": 58,
+    "gender": "男",
+    "patientId": "patient-demo-001",
+    "visitId": "visit-demo-001",
+    "diagnoses": [],
+    "medications": [],
+    "keyVitals": {
+      "temperature": "36.8℃",
+      "heartRate": "82/min"
+    }
+  },
+  "ragEvidence": [],
+  "clinicalReports": [],
+  "timelineNodes": [
+    {
+      "time": "2026-10-25T09:00:00+08:00",
+      "event": "办理入院，收入内科观察",
+      "source": "admission-record"
+    },
+    {
+      "time": "2026-10-25T17:30:00+08:00",
+      "event": "首次病程记录完成，查体平稳",
+      "source": "first-progress"
+    }
+  ],
+  "orders": [],
+  "examResults": [],
+  "review": null,
+  "consentConfirmed": false
+}

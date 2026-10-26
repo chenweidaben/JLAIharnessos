@@ -1,0 +1,310 @@
+# 健澜AI原生医院操作系统OS - 住院病历智能体声明包
+# 版权所有 (c) 2026 杭州健澜科技有限公司
+# 说明：本包为 S-10 独立声明包，catalog 挂载归后续 BFF / 前端批次；
+#       当前清单未登记前，目录加载器不会将其挂接进运行时注册表。
+id: medical-record-inpatient
+name: 住院病历智能体
+nameEn: Inpatient Medical Record Agent
+version: 1.0.0
+category: 电子病历
+tags:
+  - 住院病历
+  - 七类文书
+  - 时限规则
+  - 语音体征
+  - 人工复核
+description: >-
+  面向入院记录、首次病程记录、日常病程记录、上级医师查房记录、阶段小结、出院记录
+  与病情综合分析七类住院文书，依据住院登记、既往病历、检验检查、医嘱、护理记录与
+  查房语音时间线，分节生成结构化住院病历；一致性规则自检，经输出侧防护与人工确认
+  后回写 EMR 草稿。上级查房中涉及诊疗方案调整建议的部分须由上级医师确认。
+allowedRoles:
+  - doctor
+riskLevel: medium
+humanInLoop: true
+tools:
+  - get_inpatient_context
+  - get_order_list
+  - get_exam_results
+  - get_nursing_notes
+  - voice_to_vitals
+  - kb_search
+  - icd_lookup
+  - submit_inpatient_draft
+  - schedule_timeline_check
+knowledgeBases:
+  - writing-standard
+  - clinical-guide
+  - data-standard
+  - hospital-policy
+model:
+  provider: local-demo
+  model: inpatient-draft-v1
+  temperature: 0.2
+systemPrompt: prompts/system.md
+entryWorkflow: inpatient-main
+disclaimer: >-
+  本住院病历由 AI 辅助生成，仅供临床参考；诊断方向、诊疗方案、检查与用药建议均须由
+  执业医师结合实时资料核实确认。上级查房涉及方案调整建议时，须经上级医师复核确认，
+  并经人工签名后方可作为正式医疗文书。AI 不承担诊疗责任。
+
+workflows:
+  - meta:
+      id: inpatient-main
+      name: 住院病历生成-一致性校验-人工复核-回写主流程
+      version: 1.0.0
+    timeout:
+      nodeTimeoutMs: 60000
+      workflowTimeoutMs: 180000
+    # 事件预留：write_record 成功后由运行时发出 inpatient-record-completed；
+    # 事件总线真实挂载归后续批次，本声明包不接真实事件通道。
+    nodes:
+      - id: start
+        type: start
+        name: 开始
+        config: {}
+
+      - id: fetch_inpatient_context
+        type: tool
+        name: 调取住院上下文与全量资料时间线
+        config:
+          toolName: get_inpatient_context
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            department: input.department
+
+      - id: fetch_parallel
+        type: parallel
+        name: 并行调取医嘱、检验检查与护理记录
+        config:
+          mode: all
+          concurrency: 3
+          branches:
+            - name: order_list
+              entryNode: fetch_orders
+            - name: exam_results
+              entryNode: fetch_exam_results
+            - name: nursing_notes
+              entryNode: fetch_nursing_notes
+
+      - id: fetch_orders
+        type: tool
+        name: 调取医嘱清单
+        config:
+          toolName: get_order_list
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: fetch_exam_results
+        type: tool
+        name: 调取检验检查结果
+        config:
+          toolName: get_exam_results
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: fetch_nursing_notes
+        type: tool
+        name: 调取护理记录
+        config:
+          toolName: get_nursing_notes
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+
+      - id: voice_to_vitals
+        type: tool
+        name: 移动查房语音体征解析
+        config:
+          toolName: voice_to_vitals
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            text: input.vitalsText
+          # 识别数值、单位与体征项；异常值标注并转人工核对；无法识别片段保留原文并入 missingInfo。
+
+      - id: rag_standards
+        type: rag
+        name: 检索住院规范、指南与制度知识
+        config:
+          knowledgeBases:
+            - writing-standard
+            - clinical-guide
+            - data-standard
+            - hospital-policy
+          query: input.chiefComplaint
+          topK: 5
+          scoreThreshold: 0.35
+          strategy: hybrid
+          outputVariable: evidence
+
+      - id: choose_document_type
+        type: condition
+        name: 选择七类住院文书模板
+        config:
+          mode: switch
+          cases:
+            admission-record: admission-record
+            first-progress: first-progress
+            daily-progress: daily-progress
+            senior-round: senior-round
+            stage-summary: stage-summary
+            discharge-record: discharge-record
+            comprehensive-analysis: comprehensive-analysis
+          defaultPort: summary_or_outline
+
+      - id: summary_or_outline
+        type: llm
+        name: 长住院摘要压缩与文书提纲
+        config:
+          model: inpatient-draft-v1
+          systemPrompt: prompts/system.md
+          userTemplate: >-
+            长住院先按“摘要 + 关键节点”压缩时间线，再按所选文书模板生成提纲；
+            诊断变更、手术、危急值、过敏史、输血、抢救等关键节点不得丢失。
+          jsonMode: true
+
+      - id: draft_sections
+        type: llm
+        name: 分节生成住院病历初稿
+        config:
+          model: inpatient-draft-v1
+          systemPrompt: prompts/system.md
+          userTemplate: |-
+            依据提纲、住院资料时间线、语音体征与检索依据生成分节病历。
+            诊断方向、检查建议、用药建议必须在句末标注引用编号 [n]；
+            资料不足处标注「（待核实）」，不得使用确定性诊断表述。
+          jsonMode: true
+          jsonSchema:
+            type: object
+            properties:
+              chiefComplaint: { type: string }
+              presentIllness: { type: string }
+              historyIllness: { type: string }
+              physicalExam: { type: string }
+              auxiliaryExams: { type: string }
+              orders: { type: string }
+              nursingNotes: { type: string }
+              diagnosis: { type: array, items: { type: object } }
+              suggestions: { type: array, items: { type: object } }
+              discharge: { type: object }
+              keyNodes: { type: array, items: { type: object } }
+              missingInfo: { type: array, items: { type: string } }
+
+      - id: schedule_timeline_check
+        type: tool
+        name: 文书时限规则校验与提醒
+        config:
+          toolName: schedule_timeline_check
+          readOnly: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            context: scheduleReminders
+          # 入院 24h、首次病程 8h、日常病程按分级频次、阶段小结 30 天或病情突变、
+          # 出院记录出院后规定时限；规则只产出提醒，不替代院方制度判断。
+
+      - id: consistency_check
+        type: code
+        name: 主诉、诊断、查体、医嘱与检验一致性校验
+        config:
+          assignments:
+            consistencyFindings: runConsistencyCheck(draft, context)
+          # 规则：主诉/诊断对应、查体/诊断不矛盾、医嘱/用药匹配、检验结论被引用且方向一致。
+          # 阻断项回退 revise；最多 2 次，超限转人工队列或阻断出稿。
+
+      - id: revise_loop
+        type: loop
+        name: 一致性问题修订循环（最多 2 次）
+        config:
+          mode: times
+          maxIterations: 2
+          bodyEntry: revise_draft
+          # 超限口径：两次修订后仍存在阻断 / Schema 问题，转人工队列或阻断出稿，不强行成稿。
+          onExhaust: manual-queue
+
+      - id: revise_draft
+        type: code
+        name: 按一致性问题修订草稿
+        config:
+          assignments:
+            revisionRound: vars.revisionRound + 1
+            revisionNote: consistencyFindings 汇总问题清单
+
+      - id: output_guard
+        type: code
+        name: 输出侧防护校验
+        config:
+          assignments:
+            guardVerdict: guardOutbound(guardContext)
+          # 复用 S-01 guardOutbound：虚构身份 / 事实矛盾 / 确定性红线 / 敏感承诺 /
+          # Schema 结构 / 无依据结论 / 要素完整性；BLOCK 直接终止，CAUTION 留痕后继续。
+
+      - id: human_review
+        type: human
+        name: 住院病历人工复核
+        config:
+          title: 住院病历复核与签名确认
+          instructions: 请核对病史、诊断方向、诊疗方案、体征与引用依据；可采纳、修改、拒绝或退回修订。
+          assigneeRoles:
+            - doctor
+          reviewMode:
+            default: physician-confirm
+            expertReview: senior-round + treatment-plan-adjustment
+          formSchema:
+            decision: { type: string, enum: ['adopted', 'modified', 'rejected', 'returned-for-revision'] }
+            reviewerRole: { type: string, enum: ['physician-confirm', 'expert-review'] }
+            comment: { type: string }
+            modifiedDraft: { type: object }
+          timeoutMs: 86400000
+
+      - id: write_record
+        type: tool
+        name: 回写住院草稿并留痕
+        config:
+          toolName: submit_inpatient_draft
+          requireConfirmation: true
+          inputMapping:
+            patientId: input.patientId
+            visitId: input.visitId
+            draft: draft
+            reviewer: human_review.reviewerRole
+          # 写路径须校验调用者角色为 doctor、知情同意确认且 patientId / visitId 齐全；
+          # 三重校验任一不满足即阻断并记录 UNAUTHORIZED_WRITE 审计条目。
+
+      - id: end
+        type: end
+        name: 结束
+        config:
+          outputMapping:
+            status: vars.status
+            draft: draft
+            consistencyFindings: consistencyFindings
+            scheduleReminders: scheduleReminders
+            guardLevel: guardVerdict.level
+            review: human_review.decision
+
+    edges:
+      - { id: e1, source: start, target: fetch_inpatient_context }
+      - { id: e2, source: fetch_inpatient_context, target: fetch_parallel }
+      - { id: e3, source: fetch_parallel, target: voice_to_vitals }
+      - { id: e4, source: voice_to_vitals, target: rag_standards }
+      - { id: e5, source: rag_standards, target: choose_document_type }
+      - { id: e6, source: choose_document_type, target: summary_or_outline, sourcePort: summary_or_outline }
+      - { id: e7, source: summary_or_outline, target: draft_sections }
+      - { id: e8, source: draft_sections, target: schedule_timeline_check }
+      - { id: e9, source: schedule_timeline_check, target: consistency_check }
+      - { id: e10, source: consistency_check, target: output_guard, sourcePort: pass }
+      - { id: e11, source: consistency_check, target: revise_loop, sourcePort: revise }
+      - { id: e12, source: revise_loop, target: output_guard }
+      - { id: e13, source: output_guard, target: human_review }
+      - { id: e14, source: human_review, target: write_record }
+      - { id: e15, source: write_record, target: end }
