@@ -603,6 +603,7 @@ import { m606Routes } from './routes/m606Routes'; // M606 院感暴发预警（5
 import { m607Routes } from './routes/m607Routes'; // M607 DRG 分组（8 病例含 3 超支+2 结余·6 个 DRG 组目录）
 import { m608Routes } from './routes/m608Routes'; // M608 医保结算（10 条含 3 拒付+2 部分支付·3 条预授权）
 import { m609Routes } from './routes/m609Routes'; // M609 CDR 临床数据中心（患者全景概览+通用查询+数据量统计）
+import { m610Routes } from './routes/m610Routes'; // M610 病历正文 append-only 版本链守卫（链校验+受控追加修订）
 import { imagingRoutes } from './routes/imaging';
 import { medicalRoutes } from './routes/medical';
 import { operationRoutes } from './routes/operation';
@@ -4547,6 +4548,7 @@ const allRoutes: RouteDef[] = [
   ...m607Routes, // M607 DRG 分组（8 病例含 3 超支+2 结余·6 个 DRG 组目录）
   ...m608Routes, // M608 医保结算（10 条含 3 拒付+2 部分支付·3 条预授权）
   ...m609Routes, // M609 CDR 临床数据中心（患者全景概览+通用查询+数据量统计）
+  ...m610Routes, // M610 病历正文 append-only 版本链守卫（链校验+受控追加修订）
   ...patientServiceRoutes, // M193-P0: 患者端智慧服务
   ...researchExportRoutes, // M193-P0: 科研队列导出
   ...qualityRoutes,

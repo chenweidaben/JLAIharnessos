@@ -1,7 +1,7 @@
 # 合规达标蓝图（COMPLIANCE BLUEPRINT）
 
-**版本**：M247
-**更新时间**：2026-10-20 21:20:00 CST
+**版本**：M610
+**更新时间**：2026-10-26 10:00:00 CST
 **适用系统**：健澜科技 jlmedaios 数智医院 BFF
 **合规基准**：等保三级 / 《个人信息保护法》/《医疗卫生机构网络安全管理办法》/ 电子病历五级
 
@@ -21,10 +21,11 @@
 > M245 补强：病历质控看板/规则、租户隔离测试（5/5 通过）、威胁建模、渗透测试报告、安全事件响应。
 > M246 补强：病历缺陷明细/科室质控统计、租户配额、CVE 漏洞情报、WAF 防护统计、SIEM 告警。
 > M247 补强：病历质控 12 月趋势/科室排名、租户用量统计、日志归档配置、安全事件时间线、安全运营指标（MTTR/MTTD）。
+> M610 补强：病历正文 append-only 领域版本链守卫（建档/追加修订/锁定/签名定稿/整链 SHA-256 哈希校验/物理覆盖拦截）+ 受控 BFF 接口；DB 层 append-only 触发器与 WORM 存证待补。
 
 | # | 合规项 | 达成度 | 状态 | 落地模块 / 依据 |
 |---|---|---|---|---|
-| 1 | 病历修改痕迹（append-only） | 99% | 🟢 已补强 | `versions`/`audit-trail`（M239）+ `lock`/`sign`（M240）+ `signature`/`watermark`（M243）+ `lock-history`/`revision`（M244）+ `quality-dashboard`/`rules`（M245）+ `quality-defects`/`stats`（M246）+ `quality-trend`/`quality-department`（M247 12 月趋势 + 科室排名）；DB 层 append-only 触发器待补 |
+| 1 | 病历修改痕迹（append-only） | 99% | 🟢 已补强 | `versions`/`audit-trail`（M239）+ `lock`/`sign`（M240）+ `signature`/`watermark`（M243）+ `lock-history`/`revision`（M244）+ `quality-dashboard`/`rules`（M245）+ `quality-defects`/`stats`（M246）+ `quality-trend`/`quality-department`（M247 12 月趋势 + 科室排名）+ `RecordVersionChain` 领域版本链守卫与 `record-version-chain` 受控接口（M610：建档/追加修订/锁定/签名定稿/整链 SHA-256 校验/物理覆盖拦截）；DB 层 append-only 触发器待补 |
 | 2 | PHI 脱敏 / 患者权利 | 99% | 🟢 已补强 | `mask-rules`/`access-logs`（M239）+ `data-mask`（M236）+ `export-audit`/`retention`（M240）+ `consent`/`minimize`/`anonymization`/`deletion`（M243）+ `consent-log`/`data-flow`/`dpi`（M244） |
 | 3 | 审计日志 / 安全运营 | 99% | 🟢 已补强 | `compliance/audit`（M236）+ `access-logs`/`emr/audit-trail`（M239）+ `export-audit`/`breach`（M240）+ `auth/audit`（M241）+ `audit/trail`/`audit/compliance`（M242）+ `audit-cert`（M244）+ `threat-model`/`pentest`/`incident-response`（M245）+ `cve-feed`/`waf`/`siem`（M246）+ `log-archive`/`incident-timeline`/`metrics`（M247 MTTR/MTTD）；WORM 防篡改待补 |
 | 4 | 多租户隔离 | 98% | 🟢 已补强 | `tenants/list`+`config`（M239）+ `tenants/switch`（M240）+ `data-isolation`/`rate-limit`（M242）+ `isolation-test`（M245 5/5 通过）+ `quota`（M246 配额）+ `usage-stats`（M247 用量统计）；RLS 全量待补 |
@@ -37,9 +38,9 @@
 
 ## 二、各合规项详解
 
-### 1. 病历修改痕迹（append-only）— 70%
-- 已建：病历复印留痕（`emrCopyTraceV14`）、电子签名（`emrSignatureV14`）、缺陷闭环（`emrDefectClosedLoopV14`）、操作日志。
-- 待强化：对病历正文执行"不可物理删除、只能追加修订版本"的写入层拦截；当前为应用层留痕，DB 层触发器/版本链待补。
+### 1. 病历修改痕迹（append-only）— 99%
+- 已建：病历复印留痕（`emrCopyTraceV14`）、电子签名（`emrSignatureV14`）、缺陷闭环（`emrDefectClosedLoopV14`）、操作日志；M610 落地领域层 `RecordVersionChain` 守卫：建档/追加修订/锁定/签名定稿、版本号单调递增、`prevVersionId` 链式指针、内容 SHA-256 指纹、整链重算校验、物理覆盖旧版本直接拒绝，配套 11 项单元测试闭环。
+- 待强化：DB 层 append-only 触发器、WORM 存储与每日根哈希存证；当前应用层领域契约已就绪，生产化接入仓储后即可闭环。
 
 ### 2. PHI 脱敏 — 85%
 - 已建：M236 `data-mask` 配置接口定义姓名/身份证/手机号/地址的部分掩码、全掩码、哈希三种方式及适用角色（访客/第三方审计/实习医生）；V14 提供输出脱敏（`emrDeidentifyOutputV14`）。
@@ -66,7 +67,7 @@
 ## 三、生产化整改清单（从 82% → ≥95%）
 
 1. 关闭 DEMO_MODE，接入真实用户中心 RBAC。
-2. 病历正文 append-only 写入层拦截 + 版本链。
+2. 病历正文 append-only 写入层拦截 + 版本链。【M610 领域层已落地：版本链守卫 + 受控接口 + 单测；待补 DB 触发器/WORM 存证】
 3. 审计日志 WORM 存储 / 哈希链防篡改。
 4. 多租户行级安全策略（RLS）+ 越权测试套件。
 5. 密钥轮换 + refresh token 流程。
