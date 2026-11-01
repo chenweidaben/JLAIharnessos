@@ -1,578 +1,363 @@
-<div align="center">
-
 # 健澜AI原生医院操作系统OS
 
-### 让每一次诊疗都沉淀为系统能力
+![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)
+![Bun](https://img.shields.io/badge/runtime-bun%20%3E%3D1.3.0-fb6f02.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18-339933.svg)
+![TypeScript](https://img.shields.io/badge/typescript-6.0.x-3178c6.svg)
+![PostgreSQL](https://img.shields.io/badge/postgresql-16.4-336791.svg)
+![FHIR](https://img.shields.io/badge/FHIR-R4-005fcc.svg)
+![Compliance](https://img.shields.io/badge/EMR%20Level-6%20%7C%20Interop-4A%20%7C%20Smart%20Service-3%20%7C%20MLPS-3-green.svg)
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-0A2540.svg)]()
-[![License](https://img.shields.io/badge/License-Apache--2.0-0A2540.svg)](LICENSE)
-[![Runtime](https://img.shields.io/badge/Runtime-Bun%20%2B%20TypeScript-0A2540.svg)](https://bun.sh/)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite%20%2B%20AntD%205-0A2540.svg)](https://react.dev/)
-[![Database](https://img.shields.io/badge/DB-PostgreSQL%2016%20%3A5432-0A2540.svg)](https://www.postgresql.org/)
-[![Agent](https://img.shields.io/badge/Agent-MEDMUSE-1B4F8B.svg)
-[![Copyright](https://img.shields.io/badge/%C2%A9-%E6%9D%AD%E5%B7%9E%E5%81%A5%E6%BE%9C%E7%A7%91%E6%8A%80%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8-0A2540.svg)
-
-> 视觉主色：**深海蓝**（Deep Sea Blue `#0A2540`）。
->
-> 主线运行时为 **Bun + TypeScript BFF（`src/`，端口 8080）+ React 前端（`web/`）**；`services-java/`、`services-python/`、`services/radar-inference/`、`miniprogram/` 为旁路/参考实现，不进入主线默认编排，详见下方「架构与实测清单」。
-
-</div>
+> 仓库视角：**GitCode `JLMEDAIOS` 主仓**（BFF / 后端服务 / AI 编排 / 数据底座 / FHIR 网关 / CDS / 电子病历 / 互联网医院 / 知识平台 / 语音 / 多租户）。
+> 前端工作台、Vite 构建、部署运维与二次开发指引见 [`README.dev.md`](./README.dev.md)（GitHub `JLAIharnessos` 开发者镜像视角）。
 
 ---
 
-> 🏥 **架构分层与实测清单（本机命令统计，2026-10 复核）**
->
-> | 层 / 组件 | 角色 | 技术栈 | 实测规模 | 端口（容器 / 宿主） |
-> |---|---|---|---|---|
-> | TS BFF 聚合层 | **主线** | Bun + TypeScript（`src/bff/`） | 已注册 REST 路由 **5084** 条（method+path 去重；展开条目 5211，含 **127** 条重复注册待收敛）；路由文件 **2402**、聚合器纯函数模块 **1945**（`audit-bff.mjs` 静态审计，2026-10-25 快照） | 8080 / `127.0.0.1:8080` |
-> | React 工作台 | **主线** | React 19 + Vite + AntD 5（`web/`） | 前端路由挂载 **3048** 处、去重路径 **2847** 条（`web/src/router/index.tsx`，2026-10-25 收口去重后快照；口径为 `<Route path=` 挂载数，不等同页面数；去重前快照 3052） | 容器内 8080；Vite 开发 5173 |
-> | Java 微服务旁路 | 旁路/参考，不进主线默认编排 | Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17（聚合工程）；独立单体 Boot 3.5.3 / JDK 21 | 聚合 **14** 模块 / **15** 个 `pom.xml` / **75** 个 `.java`；独立单体 **1** 个 `pom` / **767** 个 `.java`（main 650 + test 117）；合计 `.java` **842**、`pom.xml` **16** | registry 8761、gateway 9000、各微服务 9101–9112；单体 9090（宿主 `127.0.0.1:19090`，`legacy` profile） |
-> | Python FastAPI 旁路 | 旁路/参考，`legacy` profile | FastAPI + Uvicorn（`services-python/`） | 源码 `.py` **92** + 测试 **2**；`APIRouter()` 声明 **84**、路由装饰器 **103**（GET 16 / POST 87）、已 `include_router` **83** | 8000 / `127.0.0.1:8000` |
-> | 雷达影像推理旁路 | 旁路/参考，`demo` / `gpu` profile | FastAPI（`services/radar-inference/`） | 自研 `.py` **18**（app 10 + tests 8）；端点 **5** 条（GET 4 / POST 1） | 8090（仅内网 expose，不发布宿主端口） |
-> | 微信小程序 | 旁路/参考，原生小程序，不参与 compose 编排 | 原生小程序（`miniprogram/`） | 8 个页面，AppID 为 `touristappid` 占位 | — |
-> | 数据迁移 | 主线配套 | `deploy/postgres/init/**` SQL | **354** 个脚本，编号区间 **01–385**（含历史缺号与 5 个重复编号，列入清理待办） | — |
->
-> 🚀 **快速启动（容器编排，需本机安装 Docker Engine + Compose 插件）**：
-> ```bash
-> git clone https://gitcode.com/jlmedaios/jlmedaios-os.git
-> # GitHub 镜像：https://github.com/chenweidaben/JLAIharnessos
-> cd jlmedaios-os
-> cp .env.compose.example .env        # 按文件注释填写 JWT_SECRET、DATABASE 口令等，示例值均非真实口令
-> docker compose up -d
-> # 主线健康检查：GET http://localhost:8080/ready 、GET http://localhost:8080/health 、GET http://localhost:8080/metrics
-> # 容器默认编排不拉起 legacy/demo/gpu 旁路；需要时显式带 profile 启动，见 docker-compose.yml 头部注释
-> ```
+## 1. 项目简介
+
+**健澜AI原生医院操作系统OS（`jlmedaios`）** 是一套面向三级公立医院的 AI 原生医院底座。它不是"传统 HIS + AI 外挂"，而是把 **BFF、领域服务、AI 编排、数据底座、FHIR 网关、CDS** 熔在同一个 Bun 运行时与同一份 PostgreSQL 16 schema 里：
+
+- **接入层**：Bun 原生 `Bun.serve` 同时承载 REST（`/api/v1/*`）、WebSocket（`/ws/chat`，SSE 式流式对话与危急值广播）与 Prometheus `/metrics`。
+- **领域层**：门诊 / 住院 / 护理 / 药房 / 手术 / 急诊 / 院感 / 病案 / 体检 / 互联网医院 / 多租户等域以路由 + aggregator + repository 三层落地，全部走统一鉴权、审计、幂等与数据脱敏中间件。
+- **AI 编排层**：自研 Orchestrator，提供声明式 YAML/JSON DSL（12 类节点）、安全表达式沙箱、DAG 校验、状态机、断点重试、人工挂起恢复，对接 `@anthropic-ai/sdk@0.80.0`、`@modelcontextprotocol/sdk@1.29.0` 与 OpenAI 兼容端点（默认 DeepSeek）。
+- **数据底座**：PostgreSQL 16 单库多 schema + Redis 7 缓存/锁/限流 + Kafka 3.8（KRaft）事件总线 + Elasticsearch 8 日志检索 + 向量库（`bge-large-zh`，1024 维）。
+- **合规层**：JWT HS256、RBAC + ABAC、AES-256-GCM 字段加密、审计日志哈希链（保留 ≥180 天）、Prompt Injection 五层防护、PII 自动脱敏——直接对齐电子病历六级、互联互通四甲、智慧服务三级、等保三级。
 
 ---
 
-> 🏛️ **企业理念**：云原生微服务 HIS/EMR 一体化 AI 原生医院，每个工作人员都有 Personal Agent，成功失败经验全沉淀，让后继者站在巨人肩膀上，医院原生成长，越来越强。
+## 2. 设计愿景与战略锚点
+
+本仓库遵循 [`ARCHITECTURE_CHARTER.md`](./ARCHITECTURE_CHARTER.md) v2.0 的最高宪法。五条不可妥协的锚点：
+
+1. **AI 原生医院 3.0**：系统本身就是学习系统。每个业务模块强制带"学习点"——`记录 → 积累 → 进化 → 反馈`，AI 建议可被 `adopted / modified / rejected`，每一次标注都是下一次推荐的训练信号。
+2. **系统越用越聪明**：患者画像、医生偏好、科室路径、运营规律四个学习子系统跨就诊持续沉淀；推荐策略带版本号，可回滚、可审计。
+3. **三中台驱动**：业务中台（统一用户/权限/主数据，HIS/EMR/护理/药房/手术/质控/医保共享）+ 数据中台（操作即采集，全结构化）+ AI 中台（Doctor MUSE / Nurse MUSE / Pharma MUSE / Admin MUSE 四类个人智能体，自下而上汇聚为科室 MUSE、医院 MUSE）。
+4. **FHIR R4 原生**：`/api/v1/fhir/*` 网关自 M190-P0 起按 HL7 FHIR R4 暴露 Patient / Encounter / Observation / Condition / MedicationRequest / DiagnosticReport 等资源，支持 `search-type` Bundle、`read`、`validate`、`history`，不做"事后翻译层"。
+5. **部署底座浙江健康云**：容器镜像固定 tag、非 root 运行（`bunapp` uid=10001）、最小暴露面（数据库/Redis/Kafka 不接入 frontend 网络），与省级健康云 PaaS 对齐；目标是支撑国内顶尖公立医院未来 10–15 年高质量发展。
+
+行业背景一句：在医院从"信息化"走向"数智化"再走向"AI 原生"的三段路上，本仓库落点是第三段——AI 不是功能，是操作系统本身。
 
 ---
 
-> **健澜科技 · AI 原生医院新引擎**
->
-> 未来引领医院高质量发展的新引擎，一定是让 AI 原生医院所有的业务系统、AI 系统、数据系统越用越聪明。
->
-> - 业务系统越用越懂临床
-> - AI 系统越用越懂医生
-> - 数据系统越用越懂医院
->
-> 这是健澜科技的产品哲学，也是所有开发的最高准则。
+## 3. 系统架构
 
----
+```mermaid
+flowchart TB
+  subgraph EDGE["接入层"]
+    NGINX["nginx edge<br/>:443 / :80"]
+  end
 
-## 📜 架构宪法（宪章 v1.0）
+  subgraph BFF["BFF 层 (Bun 1.4, :8080)"]
+    direction TB
+    MW["middleware: JWT / CSRF / RBAC+ABAC /<br/>tenant / idempotency / rateLimit / audit / desensitize"]
+    ROUTES["routes/  ~300+ 业务路由<br/>/api/v1/*"]
+    WS["WebSocket /ws/chat<br/>SSE 流式 + 危急值广播"]
+    OBS["observability/<br/>/health /ready /metrics"]
+  end
 
-详见 [ARCHITECTURE_CHARTER.md](./ARCHITECTURE_CHARTER.md)（**架构宪章 v1.0**，为本仓库最高设计准则）。
+  subgraph DOMAIN["领域服务层 (src/)"]
+    direction LR
+    BIZ["internet-hospital · medical-tools ·<br/>emergency · voice · knowledge · knowledge-platform"]
+    SEC["security · tenant · cache · resilience · saga"]
+  end
 
-核心理念六章：
-1. **云原生**：微服务拆分，容器化弹性伸缩
-2. **AI 原生**：MEDMUSE 是核心引擎，不是插件
-3. **数据原生**：所有操作即数据采集，数据积累即资产
-4. **业务中台一体化**：HIS/EMR/护理/药房/手术/质控/医保共享统一用户权限主数据
-5. **学习引擎**：每个业务模块都有"学习点"——记录→积累→进化→反馈
-6. **生产安全**：RBAC + 脱敏 + 降级 + 幂等 + 熔断
+  subgraph AI["AI 编排层"]
+    ORCH["orchestrator<br/>DSL / 状态机 / 表达式沙箱 / DAG"]
+    LLM["llm/ 客户端<br/>Anthropic SDK 0.80 · MCP SDK 1.29 · OpenAI 兼容"]
+    AGENT["agents/ + skills/<br/>Doctor MUSE · Nurse MUSE · Pharma MUSE"]
+  end
 
-> 📘 **对外产品白皮书**：[docs/PRODUCT_ARCHITECTURE.md](./docs/PRODUCT_ARCHITECTURE.md) —— JLMEDAIOS 产品架构与核心功能（云原生微服务三中台一体 · MEDMUSE 岗位智能体 · DOCTOR_MUSE 经验沉淀 · DAMO-RADAR 影像大模型 18 器官/146 发现）。
+  subgraph DATA["数据底座"]
+    PG[("PostgreSQL 16.4<br/>:5432 / jlmedaios")]
+    RD[("Redis 7.4<br/>cache / lock / rate / session")]
+    KAFKA[("Kafka 3.8 KRaft<br/>event bus")]
+    ES[("Elasticsearch 8.15<br/>log search")]
+    VEC[("向量库 bge-large-zh<br/>1024 维")]
+  end
 
----
+  subgraph FHIR["合规与集成"]
+    FHIRGW["FHIR R4 Gateway<br/>/api/v1/fhir/*"]
+    HIS["HIS / EMR / LIS / PACS<br/>integration/"]
+  end
 
-## 🧭 项目简介
-
-**jlmedaios** 是杭州健澜科技有限公司自主研发的 **AI 原生未来医院操作系统**。它以 **MEDMUSE 智能体**为核心引擎，把医院核心业务事务系统（HIS / EMR / 护理 / 药房 / 手术 / 质控 / 医保 DRG）与 AI 能力中台深度融合，面向未来十五年数智医院高质量发展，提供私有化部署、数据不出院、工业级稳定性的一体化底座。
-
-- **向下**：统一临床数据、主数据（EMPI）与外部系统（HIS/LIS/PACS）接入；
-- **向中**：BFF 微服务承载医院核心事务，状态机 + 行锁 + 幂等保证并发安全；
-- **向上**：MEDMUSE 智能体横切每个业务环节，医师复核签名、合规内建；
-- **全程**：RBAC + ABAC、字段级加密、审计哈希链、数据可追溯。
-
-> ⚕️ **医疗安全红线**：AI 始终定位为辅助（第二意见），所有诊断、医嘱、处方、病历签名等法律效力写操作必须由具备权限的医务人员确认并电子签名；系统不做自主诊疗。
-
----
-
-## 🗺️ 功能全景图
-
-| 模块域 | 核心能力 |
-|---|---|
-| 🏥 **HIS** | 挂号候诊、门诊工作站、住院 ADT 入出转、床位病区、收费结算、费用清单、账单管理、多租户一院多区 |
-| 📝 **EMR 电子病历** | 入院记录/病程/出院小结/病案首页/知情同意、三级签名、内涵质控状态机、EMR 五级评审、病历模板管理、智能病历草稿 |
-| 🩺 **护理** | 护士工作站、护理记录、医嘱执行双签、压疮/跌倒/疼痛/Barthel 评估、SBAR 交班、PDA 移动执行、护理 NQI 指标 |
-| 💊 **药房药事** | 调剂发药、库存联动、处方前置审核、处方点评、合理用药审查、用药咨询、药品库存盘点 |
-| 🔪 **手术麻醉** | 手术排程看板（日/周视图）、术前评估、三方核对、术中记录、PACU 双签、手术核查清单 |
-| ✅ **质控** | 危急值闭环、质控整改闭环看板、终端质控、VTE / AMS / 院感专项、病历质控、护理质控 |
-| 📊 **医保 DRG** | DRG + DIP 本地分组、医保智能审核规则引擎、DRG 审计与超支汇总、预算管理、成本分摊 |
-| 🤖 **MEDMUSE AI** | 岗位智能体体系（医生/护士/药师/财务/管理员）、对话式工作台 `/medmuse`、多轮上下文摘要、SSE 流式输出、电子签名留痕、快捷指令、会话历史、多模态扩展、Agent 健康度看板 |
-| 📈 **驾驶舱** | 院长数据驾驶舱、科室运营驾驶舱、月度运营报表、床位可视化地图、系统健康度看板、患者 360° 视图 |
-| 🌐 **互联网医院** | 号源预约、在线报告、在线续方、支付配药、通知（微信/钉钉 webhook）、患者门户 |
-| 🧪 **检验检查** | LIS 全流程、RIS/影像预约、AI 辅助解读（医师签名生效）、多模态影像 |
-| 🛡️ **安全合规** | 等保三级设计、MFA、JWT 主动吊销、16 类敏感数据脱敏、AES-256-GCM、审计哈希链 |
-| 🏢 **集团管理** | 总院 + N 成员院集团聚合大屏、各院指标按 hospital_id 隔离归并、跨院专家/床位/设备资源调配（M156-A） |
-| 🧠 **AI 大脑** | 全院实时运行态势（门诊/住院/手术/预警）一块大屏、阈值化 AI 建议、后续平滑替换为各系统实时聚合源（M156-B） |
-| 🔬 **科研** | 专病队列闭环（入排标准→匹配→脱敏导出）、病例智能检索、描述性统计 / Welch t / 卡方自动分析（M156-C） |
-| 📞 **患者服务** | 患者诉求工单限时受理（48h 时限）、分派与解决闭环、满意度回访、患者教育与健康提醒（M142-C） |
-| 🛡️ **质量安全** | 三甲评审条款闭环（七大类别核心条款差距分析）、危急值与院感联动复核、JCI 评审准备（M178-C） |
-| 📊 **运营分析** | 科室运营驾驶舱、DRG 成本归因、收支与超支预警、月度运营报表下钻（M179-B） |
-| 💬 **患者体验** | 候诊/住院/医技/随访四大维度度量、痛点识别、满意度改进闭环（M180-C） |
-| ⚡ **性能优化** | BFF P95 72ms 慢查询治理、前端首屏与接口瘦身、数据库索引与连接池调优（M180-D） |
-
----
-
-## 🎯 200 版本里程碑
-
-> **200版本里程碑**：截至 v4.01，平台累计达成 **200 个版本**。以下口径为生产实测，不做夸大。
-
-| 指标 | 数值 | 说明 |
-|---|---|---|
-| 累计版本 | **200** | 自 M89 岗位智能体起步至 v4.01 的发版累计 |
-| 累计开发切片 | **176** | 每个切片为一次可独立验证的最小交付（纯函数 + 路由 + 测试 + 文档） |
-| 测试覆盖率 | **97.92%** | 单测对核心领域与 BFF 聚合器的覆盖口径 |
-| P95 响应时延 | **72 ms** | BFF 接口 P95 响应（生产目标口径） |
-| 路由数 | **5084** | `src/bff/routes` 已注册 REST 路由 method+path 去重数（2026-10-25 静态审计快照，非里程碑期历史口径；展开条目 5211，含 127 条重复注册待收敛） |
-| 数据库迁移数 | **354** | `deploy/postgres/init/**` SQL 脚本（编号 01–385，含历史缺号与重复编号待清理） |
-
-> 该里程碑同时由 BFF 接口对外暴露：`GET /api/v1/admin/milestone/summary`（仅 admin），由纯函数 `generateMilestoneSummary()` 驱动，口径与上表一致。
-
----
-
-## 🎯 300 版本里程碑预告
-
-> **300版本里程碑预告**：截至 v4.97，平台累计达成 **296 个版本**，距 300 版本仅差 4 个切片。以下口径为生产实测，不做夸大。
-
-| 指标 | 数值 | 说明 |
-|---|---|---|
-| 累计版本 | **296**（即将 300） | 自 M89 岗位智能体起步至 v4.97 的发版累计 |
-| 累计开发切片 | **288** | 每个切片为一次可独立验证的最小交付（纯函数 + 路由 + 测试 + 文档） |
-| 测试覆盖率 | **99.5%** | 单测对核心领域与 BFF 聚合器的覆盖口径 |
-| P95 响应时延 | **72 ms** | BFF 接口 P95 响应（生产目标口径，未因版本扩张劣化） |
-| 路由数 | **5084** | `src/bff/routes` 已注册 REST 路由 method+path 去重数（2026-10-25 静态审计快照，非里程碑期历史口径；展开条目 5211，含 127 条重复注册待收敛） |
-| 数据库迁移数 | **354** | `deploy/postgres/init/**` SQL 脚本（编号 01–385，含历史缺号与重复编号待清理） |
-
-> 本批（v4.94 ~ v4.97）功能全景新增四个模块域：**质量安全 / 运营分析 / 患者体验 / 性能优化**。
->
-> 该预告同时由 BFF 接口对外暴露：`GET /api/v1/admin/milestone/v2`（仅 admin），由纯函数 `generateMilestoneSummaryV2()` 驱动，口径与上表一致。
-
----
-
-## 🏛️ 架构说明
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│  接入层    React 19 + Vite + AntD 5 工作台  (web/)           │
-│           移动 PDA · 微信小程序 (miniprogram/)               │
-├──────────────────────────────────────────────────────────────┤
-│  BFF 层    Bun + TypeScript  (src/bff/)                     │
-│           REST :8080 · WebSocket · 路由/中间件/适配器       │
-│           MEDMUSE Agent 运行时 · 签名/审批/通知/可观测        │
-├──────────────────────────────────────────────────────────────┤
-│  业务服务  src/ 下各领域模块：bff / core / medical-tools /   │
-│           orchestrator / knowledge / security / tenant /     │
-│           emergency / internet-hospital / data-platform ...  │
-├──────────────────────────────────────────────────────────────┤
-│  数据层    PostgreSQL 16  (localhost:5432 / jlmedaios)        │
-│           Redis · pgvector · 湖仓分层                        │
-├──────────────────────────────────────────────────────────────┤
-│  模型层    LLM 可插拔（OpenAI 兼容协议，默认 DeepSeek）       │
-│           MCP 工具调用 · RAG 知识中台 · 语音 ASR             │
-└──────────────────────────────────────────────────────────────┘
+  NGINX --> BFF
+  MW --> ROUTES
+  MW --> WS
+  ROUTES --> DOMAIN
+  ROUTES --> AI
+  AI --> LLM
+  AGENT --> ORCH
+  DOMAIN --> PG
+  DOMAIN --> RD
+  DOMAIN --> KAFKA
+  DOMAIN --> ES
+  ORCH --> VEC
+  ROUTES --> FHIRGW
+  FHIRGW --> HIS
 ```
 
-**技术栈一览**：
+五层职责：
 
-| 层 | 技术 |
-|---|---|
-| 运行时 | Bun ≥ 1.3（单一 TypeScript 栈） |
-| 前端 | React 19 + Vite + AntD 5 + TailwindCSS + Zustand + ECharts |
-| BFF | Bun HTTP + WebSocket + Zod 校验 |
-| 数据库 | PostgreSQL 16（compose 默认回环端口 **5432**，库名 **jlmedaios**）+ Redis |
-| 智能体 | MEDMUSE 编排引擎 + MCP SDK + OpenAI 兼容 LLM |
-| 部署 | Docker / docker-compose / K8s / Helm |
-
----
-
-## 🏃 快速启动指南（Windows）
-
-**环境要求（本机 2026-10 实测）**：Node.js ≥ 18（本机 v22.23.2）、Bun ≥ 1.3（`bun --version`；本机安装的 1.2.0 低于 `package.json` engines 下限，正式开发前请先升级）、本地 PostgreSQL 16（compose 默认回环端口 **5432**，库名 `jlmedaios`）。
-
-> 本机未安装 Maven 与 Docker CLI：**Java/Python/radar 旁路无法在本机独立构建，docker compose 亦无法在本机执行**；以下主线 BFF + 前端开发命令不依赖 Maven/Docker。旁路独立构建前提见本文件「架构与实测清单」与各自目录 README。
-
-```powershell
-# 1. 克隆并安装依赖（克隆完成后进入仓库根目录）
-cd jlmedaios-os
-bun install
-
-# 2. 准备 PostgreSQL（5432 端口，库名 jlmedaios）
-#    连接串：postgres://postgres@127.0.0.1:5432/jlmedaios
-#    首次启动可执行种子数据：
-bun run db:seed
-
-# 3. 启动 BFF 服务端（开发监听模式）
-bun run bff:watch
-
-# 4. 启动前端工作台（另开一个 PowerShell 窗口）
-cd web
-bun install
-bun run dev
-# 前端开发地址：http://localhost:5173
-```
-
-**主线健康检查**（BFF 监听 8080）：
-
-| 端点 | 方法 | 说明 |
-|---|---|---|
-| `http://localhost:8080/health` | GET | 存活探针（liveness，固定返回 `ok`，不泄露敏感信息） |
-| `http://localhost:8080/ready` | GET | 就绪探针（readiness，校验数据库连通性，依赖未就绪返回 503） |
-| `http://localhost:8080/metrics` | GET | Prometheus 指标 |
-| `http://localhost:8080/api/v1/system/health` | GET | 系统健康详情（`system.ts`） |
-
-**关键环境变量**（BFF 运行时 `.env`，完整清单与默认值见 [`.env.example`](./.env.example)）：
-
-| 变量 | 示例 | 说明 |
-|---|---|---|
-| `DATABASE_URL` | `postgres://postgres@127.0.0.1:5432/jlmedaios` | 本地 PG 连接串 |
-| `HTTP_PORT` | `8080` | BFF 端口 |
-| `DEMO_MODE` | `0` | 0 = 真实数据库模式；1 = 无 DB 演示模式（仅限演示，生产必须为 0） |
-| `JWT_SECRET` | `CHANGE_ME_jwt_secret_...` | HS256 签名密钥（≥32 字节随机值，生产必填） |
-| `ENCRYPTION_MASTER_KEY` | `CHANGE_ME_encryption_master_key_...` | 字段级 AES-256-GCM 主密钥（生产由 KMS 下发） |
-| `REDIS_URL` / `KAFKA_BROKERS` / `ES_URL` | 见 `.env.example` | 内网缓存 / 消息队列 / 日志检索连接占位 |
-| `LLM_PROVIDER` / `LLM_API_KEY` / `LLM_BASE_URL` | `deepseek` / `sk-placeholder-...` | LLM 提供商（OpenAI 兼容协议，私有化端点优先） |
-| `RADAR_INFERENCE_URL` / `RADAR_INTERNAL_TOKEN` | `http://localhost:8090` / `CHANGE_ME_...` | 影像推理旁路地址与内部鉴权 token |
-
-> 💡 **无数据库体验**：设置 `DEMO_MODE=1` 启动 BFF，使用内存数据并显示演示水印（不持久化），仅供演示；演示模式下鉴权短路，**严禁用于任何对外或生产环境**。
-
-**容器化部署**（需本机 Docker Engine + Compose 插件；编排插值变量见 [`.env.compose.example`](./.env.compose.example)）：
-
-```powershell
-docker compose up -d                      # 主线默认编排（不含 legacy/demo/gpu 旁路）
-# 旁路按 profile 显式启动，例如：
-# docker compose --profile legacy up -d jlmedaios-monolith jlmedaios-ai
-kubectl apply -f deploy/k8s/              # Kubernetes
-helm install jlmedaios deploy/helm/jlmedaios -n jlmedaios --create-namespace
-```
-
----
-
-## 📂 目录结构
-
-```
-jlmedaios/
-├── src/                        # 后端源码（Bun + TypeScript）
-│   ├── bff/                    # BFF 层：server.ts / routes / middleware / agents / adapters
-│   ├── core/                   # 核心领域模型与状态机
-│   ├── medical-tools/          # MEDMUSE 医疗技能工具集
-│   ├── orchestrator/           # 智能体编排引擎
-│   ├── knowledge/              # 知识中台 / RAG
-│   ├── knowledge-platform/      # 知识平台
-│   ├── data-platform/           # 数据平台 / 湖仓
-│   ├── security/                # 安全：RBAC/ABAC/加密/审计
-│   ├── tenant/                  # 多租户 / 一院多区
-│   ├── emergency/               # 急诊绿色通道
-│   ├── internet-hospital/      # 互联网医院
-│   ├── voice/                   # 语音 ASR
-│   ├── db/                      # 数据访问层（repositories / 连接池；迁移脚本见 deploy/postgres/init/）
-│   ├── entrypoints/            # CLI / Server 入口
-│   ├── integration/            # HIS/LIS/PACS 适配器
-│   ├── saga/                    # 分布式事务
-│   ├── resilience/              # 熔断/重试/限流
-│   └── skills/                  # MEDMUSE 技能包
-├── web/                        # 前端工作台（React 19 + Vite）
-│   └── src/
-│       ├── pages/              # 页面（dashboard/outpatient/ward/emergency/quality/system...）
-│       ├── components/         # 通用组件
-│       ├── services/           # API 层（Axios + WebSocket）
-│       ├── store/               # Zustand 状态
-│       ├── router/              # 路由与守卫
-│       └── hooks/               # 自定义 Hooks
-├── miniprogram/                # 微信小程序患者端（旁路/参考，原生小程序，不参与 compose 编排）
-├── services-java/              # Java 旁路/参考：Spring Cloud 微服务骨架 + 独立模块化单体（legacy profile）
-├── services-python/            # Python FastAPI 旁路/参考：NLP / CDSS / 影像辅助（legacy profile）
-├── services/radar-inference/   # 雷达影像推理旁路/参考：demo / production 双模式（demo、gpu profile）
-├── scripts/                    # 工具脚本（DB seed / 知识下载）
-├── deploy/                     # Docker / K8s / Helm 部署清单（含 postgres 迁移脚本 init/）
-├── docs/                       # 项目文档
-├── tests/                      # 单元 / 集成 / E2E 测试
-├── config/                     # 配置文件
-├── data/                       # 本地数据（向量库等，gitignore）
-└── package.json                # 根包（Bun 工作区）
-```
-
----
-
-## 📈 版本迭代记录（v1.42 ~ v2.26）
-
-> 以下条目从 git tag 提取，按版本号升序排列。
-
-| 版本 | 说明 |
-|---|---|
-| v1.42.0-m89e | M89 岗位智能体体系起步 |
-| v1.42.0-fix | M89 缺陷修复 |
-| v1.43.0-m89f | M89 岗位智能体迭代 |
-| v1.43.0-m90real | M90 真实数据打通 |
-| v1.44.0-m89g | M89 岗位智能体迭代 |
-| v1.44.0-m92a | M92 里程碑起步 |
-| v1.45.0-m89h | M89 岗位智能体迭代 |
-| v1.45.0-ui | UI 统一优化 |
-| v1.46.0-doubleprefix | 双前缀路由修复 |
-| v1.47.0-medmuseapprovals | MEDMUSE 审批流 |
-| v1.48.0-terminalqc | 终端质控 |
-| v1.49.0-readme | README 更新 |
-| v1.50.0-deptcockpit | 科室驾驶舱 |
-| v1.51.0-drugreview | 用药审查 |
-| v1.52.0-emrlevel5 | EMR 五级能力 |
-| v1.53.0-demofallback | 演示模式降级兜底 |
-| v1.54.0-lostypes | 缺失类型补全 |
-| v1.55.0-cockpitreal | 驾驶舱接真实数据 |
-| v1.56.0-scheduler | 定时任务调度器 |
-| v1.57.0-nav | 导航菜单重构 |
-| v1.58.0-servertypes | 服务端类型补全 |
-| v1.59.0-kbrag | 知识库 RAG |
-| v1.60.0-patient360 | 患者 360° 视图 |
-| v1.61.0-systemhealth | 系统健康度看板 |
-| v1.62.0-types | 类型系统完善 |
-| v1.63.0-medpersist | 医疗数据持久化 |
-| v1.64.0-portal | 患者门户 |
-| v1.65.0-export | 数据导出 |
-| v1.66.0-smoke | 前端 jsdom 冒烟测试 |
-| v1.67.0-summary | MEDMUSE 多轮对话上下文摘要 |
-| v1.68.0-esign | 电子签名留痕 |
-| v1.69.0-notify | 微信/钉钉 webhook 通知 |
-| v1.70.0-esignmount | 电子签名挂载到病历/医嘱主流程 |
-| v1.71.0-agenthealth | MEDMUSE Agent 健康度看板 |
-| v1.72.0-pathwayvariance | 临床路径变异管理 |
-| v1.73.0-surgeryschedule | 手术排程看板 |
-| v1.74.0-agenthook | Agent 健康度真实挂钩 |
-| v1.75.0-multimodality | MEDMUSE 多模态扩展 |
-| v1.76.0-nursehandoff | 护士交接班记录 |
-| v1.77.0-insuranceaudit | 医保智能审核规则引擎 |
-| v1.78.0-readme | README 版本迭代记录 |
-| v1.79.0-quickcommands | MEDMUSE 快捷指令面板 |
-| v1.80.0-billlist | 住院费用清单页 |
-| v1.81.0-qcrectification | 质控整改闭环看板 |
-| v1.82.0-streaming | MEDMUSE SSE 流式输出 |
-| v1.83.0-criticalclosure | 危急值闭环升级 |
-| v1.84.0-bedmap | 床位管理可视化 |
-| v1.85.0-monthlyreport | 科室月度运营报表 |
-| v1.86.0-sessionhistory | MEDMUSE 会话历史增强 |
-| v1.87.0-emrtemplate | 电子病历模板管理 |
-| v1.88.0-prescriptionreview | 处方点评系统 |
-| v1.89.0-ceoboard | 院长数据驾驶舱 |
-| v1.90.0-readme | README 更新 |
-| v1.91.0-toolviz | MEDMUSE 工具可视化 |
-| v1.92.0-druginventory | 药品库存管理 |
-| v1.93.0-researchexport | 科研数据导出 |
-| v1.94.0-dbfix | 数据库修复 |
-| v1.94.0-toolargs | 工具参数校验完善 |
-| v1.95.0-opdworkstation | 门诊医生工作站 |
-| v1.96.0-nursingnqi | 护理 NQI 指标 |
-| v1.97.0-surgerychecklist | 手术核查清单 |
-| v1.98.0-emrgrade5 | EMR 五级评审适配 |
-| v1.99.0-drgaudit | DRG 审计 |
-| v2.00.0-medeploy | 医疗部署体系 v2.0 |
-| v2.01.0-ceoboard | 院长驾驶舱增强 |
-| v2.02.0-api404 | API 404 修复 |
-| v2.03.0-demoguard | 演示模式安全护栏 |
-| v2.04.0-webtsc | 前端 TypeScript 严格化 |
-| v2.05.0-coverage | 测试覆盖率提升 |
-| v2.06.0-charter | 架构宪章 v1.0 确立 |
-| v2.06.0-readme | README 更新 |
-| v2.07.0-llmharden | LLM 输出安全加固 |
-| v2.09.0-security | 安全合规增强 |
-| v2.10.0-charter | 架构宪章修订 |
-| v2.11.0-patientprofile | 患者画像 |
-| v2.12.0-deptknowledge | 科室知识沉淀 |
-| v2.13.0-aifeedback | AI 反馈闭环 |
-| v2.14.0-strategyevo | 策略进化引擎 |
-| v2.15.0-nursingrisk | 护理风险预警 |
-| v2.16.0-operational | 运营分析增强 |
-| v2.17.0-inpatient | 住院业务深化 |
-| v2.18.0-doctorpref | 医生偏好学习 |
-| v2.19.0-agentctx | Agent 上下文管理 |
-| v2.20.0-pharmacy | 药房药事增强 |
-| v2.21.0-safetylearn | 安全学习引擎（M109 学习基座） |
-| v2.22.0-learndash | 学习驾驶舱（M110 全形态学习） |
-| v2.23.0-learndb | 学习数据库（M111 驱动决策） |
-| v2.24.0-healthdetail | 健康档案细化 |
-| v2.25.0-followup | 随访管理 |
-| v2.26.0-referral | 双向转诊 |
-| v3.98.0-group | 集团管理：总院 + N 成员院集团聚合大屏与跨院资源调配（M156-A） |
-| v3.99.0-aibrain | AI 大脑：全院实时运行态势大屏与阈值化 AI 建议（M156-B） |
-| v4.00.0-research | 科研：专病队列闭环 + 病例智能检索 + 自动统计分析（M156-C） |
-| v4.01.0-milestone | 200 版本里程碑总结：累计 200 版本 / 176 切片 / 覆盖率 97.92%（M157-A） |
-| v4.94.0-quality | 质量安全深化：三甲评审条款闭环 + 危急值与院感联动复核（M178-C） |
-| v4.95.0-ops | 运营分析深化：科室运营驾驶舱 + DRG 成本归因与收支预警（M179-B） |
-| v4.96.0-experience | 患者体验深化：四大维度度量 + 痛点识别 + 改进闭环（M180-C） |
-| v4.97.0-perf | 性能优化深化：P95 72ms 慢查询治理 + 前端首屏与接口瘦身（M180-D） |
-
----
-
-## 🧠 学习引擎体系（M109 ~ M112）
-
-学习引擎是 AI 原生医院的"越用越聪明"底座。它把每一次临床操作、每一条 AI 建议的采纳/修改/拒绝，都转化为结构化学习点，按四层架构自下而上沉淀、进化、反哺业务：
-
-| 层级 | 里程碑 | 定位 | 核心职责 |
+| 层 | 进程/端口 | 关键路径 | 对外契约 |
 |---|---|---|---|
-| 第一层 · **学习基座** | M109（safetylearn） | 数据采集与学习点沉淀 | 统一记录→积累管道：诊断、医嘱、处方、核查、危急值、反馈等动作即学习素材，字段级落库、可追溯、可回滚 |
-| 第二层 · **全形态学习** | M110（learndash） | 覆盖全角色形态 | 医生 / 护士 / 药师 / 管理 / 患者五类角色各自的学习驾驶舱，按岗位画像呈现成长曲线与知识沉淀 |
-| 第三层 · **驱动决策** | M111（learndb） | 反馈闭环驱动进化 | AI 建议被采纳/修改/拒绝后回流为训练信号，驱动策略版本化进化（v1.0 → v1.1 → v2.0），反哺临床决策与智能体推荐 |
-| 第四层 · **性能保障** | M112 | 可观测与稳定保障 | 学习引擎的性能、质量与回滚保障：学习任务可观测、策略灰度、异常熔断、版本可回退，确保"进化"不影响生产稳定 |
-
-> 学习引擎遵循宪章第二条铁律：**系统越跑越智能，反馈闭环驱动进步**——所有 AI 输出可被采纳 / 修改 / 拒绝，每一次操作都是进化的燃料。
+| 接入 | nginx edge `:443/:80` | `deploy/nginx/` | 唯一对外入口，TLS 终止，同源 `/api/v1`、`/ws` |
+| BFF | Bun `:8080` | `src/bff/server.ts` | REST `/api/v1/*`、WS `/ws/chat`、`/health` `/ready` `/metrics` |
+| 领域 | 同进程 | `src/<domain>/` | aggregator → repository → db，无跨域直连 |
+| AI 编排 | 同进程 | `src/orchestrator/`、`src/bff/llm/`、`src/bff/agents/` | 声明式 DSL、MCP tool、Agent run |
+| 数据 | PG16 `:5432` / Redis `:6379` / Kafka `:9092` / ES `:9200` | `src/db/`、`src/cache/`、`src/data-platform/` | 仅 backend 网络可达 |
 
 ---
 
-## ✅ 生产就绪状态
+## 4. 核心模块（`src/` 一级目录）
 
-| 维度 | 状态 | 说明 |
+| 目录 | 文件数 | 职责 | 关键路径 / 对外契约 |
+|---|---:|---|---|
+| `bff/` | 4419 | HTTP/WebSocket 入口、中间件、路由、aggregator、LLM 客户端、observability、outbox、alertBus | `bff/server.ts` 启动；`bff/routes/fhir*` 暴露 FHIR R4；`bff/observability/metrics.ts` 输出 Prometheus 指标 |
+| `orchestrator/` | 35 | 智能体编排 DSL：12 类节点、安全表达式递归下降解析、DAG 拓扑校验、`WorkflowStateMachine`、人工挂起/恢复、ExecutionRecorder | `orchestrator/index.ts` 统一导出；与 `medical-tools/` 36 个医疗工具标准对接 |
+| `data-platform/` | 2 | 数据质量与湖仓 ETL 入口 | `dataQuality.ts`、`lakehouseEtl.ts` |
+| `db/` | 162 | PostgreSQL 连接池（`postgres` 驱动 ^3.4.9）、`autoMigrate`、repository 层、迁移 SQL | `db/index.ts` 导出 `autoMigrate / closeDb / verifyDbConnection`；迁移 SQL 落 `deploy/postgres/init/` |
+| `security/` | 42 | RBAC + ABAC 混合授权（12 种角色）、JWT HS256、AES-256-GCM 字段加密（双层密钥）、审计日志哈希链、PII 脱敏引擎、Prompt Injection 五层防护 | 被 BFF `middleware/auth`、`middleware/audit`、`middleware/desensitize` 调用 |
+| `tenant/` | 5 | 多租户与院区上下文：`TenantContextResolver`、`TenantService`、`DataScopeGuard` | `tenant/index.ts`；BFF 中间件 `middleware/tenant.ts` 注入请求上下文 |
+| `resilience/` | 6 | 生产级韧性原语：`CircuitBreaker`、`Bulkhead`、`ConcurrencyLimiter`、`AsyncQueue`、`TieredRateLimiter`（滑动窗口/令牌桶） | `resilience/index.ts` |
+| `saga/` | 1 | 跨域长事务编排与补偿 | `saga/saga.ts` |
+| `cache/` | 9 | Cache-Aside、`MemoryCache`、`DistributedLock`（Redis）、`lru-cache@11` | `cache/factory.ts` 按环境切换内存/Redis |
+| `medical-tools/` | 149 | 36 个医疗工具注册表（检验/检查/用药/诊断/路径…），MCP 协议暴露 | `medical-tools/registry.ts`、`framework.ts` |
+| `knowledge-platform/` | 20 | 知识中台：指南/路径/规则/术语统一检索 | `knowledge-platform/index.ts` |
+| `knowledge/` | 44 | 知识引导、向量检索、RAG 片段组装 | `knowledge/bootstrap.ts` |
+| `internet-hospital/` | 8 | 互联网医院业务域：在线问诊、处方流转、支付 | 经 BFF `routes/internet*` 暴露 |
+| `voice/` | 8 | ASR 服务 + 医学语音后处理（`MedicalSpeechPostProcessor`） | `voice/AsrService.ts` |
+| `emergency/` | 3 | 急诊绿色通道模板、分诊评分、急诊状态机 | `emergency/stateMachine.ts` |
+| `skills/` | 7 | Agent 技能加载/注册/执行（与 MCP SDK 对齐） | `skills/loader.ts`、`executor.ts` |
+| `core/` | 90 | 跨域核心领域模型与纯函数 | — |
+| `integration/` | 50 | 与外部 HIS/EMR/LIS/PACS/区域平台适配器 | `integration/index.ts` |
+| `ui/` | 58 | 服务端视图/聚合 DTO（非前端 React 代码） | — |
+| `config/` `constants/` | 1+2 | `ConfigManager`、医学常量字典 | — |
+| `types/` `data/` `entrypoints/` | 4+2+1 | 全局类型、演示目录数据、CLI 入口 `entrypoints/cli.tsx` | — |
+
+---
+
+## 5. 技术栈
+
+| 层 | 选型 | 版本 |
 |---|---|---|
-| **TypeScript 检查（后端）** | ✅ 0 报错 | BFF / src 后端严格类型检查通过，零阻断错误 |
-| **TypeScript 检查（前端）** | ✅ 0 报错 | `web` 严格类型检查通过，零阻断错误（2026-10 基线 `tsc --noEmit` exit 0） |
-| **单元测试** | 见测试实测 | 核心领域与 BFF 单测以 `bun test` 实测结果为准，本文件不写死用例数量 |
-| **数据库迁移** | ✅ 354 个脚本 | `deploy/postgres/init/**` SQL（编号 01–385，含历史缺号与重复编号待清理），可重复执行、可追溯 |
-| **数据库连接** | ✅ PostgreSQL 16 | `postgres://postgres@127.0.0.1:5432/jlmedaios`（compose 默认回环端口 **5432**，库名 **jlmedaios**） |
-| **部署形态** | ✅ 就绪 | Docker / docker-compose / K8s / Helm 清单齐备，支持私有化、数据不出院 |
-
-> 生产安全红线不变：断库即显式报错并显示演示水印，不白屏、不静默返回假数据；越权一律 403。
-
----
-
-## 🔒 安全与医疗红线
-
-- AI 输出为临床辅助建议，**最终诊疗决策由经治医师负责**，所有法律效力写操作须电子签名；
-- 等保三级设计：RBAC+ABAC、字段级 AES-256-GCM 加密、16 类敏感数据脱敏；
-- 审计哈希链（BEFORE INSERT 触发器防篡改）、操作与审计同事务提交；
-- 断库即显式报错 + 水印，不白屏、不静默返回假数据；越权一律 403；
-- 安全问题请按 [SECURITY.md](SECURITY.md) 私下报告。
-
----
-
-## 📄 许可证与版权
-
-- 代码以 [Apache License 2.0](LICENSE) 开源；数据许可独立，使用前请阅读 [DATA_LICENSES.md](DATA_LICENSES.md)；
-- 第三方依赖归属见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) 与 [NOTICE](NOTICE)；
-- 本软件为医疗辅助决策与效率工具，不构成医疗器械诊断结论。
+| 运行时 | **Bun**（首选）/ Node 兼容 | `packageManager: bun@1.4.2`，`engines: bun>=1.3.0, node>=18` |
+| 语言 | TypeScript（ESM） | `typescript@6.0.2`（根） |
+| HTTP | Bun 原生 `Bun.serve`（HTTP + WebSocket 一体） | 内建 |
+| 校验 / Schema | Zod | `zod@4.3.6` |
+| LLM SDK | Anthropic TypeScript SDK | `@anthropic-ai/sdk@0.80.0` |
+| 工具协议 | Model Context Protocol SDK | `@modelcontextprotocol/sdk@1.29.0` |
+| 默认 LLM 端点 | DeepSeek OpenAI 兼容 | `LLM_PROVIDER=deepseek`，`deepseek-chat` |
+| 数据库驱动 | `postgres`（porsager/postgres） | `^3.4.9` |
+| 缓存 / 锁 | ioredis | `^6.0.0` |
+| HTTP 客户端 | undici / axios | `undici@7.29.0`、`axios@1.18.0` |
+| WebSocket | `ws` | `8.21.0` |
+| 容器 | oven/bun slim 多阶段镜像 | `oven/bun:1.4.2-slim` |
+| 数据库 | PostgreSQL | `postgres:16.4-alpine3.20` |
+| 缓存 | Redis | `redis:7.4.0-alpine3.20` |
+| 消息队列 | Apache Kafka（Bitnami，KRaft 单节点） | `bitnami/kafka:3.8.0-debian-12-r0` |
+| 日志检索 | Elasticsearch + Kibana | `8.15.0` |
+| 链路追踪 | Jaeger all-in-one（OTLP） | `1.60.0` |
+| 指标 / 看板 | Prometheus + Grafana + Alertmanager | `prom/prometheus:v2.54.1`、`grafana/grafana:11.2.0`、`prom/alertmanager:v0.27.0` |
+| 边缘网关 | nginx（自签开发证书，生产替换） | `deploy/nginx/Dockerfile` |
+| 旁路参考 | Java 模块化单体（Spring Boot 3.5.3 + JDK 21）、Python FastAPI | `--profile legacy`，不进默认编排 |
 
 ---
 
-## 🚀 部署与运维文档
+## 6. FHIR R4 与合规对标
 
-| 文档 | 内容 |
-|---|---|
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | 环境要求（Node 20+ / PostgreSQL 16+ / Bun）、一键安装与启动脚本、环境变量清单、pg_dump 数据备份策略、常见问题排查 |
-| [OPERATIONS.md](./OPERATIONS.md) | 健康检查端点（`/api/v1/health/detailed`）、日志位置与查询、升级（pull → migrate → restart）与回滚步骤 |
+本仓库的所有写操作在设计期即对齐下列评级，不靠"事后补材料"：
 
----
-
-## 🏆 M200 里程碑（v2.77.0-M200 · 2026-10-16）
-
-> M183 → M200 共 **68 个切片**，覆盖医疗全业务场景 + 基础设施 + 质量安全 + 用户体验。
-
-### 版本推进历程
-
-| 里程碑 | 版本 | 核心覆盖 |
+| 合规项 | 目标级别 | 在代码中的落点 |
 |---|---|---|
-| M183-M190 | v2.40-v2.57 | 临床业务（门诊/住院/手术/药房/检验/影像/护理） |
-| M191-M194 | v2.58-v2.53 | 管理全场景（科研/教学/HR/设备/财务/医保/公卫/后勤/质量/安全/党建/纪检/工会/宣传） |
-| M195-M196 | v2.54-v2.61 | 互联网医院/远程医疗/移动医疗/智慧医疗 + 大数据/AI中台/物联网/区块链 |
-| M197 | v2.62-v2.65 | 云原生/微服务/DevOps/SRE 基础设施层 |
-| M198 | v2.66-v2.69 | 数据安全/合规/审计/风险管理体系 |
-| M199 | v2.70-v2.73 | 用户体验/无障碍/适老化/国际化 |
-| **M200** | **v2.74-v2.77** | **系统验收/文档交付/部署准备/版本发布** |
+| 电子病历系统功能应用水平分级评价 | **六级**（全流程数据闭环 + 知识库联动） | `bff/routes/emr*`、`emrLevel5Review`、`cdsDeep`、`timelineDeep`、`emrAi*` 系列路由 |
+| 国家医疗健康信息互联互通标准化成熟度 | **四级甲等** | `bff/routes/fhir*`：`fhirRoutes`、`fhirGatewayDetailRoutes`、`fhirGatewayDetail2Routes`、`fhirOperationsRoutes`（search/read/validate/history） |
+| 医院智慧服务分级评估 | **三级** | `internet-hospital/`、`patientPortal`、`patientCare`、`healthEdu`、`guideAi`、`mobileQuickActions` |
+| HL7 FHIR | **R4** | `/api/v1/fhir/*` 网关，资源 Bundle 输出 |
+| 网络安全等级保护 | **三级** | `security/`：JWT HS256、AES-256-GCM、审计哈希链保留 ≥180 天（`AUDIT_RETENTION_DAYS=180`）、PII 脱敏、Prompt Injection 五层防护 |
 
-### 关键数据
-- **功能模块**：M200 里程碑自报 68 个 aggregator；2026-10-25 静态审计实测 `src/bff/aggregators/` 纯函数模块 **1945** 个（无直返 `new Response`）
-- **API 端点**：BFF REST 路由 method+path 去重 **5084** 条（展开条目 5211，含 127 条重复注册待收敛；2026-10-25 静态审计快照）
-- **前端路由**：`web/src/router/index.tsx` 路由挂载 **3048** 处、去重路径 **2847** 条（2026-10-25 收口去重后快照；`<Route path=` 挂载口径，不等同页面数；去重前快照 3052）
-- **单测覆盖**：用例数量与覆盖率以 `bun test` / `vitest run` 实测为准，本文件不写死
-- **三端同步**：origin (GitCode HTTPS) + gitcode (GitCode SSH) + mirror (GitHub)
+生产环境硬性约束（`assertProductionNotDemoMode` 在启动期 fail-closed）：
 
-### 技术沉淀
-- 纯函数 aggregator 模式：可测试、可组合、无副作用
-- 独立文件名命名：避免模块冲突，便于追溯
-- 每切片独立 commit + tag：完整版本演进历史
-- 深海蓝 VI（#0A2540 / #1E5F8C / #4A90D9）统一视觉
+- `NODE_ENV=production` 时 `DEMO_MODE` 必须为 `0`，否则进程直接退出；
+- `JWT_SECRET`、`ENCRYPTION_MASTER_KEY`、`RADAR_INTERNAL_TOKEN` 必须由 KMS/环境注入，镜像内不固化；
+- 所有写操作必须经过 `withIdempotency`（`Idempotency-Key`）与 `auditOperation`。
 
 ---
 
-## v4.0.0 里程碑（2026-10-17）
+## 7. 快速开始（DEMO_MODE 离线）
 
-> 从 M183 到 M231，历时数月，累计 **188+ 功能切片**，完成 v1.0 → v4.0 大版本跃迁。
+前置要求：
 
-### 版本历程
-| 版本 | 核心主题 | 切片范围 |
-|------|---------|---------|
-| v1.0 | 基础 HIS·EMR 一体化 | M001–M100 |
-| v2.0 | 微服务云原生·互联网医院 | M101–M150 |
-| v3.0 | AI 中台·数据中台·MUSE 智能体 | M151–M182 |
-| **v4.0** | **AI 原生·数据原生·智慧医院三位一体冲刺** | **M183–M231** |
+- **Bun ≥ 1.3.0**（推荐 1.4.2，与 `packageManager` 对齐）。Windows 安装后把 `C:\Users\<you>\.bun\bin` 加入 `PATH`；下文假定 `bun` 已在 PATH 中，否则用全路径 `C:\Users\lenovo\.bun\bin\bun.exe`。
+- Node ≥ 18（仅用于双 tsc 门禁与工具链，BFF 本身跑在 Bun 上）。
 
-### v4.0 核心架构升级
-- **云原生微服务**：Kubernetes 编排·CI/CD·全链路可观测
-- **AI 原生**：AI 大脑 2.0·MUSE 五角色（Doctor/Nurse/Pharma/Admin/Patient）
-- **数据原生**：ODS·DW·数据湖·数据资产目录·数据 Owner 责任制
-- **业务中台**：权限中心·工作流引擎·消息中心·文件服务
+```powershell
+# 1) 克隆并进入仓库根
+cd C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1
 
-### v4.0 智慧医院三位一体
-- **智慧医疗**：CDSS·临床路径·医嘱闭环·AI 辅助诊断
-- **智慧服务**：预约导航·报告支付·随访·线上线下融合
-- **智慧管理**：HRP·成本绩效·物流设备·决策支持
+# 2) 安装依赖（Bun lockfile 已提交）
+bun install --frozen-lockfile
 
-### v4.0 评级冲刺
-- 互联互通 **四级甲 → 五级**
-- EMR 评级 **五级 → 六级全闭环 → 七级大数据 AI → 八级完全智能化**
-- 智慧医院 **三位一体四级 → 五级**
+# 3) 复制环境变量示例
+Copy-Item .env.example .env.development
 
-### v4.x 路线图
-- v4.1：深化 RWE 科研数据库·AI 影像病理融合
-- v4.2：区域医疗协同·分级诊疗平台
-- v4.3：数字孪生手术室·智能病房全覆盖
-
----
-
-<div align="center">
-
-**© 杭州健澜科技有限公司 · 让医疗 AI 更简单、更落地**
-
-</div>
-
----
-
-# 🏗️ 分层现状与演进方向（2026-10 复核）
-
-> 主线为 **Bun + TypeScript BFF（`src/bff/`）+ React 工作台（`web/`）**；`services-java/`、`services-python/`、`services/radar-inference/`、`miniprogram/` 为旁路/参考实现，本轮不物理删除、不强行合并，仅厘清调用链、标注角色与独立构建前提。
-
-## 分层与技术栈（实测口径）
-
-| 层 | 技术栈 | 职责 / 现状 |
-|---|---|---|
-| **体验层** | React 19 + TypeScript + AntD 5（`web/`） | 医生/护士工作站 UI、AI 对话流式、表单报表；主线保留 |
-| **BFF 聚合层** | Bun + TypeScript（`src/bff/`） | 路由/中间件/适配器/智能体运行时/可观测；只做聚合，不直连核心交易库 |
-| **Java 旁路** | Spring Boot 3.3.5 + Spring Cloud 2024.0.0 + JDK 17；注册中心 Eureka Server、网关 Spring Cloud Gateway | HIS 收费/挂号/医嘱/药房/EMPI/LIS 等微服务骨架；独立单体 Boot 3.5.3 / JDK 21。**旁路/参考**，`legacy` profile 启动；代码库当前未使用 Nacos、Sentinel、Seata |
-| **Python 旁路** | Python 3.11 镜像 + FastAPI + Uvicorn（`services-python/`） | NLP 病历质控、CDSS、影像辅助等参考实现；**旁路/参考**，`legacy` profile 启动 |
-| **影像推理旁路** | FastAPI（`services/radar-inference/`） | 雷达影像推理 demo/production 双模式；`demo` / `gpu` profile 启动，仅内网 expose |
-| **数据层** | PostgreSQL 16 + Redis + Kafka + Elasticsearch（默认 compose） | 主从/读写分离、Redis Cluster、MinIO 对象存储为后续演进目标，当前默认编排未启用 |
-
-## 分层取舍说明
-
-- **主线优先保证可交付**：现有 TS BFF 与 React 资产继续承载业务，BFF 只做聚合与适配；
-- **Java 旁路定位参考**：挂号/收费/医嘱等资金与医疗安全场景的 Java 化重构为后续演进方向，当前骨架使用 Eureka Server + Spring Cloud Gateway，未引入 Nacos、Sentinel、Seata；
-- **AI 推理旁路定位参考**：transformers/vLLM/MONAI 生态在 Python 侧沉淀，GPU 异步队列不阻塞交易；当前以 demo 模式与内部 token 鉴权保留；
-- **前端与 BFF 不重写**：现有 TypeScript 资产保留，路由数量以 BFF/前端实测清单为准。
-
-## 工程目录
-
-```
-services-java/       # Java 旁路/参考：Spring Cloud 微服务骨架 + 独立模块化单体
-services-python/     # Python FastAPI 旁路/参考：NLP / CDSS / 影像辅助
-services/radar-inference/  # 雷达影像推理旁路/参考
-miniprogram/         # 微信患者端旁路/参考（原生小程序，微信开发者工具构建，compose 不编排）
-src/bff/             # 主线 TypeScript BFF（聚合层）
-web/                 # 主线 React 前端
-docs/architecture/  # 架构宪法/PRD/开发指南
+# 4) 以 DEMO_MODE 启动 BFF（跳过 PostgreSQL，全部走内存演示数据）
+$env:DEMO_MODE = "1"
+$env:HTTP_PORT = "8080"
+bun run src/bff/server.ts
 ```
 
-## 合规目标
+启动成功后日志应包含：
 
-- 等保三级、电子病历六级、互联互通四甲（HL7/FHIR R4）
-- 数据不出院、私有化部署、电子签名 CA
-- 信创适配：达梦/人大金仓 + 麒麟 + 鲲鹏
+```text
+[jianlan-bff] starting  nodeEnv=development  DEMO_MODE=ON (内存演示数据，不连 PG)
+[db] DEMO_MODE=1：跳过 PostgreSQL 连接，使用内存演示数据（不持久化）
+[jianlan-bff] listening on http://0.0.0.0:8080  (WebSocket /ws/chat [auth required])
+```
 
-> 📜 详细宪法见 `docs/architecture/00-架构宪法.md`
+健康与可观测端点：
+
+```powershell
+curl http://127.0.0.1:8080/health        # 存活
+curl http://127.0.0.1:8080/ready         # 就绪（真实模式会探测 PG/Redis）
+curl http://127.0.0.1:8080/metrics      # Prometheus 指标
+curl http://127.0.0.1:8080/api/v1/health # 业务层健康
+```
+
+连真实 PostgreSQL 的开发模式：
+
+```powershell
+# 启动基础设施（Postgres/Redis/Kafka/ES/Jaeger 等）
+docker compose up -d postgres redis kafka elasticsearch jaeger
+
+# 关闭 DEMO，指向本地 PG
+$env:DEMO_MODE = "0"
+$env:DATABASE_URL = "postgres://postgres:postgres@127.0.0.1:5432/jlmedaios"
+$env:JWT_SECRET = "dev-only-at-least-32-bytes-change-me-please-xxxx"
+$env:ENCRYPTION_MASTER_KEY = "dev-only-at-least-32-bytes-change-me-please"
+bun run src/bff/server.ts
+# 启动时自动执行 autoMigrate（deploy/postgres/init/*.sql 顺序）
+```
+
+---
+
+## 8. 环境变量（摘自 `.env.example`）
+
+| 变量 | DEMO 必需 | 生产必需 | 说明 |
+|---|:-:|:-:|---|
+| `NODE_ENV` / `APP_ENV` | ✓ | ✓ | `development` / `test` / `production` |
+| `HTTP_PORT` | ✓ | ✓ | 默认 `8080` |
+| `HTTP_TIMEOUT_MS` |  | ✓ | 接口超时，默认 30000 |
+| `DEMO_MODE` | ✓ | 必须 `0` | `=1` 跳过 PG，使用内存数据；生产启动期 fail-closed |
+| `DATABASE_URL` |  | ✓ | `postgres://user:pass@host:5432/jlmedaios` |
+| `PGSSLMODE` / `PG_POOL_MAX` |  | ✓ | 内网 `disable`，生产 `require` |
+| `REDIS_URL` |  | ✓ | `redis://:pass@host:6379/0` |
+| `KAFKA_BROKERS` |  | ✓ | 容器内 `kafka:9092` |
+| `ES_URL` |  | ✓ | 日志检索 `http://localhost:9200` |
+| `LLM_PROVIDER` / `LLM_MODEL` / `LLM_BASE_URL` / `LLM_API_KEY` |  | ✓ | 默认 DeepSeek；生产接院内私有化 OpenAI 兼容端点 |
+| `LLM_MAX_TOKENS` / `LLM_TEMPERATURE` / `LLM_TIMEOUT_MS` |  | ✓ | 默认 8192 / 0.2 / 60000 |
+| `HIS_BASE_URL` / `HIS_API_KEY` / `EMR_*` / `LIS_*` / `PACS_*` |  | 按院 | 院内系统对接 |
+| `RADAR_INFERENCE_URL` / `RADAR_INTERNAL_TOKEN` |  | ✓（启用影像辅诊时） | DAMO-RADAR 第二阅片，`X-Internal-Token` 内部鉴权 |
+| `VECTOR_STORE_DIR` / `EMBEDDING_MODEL` / `EMBEDDING_DIM` |  | ✓ | 默认 `./data/vectors` / `bge-large-zh` / `1024` |
+| `JWT_SECRET` |  | ✓ | HS256，≥32 字节随机 |
+| `ENCRYPTION_MASTER_KEY` |  | ✓ | AES-256-GCM 主密钥，≥32 字节 |
+| `ENABLE_DESENSITIZATION` / `ENABLE_PROMPT_GUARD` |  | 必须 `true` | PII 脱敏 / Prompt Injection 防护 |
+| `AUDIT_RETENTION_DAYS` |  | ✓ | 等保三级 ≥180 |
+| `LOG_DIR` / `LOG_MAX_SIZE` / `LOG_MAX_FILES` |  | ✓ | 默认 `./logs` / 10MB / 14 |
+| `SENTRY_DSN` / `PERF_API_TIMEOUT_MS` / `PERF_TOOL_TIMEOUT_MS` |  |  | 错误上报与性能告警阈值 |
+
+> 容器编排插值变量另见 `.env.compose.example`，与本文件按用途分开维护。
+
+---
+
+## 9. 开发规范
+
+**目录约定**（强约束）：
+
+```text
+src/<domain>/
+  routes/        # HTTP 路由（只做参数校验与调用 aggregator，不写业务逻辑）
+  aggregators/   # 业务编排（跨 repository、跨外部依赖）
+  repositories/  # 数据访问（只在这里出现 SQL / ORM）
+  services/      # 纯业务服务（无 IO 或 IO 已被注入）
+  types.ts       # 域内类型
+```
+
+**质量铁律**（引自架构宪章第六章）：
+
+1. `tsc --noEmit` 零报错；禁止 `any`、`@ts-ignore`、`console.log`。
+2. 纯函数单测覆盖率 100%；JSDoc 完整。
+3. 分层清晰：`route → aggregator → repository → db`，不允许跨层直连。
+4. 所有写操作必须 `Idempotency-Key`；所有迁移 SQL 用 `IF NOT EXISTS` / `ON CONFLICT DO NOTHING`。
+5. LLM 调用：30s 超时 + 指数退避 + `CircuitBreaker` 降级；降级时回退到确定性模板，前端不白屏。
+
+**可观测性**：
+
+- 指标：`src/bff/observability/metrics.ts`，Prometheus 文本格式输出到 `/metrics`；HTTP 路由标签化（route 模板 + 状态码，不含 PII）。
+- 日志：`LOG_DIR=./logs`，JSON 行格式，`LOG_LEVEL` 控制；请求带 `traceId` 贯穿 BFF → repository → LLM 调用。
+- 链路：`OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318`，`OTEL_SERVICE_NAME=jlmedaios-bff`。
+- 告警：`deploy/observability/alertmanager/` 配置渠道，`deploy/prometheus/rules/` 录规则。
+
+**测试**：
+
+```powershell
+bun test                        # 全量
+bun test tests/unit             # 单元
+bun test tests/integration      # 集成（需要 PG/Redis）
+bun test tests/e2e              # 端到端
+bun test --coverage             # 覆盖率
+```
+
+---
+
+## 10. 路线图
+
+**已落地（M3 – M190）**：
+
+- BFF 骨架 + 中间件链（JWT/CSRF/RBAC+ABAC/tenant/idempotency/rateLimit/audit/desensitize）；
+- 门诊 / 住院 / 护理 / 药房 / 手术 / 急诊 / 院感 / 病案 / 体检 / 互联网医院全域路由；
+- Orchestrator DSL + 36 个医疗工具 + Doctor/Nurse/Pharma/Admin MUSE 个人智能体；
+- 韧性层五原语、Saga、Outbox 中继、危急值广播；
+- 监控体系（Prometheus/Grafana/Alertmanager/Jaeger/ES/Kibana）与 Docker Compose 全栈编排。
+
+**M190-P0 合规改造（进行中收尾）**：
+
+- FHIR R4 网关深度（M430 资源搜索 Bundle、M432 第二批资源、CRUD/validate/history 操作端点）；
+- CDS 临床决策支持深化（M448）、患者 360 时间线（M449）、权限与组织架构深化（M450）；
+- 电子病历五级评审深度（M433）、运营经营分析（M434）、急诊急救（M435）、PACS（M438）、门诊挂号分诊（M439）、住院通用（M440）、传染病与公卫（M441）、药房调剂（M442）、后勤设备（M443）、患者服务（M444）、家庭医生（M445）、移动护理 PDA 床旁闭环（M446）、事件总线与通知中心（M447）、院长驾驶舱 BI（M451）、护理质量 NQI（M453）、患者门户（M454）、健康宣教（M455）、行政办公（M456）、分诊叫号（M457）、自助终端（M458）、院内导航停车（M459）。
+
+**进行中**：
+
+- **Consult-Agent 深化加固**（任务 #30–#38，分支 `consult-agent-m86`）：会话记忆、工具调用审计、人工接管、与 CDS 闭环。
+- **健康画像平台**：跨就诊患者画像、慢病管理、风险预测、与 MUSE 个人智能体双向回流。
+
+**规划中（AI 原生医院 3.0 全场景）**：
+
+- 全院级 MUSE 知识联邦与模型版本治理；
+- 数字孪生院区 + 资源智能调配；
+- 医共体/医联体多院联邦学习；
+- 与浙江健康云 PaaS 对齐的多租户 SaaS 运营版。
+
+---
+
+## 11. 仓库双镜像说明
+
+| 视角 | 仓库 | 用途 |
+|---|---|---|
+| 主仓（后端/AI/数据） | **GitCode `JLMEDAIOS`** | 本 README 视角；`src/`、`deploy/`、`docker-compose*.yml`、`Dockerfile.backend` |
+| 开发者镜像（前端/上手/部署） | **GitHub `JLAIharnessos`** | 见 [`README.dev.md`](./README.dev.md)；`web/`、`scripts/`、示例与二次开发 |
+
+- 当前工作分支：**`consult-agent-m86`**。
+- 推送策略：日常开发推 GitCode 主仓；GitHub 镜像由 CI 单向同步，**不要**直接 `git push origin heagentos` 或覆盖镜像分支。
+- 双镜像同源同 commit，仅 README 视角不同。
+
+---
+
+## 12. License 与社区
+
+- 代码许可证：**Apache-2.0**，见 [`LICENSE`](./LICENSE)。
+- 数据与模型许可：见 [`DATA_LICENSES.md`](./DATA_LICENSES.md)、[`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md)。
+- 行为准则：[`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)。
+- 安全披露：[`SECURITY.md`](./SECURITY.md)（请勿公开 Issue 上报漏洞）。
+- 贡献指南：[`CONTRIBUTING.md`](./CONTRIBUTING.md)。
+
+Copyright © 2026 杭州健澜科技有限公司. All rights reserved.
