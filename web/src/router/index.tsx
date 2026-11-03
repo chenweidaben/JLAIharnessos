@@ -4847,6 +4847,19 @@ const MobileHandoff = lazy(() => import('@/pages/mobile/Handoff'));
 const MobileMe = lazy(() => import('@/pages/mobile/Me'));
 const MobileQuickActions = lazy(() => import('@/pages/mobile/QuickActions'));
 const PreopAssessmentM521Page = lazy(() => import('@/pages/clinical/preop-assessment-m521'));
+// HIS-EMR 一体化工作站页面 lazy 注册（对标行业头部上市医疗IT厂商）
+const OrderVerificationPage = lazy(() => import('@/pages/order/verification'));
+const BillingWindowPage = lazy(() => import('@/pages/billing/window'));
+const OutpatientPharmacyDispensePage = lazy(() => import('@/pages/outpatient-pharmacy/dispense'));
+const InpatientDepositPage = lazy(() => import('@/pages/inpatient/deposit'));
+const DischargeSettlePage = lazy(() => import('@/pages/inpatient/discharge-settle'));
+const VitalsChartPage = lazy(() => import('@/pages/nursing/vitals-chart'));
+const PharmacyPrepackPage = lazy(() => import('@/pages/pharmacy/prepack'));
+const PharmacyReturnPage = lazy(() => import('@/pages/pharmacy/return'));
+const InpatientCheckinPage = lazy(() => import('@/pages/inpatient/checkin'));
+const ThreeLevelWardRoundSignPage = lazy(() => import('@/pages/three-level-ward-round/sign'));
+const MedAdminScanPage = lazy(() => import('@/pages/medAdmin/scan'));
+const OutpatientRegisterRefundPage = lazy(() => import('@/pages/outpatient/register-refund'));
 
 function PageLoading() {
   return (
@@ -10823,6 +10836,19 @@ export default function AppRoutes() {
           <Route path="pharmacy/expiry-detail" element={<PharmacyExpiryDetailPage />} />
           {/* M521 P0：术前访视 ASA 分级评估（临床表单专项改造） */}
           <Route path="clinical/preop-assessment-m521" element={<PreopAssessmentM521Page />} />
+          {/* HIS-EMR 一体化工作站路由 */}
+          <Route path="order/verification" element={<OrderVerificationPage />} />
+          <Route path="billing/window" element={<BillingWindowPage />} />
+          <Route path="outpatient-pharmacy/dispense" element={<OutpatientPharmacyDispensePage />} />
+          <Route path="inpatient/deposit" element={<InpatientDepositPage />} />
+          <Route path="inpatient/discharge-settle" element={<DischargeSettlePage />} />
+          <Route path="nursing/vitals-chart" element={<VitalsChartPage />} />
+          <Route path="pharmacy/prepack" element={<PharmacyPrepackPage />} />
+          <Route path="pharmacy/return" element={<PharmacyReturnPage />} />
+          <Route path="inpatient/checkin" element={<InpatientCheckinPage />} />
+          <Route path="three-level-ward-round/sign" element={<ThreeLevelWardRoundSignPage />} />
+          <Route path="med-admin/scan" element={<MedAdminScanPage />} />
+          <Route path="outpatient/register-refund" element={<OutpatientRegisterRefundPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />
