@@ -5,17 +5,17 @@
  */
 
 /**
- * 健澜科技数智医院智能体 - 卫宁HIS适配器（骨架）
+ * 健澜科技数智医院智能体 - 示例HIS厂商A适配器（骨架）
  *
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 卫宁健康（WiNEX）HIS系统适配器骨架。
- * 卫宁健康是国内HIS市场占有率第一的厂商，新一代产品WiNEX提供
+ * 示例HIS厂商A（HIS-Rest）HIS系统适配器骨架。
+ * 示例HIS厂商A是国内HIS市场占有率第一的厂商，新一代产品HIS-Rest提供
  * REST API开放平台，传统HIS通过WebService集成。
  *
  * 本文件为骨架实现，包含：
- * - 卫宁HIS API对接结构
+ * - 示例HIS厂商A API对接结构
  * - 字段映射配置
  * - 认证流程实现
  * - 核心方法骨架（具体实现留空+TODO）
@@ -52,33 +52,33 @@ import type {
   PatientSyncResult,
 } from './HISAdapter';
 
-/** 卫宁HIS适配器配置 */
+/** 示例HIS厂商A适配器配置 */
 export interface WeiningHISConfig extends Partial<AdapterConfig> {
-  /** 卫宁API版本：winex（新一代REST） / classic（传统WebService） */
-  apiVersion?: 'winex' | 'classic';
-  /** 卫宁开放平台应用ID */
+  /** 示例HIS厂商AAPI版本：his-rest（新一代REST） / classic（传统WebService） */
+  apiVersion?: 'his-rest' | 'classic';
+  /** 示例HIS厂商A开放平台应用ID */
   appId?: string;
-  /** 卫宁开放平台应用密钥 */
+  /** 示例HIS厂商A开放平台应用密钥 */
   appSecret?: string;
   /** 医院机构代码 */
   orgCode?: string;
 }
 
 /**
- * 卫宁HIS适配器
+ * 示例HIS厂商A适配器
  *
- * 对接卫宁健康HIS系统，支持WiNEX新一代REST API和传统WebService两种模式。
+ * 对接示例HIS厂商AHIS系统，支持HIS-Rest 新一代REST API和传统WebService两种模式。
  *
  * TODO: 完成以下核心功能的实际实现：
- * 1. WiNEX OAuth2 认证流程（获取access_token）
+ * 1. HIS-Rest OAuth2 认证流程（获取access_token）
  * 2. 患者信息查询API调用
  * 3. 医嘱下达API调用
  * 4. 费用查询API调用
  * 5. HL7 ADT消息接收与解析（患者入出转事件）
- * 6. 字段映射：卫宁字段 → 健澜内部模型
+ * 6. 字段映射：示例HIS厂商A字段 → 健澜内部模型
  */
 export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
-  private readonly apiVersion: 'winex' | 'classic';
+  private readonly apiVersion: 'his-rest' | 'classic';
   private readonly orgCode?: string;
   private patientEventListeners = new Set<(event: PatientEvent) => void>();
   private orderEventListeners = new Set<(event: OrderEvent) => void>();
@@ -87,18 +87,18 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
     const adapterConfig = createDefaultAdapterConfig({
       id: config.id ?? 'his-weining',
       type: 'his',
-      vendor: '卫宁健康',
-      version: config.version ?? 'WiNEX 2.0',
-      name: config.name ?? '卫宁HIS适配器',
-      description: '对接卫宁健康HIS系统（WiNEX/传统HIS）',
-      endpoint: config.endpoint ?? 'https://his-api.hospital.com/winex',
+      vendor: '示例HIS厂商A',
+      version: config.version ?? 'HIS-Rest 2.0',
+      name: config.name ?? '示例HIS厂商A适配器',
+      description: '对接示例HIS厂商AHIS系统（HIS-Rest/传统HIS）',
+      endpoint: config.endpoint ?? 'https://his-api.hospital.com/his-rest',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
       auth: {
         type: 'oauth2',
         clientId: config.appId,
         clientSecret: config.appSecret,
-        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/winex'}/oauth2/token`,
+        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/his-rest'}/oauth2/token`,
         ...config.auth,
       },
       fieldMapping: {
@@ -149,7 +149,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
     });
 
     super(adapterConfig);
-    this.apiVersion = config.apiVersion ?? 'winex';
+    this.apiVersion = config.apiVersion ?? 'his-rest';
     this.orgCode = config.orgCode;
   }
 
@@ -157,11 +157,11 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
     return {
       id: this.config.id,
       type: 'his',
-      vendor: '卫宁健康',
+      vendor: '示例HIS厂商A',
       version: this.config.version,
-      name: '卫宁HIS适配器',
-      description: `对接卫宁健康HIS系统（${this.apiVersion === 'winex' ? 'WiNEX REST API' : '传统WebService'}）`,
-      supportedProtocols: this.apiVersion === 'winex' ? ['rest', 'hl7'] : ['soap', 'hl7'],
+      name: '示例HIS厂商A适配器',
+      description: `对接示例HIS厂商AHIS系统（${this.apiVersion === 'his-rest' ? 'HIS-Rest REST API' : '传统WebService'}）`,
+      supportedProtocols: this.apiVersion === 'his-rest' ? ['rest', 'hl7'] : ['soap', 'hl7'],
     };
   }
 
@@ -170,7 +170,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   // ============================================================
 
   /**
-   * 卫宁WiNEX OAuth2 认证
+   * 示例HIS厂商A-HIS-Rest OAuth2 认证
    *
    * 使用客户端凭证模式（client_credentials）获取 access_token。
    *
@@ -181,7 +181,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
    * 4. 存储令牌和过期时间
    */
   protected override async authenticateOAuth2(): Promise<void> {
-    // TODO: 实现卫宁WiNEX OAuth2认证
+    // TODO: 实现示例HIS厂商A-HIS-Rest OAuth2认证
     // const { auth } = this.config;
     // try {
     //   const response = await axios.post(auth.tokenUrl!, new URLSearchParams({
@@ -195,7 +195,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
     //   this.authToken = response.data.access_token;
     //   this.tokenExpiresAt = Date.now() + response.data.expires_in * 1000;
     // } catch (error) {
-    //   throw AdapterError.authentication('卫宁HIS认证失败', AdapterErrorCode.AUTHENTICATION_FAILED, {
+    //   throw AdapterError.authentication('示例HIS厂商A认证失败', AdapterErrorCode.AUTHENTICATION_FAILED, {
     //     adapterId: this.id,
     //     cause: error,
     //   });
@@ -210,14 +210,14 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   /**
    * 查询患者信息
    *
-   * TODO: 调用卫宁HIS患者查询API：
+   * TODO: 调用示例HIS厂商A患者查询API：
    * GET {endpoint}/api/patients/{patientId}
    * Header: Authorization: Bearer {token}
    * 响应字段映射：patientId, patientName, sex, birthday, idCardNo, mobile
    */
   async getPatientInfo(patientId: string): Promise<Patient> {
     return this.execute(async () => {
-      // TODO: 实现卫宁HIS患者信息查询
+      // TODO: 实现示例HIS厂商A患者信息查询
       // const response = await axios.get(`${this.config.endpoint}/api/patients/${patientId}`, {
       //   headers: this.buildAuthHeaders(),
       //   timeout: this.config.timeout,
@@ -235,14 +235,14 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   /**
    * 搜索患者
    *
-   * TODO: 调用卫宁HIS患者搜索API：
+   * TODO: 调用示例HIS厂商A患者搜索API：
    * GET {endpoint}/api/patients?name={name}&page={page}&pageSize={pageSize}
    */
   async searchPatients(
     criteria: PatientSearchCriteria,
   ): Promise<{ patients: Patient[]; total: number }> {
     return this.execute(async () => {
-      // TODO: 实现卫宁HIS患者搜索
+      // TODO: 实现示例HIS厂商A患者搜索
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
@@ -287,14 +287,14 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   /**
    * 创建医嘱
    *
-   * TODO: 调用卫宁HIS医嘱创建API：
+   * TODO: 调用示例HIS厂商A医嘱创建API：
    * POST {endpoint}/api/orders
-   * Body: 医嘱信息（需按卫宁字段格式封装）
+   * Body: 医嘱信息（需按示例HIS厂商A字段格式封装）
    * 注意：医嘱创建为高风险操作，需CA签名和双重确认
    */
   async createOrder(request: OrderCreateRequest): Promise<OrderResult> {
     return this.execute(async () => {
-      // TODO: 实现卫宁HIS医嘱创建
+      // TODO: 实现示例HIS厂商A医嘱创建
       // const hisOrder = this.mapOrderToWeining(request);
       // const response = await axios.post(`${this.config.endpoint}/api/orders`, hisOrder, {
       //   headers: { ...this.buildAuthHeaders(), 'Content-Type': 'application/json' },
@@ -520,7 +520,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   // ============================================================
 
   /**
-   * 将卫宁患者数据映射为健澜内部Patient模型
+   * 将示例HIS厂商A患者数据映射为健澜内部Patient模型
    *
    * TODO: 实现完整的字段映射逻辑，使用 config.fieldMapping 配置
    */
@@ -531,7 +531,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   }
 
   /**
-   * 将健澜医嘱请求映射为卫宁HIS医嘱格式
+   * 将健澜医嘱请求映射为示例HIS厂商A医嘱格式
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private mapOrderToWeining(request: OrderCreateRequest): Record<string, unknown> {

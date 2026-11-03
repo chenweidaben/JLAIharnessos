@@ -45,8 +45,8 @@ interface AdapterRegistration {
  * @example
  * ```typescript
  * const registry = AdapterRegistry.getInstance();
- * registry.register('his-winning', metadata, () => new WeiningHISAdapter(config), true);
- * const his = registry.getAdapter<HISAdapter>('his-winning');
+ * registry.register('his-vendor-a', metadata, () => new WeiningHISAdapter(config), true);
+ * const his = registry.getAdapter<HISAdapter>('his-vendor-a');
  * ```
  */
 export class AdapterRegistry {
