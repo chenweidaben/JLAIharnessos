@@ -4865,6 +4865,8 @@ const AnesthesiaPreopVisitPage = lazy(() => import('@/pages/anesthesia/preop-vis
 const AnesthesiaRecordSheetPage = lazy(() => import('@/pages/anesthesia/record-sheet'));
 const PostopAnalgesiaPage = lazy(() => import('@/pages/anesthesia/postop-analgesia'));
 const PacuScorePage = lazy(() => import('@/pages/anesthesia/pacu-score'));
+// M86-J：国密 SM2/SM3 电子签名留痕审计
+const CryptoSignatureAuditPage = lazy(() => import('@/pages/crypto/signature-audit'));
 
 function PageLoading() {
   return (
@@ -10859,6 +10861,7 @@ export default function AppRoutes() {
           <Route path="anesthesia/record-sheet" element={<AnesthesiaRecordSheetPage />} />
           <Route path="anesthesia/postop-analgesia" element={<PostopAnalgesiaPage />} />
           <Route path="anesthesia/pacu-score" element={<PacuScorePage />} />
+          <Route path="crypto/signature-audit" element={<CryptoSignatureAuditPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />

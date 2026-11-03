@@ -4109,6 +4109,11 @@ import { anesthesiaPreopVisitRoutes } from './routes/anesthesiaPreopVisit'; // M
 import { anesthesiaRecordSheetRoutes } from './routes/anesthesiaRecordSheet'; // M86-I：【手术麻醉闭环】麻醉记录单（逐5分钟生命体征/用药/出入量/医师签名）
 import { postopAnalgesiaFupRoutes } from './routes/postopAnalgesiaFup'; // M86-I：【手术麻醉闭环】术后镇痛随访（VAS/Ramsay/副作用/PCA）
 import { pacuScoringRoutes } from './routes/pacuScoring'; // M86-I：【手术麻醉闭环】PACU Steward 复苏评分与出室判定
+import { fhirPatientRoutes } from './routes/fhirPatient'; // M86-I：【FHIR R4】Patient 资源出口（/fhir/r4/Patient）
+import { fhirEncounterRoutes } from './routes/fhirEncounter'; // M86-I：【FHIR R4】Encounter 资源出口
+import { fhirMedicationRequestRoutes } from './routes/fhirMedicationRequest'; // M86-I：【FHIR R4】MedicationRequest 资源出口
+import { fhirConditionRoutes } from './routes/fhirCondition'; // M86-I：【FHIR R4】Condition 资源出口
+import { cryptoSignatureRoutes } from './routes/cryptoSignature'; // M86-J：【国密签名】SM2/SM3 电子签名留痕骨架
 
 // ============================================================================
 // 路由表与编译
@@ -6550,6 +6555,11 @@ const allRoutes: RouteDef[] = [
   ...anesthesiaRecordSheetRoutes, // M86-I：【手术麻醉闭环】麻醉记录单
   ...postopAnalgesiaFupRoutes, // M86-I：【手术麻醉闭环】术后镇痛随访
   ...pacuScoringRoutes, // M86-I：【手术麻醉闭环】PACU 复苏评分
+  ...fhirPatientRoutes, // M86-I：【FHIR R4】Patient
+  ...fhirEncounterRoutes, // M86-I：【FHIR R4】Encounter
+  ...fhirMedicationRequestRoutes, // M86-I：【FHIR R4】MedicationRequest
+  ...fhirConditionRoutes, // M86-I：【FHIR R4】Condition
+  ...cryptoSignatureRoutes, // M86-J：【国密签名】SM2/SM3 签名留痕
 ];
 
 interface Compiled {
