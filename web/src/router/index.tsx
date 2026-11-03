@@ -4860,6 +4860,11 @@ const InpatientCheckinPage = lazy(() => import('@/pages/inpatient/checkin'));
 const ThreeLevelWardRoundSignPage = lazy(() => import('@/pages/three-level-ward-round/sign'));
 const MedAdminScanPage = lazy(() => import('@/pages/medAdmin/scan'));
 const OutpatientRegisterRefundPage = lazy(() => import('@/pages/outpatient/register-refund'));
+// M86-I：手术麻醉闭环深化
+const AnesthesiaPreopVisitPage = lazy(() => import('@/pages/anesthesia/preop-visit'));
+const AnesthesiaRecordSheetPage = lazy(() => import('@/pages/anesthesia/record-sheet'));
+const PostopAnalgesiaPage = lazy(() => import('@/pages/anesthesia/postop-analgesia'));
+const PacuScorePage = lazy(() => import('@/pages/anesthesia/pacu-score'));
 
 function PageLoading() {
   return (
@@ -10849,6 +10854,11 @@ export default function AppRoutes() {
           <Route path="three-level-ward-round/sign" element={<ThreeLevelWardRoundSignPage />} />
           <Route path="med-admin/scan" element={<MedAdminScanPage />} />
           <Route path="outpatient/register-refund" element={<OutpatientRegisterRefundPage />} />
+          {/* M86-I：手术麻醉闭环深化 */}
+          <Route path="anesthesia/preop-visit" element={<AnesthesiaPreopVisitPage />} />
+          <Route path="anesthesia/record-sheet" element={<AnesthesiaRecordSheetPage />} />
+          <Route path="anesthesia/postop-analgesia" element={<PostopAnalgesiaPage />} />
+          <Route path="anesthesia/pacu-score" element={<PacuScorePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />

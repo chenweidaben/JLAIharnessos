@@ -4105,6 +4105,10 @@ import { admissionCheckinRoutes } from './routes/admissionCheckin'; // M86-H：�
 import { wardRoundSignRoutes } from './routes/wardRoundSign'; // M86-H：【HIS-EMR一体化】三级检诊签名（住院医/主治/主任）/退回下级
 import { pdaMedAdminRoutes } from './routes/pdaMedAdmin'; // M86-H：【HIS-EMR一体化】PDA 扫码核对（患者+药品+医嘱）/服药执行确认
 import { registerRefundRoutes } from './routes/registerRefund'; // M86-H：【HIS-EMR一体化】门诊挂号退号退费联动 + 当日可退号列表
+import { anesthesiaPreopVisitRoutes } from './routes/anesthesiaPreopVisit'; // M86-I：【手术麻醉闭环】术前访视（病史/过敏史/ASA分级/气道评估/麻醉方案）
+import { anesthesiaRecordSheetRoutes } from './routes/anesthesiaRecordSheet'; // M86-I：【手术麻醉闭环】麻醉记录单（逐5分钟生命体征/用药/出入量/医师签名）
+import { postopAnalgesiaFupRoutes } from './routes/postopAnalgesiaFup'; // M86-I：【手术麻醉闭环】术后镇痛随访（VAS/Ramsay/副作用/PCA）
+import { pacuScoringRoutes } from './routes/pacuScoring'; // M86-I：【手术麻醉闭环】PACU Steward 复苏评分与出室判定
 
 // ============================================================================
 // 路由表与编译
@@ -6542,6 +6546,10 @@ const allRoutes: RouteDef[] = [
   ...wardRoundSignRoutes, // M86-H：【HIS-EMR一体化】三级检诊签名
   ...pdaMedAdminRoutes, // M86-H：【HIS-EMR一体化】PDA 给药核对
   ...registerRefundRoutes, // M86-H：【HIS-EMR一体化】门诊挂号退号退费
+  ...anesthesiaPreopVisitRoutes, // M86-I：【手术麻醉闭环】术前访视
+  ...anesthesiaRecordSheetRoutes, // M86-I：【手术麻醉闭环】麻醉记录单
+  ...postopAnalgesiaFupRoutes, // M86-I：【手术麻醉闭环】术后镇痛随访
+  ...pacuScoringRoutes, // M86-I：【手术麻醉闭环】PACU 复苏评分
 ];
 
 interface Compiled {
