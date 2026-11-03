@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Card, Col, Modal, Row, Spin, Statistic, Tag, message } from 'antd';
+import { Alert, Button, Card, Col, Modal, Progress, Row, Select, Spin, Statistic, Tag, message } from 'antd';
 import { PageContainer } from '@/components/common';
 import { usePageTitle } from '@/hooks';
 
@@ -30,11 +30,21 @@ interface TrendPoint {
   temp: number;
 }
 
+interface SepsisFactor {
+  factor: string;
+  contribution: number;
+  detail: string;
+}
+
 interface BedMonitor {
   bedId: string;
+  provider?: string;
+  stub?: boolean;
+  message?: string;
   trends: TrendPoint[];
-  sepsisScreen: { qsofa: number; lac: string; riskScore: number; suggestion: string };
-  sedation: { rass: number; aiAdvised: string };
+  sepsisScreen: { qsofa: number; lac: string; riskScore: number; suggestion: string } | null;
+  sedation: { rass: number; aiAdvised: string } | null;
+  explainability: { sepsisFactors: SepsisFactor[]; sedationBasis: string } | null;
 }
 
 interface AiAlert {
@@ -42,6 +52,8 @@ interface AiAlert {
   level: 'info' | 'warning' | 'critical';
   message: string;
   suggestedAction: string;
+  stub?: boolean;
+  explain?: { reason: string; contributingFactors: string[] } | null;
 }
 
 const demoBeds: IcuBed[] = [
@@ -112,6 +124,7 @@ export default function AiIcuMonitorPage() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [alert, setAlert] = useState<AiAlert | null>(null);
   const [alertLoading, setAlertLoading] = useState(false);
+  const [provider, setProvider] = useState<'demo' | 'llm-stub'>('demo');
 
   const loadBeds = useCallback(() => {
     let alive = true;
@@ -139,7 +152,7 @@ export default function AiIcuMonitorPage() {
     setMonitorLoading(true);
     setMonitor(null);
     try {
-      const r = await fetch(`/api/v1/ai-icu/beds/${bed.bedId}/monitor`);
+      const r = await fetch(`/api/v1/ai-icu/beds/${bed.bedId}/monitor?provider=${provider}`);
       const j = await r.json();
       if (j.data) setMonitor(j.data as BedMonitor);
     } catch {
@@ -154,7 +167,7 @@ export default function AiIcuMonitorPage() {
     setAlertLoading(true);
     setAlert(null);
     try {
-      const r = await fetch(`/api/v1/ai-icu/beds/${bed.bedId}/alerts`, {
+      const r = await fetch(`/api/v1/ai-icu/beds/${bed.bedId}/alerts?provider=${provider}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
@@ -168,8 +181,26 @@ export default function AiIcuMonitorPage() {
     }
   };
 
+  const providerExtra = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ fontSize: 13, color: '#666' }}>预测模型</span>
+      <Select
+        value={provider}
+        style={{ width: 160 }}
+        onChange={(v) => {
+          setProvider(v as 'demo' | 'llm-stub');
+          if (v === 'llm-stub') message.info('llm-stub：需接入真实模型服务，当前返回占位');
+        }}
+        options={[
+          { value: 'demo', label: 'demo（规则模拟）' },
+          { value: 'llm-stub', label: 'llm-stub（待接入）' },
+        ]}
+      />
+    </div>
+  );
+
   return (
-    <PageContainer title="AI 重症监护台" description="ICU 床位实时监护：SOFA 评分 / 脓毒症风险 / 呼吸机模式 / AI 建议与预警">
+    <PageContainer title="AI 重症监护台" description="ICU 床位实时监护：SOFA 评分 / 脓毒症风险 / 呼吸机模式 / AI 建议与预警" extra={providerExtra}>
       <Spin spinning={loading}>
         {error && <Alert type="error" showIcon message={error} style={{ marginBottom: 16 }} />}
         <Row gutter={[16, 16]}>
@@ -212,7 +243,9 @@ export default function AiIcuMonitorPage() {
         destroyOnClose
       >
         <Spin spinning={monitorLoading}>
-          {monitor && (
+          {monitor?.stub ? (
+            <Alert type="warning" showIcon message="需接入真实模型服务" description="当前选择 llm-stub，预测接口尚未接入院内大模型或评分模型。请切换 demo 查看模拟结果，或联系算法团队完成生产接入。" />
+          ) : monitor && (
             <>
               <Row gutter={12}>
                 <Col span={12}>
@@ -228,18 +261,45 @@ export default function AiIcuMonitorPage() {
                   <TrendChart label="呼吸 RR (次/分)" data={monitor.trends.map((t) => t.rr)} color="#096dd9" min={8} max={35} unit="/min" />
                 </Col>
               </Row>
-              <Card size="small" title="脓毒症筛查（qSOFA）" style={{ marginBottom: 12 }}>
-                <Row gutter={16}>
-                  <Col span={8}><Statistic title="qSOFA 评分" value={monitor.sepsisScreen.qsofa} /></Col>
-                  <Col span={8}><Statistic title="血乳酸 Lac" value={monitor.sepsisScreen.lac} /></Col>
-                  <Col span={8}><Statistic title="AI 风险分" value={monitor.sepsisScreen.riskScore} /></Col>
-                </Row>
-                <div style={{ marginTop: 8, fontSize: 13 }}>AI 建议：{monitor.sepsisScreen.suggestion}</div>
-              </Card>
-              <Card size="small" title="镇静镇痛 AI 建议">
-                <Statistic title="当前 RASS 评分" value={monitor.sedation.rass} />
-                <div style={{ marginTop: 8, fontSize: 13 }}>{monitor.sedation.aiAdvised}</div>
-              </Card>
+              {monitor.sepsisScreen && (
+                <Card size="small" title="脓毒症筛查（qSOFA）" style={{ marginBottom: 12 }}>
+                  <Row gutter={16}>
+                    <Col span={8}><Statistic title="qSOFA 评分" value={monitor.sepsisScreen.qsofa} /></Col>
+                    <Col span={8}><Statistic title="血乳酸 Lac" value={monitor.sepsisScreen.lac} /></Col>
+                    <Col span={8}><Statistic title="AI 风险分" value={monitor.sepsisScreen.riskScore} /></Col>
+                  </Row>
+                  <div style={{ marginTop: 8, fontSize: 13 }}>AI 建议：{monitor.sepsisScreen.suggestion}</div>
+                </Card>
+              )}
+              {monitor.sedation && (
+                <Card size="small" title="镇静镇痛 AI 建议" style={{ marginBottom: 12 }}>
+                  <Statistic title="当前 RASS 评分" value={monitor.sedation.rass} />
+                  <div style={{ marginTop: 8, fontSize: 13 }}>{monitor.sedation.aiAdvised}</div>
+                </Card>
+              )}
+              {monitor.explainability && (monitor.explainability.sepsisFactors.length > 0 || monitor.explainability.sedationBasis) && (
+                <Card size="small" title="模型解释（可解释性）">
+                  {monitor.explainability.sepsisFactors.length > 0 && (
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>脓毒症风险因素 Top{monitor.explainability.sepsisFactors.length}</div>
+                      {monitor.explainability.sepsisFactors.map((f, idx) => (
+                        <div key={idx} style={{ marginBottom: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
+                            <span><Tag color={idx === 0 ? 'red' : idx === 1 ? 'orange' : 'default'}>{f.factor}</Tag>{f.detail}</span>
+                            <span style={{ color: '#666' }}>贡献 {f.contribution}</span>
+                          </div>
+                          <Progress percent={f.contribution} showInfo={false} strokeColor={idx === 0 ? '#cf1322' : idx === 1 ? '#d46b08' : '#bfbfbf'} size="small" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {monitor.explainability.sedationBasis && (
+                    <div style={{ fontSize: 12, color: '#555', borderTop: '1px dashed #eee', paddingTop: 8 }}>
+                      <span style={{ fontWeight: 600 }}>镇静建议依据：</span>{monitor.explainability.sedationBasis}
+                    </div>
+                  )}
+                </Card>
+              )}
             </>
           )}
         </Spin>
@@ -253,14 +313,29 @@ export default function AiIcuMonitorPage() {
         destroyOnClose
       >
         <Spin spinning={alertLoading}>
-          {alert ? (
+          {alert?.stub ? (
+            <Alert type="warning" showIcon message="需接入真实模型服务" description="当前选择 llm-stub，预警判定尚未接入院内大模型。请切换 demo 查看模拟预警。" />
+          ) : alert ? (
             <>
               <p>
                 <Tag color={alertTag[alert.level].color}>{alertTag[alert.level].text}</Tag>
                 <span style={{ marginLeft: 8, color: '#999', fontSize: 12 }}>{alert.alertId}</span>
               </p>
               <p style={{ fontWeight: 600 }}>{alert.message}</p>
-              <Alert type={alert.level === 'critical' ? 'error' : alert.level === 'warning' ? 'warning' : 'info'} showIcon message="建议处置" description={alert.suggestedAction} />
+              <Alert type={alert.level === 'critical' ? 'error' : alert.level === 'warning' ? 'warning' : 'info'} showIcon message="建议处置" description={alert.suggestedAction} style={{ marginBottom: 12 }} />
+              {alert.explain && (
+                <Card size="small" title="预警判定理由">
+                  <div style={{ fontSize: 13, marginBottom: 8 }}>{alert.explain.reason}</div>
+                  {alert.explain.contributingFactors.length > 0 && (
+                    <div>
+                      <span style={{ fontSize: 12, color: '#666' }}>贡献因素：</span>
+                      {alert.explain.contributingFactors.map((f, i) => (
+                        <Tag key={i} style={{ marginTop: 4 }}>{f}</Tag>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              )}
             </>
           ) : (
             <div style={{ textAlign: 'center', padding: 20 }}>生成中...</div>

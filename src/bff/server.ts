@@ -4113,6 +4113,22 @@ import { fhirPatientRoutes } from './routes/fhirPatient'; // M86-I：【FHIR R4�
 import { fhirEncounterRoutes } from './routes/fhirEncounter'; // M86-I：【FHIR R4】Encounter 资源出口
 import { fhirMedicationRequestRoutes } from './routes/fhirMedicationRequest'; // M86-I：【FHIR R4】MedicationRequest 资源出口
 import { fhirConditionRoutes } from './routes/fhirCondition'; // M86-I：【FHIR R4】Condition 资源出口
+import { fhirObservationRoutes } from './routes/fhirObservation'; // M86-P：【FHIR R4】Observation 资源出口
+import { fhirMedicationRoutes } from './routes/fhirMedication'; // M86-P：【FHIR R4】Medication 资源出口
+import { fhirDiagnosticReportRoutes } from './routes/fhirDiagnosticReport'; // M86-P：【FHIR R4】DiagnosticReport 资源出口
+import { fhirProcedureRoutes } from './routes/fhirProcedure'; // M86-P：【FHIR R4】Procedure 资源出口
+import { fhirImmunizationRoutes } from './routes/fhirImmunization'; // M86-P：【FHIR R4】Immunization 资源出口
+import { fhirAllergyIntoleranceRoutes } from './routes/fhirAllergyIntolerance'; // M86-P：【FHIR R4】AllergyIntolerance 资源出口
+import { fhirCarePlanRoutes } from './routes/fhirCarePlan'; // M86-P：【FHIR R4】CarePlan 资源出口
+import { fhirServiceRequestRoutes } from './routes/fhirServiceRequest'; // M86-P：【FHIR R4】ServiceRequest 资源出口
+import { fhirPractitionerRoutes } from './routes/fhirPractitioner'; // M86-P：【FHIR R4】Practitioner 资源出口
+import { fhirOrganizationRoutes } from './routes/fhirOrganization'; // M86-P：【FHIR R4】Organization 资源出口
+import { fhirLocationRoutes } from './routes/fhirLocation'; // M86-P：【FHIR R4】Location 资源出口
+import { fhirAppointmentRoutes } from './routes/fhirAppointment'; // M86-P：【FHIR R4】Appointment 资源出口
+import { fhirDocumentReferenceRoutes } from './routes/fhirDocumentReference'; // M86-P：【FHIR R4】DocumentReference 资源出口
+import { fhirImagingStudyRoutes } from './routes/fhirImagingStudy'; // M86-P：【FHIR R4】ImagingStudy 资源出口
+import { fhirSpecimenRoutes } from './routes/fhirSpecimen'; // M86-P：【FHIR R4】Specimen 资源出口
+import { fhirMedicationAdministrationRoutes } from './routes/fhirMedicationAdministration'; // M86-P：【FHIR R4】MedicationAdministration 资源出口
 import { cryptoSignatureRoutes } from './routes/cryptoSignature'; // M86-J：【国密签名】SM2/SM3 电子签名留痕骨架
 import { agentResourcesRoutes } from './routes/agentResources'; // M86-K：【AgentFramework】资源 Agent 化（医嘱/病历/检验检查/患者360）
 import { medicalCaseGraphRoutes } from './routes/medicalCaseGraph'; // M86-L：【医案智图】病历知识图谱
@@ -6564,6 +6580,22 @@ const allRoutes: RouteDef[] = [
   ...fhirEncounterRoutes, // M86-I：【FHIR R4】Encounter
   ...fhirMedicationRequestRoutes, // M86-I：【FHIR R4】MedicationRequest
   ...fhirConditionRoutes, // M86-I：【FHIR R4】Condition
+  ...fhirObservationRoutes, // M86-P：【FHIR R4】Observation
+  ...fhirMedicationRoutes, // M86-P：【FHIR R4】Medication
+  ...fhirDiagnosticReportRoutes, // M86-P：【FHIR R4】DiagnosticReport
+  ...fhirProcedureRoutes, // M86-P：【FHIR R4】Procedure
+  ...fhirImmunizationRoutes, // M86-P：【FHIR R4】Immunization
+  ...fhirAllergyIntoleranceRoutes, // M86-P：【FHIR R4】AllergyIntolerance
+  ...fhirCarePlanRoutes, // M86-P：【FHIR R4】CarePlan
+  ...fhirServiceRequestRoutes, // M86-P：【FHIR R4】ServiceRequest
+  ...fhirPractitionerRoutes, // M86-P：【FHIR R4】Practitioner
+  ...fhirOrganizationRoutes, // M86-P：【FHIR R4】Organization
+  ...fhirLocationRoutes, // M86-P：【FHIR R4】Location
+  ...fhirAppointmentRoutes, // M86-P：【FHIR R4】Appointment
+  ...fhirDocumentReferenceRoutes, // M86-P：【FHIR R4】DocumentReference
+  ...fhirImagingStudyRoutes, // M86-P：【FHIR R4】ImagingStudy
+  ...fhirSpecimenRoutes, // M86-P：【FHIR R4】Specimen
+  ...fhirMedicationAdministrationRoutes, // M86-P：【FHIR R4】MedicationAdministration
   ...cryptoSignatureRoutes, // M86-J：【国密签名】SM2/SM3 签名留痕
   ...agentResourcesRoutes, // M86-K：【AgentFramework】资源 Agent 化
   ...medicalCaseGraphRoutes, // M86-L：【医案智图】病历知识图谱

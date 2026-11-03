@@ -1,4 +1,4 @@
-/** 健澜科技：P2 AI 重症监护深化（M86-M）。DEMO_MODE 下内存模拟 AI 监护数据。 */
+/** 健澜科技：P2 AI 重症监护深化（M86-P）。DEMO_MODE 下 demo provider 内存模拟，预留可插拔模型接口。 */
 import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -16,6 +16,56 @@ interface IcuBed {
   updatedAt: string;
 }
 
+interface TrendPoint {
+  t: string;
+  hr: number;
+  bp: number;
+  spo2: number;
+  rr: number;
+  temp: number;
+}
+
+/** 脓毒症风险因素（可解释性 Top3，按贡献降序） */
+interface SepsisFactor {
+  factor: string;
+  /** 贡献度 0-100 */
+  contribution: number;
+  detail: string;
+}
+
+/** 预测输入：生命体征趋势数组 + 床信息 */
+interface MonitorInput {
+  bedId: string;
+  patientName: string;
+  sofaScore: number;
+  risk: SepsisRisk;
+  trends: TrendPoint[];
+}
+
+interface SepsisPrediction {
+  qsofa: number;
+  lac: string;
+  riskScore: number;
+  level: SepsisRisk;
+  suggestion: string;
+  /** Top3 风险因素（按贡献降序）；llm-stub 可空 */
+  factors?: SepsisFactor[];
+}
+
+interface SedationSuggestion {
+  rass: number;
+  aiAdvised: string;
+  /** 镇静建议依据；llm-stub 可空 */
+  basis?: string;
+}
+
+/** 可插拔预测 provider：demo 内存模拟 / llm-stub 预留生产接入点 */
+interface IPredictionProvider {
+  name: string;
+  predictSepsis(input: MonitorInput): SepsisPrediction;
+  predictSedation(input: MonitorInput): SedationSuggestion;
+}
+
 const ventilatorModes = ['SIMV-PC', 'PSV', 'BiPAP', 'A/C VC', 'CPAP'];
 
 const demoBeds: IcuBed[] = [
@@ -26,8 +76,8 @@ const demoBeds: IcuBed[] = [
   { bedId: 'ICU-C-01', patientId: 'P-1005', patientName: '刘**', sofaScore: 5, sepsisRisk: 'medium', ventilatorMode: 'BiPAP', aiSuggestion: 'RASS 偏浅，警惕躁动拔管风险，建议适度加深镇静', updatedAt: '2026-11-04 04:20' },
 ];
 
-function genTrends(baseHr: number, baseBp: number, baseSpo2: number, baseRr: number, baseTemp: number) {
-  const points: { t: string; hr: number; bp: number; spo2: number; rr: number; temp: number }[] = [];
+function genTrends(baseHr: number, baseBp: number, baseSpo2: number, baseRr: number, baseTemp: number): TrendPoint[] {
+  const points: TrendPoint[] = [];
   const now = Date.now();
   for (let i = 11; i >= 0; i--) {
     const ts = new Date(now - i * 15 * 60 * 1000);
@@ -61,6 +111,75 @@ const trendSeeds: Record<string, { hr: number; bp: number; spo2: number; rr: num
   'ICU-C-01': { hr: 96, bp: 105, spo2: 95, rr: 20, temp: 37.8 },
 };
 
+/** demo provider：DEMO_MODE 下基于内存床旁数据与生命体征趋势的规则化模拟 */
+const demoProvider: IPredictionProvider = {
+  name: 'demo',
+  predictSepsis(input: MonitorInput): SepsisPrediction {
+    const screen = bedDetailMap[input.bedId] ?? bedDetailMap['ICU-A-02'];
+    const lacValue = parseFloat(screen.lac) || 0;
+    const latestHr = input.trends[input.trends.length - 1]?.hr ?? 0;
+    const factors: SepsisFactor[] = [];
+    if (screen.qsofa >= 2) {
+      factors.push({ factor: 'qSOFA≥2', contribution: Math.min(60, 20 + screen.qsofa * 12), detail: `qSOFA=${screen.qsofa}，呼吸/意识/收缩压三项阳性达 ${screen.qsofa} 项` });
+    }
+    if (lacValue >= 2.0) {
+      factors.push({ factor: '乳酸升高', contribution: Math.min(55, 15 + Math.round((lacValue - 1.0) * 10)), detail: `血乳酸 ${screen.lac}（>2.0 mmol/L 提示组织灌注不足）` });
+    }
+    if (latestHr >= 100) {
+      factors.push({ factor: '心率增快', contribution: Math.min(45, 10 + Math.round((latestHr - 90) * 1.2)), detail: `当前 HR=${latestHr} bpm，窦性心动过速代偿` });
+    }
+    if (factors.length < 3) {
+      factors.push({ factor: 'SOFA 升高', contribution: Math.min(40, 8 + input.sofaScore * 4), detail: `SOFA=${input.sofaScore}，多器官功能受累` });
+    }
+    factors.sort((a, b) => b.contribution - a.contribution);
+    return {
+      qsofa: screen.qsofa,
+      lac: screen.lac,
+      riskScore: screen.riskScore,
+      level: input.risk,
+      suggestion: screen.suggestion,
+      factors: factors.slice(0, 3),
+    };
+  },
+  predictSedation(input: MonitorInput): SedationSuggestion {
+    const screen = bedDetailMap[input.bedId] ?? bedDetailMap['ICU-A-02'];
+    const latestHr = input.trends[input.trends.length - 1]?.hr ?? 0;
+    const mode = demoBeds.find((b) => b.bedId === input.bedId)?.ventilatorMode ?? 'PSV';
+    return {
+      rass: screen.rass,
+      aiAdvised: screen.aiAdvised,
+      basis: `基于 RASS=${screen.rass} 趋势与镇静药物浓度建议，结合最新 HR=${latestHr} bpm 与呼吸机模式 ${mode} 综合判定`,
+    };
+  },
+};
+
+// TODO(生产接入点): 替换为院内大模型 API 或脓毒症/镇静评分模型服务。
+// 传入 MonitorInput（生命体征趋势 + 床旁信息），由真实模型返回 riskScore/qsofa/lac/level/suggestion
+// 及解释性因素（sepsisFactors），并保持本接口签名不变以实现热插拔。
+const llmProviderStub: IPredictionProvider = {
+  name: 'llm-stub',
+  predictSepsis(): SepsisPrediction {
+    throw new Error('LLM/评分模型 provider stub：需接入真实大模型 API 或院内脓毒症评分模型服务');
+  },
+  predictSedation(): SedationSuggestion {
+    throw new Error('LLM/评分模型 provider stub：需接入真实大模型 API 或院内镇静评分模型服务');
+  },
+};
+
+const predictionProviders: Record<string, IPredictionProvider> = {
+  demo: demoProvider,
+  'llm-stub': llmProviderStub,
+};
+
+function resolveProvider(c: Ctx): IPredictionProvider | { badRequest: Response } {
+  const name = c.query.get('provider') || 'demo';
+  const provider = predictionProviders[name];
+  if (!provider) {
+    return { badRequest: json(fail(ErrorCode.BAD_REQUEST, `未知预测 provider: ${name}，可选 demo / llm-stub`), 400) };
+  }
+  return provider;
+}
+
 export const aiIcuMonitorRoutes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/ai-icu/beds', auth: true,
     handle: async (): Promise<Response> => {
@@ -70,22 +189,56 @@ export const aiIcuMonitorRoutes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/ai-icu/beds/:bedId/monitor', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const bedId = c.params.bedId;
-      if (!isDemo) return json(ok({ bedId, trends: [], sepsisScreen: null, sedation: null }));
+      const resolved = resolveProvider(c);
+      if ('badRequest' in resolved) return resolved.badRequest;
+      const provider: IPredictionProvider = resolved;
+      if (!isDemo) return json(ok({ bedId, provider: provider.name, trends: [], sepsisScreen: null, sedation: null, explainability: null }));
       const seed = trendSeeds[bedId] ?? trendSeeds['ICU-A-02'];
-      const screen = bedDetailMap[bedId] ?? bedDetailMap['ICU-A-02'];
+      const trends = genTrends(seed.hr, seed.bp, seed.spo2, seed.rr, seed.temp);
+      const bed = demoBeds.find((b) => b.bedId === bedId);
+      const input: MonitorInput = {
+        bedId,
+        patientName: bed?.patientName ?? '张**',
+        sofaScore: bed?.sofaScore ?? 0,
+        risk: bed?.sepsisRisk ?? 'low',
+        trends,
+      };
+      let sepsis: SepsisPrediction;
+      let sedation: SedationSuggestion;
+      try {
+        sepsis = provider.predictSepsis(input);
+        sedation = provider.predictSedation(input);
+      } catch {
+        return json(ok({
+          demo: true,
+          bedId,
+          provider: provider.name,
+          stub: true,
+          message: '需接入真实模型服务',
+          trends,
+          sepsisScreen: null,
+          sedation: null,
+          explainability: null,
+        }));
+      }
       return json(ok({
         demo: true,
         bedId,
-        trends: genTrends(seed.hr, seed.bp, seed.spo2, seed.rr, seed.temp),
+        provider: provider.name,
+        trends,
         sepsisScreen: {
-          qsofa: screen.qsofa,
-          lac: screen.lac,
-          riskScore: screen.riskScore,
-          suggestion: screen.suggestion,
+          qsofa: sepsis.qsofa,
+          lac: sepsis.lac,
+          riskScore: sepsis.riskScore,
+          suggestion: sepsis.suggestion,
         },
         sedation: {
-          rass: screen.rass,
-          aiAdvised: screen.aiAdvised,
+          rass: sedation.rass,
+          aiAdvised: sedation.aiAdvised,
+        },
+        explainability: {
+          sepsisFactors: sepsis.factors ?? [],
+          sedationBasis: sedation.basis ?? '',
         },
       }));
     } },
@@ -93,9 +246,25 @@ export const aiIcuMonitorRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const bedId = c.params.bedId;
       await c.body().catch(() => ({} as Record<string, unknown>));
-      if (!isDemo) return json(ok({ bedId, alertId: `ALT-${Date.now()}`, level: 'info' as const, message: 'ok', suggestedAction: '' }));
+      const resolved = resolveProvider(c);
+      if ('badRequest' in resolved) return resolved.badRequest;
+      const provider: IPredictionProvider = resolved;
+      if (!isDemo) return json(ok({ bedId, alertId: `ALT-${Date.now()}`, level: 'info' as const, message: 'ok', suggestedAction: '', explain: null }));
       const bed = demoBeds.find((b) => b.bedId === bedId);
       if (!bed) return json(fail(ErrorCode.NOT_FOUND, `床位 ${bedId} 不存在`), 404);
+      if (provider.name === 'llm-stub') {
+        return json(ok({
+          demo: true,
+          bedId,
+          provider: provider.name,
+          stub: true,
+          message: '需接入真实模型服务',
+          alertId: `ALT-${bedId}-${Date.now().toString(36)}`,
+          level: 'info' as const,
+          suggestedAction: '',
+          explain: null,
+        }));
+      }
       const level: 'info' | 'warning' | 'critical' =
         bed.sepsisRisk === 'high' ? 'critical' : bed.sepsisRisk === 'medium' ? 'warning' : 'info';
       const message =
@@ -110,6 +279,17 @@ export const aiIcuMonitorRoutes: RouteDef[] = [
           : bed.sepsisRisk === 'medium'
             ? '加密监测频次，2h 内复查感染指标与乳酸'
             : '维持现有监护与治疗方案';
+      const screen = bedDetailMap[bedId] ?? bedDetailMap['ICU-A-02'];
+      const contributingFactors: string[] = [];
+      if (bed.sepsisRisk !== 'low') contributingFactors.push(`SOFA=${bed.sofaScore}`);
+      if (bed.sofaScore >= 6) contributingFactors.push('SOFA≥6 提示多器官功能障碍');
+      if (screen.qsofa >= 2) contributingFactors.push(`qSOFA=${screen.qsofa}≥2`);
+      if (parseFloat(screen.lac) >= 2.0) contributingFactors.push(`血乳酸 ${screen.lac} 升高`);
+      const reason = level === 'critical'
+        ? `${bed.patientName} 床脓毒症高危，qSOFA=${screen.qsofa} 且乳酸 ${screen.lac}，满足危急预警阈值`
+        : level === 'warning'
+          ? `${bed.patientName} 床 SOFA=${bed.sofaScore} 达中危区间，病情有恶化趋势`
+          : `${bed.patientName} 床生命体征平稳，未触发危急阈值`;
       return json(ok({
         demo: true,
         alertId: `ALT-${bedId}-${Date.now().toString(36)}`,
@@ -117,6 +297,10 @@ export const aiIcuMonitorRoutes: RouteDef[] = [
         message,
         suggestedAction,
         triggeredAt: new Date().toISOString(),
+        explain: {
+          reason,
+          contributingFactors,
+        },
       }));
     } },
 ];
