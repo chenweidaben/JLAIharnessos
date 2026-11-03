@@ -4094,6 +4094,17 @@ import { emrAiOutpatientRecordGenV14Routes } from './routes/emrAiOutpatientRecor
 import { emrAiPreopAssessRecoV14Routes } from './routes/emrAiPreopAssessRecoV14';
 import { securityBaselineRoutes } from './routes/securityBaseline';
 import { consultAgentRoutes } from './routes/consultAgentRoutes'; // M86-D：【AI 原生在线咨询智能体】12 端点 /api/v1/consult-agent/*（SSE 实时流 + 回放，急症旁路，草稿待医师复核）
+import { orderVerifyRoutes } from './routes/orderVerify'; // M86-H：【HIS-EMR一体化】医嘱双人核对/停止/拒绝/完成 + 待核对列表
+import { billingChargeRoutes } from './routes/billingCharge'; // M86-H：【HIS-EMR一体化】门诊收费/退费/票据重打 + 当日待收费队列
+import { pharmacyDispenseConfirmRoutes } from './routes/pharmacyDispenseConfirm'; // M86-H：【HIS-EMR一体化】药房发药确认（双人签名）/退药申请 + 待发药处方
+import { dischargeSettleRoutes } from './routes/dischargeSettle'; // M86-H：【HIS-EMR一体化】出院结算/押金多退/发票重打 + 待结算患者
+import { vitalsChartRoutes } from './routes/vitalsChart'; // M86-H：【HIS-EMR一体化】体温单读写（体温/脉搏/呼吸/血压/体重/入出量）
+import { pharmacyPrepackRoutes } from './routes/pharmacyPrepack'; // M86-H：【HIS-EMR一体化】住院摆药任务列表/摆药完成
+import { pharmacyReturnRoutes } from './routes/pharmacyReturn'; // M86-H：【HIS-EMR一体化】退药申请/审核/入库 + 待审核退药
+import { admissionCheckinRoutes } from './routes/admissionCheckin'; // M86-H：【HIS-EMR一体化】入院床位分配/腕带打印确认 + 待分配床位患者
+import { wardRoundSignRoutes } from './routes/wardRoundSign'; // M86-H：【HIS-EMR一体化】三级检诊签名（住院医/主治/主任）/退回下级
+import { pdaMedAdminRoutes } from './routes/pdaMedAdmin'; // M86-H：【HIS-EMR一体化】PDA 扫码核对（患者+药品+医嘱）/服药执行确认
+import { registerRefundRoutes } from './routes/registerRefund'; // M86-H：【HIS-EMR一体化】门诊挂号退号退费联动 + 当日可退号列表
 
 // ============================================================================
 // 路由表与编译
@@ -6520,6 +6531,17 @@ const allRoutes: RouteDef[] = [
   ...emrAiPreopAssessRecoV14Routes, // 补注册：病历AI术前评估推荐
   ...securityBaselineRoutes, // 补注册：安全基线检查
   ...consultAgentRoutes, // M86-D：在线咨询智能体（read / write / audit 三权限码，SSE 实时流 + 回放）
+  ...orderVerifyRoutes, // M86-H：【HIS-EMR一体化】医嘱双人核对闭环
+  ...billingChargeRoutes, // M86-H：【HIS-EMR一体化】门诊收费结算
+  ...pharmacyDispenseConfirmRoutes, // M86-H：【HIS-EMR一体化】药房发药双人签名
+  ...dischargeSettleRoutes, // M86-H：【HIS-EMR一体化】出院结算
+  ...vitalsChartRoutes, // M86-H：【HIS-EMR一体化】体温单
+  ...pharmacyPrepackRoutes, // M86-H：【HIS-EMR一体化】住院摆药
+  ...pharmacyReturnRoutes, // M86-H：【HIS-EMR一体化】退药闭环
+  ...admissionCheckinRoutes, // M86-H：【HIS-EMR一体化】入院登记/床位分配/腕带
+  ...wardRoundSignRoutes, // M86-H：【HIS-EMR一体化】三级检诊签名
+  ...pdaMedAdminRoutes, // M86-H：【HIS-EMR一体化】PDA 给药核对
+  ...registerRefundRoutes, // M86-H：【HIS-EMR一体化】门诊挂号退号退费
 ];
 
 interface Compiled {
