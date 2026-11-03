@@ -4867,6 +4867,12 @@ const PostopAnalgesiaPage = lazy(() => import('@/pages/anesthesia/postop-analges
 const PacuScorePage = lazy(() => import('@/pages/anesthesia/pacu-score'));
 // M86-J：国密 SM2/SM3 电子签名留痕审计
 const CryptoSignatureAuditPage = lazy(() => import('@/pages/crypto/signature-audit'));
+// M86-K~O：P2 五切片
+const AgentResourcesPage = lazy(() => import('@/pages/agent-resources'));
+const MedicalCaseGraphPage = lazy(() => import('@/pages/medical-case-graph'));
+const AiIcuMonitorPage = lazy(() => import('@/pages/ai-icu'));
+const InteropFiveBPage = lazy(() => import('@/pages/interop-five-b'));
+const CryptoAssessCnPage = lazy(() => import('@/pages/crypto-assess-cn'));
 
 function PageLoading() {
   return (
@@ -10862,6 +10868,11 @@ export default function AppRoutes() {
           <Route path="anesthesia/postop-analgesia" element={<PostopAnalgesiaPage />} />
           <Route path="anesthesia/pacu-score" element={<PacuScorePage />} />
           <Route path="crypto/signature-audit" element={<CryptoSignatureAuditPage />} />
+          <Route path="agent-resources" element={<AgentResourcesPage />} />
+          <Route path="medical-case-graph" element={<MedicalCaseGraphPage />} />
+          <Route path="ai-icu" element={<AiIcuMonitorPage />} />
+          <Route path="interop-five-b/self-assessment" element={<InteropFiveBPage />} />
+          <Route path="security/crypto-assess-cn" element={<CryptoAssessCnPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <SessionTimeoutWatcher />

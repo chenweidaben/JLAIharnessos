@@ -4114,6 +4114,11 @@ import { fhirEncounterRoutes } from './routes/fhirEncounter'; // M86-I：【FHIR
 import { fhirMedicationRequestRoutes } from './routes/fhirMedicationRequest'; // M86-I：【FHIR R4】MedicationRequest 资源出口
 import { fhirConditionRoutes } from './routes/fhirCondition'; // M86-I：【FHIR R4】Condition 资源出口
 import { cryptoSignatureRoutes } from './routes/cryptoSignature'; // M86-J：【国密签名】SM2/SM3 电子签名留痕骨架
+import { agentResourcesRoutes } from './routes/agentResources'; // M86-K：【AgentFramework】资源 Agent 化（医嘱/病历/检验检查/患者360）
+import { medicalCaseGraphRoutes } from './routes/medicalCaseGraph'; // M86-L：【医案智图】病历知识图谱
+import { aiIcuMonitorRoutes } from './routes/aiIcuMonitor'; // M86-M：【AI重症】ICU AI 监护深化
+import { interopFiveBRoutes } from './routes/interopFiveB'; // M86-N：【互联互通五乙】五级乙等自评
+import { cryptoAssessCnRoutes } from './routes/cryptoAssessCn'; // M86-O：【等保三级密评】商用密码应用安全性评估自评
 
 // ============================================================================
 // 路由表与编译
@@ -6560,6 +6565,11 @@ const allRoutes: RouteDef[] = [
   ...fhirMedicationRequestRoutes, // M86-I：【FHIR R4】MedicationRequest
   ...fhirConditionRoutes, // M86-I：【FHIR R4】Condition
   ...cryptoSignatureRoutes, // M86-J：【国密签名】SM2/SM3 签名留痕
+  ...agentResourcesRoutes, // M86-K：【AgentFramework】资源 Agent 化
+  ...medicalCaseGraphRoutes, // M86-L：【医案智图】病历知识图谱
+  ...aiIcuMonitorRoutes, // M86-M：【AI重症】ICU AI 监护深化
+  ...interopFiveBRoutes, // M86-N：【互联互通五乙】自评工作台
+  ...cryptoAssessCnRoutes, // M86-O：【等保三级密评】密评自评
 ];
 
 interface Compiled {
