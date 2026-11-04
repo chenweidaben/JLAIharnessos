@@ -13,6 +13,7 @@ import { attachUser, newCtx, requireAuth, requireRole, verifyJwt } from './middl
 import { verifyCsrf } from './middleware/csrf';
 import { withErrorHandler } from './middleware/error';
 import { auditOperation } from './middleware/audit';
+import { auditEventHook } from './middleware/auditEventHook'; // P4-2：内存哈希链审计 after-hook
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
 import { withSecurityHeaders } from './middleware/securityHeaders';
@@ -6971,6 +6972,8 @@ async function handleFetch(
     logRequest(ctx, status, startedAt);
     // 操作审计（POST/PUT/DELETE 才留痕，fire-and-forget，失败不影响主请求）
     auditOperation(ctx);
+    // P4-2：内存哈希链审计 after-hook（所有非 GET /api/v1/* 状态变更）
+    auditEventHook({ ctx, status });
     recordHttpRequest({
       method: req.method,
       route: routeLabel,
