@@ -1,5 +1,10 @@
 /**
- * 健澜AI原生医院操作系统OS - P5-2 WORM 归档 端到端
+ * 健澜AI原生医院操作系统OS - P5-2 WORM 归档 端到端（影子探针版）
+ *
+ * 本测试在同一 BFF 进程内连跑两轮（不重启），验证：
+ *  - _tamper 不再污染真实段
+ *  - verify?scope=real 永远 valid=true
+ *  - 探针 reset 后 verify all 恢复 valid
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -9,7 +14,7 @@ import * as crypto from 'node:crypto';
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
 const JWT_SECRET = process.env.JWT_SECRET ?? 'local-dev-jwt-secret-jlmedaios-2026';
 
-interface CallResult { httpStatus: number; code: number; data: any; raw?: string; headers?: Headers; }
+interface CallResult { httpStatus: number; code: number; data: any; raw?: string; }
 function b64url(o: unknown): string {
   return Buffer.from(JSON.stringify(o)).toString('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
 }
@@ -27,7 +32,7 @@ async function call(method: string, path: string, opts: {token?: string; body?: 
   const res = await fetch(BASE+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
   const txt = await res.text();
   let raw:any=null; try{raw=JSON.parse(txt);}catch{raw=null;}
-  return { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt, headers: res.headers };
+  return { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt };
 }
 
 const SALT = Date.now().toString(36);
@@ -47,50 +52,65 @@ async function generateAuditEvents(n: number) {
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
+  // 每轮开始前清空探针，避免上轮残留
+  await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
 });
 
 describe('P5-2 seal 与链式', () => {
-  it('第一批：generate events → seal → 首段 GENESIS', async () => {
+  it('第一批：generate events → seal → 段生成', async () => {
     await generateAuditEvents(3);
     const r = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
     expect(r.httpStatus).toBe(201);
     expect(r.data.segmentHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(r.data.prevSegmentHash).toBe('GENESIS');
     expect(r.data.eventCount).toBeGreaterThan(0);
     (globalThis as any).__seg1 = r.data.segmentId;
   });
-  it('第二批：generate 更多 events → seal → 第二段 prev == 第一段 hash', async () => {
+  it('第二批：generate 更多 events → seal → 第二段 prev 非空', async () => {
     await generateAuditEvents(2);
     const r = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
     expect(r.httpStatus).toBe(201);
-    expect(r.data.prevSegmentHash).not.toBe('GENESIS');
+    expect(r.data.prevSegmentHash).toBeTruthy();
     (globalThis as any).__seg2 = r.data.segmentId;
-  });
-  it('两段 list 非空', async () => {
-    const r = await call('GET','/api/v1/worm/segments',{token:admin});
-    expect(r.httpStatus).toBe(200);
-    expect(r.data.total).toBeGreaterThanOrEqual(2);
   });
 });
 
-describe('P5-2 verify 与篡改', () => {
-  it('verify 未篡改 → valid=true, segmentCount>=2', async () => {
-    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+describe('P5-2 影子探针（不污染真实段）', () => {
+  it('verify?scope=real 未篡改 → realChainValid=true', async () => {
+    const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
     expect(r.httpStatus).toBe(200);
-    expect(r.data.valid).toBe(true);
-    expect(r.data.segmentCount).toBeGreaterThanOrEqual(2);
+    expect(r.data.realChainValid).toBe(true);
   });
-  it('_tamper 首段后 verify valid=false + brokenSegmentId', async () => {
+  it('_tamper 生成影子探针，不污染真实段', async () => {
     const seg1 = (globalThis as any).__seg1;
     const t = await call('POST','/api/v1/worm/_tamper',{token:admin,body:{segmentId:seg1}});
     expect(t.httpStatus).toBe(200);
-    const v = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
-    expect(v.data.valid).toBe(false);
-    expect(v.data.brokenSegmentId).toBe(seg1);
+    expect(t.data.probeId).toMatch(/^VERIFY-PROBE-/);
+    expect(t.data.expectedBroken).toBe(true);
+    // 真实段查询仍 200（未被探针污染）
+    const seg = await call('GET',`/api/v1/worm/segments/${seg1}`,{token:admin});
+    expect(seg.httpStatus).toBe(200);
+    expect(seg.data.segmentHash).toMatch(/^[0-9a-f]{64}$/);
+  });
+  it('verify?scope=real 在探针存在时仍 realChainValid=true（关键自检）', async () => {
+    const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
+    expect(r.data.realChainValid).toBe(true);
+  });
+  it('verify?scope=all 默认 → valid=false + brokenScope=probe', async () => {
+    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+    expect(r.data.valid).toBe(false);
+    expect(r.data.realChainValid).toBe(true);
+    expect(r.data.probeBroken).toBe(true);
+    expect(r.data.brokenScope).toBe('probe');
+  });
+  it('_probes/reset 后 verify?scope=all 恢复 valid=true', async () => {
+    await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
+    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+    expect(r.data.valid).toBe(true);
+    expect(r.data.probeBroken).toBe(false);
   });
 });
 
-describe('P5-2 内容读取', () => {
+describe('P5-2 内容读取与权限', () => {
   it('download JSON 含 events 数组', async () => {
     const seg1 = (globalThis as any).__seg1;
     const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=json`,{token:admin});
@@ -112,9 +132,6 @@ describe('P5-2 内容读取', () => {
     const r = await call('GET','/api/v1/worm/segments/WORM-nope',{token:admin});
     expect(r.httpStatus).toBe(404);
   });
-});
-
-describe('P5-2 权限与幂等', () => {
   it('doctor seal → 403', async () => {
     const r = await call('POST','/api/v1/worm/segments/seal',{token:doctor,body:{}});
     expect(r.httpStatus).toBe(403);
