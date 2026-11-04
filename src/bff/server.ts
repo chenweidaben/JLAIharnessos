@@ -4139,6 +4139,7 @@ import { outpatientRegisterTradeRoutes } from './routes/outpatientRegisterTrade'
 import { nurseStationTradeRoutes } from './routes/nurseStationTrade'; // P0-3：护士站交易（医嘱审核/PDA床边执行/执行单生成）
 import { pharmacyDispenseTradeRoutes } from './routes/pharmacyDispenseTrade'; // P0-4：药房发药交易（摆药批次/双人核对发药/退药审批）
 import { inpatientDepositSettleTradeRoutes } from './routes/inpatientDepositSettleTrade'; // P0-5：住院押金/出院结算交易（预交金缴纳/押金预警/出院结算一日清单）
+import { orderCpoeRoutes } from './routes/orderCpoe'; // P0-2：医嘱 CPOE 交易闭环（审核/成套/执行单/权限分级）
 
 // ============================================================================
 // 路由表与编译
@@ -4553,6 +4554,7 @@ const allRoutes: RouteDef[] = [
   ...m567Routes, // M567 新标准 P6（病案首页：10 份种子·5 draft+4 verified+1 archived·draft→verified/revise 仍 draft·409 already_verified/already_archived）
   ...m568Routes, // M568 新标准 P6（医疗技术授权：15 条种子·多医生×4 级·2 条已过期 GET 自动 flag·同医生同技术未过期重复 409 already_authorized·revoke 重复 409）
   ...m569Routes, // M569 新标准 P6（急诊转诊：12 条种子·red/yellow/green·2 条 red 30min 未接 overdue·referred→accepted→completed·409 must_accept_first/already_accepted/already_completed）
+  ...orderCpoeRoutes, // P0-2：医嘱 CPOE 闭环（须先于 m570/orderVerify 注册，使 POST /:id/review、/:id/stop 由 CPOE 状态机权威处理，首匹配胜出）
   ...m570Routes, // M570 新标准 P7（医嘱闭环：仅新增 POST /:id/review·draft→reviewed approve / reject 直接 cancelled·409 already_reviewed；GET/POST/execute/cancel 已有 order.ts DB 不重复）
   ...m571Routes, // M571 新标准 P7（护理记录单：仅新增 GET /stats·15 条种子·三班多患者·byPatient 出入量平衡 + byShift 均值；GET/POST 已有 nursingRecord.ts DB 不重复）
   ...m572Routes, // M572 新标准 P7（检验检查申请：18 条种子·lab/imaging/pathology·3 条 stat 1h 未报 overdue·requested→reported/cancelled·409 already_reported/already_cancelled）
