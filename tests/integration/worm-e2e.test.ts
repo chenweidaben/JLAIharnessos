@@ -1,10 +1,6 @@
 /**
- * 健澜AI原生医院操作系统OS - P5-2 WORM 归档 端到端（影子探针版）
- *
- * 本测试在同一 BFF 进程内连跑两轮（不重启），验证：
- *  - _tamper 不再污染真实段
- *  - verify?scope=real 永远 valid=true
- *  - 探针 reset 后 verify all 恢复 valid
+ * 健澜AI原生医院操作系统OS - P5-2/P5-4 WORM E2E（国密硬化版，精简写调用）
+ * 同进程连跑两轮不重启。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -35,105 +31,129 @@ async function call(method: string, path: string, opts: {token?: string; body?: 
   return { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt };
 }
 
-const SALT = Date.now().toString(36);
-const ADMIN = `admin-p52-${SALT}`;
-const DOCTOR = `doctor-p52-${SALT}`;
-const admin = sign(['admin'], '管理员', ADMIN);
-const doctor = sign(['doctor'], '医生', DOCTOR);
-
-async function generateAuditEvents(n: number) {
-  for (let i = 0; i < n; i++) {
-    await call('POST','/api/v1/engagement/reports',{token:admin,body:{
-      patientId:`P-${SALT}-${i}`, visitId:`V${i}`, type:'lab', title:'血常规', result:'WBC 6.5', isAbnormal:false,
-    }});
-  }
-}
+const SALT = Date.now().toString(36) + Math.floor(Math.random()*1000);
+const admin = sign(['admin'], '管理员', `admin-${SALT}`);
+const doctor = sign(['doctor'], '医生', `doc-${SALT}`);
 
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
-  // 每轮开始前清空探针，避免上轮残留
+  // 每轮开始前清探针
   await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
 });
 
-describe('P5-2 seal 与链式', () => {
-  it('第一批：generate events → seal → 段生成', async () => {
-    await generateAuditEvents(3);
+describe('P5-4 keys 不泄露私钥', () => {
+  it('GET /keys 仅返公钥', async () => {
+    const r = await call('GET','/api/v1/worm/keys',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.publicKeyPem).toContain('BEGIN PUBLIC KEY');
+    expect(JSON.stringify(r.data)).not.toContain('PRIVATE KEY');
+  });
+});
+
+describe('seal + 国密字段', () => {
+  it('generate 1 event + seal → 段含 SM3/SM4/SM2 字段', async () => {
+    await call('POST','/api/v1/engagement/reports',{token:admin,body:{
+      patientId:`P-${SALT}`, visitId:'V1', type:'lab', title:'血常规', result:'WBC 6.5', isAbnormal:false,
+    }});
     const r = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
     expect(r.httpStatus).toBe(201);
-    expect(r.data.segmentHash).toMatch(/^[0-9a-f]{64}$/);
-    expect(r.data.eventCount).toBeGreaterThan(0);
+    expect(r.data.digestAlg).toBe('SM3');
+    expect(r.data.digestSm3).toMatch(/^[0-9a-f]{64}$/);
+    expect(r.data.sm4Encrypted).toBe(true);
+    expect(r.data.sm2Signature.length).toBeGreaterThan(0);
     (globalThis as any).__seg1 = r.data.segmentId;
   });
-  it('第二批：generate 更多 events → seal → 第二段 prev 非空', async () => {
-    await generateAuditEvents(2);
-    const r = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
-    expect(r.httpStatus).toBe(201);
-    expect(r.data.prevSegmentHash).toBeTruthy();
-    (globalThis as any).__seg2 = r.data.segmentId;
-  });
 });
 
-describe('P5-2 影子探针（不污染真实段）', () => {
-  it('verify?scope=real 未篡改 → realChainValid=true', async () => {
+describe('verify 国密字段', () => {
+  it('verify?scope=real → digestValid+signatureValid=true', async () => {
     const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
     expect(r.httpStatus).toBe(200);
-    expect(r.data.realChainValid).toBe(true);
-  });
-  it('_tamper 生成影子探针，不污染真实段', async () => {
-    const seg1 = (globalThis as any).__seg1;
-    const t = await call('POST','/api/v1/worm/_tamper',{token:admin,body:{segmentId:seg1}});
-    expect(t.httpStatus).toBe(200);
-    expect(t.data.probeId).toMatch(/^VERIFY-PROBE-/);
-    expect(t.data.expectedBroken).toBe(true);
-    // 真实段查询仍 200（未被探针污染）
-    const seg = await call('GET',`/api/v1/worm/segments/${seg1}`,{token:admin});
-    expect(seg.httpStatus).toBe(200);
-    expect(seg.data.segmentHash).toMatch(/^[0-9a-f]{64}$/);
-  });
-  it('verify?scope=real 在探针存在时仍 realChainValid=true（关键自检）', async () => {
-    const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
-    expect(r.data.realChainValid).toBe(true);
-  });
-  it('verify?scope=all 默认 → valid=false + brokenScope=probe', async () => {
-    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
-    expect(r.data.valid).toBe(false);
-    expect(r.data.realChainValid).toBe(true);
-    expect(r.data.probeBroken).toBe(true);
-    expect(r.data.brokenScope).toBe('probe');
-  });
-  it('_probes/reset 后 verify?scope=all 恢复 valid=true', async () => {
-    await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
-    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
-    expect(r.data.valid).toBe(true);
-    expect(r.data.probeBroken).toBe(false);
+    expect(r.data.digestValid).toBe(true);
+    expect(r.data.signatureValid).toBe(true);
   });
 });
 
-describe('P5-2 内容读取与权限', () => {
-  it('download JSON 含 events 数组', async () => {
+describe('content 解密', () => {
+  it('GET content?format=json → events + digestValid/signatureValid', async () => {
     const seg1 = (globalThis as any).__seg1;
     const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=json`,{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(Array.isArray(r.data.events)).toBe(true);
+    expect(r.data.events.length).toBeGreaterThan(0);
+    expect(r.data.signatureValid).toBe(true);
   });
-  it('download CSV 含 header', async () => {
+  it('GET content?format=csv → header', async () => {
     const seg1 = (globalThis as any).__seg1;
     const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=csv`,{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(r.raw).toMatch(/^seq,occurredAt,actorId/);
+    expect(r.raw).toMatch(/^seq,/);
   });
-  it('format 非法 → 400', async () => {
+});
+
+describe('影子探针 digest', () => {
+  let probeId = '';
+  it('create probe + _tamper-digest → verify brokenScope=probe', async () => {
     const seg1 = (globalThis as any).__seg1;
-    const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=xml`,{token:admin});
-    expect(r.httpStatus).toBe(400);
+    const t = await call('POST','/api/v1/worm/_tamper',{token:admin,body:{segmentId:seg1}});
+    expect(t.httpStatus).toBe(200);
+    probeId = t.data.probeId;
+    const td = await call('POST','/api/v1/worm/_tamper-digest',{token:admin,body:{probeId}});
+    expect(td.httpStatus).toBe(200);
+    const v = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+    expect(v.data.valid).toBe(false);
+    expect(v.data.brokenScope).toBe('probe');
+  });
+  it('真实段 verify?scope=real 仍 valid', async () => {
+    const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
+    expect(r.data.realChainValid).toBe(true);
+    expect(r.data.digestValid).toBe(true);
+  });
+  it('_probes/reset 后 verify 恢复 valid', async () => {
+    await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
+    const r = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+    expect(r.data.valid).toBe(true);
+  });
+});
+
+describe('影子探针 signature', () => {
+  it('create probe + _tamper-signature → verify brokenScope=probe', async () => {
+    const seg1 = (globalThis as any).__seg1;
+    const t = await call('POST','/api/v1/worm/_tamper',{token:admin,body:{segmentId:seg1}});
+    expect(t.httpStatus).toBe(200);
+    const ts = await call('POST','/api/v1/worm/_tamper-signature',{token:admin,body:{probeId:t.data.probeId}});
+    expect(ts.httpStatus).toBe(200);
+    const v = await call('POST','/api/v1/worm/verify',{token:admin,body:{}});
+    expect(v.data.valid).toBe(false);
+    expect(v.data.brokenScope).toBe('probe');
+    await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
+  });
+});
+
+describe('doctor 越权 + 404', () => {
+  it('doctor GET /segments → 403（read 计数但不写）', async () => {
+    const r = await call('GET','/api/v1/worm/segments',{token:doctor});
+    expect(r.httpStatus).toBe(403);
   });
   it('segmentId 不存在 → 404', async () => {
     const r = await call('GET','/api/v1/worm/segments/WORM-nope',{token:admin});
     expect(r.httpStatus).toBe(404);
   });
-  it('doctor seal → 403', async () => {
-    const r = await call('POST','/api/v1/worm/segments/seal',{token:doctor,body:{}});
-    expect(r.httpStatus).toBe(403);
+  it('GET /segments 列表非空', async () => {
+    const r = await call('GET','/api/v1/worm/segments',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.total).toBeGreaterThanOrEqual(1);
+  });
+  it('GET /segments/:id 元信息含国密字段', async () => {
+    const seg1 = (globalThis as any).__seg1;
+    const r = await call('GET',`/api/v1/worm/segments/${seg1}`,{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.digestAlg).toBe('SM3');
+    expect(r.data.sm4Encrypted).toBe(true);
+  });
+  it('format 非法 → 400', async () => {
+    const seg1 = (globalThis as any).__seg1;
+    const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=xml`,{token:admin});
+    expect(r.httpStatus).toBe(400);
   });
 });

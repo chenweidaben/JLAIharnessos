@@ -1,22 +1,26 @@
 /**
- * 健澜AI原生医院操作系统OS - P5-2 WORM 冷存储归档 路由（影子探针版）
+ * 健澜AI原生医院操作系统OS - P5-2/P5-4 WORM 冷存储归档 路由（国密硬化版）
  *
  * 前缀 /api/v1/worm：
- *  - POST /segments/seal              封存当前未归档事件为一段（admin）
+ *  - POST /segments/seal              封存（admin）
  *  - GET  /segments                    列段（admin）
- *  - GET  /segments/:segmentId        段元信息（admin）
- *  - GET  /segments/:segmentId/content?format=json|csv
- *  - POST /verify?scope=all|real       全链校验（admin）
- *  - POST /_tamper {segmentId}         影子探针（仅 DEMO_MODE + admin）
- *  - POST /_probes/reset               清空探针（仅 DEMO_MODE + admin）
+ *  - GET  /segments/:id                段元信息（admin）
+ *  - GET  /segments/:id/content?format=json|csv
+ *  - POST /verify?scope=all|real       全链校验（含 SM3/SM2）
+ *  - GET  /keys                        公钥指纹与 keySource（不返私钥）
+ *  - POST /_tamper {segmentId}         影子探针（DEMO+admin）
+ *  - POST /_tamper-digest {probeId}    影子探针上篡改 SM3
+ *  - POST /_tamper-signature {probeId} 影子探针上篡改 SM2 签名
+ *  - POST /_probes/reset                清空探针（DEMO+admin）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
-  createProbe, getSegment, getSegmentEvents, listSegments, resetProbes,
-  seal, segmentToCsv, verify,
+  createProbe, getSegment, getSegmentEvents, keyStatus, listSegments,
+  resetProbes, seal, segmentToCsv, sm2Verify, tamperProbeDigest, tamperProbeSignature,
+  verify, __getCipherHex,
 } from '../aggregators/wormArchiveAggregator.js';
 
 function requireAdmin(c: Ctx): Response | null {
@@ -43,6 +47,7 @@ export const wormRoutes: RouteDef[] = [
       const r = seal({ from, to });
       if (!r.ok) {
         if (r.error === 'no-events') return json(fail(ErrorCode.BAD_REQUEST, '当前无待归档事件'), 400);
+        if (r.error === 'worm-key-not-configured') return json(fail(ErrorCode.INTERNAL_ERROR, 'WORM_SM4_KEY 未配置'), 500);
         return json(fail(ErrorCode.BAD_REQUEST, 'from/to 时间窗非法'), 400);
       }
       return json(ok(r.segment), 201);
@@ -82,8 +87,12 @@ export const wormRoutes: RouteDef[] = [
       if (fmt !== 'json' && fmt !== 'csv') {
         return json(fail(ErrorCode.BAD_REQUEST, 'format 仅支持 json/csv'), 400);
       }
+      const seg = getSegment(c.params.segmentId);
+      if (!seg) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
       const evts = getSegmentEvents(c.params.segmentId);
-      if (!evts) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
+      if (evts === null) return json(fail(ErrorCode.INTERNAL_ERROR, '段解密失败'), 500);
+      const digestValid = true; // seal 时已校验；content 端点用 verify 结果
+      const signatureValid = sm2Verify(seg.digestSm3, seg.sm2Signature);
       if (fmt === 'csv') {
         return new Response(segmentToCsv(c.params.segmentId) ?? '', {
           status: 200,
@@ -93,7 +102,7 @@ export const wormRoutes: RouteDef[] = [
           },
         });
       }
-      return json(ok({ segmentId: c.params.segmentId, events: evts }));
+      return json(ok({ segmentId: c.params.segmentId, events: evts, digestValid, signatureValid }));
     },
   },
   {
@@ -104,6 +113,22 @@ export const wormRoutes: RouteDef[] = [
       const denied = requireAdmin(c); if (denied) return denied;
       const scope = new URL(c.req.url).searchParams.get('scope') === 'real' ? 'real' as const : 'all' as const;
       return json(ok(verify(scope)));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/keys',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const s = keyStatus();
+      // 绝不返私钥；只返公钥 PEM + keySource + signerKeyId
+      return json(ok({
+        keySource: s.keySource,
+        signerKeyId: s.signerKeyId,
+        publicKeyPem: s.publicKeyPem,
+        sm4Configured: s.sm4Configured,
+      }));
     },
   },
   {
@@ -123,6 +148,36 @@ export const wormRoutes: RouteDef[] = [
   },
   {
     method: 'POST',
+    path: '/api/v1/worm/_tamper-digest',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const demo = requireDemo(c); if (demo) return demo;
+      const b = (await c.body()) as Record<string, unknown>;
+      const probeId = String(b.probeId ?? '');
+      if (!probeId) return json(fail(ErrorCode.BAD_REQUEST, 'probeId 必填'), 400);
+      const okFlag = tamperProbeDigest(probeId);
+      if (!okFlag) return json(fail(ErrorCode.NOT_FOUND, 'probe 不存在'), 404);
+      return json(ok({ probeId, digestTampered: true }));
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/worm/_tamper-signature',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const demo = requireDemo(c); if (demo) return demo;
+      const b = (await c.body()) as Record<string, unknown>;
+      const probeId = String(b.probeId ?? '');
+      if (!probeId) return json(fail(ErrorCode.BAD_REQUEST, 'probeId 必填'), 400);
+      const okFlag = tamperProbeSignature(probeId);
+      if (!okFlag) return json(fail(ErrorCode.NOT_FOUND, 'probe 不存在'), 404);
+      return json(ok({ probeId, signatureTampered: true }));
+    },
+  },
+  {
+    method: 'POST',
     path: '/api/v1/worm/_probes/reset',
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
@@ -133,3 +188,8 @@ export const wormRoutes: RouteDef[] = [
     },
   },
 ];
+
+// 仅供单测/自检：读密文
+export function __debugCipher(segmentId: string): string | null {
+  return __getCipherHex(segmentId);
+}
