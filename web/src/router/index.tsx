@@ -513,7 +513,6 @@ const SmartServiceMedicationRemindPage = lazy(() => import('@/pages/smart-servic
 const SmartServiceFollowupPage = lazy(() => import('@/pages/smart-service/followup'));
 const SmartServiceHealthRecordsPage = lazy(() => import('@/pages/smart-service/health-records'));
 // M323 运营管理 lazy 注册
-const OperationDashboardPage = lazy(() => import('@/pages/operation/dashboard'));
 const OperationKpiPage = lazy(() => import('@/pages/operation/kpi'));
 const OperationComparisonPage = lazy(() => import('@/pages/operation/comparison'));
 const OperationEfficiencyPage = lazy(() => import('@/pages/operation/efficiency'));
@@ -868,7 +867,6 @@ const PerformanceReportV2 = lazy(() => import('@/pages/admin/performance-v2'));
 // M187-B：安全加固 V2
 const SecurityReportV2 = lazy(() => import('@/pages/admin/security-v2'));
 // M187-C：EMR 五级评审 V2
-const EMRGrade5V2 = lazy(() => import('@/pages/emr/grade5'));
 // v5.0试点扩展（浏览器bug修复）：/emr 总入口占位页（原 /emr 路由缺失导致 404）
 const EmrLanding = lazy(() => import('@/pages/emr/Landing'));
 // M187-D：DRG 智能审核 V2
@@ -5756,7 +5754,6 @@ export default function AppRoutes() {
           {/* M187-B：安全加固 */}
           <Route path="admin/security" element={<SecurityReportV2 />} />
           {/* M187-C：EMR 五级评审 */}
-          <Route path="emr/grade5" element={<EMRGrade5V2 />} />
           {/* M187-D：DRG 审核 */}
           <Route path="drg/audit" element={<DRGAuditV2 />} />
           {/* M188-A：临床路径 */}
@@ -6300,7 +6297,6 @@ export default function AppRoutes() {
           {/* M255-D：临床规则引擎 V3 */}
           <Route path="clinical-rule-engine-v3/report" element={<ClinicalRuleEngineV3 />} />
           {/* M256-A：患者安全 V3 */}
-          <Route path="patient-safety-v3/report" element={<PatientSafetyV3 />} />
           {/* M256-B：院感控制 V3 */}
           <Route path="infection-control-v3/report" element={<InfectionControlV3Page />} />
           {/* M256-C：病历质量 V3（里程碑 v5.00.0） */}
@@ -8782,7 +8778,6 @@ export default function AppRoutes() {
           {/* 门诊医生工作站（M105-B） */}
           <Route path="opd/workstation" element={<OpdWorkstationPage />} />
           {/* 护理敏感指标看板（M105-C） */}
-          <Route path="nursing/nqi-dashboard" element={<NqiDashboardPage />} />
           {/* 手术安全核查表（M105-D） */}
           <Route path="surgery/checklist" element={<SurgeryChecklistPage />} />
           {/* 医学知识图谱可视化（M147-A 知识图谱与患者教育） */}
@@ -9032,7 +9027,6 @@ export default function AppRoutes() {
           <Route path="smart-service/followup" element={<SmartServiceFollowupPage />} />
           <Route path="smart-service/health-records" element={<SmartServiceHealthRecordsPage />} />
           {/* M323 路由注册 */}
-          <Route path="operation/dashboard" element={<OperationDashboardPage />} />
           <Route path="operation/kpi" element={<OperationKpiPage />} />
           <Route path="operation/comparison" element={<OperationComparisonPage />} />
           <Route path="operation/efficiency" element={<OperationEfficiencyPage />} />
@@ -9205,7 +9199,6 @@ export default function AppRoutes() {
           <Route path="tenants/overview" element={<TenantsOverviewPage />} />
           <Route path="tenants/quota" element={<TenantsQuotaPage />} />
           <Route path="tenants/billing" element={<TenantsBillingPage />} />
-          <Route path="system/config" element={<SystemConfigPage />} />
           <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
           {/* M348 路由注册 */}
           <Route path="bi/realtime" element={<BiRealtimePage />} />
@@ -9325,7 +9318,6 @@ export default function AppRoutes() {
           {/* M268 路由注册 */}
           <Route path="emr/quality-defects" element={<EmrQualityDefectsPage />} />
           <Route path="emr/quality-stats" element={<EmrQualityStatsPage />} />
-          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
           <Route path="security/cve-feed" element={<SecurityCveFeedPage />} />
           <Route path="security/waf" element={<SecurityWafPage />} />
           <Route path="security/siem" element={<SecuritySiemPage />} />
@@ -9344,166 +9336,42 @@ export default function AppRoutes() {
           <Route path="nursing/nqi-scores" element={<NursingNqiScoresPage />} />
           <Route path="nursing/nqi-trend" element={<NursingNqiTrendPage />} />
           {/* M271 路由注册 */}
-          <Route path="fhir/patient" element={<FhirPatientPage />} />
-          <Route path="fhir/observation" element={<FhirObservationPage />} />
-          <Route path="fhir/condition" element={<FhirConditionPage />} />
-          <Route path="fhir/medicationrequest" element={<FhirMedicationRequestPage />} />
           <Route path="events/bus" element={<EventsBusPage />} />
           <Route path="events/audit" element={<EventsAuditPage />} />
           {/* M272 路由注册 */}
-          <Route path="fhir/encounter" element={<FhirEncounterPage />} />
-          <Route path="fhir/procedure" element={<FhirProcedurePage />} />
-          <Route path="fhir/diagnosticreport" element={<FhirDiagnosticReportPage />} />
           {/* M344 路由注册 */}
-          <Route path="fhir/practitioner" element={<FhirPractitionerPage />} />
-          <Route path="fhir/organization" element={<FhirOrganizationPage />} />
-          <Route path="fhir/location" element={<FhirLocationPage />} />
-          <Route path="fhir/medication" element={<FhirMedicationPage />} />
-          <Route path="fhir/procedure" element={<FhirProcedurePage />} />
-          <Route path="fhir/allergyintolerance" element={<FhirAllergyintolerancePage />} />
           {/* M345 路由注册 */}
-          <Route path="security/audit-detail" element={<SecurityAuditDetailPage />} />
-          <Route path="security/audit-export" element={<SecurityAuditExportPage />} />
-          <Route path="security/audit-anomaly" element={<SecurityAuditAnomalyPage />} />
-          <Route path="security/audit-whitelist" element={<SecurityAuditWhitelistPage />} />
-          <Route path="security/audit-report" element={<SecurityAuditReportPage />} />
-          <Route path="security/compliance-score" element={<SecurityComplianceScorePage />} />
           {/* M346 路由注册 */}
-          <Route path="security/audit-logs" element={<SecurityAuditLogsPage />} />
-          <Route path="security/user-sessions" element={<SecurityUserSessionsPage />} />
-          <Route path="security/login-history" element={<SecurityLoginHistoryPage />} />
-          <Route path="security/permission-matrix" element={<SecurityPermissionMatrixPage />} />
-          <Route path="security/role-mapping" element={<SecurityRoleMappingPage />} />
-          <Route path="security/data-access-log" element={<SecurityDataAccessLogPage />} />
-          <Route path="security/privacy-report" element={<SecurityPrivacyReportPage />} />
           {/* M347 路由注册 */}
-          <Route path="tenants/overview" element={<TenantsOverviewPage />} />
-          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
-          <Route path="tenants/billing" element={<TenantsBillingPage />} />
-          <Route path="system/config" element={<SystemConfigPage />} />
-          <Route path="system/feature-flags" element={<SystemFeatureFlagsPage />} />
           {/* M348 路由注册 */}
-          <Route path="bi/realtime" element={<BiRealtimePage />} />
-          <Route path="bi/funnel" element={<BiFunnelPage />} />
-          <Route path="bi/retention" element={<BiRetentionPage />} />
-          <Route path="operation/benchmark" element={<OperationBenchmarkPage />} />
-          <Route path="operation/alerts" element={<OperationAlertsPage />} />
           {/* M349 路由注册 */}
-          <Route path="research/grants" element={<ResearchGrantsPage />} />
-          <Route path="teaching/training" element={<TeachingTrainingPage />} />
-          <Route path="internet/hospital-orders" element={<InternetHospitalOrdersPage />} />
           {/* M350 路由注册 */}
-          <Route path="telemedicine/consultations" element={<TelemedicineConsultationsPage />} />
-          <Route path="telemedicine/records" element={<TelemedicineRecordsPage />} />
-          <Route path="telemedicine/devices" element={<TelemedicineDevicesPage />} />
-          <Route path="community/visits" element={<CommunityVisitsPage />} />
           {/* M351 路由注册 */}
-          <Route path="maternal/prenatal" element={<MaternalPrenatalPage />} />
-          <Route path="maternal/postnatal" element={<MaternalPostnatalPage />} />
-          <Route path="maternal/child-health" element={<MaternalChildHealthPage />} />
-          <Route path="emergency/redbox" element={<EmergencyRedboxPage />} />
-          <Route path="emergency/calls" element={<EmergencyCallsPage />} />
           {/* M352 路由注册 */}
-          <Route path="rehab/assessments" element={<RehabAssessmentsPage />} />
-          <Route path="rehab/records" element={<RehabRecordsPage />} />
           {/* M353 路由注册 */}
-          <Route path="geriatrics/assessment" element={<GeriatricsAssessmentPage />} />
-          <Route path="geriatrics/falls" element={<GeriatricsFallsPage />} />
-          <Route path="geriatrics/dementia" element={<GeriatricsDementiaPage />} />
-          <Route path="qc/indicators" element={<QcIndicatorsPage />} />
-          <Route path="qc/audits" element={<QcAuditsPage />} />
-          <Route path="qc/corrective" element={<QcCorrectivePage />} />
           {/* M354 路由注册 */}
-          <Route path="emr/templates" element={<EmrTemplatesPage />} />
-          <Route path="emr/signatures" element={<EmrSignaturesPage />} />
-          <Route path="emr/archives" element={<EmrArchivesPage />} />
-          <Route path="insurance/benefits" element={<InsuranceBenefitsPage />} />
-          <Route path="insurance/directory" element={<InsuranceDirectoryPage />} />
           {/* M355 路由注册 */}
-          <Route path="pharmacy/purchasing" element={<PharmacyPurchasingPage />} />
-          <Route path="pharmacy/dispensing" element={<PharmacyDispensingPage />} />
-          <Route path="hr/trainings" element={<HrTrainingsPage />} />
-          <Route path="hr/recruitment" element={<HrRecruitmentPage />} />
           {/* M356 路由注册 */}
-          <Route path="finance/expenses" element={<FinanceExpensesPage />} />
-          <Route path="finance/assets" element={<FinanceAssetsPage />} />
-          <Route path="billing/invoices" element={<BillingInvoicesPage />} />
           {/* M357 路由注册 */}
-          <Route path="surgery/orders" element={<SurgeryOrdersPage />} />
-          <Route path="surgery/records" element={<SurgeryRecordsPage />} />
-          <Route path="nursing/rounds" element={<NursingRoundsPage />} />
-          <Route path="nursing/plans" element={<NursingPlansPage />} />
           {/* M358 路由注册 */}
-          <Route path="lab/orders" element={<LabOrdersPage />} />
-          <Route path="lab/results" element={<LabResultsPage />} />
-          <Route path="radiology/orders" element={<RadiologyOrdersPage />} />
-          <Route path="radiology/results" element={<RadiologyResultsPage />} />
-          <Route path="radiology/reports" element={<RadiologyReportsPage />} />
           {/* M359 路由注册 */}
-          <Route path="outpatient/visits" element={<OutpatientVisitsPage />} />
-          <Route path="outpatient/prescriptions" element={<OutpatientPrescriptionsPage />} />
-          <Route path="outpatient/triage" element={<OutpatientTriagePage />} />
           {/* M360 路由注册 */}
-          <Route path="orders/list" element={<OrdersListPage />} />
-          <Route path="orders/active" element={<OrdersActivePage />} />
-          <Route path="orders/completed" element={<OrdersCompletedPage />} />
-          <Route path="orders/cancelled" element={<OrdersCancelledPage />} />
-          <Route path="prescriptions/outpatient" element={<PrescriptionsOutpatientPage />} />
-          <Route path="prescriptions/inpatient" element={<PrescriptionsInpatientPage />} />
-          <Route path="prescriptions/emergency" element={<PrescriptionsEmergencyPage />} />
           {/* M361 路由注册 */}
-          <Route path="patient/profile" element={<PatientProfilePage />} />
-          <Route path="patient/allergies" element={<PatientAllergiesPage />} />
-          <Route path="patient/family" element={<PatientFamilyPage />} />
-          <Route path="patient/vitals" element={<PatientVitalsPage />} />
           {/* M362 路由注册 */}
-          <Route path="cds/alerts" element={<CdsAlertsPage />} />
-          <Route path="cds/interventions" element={<CdsInterventionsPage />} />
-          <Route path="cds/guidelines" element={<CdsGuidelinesPage />} />
-          <Route path="cds/checklists" element={<CdsChecklistsPage />} />
-          <Route path="cds/drugs-interaction" element={<CdsDrugsInteractionPage />} />
-          <Route path="cds/duplicate-therapy" element={<CdsDuplicateTherapyPage />} />
           {/* M363 路由注册 */}
-          <Route path="workflow/tasks" element={<WorkflowTasksPage />} />
-          <Route path="workflow/templates" element={<WorkflowTemplatesPage />} />
-          <Route path="tasks/todo" element={<TasksTodoPage />} />
-          <Route path="tasks/done" element={<TasksDonePage />} />
-          <Route path="tasks/overdue" element={<TasksOverduePage />} />
           {/* M364 路由注册 */}
-          <Route path="security/roles" element={<SecurityRolesPage />} />
-          <Route path="security/permissions" element={<SecurityPermissionsPage />} />
-          <Route path="system/configs" element={<SystemConfigsPage />} />
-          <Route path="system/version" element={<SystemVersionPage />} />
-          <Route path="events/dead-letter" element={<EventsDeadLetterPage />} />
-          <Route path="events/retry" element={<EventsRetryPage />} />
-          <Route path="audit/reports" element={<AuditReportsPage />} />
           {/* M365 路由注册 */}
-          <Route path="tenant/list" element={<TenantListPage />} />
-          <Route path="tenant/config" element={<TenantConfigPage />} />
-          <Route path="tenant/data-isolation" element={<TenantDataIsolationPage />} />
-          <Route path="tenant/quota" element={<TenantQuotaPage />} />
-          <Route path="tenant/usage" element={<TenantUsagePage />} />
           {/* M366 路由注册 */}
-          <Route path="security/masking-rules" element={<SecurityMaskingRulesPage />} />
-          <Route path="security/masking-logs" element={<SecurityMaskingLogsPage />} />
-          <Route path="security/encryption-keys" element={<SecurityEncryptionKeysPage />} />
-          <Route path="security/encryption-status" element={<SecurityEncryptionStatusPage />} />
-          <Route path="security/data-classification" element={<SecurityDataClassificationPage />} />
-          <Route path="security/data-retention" element={<SecurityDataRetentionPage />} />
           <Route path="workflow/doctor" element={<WorkflowDoctorPage />} />
           <Route path="workflow/nurse" element={<WorkflowNursePage />} />
           <Route path="workflow/pharmacist" element={<WorkflowPharmacistPage />} />
           {/* M273 路由注册 */}
           <Route path="fhir/documentref" element={<FhirDocumentrefPage />} />
-          <Route path="fhir/allergyintolerance" element={<FhirAllergyintolerancePage />} />
           <Route path="fhir/immunization" element={<FhirImmunizationPage />} />
           <Route path="emr/version-diff" element={<EmrVersionDiffPage />} />
           <Route path="emr/version-compare" element={<EmrVersionComparePage />} />
           <Route path="emr/version-restore" element={<EmrVersionRestorePage />} />
           {/* M274 路由注册 */}
-          <Route path="fhir/location" element={<FhirLocationPage />} />
-          <Route path="fhir/practitioner" element={<FhirPractitionerPage />} />
-          <Route path="fhir/organization" element={<FhirOrganizationPage />} />
           <Route path="patient/360-overview" element={<Patient360OverviewPage />} />
           <Route path="patient/360-timeline" element={<Patient360TimelinePage />} />
           <Route path="patient/360-risk" element={<Patient360RiskPage />} />
@@ -9605,7 +9473,6 @@ export default function AppRoutes() {
           <Route path="internet/payments" element={<InternetPaymentsPage />} />
           <Route path="internet/consultations" element={<InternetConsultationsPage />} />
           {/* M307 路由注册 */}
-          <Route path="fhir/medication" element={<FhirMedicationPage />} />
           <Route path="fhir/coverage" element={<FhirCoveragePage />} />
           <Route path="fhir/claim" element={<FhirClaimPage />} />
           <Route path="fhir/account" element={<FhirAccountPage />} />
@@ -9684,37 +9551,16 @@ export default function AppRoutes() {
           <Route path="security/incident-response" element={<SecurityIncidentResponsePage />} />
           <Route path="workflow/admin" element={<WorkflowAdminPage />} />
           <Route path="events/metrics" element={<EventsMetricsPage />} />
-          <Route path="emr/template" element={<EmrTemplatePage />} />
           <Route path="cds/guideline" element={<CdsGuidelinePage />} />
           {/* M309 路由注册 */}
           <Route path="auth/roles" element={<AuthRolesPage />} />
-          <Route path="auth/permissions" element={<AuthPermissionsPage />} />
           <Route path="audit/logs" element={<AuditLogsPage />} />
           <Route path="compliance/score" element={<ComplianceScorePage />} />
           <Route path="security/dashboard" element={<SecurityDashboardPage />} />
-          <Route path="tenants/list" element={<TenantsListPage />} />
           {/* M311 路由注册 */}
-          <Route path="anesthesia/records" element={<AnesthesiaRecordsPage />} />
-          <Route path="anesthesia/complications" element={<AnesthesiaComplicationsPage />} />
-          <Route path="tcm/prescriptions" element={<TcmPrescriptionsPage />} />
-          <Route path="tcm/formulas" element={<TcmFormulasPage />} />
-          <Route path="dental/appointments" element={<DentalAppointmentsPage />} />
           {/* M312 路由注册 */}
-          <Route path="oncology/records" element={<OncologyRecordsPage />} />
-          <Route path="chronic/management" element={<ChronicManagementPage />} />
-          <Route path="icu/monitor" element={<IcuMonitorPage />} />
           {/* M316 路由注册 */}
-          <Route path="financial/procurement" element={<FinancialProcurementPage />} />
-          <Route path="financial/assets" element={<FinancialAssetsPage />} />
-          <Route path="logistics/preventive" element={<LogisticsPreventivePage />} />
-          <Route path="discharge/summary" element={<DischargeSummaryPage />} />
           {/* M317 路由注册 */}
-          <Route path="consultation/list" element={<ConsultationListPage />} />
-          <Route path="emergency/list" element={<EmergencyListPage />} />
-          <Route path="icu/list" element={<IcuListPage />} />
-          <Route path="anesthesia/list" element={<AnesthesiaListPage />} />
-          <Route path="discharge/list" element={<DischargeListPage />} />
-          <Route path="cds/diagnosis-suggest" element={<CdsDiagnosisSuggestPage />} />
           <Route path="transfusion" element={<TransfusionPage />} />
           <Route path="blood-quality" element={<BloodQualityPage />} />
           {/* 检验管理 LIS（M11-A）：查看 lab:read，写操作按 lis:* 细分 */}
@@ -10450,7 +10296,7 @@ export default function AppRoutes() {
         >
           <Route index element={<Navigate to="/m/patients" replace />} />
           <Route path="quick-actions" element={<MobileQuickActions />} />
-          <Route path="patients" element={<MobilePatients />} />
+          <Route path="mobile/patients" element={<MobilePatients />} />
           <Route path="bed/:visitId" element={<MobileBedSide />} />
           <Route path="tasks" element={<MobileTasks />} />
           <Route path="handoff" element={<MobileHandoff />} />
@@ -10458,13 +10304,6 @@ export default function AppRoutes() {
         </Route>
 
           {/* M383+M385 路由注册（补登） */}
-          <Route path="security/data-access" element={<SecurityDataAccessPage />} />
-          <Route path="security/data-sharing" element={<SecurityDataSharingPage />} />
-          <Route path="security/data-export" element={<SecurityDataExportPage />} />
-          <Route path="security/data-backup" element={<SecurityDataBackupPage />} />
-          <Route path="security/data-recovery" element={<SecurityDataRecoveryPage />} />
-          <Route path="security/incidents" element={<SecurityIncidentsPage />} />
-          <Route path="security/incident-response" element={<SecurityIncidentResponsePage />} />
           {/* M386 智慧服务路由 */}
           <Route path="service/appointments" element={<ServiceAppointmentsPage />} />
           <Route path="service/payments" element={<ServicePaymentsPage />} />
@@ -10493,15 +10332,10 @@ export default function AppRoutes() {
           <Route path="pharmacy/dashboard" element={<PharmacyDashboardPage />} />
           <Route path="pharmacy/inventory-detail" element={<PharmacyInventoryDetailPage />} />
           <Route path="pharmacy/suppliers" element={<PharmacySuppliersPage />} />
-          <Route path="pharmacy/purchasing" element={<PharmacyPurchasingPage />} />
           <Route path="pharmacy/expiry" element={<PharmacyExpiryPage />} />
           {/* M391 科研教学路由补登 */}
-          <Route path="research/projects" element={<ResearchProjectsPage />} />
-          <Route path="research/papers" element={<ResearchPapersPage />} />
-          <Route path="research/funds" element={<ResearchFundsPage />} />
           <Route path="research/awards" element={<ResearchAwardsPage />} />
           <Route path="teaching/courses" element={<TeachingCoursesPage />} />
-          <Route path="teaching/training" element={<TeachingTrainingPage />} />
           {/* M392 互联网医院路由 */}
           <Route path="telemed/prescriptions" element={<TelemedPrescriptionsPage />} />
           <Route path="telemed/payments" element={<TelemedPaymentsPage />} />
@@ -10516,7 +10350,6 @@ export default function AppRoutes() {
           <Route path="telemed/remote-training" element={<TelemedRemoteTrainingPage />} />
           <Route path="telemed/remote-equipment" element={<TelemedRemoteEquipmentPage />} />
           {/* M395 社区医疗路由 */}
-          <Route path="community/visits" element={<CommunityVisitsPage />} />
           <Route path="community/health-records" element={<CommunityHealthRecordsPage />} />
           <Route path="community/elderly-care" element={<CommunityElderlyCarePage />} />
           <Route path="community/chronic-disease" element={<CommunityChronicDiseasePage />} />
@@ -10530,32 +10363,22 @@ export default function AppRoutes() {
           <Route path="maternity/genetic-screening" element={<MaternityGeneticScreeningPage />} />
           {/* M397 急诊急救路由补登 */}
           <Route path="emergency/triage" element={<EmergencyTriagePage />} />
-          <Route path="emergency/rescue" element={<EmergencyRescuePage />} />
-          <Route path="emergency/ambulance" element={<EmergencyAmbulancePage />} />
           <Route path="emergency/disaster" element={<EmergencyDisasterPage />} />
-          <Route path="emergency/poisoning" element={<EmergencyPoisoningPage />} />
-          <Route path="emergency/trauma" element={<EmergencyTraumaPage />} />
           {/* M398 肿瘤医学路由 */}
           <Route path="oncology/screening" element={<OncologyScreeningPage />} />
           <Route path="oncology/diagnosis" element={<OncologyDiagnosisPage />} />
           <Route path="oncology/treatment-plan" element={<OncologyTreatmentPlanPage />} />
           <Route path="oncology/followup" element={<OncologyFollowupPage />} />
           {/* M399 康复医学路由 */}
-          <Route path="rehab/assessment" element={<RehabAssessmentPage />} />
           <Route path="rehab/treatment" element={<RehabTreatmentPage />} />
           <Route path="rehab/therapy" element={<RehabTherapyPage />} />
           <Route path="rehab/exercise" element={<RehabExercisePage />} />
           <Route path="rehab/occupational" element={<RehabOccupationalPage />} />
           {/* M401 老年医学路由补登 */}
-          <Route path="geriatrics/assessment" element={<GeriatricsAssessmentPage />} />
           <Route path="geriatrics/care-plan" element={<GeriatricsCarePlanPage />} />
           <Route path="geriatrics/comorbidity" element={<GeriatricsComorbidityPage />} />
           <Route path="geriatrics/frail" element={<GeriatricsFrailPage />} />
-          <Route path="geriatrics/dementia" element={<GeriatricsDementiaPage />} />
-          <Route path="geriatrics/falls" element={<GeriatricsFallsPage />} />
           {/* M402 病历管理路由补登 */}
-          <Route path="emr/templates" element={<EmrTemplatesPage />} />
-          <Route path="emr/signatures" element={<EmrSignaturesPage />} />
           <Route path="emr/templates-detail" element={<EmrTemplatesDetailPage />} />
           <Route path="emr/quality-check" element={<EmrQualityCheckPage />} />
           <Route path="emr/retrieval" element={<EmrRetrievalPage />} />
@@ -10568,66 +10391,45 @@ export default function AppRoutes() {
           <Route path="insurance/disease-codes" element={<InsuranceDiseaseCodesPage />} />
           <Route path="insurance/items" element={<InsuranceItemsPage />} />
           {/* M404 手术麻醉路由补登 */}
-          <Route path="surgery/schedule" element={<SurgerySchedulePage />} />
-          <Route path="surgery/records" element={<SurgeryRecordsPage />} />
           <Route path="surgery/consent" element={<SurgeryConsentPage />} />
-          <Route path="anesthesia/records" element={<AnesthesiaRecordsPage />} />
           <Route path="anesthesia/assessment" element={<AnesthesiaAssessmentPage />} />
           <Route path="anesthesia/recovery" element={<AnesthesiaRecoveryPage />} />
           {/* M405 检验检查路由补登 */}
           <Route path="lab/items" element={<LabItemsPage />} />
-          <Route path="lab/results" element={<LabResultsPage />} />
           <Route path="lab/reports" element={<LabReportsPage />} />
           <Route path="radiology/items" element={<RadiologyItemsPage />} />
-          <Route path="radiology/results" element={<RadiologyResultsPage />} />
-          <Route path="radiology/reports" element={<RadiologyReportsPage />} />
           {/* M406 门诊住院路由补登 */}
-          <Route path="outpatient/queue" element={<OutpatientQueuePage />} />
-          <Route path="outpatient/visits" element={<OutpatientVisitsPage />} />
-          <Route path="outpatient/prescriptions" element={<OutpatientPrescriptionsPage />} />
           <Route path="inpatient/admissions" element={<InpatientAdmissionsPage />} />
           <Route path="inpatient/discharges" element={<InpatientDischargesPage />} />
           <Route path="inpatient/transfers" element={<InpatientTransfersPage />} />
           {/* M407 医嘱处方路由补登 */}
-          <Route path="orders/list" element={<OrdersListPage />} />
           <Route path="orders/detail" element={<OrdersDetailPage />} />
           <Route path="orders/templates" element={<OrdersTemplatesPage />} />
           <Route path="prescriptions/list" element={<PrescriptionsListPage />} />
           <Route path="prescriptions/detail" element={<PrescriptionsDetailPage />} />
           <Route path="prescriptions/audit" element={<PrescriptionsAuditPage />} />
           {/* M408 患者360路由补登 */}
-          <Route path="patient/profile" element={<PatientProfilePage />} />
           <Route path="patient/visits" element={<PatientVisitsPage />} />
-          <Route path="patient/allergies" element={<PatientAllergiesPage />} />
           <Route path="patient/medications" element={<PatientMedicationsPage />} />
           <Route path="patient/labs" element={<PatientLabsPage />} />
           <Route path="patient/imaging" element={<PatientImagingPage />} />
           {/* M409 CDS路由补登 */}
           <Route path="cds/rules" element={<CdsRulesPage />} />
-          <Route path="cds/alerts" element={<CdsAlertsPage />} />
           <Route path="cds/recommendations" element={<CdsRecommendationsPage />} />
           <Route path="cds/drug-interactions" element={<CdsDrugInteractionsPage />} />
           <Route path="cds/contraindications" element={<CdsContraindicationsPage />} />
-          <Route path="cds/guidelines" element={<CdsGuidelinesPage />} />
           {/* M410 工作流路由补登 */}
-          <Route path="workflow/tasks" element={<WorkflowTasksPage />} />
-          <Route path="workflow/templates" element={<WorkflowTemplatesPage />} />
           <Route path="workflow/instances" element={<WorkflowInstancesPage />} />
           <Route path="workflow/approval" element={<WorkflowApprovalPage />} />
           <Route path="workflow/scheduling" element={<WorkflowSchedulingPage />} />
           <Route path="workflow/notifications" element={<WorkflowNotificationsPage />} />
           {/* M411 系统管理配置路由补登 */}
-          <Route path="system/config" element={<SystemConfigPage />} />
           <Route path="system/menus" element={<SystemMenusPage />} />
           <Route path="system/params" element={<SystemParamsPage />} />
           <Route path="system/cache" element={<SystemCachePage />} />
           {/* M412 多租户路由补登 */}
-          <Route path="tenants/list" element={<TenantsListPage />} />
           <Route path="tenants/detail" element={<TenantsDetailPage />} />
-          <Route path="tenants/config" element={<TenantsConfigPage />} />
-          <Route path="tenants/quota" element={<TenantsQuotaPage />} />
           <Route path="tenants/isolation" element={<TenantsIsolationPage />} />
-          <Route path="tenants/switch" element={<TenantsSwitchPage />} />
           {/* M413 PHI脱敏路由 */}
           <Route path="phi/masking" element={<PhiMaskingPage />} />
           <Route path="phi/encryption" element={<PhiEncryptionPage />} />
@@ -10639,10 +10441,7 @@ export default function AppRoutes() {
           <Route path="signatures/list" element={<SignaturesListPage />} />
           <Route path="signatures/verify" element={<SignaturesVerifyPage />} />
           <Route path="signatures/templates" element={<SignaturesTemplatesPage />} />
-          <Route path="audit/trails" element={<AuditTrailsPage />} />
-          <Route path="audit/reports" element={<AuditReportsPage />} />
           {/* M415 BI运营分析路由补登 */}
-          <Route path="bi/dashboard" element={<BiDashboardPage />} />
           <Route path="bi/charts" element={<BiChartsPage />} />
           <Route path="bi/reports" element={<BiReportsPage />} />
           <Route path="bi/analysis" element={<BiAnalysisPage />} />
@@ -10712,7 +10511,6 @@ export default function AppRoutes() {
           <Route path="geriatrics/dementia-detail" element={<GeriatricsDementiaDetailPage />} />
           <Route path="geriatrics/falls-detail" element={<GeriatricsFallsDetailPage />} />
           {/* M429 病历管理详情路由补登 */}
-          <Route path="emr/templates-detail" element={<EmrTemplatesDetailPage />} />
           <Route path="emr/quality-check-detail" element={<EmrQualityCheckDetailPage />} />
           <Route path="emr/retrieval-detail" element={<EmrRetrievalDetailPage />} />
           <Route path="emr/archive-detail" element={<EmrArchiveDetailPage />} />
