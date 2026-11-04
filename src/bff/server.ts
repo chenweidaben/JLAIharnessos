@@ -4067,6 +4067,7 @@ import { clinicalSignatureRoutes } from './routes/clinicalSignature'; // P0-6：
 import { wardRoundSignoffRoutes } from './routes/wardRoundSignoff'; // P1-1：三级检诊工作流 resident/attending/chief
 import { vitalsSheetRoutes } from './routes/vitalsSheet'; // P1-2：体温单独立护理文书
 import { orderSheetPrintRoutes } from './routes/orderSheetPrint'; // P1-2：医嘱单续打/补打/重打
+import { surgeryWorkflowRoutes } from './routes/surgeryWorkflow'; // P1-3：手术麻醉闭环
 // 【新业务场景】M138-C：医院内部即时通讯（IM）
 import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
@@ -6525,6 +6526,7 @@ const allRoutes: RouteDef[] = [
   ...wardRoundSignoffRoutes, // P1-1：三级检诊工作流 resident/attending/chief
   ...vitalsSheetRoutes, // P1-2：体温单独立护理文书
   ...orderSheetPrintRoutes, // P1-2：医嘱单续打/补打/重打
+  ...surgeryWorkflowRoutes, // P1-3：手术麻醉闭环
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
