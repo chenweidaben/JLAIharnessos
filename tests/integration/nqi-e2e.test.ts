@@ -70,7 +70,7 @@ describe('P2-4 NQI 上报与看板', () => {
   });
   it('管路滑脱上报', async () => {
     const r = await call('POST','/api/v1/nqi/events/tube-displacement',{token:nurse,body:{visitId:VID,patientId:'P',departmentId:DEP,occurredAt:'2026-11-04T10:00:00Z',catheterType:'cvc',reason:'accidental',reinserted:true}});
-    expect(r.httpStatus).toBe(200); expect(r.details === undefined ? r.data.details.catheterType : '').toBe('cvc');
+    expect(r.httpStatus).toBe(200); expect(r.data.details.catheterType).toBe('cvc');
   });
   it('约束开始 + assess + release + 重复 release 409', async () => {
     const start = await call('POST','/api/v1/nqi/events/restraint',{token:nurse,body:{visitId:VID,patientId:'P',departmentId:DEP,occurredAt:'2026-11-04T11:00:00Z',restraintType:'physical',appliedAt:'2026-11-04T11:00:00Z',rationale:'防拔管'}});
