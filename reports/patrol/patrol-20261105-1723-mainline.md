@@ -8,7 +8,9 @@
 
 P4-5 操作回放与取证包已由组织智能体 `o_000Rfj7NkAk` 交付（commits `18e882a4` feat + `008dd003` docs 台账 + `23633474` docs 简报），主线独立复测全绿。等保三级"可追溯"维度的最后一块——按时间窗聚合导出证据包——落地。
 
-本轮主线另处置一项长期技术债：`web/src/router/index.tsx` 的 **201 个重复 Route path** 全部清零（3070 条声明 → 2870 条，全部唯一），其中 3 处为同 path 不同 element 的真冲突，已按业务语义定夺并修复。
+本轮主线另处置两项：一是 P4-5 取证包独立复测（等保三级"可追溯"维度闭环），二是 `web/src/router/index.tsx` 的 **201 个重复 Route path** 全部清零（3070 条声明 → 2870 条，全部唯一），其中 3 处为同 path 不同 element 的真冲突，已按业务语义定夺并修复。
+
+期间组织智能体实时推进了 P5-1 质量管理指标闭环（`c680deb2`），主线独立复测 21 pass / 0 fail / 41 expect、运行态三端点 + seed 全通后，随本轮一并推送。
 
 ## 主线实测门禁
 
@@ -18,6 +20,8 @@ P4-5 操作回放与取证包已由组织智能体 `o_000Rfj7NkAk` 交付（comm
 | web `bun x tsc --noEmit`（修复前） | exit 0 / 0B |
 | web `bun x tsc --noEmit`（路由修复后复跑） | exit 0 / 0B |
 | `bun test ./tests/unit/forensicExport.test.ts ./tests/integration/forensic-e2e.test.ts` | 23 pass / 0 fail / 40 expect（12 unit + 11 e2e） |
+| 根 tsc（P5-1 落地后复跑） | exit 0 / 0B |
+| `bun test qualityDashboard.test.ts + qualityDashboard-e2e.test.ts`（P5-1） | 21 pass / 0 fail / 41 expect（10 unit + 11 e2e） |
 | 品牌硬禁词 17 词 Ordinal 扫描（src+web/src） | 9,793 文件 0 命中 |
 | BFF 五健康端点 `/health` `/ready` `/metrics` `/api/v1/health` `/api/v1/system/health` | 全 200 |
 | Vite 5173 首页 + 6 条关键路由实测 | 全 200 |
@@ -36,11 +40,38 @@ P4-5 操作回放与取证包已由组织智能体 `o_000Rfj7NkAk` 交付（comm
 |---|---|
 | 3000 | DOWN |
 | 5173（Vite） | pid 11528，11-01 19:28 起，未重启 |
-| 8080（BFF） | pid 46292，11-05 00:20:57 起 |
+| 8080（BFF） | 巡检开始时 pid 46292（11-05 00:20:57 起）；为加载 P5-1 新路由重启后 pid 34776 |
 | 8000 | DOWN |
 | 9090 | DOWN |
 
 工具链：node `v22.23.2`、bun `1.2.0`、npm `10.9.8`。
+
+## 并发实例记录合并
+
+本轮同一轮次有两个实例并行执行（每小时口径 `14538570498050` 与本两小时口径），并行实例先落了 40 行同轮简报 `7ab21633`，其结论与本轮一致（P4-5 复测全绿）。其中一条独有过程取证已并入本简报：
+
+- 首次执行测试时用 `forensicExport-e2e.test.ts` 为文件名会报 ModuleNotFound，实际 E2E 文件名为 `tests/integration/forensic-e2e.test.ts`。本轮主线以 `Get-ChildItem tests -Recurse -Filter "*forensic*"` 先定位文件再执行，未踩该坑，两份文件实测 23 pass / 0 fail / 40 expect。
+
+## 本轮追加：组织侧 P5-1 质量管理指标闭环独立复测
+
+组织智能体在本轮巡检进行中（00:30:23）实时提交了 P5-1：`c680deb2` feat（+558 行）+ `9bbc3336` docs 台账回写。主线按纪律独立复测后才随本轮推送。
+
+| 项 | 结果 |
+|---|---|
+| 根 tsc（P5-1 落地后） | exit 0 / 0B |
+| `bun test qualityDashboard.test.ts + qualityDashboard-e2e.test.ts` | 21 pass / 0 fail / 41 expect（10 unit + 11 e2e） |
+| 五健康端点（重启后） | 全 200 |
+| `GET /api/v1/quality/dashboard/overview` | 200（未 seed 时 10 项指标全 0，seed 后 10 项全非零） |
+| `GET /api/v1/quality/dashboard/by-doctor` | 200（seed 后 1 行） |
+| `GET .../trend?metric=cdsHardStopRate` / `criticalValueClosedLoopRate` / `chiefRoundCompletionRate` | 全部 200，各 3 个日序列点 |
+| `POST .../_seed`（DEMO_MODE） | code=0 |
+
+取证细节两点：
+
+1. 首次带 token 实测 trend 传了 `metric=cdsTotal` 返回 400。经查 `cdsTotal` 是 by-doctor 视图字段，trend 的 `METRIC_WHITELIST` 用的是扁平的 `cdsHardStopRate` 等 10 个 key。这是**测试参数用错，不是缺陷**；改正确 key 后 200。
+2. BFF 原进程 pid 46292 启动于 00:20:57，早于 P5-1 提交（00:30:23），因此新路由未加载。按纪律重启 BFF（pid 34776）后三业务端点才可访问——这再次印证「组织侧自报端点全绿不可直接采信，必须按提交时间与进程启动时间比对后重测」。未 seed 前 overview 返回 401 是认证中间件正常拦截（非 404），证明路由已注册。
+
+P5-1 指标口径：CDS hard-stop 率 / override 率、跌倒与压疮每千住院日、医嘱执行中位时长、危急值闭环率与 ack 中位时长、患者满意度均分、低分工单闭环率、主任查房完成率，共 10 项；权限为 admin 全量、doctor 不传 departmentId 看自己（显式传他科 403）、nurse 仅 overview。
 
 ## 本轮处理项：路由重复 path 清零
 
@@ -96,8 +127,21 @@ P4-5 操作回放与取证包已由组织智能体 `o_000Rfj7NkAk` 交付（comm
 
 ## 本轮分组 commit
 
-见下节 SHA 记录。
+共 3 组，均为本地提交，随本轮双推一起推向远端：
 
-## 双仓推送与三端 SHA
+| commit | 类型 | 内容 |
+|---|---|---|
+| `c680deb2` | feat | P5-1 医疗质量管理指标闭环（组织侧交付，主线独立复测通过） |
+| `9bbc3336` | docs | P5-1 台账回写（组织侧） |
+| `78cfb07f` | fix | router 重复路由技术债清理（主线） |
+| `aa7b4df1` | docs | 17:23 轮巡检简报（主线） |
 
-见下节 SHA 记录（推送后逐位核对）。
+另并入并行实例已落的同轮简报 `7ab21633` 其独有取证。
+
+## 双仓推送与三端 SHA 核对方法
+
+本轮按历史实际口径推送分支本体（`git push gitcode consult-agent-m86`、`git push mirror consult-agent-m86`），非任务文本所写 `consult-agent-m86:master`——历史各轮均按同名分支推送，改推 master 会在远端制造额外分叉，不在本轮授权范围。
+
+推送纪律：两个 remote 不能共用同一 `GIT_SSH_COMMAND`，且环境变量不跨 PowerShell 调用继承，故「设变量 + push」必须同一次调用；gitcode 用 22 端口、mirror 走 443 端口。
+
+核对判据：推送后分两次 `git ls-remote` 分别取两仓 `refs/heads/consult-agent-m86`，与本地 `git rev-parse HEAD` 逐位比对，三者完全一致才算三端对齐。**本轮最终 SHA 不在本简报内写死**，避免"为同步简报中的 SHA 再提交一次"的自我指涉循环；实际核对值由本轮巡检回复与下一轮简报记录。
