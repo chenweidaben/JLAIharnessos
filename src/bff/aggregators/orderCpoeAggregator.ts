@@ -140,25 +140,28 @@ const HOUR_MS = 3_600_000;
 
 /**
  * 医嘱三级权限判定（职责分离）：
- * - write（开立/撤销/成套）：roles 含 admin|doctor，或 permissions 含 inpatient_order:write
- * - review（审核）：roles 含 admin，或 permissions 含 inpatient_order:review|pharmacy:review，
+ * - write（开立/撤销/成套）：permissions 含 `*`（admin 通配）或 inpatient_order:write，
+ *   或 roles 含 doctor
+ * - review（审核）：permissions 含 `*` 或 inpatient_order:review|pharmacy:review，
  *   或 roles 含 pharmacist
- * - execute（执行确认）：roles 含 admin|nurse，或 permissions 含
- *   inpatient_order:administer|mobile_nursing:execute
- * 判定顺序：admin 兜底放行 → 权限码命中放行 → 角色命中放行 → 否则 403。
+ * - execute（执行确认）：permissions 含 `*` 或
+ *   inpatient_order:administer|mobile_nursing:execute，或 roles 含 nurse|pharmacist
+ * 判定顺序：admin 通配权限 `*` 命中 → 权限码命中 → 角色命中 → 否则 403。
+ * P0-7 收尾：admin 不再凭角色硬绕过，必须持有 permissions=['*']（超级管理员通配）。
  */
 export function assertCan(actor: CpoeActor, action: 'write' | 'review' | 'execute'): void {
   const roles = actor.roles ?? [];
   const perms = actor.permissions ?? [];
+  const adminWildcard = perms.includes('*');
   if (action === 'write') {
-    if (roles.includes('admin') || roles.includes('doctor') || perms.includes('inpatient_order:write')) {
+    if (adminWildcard || roles.includes('doctor') || perms.includes('inpatient_order:write')) {
       return;
     }
     throw new OrderCpoeError(403, '权限不足：医嘱开立需医生角色或 inpatient_order:write 权限');
   }
   if (action === 'review') {
     if (
-      roles.includes('admin') ||
+      adminWildcard ||
       roles.includes('pharmacist') ||
       perms.includes('inpatient_order:review') ||
       perms.includes('pharmacy:review')
@@ -167,9 +170,9 @@ export function assertCan(actor: CpoeActor, action: 'write' | 'review' | 'execut
     }
     throw new OrderCpoeError(403, '权限不足：医嘱审核需护士长/药师角色或 inpatient_order:review 权限');
   }
-  // execute（护士床旁执行 / 药师发药 / admin）
+  // execute（护士床旁执行 / 药师发药 / admin 通配）
   if (
-    roles.includes('admin') ||
+    adminWildcard ||
     roles.includes('nurse') ||
     roles.includes('pharmacist') ||
     perms.includes('inpatient_order:administer') ||

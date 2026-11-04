@@ -10,6 +10,7 @@
  */
 
 import { newJti, signJwt, verifyJwt } from '../middleware/auth';
+import { scryptSync, timingSafeEqual } from 'node:crypto';
 import { isProductionEnv } from '../config/runtimeEnv';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
@@ -52,6 +53,14 @@ function unauthorized(): Response {
 function demoViewFor(username: string): AuthView {
   const base = { phone: '', email: '', status: 'active' as const, roles: [] };
   switch (username) {
+    case 'demo-doctor':
+      return { ...base, id: 'u_demo_doctor', username, realName: '演示医生', employeeNo: 'DEM-DOC', gender: 'unknown', deptCode: 'cardiology', deptName: '心血管内科', title: '主治医师', roleCodes: ['doctor'], rawRoles: ['doctor'], permissions: ROLE_PERMISSIONS.doctor, dataScope: 'dept' };
+    case 'demo-nurse':
+      return { ...base, id: 'u_demo_nurse', username, realName: '演示护士', employeeNo: 'DEM-NUR', gender: 'female', deptCode: 'ward_3f', deptName: '三病区', title: '护师', roleCodes: ['nurse'], rawRoles: ['nurse'], permissions: ROLE_PERMISSIONS.nurse, dataScope: 'dept' };
+    case 'demo-pharmacist':
+      return { ...base, id: 'u_demo_pharma', username, realName: '演示药师', employeeNo: 'DEM-PHA', gender: 'male', deptCode: 'pharmacy', deptName: '药学部', title: '主管药师', roleCodes: ['pharmacist'], rawRoles: ['pharmacist'], permissions: ROLE_PERMISSIONS.pharmacist, dataScope: 'dept' };
+    case 'demo-admin':
+      return { ...base, id: 'u_demo_admin', username, realName: '演示管理员', employeeNo: 'DEM-ADM', gender: 'unknown', deptCode: 'admin', deptName: '信息科', title: '系统管理员', roleCodes: ['admin'], rawRoles: ['admin'], permissions: ['*'], dataScope: 'all' };
     case 'doctor_li':
       return { ...base, id: 'u_2001', username, realName: '李医生', employeeNo: 'DOC2001', gender: 'male', deptCode: 'cardiology', deptName: '心血管内科', title: '主治医师', roleCodes: ['doctor'], rawRoles: ['doctor'], permissions: ROLE_PERMISSIONS.doctor, dataScope: 'dept' };
     case 'nurse_wang':
@@ -70,6 +79,41 @@ function demoViewFor(username: string): AuthView {
 }
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
+
+/* ------------------------------------------------------------------ */
+/* P0-7 收尾：DEMO 模式真实口令哈希校验（scrypt，不明文存）              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * DEMO 模式登录不再任意放行（此前 demoViewFor 忽略口令）。
+ * 内置 4 个演示账号（demo-doctor/nurse/pharmacist/admin）以及既有演示用户名，
+ * 口令以 scrypt(salt) 哈希形式登记；登录时 timingSafeEqual 比对，
+ * 用户名不存在或口令错误统一返回 401 code=40101（防枚举）。
+ * 生产模式走 iam 真实用户表，本表不参与。
+ */
+const DEMO_CRED_SALT = 'jianlan-demo-scrypt-salt-v1';
+function demoPwHash(password: string): Buffer {
+  return scryptSync(password, DEMO_CRED_SALT, 64) as Buffer;
+}
+/** username -> 明文口令（仅演示种子，生产无此表） */
+const DEMO_CREDENTIALS: Record<string, string> = {
+  'demo-doctor': 'Demo@Doctor1',
+  'demo-nurse': 'Demo@Nurse1',
+  'demo-pharmacist': 'Demo@Pharma1',
+  'demo-admin': 'Demo@Admin1',
+  'doctor_chen': 'Demo@Admin1',
+  'doctor_li': 'Demo@Doctor1',
+  'nurse_wang': 'Demo@Nurse1',
+  'pharmacist_zhang': 'Demo@Pharma1',
+};
+/** DEMO 模式校验口令；通过返回 true，否则 false。 */
+export function verifyDemoPassword(username: string, password: string): boolean {
+  const expected = DEMO_CREDENTIALS[username];
+  if (!expected) return false;
+  const a = demoPwHash(password);
+  const b = demoPwHash(expected);
+  return timingSafeEqual(a, b);
+}
 
 /** 提取登录终端信息（IP 取代理转发头，UA 截断存储）。 */
 function requestEndpoint(c: Ctx): { ip: string | null; userAgent: string | null } {
@@ -198,6 +242,12 @@ export const authRoutes: RouteDef[] = [
           });
         }
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码错误'), 400);
+      }
+
+      // P0-7 收尾：DEMO 模式下真实校验口令（scrypt 哈希），不再任意放行。
+      // 用户名未登记或口令错误统一 401 code=40101，不区分原因（防枚举）。
+      if (isDemo && !verifyDemoPassword(loginUsername, body.password)) {
+        return json(fail(40101, '用户名或密码错误'), 401);
       }
 
       // M3-C：若用户已启用 MFA，密码通过后不直接发令牌，改发第二因子挑战。
