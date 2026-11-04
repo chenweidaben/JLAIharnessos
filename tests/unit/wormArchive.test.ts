@@ -5,13 +5,14 @@
  */
 
 import { beforeEach, describe, expect, test } from 'bun:test';
+import { rmSync } from 'node:fs';
 import { __resetStore as resetAudit, recordEvent } from '../../src/bff/aggregators/auditEventAggregator';
 import {
-  __getCipherHex, __resetStore, __sm3StandardVector, checkSeqContinuity,
+  __counters, __getCipherHex, __resetStore, __sm3StandardVector, checkSeqContinuity,
   createProbe, getSegment, getSegmentEvents, keyStatus, listSegments, resetProbes,
   seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
-import { FileWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
+import { FileWormStore, __resetWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
 
@@ -263,5 +264,55 @@ describe('P5-5 storeInfo', () => {
     expect(s.kind).toBe('memory');
     expect(s.segmentCount).toBe(1);
     expect(s.oldestSeq).toBe(1);
+  });
+});
+
+describe('P5-5 fs 后端重启后计数器回填', () => {
+  function mkSeg(segmentId: string, seq: number, fromSeq: number, toSeq: number): never {
+    return {
+      segmentId, seq, fromSeq, toSeq, eventCount: toSeq - fromSeq + 1,
+      segmentHash: 'b'.repeat(64), prevSegmentHash: 'GENESIS', sourceChainHead: 'c'.repeat(64),
+      sourceChainValid: true, sealedAt: new Date().toISOString(), bytes: 10,
+      digestAlg: 'SM3', digestSm3: 'd'.repeat(64), sm4Encrypted: true, iv: 'e'.repeat(32),
+      cipherBytes: 'ff', sm2Signature: 'a'.repeat(128), signerKeyId: 'x', keySource: 'demo-ephemeral',
+    } as never;
+  }
+
+  test('磁盘已有段 → 重启后 seq 续写、不重复归档', () => {
+    const dir = `logs/worm-store-restart-${Math.random().toString(36).slice(2)}`;
+    const prevBackend = process.env.WORM_BACKEND;
+    const prevDir = process.env.WORM_STORE_DIR;
+    try {
+      process.env.WORM_BACKEND = 'fs';
+      process.env.WORM_STORE_DIR = dir;
+      __resetWormStore();
+      __resetStore();
+      resetProbes();
+
+      // 模拟上一进程留下的两段：事件 1..2、3..4
+      const seeded = new FileWormStore(dir);
+      seeded.put(mkSeg('WORM-0001-seed1', 1, 1, 2));
+      seeded.put(mkSeg('WORM-0002-seed2', 2, 3, 4));
+
+      // 重启后进程内计数器归零
+      expect(__counters()).toEqual({ segmentCounter: 0, lastArchivedSeq: 0 });
+
+      seedN(6); // 新进程事件流重新从 1 开始，1..4 已归档过
+      const r = seal({});
+      expect(r.ok).toBe(true);
+      expect(r.segment!.seq).toBe(3);          // 续写 seq，而不是回到 1 撞车
+      expect(r.segment!.fromSeq).toBe(5);      // 已归档到 4，不重复封存
+      expect(r.segment!.prevSegmentHash).toBe('b'.repeat(64)); // 链接磁盘末段
+      expect(__counters()).toEqual({ segmentCounter: 3, lastArchivedSeq: 6 });
+    } finally {
+      if (prevBackend === undefined) delete process.env.WORM_BACKEND;
+      else process.env.WORM_BACKEND = prevBackend;
+      if (prevDir === undefined) delete process.env.WORM_STORE_DIR;
+      else process.env.WORM_STORE_DIR = prevDir;
+      __resetWormStore();
+      __resetStore();
+      resetProbes();
+      try { rmSync(dir, { recursive: true, force: true }); } catch { /* 只读属性残留可忽略 */ }
+    }
   });
 });

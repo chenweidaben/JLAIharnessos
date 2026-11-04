@@ -71,8 +71,33 @@ const probes = new Map<string, ProbeRecord>();
 let lastArchivedSeq = 0;
 let segmentCounter = 0;
 let probeCounter = 0;
+let countersHydrated = false;
 const GENESIS = 'GENESIS';
 function store(): WormStore { return getWormStore(); }
+
+/**
+ * 从已持久化的段对齐计数器。
+ *
+ * fs 后端在进程重启后 segmentCounter / lastArchivedSeq 都是 0，若不回填会造成两个真实故障：
+ * 1) 新段 seq 从 1 重排，与磁盘已有段 seq 冲突 → seqContinuity 判定 duplicateSeq，整链 verify 变红；
+ * 2) pending 用 seq > lastArchivedSeq 过滤，lastArchivedSeq=0 会把已归档事件再封存一遍，产生重复归档。
+ * 因此每次 seal 前按 store 实际内容对齐一次（store 为空时不动，保持首次归档语义）。
+ */
+function hydrateCountersFromStore(): void {
+  if (countersHydrated) return;
+  countersHydrated = true;
+  const existing = store().list();
+  if (existing.length === 0) return;
+  for (const s of existing) {
+    if (s.seq > segmentCounter) segmentCounter = s.seq;
+    if (s.toSeq > lastArchivedSeq) lastArchivedSeq = s.toSeq;
+  }
+}
+
+/** 测试与巡检取证用：读取当前计数器。 */
+export function __counters(): { segmentCounter: number; lastArchivedSeq: number } {
+  return { segmentCounter, lastArchivedSeq };
+}
 
 /* ------------------------------ 密钥准备（真国密） ------------------------------ */
 
@@ -185,6 +210,8 @@ export function seal(input: SealInput = {}): SealResult {
   if (input.to && Number.isNaN(new Date(input.to).getTime())) return { ok: false, error: 'invalid-window' };
   if (sm4KeyHex.length !== 32 || !sm2PrivateKeyHex) return { ok: false, error: 'worm-key-not-configured' };
 
+  hydrateCountersFromStore();
+
   const all = queryEvents({ limit: 5000, offset: 0 }).rows.slice().sort((a, b) => a.seq - b.seq);
   let pending = all.filter((e) => e.seq > lastArchivedSeq);
   if (input.from) pending = pending.filter((e) => e.occurredAt >= (input.from as string));
@@ -194,8 +221,9 @@ export function seal(input: SealInput = {}): SealResult {
   const chain = verifyChain();
   const sourceChainHead = all.length ? all[all.length - 1].hash : GENESIS;
 
-  segmentCounter += 1;
-  const prev = store().list()[store().list().length - 1];
+  // 单次 list() 取值：读两遍会拿到两个快照，且 fs 后端每次 list 都是一次全目录读取
+  const segments = store().list();
+  const prev = segments[segments.length - 1];
   const prevSegmentHash = prev ? prev.segmentHash : GENESIS;
   const body = serializeEvents(pending);
   const segmentHash = computeSegmentHash(prevSegmentHash, sourceChainHead, body);
@@ -203,10 +231,12 @@ export function seal(input: SealInput = {}): SealResult {
   const { cipherHex, ivHex } = sm4Encrypt(body);
   const sm2Signature = sm2Sign(digestSm3);
   const now = new Date().toISOString();
-  const segmentId = `WORM-${String(segmentCounter).padStart(4, '0')}-${Date.now().toString(36)}`;
+  // put 成功后才推进计数器，避免写失败留下 seq 空洞
+  const nextSeq = segmentCounter + 1;
+  const segmentId = `WORM-${String(nextSeq).padStart(4, '0')}-${Date.now().toString(36)}`;
 
   const rec: SegmentRecord = {
-    segmentId, seq: segmentCounter,
+    segmentId, seq: nextSeq,
     fromSeq: pending[0].seq, toSeq: pending[pending.length - 1].seq,
     eventCount: pending.length, segmentHash, prevSegmentHash,
     sourceChainHead, sourceChainValid: chain.valid,
@@ -216,6 +246,7 @@ export function seal(input: SealInput = {}): SealResult {
     sm2Signature, signerKeyId, keySource: sm2KeySource,
   };
   store().put(rec);
+  segmentCounter = nextSeq;
   lastArchivedSeq = pending[pending.length - 1].seq;
 
   return { ok: true, segment: rec };
@@ -359,7 +390,13 @@ function verifyReal(): {
     const c = checkSeg(seg);
     if (!c.digestValid || !c.signatureValid) {
       checks.push({ segmentId: seg.segmentId, digestValid: c.digestValid, signatureValid: c.signatureValid });
-      return { ok: false, brokenSegmentId: seg.segmentId, reason: '段 SM3 摘要或 SM2 签名校验失败', segmentChecks: checks, digestValid: c.digestValid, signatureValid: c.signatureValid, seqContinuity: continuity };
+      // 密钥不一致 ≠ 被篡改：demo-ephemeral 每进程重生成 SM2 密钥，重启后老段必然验签失败。
+      // 两种情形必须分开报，否则巡检会把"换了密钥"误判成"归档被篡改"。
+      const keyMismatch = !c.signatureValid && seg.signerKeyId !== signerKeyId;
+      const reason = keyMismatch
+        ? `签名密钥与当前进程不一致：该段由 ${seg.signerKeyId} 签发，当前 ${signerKeyId}（keySource=${sm2KeySource}）。不是篡改；固定 WORM_SM2_PRIVATE_KEY/WORM_SM2_PUBLIC_KEY 后老段方可继续验证`
+        : '段 SM3 摘要或 SM2 签名校验失败';
+      return { ok: false, brokenSegmentId: seg.segmentId, reason, segmentChecks: checks, digestValid: c.digestValid, signatureValid: c.signatureValid, seqContinuity: continuity };
     }
     if (c.body) {
       const evts = JSON.parse(c.body) as AuditEvent[];
@@ -508,6 +545,7 @@ export function __resetStore(): void {
   lastArchivedSeq = 0;
   segmentCounter = 0;
   probeCounter = 0;
+  countersHydrated = false;
 }
 
 export function __getCipherHex(segmentId: string): string | null {
