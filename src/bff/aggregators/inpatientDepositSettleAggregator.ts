@@ -60,6 +60,7 @@ export interface BillItem {
 export interface SettlementRecord {
   settleNo: string;
   visitId: string;
+  type: 'discharge' | 'mid';   // P0-5 深化：discharge 出院结算 / mid 中途结算
   dailyBill: BillItem[];
   totalCents: number;        // Σ amountCents（整数分）
   depositCents: number;      // 结算时已缴押金
@@ -67,7 +68,20 @@ export interface SettlementRecord {
   shortfallCents: number;    // 需补缴（>=0，整数分）
   refundCents: number;       // 退押金（>=0，整数分）
   operatorId: string;
+  operatorNote?: string;      // 中途结算备注
   settledAt: number;
+}
+
+export interface DailyStatement {
+  statementNo: string;
+  visitId: string;
+  patientId: string;
+  statementDate: string;     // yyyy-mm-dd
+  items: Array<{ name: string; amountCents: number }>;
+  totalCents: number;         // 累计费用（整数分）
+  depositBalanceCents: number;
+  pushedBy?: string;
+  pushedAt: number;
 }
 
 export interface DepositWarning {
@@ -334,6 +348,7 @@ export function settleDischarge(input: {
   const rec: SettlementRecord = {
     settleNo,
     visitId: input.visitId,
+    type: 'discharge',
     dailyBill,
     totalCents,
     depositCents: acc.depositCents,
@@ -346,6 +361,154 @@ export function settleDischarge(input: {
   settlements.set(settleNo, rec);
 
   acc.status = 'settled';
+  return rec;
+}
+
+/* ------------------------------------------------------------------ */
+/* P0-5 深化：中途结算 + 一日清单推送                                     */
+/* ------------------------------------------------------------------ */
+
+import { assertVisitPatientBinding } from './orderCpoeAggregator.js';
+
+// 中途结算幂等键（idempotencyKey）与一日清单（visitId|date）
+const midByIdem = new Map<string, SettlementRecord>();
+const dailyStatements = new Map<string, DailyStatement>();
+let midSeq = 0;
+let statementSeq = 0;
+
+function todayStr(now: number): string {
+  const d = new Date(now);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/**
+ * 中途结算（住院期间对指定费用项做部分结算，非出院）。
+ * - 行级 visitId-patientId 绑定；账户须 in_hospital，已出院 settled → 409
+ * - items 必填、每条 cents 正整数、name 必填；totalCents=Σcents
+ * - 幂等：同 idempotencyKey 重复提交 → 返回原单（200），不重复扣款
+ * - 扣减：acc.consumedCents += totalCents（费用从押金余额中扣减）
+ * - 写 SettlementRecord{type:'mid'}
+ */
+export function settleMid(input: {
+  visitId: string;
+  patientId: string;
+  items: Array<{ name: string; cents: number }>;
+  operatorId: string;
+  operatorNote?: string;
+  idempotencyKey?: string;
+  now?: number;
+}): SettlementRecord {
+  const now = input.now ?? Date.now();
+  if (!input.visitId) throw new InpatientDepositSettleError(400, 'visitId 必填');
+  assertVisitPatientBinding(input.visitId, input.patientId);
+  if (!input.operatorId) throw new InpatientDepositSettleError(400, 'operatorId 必填');
+  if (!Array.isArray(input.items) || input.items.length === 0) {
+    throw new InpatientDepositSettleError(400, '中途结算明细不能为空');
+  }
+
+  if (input.idempotencyKey) {
+    const hit = midByIdem.get(input.idempotencyKey);
+    if (hit) return hit;
+  }
+
+  const acc = accounts.get(input.visitId);
+  if (!acc) throw new InpatientDepositSettleError(404, `住院账户不存在: ${input.visitId}`);
+  if (acc.status === 'settled') {
+    throw new InpatientDepositSettleError(409, '该住院已出院结算，不可再中途结算');
+  }
+  if (acc.status !== 'in_hospital') {
+    throw new InpatientDepositSettleError(409, '当前住院状态不可中途结算');
+  }
+
+  const dailyBill: BillItem[] = [];
+  let totalCents = 0;
+  for (const it of input.items) {
+    if (!it.name) throw new InpatientDepositSettleError(400, '结算项目名称必填');
+    if (!Number.isInteger(it.cents) || it.cents <= 0) {
+      throw new InpatientDepositSettleError(400, '费用必须为正整数分');
+    }
+    dailyBill.push({ name: it.name, quantity: 1, unitPriceCents: it.cents, amountCents: it.cents });
+    totalCents += it.cents;
+  }
+  if (!Number.isInteger(totalCents)) {
+    throw new InpatientDepositSettleError(500, '费用合计非整数分');
+  }
+
+  midSeq += 1;
+  acc.consumedCents += totalCents;
+  const settleNo = `MID-${input.visitId}-${midSeq}`;
+  const rec: SettlementRecord = {
+    settleNo,
+    visitId: input.visitId,
+    type: 'mid',
+    dailyBill,
+    totalCents,
+    depositCents: acc.depositCents,
+    consumedCents: acc.consumedCents,
+    shortfallCents: 0,
+    refundCents: 0,
+    operatorId: input.operatorId,
+    operatorNote: input.operatorNote,
+    settledAt: now,
+  };
+  settlements.set(settleNo, rec);
+  if (input.idempotencyKey) midByIdem.set(input.idempotencyKey, rec);
+  return rec;
+}
+
+/**
+ * 一日清单推送：生成当日费用清单（费用项 + 押金余额 + 累计费用）并写推送记录。
+ * - 行级绑定；同 visitId+statementDate 重复推送 → 返回原清单（幂等 200）
+ * - items 取该住院已结算（含中途结算）费用项；totalCents=acc.consumedCents；
+ *   depositBalanceCents=depositCents-consumedCents。
+ */
+export function pushDailyStatement(input: {
+  visitId: string;
+  patientId: string;
+  statementDate?: string;
+  operatorId?: string;
+  now?: number;
+}): DailyStatement {
+  const now = input.now ?? Date.now();
+  if (!input.visitId) throw new InpatientDepositSettleError(400, 'visitId 必填');
+  assertVisitPatientBinding(input.visitId, input.patientId);
+
+  const acc = accounts.get(input.visitId);
+  if (!acc) throw new InpatientDepositSettleError(404, `住院账户不存在: ${input.visitId}`);
+
+  const date = input.statementDate ?? todayStr(now);
+  const key = `${input.visitId}|${date}`;
+  const existing = dailyStatements.get(key);
+  if (existing) return existing;
+
+  // 汇总该住院已结算费用项（同名合并）
+  const agg = new Map<string, number>();
+  for (const s of settlements.values()) {
+    if (s.visitId !== input.visitId) continue;
+    for (const b of s.dailyBill) {
+      agg.set(b.name, (agg.get(b.name) ?? 0) + b.amountCents);
+    }
+  }
+  const items = Array.from(agg.entries()).map(([name, amountCents]) => ({ name, amountCents }));
+  const totalCents = acc.consumedCents;
+  const depositBalanceCents = acc.depositCents - acc.consumedCents;
+
+  statementSeq += 1;
+  const rec: DailyStatement = {
+    statementNo: `DS-${input.visitId}-${statementSeq}`,
+    visitId: input.visitId,
+    patientId: acc.patientId,
+    statementDate: date,
+    items,
+    totalCents,
+    depositBalanceCents,
+    pushedBy: input.operatorId,
+    pushedAt: now,
+  };
+  dailyStatements.set(key, rec);
   return rec;
 }
 
@@ -373,8 +536,12 @@ export function __resetStore(): void {
   accounts.clear();
   deposits.clear();
   settlements.clear();
+  midByIdem.clear();
+  dailyStatements.clear();
   depositSeqs.clear();
   settleSeq = 0;
+  midSeq = 0;
+  statementSeq = 0;
   seedDemoAccounts();
 }
 

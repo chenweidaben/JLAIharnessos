@@ -22,10 +22,13 @@ import {
   payDeposit,
   assessDepositWarning,
   settleDischarge,
+  settleMid,
+  pushDailyStatement,
   getAccount,
   listDeposits,
   listSettlements,
 } from '../aggregators/inpatientDepositSettleAggregator.js';
+import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -43,7 +46,22 @@ function mapError(err: unknown): Response {
       : ErrorCode.BAD_REQUEST;
     return json(fail(code, err.message), err.status);
   }
+  if (err instanceof OrderCpoeError) {
+    const code =
+      err.status === 403 ? ErrorCode.FORBIDDEN
+      : err.status === 404 ? ErrorCode.NOT_FOUND
+      : err.status === 409 ? ErrorCode.CONFLICT
+      : ErrorCode.BAD_REQUEST;
+    return json(fail(code, err.message), err.status);
+  }
   return json(fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '失败'), 500);
+}
+
+/** 中途结算/一日清单：cashier/finance/admin 可执行，doctor/nurse 403。 */
+function assertCashier(roles: string[]): void {
+  if (!roles.includes('cashier') && !roles.includes('finance') && !roles.includes('admin')) {
+    throw new InpatientDepositSettleError(403, '权限不足：需收费员/财务角色执行结算');
+  }
 }
 
 /** 押金结算交易：要求已登录且权限集合非空（即真实收费员账号）。 */
@@ -151,6 +169,47 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
       try {
         assertStaff(view);
         return json(ok(listSettlements()));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  // ---- P0-5 深化：中途结算 + 一日清单推送（JWT 角色直判 cashier/finance/admin）----
+  {
+    method: 'POST',
+    path: '/api/v1/inpatient/deposit-settle/mid-settlements',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        assertCashier(c.user?.roles ?? []);
+        const b = (await c.body()) as Record<string, unknown>;
+        const rawItems = Array.isArray(b.items) ? b.items as Array<Record<string, unknown>> : [];
+        return json(ok(settleMid({
+          visitId: String(b.visitId ?? ''),
+          patientId: String(b.patientId ?? ''),
+          items: rawItems.map((it) => ({
+            name: String(it.name ?? ''),
+            cents: typeof it.cents === 'number' ? it.cents : NaN,
+          })),
+          operatorId: c.user?.id ?? 'unknown',
+          operatorNote: b.operatorNote ? String(b.operatorNote) : undefined,
+          idempotencyKey: b.idempotencyKey ? String(b.idempotencyKey) : undefined,
+        })));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/inpatient/deposit-settle/daily-statements/push',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        assertCashier(c.user?.roles ?? []);
+        const b = (await c.body()) as Record<string, unknown>;
+        return json(ok(pushDailyStatement({
+          visitId: String(b.visitId ?? ''),
+          patientId: String(b.patientId ?? ''),
+          statementDate: b.statementDate ? String(b.statementDate) : undefined,
+          operatorId: c.user?.id ?? 'unknown',
+        })));
       } catch (e) { return mapError(e); }
     },
   },
