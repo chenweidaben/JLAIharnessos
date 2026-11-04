@@ -241,7 +241,7 @@ export function endConsultation(consultId: string, summary: string, now?: string
   if (c.status !== 'ongoing') {
     throw new Error(`问诊单当前状态为 ${c.status}，仅「咨询中」可结束`);
   }
-  if (!sum) throw new Error('诊疗小结 summary 不能为空，医师须手写处置建议后方可结束');
+  if (!sum || !sum.trim()) throw new Error('诊疗小结 summary 不能为空，医师须手写处置建议后方可结束');
 
   const ended = now ? new Date(now).toISOString() : new Date().toISOString();
   c.summary = sum;

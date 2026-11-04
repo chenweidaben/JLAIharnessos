@@ -90,8 +90,11 @@ describe('endConsultation 结束问诊', () => {
     expect(() => endConsultation(pending.id, '小结')).toThrow(); // 待接单不可结束
 
     const c = createConsultation('P3003', '', '全科', '失眠');
-    acceptConsultation(c.id, 'D1', '2026-10-16T08:00:00Z');
-    expect(() => endConsultation(c.id, '   ')).toThrow(); // 小结必填
+    // 接单 5 分钟前、此刻结束，确保落在 30 分钟窗内（不被 sweepTimeouts 抢先关单）
+    const acceptedIso = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const endIso = new Date(Date.now()).toISOString();
+    acceptConsultation(c.id, 'D1', acceptedIso);
+    expect(() => endConsultation(c.id, '   ', endIso)).toThrow(); // 小结必填
   });
 });
 
