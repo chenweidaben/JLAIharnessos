@@ -42,10 +42,10 @@ describe('P2-1 新建与角色', () => {
     expect(listVersions(n.noteId).length).toBe(1);
   });
   test('nurse 建病历 → 403', () => {
-    expect(statusOf(() => createNote({ visitId:'V', patientId:'P', title:'t', noteType:'admission', content:{a:'b'}, roles: NURSE, authorId:'n1', authorRole:'nurse' }))).toBe(403);
+    expect(statusOf(() => createNote({ visitId:'V', patientId:'P', title:'t', noteType:'admission', content:{chiefComplaint:'x'}, roles: NURSE, authorId:'n1', authorRole:'nurse' }))).toBe(403);
   });
   test('非法 noteType → 400', () => {
-    expect(statusOf(() => createNote({ visitId:'V', patientId:'P', title:'t', noteType:'fake', content:{a:'b'}, roles: RESIDENT, authorId:'r1', authorRole:'r' }))).toBe(400);
+    expect(statusOf(() => createNote({ visitId:'V', patientId:'P', title:'t', noteType:'fake', content:{chiefComplaint:'x'}, roles: RESIDENT, authorId:'r1', authorRole:'r' }))).toBe(400);
   });
   test('空 content → 400', () => {
     expect(statusOf(() => createNote({ visitId:'V', patientId:'P', title:'t', noteType:'admission', content:{}, roles: RESIDENT, authorId:'r1', authorRole:'r' }))).toBe(400);
@@ -107,7 +107,7 @@ describe('P2-1 终稿锁定与解锁', () => {
     const n = makeNote();
     finalize(n.noteId, ATTENDING);
     unlockForEdit(n.noteId, 'x', 'a1', ATTENDING);
-    revise(n.noteId, { x: 'y' }, RESIDENT, 'r1', 'r');
+    revise(n.noteId, { physicalExam: '腹软' }, RESIDENT, 'r1', 'r');
     expect(reLock(n.noteId, ATTENDING).state).toBe('finalized');
     expect(statusOf(() => reLock(n.noteId, ATTENDING))).toBe(409);
   });
