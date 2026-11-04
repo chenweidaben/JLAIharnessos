@@ -4135,6 +4135,7 @@ import { medicalCaseGraphRoutes } from './routes/medicalCaseGraph'; // M86-L：�
 import { aiIcuMonitorRoutes } from './routes/aiIcuMonitor'; // M86-M：【AI重症】ICU AI 监护深化
 import { interopFiveBRoutes } from './routes/interopFiveB'; // M86-N：【互联互通五乙】五级乙等自评
 import { cryptoAssessCnRoutes } from './routes/cryptoAssessCn'; // M86-O：【等保三级密评】商用密码应用安全性评估自评
+import { outpatientRegisterTradeRoutes } from './routes/outpatientRegisterTrade'; // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
 
 // ============================================================================
 // 路由表与编译
@@ -6602,6 +6603,7 @@ const allRoutes: RouteDef[] = [
   ...aiIcuMonitorRoutes, // M86-M：【AI重症】ICU AI 监护深化
   ...interopFiveBRoutes, // M86-N：【互联互通五乙】自评工作台
   ...cryptoAssessCnRoutes, // M86-O：【等保三级密评】密评自评
+  ...outpatientRegisterTradeRoutes, // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
 ];
 
 interface Compiled {
