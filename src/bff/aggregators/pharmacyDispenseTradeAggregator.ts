@@ -23,6 +23,8 @@ export class PharmacyDispenseTradeError extends Error {
   }
 }
 
+const HOUR_MS = 3_600_000;
+
 export type PrepackPeriod = 'morning' | 'noon' | 'evening' | 'night';
 export const PREPACK_PERIODS: readonly PrepackPeriod[] = ['morning', 'noon', 'evening', 'night'];
 
@@ -382,15 +384,234 @@ export function listReturnRequests(): DispenseRecord[] {
   return Array.from(dispenses.values()).filter((d) => d.status === 'return_requested');
 }
 
+/* ------------------------------------------------------------------ */
+/* P0-4 深化：处方审核 → 发药链路（prescription）                        */
+/* 状态机：pending_review → approved/rejected/stopped；approved → dispensed */
+/* 权限复用 P0-2 assertCan（write=开方 / review=审核 / execute=发药）     */
+/* ------------------------------------------------------------------ */
+
+import {
+  assertCan,
+  assertVisitPatientBinding,
+  OrderCpoeError,
+  type CpoeActor,
+} from './orderCpoeAggregator.js';
+
+export type RxStatus = 'pending_review' | 'approved' | 'rejected' | 'stopped' | 'dispensed';
+
+export interface Prescription {
+  rxNo: string;
+  visitId: string;
+  patientId: string;
+  patientName: string;
+  drugName: string;
+  specification: string;
+  quantity: number;          // 正整数
+  unitFeeCents: number;      // 单价（整数分）
+  feeCents: number;          // 合计（整数分）
+  status: RxStatus;
+  prescribedBy: string;
+  prescribedByName?: string;
+  prescribedAt: number;
+  reviewerId?: string;
+  reviewerName?: string;
+  reviewedAt?: number;
+  reviewComment?: string;
+  dispensedBy?: string;
+  dispensedByName?: string;
+  dispensedAt?: number;
+}
+
+const prescriptions = new Map<string, Prescription>();
+let rxSeq = 0;
+
+/**
+ * 医生开处方：assertCan(write)（doctor/admin）；visitId-patient 行级绑定；
+ * feeCents 整数分；status=pending_review。
+ */
+export function createPrescription(input: {
+  visitId: string;
+  patientId: string;
+  patientName: string;
+  drugName: string;
+  specification: string;
+  quantity: number;
+  unitFeeCents: number;
+  actor: CpoeActor;
+  prescribedBy: string;
+  prescribedByName?: string;
+  now?: number;
+}): Prescription {
+  const now = input.now ?? Date.now();
+  assertCan(input.actor, 'write');
+  if (!input.visitId) throw new PharmacyDispenseTradeError(400, 'visitId 必填');
+  if (!input.patientId) throw new PharmacyDispenseTradeError(400, 'patientId 必填');
+  assertVisitPatientBinding(input.visitId, input.patientId);
+  if (!input.drugName) throw new PharmacyDispenseTradeError(400, '药品名称必填');
+  if (!Number.isInteger(input.quantity) || input.quantity <= 0) {
+    throw new PharmacyDispenseTradeError(400, '数量必须为正整数');
+  }
+  if (!Number.isInteger(input.unitFeeCents) || input.unitFeeCents < 0) {
+    throw new PharmacyDispenseTradeError(400, '单价必须为非负整数分');
+  }
+  const feeCents = input.unitFeeCents * input.quantity;
+  if (!Number.isInteger(feeCents)) {
+    throw new PharmacyDispenseTradeError(500, '费用字段非整数分');
+  }
+
+  rxSeq += 1;
+  const rx: Prescription = {
+    rxNo: `RX-${String(rxSeq).padStart(4, '0')}`,
+    visitId: input.visitId,
+    patientId: input.patientId,
+    patientName: input.patientName,
+    drugName: input.drugName,
+    specification: input.specification,
+    quantity: input.quantity,
+    unitFeeCents: input.unitFeeCents,
+    feeCents,
+    status: 'pending_review',
+    prescribedBy: input.prescribedBy,
+    prescribedByName: input.prescribedByName,
+    prescribedAt: now,
+  };
+  prescriptions.set(rx.rxNo, rx);
+  return rx;
+}
+
+/**
+ * 药师审核处方：assertCan(review)（pharmacist/admin）。
+ * 仅 pending_review 可审；approve→approved，reject→rejected；重复审核 409。
+ */
+export function reviewPrescription(input: {
+  rxNo: string;
+  decision: 'approve' | 'reject';
+  comment?: string;
+  actor: CpoeActor;
+  reviewerId: string;
+  reviewerName?: string;
+  now?: number;
+}): Prescription {
+  const now = input.now ?? Date.now();
+  assertCan(input.actor, 'review');
+  const rx = prescriptions.get(input.rxNo);
+  if (!rx) throw new PharmacyDispenseTradeError(404, `处方不存在: ${input.rxNo}`);
+  if (rx.status !== 'pending_review') {
+    throw new PharmacyDispenseTradeError(409, `处方已审核（当前状态 ${rx.status}），不可重复审核`);
+  }
+  if (input.decision !== 'approve' && input.decision !== 'reject') {
+    throw new PharmacyDispenseTradeError(400, 'decision 必须为 approve/reject');
+  }
+  rx.status = input.decision === 'approve' ? 'approved' : 'rejected';
+  rx.reviewerId = input.reviewerId;
+  rx.reviewerName = input.reviewerName;
+  rx.reviewedAt = now;
+  rx.reviewComment = input.comment;
+  return rx;
+}
+
+/** 停止处方（doctor/admin，write）；已停止不得发药。 */
+export function stopPrescription(input: {
+  rxNo: string;
+  actor: CpoeActor;
+  now?: number;
+}): Prescription {
+  const now = input.now ?? Date.now();
+  assertCan(input.actor, 'write');
+  const rx = prescriptions.get(input.rxNo);
+  if (!rx) throw new PharmacyDispenseTradeError(404, `处方不存在: ${input.rxNo}`);
+  if (rx.status === 'dispensed') {
+    throw new PharmacyDispenseTradeError(409, '已发药处方不得停止');
+  }
+  rx.status = 'stopped';
+  rx.reviewedAt = now;
+  return rx;
+}
+
+/**
+ * 处方发药：assertCan(execute)（nurse/pharmacist/admin）。
+ * 仅 approved 可发药——未审核/已拒绝/已停止一律 409；重复发药 409。
+ */
+export function dispensePrescription(input: {
+  rxNo: string;
+  actor: CpoeActor;
+  dispenserId: string;
+  dispenserName?: string;
+  now?: number;
+}): Prescription {
+  const now = input.now ?? Date.now();
+  assertCan(input.actor, 'execute');
+  const rx = prescriptions.get(input.rxNo);
+  if (!rx) throw new PharmacyDispenseTradeError(404, `处方不存在: ${input.rxNo}`);
+  if (rx.status === 'dispensed') {
+    throw new PharmacyDispenseTradeError(409, '处方已发药，不可重复发药');
+  }
+  if (rx.status === 'stopped') {
+    throw new PharmacyDispenseTradeError(409, '已停止处方不得发药');
+  }
+  if (rx.status !== 'approved') {
+    throw new PharmacyDispenseTradeError(409, `处方未审核通过（当前状态 ${rx.status}），不得发药`);
+  }
+  rx.status = 'dispensed';
+  rx.dispensedBy = input.dispenserId;
+  rx.dispensedByName = input.dispenserName;
+  rx.dispensedAt = now;
+  return rx;
+}
+
+/** 处方列表（可按 visitId 过滤）。 */
+export function listPrescriptions(visitId?: string): Prescription[] {
+  const all = Array.from(prescriptions.values());
+  return visitId ? all.filter((r) => r.visitId === visitId) : all;
+}
+
 /** 单测隔离：清空台账并重播种子数据。 */
 export function __resetStore(): void {
   drugOrders.clear();
   prepackBatches.clear();
   dispenses.clear();
+  prescriptions.clear();
   batchSeq = 0;
   dispenseSeq = 0;
+  rxSeq = 0;
   seedDemoOrders();
+  seedPrescriptions();
+}
+
+/** 处方 seed：滚动时间基准，患者张某某/李某某/王某某。 */
+function seedPrescriptions(): void {
+  const now = Date.now();
+  prescriptions.clear();
+  rxSeq = 2;
+  const mk = (
+    rxNo: string,
+    visitId: string,
+    patientId: string,
+    patientName: string,
+    status: RxStatus,
+    hrsAgo: number,
+  ): Prescription => ({
+    rxNo,
+    visitId,
+    patientId,
+    patientName,
+    drugName: status === 'approved' ? '盐酸左氧氟沙星片' : '葡萄糖注射液',
+    specification: '0.5g*12片',
+    quantity: 1,
+    unitFeeCents: 450,
+    feeCents: 450,
+    status,
+    prescribedBy: 'u_doc01',
+    prescribedByName: '王医生',
+    prescribedAt: now - hrsAgo * HOUR_MS,
+    reviewerId: status === 'approved' || status === 'rejected' ? 'u_pharm01' : undefined,
+    reviewerName: status === 'approved' || status === 'rejected' ? '药师丙' : undefined,
+    reviewedAt: status === 'approved' || status === 'rejected' ? now - (hrsAgo - 0.5) * HOUR_MS : undefined,
+  });
+  prescriptions.set('RX-0001', mk('RX-0001', 'VISIT-A100', 'PT-P001', '张某某', 'approved', 3));
+  prescriptions.set('RX-0002', mk('RX-0002', 'VISIT-B200', 'PT-P002', '李某某', 'pending_review', 1));
 }
 
 // 模块加载时即播种子（DEMO 演示数据）。
 seedDemoOrders();
+seedPrescriptions();

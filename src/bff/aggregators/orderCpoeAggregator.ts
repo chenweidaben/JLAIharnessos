@@ -167,16 +167,17 @@ export function assertCan(actor: CpoeActor, action: 'write' | 'review' | 'execut
     }
     throw new OrderCpoeError(403, '权限不足：医嘱审核需护士长/药师角色或 inpatient_order:review 权限');
   }
-  // execute
+  // execute（护士床旁执行 / 药师发药 / admin）
   if (
     roles.includes('admin') ||
     roles.includes('nurse') ||
+    roles.includes('pharmacist') ||
     perms.includes('inpatient_order:administer') ||
     perms.includes('mobile_nursing:execute')
   ) {
     return;
   }
-  throw new OrderCpoeError(403, '权限不足：医嘱执行需护士角色或 inpatient_order:administer 权限');
+  throw new OrderCpoeError(403, '权限不足：医嘱执行需护士/药师角色或 inpatient_order:administer 权限');
 }
 
 /* ------------------------------------------------------------------ */

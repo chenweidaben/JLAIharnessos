@@ -27,7 +27,13 @@ import {
   listPrepackBatches,
   listDispenses,
   listReturnRequests,
+  createPrescription,
+  reviewPrescription,
+  dispensePrescription,
+  stopPrescription,
+  listPrescriptions,
 } from '../aggregators/pharmacyDispenseTradeAggregator.js';
+import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -45,7 +51,20 @@ function mapError(err: unknown): Response {
       : ErrorCode.BAD_REQUEST;
     return json(fail(code, err.message), err.status);
   }
+  if (err instanceof OrderCpoeError) {
+    const code =
+      err.status === 403 ? ErrorCode.FORBIDDEN
+      : err.status === 404 ? ErrorCode.NOT_FOUND
+      : err.status === 409 ? ErrorCode.CONFLICT
+      : ErrorCode.BAD_REQUEST;
+    return json(fail(code, err.message), err.status);
+  }
   return json(fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '失败'), 500);
+}
+
+/** 处方链：从 JWT 直取角色构造 actor（P0-2/P0-3 范式，不走 DB requester）。 */
+function actorOf(c: Ctx): { roles: string[]; permissions: string[] } {
+  return { roles: c.user?.roles ?? [], permissions: c.user?.permissions ?? [] };
 }
 
 /** 药房交易：要求已登录且权限集合非空（即真实药师账号）。 */
@@ -180,6 +199,86 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
       try {
         assertStaff(view);
         return json(ok(listReturnRequests()));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  // ---- P0-4 深化：处方审核→发药链路（JWT 角色直签 actor，不走 DB requester）----
+  {
+    method: 'POST',
+    path: '/api/v1/pharmacy/dispense-trade/prescriptions',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        const b = (await c.body()) as Record<string, unknown>;
+        return json(ok(createPrescription({
+          visitId: String(b.visitId ?? ''),
+          patientId: String(b.patientId ?? ''),
+          patientName: String(b.patientName ?? ''),
+          drugName: String(b.drugName ?? ''),
+          specification: String(b.specification ?? ''),
+          quantity: Number(b.quantity),
+          unitFeeCents: Number(b.unitFeeCents),
+          actor: actorOf(c),
+          prescribedBy: c.user?.id ?? 'unknown',
+          prescribedByName: c.user?.name,
+        })));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/pharmacy/dispense-trade/prescriptions/:rxNo/review',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        const b = (await c.body()) as Record<string, unknown>;
+        return json(ok(reviewPrescription({
+          rxNo: c.params.rxNo,
+          decision: String(b.decision ?? '') as 'approve' | 'reject',
+          comment: b.comment ? String(b.comment) : undefined,
+          actor: actorOf(c),
+          reviewerId: c.user?.id ?? 'unknown',
+          reviewerName: c.user?.name,
+        })));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/pharmacy/dispense-trade/prescriptions/:rxNo/dispense',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        return json(ok(dispensePrescription({
+          rxNo: c.params.rxNo,
+          actor: actorOf(c),
+          dispenserId: c.user?.id ?? 'unknown',
+          dispenserName: c.user?.name,
+        })));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/pharmacy/dispense-trade/prescriptions/:rxNo/stop',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        return json(ok(stopPrescription({
+          rxNo: c.params.rxNo,
+          actor: actorOf(c),
+        })));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/pharmacy/dispense-trade/prescriptions',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      try {
+        const visitId = c.query.get('visitId') ?? undefined;
+        return json(ok(listPrescriptions(visitId)));
       } catch (e) { return mapError(e); }
     },
   },
