@@ -1,5 +1,5 @@
 /**
- * 健澜科技数智医院智能体 - integration/adapters/his/ChuangyeHISAdapter.ts
+ * 健澜科技数智医院智能体 - integration/adapters/his/VendorBHISAdapter.ts
  *
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
@@ -16,7 +16,7 @@
  *
  * 本文件为骨架实现，包含认证流程、字段映射配置与全部接口方法骨架。
  *
- * @module integration/adapters/his/ChuangyeHISAdapter
+ * @module integration/adapters/his/VendorBHISAdapter
  */
 
 import type {
@@ -49,7 +49,7 @@ import type {
 } from './HISAdapter';
 
 /** 创业慧康HIS适配器配置 */
-export interface ChuangyeHISConfig extends Partial<AdapterConfig> {
+export interface VendorBHISConfig extends Partial<AdapterConfig> {
   /** 应用ID */
   appId?: string;
   /** 应用密钥 */
@@ -66,11 +66,11 @@ export interface ChuangyeHISConfig extends Partial<AdapterConfig> {
  * 2. 患者/医嘱/费用 API 调用
  * 3. HL7 ADT 事件接收
  */
-export class ChuangyeHISAdapter extends BaseAdapter implements HISAdapter {
+export class VendorBHISAdapter extends BaseAdapter implements HISAdapter {
   private patientEventListeners = new Set<(event: PatientEvent) => void>();
   private orderEventListeners = new Set<(event: OrderEvent) => void>();
 
-  constructor(config: ChuangyeHISConfig = {}) {
+  constructor(config: VendorBHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
       id: config.id ?? 'his-chuangye',
       type: 'his',
@@ -123,7 +123,7 @@ export class ChuangyeHISAdapter extends BaseAdapter implements HISAdapter {
       new AdapterError(
         AdapterErrorType.BUSINESS,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[ChuangyeHISAdapter] ${method} 尚未实现${detail ? `（${detail}）` : ''}`,
+        `[VendorBHISAdapter] ${method} 尚未实现${detail ? `（${detail}）` : ''}`,
         { adapterId: this.id, retryable: false },
       ),
     );

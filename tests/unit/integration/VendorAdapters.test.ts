@@ -5,53 +5,53 @@
  */
 
 import { describe, it, expect } from 'bun:test';
-import { DonghuaHISAdapter } from '../../../src/integration/adapters/his/DonghuaHISAdapter';
-import { ChuangyeHISAdapter } from '../../../src/integration/adapters/his/ChuangyeHISAdapter';
-import { LianzhongHISAdapter } from '../../../src/integration/adapters/his/LianzhongHISAdapter';
-import { ZhiyeHISAdapter } from '../../../src/integration/adapters/his/ZhiyeHISAdapter';
+import { VendorCHISAdapter } from '../../../src/integration/adapters/his/VendorCHISAdapter';
+import { VendorBHISAdapter } from '../../../src/integration/adapters/his/VendorBHISAdapter';
+import { VendorDHISAdapter } from '../../../src/integration/adapters/his/VendorDHISAdapter';
+import { VendorEHISAdapter } from '../../../src/integration/adapters/his/VendorEHISAdapter';
 
-describe('DonghuaHISAdapter', () => {
+describe('VendorCHISAdapter', () => {
   it('应返回正确元信息', () => {
-    const adapter = new DonghuaHISAdapter();
+    const adapter = new VendorCHISAdapter();
     const meta = adapter.getMetadata();
     expect(meta.vendor).toBe('东华医为');
     expect(meta.type).toBe('his');
   });
 
   it('未实现方法应抛出错误', async () => {
-    const adapter = new DonghuaHISAdapter();
+    const adapter = new VendorCHISAdapter();
     await expect(adapter.getPatientInfo('P1')).rejects.toThrow(/尚未实现/);
     await expect(adapter.batchCreateOrders([])).rejects.toThrow(/尚未实现/);
   });
 });
 
-describe('ChuangyeHISAdapter', () => {
+describe('VendorBHISAdapter', () => {
   it('应返回创业慧康元信息', () => {
-    const adapter = new ChuangyeHISAdapter();
+    const adapter = new VendorBHISAdapter();
     expect(adapter.getMetadata().vendor).toBe('创业慧康');
   });
 
   it('新接口方法应抛出未实现', async () => {
-    const adapter = new ChuangyeHISAdapter();
+    const adapter = new VendorBHISAdapter();
     await expect(adapter.getAsyncTaskStatus('T1')).rejects.toThrow(/尚未实现/);
   });
 });
 
-describe('LianzhongHISAdapter', () => {
+describe('VendorDHISAdapter', () => {
   it('应返回联众元信息', () => {
-    const adapter = new LianzhongHISAdapter();
+    const adapter = new VendorDHISAdapter();
     expect(adapter.getMetadata().vendor).toBe('联众智慧');
   });
 });
 
-describe('ZhiyeHISAdapter', () => {
+describe('VendorEHISAdapter', () => {
   it('应返回智业元信息', () => {
-    const adapter = new ZhiyeHISAdapter();
+    const adapter = new VendorEHISAdapter();
     expect(adapter.getMetadata().vendor).toBe('智业软件');
   });
 
   it('取消医嘱应抛出未实现', async () => {
-    const adapter = new ZhiyeHISAdapter();
+    const adapter = new VendorEHISAdapter();
     await expect(adapter.cancelOrder('ORD1')).rejects.toThrow(/尚未实现/);
   });
 });

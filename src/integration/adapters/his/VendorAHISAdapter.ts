@@ -1,5 +1,5 @@
 /**
- * 健澜科技数智医院智能体 - integration/adapters/his/WeiningHISAdapter.ts
+ * 健澜科技数智医院智能体 - integration/adapters/his/VendorAHISAdapter.ts
  *
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
@@ -20,7 +20,7 @@
  * - 认证流程实现
  * - 核心方法骨架（具体实现留空+TODO）
  *
- * @module integration/adapters/his/WeiningHISAdapter
+ * @module integration/adapters/his/VendorAHISAdapter
  */
 
 import type {
@@ -53,7 +53,7 @@ import type {
 } from './HISAdapter';
 
 /** 示例HIS厂商A适配器配置 */
-export interface WeiningHISConfig extends Partial<AdapterConfig> {
+export interface VendorAHISConfig extends Partial<AdapterConfig> {
   /** 示例HIS厂商AAPI版本：his-rest（新一代REST） / classic（传统WebService） */
   apiVersion?: 'his-rest' | 'classic';
   /** 示例HIS厂商A开放平台应用ID */
@@ -77,15 +77,15 @@ export interface WeiningHISConfig extends Partial<AdapterConfig> {
  * 5. HL7 ADT消息接收与解析（患者入出转事件）
  * 6. 字段映射：示例HIS厂商A字段 → 健澜内部模型
  */
-export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
+export class VendorAHISAdapter extends BaseAdapter implements HISAdapter {
   private readonly apiVersion: 'his-rest' | 'classic';
   private readonly orgCode?: string;
   private patientEventListeners = new Set<(event: PatientEvent) => void>();
   private orderEventListeners = new Set<(event: OrderEvent) => void>();
 
-  constructor(config: WeiningHISConfig = {}) {
+  constructor(config: VendorAHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
-      id: config.id ?? 'his-weining',
+      id: config.id ?? 'his-vendor-a',
       type: 'his',
       vendor: '示例HIS厂商A',
       version: config.version ?? 'HIS-Rest 2.0',
@@ -200,7 +200,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
     //     cause: error,
     //   });
     // }
-    this.logger.warn(`[WeiningHISAdapter] OAuth2认证为骨架实现，TODO: 完成实际令牌获取`);
+    this.logger.warn(`[VendorAHISAdapter] OAuth2认证为骨架实现，TODO: 完成实际令牌获取`);
   }
 
   // ============================================================
@@ -226,7 +226,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getPatientInfo 尚未实现（患者ID: ${patientId}）`,
+        `[VendorAHISAdapter] getPatientInfo 尚未实现（患者ID: ${patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -246,7 +246,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] searchPatients 尚未实现`,
+        `[VendorAHISAdapter] searchPatients 尚未实现`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -262,7 +262,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getEncounter 尚未实现（就诊ID: ${encounterId}）`,
+        `[VendorAHISAdapter] getEncounter 尚未实现（就诊ID: ${encounterId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -274,7 +274,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getEncounterList 尚未实现（患者ID: ${patientId}）`,
+        `[VendorAHISAdapter] getEncounterList 尚未实现（患者ID: ${patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -295,7 +295,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
   async createOrder(request: OrderCreateRequest): Promise<OrderResult> {
     return this.execute(async () => {
       // TODO: 实现示例HIS厂商A医嘱创建
-      // const hisOrder = this.mapOrderToWeining(request);
+      // const hisOrder = this.mapOrderToVendorA(request);
       // const response = await axios.post(`${this.config.endpoint}/api/orders`, hisOrder, {
       //   headers: { ...this.buildAuthHeaders(), 'Content-Type': 'application/json' },
       //   timeout: this.config.timeout,
@@ -304,7 +304,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] createOrder 尚未实现（医嘱: ${request.orderName}）`,
+        `[VendorAHISAdapter] createOrder 尚未实现（医嘱: ${request.orderName}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -316,7 +316,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] cancelOrder 尚未实现（医嘱ID: ${orderId}）`,
+        `[VendorAHISAdapter] cancelOrder 尚未实现（医嘱ID: ${orderId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -328,7 +328,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getOrderList 尚未实现（患者ID: ${patientId}）`,
+        `[VendorAHISAdapter] getOrderList 尚未实现（患者ID: ${patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -340,7 +340,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getOrderStatus 尚未实现（医嘱ID: ${orderId}）`,
+        `[VendorAHISAdapter] getOrderStatus 尚未实现（医嘱ID: ${orderId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -356,7 +356,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getPatientCost 尚未实现（患者ID: ${patientId}）`,
+        `[VendorAHISAdapter] getPatientCost 尚未实现（患者ID: ${patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -368,7 +368,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getCostDetails 尚未实现`,
+        `[VendorAHISAdapter] getCostDetails 尚未实现`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -380,7 +380,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getInsuranceInfo 尚未实现（患者ID: ${patientId}）`,
+        `[VendorAHISAdapter] getInsuranceInfo 尚未实现（患者ID: ${patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -396,7 +396,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getDoctorSchedule 尚未实现（医生ID: ${doctorId}）`,
+        `[VendorAHISAdapter] getDoctorSchedule 尚未实现（医生ID: ${doctorId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -408,7 +408,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getAvailableSlots 尚未实现（科室ID: ${departmentId}）`,
+        `[VendorAHISAdapter] getAvailableSlots 尚未实现（科室ID: ${departmentId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -444,7 +444,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] syncPatient 尚未实现（患者ID: ${patient.patientId}）`,
+        `[VendorAHISAdapter] syncPatient 尚未实现（患者ID: ${patient.patientId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -456,7 +456,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] placeOrderAsync 尚未实现（医嘱: ${request.orderName}）`,
+        `[VendorAHISAdapter] placeOrderAsync 尚未实现（医嘱: ${request.orderName}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -471,7 +471,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] settleInsurance 尚未实现（就诊ID: ${encounterId}）`,
+        `[VendorAHISAdapter] settleInsurance 尚未实现（就诊ID: ${encounterId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -485,7 +485,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] batchGetPatients 尚未实现（数量: ${patientIds.length}）`,
+        `[VendorAHISAdapter] batchGetPatients 尚未实现（数量: ${patientIds.length}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -497,7 +497,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] batchCreateOrders 尚未实现（数量: ${requests.length}）`,
+        `[VendorAHISAdapter] batchCreateOrders 尚未实现（数量: ${requests.length}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -509,7 +509,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
       throw new AdapterError(
         'BUSINESS' as never,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[WeiningHISAdapter] getAsyncTaskStatus 尚未实现（任务ID: ${taskId}）`,
+        `[VendorAHISAdapter] getAsyncTaskStatus 尚未实现（任务ID: ${taskId}）`,
         { adapterId: this.id, retryable: false },
       );
     });
@@ -525,7 +525,7 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
    * TODO: 实现完整的字段映射逻辑，使用 config.fieldMapping 配置
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private mapPatient(weiningData: Record<string, unknown>): Patient {
+  private mapPatient(vendorAData: Record<string, unknown>): Patient {
     // TODO: 实现字段映射
     throw new Error('mapPatient 尚未实现');
   }
@@ -534,8 +534,8 @@ export class WeiningHISAdapter extends BaseAdapter implements HISAdapter {
    * 将健澜医嘱请求映射为示例HIS厂商A医嘱格式
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private mapOrderToWeining(request: OrderCreateRequest): Record<string, unknown> {
+  private mapOrderToVendorA(request: OrderCreateRequest): Record<string, unknown> {
     // TODO: 实现字段映射
-    throw new Error('mapOrderToWeining 尚未实现');
+    throw new Error('mapOrderToVendorA 尚未实现');
   }
 }

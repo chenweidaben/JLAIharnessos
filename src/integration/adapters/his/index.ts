@@ -10,10 +10,10 @@
  * 版权所有 (c) 2026 健澜科技
  */
 
-export type { ChuangyeHISConfig } from './ChuangyeHISAdapter';
-export { ChuangyeHISAdapter } from './ChuangyeHISAdapter';
-export type { DonghuaHISConfig } from './DonghuaHISAdapter';
-export { DonghuaHISAdapter } from './DonghuaHISAdapter';
+export type { VendorBHISConfig } from './VendorBHISAdapter';
+export { VendorBHISAdapter } from './VendorBHISAdapter';
+export type { VendorCHISConfig } from './VendorCHISAdapter';
+export { VendorCHISAdapter } from './VendorCHISAdapter';
 export type {
   AsyncTask,
   AsyncTaskStatus,
@@ -27,9 +27,9 @@ export type {
 } from './HISAdapter';
 export type { CriticalValuePush, HISMockConfig } from './HISMockAdapter';
 export { HISMockAdapter } from './HISMockAdapter';
-export type { LianzhongHISConfig } from './LianzhongHISAdapter';
-export { LianzhongHISAdapter } from './LianzhongHISAdapter';
-export type { WeiningHISConfig } from './WeiningHISAdapter';
-export { WeiningHISAdapter } from './WeiningHISAdapter';
-export type { ZhiyeHISConfig } from './ZhiyeHISAdapter';
-export { ZhiyeHISAdapter } from './ZhiyeHISAdapter';
+export type { VendorDHISConfig } from './VendorDHISAdapter';
+export { VendorDHISAdapter } from './VendorDHISAdapter';
+export type { VendorAHISConfig } from './VendorAHISAdapter';
+export { VendorAHISAdapter } from './VendorAHISAdapter';
+export type { VendorEHISConfig } from './VendorEHISAdapter';
+export { VendorEHISAdapter } from './VendorEHISAdapter';

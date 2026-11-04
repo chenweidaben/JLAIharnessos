@@ -1,5 +1,5 @@
 /**
- * 健澜科技数智医院智能体 - integration/adapters/his/ZhiyeHISAdapter.ts
+ * 健澜科技数智医院智能体 - integration/adapters/his/VendorEHISAdapter.ts
  *
  * Copyright (c) 2026 健澜科技. All rights reserved.
  */
@@ -10,13 +10,13 @@
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 智业软件（Zhiye）HIS系统适配器骨架。
+ * 智业软件（VendorE）HIS系统适配器骨架。
  * 智业软件在华南地区市场占有率较高，核心产品"智业数字化医院"，
  * 集成以 REST API + HL7 为主。
  *
  * 本文件为骨架实现，包含认证流程、字段映射配置与全部接口方法骨架。
  *
- * @module integration/adapters/his/ZhiyeHISAdapter
+ * @module integration/adapters/his/VendorEHISAdapter
  */
 
 import type {
@@ -49,7 +49,7 @@ import type {
 } from './HISAdapter';
 
 /** 智业HIS适配器配置 */
-export interface ZhiyeHISConfig extends Partial<AdapterConfig> {
+export interface VendorEHISConfig extends Partial<AdapterConfig> {
   appId?: string;
   appSecret?: string;
   orgCode?: string;
@@ -60,11 +60,11 @@ export interface ZhiyeHISConfig extends Partial<AdapterConfig> {
  *
  * TODO: 完成实际对接。
  */
-export class ZhiyeHISAdapter extends BaseAdapter implements HISAdapter {
+export class VendorEHISAdapter extends BaseAdapter implements HISAdapter {
   private patientEventListeners = new Set<(event: PatientEvent) => void>();
   private orderEventListeners = new Set<(event: OrderEvent) => void>();
 
-  constructor(config: ZhiyeHISConfig = {}) {
+  constructor(config: VendorEHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
       id: config.id ?? 'his-zhiye',
       type: 'his',
@@ -112,7 +112,7 @@ export class ZhiyeHISAdapter extends BaseAdapter implements HISAdapter {
       new AdapterError(
         AdapterErrorType.BUSINESS,
         AdapterErrorCode.UNKNOWN_ERROR,
-        `[ZhiyeHISAdapter] ${method} 尚未实现${detail ? `（${detail}）` : ''}`,
+        `[VendorEHISAdapter] ${method} 尚未实现${detail ? `（${detail}）` : ''}`,
         { adapterId: this.id, retryable: false },
       ),
     );
