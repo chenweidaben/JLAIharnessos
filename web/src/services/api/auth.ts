@@ -79,6 +79,58 @@ export async function logoutApi(): Promise<void> {
   await post('/auth/logout');
 }
 
+// ---- 演示角色一键登录（P0-7 前端收尾）------------------------------------
+// 后端 POST /api/v1/auth/demo-login { role } 直接签发真实 JWT，
+// 返回结构比标准登录更窄（tokens 无 refreshToken；user 仅 id/name/roles/permissions）。
+// 这里把它补齐成 AuthLoginApiResponse，复用 establishSession 走完整会话落地。
+
+export type DemoRole = 'doctor' | 'nurse' | 'pharmacist' | 'admin';
+
+/** 后端 demo-login 原始返回（窄口径，与标准登录响应不一致） */
+interface DemoLoginRawResponse {
+  tokens: {
+    accessToken: string;
+    tokenType: string;
+    expiresIn: number;
+    refreshToken?: string;
+  };
+  user: {
+    id: string;
+    name: string;
+    roles: string[];
+    permissions: string[];
+  };
+}
+
+export async function demoLoginApi(role: DemoRole): Promise<AuthLoginApiResponse> {
+  const res = await post<DemoLoginRawResponse>('/auth/demo-login', { role });
+  return {
+    tokens: {
+      accessToken: res.tokens.accessToken,
+      // 演示 token 不签发 refreshToken；留空串，过期后重新点角色按钮即可
+      refreshToken: res.tokens.refreshToken ?? '',
+      expiresIn: res.tokens.expiresIn,
+    },
+    user: {
+      id: res.user.id,
+      username: res.user.id,
+      realName: res.user.name,
+      employeeNo: '',
+      gender: 'unknown',
+      deptCode: '',
+      deptName: '',
+      title: '',
+      phone: '',
+      email: '',
+      status: 'active',
+      roles: [],
+      roleCodes: res.user.roles as AuthLoginApiResponse['user']['roleCodes'],
+      permissions: res.user.permissions,
+      dataScope: 'dept',
+    },
+  };
+}
+
 // ---- 多因素认证（MFA / TOTP）---------------------------------------------
 
 export interface MfaStatus {

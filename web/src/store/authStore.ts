@@ -19,6 +19,8 @@ import {
   loginApi,
   refreshApi,
   verifyLoginMfaApi,
+  demoLoginApi,
+  type DemoRole,
 } from '@/services/api/auth';
 import type { AuthLoginApiResponse } from '@/services/authMapper';
 import { toAuthUser } from '@/services/authMapper';
@@ -103,6 +105,8 @@ export interface AuthState {
   login: (req: LoginRequest) => Promise<LoginResponse>;
   /** 完成第二因子：凭 challengeId + TOTP/备份码换发会话 */
   completeMfa: (token: string) => Promise<LoginResponse>;
+  /** 演示角色一键登录：POST /auth/demo-login，签发真实 JWT 并落地会话 */
+  demoLogin: (role: DemoRole) => Promise<LoginResponse>;
   logout: () => void;
   refreshAccessToken: () => Promise<boolean>;
   fetchUserInfo: () => Promise<ReturnType<typeof toAuthUser>>;
@@ -243,6 +247,19 @@ export const useAuthStore = create<AuthState>()((set, get) => {
     } catch (e) {
       set({ loading: false });
       const msg = e instanceof Error ? e.message : '动态码校验失败';
+      throw new LoginError('BAD_CREDENTIALS', msg);
+    }
+  },
+
+  /* ---------------- 演示角色一键登录 ---------------- */
+  demoLogin: async (role) => {
+    set({ loading: true });
+    try {
+      const res = await demoLoginApi(role);
+      return await establishSession(res, true);
+    } catch (e) {
+      set({ loading: false });
+      const msg = e instanceof Error ? e.message : '演示登录失败，请稍后重试';
       throw new LoginError('BAD_CREDENTIALS', msg);
     }
   },

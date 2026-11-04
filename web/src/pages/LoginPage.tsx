@@ -17,10 +17,13 @@ import {
   ReloadOutlined,
   CheckCircleFilled,
   LoadingOutlined,
+  HeartOutlined,
+  MedicineBoxOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { useAuthStore } from '@/store/authStore';
+import type { DemoRole } from '@/services/api/auth';
 import { fetchCaptcha, fetchQrCode, mockSsoLogin, ssoProviders, LoginError } from '@/mock/authMock';
 import type { Captcha, QrCodeSession, QrCodeStatus } from '@/types/auth';
 import { LoginMfaRequiredError } from '@/types/auth';
@@ -52,6 +55,24 @@ export default function LoginPage() {
   // 当前登录方式 Tab。二维码自动轮询仅在用户主动切到二维码 Tab 时启动，
   // 避免登录页一挂载就在后台模拟扫码并自动登录（否则退出/未登录拦截会被绕过）。
   const [activeTab, setActiveTab] = useState('account');
+
+  /* ---------------- 演示角色一键登录 ---------------- */
+  const demoLogin = useAuthStore((s) => s.demoLogin);
+  const [demoLoading, setDemoLoading] = useState<DemoRole | null>(null);
+
+  const onDemoLogin = async (role: DemoRole) => {
+    setDemoLoading(role);
+    try {
+      await demoLogin(role);
+      message.success('演示登录成功');
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(from && from !== '/login' ? from : '/dashboard', { replace: true });
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : '演示登录失败，请重试');
+    } finally {
+      setDemoLoading(null);
+    }
+  };
 
   const [captcha, setCaptcha] = useState<Captcha>({ captchaId: '', image: '' });
   const refreshCaptcha = useCallback(async () => {
@@ -326,10 +347,64 @@ export default function LoginPage() {
     </div>
   );
 
+  /* ---------------- 演示角色一键登录（P0-7 前端收尾） ---------------- */
+  const demoRoles: Array<{ role: DemoRole; label: string; desc: string; icon: typeof UserOutlined }> = [
+    { role: 'doctor', label: '医生', desc: '门诊 / 住院 / 处方', icon: UserOutlined },
+    { role: 'nurse', label: '护士', desc: '护理执行 / 医嘱核对', icon: HeartOutlined },
+    { role: 'pharmacist', label: '药师', desc: '处方审核 / 发药', icon: MedicineBoxOutlined },
+    { role: 'admin', label: '管理员', desc: '系统配置 / 全局权限', icon: SafetyOutlined },
+  ];
+
+  const demoTab = (
+    <div style={{ padding: '8px 0' }}>
+      <Typography.Paragraph type="secondary" style={{ textAlign: 'center', marginBottom: 16 }}>
+        演示环境一键切换角色，无需输入密码，自动签发 2 小时令牌
+      </Typography.Paragraph>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: 12,
+        }}
+      >
+        {demoRoles.map(({ role, label, desc, icon: Icon }) => (
+          <Button
+            key={role}
+            size="large"
+            loading={demoLoading === role}
+            icon={<Icon style={{ fontSize: 20 }} />}
+            onClick={() => void onDemoLogin(role)}
+            style={{
+              height: 72,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              gap: 2,
+              padding: '0 16px',
+              borderColor: '#d6e4f5',
+              color: '#0A4D8C',
+              background: 'linear-gradient(135deg, #f5f9ff 0%, #e8f1fb 100%)',
+              fontWeight: 600,
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: 15, lineHeight: 1.2 }}>{label}</span>
+            <span style={{ fontSize: 12, fontWeight: 400, color: '#5a7a9a' }}>{desc}</span>
+          </Button>
+        ))}
+      </div>
+      <Typography.Text type="secondary" style={{ display: 'block', textAlign: 'center', marginTop: 12, fontSize: 12 }}>
+        角色权限由后端按 JWT 签发，前端不做越权放行
+      </Typography.Text>
+    </div>
+  );
+
   const items: TabsProps['items'] = [
     { key: 'account', label: '账号密码登录', children: accountTab },
     { key: 'sso', label: 'SSO 登录', children: ssoTab },
     { key: 'qrcode', label: '二维码登录', children: qrTab },
+    { key: 'demo', label: '演示角色', children: demoTab },
   ];
 
   return (
