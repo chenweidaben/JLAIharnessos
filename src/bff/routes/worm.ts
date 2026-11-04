@@ -122,11 +122,11 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const s = keyStatus();
-      // 绝不返私钥；只返公钥 PEM + keySource + signerKeyId
+      // 绝不返私钥；只返 hex 公钥 + keySource + signerKeyId
       return json(ok({
         keySource: s.keySource,
         signerKeyId: s.signerKeyId,
-        publicKeyPem: s.publicKeyPem,
+        publicKeyHex: s.publicKeyHex,
         sm4Configured: s.sm4Configured,
       }));
     },

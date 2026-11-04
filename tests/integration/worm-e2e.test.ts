@@ -43,11 +43,12 @@ beforeAll(async () => {
 });
 
 describe('P5-4 keys 不泄露私钥', () => {
-  it('GET /keys 仅返公钥', async () => {
+  it('GET /keys 仅返 hex 公钥，无 PRIVATE KEY', async () => {
     const r = await call('GET','/api/v1/worm/keys',{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(r.data.publicKeyPem).toContain('BEGIN PUBLIC KEY');
+    expect(r.data.publicKeyHex).toMatch(/^04[0-9a-f]{128}$/);
     expect(JSON.stringify(r.data)).not.toContain('PRIVATE KEY');
+    expect(JSON.stringify(r.data)).not.toContain('privateKey');
   });
 });
 

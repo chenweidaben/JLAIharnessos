@@ -7,9 +7,9 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 import { __resetStore as resetAudit, recordEvent } from '../../src/bff/aggregators/auditEventAggregator';
 import {
-  __getCipherHex, __resetStore, createProbe, getSegment, getSegmentEvents,
-  keyStatus, listSegments, resetProbes, seal, sm2Verify, tamperProbeDigest,
-  tamperProbeSignature, verify,
+  __getCipherHex, __resetStore, __sm3StandardVector, createProbe, getSegment,
+  getSegmentEvents, keyStatus, listSegments, resetProbes, seal, sm2Verify,
+  tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
@@ -52,6 +52,9 @@ describe('P5-2 seal 基础（回归）', () => {
 });
 
 describe('P5-4 SM3 摘要', () => {
+  test('SM3 标准向量：sm3("abc") === 66c7f0f4...ba8e0', () => {
+    expect(__sm3StandardVector()).toBe('66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0');
+  });
   test('段字段含 digestAlg=SM3 与 digestSm3 64 hex', () => {
     seedN(3);
     const r = seal({});
@@ -113,12 +116,13 @@ describe('P5-4 SM2 签名', () => {
     const fakeDigest = '0'.repeat(64);
     expect(sm2Verify(fakeDigest, r.segment!.sm2Signature)).toBe(false);
   });
-  test('keyStatus 不泄露私钥字段', () => {
+  test('keyStatus 不泄露私钥字段，返 hex 公钥', () => {
     const s = keyStatus();
     expect(s.signerKeyId).toBeTruthy();
-    expect(s.publicKeyPem).toContain('BEGIN PUBLIC KEY');
-    // 不应出现私钥 PEM
+    // SM2 公钥 130 hex（04+x+y）
+    expect(s.publicKeyHex).toMatch(/^04[0-9a-f]{128}$/);
     expect(JSON.stringify(s)).not.toContain('PRIVATE KEY');
+    expect(JSON.stringify(s)).not.toContain('privateKey');
   });
 });
 
