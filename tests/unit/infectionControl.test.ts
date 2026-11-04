@@ -141,21 +141,26 @@ describe('M141-D 传播追踪 trackInfectionSpread', () => {
 });
 
 describe('M141-D 月报生成 generateInfectionReport', () => {
+  // reportInfection 落账用 new Date().toISOString()（滚动时间基准），
+  // 月报账期必须与落账时间同月，否则查不到事件。
+  const currentPeriod = new Date().toISOString().slice(0, 7);
+
   it('账期切片 + 四类指标率值计算', () => {
-    // 2026-10：2 例 ssi、1 例 vap
+    // 本月：2 例 ssi、1 例 vap
     reportInfection('p1', '普外科', 'ssi', 'doctor');
     reportInfection('p2', '普外科', 'ssi', 'doctor');
     reportInfection('p3', 'ICU', 'vap', 'nurse');
-    // 2026-09：1 例 mdro（不应计入 10 月）
+    // 上月：1 例 mdro（不应计入本月）
+    const lastPeriod = '2026-09';
     const sep = buildReportFromEvents(
       [makeEvent('old', 'p9', '呼吸内科', 'mdro', '2026-09-15T08:00:00Z')],
-      '2026-09',
+      lastPeriod,
     );
     expect(sep.totalEvents).toBe(1);
     expect(sep.metrics.find((m) => m.type === 'mdro')!.cases).toBe(1);
 
-    const rep = generateInfectionReport('2026-10');
-    expect(rep.period).toBe('2026-10');
+    const rep = generateInfectionReport(currentPeriod);
+    expect(rep.period).toBe(currentPeriod);
     expect(rep.totalEvents).toBe(3);
     expect(rep.metrics).toHaveLength(4);
 
@@ -177,7 +182,7 @@ describe('M141-D 月报生成 generateInfectionReport', () => {
     reportInfection('p1', '普外科', 'ssi', 'doctor');
     reportInfection('p2', '普外科', 'ssi', 'doctor');
     reportInfection('p3', 'ICU', 'vap', 'nurse');
-    const rep = generateInfectionReport('2026-10');
+    const rep = generateInfectionReport(currentPeriod);
     expect(rep.deptBreakdown[0].dept).toBe('普外科');
     expect(rep.deptBreakdown[0].cases).toBe(2);
   });
@@ -185,7 +190,7 @@ describe('M141-D 月报生成 generateInfectionReport', () => {
   it('本期出现聚集 → 月报 alerts 非空', () => {
     reportInfection('p1', '呼吸内科', 'mdro', 'microbiology');
     reportInfection('p2', '呼吸内科', 'mdro', 'microbiology');
-    const rep = generateInfectionReport('2026-10');
+    const rep = generateInfectionReport(currentPeriod);
     expect(rep.alerts.length).toBeGreaterThanOrEqual(1);
   });
 
