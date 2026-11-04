@@ -18,7 +18,7 @@ import { inpatientDepositSettleTradeRoutes } from '../../src/bff/routes/inpatien
 
 afterEach(() => __resetStore());
 
-/** 种子时间基准：与 aggregator 内 seedDemoAccounts 的 T0 对齐。 */
+/** 测试内注入的固定 now（仅用于 payDeposit/settleDischarge 的时间戳留痕断言，与 seed 滚动 admissionAt 无关）。 */
 const T0 = 1_700_000_000_000;
 
 describe('P0-5 预交金缴纳', () => {
@@ -94,29 +94,38 @@ describe('P0-5 预交金缴纳', () => {
 });
 
 describe('P0-5 押金不足预警', () => {
-  it('VISIT-A100（余额充足）-> level=ok', () => {
-    const w = assessDepositWarning({ visitId: 'VISIT-A100', now: T0 });
+  // 说明：seed 的 admissionAt 为滚动基准（模块加载时刻 - N 天），故此处不再注入固定 now=T0，
+  // 让其用真实 Date.now() 与滚动 admissionAt 对齐；金额断言仍精确，
+  // 天数相关断言改为演示合理区间（住院 3~12 天 -> avgDaily 为正整数、daysCovered 落在 [3,30]）。
+  it('VISIT-A100（余额充足）-> level=ok，天数落在合理演示区间', () => {
+    const w = assessDepositWarning({ visitId: 'VISIT-A100' });
     expect(w.level).toBe('ok');
     expect(w.balanceCents).toBe(450_000);
-    expect(w.avgDailyCostCents).toBe(10_000);
-    expect(w.daysCovered).toBe(45);
+    // avgDailyCostCents 必须为正整数分（住院天数非负、已消耗非负）
+    expect(Number.isInteger(w.avgDailyCostCents)).toBe(true);
+    expect(w.avgDailyCostCents).toBeGreaterThan(0);
+    expect(w.avgDailyCostCents).toBeLessThan(100_000);
+    // 住院 3~4 天（ceil 边界会 +1）、余额 4500 元 -> 可覆盖天数应在数十天量级，
+    // 绝不允许出现 20000+ 这种"住院 56 年"的失真值；上界 60 仍比失真值小两个数量级。
+    expect(w.daysCovered).toBeGreaterThanOrEqual(3);
+    expect(w.daysCovered).toBeLessThanOrEqual(60);
   });
 
   it('VISIT-B200（余额低于阈值）-> level=warn', () => {
-    const w = assessDepositWarning({ visitId: 'VISIT-B200', now: T0 });
+    const w = assessDepositWarning({ visitId: 'VISIT-B200' });
     expect(w.level).toBe('warn');
     expect(w.balanceCents).toBe(70_000);
     expect(w.thresholdCents).toBe(100_000);
   });
 
   it('VISIT-C300（余额透支）-> level=critical', () => {
-    const w = assessDepositWarning({ visitId: 'VISIT-C300', now: T0 });
+    const w = assessDepositWarning({ visitId: 'VISIT-C300' });
     expect(w.level).toBe('critical');
     expect(w.balanceCents).toBe(-60_000);
   });
 
   it('thresholdCents 参数生效：A100 提高阈值后从 ok 变为 warn', () => {
-    const w = assessDepositWarning({ visitId: 'VISIT-A100', thresholdCents: 1_000_000, now: T0 });
+    const w = assessDepositWarning({ visitId: 'VISIT-A100', thresholdCents: 1_000_000 });
     // A100 余额 450000 < 阈值 1000000 -> warn
     expect(w.thresholdCents).toBe(1_000_000);
     expect(w.level).toBe('warn');

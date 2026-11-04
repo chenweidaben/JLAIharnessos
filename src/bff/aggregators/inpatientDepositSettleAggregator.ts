@@ -92,12 +92,15 @@ const DAY_MS = 86_400_000;
 
 /**
  * 预置 3 条脱敏住院账户：
- * - VISIT-A100 张某某：余额充足 -> ok
- * - VISIT-B200 李某某：余额低于阈值但可覆盖天数>=2 -> warn
- * - VISIT-C300 王某某：余额已透支 -> critical
+ * - VISIT-A100 张某某：住院 3 天，余额充足 -> ok
+ * - VISIT-B200 李某某：住院 5 天，余额低于阈值但可覆盖天数>=2 -> warn
+ * - VISIT-C300 王某某：住院 12 天，余额已透支 -> critical
+ *
+ * admissionAt 采用滚动基准（模块加载/重置时刻 - N 天），禁止硬编码固定 T0，
+ * 否则住院天数会随墙钟漂移（曾因 T0=2023-11-14 到 2026 年被算成住院 1000+ 天）。
  */
 function seedDemoAccounts(): void {
-  const T0 = 1_700_000_000_000;
+  const now = Date.now();
   const seeds: InpatientAccount[] = [
     {
       visitId: 'VISIT-A100',
@@ -105,7 +108,7 @@ function seedDemoAccounts(): void {
       patientName: '张某某',
       deptCode: 'WARD1',
       bedNo: '12床',
-      admissionAt: T0 - 5 * DAY_MS,
+      admissionAt: now - 3 * DAY_MS,
       depositCents: 500_000,
       consumedCents: 50_000,
       status: 'in_hospital',
@@ -116,7 +119,7 @@ function seedDemoAccounts(): void {
       patientName: '李某某',
       deptCode: 'WARD2',
       bedNo: '8床',
-      admissionAt: T0 - 4 * DAY_MS,
+      admissionAt: now - 5 * DAY_MS,
       depositCents: 150_000,
       consumedCents: 80_000,
       status: 'in_hospital',
@@ -127,7 +130,7 @@ function seedDemoAccounts(): void {
       patientName: '王某某',
       deptCode: 'WARD3',
       bedNo: '15床',
-      admissionAt: T0 - 5 * DAY_MS,
+      admissionAt: now - 12 * DAY_MS,
       depositCents: 60_000,
       consumedCents: 120_000,
       status: 'in_hospital',
