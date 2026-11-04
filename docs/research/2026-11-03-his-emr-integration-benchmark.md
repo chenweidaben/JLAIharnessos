@@ -421,12 +421,26 @@
 | # | 差距域 | 具体缺口 | 健澜现状证据 |
 |---|---|---|---|
 | P0-1 | **门诊挂号交易闭环** | 挂号 POST、退号审批、叫号状态机、号池预占/释放、与医生站叫号联动 | `outpatientRegister.ts` 5 个 GET 全是 M439 DEMO 桩，auth:false |
-| P0-2 | **医嘱 CPOE 闭环** | 医嘱开立 POST、护士审核、执行确认、停止/撤销、成套医嘱、医嘱权限分级、执行单生成 | `order.ts` 仅 3.2KB 桩；AI 推荐侧已超前但人类交易层缺 |
+| P0-2 | **医嘱 CPOE 闭环** | 医嘱开立 POST、护士审核、执行确认、停止/撤销、成套医嘱、医嘱权限分级、执行单生成 | **已落地**（commit `569fe35d` + E2E `8901f415`）：`orderCpoeAggregator.ts` 严格状态机 + `orderCpoe.ts` 6 路由 + `order.ts` 改造。覆盖审核 pending_review→approved/rejected（重复审核 409）、成套医嘱原子开立（任一非法零落库）、执行单 SLIP-CO-N 幂等重打、开立/审核/执行三级权限分级（越权 403 带 code）、内存 seed 三态+驳回 |
 | P0-3 | **护士站交易工作台** | 医嘱审核 POST、PDA 床边执行 POST、执行单、体征录入、护理记录书写 POST | `nurseStation.ts` 仅 3 条 GET 只读 |
 | P0-4 | **药房发药/摆药交易** | 发药确认 POST、摆药批次、单剂量核对、退药审批、与医嘱执行联动 | `pharmacyDispense.ts` 2.3KB 桩 |
 | P0-5 | **住院押金/结算交易** | 预交金缴纳 POST、押金不足预警、中途结算、出院结算 POST、一日清单推送 | `inpatientBillingMgmtV13.ts` 为统计型，无交易路由 |
 | P0-6 | **电子签名国密化** | 病历/医嘱/护理记录可靠电子签名接 SM2/TSA 第三方时间戳 | `emr-gap-matrix` P0 项：当前 mock 预留 |
 | P0-7 | **生产 RBAC 关闭 DEMO 短路** | 真实口令哈希核验、就诊/患者归属行级校验、admin 角色不绕过 | `emr-gap-matrix` P0-① |
+
+#### 4.1.1 P0 落地状态（截至 2026-11-04 16:23 轮）
+
+| 切片 | 完成事实 | commit | 代码路径证据 |
+|---|---|---|---|
+| P0-1 门诊挂号交易 | 号源预占/挂号/退号/叫号状态机内存闭环 | `b34c2f58` | `outpatientRegisterTradeAggregator.ts` / `outpatientRegisterTrade.ts` |
+| P0-3 护士站交易 | 医嘱审核/PDA 床边执行/执行单生成工作台 | `e111b286` | `nurseStationTradeAggregator.ts` / `nurseStationTrade.ts` |
+| P0-4 药房发药 | 摆药批次/双人核对发药/退药审批 | `9a5f27ac` | `pharmacyDispenseTradeAggregator.ts` / `pharmacyDispenseTrade.ts` |
+| P0-5 押金结算 | 预交金缴纳/押金预警/出院结算一日清单；seed 时间基准改滚动 | `9a0a4d43` + seed 修复 `4928effb` | `inpatientDepositSettleAggregator.ts` / `inpatientDepositSettleTrade.ts` |
+| P0 四切片 E2E | 真实 HTTP 打 8080，状态自适应 probe-then-branch 可重跑 | `f3f77cb4` + 自适应 `076ddd1b` | `tests/integration/p0-trade-e2e.test.ts` |
+| CI BFF 基座 | 集成测试 job 自起 BFF，修复 E2E 在 CI 必红且被 continue-on-error 掩盖 | `d3164775` | CI 集成测试 job |
+| P0-2 CPOE | 审核状态机/成套原子/执行单幂等/三级权限/内存 seed + 自签 4 角色 JWT 的 E2E | `569fe35d` + E2E `8901f415` | `orderCpoeAggregator.ts` / `orderCpoe.ts` / `order.ts` / `tests/integration/orderCpoe-e2e.test.ts` |
+
+> **防误判注记**：`order.ts` 虽早已注册 5 条路由，但护士审核、成套医嘱、医嘱权限分级、执行单生成、演示态真实 seed 长期缺失（GET 列表在 DEMO 下直接 `return ok([])` 空桩），曾据此被误判为「P0-2 已完成」。本轮按台账原判重做落地。另：`POST /api/v1/orders/:id/review` 与 `/:id/stop` 此前由 `m570Routes.ts` 与 `orderVerify.ts` 各注册一份 stub，现由 `orderCpoe.ts` 在 allRoutes 中**前置注册**接管（路由首匹配胜出），两个旧 stub 成为不可达死路由；前端与既有测试均走 `/api/v1/inpatient/orders/...`，无调用方受损，后续可清理。
 
 ### 4.2 P1（业务深度——三甲医院评级与学科建设所需）
 
