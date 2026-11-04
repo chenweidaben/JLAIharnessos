@@ -4079,6 +4079,7 @@ import { patientTimelineAggregatedRoutes } from './routes/patientTimelineAggrega
 import { nqiRoutes } from './routes/nqi'; // P2-4：护理 NQI 敏感指标
 import { patientPortalV2Routes } from './routes/patientPortalV2'; // P3-1：患者互联网+服务门户
 import { smartTriageV2Routes } from './routes/smartTriageV2'; // P3-2：智能预问诊+智慧导诊
+import { selfSchedulingRoutes } from './routes/selfScheduling'; // P3-3：号源池+患者自助预约
 // 【新业务场景】M138-C：医院内部即时通讯（IM）
 import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
@@ -6549,6 +6550,7 @@ const allRoutes: RouteDef[] = [
   ...nqiRoutes, // P2-4：护理 NQI 敏感指标
   ...patientPortalV2Routes, // P3-1：患者互联网+服务门户
   ...smartTriageV2Routes, // P3-2：智能预问诊+智慧导诊
+  ...selfSchedulingRoutes, // P3-3：号源池+患者自助预约
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
