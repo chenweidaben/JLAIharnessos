@@ -4088,6 +4088,8 @@ import { rateLimitAdminRoutes } from './routes/rateLimitAdmin'; // P4-3：登录
 import { forensicRoutes } from './routes/forensic'; // P4-5：操作回放与取证包
 import { qualityDashboardRoutes } from './routes/qualityDashboard'; // P5-1：医疗质量指标闭环
 import { wormRoutes } from './routes/worm'; // P5-2：WORM 冷存储归档
+import { empiFederatedRoutes } from './routes/empiFederated'; // P5-3：EMPI 跨域主索引
+import { xdsRoutes } from './routes/xds'; // P5-3：XDS 文档共享
 // 【新业务场景】M138-C：医院内部即时通讯（IM）
 import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
@@ -6565,6 +6567,8 @@ const allRoutes: RouteDef[] = [
   ...forensicRoutes, // P4-5：操作回放与取证包
   ...qualityDashboardRoutes, // P5-1：医疗质量指标闭环
   ...wormRoutes, // P5-2：WORM 冷存储归档
+  ...empiFederatedRoutes, // P5-3：EMPI 跨域主索引
+  ...xdsRoutes, // P5-3：XDS 文档共享
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
