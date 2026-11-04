@@ -4073,6 +4073,7 @@ import { icuNotesRoutes } from './routes/icuNotes'; // P1-5：ICU 监护文书
 import { inpatientConciergeRoutes } from './routes/inpatientConcierge'; // P1-6：院前住院管家
 import { medicationVerificationRoutes } from './routes/medicationVerification'; // P1-7：医嘱执行机读核对
 import { fhirR4ResourcesRoutes } from './routes/fhirR4Resources'; // P1-8：FHIR R4 24 类资源统一 CRUD
+import { emrVersionsRoutes } from './routes/emrVersions'; // P2-1：病历版本管理
 // 【新业务场景】M138-C：医院内部即时通讯（IM）
 import { imRoutes } from './routes/im';
 // 【医院运营管理】M139-A：OA 多级审批（请假/报销/采购/用印，三级流转不可跳步）
@@ -6537,6 +6538,7 @@ const allRoutes: RouteDef[] = [
   ...inpatientConciergeRoutes, // P1-6：院前住院管家
   ...medicationVerificationRoutes, // P1-7：医嘱执行机读核对
   ...fhirR4ResourcesRoutes, // P1-8：FHIR R4 24 类资源统一 CRUD
+  ...emrVersionsRoutes, // P2-1：病历版本管理
   ...imRoutes, // M138-C：医院内部即时通讯 send / conversation / unread-count
   ...oaApprovalRoutes, // M139-A：OA 多级审批 POST/GET/PUT /api/v1/oa/approvals
   ...partyUnionRoutes, // M140-D：党建工会活动留痕 GET/POST /api/v1/admin/party-union
