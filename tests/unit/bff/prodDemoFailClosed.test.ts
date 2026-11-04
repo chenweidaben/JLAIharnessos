@@ -3,8 +3,8 @@
  *
  * 覆盖口径：
  *  1. assertProductionNotDemoMode：生产 + DEMO_MODE=1 启动即抛错；非生产演示放行；
- *  2. requireAuth：生产环境即使误配 DEMO_MODE=1 也不授予 demo admin，无登录态返回 401；
- *     非生产演示模式保持既有短路放行行为；
+ *  2. requireAuth：生产/非生产 + DEMO_MODE=1 一律 fail-closed——无登录态返回 401，
+ *     不再注入 demo admin 超管（P0-7 关闭演示短路，演示态须经 /api/v1/auth/demo-login 拿 JWT）；
  *  3. enforceSession：生产环境不得跳过 jti 会话校验；DB 故障按未登录拒绝（fail-closed）；
  *     非生产演示模式跳过查库；
  *  4. shouldSkipAuditForDemo：生产环境不得跳过操作审计落库；非生产演示模式跳过；
@@ -113,15 +113,14 @@ describe('requireAuth 演示短路仅限非生产环境', () => {
     expect(ctx.user).toBe(original);
   });
 
-  it('非生产环境 + DEMO_MODE=1：无登录态短路授予 demo admin（既有演示行为保留）', () => {
+  it('非生产环境 + DEMO_MODE=1：无登录态也返回 401（P0-7 关闭演示短路，必须经 demo-login 拿 JWT）', () => {
     process.env.NODE_ENV = 'development';
     process.env.DEMO_MODE = '1';
     const ctx = makeCtx({ user: null });
     const denied = requireAuth(ctx);
-    expect(denied).toBeNull();
-    expect(ctx.user).not.toBeNull();
-    expect(ctx.user!.roles).toEqual(['admin']);
-    expect(ctx.user!.permissions).toEqual(['*']);
+    expect(denied).not.toBeNull();
+    expect(denied!.status).toBe(401);
+    expect(ctx.user).toBeNull();
   });
 
   it('生产环境未开启演示模式：无登录态返回 401', () => {
