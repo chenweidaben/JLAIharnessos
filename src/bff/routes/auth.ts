@@ -27,6 +27,11 @@ import {
 } from '@/db/repositories/sessionRepo';
 import { recordLoginAttempt } from '@/db/repositories/loginAttemptRepo';
 import { loginRateLimit } from '../middleware/rateLimit';
+// P4-3：账号锁定 + IP 防爆破（等保三级）
+import {
+  checkAccountLockout, recordAccountFailure, resetAccountFailures,
+  checkIpLogin, recordIpLoginHit,
+} from '../aggregators/loginLockoutAggregator';
 import { markSessionRevoked } from '../middleware/sessionGuard';
 import { buildAuthView, ROLE_PERMISSIONS, type AuthView } from '../view/userView';
 import { getMfaService } from '../mfaRuntime.js';
@@ -221,15 +226,33 @@ export const authRoutes: RouteDef[] = [
       const limited = loginRateLimit(c);
       if (limited) return limited;
 
+      // P4-3：IP 登录防爆破（1min >20 次 → 5min 封禁）
+      const ipAddr = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || c.clientIp || '127.0.0.1';
+      const ipBanned = checkIpLogin(ipAddr);
+      if (ipBanned?.bannedUntil) {
+        const retrySec = Math.max(1, Math.ceil((new Date(ipBanned.bannedUntil).getTime() - Date.now()) / 1000));
+        return json(fail(42900, `登录尝试过于频繁，请 ${retrySec}s 后再试`), 429);
+      }
+      recordIpLoginHit(ipAddr);
+
       const body = await c.body<{ username?: string; password?: string }>();
       if (!body.username || !body.password) {
         return json(fail(ErrorCode.BAD_REQUEST, '用户名或密码缺失'), 400);
+      }
+      const loginUsername0 = body.username.trim();
+      // P4-3：账号锁定检查（连续失败 5 次锁 15min）
+      const locked = checkAccountLockout(loginUsername0);
+      if (locked?.lockedUntil) {
+        const retrySec = Math.max(1, Math.ceil((new Date(locked.lockedUntil).getTime() - Date.now()) / 1000));
+        return json(fail(42300, `账号已锁定，请 ${retrySec}s 后再试`), 423);
       }
       // 真实模式：从 iam 加载用户（试用构建不校验生产口令哈希，统一放行已存在账号）；
       // 用户不存在/停用 → 通用文案，不区分原因（防枚举）。
       const loginUsername = body.username.trim();
       const view = await loadViewByUsername(loginUsername);
       if (!view) {
+        // P4-3：账号失败计数
+        recordAccountFailure(loginUsername);
         // 记录失败登录（用户不存在/停用/口令错误统一文案，防枚举）
         if (!isDemo) {
           const ep = requestEndpoint(c);
@@ -247,8 +270,11 @@ export const authRoutes: RouteDef[] = [
       // P0-7 收尾：DEMO 模式下真实校验口令（scrypt 哈希），不再任意放行。
       // 用户名未登记或口令错误统一 401 code=40101，不区分原因（防枚举）。
       if (isDemo && !verifyDemoPassword(loginUsername, body.password)) {
+        recordAccountFailure(loginUsername);
         return json(fail(40101, '用户名或密码错误'), 401);
       }
+      // P4-3：登录成功清零失败计数
+      resetAccountFailures(loginUsername);
 
       // M3-C：若用户已启用 MFA，密码通过后不直接发令牌，改发第二因子挑战。
       // 客户端凭 challengeId 调 POST /api/v1/auth/login/mfa 提交 TOTP/备份码后才换发令牌。
