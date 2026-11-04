@@ -4137,6 +4137,7 @@ import { interopFiveBRoutes } from './routes/interopFiveB'; // M86-N：【互联
 import { cryptoAssessCnRoutes } from './routes/cryptoAssessCn'; // M86-O：【等保三级密评】商用密码应用安全性评估自评
 import { outpatientRegisterTradeRoutes } from './routes/outpatientRegisterTrade'; // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
 import { nurseStationTradeRoutes } from './routes/nurseStationTrade'; // P0-3：护士站交易（医嘱审核/PDA床边执行/执行单生成）
+import { pharmacyDispenseTradeRoutes } from './routes/pharmacyDispenseTrade'; // P0-4：药房发药交易（摆药批次/双人核对发药/退药审批）
 
 // ============================================================================
 // 路由表与编译
@@ -6606,6 +6607,7 @@ const allRoutes: RouteDef[] = [
   ...cryptoAssessCnRoutes, // M86-O：【等保三级密评】密评自评
   ...outpatientRegisterTradeRoutes, // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
   ...nurseStationTradeRoutes, // P0-3：护士站交易（医嘱审核/PDA床边执行/执行单生成）
+  ...pharmacyDispenseTradeRoutes, // P0-4：药房发药交易（摆药批次/双人核对发药/退药审批）
 ];
 
 interface Compiled {
