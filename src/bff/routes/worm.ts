@@ -19,9 +19,10 @@
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   createProbe, getSegment, getSegmentEvents, keyStatus, listSegments,
-  resetProbes, seal, segmentToCsv, sm2Verify, tamperProbeDigest, tamperProbeSignature,
-  verify, __getCipherHex,
+  resetProbes, seal, segmentToCsv, sm2Verify, storeInfo, tamperProbeDigest,
+  tamperProbeSignature, verify, __getCipherHex,
 } from '../aggregators/wormArchiveAggregator.js';
+import { isValidSegmentId } from '../aggregators/wormStore.js';
 
 function requireAdmin(c: Ctx): Response | null {
   if (!(c.user?.roles ?? []).includes('admin')) {
@@ -72,6 +73,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
+      if (!isValidSegmentId(c.params.segmentId)) return json(fail(ErrorCode.BAD_REQUEST, 'invalid-segment-id'), 400);
       const seg = getSegment(c.params.segmentId);
       if (!seg) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
       return json(ok(seg));
@@ -83,6 +85,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
+      if (!isValidSegmentId(c.params.segmentId)) return json(fail(ErrorCode.BAD_REQUEST, 'invalid-segment-id'), 400);
       const fmt = new URL(c.req.url).searchParams.get('format') ?? 'json';
       if (fmt !== 'json' && fmt !== 'csv') {
         return json(fail(ErrorCode.BAD_REQUEST, 'format 仅支持 json/csv'), 400);
@@ -129,6 +132,15 @@ export const wormRoutes: RouteDef[] = [
         publicKeyHex: s.publicKeyHex,
         sm4Configured: s.sm4Configured,
       }));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/store/info',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      return json(ok(storeInfo()));
     },
   },
   {

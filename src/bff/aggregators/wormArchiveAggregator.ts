@@ -12,6 +12,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import {
   queryEvents, verifyChain, type AuditEvent,
 } from './auditEventAggregator.js';
+import { getWormStore, isValidSegmentId, type WormStore } from './wormStore.js';
 
 // sm-crypto 真国密
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -66,12 +67,12 @@ interface ProbeRecord {
   sealedAt: string;
 }
 
-const segments = new Map<string, SegmentRecord>();
 const probes = new Map<string, ProbeRecord>();
 let lastArchivedSeq = 0;
 let segmentCounter = 0;
 let probeCounter = 0;
 const GENESIS = 'GENESIS';
+function store(): WormStore { return getWormStore(); }
 
 /* ------------------------------ 密钥准备（真国密） ------------------------------ */
 
@@ -194,7 +195,7 @@ export function seal(input: SealInput = {}): SealResult {
   const sourceChainHead = all.length ? all[all.length - 1].hash : GENESIS;
 
   segmentCounter += 1;
-  const prev = Array.from(segments.values()).pop();
+  const prev = store().list()[store().list().length - 1];
   const prevSegmentHash = prev ? prev.segmentHash : GENESIS;
   const body = serializeEvents(pending);
   const segmentHash = computeSegmentHash(prevSegmentHash, sourceChainHead, body);
@@ -214,7 +215,7 @@ export function seal(input: SealInput = {}): SealResult {
     sm4Encrypted: true, iv: ivHex, cipherBytes: cipherHex,
     sm2Signature, signerKeyId, keySource: sm2KeySource,
   };
-  segments.set(segmentId, rec);
+  store().put(rec);
   lastArchivedSeq = pending[pending.length - 1].seq;
 
   return { ok: true, segment: rec };
@@ -236,19 +237,19 @@ function metaOf(r: SegmentRecord): WormSegment {
 }
 
 export function listSegments(limit = 50, offset = 0): { rows: WormSegment[]; total: number } {
-  const all = Array.from(segments.values())
-    .slice().sort((a, b) => a.seq - b.seq)
-    .map(metaOf);
+  const all = store().list().map(metaOf);
   return { rows: all.slice(offset, offset + limit), total: all.length };
 }
 
 export function getSegment(segmentId: string): WormSegment | null {
-  const r = segments.get(segmentId);
+  if (!isValidSegmentId(segmentId)) return null;
+  const r = store().get(segmentId);
   return r ? metaOf(r) : null;
 }
 
 export function getSegmentEvents(segmentId: string): AuditEvent[] | null {
-  const r = segments.get(segmentId);
+  if (!isValidSegmentId(segmentId)) return null;
+  const r = store().get(segmentId);
   if (!r) return null;
   return decryptEvents(r);
 }
@@ -268,7 +269,7 @@ export function segmentToCsv(segmentId: string): string | null {
 /* ------------------------------ 影子探针 ------------------------------ */
 
 export function createProbe(segmentId: string): { probeId: string; sourceSegmentId: string } | null {
-  const src = segments.get(segmentId);
+  const src = store().get(segmentId);
   if (!src) return null;
   probeCounter += 1;
   const probeId = `VERIFY-PROBE-${String(probeCounter).padStart(3, '0')}-${Date.now().toString(36)}`;
@@ -318,6 +319,7 @@ export interface VerifyResult {
   probeBroken: boolean;
   digestValid: boolean;
   signatureValid: boolean;
+  seqContinuity: SeqContinuity;
   segmentCount: number;
   probeCount: number;
   brokenSegmentId?: string;
@@ -341,28 +343,30 @@ function checkSeg(seg: SegmentRecord): { digestValid: boolean; signatureValid: b
 function verifyReal(): {
   ok: boolean; brokenSegmentId?: string; reason?: string;
   segmentChecks: SegmentCheck[]; digestValid: boolean; signatureValid: boolean;
+  seqContinuity: SeqContinuity;
 } {
-  const all = Array.from(segments.values()).sort((a, b) => a.seq - b.seq);
-  if (all.length === 0) return { ok: true, segmentChecks: [], digestValid: true, signatureValid: true };
+  const all = store().list().sort((a, b) => a.seq - b.seq);
+  const continuity = checkSeqContinuity(all);
+  if (all.length === 0) return { ok: true, segmentChecks: [], digestValid: true, signatureValid: true, seqContinuity: continuity };
   let prevHash = GENESIS;
   const checks: SegmentCheck[] = [];
   let allDigest = true;
   let allSig = true;
   for (const seg of all) {
     if (seg.prevSegmentHash !== prevHash) {
-      return { ok: false, brokenSegmentId: seg.segmentId, reason: 'prevSegmentHash 链断裂', segmentChecks: checks, digestValid: allDigest, signatureValid: allSig };
+      return { ok: false, brokenSegmentId: seg.segmentId, reason: 'prevSegmentHash 链断裂', segmentChecks: checks, digestValid: allDigest, signatureValid: allSig, seqContinuity: continuity };
     }
     const c = checkSeg(seg);
     if (!c.digestValid || !c.signatureValid) {
       checks.push({ segmentId: seg.segmentId, digestValid: c.digestValid, signatureValid: c.signatureValid });
-      return { ok: false, brokenSegmentId: seg.segmentId, reason: '段 SM3 摘要或 SM2 签名校验失败', segmentChecks: checks, digestValid: c.digestValid, signatureValid: c.signatureValid };
+      return { ok: false, brokenSegmentId: seg.segmentId, reason: '段 SM3 摘要或 SM2 签名校验失败', segmentChecks: checks, digestValid: c.digestValid, signatureValid: c.signatureValid, seqContinuity: continuity };
     }
     if (c.body) {
       const evts = JSON.parse(c.body) as AuditEvent[];
       let expectedSeq = seg.fromSeq;
       for (const e of evts) {
         if (e.seq !== expectedSeq) {
-          return { ok: false, brokenSegmentId: seg.segmentId, reason: `seq 不连续：期望 ${expectedSeq}，实际 ${e.seq}`, segmentChecks: checks, digestValid: allDigest, signatureValid: allSig };
+          return { ok: false, brokenSegmentId: seg.segmentId, reason: `seq 不连续：期望 ${expectedSeq}，实际 ${e.seq}`, segmentChecks: checks, digestValid: allDigest, signatureValid: allSig, seqContinuity: continuity };
         }
         expectedSeq += 1;
       }
@@ -370,12 +374,53 @@ function verifyReal(): {
     checks.push({ segmentId: seg.segmentId, digestValid: true, signatureValid: true });
     prevHash = seg.segmentHash;
   }
-  return { ok: true, segmentChecks: checks, digestValid: allDigest, signatureValid: allSig };
+  return { ok: true, segmentChecks: checks, digestValid: allDigest, signatureValid: allSig, seqContinuity: continuity };
+}
+
+export interface SeqGap { prevToSeq: number; nextFromSeq: number; expected: number; actual: number; }
+export interface SeqContinuity {
+  valid: boolean;
+  gaps: SeqGap[];
+  duplicateSeq: number[];
+  outOfOrder: boolean;
+  startGap?: { expected: number; actual: number };
+}
+
+export function checkSeqContinuity(segs: WormSegment[]): SeqContinuity {
+  const sorted = segs.slice().sort((a, b) => a.seq - b.seq);
+  const gaps: SeqGap[] = [];
+  const duplicateSeq: number[] = [];
+  let outOfOrder = false;
+  // 段 seq 1..N
+  for (let i = 0; i < sorted.length; i++) {
+    if (sorted[i].seq !== i + 1) outOfOrder = true;
+  }
+  // 相邻段 from/to 衔接
+  for (let i = 1; i < sorted.length; i++) {
+    const prevTo = sorted[i - 1].toSeq;
+    const nextFrom = sorted[i].fromSeq;
+    if (nextFrom !== prevTo + 1) {
+      gaps.push({ prevToSeq: prevTo, nextFromSeq: nextFrom, expected: prevTo + 1, actual: nextFrom });
+    }
+  }
+  // 段内 fromSeq 重复
+  const fromSet = new Set<number>();
+  for (const s of sorted) {
+    if (fromSet.has(s.fromSeq)) duplicateSeq.push(s.fromSeq);
+    fromSet.add(s.fromSeq);
+  }
+  // 首段 fromSeq 应为 1
+  let startGap: SeqContinuity['startGap'];
+  if (sorted.length > 0 && sorted[0].fromSeq !== 1) {
+    startGap = { expected: 1, actual: sorted[0].fromSeq };
+  }
+  const valid = !outOfOrder && gaps.length === 0 && duplicateSeq.length === 0;
+  return { valid, gaps, duplicateSeq, outOfOrder, startGap };
 }
 
 function verifyProbes(): { broken: boolean; probeId?: string; reason?: string } {
   for (const probe of probes.values()) {
-    const src = segments.get(probe.sourceSegmentId);
+    const src = store().get(probe.sourceSegmentId);
     if (!src) continue;
     if (probe.tamperedEventCount !== getSegmentEvents(src.segmentId)?.length) {
       return { broken: true, probeId: probe.probeId, reason: '探针 eventCount 与实际 events 不一致（预期）' };
@@ -393,33 +438,37 @@ function verifyProbes(): { broken: boolean; probeId?: string; reason?: string } 
 export function verify(scope: 'all' | 'real' = 'all'): VerifyResult {
   const real = verifyReal();
   const realChainValid = real.ok;
-  const segmentCount = segments.size;
+  const segmentCount = store().count();
+  const seqContinuity = real.seqContinuity;
 
   if (scope === 'real') {
+    const valid = realChainValid && seqContinuity.valid && real.digestValid && real.signatureValid;
     return {
-      valid: realChainValid && real.digestValid && real.signatureValid,
+      valid,
       realChainValid,
       probeBroken: false,
       digestValid: real.digestValid,
       signatureValid: real.signatureValid,
+      seqContinuity,
       segmentCount,
       probeCount: probes.size,
       brokenSegmentId: realChainValid ? undefined : real.brokenSegmentId,
       brokenScope: realChainValid ? undefined : 'real',
-      reason: real.reason,
+      reason: real.reason ?? (seqContinuity.valid ? undefined : '跨段 seq 不连续'),
       segments: real.segmentChecks,
     };
   }
 
   const probe = verifyProbes();
   const probeBroken = probe.broken;
-  const valid = realChainValid && !probeBroken && real.digestValid && real.signatureValid;
+  const valid = realChainValid && seqContinuity.valid && !probeBroken && real.digestValid && real.signatureValid;
   return {
     valid,
     realChainValid,
     probeBroken,
     digestValid: real.digestValid,
     signatureValid: real.signatureValid,
+    seqContinuity,
     segmentCount,
     probeCount: probes.size,
     brokenSegmentId: realChainValid ? (probeBroken ? probe.probeId : undefined) : real.brokenSegmentId,
@@ -429,10 +478,32 @@ export function verify(scope: 'all' | 'real' = 'all'): VerifyResult {
   };
 }
 
+/* ------------------------------ store info ------------------------------ */
+
+export function storeInfo(): { kind: string; segmentCount: number; dir?: string; writable: boolean; oldestSeq: number | null; newestSeq: number | null } {
+  const s = store();
+  const all = s.list();
+  const oldest = all.length ? all[0].fromSeq : null;
+  const newest = all.length ? all[all.length - 1].toSeq : null;
+  return {
+    kind: s.kind,
+    segmentCount: all.length,
+    dir: s.kind === 'fs' ? (s as unknown as { dir: string }).dir : undefined,
+    writable: true,
+    oldestSeq: oldest,
+    newestSeq: newest,
+  };
+}
+
 /* ------------------------------ 工具 ------------------------------ */
 
 export function __resetStore(): void {
-  segments.clear();
+  // Memory store：清空；File store：由单测指定临时目录，不删磁盘文件
+  const s = store();
+  if (s.kind === 'memory') {
+    // @ts-expect-error 清 map
+    s.__clear?.();
+  }
   probes.clear();
   lastArchivedSeq = 0;
   segmentCounter = 0;
@@ -440,7 +511,7 @@ export function __resetStore(): void {
 }
 
 export function __getCipherHex(segmentId: string): string | null {
-  return segments.get(segmentId)?.cipherBytes ?? null;
+  return store().get(segmentId)?.cipherBytes ?? null;
 }
 
 /** 仅用于单测：暴露 sm3 标准向量 */

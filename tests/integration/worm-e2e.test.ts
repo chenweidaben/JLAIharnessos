@@ -136,8 +136,8 @@ describe('doctor 越权 + 404', () => {
     const r = await call('GET','/api/v1/worm/segments',{token:doctor});
     expect(r.httpStatus).toBe(403);
   });
-  it('segmentId 不存在 → 404', async () => {
-    const r = await call('GET','/api/v1/worm/segments/WORM-nope',{token:admin});
+  it('segmentId 不存在 → 404（合法格式但无此段）', async () => {
+    const r = await call('GET','/api/v1/worm/segments/WORM-9999-nonexist',{token:admin});
     expect(r.httpStatus).toBe(404);
   });
   it('GET /segments 列表非空', async () => {
@@ -155,6 +155,24 @@ describe('doctor 越权 + 404', () => {
   it('format 非法 → 400', async () => {
     const seg1 = (globalThis as any).__seg1;
     const r = await call('GET',`/api/v1/worm/segments/${seg1}/content?format=xml`,{token:admin});
+    expect(r.httpStatus).toBe(400);
+  });
+});
+
+describe('P5-5 store/info + seqContinuity + 路径穿越', () => {
+  it('GET /store/info 返 kind=memory 与 segmentCount≥1', async () => {
+    const r = await call('GET','/api/v1/worm/store/info',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.kind).toBe('memory');
+    expect(r.data.segmentCount).toBeGreaterThanOrEqual(1);
+  });
+  it('verify?scope=real 返 seqContinuity.valid=true', async () => {
+    const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.seqContinuity.valid).toBe(true);
+  });
+  it('非法 segmentId（路径穿越串）→ 400', async () => {
+    const r = await call('GET','/api/v1/worm/segments/..%2F..%2Fetc%2Fpasswd',{token:admin});
     expect(r.httpStatus).toBe(400);
   });
 });

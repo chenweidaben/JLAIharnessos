@@ -7,10 +7,11 @@
 import { beforeEach, describe, expect, test } from 'bun:test';
 import { __resetStore as resetAudit, recordEvent } from '../../src/bff/aggregators/auditEventAggregator';
 import {
-  __getCipherHex, __resetStore, __sm3StandardVector, createProbe, getSegment,
-  getSegmentEvents, keyStatus, listSegments, resetProbes, seal, sm2Verify,
-  tamperProbeDigest, tamperProbeSignature, verify,
+  __getCipherHex, __resetStore, __sm3StandardVector, checkSeqContinuity,
+  createProbe, getSegment, getSegmentEvents, keyStatus, listSegments, resetProbes,
+  seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
+import { FileWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
 
@@ -177,5 +178,90 @@ describe('P5-4 查询', () => {
     seedN(3); seal({});
     seedN(2); seal({});
     expect(listSegments(10, 0).total).toBe(2);
+  });
+});
+
+describe('P5-5 路径穿越防护', () => {
+  test('合法 segmentId 通过', () => {
+    expect(isValidSegmentId('WORM-0001-abc123')).toBe(true);
+    expect(isValidSegmentId('VERIFY-PROBE-1-xyz')).toBe(true);
+  });
+  test('恶意串被拒（3 例）', () => {
+    expect(isValidSegmentId('../../etc/passwd')).toBe(false);
+    expect(isValidSegmentId('..\\..\\win.ini')).toBe(false);
+    expect(isValidSegmentId('WORM-0001-x/../../y')).toBe(false);
+  });
+  test('getSegment 对非法 id 返 null（不抛）', () => {
+    expect(getSegment('../../etc/passwd')).toBeNull();
+  });
+});
+
+describe('P5-5 FileWormStore', () => {
+  test('put → get 往返 + 新实例同目录读回（等价重启不丢）', () => {
+    const dir = `logs/worm-store-test-${Math.random().toString(36).slice(2)}`;
+    const s1 = new FileWormStore(dir);
+    const fake = {
+      segmentId: 'WORM-9999-test', seq: 1, fromSeq: 1, toSeq: 1, eventCount: 1,
+      segmentHash: 'a'.repeat(64), prevSegmentHash: 'GENESIS', sourceChainHead: 'b'.repeat(64),
+      sourceChainValid: true, sealedAt: new Date().toISOString(), bytes: 10,
+      digestAlg: 'SM3', digestSm3: 'c'.repeat(64), sm4Encrypted: true, iv: 'd'.repeat(32),
+      cipherBytes: 'ef', sm2Signature: 'f'.repeat(128), signerKeyId: 'x', keySource: 'demo-ephemeral',
+    } as const;
+    s1.put(fake as never);
+    // 新实例读同目录
+    const s2 = new FileWormStore(dir);
+    const got = s2.get('WORM-9999-test');
+    expect(got?.segmentId).toBe('WORM-9999-test');
+    expect(got?.digestSm3).toBe('c'.repeat(64));
+    expect(s2.count()).toBe(1);
+    // 重复 put → duplicate
+    expect(() => s1.put(fake as never)).toThrow(/duplicate/);
+  });
+});
+
+describe('P5-5 seqContinuity', () => {
+  test('正常无缝 → valid=true', () => {
+    seedN(3); seal({});
+    seedN(3); seal({});
+    const v = verify('real');
+    expect(v.seqContinuity.valid).toBe(true);
+    expect(v.seqContinuity.gaps.length).toBe(0);
+  });
+  test('人为构造 toSeq 跳号 → gaps 非空', () => {
+    const segs = [
+      { segmentId: 'WORM-1-a', seq: 1, fromSeq: 1, toSeq: 3 },
+      { segmentId: 'WORM-2-b', seq: 2, fromSeq: 10, toSeq: 12 },
+    ] as never[];
+    const c = checkSeqContinuity(segs as never);
+    expect(c.valid).toBe(false);
+    expect(c.gaps.length).toBeGreaterThan(0);
+  });
+  test('seq 重复 → duplicateSeq 非空', () => {
+    const segs = [
+      { segmentId: 'WORM-1-a', seq: 1, fromSeq: 1, toSeq: 3 },
+      { segmentId: 'WORM-2-b', seq: 2, fromSeq: 1, toSeq: 3 },
+    ] as never[];
+    const c = checkSeqContinuity(segs as never);
+    expect(c.valid).toBe(false);
+    expect(c.duplicateSeq.length).toBeGreaterThan(0);
+  });
+  test('首段 fromSeq≠1 → startGap 记录但不判 fail', () => {
+    const segs = [
+      { segmentId: 'WORM-1-a', seq: 1, fromSeq: 5, toSeq: 7 },
+    ] as never[];
+    const c = checkSeqContinuity(segs as never);
+    expect(c.startGap).toEqual({ expected: 1, actual: 5 });
+    // 单段不构成 gap，valid=true
+    expect(c.valid).toBe(true);
+  });
+});
+
+describe('P5-5 storeInfo', () => {
+  test('storeInfo 返 kind 与 segmentCount', () => {
+    seedN(3); seal({});
+    const s = storeInfo();
+    expect(s.kind).toBe('memory');
+    expect(s.segmentCount).toBe(1);
+    expect(s.oldestSeq).toBe(1);
   });
 });
