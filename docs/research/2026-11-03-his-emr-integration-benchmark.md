@@ -449,7 +449,7 @@
 | # | 差距域 | 具体缺口 |
 |---|---|---|
 | P1-1 | 三级检诊工作流 | 住院医/主治/主任三级查房签审时间线、越级签审记录、签审意见留痕 | **已落地**（commit `17dd063d`）：新建内存三级工作流 `wardRoundSignoffAggregator`——状态机 draft(resident写)─attending approve→chief_sign─chief终签→archived；reject/return 回 draft；archived 不可改（409）；越级留痕（主治未审主任直签标 escalated=true/bypassedLevel=attending）；签审意见 trail {reviewerId/role/action/comment/signedAt}；resident/attending/chief 三级角色越权 403(code=40300)；visitId-patientId 行级绑定。端点 `/api/v1/inpatient/ward-round-signoff/notes*`（5 条）。**未覆盖**：病程版本对比、与既有 PG 二级 rounds 合并、电子签名(P0-6)挂接终签 |
-| P1-2 | 体温单/医嘱单 | 体温单作为独立护理文书模块（自动采集 + 绘制曲线）、医嘱单续打/补打/重打 |
+| P1-2 | 体温单/医嘱单 | 体温单作为独立护理文书模块（自动采集 + 绘制曲线）、医嘱单续打/补打/重打 | **已落地**（commit `__P12_SHA__`）：①新建内存 `vitalsSheetAggregator`——护士录入体温/脉搏/呼吸/血压/SpO2/体重/大便，硬校验（体温 35~42℃、脉搏 40~160、呼吸 8~40、SBP 60~220、DBP 30~130），越界 400 指明字段；`GET /curve` 按 4h 槽位（0/4/8/12/16/20，±2h 取最近）输出 temperatureCurve/pulseCurve/respirationCurve/bpSeries/spo2Series 各 6 点（缺失 null）+ weight + bowelMovements。②新建 `orderSheetPrintAggregator`——continuation 续打（nextPage 递增）/reissue 补打（range 留痕 reissuedPages）/reprint 重打（作废前次），同 visitId+printMode 重复 printCount+1（200 留痕非 409）。nurse 录入+查看、doctor 仅查看；doctor/nurse 可打印；行级 visitId-patientId 绑定。端点 `/api/v1/nursing/vitals-sheet/{entries,curve}`、`/api/v1/clinical/order-sheet/{print,prints}`。**未覆盖**：体温单绘制前端（体温曲线图形/网格）、医嘱单 PDF 排版与长期/临时分单、与 P0-3 PDA 体征联动 |
 | P1-3 | 手术麻醉闭环 | 手术申请 POST、手术排班（手术间资源）、麻醉记录单、术中监护、PACU 复苏记录 |
 | P1-4 | 输血闭环 | 输血申请、血型鉴定、交叉配血、发血、双人核对、输血记录、不良反应 |
 | P1-5 | ICU 监护文书 | Q1H/Q2H 监护记录、RASS 镇静评分、CAM-ICU 谵妄、24h 出入量、呼吸机/输液泵数据接入 |
