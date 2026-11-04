@@ -275,10 +275,19 @@ describe('P0-2 权限分级 assertCan', () => {
     } catch (e) { expectStatus(e, 403); }
   });
 
-  it('admin 三动作全通', () => {
-    expect(() => assertCan(mkActor(['admin'], []), 'write')).not.toThrow();
-    expect(() => assertCan(mkActor(['admin'], []), 'review')).not.toThrow();
-    expect(() => assertCan(mkActor(['admin'], []), 'execute')).not.toThrow();
+  it('admin 角色不再硬绕过 permissions=[] → 三动作均 403', () => {
+    try { assertCan(mkActor(['admin'], []), 'write'); throw new Error('应当抛错'); }
+    catch (e) { expectStatus(e, 403); }
+    try { assertCan(mkActor(['admin'], []), 'review'); throw new Error('应当抛错'); }
+    catch (e) { expectStatus(e, 403); }
+    try { assertCan(mkActor(['admin'], []), 'execute'); throw new Error('应当抛错'); }
+    catch (e) { expectStatus(e, 403); }
+  });
+
+  it('permissions=["*"] 通配 → 三动作全通', () => {
+    expect(() => assertCan(mkActor(['admin'], ['*']), 'write')).not.toThrow();
+    expect(() => assertCan(mkActor(['admin'], ['*']), 'review')).not.toThrow();
+    expect(() => assertCan(mkActor(['admin'], ['*']), 'execute')).not.toThrow();
   });
 
   it('无角色无权限 -> 403', () => {
