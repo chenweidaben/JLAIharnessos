@@ -16,6 +16,7 @@ import { auditOperation } from './middleware/audit';
 import { auditEventHook } from './middleware/auditEventHook'; // P4-2：内存哈希链审计 after-hook
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
+import { globalRateLimit } from './middleware/globalRateLimit'; // P4-4：通用 read/write 限流全局挂载
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
 import { withIdempotency } from './middleware/idempotency';
@@ -6908,6 +6909,12 @@ async function handleFetch(
   let status = 200;
   let routeLabel = 'unmatched';
   try {
+    // P4-4：通用 read/write 限流（GET 100/min、写 30/min，按 IP）
+    const globalLimited = globalRateLimit(ctx);
+    if (globalLimited) {
+      status = 429;
+      return withSecurityHeaders(globalLimited);
+    }
     // 限流
     const limited = rateLimit(ctx);
     if (limited) {
