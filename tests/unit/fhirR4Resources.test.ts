@@ -38,7 +38,7 @@ describe('P1-8 白名单规模与不支持类型', () => {
   test('支持 24 类资源（含原 4 类）', () => {
     expect(SUPPORTED_RESOURCES.length).toBe(24);
     for (const must of ['Patient', 'Encounter', 'Observation', 'MedicationRequest', 'Condition', 'DiagnosticReport', 'ServiceRequest']) {
-      expect(SUPPORTED_RESOURCES).toContain(must);
+      expect((SUPPORTED_RESOURCES as readonly string[])).toContain(must);
     }
   });
   test('不支持的 resourceType → 404', () => {
@@ -53,7 +53,7 @@ describe('P1-8 24 类 round-trip（doctor 视角）', () => {
       const created = createResource(rt, body, DOCTOR, 'd1');
       expect(created.resourceType).toBe(rt);
       expect(created.id).toBe(`${rt}-1`);
-      expect(created.meta.lastUpdated).toBeTruthy();
+      expect((created as { meta: { lastUpdated: string } }).meta.lastUpdated).toBeTruthy();
       const got = getResource(rt, `${rt}-1`, DOCTOR, 'd1');
       expect(got.id).toBe(`${rt}-1`);
     });
