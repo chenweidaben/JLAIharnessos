@@ -4138,6 +4138,7 @@ import { cryptoAssessCnRoutes } from './routes/cryptoAssessCn'; // M86-O：【�
 import { outpatientRegisterTradeRoutes } from './routes/outpatientRegisterTrade'; // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
 import { nurseStationTradeRoutes } from './routes/nurseStationTrade'; // P0-3：护士站交易（医嘱审核/PDA床边执行/执行单生成）
 import { pharmacyDispenseTradeRoutes } from './routes/pharmacyDispenseTrade'; // P0-4：药房发药交易（摆药批次/双人核对发药/退药审批）
+import { inpatientDepositSettleTradeRoutes } from './routes/inpatientDepositSettleTrade'; // P0-5：住院押金/出院结算交易（预交金缴纳/押金预警/出院结算一日清单）
 
 // ============================================================================
 // 路由表与编译
@@ -6608,6 +6609,7 @@ const allRoutes: RouteDef[] = [
   ...outpatientRegisterTradeRoutes, // P0-1：门诊挂号交易闭环（号源预占/挂号/退号/叫号状态机）
   ...nurseStationTradeRoutes, // P0-3：护士站交易（医嘱审核/PDA床边执行/执行单生成）
   ...pharmacyDispenseTradeRoutes, // P0-4：药房发药交易（摆药批次/双人核对发药/退药审批）
+  ...inpatientDepositSettleTradeRoutes, // P0-5：住院押金/出院结算交易（预交金缴纳/押金预警/出院结算一日清单）
 ];
 
 interface Compiled {
