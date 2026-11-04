@@ -448,7 +448,7 @@
 
 | # | 差距域 | 具体缺口 |
 |---|---|---|
-| P1-1 | 三级检诊工作流 | 住院医/主治/主任三级查房签审时间线、越级签审记录、签审意见留痕 | **已落地**（commit `__P11_SHA__`）：新建内存三级工作流 `wardRoundSignoffAggregator`——状态机 draft(resident写)─attending approve→chief_sign─chief终签→archived；reject/return 回 draft；archived 不可改（409）；越级留痕（主治未审主任直签标 escalated=true/bypassedLevel=attending）；签审意见 trail {reviewerId/role/action/comment/signedAt}；resident/attending/chief 三级角色越权 403(code=40300)；visitId-patientId 行级绑定。端点 `/api/v1/inpatient/ward-round-signoff/notes*`（5 条）。**未覆盖**：病程版本对比、与既有 PG 二级 rounds 合并、电子签名(P0-6)挂接终签 |
+| P1-1 | 三级检诊工作流 | 住院医/主治/主任三级查房签审时间线、越级签审记录、签审意见留痕 | **已落地**（commit `17dd063d`）：新建内存三级工作流 `wardRoundSignoffAggregator`——状态机 draft(resident写)─attending approve→chief_sign─chief终签→archived；reject/return 回 draft；archived 不可改（409）；越级留痕（主治未审主任直签标 escalated=true/bypassedLevel=attending）；签审意见 trail {reviewerId/role/action/comment/signedAt}；resident/attending/chief 三级角色越权 403(code=40300)；visitId-patientId 行级绑定。端点 `/api/v1/inpatient/ward-round-signoff/notes*`（5 条）。**未覆盖**：病程版本对比、与既有 PG 二级 rounds 合并、电子签名(P0-6)挂接终签 |
 | P1-2 | 体温单/医嘱单 | 体温单作为独立护理文书模块（自动采集 + 绘制曲线）、医嘱单续打/补打/重打 |
 | P1-3 | 手术麻醉闭环 | 手术申请 POST、手术排班（手术间资源）、麻醉记录单、术中监护、PACU 复苏记录 |
 | P1-4 | 输血闭环 | 输血申请、血型鉴定、交叉配血、发血、双人核对、输血记录、不良反应 |
