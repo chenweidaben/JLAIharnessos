@@ -142,11 +142,31 @@ jobs:
               psql -v ON_ERROR_STOP=1 -q -h 127.0.0.1 -U postgres -d jlmedaios -f "$f"
             fi
           done
+      - name: 启动 BFF 基座（P0 交易 E2E 需要，DEMO 内存兜底）
+        env:
+          DEMO_MODE: '1'
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/jlmedaios
+          PGSSLMODE: disable
+        run: |
+          bun run src/bff/server.ts > /tmp/bff-ci.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/health > /dev/null 2>&1; then
+              echo "BFF 就绪（第 ${i} 次探测）"
+              break
+            fi
+            sleep 1
+          done
+          if ! curl -fsS http://127.0.0.1:8080/health > /dev/null 2>&1; then
+            echo "::error::BFF 在 30 秒内未就绪，tests/integration/p0-trade-e2e.test.ts 将无法运行"
+            tail -n 60 /tmp/bff-ci.log || true
+            exit 1
+          fi
       - name: 运行集成测试（TEST_REAL=1 连真实库）
         env:
           TEST_REAL: '1'
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/jlmedaios
           PGSSLMODE: disable
+          BFF_BASE_URL: http://127.0.0.1:8080
         run: bun run test:integration
 
   security-audit:
