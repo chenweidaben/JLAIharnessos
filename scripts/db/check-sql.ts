@@ -105,9 +105,12 @@ export async function verifySql(): Promise<CheckResult> {
   if (!/FUNCTION audit\.compute_chain_hash/.test(all))
     errors.push('缺少 audit.compute_chain_hash 函数');
 
-  // 括号配平（按文件，忽略字符串内括号的粗略检查，仅作冒烟）
+  // 括号配平（按文件，忽略字符串字面量与 -- 行注释内括号的粗略检查，仅作冒烟）
   for (const [f, sql] of contents) {
-    const stripped = sql.replace(/'(?:''|[^'])*'/g, "''"); // 去掉字符串字面量
+    // 先去掉字符串字面量（含 '' 转义），再去掉 -- 行注释（注释里常有 1)/2) 编号）
+    const stripped = sql
+      .replace(/'(?:''|[^'])*'/g, "''")
+      .replace(/--[^\n]*/g, "");
     const open = (stripped.match(/\(/g) || []).length;
     const close = (stripped.match(/\)/g) || []).length;
     if (open !== close) errors.push(`${f} 括号不配平：( ${open} vs ) ${close}`);
