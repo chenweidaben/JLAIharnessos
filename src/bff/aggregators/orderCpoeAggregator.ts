@@ -180,6 +180,30 @@ export function assertCan(actor: CpoeActor, action: 'write' | 'review' | 'execut
 }
 
 /* ------------------------------------------------------------------ */
+/* 行级归属（P0-7 RBAC 收口）                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 行级归属校验：visitId ↔ patientId 绑定（P0-7）。
+ *
+ * 临床数据按"就诊—患者"二元绑定。若请求体显式携带 patientId，且该 visitId 已在
+ * visitRegistry 登记，则必须与登记患者一致；不一致说明跨患者越权访问，抛 403。
+ *  - 客户端未传 patientId：不阻断（向后兼容既有调用方，患者由 visitRegistry 服务端补全）。
+ *  - visitId 未在台账登记：不阻断（生产接 visitRepo 后再补严，避免演示态新就诊被误拦）。
+ */
+export function assertVisitPatientBinding(visitId: string, patientId?: string): void {
+  if (!patientId) return;
+  const reg = visitRegistry.get(visitId);
+  if (!reg) return;
+  if (reg.patientId !== patientId) {
+    throw new OrderCpoeError(
+      403,
+      `行级归属校验失败：就诊 ${visitId} 绑定患者 ${reg.patientId}，与传入 patientId=${patientId} 不一致`,
+    );
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* 内部校验                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -212,6 +236,7 @@ function resolvePatient(visitId: string): { patientId: string; patientName: stri
 
 export interface CreateOrderInput {
   visitId: string;
+  patientId?: string;
   orderType: string;
   content: string;
   dosage?: string;
@@ -226,12 +251,14 @@ export interface CreateOrderInput {
 /**
  * 单条开立医嘱。visitId/content 必填；feeCents 必须非负整数分。
  * 新建医嘱初始状态 pending_review。
+ * P0-7：若请求显式携带 patientId，先做 visitId↔patientId 行级归属校验，越权 403。
  * TODO-prod: 权限码 inpatient_order:write 已由路由层 assertCan 校验；生产接 orderRepo.insert。
  */
 export function createOrder(input: CreateOrderInput): CpoeOrder {
   const now = input.now ?? Date.now();
   if (!input.visitId) throw new OrderCpoeError(400, 'visitId 必填');
   if (!input.content) throw new OrderCpoeError(400, '医嘱内容必填');
+  assertVisitPatientBinding(input.visitId, input.patientId);
   const orderType = assertOrderType(input.orderType);
   assertFeeCents(input.feeCents);
 
@@ -409,6 +436,7 @@ export interface OrderSetItem {
 
 export interface CreateOrderSetInput {
   visitId: string;
+  patientId?: string;
   setName: string;
   orders: OrderSetItem[];
   orderedBy: string;
@@ -429,6 +457,7 @@ export function createOrderSet(input: CreateOrderSetInput): OrderSetResult {
   if (!Array.isArray(input.orders) || input.orders.length === 0) {
     throw new OrderCpoeError(400, '成套医嘱明细不能为空');
   }
+  assertVisitPatientBinding(input.visitId, input.patientId);
   const pid = resolvePatient(input.visitId);
 
   // 第一遍：构造候选对象并逐条校验，任何一条不合法立即抛错（此时未写任何 Map）

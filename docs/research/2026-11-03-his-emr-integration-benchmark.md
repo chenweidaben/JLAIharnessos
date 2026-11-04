@@ -426,7 +426,7 @@
 | P0-4 | **药房发药/摆药交易** | 发药确认 POST、摆药批次、单剂量核对、退药审批、与医嘱执行联动 | `pharmacyDispense.ts` 2.3KB 桩 |
 | P0-5 | **住院押金/结算交易** | 预交金缴纳 POST、押金不足预警、中途结算、出院结算 POST、一日清单推送 | `inpatientBillingMgmtV13.ts` 为统计型，无交易路由 |
 | P0-6 | **电子签名国密化** | 病历/医嘱/护理记录可靠电子签名接 SM2/TSA 第三方时间戳 | `emr-gap-matrix` P0 项：当前 mock 预留 |
-| P0-7 | **生产 RBAC 关闭 DEMO 短路** | 真实口令哈希核验、就诊/患者归属行级校验、admin 角色不绕过 | `emr-gap-matrix` P0-① |
+| P0-7 | **生产 RBAC 关闭 DEMO 短路** | 真实口令哈希核验、就诊/患者归属行级校验、admin 角色不绕过 | **已落地**（见 4.1.1 P0-7 行）：`requireAuth` 删除 DEMO_MODE 短路注入，无有效 Bearer JWT 一律 401；运维白名单无 token 开放；`POST /api/v1/auth/demo-login` 四角色签 JWT；visitId↔patientId 行级绑定越权 403 |
 
 #### 4.1.1 P0 落地状态（截至 2026-11-04 16:23 轮）
 
@@ -439,6 +439,7 @@
 | P0 四切片 E2E | 真实 HTTP 打 8080，状态自适应 probe-then-branch 可重跑 | `f3f77cb4` + 自适应 `076ddd1b` | `tests/integration/p0-trade-e2e.test.ts` |
 | CI BFF 基座 | 集成测试 job 自起 BFF，修复 E2E 在 CI 必红且被 continue-on-error 掩盖 | `d3164775` | CI 集成测试 job |
 | P0-2 CPOE | 审核状态机/成套原子/执行单幂等/三级权限/内存 seed + 自签 4 角色 JWT 的 E2E | `569fe35d` + E2E `8901f415` | `orderCpoeAggregator.ts` / `orderCpoe.ts` / `order.ts` / `tests/integration/orderCpoe-e2e.test.ts` |
+| P0-7 生产 RBAC | 删除 `requireAuth` DEMO 短路（无 token→401/40100）；运维白名单 /health /ready /metrics /api/v1/health /api/v1/system/health 无 token 开放；新增 `POST /api/v1/auth/demo-login` 四角色(doctor/nurse/pharmacist/admin)签 HS256 JWT；`assertVisitPatientBinding` 行级归属 visitId↔patientId 越权 403(40300)；`p0-trade-e2e` 迁移自签 JWT；新增 `p0-rbac-e2e` | __P07_SHA__ | `middleware/auth.ts` / `routes/auth.ts`(demo-login) / `aggregators/orderCpoeAggregator.ts`(行级绑定) / `routes/order.ts`+`orderCpoe.ts`(透传 patientId) / `tests/integration/p0-rbac-e2e.test.ts` |
 
 > **防误判注记**：`order.ts` 虽早已注册 5 条路由，但护士审核、成套医嘱、医嘱权限分级、执行单生成、演示态真实 seed 长期缺失（GET 列表在 DEMO 下直接 `return ok([])` 空桩），曾据此被误判为「P0-2 已完成」。本轮按台账原判重做落地。另：`POST /api/v1/orders/:id/review` 与 `/:id/stop` 此前由 `m570Routes.ts` 与 `orderVerify.ts` 各注册一份 stub，现由 `orderCpoe.ts` 在 allRoutes 中**前置注册**接管（路由首匹配胜出），两个旧 stub 成为不可达死路由；前端与既有测试均走 `/api/v1/inpatient/orders/...`，无调用方受损，后续可清理。
 

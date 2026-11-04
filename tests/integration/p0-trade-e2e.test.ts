@@ -27,8 +27,10 @@
  */
 
 import { beforeAll, describe, expect, it } from 'bun:test';
+import * as crypto from 'node:crypto';
 
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
+const JWT_SECRET = process.env.JWT_SECRET ?? 'local-dev-jwt-secret-jlmedaios-2026';
 
 interface CallResult {
   httpStatus: number;
@@ -36,14 +38,36 @@ interface CallResult {
   raw: any;
 }
 
-/** 统一 HTTP 调用：带 demo admin 头；非 2xx 也返回 body，便于断言 409。 */
-async function call(method: string, path: string, body?: unknown): Promise<CallResult> {
+function b64url(obj: unknown): string {
+  return Buffer.from(JSON.stringify(obj))
+    .toString('base64')
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+/** 自签 HS256 JWT（与 middleware/auth.ts 同算法同密钥，P0-7 起替代 jt- 演示短路 token）。 */
+function signToken(roles: string[], name: string, sub: string, permissions: string[] = []): string {
+  const now = Math.floor(Date.now() / 1000);
+  const h = b64url({ alg: 'HS256', typ: 'JWT' });
+  const p = b64url({ sub, name, roles, permissions, iss: 'jianlan-bff', nbf: now, exp: now + 3600 });
+  const data = `${h}.${p}`;
+  const sig = crypto
+    .createHmac('sha256', JWT_SECRET)
+    .update(data)
+    .digest('base64')
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return `${data}.${sig}`;
+}
+
+// P0-7：四条交易切片由 admin 角色自签 JWT 驱动（不再依赖 jt-e2e-admin 演示短路）。
+const adminToken = signToken(['admin'], '交易测试管理员', 'p0-trade-admin', ['*']);
+
+/** 统一 HTTP 调用：默认带自签 admin JWT；非 2xx 也返回 body，便于断言 409。 */
+async function call(method: string, path: string, body?: unknown, token: string = adminToken): Promise<CallResult> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(BASE + path, {
     method,
-    headers: {
-      'Authorization': 'Bearer jt-e2e-admin',
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   let raw: any = null;
@@ -59,9 +83,8 @@ async function call(method: string, path: string, body?: unknown): Promise<CallR
 const uniq = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 beforeAll(async () => {
-  const res = await fetch(BASE + '/health', {
-    headers: { 'Authorization': 'Bearer jt-e2e-admin' },
-  });
+  // /health 为运维白名单，无 token 开放（P0-7 规格 2）
+  const res = await fetch(BASE + '/health');
   if (res.status !== 200) {
     throw new Error('BFF 未就绪：请先启动 bun run src/bff/server.ts（DEMO_MODE=1）');
   }

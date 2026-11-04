@@ -56,6 +56,7 @@ export const orderRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createOrder({
           visitId: String(b.visitId ?? ''),
+          patientId: b.patientId ? String(b.patientId) : undefined,
           orderType: String(b.orderType ?? 'other'),
           content: String(b.content ?? ''),
           dosage: b.dosage ? String(b.dosage) : undefined,

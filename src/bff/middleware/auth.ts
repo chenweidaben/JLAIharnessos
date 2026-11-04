@@ -12,7 +12,7 @@
 
 import * as crypto from 'node:crypto';
 
-import { isDemoModeEnabled, isProductionEnv } from '../config/runtimeEnv';
+import { isProductionEnv } from '../config/runtimeEnv';
 import { type ApiResponse, type Ctx, ErrorCode, fail, json, newTraceId } from '../types';
 
 /* ------------------------------------------------------------------ */
@@ -167,13 +167,15 @@ export function attachUser(c: Ctx): void {
   c.user = null;
 }
 
-/** 要求登录，否则 401；演示模式短路放行仅限非生产环境 */
+/**
+ * 要求登录，否则 401。
+ *
+ * P0-7 生产 RBAC 收口：彻底移除 DEMO_MODE 下"无 Authorization 头即注入 demo/super-admin"的短路。
+ * 现在无论是否 DEMO_MODE，auth:true 业务路由在缺少有效 Bearer JWT 时一律 401；
+ * 演示态仅能通过 POST /api/v1/auth/demo-login 或 /api/v1/auth/login 换取真实签发的 JWT 后访问。
+ * 生产环境即使误配 DEMO_MODE=1 也永远不会授予演示身份（fail-closed）。
+ */
 export function requireAuth(c: Ctx): Response | null {
-  // 演示模式短路授予 demo admin 仅限非生产环境；生产环境即使误配 DEMO_MODE=1 也不授予演示身份
-  if (!isProductionEnv() && isDemoModeEnabled()) {
-    c.user = c.user ?? { id: 'demo', name: '演示用户', roles: ['admin'], permissions: ['*'] };
-    return null;
-  }
   if (!c.user) {
     return json(fail(ErrorCode.UNAUTHORIZED, '未登录或登录已过期', c.traceId), 401);
   }

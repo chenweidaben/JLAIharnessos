@@ -10,6 +10,7 @@
  */
 
 import { newJti, signJwt, verifyJwt } from '../middleware/auth';
+import { isProductionEnv } from '../config/runtimeEnv';
 import { issueCsrfToken } from '../middleware/csrf';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
@@ -223,6 +224,55 @@ export const authRoutes: RouteDef[] = [
       // 下发 CSRF cookie（HttpOnly 否，因为前端需读取放入 X-CSRF-Token 头）
       res.headers.set('Set-Cookie', `csrf-token=${csrfToken}; Path=/; SameSite=Lax; Max-Age=7200`);
       return res;
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/auth/demo-login',
+    handle: async (c: Ctx) => {
+      // P0-7 生产 RBAC 收口：DEMO_MODE 下不再由 requireAuth 短路注入 demo/super-admin。
+      // 前端四角色演示 / E2E 自签改用本端点换取真实 HS256 JWT（与 CPOE E2E 自签同密钥同算法）。
+      // 生产环境一律 403：演示登录入口不得在生产开放。
+      if (isProductionEnv()) {
+        return json(fail(ErrorCode.FORBIDDEN, '生产环境禁止演示登录'), 403);
+      }
+      const b = await c.body<{ role?: string }>();
+      const role = String(b.role ?? '').trim();
+      const allowed = ['doctor', 'nurse', 'pharmacist', 'admin'] as const;
+      if (!((allowed as readonly string[]).includes(role))) {
+        return json(
+          fail(ErrorCode.BAD_REQUEST, `role 必须为 ${allowed.join('/')} 之一`),
+          400,
+        );
+      }
+      const nameMap: Record<string, string> = {
+        doctor: '演示医生',
+        nurse: '演示护士',
+        pharmacist: '演示药师',
+        admin: '演示管理员',
+      };
+      const sub = `demo-${role}`;
+      const permissions: string[] =
+        role === 'admin' ? ['*'] : (ROLE_PERMISSIONS[role] ?? []);
+      const accessToken = signJwt(
+        { sub, name: nameMap[role], roles: [role], permissions },
+        7200,
+      );
+      return json(
+        ok({
+          tokens: {
+            accessToken,
+            tokenType: 'Bearer',
+            expiresIn: 7200,
+          },
+          user: {
+            id: sub,
+            name: nameMap[role],
+            roles: [role],
+            permissions,
+          },
+        }),
+      );
     },
   },
   {

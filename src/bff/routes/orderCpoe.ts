@@ -77,6 +77,7 @@ export const orderCpoeRoutes: RouteDef[] = [
         const rawOrders = Array.isArray(b.orders) ? b.orders as Array<Record<string, unknown>> : [];
         return json(ok(createOrderSet({
           visitId: String(b.visitId ?? ''),
+          patientId: b.patientId ? String(b.patientId) : undefined,
           setName: String(b.setName ?? ''),
           orders: rawOrders.map((it) => ({
             orderType: String(it.orderType ?? ''),
