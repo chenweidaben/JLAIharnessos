@@ -121,11 +121,53 @@ describe('P5-10 keys/purge 真实 refs===2', () => {
 
     // purge kNew：应返回 409 + refs===2
     const h = findHandler('POST', '/api/v1/worm/keys/purge');
-    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: kNew } });
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: kNew, confirm: 'PURGE' } });
     const res = await h(c);
     expect(res.status).toBe(409);
     const body = await res.json() as any;
     expect(body.error).toBe('key-in-use');
     expect(body.refs).toBe(2);
+  });
+});
+
+describe('P5-11 purge 二次确认', () => {
+  test('缺 confirm → 400 confirm-required', async () => {
+    const h = findHandler('POST', '/api/v1/worm/keys/purge');
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: 'k-any' } });
+    const res = await h(c);
+    expect(res.status).toBe(400);
+    expect(await res.text()).toContain('confirm-required');
+  });
+
+  test('confirm 小写 → 400 confirm-required', async () => {
+    const h = findHandler('POST', '/api/v1/worm/keys/purge');
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: 'k-any', confirm: 'purge' } });
+    const res = await h(c);
+    expect(res.status).toBe(400);
+    expect(await res.text()).toContain('confirm-required');
+  });
+
+  test('正确 confirm + 零引用 key → 200', async () => {
+    const provider = getKeyProvider();
+    // rotate 两次拿到一个 retired 且零引用的 keyId
+    provider.rotate();
+    const kZero = provider.activeKeyId();
+    provider.rotate();
+    // kZero 不再 active，且没 seal 过任何段 → refs=0
+    const h = findHandler('POST', '/api/v1/worm/keys/purge');
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: kZero, confirm: 'PURGE' } });
+    const res = await h(c);
+    expect(res.status).toBe(200);
+  });
+
+  test('retire 不需要 confirm（只给 keyId）→ 200', async () => {
+    const provider = getKeyProvider();
+    provider.rotate();
+    const kR = provider.activeKeyId();
+    provider.rotate();
+    const h = findHandler('POST', '/api/v1/worm/keys/retire');
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: kR } });
+    const res = await h(c);
+    expect(res.status).toBe(200);
   });
 });

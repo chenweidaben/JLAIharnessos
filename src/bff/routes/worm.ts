@@ -42,18 +42,19 @@ function requireDemo(c: Ctx): Response | null {
 // P5-11：独立运维审计流，落 <WORM_STORE_DIR>/_key-ops.json，不进业务审计链。
 // 绝不记录任何密钥值。
 interface KeyOp { at: string; actorId: string; action: 'retire' | 'purge'; keyId: string; result: string; refs: number | null; }
+type KeyOpInput = Omit<KeyOp, 'at'>;
 function opsPath(): string {
   const dir = process.env.WORM_STORE_DIR || 'logs/worm-store';
   return `${dir}/_key-ops.json`;
 }
-async function logKeyOp(op: KeyOp): Promise<void> {
+async function logKeyOp(op: KeyOpInput): Promise<void> {
   try {
     const fs = await import('node:fs/promises');
     const p = opsPath();
+    const record: KeyOp = { at: new Date().toISOString(), ...op };
     let arr: KeyOp[] = [];
     try { arr = JSON.parse(await fs.readFile(p, 'utf8')); } catch { arr = []; }
-    arr.push(op);
-    // 环形保留最近 1000 条
+    arr.push(record);
     if (arr.length > 1000) arr = arr.slice(arr.length - 1000);
     await fs.writeFile(p, JSON.stringify(arr, null, 2), 'utf8');
   } catch { /* 审计写失败不阻断主流程 */ }

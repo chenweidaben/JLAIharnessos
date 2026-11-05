@@ -558,3 +558,42 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', () => {
     expect(v.valid).toBe(true);
   });
 });
+
+describe('P5-11 FileWormStore 自动检测跨进程写入', () => {
+  test('实例 B 写入后实例 A 不 refresh 也能看到', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-ad-'));
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+    const storeB = new FileWormStore(tmp);
+
+    // B.put 一段，signerKeyId='kX'
+    storeB.put({ segmentId: 'WORM-2026-ad1', seq: 1, prevHash: '0'.repeat(64), hash: 'a'.repeat(64), payloadCid: 'cid-1', signerKeyId: 'kX', signature: 'sig-1', sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z' });
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+
+    // A 不调 refresh()，直接 countBySigner
+    expect(storeA.countBySigner('kX')).toBe(1);
+    expect(storeA.list().length).toBe(storeB.list().length);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  test('连续 put 3 次后 A 的索引与真实一致', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-ad2-'));
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+    const storeB = new FileWormStore(tmp);
+
+    for (let i = 1; i <= 3; i++) {
+      storeB.put({ segmentId: `WORM-2026-ad2${i}`, seq: i, prevHash: '0'.repeat(64), hash: 'a'.repeat(64), payloadCid: `cid-${i}`, signerKeyId: 'kY', signature: `sig-${i}`, sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z' });
+    }
+
+    expect(storeA.countBySigner('kY')).toBe(3);
+    expect(storeA.list().length).toBe(3);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+});
