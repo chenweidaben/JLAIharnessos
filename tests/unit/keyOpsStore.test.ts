@@ -164,6 +164,17 @@ describe('P5-14 keyOpsStore', () => {
     expect(existsSync(oldF)).toBe(false);
   });
 
+  test('INSTANCE_ID 非空、无连续 --、文件名能被清理正则匹配', async () => {
+    const mod = await import('../../src/bff/aggregators/keyOpsStore');
+    const id = mod.__instanceId();
+    expect(id.length).toBeGreaterThan(0);
+    expect(id).not.toMatch(/--/);
+    // 模拟清理正则能识别 _key-ops-<id>-<YYYYMMDD>.jsonl
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const fname = `_key-ops-${id}-${today}.jsonl`;
+    expect(fname).toMatch(/^_key-ops-[^-]+-\d+-[a-z0-9]+-(\d{8})\.jsonl$/);
+  });
+
   test('回归 P5-11b：WORM_STORE_DIR 指向不存在的嵌套路径 → 写一条 → 目录自动创建、读回 1 条', async () => {
     const nested = join(testDir, 'a', 'b', 'c', 'keyops');
     expect(existsSync(nested)).toBe(false);

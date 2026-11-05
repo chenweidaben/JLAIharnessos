@@ -30,7 +30,14 @@ export interface KeyOp {
 export type KeyOpInput = Omit<KeyOp, 'at'>;
 
 // 进程启动时生成一次：hostname-pid-rand6，保证多实例不撞文件
-const INSTANCE_ID = `${hostname().replace(/[^a-zA-Z0-9]/g, '')}-${process.pid}-${Math.random().toString(36).slice(2, 8)}`;
+// 注意：Math.random().toString(36) 在极罕见情况下可能短于 6 字符（甚至空串），
+// 会导致文件名出现连续 "--"，清理正则永远匹配不到、文件永久滞留。
+// 这里兜底到固定长度，保证文件名稳定可解析。
+function randomSuffix(): string {
+  const s = Math.random().toString(36).slice(2, 8);
+  return s.length >= 6 ? s : (s + '000000').slice(0, 6);
+}
+const INSTANCE_ID = `${hostname().replace(/[^a-zA-Z0-9]/g, '')}-${process.pid}-${randomSuffix()}`;
 
 function storeDir(): string {
   return process.env.WORM_STORE_DIR ?? 'logs/worm-store';
@@ -138,7 +145,7 @@ export function resolveRetentionDays(envValue: string | undefined = process.env.
     throw new Error(`KEY_OPS_RETENTION_DAYS=${envValue} 非法：必须是正整数`);
   }
   if (n < 180) {
-    throw new Error(`KEY_OPS_RETENTION_DAYS=${envValue} 低于合规下限 180 天（网络日志留存 6 个月），拒绝启动`);
+    throw new Error(`KEY_OPS_RETENTION_DAYS=${envValue} 低于合规下限 180 天（网络日志留存 6 个月），拒绝执行清理`);
   }
   return Math.floor(n);
 }
