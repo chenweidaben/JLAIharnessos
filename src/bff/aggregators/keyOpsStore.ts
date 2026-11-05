@@ -15,7 +15,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { appendFileSync, existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { join } from 'node:path';
 
@@ -33,7 +33,7 @@ export type KeyOpInput = Omit<KeyOp, 'at'>;
 const INSTANCE_ID = `${hostname().replace(/[^a-zA-Z0-9]/g, '')}-${process.pid}-${Math.random().toString(36).slice(2, 8)}`;
 
 function storeDir(): string {
-  return process.env.WORM_STORE_DIR || 'logs/worm-store';
+  return process.env.WORM_STORE_DIR ?? 'logs/worm-store';
 }
 
 function today(): string {
@@ -147,8 +147,9 @@ export function resolveRetentionDays(envValue: string | undefined = process.env.
  * 从文件名 _key-ops-<instanceId>-<YYYYMMDD>.jsonl 提取 YYYYMMDD。
  * 解析失败返回 NaN（调用方视为不可识别文件，不删）。
  */
+const KEY_OPS_NAME_RE = /^_key-ops-[^-]+-\d+-[a-z0-9]+-(\d{8})\.jsonl$/;
 function extractDateFromName(name: string): number {
-  const m = name.match(/^_key-ops-[^-]+-\d+-[a-z0-9]+-(\d{8})\.jsonl$/);
+  const m = KEY_OPS_NAME_RE.exec(name);
   if (!m) return NaN;
   const ymd = m[1];
   const y = Number(ymd.slice(0, 4));
@@ -196,8 +197,7 @@ export function cleanupOldKeyOps(opts: { dryRun?: boolean; retentionDays?: numbe
     result.files.push(p);
     if (dryRun) continue;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      require('node:fs').unlinkSync(p);
+      unlinkSync(p);
       result.removed++;
     } catch (e) {
       console.warn('[worm-key-ops] 清理旧文件失败:', name, (e as Error).message);

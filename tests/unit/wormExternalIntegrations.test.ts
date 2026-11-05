@@ -7,11 +7,13 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { describe, expect, test } from 'bun:test';
-import { MemoryWormStore, toAsyncStore, type AsyncWormStore } from '../../src/bff/aggregators/wormStore';
+
 import { MockS3Client, S3WormStore } from '../../src/bff/aggregators/s3WormStore';
 import { formatCEF, MockSyslogExporter } from '../../src/bff/aggregators/syslogCefExporter';
+import type { WormSegment } from '../../src/bff/aggregators/wormArchiveAggregator.js';
+import { type AsyncWormStore,MemoryWormStore, toAsyncStore } from '../../src/bff/aggregators/wormStore';
 
-function makeSegment(seq: number, signerKeyId = 'k1'): any {
+function makeSegment(seq: number, signerKeyId = 'k1'): WormSegment {
   return {
     segmentId: `WORM-0001-ab${seq}`,
     seq,
@@ -22,13 +24,13 @@ function makeSegment(seq: number, signerKeyId = 'k1'): any {
     prevSegmentHash: seq > 1 ? `hash-${seq - 1}` : '',
     events: [{ seq, at: '2026-01-01T00:00:00.000Z', patientId: 'P-1', type: 'lab', result: 'ok' }],
     sealedAt: '2026-01-01T00:00:00.000Z',
-  };
+  } as WormSegment;
 }
 
-async function runAsyncContract(makeStore: () => AsyncWormStore) {
+async function runAsyncContract(makeStore: () => { store: AsyncWormStore; s3?: MockS3Client }) {
   const mem = new MemoryWormStore();
   const ref = toAsyncStore(mem);
-  const sut = makeStore();
+  const { store: sut, s3 } = makeStore();
 
   // put → get 回读
   const seg1 = makeSegment(1, 'k1');
@@ -52,32 +54,33 @@ async function runAsyncContract(makeStore: () => AsyncWormStore) {
   // newestSeq
   expect(await sut.newestSeq()).toBe(3);
 
-  // refresh：外部写入后重新拉
-  // 仅对 S3 路径做（MemoryWormStore 没有"外部写入"概念）
-  if (sut instanceof S3WormStore) {
+  // refresh：外部写入后重新拉（仅 S3 路径）
+  if (s3) {
     const extra = makeSegment(9, 'k3');
-    await (sut as any).s3.putObject({
+    await s3.putObject({
       Bucket: 'test-bucket',
-      Key: 'worm/segments/' + extra.segmentId + '.json',
+      Key: `worm/segments/${extra.segmentId}.json`,
       Body: JSON.stringify(extra),
     });
-    // refresh 后能看到外部写入
     await sut.refresh();
     expect(await sut.get(extra.segmentId)).not.toBeNull();
     expect(await sut.countBySigner('k3')).toBe(1);
   }
 
   // duplicate-segment
+  // eslint-disable-next-line @typescript-eslint/await-thenable
   await expect(sut.put(seg1)).rejects.toThrow('duplicate-segment');
 }
 
 describe('P5-15 AsyncWormStore 契约（S3 与 Memory 参照行为一致）', () => {
   test('MemoryWormStore via toAsyncStore 满足契约', async () => {
-    await runAsyncContract(() => toAsyncStore(new MemoryWormStore()));
+    await runAsyncContract(() => ({ store: toAsyncStore(new MemoryWormStore()), s3: undefined }));
   });
 
   test('S3WormStore(MockS3) 满足同一套契约', async () => {
-    await runAsyncContract(() => new S3WormStore(new MockS3Client(), 'test-bucket'));
+    const s3 = new MockS3Client();
+    const store = new S3WormStore(s3, 'test-bucket');
+    await runAsyncContract(() => ({ store, s3 }));
   });
 });
 

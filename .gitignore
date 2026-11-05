@@ -136,3 +136,5 @@ reports/*.csv
 # radar 服务随源码打包的内嵌契约兜底数据（根契约缺失时的回退；Dockerfile COPY app/data 依赖本目录）
 !services/radar-inference/app/data/
 !services/radar-inference/app/data/**
+
+.eslintcache
