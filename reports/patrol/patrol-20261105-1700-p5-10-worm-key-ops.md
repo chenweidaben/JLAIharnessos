@@ -21,7 +21,7 @@
 
 - **retire 后**：旧段仍可验签（公钥保留在环里），新 seal 用下一个未 retired key
 - **purge 受双重约束**：非 active + 无段引用
-- **purge 成功后**：旧段 verify 返 `unknown-key-id`（链断，需运维侧补签或重建）
+- **purge 的适用面**：只允许在「非 active 且零段引用」时执行，因此成功 purge 不会破坏已有链；曾签过段的密钥一律被 409 `key-in-use` 拦住，只能 retire。purge 后该密钥公钥移出验证环，若后续出现用它签名的段（外部写入或索引滞后），验签才会报 `unknown-key-id`
 - **全 retired 时**：seal 返 `worm-no-active-key`（独立错误码，不与未配置混淆）
 
 ## 3. 索引化
