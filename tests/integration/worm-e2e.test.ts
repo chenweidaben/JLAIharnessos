@@ -200,7 +200,12 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     // enabled=false 时 reason='disabled'
     expect(typeof r.data.reason).toBe('string');
   });
-  it('GET /worm/search 跨段检索有结果', async () => {
+  it('GET /worm/search 跨段检索有结果（自造段不依赖冷启动）', async () => {
+    // 先自造一个段，不依赖前序测试状态
+    await call('POST','/api/v1/engagement/reports',{token:admin,body:{
+      patientId:`P-search-${SALT}`, visitId:'V1', type:'lab', title:'search', result:'ok', isAbnormal:false,
+    }});
+    await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     expect(r.httpStatus).toBe(200);
     expect(r.data.total).toBeGreaterThanOrEqual(1);
