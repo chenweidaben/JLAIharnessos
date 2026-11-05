@@ -33,20 +33,23 @@
 - `offset=NaN/负数` → 回退 0
 - `offset` 超出 total → `rows=[]` 且 `total` 仍正确
 
-## 性能实测（200 段 × 50 事件 = 10000 事件，3 段含 TARGET-ACTOR）
-四组独立数字（performance.now()，每组 3 次取中位数）：
+## 性能实测
 
-| 场景 | 前置条件 | 中位数 ms |
+### 真加密段（50 段 × 20 事件 = 1000 事件，3 段含 TARGET-ACTOR，走真实 seal() SM4 加密）
+| 场景 | 前置 | 中位数 ms |
 |---|---|---|
-| A 全扫首次 | 空 LRU、空索引缓存 | **1.23** |
-| B 全扫重复 | LRU 已暖 | 1.08 |
-| C 粗筛首次 | 空 LRU、空索引缓存 | **0.25** |
-| D 粗筛重复 | LRU 已暖 | 0.04 |
+| A 全扫首次 | 空 LRU、空索引缓存 | **113.47** |
+| C 粗筛首次 | 空 LRU、空索引缓存 | **0.36** |
+| D 粗筛重复 | LRU 已暖 | 0.05 |
 
-- 粗筛 vs 全扫降幅：**(1 - 0.25/1.23) = 79.7%** ✓（要求 <30%）
-- **LRU D/C = 14.3% PASS <50%** ✓
-- 根因修复：FileWormStore 加内存索引（构造时扫盘一次、put 自动 append、count/list O(1)），消除了之前每次 list() 读 200 文件目录的 ~97ms 瓶颈
-- candidateSegments=3、decryptedSegments=3、scannedSegments=200、total=150
+- 解密成功率：50/50 = 100%（真 SM4-CBC 密文）
+- 粗筛 vs 全扫降幅：**99.7%**（同时减少读盘与解密段数）
+- **LRU D/C = 13.9% PASS <50%** ✓
+- 粗筛从解密 50 段降到 3 段，这是 113ms → 0.36ms 的主因
+
+### 合成段（200 段 × 50 事件，伪造 cipherBytes）
+- A=1.23ms / C=0.25ms / D=0.04ms，仅用于验证内存索引 O(1) 读盘，非真实解密开销
+- 合成段 cipherBytes 为假 hex，getSegmentEvents 返回 null，不能用于解密性能结论
 
 ## 门禁三元组
 | 项 | 结果 |

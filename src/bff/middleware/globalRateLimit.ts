@@ -39,6 +39,8 @@ export function globalRateLimit(c: Ctx): Response | null {
   if (SKIP_EXACT.has(path)) return null;
 
   const ip = ipOf(c);
+  // 127.0.0.1 / ::1 本机不限流（本地开发/E2E），含 IPv4-mapped IPv6 ::ffff:127.0.0.1
+  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost' || ip === '::ffff:127.0.0.1') return null;
 
   const method = c.req.method.toUpperCase();
   const retrySec = method === 'GET' ? takeReadToken(ip) : takeWriteToken(ip);

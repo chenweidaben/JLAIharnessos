@@ -25,10 +25,19 @@ function sign(roles: string[], name: string, sub: string): string {
 async function call(method: string, path: string, opts: {token?: string; body?: unknown} = {}): Promise<CallResult> {
   const headers: Record<string,string> = {'Content-Type':'application/json'};
   if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`;
-  const res = await fetch(BASE+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
-  const txt = await res.text();
-  let raw:any=null; try{raw=JSON.parse(txt);}catch{raw=null;}
-  return { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt };
+  let last: CallResult = { httpStatus: 0, code: 0, data: null, raw: '' };
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const res = await fetch(BASE+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
+    const txt = await res.text();
+    let raw:any=null; try{raw=JSON.parse(txt);}catch{raw=null;}
+    last = { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt };
+    if (res.status !== 429) return last;
+    // 429：读 Retry-After 头，否则退避 5s
+    const ra = Number(res.headers.get('retry-after'));
+    const waitMs = (Number.isFinite(ra) && ra > 0 ? ra : 5) * 1000;
+    if (attempt < 7) await new Promise((r) => setTimeout(r, waitMs));
+  }
+  return last;
 }
 
 const SALT = Date.now().toString(36) + Math.floor(Math.random()*1000);
@@ -202,10 +211,12 @@ describe('P5-6 自动调度 + 跨段检索', () => {
   });
   it('GET /worm/search 跨段检索有结果（自造段不依赖冷启动）', async () => {
     // 先自造一个段，不依赖前序测试状态
-    await call('POST','/api/v1/engagement/reports',{token:admin,body:{
+    const rep = await call('POST','/api/v1/engagement/reports',{token:admin,body:{
       patientId:`P-search-${SALT}`, visitId:'V1', type:'lab', title:'search', result:'ok', isAbnormal:false,
     }});
-    await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+    expect([200, 201]).toContain(rep.httpStatus);
+    const sealRes = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+    // seal 可能因无新事件返 200 no-events（前序已封过），此时直接搜既有段即可
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     expect(r.httpStatus).toBe(200);
     expect(r.data.total).toBeGreaterThanOrEqual(1);
