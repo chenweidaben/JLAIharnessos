@@ -28,7 +28,7 @@ export interface VerifyOutcome { ok: boolean; reason?: KeyIdReason; }
 export interface PurgeResult { ok: boolean; error?: PurgeError; refs?: number; }
 
 export interface KeyProvider {
-  readonly kind: 'file' | 'demo-ephemeral' | 'memory';
+  readonly kind: 'file' | 'demo-ephemeral' | 'memory' | 'env';
   readonly productionSafe: boolean;
   activeKeyId(): string;
   getSigningKey(): { keyId: string; privateKeyHex: string };
@@ -72,31 +72,17 @@ function kekFromEnv(): string {
 /* -------------------- DemoEphemeral -------------------- */
 
 export class DemoEphemeralKeyProvider implements KeyProvider {
-  kind: 'demo-ephemeral' | 'env' = 'demo-ephemeral';
+  readonly kind = 'demo-ephemeral' as const;
   readonly productionSafe = false;
   private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
-  // P5-9：fail-closed——未注入 checker 时 purge 拒绝，不猜 refs=0
   private keyInUse: ((keyId: string) => number) | null = null;
 
   constructor() {
-    // P5-12：恢复 env 密钥优先语义（P5-8 重构回归）
-    const envPriv = process.env.WORM_SM2_PRIVATE_KEY ?? '';
-    const envPub = process.env.WORM_SM2_PUBLIC_KEY ?? '';
-    if (/^[0-9a-f]{64}$/i.test(envPriv) && /^04[0-9a-f]{128}$/i.test(envPub)) {
-      // 从公钥稳定派生 keyId：'k-' + 公钥第 3-14 位（跨进程一致）
-      const keyId = 'k-' + envPub.slice(2, 14);
-      this.ring = [{ keyId, publicKeyHex: envPub, privateKeyHex: envPriv }];
-      this.activeKey = keyId;
-      this.kind = 'env';
-      console.warn('[worm-key] env-configured SM2 key in use (keyId=' + keyId + ')');
-    } else {
-      const kp = newKeyPair();
-      this.ring = [{ keyId: kp.keyId, publicKeyHex: kp.publicKeyHex, privateKeyHex: kp.privateKeyHex }];
-      this.activeKey = kp.keyId;
-      this.kind = 'demo-ephemeral';
-      console.warn('[worm-key] demo-ephemeral provider in use — NOT FOR PRODUCTION');
-    }
+    const kp = newKeyPair();
+    this.ring = [{ keyId: kp.keyId, publicKeyHex: kp.publicKeyHex, privateKeyHex: kp.privateKeyHex }];
+    this.activeKey = kp.keyId;
+    console.warn('[worm-key] demo-ephemeral provider in use — NOT FOR PRODUCTION');
   }
 
   private byId(keyId: string) { return this.ring.find((r) => r.keyId === keyId); }
@@ -158,6 +144,63 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
 }
 
 /* -------------------- FileKeyProvider -------------------- */
+
+/* -------------------- EnvKeyProvider (P5-12) -------------------- */
+
+/**
+ * 从 env 读 SM2 密钥对，适合生产环境（容器 secret / 启动脚本注入）。
+ * 不配 NOT FOR PRODUCTION 警告；keyId 从公钥稳定派生，跨进程一致。
+ * 只配一半（私钥/公钥缺失）抛明确错误，不静默降级。
+ */
+export class EnvKeyProvider implements KeyProvider {
+  readonly kind = 'env' as const;
+  readonly productionSafe = true;
+  private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
+  private activeKey = '';
+  private keyInUse: ((keyId: string) => number) | null = null;
+
+  constructor() {
+    const priv = process.env.WORM_SM2_PRIVATE_KEY ?? '';
+    const pub = process.env.WORM_SM2_PUBLIC_KEY ?? '';
+    if (!(/^[0-9a-f]{64}$/i.test(priv) && /^04[0-9a-f]{128}$/i.test(pub))) {
+      throw new Error('worm-env-key-invalid: WORM_SM2_PRIVATE_KEY (64 hex) 与 WORM_SM2_PUBLIC_KEY (04+128 hex) 必须同时配置且格式合法');
+    }
+    const keyId = 'k-' + pub.slice(2, 14);
+    this.ring = [{ keyId, publicKeyHex: pub, privateKeyHex: priv }];
+    this.activeKey = keyId;
+  }
+
+  activeKeyId(): string { return this.activeKey; }
+  getSigningKey(): { keyId: string; privateKeyHex: string } {
+    const e = this.ring[0];
+    return { keyId: e.keyId, privateKeyHex: e.privateKeyHex };
+  }
+  getPublicKey(keyId: string): string | null {
+    return this.ring.find((r) => r.keyId === keyId)?.publicKeyHex ?? null;
+  }
+  verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome {
+    const e = this.ring.find((r) => r.keyId === (keyId || this.activeKey));
+    if (!e) return { ok: false, reason: 'unknown-key-id' };
+    try {
+      return sm2.doVerifySignature(digestHex, signatureHex, e.publicKeyHex) ? { ok: true } : { ok: false, reason: 'bad-signature' };
+    } catch { return { ok: false, reason: 'bad-signature' }; }
+  }
+  rotate(): { fromKeyId: string; toKeyId: string } {
+    // env 模式不支持 rotate（密钥来自 env，由 KMS/运维注入）
+    throw new Error('worm-env-rotate-not-supported: env 模式请通过更新 WORM_SM2_PRIVATE_KEY/PUBLIC_KEY 并重启来轮换');
+  }
+  listKeyIds(): string[] { return this.ring.map((r) => r.keyId); }
+  retire(keyId: string): { ok: boolean; error?: string } {
+    const e = this.ring.find((r) => r.keyId === keyId);
+    if (!e) return { ok: false, error: 'unknown-key-id' };
+    e.retired = true;
+    return { ok: true };
+  }
+  purge(keyId: string): PurgeResult {
+    return { ok: false, error: 'cannot-purge-active' };
+  }
+  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+}
 
 export class FileKeyProvider implements KeyProvider {
   readonly kind = 'file' as const;
@@ -285,9 +328,14 @@ let globalProvider: KeyProvider | null = null;
 export function getKeyProvider(): KeyProvider {
   if (globalProvider) return globalProvider;
   const storeDir = process.env.WORM_STORE_DIR || join(process.cwd(), 'logs', 'worm-store');
-  // KEK 独立配置；缺失时一律走 demo-ephemeral（显式 warn），不静默降级
+  // 工厂选择顺序（P5-12）：
+  // 1. WORM_KEY_DIR 配了 → FileKeyProvider（落盘加密私钥）
+  // 2. WORM_SM2_PRIVATE_KEY + WORM_SM2_PUBLIC_KEY 都配且格式合法 → EnvKeyProvider（容器 secret 注入）
+  // 3. 都不配 → DemoEphemeralKeyProvider（每进程临时生成，打 NOT FOR PRODUCTION）
   if (kekFromEnv() && (process.env.NODE_ENV === 'production' || process.env.WORM_FILE_KEY === '1')) {
     globalProvider = new FileKeyProvider(storeDir);
+  } else if (/^[0-9a-f]{64}$/i.test(process.env.WORM_SM2_PRIVATE_KEY ?? '') && /^04[0-9a-f]{128}$/i.test(process.env.WORM_SM2_PUBLIC_KEY ?? '')) {
+    globalProvider = new EnvKeyProvider();
   } else {
     globalProvider = new DemoEphemeralKeyProvider();
   }

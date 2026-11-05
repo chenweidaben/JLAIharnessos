@@ -9,7 +9,7 @@ import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
-  DemoEphemeralKeyProvider, FileKeyProvider, __resetKeyProvider,
+  DemoEphemeralKeyProvider, EnvKeyProvider, FileKeyProvider, __resetKeyProvider,
 } from '../../src/bff/aggregators/wormKeyProvider';
 
 let tmpDir = '';
@@ -227,7 +227,7 @@ describe('P5-9 retire / purge 回收策略', () => {
   });
 });
 
-describe('P5-12 env 密钥优先语义', () => {
+describe('P5-12 EnvKeyProvider', () => {
   const ORIG_PRIV = process.env.WORM_SM2_PRIVATE_KEY;
   const ORIG_PUB = process.env.WORM_SM2_PUBLIC_KEY;
   afterAll(() => {
@@ -235,31 +235,32 @@ describe('P5-12 env 密钥优先语义', () => {
     if (ORIG_PUB === undefined) delete process.env.WORM_SM2_PUBLIC_KEY; else process.env.WORM_SM2_PUBLIC_KEY = ORIG_PUB;
   });
 
-  test('配 env → keySource=env，两次构造 signerKeyId 相同', () => {
-    const priv = 'a'.repeat(64);
-    const pub = '04' + 'b'.repeat(128);
-    process.env.WORM_SM2_PRIVATE_KEY = priv;
-    process.env.WORM_SM2_PUBLIC_KEY = pub;
-    const p1 = new DemoEphemeralKeyProvider();
-    const p2 = new DemoEphemeralKeyProvider();
+  test('kind=env, productionSafe=true, signerKeyId 跨实例一致', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    process.env.WORM_SM2_PUBLIC_KEY = '04' + 'b'.repeat(128);
+    const p1 = new EnvKeyProvider();
+    const p2 = new EnvKeyProvider();
     expect(p1.kind).toBe('env');
-    expect(p2.kind).toBe('env');
+    expect(p1.productionSafe).toBe(true);
     expect(p1.activeKeyId()).toBe(p2.activeKeyId());
-    expect(p1.activeKeyId()).toBe('k-' + pub.slice(2, 14));
+    expect(p1.activeKeyId()).toBe('k-' + 'b'.repeat(12));
   });
 
-  test('配 env → 新实例 getPublicKey 跨进程一致', () => {
-    const priv = 'a'.repeat(64);
-    const pub = '04' + 'b'.repeat(128);
-    process.env.WORM_SM2_PRIVATE_KEY = priv;
-    process.env.WORM_SM2_PUBLIC_KEY = pub;
-    const p1 = new DemoEphemeralKeyProvider();
-    const p2 = new DemoEphemeralKeyProvider();
-    expect(p1.getPublicKey(p1.activeKeyId())).toBe(pub);
-    expect(p2.getPublicKey(p1.activeKeyId())).toBe(pub);
+  test('另一实例 getPublicKey 能取到', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    process.env.WORM_SM2_PUBLIC_KEY = '04' + 'b'.repeat(128);
+    const p1 = new EnvKeyProvider();
+    const p2 = new EnvKeyProvider();
+    expect(p2.getPublicKey(p1.activeKeyId())).toBe('04' + 'b'.repeat(128));
   });
 
-  test('不配 env → keySource=demo-ephemeral，两次构造 signerKeyId 不同', () => {
+  test('只配私钥不配公钥 → 抛明确错误', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    delete process.env.WORM_SM2_PUBLIC_KEY;
+    expect(() => new EnvKeyProvider()).toThrow(/worm-env-key-invalid/);
+  });
+
+  test('不配 env → DemoEphemeralKeyProvider 仍每进程随机', () => {
     delete process.env.WORM_SM2_PRIVATE_KEY;
     delete process.env.WORM_SM2_PUBLIC_KEY;
     const p1 = new DemoEphemeralKeyProvider();
