@@ -13,6 +13,21 @@ import {
 } from '../../src/bff/aggregators/wormKeyProvider';
 
 let tmpDir = '';
+// 关键：本文件会临时改写进程环境（WORM_KEK / NODE_ENV / DEMO_MODE / WORM_FILE_KEY）。
+// 必须先存原值、afterAll 精确还原——否则后续加载的 wormArchiveAggregator
+// 在 initKeys() 时读不到 DEMO_MODE=1，SM4/SM2 被置空，seal 全返回 key-not-configured。
+const ORIGINAL_ENV: Record<string, string | undefined> = {
+  WORM_KEK: process.env.WORM_KEK,
+  NODE_ENV: process.env.NODE_ENV,
+  DEMO_MODE: process.env.DEMO_MODE,
+  WORM_FILE_KEY: process.env.WORM_FILE_KEY,
+  WORM_SM4_KEY: process.env.WORM_SM4_KEY,
+};
+function restoreEnv(key: string): void {
+  const v = ORIGINAL_ENV[key];
+  if (v === undefined) delete process.env[key];
+  else process.env[key] = v;
+}
 beforeEach(() => {
   tmpDir = mkdtempSync(join(tmpdir(), 'worm-key-'));
   process.env.WORM_KEK = 'a'.repeat(32);
@@ -22,6 +37,7 @@ beforeEach(() => {
 });
 afterAll(() => {
   if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
+  for (const k of Object.keys(ORIGINAL_ENV)) restoreEnv(k);
   __resetKeyProvider(null);
 });
 

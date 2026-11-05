@@ -3,7 +3,8 @@
  *
  * - DemoEphemeralKeyProvider：进程内生成，productionSafe=false，显式 warn
  * - FileKeyProvider：密钥环持久化到 <WORM_STORE_DIR>/_keys.json，
- *   私钥用 SM4-CBC 加密落盘（KEK=WORM_KEK 或回落 WORM_SM4_KEY），绝不明文
+ *   私钥用 SM4-CBC 加密落盘（KEK 只认 WORM_KEK，缺失即拒绝构造，绝不回落
+ *   内容密钥 WORM_SM4_KEY），绝不明文
  * - 按段 signerKeyId 选公钥验签，未知 keyId → unknown-key-id（与篡改区分）
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
