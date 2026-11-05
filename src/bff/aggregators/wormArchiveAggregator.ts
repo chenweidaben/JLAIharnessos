@@ -13,6 +13,7 @@ import {
   queryEvents, verifyChain, type AuditEvent,
 } from './auditEventAggregator.js';
 import { getWormStore, isValidSegmentId, type WormStore } from './wormStore.js';
+import { getKeyProvider } from './wormKeyProvider.js';
 
 // sm-crypto 真国密
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -183,15 +184,13 @@ function sm4Decrypt(cipherHex: string, ivHex: string): string {
   return sm4.decrypt(cipherHex, sm4KeyHex, { mode: 'cbc', iv: ivHex });
 }
 
-function sm2Sign(digestHex: string): string {
-  return sm2.doSignature(digestHex, sm2PrivateKeyHex);
+function sm2Sign(digestHex: string): { signature: string; keyId: string } {
+  const { keyId, privateKeyHex } = getKeyProvider().getSigningKey();
+  return { signature: sm2.doSignature(digestHex, privateKeyHex), keyId };
 }
 export function sm2Verify(digestHex: string, signatureHex: string): boolean {
-  try {
-    return sm2.doVerifySignature(digestHex, signatureHex, sm2PublicKeyHex);
-  } catch {
-    return false;
-  }
+  // 兼容旧调用：不传 keyId 时用 active key 验
+  return getKeyProvider().verify(digestHex, signatureHex).ok;
 }
 
 /* ------------------------------ 密钥状态查询 ------------------------------ */
@@ -240,7 +239,7 @@ export function seal(input: SealInput = {}): SealResult {
   const segmentHash = computeSegmentHash(prevSegmentHash, sourceChainHead, body);
   const digestSm3 = computeDigestSm3(prevSegmentHash, sourceChainHead, body);
   const { cipherHex, ivHex } = sm4Encrypt(body);
-  const sm2Signature = sm2Sign(digestSm3);
+  const { signature: sm2Signature, keyId: sealKeyId } = sm2Sign(digestSm3);
   const now = new Date().toISOString();
   // put 成功后才推进计数器，避免写失败留下 seq 空洞
   const nextSeq = segmentCounter + 1;
@@ -254,7 +253,7 @@ export function seal(input: SealInput = {}): SealResult {
     sealedAt: now, bytes: Buffer.byteLength(body, 'utf8'),
     digestAlg: 'SM3', digestSm3,
     sm4Encrypted: true, iv: ivHex, cipherBytes: cipherHex,
-    sm2Signature, signerKeyId, keySource: sm2KeySource,
+    sm2Signature, signerKeyId: sealKeyId, keySource: sm2KeySource,
   };
   store().put(rec);
   segmentCounter = nextSeq;
@@ -370,7 +369,7 @@ export interface VerifyResult {
   segments: SegmentCheck[];
 }
 
-function checkSeg(seg: SegmentRecord): { digestValid: boolean; signatureValid: boolean; body?: string } {
+function checkSeg(seg: SegmentRecord): { digestValid: boolean; signatureValid: boolean; body?: string; sigReason?: 'unknown-key-id' | 'bad-signature' } {
   const evts = decryptEvents(seg);
   if (!evts) return { digestValid: false, signatureValid: false };
   const body = serializeEvents(evts);
@@ -378,8 +377,9 @@ function checkSeg(seg: SegmentRecord): { digestValid: boolean; signatureValid: b
   if (recomputedHash !== seg.segmentHash) return { digestValid: false, signatureValid: false, body };
   const recomputedSm3 = computeDigestSm3(seg.prevSegmentHash, seg.sourceChainHead, body);
   const digestValid = recomputedSm3 === seg.digestSm3;
-  const signatureValid = sm2Verify(seg.digestSm3, seg.sm2Signature);
-  return { digestValid, signatureValid, body };
+  // P5-8：按段 signerKeyId 选公钥验签，未知 keyId 与签名不符明确区分
+  const v = getKeyProvider().verify(seg.digestSm3, seg.sm2Signature, seg.signerKeyId);
+  return { digestValid, signatureValid: v.ok, body, sigReason: v.ok ? undefined : v.reason };
 }
 
 function verifyReal(): {
@@ -401,12 +401,12 @@ function verifyReal(): {
     const c = checkSeg(seg);
     if (!c.digestValid || !c.signatureValid) {
       checks.push({ segmentId: seg.segmentId, digestValid: c.digestValid, signatureValid: c.signatureValid });
-      // 密钥不一致 ≠ 被篡改：demo-ephemeral 每进程重生成 SM2 密钥，重启后老段必然验签失败。
-      // 两种情形必须分开报，否则巡检会把"换了密钥"误判成"归档被篡改"。
-      const keyMismatch = !c.signatureValid && seg.signerKeyId !== signerKeyId;
-      const reason = keyMismatch
-        ? `签名密钥与当前进程不一致：该段由 ${seg.signerKeyId} 签发，当前 ${signerKeyId}（keySource=${sm2KeySource}）。不是篡改；固定 WORM_SM2_PRIVATE_KEY/WORM_SM2_PUBLIC_KEY 后老段方可继续验证`
-        : '段 SM3 摘要或 SM2 签名校验失败';
+      // P5-8：未知 keyId（密钥环里没有该公钥）与签名不符（疑似篡改）明确区分
+      const reason = c.sigReason === 'unknown-key-id'
+        ? `未知签名密钥：段由 ${seg.signerKeyId} 签发，密钥环中无此公钥（unknown-key-id）`
+        : c.sigReason === 'bad-signature'
+          ? `段 SM2 签名校验失败：段由 ${seg.signerKeyId} 签发（bad-signature，疑似篡改）`
+          : `段 SM3 摘要或 SM2 签名校验失败`;
       return { ok: false, brokenSegmentId: seg.segmentId, reason, segmentChecks: checks, digestValid: c.digestValid, signatureValid: c.signatureValid, seqContinuity: continuity };
     }
     if (c.body) {
