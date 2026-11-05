@@ -17,6 +17,7 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { AuditEvent } from './auditEventAggregator.js';
 import { getSegmentEvents, seal, queryAuditEventsCount } from './wormArchiveAggregator.js';
 import { getWormStore, FileWormStore } from './wormStore.js';
@@ -79,26 +80,111 @@ export interface TickResult {
   segmentId?: string;
 }
 
+export interface TickHistoryEntry {
+  at: string;
+  sealed: boolean;
+  reason?: string;
+  pendingBefore: number;
+  segmentsBefore: number;
+  segmentsAfter: number;
+  intervalDue: boolean;
+  thresholdDue: boolean;
+  durationMs: number;
+}
+
+const HISTORY_MAX = 1000;
+const tickHistory: TickHistoryEntry[] = [];
+
+export function __resetTickHistory(): void { tickHistory.length = 0; }
+
+function historyFilePath(): string {
+  const store = getWormStore();
+  const dir = store instanceof FileWormStore ? store.dir : path.join('logs', 'worm-store');
+  mkdirSync(dir, { recursive: true });
+  return path.join(dir, '_history.json');
+}
+
+function loadHistoryDisk(): void {
+  const p = historyFilePath();
+  if (!existsSync(p)) return;
+  try {
+    const arr = JSON.parse(readFileSync(p, 'utf8')) as TickHistoryEntry[];
+    tickHistory.length = 0;
+    tickHistory.push(...arr);
+  } catch { /* 忽略损坏 */ }
+}
+
+function appendHistory(entry: TickHistoryEntry): void {
+  loadHistoryDisk();
+  tickHistory.push(entry);
+  while (tickHistory.length > HISTORY_MAX) tickHistory.shift();
+  writeFileSync(historyFilePath(), JSON.stringify(tickHistory, null, 2), 'utf8');
+}
+
+export function listTickHistory(limit = 50, offset = 0): { rows: TickHistoryEntry[]; total: number } {
+  loadHistoryDisk();
+  // 倒序：最新在前
+  const arr = tickHistory.slice().reverse();
+  const total = arr.length;
+  const lim = Math.min(Math.max(Math.floor(limit) || 50, 1), 500);
+  const off = Math.max(Math.floor(offset) || 0, 0);
+  return { rows: arr.slice(off, off + lim), total };
+}
+
 export function tick(): TickResult {
   const cfg = getAutoConfig();
-  if (!cfg.enabled) return { sealed: false, reason: 'disabled' };
-  const pending = queryAuditEventsCount();
-  if (pending === 0) return { sealed: false, reason: 'no-events' };
-  const now = Date.now();
-  if (cfg.lastSealAt) {
-    // 语义：距上次 seal 超 intervalMs「或」待归档事件数 ≥ threshold，二者任一成立即封段。
-    // 不能先判「间隔未到且未到阈值」再单独用阈值拦截，否则时间窗永远无法在低事件量时触发。
-    const elapsed = now - new Date(cfg.lastSealAt).getTime();
-    const intervalDue = Number.isFinite(elapsed) && elapsed >= cfg.intervalMs;
-    const thresholdDue = pending >= cfg.threshold;
-    if (!intervalDue && !thresholdDue) {
-      return { sealed: false, reason: 'below-threshold' };
+  const t0 = performance.now();
+  const store = getWormStore();
+  const segmentsBefore = store.count();
+  let sealed = false;
+  let reason: TickResult['reason'] | undefined;
+  let segmentId: string | undefined;
+  let pendingBefore = 0;
+  let intervalDue = false;
+  let thresholdDue = false;
+
+  if (!cfg.enabled) {
+    reason = 'disabled';
+  } else {
+    pendingBefore = queryAuditEventsCount();
+    if (pendingBefore === 0) {
+      reason = 'no-events';
+    } else {
+      const now = Date.now();
+      if (cfg.lastSealAt) {
+        const elapsed = now - new Date(cfg.lastSealAt).getTime();
+        intervalDue = Number.isFinite(elapsed) && elapsed >= cfg.intervalMs;
+      } else {
+        intervalDue = true;
+      }
+      thresholdDue = pendingBefore >= cfg.threshold;
+      if (!intervalDue && !thresholdDue) {
+        reason = 'below-threshold';
+      } else {
+        const r = seal({});
+        if (!r.ok) {
+          reason = 'no-events';
+        } else {
+          sealed = true;
+          segmentId = r.segment!.segmentId;
+          setAutoConfig({ lastSealAt: new Date().toISOString() });
+        }
+      }
     }
   }
-  const r = seal({});
-  if (!r.ok) return { sealed: false, reason: 'no-events' };
-  setAutoConfig({ lastSealAt: new Date().toISOString() });
-  return { sealed: true, segmentId: r.segment!.segmentId };
+
+  const durationMs = Number((performance.now() - t0).toFixed(2));
+  const segmentsAfter = store.count();
+  appendHistory({
+    at: new Date().toISOString(),
+    sealed, reason, pendingBefore, segmentsBefore, segmentsAfter,
+    intervalDue, thresholdDue, durationMs,
+  });
+
+  const out: TickResult = { sealed };
+  if (reason) out.reason = reason;
+  if (segmentId) out.segmentId = segmentId;
+  return out;
 }
 
 /* ------------------------------ 检索索引 ------------------------------ */
@@ -120,12 +206,14 @@ function indexFilePath(): string {
   return path.join(dir, '_index.json');
 }
 
+let indexCache: SegmentIndexEntry[] = [];
+
 export function rebuildIndex(): SegmentIndexEntry[] {
   const store = getWormStore();
   const segs = store.list();
   const entries: SegmentIndexEntry[] = [];
   for (const s of segs) {
-    const evts = getSegmentEvents(s.segmentId) ?? [];
+    const evts = getDecrypted(s.segmentId) ?? [];
     entries.push({
       segmentId: s.segmentId,
       actorIds: Array.from(new Set(evts.map((e) => e.actorId))),
@@ -137,16 +225,26 @@ export function rebuildIndex(): SegmentIndexEntry[] {
     });
   }
   writeFileSync(indexFilePath(), JSON.stringify(entries, null, 2), 'utf8');
+  indexCache = entries;
   return entries;
 }
 
+export function __resetIndexCache(): void { indexCache = []; }
+
 export function loadIndex(): SegmentIndexEntry[] {
+  // 内存索引缓存：避免每次 search 都读 _index.json
+  if (indexCache.length > 0) return indexCache;
   const p = indexFilePath();
-  if (!existsSync(p)) return rebuildIndex();
+  if (!existsSync(p)) {
+    indexCache = rebuildIndex();
+    return indexCache;
+  }
   try {
-    return JSON.parse(readFileSync(p, 'utf8')) as SegmentIndexEntry[];
+    indexCache = JSON.parse(readFileSync(p, 'utf8')) as SegmentIndexEntry[];
+    return indexCache;
   } catch {
-    return rebuildIndex();
+    indexCache = rebuildIndex();
+    return indexCache;
   }
 }
 
@@ -168,14 +266,40 @@ export interface SearchResult {
   total: number;
   scannedSegments: number;
   indexHit: boolean;
+  candidateSegments: number;
+  decryptedSegments: number;
+}
+
+// LRU：解密后的段事件按 segmentId 缓存（容量 32）
+const DECRYPT_CAP = 32;
+const decryptCache = new Map<string, AuditEvent[]>();
+
+export function __resetDecryptCache(): void { decryptCache.clear(); }
+
+function getDecrypted(segmentId: string): AuditEvent[] | null {
+  const hit = decryptCache.get(segmentId);
+  if (hit) {
+    // LRU：命中后移到末尾
+    decryptCache.delete(segmentId);
+    decryptCache.set(segmentId, hit);
+    return hit;
+  }
+  const evts = getSegmentEvents(segmentId);
+  if (!evts) return null;
+  decryptCache.set(segmentId, evts);
+  while (decryptCache.size > DECRYPT_CAP) {
+    const first = decryptCache.keys().next().value;
+    if (first === undefined) break;
+    decryptCache.delete(first);
+  }
+  return evts;
 }
 
 export function search(q: SearchQuery): SearchResult {
   let index = loadIndex();
-  // 索引与磁盘段数不一致 → 重建（seal 后未写索引）
   const store = getWormStore();
+  // 索引与磁盘段数不一致 → 重建（seal 后未写索引）
   if (index.length !== store.count()) index = rebuildIndex();
-  // 先用索引缩小候选段
   let candidates = index;
   let indexHit = false;
   if (q.actorId || q.patientId || q.action || q.module || q.from || q.to) {
@@ -190,11 +314,13 @@ export function search(q: SearchQuery): SearchResult {
       return true;
     });
   }
-  const scannedSegments = candidates.length;
-  // 解密候选段逐事件过滤
+  const scannedSegments = index.length;
+  const candidateSegments = candidates.length;
+  let decryptedSegments = 0;
   const all: AuditEvent[] = [];
   for (const c of candidates) {
-    const evts = getSegmentEvents(c.segmentId) ?? [];
+    const evts = getDecrypted(c.segmentId) ?? [];
+    decryptedSegments += 1;
     for (const e of evts) {
       if (q.actorId && e.actorId !== q.actorId) continue;
       if (q.patientId && e.patientId !== q.patientId) continue;
@@ -206,7 +332,6 @@ export function search(q: SearchQuery): SearchResult {
     }
   }
   all.sort((a, b) => a.seq - b.seq);
-  // 分页参数防御：?limit=abc / 负数 / 0 不得静默返回空页
   const MAX_LIMIT = 500;
   const limitRaw = typeof q.limit === 'number' ? q.limit : 50;
   const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? Math.min(Math.floor(limitRaw), MAX_LIMIT) : 50;
@@ -217,5 +342,7 @@ export function search(q: SearchQuery): SearchResult {
     total: all.length,
     scannedSegments,
     indexHit,
+    candidateSegments,
+    decryptedSegments,
   };
 }

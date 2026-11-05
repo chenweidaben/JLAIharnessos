@@ -13,7 +13,7 @@ import {
   seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
 import { FileWormStore, __resetWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
-import { getAutoConfig, search, setAutoConfig, tick } from '../../src/bff/aggregators/wormAuto';
+import { getAutoConfig, listTickHistory, rebuildIndex, search, setAutoConfig, tick, __resetDecryptCache, __resetIndexCache, __resetTickHistory } from '../../src/bff/aggregators/wormAuto';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
 
@@ -320,6 +320,8 @@ describe('P5-5 fs 后端重启后计数器回填', () => {
 
 describe('P5-6 自动调度 + 检索', () => {
   beforeEach(() => {
+    __resetDecryptCache();
+    __resetIndexCache();
     // 清理 _auto.json，避免上一个用例的 enabled:true 污染下一个
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -400,5 +402,89 @@ describe('P5-6 自动调度 + 检索', () => {
     }
     const capped = search({ limit: 100000 });
     expect(capped.rows.length).toBeLessThanOrEqual(500);
+  });
+});
+
+describe('P5-7 tick 落审计 + 检索性能', () => {
+  beforeEach(() => {
+    __resetDecryptCache();
+    __resetIndexCache();
+    __resetTickHistory();
+    try {
+      const fs = require('node:fs') as typeof import('node:fs');
+      const path = require('node:path') as typeof import('node:path');
+      const dir = process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store');
+      for (const f of ['_auto.json', '_history.json', '_index.json']) {
+        const p = path.join(dir, f);
+        if (fs.existsSync(p)) fs.unlinkSync(p);
+      }
+    } catch { /* 忽略 */ }
+  });
+
+  test('tick 5 次 → history total=5，8 字段齐全、at 递增', () => {
+    setAutoConfig({ enabled: false });
+    for (let i = 0; i < 5; i++) tick();
+    const h = listTickHistory(50, 0);
+    expect(h.total).toBe(5);
+    // 倒序：rows[0] 是最新
+    for (const row of h.rows) {
+      expect(row).toHaveProperty('at');
+      expect(row).toHaveProperty('sealed');
+      expect(row).toHaveProperty('reason');
+      expect(row).toHaveProperty('pendingBefore');
+      expect(row).toHaveProperty('segmentsBefore');
+      expect(row).toHaveProperty('segmentsAfter');
+      expect(row).toHaveProperty('intervalDue');
+      expect(row).toHaveProperty('thresholdDue');
+      expect(row).toHaveProperty('durationMs');
+    }
+    // at 倒序递增（最新在前 → 时间递减）
+    for (let i = 1; i < h.rows.length; i++) {
+      expect(h.rows[i - 1].at >= h.rows[i].at).toBe(true);
+    }
+  });
+
+  test('不自激：tick 5 次后段数不变', () => {
+    setAutoConfig({ enabled: false });
+    const before = listSegments(100, 0).total;
+    for (let i = 0; i < 5; i++) tick();
+    const after = listSegments(100, 0).total;
+    expect(after).toBe(before);
+  });
+
+  test('不自激：seal 1 次后立刻再 seal 第二次 → no-events', () => {
+    seedN(3);
+    const r1 = seal({});
+    expect(r1.ok).toBe(true);
+    const count1 = listSegments(100, 0).total;
+    const r2 = seal({});
+    expect(r2.ok).toBe(false);
+    expect(r2.error).toBe('no-events');
+    const count2 = listSegments(100, 0).total;
+    expect(count2).toBe(count1);
+  });
+
+  test('search 返回 candidateSegments/decryptedSegments 字段', () => {
+    seedN(3); seal({});
+    const r = search({ limit: 50 });
+    expect(typeof r.candidateSegments).toBe('number');
+    expect(typeof r.decryptedSegments).toBe('number');
+    expect(r.scannedSegments).toBeGreaterThanOrEqual(1);
+  });
+
+  test('offset 超出 total → rows=[] 且 total 正确', () => {
+    seedN(3); seal({});
+    const r = search({ limit: 50, offset: 99999 });
+    expect(r.rows.length).toBe(0);
+    expect(r.total).toBeGreaterThanOrEqual(3);
+  });
+
+  test('limit=abc 回退 50；offset=-5 回退 0', () => {
+    seedN(3); seal({});
+    // 路由层传 number，这里直接传 NaN 模拟
+    const r1 = search({ limit: Number.NaN });
+    expect(r1.rows.length).toBeGreaterThan(0);
+    const r2 = search({ offset: -5 });
+    expect(r2.rows.length).toBeGreaterThan(0);
   });
 });

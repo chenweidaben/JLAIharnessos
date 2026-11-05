@@ -102,7 +102,7 @@ export function __counters(): { segmentCounter: number; lastArchivedSeq: number 
 /** P5-6：待归档事件数（pending = seq > lastArchivedSeq） */
 export function queryAuditEventsCount(): number {
   const all = queryEvents({ limit: 5000, offset: 0 }).rows;
-  return all.filter((e) => e.seq > lastArchivedSeq).length;
+  return all.filter((e) => e.seq > lastArchivedSeq && !e.excludeFromArchive).length;
 }
 
 /* ------------------------------ 密钥准备（真国密） ------------------------------ */
@@ -219,7 +219,8 @@ export function seal(input: SealInput = {}): SealResult {
   hydrateCountersFromStore();
 
   const all = queryEvents({ limit: 5000, offset: 0 }).rows.slice().sort((a, b) => a.seq - b.seq);
-  let pending = all.filter((e) => e.seq > lastArchivedSeq);
+  // P5-7：excludeFromArchive 标记的系统事件不进入待归档池（防 tick/seal 自激）
+  let pending = all.filter((e) => e.seq > lastArchivedSeq && !e.excludeFromArchive);
   if (input.from) pending = pending.filter((e) => e.occurredAt >= (input.from as string));
   if (input.to) pending = pending.filter((e) => e.occurredAt <= (input.to as string));
   if (pending.length === 0) return { ok: false, error: 'no-events' };

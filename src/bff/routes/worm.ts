@@ -22,7 +22,7 @@ import {
   resetProbes, seal, segmentToCsv, sm2Verify, storeInfo, tamperProbeDigest,
   tamperProbeSignature, verify, __getCipherHex,
 } from '../aggregators/wormArchiveAggregator.js';
-import { getAutoConfig, search, setAutoConfig, tick } from '../aggregators/wormAuto.js';
+import { getAutoConfig, listTickHistory, search, setAutoConfig, tick } from '../aggregators/wormAuto.js';
 import { isValidSegmentId } from '../aggregators/wormStore.js';
 
 function requireAdmin(c: Ctx): Response | null {
@@ -251,6 +251,18 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       return json(ok(tick()));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/auto/history',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const u = new URL(c.req.url).searchParams;
+      const limit = Number(u.get('limit')) || 50;
+      const offset = Number(u.get('offset')) || 0;
+      return json(ok(listTickHistory(limit, offset)));
     },
   },
 ];

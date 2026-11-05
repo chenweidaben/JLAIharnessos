@@ -39,6 +39,8 @@ export interface AuditEvent {
   userAgent: string;
   prevHash: string;
   hash: string;
+  /** P5-7：标记为系统/调度事件，不进入 WORM 待归档池（仅内存标记，不参与哈希） */
+  excludeFromArchive?: boolean;
 }
 
 const events: AuditEvent[] = [];
