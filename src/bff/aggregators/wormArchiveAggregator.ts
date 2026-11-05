@@ -153,6 +153,15 @@ function initKeys(): void {
 }
 initKeys();
 
+// P5-9：把"该 keyId 是否仍被段引用"的检查注册给 KeyProvider，
+// 让 purge() 能在仍有段引用时拒绝（key-in-use）。
+// 每次取 provider 时确保 checker 已挂上（单测可能换 provider 实例）。
+function ensureKeyInUseChecker(): void {
+  const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
+  if (typeof p.setKeyInUseChecker !== 'function') return;
+  p.setKeyInUseChecker((keyId: string) => store().list().filter((s) => s.signerKeyId === keyId).length);
+}
+
 /* ------------------------------ 密码学原语 ------------------------------ */
 
 function sha256(s: string): string {
@@ -197,6 +206,7 @@ export function sm2Verify(digestHex: string, signatureHex: string): boolean {
 
 export function keyStatus(): { keySource: string; signerKeyId: string; publicKeyHex: string; sm4Configured: boolean } {
   // P5-8：从 provider 读 active keyId（rotate 后同步）
+  ensureKeyInUseChecker();
   const p = getKeyProvider();
   const signing = p.getSigningKey();
   return {
