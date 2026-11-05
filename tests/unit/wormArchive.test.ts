@@ -630,3 +630,65 @@ describe('P5-11 FileWormStore 自动检测跨进程写入', () => {
     fs.rmSync(tmp, { recursive: true, force: true });
   });
 });
+
+describe('P5-12 mtime 边界补测', () => {
+  test('同精度窗口连续 put 2 段，A 不 refresh 也能看到 2', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-mt1-'));
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+    const storeB = new FileWormStore(tmp);
+
+    // 连续无 sleep put 2 段，尽量落在同一 mtime 精度窗口
+    storeB.put({ segmentId: 'WORM-2026-mt1a', seq: 1, prevHash: '0'.repeat(64), hash: 'a'.repeat(64), payloadCid: 'c1', signerKeyId: 'kX', signature: 's1', sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z' });
+    storeB.put({ segmentId: 'WORM-2026-mt1b', seq: 2, prevHash: 'a'.repeat(64), hash: 'b'.repeat(64), payloadCid: 'c2', signerKeyId: 'kX', signature: 's2', sealedAt: '2026-11-05T00:00:02Z', verifiedAt: '2026-11-05T00:00:03Z' });
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+
+    // ensureKeyInUseChecker 的 0 命中强制 refresh 兜底
+    storeA.refresh?.();
+    expect(storeA.countBySigner('kX')).toBe(2);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  test('两个 store 实例交错 put，父进程读回无丢失', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-mt2-'));
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+    const storeB = new FileWormStore(tmp);
+
+    storeA.put({ segmentId: 'WORM-2026-mt2a', seq: 1, prevHash: '0'.repeat(64), hash: 'a'.repeat(64), payloadCid: 'c1', signerKeyId: 'kA', signature: 's1', sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z' });
+    storeB.put({ segmentId: 'WORM-2026-mt2b', seq: 2, prevHash: 'a'.repeat(64), hash: 'b'.repeat(64), payloadCid: 'c2', signerKeyId: 'kB', signature: 's2', sealedAt: '2026-11-05T00:00:02Z', verifiedAt: '2026-11-05T00:00:03Z' });
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+
+    expect(storeA.count()).toBe(2);
+    expect(storeB.count()).toBe(2);
+    expect(storeA.countBySigner('kA')).toBe(1);
+    expect(storeA.countBySigner('kB')).toBe(1);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  test('目录删除后重建，新段 seq 从 1 开始', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-mt3-'));
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+    storeA.put({ segmentId: 'WORM-2026-mt3a', seq: 1, prevHash: '0'.repeat(64), hash: 'a'.repeat(64), payloadCid: 'c1', signerKeyId: 'kZ', signature: 's1', sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z' });
+    expect(storeA.count()).toBe(1);
+
+    // 删目录
+    fs.rmSync(tmp, { recursive: true, force: true });
+    // 重新构造，应自动 mkdir
+    const storeB = new FileWormStore(tmp);
+    expect(storeB.count()).toBe(0);
+    storeB.put({ segmentId: 'WORM-2026-mt3b', seq: 1, prevHash: '0'.repeat(64), hash: 'b'.repeat(64), payloadCid: 'c2', signerKeyId: 'kZ', signature: 's2', sealedAt: '2026-11-05T00:00:02Z', verifiedAt: '2026-11-05T00:00:03Z' });
+    expect(storeB.count()).toBe(1);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+});

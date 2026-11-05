@@ -92,3 +92,26 @@ purge(keyId): { ok, error?, refs? }
 - demo-ephemeral：每进程启动重新生成密钥，**跨进程旧段会 `unknown-key-id`**；无持久化；**不可用于生产**。
 - FileKeyProvider：私钥加密落盘，跨进程一致，适合单机/小规模生产。
 - KmsKeyProvider：私钥不出 KMS，适合多实例/合规生产。
+
+## P5-12：索引一致性边界
+
+`FileWormStore` 的内存索引（`segments` / `byId` / `bySigner`）是**最终一致**，不是强一致。
+
+### 检测机制
+- 读路径（`list()` / `count()` / `countBySigner()`）入口调 `autoDetect()`：`statSync(dir)` 比 `mtimeMs`，O(微秒)。
+- mtime 变化时才 `readdirSync` 计数；文件数不一致才 `refresh()`（全量重建）。
+- 双保险：mtime 精度窗口（NTFS 约 1ms）内多次写入可能漏检，由文件数比对兜底。
+
+### 已知边界
+- **mtime 精度窗口内连续写入**：若两次写入落在同一 `mtimeMs` 粒度内，且文件数也恰好没变（不太可能但理论上），`autoDetect()` 会漏检。此时 `countBySigner()` 可能短暂滞后。
+- **purge 判定是 fail-closed**：`ensureKeyInUseChecker` 在索引命中 0 时会先强制 `refresh()` 再回退 `list().filter()` 真实扫描。宁可多扫一次，不会误删。
+- **直接 `countBySigner()` 查询**在极端窗口内可能短暂滞后，不用于安全判定，只用于统计展示。
+
+### 何时需要显式 `refresh()`
+- 运维通过外部工具直接操作 `WORM_STORE_DIR` 后。
+- 多进程写入密集、且需要立即读到最新索引时。
+- 怀疑索引与磁盘不一致时（调用一次 `store.refresh()`）。
+
+### 结论
+- purge / retire 的引用判定**不会误删**（fail-closed 双保险）。
+- 段数统计 / `countBySigner` 展示可能在毫秒级窗口内滞后，最终一致。
