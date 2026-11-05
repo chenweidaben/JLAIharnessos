@@ -6905,6 +6905,37 @@ async function handleFetch(
     });
   }
 
+  // P5-13：/health 保持纯文本 ok（向后兼容负载均衡探活）；/ready 返回 JSON 含 worm/audit 后端。
+  if (url.pathname === '/health' && req.method === 'GET') {
+    return new Response('ok', { status: 200, headers: { 'content-type': 'text/plain' } });
+  }
+  if (url.pathname === '/ready' && req.method === 'GET') {
+    let wormBackend = 'unknown';
+    let wormStoreDir = '';
+    let auditStore = 'unknown';
+    try {
+      const wm = await import('./aggregators/wormStore');
+      const wInfo = wm.getWormBackendInfo();
+      wormBackend = wInfo.backend;
+      wormStoreDir = wInfo.dir;
+    } catch { /* ignore */ }
+    try {
+      const am = await import('./aggregators/auditEventStore');
+      auditStore = am.getAuditStore().kind;
+    } catch { /* ignore */ }
+    const body = {
+      status: 'ok',
+      wormBackend,
+      wormStoreDir,
+      auditStore,
+      uptimeSec: Math.round(process.uptime()),
+    };
+    return new Response(JSON.stringify(body), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
   const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
   const rawBody = mayHaveBody ? await req.text() : null;
@@ -7057,12 +7088,8 @@ import('./aggregators/auditEventStore').then((m) => {
     // 触发一次 getWormStore() 以打出 [worm] backend=... 日志
     w.getWormStore();
     if (auditStore.kind === 'pg' && wormInfo.backend === 'memory') {
-      const msg = '审计事件已持久化到 PG，但 WORM 段仅在内存。重启后 lastArchivedSeq 归零，'
-        + '会把已归档事件重复归档并覆盖旧段。请设置 WORM_BACKEND=fs。';
-      if ((process.env.NODE_ENV ?? 'development') === 'production') {
-        throw new Error(`[worm] unsafe combo: ${msg}`);
-      }
-      console.error(`[worm] unsafe combo: ${msg}`);
+      const check = w.assertWormAuditCombo(auditStore.kind, wormInfo.backend, process.env.NODE_ENV ?? 'development');
+      if (!check.ok) throw new Error(check.message);
     }
     // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
     // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。

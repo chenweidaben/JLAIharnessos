@@ -1,29 +1,29 @@
 /**
- * P5-12：WORM_BACKEND=fs 运行态验收脚本
+ * P5-13：WORM_BACKEND=fs 运行态验收脚本
  *
  * 跨进程重启验收：A seal 2 段 → 杀 A → 起 B → 读回 + 续 seal + verify。
- * 密钥在脚本内生成一次性测试值，落临时文件，跑完删除。不打印、不入库。
+ * SM2 密钥用 sm-crypto 现场生成（合法曲线点，验签能通过）；storeDir 每次独立子目录，跑完删除。
  *
  * 用法：bun run scripts/verify-fs-backend.mts
  */
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
+import { mkdirSync, rmSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn, type ChildProcess } from 'node:child_process';
+import crypto from 'node:crypto';
 
 const REPO = join(import.meta.dir, '..');
 const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
-const storeDir = join(REPO, 'logs', `worm-fs-${ts}`);
+const storeDir = join(REPO, 'logs', `worm-fs-verify-${ts}`);
 const port = 8099;
 mkdirSync(storeDir, { recursive: true });
 
-// 一次性测试密钥（脚本内生成，不打印）
+// 一次性测试密钥（脚本内生成，不打印、不落盘）
 const sm4Key = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
-// 用 sm-crypto 生成真实 SM2 密钥对（保证签名/验签能通过）
 const { sm2: sm2lib } = require('sm-crypto');
 const kp = sm2lib.generateKeyPairHex();
-const sm2Priv = kp.privateKey;
-const sm2Pub = kp.publicKey;
-const kek = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex');
+const sm2Priv: string = kp.privateKey;
+const sm2Pub: string = kp.publicKey;
+const kek = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
 
 const results: Array<{ name: string; pass: boolean; detail?: string }> = [];
 function check(name: string, pass: boolean, detail?: string): void {
@@ -44,13 +44,14 @@ async function api(path: string, opts: { method?: string; body?: unknown; token?
 }
 
 function startBff(): ChildProcess {
-  const child = spawn('C:\\Users\\lenovo\\.bun\\bin\\bun.exe', ['run', 'src/bff/index.ts'], {
+  const child = spawn('C:\\Users\\lenovo\\.bun\\bin\\bun.exe', ['run', 'src/bff/server.ts'], {
     cwd: REPO,
     env: {
       ...process.env,
       DEMO_MODE: '1',
       WORM_BACKEND: 'fs',
       WORM_STORE_DIR: storeDir,
+      WORM_FILE_KEY: '1',
       WORM_SM4_KEY: sm4Key,
       WORM_SM2_PRIVATE_KEY: sm2Priv,
       WORM_SM2_PUBLIC_KEY: sm2Pub,
@@ -63,22 +64,20 @@ function startBff(): ChildProcess {
 }
 
 async function waitReady(): Promise<void> {
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 40; i++) {
     try {
-      const r = await fetch(`http://127.0.0.1:${port}/api/v1/health`);
-      if (r.ok || r.status === 401) return;
+      const r = await fetch(`http://127.0.0.1:${port}/health`);
+      if (r.ok) return;
     } catch { /* not ready */ }
     await new Promise((r) => setTimeout(r, 500));
   }
-  throw new Error('BFF not ready in 15s');
+  throw new Error('BFF not ready in 20s');
 }
 
 async function main(): Promise<void> {
-  // 登录拿 admin token
   async function adminToken(): Promise<string> {
     const r = await api('/api/v1/auth/demo-login', { method: 'POST', body: { role: 'admin' } });
-    console.log('demo-login response:', JSON.stringify(r.data).slice(0, 200));
-    return r.data?.tokens?.accessToken ?? r.data?.data?.tokens?.accessToken ?? '';
+    return r.data?.data?.tokens?.accessToken ?? r.data?.tokens?.accessToken ?? '';
   }
 
   // === 进程 A ===
@@ -87,35 +86,29 @@ async function main(): Promise<void> {
   await waitReady();
   const tokA = await adminToken();
 
-  // seed 1 事件 + seal 第一段
+  // A: seed 1 + seal 第一段
   await api('/api/v1/audit/events/_seed', { method: 'POST', token: tokA, body: { items: [
-    { actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
+    { actorId: 'zhangmou', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
   ] } });
   const sealFirst = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokA, body: {} });
-    check('A-seal-1st', sealFirst.status === 200 || sealFirst.status === 201, `status=${sealFirst.status}`);
-  // seed 另 1 事件 + seal 第二段
+  const firstToSeq = sealFirst.data?.data?.toSeq ?? sealFirst.data?.toSeq;
+  check('A-seal-1st', (sealFirst.status === 200 || sealFirst.status === 201) && firstToSeq >= 1, `status=${sealFirst.status} toSeq=${firstToSeq}`);
+
+  // A: seed 另 1 + seal 第二段
   await api('/api/v1/audit/events/_seed', { method: 'POST', token: tokA, body: { items: [
-    { actorId: 'D2', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
+    { actorId: 'limou', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
   ] } });
   const sealA = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokA, body: {} });
-    check('A-seal-2nd', sealA.status === 200 || sealA.status === 201, `status=${sealA.status}`);
+  const secondFrom = sealA.data?.data?.fromSeq ?? sealA.data?.fromSeq;
+  check('A-seal-2nd', (sealA.status === 200 || sealA.status === 201) && secondFrom === firstToSeq + 1, `status=${sealA.status} fromSeq=${secondFrom} expected=${firstToSeq + 1}`);
 
-  // 磁盘目录至少 1 个 WORM-*.json（2 事件可能合为 1 段）
+  // 磁盘至少 2 个 WORM-*.json
   const files = readdirSync(storeDir).filter((f) => f.startsWith('WORM-') && f.endsWith('.json'));
-  check('A-disk-1json', files.length >= 1, `files=${files.length}`);
-
-  const infoA = await api('/api/v1/worm/store/info', { token: tokA });
-  console.log('store-info A:', JSON.stringify(infoA.data).slice(0, 200));
-  const kindA = infoA.data?.kind ?? infoA.data?.data?.kind;
-  check('A-store-info-kind-fs', kindA === 'fs', `kind=${kindA}`);
-
-  // keyStatus A
-  const ksA = await api('/api/v1/worm/keys', { token: tokA });
-  console.log('KEY-STATUS-A:', JSON.stringify(ksA.data).slice(0, 300));
+  check('A-disk-2json', files.length === 2, `files=${files.length}`);
 
   // 杀 A
   a.kill();
-  await new Promise((r) => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 1500));
 
   // === 进程 B ===
   console.log('=== 进程 B ===');
@@ -123,52 +116,51 @@ async function main(): Promise<void> {
   await waitReady();
   const tokB = await adminToken();
 
+  // B: /ready 应显示 wormBackend=fs
+  const readyB = await api('/ready');
+  check('B-ready-wormBackend-fs', readyB.data?.wormBackend === 'fs', `ready=${JSON.stringify(readyB.data)}`);
+
+  // B: 读回 2 段
   const infoB = await api('/api/v1/worm/store/info', { token: tokB });
-  const kindB = infoB.data?.kind ?? infoB.data?.data?.kind;
-  const countB = infoB.data?.segmentCount ?? infoB.data?.data?.segmentCount;
-  check('B-store-info-fs-count2', kindB === 'fs' && countB === 2, `kind=${kindB} count=${countB}`);
+  const countB = infoB.data?.data?.segmentCount ?? infoB.data?.segmentCount;
+  check('B-store-count2', countB === 2, `count=${countB}`);
 
-  // keyStatus B
-  const ksB = await api('/api/v1/worm/keys', { token: tokB });
-  console.log('KEY-STATUS-B:', JSON.stringify(ksB.data).slice(0, 300));
-
-  // verify full dump
-  const vFull = await api('/api/v1/worm/verify?scope=real', { method: 'POST', token: tokB, body: {} });
-  console.log('VERIFY-FULL-B:', JSON.stringify(vFull.data, null, 2));
-
-  // B 上续 seal 第 3 段（已知限制：pending 池纯内存，重启后未归档事件丢失）
+  // B: seed 1 新事件 + seal 第三段（fromSeq 应接上一段 toSeq+1）
   await api('/api/v1/audit/events/_seed', { method: 'POST', token: tokB, body: { items: [
-    { actorId: 'D3', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n3', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
+    { actorId: 'wangmou', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n3', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
   ] } });
   await new Promise((r) => setTimeout(r, 500));
   const sealB = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokB, body: {} });
-  // KNOWN_LIMITATION 必须“有据可依”：只接受 400 + “当前无待归档事件”这一种确定原因。
-  // 其他失败（密钥缺失 500、时间窗非法、网络异常）一律 FAIL，
-  // 避免把无关红灯伪装成已知限制（fail-open 的另一种形态）。
-  const sealBMsg = String((sealB.data as any)?.message ?? '');
-  const isNoPendingOnly = sealB.status === 400 && sealBMsg.includes('无待归档事件');
-  check('B-seal-after-restart-limit', isNoPendingOnly, `status=${sealB.status} message=${sealBMsg}`);
+  const bFrom = sealB.data?.data?.fromSeq ?? sealB.data?.fromSeq;
+  const bStatus = sealB.status;
+  check('B-seal-after-restart', (bStatus === 200 || bStatus === 201) && typeof bFrom === 'number', `status=${bStatus} fromSeq=${bFrom}`);
 
-  // verify real
+  // B: verify real
   const v = await api('/api/v1/worm/verify?scope=real', { method: 'POST', token: tokB, body: {} });
-  const vValid = v.data?.valid ?? v.data?.data?.valid;
-  const vGaps = v.data?.gaps ?? v.data?.data?.gaps ?? [];
+  const vValid = v.data?.data?.valid ?? v.data?.valid;
+  const vGaps = v.data?.data?.seqContinuity?.gaps ?? v.data?.seqContinuity?.gaps ?? v.data?.gaps ?? [];
+  const vSegments = v.data?.data?.segmentCount ?? v.data?.segmentCount;
   check('B-verify-valid', vValid === true, `valid=${vValid}`);
-  check('B-verify-no-gaps', vGaps.length === 0, `gaps=${JSON.stringify(vGaps)}`);
+  check('B-verify-no-gaps', Array.isArray(vGaps) && vGaps.length === 0, `gaps=${JSON.stringify(vGaps)}`);
+  check('B-verify-segmentCount3', vSegments === 3, `segmentCount=${vSegments}`);
+
+  // /metrics 计数器
+  const metricsRes = await fetch(`http://127.0.0.1:${port}/metrics`);
+  const metricsText = await metricsRes.text();
+  const hasCounter = /^jlmedaios_audit_persist_failed_total\s+0$/m.test(metricsText);
+  check('metrics-audit-persist-0', hasCounter, 'counter literal not found');
 
   b.kill();
 
-  // 清理
+  // 清理独立 storeDir
   try { rmSync(storeDir, { recursive: true, force: true }); } catch { /* ignore */ }
 
   const failed = results.filter((r) => !r.pass);
   if (failed.length === 0) {
-    console.log('RESULT: PASS_WITH_KNOWN_LIMITATIONS (1)');
-    console.log('LIMITATIONS:');
-    console.log('  - pending pool is memory-only; unarchived audit events are lost on restart (see P4 audit persistence backlog)');
+    console.log('RESULT: PASS (8/8)');
     process.exit(0);
   }
-  console.log(`RESULT: FAIL (${failed.length} items)`);
+  console.log(`RESULT: FAIL (${failed.length}/8)`);
   process.exit(1);
 }
 

@@ -192,6 +192,27 @@ export function getWormBackendInfo(): { backend: 'fs' | 'memory'; dir: string } 
   }
   return { backend: 'memory', dir: '(in-process memory; not persisted)' };
 }
+
+/**
+ * P5-13 安全自检：audit=pg + worm=memory 是最危险组合。
+ * production 抛错拒绝启动；其他环境 console.error 但不阻断（E2E/单测跑在 memory 上）。
+ */
+export function assertWormAuditCombo(
+  auditKind: 'pg' | 'memory',
+  wormBackend: 'fs' | 'memory',
+  nodeEnv: string,
+): { ok: boolean; message: string } {
+  if (auditKind === 'pg' && wormBackend === 'memory') {
+    const msg = '审计事件已持久化到 PG，但 WORM 段仅在内存。重启后 lastArchivedSeq 归零，'
+      + '会把已归档事件重复归档并覆盖旧段。请设置 WORM_BACKEND=fs。';
+    if (nodeEnv === 'production') {
+      return { ok: false, message: `[worm] unsafe combo: ${msg}` };
+    }
+    console.error(`[worm] unsafe combo: ${msg}`);
+    return { ok: true, message: msg };
+  }
+  return { ok: true, message: '' };
+}
 export function getWormStore(): WormStore {
   if (!_store) {
     if (process.env.WORM_BACKEND === 'fs') {
