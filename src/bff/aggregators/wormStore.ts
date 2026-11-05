@@ -60,6 +60,9 @@ export class FileWormStore implements WormStore {
   private segments: WormSegment[] = [];
   private byId = new Map<string, WormSegment>();
   private bySigner = new Map<string, number>();
+  // P5-11：目录变更自动检测
+  private lastScanMtimeMs = 0;
+  private lastFileCount = 0;
 
   constructor(dir?: string) {
     this.dir = path.resolve(dir ?? process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
@@ -68,8 +71,24 @@ export class FileWormStore implements WormStore {
   }
 
   /**
+   * 轻量变更检测：statSync(dir) 比 mtimeMs，O(微秒)。
+   * mtime 变化时才 readdirSync 计数；不一致才 refresh()。
+   * 不在每次调用都 readdirSync。
+   */
+  private autoDetect(): void {
+    try {
+      const st = require('node:fs').statSync(this.dir);
+      if (st.mtimeMs === this.lastScanMtimeMs) return;
+      const names = require('node:fs').readdirSync(this.dir).filter((n: string) => n.endsWith('.json'));
+      if (st.mtimeMs !== this.lastScanMtimeMs || names.length !== this.lastFileCount) {
+        this.refresh();
+      }
+    } catch { /* ignore */ }
+  }
+
+  /**
    * 重新扫目录重建内存索引（含 bySigner 倒排）。
-   * 同实例不会自动感知外部（其他进程/实例）写入的新段，需要显式调 refresh()。
+   * 显式调用供确定性场景使用；日常读路径由 autoDetect() 轻量检测。
    */
   refresh(): void {
     this.segments = [];
@@ -77,8 +96,10 @@ export class FileWormStore implements WormStore {
     this.bySigner.clear();
     let names: string[] = [];
     try { names = readdirSync(this.dir); } catch { return; }
+    let fileCount = 0;
     for (const n of names) {
       if (!n.endsWith('.json')) continue;
+      fileCount++;
       const id = n.slice(0, -5);
       if (!isValidSegmentId(id)) continue;
       try {
@@ -90,6 +111,8 @@ export class FileWormStore implements WormStore {
       } catch { /* 损坏文件跳过 */ }
     }
     this.segments.sort((a, b) => a.seq - b.seq);
+    try { this.lastScanMtimeMs = require('node:fs').statSync(this.dir).mtimeMs; } catch { /* ignore */ }
+    this.lastFileCount = fileCount;
   }
 
   private safePath(segmentId: string): string {
@@ -140,14 +163,17 @@ export class FileWormStore implements WormStore {
   }
 
   list(): WormSegment[] {
+    this.autoDetect();
     return this.segments.slice();
   }
 
   count(): number {
+    this.autoDetect();
     return this.segments.length;
   }
 
   countBySigner(keyId: string): number {
+    this.autoDetect();
     return this.bySigner.get(keyId) ?? 0;
   }
 }
