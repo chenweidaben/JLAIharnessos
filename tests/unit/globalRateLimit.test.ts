@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { beforeEach, describe, expect, test } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { __resetStore as resetAudit, queryEvents } from '../../src/bff/aggregators/auditEventAggregator';
 import { __resetStore as resetLockout, takeReadToken, takeWriteToken } from '../../src/bff/aggregators/loginLockoutAggregator';
 import { auditEventHook } from '../../src/bff/middleware/auditEventHook';
@@ -51,6 +51,42 @@ describe('P4-4 通用限流桶', () => {
   test('globalRateLimit 非 /api/v1/ 前缀不拦', () => {
     const r = globalRateLimit(makeCtx({ method: 'POST', url: '/ws/chat', ip: '5.5.5.5' }));
     expect(r).toBeNull();
+  });
+});
+
+describe('P4-4 本机回环免流门控（反代安全）', () => {
+  const savedNodeEnv = process.env.NODE_ENV;
+  const savedDemo = process.env.DEMO_MODE;
+  const savedProxy = process.env.TRUST_PROXY;
+  afterEach(() => {
+    process.env.NODE_ENV = savedNodeEnv;
+    process.env.DEMO_MODE = savedDemo;
+    process.env.TRUST_PROXY = savedProxy;
+  });
+  test('开发+无代理 → 127.0.0.1 免流', () => {
+    process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
+    expect(globalRateLimit(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' }))).toBeNull();
+  });
+  test('DEMO_MODE=1+无代理 → 127.0.0.1 免流', () => {
+    delete process.env.NODE_ENV; process.env.DEMO_MODE = '1'; delete process.env.TRUST_PROXY;
+    expect(globalRateLimit(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '::ffff:127.0.0.1' }))).toBeNull();
+  });
+  test('生产（NODE_ENV=production）→ 127.0.0.1 仍受限流', () => {
+    process.env.NODE_ENV = 'production'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
+    const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' });
+    // 连续打 101 次，第 101 次应 429
+    let last: Response | null = null;
+    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    expect(last).not.toBeNull();
+    expect(last!.status).toBe(429);
+  });
+  test('TRUST_PROXY=1（反代）→ 127.0.0.1 仍受限流', () => {
+    process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; process.env.TRUST_PROXY = '1';
+    const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' });
+    let last: Response | null = null;
+    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    expect(last).not.toBeNull();
+    expect(last!.status).toBe(429);
   });
 });
 

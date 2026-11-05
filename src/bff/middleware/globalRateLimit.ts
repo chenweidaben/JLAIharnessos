@@ -39,8 +39,15 @@ export function globalRateLimit(c: Ctx): Response | null {
   if (SKIP_EXACT.has(path)) return null;
 
   const ip = ipOf(c);
-  // 127.0.0.1 / ::1 本机不限流（本地开发/E2E），含 IPv4-mapped IPv6 ::ffff:127.0.0.1
-  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost' || ip === '::ffff:127.0.0.1') return null;
+  // 本机回环免流：仅在开发/演示环境且未启用反代时生效。
+  // 生产部署在 Nginx/负载均衡后时，所有外部请求源 IP 都会被反代归一成 127.0.0.1，
+  // 若无条件免流等于对全网取消限流。因此必须同时满足：
+  //   1) NODE_ENV=development 或 DEMO_MODE=1
+  //   2) TRUST_PROXY 未设为 '1'（反代场景下即使开发环境也不免）
+  const isLocal = ip === '127.0.0.1' || ip === '::1' || ip === 'localhost' || ip === '::ffff:127.0.0.1';
+  const devMode = process.env.NODE_ENV === 'development' || process.env.DEMO_MODE === '1';
+  const noProxy = process.env.TRUST_PROXY !== '1';
+  if (isLocal && devMode && noProxy) return null;
 
   const method = c.req.method.toUpperCase();
   const retrySec = method === 'GET' ? takeReadToken(ip) : takeWriteToken(ip);
