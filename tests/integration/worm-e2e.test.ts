@@ -256,26 +256,29 @@ describe('P5-8 密钥轮换 HTTP 层', () => {
 });
 
 describe('P5-10 retire/purge HTTP 闭环', () => {
-  it('seal 2 段(k1) → rotate → purge(k1) 409 key-in-use refs>=1 → retire(k1) 200 → verify valid', async () => {
-    const before = await call('GET','/api/v1/worm/keys',{token:admin});
-    const k1 = before.data.signerKeyId;
-    // seal 2 段用 k1
+  it('seal 2 段(k1) → rotate → purge(k1) 409 key-in-use refs===2 → retire(k1) 200 → verify valid', async () => {
+    // rotate 两次拿到一个全新 keyId kNew，再 seal 2 段用它，再 rotate 让 kNew 非 active
+    await call('POST','/api/v1/worm/keys/rotate',{token:admin,body:{}});
+    const afterRot = await call('GET','/api/v1/worm/keys',{token:admin});
+    const kNew = afterRot.data.signerKeyId;
+    // seed + seal 第一段
+    await call('POST','/api/v1/audit/events/_seed',{token:admin,body:{items:[{actorId:'D1',actorRole:'doctor',action:'create',module:'emr',resourceType:'note',resourceId:'n1',result:'success',ip:'1.1.1.1',userAgent:'ua'}]}});
     await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+    // seed + seal 第二段
+    await call('POST','/api/v1/audit/events/_seed',{token:admin,body:{items:[{actorId:'D2',actorRole:'doctor',action:'create',module:'emr',resourceType:'note',resourceId:'n2',result:'success',ip:'1.1.1.1',userAgent:'ua'}]}});
     await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
-    // rotate → k2 成为 active
-    const rot = await call('POST','/api/v1/worm/keys/rotate',{token:admin,body:{}});
-    expect(rot.httpStatus).toBe(200);
-    // purge k1：仍有段引用 → 409 + key-in-use
-    const pr = await call('POST','/api/v1/worm/keys/purge',{token:admin,body:{keyId:k1}});
+    // rotate 让 kNew 不再 active
+    await call('POST','/api/v1/worm/keys/rotate',{token:admin,body:{}});
+    // purge kNew：恰好 2 段引用
+    const pr = await call('POST','/api/v1/worm/keys/purge',{token:admin,body:{keyId:kNew}});
     expect(pr.httpStatus).toBe(409);
     expect(pr.raw).toContain('key-in-use');
-    // refs 来自真实 store 索引（至少 2 段用 k1）
-    expect(pr.data?.refs ?? JSON.parse(pr.raw)?.refs ?? 0).toBeGreaterThanOrEqual(2);
-    // retire k1：200
-    const rt = await call('POST','/api/v1/worm/keys/retire',{token:admin,body:{keyId:k1}});
+    expect(JSON.parse(pr.raw).refs).toBe(2);
+    // retire kNew：200
+    const rt = await call('POST','/api/v1/worm/keys/retire',{token:admin,body:{keyId:kNew}});
     expect(rt.httpStatus).toBe(200);
     expect(rt.data.ok).toBe(true);
-    // verify real：旧段 k1 与新段 k2 都验签通过
+    // verify real
     const v = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
     expect(v.httpStatus).toBe(200);
     expect(v.data.valid).toBe(true);
