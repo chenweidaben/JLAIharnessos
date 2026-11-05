@@ -91,13 +91,14 @@ async function main(): Promise<void> {
   await api('/api/v1/audit/events/_seed', { method: 'POST', token: tokA, body: { items: [
     { actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
   ] } });
-  await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokA, body: {} });
+  const sealFirst = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokA, body: {} });
+    check('A-seal-1st', sealFirst.status === 200 || sealFirst.status === 201, `status=${sealFirst.status}`);
   // seed 另 1 事件 + seal 第二段
   await api('/api/v1/audit/events/_seed', { method: 'POST', token: tokA, body: { items: [
     { actorId: 'D2', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' },
   ] } });
   const sealA = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokA, body: {} });
-    check('A-seal-2segments', sealA.status === 200 || sealA.status === 201, `status=${sealA.status}`);
+    check('A-seal-2nd', sealA.status === 200 || sealA.status === 201, `status=${sealA.status}`);
 
   // 磁盘目录至少 1 个 WORM-*.json（2 事件可能合为 1 段）
   const files = readdirSync(storeDir).filter((f) => f.startsWith('WORM-') && f.endsWith('.json'));
@@ -141,8 +142,12 @@ async function main(): Promise<void> {
   ] } });
   await new Promise((r) => setTimeout(r, 500));
   const sealB = await api('/api/v1/worm/segments/seal', { method: 'POST', token: tokB, body: {} });
-  // KNOWN_LIMITATION: audit events 纯内存无持久化，重启后 pending 池空
-  console.log(`CHECK-B-seal-after-restart: KNOWN_LIMITATION | reason=pending-pool-is-memory-only, status=${sealB.status}`);
+  // KNOWN_LIMITATION 必须“有据可依”：只接受 400 + “当前无待归档事件”这一种确定原因。
+  // 其他失败（密钥缺失 500、时间窗非法、网络异常）一律 FAIL，
+  // 避免把无关红灯伪装成已知限制（fail-open 的另一种形态）。
+  const sealBMsg = String((sealB.data as any)?.message ?? '');
+  const isNoPendingOnly = sealB.status === 400 && sealBMsg.includes('无待归档事件');
+  check('B-seal-after-restart-limit', isNoPendingOnly, `status=${sealB.status} message=${sealBMsg}`);
 
   // verify real
   const v = await api('/api/v1/worm/verify?scope=real', { method: 'POST', token: tokB, body: {} });
