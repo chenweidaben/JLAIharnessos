@@ -64,6 +64,9 @@ export const wormRoutes: RouteDef[] = [
       if (!r.ok) {
         if (r.error === 'no-events') return json(fail(ErrorCode.BAD_REQUEST, '当前无待归档事件'), 400);
         if (r.error === 'worm-key-not-configured') return json(fail(ErrorCode.INTERNAL_ERROR, 'WORM_SM4_KEY 未配置'), 500);
+        if (r.error === 'worm-seal-disabled-backfill-truncated') {
+          return json(fail(ErrorCode.INTERNAL_ERROR, '审计 backfill 截断，seal 已禁用：请调大 AUDIT_BACKFILL_LIMIT 后重启'), 503);
+        }
         return json(fail(ErrorCode.BAD_REQUEST, 'from/to 时间窗非法'), 400);
       }
       return json(ok(r.segment), 201);

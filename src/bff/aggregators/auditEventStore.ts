@@ -49,6 +49,8 @@ export interface AuditEventStore {
   streamAll(): AsyncIterable<AuditEvent[]>;
   /** 启动回填：把 seq > fromSeq 的事件灌回 pending（仅 Pg 有意义） */
   backfill(fromSeq: number, limit?: number): Promise<AuditEvent[]>;
+  /** 统计 seq > fromSeq 的事件总数（backfill 截断检测用） */
+  countAfter(fromSeq: number): Promise<number>;
 }
 
 // ---- 计数器（运行态 /metrics 暴露） ----
@@ -113,6 +115,9 @@ export class MemoryAuditStore implements AuditEventStore {
       .filter((e) => e.seq > fromSeq)
       .sort((a, b) => a.seq - b.seq)
       .slice(0, limit);
+  }
+  async countAfter(fromSeq: number): Promise<number> {
+    return this.rows.filter((e) => e.seq > fromSeq).length;
   }
   all(): AuditEvent[] { return this.rows; }
   reset(): void { this.rows = []; }
@@ -243,6 +248,11 @@ export class PgAuditStore implements AuditEventStore {
       SELECT * FROM audit.events WHERE seq > ${fromSeq} ORDER BY seq ASC LIMIT ${limit}
     `;
     return (rows as unknown as EventsRow[]).map(rowFromDb);
+  }
+
+  async countAfter(fromSeq: number): Promise<number> {
+    const r = await this.sql`SELECT count(*)::bigint AS n FROM audit.events WHERE seq > ${fromSeq}`;
+    return Number((r as unknown as Array<{ n: string }>)[0]?.n ?? 0);
   }
 }
 

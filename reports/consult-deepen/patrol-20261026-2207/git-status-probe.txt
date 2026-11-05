@@ -1,0 +1,36 @@
+HEAD=5a1e3801be633ec865649cb559312809cfb02dd5
+HEAD_SHORT=5a1e3801
+BRANCH=consult-agent-m86
+TRACKED_MODIFIED=4
+CONSULT_MODIFIED=0
+UNTRACKED=51
+UNTRACKED_ARCHIVE=20
+UNTRACKED_REBUILD=12
+UNTRACKED_PATROL_MD=4
+UNTRACKED_OTHER=15
+=== modified ===
+ M src/bff/agents/index.ts
+ M src/knowledge-platform/index.ts
+ M src/security/audit/index.ts
+ M src/security/index.ts
+=== consult modified ===
+=== untracked other ===
+reports/slices/S-03-model-router/
+reports/slices/S-04-prompt-governance/
+reports/slices/S-06-agent-admission/
+reports/slices/S-08-ai-audit/
+reports/slices/S-11-rag-lifecycle/
+src/bff/agents/agentAdmission.ts
+src/bff/agents/modelRouter.ts
+src/bff/prompt/
+src/knowledge-platform/lifecycle/
+src/security/audit/aiAudit.ts
+tests/unit/bff/agents/agentAdmission.test.ts
+tests/unit/bff/agents/modelRouter.test.ts
+tests/unit/bff/prompt/
+tests/unit/knowledge-platform/
+tests/unit/security/aiAudit.test.ts
+=== isolation ===
+probe_m416.txt -> []
+web/src/store/cdrQueryV2M636Store.ts -> []
+.env.example -> []

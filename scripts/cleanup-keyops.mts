@@ -12,7 +12,7 @@
  * 删除按文件名里的 YYYYMMDD 判定，跨实例（含已退出进程）清理。
  * 默认 dry-run 是因为审计文件删除不可逆，必须先看清单再 apply。
  */
-import { resolveRetentionDays, cleanupOldKeyOps } from '../src/bff/aggregators/keyOpsStore.ts';
+import { resolveRetentionDays, cleanupOldKeyOps } from '../src/bff/aggregators/keyOpsStore.js';
 
 const apply = process.argv.includes('--apply');
 const retention = resolveRetentionDays();

@@ -1,0 +1,31 @@
+=== log ===
+f3460245 docs(patrol): P1/P2 续做收口 00:55 轮
+64b46485 feat(m86-j): P2 国密 SM2/SM3 电子签名骨架——医嘱/病历三级检诊签名留痕
+7bda0927 feat(m86-i): 手术麻醉闭环深化——术前访视/麻醉记录单/术后镇痛随访/PACU复苏评分
+0e260e92 feat(bff): P1 FHIR R4 资源出口扩面（M86-I）—— Patient/Encounter/MedicationRequest/Condition 四类资源 BFF 出口
+c42e2d83 fix(brand)+chore(patrol): HIS适配器层与前端mock对标厂商真名脱敏；00:23轮巡检简报
+
+=== stat ===
+ reports/patrol/patrol-20261104-0023.md             |  86 ++++++++
+ reports/patrol/patrol-20261104-0055-p1p2.md        |  18 ++
+ src/bff/routes/anesthesiaPreopVisit.ts             |  59 ++++++
+ src/bff/routes/anesthesiaRecordSheet.ts            |  91 ++++++++
+ src/bff/routes/cryptoSignature.ts                  | 215 +++++++++++++++++++
+ src/bff/routes/fhirCondition.ts                    | 206 ++++++++++++++++++
+ src/bff/routes/fhirEncounter.ts                    | 182 ++++++++++++++++
+ src/bff/routes/fhirMedicationRequest.ts            | 232 +++++++++++++++++++++
+ src/bff/routes/fhirPatient.ts                      | 147 +++++++++++++
+ src/bff/routes/pacuScoring.ts                      |  55 +++++
+ src/bff/routes/postopAnalgesiaFup.ts               |  43 ++++
+ src/bff/server.ts                                  |  18 ++
+ src/integration/adapters/AdapterRegistry.ts        |   4 +-
+ src/integration/adapters/his/HISAdapter.ts         |   2 +-
+ src/integration/adapters/his/WeiningHISAdapter.ts  |  74 +++----
+ web/src/mock/systemMock.ts                         |   4 +-
+ web/src/pages/anesthesia/pacu-score/index.tsx      | 182 ++++++++++++++++
+ .../pages/anesthesia/postop-analgesia/index.tsx    | 152 ++++++++++++++
+ web/src/pages/anesthesia/preop-visit/index.tsx     | 137 ++++++++++++
+ web/src/pages/anesthesia/record-sheet/index.tsx    | 151 ++++++++++++++
+ web/src/pages/crypto/signature-audit/index.tsx     | 228 ++++++++++++++++++++
+ web/src/router/index.tsx                           |  13 ++
+ 22 files changed, 2257 insertions(+), 42 deletions(-)

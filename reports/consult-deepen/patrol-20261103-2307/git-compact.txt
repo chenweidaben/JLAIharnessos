@@ -1,0 +1,15 @@
+HEAD=4bc394060dbc8cd1646fb8aaf338e9b9714c2559
+SHORT=4bc39406
+BRANCH=consult-agent-m86
+TRACKED_MOD=0
+CONSULT_MOD=0
+UNTRACKED=293
+ARCH=148
+REBUILD=12
+MD=133
+OTHER=0
+D0=173
+C2=147
+GITCODE=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html 4bc394060dbc8cd1646fb8aaf338e9b9714c2559	refs/heads/master
+HEAGENTOS=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html d0c2d79756cacd75960bd7563ba8d9b186127270	refs/heads/main
+MIRROR=4bc394060dbc8cd1646fb8aaf338e9b9714c2559	refs/heads/master

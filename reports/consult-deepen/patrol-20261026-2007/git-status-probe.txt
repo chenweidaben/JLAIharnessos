@@ -1,0 +1,26 @@
+HEAD=5a1e3801be633ec865649cb559312809cfb02dd5
+HEAD_SHORT=5a1e3801
+BRANCH=consult-agent-m86
+TRACKED_MODIFIED=1
+CONSULT_MODIFIED=0
+UNTRACKED=37
+UNTRACKED_ARCHIVE=18
+UNTRACKED_REBUILD=12
+UNTRACKED_PATROL_MD=3
+UNTRACKED_OTHER=4
+=== modified (other lane, consult_hits=0) ===
+M src/bff/agents/index.ts (583B, consult=0; S-02/S-03 model barrel, exports modelRouter.js; +3/-2)
+=== consult modified ===(none)
+=== untracked md ===
+reports/patrol/patrol-20261026-1829.md
+reports/patrol/patrol-20261026-1918.md
+reports/patrol/patrol-20261026-2007.md
+=== untracked other (other lane, consult_hits=0) ===
+src/bff/agents/modelRouter.ts (19009B, consult=0; S-02/S-03 model strategy router)
+tests/unit/bff/agents/modelRouter.test.ts (21336B, consult=0; router unit tests)
+reports/slices/S-03-model-router/slice-record.md (17452B, perm_code_hits=0; S-03 slice record)
+src/bff/prompt/ directory (5 files: assetRegistry.ts 19205B, index.ts 543B, metricsAggregator.ts 7395B, promptLoader.ts 9909B, schemaGuard.ts 8494B; consult=0, perm_code=0; other lane prompt slice WIP)
+=== isolation ===
+probe_m416.txt -> []
+web/src/store/cdrQueryV2M636Store.ts -> []
+.env.example -> []

@@ -1,0 +1,24 @@
+HEAD=c2b82c3ac6187a57a1c699cd3b2830fa0828fe40
+HEAD_SHORT=c2b82c3a
+BRANCH=consult-agent-m86
+TRACKED_MODIFIED=12
+CONSULT_MODIFIED=0
+UNTRACKED=48
+=== modified ===
+ M src/bff/aggregators/i18nDeepAggregator.ts
+ M src/bff/aggregators/userManualAggregator.ts
+ M src/bff/routes/fhir.ts
+ M src/knowledge-platform/index.ts
+ M src/knowledge-platform/types.ts
+ M web/.env.example
+ M web/index.html
+ M web/public/manifest.webmanifest
+ M web/src/components/emergency/EmergencyRecord.tsx
+ M web/src/pages/agent/MedMuseChatPage.tsx
+ M web/src/pages/help/Manual/index.tsx
+ M web/src/pages/login/index.tsx
+=== consult modified ===
+=== isolation ===
+probe_m416.txt -> []
+web/src/store/cdrQueryV2M636Store.ts -> []
+.env.example -> []

@@ -1,0 +1,4 @@
+﻿LOCAL_HEAD c2b82c3ac6187a57a1c699cd3b2830fa0828fe40
+gitcode JLMEDAIOS master c2b82c3ac6187a57a1c699cd3b2830fa0828fe40 match=True
+heagentos HEAGENTOS main d0c2d79756cacd75960bd7563ba8d9b186127270 match=False
+github JLAIharnessos master c2b82c3ac6187a57a1c699cd3b2830fa0828fe40 match=True

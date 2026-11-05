@@ -44,9 +44,9 @@ console.log('--- concurrency result ---');
 console.log('ops read back:', result.ops.length, '(expected 300)');
 console.log('files:', result.files);
 console.log('malformed:', result.malformed);
-const ids = new Set(result.ops.map((o) => o.actorId));
+const ids = new Set(result.ops.map((o: { actorId: string }) => o.actorId));
 console.log('unique actorIds:', ids.size, '(expected 300)');
-console.log('sorted ascending:', result.ops.every((op, i, arr) => i === 0 || arr[i-1].at <= op.at));
+console.log('sorted ascending:', result.ops.every((op: { at: number }, i: number, arr: { at: number }[]) => i === 0 || arr[i-1].at <= op.at));
 
 // 边写边读
 console.log('--- concurrent reader ---');
@@ -62,7 +62,7 @@ for (let i = 0; i < 20; i++) {
 }
 await writerDone;
 const final = readKeyOps(0);
-const finalStream = final.ops.filter((o) => o.actorId.startsWith('stream-'));
+const finalStream = final.ops.filter((o: { actorId: string }) => o.actorId.startsWith('stream-'));
 console.log('streamed ops final:', finalStream.length, '(expected 200)');
 
 rmSync(storeDir, { recursive: true, force: true });

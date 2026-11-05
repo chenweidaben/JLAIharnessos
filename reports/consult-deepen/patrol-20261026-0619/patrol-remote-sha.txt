@@ -1,0 +1,5 @@
+﻿LOCAL_HEAD c7450f21cda6a533249e6929b2bea69a6bb8c5c5
+gitcode JLMEDAIOS master 7149cd7f41c2f435de8654092e697e26925ef4c5  (C4, local ancestor, fast-forward reachable; C5 and later 4 commits NOT pushed)
+heagentos HEAGENTOS main d0c2d79756cacd75960bd7563ba8d9b186127270  (baseline, PENDING push)
+mirror GitHub master d0c2d79756cacd75960bd7563ba8d9b186127270  (baseline, read-only check, NO push this round)
+LEAKAGE_COUNT=0; SSH post-quantum warning is OpenSSH notice, not an error

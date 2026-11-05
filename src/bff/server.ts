@@ -6923,11 +6923,20 @@ async function handleFetch(
       const am = await import('./aggregators/auditEventStore');
       auditStore = am.getAuditStore().kind;
     } catch { /* ignore */ }
+    let sealDisabled = false;
+    let sealDisabledReason = '';
+    try {
+      const wm2 = await import('./aggregators/auditEventAggregator');
+      const d = wm2.__sealDisabled();
+      if (d) { sealDisabled = true; sealDisabledReason = d.reason; }
+    } catch { /* ignore */ }
     const body = {
       status: 'ok',
       wormBackend,
       wormStoreDir,
       auditStore,
+      sealDisabled,
+      sealDisabledReason,
       uptimeSec: Math.round(process.uptime()),
     };
     return new Response(JSON.stringify(body), {
@@ -7105,7 +7114,9 @@ import('./aggregators/auditEventStore').then((m) => {
     });
   });
 }).then((n) => {
-  if (typeof n === 'number') console.log(`[audit] backfill done: ${n} events`);
+  if (n && typeof n === 'object' && 'filled' in n) {
+    console.log(`[audit] backfill done: filled=${n.filled} total=${n.total} truncated=${n.truncated}`);
+  }
 }).catch((e) => { console.error('[audit] init failed:', e?.message ?? e); });
 
 void initDatabase().then(() => {

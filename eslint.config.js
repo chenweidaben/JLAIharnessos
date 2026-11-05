@@ -170,15 +170,10 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
 
-  // scripts/** 不在根 tsconfig 里；三个 P5-15 脚本走独立 tsconfig 开类型感知，
-  // 其余脚本仍走无类型感知规则集（避免全量编译慢）。
+  // scripts/**：三个 P5-15 脚本已加入根 tsconfig include，走全局 projectService 类型感知。
+  // 开 no-floating-promises 防止 async 化后脚本层漏 await；其余 type-checked 规则对脚本过于严格，关闭。
   {
     files: ['scripts/verify-fs-backend.mts', 'scripts/verify-keyops-concurrency.mts', 'scripts/cleanup-keyops.mts'],
-    languageOptions: {
-      parserOptions: {
-        project: './scripts/tsconfig.json',
-      },
-    },
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unused-vars': [
@@ -187,52 +182,36 @@ export default tseslint.config(
       ],
       'no-unused-vars': 'off',
       'no-console': 'off',
-    },
-  },
-  {
-    files: ['scripts/**/*.mts', 'scripts/**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        projectService: false,
-        project: null,
-      },
-    },
-    rules: {
-      ...tseslint.configs.disableTypeChecked.rules,
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-      ],
-      'no-unused-vars': 'off',
-      'no-console': 'off',
-      'no-undef': 'off',
-      '@typescript-eslint/await-thenable': 'off',
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/no-misused-promises': 'off',
-      '@typescript-eslint/return-await': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/restrict-plus-operands': 'off',
-      '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
       '@typescript-eslint/no-unsafe-declaration-merging': 'off',
+      '@typescript-eslint/restrict-plus-operands': 'off',
+      '@typescript-eslint/restrict-template-expressions': 'off',
+      '@typescript-eslint/no-unsafe-type-assertion': 'off',
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
-      '@typescript-eslint/no-unnecessary-type-arguments': 'off',
-      '@typescript-eslint/no-unnecessary-type-constraint': 'off',
-      '@typescript-eslint/non-nullable-type-assertion-style': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/prefer-nullish-coalescing': 'off',
-      '@typescript-eslint/prefer-optional-chain': 'off',
       '@typescript-eslint/no-base-to-string': 'off',
-      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
-      '@typescript-eslint/require-array-sort-compare': 'off',
+      '@typescript-eslint/await-thenable': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
+      '@typescript-eslint/return-await': 'off',
       '@typescript-eslint/no-deprecated': 'off',
       '@typescript-eslint/no-meaningless-void-operator': 'off',
       '@typescript-eslint/no-misused-new': 'off',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/prefer-optional-chain': 'off',
+      '@typescript-eslint/non-nullable-type-assertion-style': 'off',
+      '@typescript-eslint/no-unnecessary-type-arguments': 'off',
+      '@typescript-eslint/no-unnecessary-type-constraint': 'off',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
+      '@typescript-eslint/require-array-sort-compare': 'off',
+      'dot-notation': 'off',
+      '@typescript-eslint/dot-notation': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
     },
   },
 

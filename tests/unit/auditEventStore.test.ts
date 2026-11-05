@@ -141,7 +141,7 @@ describe('P5-13 启动回填边界（lastArchivedSeq）', () => {
     // backfill 只取 seq > 6
     const { backfillPending, getPendingEvents } = await import('../../src/bff/aggregators/auditEventAggregator');
     const n = await backfillPending(6);
-    expect(n).toBe(3);
+    expect(n.filled).toBe(3);
     const pending = getPendingEvents();
     expect(pending.length).toBe(3);
     expect(pending[0].seq).toBe(7);
@@ -160,7 +160,7 @@ describe('P5-13 启动回填边界（lastArchivedSeq）', () => {
     })) as any;
     const { backfillPending, getPendingEvents } = await import('../../src/bff/aggregators/auditEventAggregator');
     const n = await backfillPending(0);
-    expect(n).toBe(3);
+    expect(n.filled).toBe(3);
     expect(getPendingEvents()[0].seq).toBe(1);
   });
 });

@@ -1,0 +1,16 @@
+=== MODIFIED ===
+ M web/src/router/index.tsx
+=== OTHER UNTRACKED ===
+?? docs/research/2026-11-03-his-emr-gap-survey.md
+?? docs/research/2026-11-03-his-emr-integration-benchmark.md
+?? web/src/pages/billing/window/
+?? web/src/pages/inpatient/checkin/
+?? web/src/pages/inpatient/deposit/
+?? web/src/pages/inpatient/discharge-settle/
+?? web/src/pages/medAdmin/scan/
+?? web/src/pages/nursing/vitals-chart/
+?? web/src/pages/outpatient-pharmacy/dispense/
+?? web/src/pages/outpatient/register-refund/
+?? web/src/pages/pharmacy/prepack/
+?? web/src/pages/pharmacy/return/
+?? web/src/pages/three-level-ward-round/sign/

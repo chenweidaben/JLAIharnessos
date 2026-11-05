@@ -213,22 +213,60 @@ export function getPendingEvents(): AuditEvent[] { return [...events]; }
 /** P5-13 测试用：直接往 pending 池注入事件（造 gap 场景） */
 export function __injectPending(evt: AuditEvent): void { events.push(evt); }
 
+/**
+ * P5-16 backfill 截断时 fail-closed：seal 拒绝产出，避免内存 pending 池不完整导致段内 seq 断档。
+ * 断档段会让 verify 永久 false（不可修），比暂停归档（可见、可修）危害大得多。
+ */
+let sealDisabled: { reason: string; filled: number; total: number } | null = null;
+export function __sealDisabled(): { reason: string; filled: number; total: number } | null {
+  return sealDisabled ? { ...sealDisabled } : null;
+}
+export function __resetSealDisabled(): void { sealDisabled = null; }
+
+function resolveBackfillLimit(): number {
+  const raw = process.env.AUDIT_BACKFILL_LIMIT;
+  if (!raw) return 1000;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) {
+    throw new Error(`AUDIT_BACKFILL_LIMIT must be a positive integer, got ${JSON.stringify(raw)}`);
+  }
+  return n;
+}
+
+export interface BackfillResult {
+  filled: number;
+  total: number;
+  truncated: boolean;
+}
+
 /** P5-13 启动回填：把 store 中 seq > fromSeq 的事件灌回内存 pending 池。
- *  fromSeq 必须显式传（通常是 lastArchivedSeq），禁止默认 0。 */
-export async function backfillPending(fromSeq: number): Promise<number> {
+ *  fromSeq 必须显式传（通常是 lastArchivedSeq），禁止默认 0。
+ *
+ * P5-16 fail-closed：若 total > limit（pending 池不完整），不截断装作没事，
+ * 而是设置 sealDisabled 标志，seal 后续返回 503，等人工调大 AUDIT_BACKFILL_LIMIT 或重启。 */
+export async function backfillPending(fromSeq: number): Promise<BackfillResult> {
   if (!Number.isFinite(fromSeq) || fromSeq < 0) {
     throw new Error(`[audit] backfillPending: fromSeq must be >= 0, got ${fromSeq}`);
   }
+  const limit = resolveBackfillLimit();
   const store = getAuditStore();
   try {
-    const rows = await store.backfill(fromSeq, 1000);
+    const total = await store.countAfter(fromSeq);
+    const rows = await store.backfill(fromSeq, limit);
     for (const e of rows) events.push(e);
-    if (rows.length > 0) {
+    const truncated = total > rows.length;
+    if (truncated) {
+      sealDisabled = { reason: 'audit-backfill-truncated', filled: rows.length, total };
+      console.error(
+        `[audit] backfill TRUNCATED: filled=${rows.length} total=${total} limit=${limit} — SEAL DISABLED. `
+        + `Set AUDIT_BACKFILL_LIMIT >= ${total} and restart to clear.`,
+      );
+    } else if (rows.length > 0) {
       console.log(`[audit] backfilled ${rows.length} events (seq ${rows[0].seq}..${rows[rows.length - 1].seq}), lastArchivedSeq=${fromSeq}`);
     } else {
       console.log(`[audit] backfilled 0 events, lastArchivedSeq=${fromSeq}`);
     }
-    return rows.length;
+    return { filled: rows.length, total, truncated };
   } catch (err) {
     console.error(`[audit] backfill failed:`, err instanceof Error ? err.message : String(err));
     try {
@@ -236,6 +274,6 @@ export async function backfillPending(fromSeq: number): Promise<number> {
       const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
       bffMetrics.auditPersistFailed.inc();
     } catch { /* ignore */ }
-    return 0;
+    return { filled: 0, total: 0, truncated: false };
   }
 }

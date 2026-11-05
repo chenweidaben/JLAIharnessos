@@ -10,7 +10,7 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import {
-  getPendingEvents, verifyChainSync, type AuditEvent,
+  getPendingEvents, verifyChainSync, __sealDisabled, type AuditEvent,
 } from './auditEventAggregator.js';
 import { getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
@@ -244,14 +244,20 @@ export function keyStatus(): { keySource: string; signerKeyId: string; publicKey
 export interface SealInput { from?: string; to?: string; }
 export interface SealResult {
   ok: boolean;
-  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured' | 'worm-no-active-key' | 'seq-gap';
+  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured' | 'worm-no-active-key' | 'seq-gap' | 'worm-seal-disabled-backfill-truncated';
   expectedSeq?: number;
   actualFirstSeq?: number;
   segment?: WormSegment;
+  sealDisabledReason?: string;
 }
 
 export async function seal(input: SealInput = {}): Promise<SealResult> {
   if (input.from && Number.isNaN(new Date(input.from).getTime())) return { ok: false, error: 'invalid-window' };
+  // P5-16 fail-closed：backfill 截断时拒绝产段，避免 pending 池不完整导致段内 seq 断档
+  const disabled = __sealDisabled?.();
+  if (disabled) {
+    return { ok: false, error: 'worm-seal-disabled-backfill-truncated', sealDisabledReason: disabled.reason };
+  }
   if (input.to && Number.isNaN(new Date(input.to).getTime())) return { ok: false, error: 'invalid-window' };
   if (sm4KeyHex.length !== 32 || !sm2PrivateKeyHex) return { ok: false, error: 'worm-key-not-configured' };
 

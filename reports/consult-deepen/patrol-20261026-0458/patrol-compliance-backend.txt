@@ -1,0 +1,50 @@
+﻿=== permissions.ts three codes ===
+permissions.ts:200: *  - consult-agent:read    查看会话 / 历史消息 / 草稿 / 画像 / 规则快照 / 事件回放
+permissions.ts:201: *  - consult-agent:write   创建会话 / 发送消息 / 语音转写 / 流式问诊 / 退出会话
+permissions.ts:202: *  - consult-agent:audit   查看会话审计轨迹
+permissions.ts:208: READ: 'consult-agent:read',
+permissions.ts:209: WRITE: 'consult-agent:write',
+permissions.ts:210: AUDIT: 'consult-agent:audit',
+
+=== routes: guard permission checks ===
+consultAgentRoutes.ts:9: * handler 内仅调用 requirePermissionCode 做细粒度权限校验；SSE 流路由不消费
+consultAgentRoutes.ts:37: import { requirePermissionCode } from '../middleware/auth.js';
+consultAgentRoutes.ts:38: import { CONSULT_AGENT_PERMISSIONS } from '../permissions.js';
+consultAgentRoutes.ts:179: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.WRITE);
+consultAgentRoutes.ts:239: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:252: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.WRITE);
+consultAgentRoutes.ts:296: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:313: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.WRITE);
+consultAgentRoutes.ts:340: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.AUDIT);
+consultAgentRoutes.ts:357: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:382: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.WRITE);
+consultAgentRoutes.ts:417: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:515: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:540: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.READ);
+consultAgentRoutes.ts:553: const denied = requirePermissionCode(c, CONSULT_AGENT_PERMISSIONS.WRITE);
+
+=== routes: method + path route definitions ===
+
+=== orchestrator acute bypass ===
+consultOrchestrator.ts:8: * 2. evaluateSafety：acute -> escalated 旁路，发急症引导、审计 acute_bypass、
+consultOrchestrator.ts:9: *    事件 safety:acute，不进角色、不产草稿；
+consultOrchestrator.ts:10: * 3. classifyIntent：exit -> 关闭线程；
+consultOrchestrator.ts:19: import { classifyIntent } from './intentClassifier';
+consultOrchestrator.ts:24: import { appendDisclaimer, confidenceLevel, newId, nowIso } from './roleSupport';
+consultOrchestrator.ts:25: import { evaluateSafety } from './safety/safetyGate';
+consultOrchestrator.ts:43: import { ACUTE_GUIDANCE, DISCLAIMER } from './types';
+consultOrchestrator.ts:138: const safety = evaluateSafety(userText);
+consultOrchestrator.ts:142: transitionTo(thread, 'escalated');
+consultOrchestrator.ts:151: action: 'acute_bypass',
+consultOrchestrator.ts:159: content: ACUTE_GUIDANCE,
+consultOrchestrator.ts:165: disclaimer: DISCLAIMER,
+consultOrchestrator.ts:170: { type: 'safety:acute', matched: safety.matched, guidance: ACUTE_GUIDANCE },
+consultOrchestrator.ts:171: { type: 'disclaimer', text: DISCLAIMER },
+consultOrchestrator.ts:182: const intent = classifyIntent(userText, history);
+consultOrchestrator.ts:207: const reply = appendDisclaimer('会话已结束，感谢您的咨询。如需再次咨询可新建会话。');
+consultOrchestrator.ts:218: disclaimer: DISCLAIMER,
+consultOrchestrator.ts:223: { type: 'disclaimer', text: DISCLAIMER },
+consultOrchestrator.ts:301: replyParts.push(appendDisclaimer(`草稿未通过安全校验：${decision.reason ?? '未知原因'}`));
+consultOrchestrator.ts:372: disclaimer: DISCLAIMER,
+consultOrchestrator.ts:381: events.push({ type: 'disclaimer', text: DISCLAIMER });
+consultOrchestrator.ts:385: disclaimer: DISCLAIMER,
