@@ -63,9 +63,8 @@ describe('P5-10 keys/retire 路由鉴权', () => {
   test('无 token → 401', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/retire');
     const c = makeCtx({ user: null, body: { keyId: 'x' } });
-    // requireAdmin 检查 user.roles；user=null → 403（不是 401，因为 auth 层在路由外）
     const res = await h(c);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
   });
 
   test('nurse（非 admin）→ 403', async () => {
@@ -77,11 +76,11 @@ describe('P5-10 keys/retire 路由鉴权', () => {
 });
 
 describe('P5-10 keys/purge 路由鉴权', () => {
-  test('无 token → 403', async () => {
+  test('无 token → 401', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/purge');
     const c = makeCtx({ user: null, body: { keyId: 'x' } });
     const res = await h(c);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
   });
 
   test('nurse（非 admin）→ 403', async () => {
@@ -89,6 +88,18 @@ describe('P5-10 keys/purge 路由鉴权', () => {
     const c = makeCtx({ user: { id: 'N1', name: '护士', roles: ['nurse'] }, body: { keyId: 'x' } });
     const res = await h(c);
     expect(res.status).toBe(403);
+  });
+});
+
+describe('P5-10 purge 响应无私钥', () => {
+  test('purge 不存在的 keyId 响应体不含 privateKey/PRIVATE', async () => {
+    const h = findHandler('POST', '/api/v1/worm/keys/purge');
+    const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: 'nonexistent-x' } });
+    const res = await h(c);
+    const txt = await res.text();
+    expect(txt).not.toContain('privateKey');
+    expect(txt).not.toContain('PRIVATE KEY');
+    expect(txt).not.toContain('privateKeyHex');
   });
 });
 

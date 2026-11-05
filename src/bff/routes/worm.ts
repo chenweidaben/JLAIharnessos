@@ -26,7 +26,10 @@ import { getAutoConfig, listTickHistory, search, setAutoConfig, tick } from '../
 import { isValidSegmentId } from '../aggregators/wormStore.js';
 
 function requireAdmin(c: Ctx): Response | null {
-  if (!(c.user?.roles ?? []).includes('admin')) {
+  // 未认证（c.user 缺失）→ 401 Unauthorized；已认证但非 admin → 403 Forbidden。
+  // auth:true 中间件正常会先拦 401，这里做防御性双保险。
+  if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录或登录已过期'), 401);
+  if (!(c.user.roles ?? []).includes('admin')) {
     return json(fail(ErrorCode.FORBIDDEN, '仅 admin 可操作 WORM 归档'), 403);
   }
   return null;
