@@ -142,7 +142,7 @@ expect(fs.existsSync(path.join(dir, '_key-ops.json'))).toBe(true);
 | E2E Round 1（demo-ephemeral BFF） | **23 / 0 / 81** |
 | E2E Round 2 | **23 / 0 / 81** |
 | 并发取证脚本 | **300/300 read back, 0 malformed, 200 streamed, PASS** |
-| 品牌 17 词扫描（新增文件） | 仅"健澜科技"版权头，0 友商名、0 `gangos_` |
+| 品牌 17 词扫描（新增文件） | 仅"健澜科技"版权头，0 友商名、本轮新增 0 处风险前缀（存量口径见 backlog） |
 
 种子人名一律使用"张某某 / 李某某 / 王某某"，未使用 `张**` 之类会闭合块注释的写法。
 
