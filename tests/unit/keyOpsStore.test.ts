@@ -96,18 +96,72 @@ describe('P5-14 keyOpsStore', () => {
     expect(r2.ops.length).toBe(2);
   });
 
-  test('cleanupOldKeyOps 只删本实例旧文件', async () => {
+  test('跨实例清理：他实例的旧文件同样被清理，新文件保留', async () => {
     resetDir();
     const mod = await import('../../src/bff/aggregators/keyOpsStore');
-    // 写一条当前实例的
-    mod.appendKeyOp({ actorId: 'u1', action: 'retire', keyId: 'k1', result: 'ok', refs: null });
-    // 写一个"其他实例"的旧文件（31 天前 mtime 由 cleanup 自己判断）
-    const otherFile = join(testDir, '_key-ops-otherhost-1111-xyz000-20200101.jsonl');
-    writeFileSync(otherFile, JSON.stringify({ at: '2020-01-01T00:00:00.000Z', actorId: 'x', action: 'retire', keyId: 'kx', result: 'ok', refs: null }) + '\n', 'utf8');
-    const removed = mod.cleanupOldKeyOps(30);
-    // 其他实例的旧文件不删（只删本 instanceId 前缀的）
-    expect(removed).toBe(0);
-    expect(existsSync(otherFile)).toBe(true);
+    // 造 3 个实例的文件，每个实例一个"300 天前"旧文件 + 一个"今天"新文件
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const oldDate = '20200101'; // 远早于 180 天
+    const oldFiles: string[] = [];
+    const newFiles: string[] = [];
+    for (const inst of ['hostA-111-aaa111', 'hostB-222-bbb222', 'hostC-333-ccc333']) {
+      const oldF = join(testDir, `_key-ops-${inst}-${oldDate}.jsonl`);
+      const newF = join(testDir, `_key-ops-${inst}-${today}.jsonl`);
+      writeFileSync(oldF, JSON.stringify({ at: '2020-01-01T00:00:00.000Z', actorId: 'x', action: 'retire', keyId: 'kx', result: 'ok', refs: null }) + '\n', 'utf8');
+      writeFileSync(newF, JSON.stringify({ at: new Date().toISOString(), actorId: 'y', action: 'purge', keyId: 'ky', result: 'ok', refs: 1 }) + '\n', 'utf8');
+      oldFiles.push(oldF);
+      newFiles.push(newF);
+    }
+    const r = mod.cleanupOldKeyOps({ dryRun: false, retentionDays: 180 });
+    expect(r.removed).toBe(3);
+    for (const f of oldFiles) expect(existsSync(f)).toBe(false);
+    for (const f of newFiles) expect(existsSync(f)).toBe(true);
+  });
+
+  test('180 天边界：181 天前删、179 天前留', async () => {
+    resetDir();
+    const mod = await import('../../src/bff/aggregators/keyOpsStore');
+    const fmt = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, '');
+    const d181 = fmt(new Date(Date.now() - 181 * 86400_000));
+    const d179 = fmt(new Date(Date.now() - 179 * 86400_000));
+    const oldF = join(testDir, `_key-ops-host-111-aaa111-${d181}.jsonl`);
+    const newF = join(testDir, `_key-ops-host-222-bbb222-${d179}.jsonl`);
+    writeFileSync(oldF, 'x\n', 'utf8');
+    writeFileSync(newF, 'x\n', 'utf8');
+    const r = mod.cleanupOldKeyOps({ dryRun: false, retentionDays: 180 });
+    expect(r.removed).toBe(1);
+    expect(existsSync(oldF)).toBe(false);
+    expect(existsSync(newF)).toBe(true);
+  });
+
+  test('env 覆盖：KEY_OPS_RETENTION_DAYS=200 生效；非法值抛错', async () => {
+    const mod = await import('../../src/bff/aggregators/keyOpsStore');
+    // 合法覆盖
+    expect(mod.resolveRetentionDays('200')).toBe(200);
+    // 非法值
+    expect(() => mod.resolveRetentionDays('abc')).toThrow(/正整数/);
+    expect(() => mod.resolveRetentionDays('0')).toThrow(/正整数/);
+    expect(() => mod.resolveRetentionDays('30')).toThrow(/180/);
+    // 空字符串/undefined → 默认 180
+    expect(mod.resolveRetentionDays('')).toBe(180);
+    expect(mod.resolveRetentionDays(undefined)).toBe(180);
+  });
+
+  test('dry-run 不删文件、apply 才删', async () => {
+    resetDir();
+    const mod = await import('../../src/bff/aggregators/keyOpsStore');
+    const oldDate = '20200101';
+    const oldF = join(testDir, `_key-ops-host-111-aaa111-${oldDate}.jsonl`);
+    writeFileSync(oldF, 'x\n', 'utf8');
+    // 默认 dry-run=true
+    const r1 = mod.cleanupOldKeyOps({ retentionDays: 180 });
+    expect(r1.removed).toBe(0);
+    expect(r1.files.length).toBe(1);
+    expect(existsSync(oldF)).toBe(true);
+    // 显式 apply
+    const r2 = mod.cleanupOldKeyOps({ dryRun: false, retentionDays: 180 });
+    expect(r2.removed).toBe(1);
+    expect(existsSync(oldF)).toBe(false);
   });
 
   test('回归 P5-11b：WORM_STORE_DIR 指向不存在的嵌套路径 → 写一条 → 目录自动创建、读回 1 条', async () => {

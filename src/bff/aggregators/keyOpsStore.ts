@@ -126,27 +126,82 @@ export function readKeyOps(limit: number): KeyOpsReadResult {
   return { ops: sliced, malformed, files };
 }
 
-/** 清理：删除 30 天前的 key-ops jsonl（只删自己 instanceId 前缀的，避免误删他实例）。 */
-export function cleanupOldKeyOps(maxAgeDays = 30): number {
+/**
+ * 解析留存天数：默认 180；可由 KEY_OPS_RETENTION_DAYS 覆盖。
+ * 非法值（非数字、<=0、<180）直接抛错，不允许静默取默认——审计留存是合规硬指标。
+ */
+export function resolveRetentionDays(envValue: string | undefined = process.env.KEY_OPS_RETENTION_DAYS): number {
+  const DEFAULT = 180;
+  if (envValue === undefined || envValue === '') return DEFAULT;
+  const n = Number(envValue);
+  if (!Number.isFinite(n) || n <= 0) {
+    throw new Error(`KEY_OPS_RETENTION_DAYS=${envValue} 非法：必须是正整数`);
+  }
+  if (n < 180) {
+    throw new Error(`KEY_OPS_RETENTION_DAYS=${envValue} 低于合规下限 180 天（网络日志留存 6 个月），拒绝启动`);
+  }
+  return Math.floor(n);
+}
+
+/**
+ * 从文件名 _key-ops-<instanceId>-<YYYYMMDD>.jsonl 提取 YYYYMMDD。
+ * 解析失败返回 NaN（调用方视为不可识别文件，不删）。
+ */
+function extractDateFromName(name: string): number {
+  const m = name.match(/^_key-ops-[^-]+-\d+-[a-z0-9]+-(\d{8})\.jsonl$/);
+  if (!m) return NaN;
+  const ymd = m[1];
+  const y = Number(ymd.slice(0, 4));
+  const mo = Number(ymd.slice(4, 6));
+  const d = Number(ymd.slice(6, 8));
+  return Date.UTC(y, mo - 1, d);
+}
+
+export interface CleanupResult {
+  removed: number;
+  files: string[];
+  retentionDays: number;
+  cutoffIso: string;
+}
+
+/**
+ * 跨实例清理：按文件名里的 YYYYMMDD 判断新旧，删除所有实例（含已退出进程）的旧文件。
+ *
+ * 历史问题：旧实现只删"文件名含本 instanceId"的文件，而 instanceId 含 pid+随机串，
+ * 进程重启后新实例拿不到旧实例的 id，旧文件永远无人清理。
+ * 现在改为按文件名日期判定，不依赖 instanceId，任何一次运维脚本执行都能清理所有实例的旧文件。
+ *
+ * 默认 dryRun=true：只返回清单，不真删。审计文件删除不可逆，必须显式 apply。
+ */
+export function cleanupOldKeyOps(opts: { dryRun?: boolean; retentionDays?: number } = {}): CleanupResult {
+  const retentionDays = opts.retentionDays ?? resolveRetentionDays();
+  const dryRun = opts.dryRun ?? true;
   const dir = storeDir();
-  if (!existsSync(dir)) return 0;
+  const cutoffMs = Date.now() - retentionDays * 86400_000;
+  const result: CleanupResult = {
+    removed: 0,
+    files: [],
+    retentionDays,
+    cutoffIso: new Date(cutoffMs).toISOString(),
+  };
+  if (!existsSync(dir)) return result;
   let names: string[] = [];
-  try { names = readdirSync(dir); } catch { return 0; }
-  let removed = 0;
-  const cutoff = Date.now() - maxAgeDays * 86400_000;
+  try { names = readdirSync(dir); } catch { return result; }
   for (const name of names) {
     if (!name.startsWith('_key-ops-') || !name.endsWith('.jsonl')) continue;
-    // 只清理本实例的旧文件；他实例的文件由他实例自己清理
-    if (!name.includes(INSTANCE_ID)) continue;
+    const fileDateMs = extractDateFromName(name);
+    if (Number.isNaN(fileDateMs)) continue; // 不可识别的命名，不删
+    if (fileDateMs >= cutoffMs) continue;    // 未超期
     const p = join(dir, name);
+    result.files.push(p);
+    if (dryRun) continue;
     try {
-      const st = statSync(p);
-      if (st.mtimeMs < cutoff) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('node:fs').unlinkSync(p);
-        removed++;
-      }
-    } catch { /* ignore */ }
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require('node:fs').unlinkSync(p);
+      result.removed++;
+    } catch (e) {
+      console.warn('[worm-key-ops] 清理旧文件失败:', name, (e as Error).message);
+    }
   }
-  return removed;
+  return result;
 }
