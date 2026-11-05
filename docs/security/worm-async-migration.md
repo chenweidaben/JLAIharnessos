@@ -20,6 +20,17 @@
 
 **结论**：五个方法的调用方全在 async HTTP handler 里，改 Promise 是自然传播，不需要改 ctx / 中间件 / 错误处理框架。路由层 `json(ok(await aggregator.seal(...)))` 只是多一个 await。
 
+**seal() 全部调用点（grep 实测）**：
+- `routes/worm.ts:63` — HTTP `POST /segments/seal`，async ✅
+- `wormAuto.ts:164` — `tick()` 内部调用；`tick()` 本身由 `routes/worm.ts:335` 的 `POST /auto/tick` 调用，async ✅（但 `tick()` 函数签名要同步改 `async`，内部 `await seal({})`）
+- 测试：`tests/unit/wormArchive.test.ts`、`tests/integration/worm-e2e.test.ts`，全是 `await` 上下文 ✅
+- **无启动流程、无 setInterval 直接调用 seal**（wormAuto.tick 只通过 HTTP 触发，没有定时器自动跑）
+
+**级联影响**：`wormArchiveAggregator.ts:173` 注册了 `setKeyInUseChecker((keyId) => store.countBySigner(keyId))`，这个同步回调被 `wormKeyProvider` 在 retire/rotate 时同步调用。改 async 后：
+- `keyInUse` 回调签名改 `(keyId: string) => Promise<number>`
+- `wormKeyProvider.retire()/rotate()` 内部 `await this.keyInUse(keyId)`
+- 这两个方法本身只在 keys 路由（async handler）里被调，传播 OK
+
 **被否决的方案**：在 aggregator 内部把所有调用并行 `Promise.all`（seal 里 put 多个段）——seal 一次只产一个段，没有并行收益，反而引入错误处理复杂度。
 
 ---
@@ -29,7 +40,25 @@
 **结论：放在 `AsyncWormStore` 的装饰层**，包装 S3 client，不侵入 aggregator、不侵入业务代码。
 
 - 装饰类 `S3WormStoreWithResilience`：构造时包一个 `AsyncWormStore`，每个方法加 `Promise.race([inner.method(), timeout(ms)])`；并发上限用简单的信号量（`p-limit` 风格，自己写 20 行：一个队列 + in-flight 计数）。
-- 默认 timeout 5s、in-flight 20。
+
+**按方法分档超时**（5s 对 seal 太短，因为 seal 含 SM3/SM4/SM2 CPU 操作）：
+
+| 方法 | 超时 | 理由 |
+|---|---|---|
+| `put`（seal 调用） | **30s** | seal 要取 pending → SM3 哈希 → SM4 加密 → SM2 签名 → 写 S3；段几百条事件时 CPU + 网络都耗时 |
+| `get` | 5s | 单段读，小对象 |
+| `list` | 10s | S3 listObjects 可能分页 |
+| `countBySigner` | 5s | 基于 list 的内存过滤 |
+| `refresh` | 10s | 重新拉索引 |
+| `newestSeq` | 5s | 单次读 |
+
+**in-flight 并发上限**：put 5（seal 不会高频并发），get/list 各 20。
+
+**seal 超时后的行为（关键）**：超时 ≠ 没写。S3 put 可能已经成功，只是响应慢。处理：
+- 超时后**不抛错给上层**，而是把这次 put 标记为"结果未知"，立即 `headObject` 查询该 segmentId 是否存在
+- 如果 headObject 返回存在 → 视为成功，继续返回 seal 结果
+- 如果不存在 → 走 Q3 的本地兜底回退
+- **绝不允许上层重试 seal**——重试会产生重复段（segmentId 相同）。seal 的幂等键是 segmentId，重复 put 会被 `duplicate-segment` 拦截，但这会让用户看到错误
 
 **为什么不放 aggregator 调用点**：
 - aggregator 有 5+ 方法 × 多个路由，每个调用点都写 timeout/并发是重复代码
@@ -44,20 +73,28 @@
 
 ## Q3. 失败如何回退到本地 fs
 
-**结论：S3 put 失败时，写本地 `FileWormStore` 并打 `[worm] s3 put failed, fell back to local: ...` 警告；读路径合并两边。**
+**结论：S3 put 失败时，写本地 `FileWormStore` 并打 `[worm] s3 put failed, fell back to local: ...` 警告；读路径合并两边，但必须做段一致性校验。**
 
 具体：
-- **写路径**：`put(segment)` 先写 S3；S3 抛错 → 写本地 `FileWormStore(WORM_STORE_DIR)`，并在内存标记 `pendingUpload.add(segmentId)`。
-- **读路径**：`list()` = `S3.list() ∪ Local.list()`，按 segmentId 去重，S3 优先（S3 有的段本地忽略）。`get(id)` 先查 S3，miss 再查本地。
-- **后台补传**：一个低优先级 setInterval（如 60s）扫 `pendingUpload`，重试 S3 put，成功后从本地删除该段（或标记已上传）。
+- **写路径**：`put(segment)` 先写 S3；S3 抛错 → 写本地 `FileWormStore(WORM_STORE_DIR)`。
+- **读路径合并**：`list()` = S3.list() ∪ Local.list()，按 segmentId 去重。`get(id)` 先查 S3，miss 再查本地。
+- **段一致性校验（关键）**：同一 `segmentId` 在 S3 和本地都存在时，**比对 `segmentHash`（SM3 摘要）**：
+  - 一致 → 正常返回
+  - **不一致 → 不返回任何一份，抛 `worm-segment-divergence` 错误 + 计数 metric + 日志记 segmentId 与两侧 hash**，交由人工处置
+  - 理由：WORM 段不可变，读到不一致本身就是完整性事件，静默选一边等于吞掉篡改信号
+- **后台补传（无状态推导）**：不维护内存 `pendingUpload` Set（重启即丢）。改成：每次 `list()` 或定期（60s）扫描时，发现"S3 miss 但本地有"的段，自动异步补传到 S3，成功后从本地删除。无状态推导，重启即恢复，不引入新的可丢失状态。
 
 **数据一致性后果（说清）**：
 - S3 写成功但本地没写 → 正常，无影响
-- S3 写失败、本地写成功 → 读路径能读到（本地兜底），但段在 S3 缺失；补传任务负责追上
-- S3 写成功、本地也写了（双写窗口） → 读路径 S3 优先，本地那份是冗余，补传任务完成后删本地
+- S3 写失败、本地写成功 → 读路径能读到（本地兜底），下次 list/定期扫描自动补传
+- S3 写成功、本地也写了（双写窗口，如 seal 超时后 headObject 发现已存在但本地也落了） → 读路径比对 hash 一致后正常返回，定期扫描清理本地冗余
+- **同一 segmentId 两边 hash 不同** → `worm-segment-divergence`，人工处置，不静默返回
 - **不允许**：S3 失败直接让 seal 500——那样用户写操作失败，但段可能已经在本地/PG 落了，状态不一致
 
-**被否决的方案**：S3 失败直接 500 让上层重试。理由：seal 是归档操作，失败重试可能造成 pending 事件被重复归档（已有 seq-gap 闸保护，但仍会让用户看到错误）。本地兜底 + 后台补传是最终一致，对用户透明。
+**被否决的方案**：
+- S3 失败直接 500 让上层重试：seal 是归档操作，失败重试可能造成 pending 事件被重复归档
+- 内存 `pendingUpload` Set：重启丢失，本地文件永久滞留（P5-15 修过的同一个病）
+- 静默"S3 优先"选边：WORM 不可变语义下，不一致是安全事件，必须告警
 
 ---
 
@@ -79,11 +116,12 @@
 
 **本切片（落地时）只做**：
 1. `wormArchiveAggregator.ts` 五个方法签名改 `async`，内部所有 `store.put/get/list/countBySigner/refresh` 调用加 await
-2. 路由层（`worm.ts`）五个对应 handler 加 await（机械改动）
+2. 路由层（`worm.ts`）五个对应 handler 加 await（机械改动）；`wormAuto.tick()` 同步改 `async`
 3. `MemoryWormStore` / `FileWormStore` 包成 `AsyncWormStore`（用已有 `toAsyncStore`），aggregator 构造函数注入 `AsyncWormStore`
-4. `S3WormStoreWithResilience` 装饰类（Q2）
-5. 双写兜底逻辑（Q3），但**默认不启用 S3**——`WORM_BACKEND=s3` 才走 S3WormStore，否则走现有 fs/memory
-6. 单测：aggregator 用 async store 重跑现有所有 wormArchive 用例（Promise 化）
+4. `S3WormStoreWithResilience` 装饰类（Q2，按方法分档超时）
+5. 双写兜底逻辑（Q3，含段一致性校验 + 无状态补传），但**默认不启用 S3**——`WORM_BACKEND=s3` 才走 S3WormStore，否则走现有 fs/memory
+6. **fail-closed 启动校验**：`WORM_BACKEND=s3` 但没配 `S3_BUCKET` / 凭据 → 拒绝启动（不许静默回落 memory）；production 下 `WORM_BACKEND=s3` 无凭据同样拒绝
+7. 单测：aggregator 用 async store 重跑现有所有 wormArchive 用例（Promise 化）；补 `worm-segment-divergence` 用例（本地与 S3 同 id 不同 hash → 抛错）；补 fail-closed 启动校验用例
 
 **本切片明确不做**：
 - 不接真实 `@aws-sdk/client-s3`（继续用 MockS3Client 跑契约）
@@ -109,3 +147,6 @@
 | S3 失败直接 500 | 状态不一致，用户体验差 |
 | deasync / Atomics.wait 桥接 | 独占事件循环，技术债 |
 | 默认启用 S3 | 风险高，必须 opt-in |
+| 内存 pendingUpload Set | 重启丢失，本地文件永久滞留 |
+| 同 id 不同 hash 时静默选 S3 | 吞掉篡改信号，违反 WORM 不可变语义 |
+| WORM_BACKEND=s3 但缺凭据时回落 memory | P5-13 教训，fail-closed |
