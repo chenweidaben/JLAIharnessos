@@ -27,6 +27,6 @@
     },
     "types": ["bun-types"]
   },
-  "include": ["src/**/*", "tests/**/*", "scripts/**/*"],
+  "include": ["src/**/*", "tests/**/*", "scripts/perf-worm-search.mts"],
   "exclude": ["node_modules", "dist"]
 }
