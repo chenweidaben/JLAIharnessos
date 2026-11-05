@@ -24,6 +24,7 @@ import {
 } from '../aggregators/wormArchiveAggregator.js';
 import { getAutoConfig, listTickHistory, search, setAutoConfig, tick } from '../aggregators/wormAuto.js';
 import { isValidSegmentId } from '../aggregators/wormStore.js';
+import { appendKeyOp, readKeyOps as readKeyOpsFromStore, type KeyOp, type KeyOpInput } from '../aggregators/keyOpsStore.js';
 
 function requireAdmin(c: Ctx): Response | null {
   // 未认证（c.user 缺失）→ 401 Unauthorized；已认证但非 admin → 403 Forbidden。
@@ -39,40 +40,14 @@ function requireDemo(c: Ctx): Response | null {
   return null;
 }
 
-// P5-11：独立运维审计流，落 <WORM_STORE_DIR>/_key-ops.json，不进业务审计链。
+// P5-11：独立运维审计流，不进业务审计链。
+// P5-14：实现迁到 aggregators/keyOpsStore.ts，按实例分文件 JSONL 追加，消除多实例读-改-写竞态。
 // 绝不记录任何密钥值。
-interface KeyOp { at: string; actorId: string; action: 'retire' | 'purge'; keyId: string; result: string; refs: number | null; }
-type KeyOpInput = Omit<KeyOp, 'at'>;
-function opsPath(): string {
-  const dir = process.env.WORM_STORE_DIR || 'logs/worm-store';
-  return `${dir}/_key-ops.json`;
-}
 async function logKeyOp(op: KeyOpInput): Promise<void> {
-  try {
-    const fs = await import('node:fs/promises');
-    const p = opsPath();
-    const record: KeyOp = { at: new Date().toISOString(), ...op };
-    let arr: KeyOp[] = [];
-    try { arr = JSON.parse(await fs.readFile(p, 'utf8')); } catch { arr = []; }
-    arr.push(record);
-    if (arr.length > 1000) arr = arr.slice(arr.length - 1000);
-    // P5-11b：首次写入时目录可能尚不存在（全新部署/独立 WORM_STORE_DIR），
-    // 先递归建目录，否则审计会静默丢失——审计缺失本身就是合规缺陷。
-    const path = await import('node:path');
-    await fs.mkdir(path.dirname(p), { recursive: true });
-    await fs.writeFile(p, JSON.stringify(arr, null, 2), 'utf8');
-  } catch (e) {
-    // 不阻断主流程，但必须留痕，不能静默吞掉（只打印路径级错误，不含密钥值）
-    console.warn('[worm-key-ops] 运维审计写入失败，本条记录已丢失:', (e as Error).message);
-  }
+  appendKeyOp(op);
 }
 function readKeyOps(limit: number): KeyOp[] {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('node:fs');
-    const arr = JSON.parse(fs.readFileSync(opsPath(), 'utf8')) as KeyOp[];
-    return arr.slice(-limit).reverse();
-  } catch { return []; }
+  return readKeyOpsFromStore(limit).ops;
 }
 
 export const wormRoutes: RouteDef[] = [
