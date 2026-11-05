@@ -170,7 +170,25 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
 
-  // scripts/** 不在 tsconfig 里，关掉类型感知规则，只跑基础规则
+  // scripts/** 不在根 tsconfig 里；三个 P5-15 脚本走独立 tsconfig 开类型感知，
+  // 其余脚本仍走无类型感知规则集（避免全量编译慢）。
+  {
+    files: ['scripts/verify-fs-backend.mts', 'scripts/verify-keyops-concurrency.mts', 'scripts/cleanup-keyops.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './scripts/tsconfig.json',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      'no-unused-vars': 'off',
+      'no-console': 'off',
+    },
+  },
   {
     files: ['scripts/**/*.mts', 'scripts/**/*.ts'],
     languageOptions: {
