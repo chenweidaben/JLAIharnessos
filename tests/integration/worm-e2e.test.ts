@@ -47,6 +47,17 @@ const doctor = sign(['doctor'], '医生', `doc-${SALT}`);
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
+  // P5-14 前置条件：KeyProvider 必须是可轮换的（file / demo-ephemeral），不能是 env。
+  // env 模式按设计不支持 rotate（worm-env-rotate-not-supported），purge 会走 cannot-purge-active，
+  // 9 条用例会散落失败。这里直接抛错，把 9 条红灯收敛成 1 条前置条件失败。
+  const ks = await call('GET','/api/v1/worm/keys',{token:admin});
+  if (ks.data?.keySource === 'env') {
+    throw new Error(
+      'E2E 前置条件不满足：BFF 以 WORM_SM2_PRIVATE_KEY/PUBLIC_KEY 启动（EnvKeyProvider），'
+      + '该模式按设计不支持 rotate（worm-env-rotate-not-supported），purge 会因此走 cannot-purge-active。'
+      + '请用未设置 WORM_SM2_* 的 BFF 环境运行本 E2E。'
+    );
+  }
   // 每轮开始前清探针
   await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
 });
