@@ -171,3 +171,48 @@ describe('P5-11 purge 二次确认', () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe('P5-11b 运维审计流落盘', () => {
+  test('WORM_STORE_DIR 指向不存在的嵌套目录时 purge 仍能落审计', async () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-ops-'));
+    const dir = path.join(tmp, 'nested', 'store'); // 刻意不存在
+    const prev = process.env.WORM_STORE_DIR;
+    process.env.WORM_STORE_DIR = dir;
+    try {
+      const provider = getKeyProvider();
+      provider.rotate();
+      const kZero = provider.activeKeyId();
+      provider.rotate(); // kZero 退出 active，且从未签段 → refs=0
+
+      const purgeH = findHandler('POST', '/api/v1/worm/keys/purge');
+      const res = await purgeH(makeCtx({
+        user: { id: 'A1', name: 'admin', roles: ['admin'] },
+        body: { keyId: kZero, confirm: 'PURGE' },
+      }));
+      expect(res.status).toBe(200);
+      // 审计目录应被自动创建并落盘，不能静默丢失
+      expect(fs.existsSync(path.join(dir, '_key-ops.json'))).toBe(true);
+
+      const opsH = findHandler('GET', '/api/v1/worm/keys/ops');
+      const ctx: any = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] } });
+      ctx.query = new URLSearchParams('limit=10');
+      const opsRes = await opsH(ctx);
+      expect(opsRes.status).toBe(200);
+      const body: any = await opsRes.json();
+      const rows: any[] = body.data.ops;
+      expect(rows.length).toBeGreaterThanOrEqual(1);
+      expect(rows[0].keyId).toBe(kZero);
+      expect(rows[0].actorId).toBe('A1');
+      expect(rows[0].action).toBe('purge');
+      // 审计里只能有 keyId，不允许出现任何密钥值
+      expect(JSON.stringify(rows)).not.toContain('privateKey');
+    } finally {
+      if (prev === undefined) delete process.env.WORM_STORE_DIR;
+      else process.env.WORM_STORE_DIR = prev;
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+});

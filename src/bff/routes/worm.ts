@@ -56,8 +56,15 @@ async function logKeyOp(op: KeyOpInput): Promise<void> {
     try { arr = JSON.parse(await fs.readFile(p, 'utf8')); } catch { arr = []; }
     arr.push(record);
     if (arr.length > 1000) arr = arr.slice(arr.length - 1000);
+    // P5-11b：首次写入时目录可能尚不存在（全新部署/独立 WORM_STORE_DIR），
+    // 先递归建目录，否则审计会静默丢失——审计缺失本身就是合规缺陷。
+    const path = await import('node:path');
+    await fs.mkdir(path.dirname(p), { recursive: true });
     await fs.writeFile(p, JSON.stringify(arr, null, 2), 'utf8');
-  } catch { /* 审计写失败不阻断主流程 */ }
+  } catch (e) {
+    // 不阻断主流程，但必须留痕，不能静默吞掉（只打印路径级错误，不含密钥值）
+    console.warn('[worm-key-ops] 运维审计写入失败，本条记录已丢失:', (e as Error).message);
+  }
 }
 function readKeyOps(limit: number): KeyOp[] {
   try {
