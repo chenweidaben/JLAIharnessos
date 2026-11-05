@@ -51,7 +51,10 @@ function newKeyPair(): { keyId: string; publicKeyHex: string; privateKeyHex: str
 }
 
 function kekFromEnv(): string {
-  const kek = process.env.WORM_KEK || process.env.WORM_SM4_KEY || '';
+  // 硬边界：KEK 必须独立配置，不回落 WORM_SM4_KEY。
+  // 原因：内容加密密钥(WORM_SM4_KEY)与 KEK(加密 SM2 私钥环)用途不同，
+  // 同钥多用途会扩大 CBC 攻击面，且内容密钥泄露等于私钥环泄露。
+  const kek = process.env.WORM_KEK || '';
   if (!/^[0-9a-fA-F]{32}$/.test(kek)) return '';
   return kek.toLowerCase();
 }
@@ -202,14 +205,11 @@ let globalProvider: KeyProvider | null = null;
 export function getKeyProvider(): KeyProvider {
   if (globalProvider) return globalProvider;
   const storeDir = process.env.WORM_STORE_DIR || join(process.cwd(), 'logs', 'worm-store');
-  // 生产模式必须有 KEK 且用 FileKeyProvider；否则 demo ephemeral
-  if (kekFromEnv() && process.env.NODE_ENV === 'production') {
+  // KEK 独立配置；缺失时一律走 demo-ephemeral（显式 warn），不静默降级
+  if (kekFromEnv() && (process.env.NODE_ENV === 'production' || process.env.WORM_FILE_KEY === '1')) {
     globalProvider = new FileKeyProvider(storeDir);
-  } else if (process.env.DEMO_MODE === '1' || !kekFromEnv()) {
-    globalProvider = new DemoEphemeralKeyProvider();
   } else {
-    // 有 KEK 但非 production：仍用 file（可测试）
-    globalProvider = new FileKeyProvider(storeDir);
+    globalProvider = new DemoEphemeralKeyProvider();
   }
   return globalProvider;
 }

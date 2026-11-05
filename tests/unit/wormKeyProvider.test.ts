@@ -18,6 +18,7 @@ beforeEach(() => {
   process.env.WORM_KEK = 'a'.repeat(32);
   delete process.env.NODE_ENV;
   delete process.env.DEMO_MODE;
+  delete process.env.WORM_FILE_KEY;
 });
 afterAll(() => {
   if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
@@ -117,5 +118,30 @@ describe('P5-8 FileKeyProvider', () => {
     expect(r1.reason).toBe('unknown-key-id');
     // 环里的 keyId 仍在
     expect(p.listKeyIds()).toContain(k1);
+  });
+  test('未配 WORM_KEK 时 FileKeyProvider 拒绝构造', () => {
+    delete process.env.WORM_KEK;
+    // 即使回落设了 WORM_SM4_KEY 也不应被复用为 KEK
+    process.env.WORM_SM4_KEY = 'b'.repeat(32);
+    expect(() => new FileKeyProvider(tmpDir)).toThrow(/worm-kek-not-configured/);
+    delete process.env.WORM_SM4_KEY;
+  });
+  test('encryptedPrivateKeyHex 是真密文（长度对齐 + 真解密回读）', () => {
+    const p = new FileKeyProvider(tmpDir);
+    const { privateKeyHex } = p.getSigningKey();
+    const content = JSON.parse(readFileSync(join(tmpDir, '_keys.json'), 'utf8'));
+    const entry = content.ring[0];
+    // sm4-crypto CBC 带 PKCS 填充，密文 hex 长度 ≥ 明文；只断言密文比明文长
+    expect(entry.encryptedPrivateKeyHex.length).toBeGreaterThan(privateKeyHex.length);
+    // 前 32 字符与明文完全不同（不是简单 hex 编码）
+    expect(entry.encryptedPrivateKeyHex.slice(0, 32)).not.toBe(privateKeyHex.slice(0, 32));
+    // ivHex 存在且非全零
+    expect(entry.ivHex.length).toBe(32);
+    expect(entry.ivHex).not.toBe('0'.repeat(32));
+    // 真解密回读：用 KEK 解开，得到的就是原私钥
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const sm4 = require('sm-crypto').sm4;
+    const decrypted = sm4.decrypt(entry.encryptedPrivateKeyHex, process.env.WORM_KEK!, { mode: 'cbc', iv: entry.ivHex });
+    expect(decrypted).toBe(privateKeyHex);
   });
 });
