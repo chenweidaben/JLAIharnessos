@@ -153,6 +153,40 @@ export const wormRoutes: RouteDef[] = [
     },
   },
   {
+    method: 'POST',
+    path: '/api/v1/worm/keys/retire',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const b = (await c.body()) as Record<string, unknown>;
+      const keyId = String(b.keyId ?? '');
+      if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
+      const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
+      const r = getKeyProvider().retire(keyId);
+      if (!r.ok) return json(fail(ErrorCode.BAD_REQUEST, r.error ?? 'retire-failed'), 400);
+      return json(ok({ ok: true, keyId, keySource: getKeyProvider().kind, activeKeyId: getKeyProvider().activeKeyId() }));
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/worm/keys/purge',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const b = (await c.body()) as Record<string, unknown>;
+      const keyId = String(b.keyId ?? '');
+      if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
+      const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
+      const r = getKeyProvider().purge(keyId);
+      if (!r.ok) {
+        // 409 for conflict (in-use / active), 400 for unknown-id
+        const status = r.error === 'key-in-use' || r.error === 'cannot-purge-active' ? 409 : 400;
+        return json({ ok: false, error: r.error, refs: r.refs } as never, status as never);
+      }
+      return json(ok({ ok: true, keyId, keySource: getKeyProvider().kind, activeKeyId: getKeyProvider().activeKeyId() }));
+    },
+  },
+  {
     method: 'GET',
     path: '/api/v1/worm/store/info',
     auth: true,

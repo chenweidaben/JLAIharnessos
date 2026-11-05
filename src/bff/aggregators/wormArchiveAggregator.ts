@@ -159,7 +159,7 @@ initKeys();
 function ensureKeyInUseChecker(): void {
   const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
   if (typeof p.setKeyInUseChecker !== 'function') return;
-  p.setKeyInUseChecker((keyId: string) => store().list().filter((s) => s.signerKeyId === keyId).length);
+  p.setKeyInUseChecker((keyId: string) => store().countBySigner(keyId));
 }
 ensureKeyInUseChecker();
 

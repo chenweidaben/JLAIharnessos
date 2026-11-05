@@ -25,15 +25,20 @@ export interface WormStore {
   get(segmentId: string): WormSegment | null;
   list(): WormSegment[];
   count(): number;
+  /** P5-10：按 signerKeyId 倒排统计，O(1)；索引在 put/refresh 时维护 */
+  countBySigner(keyId: string): number;
 }
 
 export class MemoryWormStore implements WormStore {
   readonly kind = 'memory' as const;
   private map = new Map<string, WormSegment>();
+  private bySigner = new Map<string, number>();
 
   put(segment: WormSegment): void {
     if (this.map.has(segment.segmentId)) throw new Error('duplicate-segment');
     this.map.set(segment.segmentId, segment);
+    const k = segment.signerKeyId ?? '';
+    this.bySigner.set(k, (this.bySigner.get(k) ?? 0) + 1);
   }
   get(segmentId: string): WormSegment | null {
     return this.map.get(segmentId) ?? null;
@@ -42,7 +47,11 @@ export class MemoryWormStore implements WormStore {
     return Array.from(this.map.values()).sort((a, b) => a.seq - b.seq);
   }
   count(): number { return this.map.size; }
-  __clear(): void { this.map.clear(); }
+  countBySigner(keyId: string): number { return this.bySigner.get(keyId) ?? 0; }
+  __clear(): void {
+    this.map.clear();
+    this.bySigner.clear();
+  }
 }
 
 export class FileWormStore implements WormStore {
@@ -50,6 +59,7 @@ export class FileWormStore implements WormStore {
   readonly dir: string;
   private segments: WormSegment[] = [];
   private byId = new Map<string, WormSegment>();
+  private bySigner = new Map<string, number>();
 
   constructor(dir?: string) {
     this.dir = path.resolve(dir ?? process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
@@ -58,13 +68,13 @@ export class FileWormStore implements WormStore {
   }
 
   /**
-   * 重新扫目录重建内存索引。
-   * 同实例不会自动感知外部（其他进程/实例）写入的新段，需要显式调 refresh()；
-   * 新实例构造时自然是最新的。put() 成功后已自动 append 到内存，无需手动 refresh。
+   * 重新扫目录重建内存索引（含 bySigner 倒排）。
+   * 同实例不会自动感知外部（其他进程/实例）写入的新段，需要显式调 refresh()。
    */
   refresh(): void {
     this.segments = [];
     this.byId.clear();
+    this.bySigner.clear();
     let names: string[] = [];
     try { names = readdirSync(this.dir); } catch { return; }
     for (const n of names) {
@@ -75,6 +85,8 @@ export class FileWormStore implements WormStore {
         const seg = JSON.parse(readFileSync(path.join(this.dir, n), 'utf8')) as WormSegment;
         this.segments.push(seg);
         this.byId.set(seg.segmentId, seg);
+        const k = seg.signerKeyId ?? '';
+        this.bySigner.set(k, (this.bySigner.get(k) ?? 0) + 1);
       } catch { /* 损坏文件跳过 */ }
     }
     this.segments.sort((a, b) => a.seq - b.seq);
@@ -103,6 +115,8 @@ export class FileWormStore implements WormStore {
     }
     this.segments.push(segment);
     this.byId.set(segment.segmentId, segment);
+    const k = segment.signerKeyId ?? '';
+    this.bySigner.set(k, (this.bySigner.get(k) ?? 0) + 1);
     this.segments.sort((a, b) => a.seq - b.seq);
   }
 
@@ -116,6 +130,8 @@ export class FileWormStore implements WormStore {
       const seg = JSON.parse(raw) as WormSegment;
       this.byId.set(segmentId, seg);
       this.segments.push(seg);
+      const k = seg.signerKeyId ?? '';
+      this.bySigner.set(k, (this.bySigner.get(k) ?? 0) + 1);
       this.segments.sort((a, b) => a.seq - b.seq);
       return seg;
     } catch {
@@ -129,6 +145,10 @@ export class FileWormStore implements WormStore {
 
   count(): number {
     return this.segments.length;
+  }
+
+  countBySigner(keyId: string): number {
+    return this.bySigner.get(keyId) ?? 0;
   }
 }
 

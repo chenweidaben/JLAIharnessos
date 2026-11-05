@@ -528,9 +528,8 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', () => {
       require('../../src/bff/aggregators/wormKeyProvider');
     __resetKeyProvider(new DemoEphemeralKeyProvider());
     const provider = getKeyProvider();
-    // 把真实 store.list() 扫描挂上（模拟模块加载时的 ensureKeyInUseChecker）
-    provider.setKeyInUseChecker((kid: string) =>
-      getWormStore().list().filter((s: any) => s.signerKeyId === kid).length);
+    // 用 O(1) 索引 countBySigner
+    provider.setKeyInUseChecker((kid: string) => getWormStore().countBySigner(kid));
 
     seedN(2);
     const r1 = seal({});
