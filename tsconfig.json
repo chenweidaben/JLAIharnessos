@@ -27,6 +27,6 @@
     },
     "types": ["bun-types"]
   },
-  "include": ["src/**/*", "tests/**/*", "scripts/perf-worm-search.mts"],
+  "include": ["src/**/*", "tests/**/*", "scripts/perf-worm-search.mts", "scripts/perf-signer-index.mts"],
   "exclude": ["node_modules", "dist"]
 }
