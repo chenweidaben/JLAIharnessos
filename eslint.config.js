@@ -218,13 +218,14 @@ export default tseslint.config(
     },
   },
 
-  // P5-16 async 化门禁：这四个文件必须 0 floating promises（漏 await）
+  // P5-16 async 化门禁：这五个文件必须 0 floating promises（漏 await）
   {
     files: [
       'src/bff/aggregators/wormArchiveAggregator.ts',
       'src/bff/aggregators/wormAuto.ts',
       'src/bff/routes/worm.ts',
       'src/bff/aggregators/wormKeyProvider.ts',
+      'src/bff/aggregators/wormStoreResilience.ts',
     ],
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
