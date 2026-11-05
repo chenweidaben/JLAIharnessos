@@ -122,3 +122,45 @@ describe('P5-13 PgAuditStore fake executor（模板标签形态）', () => {
     process.env.AUDIT_FALLBACK_DIR = tmp;
   });
 });
+
+describe('P5-13 启动回填边界（lastArchivedSeq）', () => {
+  test('backfillPending(6) 只回填 seq>6 的事件，首条 seq===7', async () => {
+    // 模拟 Memory store 里已有 seq 1..9
+    const mem = new MemoryAuditStore();
+    __resetStore();
+    __resetAuditStore(mem);
+    // 手动造 9 条事件（不经过 recordEvent 的 seq 分配）
+    const fake = [1,2,3,4,5,6,7,8,9].map((n) => ({
+      eventId: `e-${n}`, seq: n, occurredAt: '2026-11-06T00:00:00Z',
+      actorId: 'zhangsan', actorRole: 'admin', action: 'login', module: 'auth',
+      resourceType: 'session', resourceId: `s-${n}`, result: 'success',
+      ip: '127.0.0.1', userAgent: 't', prevHash: 'h', hash: 'h',
+    })) as any;
+    // 直接灌进 store.rows（绕过 recordEvent）
+    (mem as any).rows = [...fake];
+    // backfill 只取 seq > 6
+    const { backfillPending, getPendingEvents } = await import('../../src/bff/aggregators/auditEventAggregator');
+    const n = await backfillPending(6);
+    expect(n).toBe(3);
+    const pending = getPendingEvents();
+    expect(pending.length).toBe(3);
+    expect(pending[0].seq).toBe(7);
+    expect(pending[2].seq).toBe(9);
+  });
+
+  test('backfillPending(0) 时 lastArchivedSeq=0 → 全部回填（首段场景）', async () => {
+    const mem = new MemoryAuditStore();
+    __resetStore();
+    __resetAuditStore(mem);
+    (mem as any).rows = [1,2,3].map((n) => ({
+      eventId: `e-${n}`, seq: n, occurredAt: '2026-11-06T00:00:00Z',
+      actorId: 'zhangsan', actorRole: 'admin', action: 'login', module: 'auth',
+      resourceType: 'session', resourceId: `s-${n}`, result: 'success',
+      ip: '127.0.0.1', userAgent: 't', prevHash: 'h', hash: 'h',
+    })) as any;
+    const { backfillPending, getPendingEvents } = await import('../../src/bff/aggregators/auditEventAggregator');
+    const n = await backfillPending(0);
+    expect(n).toBe(3);
+    expect(getPendingEvents()[0].seq).toBe(1);
+  });
+});

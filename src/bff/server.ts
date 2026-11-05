@@ -7049,16 +7049,31 @@ console.log(
 
 // P5-13：显式初始化审计存储并打印后端类型（审计不跟随 DEMO_MODE 跳过 PG）
 import('./aggregators/auditEventStore').then((m) => {
-  m.initAuditStore();
-  // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
-  // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。
-  return import('./aggregators/wormArchiveAggregator').then((w) => {
-    const c = w.ensureCountersHydrated();
-    return import('./aggregators/auditEventAggregator').then((a) => a.backfillPending(c.lastArchivedSeq));
+  const auditStore = m.initAuditStore();
+  // P5-13 安全自检：audit=pg + worm=memory 是最危险组合（事件入 PG，段只在内存，
+  // 重启后 lastArchivedSeq 归零，已归档事件被重复归档覆盖）。
+  return import('./aggregators/wormStore').then((w) => {
+    const wormInfo = w.getWormBackendInfo();
+    // 触发一次 getWormStore() 以打出 [worm] backend=... 日志
+    w.getWormStore();
+    if (auditStore.kind === 'pg' && wormInfo.backend === 'memory') {
+      const msg = '审计事件已持久化到 PG，但 WORM 段仅在内存。重启后 lastArchivedSeq 归零，'
+        + '会把已归档事件重复归档并覆盖旧段。请设置 WORM_BACKEND=fs。';
+      if ((process.env.NODE_ENV ?? 'development') === 'production') {
+        throw new Error(`[worm] unsafe combo: ${msg}`);
+      }
+      console.error(`[worm] unsafe combo: ${msg}`);
+    }
+    // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
+    // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。
+    return import('./aggregators/wormArchiveAggregator').then((wa) => {
+      const c = wa.ensureCountersHydrated();
+      return import('./aggregators/auditEventAggregator').then((a) => a.backfillPending(c.lastArchivedSeq));
+    });
   });
 }).then((n) => {
   if (typeof n === 'number') console.log(`[audit] backfill done: ${n} events`);
-}).catch(() => {});
+}).catch((e) => { console.error('[audit] init failed:', e?.message ?? e); });
 
 void initDatabase().then(() => {
   // eslint-disable-next-line no-console

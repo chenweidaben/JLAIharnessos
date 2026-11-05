@@ -184,12 +184,30 @@ export class FileWormStore implements WormStore {
 }
 
 let _store: WormStore | null = null;
-export function getWormStore(): WormStore {
-  if (_store) return _store;
+let _loggedBackend = false;
+export function getWormBackendInfo(): { backend: 'fs' | 'memory'; dir: string } {
   if (process.env.WORM_BACKEND === 'fs') {
-    _store = new FileWormStore();
-  } else {
-    _store = new MemoryWormStore();
+    const dir = path.resolve(process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
+    return { backend: 'fs', dir };
+  }
+  return { backend: 'memory', dir: '(in-process memory; not persisted)' };
+}
+export function getWormStore(): WormStore {
+  if (!_store) {
+    if (process.env.WORM_BACKEND === 'fs') {
+      _store = new FileWormStore();
+    } else {
+      _store = new MemoryWormStore();
+    }
+  }
+  if (!_loggedBackend) {
+    _loggedBackend = true;
+    const info = getWormBackendInfo();
+    if (info.backend === 'fs') {
+      console.info(`[worm] backend=fs dir=${info.dir}`);
+    } else {
+      console.warn(`[worm] backend=memory — segments are NOT persisted; restart will re-archive already-sealed events and BREAK the cross-segment chain. Set WORM_BACKEND=fs for production.`);
+    }
   }
   return _store;
 }

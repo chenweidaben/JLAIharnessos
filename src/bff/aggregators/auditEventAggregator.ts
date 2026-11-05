@@ -9,7 +9,7 @@
  */
 
 import { createHash, randomUUID } from 'node:crypto';
-import { getAuditStore, type AppendResult } from './auditEventStore';
+import { getAuditStore, __resetAuditStore, type AppendResult } from './auditEventStore';
 
 export class AuditError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -200,7 +200,12 @@ export function __tamper(seq: number, patch: Partial<AuditEvent>): void {
   Object.assign(e, patch);
 }
 
-export function __resetStore(): void { events.length = 0; }
+export function __resetStore(): void {
+  events.length = 0;
+  // P5-13：同步清空全局 store，避免跨用例 MemoryAuditStore rows 累积导致 seq 漂移
+  //（Memory store 用 rows.length+1 分配 seq，不清空会导致 pending 首条 seq != lastArchivedSeq+1）。
+  __resetAuditStore(null);
+}
 
 /** P5-13：暴露内存 pending 池（seal 路径用，避免每次 seal 查 DB） */
 export function getPendingEvents(): AuditEvent[] { return [...events]; }

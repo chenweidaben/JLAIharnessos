@@ -692,3 +692,34 @@ describe('P5-12 mtime 边界补测', async () => {
     fs.rmSync(tmp, { recursive: true, force: true });
   });
 });
+
+describe('P5-13 seal 跨段 seq 衔接 fail-closed', async () => {
+  test('pending 首条 seq !== lastArchivedSeq+1 → 拒绝 seq-gap', async () => {
+    await seedN(3);
+    const r1 = seal({});
+    expect(r1.ok).toBe(true);
+    const { __injectPending } = await import('../../src/bff/aggregators/auditEventAggregator');
+    __injectPending({
+      eventId: 'injected', seq: 100, occurredAt: '2026-11-06T00:00:00Z',
+      actorId: 'zhangsan', actorRole: 'admin', action: 'login', module: 'auth',
+      resourceType: 'session', resourceId: 's-100', result: 'success',
+      ip: '127.0.0.1', userAgent: 't', prevHash: 'h', hash: 'h',
+    } as any);
+    const r2 = seal({});
+    expect(r2.ok).toBe(false);
+    expect(r2.error).toBe('seq-gap');
+    expect(r2.expectedSeq).toBe(4);
+    expect(r2.actualFirstSeq).toBe(100);
+  });
+
+  test('正常衔接：pending 首条 === lastArchivedSeq+1 → 放行', async () => {
+    await seedN(3);
+    const s1 = seal({});
+    expect(s1.ok).toBe(true);
+    await seedN(2);
+    const s2 = seal({});
+    expect(s2.ok).toBe(true);
+    expect(s2.segment!.fromSeq).toBe(4);
+    expect(s2.segment!.toSeq).toBe(5);
+  });
+});
