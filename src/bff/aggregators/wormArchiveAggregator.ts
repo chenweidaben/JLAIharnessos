@@ -87,7 +87,7 @@ function hydrateCountersFromStore(): void {
   if (countersHydrated) return;
   countersHydrated = true;
   // 单例可能在外部段写入前就已构造，refresh() 重新扫磁盘保证拿到最新段集合
-  const s = store() as { refresh?: () => void };
+  const s = store() as WormStore & { refresh?: () => void };
   if (typeof s.refresh === 'function') s.refresh();
   const existing = s.list();
   if (existing.length === 0) return;
