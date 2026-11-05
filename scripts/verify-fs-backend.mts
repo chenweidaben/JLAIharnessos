@@ -10,6 +10,7 @@ import { mkdirSync, rmSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn, type ChildProcess } from 'node:child_process';
 import crypto from 'node:crypto';
+import { sm2 as sm2lib } from 'sm-crypto';
 
 const REPO = join(import.meta.dir, '..');
 const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
@@ -19,13 +20,12 @@ mkdirSync(storeDir, { recursive: true });
 
 // 一次性测试密钥（脚本内生成，不打印、不落盘）
 const sm4Key = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
-const { sm2: sm2lib } = require('sm-crypto');
 const kp = sm2lib.generateKeyPairHex();
 const sm2Priv: string = kp.privateKey;
 const sm2Pub: string = kp.publicKey;
 const kek = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
 
-const results: Array<{ name: string; pass: boolean; detail?: string }> = [];
+const results: { name: string; pass: boolean; detail?: string }[] = [];
 function check(name: string, pass: boolean, detail?: string): void {
   results.push({ name, pass, detail });
   console.log(`CHECK-${name}: ${pass ? 'PASS' : 'FAIL'}${detail ? ' | ' + detail : ''}`);
