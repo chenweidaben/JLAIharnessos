@@ -7089,7 +7089,13 @@ import('./aggregators/auditEventStore').then((m) => {
     w.getWormStore();
     if (auditStore.kind === 'pg' && wormInfo.backend === 'memory') {
       const check = w.assertWormAuditCombo(auditStore.kind, wormInfo.backend, process.env.NODE_ENV ?? 'development');
-      if (!check.ok) throw new Error(check.message);
+      // P5-13 巡检修正：production 下必须拒绝启动。此前的 throw 会被外层 .catch 吞掉、
+      // 只 console.error 后继续 listen，等于把「安全自检失败」降级成告警（fail-open）。
+      if (!check.ok) {
+        // eslint-disable-next-line no-console
+        console.error(check.message);
+        process.exit(1);
+      }
     }
     // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
     // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。
