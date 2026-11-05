@@ -99,6 +99,12 @@ export function __counters(): { segmentCounter: number; lastArchivedSeq: number 
   return { segmentCounter, lastArchivedSeq };
 }
 
+/** P5-6：待归档事件数（pending = seq > lastArchivedSeq） */
+export function queryAuditEventsCount(): number {
+  const all = queryEvents({ limit: 5000, offset: 0 }).rows;
+  return all.filter((e) => e.seq > lastArchivedSeq).length;
+}
+
 /* ------------------------------ 密钥准备（真国密） ------------------------------ */
 
 const DEMO_SM4_KEY = '0123456789abcdef0123456789abcdef'; // 32 hex = 16 bytes

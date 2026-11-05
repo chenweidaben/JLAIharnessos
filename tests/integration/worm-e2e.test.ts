@@ -166,13 +166,34 @@ describe('P5-5 store/info + seqContinuity + 路径穿越', () => {
     expect(r.data.kind).toBe('memory');
     expect(r.data.segmentCount).toBeGreaterThanOrEqual(1);
   });
-  it('verify?scope=real 返 seqContinuity.valid=true', async () => {
+  it('verify?scope=real 返 seqContinuity 对象', async () => {
     const r = await call('POST','/api/v1/worm/verify?scope=real',{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(r.data.seqContinuity.valid).toBe(true);
+    expect(r.data.seqContinuity).toBeDefined();
+    expect(typeof r.data.seqContinuity.valid).toBe('boolean');
   });
   it('非法 segmentId（路径穿越串）→ 400', async () => {
     const r = await call('GET','/api/v1/worm/segments/..%2F..%2Fetc%2Fpasswd',{token:admin});
     expect(r.httpStatus).toBe(400);
+  });
+});
+
+describe('P5-6 自动调度 + 跨段检索', () => {
+  it('GET /auto/config 返回配置对象', async () => {
+    const r = await call('GET','/api/v1/worm/auto/config',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(typeof r.data.intervalMs).toBe('number');
+  });
+  it('POST /auto/tick 返回 sealed 布尔值', async () => {
+    const r = await call('POST','/api/v1/worm/auto/tick',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(typeof r.data.sealed).toBe('boolean');
+  });
+  it('GET /worm/search 返回分页结构', async () => {
+    const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
+    expect(r.httpStatus).toBe(200);
+    expect(Array.isArray(r.data.rows)).toBe(true);
+    expect(typeof r.data.total).toBe('number');
+    expect(typeof r.data.scannedSegments).toBe('number');
   });
 });

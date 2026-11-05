@@ -13,6 +13,7 @@ import {
   seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
 import { FileWormStore, __resetWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
+import { getAutoConfig, search, setAutoConfig, tick } from '../../src/bff/aggregators/wormAuto';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
 
@@ -314,5 +315,32 @@ describe('P5-5 fs 后端重启后计数器回填', () => {
       resetProbes();
       try { rmSync(dir, { recursive: true, force: true }); } catch { /* 只读属性残留可忽略 */ }
     }
+  });
+});
+
+describe('P5-6 自动调度 + 检索', () => {
+  test('getAutoConfig 默认值', () => {
+    const c = getAutoConfig();
+    expect(c.enabled).toBe(false);
+    expect(c.intervalMs).toBeGreaterThan(0);
+  });
+  test('setAutoConfig 持久化', () => {
+    const c = setAutoConfig({ enabled: true, intervalMs: 60000, threshold: 5 });
+    expect(c.enabled).toBe(true);
+    expect(c.intervalMs).toBe(60000);
+    expect(getAutoConfig().intervalMs).toBe(60000);
+  });
+  test('tick 无事件 → sealed=false no-events', () => {
+    const r = tick();
+    expect(r.sealed).toBe(false);
+    expect(r.reason).toBe('no-events');
+  });
+  test('search 跨段过滤 actorId', () => {
+    seedN(3); seal({});
+    seedN(3); seal({});
+    const evts = (globalThis as any).__lastSealedEvents ?? null;
+    const r = search({ limit: 50 });
+    expect(r.total).toBeGreaterThanOrEqual(6);
+    expect(r.scannedSegments).toBeGreaterThanOrEqual(1);
   });
 });

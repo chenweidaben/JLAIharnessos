@@ -22,6 +22,7 @@ import {
   resetProbes, seal, segmentToCsv, sm2Verify, storeInfo, tamperProbeDigest,
   tamperProbeSignature, verify, __getCipherHex,
 } from '../aggregators/wormArchiveAggregator.js';
+import { getAutoConfig, search, setAutoConfig, tick } from '../aggregators/wormAuto.js';
 import { isValidSegmentId } from '../aggregators/wormStore.js';
 
 function requireAdmin(c: Ctx): Response | null {
@@ -197,6 +198,59 @@ export const wormRoutes: RouteDef[] = [
       const demo = requireDemo(c); if (demo) return demo;
       resetProbes();
       return json(ok({ reset: true }));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/search',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const q = new URL(c.req.url).searchParams;
+      const r = search({
+        actorId: q.get('actorId') ?? undefined,
+        patientId: q.get('patientId') ?? undefined,
+        action: q.get('action') ?? undefined,
+        module: q.get('module') ?? undefined,
+        from: q.get('from') ?? undefined,
+        to: q.get('to') ?? undefined,
+        limit: q.get('limit') ? Number(q.get('limit')) : 50,
+        offset: q.get('offset') ? Number(q.get('offset')) : 0,
+      });
+      return json(ok(r));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/auto/config',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      return json(ok(getAutoConfig()));
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/worm/auto/config',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const b = (await c.body()) as Record<string, unknown>;
+      const cfg = setAutoConfig({
+        enabled: typeof b.enabled === 'boolean' ? b.enabled : undefined,
+        intervalMs: typeof b.intervalMs === 'number' ? b.intervalMs : undefined,
+        threshold: typeof b.threshold === 'number' ? b.threshold : undefined,
+      });
+      return json(ok(cfg));
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/worm/auto/tick',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      return json(ok(tick()));
     },
   },
 ];
