@@ -9,7 +9,7 @@ import { rmSync } from 'node:fs';
 import { __resetStore as resetAudit, recordEvent } from '../../src/bff/aggregators/auditEventAggregator';
 import {
   __counters, __getCipherHex, __resetStore, __sm3StandardVector, checkSeqContinuity,
-  createProbe, getSegment, getSegmentEvents, keyStatus, listSegments, resetProbes,
+  createProbe, getSegment, getSegmentEvents, keyStatus, listSegments, queryAuditEventsCount, resetProbes,
   seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
 import { FileWormStore, __resetWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
@@ -486,5 +486,37 @@ describe('P5-7 tick 落审计 + 检索性能', () => {
     expect(r1.rows.length).toBeGreaterThan(0);
     const r2 = search({ offset: -5 });
     expect(r2.rows.length).toBeGreaterThan(0);
+  });
+});
+
+describe('P5-7 防自激：待归档池只由真实业务事件驱动', () => {
+  test('pending 计数 = lastArchivedSeq 之后的事件数（与段无缝对齐）', () => {
+    seedN(3);
+    expect(queryAuditEventsCount()).toBe(3);
+    seal({});
+    expect(queryAuditEventsCount()).toBe(0);
+    seedN(2);
+    expect(queryAuditEventsCount()).toBe(2);
+  });
+
+  test('连续封段 fromSeq/toSeq 严格无缝（nextFrom = prevTo + 1）', () => {
+    seedN(2);
+    const s1 = seal({}).segment!;
+    seedN(2);
+    const s2 = seal({}).segment!;
+    expect(s2.fromSeq).toBe(s1.toSeq + 1);
+    expect(s1.eventCount).toBe(2);
+    expect(s2.eventCount).toBe(2);
+  });
+
+  test('无新业务事件时 tick 不会封段（不产生空转段）', () => {
+    seedN(2);
+    seal({});
+    __resetTickHistory();
+    const r1 = tick();
+    expect(r1.sealed).toBe(false);
+    const r2 = tick();
+    expect(r2.sealed).toBe(false);
+    expect(listSegments().total).toBe(1);
   });
 });

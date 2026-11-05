@@ -104,3 +104,33 @@ describe('P4-2 after-hook 映射', () => {
     expect(queryEvents({}).rows[0].actorRole).toBe('admin');
   });
 });
+
+describe('P5-7 归档控制面调用不进审计链（防自激）', () => {
+  const admin = { id: 'admin', name: 'a', roles: ['admin'] };
+
+  test('POST /worm/auto/tick 不落审计事件', () => {
+    for (let i = 0; i < 3; i++) {
+      auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/worm/auto/tick', user: admin }), status: 200 });
+    }
+    expect(queryEvents({}).total).toBe(0);
+  });
+
+  test('POST /worm/segments/seal 不落审计事件', () => {
+    auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/worm/segments/seal', user: admin }), status: 201 });
+    expect(queryEvents({}).total).toBe(0);
+  });
+
+  test('普通业务写（/engagement/reports）仍照常记录', () => {
+    auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/engagement/reports', user: admin }), status: 200 });
+    auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/worm/segments/seal', user: admin }), status: 201 });
+    const r = queryEvents({});
+    expect(r.total).toBe(1);
+    expect(r.rows[0].module).toBe('engagement');
+    expect(r.rows[0].hash).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  test('worm 其它写操作（如 auto/config）不被误跳', () => {
+    auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/worm/auto/config', user: admin }), status: 200 });
+    expect(queryEvents({}).total).toBe(1);
+  });
+});

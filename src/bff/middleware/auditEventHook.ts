@@ -37,6 +37,21 @@ const SKIP_EXACT = new Set([
   '/api/v1/health', '/api/v1/system/health',
 ]);
 
+/**
+ * P5-7 归档控制面路径：这些调用只用于驱动/观察归档本身。
+ * 若它们的审计事件进入 WORM 待归档池，每 tick/seal 都会自我喂养一次
+ * （seal 一结束就留下 1 条待归档事件，阈值随即被自己推高），形成自激封段；
+ * 若改为“记录但排除出段”，又会在 fromSeq/toSeq 上留 seq 空洞，
+ * 使 checkSeqContinuity 必然误报 broken。
+ * 因此与 /api/v1/audit/、/health 同规则：不进审计链。
+ * 可观测性由独立账本承担——tick 落 <wormDir>/_history.json（环形 1000 条），
+ * seal 落段记录（segmentId/sealedAt/fromSeq/toSeq/eventCount/segmentHash）。
+ */
+const ARCHIVE_CONTROL_PATHS = new Set([
+  '/api/v1/worm/auto/tick',
+  '/api/v1/worm/segments/seal',
+]);
+
 function pickRole(roles: string[]): ActorRole {
   if (!roles || roles.length === 0) return 'system';
   const r = roles[0].toLowerCase();
@@ -73,6 +88,8 @@ export function auditEventHook(input: HookInput): void {
     // 白名单跳过
     for (const p of SKIP_PATH_PREFIXES) if (path.startsWith(p)) return;
     if (SKIP_EXACT.has(path)) return;
+    // 归档控制面不记（防自激，见 ARCHIVE_CONTROL_PATHS 注释）
+    if (ARCHIVE_CONTROL_PATHS.has(path)) return;
 
     // method → action；P4-4：登录/登出路径特例
     const action: AuditAction = PATH_ACTION_OVERRIDE[path] ?? (METHOD_TO_ACTION[method] ?? ('view' as AuditAction));
