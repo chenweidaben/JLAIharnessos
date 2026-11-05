@@ -27,6 +27,11 @@ export interface WormStore {
   count(): number;
   /** P5-10：按 signerKeyId 倒排统计，O(1)；索引在 put/refresh 时维护 */
   countBySigner(keyId: string): number;
+  /**
+   * P5-11b：可选的全量重扫。仅文件后端需要；内存后端天然一致，不实现。
+   * 供破坏性操作（purge 判定）在索引 0 命中时强制校准，避免窄窗口漏检。
+   */
+  refresh?(): void;
 }
 
 export class MemoryWormStore implements WormStore {

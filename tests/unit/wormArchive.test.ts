@@ -596,4 +596,37 @@ describe('P5-11 FileWormStore 自动检测跨进程写入', () => {
     expect(storeA.list().length).toBe(3);
     fs.rmSync(tmp, { recursive: true, force: true });
   });
+
+  // P5-11b：purge 判定依赖「索引 0 命中时强制 refresh」，本用例证明该兜底有效。
+  // 构造：目录 mtime 被冻结（模拟同一精度窗口内的外部写入），autoDetect 走快速返回
+  // 路径看不到新段；显式 refresh() 必须无视 mtime 缓存重建索引。
+  test('mtime 冻结时 autoDetect 漏检，refresh 强制重扫可纠正（purge 兜底保证）', () => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-ad3-'));
+    const frozen = new Date('2026-11-05T00:00:00.000Z');
+    fs.utimesSync(tmp, frozen, frozen);
+
+    const { FileWormStore } = require('../../src/bff/aggregators/wormStore');
+    const storeA = new FileWormStore(tmp);
+
+    // 直接落盘（模拟另一进程写入），随后把目录 mtime 改回原值
+    fs.writeFileSync(path.join(tmp, 'WORM-2026-ad3.json'), JSON.stringify({
+      segmentId: 'WORM-2026-ad3', seq: 1, prevHash: '0'.repeat(64), hash: 'a'.repeat(64),
+      payloadCid: 'cid-ad3', signerKeyId: 'kZ', signature: 'sig-ad3',
+      sealedAt: '2026-11-05T00:00:00Z', verifiedAt: '2026-11-05T00:00:01Z',
+    }), 'utf8');
+    fs.utimesSync(tmp, frozen, frozen);
+
+    // 快速路径按 mtime 判断"无变化"，索引仍是旧的 0（漏检窗口真实存在）
+    expect(storeA.countBySigner('kZ')).toBe(0);
+
+    // purge 前强制重扫后，真实引用数必须被看见
+    storeA.refresh();
+    expect(storeA.countBySigner('kZ')).toBe(1);
+    expect(storeA.list().filter((s: { signerKeyId?: string }) => s.signerKeyId === 'kZ').length).toBe(1);
+
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
 });

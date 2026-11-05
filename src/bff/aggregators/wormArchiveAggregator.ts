@@ -157,13 +157,18 @@ initKeys();
 // 在模块加载时立即挂载（不依赖 /worm/keys 调用），保证 purge 前 checker 已就位。
 // P5-10：走 O(1) 索引 countBySigner；索引命中 0 时回退一次真实 list 扫描，
 // 防外部写入未 refresh 导致索引滞后而误删（fail-closed 双保险）。
+// P5-11b：purge 是破坏性操作，索引 0 命中时先强制一次全量重扫再判定，
+// 闭合「目录 mtime 精度窗口内外部写入、autoDetect 判定无变化」的窄窗口漏检——
+// 这一路径只在 purge 判定触发一次，不影响热路径性能。
 function ensureKeyInUseChecker(): void {
   const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
   if (typeof p.setKeyInUseChecker !== 'function') return;
   p.setKeyInUseChecker((keyId: string) => {
-    const idx = store().countBySigner(keyId);
+    const s = store();
+    const idx = s.countBySigner(keyId);
     if (idx > 0) return idx;
-    return store().list().filter((s) => s.signerKeyId === keyId).length;
+    if (typeof s.refresh === 'function') s.refresh();
+    return s.list().filter((seg) => seg.signerKeyId === keyId).length;
   });
 }
 ensureKeyInUseChecker();
