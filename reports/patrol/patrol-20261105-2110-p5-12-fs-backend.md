@@ -55,6 +55,21 @@
 - fs 验收脚本：PASS_WITH_KNOWN_LIMITATIONS (1)
 - 品牌 17 词：通过（无违规命中）
 
+
+## 发现 3：factory 路径 fail-open（已修）
+
+**问题**：`getKeyProvider()` 原实现配置错了会静默降级到临时密钥：
+- `WORM_SM2_PRIVATE_KEY` 配了、`WORM_SM2_PUBLIC_KEY` 漏配 → 静默用 demo-ephemeral，零提示
+- `WORM_KEY_DIR` 配了但 FileKeyProvider 实际触发条件是 `WORM_KEK && (NODE_ENV=production || WORM_FILE_KEY=1)`，与 `WORM_KEY_DIR` 无关 → 运维以为在用文件密钥环，实际还是内存临时密钥
+
+**后果**：运维配了一半密钥就上线，系统悄悄用临时密钥签名，所有段重启即 `unknown-key-id`，且错误信息一次都没有。
+
+**修法**：三级选择全 fail-closed：
+1. `WORM_KEY_DIR` 非空（或 `WORM_FILE_KEY=1`）→ FileKeyProvider，缺 `WORM_KEK` 抛 `worm-kek-not-configured`
+2. SM2 任一 env 有值 → 必须成对且格式合法，否则抛 `worm-env-key-invalid`
+3. 前两条都不适用 → DemoEphemeralKeyProvider；若 `NODE_ENV=production` 抛 `worm-key-provider-not-configured-for-production`
+
+**为什么单测没抓到**：之前只测直接 `new EnvKeyProvider()`，没走 factory 路径。本轮补 9 条 factory 用例全部通过 `getKeyProvider()` 触发。
 ## 历史 commit 说明
 
 - `93e59981`（20:53:29）实际同时包含 fs 脚本 fix 与 mtime 三用例两部分（amend 时合并），不拆历史

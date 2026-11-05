@@ -4,12 +4,12 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { afterAll, beforeEach, describe, expect, test } from 'bun:test';
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import {
-  DemoEphemeralKeyProvider, EnvKeyProvider, FileKeyProvider, __resetKeyProvider,
+  DemoEphemeralKeyProvider, EnvKeyProvider, FileKeyProvider, getKeyProvider, __resetKeyProvider,
 } from '../../src/bff/aggregators/wormKeyProvider';
 
 let tmpDir = '';
@@ -267,5 +267,66 @@ describe('P5-12 EnvKeyProvider', () => {
     const p2 = new DemoEphemeralKeyProvider();
     expect(p1.kind).toBe('demo-ephemeral');
     expect(p1.activeKeyId()).not.toBe(p2.activeKeyId());
+  });
+});
+
+describe('P5-12 factory 路径 fail-closed（getKeyProvider）', () => {
+  const ORIG: Record<string, string | undefined> = {};
+  const keys = ['WORM_KEY_DIR','WORM_FILE_KEY','WORM_SM2_PRIVATE_KEY','WORM_SM2_PUBLIC_KEY','WORM_KEK','WORM_STORE_DIR','NODE_ENV'];
+  beforeAll(() => {
+    for (const k of keys) ORIG[k] = process.env[k];
+  });
+  afterAll(() => {
+    for (const k of keys) {
+      if (ORIG[k] === undefined) delete process.env[k]; else process.env[k] = ORIG[k];
+    }
+    __resetKeyProvider(null);
+  });
+  beforeEach(() => {
+    for (const k of keys) delete process.env[k];
+    __resetKeyProvider(null);
+  });
+
+  test('只配 WORM_SM2_PRIVATE_KEY → 抛 worm-env-key-invalid', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    expect(() => getKeyProvider()).toThrow(/worm-env-key-invalid/);
+  });
+  test('只配 WORM_SM2_PUBLIC_KEY → 抛 worm-env-key-invalid', () => {
+    process.env.WORM_SM2_PUBLIC_KEY = '04' + 'b'.repeat(128);
+    expect(() => getKeyProvider()).toThrow(/worm-env-key-invalid/);
+  });
+  test('两个都配但私钥长度不对 → 抛 worm-env-key-invalid', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(60);
+    process.env.WORM_SM2_PUBLIC_KEY = '04' + 'b'.repeat(128);
+    expect(() => getKeyProvider()).toThrow(/worm-env-key-invalid/);
+  });
+  test('两个都配但公钥不是 04 开头 → 抛 worm-env-key-invalid', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    process.env.WORM_SM2_PUBLIC_KEY = '03' + 'b'.repeat(128);
+    expect(() => getKeyProvider()).toThrow(/worm-env-key-invalid/);
+  });
+  test('配 WORM_KEY_DIR 但不配 WORM_KEK → 抛 worm-kek-not-configured', () => {
+    process.env.WORM_KEY_DIR = './tmp-keys';
+    expect(() => getKeyProvider()).toThrow(/worm-kek-not-configured/);
+  });
+  test('配 WORM_KEY_DIR + WORM_KEK → kind=file', () => {
+    process.env.WORM_KEY_DIR = './tmp-keys';
+    process.env.WORM_KEK = 'c'.repeat(32);
+    const p = getKeyProvider();
+    expect(p.kind).toBe('file');
+  });
+  test('都不配（非 production）→ kind=demo-ephemeral', () => {
+    const p = getKeyProvider();
+    expect(p.kind).toBe('demo-ephemeral');
+  });
+  test('NODE_ENV=production + 都不配 → 抛 not-configured-for-production', () => {
+    process.env.NODE_ENV = 'production';
+    expect(() => getKeyProvider()).toThrow(/worm-key-provider-not-configured-for-production/);
+  });
+  test('两个 env 都合法配齐 → kind=env', () => {
+    process.env.WORM_SM2_PRIVATE_KEY = 'a'.repeat(64);
+    process.env.WORM_SM2_PUBLIC_KEY = '04' + 'b'.repeat(128);
+    const p = getKeyProvider();
+    expect(p.kind).toBe('env');
   });
 });

@@ -328,15 +328,31 @@ let globalProvider: KeyProvider | null = null;
 export function getKeyProvider(): KeyProvider {
   if (globalProvider) return globalProvider;
   const storeDir = process.env.WORM_STORE_DIR || join(process.cwd(), 'logs', 'worm-store');
-  // 工厂选择顺序（P5-12）：
-  // 1. WORM_KEY_DIR 配了 → FileKeyProvider（落盘加密私钥）
-  // 2. WORM_SM2_PRIVATE_KEY + WORM_SM2_PUBLIC_KEY 都配且格式合法 → EnvKeyProvider（容器 secret 注入）
-  // 3. 都不配 → DemoEphemeralKeyProvider（每进程临时生成，打 NOT FOR PRODUCTION）
-  if (kekFromEnv() && (process.env.NODE_ENV === 'production' || process.env.WORM_FILE_KEY === '1')) {
+  const NODE_ENV = process.env.NODE_ENV ?? '';
+
+  // P5-12：三级选择全 fail-closed，配置错了抛错，不静默降级到临时密钥
+  // 1. WORM_KEY_DIR 非空 → FileKeyProvider（必须同时配 WORM_KEK，否则抛错）
+  // 2. WORM_SM2_PRIVATE_KEY 或 WORM_SM2_PUBLIC_KEY 任一有值 → 必须成对且格式合法
+  // 3. 前两条都不适用 → DemoEphemeralKeyProvider（仅非 production 允许）
+  const keyDir = process.env.WORM_KEY_DIR ?? '';
+  const sm2Priv = process.env.WORM_SM2_PRIVATE_KEY ?? '';
+  const sm2Pub = process.env.WORM_SM2_PUBLIC_KEY ?? '';
+  const wantFile = keyDir !== '' || process.env.WORM_FILE_KEY === '1';
+
+  if (wantFile) {
+    if (!kekFromEnv()) {
+      throw new Error('worm-kek-not-configured: WORM_KEY_DIR/WORM_FILE_KEY 要求同时配置 WORM_KEK');
+    }
     globalProvider = new FileKeyProvider(storeDir);
-  } else if (/^[0-9a-f]{64}$/i.test(process.env.WORM_SM2_PRIVATE_KEY ?? '') && /^04[0-9a-f]{128}$/i.test(process.env.WORM_SM2_PUBLIC_KEY ?? '')) {
+  } else if (sm2Priv !== '' || sm2Pub !== '') {
+    if (!(/^[0-9a-f]{64}$/i.test(sm2Priv) && /^04[0-9a-f]{128}$/i.test(sm2Pub))) {
+      throw new Error('worm-env-key-invalid: WORM_SM2_PRIVATE_KEY (64 hex) 与 WORM_SM2_PUBLIC_KEY (04+128 hex) 必须同时配置且格式合法');
+    }
     globalProvider = new EnvKeyProvider();
   } else {
+    if (NODE_ENV === 'production') {
+      throw new Error('worm-key-provider-not-configured-for-production: production 环境必须配置 WORM_KEY_DIR+WORM_KEK 或 WORM_SM2_PRIVATE_KEY/PUBLIC_KEY，禁止临时密钥');
+    }
     globalProvider = new DemoEphemeralKeyProvider();
   }
   return globalProvider;
