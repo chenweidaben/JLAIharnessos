@@ -12,7 +12,7 @@ import {
   createProbe, getSegment, getSegmentEvents, keyStatus, listSegments, queryAuditEventsCount, resetProbes,
   seal, sm2Verify, storeInfo, tamperProbeDigest, tamperProbeSignature, verify,
 } from '../../src/bff/aggregators/wormArchiveAggregator';
-import { FileWormStore, __resetWormStore, isValidSegmentId } from '../../src/bff/aggregators/wormStore';
+import { FileWormStore, __resetWormStore, isValidSegmentId, getWormStore } from '../../src/bff/aggregators/wormStore';
 import { getAutoConfig, listTickHistory, rebuildIndex, search, setAutoConfig, tick, __resetDecryptCache, __resetIndexCache, __resetTickHistory } from '../../src/bff/aggregators/wormAuto';
 
 beforeEach(() => { resetAudit(); __resetStore(); resetProbes(); });
@@ -518,5 +518,44 @@ describe('P5-7 防自激：待归档池只由真实业务事件驱动', () => {
     const r2 = tick();
     expect(r2.sealed).toBe(false);
     expect(listSegments().total).toBe(1);
+  });
+});
+
+describe('P5-9 purge 真实 store refs 统计（非 mock）', () => {
+  test('seal 2 段后 purge(k1) → key-in-use refs=2，k1 仍可验签', () => {
+    // 用真实 store（内存即可），不 mock checker
+    const { getKeyProvider, __resetKeyProvider, DemoEphemeralKeyProvider } =
+      require('../../src/bff/aggregators/wormKeyProvider');
+    __resetKeyProvider(new DemoEphemeralKeyProvider());
+    const provider = getKeyProvider();
+    // 把真实 store.list() 扫描挂上（模拟模块加载时的 ensureKeyInUseChecker）
+    provider.setKeyInUseChecker((kid: string) =>
+      getWormStore().list().filter((s: any) => s.signerKeyId === kid).length);
+
+    seedN(2);
+    const r1 = seal({});
+    expect(r1.ok).toBe(true);
+    const k1 = r1.segment!.signerKeyId;
+
+    seedN(2);
+    const r1b = seal({});
+    expect(r1b.ok).toBe(true);
+    expect(r1b.segment!.signerKeyId).toBe(k1); // 未 rotate，仍是 k1
+
+    // rotate 让 k2 成为 active，这样 k1 不再是 active key，可以 purge
+    provider.rotate();
+
+    // 现在 store 里有 2 段用 k1 签
+    const purgeResult = provider.purge(k1);
+    expect(purgeResult.ok).toBe(false);
+    expect(purgeResult.error).toBe('key-in-use');
+    expect(purgeResult.refs).toBe(2); // 来自真实 store.list()，两段都用 k1
+
+    // k1 仍在环里
+    expect(provider.getPublicKey(k1)).not.toBeNull();
+
+    // 两段仍 verify 通过（按段 signerKeyId 选钥验签）
+    const v = verify({ scope: 'real' });
+    expect(v.valid).toBe(true);
   });
 });
