@@ -48,10 +48,36 @@ export class MemoryWormStore implements WormStore {
 export class FileWormStore implements WormStore {
   readonly kind = 'fs' as const;
   readonly dir: string;
+  private segments: WormSegment[] = [];
+  private byId = new Map<string, WormSegment>();
 
   constructor(dir?: string) {
     this.dir = path.resolve(dir ?? process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
     mkdirSync(this.dir, { recursive: true });
+    this.refresh();
+  }
+
+  /**
+   * 重新扫目录重建内存索引。
+   * 同实例不会自动感知外部（其他进程/实例）写入的新段，需要显式调 refresh()；
+   * 新实例构造时自然是最新的。put() 成功后已自动 append 到内存，无需手动 refresh。
+   */
+  refresh(): void {
+    this.segments = [];
+    this.byId.clear();
+    let names: string[] = [];
+    try { names = readdirSync(this.dir); } catch { return; }
+    for (const n of names) {
+      if (!n.endsWith('.json')) continue;
+      const id = n.slice(0, -5);
+      if (!isValidSegmentId(id)) continue;
+      try {
+        const seg = JSON.parse(readFileSync(path.join(this.dir, n), 'utf8')) as WormSegment;
+        this.segments.push(seg);
+        this.byId.set(seg.segmentId, seg);
+      } catch { /* 损坏文件跳过 */ }
+    }
+    this.segments.sort((a, b) => a.seq - b.seq);
   }
 
   private safePath(segmentId: string): string {
@@ -75,37 +101,34 @@ export class FileWormStore implements WormStore {
         cp.execSync(`attrib +R "${p}"`, { stdio: 'ignore' });
       } catch { /* 忽略 */ }
     }
+    this.segments.push(segment);
+    this.byId.set(segment.segmentId, segment);
+    this.segments.sort((a, b) => a.seq - b.seq);
   }
 
   get(segmentId: string): WormSegment | null {
+    const cached = this.byId.get(segmentId);
+    if (cached) return cached;
     const p = this.safePath(segmentId);
     if (!existsSync(p)) return null;
     try {
       const raw = readFileSync(p, 'utf8');
-      return JSON.parse(raw) as WormSegment;
+      const seg = JSON.parse(raw) as WormSegment;
+      this.byId.set(segmentId, seg);
+      this.segments.push(seg);
+      this.segments.sort((a, b) => a.seq - b.seq);
+      return seg;
     } catch {
       return null;
     }
   }
 
   list(): WormSegment[] {
-    const out: WormSegment[] = [];
-    let names: string[] = [];
-    try { names = readdirSync(this.dir); } catch { return out; }
-    for (const n of names) {
-      if (!n.endsWith('.json')) continue;
-      const id = n.slice(0, -5);
-      if (!isValidSegmentId(id)) continue;
-      try {
-        const seg = JSON.parse(readFileSync(path.join(this.dir, n), 'utf8')) as WormSegment;
-        out.push(seg);
-      } catch { /* 损坏文件跳过 */ }
-    }
-    return out.sort((a, b) => a.seq - b.seq);
+    return this.segments.slice();
   }
 
   count(): number {
-    return this.list().length;
+    return this.segments.length;
   }
 }
 

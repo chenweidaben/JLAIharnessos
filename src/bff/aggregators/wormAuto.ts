@@ -276,6 +276,11 @@ const decryptCache = new Map<string, AuditEvent[]>();
 
 export function __resetDecryptCache(): void { decryptCache.clear(); }
 
+/** 仅供 benchmark：直接把解密后的事件塞进 LRU，绕过真实加解密。 */
+export function __injectDecryptedForBench(segmentId: string, evts: AuditEvent[]): void {
+  decryptCache.set(segmentId, evts);
+}
+
 function getDecrypted(segmentId: string): AuditEvent[] | null {
   const hit = decryptCache.get(segmentId);
   if (hit) {
