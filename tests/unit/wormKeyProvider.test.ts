@@ -226,3 +226,45 @@ describe('P5-9 retire / purge 回收策略', () => {
     expect(r.error).toBe('key-in-use-checker-not-wired');
   });
 });
+
+describe('P5-12 env 密钥优先语义', () => {
+  const ORIG_PRIV = process.env.WORM_SM2_PRIVATE_KEY;
+  const ORIG_PUB = process.env.WORM_SM2_PUBLIC_KEY;
+  afterAll(() => {
+    if (ORIG_PRIV === undefined) delete process.env.WORM_SM2_PRIVATE_KEY; else process.env.WORM_SM2_PRIVATE_KEY = ORIG_PRIV;
+    if (ORIG_PUB === undefined) delete process.env.WORM_SM2_PUBLIC_KEY; else process.env.WORM_SM2_PUBLIC_KEY = ORIG_PUB;
+  });
+
+  test('配 env → keySource=env，两次构造 signerKeyId 相同', () => {
+    const priv = 'a'.repeat(64);
+    const pub = '04' + 'b'.repeat(128);
+    process.env.WORM_SM2_PRIVATE_KEY = priv;
+    process.env.WORM_SM2_PUBLIC_KEY = pub;
+    const p1 = new DemoEphemeralKeyProvider();
+    const p2 = new DemoEphemeralKeyProvider();
+    expect(p1.kind).toBe('env');
+    expect(p2.kind).toBe('env');
+    expect(p1.activeKeyId()).toBe(p2.activeKeyId());
+    expect(p1.activeKeyId()).toBe('k-' + pub.slice(2, 14));
+  });
+
+  test('配 env → 新实例 getPublicKey 跨进程一致', () => {
+    const priv = 'a'.repeat(64);
+    const pub = '04' + 'b'.repeat(128);
+    process.env.WORM_SM2_PRIVATE_KEY = priv;
+    process.env.WORM_SM2_PUBLIC_KEY = pub;
+    const p1 = new DemoEphemeralKeyProvider();
+    const p2 = new DemoEphemeralKeyProvider();
+    expect(p1.getPublicKey(p1.activeKeyId())).toBe(pub);
+    expect(p2.getPublicKey(p1.activeKeyId())).toBe(pub);
+  });
+
+  test('不配 env → keySource=demo-ephemeral，两次构造 signerKeyId 不同', () => {
+    delete process.env.WORM_SM2_PRIVATE_KEY;
+    delete process.env.WORM_SM2_PUBLIC_KEY;
+    const p1 = new DemoEphemeralKeyProvider();
+    const p2 = new DemoEphemeralKeyProvider();
+    expect(p1.kind).toBe('demo-ephemeral');
+    expect(p1.activeKeyId()).not.toBe(p2.activeKeyId());
+  });
+});

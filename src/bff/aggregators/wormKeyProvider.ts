@@ -72,7 +72,7 @@ function kekFromEnv(): string {
 /* -------------------- DemoEphemeral -------------------- */
 
 export class DemoEphemeralKeyProvider implements KeyProvider {
-  readonly kind = 'demo-ephemeral' as const;
+  kind: 'demo-ephemeral' | 'env' = 'demo-ephemeral';
   readonly productionSafe = false;
   private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
@@ -80,10 +80,23 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
   private keyInUse: ((keyId: string) => number) | null = null;
 
   constructor() {
-    const kp = newKeyPair();
-    this.ring = [{ keyId: kp.keyId, publicKeyHex: kp.publicKeyHex, privateKeyHex: kp.privateKeyHex }];
-    this.activeKey = kp.keyId;
-    console.warn('[worm-key] demo-ephemeral provider in use — NOT FOR PRODUCTION');
+    // P5-12：恢复 env 密钥优先语义（P5-8 重构回归）
+    const envPriv = process.env.WORM_SM2_PRIVATE_KEY ?? '';
+    const envPub = process.env.WORM_SM2_PUBLIC_KEY ?? '';
+    if (/^[0-9a-f]{64}$/i.test(envPriv) && /^04[0-9a-f]{128}$/i.test(envPub)) {
+      // 从公钥稳定派生 keyId：'k-' + 公钥第 3-14 位（跨进程一致）
+      const keyId = 'k-' + envPub.slice(2, 14);
+      this.ring = [{ keyId, publicKeyHex: envPub, privateKeyHex: envPriv }];
+      this.activeKey = keyId;
+      this.kind = 'env';
+      console.warn('[worm-key] env-configured SM2 key in use (keyId=' + keyId + ')');
+    } else {
+      const kp = newKeyPair();
+      this.ring = [{ keyId: kp.keyId, publicKeyHex: kp.publicKeyHex, privateKeyHex: kp.privateKeyHex }];
+      this.activeKey = kp.keyId;
+      this.kind = 'demo-ephemeral';
+      console.warn('[worm-key] demo-ephemeral provider in use — NOT FOR PRODUCTION');
+    }
   }
 
   private byId(keyId: string) { return this.ring.find((r) => r.keyId === keyId); }
