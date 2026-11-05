@@ -109,4 +109,22 @@ describe('P5-14 keyOpsStore', () => {
     expect(removed).toBe(0);
     expect(existsSync(otherFile)).toBe(true);
   });
+
+  test('回归 P5-11b：WORM_STORE_DIR 指向不存在的嵌套路径 → 写一条 → 目录自动创建、读回 1 条', async () => {
+    const nested = join(testDir, 'a', 'b', 'c', 'keyops');
+    expect(existsSync(nested)).toBe(false);
+    const prev = process.env.WORM_STORE_DIR;
+    process.env.WORM_STORE_DIR = nested;
+    try {
+      const mod = await import('../../src/bff/aggregators/keyOpsStore');
+      mod.appendKeyOp({ actorId: 'u-nested', action: 'retire', keyId: 'k-nested', result: 'ok', refs: null });
+      expect(existsSync(nested)).toBe(true);
+      const r = mod.readKeyOps(0);
+      expect(r.ops.length).toBe(1);
+      expect(r.ops[0].actorId).toBe('u-nested');
+      expect(r.malformed).toBe(0);
+    } finally {
+      process.env.WORM_STORE_DIR = prev ?? '';
+    }
+  });
 });

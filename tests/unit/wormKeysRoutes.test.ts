@@ -194,7 +194,9 @@ describe('P5-11b 运维审计流落盘', async () => {
       }));
       expect(res.status).toBe(200);
       // 审计目录应被自动创建并落盘，不能静默丢失
-      expect(fs.existsSync(path.join(dir, '_key-ops.json'))).toBe(true);
+      // P5-14：文件名改为 _key-ops-<instanceId>-<YYYYMMDD>.jsonl（按实例分文件）
+      const files = fs.readdirSync(dir).filter((f: string) => f.startsWith('_key-ops-') && f.endsWith('.jsonl'));
+      expect(files.length).toBeGreaterThanOrEqual(1);
 
       const opsH = findHandler('GET', '/api/v1/worm/keys/ops');
       const ctx: any = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] } });
