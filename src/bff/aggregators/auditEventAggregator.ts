@@ -110,20 +110,32 @@ export interface QueryInput {
   patientId?: string; from?: string; to?: string; limit?: number; offset?: number;
 }
 
-export function queryEvents(q: QueryInput): { rows: AuditEvent[]; total: number } {
-  let arr = [...events];
-  if (q.actorId) arr = arr.filter((e) => e.actorId === q.actorId);
-  if (q.module) arr = arr.filter((e) => e.module === q.module);
-  if (q.action) arr = arr.filter((e) => e.action === q.action);
-  if (q.result) arr = arr.filter((e) => e.result === q.result);
-  if (q.patientId) arr = arr.filter((e) => e.patientId === q.patientId);
-  if (q.from) arr = arr.filter((e) => e.occurredAt >= (q.from as string));
-  if (q.to) arr = arr.filter((e) => e.occurredAt <= (q.to as string));
-  arr.sort((a, b) => (a.occurredAt < b.occurredAt ? 1 : a.occurredAt > b.occurredAt ? -1 : b.seq - a.seq));
-  const total = arr.length;
+export async function queryEvents(q: QueryInput): Promise<{ rows: AuditEvent[]; total: number }> {
   const limit = Math.min(Math.max(q.limit ?? 50, 1), 500);
   const offset = Math.max(q.offset ?? 0, 0);
-  return { rows: arr.slice(offset, offset + limit), total };
+  // P5-13：所有过滤进 SQL WHERE，total 用 count(*)，分页用 LIMIT/OFFSET
+  // 不在应用层二次过滤，避免 total 与分页错乱。
+  // Memory 实现忽略 WHERE（单测用），返回全量由路由层再过滤分页。
+  const store = getAuditStore();
+  if (store.kind === 'pg') {
+    const r = await store.query({
+      limit, offset,
+      actorId: q.actorId, module: q.module, action: q.action, result: q.result,
+      patientId: q.patientId, from: q.from, to: q.to,
+    });
+    return r;
+  }
+  // Memory 路径：返回全量后在内存过滤+分页（保持单测语义）
+  const r = await store.query({ limit: 10_000, offset: 0 });
+  let rows = r.rows;
+  if (q.actorId) rows = rows.filter((e) => e.actorId === q.actorId);
+  if (q.module) rows = rows.filter((e) => e.module === q.module);
+  if (q.action) rows = rows.filter((e) => e.action === q.action);
+  if (q.result) rows = rows.filter((e) => e.result === q.result);
+  if (q.patientId) rows = rows.filter((e) => e.patientId === q.patientId);
+  if (q.from) rows = rows.filter((e) => e.occurredAt >= (q.from as string));
+  if (q.to) rows = rows.filter((e) => e.occurredAt <= (q.to as string));
+  return { rows: rows.slice(offset, offset + limit), total: rows.length };
 }
 
 export function exportCsv(): string {
@@ -136,7 +148,8 @@ export function exportCsv(): string {
   return [header, ...lines].join('\n');
 }
 
-export function verifyChain(): { valid: boolean; brokenAt?: number; totalEvents: number } {
+/** 同步版本：基于内存 pending 池重算哈希链（seal 路径用） */
+export function verifyChainSync(): { valid: boolean; brokenAt?: number; totalEvents: number } {
   let prevHash = GENESIS;
   for (const e of events) {
     if (e.prevHash !== prevHash) return { valid: false, brokenAt: e.seq, totalEvents: events.length };
@@ -154,6 +167,30 @@ export function verifyChain(): { valid: boolean; brokenAt?: number; totalEvents:
   return { valid: true, totalEvents: events.length };
 }
 
+/** 异步版本：流式从 store 读全量重算（/audit/events/verify-chain 路由用） */
+export async function verifyChain(): Promise<{ valid: boolean; brokenAt?: number; totalEvents: number }> {
+  let prevHash = GENESIS;
+  let total = 0;
+  const store = getAuditStore();
+  for await (const batch of store.streamAll()) {
+    for (const e of batch) {
+      total += 1;
+      if (e.prevHash !== prevHash) return { valid: false, brokenAt: e.seq, totalEvents: total };
+      const base: Omit<AuditEvent, 'hash'> = {
+        eventId: e.eventId, seq: e.seq, occurredAt: e.occurredAt,
+        actorId: e.actorId, actorRole: e.actorRole, action: e.action, module: e.module,
+        resourceType: e.resourceType, resourceId: e.resourceId,
+        patientId: e.patientId, result: e.result, errorCode: e.errorCode,
+        ip: e.ip, userAgent: e.userAgent, prevHash: e.prevHash,
+      };
+      const recomputed = computeHash(e.prevHash, canonical(base));
+      if (recomputed !== e.hash) return { valid: false, brokenAt: e.seq, totalEvents: total };
+      prevHash = e.hash;
+    }
+  }
+  return { valid: true, totalEvents: total };
+}
+
 /** 仅测试用：直接篡改某条事件（用于 verify-chain 检测） */
 export function __tamper(seq: number, patch: Partial<AuditEvent>): void {
   const e = events.find((x) => x.seq === seq);
@@ -162,3 +199,33 @@ export function __tamper(seq: number, patch: Partial<AuditEvent>): void {
 }
 
 export function __resetStore(): void { events.length = 0; }
+
+/** P5-13：暴露内存 pending 池（seal 路径用，避免每次 seal 查 DB） */
+export function getPendingEvents(): AuditEvent[] { return [...events]; }
+
+/** P5-13 启动回填：把 store 中 seq > fromSeq 的事件灌回内存 pending 池。
+ *  fromSeq 必须显式传（通常是 lastArchivedSeq），禁止默认 0。 */
+export async function backfillPending(fromSeq: number): Promise<number> {
+  if (!Number.isFinite(fromSeq) || fromSeq < 0) {
+    throw new Error(`[audit] backfillPending: fromSeq must be >= 0, got ${fromSeq}`);
+  }
+  const store = getAuditStore();
+  try {
+    const rows = await store.backfill(fromSeq, 1000);
+    for (const e of rows) events.push(e);
+    if (rows.length > 0) {
+      console.log(`[audit] backfilled ${rows.length} events (seq ${rows[0].seq}..${rows[rows.length - 1].seq}), lastArchivedSeq=${fromSeq}`);
+    } else {
+      console.log(`[audit] backfilled 0 events, lastArchivedSeq=${fromSeq}`);
+    }
+    return rows.length;
+  } catch (err) {
+    console.error(`[audit] backfill failed:`, err instanceof Error ? err.message : String(err));
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
+      bffMetrics.auditPersistFailed.inc();
+    } catch { /* ignore */ }
+    return 0;
+  }
+}

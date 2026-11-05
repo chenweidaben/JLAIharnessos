@@ -7048,7 +7048,17 @@ console.log(
 );
 
 // P5-13：显式初始化审计存储并打印后端类型（审计不跟随 DEMO_MODE 跳过 PG）
-import('./aggregators/auditEventStore').then((m) => m.initAuditStore()).catch(() => {});
+import('./aggregators/auditEventStore').then((m) => {
+  m.initAuditStore();
+  // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
+  // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。
+  return import('./aggregators/wormArchiveAggregator').then((w) => {
+    const c = w.ensureCountersHydrated();
+    return import('./aggregators/auditEventAggregator').then((a) => a.backfillPending(c.lastArchivedSeq));
+  });
+}).then((n) => {
+  if (typeof n === 'number') console.log(`[audit] backfill done: ${n} events`);
+}).catch(() => {});
 
 void initDatabase().then(() => {
   // eslint-disable-next-line no-console

@@ -5,12 +5,12 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { beforeEach, describe, expect, test } from 'bun:test';
+import { beforeEach, describe, expect, test  } from 'bun:test';
 import {
   __resetStore, __tamper, AuditError,
-  recordEvent, queryEvents, exportCsv, verifyChain,
-} from '../../src/bff/aggregators/auditEventAggregator';
-import { __resetAuditStore } from '../../src/bff/aggregators/auditEventStore';
+  recordEvent, queryEvents, exportCsv, verifyChainSync,
+ } from '../../src/bff/aggregators/auditEventAggregator';
+import { __resetAuditStore  } from '../../src/bff/aggregators/auditEventStore';
 
 beforeEach(() => {
   __resetStore();
@@ -45,21 +45,21 @@ describe('P4-1 哈希链', () => {
   });
   test('verify-chain 全绿（N 条）', async () => {
     await seedN(20);
-    const v = verifyChain();
+    const v = verifyChainSync();
     expect(v.valid).toBe(true);
     expect(v.totalEvents).toBe(20);
   });
   test('篡改一条 → verify 失败返回 brokenAt', async () => {
     await seedN(10);
     __tamper(5, { result: 'failure' });
-    const v = verifyChain();
+    const v = verifyChainSync();
     expect(v.valid).toBe(false);
     expect(v.brokenAt).toBe(5);
   });
   test('篡改 prevHash 链也会被检测', async () => {
     await seedN(5);
     __tamper(3, { prevHash: 'deadbeef' });
-    const v = verifyChain();
+    const v = verifyChainSync();
     expect(v.valid).toBe(false);
     expect(v.brokenAt).toBe(3);
   });
@@ -84,38 +84,38 @@ describe('P4-1 查询', () => {
   test('actorId 过滤', async () => {
     await seedN(4, 'D1');
     await seedN(3, 'D2');
-    expect(queryEvents({ actorId: 'D10' }).total).toBe(2);
-    expect(queryEvents({ actorId: 'D21' }).total).toBe(1);
+    expect((await queryEvents({ actorId: 'D10' })).total).toBe(2);
+    expect((await queryEvents({ actorId: 'D21' })).total).toBe(1);
   });
   test('module 过滤', async () => {
     await seedN(3, 'D1', 'cpoe');
     await seedN(2, 'D2', 'emr');
-    expect(queryEvents({ module: 'cpoe' }).total).toBe(3);
-    expect(queryEvents({ module: 'emr' }).total).toBe(2);
+    expect((await queryEvents({ module: 'cpoe' })).total).toBe(3);
+    expect((await queryEvents({ module: 'emr' })).total).toBe(2);
   });
   test('result 过滤', async () => {
     await seedN(3, 'D1', 'cpoe', 'create', 'success');
     await seedN(2, 'D2', 'cpoe', 'create', 'failure');
-    expect(queryEvents({ result: 'success' }).total).toBe(3);
-    expect(queryEvents({ result: 'failure' }).total).toBe(2);
+    expect((await queryEvents({ result: 'success' })).total).toBe(3);
+    expect((await queryEvents({ result: 'failure' })).total).toBe(2);
   });
   test('时间范围 from/to', async () => {
     await seedN(10, 'D1', 'cpoe');
-    const r = queryEvents({ from: '2026-11-03T00:00:00Z', to: '2026-11-05T23:59:59Z' });
+    const r = await queryEvents({ from: '2026-11-03T00:00:00Z', to: '2026-11-05T23:59:59Z' });
     expect(r.total).toBeGreaterThan(0);
   });
   test('limit/offset 分页', async () => {
     await seedN(20, 'D1', 'cpoe');
-    const r = queryEvents({ limit: 5, offset: 0 });
+    const r = await queryEvents({ limit: 5, offset: 0 });
     expect(r.rows.length).toBe(5);
     expect(r.total).toBe(20);
-    const r2 = queryEvents({ limit: 5, offset: 15 });
+    const r2 = await queryEvents({ limit: 5, offset: 15 });
     expect(r2.rows.length).toBe(5);
   });
   test('patientId 过滤', async () => {
     await recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'view', module: 'emr', resourceType: 'note', resourceId: 'N1', patientId: 'P1', result: 'success' });
     await recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'view', module: 'emr', resourceType: 'note', resourceId: 'N2', patientId: 'P2', result: 'success' });
-    expect(queryEvents({ patientId: 'P1' }).total).toBe(1);
+    expect((await queryEvents({ patientId: 'P1' })).total).toBe(1);
   });
 });
 

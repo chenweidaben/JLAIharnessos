@@ -10,7 +10,7 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import {
-  queryEvents, verifyChain, type AuditEvent,
+  getPendingEvents, verifyChainSync, type AuditEvent,
 } from './auditEventAggregator.js';
 import { getWormStore, isValidSegmentId, type WormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
@@ -103,9 +103,16 @@ export function __counters(): { segmentCounter: number; lastArchivedSeq: number 
   return { segmentCounter, lastArchivedSeq };
 }
 
+/** P5-13：启动时显式 hydrate，供 audit backfill 取 lastArchivedSeq */
+export function ensureCountersHydrated(): { segmentCounter: number; lastArchivedSeq: number } {
+  hydrateCountersFromStore();
+  return { segmentCounter, lastArchivedSeq };
+}
+
 /** P5-6：待归档事件数（pending = seq > lastArchivedSeq） */
 export function queryAuditEventsCount(): number {
-  const all = queryEvents({ limit: 5000, offset: 0 }).rows;
+  // P5-13：seal 路径直接读内存 pending 池（不查 DB，避免 seal 变 async）
+  const all = getPendingEvents();
   return all.filter((e) => e.seq > lastArchivedSeq).length;
 }
 
@@ -233,7 +240,9 @@ export function keyStatus(): { keySource: string; signerKeyId: string; publicKey
 export interface SealInput { from?: string; to?: string; }
 export interface SealResult {
   ok: boolean;
-  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured' | 'worm-no-active-key';
+  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured' | 'worm-no-active-key' | 'seq-gap';
+  expectedSeq?: number;
+  actualFirstSeq?: number;
   segment?: WormSegment;
 }
 
@@ -244,7 +253,7 @@ export function seal(input: SealInput = {}): SealResult {
 
   hydrateCountersFromStore();
 
-  const all = queryEvents({ limit: 5000, offset: 0 }).rows.slice().sort((a, b) => a.seq - b.seq);
+  const all = getPendingEvents().sort((a, b) => a.seq - b.seq);
   // 归档控制面调用（auto/tick、segments/seal）不进审计链（见 auditEventHook），
   // 因此 pending 就是 seq 连续的一段，段间 fromSeq/toSeq 保持无缝，连续性校验不被空洞污染。
   let pending = all.filter((e) => e.seq > lastArchivedSeq);
@@ -252,7 +261,18 @@ export function seal(input: SealInput = {}): SealResult {
   if (input.to) pending = pending.filter((e) => e.occurredAt <= (input.to as string));
   if (pending.length === 0) return { ok: false, error: 'no-events' };
 
-  const chain = verifyChain();
+  // P5-13 跨段连续性 fail-closed：pending 首条必须 === lastArchivedSeq + 1
+  // 防止重启后 backfill 越界导致已归档事件被重复归档/覆盖。
+  const expectedSeq = lastArchivedSeq + 1;
+  const actualFirstSeq = pending[0].seq;
+  if (actualFirstSeq !== expectedSeq) {
+    return {
+      ok: false, error: 'seq-gap',
+      expectedSeq, actualFirstSeq,
+    } as const;
+  }
+
+  const chain = verifyChainSync();
   const sourceChainHead = all.length ? all[all.length - 1].hash : GENESIS;
 
   // 单次 list() 取值：读两遍会拿到两个快照，且 fs 后端每次 list 都是一次全目录读取

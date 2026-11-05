@@ -3,7 +3,7 @@
  *
  * 存储可插拔：
  *  - MemoryAuditStore：单测/显式 AUDIT_STORE=memory，进程内存
- *  - PgAuditStore：生产，走 src/db/pool.ts，advisory lock 保证 seq 严格连续
+ *  - PgAuditStore：生产，走 postgres.js 模板标签，advisory lock 保证 seq 严格连续
  *
  * 选型规则（DEMO_MODE 不参与判定，避免运行态假绿）：
  *  - NODE_ENV=test            → Memory
@@ -18,14 +18,13 @@ import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { AuditEvent } from './auditEventAggregator';
 
-/** 最小 SQL 执行器（postgres.js ISql 结构化兼容，便于测试注入 fake） */
-export interface SqlExecutor {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  query<T extends Record<string, unknown>>(
-    texts: TemplateStringsArray | string,
-    ...params: unknown[]
-  ): Promise<{ rows: T[] }>;
-}
+/**
+ * postgres.js ISql 形态：可作为模板标签调用 sql`...`，
+ * 也有 sql.begin(tx => ...) 事务、sql.cursor(batch)`...` 流式。
+ * 用宽松 any 类型避免与 postgres.js 严格泛型耦合。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SqlExecutor = any;
 
 export interface AppendResult {
   ok: boolean;
@@ -38,6 +37,16 @@ export interface AuditEventStore {
   readonly kind: 'memory' | 'pg';
   append(evt: AuditEvent): Promise<AppendResult>;
   maxSeq(): Promise<number>;
+  /** 分页查询（DB 分页 + count，所有过滤进 WHERE） */
+  query(opts: {
+    limit: number; offset: number;
+    actorId?: string; module?: string; action?: string; result?: string; patientId?: string;
+    from?: string; to?: string;
+  }): Promise<{ rows: AuditEvent[]; total: number }>;
+  /** 流式读全量（verifyChain 用，按 seq 升序） */
+  streamAll(): AsyncIterable<AuditEvent[]>;
+  /** 启动回填：把 seq > fromSeq 的事件灌回 pending（仅 Pg 有意义） */
+  backfill(fromSeq: number, limit?: number): Promise<AuditEvent[]>;
 }
 
 // ---- 计数器（运行态 /metrics 暴露） ----
@@ -62,6 +71,16 @@ function writeFallback(evt: AuditEvent): string | null {
   }
 }
 
+function incPersistFailed(): void {
+  persistFailedTotal += 1;
+  try {
+    // 延迟 import 避免循环依赖
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
+    bffMetrics.auditPersistFailed.inc();
+  } catch { /* metrics 未就绪不阻塞 */ }
+}
+
 // ---- Memory ----
 export class MemoryAuditStore implements AuditEventStore {
   readonly kind = 'memory' as const;
@@ -74,6 +93,18 @@ export class MemoryAuditStore implements AuditEventStore {
   async maxSeq(): Promise<number> {
     return this.rows.length;
   }
+  async query(opts: { limit: number; offset: number }): Promise<{ rows: AuditEvent[]; total: number }> {
+    // Memory 实现：返回全量（路由层做过滤+分页），保证单测语义与 Pg 一致
+    const sorted = [...this.rows].sort((a, b) => b.seq - a.seq);
+    return { rows: sorted, total: sorted.length };
+  }
+  async *streamAll(): AsyncIterable<AuditEvent[]> {
+    const sorted = [...this.rows].sort((a, b) => a.seq - b.seq);
+    for (let i = 0; i < sorted.length; i += 500) {
+      yield sorted.slice(i, i + 500);
+    }
+  }
+  async backfill(): Promise<AuditEvent[]> { return []; }
   all(): AuditEvent[] { return this.rows; }
   reset(): void { this.rows = []; }
 }
@@ -99,37 +130,44 @@ interface EventsRow {
   tenant_id: string | null;
 }
 
+function rowFromDb(r: EventsRow): AuditEvent {
+  return {
+    eventId: r.event_id, seq: Number(r.seq), occurredAt: r.occurred_at,
+    actorId: r.actor_id, actorRole: r.actor_role as AuditEvent['actorRole'],
+    action: r.action as AuditEvent['action'], module: r.module,
+    resourceType: r.resource_type, resourceId: r.resource_id,
+    patientId: r.patient_id ?? undefined, result: r.result as AuditEvent['result'],
+    errorCode: r.error_code ?? undefined, ip: r.ip, userAgent: r.user_agent,
+    prevHash: r.prev_hash, hash: r.hash,
+  };
+}
+
 export class PgAuditStore implements AuditEventStore {
   readonly kind = 'pg' as const;
   constructor(private readonly sql: SqlExecutor) {}
 
   async append(evt: AuditEvent): Promise<AppendResult> {
     try {
-      // 单语句隐式事务：advisory lock → MAX(seq)+1 → INSERT。锁随语句 COMMIT 释放。
-      // 锁内只做这三步，不做 SM3、不写文件、不查别的表。
-      await this.sql.query(
-        `WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
-             nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM audit.events, lock)
-         INSERT INTO audit.events
-           (seq, event_id, occurred_at, actor_id, actor_role, action, module,
-            resource_type, resource_id, patient_id, result, error_code, ip, user_agent,
-            prev_hash, hash)
-         SELECT nxt.seq, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
-         FROM nxt`,
-        evt.seq,
-        evt.eventId, evt.occurredAt, evt.actorId, evt.actorRole, evt.action, evt.module,
-        evt.resourceType, evt.resourceId, evt.patientId ?? null, evt.result, evt.errorCode ?? null,
-        evt.ip, evt.userAgent, evt.prevHash, evt.hash,
-      );
+      // 事务内拿 advisory lock，锁在 COMMIT 时自动释放。
+      // 锁内只做：取 MAX(seq)+1 + INSERT，不做 SM3、不写文件、不查别的表。
+      await this.sql.begin(async (tx: SqlExecutor) => {
+        await tx`
+          WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
+               nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM audit.events, lock)
+          INSERT INTO audit.events
+            (seq, event_id, occurred_at, actor_id, actor_role, action, module,
+             resource_type, resource_id, patient_id, result, error_code, ip, user_agent,
+             prev_hash, hash)
+          SELECT nxt.seq, ${evt.eventId}, ${evt.occurredAt}, ${evt.actorId}, ${evt.actorRole},
+                 ${evt.action}, ${evt.module}, ${evt.resourceType}, ${evt.resourceId},
+                 ${evt.patientId ?? null}, ${evt.result}, ${evt.errorCode ?? null},
+                 ${evt.ip}, ${evt.userAgent}, ${evt.prevHash}, ${evt.hash}
+          FROM nxt
+        `;
+      });
       return { ok: true, persisted: true };
     } catch (err) {
-      persistFailedTotal += 1;
-      try {
-        // 延迟 import 避免循环依赖
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
-        bffMetrics.auditPersistFailed.inc();
-      } catch { /* metrics 未就绪不阻塞 */ }
+      incPersistFailed();
       const reason = err instanceof Error ? err.message : String(err);
       const fb = writeFallback(evt);
       if (fb) {
@@ -142,10 +180,57 @@ export class PgAuditStore implements AuditEventStore {
   }
 
   async maxSeq(): Promise<number> {
-    const r = await this.sql.query<{ max: string | number | null }>(
-      'SELECT COALESCE(MAX(seq),0) AS max FROM audit.events',
-    );
-    return Number(r.rows[0]?.max ?? 0);
+    const rows = await this.sql`SELECT COALESCE(MAX(seq),0)::bigint AS max FROM audit.events`;
+    return Number(rows[0]?.max ?? 0);
+  }
+
+  async query(opts: {
+    limit: number; offset: number;
+    actorId?: string; module?: string; action?: string; result?: string; patientId?: string;
+    from?: string; to?: string;
+  }): Promise<{ rows: AuditEvent[]; total: number }> {
+    // 所有过滤进 WHERE；total 用单独 count(*) 走同一 WHERE
+    // postgres.js 模板标签自动参数化，用 WHERE AND ${cond} 片段
+    const conds: any[] = [this.sql``]; // 占位，后续 AND
+    const and = (frag: any) => conds.push(this.sql`AND ${frag}`);
+    if (opts.actorId) and(this.sql`actor_id = ${opts.actorId}`);
+    if (opts.module) and(this.sql`module = ${opts.module}`);
+    if (opts.action) and(this.sql`action = ${opts.action}`);
+    if (opts.result) and(this.sql`result = ${opts.result}`);
+    if (opts.patientId) and(this.sql`patient_id = ${opts.patientId}`);
+    if (opts.from) and(this.sql`occurred_at >= ${opts.from}`);
+    if (opts.to) and(this.sql`occurred_at <= ${opts.to}`);
+    // 第一片是占位空，去掉
+    const where = conds.slice(1);
+    const whereSql = where.length
+      ? this.sql`WHERE ${this.sql.join(where, ' ')}`
+      : this.sql``;
+
+    const totalRows = await this.sql`SELECT COUNT(*)::bigint AS count FROM audit.events ${whereSql}`;
+    const total = Number(totalRows[0]?.count ?? 0);
+
+    const rows = await this.sql`
+      SELECT * FROM audit.events ${whereSql}
+      ORDER BY seq DESC
+      LIMIT ${opts.limit} OFFSET ${opts.offset}
+    `;
+    return { rows: (rows as unknown as EventsRow[]).map(rowFromDb), total };
+  }
+
+  async *streamAll(): AsyncIterable<AuditEvent[]> {
+    // postgres.js cursor：每 500 条一批
+    const cursor = this.sql.cursor(500)`SELECT * FROM audit.events ORDER BY seq ASC`;
+    // eslint-disable-next-line no-unreachable-loop
+    for await (const batch of cursor) {
+      yield (batch as unknown as EventsRow[]).map(rowFromDb);
+    }
+  }
+
+  async backfill(fromSeq: number, limit = 1000): Promise<AuditEvent[]> {
+    const rows = await this.sql`
+      SELECT * FROM audit.events WHERE seq > ${fromSeq} ORDER BY seq ASC LIMIT ${limit}
+    `;
+    return (rows as unknown as EventsRow[]).map(rowFromDb);
   }
 }
 
@@ -163,7 +248,7 @@ export function getAuditStore(): AuditEventStore {
     // 审计不跟随 DEMO_MODE 跳过 PG：审计是合规要求，不是演示数据
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { getDb } = require('../../db/pool') as typeof import('../../db/pool');
-    globalStore = new PgAuditStore(getDb() as unknown as SqlExecutor);
+    globalStore = new PgAuditStore(getDb());
   } else {
     console.warn('[audit] using MemoryAuditStore — audit events will be LOST on restart (not for production)');
     globalStore = new MemoryAuditStore();
@@ -175,6 +260,12 @@ export function getAuditStore(): AuditEventStore {
 export function initAuditStore(): AuditEventStore {
   const s = getAuditStore();
   console.log(`[audit] store=${s.kind}`);
+  // 启动时让计数器在 /metrics 输出 0 值样本
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
+    bffMetrics.auditPersistFailed.inc({}, 0);
+  } catch { /* ignore */ }
   return s;
 }
 

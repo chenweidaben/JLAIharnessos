@@ -51,7 +51,7 @@ export const auditEventRoutes: RouteDef[] = [
         const actorId = roles.includes('admin') ? (requestedActorId || undefined) : (c.user?.id ?? '');
         const limitRaw = Number(u.searchParams.get('limit') ?? '50');
         if (Number.isFinite(limitRaw) && limitRaw > 500) throw new AuditError(400, 'limit 不能超过 500');
-        const r = queryEvents({
+        const r = await queryEvents({
           actorId,
           module: u.searchParams.get('module') ?? undefined,
           action: u.searchParams.get('action') ?? undefined,
@@ -63,7 +63,11 @@ export const auditEventRoutes: RouteDef[] = [
           offset: Number(u.searchParams.get('offset') ?? '0'),
         });
         return json(ok(r));
-      } catch (e) { return mapError(e); }
+      } catch (e) {
+        // 审计查询失败不崩进程：返回 500 + 明确错误码
+        console.error('[audit] queryEvents route failed:', e instanceof Error ? e.message : String(e));
+        return mapError(e);
+      }
     },
   },
   {
@@ -96,7 +100,7 @@ export const auditEventRoutes: RouteDef[] = [
       try {
         const roles = c.user?.roles ?? [];
         if (!roles.includes('admin')) throw new AuditError(403, '仅 admin 可校验哈希链');
-        return json(ok(verifyChain()));
+        return json(ok(await verifyChain()));
       } catch (e) { return mapError(e); }
     },
   },

@@ -6,12 +6,13 @@
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { __resetStore as resetAudit, queryEvents } from '../../src/bff/aggregators/auditEventAggregator';
+import { __resetAuditStore } from '../../src/bff/aggregators/auditEventStore';
 import { __resetStore as resetLockout, takeReadToken, takeWriteToken } from '../../src/bff/aggregators/loginLockoutAggregator';
 import { auditEventHook } from '../../src/bff/middleware/auditEventHook';
 import { globalRateLimit } from '../../src/bff/middleware/globalRateLimit';
 import type { Ctx } from '../../src/bff/types';
 
-beforeEach(() => { resetAudit(); resetLockout(); });
+beforeEach(() => { resetAudit(); __resetAuditStore(null); resetLockout(); });
 
 function makeCtx(opts: { method: string; url: string; user?: { id: string; name: string; roles: string[] } | null; rawBody?: string; ip?: string; xff?: string }): Ctx {
   const headers = new Headers();
@@ -103,33 +104,33 @@ describe('P4-4 本机回环免流门控（反代安全）', async () => {
 describe('P4-4 login action 特例', async () => {
   test('POST /auth/login → action=login（不是 create）', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/auth/login', user: { id: 'D1', name: 'x', roles: ['doctor'] }, rawBody: '{"username":"D1","password":"x"}' }), status: 200 });
-    expect(queryEvents({}).rows[0].action).toBe('login');
+    expect((await queryEvents({})).rows[0].action).toBe('login');
   });
   test('POST /auth/demo-login → action=login', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/auth/demo-login', user: { id: 'D1', name: 'x', roles: ['doctor'] } }), status: 200 });
-    expect(queryEvents({}).rows[0].action).toBe('login');
+    expect((await queryEvents({})).rows[0].action).toBe('login');
   });
   test('POST /auth/logout → action=logout', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/auth/logout', user: { id: 'D1', name: 'x', roles: ['doctor'] } }), status: 200 });
-    expect(queryEvents({}).rows[0].action).toBe('logout');
+    expect((await queryEvents({})).rows[0].action).toBe('logout');
   });
   test('普通 POST 仍记 create', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/cds/checks/medication', user: { id: 'D1', name: 'x', roles: ['doctor'] } }), status: 200 });
-    expect(queryEvents({}).rows[0].action).toBe('create');
+    expect((await queryEvents({})).rows[0].action).toBe('create');
   });
 });
 
 describe('P4-4 patientId 从 body 提取', async () => {
   test('body 含 patientId → 审计带 patientId', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/cds/checks/medication', user: { id: 'D1', name: 'x', roles: ['doctor'] }, rawBody: '{"patientId":"P-123","drug":"warfarin"}' }), status: 200 });
-    expect(queryEvents({}).rows[0].patientId).toBe('P-123');
+    expect((await queryEvents({})).rows[0].patientId).toBe('P-123');
   });
   test('body 无 patientId → 不崩，patientId 为 undefined', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/cds/checks/medication', user: { id: 'D1', name: 'x', roles: ['doctor'] }, rawBody: '{"drug":"warfarin"}' }), status: 200 });
-    expect(queryEvents({}).rows[0].patientId).toBeUndefined();
+    expect((await queryEvents({})).rows[0].patientId).toBeUndefined();
   });
   test('body 非法 JSON → 不崩', async () => {
     await auditEventHook({ ctx: makeCtx({ method: 'POST', url: '/api/v1/cds/checks/medication', user: { id: 'D1', name: 'x', roles: ['doctor'] }, rawBody: 'not-json' }), status: 200 });
-    expect(queryEvents({}).total).toBe(1);
+    expect((await queryEvents({})).total).toBe(1);
   });
 });

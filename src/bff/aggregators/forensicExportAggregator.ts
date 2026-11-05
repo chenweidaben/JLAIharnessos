@@ -8,7 +8,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { queryEvents, verifyChain, type AuditEvent } from './auditEventAggregator.js';
+import { getPendingEvents, verifyChainSync, type AuditEvent } from './auditEventAggregator.js';
 
 export interface ForensicQuery {
   actorId?: string;
@@ -58,28 +58,18 @@ export function validateQuery(q: ForensicQuery): string | null {
 export function replay(q: ForensicQuery): { rows: AuditEvent[]; total: number } {
   const limit = Math.min(Math.max(q.limit ?? 50, 1), 500);
   const offset = Math.max(q.offset ?? 0, 0);
-  // audit queryEvents 默认按 seq desc；这里正序
-  const all = queryEvents({
-    actorId: q.actorId,
-    patientId: q.patientId,
-    limit: 5000,
-    offset: 0,
-  }).rows;
+  // P5-13：forensic 走内存 pending（与 seal 同源）
+  const all = getPendingEvents();
   const timeFiltered = applyTimeFilter(all, q.from, q.to);
-  // queryEvents 已按 seq desc，这里 reverse 成正序
+  // 正序
   const asc = timeFiltered.slice().sort((a, b) => a.seq - b.seq);
   return { rows: asc.slice(offset, offset + limit), total: asc.length };
 }
 
 export function createPackage(q: ForensicQuery, generatedBy: string): ForensicPackage {
-  const all = queryEvents({
-    actorId: q.actorId,
-    patientId: q.patientId,
-    limit: 5000,
-    offset: 0,
-  }).rows;
+  const all = getPendingEvents();
   const timeFiltered = applyTimeFilter(all, q.from, q.to).slice().sort((a, b) => a.seq - b.seq);
-  const chain = verifyChain();
+  const chain = verifyChainSync();
   const pkg: ForensicPackage = {
     packageId: nextId(),
     generatedBy,
