@@ -39,6 +39,34 @@ function requireDemo(c: Ctx): Response | null {
   return null;
 }
 
+// P5-11：独立运维审计流，落 <WORM_STORE_DIR>/_key-ops.json，不进业务审计链。
+// 绝不记录任何密钥值。
+interface KeyOp { at: string; actorId: string; action: 'retire' | 'purge'; keyId: string; result: string; refs: number | null; }
+function opsPath(): string {
+  const dir = process.env.WORM_STORE_DIR || 'logs/worm-store';
+  return `${dir}/_key-ops.json`;
+}
+async function logKeyOp(op: KeyOp): Promise<void> {
+  try {
+    const fs = await import('node:fs/promises');
+    const p = opsPath();
+    let arr: KeyOp[] = [];
+    try { arr = JSON.parse(await fs.readFile(p, 'utf8')); } catch { arr = []; }
+    arr.push(op);
+    // 环形保留最近 1000 条
+    if (arr.length > 1000) arr = arr.slice(arr.length - 1000);
+    await fs.writeFile(p, JSON.stringify(arr, null, 2), 'utf8');
+  } catch { /* 审计写失败不阻断主流程 */ }
+}
+function readKeyOps(limit: number): KeyOp[] {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const fs = require('node:fs');
+    const arr = JSON.parse(fs.readFileSync(opsPath(), 'utf8')) as KeyOp[];
+    return arr.slice(-limit).reverse();
+  } catch { return []; }
+}
+
 export const wormRoutes: RouteDef[] = [
   {
     method: 'POST',
@@ -166,6 +194,7 @@ export const wormRoutes: RouteDef[] = [
       if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
       const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
       const r = getKeyProvider().retire(keyId);
+      await logKeyOp({ actorId: c.user?.id ?? 'unknown', action: 'retire', keyId, result: r.ok ? 'ok' : (r.error ?? 'unknown'), refs: null });
       if (!r.ok) return json(fail(ErrorCode.BAD_REQUEST, r.error ?? 'retire-failed'), 400);
       return json(ok({ ok: true, keyId, keySource: getKeyProvider().kind, activeKeyId: getKeyProvider().activeKeyId() }));
     },
@@ -177,16 +206,32 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const b = (await c.body()) as Record<string, unknown>;
+      // P5-11：二次确认，避免误删
+      if (b.confirm !== 'PURGE') {
+        return json(fail(ErrorCode.BAD_REQUEST, 'confirm-required'), 400);
+      }
       const keyId = String(b.keyId ?? '');
       if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
       const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
       const r = getKeyProvider().purge(keyId);
+      // P5-11：写独立运维审计（不进业务审计链）
+      await logKeyOp({ actorId: c.user?.id ?? 'unknown', action: 'purge', keyId, result: r.ok ? 'ok' : (r.error ?? 'unknown'), refs: r.refs ?? null });
       if (!r.ok) {
-        // 409 for conflict (in-use / active), 400 for unknown-id
         const status = r.error === 'key-in-use' || r.error === 'cannot-purge-active' ? 409 : 400;
         return json({ ok: false, error: r.error, refs: r.refs } as never, status as never);
       }
       return json(ok({ ok: true, keyId, keySource: getKeyProvider().kind, activeKeyId: getKeyProvider().activeKeyId() }));
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/worm/keys/ops',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      const limit = Math.min(Number(c.query.get('limit') ?? '50'), 200);
+      const ops = readKeyOps(limit);
+      return json(ok({ ops }));
     },
   },
   {
