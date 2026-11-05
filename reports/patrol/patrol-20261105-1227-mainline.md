@@ -110,6 +110,8 @@ P5-7 组织侧宣称的「防自激双保险」（`excludeFromArchive` 标记 + 
 
 推送口径：`git push gitcode consult-agent-m86:master` + `git push mirror consult-agent-m86:master`（不推 `origin`、不推 `heagentos`、不打 tag）。推送后分别 `git ls-remote` 读 `refs/heads/master` 与 `refs/heads/consult-agent-m86`，与本地 `HEAD` 逐位比对——**本轮三端 SHA 值见巡检回执**（简报不写死自身 SHA，避免自我指涉循环）。
 
+本轮 mirror 推送又报 `update_ref failed for ref 'refs/remotes/mirror/*': reference broken`（远端 refspec 已成功更新、退出码 0，属**本地跟踪引用损坏**）。取证：`.git/refs/remotes/mirror/master` 与 `…/consult-agent-m86` 均为 41 字节，内容为 40 个 `0x00` 的坏引用（`refs/remotes/mirror/HEAD` 指向 `master` 的符号引用正常）。处置：`Remove-Item -LiteralPath` 精确删除这两个坏文件（不动 `packed-refs` 与远端），`git for-each-ref refs/remotes/mirror` 回落到 `packed-refs` 的 `ce41c947` 且不再报错。属本地元数据修复，不影响远端 SHA 与代码内容；下一轮 fan-out `git fetch mirror` 可让其重新生成。
+
 ## 9. 遗留风险与下一轮重点
 
 1. **LRU 性能口径未闭环**：组织侧报「粗筛降幅 99.7%，LRU D/C=13.9%」，但同批自述 `store.count()` 目录读是瓶颈、LRU 对总耗时无可观测贡献；本批 `FileWormStore` 内存索引（`1a75e961`）已把 `count()` 变 O(1)，但**尚无主线侧复测数字**。下一轮补一次真加密段基准（全扫 / 粗筛首次 / 粗筛重复 三档，同一进程、同一数据集）。
