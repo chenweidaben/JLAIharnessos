@@ -59,7 +59,7 @@ beforeEach(() => {
   getKeyProvider().setKeyInUseChecker((kid: string) => getWormStore().countBySigner(kid));
 });
 
-describe('P5-10 keys/retire 路由鉴权', () => {
+describe('P5-10 keys/retire 路由鉴权', async () => {
   test('无 token → 401', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/retire');
     const c = makeCtx({ user: null, body: { keyId: 'x' } });
@@ -75,7 +75,7 @@ describe('P5-10 keys/retire 路由鉴权', () => {
   });
 });
 
-describe('P5-10 keys/purge 路由鉴权', () => {
+describe('P5-10 keys/purge 路由鉴权', async () => {
   test('无 token → 401', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/purge');
     const c = makeCtx({ user: null, body: { keyId: 'x' } });
@@ -91,7 +91,7 @@ describe('P5-10 keys/purge 路由鉴权', () => {
   });
 });
 
-describe('P5-10 purge 响应无私钥', () => {
+describe('P5-10 purge 响应无私钥', async () => {
   test('purge 不存在的 keyId 响应体不含 privateKey/PRIVATE', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/purge');
     const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: 'nonexistent-x' } });
@@ -103,7 +103,7 @@ describe('P5-10 purge 响应无私钥', () => {
   });
 });
 
-describe('P5-10 keys/purge 真实 refs===2', () => {
+describe('P5-10 keys/purge 真实 refs===2', async () => {
   test('admin purge 被恰好 2 段引用的 key → 409 + refs===2', async () => {
     const provider = getKeyProvider();
     // rotate 两次：第一次得到 kNew（active），seal 2 段用它；第二次 rotate 让 kNew 不再 active
@@ -111,9 +111,9 @@ describe('P5-10 keys/purge 真实 refs===2', () => {
     const kNew = provider.activeKeyId();
 
     // seal 2 段，都用 kNew
-    recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
+    await recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
     seal({});
-    recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
+    await recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
     seal({});
 
     // rotate 让 kNew 不再 active
@@ -130,7 +130,7 @@ describe('P5-10 keys/purge 真实 refs===2', () => {
   });
 });
 
-describe('P5-11 purge 二次确认', () => {
+describe('P5-11 purge 二次确认', async () => {
   test('缺 confirm → 400 confirm-required', async () => {
     const h = findHandler('POST', '/api/v1/worm/keys/purge');
     const c = makeCtx({ user: { id: 'A1', name: 'admin', roles: ['admin'] }, body: { keyId: 'k-any' } });
@@ -172,7 +172,7 @@ describe('P5-11 purge 二次确认', () => {
   });
 });
 
-describe('P5-11b 运维审计流落盘', () => {
+describe('P5-11b 运维审计流落盘', async () => {
   test('WORM_STORE_DIR 指向不存在的嵌套目录时 purge 仍能落审计', async () => {
     const fs = require('node:fs');
     const os = require('node:os');

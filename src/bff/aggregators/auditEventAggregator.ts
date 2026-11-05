@@ -9,6 +9,7 @@
  */
 
 import { createHash, randomUUID } from 'node:crypto';
+import { getAuditStore, type AppendResult } from './auditEventStore';
 
 export class AuditError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -70,7 +71,7 @@ export interface RecordInput {
   result: unknown; errorCode?: string; ip?: string; userAgent?: string; occurredAt?: string;
 }
 
-export function recordEvent(input: RecordInput): AuditEvent {
+export async function recordEvent(input: RecordInput): Promise<{ event: AuditEvent; result: AppendResult }> {
   if (!input.actorId) throw new AuditError(400, 'actorId 必填');
   if (!input.module) throw new AuditError(400, 'module 必填');
   if (!input.resourceType) throw new AuditError(400, 'resourceType 必填');
@@ -81,6 +82,7 @@ export function recordEvent(input: RecordInput): AuditEvent {
 
   const prev = events[events.length - 1];
   const prevHash = prev ? prev.hash : GENESIS;
+  // seq 占位：Memory store 用 events.length+1；Pg store 用 SQL MAX(seq)+1
   const seq = events.length + 1;
   const occurredAt = input.occurredAt ?? new Date().toISOString();
   const base: Omit<AuditEvent, 'hash'> = {
@@ -93,8 +95,14 @@ export function recordEvent(input: RecordInput): AuditEvent {
   };
   const hash = computeHash(prevHash, canonical(base));
   const evt: AuditEvent = { ...base, hash };
-  events.push(evt);
-  return evt;
+
+  // P5-13：写穿。成功才进 pending 池；失败走 fallback，不进 pending。
+  const store = getAuditStore();
+  const r = await store.append(evt);
+  if (r.ok && r.persisted) {
+    events.push(evt);
+  }
+  return { event: evt, result: r };
 }
 
 export interface QueryInput {

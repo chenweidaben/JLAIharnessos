@@ -111,14 +111,21 @@ export const auditEventRoutes: RouteDef[] = [
         if (!roles.includes('admin')) throw new AuditError(403, '_seed 仅 admin');
         const b = (await c.body()) as Record<string, unknown>;
         const items = Array.isArray(b.items) ? (b.items as Array<Record<string, unknown>>) : [];
-        const out = items.map((it) => recordEvent({
-          actorId: String(it.actorId ?? ''), actorRole: it.actorRole, action: it.action,
-          module: String(it.module ?? ''), resourceType: String(it.resourceType ?? ''),
-          resourceId: String(it.resourceId ?? ''), patientId: it.patientId === undefined ? undefined : String(it.patientId),
-          result: it.result, errorCode: it.errorCode === undefined ? undefined : String(it.errorCode),
-          ip: String(it.ip ?? '10.0.0.1'), userAgent: String(it.userAgent ?? 'seed'),
-          occurredAt: it.occurredAt === undefined ? undefined : String(it.occurredAt),
-        }));
+        const out: Array<{ seeded: boolean; reason?: string }> = [];
+        for (const it of items) {
+          const r = await recordEvent({
+            actorId: String(it.actorId ?? ''), actorRole: it.actorRole, action: it.action,
+            module: String(it.module ?? ''), resourceType: String(it.resourceType ?? ''),
+            resourceId: String(it.resourceId ?? ''), patientId: it.patientId === undefined ? undefined : String(it.patientId),
+            result: it.result, errorCode: it.errorCode === undefined ? undefined : String(it.errorCode),
+            ip: String(it.ip ?? '10.0.0.1'), userAgent: String(it.userAgent ?? 'seed'),
+            occurredAt: it.occurredAt === undefined ? undefined : String(it.occurredAt),
+          });
+          if (!r.result.ok) {
+            throw new AuditError(500, `audit-persist-failed: ${r.result.reason ?? 'unknown'}`);
+          }
+          out.push({ seeded: true });
+        }
         return json(ok({ seeded: out.length }));
       } catch (e) { return mapError(e); }
     },

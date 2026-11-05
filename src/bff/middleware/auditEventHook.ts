@@ -74,7 +74,7 @@ export interface HookInput {
  * after-hook 入口：把一次 HTTP 状态变更落为 AuditEvent。
  * 任何异常吞掉，绝不影响业务响应。
  */
-export function auditEventHook(input: HookInput): void {
+export async function auditEventHook(input: HookInput): Promise<void> {
   try {
     const { ctx, status } = input;
     const method = ctx.req.method.toUpperCase();
@@ -121,14 +121,19 @@ export function auditEventHook(input: HookInput): void {
     const ip = ctx.clientIp || '0.0.0.0';
     const userAgent = ctx.req.headers?.get?.('user-agent') ?? 'unknown';
 
-    recordEvent({
+    // P5-13：async 写穿。失败只 log/metric，不阻断业务（业务已在 finally 前完成）
+    const r = await recordEvent({
       actorId, actorRole, action, module,
       resourceType, resourceId, patientId,
       result,
       errorCode: status >= 400 ? String(status) : undefined,
       ip, userAgent,
     });
-  } catch {
-    // 静默吞，审计不能拖垮业务
+    if (!r.result.ok || !r.result.persisted) {
+      console.error(`[audit] hook record non-fatal: ok=${r.result.ok} persisted=${r.result.persisted} reason=${r.result.reason ?? ''}`);
+    }
+  } catch (e) {
+    // 审计不能拖垮业务；最后兜底只 log
+    console.error('[audit] hook unhandled:', e instanceof Error ? e.message : String(e));
   }
 }

@@ -60,6 +60,9 @@ export const bffMetrics = {
   outboxOldestPendingAge: registry.register(
     new Gauge('gangos_outbox_oldest_pending_age_seconds', '最老未发布（pending）事件年龄（秒）'),
   ),
+  auditPersistFailed: registry.register(
+    new Counter('gangos_audit_persist_failed_total', '审计事件落库失败次数（含 fallback 成功）'),
+  ),
 };
 
 /** 聚合全部指标（业务 + BFF），便于按名访问 */

@@ -6991,8 +6991,8 @@ async function handleFetch(
     logRequest(ctx, status, startedAt);
     // 操作审计（POST/PUT/DELETE 才留痕，fire-and-forget，失败不影响主请求）
     auditOperation(ctx);
-    // P4-2：内存哈希链审计 after-hook（所有非 GET /api/v1/* 状态变更）
-    auditEventHook({ ctx, status });
+    // P4-2：审计 after-hook（P5-13 改 async 写穿，失败只 log 不阻断业务）
+    await auditEventHook({ ctx, status });
     recordHttpRequest({
       method: req.method,
       route: routeLabel,
@@ -7046,6 +7046,9 @@ console.log(
   `[jianlan-bff] starting  nodeEnv=${(process.env.NODE_ENV ?? 'development')}  ` +
     `DEMO_MODE=${getEnv().demoMode ? 'ON (内存演示数据，不连 PG)' : 'OFF (连 PostgreSQL)'}`,
 );
+
+// P5-13：显式初始化审计存储并打印后端类型（审计不跟随 DEMO_MODE 跳过 PG）
+import('./aggregators/auditEventStore').then((m) => m.initAuditStore()).catch(() => {});
 
 void initDatabase().then(() => {
   // eslint-disable-next-line no-console
