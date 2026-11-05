@@ -24,7 +24,7 @@ function makeSegment(seq: number, signerKeyId = 'k1'): WormSegment {
     prevSegmentHash: seq > 1 ? `hash-${seq - 1}` : '',
     events: [{ seq, at: '2026-01-01T00:00:00.000Z', patientId: 'P-1', type: 'lab', result: 'ok' }],
     sealedAt: '2026-01-01T00:00:00.000Z',
-  } as WormSegment;
+  } as unknown as WormSegment;
 }
 
 async function runAsyncContract(makeStore: () => { store: AsyncWormStore; s3?: MockS3Client }) {
