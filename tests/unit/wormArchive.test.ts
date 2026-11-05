@@ -354,4 +354,51 @@ describe('P5-6 自动调度 + 检索', () => {
     expect(typeof r.total).toBe('number');
     expect(typeof r.scannedSegments).toBe('number');
   });
+  test('部分更新不清空其它配置字段（undefined 不得覆盖）', () => {
+    setAutoConfig({ enabled: true, intervalMs: 60000, threshold: 5 });
+    const c = setAutoConfig({ intervalMs: 30000 } as Partial<{ intervalMs: number }>);
+    expect(c.enabled).toBe(true);      // 未被 undefined 清空
+    expect(c.threshold).toBe(5);       // 保持原值
+    expect(c.intervalMs).toBe(30000);
+    expect(getAutoConfig().enabled).toBe(true);
+  });
+  test('配置越界值被夹紧（intervalMs<threshold 非法）', () => {
+    const c = setAutoConfig({ intervalMs: 10, threshold: 0 });
+    expect(c.intervalMs).toBeGreaterThanOrEqual(1000);
+    expect(c.threshold).toBeGreaterThanOrEqual(1);
+  });
+  test('时间窗触发：间隔已到即使未到阈值也封段', () => {
+    recordEvent({
+      actorId: 'A-TICK', actorRole: 'doctor', action: 'create', module: 'emr',
+      resourceType: 'note', resourceId: 'N-TICK', result: 'success',
+      ip: '1.1.1.1', userAgent: 'ua',
+    });
+    const twoHoursAgo = new Date(Date.now() - 2 * 3600_000).toISOString();
+    setAutoConfig({ enabled: true, intervalMs: 60_000, threshold: 20, lastSealAt: twoHoursAgo });
+    const r = tick();
+    expect(r.sealed).toBe(true);
+    expect(typeof r.segmentId).toBe('string');
+  });
+  test('interval 未到且未到阈值 → 不封段', () => {
+    recordEvent({
+      actorId: 'A-TICK2', actorRole: 'doctor', action: 'create', module: 'emr',
+      resourceType: 'note', resourceId: 'N-TICK2', result: 'success',
+      ip: '1.1.1.1', userAgent: 'ua',
+    });
+    setAutoConfig({ enabled: true, intervalMs: 3600_000, threshold: 50, lastSealAt: new Date().toISOString() });
+    const r = tick();
+    expect(r.sealed).toBe(false);
+    expect(r.reason).toBe('below-threshold');
+  });
+  test('limit 非法（NaN/负数/0）回退默认且不返回空页', () => {
+    seedN(3);
+    seal({});
+    for (const bad of [Number.NaN, -5, 0]) {
+      const r = search({ limit: bad });
+      expect(r.total).toBe(3);
+      expect(r.rows.length).toBe(3);       // 回退默认 50，而不是 slice(NaN) 空页
+    }
+    const capped = search({ limit: 100000 });
+    expect(capped.rows.length).toBeLessThanOrEqual(500);
+  });
 });

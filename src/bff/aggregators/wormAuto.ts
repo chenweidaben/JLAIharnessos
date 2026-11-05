@@ -55,7 +55,20 @@ export function getAutoConfig(): AutoConfig {
 
 export function setAutoConfig(cfg: Partial<AutoConfig>): AutoConfig {
   const cur = getAutoConfig();
-  const next: AutoConfig = { ...cur, ...cfg };
+  // 只接受显式给出的合法字段：undefined/非法值不得覆盖已有配置
+  // （路由层会把未提供的字段显式传成 undefined，若直接展开会让 enabled/threshold 被清空回默认）
+  const patch: Partial<AutoConfig> = {};
+  if (typeof cfg.enabled === 'boolean') patch.enabled = cfg.enabled;
+  if (typeof cfg.intervalMs === 'number' && Number.isFinite(cfg.intervalMs)) {
+    patch.intervalMs = Math.max(1_000, Math.floor(cfg.intervalMs));
+  }
+  if (typeof cfg.threshold === 'number' && Number.isFinite(cfg.threshold)) {
+    patch.threshold = Math.max(1, Math.floor(cfg.threshold));
+  }
+  if (typeof cfg.lastSealAt === 'string' || cfg.lastSealAt === null) {
+    patch.lastSealAt = cfg.lastSealAt;
+  }
+  const next: AutoConfig = { ...cur, ...patch };
   writeFileSync(autoFilePath(), JSON.stringify(next, null, 2), 'utf8');
   return next;
 }
@@ -73,14 +86,14 @@ export function tick(): TickResult {
   if (pending === 0) return { sealed: false, reason: 'no-events' };
   const now = Date.now();
   if (cfg.lastSealAt) {
+    // 语义：距上次 seal 超 intervalMs「或」待归档事件数 ≥ threshold，二者任一成立即封段。
+    // 不能先判「间隔未到且未到阈值」再单独用阈值拦截，否则时间窗永远无法在低事件量时触发。
     const elapsed = now - new Date(cfg.lastSealAt).getTime();
-    if (elapsed < cfg.intervalMs && pending < cfg.threshold) {
-      return { sealed: false, reason: 'interval-not-elapsed' };
+    const intervalDue = Number.isFinite(elapsed) && elapsed >= cfg.intervalMs;
+    const thresholdDue = pending >= cfg.threshold;
+    if (!intervalDue && !thresholdDue) {
+      return { sealed: false, reason: 'below-threshold' };
     }
-  }
-  if (pending < cfg.threshold && cfg.lastSealAt) {
-    // 未到阈值且已归档过
-    return { sealed: false, reason: 'below-threshold' };
   }
   const r = seal({});
   if (!r.ok) return { sealed: false, reason: 'no-events' };
@@ -193,8 +206,12 @@ export function search(q: SearchQuery): SearchResult {
     }
   }
   all.sort((a, b) => a.seq - b.seq);
-  const limit = q.limit ?? 50;
-  const offset = q.offset ?? 0;
+  // 分页参数防御：?limit=abc / 负数 / 0 不得静默返回空页
+  const MAX_LIMIT = 500;
+  const limitRaw = typeof q.limit === 'number' ? q.limit : 50;
+  const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? Math.min(Math.floor(limitRaw), MAX_LIMIT) : 50;
+  const offsetRaw = typeof q.offset === 'number' ? q.offset : 0;
+  const offset = Number.isFinite(offsetRaw) && offsetRaw > 0 ? Math.floor(offsetRaw) : 0;
   return {
     rows: all.slice(offset, offset + limit),
     total: all.length,
