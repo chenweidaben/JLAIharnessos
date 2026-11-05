@@ -155,11 +155,16 @@ initKeys();
 
 // P5-9：把"该 keyId 是否仍被段引用"的检查注册给 KeyProvider。
 // 在模块加载时立即挂载（不依赖 /worm/keys 调用），保证 purge 前 checker 已就位。
-// 若 provider 换实例（单测），ensure 会重新挂上。
+// P5-10：走 O(1) 索引 countBySigner；索引命中 0 时回退一次真实 list 扫描，
+// 防外部写入未 refresh 导致索引滞后而误删（fail-closed 双保险）。
 function ensureKeyInUseChecker(): void {
   const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
   if (typeof p.setKeyInUseChecker !== 'function') return;
-  p.setKeyInUseChecker((keyId: string) => store().countBySigner(keyId));
+  p.setKeyInUseChecker((keyId: string) => {
+    const idx = store().countBySigner(keyId);
+    if (idx > 0) return idx;
+    return store().list().filter((s) => s.signerKeyId === keyId).length;
+  });
 }
 ensureKeyInUseChecker();
 
