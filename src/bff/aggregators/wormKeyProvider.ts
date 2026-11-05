@@ -22,8 +22,10 @@ const { sm2, sm4 } = smCrypto as {
 };
 
 export type KeyIdReason = 'unknown-key-id' | 'bad-signature';
+export type PurgeError = 'unknown-key-id' | 'cannot-purge-active' | 'key-in-use';
 
 export interface VerifyOutcome { ok: boolean; reason?: KeyIdReason; }
+export interface PurgeResult { ok: boolean; error?: PurgeError; refs?: number; }
 
 export interface KeyProvider {
   readonly kind: 'file' | 'demo-ephemeral' | 'memory';
@@ -34,6 +36,12 @@ export interface KeyProvider {
   verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome;
   rotate(): { fromKeyId: string; toKeyId: string };
   listKeyIds(): string[];
+  /** P5-9：标记 key 不可用于新签名，旧段仍可验签 */
+  retire(keyId: string): { ok: boolean; error?: string };
+  /** P5-9：彻底删除 key。若仍有段引用则拒绝（key-in-use） */
+  purge(keyId: string): PurgeResult;
+  /** 由外部注入"该 keyId 是否仍被段引用"的检查，用于 purge 护栏 */
+  setKeyInUseChecker(fn: (keyId: string) => number): void;
 }
 
 interface RingEntry {
@@ -43,6 +51,7 @@ interface RingEntry {
   ivHex: string;
   createdAt: string;
   active: boolean;
+  retired?: boolean;
 }
 
 function newKeyPair(): { keyId: string; publicKeyHex: string; privateKeyHex: string } {
@@ -65,8 +74,9 @@ function kekFromEnv(): string {
 export class DemoEphemeralKeyProvider implements KeyProvider {
   readonly kind = 'demo-ephemeral' as const;
   readonly productionSafe = false;
-  private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string }> = [];
+  private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
+  private keyInUse: (keyId: string) => number = () => 0;
 
   constructor() {
     const kp = newKeyPair();
@@ -78,11 +88,17 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
   private byId(keyId: string) { return this.ring.find((r) => r.keyId === keyId); }
   private active() {
     const e = this.byId(this.activeKey);
-    if (!e) throw new Error('worm-demo-key-ring-empty');
+    if (!e || e.retired) {
+      // 自动选下一个未 retired 的
+      const next = this.ring.find((r) => !r.retired);
+      if (!next) throw new Error('worm-no-active-key');
+      this.activeKey = next.keyId;
+      return next;
+    }
     return e;
   }
 
-  activeKeyId(): string { return this.activeKey; }
+  activeKeyId(): string { return this.active().keyId; }
   getSigningKey(): { keyId: string; privateKeyHex: string } {
     const e = this.active();
     return { keyId: e.keyId, privateKeyHex: e.privateKeyHex };
@@ -91,7 +107,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     return this.byId(keyId)?.publicKeyHex ?? null;
   }
   verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome {
-    const kid = keyId || this.activeKey;
+    const kid = keyId || this.activeKeyId();
     const e = this.byId(kid);
     if (!e) return { ok: false, reason: 'unknown-key-id' };
     try {
@@ -100,13 +116,30 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     } catch { return { ok: false, reason: 'bad-signature' }; }
   }
   rotate(): { fromKeyId: string; toKeyId: string } {
-    const from = this.activeKey;
+    const from = this.activeKeyId();
     const kp = newKeyPair();
     this.ring.push({ keyId: kp.keyId, publicKeyHex: kp.publicKeyHex, privateKeyHex: kp.privateKeyHex });
     this.activeKey = kp.keyId;
     return { fromKeyId: from, toKeyId: kp.keyId };
   }
   listKeyIds(): string[] { return this.ring.map((r) => r.keyId); }
+  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+
+  retire(keyId: string): { ok: boolean; error?: string } {
+    const e = this.byId(keyId);
+    if (!e) return { ok: false, error: 'unknown-key-id' };
+    e.retired = true;
+    return { ok: true };
+  }
+  purge(keyId: string): PurgeResult {
+    const e = this.byId(keyId);
+    if (!e) return { ok: false, error: 'unknown-key-id' };
+    if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
+    const refs = this.keyInUse(keyId);
+    if (refs > 0) return { ok: false, error: 'key-in-use', refs };
+    this.ring = this.ring.filter((r) => r.keyId !== keyId);
+    return { ok: true };
+  }
 }
 
 /* -------------------- FileKeyProvider -------------------- */
@@ -117,8 +150,8 @@ export class FileKeyProvider implements KeyProvider {
   private ring: RingEntry[] = [];
   private ringPath: string;
   private kek: string;
-  // 内存中解密后的私钥缓存（避免每次签都解一次）
   private privateCache = new Map<string, string>();
+  private keyInUse: (keyId: string) => number = () => 0;
 
   constructor(storeDir: string) {
     this.ringPath = join(storeDir, '_keys.json');
@@ -149,8 +182,15 @@ export class FileKeyProvider implements KeyProvider {
   }
 
   private activeEntry(): RingEntry {
-    const a = this.ring.find((r) => r.active);
-    if (!a) throw new Error('worm-key-ring-corrupt');
+    let a = this.ring.find((r) => r.active && !r.retired);
+    if (!a) {
+      // 当前 active 已被 retire，自动切到下一个未 retired 的
+      a = this.ring.find((r) => !r.retired);
+      if (!a) throw new Error('worm-no-active-key');
+      for (const r of this.ring) r.active = false;
+      a.active = true;
+      this.persist();
+    }
     return a;
   }
 
@@ -197,6 +237,28 @@ export class FileKeyProvider implements KeyProvider {
   listKeyIds(): string[] { return this.ring.map((r) => r.keyId); }
 
   ringFilePath(): string { return this.ringPath; }
+
+  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+
+  retire(keyId: string): { ok: boolean; error?: string } {
+    const e = this.ring.find((r) => r.keyId === keyId);
+    if (!e) return { ok: false, error: 'unknown-key-id' };
+    e.retired = true;
+    this.persist();
+    return { ok: true };
+  }
+
+  purge(keyId: string): PurgeResult {
+    const e = this.ring.find((r) => r.keyId === keyId);
+    if (!e) return { ok: false, error: 'unknown-key-id' };
+    if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
+    const refs = this.keyInUse(keyId);
+    if (refs > 0) return { ok: false, error: 'key-in-use', refs };
+    this.ring = this.ring.filter((r) => r.keyId !== keyId);
+    this.privateCache.delete(keyId);
+    this.persist();
+    return { ok: true };
+  }
 }
 
 /* -------------------- 工厂 -------------------- */

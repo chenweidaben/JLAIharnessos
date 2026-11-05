@@ -43,10 +43,12 @@ export function globalRateLimit(c: Ctx): Response | null {
   // 生产部署在 Nginx/负载均衡后时，所有外部请求源 IP 都会被反代归一成 127.0.0.1，
   // 若无条件免流等于对全网取消限流。因此必须同时满足：
   //   1) NODE_ENV=development 或 DEMO_MODE=1
-  //   2) TRUST_PROXY 未设为 '1'（反代场景下即使开发环境也不免）
+  //   2) TRUST_PROXY 未设为 '1'
+  //   3) 请求未带 X-Forwarded-For 头（带了就说明经过代理，不可信本机）
   const isLocal = ip === '127.0.0.1' || ip === '::1' || ip === 'localhost' || ip === '::ffff:127.0.0.1';
   const devMode = process.env.NODE_ENV === 'development' || process.env.DEMO_MODE === '1';
-  const noProxy = process.env.TRUST_PROXY !== '1';
+  const hasXForwardedFor = c.req.headers.has('x-forwarded-for');
+  const noProxy = process.env.TRUST_PROXY !== '1' && !hasXForwardedFor;
   if (isLocal && devMode && noProxy) return null;
 
   const method = c.req.method.toUpperCase();

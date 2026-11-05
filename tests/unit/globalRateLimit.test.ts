@@ -13,9 +13,10 @@ import type { Ctx } from '../../src/bff/types';
 
 beforeEach(() => { resetAudit(); resetLockout(); });
 
-function makeCtx(opts: { method: string; url: string; user?: { id: string; name: string; roles: string[] } | null; rawBody?: string; ip?: string }): Ctx {
+function makeCtx(opts: { method: string; url: string; user?: { id: string; name: string; roles: string[] } | null; rawBody?: string; ip?: string; xff?: string }): Ctx {
   const headers = new Headers();
   headers.set('user-agent', 'test-agent');
+  if (opts.xff) headers.set('x-forwarded-for', opts.xff);
   return {
     req: { method: opts.method, url: `http://internal${opts.url}`, headers } as unknown as Request,
     params: {},
@@ -83,6 +84,15 @@ describe('P4-4 本机回环免流门控（反代安全）', () => {
   test('TRUST_PROXY=1（反代）→ 127.0.0.1 仍受限流', () => {
     process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; process.env.TRUST_PROXY = '1';
     const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' });
+    let last: Response | null = null;
+    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    expect(last).not.toBeNull();
+    expect(last!.status).toBe(429);
+  });
+  test('带 X-Forwarded-For 头（即使未设 TRUST_PROXY）→ 127.0.0.1 仍受限流', () => {
+    // 安全项：攻击者直连 app 并伪造 XFF: 127.0.0.1 不能绕过免流
+    process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
+    const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1', xff: '127.0.0.1' });
     let last: Response | null = null;
     for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
     expect(last).not.toBeNull();
