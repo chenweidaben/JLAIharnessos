@@ -29,6 +29,8 @@ export type SqlExecutor = any;
 export interface AppendResult {
   ok: boolean;
   persisted: boolean;
+  /** Pg 路径返回 DB 实际分配的 seq；Memory 路径返回内存分配的 seq。 */
+  seq?: number;
   fallbackPath?: string;
   reason?: string;
 }
@@ -87,8 +89,9 @@ export class MemoryAuditStore implements AuditEventStore {
   private rows: AuditEvent[] = [];
 
   async append(evt: AuditEvent): Promise<AppendResult> {
-    this.rows.push(evt);
-    return { ok: true, persisted: true };
+    const seq = this.rows.length + 1;
+    this.rows.push({ ...evt, seq });
+    return { ok: true, persisted: true, seq };
   }
   async maxSeq(): Promise<number> {
     return this.rows.length;
@@ -104,7 +107,13 @@ export class MemoryAuditStore implements AuditEventStore {
       yield sorted.slice(i, i + 500);
     }
   }
-  async backfill(): Promise<AuditEvent[]> { return []; }
+  async backfill(fromSeq: number, limit = 1000): Promise<AuditEvent[]> {
+    // Memory 实现：返回 seq > fromSeq 的行（供单测验证回填边界）
+    return this.rows
+      .filter((e) => e.seq > fromSeq)
+      .sort((a, b) => a.seq - b.seq)
+      .slice(0, limit);
+  }
   all(): AuditEvent[] { return this.rows; }
   reset(): void { this.rows = []; }
 }
@@ -150,8 +159,9 @@ export class PgAuditStore implements AuditEventStore {
     try {
       // 事务内拿 advisory lock，锁在 COMMIT 时自动释放。
       // 锁内只做：取 MAX(seq)+1 + INSERT，不做 SM3、不写文件、不查别的表。
+      let assignedSeq = 0;
       await this.sql.begin(async (tx: SqlExecutor) => {
-        await tx`
+        const rows = await tx`
           WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
                nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM audit.events, lock)
           INSERT INTO audit.events
@@ -163,9 +173,11 @@ export class PgAuditStore implements AuditEventStore {
                  ${evt.patientId ?? null}, ${evt.result}, ${evt.errorCode ?? null},
                  ${evt.ip}, ${evt.userAgent}, ${evt.prevHash}, ${evt.hash}
           FROM nxt
+          RETURNING seq
         `;
+        assignedSeq = Number(rows[0]?.seq ?? 0);
       });
-      return { ok: true, persisted: true };
+      return { ok: true, persisted: true, seq: assignedSeq };
     } catch (err) {
       incPersistFailed();
       const reason = err instanceof Error ? err.message : String(err);

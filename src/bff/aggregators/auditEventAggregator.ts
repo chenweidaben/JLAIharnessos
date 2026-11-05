@@ -100,7 +100,9 @@ export async function recordEvent(input: RecordInput): Promise<{ event: AuditEve
   const store = getAuditStore();
   const r = await store.append(evt);
   if (r.ok && r.persisted) {
-    events.push(evt);
+    // Pg 路径用 DB RETURNING 的 seq 覆盖内存占位 seq，保证 pending 池与 DB 一致。
+    const persisted = r.seq ? { ...evt, seq: r.seq } : evt;
+    events.push(persisted);
   }
   return { event: evt, result: r };
 }
@@ -202,6 +204,9 @@ export function __resetStore(): void { events.length = 0; }
 
 /** P5-13：暴露内存 pending 池（seal 路径用，避免每次 seal 查 DB） */
 export function getPendingEvents(): AuditEvent[] { return [...events]; }
+
+/** P5-13 测试用：直接往 pending 池注入事件（造 gap 场景） */
+export function __injectPending(evt: AuditEvent): void { events.push(evt); }
 
 /** P5-13 启动回填：把 store 中 seq > fromSeq 的事件灌回内存 pending 池。
  *  fromSeq 必须显式传（通常是 lastArchivedSeq），禁止默认 0。 */
