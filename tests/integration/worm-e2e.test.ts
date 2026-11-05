@@ -179,21 +179,34 @@ describe('P5-5 store/info + seqContinuity + 路径穿越', () => {
 });
 
 describe('P5-6 自动调度 + 跨段检索', () => {
-  it('GET /auto/config 返回配置对象', async () => {
+  it('GET /auto/config 返完整配置字段', async () => {
     const r = await call('GET','/api/v1/worm/auto/config',{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(typeof r.data.intervalMs).toBe('number');
+    expect(typeof r.data.enabled).toBe('boolean');
+    expect(r.data.intervalMs).toBeGreaterThan(0);
+    expect(r.data.threshold).toBeGreaterThan(0);
   });
-  it('POST /auto/tick 返回 sealed 布尔值', async () => {
+  it('POST /auto/config 写不触发 seal 的值', async () => {
+    const r = await call('POST','/api/v1/worm/auto/config',{token:admin, body:{enabled:false, intervalMs:999999, threshold:999999}});
+    expect(r.httpStatus).toBe(200);
+    expect(r.data.enabled).toBe(false);
+    expect(r.data.intervalMs).toBe(999999);
+    expect(r.data.threshold).toBe(999999);
+  });
+  it('POST /auto/tick 返 sealed 布尔 + reason 字符串', async () => {
     const r = await call('POST','/api/v1/worm/auto/tick',{token:admin});
     expect(r.httpStatus).toBe(200);
     expect(typeof r.data.sealed).toBe('boolean');
+    // enabled=false 时 reason='disabled'
+    expect(typeof r.data.reason).toBe('string');
   });
-  it('GET /worm/search 返回分页结构', async () => {
+  it('GET /worm/search 跨段检索有结果', async () => {
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     expect(r.httpStatus).toBe(200);
+    expect(r.data.total).toBeGreaterThanOrEqual(1);
+    expect(r.data.scannedSegments).toBeGreaterThanOrEqual(1);
     expect(Array.isArray(r.data.rows)).toBe(true);
-    expect(typeof r.data.total).toBe('number');
-    expect(typeof r.data.scannedSegments).toBe('number');
+    expect(r.data.rows[0]).toHaveProperty('seq');
+    expect(r.data.rows[0]).toHaveProperty('occurredAt');
   });
 });

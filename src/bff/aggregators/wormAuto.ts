@@ -5,6 +5,13 @@
  * - 索引 <dir>/_index.json：每段 actorIds/patientIds/actions/modules/fromTs/toTs
  * - 检索：跨段解密后按条件过滤
  *
+ * 【架构边界（独立验证确认）】
+ * 审计事件聚合器（auditEventAggregator）是进程内存态，不跨进程共享。
+ * 因此跨进程保证的是：①段持久化到磁盘；②段间链式衔接（prevSegmentHash）；
+ * ③_auto.json 配置读回；④_index.json 索引读回/重建。
+ * 跨进程不能继续归档新事件——B 进程 audit 内存为空，pending=0，seal() 返 no-events。
+ * 这不是缺陷，是当前内存架构的预期行为。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
