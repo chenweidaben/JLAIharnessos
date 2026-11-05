@@ -22,7 +22,7 @@ const { sm2, sm4 } = smCrypto as {
 };
 
 export type KeyIdReason = 'unknown-key-id' | 'bad-signature';
-export type PurgeError = 'unknown-key-id' | 'cannot-purge-active' | 'key-in-use';
+export type PurgeError = 'unknown-key-id' | 'cannot-purge-active' | 'key-in-use' | 'key-in-use-checker-not-wired';
 
 export interface VerifyOutcome { ok: boolean; reason?: KeyIdReason; }
 export interface PurgeResult { ok: boolean; error?: PurgeError; refs?: number; }
@@ -76,7 +76,8 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
   readonly productionSafe = false;
   private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
-  private keyInUse: (keyId: string) => number = () => 0;
+  // P5-9：fail-closed——未注入 checker 时 purge 拒绝，不猜 refs=0
+  private keyInUse: ((keyId: string) => number) | null = null;
 
   constructor() {
     const kp = newKeyPair();
@@ -135,6 +136,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     const e = this.byId(keyId);
     if (!e) return { ok: false, error: 'unknown-key-id' };
     if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
+    if (!this.keyInUse) return { ok: false, error: 'key-in-use-checker-not-wired' };
     const refs = this.keyInUse(keyId);
     if (refs > 0) return { ok: false, error: 'key-in-use', refs };
     this.ring = this.ring.filter((r) => r.keyId !== keyId);
@@ -151,7 +153,8 @@ export class FileKeyProvider implements KeyProvider {
   private ringPath: string;
   private kek: string;
   private privateCache = new Map<string, string>();
-  private keyInUse: (keyId: string) => number = () => 0;
+  // P5-9：fail-closed——未注入 checker 时 purge 拒绝
+  private keyInUse: ((keyId: string) => number) | null = null;
 
   constructor(storeDir: string) {
     this.ringPath = join(storeDir, '_keys.json');
@@ -252,6 +255,7 @@ export class FileKeyProvider implements KeyProvider {
     const e = this.ring.find((r) => r.keyId === keyId);
     if (!e) return { ok: false, error: 'unknown-key-id' };
     if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
+    if (!this.keyInUse) return { ok: false, error: 'key-in-use-checker-not-wired' };
     const refs = this.keyInUse(keyId);
     if (refs > 0) return { ok: false, error: 'key-in-use', refs };
     this.ring = this.ring.filter((r) => r.keyId !== keyId);

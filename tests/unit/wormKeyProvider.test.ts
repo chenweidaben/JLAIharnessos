@@ -214,4 +214,15 @@ describe('P5-9 retire / purge 回收策略', () => {
     expect(r.ok).toBe(false);
     expect(r.error).toBe('unknown-key-id');
   });
+
+  test('purge 未挂 checker 时 → key-in-use-checker-not-wired（fail-closed）', () => {
+    const p = new DemoEphemeralKeyProvider();
+    p.rotate();
+    const k1 = p.listKeyIds()[0];
+    p.retire(k1);
+    // 不调 setKeyInUseChecker → checker 为 null
+    const r = p.purge(k1);
+    expect(r.ok).toBe(false);
+    expect(r.error).toBe('key-in-use-checker-not-wired');
+  });
 });

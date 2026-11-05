@@ -153,14 +153,15 @@ function initKeys(): void {
 }
 initKeys();
 
-// P5-9：把"该 keyId 是否仍被段引用"的检查注册给 KeyProvider，
-// 让 purge() 能在仍有段引用时拒绝（key-in-use）。
-// 每次取 provider 时确保 checker 已挂上（单测可能换 provider 实例）。
+// P5-9：把"该 keyId 是否仍被段引用"的检查注册给 KeyProvider。
+// 在模块加载时立即挂载（不依赖 /worm/keys 调用），保证 purge 前 checker 已就位。
+// 若 provider 换实例（单测），ensure 会重新挂上。
 function ensureKeyInUseChecker(): void {
   const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
   if (typeof p.setKeyInUseChecker !== 'function') return;
   p.setKeyInUseChecker((keyId: string) => store().list().filter((s) => s.signerKeyId === keyId).length);
 }
+ensureKeyInUseChecker();
 
 /* ------------------------------ 密码学原语 ------------------------------ */
 
@@ -222,7 +223,7 @@ export function keyStatus(): { keySource: string; signerKeyId: string; publicKey
 export interface SealInput { from?: string; to?: string; }
 export interface SealResult {
   ok: boolean;
-  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured';
+  error?: 'no-events' | 'invalid-window' | 'worm-key-not-configured' | 'worm-no-active-key';
   segment?: WormSegment;
 }
 
@@ -252,7 +253,16 @@ export function seal(input: SealInput = {}): SealResult {
   const segmentHash = computeSegmentHash(prevSegmentHash, sourceChainHead, body);
   const digestSm3 = computeDigestSm3(prevSegmentHash, sourceChainHead, body);
   const { cipherHex, ivHex } = sm4Encrypt(body);
-  const { signature: sm2Signature, keyId: sealKeyId } = sm2Sign(digestSm3);
+  let sig: { signature: string; keyId: string };
+  try {
+    sig = sm2Sign(digestSm3);
+  } catch (e) {
+    const msg = (e as Error).message;
+    // P5-9：全部 key 被 retire 是独立故障，不能和"未配置密钥"混为一谈
+    if (msg === 'worm-no-active-key') return { ok: false, error: 'worm-no-active-key' };
+    throw e;
+  }
+  const { signature: sm2Signature, keyId: sealKeyId } = sig;
   const now = new Date().toISOString();
   // put 成功后才推进计数器，避免写失败留下 seq 空洞
   const nextSeq = segmentCounter + 1;
