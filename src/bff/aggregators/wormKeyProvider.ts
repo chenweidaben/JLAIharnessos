@@ -39,9 +39,9 @@ export interface KeyProvider {
   /** P5-9：标记 key 不可用于新签名，旧段仍可验签 */
   retire(keyId: string): { ok: boolean; error?: string };
   /** P5-9：彻底删除 key。若仍有段引用则拒绝（key-in-use） */
-  purge(keyId: string): PurgeResult;
+  purge(keyId: string): Promise<PurgeResult>;
   /** 由外部注入"该 keyId 是否仍被段引用"的检查，用于 purge 护栏 */
-  setKeyInUseChecker(fn: (keyId: string) => number): void;
+  setKeyInUseChecker(fn: (keyId: string) => Promise<number>): void;
 }
 
 interface RingEntry {
@@ -76,7 +76,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
   readonly productionSafe = false;
   private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
-  private keyInUse: ((keyId: string) => number) | null = null;
+  private keyInUse: ((keyId: string) => Promise<number>) | null = null;
 
   constructor() {
     const kp = newKeyPair();
@@ -123,7 +123,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     return { fromKeyId: from, toKeyId: kp.keyId };
   }
   listKeyIds(): string[] { return this.ring.map((r) => r.keyId); }
-  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+  setKeyInUseChecker(fn: (keyId: string) => Promise<number>): void { this.keyInUse = fn; }
 
   retire(keyId: string): { ok: boolean; error?: string } {
     const e = this.byId(keyId);
@@ -131,12 +131,12 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     e.retired = true;
     return { ok: true };
   }
-  purge(keyId: string): PurgeResult {
+  async purge(keyId: string): Promise<PurgeResult> {
     const e = this.byId(keyId);
     if (!e) return { ok: false, error: 'unknown-key-id' };
     if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
     if (!this.keyInUse) return { ok: false, error: 'key-in-use-checker-not-wired' };
-    const refs = this.keyInUse(keyId);
+    const refs = await this.keyInUse(keyId);
     if (refs > 0) return { ok: false, error: 'key-in-use', refs };
     this.ring = this.ring.filter((r) => r.keyId !== keyId);
     return { ok: true };
@@ -157,7 +157,7 @@ export class EnvKeyProvider implements KeyProvider {
   readonly productionSafe = true;
   private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
   private activeKey = '';
-  private keyInUse: ((keyId: string) => number) | null = null;
+  private keyInUse: ((keyId: string) => Promise<number>) | null = null;
 
   constructor() {
     const priv = process.env.WORM_SM2_PRIVATE_KEY ?? '';
@@ -196,10 +196,10 @@ export class EnvKeyProvider implements KeyProvider {
     e.retired = true;
     return { ok: true };
   }
-  purge(keyId: string): PurgeResult {
+  async purge(_keyId: string): Promise<PurgeResult> {
     return { ok: false, error: 'cannot-purge-active' };
   }
-  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+  setKeyInUseChecker(fn: (keyId: string) => Promise<number>): void { this.keyInUse = fn; }
 }
 
 export class FileKeyProvider implements KeyProvider {
@@ -210,7 +210,7 @@ export class FileKeyProvider implements KeyProvider {
   private kek: string;
   private privateCache = new Map<string, string>();
   // P5-9：fail-closed——未注入 checker 时 purge 拒绝
-  private keyInUse: ((keyId: string) => number) | null = null;
+  private keyInUse: ((keyId: string) => Promise<number>) | null = null;
 
   constructor(storeDir: string) {
     this.ringPath = join(storeDir, '_keys.json');
@@ -297,7 +297,7 @@ export class FileKeyProvider implements KeyProvider {
 
   ringFilePath(): string { return this.ringPath; }
 
-  setKeyInUseChecker(fn: (keyId: string) => number): void { this.keyInUse = fn; }
+  setKeyInUseChecker(fn: (keyId: string) => Promise<number>): void { this.keyInUse = fn; }
 
   retire(keyId: string): { ok: boolean; error?: string } {
     const e = this.ring.find((r) => r.keyId === keyId);
@@ -307,12 +307,12 @@ export class FileKeyProvider implements KeyProvider {
     return { ok: true };
   }
 
-  purge(keyId: string): PurgeResult {
+  async purge(keyId: string): Promise<PurgeResult> {
     const e = this.ring.find((r) => r.keyId === keyId);
     if (!e) return { ok: false, error: 'unknown-key-id' };
     if (this.activeKeyId() === keyId) return { ok: false, error: 'cannot-purge-active' };
     if (!this.keyInUse) return { ok: false, error: 'key-in-use-checker-not-wired' };
-    const refs = this.keyInUse(keyId);
+    const refs = await this.keyInUse(keyId);
     if (refs > 0) return { ok: false, error: 'key-in-use', refs };
     this.ring = this.ring.filter((r) => r.keyId !== keyId);
     this.privateCache.delete(keyId);

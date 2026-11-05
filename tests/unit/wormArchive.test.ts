@@ -35,22 +35,22 @@ async function seedN(n: number): Promise<string[]> {
 
 describe('P5-2 seal 基础（回归）', async () => {
   test('无事件 seal → no-events', async () => {
-    expect(seal({}).ok).toBe(false);
+    expect((await seal({})).ok).toBe(false);
   });
   test('首段 prevSegmentHash = GENESIS', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     expect(r.ok).toBe(true);
     expect(r.segment!.prevSegmentHash).toBe('GENESIS');
   });
   test('第二段 prev == 第一段 hash', async () => {
-    await seedN(3); const s1 = seal({}).segment!;
-    await seedN(2); const s2 = seal({}).segment!;
+    await seedN(3); const s1 = (await seal({})).segment!;
+    await seedN(2); const s2 = (await seal({})).segment!;
     expect(s2.prevSegmentHash).toBe(s1.segmentHash);
   });
   test('幂等：无新事件再 seal → no-events', async () => {
-    await seedN(3); seal({});
-    expect(seal({}).ok).toBe(false);
+    await seedN(3); await seal({});
+    expect((await seal({})).ok).toBe(false);
   });
 });
 
@@ -60,61 +60,61 @@ describe('P5-4 SM3 摘要', async () => {
   });
   test('段字段含 digestAlg=SM3 与 digestSm3 64 hex', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     expect(r.segment!.digestAlg).toBe('SM3');
     expect(r.segment!.digestSm3).toMatch(/^[0-9a-f]{64}$/);
   });
   test('SM3 稳定：同输入同摘要（重算一致）', async () => {
     await seedN(3);
-    const r = seal({});
-    const seg = getSegment(r.segment!.segmentId)!;
-    expect(seg.digestSm3).toBe(r.segment!.digestSm3);
+    const r = await seal({});
+    const seg = await getSegment(r.segment!.segmentId);
+    expect(seg!.digestSm3).toBe(r.segment!.digestSm3);
   });
 });
 
 describe('P5-4 SM4 加密', async () => {
   test('段字段含 sm4Encrypted=true、iv、cipherBytes', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     expect(r.segment!.sm4Encrypted).toBe(true);
     expect(r.segment!.iv).toMatch(/^[0-9a-f]{32}$/);
     expect(r.segment!.cipherBytes.length).toBeGreaterThan(0);
   });
   test('密文不含明文 actorId 关键词（核心安全断言）', async () => {
     await seedN(3);
-    const r = seal({});
-    const cipherHex = __getCipherHex(r.segment!.segmentId)!;
+    const r = await seal({});
+    const cipherHex = await __getCipherHex(r.segment!.segmentId);
     // 取该段所有 events，验证每个 actorId 都不在密文 hex 中
-    const evts = getSegmentEvents(r.segment!.segmentId)!;
-    for (const e of evts) {
+    const evts = await getSegmentEvents(r.segment!.segmentId);
+    for (const e of evts!) {
       const actorHex = Buffer.from(e.actorId, 'utf8').toString('hex');
-      expect(cipherHex.toLowerCase()).not.toContain(actorHex.toLowerCase());
+      expect(cipherHex!.toLowerCase()).not.toContain(actorHex.toLowerCase());
     }
   });
   test('content 端点解密往返：明文与原 events 一致', async () => {
     await seedN(3);
-    const r = seal({});
-    const evts = getSegmentEvents(r.segment!.segmentId)!;
-    expect(evts.length).toBe(3);
-    expect(evts[0].action).toBe('create');
+    const r = await seal({});
+    const evts = await getSegmentEvents(r.segment!.segmentId);
+    expect(evts!.length).toBe(3);
+    expect(evts![0].action).toBe('create');
   });
 });
 
 describe('P5-4 SM2 签名', async () => {
   test('段字段含 sm2Signature 与 signerKeyId', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     expect(r.segment!.sm2Signature.length).toBeGreaterThan(0);
     expect(r.segment!.signerKeyId).toBeTruthy();
   });
   test('正常段 sm2Verify(digestSm3, signature) = true', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     expect(sm2Verify(r.segment!.digestSm3, r.segment!.sm2Signature)).toBe(true);
   });
   test('篡改 digestSm3 后 sm2Verify = false', async () => {
     await seedN(3);
-    const r = seal({});
+    const r = await seal({});
     // 用一个假的 64 hex digest
     const fakeDigest = '0'.repeat(64);
     expect(sm2Verify(fakeDigest, r.segment!.sm2Signature)).toBe(false);
@@ -131,8 +131,8 @@ describe('P5-4 SM2 签名', async () => {
 
 describe('P5-4 verify 扩展字段', async () => {
   test('未篡改段 verify → digestValid=true signatureValid=true', async () => {
-    await seedN(3); seal({});
-    const v = verify('real');
+    await seedN(3); await seal({});
+    const v = await verify("real");
     expect(v.realChainValid).toBe(true);
     expect(v.digestValid).toBe(true);
     expect(v.signatureValid).toBe(true);
@@ -140,35 +140,35 @@ describe('P5-4 verify 扩展字段', async () => {
     expect(v.segments[0].digestValid).toBe(true);
   });
   test('_tamper-digest 后 verify all → brokenScope=probe', async () => {
-    await seedN(3); const s1 = seal({}).segment!;
-    const probe = createProbe(s1.segmentId)!;
+    await seedN(3); const s1 = (await seal({})).segment!;
+    const probe = (await createProbe(s1.segmentId))!;
     tamperProbeDigest(probe.probeId);
-    const v = verify('all');
+    const v = await verify("all");
     expect(v.valid).toBe(false);
     expect(v.brokenScope).toBe('probe');
   });
   test('_tamper-signature 后 verify all → brokenScope=probe', async () => {
-    await seedN(3); const s1 = seal({}).segment!;
-    const probe = createProbe(s1.segmentId)!;
+    await seedN(3); const s1 = (await seal({})).segment!;
+    const probe = (await createProbe(s1.segmentId))!;
     tamperProbeSignature(probe.probeId);
-    const v = verify('all');
+    const v = await verify("all");
     expect(v.valid).toBe(false);
     expect(v.brokenScope).toBe('probe');
   });
   test('_probes/reset 后 verify 恢复 valid=true', async () => {
-    await seedN(3); const s1 = seal({}).segment!;
-    const probe = createProbe(s1.segmentId)!;
+    await seedN(3); const s1 = (await seal({})).segment!;
+    const probe = (await createProbe(s1.segmentId))!;
     tamperProbeDigest(probe.probeId);
-    expect(verify('all').valid).toBe(false);
+    expect((await verify('all')).valid).toBe(false);
     resetProbes();
-    expect(verify('all').valid).toBe(true);
+    expect((await verify('all')).valid).toBe(true);
   });
   test('真实段未被 _tamper-digest 污染（verify?scope=real 仍 valid）', async () => {
-    await seedN(3); const s1 = seal({}).segment!;
-    const probe = createProbe(s1.segmentId)!;
+    await seedN(3); const s1 = (await seal({})).segment!;
+    const probe = (await createProbe(s1.segmentId))!;
     tamperProbeDigest(probe.probeId);
     tamperProbeSignature(probe.probeId);
-    const v = verify('real');
+    const v = await verify("real");
     expect(v.realChainValid).toBe(true);
     expect(v.digestValid).toBe(true);
     expect(v.signatureValid).toBe(true);
@@ -177,9 +177,9 @@ describe('P5-4 verify 扩展字段', async () => {
 
 describe('P5-4 查询', async () => {
   test('listSegments 分页', async () => {
-    await seedN(3); seal({});
-    await seedN(2); seal({});
-    expect(listSegments(10, 0).total).toBe(2);
+    await seedN(3); await seal({});
+    await seedN(2); await seal({});
+    expect((await listSegments(10, 0)).total).toBe(2);
   });
 });
 
@@ -194,7 +194,7 @@ describe('P5-5 路径穿越防护', async () => {
     expect(isValidSegmentId('WORM-0001-x/../../y')).toBe(false);
   });
   test('getSegment 对非法 id 返 null（不抛）', async () => {
-    expect(getSegment('../../etc/passwd')).toBeNull();
+    expect(await getSegment("../../etc/passwd")).toBeNull();
   });
 });
 
@@ -223,9 +223,9 @@ describe('P5-5 FileWormStore', async () => {
 
 describe('P5-5 seqContinuity', async () => {
   test('正常无缝 → valid=true', async () => {
-    await seedN(3); seal({});
-    await seedN(3); seal({});
-    const v = verify('real');
+    await seedN(3); await seal({});
+    await seedN(3); await seal({});
+    const v = await verify("real");
     expect(v.seqContinuity.valid).toBe(true);
     expect(v.seqContinuity.gaps.length).toBe(0);
   });
@@ -260,8 +260,8 @@ describe('P5-5 seqContinuity', async () => {
 
 describe('P5-5 storeInfo', async () => {
   test('storeInfo 返 kind 与 segmentCount', async () => {
-    await seedN(3); seal({});
-    const s = storeInfo();
+    await seedN(3); await seal({});
+    const s = await storeInfo();
     expect(s.kind).toBe('memory');
     expect(s.segmentCount).toBe(1);
     expect(s.oldestSeq).toBe(1);
@@ -299,7 +299,7 @@ describe('P5-5 fs 后端重启后计数器回填', async () => {
       expect(__counters()).toEqual({ segmentCounter: 0, lastArchivedSeq: 0 });
 
       await seedN(6); // 新进程事件流重新从 1 开始，1..4 已归档过
-      const r = seal({});
+      const r = await seal({});
       expect(r.ok).toBe(true);
       expect(r.segment!.seq).toBe(3);          // 续写 seq，而不是回到 1 撞车
       expect(r.segment!.fromSeq).toBe(5);      // 已归档到 4，不重复封存
@@ -346,12 +346,12 @@ describe('P5-6 自动调度 + 检索', async () => {
   });
   test('tick 无事件 → sealed=false（disabled 或 no-events）', async () => {
     setAutoConfig({ enabled: true, intervalMs: 1, threshold: 1 });
-    const r = tick();
+    const r = await tick();
     expect(r.sealed).toBe(false);
     expect(['no-events', 'disabled', 'below-threshold']).toContain(r.reason ?? '');
   });
   test('search 返回分页结构', async () => {
-    const r = search({ limit: 50 });
+    const r = await search({ limit: 50 });
     expect(Array.isArray(r.rows)).toBe(true);
     expect(typeof r.total).toBe('number');
     expect(typeof r.scannedSegments).toBe('number');
@@ -377,7 +377,7 @@ describe('P5-6 自动调度 + 检索', async () => {
     });
     const twoHoursAgo = new Date(Date.now() - 2 * 3600_000).toISOString();
     setAutoConfig({ enabled: true, intervalMs: 60_000, threshold: 20, lastSealAt: twoHoursAgo });
-    const r = tick();
+    const r = await tick();
     expect(r.sealed).toBe(true);
     expect(typeof r.segmentId).toBe('string');
   });
@@ -388,19 +388,19 @@ describe('P5-6 自动调度 + 检索', async () => {
       ip: '1.1.1.1', userAgent: 'ua',
     });
     setAutoConfig({ enabled: true, intervalMs: 3600_000, threshold: 50, lastSealAt: new Date().toISOString() });
-    const r = tick();
+    const r = await tick();
     expect(r.sealed).toBe(false);
     expect(r.reason).toBe('below-threshold');
   });
   test('limit 非法（NaN/负数/0）回退默认且不返回空页', async () => {
     await seedN(3);
-    seal({});
+    await seal({});
     for (const bad of [Number.NaN, -5, 0]) {
-      const r = search({ limit: bad });
+      const r = await search({ limit: bad });
       expect(r.total).toBe(3);
       expect(r.rows.length).toBe(3);       // 回退默认 50，而不是 slice(NaN) 空页
     }
-    const capped = search({ limit: 100000 });
+    const capped = await search({ limit: 100000 });
     expect(capped.rows.length).toBeLessThanOrEqual(500);
   });
 });
@@ -423,7 +423,7 @@ describe('P5-7 tick 落审计 + 检索性能', async () => {
 
   test('tick 5 次 → history total=5，8 字段齐全、at 递增', async () => {
     setAutoConfig({ enabled: false });
-    for (let i = 0; i < 5; i++) tick();
+    for (let i = 0; i < 5; i++) await tick();
     const h = listTickHistory(50, 0);
     expect(h.total).toBe(5);
     // 倒序：rows[0] 是最新
@@ -446,45 +446,45 @@ describe('P5-7 tick 落审计 + 检索性能', async () => {
 
   test('不自激：tick 5 次后段数不变', async () => {
     setAutoConfig({ enabled: false });
-    const before = listSegments(100, 0).total;
-    for (let i = 0; i < 5; i++) tick();
-    const after = listSegments(100, 0).total;
+    const before = (await listSegments(100, 0)).total;
+    for (let i = 0; i < 5; i++) await tick();
+    const after = (await listSegments(100, 0)).total;
     expect(after).toBe(before);
   });
 
   test('不自激：seal 1 次后立刻再 seal 第二次 → no-events', async () => {
     await seedN(3);
-    const r1 = seal({});
+    const r1 = await seal({});
     expect(r1.ok).toBe(true);
-    const count1 = listSegments(100, 0).total;
-    const r2 = seal({});
+    const count1 = (await listSegments(100, 0)).total;
+    const r2 = await seal({});
     expect(r2.ok).toBe(false);
     expect(r2.error).toBe('no-events');
-    const count2 = listSegments(100, 0).total;
+    const count2 = (await listSegments(100, 0)).total;
     expect(count2).toBe(count1);
   });
 
   test('search 返回 candidateSegments/decryptedSegments 字段', async () => {
-    await seedN(3); seal({});
-    const r = search({ limit: 50 });
+    await seedN(3); await seal({});
+    const r = await search({ limit: 50 });
     expect(typeof r.candidateSegments).toBe('number');
     expect(typeof r.decryptedSegments).toBe('number');
     expect(r.scannedSegments).toBeGreaterThanOrEqual(1);
   });
 
   test('offset 超出 total → rows=[] 且 total 正确', async () => {
-    await seedN(3); seal({});
-    const r = search({ limit: 50, offset: 99999 });
+    await seedN(3); await seal({});
+    const r = await search({ limit: 50, offset: 99999 });
     expect(r.rows.length).toBe(0);
     expect(r.total).toBeGreaterThanOrEqual(3);
   });
 
   test('limit=abc 回退 50；offset=-5 回退 0', async () => {
-    await seedN(3); seal({});
+    await seedN(3); await seal({});
     // 路由层传 number，这里直接传 NaN 模拟
-    const r1 = search({ limit: Number.NaN });
+    const r1 = await search({ limit: Number.NaN });
     expect(r1.rows.length).toBeGreaterThan(0);
-    const r2 = search({ offset: -5 });
+    const r2 = await search({ offset: -5 });
     expect(r2.rows.length).toBeGreaterThan(0);
   });
 });
@@ -493,7 +493,7 @@ describe('P5-7 防自激：待归档池只由真实业务事件驱动', async ()
   test('pending 计数 = lastArchivedSeq 之后的事件数（与段无缝对齐）', async () => {
     await seedN(3);
     expect(queryAuditEventsCount()).toBe(3);
-    seal({});
+    await seal({});
     expect(queryAuditEventsCount()).toBe(0);
     await seedN(2);
     expect(queryAuditEventsCount()).toBe(2);
@@ -501,9 +501,9 @@ describe('P5-7 防自激：待归档池只由真实业务事件驱动', async ()
 
   test('连续封段 fromSeq/toSeq 严格无缝（nextFrom = prevTo + 1）', async () => {
     await seedN(2);
-    const s1 = seal({}).segment!;
+    const s1 = (await seal({})).segment!;
     await seedN(2);
-    const s2 = seal({}).segment!;
+    const s2 = (await seal({})).segment!;
     expect(s2.fromSeq).toBe(s1.toSeq + 1);
     expect(s1.eventCount).toBe(2);
     expect(s2.eventCount).toBe(2);
@@ -511,13 +511,13 @@ describe('P5-7 防自激：待归档池只由真实业务事件驱动', async ()
 
   test('无新业务事件时 tick 不会封段（不产生空转段）', async () => {
     await seedN(2);
-    seal({});
+    await seal({});
     __resetTickHistory();
-    const r1 = tick();
+    const r1 = await tick();
     expect(r1.sealed).toBe(false);
-    const r2 = tick();
+    const r2 = await tick();
     expect(r2.sealed).toBe(false);
-    expect(listSegments().total).toBe(1);
+    expect((await listSegments()).total).toBe(1);
   });
 });
 
@@ -529,15 +529,15 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', async () => {
     __resetKeyProvider(new DemoEphemeralKeyProvider());
     const provider = getKeyProvider();
     // 用 O(1) 索引 countBySigner
-    provider.setKeyInUseChecker((kid: string) => getWormStore().countBySigner(kid));
+    provider.setKeyInUseChecker(async (kid: string) => getWormStore().countBySigner(kid));
 
     await seedN(2);
-    const r1 = seal({});
+    const r1 = await seal({});
     expect(r1.ok).toBe(true);
     const k1 = r1.segment!.signerKeyId;
 
     await seedN(2);
-    const r1b = seal({});
+    const r1b = await seal({});
     expect(r1b.ok).toBe(true);
     expect(r1b.segment!.signerKeyId).toBe(k1); // 未 rotate，仍是 k1
 
@@ -545,7 +545,7 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', async () => {
     provider.rotate();
 
     // 现在 store 里有 2 段用 k1 签
-    const purgeResult = provider.purge(k1);
+    const purgeResult = await provider.purge(k1);
     expect(purgeResult.ok).toBe(false);
     expect(purgeResult.error).toBe('key-in-use');
     expect(purgeResult.refs).toBe(2); // 来自真实 store.list()，两段都用 k1
@@ -554,7 +554,7 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', async () => {
     expect(provider.getPublicKey(k1)).not.toBeNull();
 
     // 两段仍 verify 通过（按段 signerKeyId 选钥验签）
-    const v = verify('real');
+    const v = await verify("real");
     expect(v.valid).toBe(true);
   });
 });
@@ -696,7 +696,7 @@ describe('P5-12 mtime 边界补测', async () => {
 describe('P5-13 seal 跨段 seq 衔接 fail-closed', async () => {
   test('pending 首条 seq !== lastArchivedSeq+1 → 拒绝 seq-gap', async () => {
     await seedN(3);
-    const r1 = seal({});
+    const r1 = await seal({});
     expect(r1.ok).toBe(true);
     const { __injectPending } = await import('../../src/bff/aggregators/auditEventAggregator');
     __injectPending({
@@ -705,7 +705,7 @@ describe('P5-13 seal 跨段 seq 衔接 fail-closed', async () => {
       resourceType: 'session', resourceId: 's-100', result: 'success',
       ip: '127.0.0.1', userAgent: 't', prevHash: 'h', hash: 'h',
     } as any);
-    const r2 = seal({});
+    const r2 = await seal({});
     expect(r2.ok).toBe(false);
     expect(r2.error).toBe('seq-gap');
     expect(r2.expectedSeq).toBe(4);
@@ -714,10 +714,10 @@ describe('P5-13 seal 跨段 seq 衔接 fail-closed', async () => {
 
   test('正常衔接：pending 首条 === lastArchivedSeq+1 → 放行', async () => {
     await seedN(3);
-    const s1 = seal({});
+    const s1 = await seal({});
     expect(s1.ok).toBe(true);
     await seedN(2);
-    const s2 = seal({});
+    const s2 = await seal({});
     expect(s2.ok).toBe(true);
     expect(s2.segment!.fromSeq).toBe(4);
     expect(s2.segment!.toSeq).toBe(5);

@@ -131,7 +131,7 @@ export function listTickHistory(limit = 50, offset = 0): { rows: TickHistoryEntr
   return { rows: arr.slice(off, off + lim), total };
 }
 
-export function tick(): TickResult {
+export async function tick(): Promise<TickResult> {
   const cfg = getAutoConfig();
   const t0 = performance.now();
   const store = getWormStore();
@@ -161,7 +161,7 @@ export function tick(): TickResult {
       if (!intervalDue && !thresholdDue) {
         reason = 'below-threshold';
       } else {
-        const r = seal({});
+        const r = await seal({});
         if (!r.ok) {
           reason = 'no-events';
         } else {
@@ -208,12 +208,12 @@ function indexFilePath(): string {
 
 let indexCache: SegmentIndexEntry[] = [];
 
-export function rebuildIndex(): SegmentIndexEntry[] {
+export async function rebuildIndex(): Promise<SegmentIndexEntry[]> {
   const store = getWormStore();
   const segs = store.list();
   const entries: SegmentIndexEntry[] = [];
   for (const s of segs) {
-    const evts = getDecrypted(s.segmentId) ?? [];
+    const evts = (await getDecrypted(s.segmentId)) ?? [];
     entries.push({
       segmentId: s.segmentId,
       actorIds: Array.from(new Set(evts.map((e) => e.actorId))),
@@ -231,19 +231,19 @@ export function rebuildIndex(): SegmentIndexEntry[] {
 
 export function __resetIndexCache(): void { indexCache = []; }
 
-export function loadIndex(): SegmentIndexEntry[] {
+export async function loadIndex(): Promise<SegmentIndexEntry[]> {
   // 内存索引缓存：避免每次 search 都读 _index.json
   if (indexCache.length > 0) return indexCache;
   const p = indexFilePath();
   if (!existsSync(p)) {
-    indexCache = rebuildIndex();
+    indexCache = await rebuildIndex();
     return indexCache;
   }
   try {
     indexCache = JSON.parse(readFileSync(p, 'utf8')) as SegmentIndexEntry[];
     return indexCache;
   } catch {
-    indexCache = rebuildIndex();
+    indexCache = await rebuildIndex();
     return indexCache;
   }
 }
@@ -281,15 +281,14 @@ export function __injectDecryptedForBench(segmentId: string, evts: AuditEvent[])
   decryptCache.set(segmentId, evts);
 }
 
-function getDecrypted(segmentId: string): AuditEvent[] | null {
+async function getDecrypted(segmentId: string): Promise<AuditEvent[] | null> {
   const hit = decryptCache.get(segmentId);
   if (hit) {
-    // LRU：命中后移到末尾
     decryptCache.delete(segmentId);
     decryptCache.set(segmentId, hit);
     return hit;
   }
-  const evts = getSegmentEvents(segmentId);
+  const evts = await getSegmentEvents(segmentId);
   if (!evts) return null;
   decryptCache.set(segmentId, evts);
   while (decryptCache.size > DECRYPT_CAP) {
@@ -300,11 +299,11 @@ function getDecrypted(segmentId: string): AuditEvent[] | null {
   return evts;
 }
 
-export function search(q: SearchQuery): SearchResult {
-  let index = loadIndex();
+export async function search(q: SearchQuery): Promise<SearchResult> {
+  let index = await loadIndex();
   const store = getWormStore();
   // 索引与磁盘段数不一致 → 重建（seal 后未写索引）
-  if (index.length !== store.count()) index = rebuildIndex();
+  if (index.length !== store.count()) index = await rebuildIndex();
   let candidates = index;
   let indexHit = false;
   if (q.actorId || q.patientId || q.action || q.module || q.from || q.to) {
@@ -324,7 +323,7 @@ export function search(q: SearchQuery): SearchResult {
   let decryptedSegments = 0;
   const all: AuditEvent[] = [];
   for (const c of candidates) {
-    const evts = getDecrypted(c.segmentId) ?? [];
+    const evts = (await getDecrypted(c.segmentId)) ?? [];
     decryptedSegments += 1;
     for (const e of evts) {
       if (q.actorId && e.actorId !== q.actorId) continue;

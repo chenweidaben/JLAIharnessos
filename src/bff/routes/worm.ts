@@ -60,7 +60,7 @@ export const wormRoutes: RouteDef[] = [
       const b = (await c.body()) as Record<string, unknown>;
       const from = typeof b.from === 'string' ? b.from : undefined;
       const to = typeof b.to === 'string' ? b.to : undefined;
-      const r = seal({ from, to });
+      const r = await seal({ from, to });
       if (!r.ok) {
         if (r.error === 'no-events') return json(fail(ErrorCode.BAD_REQUEST, '当前无待归档事件'), 400);
         if (r.error === 'worm-key-not-configured') return json(fail(ErrorCode.INTERNAL_ERROR, 'WORM_SM4_KEY 未配置'), 500);
@@ -78,7 +78,7 @@ export const wormRoutes: RouteDef[] = [
       const q = new URL(c.req.url).searchParams;
       const limit = q.get('limit') ? Number(q.get('limit')) : 50;
       const offset = q.get('offset') ? Number(q.get('offset')) : 0;
-      const r = listSegments(limit, offset);
+      const r = await listSegments(limit, offset);
       return json(ok({ rows: r.rows, total: r.total }));
     },
   },
@@ -89,7 +89,7 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       if (!isValidSegmentId(c.params.segmentId)) return json(fail(ErrorCode.BAD_REQUEST, 'invalid-segment-id'), 400);
-      const seg = getSegment(c.params.segmentId);
+      const seg = await getSegment(c.params.segmentId);
       if (!seg) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
       return json(ok(seg));
     },
@@ -105,14 +105,14 @@ export const wormRoutes: RouteDef[] = [
       if (fmt !== 'json' && fmt !== 'csv') {
         return json(fail(ErrorCode.BAD_REQUEST, 'format 仅支持 json/csv'), 400);
       }
-      const seg = getSegment(c.params.segmentId);
+      const seg = await getSegment(c.params.segmentId);
       if (!seg) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
-      const evts = getSegmentEvents(c.params.segmentId);
+      const evts = await getSegmentEvents(c.params.segmentId);
       if (evts === null) return json(fail(ErrorCode.INTERNAL_ERROR, '段解密失败'), 500);
       const digestValid = true; // seal 时已校验；content 端点用 verify 结果
       const signatureValid = sm2Verify(seg.digestSm3, seg.sm2Signature);
       if (fmt === 'csv') {
-        return new Response(segmentToCsv(c.params.segmentId) ?? '', {
+        return new Response((await segmentToCsv(c.params.segmentId)) ?? '', {
           status: 200,
           headers: {
             'Content-Type': 'text/csv; charset=utf-8',
@@ -130,7 +130,7 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const scope = new URL(c.req.url).searchParams.get('scope') === 'real' ? 'real' as const : 'all' as const;
-      return json(ok(verify(scope)));
+      return json(ok(await verify(scope)));
     },
   },
   {
@@ -196,7 +196,7 @@ export const wormRoutes: RouteDef[] = [
       const keyId = String(b.keyId ?? '');
       if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
       const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
-      const r = getKeyProvider().purge(keyId);
+      const r = await getKeyProvider().purge(keyId);
       // P5-11：写独立运维审计（不进业务审计链）
       await logKeyOp({ actorId: c.user?.id ?? 'unknown', action: 'purge', keyId, result: r.ok ? 'ok' : (r.error ?? 'unknown'), refs: r.refs ?? null });
       if (!r.ok) {
@@ -223,7 +223,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      return json(ok(storeInfo()));
+      return json(ok(await storeInfo()));
     },
   },
   {
@@ -236,7 +236,7 @@ export const wormRoutes: RouteDef[] = [
       const b = (await c.body()) as Record<string, unknown>;
       const segmentId = String(b.segmentId ?? '');
       if (!segmentId) return json(fail(ErrorCode.BAD_REQUEST, 'segmentId 必填'), 400);
-      const probe = createProbe(segmentId);
+      const probe = await createProbe(segmentId);
       if (!probe) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
       return json(ok({ ...probe, expectedBroken: true }));
     },
@@ -289,7 +289,7 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const q = new URL(c.req.url).searchParams;
-      const r = search({
+      const r = await search({
         actorId: q.get('actorId') ?? undefined,
         patientId: q.get('patientId') ?? undefined,
         action: q.get('action') ?? undefined,
@@ -332,7 +332,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      return json(ok(tick()));
+      return json(ok(await tick()));
     },
   },
   {
@@ -350,6 +350,6 @@ export const wormRoutes: RouteDef[] = [
 ];
 
 // 仅供单测/自检：读密文
-export function __debugCipher(segmentId: string): string | null {
+export async function __debugCipher(segmentId: string): Promise<string | null> {
   return __getCipherHex(segmentId);
 }

@@ -7099,8 +7099,8 @@ import('./aggregators/auditEventStore').then((m) => {
     }
     // 先 hydrate worm counters（拿到 lastArchivedSeq），再回填未归档事件。
     // 顺序写死：backfill 必须从 lastArchivedSeq 起，不能从 0 起（否则已归档事件被重复归档）。
-    return import('./aggregators/wormArchiveAggregator').then((wa) => {
-      const c = wa.ensureCountersHydrated();
+    return import('./aggregators/wormArchiveAggregator').then(async (wa) => {
+      const c = await wa.ensureCountersHydrated();
       return import('./aggregators/auditEventAggregator').then((a) => a.backfillPending(c.lastArchivedSeq));
     });
   });

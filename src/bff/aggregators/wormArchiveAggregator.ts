@@ -12,7 +12,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import {
   getPendingEvents, verifyChainSync, type AuditEvent,
 } from './auditEventAggregator.js';
-import { getWormStore, isValidSegmentId, type WormStore } from './wormStore.js';
+import { getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
 
 // sm-crypto 真国密
@@ -74,7 +74,11 @@ let segmentCounter = 0;
 let probeCounter = 0;
 let countersHydrated = false;
 const GENESIS = 'GENESIS';
-function store(): WormStore { return getWormStore(); }
+let _asyncStore: AsyncWormStore | null = null;
+function store(): AsyncWormStore {
+  if (!_asyncStore) _asyncStore = toAsyncStore(getWormStore());
+  return _asyncStore;
+}
 
 /**
  * 从已持久化的段对齐计数器。
@@ -84,17 +88,16 @@ function store(): WormStore { return getWormStore(); }
  * 2) pending 用 seq > lastArchivedSeq 过滤，lastArchivedSeq=0 会把已归档事件再封存一遍，产生重复归档。
  * 因此每次 seal 前按 store 实际内容对齐一次（store 为空时不动，保持首次归档语义）。
  */
-function hydrateCountersFromStore(): void {
+async function hydrateCountersFromStore(): Promise<void> {
   if (countersHydrated) return;
   countersHydrated = true;
-  // 单例可能在外部段写入前就已构造，refresh() 重新扫磁盘保证拿到最新段集合
-  const s = store() as WormStore & { refresh?: () => void };
-  if (typeof s.refresh === 'function') s.refresh();
-  const existing = s.list();
+  const s = store();
+  await s.refresh();
+  const existing = await s.list();
   if (existing.length === 0) return;
-  for (const s of existing) {
-    if (s.seq > segmentCounter) segmentCounter = s.seq;
-    if (s.toSeq > lastArchivedSeq) lastArchivedSeq = s.toSeq;
+  for (const seg of existing) {
+    if (seg.seq > segmentCounter) segmentCounter = seg.seq;
+    if (seg.toSeq > lastArchivedSeq) lastArchivedSeq = seg.toSeq;
   }
 }
 
@@ -104,8 +107,8 @@ export function __counters(): { segmentCounter: number; lastArchivedSeq: number 
 }
 
 /** P5-13：启动时显式 hydrate，供 audit backfill 取 lastArchivedSeq */
-export function ensureCountersHydrated(): { segmentCounter: number; lastArchivedSeq: number } {
-  hydrateCountersFromStore();
+export async function ensureCountersHydrated(): Promise<{ segmentCounter: number; lastArchivedSeq: number }> {
+  await hydrateCountersFromStore();
   return { segmentCounter, lastArchivedSeq };
 }
 
@@ -168,14 +171,15 @@ initKeys();
 // 闭合「目录 mtime 精度窗口内外部写入、autoDetect 判定无变化」的窄窗口漏检——
 // 这一路径只在 purge 判定触发一次，不影响热路径性能。
 function ensureKeyInUseChecker(): void {
-  const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => number) => void };
+  const p = getKeyProvider() as { setKeyInUseChecker?: (fn: (kid: string) => Promise<number>) => void };
   if (typeof p.setKeyInUseChecker !== 'function') return;
-  p.setKeyInUseChecker((keyId: string) => {
+  p.setKeyInUseChecker(async (keyId: string) => {
     const s = store();
-    const idx = s.countBySigner(keyId);
+    const idx = await s.countBySigner(keyId);
     if (idx > 0) return idx;
-    if (typeof s.refresh === 'function') s.refresh();
-    return s.list().filter((seg) => seg.signerKeyId === keyId).length;
+    await s.refresh();
+    const all = await s.list();
+    return all.filter((seg) => seg.signerKeyId === keyId).length;
   });
 }
 ensureKeyInUseChecker();
@@ -246,23 +250,19 @@ export interface SealResult {
   segment?: WormSegment;
 }
 
-export function seal(input: SealInput = {}): SealResult {
+export async function seal(input: SealInput = {}): Promise<SealResult> {
   if (input.from && Number.isNaN(new Date(input.from).getTime())) return { ok: false, error: 'invalid-window' };
   if (input.to && Number.isNaN(new Date(input.to).getTime())) return { ok: false, error: 'invalid-window' };
   if (sm4KeyHex.length !== 32 || !sm2PrivateKeyHex) return { ok: false, error: 'worm-key-not-configured' };
 
-  hydrateCountersFromStore();
+  await hydrateCountersFromStore();
 
   const all = getPendingEvents().sort((a, b) => a.seq - b.seq);
-  // 归档控制面调用（auto/tick、segments/seal）不进审计链（见 auditEventHook），
-  // 因此 pending 就是 seq 连续的一段，段间 fromSeq/toSeq 保持无缝，连续性校验不被空洞污染。
   let pending = all.filter((e) => e.seq > lastArchivedSeq);
   if (input.from) pending = pending.filter((e) => e.occurredAt >= (input.from as string));
   if (input.to) pending = pending.filter((e) => e.occurredAt <= (input.to as string));
   if (pending.length === 0) return { ok: false, error: 'no-events' };
 
-  // P5-13 跨段连续性 fail-closed：pending 首条必须 === lastArchivedSeq + 1
-  // 防止重启后 backfill 越界导致已归档事件被重复归档/覆盖。
   const expectedSeq = lastArchivedSeq + 1;
   const actualFirstSeq = pending[0].seq;
   if (actualFirstSeq !== expectedSeq) {
@@ -275,8 +275,7 @@ export function seal(input: SealInput = {}): SealResult {
   const chain = verifyChainSync();
   const sourceChainHead = all.length ? all[all.length - 1].hash : GENESIS;
 
-  // 单次 list() 取值：读两遍会拿到两个快照，且 fs 后端每次 list 都是一次全目录读取
-  const segments = store().list();
+  const segments = await store().list();
   const prev = segments[segments.length - 1];
   const prevSegmentHash = prev ? prev.segmentHash : GENESIS;
   const body = serializeEvents(pending);
@@ -288,13 +287,11 @@ export function seal(input: SealInput = {}): SealResult {
     sig = sm2Sign(digestSm3);
   } catch (e) {
     const msg = (e as Error).message;
-    // P5-9：全部 key 被 retire 是独立故障，不能和"未配置密钥"混为一谈
     if (msg === 'worm-no-active-key') return { ok: false, error: 'worm-no-active-key' };
     throw e;
   }
   const { signature: sm2Signature, keyId: sealKeyId } = sig;
   const now = new Date().toISOString();
-  // put 成功后才推进计数器，避免写失败留下 seq 空洞
   const nextSeq = segmentCounter + 1;
   const segmentId = `WORM-${String(nextSeq).padStart(4, '0')}-${Date.now().toString(36)}`;
 
@@ -308,7 +305,7 @@ export function seal(input: SealInput = {}): SealResult {
     sm4Encrypted: true, iv: ivHex, cipherBytes: cipherHex,
     sm2Signature, signerKeyId: sealKeyId, keySource: sm2KeySource,
   };
-  store().put(rec);
+  await store().put(rec);
   segmentCounter = nextSeq;
   lastArchivedSeq = pending[pending.length - 1].seq;
 
@@ -330,26 +327,26 @@ function metaOf(r: SegmentRecord): WormSegment {
   return { ...r };
 }
 
-export function listSegments(limit = 50, offset = 0): { rows: WormSegment[]; total: number } {
-  const all = store().list().map(metaOf);
+export async function listSegments(limit = 50, offset = 0): Promise<{ rows: WormSegment[]; total: number }> {
+  const all = (await store().list()).map(metaOf);
   return { rows: all.slice(offset, offset + limit), total: all.length };
 }
 
-export function getSegment(segmentId: string): WormSegment | null {
+export async function getSegment(segmentId: string): Promise<WormSegment | null> {
   if (!isValidSegmentId(segmentId)) return null;
-  const r = store().get(segmentId);
+  const r = await store().get(segmentId);
   return r ? metaOf(r) : null;
 }
 
-export function getSegmentEvents(segmentId: string): AuditEvent[] | null {
+export async function getSegmentEvents(segmentId: string): Promise<AuditEvent[] | null> {
   if (!isValidSegmentId(segmentId)) return null;
-  const r = store().get(segmentId);
+  const r = await store().get(segmentId);
   if (!r) return null;
   return decryptEvents(r);
 }
 
-export function segmentToCsv(segmentId: string): string | null {
-  const evts = getSegmentEvents(segmentId);
+export async function segmentToCsv(segmentId: string): Promise<string | null> {
+  const evts = await getSegmentEvents(segmentId);
   if (!evts) return null;
   const header = 'seq,occurredAt,actorId,actorRole,action,module,resourceType,resourceId,patientId,result,errorCode,ip,prevHash,hash';
   const lines = evts.map((e) => [
@@ -362,8 +359,8 @@ export function segmentToCsv(segmentId: string): string | null {
 
 /* ------------------------------ 影子探针 ------------------------------ */
 
-export function createProbe(segmentId: string): { probeId: string; sourceSegmentId: string } | null {
-  const src = store().get(segmentId);
+export async function createProbe(segmentId: string): Promise<{ probeId: string; sourceSegmentId: string } | null> {
+  const src = await store().get(segmentId);
   if (!src) return null;
   probeCounter += 1;
   const probeId = `VERIFY-PROBE-${String(probeCounter).padStart(3, '0')}-${Date.now().toString(36)}`;
@@ -435,12 +432,12 @@ function checkSeg(seg: SegmentRecord): { digestValid: boolean; signatureValid: b
   return { digestValid, signatureValid: v.ok, body, sigReason: v.ok ? undefined : v.reason };
 }
 
-function verifyReal(): {
+async function verifyReal(): Promise<{
   ok: boolean; brokenSegmentId?: string; reason?: string;
   segmentChecks: SegmentCheck[]; digestValid: boolean; signatureValid: boolean;
   seqContinuity: SeqContinuity;
-} {
-  const all = store().list().sort((a, b) => a.seq - b.seq);
+}> {
+  const all = (await store().list()).sort((a, b) => a.seq - b.seq);
   const continuity = checkSeqContinuity(all);
   if (all.length === 0) return { ok: true, segmentChecks: [], digestValid: true, signatureValid: true, seqContinuity: continuity };
   let prevHash = GENESIS;
@@ -519,11 +516,12 @@ export function checkSeqContinuity(segs: WormSegment[]): SeqContinuity {
   return { valid, gaps, duplicateSeq, outOfOrder, startGap };
 }
 
-function verifyProbes(): { broken: boolean; probeId?: string; reason?: string } {
+async function verifyProbes(): Promise<{ broken: boolean; probeId?: string; reason?: string }> {
   for (const probe of probes.values()) {
-    const src = store().get(probe.sourceSegmentId);
+    const src = await store().get(probe.sourceSegmentId);
     if (!src) continue;
-    if (probe.tamperedEventCount !== getSegmentEvents(src.segmentId)?.length) {
+    const evts = await getSegmentEvents(src.segmentId);
+    if (probe.tamperedEventCount !== evts?.length) {
       return { broken: true, probeId: probe.probeId, reason: '探针 eventCount 与实际 events 不一致（预期）' };
     }
     if (probe.digestTampered && probe.tamperedDigestSm3 !== src.digestSm3) {
@@ -536,10 +534,10 @@ function verifyProbes(): { broken: boolean; probeId?: string; reason?: string } 
   return { broken: false };
 }
 
-export function verify(scope: 'all' | 'real' = 'all'): VerifyResult {
-  const real = verifyReal();
+export async function verify(scope: 'all' | 'real' = 'all'): Promise<VerifyResult> {
+  const real = await verifyReal();
   const realChainValid = real.ok;
-  const segmentCount = store().count();
+  const segmentCount = (await store().list()).length;
   const seqContinuity = real.seqContinuity;
 
   if (scope === 'real') {
@@ -560,7 +558,7 @@ export function verify(scope: 'all' | 'real' = 'all'): VerifyResult {
     };
   }
 
-  const probe = verifyProbes();
+  const probe = await verifyProbes();
   const probeBroken = probe.broken;
   const valid = realChainValid && seqContinuity.valid && !probeBroken && real.digestValid && real.signatureValid;
   return {
@@ -581,8 +579,8 @@ export function verify(scope: 'all' | 'real' = 'all'): VerifyResult {
 
 /* ------------------------------ store info ------------------------------ */
 
-export function storeInfo(): { kind: string; segmentCount: number; dir?: string; writable: boolean; oldestSeq: number | null; newestSeq: number | null } {
-  const s = store();
+export async function storeInfo(): Promise<{ kind: string; segmentCount: number; dir?: string; writable: boolean; oldestSeq: number | null; newestSeq: number | null }> {
+  const s = getWormStore();
   const all = s.list();
   const oldest = all.length ? all[0].fromSeq : null;
   const newest = all.length ? all[all.length - 1].toSeq : null;
@@ -600,11 +598,12 @@ export function storeInfo(): { kind: string; segmentCount: number; dir?: string;
 
 export function __resetStore(): void {
   // Memory store：清空；File store：由单测指定临时目录，不删磁盘文件
-  const s = store();
+  const s = getWormStore();
   if (s.kind === 'memory') {
     // @ts-expect-error 清 map
     s.__clear?.();
   }
+  _asyncStore = null;
   probes.clear();
   lastArchivedSeq = 0;
   segmentCounter = 0;
@@ -612,8 +611,8 @@ export function __resetStore(): void {
   countersHydrated = false;
 }
 
-export function __getCipherHex(segmentId: string): string | null {
-  return store().get(segmentId)?.cipherBytes ?? null;
+export async function __getCipherHex(segmentId: string): Promise<string | null> {
+  return (await store().get(segmentId))?.cipherBytes ?? null;
 }
 
 /** 仅用于单测：暴露 sm3 标准向量 */

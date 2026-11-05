@@ -180,48 +180,44 @@ describe('P5-9 retire / purge 回收策略', () => {
     expect(p.activeKeyId()).not.toBe(k1);
   });
 
-  test('purge active key → cannot-purge-active', () => {
+  test('purge active key → cannot-purge-active', async () => {
     const p = new DemoEphemeralKeyProvider();
     const k = p.activeKeyId();
-    const r = p.purge(k);
+    const r = await p.purge(k);
     expect(r.ok).toBe(false);
     expect(r.error).toBe('cannot-purge-active');
   });
 
-  test('purge 仍被引用的 key → key-in-use 附引用数', () => {
+  test('purge 仍被引用的 key → key-in-use 附引用数', async () => {
     const p = new DemoEphemeralKeyProvider();
     const k1 = p.activeKeyId();
     p.rotate();
     p.retire(k1);
-    // 模拟 k1 被 3 段引用
-    p.setKeyInUseChecker(() => 3);
-    const r = p.purge(k1);
+    p.setKeyInUseChecker(async () => 3);
+    const r = await p.purge(k1);
     expect(r.ok).toBe(false);
     expect(r.error).toBe('key-in-use');
     expect(r.refs).toBe(3);
-    // 之后清掉引用再 purge 成功
-    p.setKeyInUseChecker(() => 0);
-    const r2 = p.purge(k1);
+    p.setKeyInUseChecker(async () => 0);
+    const r2 = await p.purge(k1);
     expect(r2.ok).toBe(true);
     expect(p.listKeyIds()).not.toContain(k1);
-    // verify 未知 keyId
     expect(p.verify('x', '0'.repeat(128), k1).reason).toBe('unknown-key-id');
   });
 
-  test('purge 不存在的 keyId → unknown-key-id', () => {
+  test('purge 不存在的 keyId → unknown-key-id', async () => {
     const p = new DemoEphemeralKeyProvider();
-    const r = p.purge('nonexistent');
+    const r = await p.purge('nonexistent');
     expect(r.ok).toBe(false);
     expect(r.error).toBe('unknown-key-id');
   });
 
-  test('purge 未挂 checker 时 → key-in-use-checker-not-wired（fail-closed）', () => {
+  test('purge 未挂 checker 时 → key-in-use-checker-not-wired（fail-closed）', async () => {
     const p = new DemoEphemeralKeyProvider();
     p.rotate();
     const k1 = p.listKeyIds()[0];
     p.retire(k1);
-    // 不调 setKeyInUseChecker → checker 为 null
-    const r = p.purge(k1);
+    const r = await p.purge(k1);
     expect(r.ok).toBe(false);
     expect(r.error).toBe('key-in-use-checker-not-wired');
   });

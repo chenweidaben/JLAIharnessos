@@ -56,7 +56,7 @@ beforeEach(() => {
   __resetStore();
   __resetKeyProvider(new DemoEphemeralKeyProvider());
   // 挂真实索引 checker
-  getKeyProvider().setKeyInUseChecker((kid: string) => getWormStore().countBySigner(kid));
+  getKeyProvider().setKeyInUseChecker(async (kid: string) => getWormStore().countBySigner(kid));
 });
 
 describe('P5-10 keys/retire 路由鉴权', async () => {
@@ -112,9 +112,9 @@ describe('P5-10 keys/purge 真实 refs===2', async () => {
 
     // seal 2 段，都用 kNew
     await recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
-    seal({});
+    await seal({});
     await recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'n2', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
-    seal({});
+    await seal({});
 
     // rotate 让 kNew 不再 active
     provider.rotate();
