@@ -270,7 +270,7 @@ describe('P5-10 retire/purge HTTP 闭环', () => {
     // rotate 让 kNew 不再 active
     await call('POST','/api/v1/worm/keys/rotate',{token:admin,body:{}});
     // purge kNew：恰好 2 段引用
-    const pr = await call('POST','/api/v1/worm/keys/purge',{token:admin,body:{keyId:kNew}});
+    const pr = await call('POST','/api/v1/worm/keys/purge',{token:admin,body:{keyId:kNew,confirm:'PURGE'}});
     expect(pr.httpStatus).toBe(409);
     expect(pr.raw).toContain('key-in-use');
     const prBody = JSON.parse(pr.raw ?? '{}') as { refs?: number };
