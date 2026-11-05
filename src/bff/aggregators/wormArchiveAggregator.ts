@@ -196,10 +196,13 @@ export function sm2Verify(digestHex: string, signatureHex: string): boolean {
 /* ------------------------------ 密钥状态查询 ------------------------------ */
 
 export function keyStatus(): { keySource: string; signerKeyId: string; publicKeyHex: string; sm4Configured: boolean } {
+  // P5-8：从 provider 读 active keyId（rotate 后同步）
+  const p = getKeyProvider();
+  const signing = p.getSigningKey();
   return {
-    keySource: sm2KeySource,
-    signerKeyId,
-    publicKeyHex: sm2PublicKeyHex,
+    keySource: p.kind,
+    signerKeyId: signing.keyId,
+    publicKeyHex: p.getPublicKey(signing.keyId) ?? '',
     sm4Configured: sm4KeyHex.length === 32,
   };
 }

@@ -136,6 +136,23 @@ export const wormRoutes: RouteDef[] = [
     },
   },
   {
+    method: 'POST',
+    path: '/api/v1/worm/keys/rotate',
+    auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const denied = requireAdmin(c); if (denied) return denied;
+      // P5-8：触发密钥轮换。旧钥保留可验签，新钥成为 active。
+      // 绝不返私钥，只返 fromKeyId/toKeyId。
+      const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
+      const r = getKeyProvider().rotate();
+      return json(ok({
+        fromKeyId: r.fromKeyId,
+        toKeyId: r.toKeyId,
+        keySource: getKeyProvider().kind,
+      }));
+    },
+  },
+  {
     method: 'GET',
     path: '/api/v1/worm/store/info',
     auth: true,

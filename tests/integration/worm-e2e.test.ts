@@ -226,3 +226,31 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     expect(r.data.rows[0]).toHaveProperty('occurredAt');
   });
 });
+
+describe('P5-8 密钥轮换 HTTP 层', () => {
+  it('rotate 后旧段 k1 与新段 k2 都验签通过', async () => {
+    // seal 1 段（用当前 active key）
+    await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+    const k1 = await call('GET','/api/v1/worm/keys',{token:admin});
+    expect(k1.data.signerKeyId).toBeTruthy();
+    // rotate
+    const rot = await call('POST','/api/v1/worm/keys/rotate',{token:admin,body:{}});
+    expect(rot.httpStatus).toBe(200);
+    expect(rot.data.fromKeyId).toBe(k1.data.signerKeyId);
+    expect(rot.data.toKeyId).toBeTruthy();
+    expect(rot.data.toKeyId).not.toBe(rot.data.fromKeyId);
+    // 确认返回不含私钥字段
+    expect(rot.data.privateKeyHex).toBeUndefined();
+    // 再 seal 1 段（用新 key）
+    await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+    const k2 = await call('GET','/api/v1/worm/keys',{token:admin});
+    expect(k2.data.signerKeyId).toBe(rot.data.toKeyId);
+    // verify real 必须 valid
+    const v = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
+    expect(v.httpStatus).toBe(200);
+    expect(v.data.valid).toBe(true);
+    expect(v.data.signatureValid).toBe(true);
+    expect(v.data.seqContinuity.gaps).toEqual([]);
+    expect(v.data.seqContinuity.duplicateSeq).toEqual([]);
+  });
+});
