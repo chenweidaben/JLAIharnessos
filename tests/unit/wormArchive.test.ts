@@ -555,7 +555,7 @@ describe('P5-9 purge 真实 store refs 统计（非 mock）', () => {
     expect(provider.getPublicKey(k1)).not.toBeNull();
 
     // 两段仍 verify 通过（按段 signerKeyId 选钥验签）
-    const v = verify({ scope: 'real' });
+    const v = verify('real');
     expect(v.valid).toBe(true);
   });
 });
