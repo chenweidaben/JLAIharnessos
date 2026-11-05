@@ -273,7 +273,8 @@ describe('P5-10 retire/purge HTTP 闭环', () => {
     const pr = await call('POST','/api/v1/worm/keys/purge',{token:admin,body:{keyId:kNew}});
     expect(pr.httpStatus).toBe(409);
     expect(pr.raw).toContain('key-in-use');
-    expect(JSON.parse(pr.raw).refs).toBe(2);
+    const prBody = JSON.parse(pr.raw ?? '{}') as { refs?: number };
+    expect(prBody.refs).toBe(2);
     // retire kNew：200
     const rt = await call('POST','/api/v1/worm/keys/retire',{token:admin,body:{keyId:kNew}});
     expect(rt.httpStatus).toBe(200);
