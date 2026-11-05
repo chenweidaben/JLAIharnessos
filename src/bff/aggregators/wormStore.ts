@@ -34,6 +34,36 @@ export interface WormStore {
   refresh?(): void;
 }
 
+/**
+ * P5-15 异步 WORM 存储接口，专用于网络后端（如 S3）。
+ *
+ * 现有同步 WormStore 只适配本地 fs/内存；S3 是网络 IO，天生异步。
+ * 真正接入 S3 前需把 wormArchiveAggregator 调用链改为 async；本切片只到 mock 契约层。
+ */
+export interface AsyncWormStore {
+  put(segment: WormSegment): Promise<void>;
+  get(segmentId: string): Promise<WormSegment | null>;
+  list(): Promise<WormSegment[]>;
+  countBySigner(keyId: string): Promise<number>;
+  refresh(): Promise<void>;
+  newestSeq(): Promise<number>;
+}
+
+/** 把同步 WormStore 包成 AsyncWormStore，供契约测试用同一套用例跑两种实现。 */
+export function toAsyncStore(sync: WormStore): AsyncWormStore {
+  return {
+    async put(segment) { sync.put(segment); },
+    async get(segmentId) { return sync.get(segmentId); },
+    async list() { return sync.list(); },
+    async countBySigner(keyId) { return sync.countBySigner(keyId); },
+    async refresh() { sync.refresh?.(); },
+    async newestSeq() {
+      const list = sync.list();
+      return list.length === 0 ? 0 : Math.max(...list.map((s) => s.seq));
+    },
+  };
+}
+
 export class MemoryWormStore implements WormStore {
   readonly kind = 'memory' as const;
   private map = new Map<string, WormSegment>();

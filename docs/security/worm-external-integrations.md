@@ -4,6 +4,10 @@
 
 ## 1. S3 WORM 段存储适配器
 
+> **重要前置说明**：现有 `WormStore` 是**同步**接口（`put/get/list/countBySigner` 直接返回值），因为它只服务 `FileWormStore`（本地 fs，同步 API）和 `MemoryWormStore`。S3 是网络 IO，天生异步。因此 `S3WormStore` 实现的是独立的 `AsyncWormStore` 接口（返回 Promise），**与现有同步接口并存**。
+>
+> 真正接入 S3 前需做一次前置改造：`wormArchiveAggregator` 的调用链（`seal` / `verify` / `listSegments` / `getSegment` / `countBySigner` 回退路径）目前全是同步的，需要改为 async（或引入一个带超时与并发上限的同步桥接层）。**本切片未做这项改造**，所以 S3 只到 mock 契约测试层面。
+
 ### 接口契约
 `src/bff/aggregators/s3WormStore.ts` 实现 `WormStore` 接口，与 `MemoryWormStore` / `FileWormStore` 行为对齐：
 

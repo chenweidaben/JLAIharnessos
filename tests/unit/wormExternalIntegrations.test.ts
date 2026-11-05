@@ -1,10 +1,13 @@
 /**
  * 健澜AI原生医院操作系统OS - P5-15 S3WormStore 与 CEF 契约测试
  *
+ * S3 契约用例同时跑在 AsyncWormStore(S3WormStore+MockS3) 与 toAsyncStore(MemoryWormStore) 上，
+ * 断言两边行为一致。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { describe, expect, test } from 'bun:test';
-import { MemoryWormStore } from '../../src/bff/aggregators/wormStore';
+import { MemoryWormStore, toAsyncStore, type AsyncWormStore } from '../../src/bff/aggregators/wormStore';
 import { MockS3Client, S3WormStore } from '../../src/bff/aggregators/s3WormStore';
 import { formatCEF, MockSyslogExporter } from '../../src/bff/aggregators/syslogCefExporter';
 
@@ -22,61 +25,59 @@ function makeSegment(seq: number, signerKeyId = 'k1'): any {
   };
 }
 
-describe('P5-15 S3WormStore 契约（与 MemoryWormStore 行为对齐）', () => {
-  test('put → get 回读一致', async () => {
-    const mem = new MemoryWormStore();
-    const s3 = new MockS3Client();
-    const s3Store = new S3WormStore(s3, 'test-bucket');
-    const seg = makeSegment(1);
+async function runAsyncContract(makeStore: () => AsyncWormStore) {
+  const mem = new MemoryWormStore();
+  const ref = toAsyncStore(mem);
+  const sut = makeStore();
+
+  // put → get 回读
+  const seg1 = makeSegment(1, 'k1');
+  await ref.put(seg1);
+  await sut.put(seg1);
+  expect(await sut.get(seg1.segmentId)).toEqual(seg1);
+
+  // list 按 seq 排序
+  for (const s of [3, 2]) {
+    const seg = makeSegment(s, s === 2 ? 'k1' : 'k2');
     mem.put(seg);
-    await s3Store.put(seg);
-    expect(mem.get(seg.segmentId)).toEqual(seg);
-    expect(await s3Store.get(seg.segmentId)).toEqual(seg);
+    await sut.put(seg);
+  }
+  const sutList = await sut.list();
+  expect(sutList.map((x) => x.seq)).toEqual([1, 2, 3]);
+
+  // countBySigner 累加
+  expect(await sut.countBySigner('k1')).toBe(2);
+  expect(await sut.countBySigner('k2')).toBe(1);
+
+  // newestSeq
+  expect(await sut.newestSeq()).toBe(3);
+
+  // refresh：外部写入后重新拉
+  // 仅对 S3 路径做（MemoryWormStore 没有"外部写入"概念）
+  if (sut instanceof S3WormStore) {
+    const extra = makeSegment(9, 'k3');
+    await (sut as any).s3.putObject({
+      Bucket: 'test-bucket',
+      Key: 'worm/segments/' + extra.segmentId + '.json',
+      Body: JSON.stringify(extra),
+    });
+    // refresh 后能看到外部写入
+    await sut.refresh();
+    expect(await sut.get(extra.segmentId)).not.toBeNull();
+    expect(await sut.countBySigner('k3')).toBe(1);
+  }
+
+  // duplicate-segment
+  await expect(sut.put(seg1)).rejects.toThrow('duplicate-segment');
+}
+
+describe('P5-15 AsyncWormStore 契约（S3 与 Memory 参照行为一致）', () => {
+  test('MemoryWormStore via toAsyncStore 满足契约', async () => {
+    await runAsyncContract(() => toAsyncStore(new MemoryWormStore()));
   });
 
-  test('list 按 seq 排序一致', async () => {
-    const mem = new MemoryWormStore();
-    const s3 = new MockS3Client();
-    const s3Store = new S3WormStore(s3, 'test-bucket');
-    for (const s of [3, 1, 2]) {
-      const seg = makeSegment(s);
-      mem.put(seg);
-      await s3Store.put(seg);
-    }
-    expect(mem.list().map((x) => x.seq)).toEqual([1, 2, 3]);
-    expect((await s3Store.list()).map((x) => x.seq)).toEqual([1, 2, 3]);
-  });
-
-  test('countBySigner 累加一致', async () => {
-    const mem = new MemoryWormStore();
-    const s3 = new MockS3Client();
-    const s3Store = new S3WormStore(s3, 'test-bucket');
-    mem.put(makeSegment(1, 'k1')); mem.put(makeSegment(2, 'k1')); mem.put(makeSegment(3, 'k2'));
-    await s3Store.put(makeSegment(1, 'k1')); await s3Store.put(makeSegment(2, 'k1')); await s3Store.put(makeSegment(3, 'k2'));
-    expect(mem.countBySigner('k1')).toBe(2);
-    expect(s3Store.countBySigner('k1')).toBe(2);
-    expect(mem.countBySigner('k2')).toBe(1);
-    expect(s3Store.countBySigner('k2')).toBe(1);
-  });
-
-  test('refresh 一致性：外部写入后重新拉列表', async () => {
-    const s3 = new MockS3Client();
-    const s3Store = new S3WormStore(s3, 'test-bucket');
-    await s3Store.put(makeSegment(1, 'k1'));
-    // 模拟另一进程直接写 S3
-    await s3.putObject({ Bucket: 'test-bucket', Key: 'worm/segments/WORM-0001-ext9.json', Body: JSON.stringify(makeSegment(9, 'k2')) });
-    expect(s3Store.count()).toBe(1); // 缓存还没看到
-    await s3Store.refresh();
-    expect(s3Store.count()).toBe(2);
-    expect(s3Store.countBySigner('k2')).toBe(1);
-  });
-
-  test('重复 put 抛 duplicate-segment', async () => {
-    const s3 = new MockS3Client();
-    const s3Store = new S3WormStore(s3, 'test-bucket');
-    const seg = makeSegment(1);
-    await s3Store.put(seg);
-    await expect(s3Store.put(seg)).rejects.toThrow('duplicate-segment');
+  test('S3WormStore(MockS3) 满足同一套契约', async () => {
+    await runAsyncContract(() => new S3WormStore(new MockS3Client(), 'test-bucket'));
   });
 });
 
@@ -98,7 +99,6 @@ describe('P5-15 CEF 格式', () => {
     expect(line).toContain('cs1Label=module');
     expect(line).toContain('cs1=worm');
     expect(line).toContain('rt=2026-01-01T00:00:00.000Z');
-    // 一行（无换行）
     expect(line.includes('\n')).toBe(false);
   });
 
@@ -125,7 +125,6 @@ describe('P5-15 CEF 格式', () => {
     expect(exp.messages.length).toBe(2);
     expect(exp.messages[0]).toContain('act=retire');
     expect(exp.messages[1]).toContain('act=purge');
-    // 每条 severity 不同
     expect(exp.messages[0]).toMatch(/\|5\|/);
     expect(exp.messages[1]).toMatch(/\|3\|/);
   });

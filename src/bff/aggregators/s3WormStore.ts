@@ -2,10 +2,11 @@
  * 健澜AI原生医院操作系统OS - P5-15 S3 WORM 段存储适配器（mock，未联调）
  *
  * ⚠️ NOT INTEGRATED — mock only, no real S3 endpoint.
+ * Implements AsyncWormStore (not the synchronous WormStore). See docs for the
+ * async migration that must precede real S3 integration.
  *
- * 实现 WormStore 接口，与 MemoryWormStore / FileWormStore 行为对齐。
- * 通过可注入的 S3Like 接口（putObject/getObject/listObjects）解耦真实 SDK，
- * 单测里用内存实现的 MockS3Client 跑同一套契约用例。
+ * 真正接入 S3 前需做前置改造：wormArchiveAggregator 的 seal/verify/listSegments
+ * 等调用链目前全是同步的，需要改为 async。本切片只到 mock 契约测试层面。
  *
  * 联调时需要：
  *   - 真实 @aws-sdk/client-s3 实现 S3Like
@@ -14,7 +15,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import type { WormSegment } from './wormArchiveAggregator.js';
-import type { WormStore } from './wormStore.js';
+import type { AsyncWormStore } from './wormStore.js';
 
 /** 最小 S3 子集：只覆盖 WORM 段需要的操作 */
 export interface S3Like {
@@ -42,8 +43,7 @@ export class MockS3Client implements S3Like {
   }
 }
 
-export class S3WormStore implements WormStore {
-  readonly kind = 'memory' as const; // 接口要求，不代表后端
+export class S3WormStore implements AsyncWormStore {
   private s3: S3Like;
   private bucket: string;
   private prefix: string;
@@ -90,16 +90,21 @@ export class S3WormStore implements WormStore {
     const { Keys } = await this.s3.listObjects({ Bucket: this.bucket, Prefix: this.prefix });
     const segs: WormSegment[] = [];
     for (const k of Keys) {
-      const id = k.slice(this.prefix.length, k.length - 5); // 去掉前缀和 .json
+      const id = k.slice(this.prefix.length, k.length - 5);
       const seg = await this.get(id);
       if (seg) segs.push(seg);
     }
     return segs.sort((a, b) => a.seq - b.seq);
   }
 
-  count(): number { return this.cache.size; }
+  async countBySigner(keyId: string): Promise<number> {
+    return this.bySigner.get(keyId) ?? 0;
+  }
 
-  countBySigner(keyId: string): number { return this.bySigner.get(keyId) ?? 0; }
+  async newestSeq(): Promise<number> {
+    const list = await this.list();
+    return list.length === 0 ? 0 : Math.max(...list.map((s) => s.seq));
+  }
 
   /** 强制从 S3 重新拉列表，清缓存 */
   async refresh(): Promise<void> {
