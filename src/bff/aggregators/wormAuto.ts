@@ -207,6 +207,12 @@ function indexFilePath(): string {
 }
 
 let indexCache: SegmentIndexEntry[] = [];
+let indexCacheSig = '';
+
+function computeStoreSig(): string {
+  const store = getWormStore();
+  return store.list().map(s => `${s.segmentId}:${s.segmentHash}:${s.toSeq}`).join('|');
+}
 
 export async function rebuildIndex(): Promise<SegmentIndexEntry[]> {
   const store = getWormStore();
@@ -226,10 +232,11 @@ export async function rebuildIndex(): Promise<SegmentIndexEntry[]> {
   }
   writeFileSync(indexFilePath(), JSON.stringify(entries, null, 2), 'utf8');
   indexCache = entries;
+  indexCacheSig = computeStoreSig();
   return entries;
 }
 
-export function __resetIndexCache(): void { indexCache = []; }
+export function __resetIndexCache(): void { indexCache = []; indexCacheSig = ''; }
 
 export async function loadIndex(): Promise<SegmentIndexEntry[]> {
   // 内存索引缓存：避免每次 search 都读 _index.json
@@ -302,8 +309,10 @@ async function getDecrypted(segmentId: string): Promise<AuditEvent[] | null> {
 export async function search(q: SearchQuery): Promise<SearchResult> {
   let index = await loadIndex();
   const store = getWormStore();
-  // 索引与磁盘段数不一致 → 重建（seal 后未写索引）
-  if (index.length !== store.count()) index = await rebuildIndex();
+  // P5-20: 失效条件从"段数"改为"段签名"（segmentId:segmentHash:toSeq）
+  // 段数不变但内容变化时（空段补齐、hash 更新）旧逻辑不重建，导致 search 返旧索引
+  const sig = computeStoreSig();
+  if (index.length !== store.count() || sig !== indexCacheSig) index = await rebuildIndex();
   let candidates = index;
   let indexHit = false;
   if (q.actorId || q.patientId || q.action || q.module || q.from || q.to) {
