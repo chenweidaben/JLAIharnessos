@@ -150,3 +150,43 @@
 | 内存 pendingUpload Set | 重启丢失，本地文件永久滞留 |
 | 同 id 不同 hash 时静默选 S3 | 吞掉篡改信号，违反 WORM 不可变语义 |
 | WORM_BACKEND=s3 但缺凭据时回落 memory | P5-13 教训，fail-closed |
+
+---
+
+## Q6. layered.put 断网兜底（P5-17 新增，待用户拍板）
+
+> 状态：**设计待审，不改代码**。当前 `layered.put(segment)` 的实现是"先 local.put 再 remote.put，remote 抛错直接往上抛"。上层 seal 调用方目前不处理这个错误，等于 S3 抖一下 seal 就 500。下面给三个选项。
+
+### 选项 A：fail-closed 抛错
+`put` 只做 `remote.put`，失败直接抛。
+
+- 优点：语义最简单，不会出现"返回成功但其实只在本地"的假成功
+- 缺点：S3 抖一下 seal 就失败，归档链路对网络异常零容忍；PG 里 pending 事件堆积，等 S3 恢复才能继续
+
+### 选项 B：结构化结果（**推荐**）
+`put` 返回 `Promise<{ok: boolean, persisted: 'remote' | 'local-only', error?: string}>`：
+
+- 先 `local.put`（保证落盘）→ 再 `remote.put`
+- remote 成功 → 返回 `{ok:true, persisted:'remote'}`，local 副本保留（读路径容灾）
+- remote 失败 → 返回 `{ok:true, persisted:'local-only', error}` + metric `jlmedaios_worm_local_only_total` +1
+- seal 侧只看 `ok`，`ok:true` 就不阻断归档
+- `sweep()` 已有的无状态推导（"remote miss 但 local 有 → 补传 → 删 local"）天然接上
+
+**为什么推荐 B**：
+- 与 P5-13 `recordEvent` 的 `{ok, persisted, fallbackPath, reason}` 是同一个模式——失败可见、不阻断业务、靠补偿追上
+- `sweep` 已经存在，不用新建机制
+- metric 告警能及时发现"S3 长期不可用导致 local 无限增长"
+
+**B 的风险**：S3 长期不可用时 local 无限增长。必须有 metric 告警（`local_only` 计数持续上涨 = S3 挂了），不能静默接受。
+
+### 选项 C：静默降级（不可接受）
+`put` 失败也返回成功，不区分 `remote`/`local-only`。等于把"审计段只在本地"这件事藏起来，用户以为有 S3 副本但其实没有。**任何时候都不批准。**
+
+### 拍板后落地清单
+- [ ] `AsyncWormStore.put` 签名改返回结构化结果（或新增 `putWithStatus` 方法，旧 `put` 保留薄包装）
+- [ ] `ResilientWormStore` 透传结构化结果
+- [ ] `layered.put` 实现 B 的顺序（先 local 后 remote）
+- [ ] seal 调用方读 `ok`，不读 `persisted`
+- [ ] Prometheus metric `jlmedaios_worm_local_only_total` 注册 + counter
+- [ ] 单测：remote 成功 / remote 失败 / 网络超时三档，断言返回值 shape
+

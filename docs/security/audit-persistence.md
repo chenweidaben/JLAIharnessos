@@ -90,3 +90,46 @@ fallback JSONL 的 replay 本切片不做，留 TODO（replay 会重新分配 se
 - 6 个月体积：900,000 × 500B ≈ 450 MB（含索引约 600 MB）
 
 单台 100GB 盘足够支撑 10 年量级。超出 N 时按线性外推。
+
+---
+
+## E2E 数据隔离方案（P5-17 新增，待拍板）
+
+> 现状：E2E 跑在 `AUDIT_STORE=memory`，不连 PG。但 `WORM_BACKEND=fs` 时会写本地段文件，多轮跑会污染 keyring（purge 后旧公钥出环 → verify 假红）。下面是切到 PG 持久化后的隔离方案。
+
+### 方案：`AUDIT_DB_SCHEMA` 参数化，E2E 用独立 schema `audit_e2e`
+
+#### 改动点（`PgAuditStore`）
+1. 构造函数读 `process.env.AUDIT_DB_SCHEMA ?? 'audit'`，存为 `this.schema`
+2. 所有 SQL 从硬编码 `audit.events` 改成 `${this.schema}.events`（用 `pg` 的标识符安全拼接，不许字符串模板拼用户输入；这里 schema 来自 env，可信）
+3. `CREATE TABLE IF NOT EXISTS` DDL 也走参数化 schema
+4. `deploy/postgres/init/120-audit-events.sql` 保持不动（默认 schema `audit` 给生产用）
+
+#### E2E `beforeAll` / `afterAll`
+```ts
+// beforeAll
+await sql`CREATE SCHEMA IF NOT EXISTS audit_e2e`;
+await sql`SET search_path TO audit_e2e`;
+// 建表（复用 120-audit-events.sql 的 DDL，替换 schema）
+// 起 BFF 时注入 AUDIT_DB_SCHEMA=audit_e2e
+// afterAll
+await sql`DROP SCHEMA IF EXISTS audit_e2e CASCADE`;
+```
+
+#### 风险与注意
+- **`search_path` 影响其他连接**：pg 连接池里改 `search_path` 只影响当前连接。E2E 用独立连接池，不与生产 BFF 共享同一 pool。生产 BFF 用默认 schema `audit`，互不影响。
+- **DDL 参数化**：`120-audit-events.sql` 里 `CREATE TABLE audit.events` 不能直接复用（schema 硬编码）。需要复制一份 `120-audit-events.e2e.sql`，或在 `PgAuditStore.init()` 里用模板字符串在运行时拼 DDL。
+- **advisory lock**：`pg_advisory_xact_lock(hashtext('audit_events_seq'))` 在两个 schema 间不会冲突（同一个 PG 实例内 advisory lock 是全局的）。E2E 与生产 BFF 同时跑时，seq 锁会竞争——但 E2E 是测试环境，不与生产共库，可接受。
+- **WORM 段目录隔离**：`WORM_STORE_DIR` 给 E2E 单独指一个 `logs/worm-store-e2e/`，afterAll 清空。
+
+#### 工程量估计
+- `PgAuditStore` 参数化：~30 行改动，5 个 SQL 模板收窄到一个 helper
+- E2E `beforeAll/afterAll`：~20 行
+- 单测：2 个（默认 schema / e2e schema 各一）
+- 总计：半天内
+
+#### 不做的替代方案
+- **独立 PG database**：隔离更彻底，但需要 CI 起两个 PG 实例，本地开发成本高
+- **mock PgAuditStore**：E2E 仍然 memory，不切 PG——等于没测到真实持久化路径
+- **E2E 自建 BFF 进程**：解决 keyring 污染，但不解决 PG 数据污染；两个方案互补，不替代
+
