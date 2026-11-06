@@ -12,9 +12,15 @@ import * as crypto from 'node:crypto';
 import { setupSchema, teardownSchema, startBff, stopBff, type BffHandle } from './worm-e2e-setup';
 
 // P5-20: BASE 由 beforeAll spawn 的 BFF 动态决定（8081）
-let BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
+// 不再有模块级默认 8080——startBff 失败时直接 throw，不能静默回落生产实例
+let BASE: string | null = null;
 let bffHandle: BffHandle | null = null;
 const JWT_SECRET = process.env.JWT_SECRET ?? 'local-dev-jwt-secret-jlmedaios-2026';
+
+function requireBase(): string {
+  if (!BASE) throw new Error('baseUrl not initialized — startBff must succeed before any request');
+  return BASE;
+}
 
 // E2E 响应 shape：聚合所有端点可能用到的字段（可选），避免 any。
 // 单测层应精确类型；E2E 跨 20+ 端点，用一个宽接口收敛。
@@ -69,7 +75,7 @@ async function call<T = ApiData>(method: string, path: string, opts: {token?: st
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
   let last: CallResult<ApiData> = { httpStatus: 0, code: 0, data: {}, raw: '' };
   for (let attempt = 0; attempt < 8; attempt++) {
-    const res = await fetch(BASE+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
+    const res = await fetch(requireBase()+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
     const txt = await res.text();
     let raw: { code?: number; data?: ApiData } | null = null;
     try { raw = JSON.parse(txt) as { code?: number; data?: ApiData }; } catch { raw = null; }
@@ -152,6 +158,7 @@ afterAll(async () => {
   // P5-20: kill BFF + DROP schema
   try { if (bffHandle) await stopBff(bffHandle); } catch {}
   try { await teardownSchema(); } catch {}
+  BASE = null;
 });
 
 describe('P5-4 keys 不泄露私钥', () => {
