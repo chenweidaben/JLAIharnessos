@@ -46,7 +46,9 @@ CREATE TABLE IF NOT EXISTS consult.threads (
                                   'document_upload','exit','unknown')),
   safety_level  text NOT NULL DEFAULT 'normal'
                 CHECK (safety_level IN ('normal','caution','acute')),
-  current_role  text CHECK (current_role IS NULL OR current_role IN
+  -- current_role 是 PostgreSQL 保留字（niladic 函数），列名必须加双引号，
+  -- 否则本文件解析期即语法错误，导致 DEMO_MODE=0（生产路径）迁移整体失败。
+  "current_role" text CHECK ("current_role" IS NULL OR "current_role" IN
                 ('supervisor','examiner','doctor','pharmacist')),
   meta          jsonb NOT NULL DEFAULT '{}'::jsonb,
   closed_at     timestamptz,
