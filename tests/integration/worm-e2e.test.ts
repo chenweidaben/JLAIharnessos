@@ -9,8 +9,11 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import * as crypto from 'node:crypto';
+import { setupSchema, teardownSchema, startBff, stopBff, type BffHandle } from './worm-e2e-setup';
 
-const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
+// P5-20: BASE 由 beforeAll spawn 的 BFF 动态决定（8081）
+let BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
+let bffHandle: BffHandle | null = null;
 const JWT_SECRET = process.env.JWT_SECRET ?? 'local-dev-jwt-secret-jlmedaios-2026';
 
 // E2E 响应 shape：聚合所有端点可能用到的字段（可选），避免 any。
@@ -91,6 +94,10 @@ interface KeysResponse { keySource?: string; signerKeyId?: string }
 interface VerifyResponse { valid?: boolean; errors?: { code?: string; segmentId?: string; message?: string }[] }
 
 beforeAll(async () => {
+  // P5-20: E2E 自管 BFF 生命周期 + audit_e2e schema 隔离
+  await setupSchema();
+  bffHandle = await startBff();
+  BASE = bffHandle.baseUrl;
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
   // P5-14 前置条件：KeyProvider 必须是可轮换的（file / demo-ephemeral），不能是 env。
@@ -142,6 +149,9 @@ afterAll(async () => {
       );
     }
   } catch { /* afterAll 失败不影响主结果 */ }
+  // P5-20: kill BFF + DROP schema
+  try { if (bffHandle) await stopBff(bffHandle); } catch {}
+  try { await teardownSchema(); } catch {}
 });
 
 describe('P5-4 keys 不泄露私钥', () => {
