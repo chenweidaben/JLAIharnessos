@@ -14,12 +14,18 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, resolve, relative } from 'node:path';
 
 const args = process.argv.slice(2);
-function argVal(flag: string, def: string): string {
+function argVals(flag: string, def: string[]): string[] {
   const i = args.indexOf(flag);
-  return i >= 0 && args[i + 1] ? args[i + 1] : def;
+  if (i < 0) return def;
+  const out: string[] = [];
+  for (let j = i + 1; j < args.length; j++) {
+    if (args[j].startsWith('--')) break;
+    out.push(args[j]);
+  }
+  return out.length > 0 ? out : def;
 }
-const paths = argVal('--paths', 'src web/src tests docs').split(/\s+/).filter(Boolean);
-const wordsFile = argVal('--words', 'logs/brand-words-reversed.txt');
+const paths = argVals('--paths', ['src', 'web/src', 'tests', 'docs']);
+const wordsFile = argVals('--words', ['logs/brand-words-reversed.txt'])[0];
 
 const root = resolve(import.meta.dirname ?? process.cwd(), '..');
 
