@@ -66,10 +66,13 @@ for (let i = 0; i < files.length; i += batchSize) {
   // 用 execFileSync 传参数数组：路径含空格/中文时不会被 shell 拆词，
   // 否则 eslint 直接报参数错，脚本会把"跑失败"误算成 0 error（差分门禁 fail-open）。
   try {
-    const out = execFileSync(process.execPath, ['node_modules/eslint/bin/eslint.js', ...batch, '-f', 'json'], {
+    // P5-19: maxBuffer 提到 64MB（server.ts 这种 7000 行文件的 eslint JSON 含 fix 字段可达 4.5MB）
+    // 用 'node' 而非 process.execPath：bun 的 execFileSync 对大输出 maxBuffer 不生效（实测 1.9MB 仍截断）
+    const out = execFileSync('node', ['node_modules/eslint/bin/eslint.js', ...batch, '-f', 'json'], {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: 64 * 1024 * 1024,
     });
     const results = JSON.parse(out);
     for (const r of results) {
@@ -108,7 +111,16 @@ for (let i = 0; i < files.length; i += batchSize) {
             }
           }
         }
-      } catch { /* ignore */ }
+      } catch (parseErr) {
+        // P5-19: 不许静默吞 JSON.parse 失败——stdout 有内容但 parse 不了，说明输出被截断/污染，必须算失败
+        totalErrors++;
+        errorDetails.push({
+          file: '<eslint-run>',
+          line: 0,
+          message: `eslint JSON parse failed: ${(parseErr as Error).message ?? 'unknown'}`,
+          rule: 'lint-run-failure',
+        });
+      }
     } else {
       // eslint 本身没跑起来（配置错/参数错/找不到文件）：必须算失败，
       // 否则差分门禁会把"跑失败"当成 0 error 静默放行。
