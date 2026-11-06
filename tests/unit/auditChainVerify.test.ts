@@ -17,15 +17,15 @@ import {
   GENESIS,
   computeHash,
   canonical,
-} from '../../src/bff/aggregators/auditEventAggregator.ts';
-import type { AuditEvent } from '../../src/bff/aggregators/auditEventAggregator.ts';
+} from '../../src/bff/aggregators/auditEventAggregator';
+import type { AuditEvent } from '../../src/bff/aggregators/auditEventAggregator';
 
 function makeEvent(seq: number, prevHash: string, eventId = `evt-${seq}`): AuditEvent {
   const base = {
     eventId, seq, occurredAt: new Date().toISOString(),
     actorId: 'test', actorRole: 'admin' as const, action: 'login' as const,
     module: 'test', resourceType: 'unit', resourceId: `r-${seq}`,
-    patientId: null, result: 'success' as const, errorCode: null,
+    patientId: undefined, result: 'success' as const, errorCode: undefined,
     ip: '127.0.0.1', userAgent: 'test', prevHash,
   };
   return { ...base, hash: computeHash(prevHash, canonical(base)) };

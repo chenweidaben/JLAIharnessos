@@ -32,6 +32,8 @@ interface ApiData {
   signatureValid?: boolean;
   digestValid?: boolean;
   realChainValid?: boolean;
+  sourceChainValid?: boolean;
+  brokenAt?: number;
   brokenScope?: string;
   errors?: { code?: string; segmentId?: string; message?: string }[];
   seqContinuity?: { valid?: boolean; gaps?: unknown[]; duplicateSeq?: unknown[] };
