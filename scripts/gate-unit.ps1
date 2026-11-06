@@ -53,12 +53,24 @@ Write-Host "=== gate-unit: $($files.Count) files ==="
 Write-Host "baseline: $expPass / $expFail / $expExpect"
 Write-Host "log: $logFile"
 
-# Run via cmd /c so stderr is merged into stdout (avoids NativeCommandError)
-$argList = @('test') + $files
-$argStr = $argList -join ' '
-$cmdLine = "bun $argStr > `"$logFile`" 2>&1"
-Write-Host "cmd: $cmdLine"
-cmd /c $cmdLine
+# 解析 bun 绝对路径：本机 PATH 未注册 bun，不能依赖 `bun` 能被解析
+$bunExe = $null
+$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
+if ($cmdBun) { $bunExe = $cmdBun.Source }
+if (-not $bunExe) {
+  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
+  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
+}
+if (-not $bunExe) {
+  Write-Host "FAIL: bun 未找到（PATH 与 %USERPROFILE%\.bun\bin\bun.exe 均不可用）"
+  exit 1
+}
+Write-Host "bun: $bunExe"
+
+# 直接调用 exe 并以 *> 重定向全部流到日志（不经过 cmd，避免引号与 PATH 问题）
+$bunArgs = @('test') + $files
+& $bunExe @bunArgs *> $logFile
+Write-Host "bun exit=$LASTEXITCODE"
 
 # Parse summary lines from log
 $pass = -1; $fail = -1; $expect = -1

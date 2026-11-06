@@ -9,13 +9,12 @@
  *   改用 execSync 同样被污染。门禁脚本的价值在「清单固定」，不在「一条命令跑完」。
  *
  * 基线（2026-11-06 22:2x 主线 PowerShell 直跑实测，HEAD=bfe8ead0）：
- *   13 文件 = 181 pass / 0 fail / 536 expect
+ *   13 文件 = 181 pass / 0 fail / 512 expect
  *
  * 与历史数字的对账（逐文件实测 pass 数，三个口径全部可复算）：
  *   181  - 27（keyOpsStore 10 + auditEventHook 17）= 154   ← 主线早期 11 文件口径
  *   181  - 29（wormKeyProvider）                    = 152   ← 组织侧 12 文件口径
  *   152  - 8（worm-s3-fallback）                    = 144   ← 组织侧 11 文件口径
- * 差异全部来自文件集合本身，0 fail 在三套口径下一致。
  * 差异全部来自文件集合本身，0 fail 在三套口径下一致。
  */
 import * as fs from 'node:fs';

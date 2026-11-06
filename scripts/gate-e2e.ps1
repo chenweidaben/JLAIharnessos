@@ -45,12 +45,25 @@ $env:AUDIT_DB_SCHEMA = 'audit_e2e'
 $env:WORM_BACKEND = 'memory'
 $env:AUDIT_BACKFILL_LIMIT = '3000'
 $env:DATABASE_URL = $dbUrl
-$env:JWT_SECRET = 'local-dev-jwt-secret-jlmedaios-2026'
+# 不再内联 JWT_SECRET：bun 会自动加载 .env，脚本里硬编码密钥常量没有必要且有泄露面
 
-# Run E2E via cmd /c to merge stderr
-$cmdLine = "bun test ./tests/integration/worm-e2e.test.ts > `"$logFile`" 2>&1"
-Write-Host "cmd: bun test ./tests/integration/worm-e2e.test.ts"
-cmd /c $cmdLine
+# 解析 bun 绝对路径：本机 PATH 未注册 bun
+$bunExe = $null
+$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
+if ($cmdBun) { $bunExe = $cmdBun.Source }
+if (-not $bunExe) {
+  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
+  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
+}
+if (-not $bunExe) {
+  Write-Host "FAIL: bun 未找到（PATH 与 %USERPROFILE%\.bun\bin\bun.exe 均不可用）"
+  exit 1
+}
+Write-Host "bun: $bunExe"
+
+# 直接调用 exe 并以 *> 重定向全部流到日志；不裸管道接 bun test
+& $bunExe test './tests/integration/worm-e2e.test.ts' *> $logFile
+Write-Host "bun exit=$LASTEXITCODE"
 
 # Parse summary lines
 $pass = -1; $fail = -1; $expect = -1
@@ -59,6 +72,8 @@ foreach ($line in [System.IO.File]::ReadAllLines($logFile)) {
   elseif ($line -match '^\s+(\d+)\s+fail\s*$') { $fail = [int]$Matches[1] }
   elseif ($line -match '^\s+(\d+)\s+expect\(\)\s*calls\s*$') { $expect = [int]$Matches[1] }
 }
+
+if ($pass -lt 0) { Write-Host "FAIL: could not parse pass count from log（用例可能根本没跑起来）"; exit 1 }
 
 Write-Host ""
 Write-Host "=== result ==="
