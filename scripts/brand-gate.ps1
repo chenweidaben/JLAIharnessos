@@ -1,6 +1,6 @@
 ﻿# scripts/brand-gate.ps1 - Brand compliance gate (English strings, BOM required)
 # Usage: .\scripts\brand-gate.ps1 [-Paths "src,web/src"]
-# Exit: 0=pass (no hard violations), 1=hard violations found
+# Exit: 0=pass (no hard violations), 1=hard violations found or path error
 
 param(
   [string]$Paths = "src,web/src"
@@ -27,6 +27,9 @@ Write-Host "words loaded: $($words.Count)"
 # gangos_ prefix is a separate backlog scan (not from word list)
 $BACKLOG_PREFIX = 'gangos_'
 
+# Allowed extensions (option A: manual filter to avoid -LiteralPath + -Include bug)
+$allowedExt = @('.ts', '.tsx', '.js', '.jsx', '.mts', '.md')
+
 # Parse paths
 $pathList = $Paths -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 $filesScanned = 0
@@ -34,9 +37,15 @@ $hardViolations = @()
 $backlogGangos = @()
 
 foreach ($p in $pathList) {
-  $abs = Join-Path $repoRoot $p
-  if (-not (Test-Path -LiteralPath $abs)) { continue }
-  $files = Get-ChildItem -LiteralPath $abs -Recurse -File -Include *.ts,*.tsx,*.js,*.jsx,*.mts,*.md -ErrorAction SilentlyContinue
+  # Support absolute paths; fail-closed if path not found
+  $full = if ([IO.Path]::IsPathRooted($p)) { $p } else { Join-Path $repoRoot $p }
+  if (-not (Test-Path -LiteralPath $full)) {
+    Write-Host "ERROR: path not found: $full"
+    exit 1
+  }
+  # Use -Path (not -LiteralPath) so -Recurse works; manual extension filter
+  $files = Get-ChildItem -Path $full -Recurse -File -ErrorAction SilentlyContinue |
+    Where-Object { $allowedExt -contains $_.Extension.ToLower() }
   foreach ($f in $files) {
     $filesScanned++
     $rel = $f.FullName.Substring($repoRoot.Length + 1)
