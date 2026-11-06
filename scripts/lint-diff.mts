@@ -46,6 +46,19 @@ function getChangedFiles(): string[] {
     .filter((f) => /\.(ts|tsx|mts|cts|js|jsx)$/.test(f));
 }
 
+function stripFix(results: any[]): void {
+  // P5-19: eslint JSON 里每条 message 带 fix 字段（autofix 整段替换文本），
+  // 一个 7000 行文件几处 import 重排就能让 fix 涨到数 MB。
+  // 我们只关心 severity/ruleId/message，不需要 fix，strip 掉根治大输出问题。
+  for (const r of results) {
+    for (const m of r.messages) {
+      delete m.fix;
+    }
+    // 去掉 eslint 9+ 的 suppressions 字段（也可能很大）
+    delete r.suppressions;
+  }
+}
+
 const files = getChangedFiles();
 if (files.length === 0) {
   console.log('[lint-diff] no changed TS/JS files, exit 0');
@@ -75,6 +88,7 @@ for (let i = 0; i < files.length; i += batchSize) {
       maxBuffer: 64 * 1024 * 1024,
     });
     const results = JSON.parse(out);
+    stripFix(results);
     for (const r of results) {
       for (const m of r.messages) {
         if (m.severity === 2) {
@@ -96,6 +110,7 @@ for (let i = 0; i < files.length; i += batchSize) {
     if (out) {
       try {
         const results = JSON.parse(out);
+        stripFix(results);
         for (const r of results) {
           for (const m of r.messages) {
             if (m.severity === 2) {
