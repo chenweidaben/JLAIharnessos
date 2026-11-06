@@ -4,7 +4,8 @@
 # Exit: 0=pass, 1=fail
 
 param(
-  [string]$Baseline = "181/0/512"
+  [string]$Baseline = "",
+  [switch]$WithChain
 )
 
 $ErrorActionPreference = 'Continue'
@@ -30,6 +31,14 @@ $files = @(
   './tests/unit/integration/VendorAdapters.test.ts',
   './tests/integration/worm-s3-fallback.test.ts'
 )
+# Optional 14th file (audit chain verify)
+$chainFile = './tests/unit/auditChainVerify.test.ts'
+
+# Default baselines per mode
+if (-not $Baseline) {
+  if ($WithChain) { $Baseline = '186/0/522' } else { $Baseline = '181/0/512' }
+}
+if ($WithChain) { $files += $chainFile }
 
 # Check files exist
 $missing = @()

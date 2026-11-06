@@ -2,9 +2,10 @@
 # Usage: .\scripts\gate-all.ps1 [-UnitBaseline "181/0/512"] [-E2eBaseline "23/0/83"]
 
 param(
-  [string]$UnitBaseline = "181/0/512",
+  [string]$UnitBaseline = "",
   [string]$E2eBaseline = "23/0/83",
-  [string]$BrandPaths = ""
+  [string]$BrandPaths = "",
+  [switch]$UnitWithChain
 )
 
 $ErrorActionPreference = 'Continue'
@@ -61,7 +62,10 @@ $results += [PSCustomObject]@{ Step='tsc-web'; Status=$st2; Seconds=[int]$sw2.El
 # Step 3: gate-unit
 Write-Host "=== 3/5 gate-unit ==="
 $sw3 = [System.Diagnostics.Stopwatch]::StartNew()
-& powershell -ExecutionPolicy Bypass -File "$repoRoot\scripts\gate-unit.ps1" -Baseline $UnitBaseline
+$unitArgs = @('-ExecutionPolicy','Bypass','-File',"$repoRoot\scripts\gate-unit.ps1")
+if ($UnitWithChain) { $unitArgs += '-WithChain' }
+if ($UnitBaseline) { $unitArgs += @('-Baseline',$UnitBaseline) }
+& powershell @unitArgs
 $exit3 = $LASTEXITCODE
 $sw3.Stop()
 $st3 = if ($exit3 -eq 0) { 'PASS' } else { 'FAIL' }
