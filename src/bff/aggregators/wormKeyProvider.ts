@@ -11,15 +11,18 @@
  */
 
 import { randomBytes } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync,mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+// sm-crypto 无 @types，用 createRequire + 本地类型
+import { createRequire } from 'node:module';
 import { join } from 'node:path';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const smCrypto = require('sm-crypto');
-const { sm2, sm4 } = smCrypto as {
+const require = createRequire(import.meta.url);
+const smCrypto = require('sm-crypto') as {
   sm2: { generateKeyPairHex: () => { publicKey: string; privateKey: string }; doSignature: (m: string, p: string) => string; doVerifySignature: (m: string, s: string, pub: string) => boolean };
   sm4: { encrypt: (p: string, k: string, o: { mode: string; iv: string }) => string; decrypt: (c: string, k: string, o: { mode: string; iv: string }) => string };
 };
+
+const { sm2, sm4 } = smCrypto;
 
 export type KeyIdReason = 'unknown-key-id' | 'bad-signature';
 export type PurgeError = 'unknown-key-id' | 'cannot-purge-active' | 'key-in-use' | 'key-in-use-checker-not-wired';
@@ -64,6 +67,7 @@ function kekFromEnv(): string {
   // 硬边界：KEK 必须独立配置，不回落 WORM_SM4_KEY。
   // 原因：内容加密密钥(WORM_SM4_KEY)与 KEK(加密 SM2 私钥环)用途不同，
   // 同钥多用途会扩大 CBC 攻击面，且内容密钥泄露等于私钥环泄露。
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- env 空串也要回退到 ''（?? 只拦 null/undefined）
   const kek = process.env.WORM_KEK || '';
   if (!/^[0-9a-fA-F]{32}$/.test(kek)) return '';
   return kek.toLowerCase();
@@ -74,7 +78,7 @@ function kekFromEnv(): string {
 export class DemoEphemeralKeyProvider implements KeyProvider {
   readonly kind = 'demo-ephemeral' as const;
   readonly productionSafe = false;
-  private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
+  private ring: { keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }[] = [];
   private activeKey = '';
   private keyInUse: ((keyId: string) => Promise<number>) | null = null;
 
@@ -107,6 +111,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
     return this.byId(keyId)?.publicKeyHex ?? null;
   }
   verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空串 keyId 也应回退到 activeKeyId
     const kid = keyId || this.activeKeyId();
     const e = this.byId(kid);
     if (!e) return { ok: false, reason: 'unknown-key-id' };
@@ -155,7 +160,7 @@ export class DemoEphemeralKeyProvider implements KeyProvider {
 export class EnvKeyProvider implements KeyProvider {
   readonly kind = 'env' as const;
   readonly productionSafe = true;
-  private ring: Array<{ keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }> = [];
+  private ring: { keyId: string; publicKeyHex: string; privateKeyHex: string; retired?: boolean }[] = [];
   private activeKey = '';
   private keyInUse: ((keyId: string) => Promise<number>) | null = null;
 
@@ -179,6 +184,7 @@ export class EnvKeyProvider implements KeyProvider {
     return this.ring.find((r) => r.keyId === keyId)?.publicKeyHex ?? null;
   }
   verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空串 keyId 回退 activeKey
     const e = this.ring.find((r) => r.keyId === (keyId || this.activeKey));
     if (!e) return { ok: false, reason: 'unknown-key-id' };
     try {
@@ -219,7 +225,8 @@ export class FileKeyProvider implements KeyProvider {
     mkdirSync(storeDir, { recursive: true });
     if (existsSync(this.ringPath)) {
       try {
-        this.ring = JSON.parse(readFileSync(this.ringPath, 'utf8')).ring as RingEntry[];
+        const parsed = JSON.parse(readFileSync(this.ringPath, 'utf8')) as { ring?: RingEntry[] };
+        this.ring = parsed.ring ?? [];
       } catch { this.ring = []; }
     }
     if (this.ring.length === 0) {
@@ -269,6 +276,7 @@ export class FileKeyProvider implements KeyProvider {
   }
 
   verify(digestHex: string, signatureHex: string, keyId?: string): VerifyOutcome {
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空串 keyId 也应回退到 activeKeyId
     const kid = keyId || this.activeKeyId();
     const pub = this.getPublicKey(kid);
     if (!pub) return { ok: false, reason: 'unknown-key-id' };
@@ -327,6 +335,7 @@ let globalProvider: KeyProvider | null = null;
 
 export function getKeyProvider(): KeyProvider {
   if (globalProvider) return globalProvider;
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- env 空串回退默认目录
   const storeDir = process.env.WORM_STORE_DIR || join(process.cwd(), 'logs', 'worm-store');
   const NODE_ENV = process.env.NODE_ENV ?? '';
 
