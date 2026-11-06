@@ -142,3 +142,7 @@ reports/*.csv
 # 另路 consult 巡检产物（由对应任务自行收口；本主线不代提交。2026-11-06 08:23 轮误纳入后撤回）
 reports/consult-deepen/
 reports/consult-rebuild/
+# 另路 patrol 定时巡检产物（每小时槽位简报，本主线不代提交；
+# 用排除模式自动放行本批自己的 p5 切片简报，不依赖 git add -f）
+reports/patrol/*
+!reports/patrol/patrol-*-p5-*.md
