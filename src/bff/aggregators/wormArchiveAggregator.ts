@@ -341,7 +341,15 @@ function decryptEvents(rec: SegmentRecord): AuditEvent[] | null {
   try {
     const json = sm4Decrypt(rec.cipherBytes, rec.iv);
     return JSON.parse(json) as AuditEvent[];
-  } catch {
+  } catch (err) {
+    console.warn('[worm] decrypt failed', {
+      segmentId: rec.segmentId,
+      cipherLen: rec.cipherBytes?.length ?? -1,
+      ivLen: rec.iv?.length ?? -1,
+      sm4Encrypted: rec.sm4Encrypted,
+      keyLen: sm4KeyHex?.length ?? -1,
+      err: err instanceof Error ? err.message : String(err),
+    });
     return null;
   }
 }
@@ -364,7 +372,10 @@ export async function getSegment(segmentId: string): Promise<WormSegment | null>
 export async function getSegmentEvents(segmentId: string): Promise<AuditEvent[] | null> {
   if (!isValidSegmentId(segmentId)) return null;
   const r = await store().get(segmentId);
-  if (!r) return null;
+  if (!r) {
+    console.warn('[worm] getSegmentEvents: segment not found in async store', { segmentId });
+    return null;
+  }
   return decryptEvents(r);
 }
 
