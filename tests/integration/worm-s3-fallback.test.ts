@@ -1,8 +1,9 @@
 /**
  * 健澜AI原生医院操作系统OS - P5-17 S3 fallback 集成测试
  *
- * 4 个用例：
- * 1. 断网（mock put 抛错）→ 段仍能写入（layered 落 local），不 500
+ * 用例：
+ * 1. 断网（mock put 抛错）→ 当前实现直接抛错、不静默落 local（兜底未实现，见用例内注释）
+ * 1b. 自定义 prefix 下 list() 仍能解析（回归：曾写死 worm/ 导致自定义前缀 list 恒空）
  * 2. sweep 补传：恢复 mock 后 sweep() 把 local 段传到 remote，local 删除
  * 3. remote 超时 → 抛 worm-store-timeout，绝不返回 null/[]
  * 4. put 超时但 probe 命中 → 视为成功，不抛错
@@ -80,7 +81,7 @@ function freshDir(): string {
 }
 
 describe('S3 fallback 集成', () => {
-  test('1. 断网 put 抛错 → layered 仍把段落 local，不 500', async () => {
+  test('1. 断网 remote.put 抛错 → 当前实现直接抛错（不静默落 local）', async () => {
     const s3 = new MockS3();
     s3.putShouldFail = true;
     const dir = freshDir();
@@ -91,16 +92,25 @@ describe('S3 fallback 集成', () => {
     });
 
     const seg = makeSegment(1);
-    // layered.put 先 remote.put（抛错），按 P5-16 设计 remote 失败时仍应落 local
-    // 当前 layered.put 是 await remote.put 失败直接抛；这里验证 remote 层抛错被记录，
-    // 段在 local 兜底（通过 sweep 后续补传）。用例断言：错误码是 network 而非超时，
-    // 且 local 后续能读到段（断网场景下段必须不丢）。
-    // eslint-disable-next-line @typescript-eslint/await-thenable -- bun:test expect.rejects 类型
+    // 真实现状（2026-11-06 10:23 巡检实测）：layered.put 只做 remote.put，remote 失败直接向上抛，
+    // 不会自动落 local。断网兜底（remote 失败 → 写 local + pending 计数 → sweep 补传）尚未实现，
+    // 属 P5-18 待定设计项（是"宁可失败"还是"降级可用"，需要产品口径）。本用例只断言真实行为，
+    // 避免把"手动写 local"伪装成"layered 已兜底"。
+    // eslint-disable-next-line @typescript-eslint/await-thenable -- bun:test 的 rejects 需 await 才真正断言
     await expect(store.put(seg)).rejects.toThrow('network-down');
+    expect(local.get(seg.segmentId)).toBeNull();
+    expect(local.list().length).toBe(0);
+  });
 
-    // 手动写 local（模拟断网时上层走本地兜底的语义）
-    local.put(seg);
-    expect(local.get(seg.segmentId)).not.toBeNull();
+  test('1b. 自定义 prefix 下 list() 仍能解析对象（不能写死 worm/）', async () => {
+    const s3 = new MockS3();
+    const remote = new S3WormStore(s3, { bucket: 'test', prefix: 'arch/' });
+    const seg = makeSegment(1, 'k1');
+    await remote.put(seg);
+    const listed = await remote.list();
+    expect(listed.length).toBe(1);
+    expect(listed[0].segmentId).toBe(seg.segmentId);
+    expect(await remote.countBySigner('k1')).toBe(1);
   });
 
   test('2. sweep 补传 → local 删除', async () => {

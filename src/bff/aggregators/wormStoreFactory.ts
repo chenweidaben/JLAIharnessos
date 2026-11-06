@@ -52,10 +52,14 @@ export class S3WormStore implements AsyncWormStore {
   readonly kind = 's3' as const;
   private readonly bucket: string;
   private readonly prefix: string;
+  /** 由 prefix 推导的 key 解析正则（不能写死 "worm/"，否则自定义前缀下 list() 恒为空） */
+  private readonly keyRe: RegExp;
 
   constructor(private readonly s3: S3Like, opts: S3WormStoreOptions) {
     this.bucket = opts.bucket;
     this.prefix = opts.prefix ?? 'worm/';
+    const escaped = this.prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    this.keyRe = new RegExp(`^${escaped}(.+)\\.json$`);
   }
 
   private key(segmentId: string): string {
@@ -98,7 +102,7 @@ export class S3WormStore implements AsyncWormStore {
     for (const item of res.Contents ?? []) {
       const k = item.Key;
       if (!k) continue;
-      const m = /worm\/(.+)\.json$/.exec(k);
+      const m = this.keyRe.exec(k);
       if (!m) continue;
       const segId = m[1];
       const seg = await this.get(segId);

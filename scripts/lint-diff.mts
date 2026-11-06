@@ -11,8 +11,8 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync, appendFileSync, mkdirSync } from 'node:fs';
+import { execFileSync, execSync } from 'node:child_process';
+import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -63,9 +63,10 @@ const errorDetails: Array<{ file: string; line: number; message: string; rule: s
 
 for (let i = 0; i < files.length; i += batchSize) {
   const batch = files.slice(i, i + batchSize);
-  const args2 = ['node', 'node_modules/eslint/bin/eslint.js', ...batch, '-f', 'json'];
+  // 用 execFileSync 传参数数组：路径含空格/中文时不会被 shell 拆词，
+  // 否则 eslint 直接报参数错，脚本会把"跑失败"误算成 0 error（差分门禁 fail-open）。
   try {
-    const out = execSync(args2.join(' '), {
+    const out = execFileSync(process.execPath, ['node_modules/eslint/bin/eslint.js', ...batch, '-f', 'json'], {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -108,6 +109,16 @@ for (let i = 0; i < files.length; i += batchSize) {
           }
         }
       } catch { /* ignore */ }
+    } else {
+      // eslint 本身没跑起来（配置错/参数错/找不到文件）：必须算失败，
+      // 否则差分门禁会把"跑失败"当成 0 error 静默放行。
+      totalErrors++;
+      errorDetails.push({
+        file: '<eslint-run>',
+        line: 0,
+        message: (err as Error).message ?? 'eslint failed without JSON output',
+        rule: 'lint-run-failure',
+      });
     }
   }
 }
@@ -120,9 +131,14 @@ if (errorDetails.length > 0) {
   }
 }
 
-// 记录基线（全量）
+// 记录基线（每次运行一行，便于追踪差分门禁的历史走势）
 const baselineDir = resolve(root, 'logs');
 if (!existsSync(baselineDir)) mkdirSync(baselineDir, { recursive: true });
 const baselineFile = resolve(baselineDir, 'lint-baseline.jsonl');
+appendFileSync(
+  baselineFile,
+  `${JSON.stringify({ at: new Date().toISOString(), files: files.length, errors: totalErrors, warnings: totalWarnings })}\n`,
+  'utf8',
+);
 
 process.exit(totalErrors > 0 ? 1 : 0);
