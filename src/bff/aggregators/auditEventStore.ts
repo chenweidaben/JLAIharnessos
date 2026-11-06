@@ -164,6 +164,7 @@ function rowFromDb(r: EventsRow): AuditEvent {
 export class PgAuditStore implements AuditEventStore {
   readonly kind = 'pg' as const;
   private readonly qualifiedTable: ReturnType<PgSql>;
+  private readonly lockKey: string;
   constructor(private readonly sql: SqlExecutor, schema?: string) {
     // P5-20: AUDIT_DB_SCHEMA 隔离（默认 'audit'，E2E 用 'audit_e2e'）
     const s = schema ?? process.env.AUDIT_DB_SCHEMA ?? 'audit';
@@ -172,6 +173,8 @@ export class PgAuditStore implements AuditEventStore {
     }
     // 白名单已校验，安全内联为标识符
     this.qualifiedTable = (this.sql as any).unsafe(`"${s}"."events"`) as ReturnType<PgSql>;
+    // P5-20 第二步：lock key 参数化，两 schema 不互相阻塞
+    this.lockKey = `audit_events_seq_${s}`;
   }
 
   async append(evt: AuditEvent): Promise<AppendResult> {
@@ -181,7 +184,7 @@ export class PgAuditStore implements AuditEventStore {
       let assignedSeq = 0;
       await this.sql.begin(async (tx) => {
         const rows = await tx<{ seq: string | number }>`
-          WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
+          WITH lock AS (SELECT pg_advisory_xact_lock(hashtext(${this.lockKey}))),
                nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM ${this.qualifiedTable}, lock)
           INSERT INTO ${this.qualifiedTable}
             (seq, event_id, occurred_at, actor_id, actor_role, action, module,

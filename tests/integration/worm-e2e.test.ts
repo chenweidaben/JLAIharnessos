@@ -351,7 +351,7 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     }
     // P5-20 debug: dump store/info + search
     const info = await call('GET','/api/v1/worm/store/info',{token:admin});
-    console.log('[P5-6-dump] store/info:', JSON.stringify({segmentCount: info.data.segmentCount, oldestSeq: info.data.oldestSeq, newestSeq: info.data.newestSeq}));
+    console.log('[P5-6-dump] store/info:', JSON.stringify({segmentCount: info.data.segmentCount, oldestSeq: (info.data as any).oldestSeq, newestSeq: (info.data as any).newestSeq}));
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     console.log('[P5-6-dump] search:', JSON.stringify({total: r.data.total, scanned: r.data.scannedSegments, rowsLen: r.data.rows?.length}));
     // P5-20 debug: dump first segment details
