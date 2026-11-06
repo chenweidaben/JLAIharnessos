@@ -138,3 +138,7 @@ reports/*.csv
 !services/radar-inference/app/data/**
 
 .eslintcache
+
+# 另路 consult 巡检产物（由对应任务自行收口；本主线不代提交。2026-11-06 08:23 轮误纳入后撤回）
+reports/consult-deepen/
+reports/consult-rebuild/

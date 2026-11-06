@@ -1,1 +1,0 @@
-STATIC_WALL=155s

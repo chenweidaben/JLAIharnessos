@@ -1,6 +1,0 @@
-﻿DELIVERY_FILES_SCANNED=72
-LEGACY_ASCII_TOTAL_HITS=0
-REAL_TOKEN_HITS=0
-LEGACY_CN_TOTAL_HITS=0
-BRAND_TOTAL_HITS=20
-BRAND_BREAKDOWN: 01-requirements.md=3; 02-architecture.md=1; 03-contract.md=1; 04-data-model.md=1; 05-state-machine.md=1; 06-test-strategy.md=1; 07-milestone-m86.md=2; 08-adr.md=1; 09-permission-matrix.md=1; 10-fmea.md=1; 11-test-coverage-matrix.md=1; 12-runbook.md=1; 13-contract-reconciliation.md=1; README.md=2; demoSeed.ts=1; ddlSchema.test.ts=1
