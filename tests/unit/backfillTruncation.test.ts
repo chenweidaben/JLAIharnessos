@@ -7,15 +7,26 @@ import { afterEach, describe, expect, test } from 'bun:test';
 import { MemoryAuditStore, __resetAuditStore } from '../../src/bff/aggregators/auditEventStore.js';
 import {
   backfillPending, __resetSealDisabled, __sealDisabled,
+  type AuditEvent,
 } from '../../src/bff/aggregators/auditEventAggregator.js';
 
-function fakeEvent(seq: number) {
+function fakeEvent(seq: number): AuditEvent {
   return {
-    seq, occurredAt: '2026-01-01T00:00:00Z', actorId: 'zhangmou', actorRole: 'doctor',
-    action: 'create', module: 'emr', resourceType: 'note', resourceId: `n-${seq}`,
-    patientId: 'p1', result: 'success', ip: '1.1.1.1', userAgent: 'ua',
-    prevHash: '0'.repeat(64), hash: 'a'.repeat(64),
-  } as any;
+    seq,
+    occurredAt: '2026-01-01T00:00:00Z',
+    actorId: 'zhangmou',
+    actorRole: 'doctor',
+    action: 'create',
+    module: 'emr',
+    resourceType: 'note',
+    resourceId: `n-${seq}`,
+    patientId: 'p1',
+    result: 'success',
+    ip: '1.1.1.1',
+    userAgent: 'ua',
+    prevHash: '0'.repeat(64),
+    hash: 'a'.repeat(64),
+  } as AuditEvent;
 }
 
 afterEach(() => {
@@ -45,14 +56,16 @@ describe('backfillPending fail-closed', () => {
     expect(r.truncated).toBe(true);
     expect(r.filled).toBe(1000);
     expect(r.total).toBe(1050);
-    expect(__sealDisabled()).not.toBeNull();
-    expect(__sealDisabled()!.reason).toBe('audit-backfill-truncated');
+    const d = __sealDisabled();
+    expect(d).not.toBeNull();
+    expect(d!.reason).toBe('audit-backfill-truncated');
   });
 
   test('AUDIT_BACKFILL_LIMIT 非法值抛错', async () => {
     process.env.AUDIT_BACKFILL_LIMIT = 'not-a-number';
     const store = new MemoryAuditStore();
     __resetAuditStore(store);
+    // eslint-disable-next-line @typescript-eslint/await-thenable -- bun:test expect().rejects 类型不是 Promise
     await expect(backfillPending(0)).rejects.toThrow(/AUDIT_BACKFILL_LIMIT/);
   });
 
@@ -67,4 +80,3 @@ describe('backfillPending fail-closed', () => {
     expect(__sealDisabled()).toBeNull();
   });
 });
-

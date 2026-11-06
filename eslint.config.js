@@ -170,10 +170,32 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
   },
 
-  // scripts/**：三个 P5-15 脚本已加入根 tsconfig include，走全局 projectService 类型感知。
-  // 开 no-floating-promises 防止 async 化后脚本层漏 await；其余 type-checked 规则对脚本过于严格，关闭。
+  // scripts/**/*.cjs / *.mjs：CommonJS/ESM JS 脚本，不在 tsconfig program 里，走无类型感知规则集
   {
-    files: ['scripts/verify-fs-backend.mts', 'scripts/verify-keyops-concurrency.mts', 'scripts/cleanup-keyops.mts'],
+    files: ['scripts/**/*.cjs', 'scripts/**/*.mjs'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: null,
+      },
+    },
+    rules: {
+      ...tseslint.configs.disableTypeChecked.rules,
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+    },
+  },
+
+  // scripts/**：走独立 scripts/tsconfig.json（glob 覆盖全量脚本，不污染根 tsconfig）。
+  // 开 no-floating-promises 防漏 await；其余 type-checked 规则对脚本历史代码过于严格，关闭。
+  {
+    files: ['scripts/**/*.ts', 'scripts/**/*.mts'],
+    languageOptions: {
+      parserOptions: {
+        project: './scripts/tsconfig.json',
+        projectService: false,
+      },
+    },
     rules: {
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unused-vars': [
@@ -212,6 +234,10 @@ export default tseslint.config(
       'dot-notation': 'off',
       '@typescript-eslint/dot-notation': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      'no-empty': 'off',
     },
   },
 

@@ -87,7 +87,7 @@ export function createSemaphore(maxInFlight: number): {
   inflight(): number;
 } {
   let active = 0;
-  const waiters: Array<() => void> = [];
+  const waiters: (() => void)[] = [];
   return {
     acquire() {
       return new Promise<() => void>((resolve) => {
