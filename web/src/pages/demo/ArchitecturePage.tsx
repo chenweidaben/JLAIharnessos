@@ -146,7 +146,7 @@ export default function ArchitecturePage() {
               </h3>
               <ul className="m-0 list-none space-y-2 p-0 text-sm text-[#3A4B66]">
                 <li>· HIS / EMR / LIS / PACS 标准适配器</li>
-                <li>· 4 大厂商骨架：东华 / 创业 / 联众 / 智业</li>
+                <li>· 4 大厂商骨架：HIS厂商B / C / D / E</li>
                 <li>· 16 种 HL7 消息类型</li>
                 <li>· 22 种 FHIR 资源模型</li>
                 <li>· 企业级消息总线，削峰填谷</li>

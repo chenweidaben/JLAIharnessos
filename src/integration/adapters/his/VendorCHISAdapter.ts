@@ -81,14 +81,14 @@ export class VendorCHISAdapter extends BaseAdapter implements HISAdapter {
       version: config.version ?? 'v8.0',
       name: config.name ?? 'HIS厂商C适配器',
       description: '对接HIS厂商C系统',
-      endpoint: config.endpoint ?? 'https://his-api.hospital.com/dhc',
+      endpoint: config.endpoint ?? 'https://his-api.hospital.com/vendor-c',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
       auth: {
         type: 'oauth2',
         clientId: config.appId,
         clientSecret: config.appSecret,
-        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/dhc'}/oauth2/token`,
+        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/vendor-c'}/oauth2/token`,
         ...config.auth,
       },
       fieldMapping: {
