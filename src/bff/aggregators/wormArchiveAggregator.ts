@@ -340,6 +340,7 @@ export async function seal(input: SealInput = {}): Promise<SealResult> {
 function decryptEvents(rec: SegmentRecord): AuditEvent[] | null {
   try {
     const json = sm4Decrypt(rec.cipherBytes, rec.iv);
+    console.warn('[worm] decrypt ok', { segmentId: rec.segmentId, plainLen: json.length, head: json.slice(0, 60) });
     return JSON.parse(json) as AuditEvent[];
   } catch (err) {
     console.warn('[worm] decrypt failed', {
@@ -373,7 +374,15 @@ export async function getSegmentEvents(segmentId: string): Promise<AuditEvent[] 
   if (!isValidSegmentId(segmentId)) return null;
   const r = await store().get(segmentId);
   if (!r) {
-    console.warn('[worm] getSegmentEvents: segment not found in async store', { segmentId });
+    // P5-20 debug: 对比 sync store 能否找到
+    const syncStore = getWormStore();
+    const syncHit = syncStore.get(segmentId);
+    console.warn('[worm] getSegmentEvents: async store miss, sync store', {
+      segmentId,
+      asyncNull: true,
+      syncFound: !!syncHit,
+      syncCount: syncStore.count(),
+    });
     return null;
   }
   return decryptEvents(r);

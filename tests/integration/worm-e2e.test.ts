@@ -275,7 +275,7 @@ describe('P5-5 store/info + seqContinuity + 路径穿越', () => {
   it('GET /store/info 返 kind 非空与 segmentCount≥1', async () => {
     const r = await call('GET','/api/v1/worm/store/info',{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(['memory','fs','s3']).toContain(r.data.kind);
+    expect(['memory','fs','s3']).toContain((r.data as any).kind);
     expect(r.data.segmentCount).toBeGreaterThanOrEqual(1);
   });
   it('verify?scope=real 返 seqContinuity 对象', async () => {
