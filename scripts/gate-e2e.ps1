@@ -77,6 +77,16 @@ Write-Host "=== result ==="
 Write-Host "actual:  $pass / $fail / $expect"
 Write-Host "expected: $expPass / $expFail / $expExpect"
 
+# Distinguish dependency outage from a genuine assertion regression:
+# when the DB is unreachable the BFF cannot start, BASE stays null and every
+# case fails with the same setup error. That is an environment failure, not a
+# test-signal failure, and must be reported as such (still exit 1).
+$e2eLogText = [IO.File]::ReadAllText($logFile)
+if ($LASTEXITCODE -ne 0 -and $e2eLogText -match "ECONNREFUSED|Failed to connect") {
+  Write-Host "ERROR: dependency unavailable - PostgreSQL unreachable (not a test-assertion regression)"
+  exit 1
+}
+
 # Check port 8081 no leftover
 Start-Sleep -Seconds 2
 $portCheck = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue
