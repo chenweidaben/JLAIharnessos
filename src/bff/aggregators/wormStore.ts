@@ -87,6 +87,15 @@ export class MemoryWormStore implements WormStore {
     this.map.clear();
     this.bySigner.clear();
   }
+  delete(segmentId: string): void {
+    const seg = this.map.get(segmentId);
+    if (!seg) return;
+    this.map.delete(segmentId);
+    const k = seg.signerKeyId ?? '';
+    const n = (this.bySigner.get(k) ?? 0) - 1;
+    if (n <= 0) this.bySigner.delete(k);
+    else this.bySigner.set(k, n);
+  }
 }
 
 export class FileWormStore implements WormStore {
