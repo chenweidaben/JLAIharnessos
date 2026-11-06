@@ -54,13 +54,12 @@ const doctor = sign(['doctor'], '医生', `doc-${SALT}`);
 let keyringBefore: string[] = [];
 
 interface KeysResponse { keySource?: string; signerKeyId?: string }
+interface VerifyResponse { valid?: boolean; errors?: Array<{ code?: string; segmentId?: string; message?: string }> }
 
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
   // P5-14 前置条件：KeyProvider 必须是可轮换的（file / demo-ephemeral），不能是 env。
-  // env 模式按设计不支持 rotate（worm-env-rotate-not-supported），purge 会走 cannot-purge-active，
-  // 9 条用例会散落失败。这里直接抛错，把 9 条红灯收敛成 1 条前置条件失败。
   const ks = await call('GET','/api/v1/worm/keys',{token:admin});
   const ksData = ks.data as KeysResponse | null;
   if (ksData?.keySource === 'env') {
@@ -70,9 +69,6 @@ beforeAll(async () => {
       + '请用未设置 WORM_SM2_* 的 BFF 环境运行本 E2E。'
     );
   }
-  // P5-17 前置自检：当前 active signerKeyId 必须存在。
-  // 同进程重复跑时，purge 会把上一轮 seal 用的 key 移出验签环，导致 verify 永久 broken。
-  // 把这条收敛成 1 条前置失败，而不是 6 条散乱红。
   if (!ksData?.signerKeyId) {
     throw new Error(
       'E2E 前置条件不满足：当前 BFF 的 keyring 不含 active signer key（可能已跑过多轮 purge）。'
@@ -80,6 +76,22 @@ beforeAll(async () => {
     );
   }
   keyringBefore = [ksData.signerKeyId];
+
+  // P5-17 关键前置：跑 /verify?scope=all，要求 valid=true。
+  // 真正的假红机制不是 active key 缺失，而是历史段用的旧 key 被 purge 出环 → verify 报
+  // unknown-key-id / signerKeyId-not-in-ring → valid=false。直接把这个状态收敛成 1 条前置失败，
+  // 而不是让 seal/rotate/verify 用例散成 6 条红。
+  const v = await call('GET','/api/v1/worm/verify?scope=all',{token:admin});
+  const vData = v.data as VerifyResponse | null;
+  if (vData && vData.valid === false) {
+    const firstErr = vData.errors?.[0];
+    throw new Error(
+      `E2E 前置条件不满足：当前 BFF 的 WORM 链 verify=${vData.valid}`
+      + (firstErr ? `（首个错误: code=${firstErr.code ?? '?'} seg=${firstErr.segmentId ?? '?'} msg=${firstErr.message ?? '?'}）` : '')
+      + '。同进程已跑过多轮 purge/rotate，历史段的签名 key 已不在 keyring 环内。请重启 BFF 后重跑。'
+    );
+  }
+
   // 每轮开始前清探针
   await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
 });
