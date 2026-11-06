@@ -532,7 +532,7 @@ export default function LoginPage() {
             <>
               <Tabs items={items} centered activeKey={activeTab} onChange={setActiveTab} />
               <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: '#8c8c8c' }}>
-                演示账号：admin / 任意 6 位以上密码；验证码请按右侧图形输入（不区分大小写）
+                演示账号：admin / Demo@Admin1（管理员）；验证码请按右侧图形输入（不区分大小写）
               </div>
             </>
           )}

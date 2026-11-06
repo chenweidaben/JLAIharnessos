@@ -102,6 +102,7 @@ function demoPwHash(password: string): Buffer {
 }
 /** username -> 明文口令（仅演示种子，生产无此表） */
 const DEMO_CREDENTIALS: Record<string, string> = {
+  'admin': 'Demo@Admin1', // 登录页预填的演示账号，与 demo-admin 同口令同权限
   'demo-doctor': 'Demo@Doctor1',
   'demo-nurse': 'Demo@Nurse1',
   'demo-pharmacist': 'Demo@Pharma1',
