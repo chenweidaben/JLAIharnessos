@@ -11,6 +11,8 @@
  * - --up 前必须 --check 通过
  * - --rollback 前 consult 表数必须 = 6
  * - 端口从 PORT/HTTP_PORT env 读，不写死
+ * - 入口固定 src/bff/server.ts（不是 src/bff/index.ts：后者只是 re-export 壳，
+ *   起进程会落到 server.ts 的默认端口，容易和 8080 撞车）
  */
 import postgres from 'postgres';
 import { spawn } from 'node:child_process';
@@ -77,7 +79,7 @@ async function up(): Promise<boolean> {
   }
   const port = PORT;
   console.log(`启动 BFF on ${port} (DEMO_MODE=0, AUDIT_STORE=pg)`);
-  const child = spawn(process.execPath, ['run', 'src/bff/index.ts'], {
+  const child = spawn(process.execPath, ['run', 'src/bff/server.ts'], {
     env: {
       ...process.env,
       DEMO_MODE: '0',
