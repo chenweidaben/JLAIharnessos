@@ -1,4 +1,4 @@
-# scripts/gate-unit.ps1 - P5 WORM+audit unit test gate
+﻿# scripts/gate-unit.ps1 - P5 WORM+audit unit test gate (PowerShell 5.1 safe, English strings)
 # Usage: .\scripts\gate-unit.ps1 [-Baseline "181/0/512"]
 # Output: logs/gate-unit-<timestamp>.log
 # Exit: 0=pass, 1=fail
@@ -42,6 +42,20 @@ if ($missing.Count -gt 0) {
   exit 1
 }
 
+# Resolve bun path: PATH then fallback
+$bunExe = $null
+$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
+if ($cmdBun) { $bunExe = $cmdBun.Source }
+if (-not $bunExe) {
+  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
+  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
+}
+if (-not $bunExe) {
+  Write-Host "FAIL: bun not found in PATH or fallback"
+  exit 1
+}
+Write-Host "bun: $bunExe"
+
 # Parse baseline
 $parts = $Baseline -split '/'
 if ($parts.Count -ne 3) { Write-Host "FAIL: bad baseline: $Baseline"; exit 1 }
@@ -53,28 +67,14 @@ Write-Host "=== gate-unit: $($files.Count) files ==="
 Write-Host "baseline: $expPass / $expFail / $expExpect"
 Write-Host "log: $logFile"
 
-# 解析 bun 绝对路径：本机 PATH 未注册 bun，不能依赖 `bun` 能被解析
-$bunExe = $null
-$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
-if ($cmdBun) { $bunExe = $cmdBun.Source }
-if (-not $bunExe) {
-  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
-  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
-}
-if (-not $bunExe) {
-  Write-Host "FAIL: bun 未找到（PATH 与 %USERPROFILE%\.bun\bin\bun.exe 均不可用）"
-  exit 1
-}
-Write-Host "bun: $bunExe"
-
-# 直接调用 exe 并以 *> 重定向全部流到日志（不经过 cmd，避免引号与 PATH 问题）
+# Run bun test directly, redirect all streams
 $bunArgs = @('test') + $files
 & $bunExe @bunArgs *> $logFile
 Write-Host "bun exit=$LASTEXITCODE"
 
 # Parse summary lines from log
 $pass = -1; $fail = -1; $expect = -1
-foreach ($line in [System.IO.File]::ReadAllLines($logFile)) {
+foreach ($line in [System.IO.File]::ReadAllLines($logFile, [Text.Encoding]::UTF8)) {
   if ($line -match '^\s+(\d+)\s+pass\s*$') { $pass = [int]$Matches[1] }
   elseif ($line -match '^\s+(\d+)\s+fail\s*$') { $fail = [int]$Matches[1] }
   elseif ($line -match '^\s+(\d+)\s+expect\(\)\s*calls\s*$') { $expect = [int]$Matches[1] }

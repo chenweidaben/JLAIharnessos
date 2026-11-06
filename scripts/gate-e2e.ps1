@@ -1,4 +1,4 @@
-# scripts/gate-e2e.ps1 - P5 WORM E2E gate
+﻿# scripts/gate-e2e.ps1 - P5 WORM E2E gate (PowerShell 5.1 safe, English strings)
 # Usage: .\scripts\gate-e2e.ps1 [-Baseline "23/0/83"]
 # Output: logs/gate-e2e-<timestamp>.log
 # Exit: 0=pass, 1=fail
@@ -13,6 +13,19 @@ Set-Location $repoRoot
 
 $ts = Get-Date -Format 'yyyyMMdd-HHmmss'
 $logFile = Join-Path $repoRoot "logs\gate-e2e-$ts.log"
+
+# Resolve bun path
+$bunExe = $null
+$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
+if ($cmdBun) { $bunExe = $cmdBun.Source }
+if (-not $bunExe) {
+  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
+  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
+}
+if (-not $bunExe) {
+  Write-Host "FAIL: bun not found"
+  exit 1
+}
 
 # Parse baseline
 $parts = $Baseline -split '/'
@@ -35,6 +48,7 @@ Write-Host "=== gate-e2e ==="
 Write-Host "baseline: $expPass / $expFail / $expExpect"
 Write-Host "log: $logFile"
 Write-Host "DATABASE_URL len=$($dbUrl.Length)"
+Write-Host "bun: $bunExe"
 
 # Set env for E2E
 $env:PORT = '8081'
@@ -45,35 +59,18 @@ $env:AUDIT_DB_SCHEMA = 'audit_e2e'
 $env:WORM_BACKEND = 'memory'
 $env:AUDIT_BACKFILL_LIMIT = '3000'
 $env:DATABASE_URL = $dbUrl
-# 不再内联 JWT_SECRET：bun 会自动加载 .env，脚本里硬编码密钥常量没有必要且有泄露面
 
-# 解析 bun 绝对路径：本机 PATH 未注册 bun
-$bunExe = $null
-$cmdBun = Get-Command bun -ErrorAction SilentlyContinue
-if ($cmdBun) { $bunExe = $cmdBun.Source }
-if (-not $bunExe) {
-  $cand = Join-Path $env:USERPROFILE '.bun\bin\bun.exe'
-  if (Test-Path -LiteralPath $cand) { $bunExe = $cand }
-}
-if (-not $bunExe) {
-  Write-Host "FAIL: bun 未找到（PATH 与 %USERPROFILE%\.bun\bin\bun.exe 均不可用）"
-  exit 1
-}
-Write-Host "bun: $bunExe"
-
-# 直接调用 exe 并以 *> 重定向全部流到日志；不裸管道接 bun test
-& $bunExe test './tests/integration/worm-e2e.test.ts' *> $logFile
+# Run E2E
+& $bunExe test ./tests/integration/worm-e2e.test.ts *> $logFile
 Write-Host "bun exit=$LASTEXITCODE"
 
 # Parse summary lines
 $pass = -1; $fail = -1; $expect = -1
-foreach ($line in [System.IO.File]::ReadAllLines($logFile)) {
+foreach ($line in [System.IO.File]::ReadAllLines($logFile, [Text.Encoding]::UTF8)) {
   if ($line -match '^\s+(\d+)\s+pass\s*$') { $pass = [int]$Matches[1] }
   elseif ($line -match '^\s+(\d+)\s+fail\s*$') { $fail = [int]$Matches[1] }
   elseif ($line -match '^\s+(\d+)\s+expect\(\)\s*calls\s*$') { $expect = [int]$Matches[1] }
 }
-
-if ($pass -lt 0) { Write-Host "FAIL: could not parse pass count from log（用例可能根本没跑起来）"; exit 1 }
 
 Write-Host ""
 Write-Host "=== result ==="
@@ -87,7 +84,7 @@ if ($portCheck) {
   Write-Host "FAIL: port 8081 still listening (PID $($portCheck.OwningProcess -join ','))"
   exit 1
 } else {
-  Write-Host "port 8081: clean (no listener)"
+  Write-Host "port 8081: clean"
 }
 
 if ($pass -eq $expPass -and $fail -eq $expFail -and $expect -eq $expExpect) {
