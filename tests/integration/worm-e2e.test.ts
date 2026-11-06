@@ -272,10 +272,10 @@ describe('doctor 越权 + 404', () => {
 });
 
 describe('P5-5 store/info + seqContinuity + 路径穿越', () => {
-  it('GET /store/info 返 kind=memory 与 segmentCount≥1', async () => {
+  it('GET /store/info 返 kind 非空与 segmentCount≥1', async () => {
     const r = await call('GET','/api/v1/worm/store/info',{token:admin});
     expect(r.httpStatus).toBe(200);
-    expect(r.data.kind).toBe('memory');
+    expect(['memory','fs','s3']).toContain(r.data.kind);
     expect(r.data.segmentCount).toBeGreaterThanOrEqual(1);
   });
   it('verify?scope=real 返 seqContinuity 对象', async () => {
@@ -349,7 +349,11 @@ describe('P5-6 自动调度 + 跨段检索', () => {
         throw new Error(`[P5-6] segmentCount 始终为 0，trace=${JSON.stringify(trace)}`);
       }
     }
+    // P5-20 debug: dump store/info + search
+    const info = await call('GET','/api/v1/worm/store/info',{token:admin});
+    console.log('[P5-6-dump] store/info:', JSON.stringify({segmentCount: info.data.segmentCount, oldestSeq: info.data.oldestSeq, newestSeq: info.data.newestSeq}));
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
+    console.log('[P5-6-dump] search:', JSON.stringify({total: r.data.total, scanned: r.data.scannedSegments, rowsLen: r.data.rows?.length}));
     expect(r.httpStatus).toBe(200);
     expect(r.data.total).toBeGreaterThanOrEqual(1);
     expect(r.data.scannedSegments).toBeGreaterThanOrEqual(1);

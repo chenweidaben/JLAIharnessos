@@ -33,12 +33,25 @@ function assertSafeSchema(schema: string): void {
 
 export async function setupSchema(): Promise<void> {
   assertSafeSchema(SCHEMA);
+  // P5-20: 清空 fs WORM 存储目录，避免跨轮状态泄漏
+  const wormDir = path.join(REPO_ROOT, 'logs', 'worm-store-e2e');
+  fs.rmSync(wormDir, { recursive: true, force: true });
   const sql = postgres(DATABASE_URL, { max: 1 });
   await sql.unsafe(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
   await sql.unsafe(`CREATE SCHEMA ${SCHEMA}`);
   const ddl = fs.readFileSync(DDL_FILE, 'utf8');
   for (const stmt of ddl.split(';').map(s => s.trim()).filter(s => s && !s.startsWith('--'))) {
     try { await sql.unsafe(stmt); } catch (e) { /* ignore idempotent notices */ }
+  }
+  // P5-20: 播种 3 条 audit 事件，让 BFF 启动时 backfillPending 能取出事件
+  // 否则 WORM seal 会出空段，P5-6 search total=0
+  const now = new Date().toISOString();
+  for (let i = 1; i <= 3; i++) {
+    await sql.unsafe(
+      `INSERT INTO ${SCHEMA}.events (seq, event_id, occurred_at, actor_id, actor_role, action, module, resource_type, resource_id, patient_id, result, ip, user_agent, prev_hash, hash)
+       VALUES ($1, gen_random_uuid(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      [i, now, `seed-admin-${i}`, 'admin', 'seed', 'worm-e2e', 'test', `seed-${i}`, null, 'success', '127.0.0.1', 'e2e-seed', `prev-${i}`, `hash-${i}`]
+    );
   }
   await sql.end();
 }
@@ -61,7 +74,8 @@ export async function startBff(): Promise<BffHandle> {
         DEMO_MODE: '1',
         AUDIT_STORE: 'pg',
         AUDIT_DB_SCHEMA: SCHEMA,
-        WORM_BACKEND: 'memory',
+        WORM_BACKEND: 'fs',
+        WORM_STORE_DIR: path.join(REPO_ROOT, 'logs', 'worm-store-e2e'),
         AUDIT_BACKFILL_LIMIT: '3000',
         DATABASE_URL,
       },
