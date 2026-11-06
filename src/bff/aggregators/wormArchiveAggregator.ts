@@ -15,10 +15,10 @@ import {
 import { getWormBackendInfo, getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
 
-// sm-crypto 真国密
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const smCrypto = require('sm-crypto');
-const { sm3, sm4, sm2 } = smCrypto as {
+// sm-crypto 真国密（无 @types，用 createRequire + 本地类型声明）
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const smCrypto = require('sm-crypto') as {
   sm3: (msg: string) => string;
   sm4: {
     encrypt: (plain: string, key: string, opts: { mode: string; iv: string }) => string;
@@ -30,6 +30,7 @@ const { sm3, sm4, sm2 } = smCrypto as {
     doVerifySignature: (msg: string, sig: string, publicKey: string) => boolean;
   };
 };
+const { sm3, sm4, sm2 } = smCrypto;
 
 export interface WormSegment {
   segmentId: string;
@@ -54,7 +55,7 @@ export interface WormSegment {
   keySource: 'env' | 'demo-ephemeral';
 }
 
-interface SegmentRecord extends WormSegment {}
+type SegmentRecord = WormSegment;
 
 interface ProbeRecord {
   probeId: string;
@@ -275,8 +276,14 @@ export async function seal(input: SealInput = {}): Promise<SealResult> {
 
   const all = getPendingEvents().sort((a, b) => a.seq - b.seq);
   let pending = all.filter((e) => e.seq > lastArchivedSeq);
-  if (input.from) pending = pending.filter((e) => e.occurredAt >= (input.from as string));
-  if (input.to) pending = pending.filter((e) => e.occurredAt <= (input.to as string));
+  if (input.from) {
+    const from: string = input.from;
+    pending = pending.filter((e) => e.occurredAt >= from);
+  }
+  if (input.to) {
+    const to: string = input.to;
+    pending = pending.filter((e) => e.occurredAt <= to);
+  }
   if (pending.length === 0) return { ok: false, error: 'no-events' };
 
   const expectedSeq = lastArchivedSeq + 1;
@@ -636,8 +643,9 @@ export function __resetStore(): void {
   // Memory store：清空；File store：由单测指定临时目录，不删磁盘文件
   const s = getWormStore();
   if (s.kind === 'memory') {
-    // @ts-expect-error 清 map
-    s.__clear?.();
+    // 清 map：memory store 内部 __clear 方法（本地扩展，非公开接口）
+    const mem = s as unknown as { __clear?: () => void };
+    mem.__clear?.();
   }
   _asyncStore = null;
   probes.clear();
