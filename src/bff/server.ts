@@ -6912,12 +6912,18 @@ async function handleFetch(
   if (url.pathname === '/ready' && req.method === 'GET') {
     let wormBackend = 'unknown';
     let wormStoreDir = '';
+    let wormS3Client = 'none';
     let auditStore = 'unknown';
     try {
       const wm = await import('./aggregators/wormStore');
       const wInfo = wm.getWormBackendInfo();
       wormBackend = wInfo.backend;
       wormStoreDir = wInfo.dir;
+      if (wInfo.backend === 's3') {
+        // P5-17 口径：装配是 s3，但 client 可能是 unsigned-fetch（未接 SigV4，真实 S3 会 403）。
+        // 由调用方通过 opts.s3 注入 @aws-sdk/client-s3 时改成 'aws-sdk'。
+        wormS3Client = process.env.WORM_S3_CLIENT ?? 'unsigned-fetch';
+      }
     } catch { /* ignore */ }
     try {
       const am = await import('./aggregators/auditEventStore');
@@ -6933,6 +6939,7 @@ async function handleFetch(
     const body = {
       status: 'ok',
       wormBackend,
+      wormS3Client,
       wormStoreDir,
       auditStore,
       sealDisabled,

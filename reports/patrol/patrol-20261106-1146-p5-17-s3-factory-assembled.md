@@ -1,4 +1,4 @@
-# P5-17 巡检简报（续作）：S3 真接线、E2E lint 真清、两轮自证
+# P5-17 巡检简报（续作）：S3 工厂装配、E2E lint 真清、两轮自证
 
 - 时间：2026-11-06 11:46
 - 分支：`consult-agent-m86`
@@ -6,7 +6,16 @@
 
 ---
 
-## 1. S3 接线去伪装（重要修正）
+## 1. S3 工厂装配（口径修正：不是"已可用"）
+
+### 准确状态
+**启动装配已接入 `createWormStore`，S3 client 为未签名的 fetch 实现，对接真实 S3 需补 SigV4（P5-18）。**
+
+当前 `/ready` 返回：
+- `wormBackend=s3`（装配是 s3）
+- `wormS3Client=unsigned-fetch`（client 未签名，真实 S3 会 403）
+
+文件头已标注 `NOT PRODUCTION READY — no SigV4 signing`。
 
 ### 上一批的问题
 上一批我报"已接线"，实际是：
@@ -18,11 +27,12 @@
 - `getWormStore()` s3 模式**直接 throw**（不再返回 Memory shim）
 - `storeInfo()` s3 模式走 async `store()`（layered(S3, fs)），与写路径同一套
 - `__resetStore()` s3 模式 throw（避免清 local 但忘清 S3）
-- 工厂 minimal S3 client 改成**真 fetch**（PUT/GET/HEAD/LIST/DELETE 都真发 HTTP），端点不可达时调用抛网络错，由 resilience 超时 + probe 兜底
+- 工厂 minimal S3 client 改成**真 fetch**（PUT/GET/HEAD/LIST/DELETE 都真发 HTTP），但**没有 SigV4 签名**，真实端点会 403
 - `S3Like.getObject` 允许返回 null（404）
 
-### 自证判据
-- `/ready` 报 s3 → seal 写进去的段，`GET /segments` 必须能列出来（读写同源）
+### 自证判据（集成测试）
+- 新增用例：`createWormStore({backend:'s3', s3: mockS3})` → `put(seg)` → `list()` 能列出该段 → `get(segId)` 返回一致
+- 证明读写同源（不再是 Memory shim）
 - 不再用"Memory shim + warning"这种中间态
 
 ---

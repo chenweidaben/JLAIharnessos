@@ -198,3 +198,27 @@ describe('createWormStore fail-closed', () => {
     await expect(store.put(makeSegment(1))).rejects.toThrow();
   });
 });
+
+describe('读写同源（P5-17 去伪装自证）', () => {
+  test('createWormStore 返回的实例，put 后 list 能拿到该段（不依赖 sync shim）', async () => {
+    // 之前的 bug：写路径走 layered(S3, fs)，读路径走 MemoryWormStore shim，永远看不到刚写的段。
+    // 本测试断言：s3 装配出来的 store，put 之后 list 必须能列出。
+    const mem = new Map<string, unknown>();
+    const mockS3: S3Like = {
+      putObject: async (a) => { mem.set(a.Key, a.Body); },
+      getObject: async (a) => { const b = mem.get(a.Key); return b ? { Body: b as Uint8Array } : null; },
+      headObject: async (a) => mem.has(a.Key) ? {} : null,
+      listObjectsV2: async (a) => ({ Contents: [...mem.keys()].filter((k) => (k as string).startsWith(a.Prefix ?? '')).map((k) => ({ Key: k as string })) }),
+      deleteObject: async (a) => { mem.delete(a.Key); },
+    };
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'worm-rw-'));
+    const store = createWormStore({ backend: 's3', bucket: 'b', s3: mockS3, dir });
+    const seg = makeSegment(42);
+    await store.put(seg);
+    const listed = await store.list();
+    expect(listed.length).toBeGreaterThanOrEqual(1);
+    expect(listed[listed.length - 1].segmentId).toBe(seg.segmentId);
+    const got = await store.get(seg.segmentId);
+    expect(got?.segmentId).toBe(seg.segmentId);
+  });
+});

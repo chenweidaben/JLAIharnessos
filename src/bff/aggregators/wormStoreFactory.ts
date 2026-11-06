@@ -178,12 +178,15 @@ export function createWormStore(opts: WormStoreFactoryOptions = {}): ResilientWo
 
 /**
  * 最小 S3 client：基于 fetch，不依赖 @aws-sdk。
- * 从 env 读 S3_ENDPOINT / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY。
- * 启动时不发起网络请求，只在首次 put/get/list 时连。端点不可达在调用时抛错，
- * 由 resilience 层的超时 + probe 兜底处理。
  *
- * 注意：SigV4 签名在 P5-18 接入 @aws-sdk/client-s3 时替换；当前用匿名/路径风格请求，
- * 仅在 dev/MinIO 本地环境可用。production 必须传 opts.s3 注入真实 client。
+ * !!! NOT PRODUCTION READY — no SigV4 signing !!!
+ * 没有 SigV4 签名，对接真实 S3 端点会返 403。本实现仅用于：
+ * - 本地 MinIO 匿名开发
+ * - 集成测试装配验证
+ * - /ready 报 s3 装配状态（不等价于 s3 可用）
+ *
+ * 生产部署必须通过 opts.s3 注入 @aws-sdk/client-s3 实例（带 SigV4）。
+ * P5-18 任务：把 createMinimalS3Client 替换为 @aws-sdk/client-s3 工厂。
  */
 function createMinimalS3Client(): S3Like {
   const endpoint = process.env.S3_ENDPOINT ?? 'http://127.0.0.1:9000';
