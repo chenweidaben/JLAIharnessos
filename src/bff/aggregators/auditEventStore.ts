@@ -27,6 +27,8 @@ export interface PgSql {
   begin<T>(fn: (tx: PgSql) => Promise<T>): Promise<T>;
   cursor<T>(batchSize: number): (strings: TemplateStringsArray, ...values: unknown[]) => AsyncIterable<T[]>;
   join(parts: unknown[], separator: string): unknown;
+  /** 原样片段（用于动态标识符，调用前必须自行完成白名单校验） */
+  unsafe(fragment: string): unknown;
 }
 // 向后兼容别名
 export type SqlExecutor = PgSql;
@@ -168,11 +170,11 @@ export class PgAuditStore implements AuditEventStore {
   constructor(private readonly sql: SqlExecutor, schema?: string) {
     // P5-20: AUDIT_DB_SCHEMA 隔离（默认 'audit'，E2E 用 'audit_e2e'）
     const s = schema ?? process.env.AUDIT_DB_SCHEMA ?? 'audit';
-    if (!/^[a-z_][a-z0-9_]+$/.test(s)) {
-      throw new Error(`AUDIT_DB_SCHEMA invalid: ${s} (must match ^[a-z_][a-z0-9_]+$)`);
+    if (!/^[a-z_][a-z0-9_]*$/.test(s)) {
+      throw new Error(`AUDIT_DB_SCHEMA invalid: ${s} (must match ^[a-z_][a-z0-9_]*$)`);
     }
     // 白名单已校验，安全内联为标识符
-    this.qualifiedTable = (this.sql as any).unsafe(`"${s}"."events"`) as ReturnType<PgSql>;
+    this.qualifiedTable = this.sql.unsafe(`"${s}"."events"`) as ReturnType<PgSql>;
     // P5-20 第二步：lock key 参数化，两 schema 不互相阻塞
     this.lockKey = `audit_events_seq_${s}`;
   }

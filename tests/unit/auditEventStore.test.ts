@@ -38,23 +38,34 @@ const sampleInput = {
 
 /**
  * 模拟 postgres.js 的 sql`...` 模板标签：
- *  - sql(strings, ...values) 调用返回 []（可定制 throwOn）
+ *  - sql(strings, ...values) 调用返回 []（可定制 throwOn）；capturedSql 按真实渲染内联 values
+ *    （含 unsafe 片段），使 SQL 契约断言能看到动态 schema 标识符
  *  - sql.begin(cb) 直接回调同一 fake
  *  - sql.join(parts, sep) 简单字符串拼接
+ *  - sql.unsafe(frag) 原样返回片段（与真实 postgres.js 语义一致）
  * 任何 .query() 调用都会立刻 TypeError，确保生产代码不退回错误形态。
  */
 function makeFakeSql(opts: { throwOnTemplate?: boolean; capturedSql?: string[] } = {}) {
-  const sql = ((strings: TemplateStringsArray | string, ..._values: unknown[]) => {
+  const sql = ((strings: TemplateStringsArray | string, ...values: unknown[]) => {
     if (typeof strings === 'string') return strings; // join 兜底
-    if (opts.capturedSql) opts.capturedSql.push(strings.join('?'));
+    if (opts.capturedSql) {
+      opts.capturedSql.push(strings.reduce(
+        (acc, s, i) => acc + s + (i < values.length ? String(values[i]) : ''),
+        '',
+      ));
+    }
     if (opts.throwOnTemplate) throw new Error('connection refused');
     return [] as any[];
   }) as any;
   sql.begin = async (cb: any) => cb(sql);
   sql.join = (parts: any[], sep: string) => parts.map((p) => (typeof p === 'string' ? p : '')).filter(Boolean).join(sep);
+  sql.unsafe = (frag: string) => frag;
   sql.cursor = (_batch: number) => {
     return async function* () { /* empty */ };
   };
+  sql.unsafeCalls = [] as string[];
+  const origUnsafe = sql.unsafe;
+  sql.unsafe = (frag: string) => { sql.unsafeCalls.push(frag); return origUnsafe(frag); };
   return sql;
 }
 
@@ -91,16 +102,32 @@ describe('P5-13 PgAuditStore fake executor（模板标签形态）', () => {
     process.env.AUDIT_FALLBACK_DIR = tmp;
   });
 
-  test('SQL 契约：advisory lock + MAX(seq)+1 + INSERT（模板拼接）', async () => {
+  test('SQL 契约：advisory lock + MAX(seq)+1 + INSERT（模块化片段 + 动态 schema 标识符）', async () => {
     const captured: string[] = [];
     const sql = makeFakeSql({ capturedSql: captured });
     __resetAuditStore(new PgAuditStore(sql));
     await recordEvent(sampleInput);
-    // begin 内的 tx`...` 会把 strings 拼出来
+    // begin 内的 tx`...` 会把 strings 拼出来（values 已按真实渲染内联）
     const all = captured.join('\n');
     expect(all).toContain('pg_advisory_xact_lock');
     expect(all).toContain('COALESCE(MAX(seq),0)+1');
-    expect(all).toContain('INSERT INTO audit.events');
+    expect(all).toContain('INSERT INTO "audit"."events"');
+    // 锁 key 带上 schema，两个 schema 不互相阻塞
+    expect(all).toContain('audit_events_seq_audit');
+  });
+
+  test('P5-20 schema 隔离：动态标识符按 schema 全限定，非法 schema 拒绝构造', async () => {
+    const sql = makeFakeSql();
+    const store = new PgAuditStore(sql, 'audit_e2e');
+    expect(sql.unsafeCalls).toContain('"audit_e2e"."events"');
+    expect(store).toBeTruthy();
+    let threw = false;
+    try {
+      new PgAuditStore(sql, 'audit"; DROP TABLE audit.events; --');
+    } catch {
+      threw = true;
+    }
+    expect(threw).toBe(true);
   });
 
   test('fake 没有 .query 方法 → 若误用立刻 TypeError（防止退回错误 API）', async () => {
