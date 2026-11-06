@@ -354,6 +354,19 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     console.log('[P5-6-dump] store/info:', JSON.stringify({segmentCount: info.data.segmentCount, oldestSeq: info.data.oldestSeq, newestSeq: info.data.newestSeq}));
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     console.log('[P5-6-dump] search:', JSON.stringify({total: r.data.total, scanned: r.data.scannedSegments, rowsLen: r.data.rows?.length}));
+    // P5-20 debug: dump first segment details
+    const segs = await call('GET','/api/v1/worm/segments',{token:admin});
+    const firstSeg = (segs.data as any).rows?.[0] ?? (segs.data as any).segments?.[0];
+    if (firstSeg) {
+      console.log('[P5-6-dump] seg[0]:', JSON.stringify({
+        segmentId: firstSeg.segmentId,
+        eventCount: firstSeg.eventCount,
+        fromSeq: firstSeg.fromSeq,
+        toSeq: firstSeg.toSeq,
+        cipherBytesLen: firstSeg.cipherBytes?.length ?? 'MISSING',
+        ivLen: firstSeg.iv?.length ?? 0,
+      }));
+    }
     expect(r.httpStatus).toBe(200);
     expect(r.data.total).toBeGreaterThanOrEqual(1);
     expect(r.data.scannedSegments).toBeGreaterThanOrEqual(1);
