@@ -1,0 +1,33 @@
+# scripts/brand-words.b64.txt - brand word list (one base64-encoded UTF-8 term per line)
+# Encoding keeps vendor real names out of plaintext in tracked files; brand-gate.ps1 decodes at load.
+# Regenerate: see reports/patrol briefing; do not store plaintext names in the repo.
+5Yib5Lia5oWn5bq3
+5Yib5Lia5oWn5bq35pm65oWn5Yy76Zmi
+5Yib5Lia5oWn5bq3SElT6YCC6YWN5Zmo
+5Lic5Y2O5pWw5a2X5YyW5Yy76Zmi
+5Lic5Y2O5Yy75Li6
+5Lic5Y2OSElT6YCC6YWN5Zmo
+5a+55o6l5Yib5Lia5oWn5bq3SElT57O757uf
+5a+55o6l5Lic5Y2O5Yy75Li6SElT57O757uf
+5a+55o6l6IGU5LyX5pm65oWnSElT57O757uf
+5a+55o6l5pm65Lia6L2v5Lu2SElT57O757uf
+6IGU5LyX5pm65oWn
+6IGU5LyXSElT6YCC6YWN5Zmo
+5bqU6L+U5Zue5Yib5Lia5oWn5bq35YWD5L+h5oGv
+5bqU6L+U5Zue6IGU5LyX5YWD5L+h5oGv
+5bqU6L+U5Zue5pm65Lia5YWD5L+h5oGv
+5pm65Lia6L2v5Lu2
+5pm65Lia5pWw5a2X5YyW5Yy76Zmi
+5pm65LiaSElT6YCC6YWN5Zmo
+Qi1Tb2Z0IDkuMA==
+REhDIDguMA==
+aGlzLWNodWFuZ3ll
+aGlzLWRvbmdodWE=
+aGlzLWxpYW56aG9uZw==
+aGlzLXpoaXll
+aHR0cHM6Ly9oaXMtYXBpLmhvc3BpdGFsLmNvbS9ic29mdA==
+aHR0cHM6Ly9oaXMtYXBpLmhvc3BpdGFsLmNvbS9kaGM=
+aHR0cHM6Ly9oaXMtYXBpLmhvc3BpdGFsLmNvbS96aGl5ZQ==
+TFogNi4w
+WC1MWi1BcHBLZXk=
+WlkgNy4w
