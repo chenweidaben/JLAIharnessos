@@ -124,3 +124,43 @@
 - E2E `AUDIT_DB_SCHEMA` 隔离方案（**本批已复现证据：dev audit.events 1084 行超 1000 门槛**）
 - `/ready` 非生产 auditStore=memory 是否 degraded
 - `WORM_BACKEND` 默认是否改 fs
+
+---
+
+## 9. P5-19 收尾补遗（2026-11-06 16:00）
+
+### lint-diff 四处同改（全部完成）
+1. maxBuffer 64MB
+2. spawn 用 
+ode 而非 process.execPath（bun execFileSync 大输出 maxBuffer 不生效）
+3. catch 不静默（parse 失败算 lint-run-failure error）
+4. **strip ix + suppressions 字段**（commit 0cac21ec）
+
+### strip fix 体积实证（server.ts）
+- 含 fix：1730270 bytes (1689.7 KB)
+- strip 后：685872 bytes (669.8 KB)
+- **省 60%**。文件再大、autofix 再多也不会撞 64MB 上限。
+
+### brand-scan --paths 多值 bug
+- 旧实现 rgVal 只取 rgs[i+1] 单个值，多路径被吞 → 5244（只 src）
+- 改为收集到下一个 --flag 为止
+- 实测：src=5244 + web/src=4572 = **9816**（与手工 Get-ChildItem 一致）
+
+### E2E 11 fail 名单（不设 AUDIT_BACKFILL_LIMIT 时）
+1. seal + 国密字段 > generate 1 event + seal
+2. content 解密 > GET content?format=json
+3. content 解密 > GET content?format=csv
+4. 影子探针 digest > _tamper-digest
+5. 影子探针 signature > _tamper-signature
+6. doctor 越权 > GET /segments 列表非空
+7. doctor 越权 > GET /segments/:id 元信息
+8. doctor 越权 > format 非法 400
+9. P5-5 store/info > GET /store/info segmentCount≥1
+10. P5-6 自动调度 > GET /worm/search 跨段检索
+11. P5-10 retire/purge > seal 2 段 → rotate → purge → retire
+
+全部为 seal 依赖链（seal 503 → 段不存在 → 后续全 fail），不是其他 bug。
+
+### 工作区清理
+- 预存改动 auth.ts（demo-admin 口令）+ LoginPage.tsx（演示账号文案）非本批，已 stash（stash@{0}）
+- 工作区回到干净态，lint-diff exit 0
