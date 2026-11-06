@@ -65,7 +65,10 @@ export async function teardownSchema(): Promise<void> {
 
 export async function startBff(): Promise<BffHandle> {
   return new Promise((resolve, reject) => {
-    const child: ChildProcess = spawn('bun', ['run', 'src/bff/server.ts'], {
+    // 用 process.execPath 而不是裸 'bun'：本机 bun 未注册到 PATH（C:\Users\lenovo\.bun\bin），
+    // 裸名 spawn 会 ENOENT，导致隔离实例起不来、测试静默回落到 8080 生产实例（假绿）。
+    const bunBin = process.env.BUN_BIN || process.execPath || 'bun';
+    const child: ChildProcess = spawn(bunBin, ['run', 'src/bff/server.ts'], {
       cwd: REPO_ROOT,
       env: {
         ...process.env,
