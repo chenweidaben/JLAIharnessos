@@ -59,7 +59,15 @@ foreach ($port in @(8080, 8081, 5173, 5174)) {
     $proc = Get-CimInstance Win32_Process -Filter "ProcessId=$pid_" -ErrorAction SilentlyContinue
     $cmdLine = if ($proc) { $proc.CommandLine } else { '(unknown)' }
     $warn = ''
-    if ($cmdLine -match 'src/bff/index\.ts') { $warn = '  [WARN: entry is index.ts shell, should be server.ts]' }
+    if ($cmdLine -match 'src/bff/index\.ts') {
+      $warn = '  [WARN: entry is index.ts shell, should be server.ts]'
+    } elseif ($cmdLine -match 'src/bff/server\.ts') {
+      $warn = ''
+    } elseif ($cmdLine -match [regex]::Escape($repoRoot)) {
+      $warn = ''
+    } else {
+      $warn = '  [WARN: port held by non-repo process]'
+    }
     Write-Host "  ${port}: LISTENING pid=$pid_ cmd=$cmdLine$warn"
   } else {
     Write-Host "  ${port}: free"
