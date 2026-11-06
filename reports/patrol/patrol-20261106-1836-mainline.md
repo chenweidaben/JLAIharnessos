@@ -131,6 +131,10 @@
 
 四 ref 逐位一致。
 
+> 说明：上表为**代码 tip**（`7019a233`）的四 ref 核对值。本轮另有 1 个 docs-only 提交用于落盘本简报，
+> 推送后再次 `git ls-remote` 核对，四 ref 同样逐位一致；两批核对原始输出见
+> `logs/patrol-1835-refs.txt` 与 `logs/patrol-1835-refs2.txt`。
+
 ## 十、仓库卫生
 
 - tracked 修改：0（本轮 3 个改动已全部入库）
