@@ -128,6 +128,16 @@ await sql`DROP SCHEMA IF EXISTS audit_e2e CASCADE`;
 - 单测：2 个（默认 schema / e2e schema 各一）
 - 总计：半天内
 
+### E2E 隔离必要性（P5-19 已复现证据）
+
+2026-11-06 实测 dev 环境：
+- `SELECT count(*) FROM audit.events` = **1084 行**（max_seq=1084）
+- 默认 `AUDIT_BACKFILL_LIMIT=1000` → 超 84 行 → `/ready` 返回 `sealDisabled=true reason=audit-backfill-truncated`
+- E2E seal 端点返 503，23 个用例中 11 个失败
+- 临时设 `AUDIT_BACKFILL_LIMIT=2000` 后 E2E 通过（23/0/81 ×2），但这是抬高 fail-closed 门槛，**不是修复**
+
+结论：E2E 当前依赖 dev 环境 `audit.events` 不超 1000 行，**不可复现**。必须落地 `AUDIT_DB_SCHEMA` 隔离方案，让 E2E 用独立 schema、每次 beforeAll 建表 afterAll DROP，不与 dev 数据混。
+
 #### 不做的替代方案
 - **独立 PG database**：隔离更彻底，但需要 CI 起两个 PG 实例，本地开发成本高
 - **mock PgAuditStore**：E2E 仍然 memory，不切 PG——等于没测到真实持久化路径
