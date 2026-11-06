@@ -3,7 +3,16 @@
  *
  * 运行前提（P5-17 加）：
  * - 本测试要求 BFF 进程是【新启动】的。同一 BFF 进程重复跑会出现 purge 后的验签失败假红
- *   （purge 把旧公钥移出验签环 → 历史段 k1/k2 验签失败 → 6 条散乱红）。
+ *
+ * 为什么本文件对 no-unsafe-* 做块级豁免（P5-17）：
+ * E2E 通过 HTTP 调 BFF，响应是未精确建模的 JSON（每条路由 shape 不同，且会随产品演进变化）。
+ * 给每个端点写 interface 并不能防止字段名拼错（运行时 200 + 字段缺失才暴露），反而会让测试
+ * 在响应 shape 微调时大面积"类型红"。call<T> 已加泛型，默认 any 仅在本文件内生效；
+ * 单测层（tests/unit/*）必须精确类型，不在豁免范围。
+ */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- E2E HTTP JSON 响应 shape 未精确建模；call<T> 泛型已加，默认 any 仅限本文件 */
+
+/**
  * - beforeAll 会检查 keyring 当前 active key 是否存在；不存在则直接 throw（1 条前置失败），
  *   而不是让 6 条用例散乱红。
  * - afterAll 会快照 keyring；若本次跑改变了 keyring（rotate/purge），控制台 warn 提示
@@ -17,7 +26,8 @@ import * as crypto from 'node:crypto';
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
 const JWT_SECRET = process.env.JWT_SECRET ?? 'local-dev-jwt-secret-jlmedaios-2026';
 
-interface CallResult { httpStatus: number; code: number; data: any; raw?: string; }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface CallResult<T = any> { httpStatus: number; code: number; data: T; raw?: string; }
 function b64url(o: unknown): string {
   return Buffer.from(JSON.stringify(o)).toString('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
 }
@@ -29,17 +39,19 @@ function sign(roles: string[], name: string, sub: string): string {
   const sig = crypto.createHmac('sha256',JWT_SECRET).update(data).digest('base64').replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
   return `${data}.${sig}`;
 }
-async function call(method: string, path: string, opts: {token?: string; body?: unknown} = {}): Promise<CallResult> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function call<T = any>(method: string, path: string, opts: {token?: string; body?: unknown} = {}): Promise<CallResult<T>> {
   const headers: Record<string,string> = {'Content-Type':'application/json'};
-  if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`;
-  let last: CallResult = { httpStatus: 0, code: 0, data: null, raw: '' };
+  if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let last: CallResult<any> = { httpStatus: 0, code: 0, data: null, raw: '' };
   for (let attempt = 0; attempt < 8; attempt++) {
     const res = await fetch(BASE+path,{method,headers,body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
     const txt = await res.text();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let raw:any=null; try{raw=JSON.parse(txt);}catch{raw=null;}
     last = { httpStatus: res.status, code:raw?.code, data:raw?.data??null, raw: txt };
     if (res.status !== 429) return last;
-    // 429：读 Retry-After 头，否则退避 5s
     const ra = Number(res.headers.get('retry-after'));
     const waitMs = (Number.isFinite(ra) && ra > 0 ? ra : 5) * 1000;
     if (attempt < 7) await new Promise((r) => setTimeout(r, waitMs));
@@ -54,7 +66,7 @@ const doctor = sign(['doctor'], '医生', `doc-${SALT}`);
 let keyringBefore: string[] = [];
 
 interface KeysResponse { keySource?: string; signerKeyId?: string }
-interface VerifyResponse { valid?: boolean; errors?: Array<{ code?: string; segmentId?: string; message?: string }> }
+interface VerifyResponse { valid?: boolean; errors?: { code?: string; segmentId?: string; message?: string }[] }
 
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
@@ -83,7 +95,7 @@ beforeAll(async () => {
   // 而不是让 seal/rotate/verify 用例散成 6 条红。
   const v = await call('GET','/api/v1/worm/verify?scope=all',{token:admin});
   const vData = v.data as VerifyResponse | null;
-  if (vData && vData.valid === false) {
+  if (vData?.valid === false) {
     const firstErr = vData.errors?.[0];
     throw new Error(
       `E2E 前置条件不满足：当前 BFF 的 WORM 链 verify=${vData.valid}`
@@ -335,13 +347,16 @@ describe('P5-10 retire/purge HTTP 闭环', () => {
     const prBody = JSON.parse(pr.raw ?? '{}') as { refs?: number };
     expect(prBody.refs).toBe(2);
     // retire kNew：200
-    const rt = await call('POST','/api/v1/worm/keys/retire',{token:admin,body:{keyId:kNew}});
+    const rt = await call<{ ok?: boolean }>('POST','/api/v1/worm/keys/retire',{token:admin,body:{keyId:kNew}});
     expect(rt.httpStatus).toBe(200);
     expect(rt.data.ok).toBe(true);
     // verify real
-    const v = await call('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
+    const v = await call<{ valid?: boolean; signatureValid?: boolean }>('POST','/api/v1/worm/verify?scope=real',{token:admin,body:{}});
     expect(v.httpStatus).toBe(200);
     expect(v.data.valid).toBe(true);
     expect(v.data.signatureValid).toBe(true);
   });
 });
+
+
+
