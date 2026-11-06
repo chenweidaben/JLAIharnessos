@@ -33,6 +33,12 @@ const allWords = readFileSync(resolve(root, wordsFile), 'utf8')
   .map((s) => s.trim())
   .filter((s) => s.length >= 2 && !s.startsWith('#'));
 
+// P5-19: 大小写不敏感（中文不受影响，英文别名 dhc/DHC/bsoft/B-Soft 才吃得下）
+const wordsLower = allWords.map((w) => ({ orig: w, lower: w.toLowerCase() }));
+
+console.log(`[brand-scan] paths=${paths.join(',')}`);
+console.log(`[brand-scan] words=${wordsLower.length} (case-insensitive, source=${wordsFile})`);
+
 // 收集文件
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'logs', '.next', 'build', 'coverage']);
 const files: string[] = [];
@@ -61,19 +67,22 @@ for (const f of files) {
   let content: string;
   try { content = readFileSync(f, 'utf8'); } catch { continue; }
   const rel = relative(root, f).replace(/\\/g, '/');
-  for (const w of allWords) {
-    if (EXCLUDE_WORDS.has(w)) continue;
+  const hay = content.toLowerCase();
+  for (const { orig, lower } of wordsLower) {
+    if (EXCLUDE_WORDS.has(orig)) continue;
     let count = 0;
-    let idx = content.indexOf(w);
-    while (idx >= 0) { count++; idx = content.indexOf(w, idx + 1); }
+    let idx = hay.indexOf(lower);
+    while (idx >= 0) { count++; idx = hay.indexOf(lower, idx + 1); }
     if (count === 0) continue;
-    if (w.startsWith(BACKLOG_PREFIX)) { backlogHits += count; continue; }
+    if (orig.startsWith(BACKLOG_PREFIX)) { backlogHits += count; continue; }
     totalHits += count;
-    byWord[w] = (byWord[w] ?? 0) + count;
+    byWord[orig] = (byWord[orig] ?? 0) + count;
     if (!byFile[rel]) byFile[rel] = [];
-    byFile[rel].push({ word: w, count });
+    byFile[rel].push({ word: orig, count });
   }
 }
+
+console.log(`[brand-scan] files=${files.length} (skipped dirs: ${[...SKIP_DIRS].join('/')})`);
 
 const report = {
   paths,
