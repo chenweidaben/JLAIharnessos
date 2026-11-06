@@ -138,6 +138,26 @@ await sql`DROP SCHEMA IF EXISTS audit_e2e CASCADE`;
 
 结论：E2E 当前依赖 dev 环境 `audit.events` 不超 1000 行，**不可复现**。必须落地 `AUDIT_DB_SCHEMA` 隔离方案，让 E2E 用独立 schema、每次 beforeAll 建表 afterAll DROP，不与 dev 数据混。
 
+## `sourceChainValid` 语义（P5-22）
+
+WORM seal 段响应里的 `sourceChainValid` 字段：
+
+- **`true`** = 从 `GENESIS` 起的哈希链完整可验（每条 `prevHash` 连续、`hash` 重算匹配）
+- **`false`** = **检测到断裂**（不是"无法验证"，是"验证过且发现断了"，fail-closed）
+- `brokenAt` = 第一条 `prevHash` 不匹配或 `hash` 重算不一致的事件 seq
+
+### 什么情况会 false
+
+1. 外部导入数据（非 `recordEvent` 路径写入，`prev_hash`/`hash` 不构成连续链）
+2. 存储层被篡改（`prev_hash` 或 `hash` 被改动）
+3. 测试夹具造假（直接 SQL INSERT 假哈希，不走 `computeHash`）
+
+### E2E 种子约束
+
+E2E 播种事件**必须用 `computeHash` 生成真实链**（`GENESIS` 起、逐条 prevHash 衔接）。否则正常 seal 用例会静默拿到 `sourceChainValid:false`，虽然其他断言（SM3/SM4/SM2）仍绿，但链完整性未被验证。
+
+单元测试 `tests/unit/auditChainVerify.test.ts` 覆盖了 false 态（断链检测），E2E 覆盖 true 态。
+
 #### 不做的替代方案
 - **独立 PG database**：隔离更彻底，但需要 CI 起两个 PG 实例，本地开发成本高
 - **mock PgAuditStore**：E2E 仍然 memory，不切 PG——等于没测到真实持久化路径
