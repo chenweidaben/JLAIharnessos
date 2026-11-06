@@ -1,0 +1,90 @@
+/**
+ * 健澜AI原生医院操作系统OS - P5-18 品牌扫描脚本
+ *
+ * 用法：
+ *   bun run scripts/brand-scan.mts [--paths src web/src tests docs] [--words logs/brand-words.txt]
+ *
+ * 逐文件 fs.readFileSync + String.indexOf(Ordinal) 计数，禁止 regex/grep 数千路径。
+ * 输出 {files, totalHits, byWord, byFile}。
+ * 分类：硬违规 exit 1；gangos_ backlog 单列；winningSupplierId 类排除。
+ *
+ * Copyright (c) 2026 杭州健澜科技有限公司
+ */
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, resolve, relative } from 'node:path';
+
+const args = process.argv.slice(2);
+function argVal(flag: string, def: string): string {
+  const i = args.indexOf(flag);
+  return i >= 0 && args[i + 1] ? args[i + 1] : def;
+}
+const paths = argVal('--paths', 'src web/src tests docs').split(/\s+/).filter(Boolean);
+const wordsFile = argVal('--words', 'logs/brand-words-reversed.txt');
+
+const root = resolve(import.meta.dirname ?? process.cwd(), '..');
+
+// 排除项
+const BACKLOG_PREFIX = 'gangos_';
+const EXCLUDE_WORDS = new Set(['winningSupplierId']);
+
+// 读词表
+const allWords = readFileSync(resolve(root, wordsFile), 'utf8')
+  .split(/\r?\n/)
+  .map((s) => s.trim())
+  .filter((s) => s.length >= 2 && !s.startsWith('#'));
+
+// 收集文件
+const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'logs', '.next', 'build', 'coverage']);
+const files: string[] = [];
+function walk(dir: string): void {
+  let entries: string[];
+  try { entries = readdirSync(dir); } catch { return; }
+  for (const e of entries) {
+    if (SKIP_DIRS.has(e)) continue;
+    const full = join(dir, e);
+    let st;
+    try { st = statSync(full); } catch { continue; }
+    if (st.isDirectory()) walk(full);
+    else if (/\.(ts|tsx|js|jsx|mts|cts|vue|md|json|html|css)$/.test(e)) files.push(full);
+  }
+}
+for (const p of paths) walk(resolve(root, p));
+
+// 扫描
+const byWord: Record<string, number> = {};
+const byFile: Record<string, Array<{ word: string; count: number }>> = {};
+let totalHits = 0;
+let backlogHits = 0;
+let excludedHits = 0;
+
+for (const f of files) {
+  let content: string;
+  try { content = readFileSync(f, 'utf8'); } catch { continue; }
+  const rel = relative(root, f).replace(/\\/g, '/');
+  for (const w of allWords) {
+    if (EXCLUDE_WORDS.has(w)) continue;
+    let count = 0;
+    let idx = content.indexOf(w);
+    while (idx >= 0) { count++; idx = content.indexOf(w, idx + 1); }
+    if (count === 0) continue;
+    if (w.startsWith(BACKLOG_PREFIX)) { backlogHits += count; continue; }
+    totalHits += count;
+    byWord[w] = (byWord[w] ?? 0) + count;
+    if (!byFile[rel]) byFile[rel] = [];
+    byFile[rel].push({ word: w, count });
+  }
+}
+
+const report = {
+  paths,
+  filesScanned: files.length,
+  wordsLoaded: allWords.length,
+  totalHits,
+  backlogGangos: backlogHits,
+  excluded: excludedHits,
+  byWord,
+  byFile,
+};
+console.log(JSON.stringify(report, null, 2));
+
+process.exit(totalHits > 0 ? 1 : 0);
