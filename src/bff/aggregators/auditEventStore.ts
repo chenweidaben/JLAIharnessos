@@ -58,6 +58,8 @@ export interface AuditEventStore {
   backfill(fromSeq: number, limit?: number): Promise<AuditEvent[]>;
   /** 统计 seq > fromSeq 的事件总数（backfill 截断检测用） */
   countAfter(fromSeq: number): Promise<number>;
+  /** P5-26: 轻量连通性探测，2s 超时；memory 永远 true */
+  ping(): Promise<boolean>;
 }
 
 // ---- 计数器（运行态 /metrics 暴露） ----
@@ -128,6 +130,7 @@ export class MemoryAuditStore implements AuditEventStore {
   }
   all(): AuditEvent[] { return this.rows; }
   reset(): void { this.rows = []; }
+  async ping(): Promise<boolean> { return true; }
 }
 
 // ---- Pg ----
@@ -272,6 +275,18 @@ export class PgAuditStore implements AuditEventStore {
   async countAfter(fromSeq: number): Promise<number> {
     const r = await this.sql<{ n: string | number }>`SELECT count(*)::bigint AS n FROM ${this.qualifiedTable} WHERE seq > ${fromSeq}`;
     return Number(r[0]?.n ?? 0);
+  }
+
+  async ping(): Promise<boolean> {
+    try {
+      await Promise.race([
+        this.sql`SELECT 1`,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('ping timeout')), 2000)),
+      ]);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

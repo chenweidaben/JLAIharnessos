@@ -6914,21 +6914,26 @@ async function handleFetch(
     let wormStoreDir = '';
     let wormS3Client = 'none';
     let auditStore = 'unknown';
+    let dbReachable = false;
     try {
       const wm = await import('./aggregators/wormStore');
       const wInfo = wm.getWormBackendInfo();
       wormBackend = wInfo.backend;
       wormStoreDir = wInfo.dir;
       if (wInfo.backend === 's3') {
-        // P5-17 口径：装配是 s3，但 client 可能是 unsigned-fetch（未接 SigV4，真实 S3 会 403）。
-        // 由调用方通过 opts.s3 注入 @aws-sdk/client-s3 时改成 'aws-sdk'。
         wormS3Client = process.env.WORM_S3_CLIENT ?? 'unsigned-fetch';
       }
     } catch { /* ignore */ }
     try {
       const am = await import('./aggregators/auditEventStore');
-      auditStore = am.getAuditStore().kind;
+      const store = am.getAuditStore();
+      auditStore = store.kind;
+      dbReachable = await store.ping();
     } catch { /* ignore */ }
+    // P5-26: if pg configured but unreachable, don't report auditStore=pg
+    if (auditStore === 'pg' && !dbReachable) {
+      auditStore = 'unreachable';
+    }
     let sealDisabled = false;
     let sealDisabledReason = '';
     try {
@@ -6936,18 +6941,24 @@ async function handleFetch(
       const d = wm2.__sealDisabled();
       if (d) { sealDisabled = true; sealDisabledReason = d.reason; }
     } catch { /* ignore */ }
+    const isProd = process.env.NODE_ENV === 'production';
+    const status = (auditStore === 'unreachable')
+      ? (isProd ? 'fail' : 'degraded')
+      : 'ok';
+    const httpStatus = (status === 'fail') ? 503 : 200;
     const body = {
-      status: 'ok',
+      status,
       wormBackend,
       wormS3Client,
       wormStoreDir,
       auditStore,
+      dbReachable,
       sealDisabled,
       sealDisabledReason,
       uptimeSec: Math.round(process.uptime()),
     };
     return new Response(JSON.stringify(body), {
-      status: 200,
+      status: httpStatus,
       headers: { 'content-type': 'application/json' },
     });
   }
