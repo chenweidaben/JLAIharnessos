@@ -19,12 +19,17 @@ import { join } from 'node:path';
 import type { AuditEvent } from './auditEventAggregator';
 
 /**
- * postgres.js ISql 形态：可作为模板标签调用 sql`...`，
- * 也有 sql.begin(tx => ...) 事务、sql.cursor(batch)`...` 流式。
- * 用宽松 any 类型避免与 postgres.js 严格泛型耦合。
+ * postgres.js 最小类型形态：只声明本文件用到的几个调用。
+ * 模板标签返回任意行数组；调用点再收窄到具体 Row 类型，避免 any 泛滥。
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type SqlExecutor = any;
+export interface PgSql {
+  <T = unknown>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T[]>;
+  begin<T>(fn: (tx: PgSql) => Promise<T>): Promise<T>;
+  cursor<T>(batchSize: number): (strings: TemplateStringsArray, ...values: unknown[]) => AsyncIterable<T[]>;
+  join(parts: unknown[], separator: string): unknown;
+}
+// 向后兼容别名
+export type SqlExecutor = PgSql;
 
 export interface AppendResult {
   ok: boolean;
@@ -59,7 +64,7 @@ export function auditPersistFailedTotal(): number { return persistFailedTotal; }
 export function __resetAuditMetrics(): void { persistFailedTotal = 0; }
 
 function fallbackFile(): string {
-  const dir = process.env.AUDIT_FALLBACK_DIR || join(process.cwd(), 'logs');
+  const dir = process.env.AUDIT_FALLBACK_DIR ?? join(process.cwd(), 'logs');
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   const date = new Date().toISOString().slice(0, 10);
   return join(dir, `audit-fallback-${date}.jsonl`);
@@ -78,10 +83,10 @@ function writeFallback(evt: AuditEvent): string | null {
 function incPersistFailed(): void {
   persistFailedTotal += 1;
   try {
-    // 延迟 import 避免循环依赖
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
-    bffMetrics.auditPersistFailed.inc();
+    // 延迟 require 避免循环依赖（metrics → server → auditEventStore）
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../observability/metrics') as { bffMetrics: { auditPersistFailed: { inc(labels?: unknown, v?: number): void } } };
+    mod.bffMetrics.auditPersistFailed.inc();
   } catch { /* metrics 未就绪不阻塞 */ }
 }
 
@@ -165,8 +170,8 @@ export class PgAuditStore implements AuditEventStore {
       // 事务内拿 advisory lock，锁在 COMMIT 时自动释放。
       // 锁内只做：取 MAX(seq)+1 + INSERT，不做 SM3、不写文件、不查别的表。
       let assignedSeq = 0;
-      await this.sql.begin(async (tx: SqlExecutor) => {
-        const rows = await tx`
+      await this.sql.begin(async (tx) => {
+        const rows = await tx<{ seq: string | number }>`
           WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
                nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM audit.events, lock)
           INSERT INTO audit.events
@@ -197,7 +202,7 @@ export class PgAuditStore implements AuditEventStore {
   }
 
   async maxSeq(): Promise<number> {
-    const rows = await this.sql`SELECT COALESCE(MAX(seq),0)::bigint AS max FROM audit.events`;
+    const rows = await this.sql<{ max: string | number }>`SELECT COALESCE(MAX(seq),0)::bigint AS max FROM audit.events`;
     return Number(rows[0]?.max ?? 0);
   }
 
@@ -208,8 +213,8 @@ export class PgAuditStore implements AuditEventStore {
   }): Promise<{ rows: AuditEvent[]; total: number }> {
     // 所有过滤进 WHERE；total 用单独 count(*) 走同一 WHERE
     // postgres.js 模板标签自动参数化，用 WHERE AND ${cond} 片段
-    const conds: any[] = [this.sql``]; // 占位，后续 AND
-    const and = (frag: any) => conds.push(this.sql`AND ${frag}`);
+    const conds: ReturnType<PgSql>[] = [this.sql``]; // 占位，后续 AND
+    const and = (frag: unknown) => conds.push(this.sql`AND ${frag}`);
     if (opts.actorId) and(this.sql`actor_id = ${opts.actorId}`);
     if (opts.module) and(this.sql`module = ${opts.module}`);
     if (opts.action) and(this.sql`action = ${opts.action}`);
@@ -223,36 +228,36 @@ export class PgAuditStore implements AuditEventStore {
       ? this.sql`WHERE ${this.sql.join(where, ' ')}`
       : this.sql``;
 
-    const totalRows = await this.sql`SELECT COUNT(*)::bigint AS count FROM audit.events ${whereSql}`;
+    const totalRows = await this.sql<{ count: string | number }>`SELECT COUNT(*)::bigint AS count FROM audit.events ${whereSql}`;
     const total = Number(totalRows[0]?.count ?? 0);
 
-    const rows = await this.sql`
+    const rows = await this.sql<EventsRow>`
       SELECT * FROM audit.events ${whereSql}
       ORDER BY seq DESC
       LIMIT ${opts.limit} OFFSET ${opts.offset}
     `;
-    return { rows: (rows as unknown as EventsRow[]).map(rowFromDb), total };
+    return { rows: rows.map(rowFromDb), total };
   }
 
   async *streamAll(): AsyncIterable<AuditEvent[]> {
     // postgres.js cursor：每 500 条一批
-    const cursor = this.sql.cursor(500)`SELECT * FROM audit.events ORDER BY seq ASC`;
+    const cursor = this.sql.cursor<EventsRow>(500)`SELECT * FROM audit.events ORDER BY seq ASC`;
     // eslint-disable-next-line no-unreachable-loop
     for await (const batch of cursor) {
-      yield (batch as unknown as EventsRow[]).map(rowFromDb);
+      yield batch.map(rowFromDb);
     }
   }
 
   async backfill(fromSeq: number, limit = 1000): Promise<AuditEvent[]> {
-    const rows = await this.sql`
+    const rows = await this.sql<EventsRow>`
       SELECT * FROM audit.events WHERE seq > ${fromSeq} ORDER BY seq ASC LIMIT ${limit}
     `;
-    return (rows as unknown as EventsRow[]).map(rowFromDb);
+    return rows.map(rowFromDb);
   }
 
   async countAfter(fromSeq: number): Promise<number> {
-    const r = await this.sql`SELECT count(*)::bigint AS n FROM audit.events WHERE seq > ${fromSeq}`;
-    return Number((r as unknown as Array<{ n: string }>)[0]?.n ?? 0);
+    const r = await this.sql<{ n: string | number }>`SELECT count(*)::bigint AS n FROM audit.events WHERE seq > ${fromSeq}`;
+    return Number(r[0]?.n ?? 0);
   }
 }
 
@@ -268,9 +273,9 @@ export function getAuditStore(): AuditEventStore {
     globalStore = new MemoryAuditStore();
   } else if (auditStoreEnv === 'pg' || nodeEnv === 'production' || process.env.DATABASE_URL) {
     // 审计不跟随 DEMO_MODE 跳过 PG：审计是合规要求，不是演示数据
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getDb } = require('../../db/pool') as typeof import('../../db/pool');
-    globalStore = new PgAuditStore(getDb());
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- 延迟 require 避免 db/pool 启动期循环
+    const mod = require('../../db/pool') as { getDb(): unknown };
+    globalStore = new PgAuditStore(mod.getDb() as PgSql);
   } else {
     console.warn('[audit] using MemoryAuditStore — audit events will be LOST on restart (not for production)');
     globalStore = new MemoryAuditStore();
@@ -284,9 +289,9 @@ export function initAuditStore(): AuditEventStore {
   console.log(`[audit] store=${s.kind}`);
   // 启动时让计数器在 /metrics 输出 0 值样本
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
-    bffMetrics.auditPersistFailed.inc({}, 0);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- 延迟 require 避免循环
+    const mod = require('../observability/metrics') as { bffMetrics: { auditPersistFailed: { inc(labels?: unknown, v?: number): void } } };
+    mod.bffMetrics.auditPersistFailed.inc({}, 0);
   } catch { /* ignore */ }
   return s;
 }
