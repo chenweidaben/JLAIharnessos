@@ -163,7 +163,16 @@ function rowFromDb(r: EventsRow): AuditEvent {
 
 export class PgAuditStore implements AuditEventStore {
   readonly kind = 'pg' as const;
-  constructor(private readonly sql: SqlExecutor) {}
+  private readonly qualifiedTable: ReturnType<PgSql>;
+  constructor(private readonly sql: SqlExecutor, schema?: string) {
+    // P5-20: AUDIT_DB_SCHEMA 隔离（默认 'audit'，E2E 用 'audit_e2e'）
+    const s = schema ?? process.env.AUDIT_DB_SCHEMA ?? 'audit';
+    if (!/^[a-z_][a-z0-9_]+$/.test(s)) {
+      throw new Error(`AUDIT_DB_SCHEMA invalid: ${s} (must match ^[a-z_][a-z0-9_]+$)`);
+    }
+    // 白名单已校验，安全内联为标识符
+    this.qualifiedTable = (this.sql as any).unsafe(`"${s}"."events"`) as ReturnType<PgSql>;
+  }
 
   async append(evt: AuditEvent): Promise<AppendResult> {
     try {
@@ -173,8 +182,8 @@ export class PgAuditStore implements AuditEventStore {
       await this.sql.begin(async (tx) => {
         const rows = await tx<{ seq: string | number }>`
           WITH lock AS (SELECT pg_advisory_xact_lock(hashtext('audit_events_seq'))),
-               nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM audit.events, lock)
-          INSERT INTO audit.events
+               nxt AS (SELECT COALESCE(MAX(seq),0)+1 AS seq FROM ${this.qualifiedTable}, lock)
+          INSERT INTO ${this.qualifiedTable}
             (seq, event_id, occurred_at, actor_id, actor_role, action, module,
              resource_type, resource_id, patient_id, result, error_code, ip, user_agent,
              prev_hash, hash)
@@ -202,7 +211,7 @@ export class PgAuditStore implements AuditEventStore {
   }
 
   async maxSeq(): Promise<number> {
-    const rows = await this.sql<{ max: string | number }>`SELECT COALESCE(MAX(seq),0)::bigint AS max FROM audit.events`;
+    const rows = await this.sql<{ max: string | number }>`SELECT COALESCE(MAX(seq),0)::bigint AS max FROM ${this.qualifiedTable}`;
     return Number(rows[0]?.max ?? 0);
   }
 
@@ -228,11 +237,11 @@ export class PgAuditStore implements AuditEventStore {
       ? this.sql`WHERE ${this.sql.join(where, ' ')}`
       : this.sql``;
 
-    const totalRows = await this.sql<{ count: string | number }>`SELECT COUNT(*)::bigint AS count FROM audit.events ${whereSql}`;
+    const totalRows = await this.sql<{ count: string | number }>`SELECT COUNT(*)::bigint AS count FROM ${this.qualifiedTable} ${whereSql}`;
     const total = Number(totalRows[0]?.count ?? 0);
 
     const rows = await this.sql<EventsRow>`
-      SELECT * FROM audit.events ${whereSql}
+      SELECT * FROM ${this.qualifiedTable} ${whereSql}
       ORDER BY seq DESC
       LIMIT ${opts.limit} OFFSET ${opts.offset}
     `;
@@ -241,7 +250,7 @@ export class PgAuditStore implements AuditEventStore {
 
   async *streamAll(): AsyncIterable<AuditEvent[]> {
     // postgres.js cursor：每 500 条一批
-    const cursor = this.sql.cursor<EventsRow>(500)`SELECT * FROM audit.events ORDER BY seq ASC`;
+    const cursor = this.sql.cursor<EventsRow>(500)`SELECT * FROM ${this.qualifiedTable} ORDER BY seq ASC`;
     // eslint-disable-next-line no-unreachable-loop
     for await (const batch of cursor) {
       yield batch.map(rowFromDb);
@@ -250,13 +259,13 @@ export class PgAuditStore implements AuditEventStore {
 
   async backfill(fromSeq: number, limit = 1000): Promise<AuditEvent[]> {
     const rows = await this.sql<EventsRow>`
-      SELECT * FROM audit.events WHERE seq > ${fromSeq} ORDER BY seq ASC LIMIT ${limit}
+      SELECT * FROM ${this.qualifiedTable} WHERE seq > ${fromSeq} ORDER BY seq ASC LIMIT ${limit}
     `;
     return rows.map(rowFromDb);
   }
 
   async countAfter(fromSeq: number): Promise<number> {
-    const r = await this.sql<{ n: string | number }>`SELECT count(*)::bigint AS n FROM audit.events WHERE seq > ${fromSeq}`;
+    const r = await this.sql<{ n: string | number }>`SELECT count(*)::bigint AS n FROM ${this.qualifiedTable} WHERE seq > ${fromSeq}`;
     return Number(r[0]?.n ?? 0);
   }
 }

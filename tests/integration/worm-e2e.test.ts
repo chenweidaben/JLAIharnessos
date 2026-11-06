@@ -313,7 +313,7 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     expect([200, 201]).toContain(sealRes.httpStatus);
     if (sealRes.httpStatus === 200 && sealRes.data.ok !== true) {
       // 审计 hook 异步落 pending 池的窗口：seal 200 no-events，等段出现
-      console.log(`[P5-6] seal 未产段 (ok=${sealRes.data.ok} error=${sealRes.data.error})，轮询 store/info`);
+      console.log(`[P5-6] seal 未产段 (ok=${sealRes.data.ok} error=${(sealRes.data as any).error})，轮询 store/info`);
     }
     // P5-19: 有界等待 segmentCount>=1，记录每次轮询值，超时主动 seal 再等
     const trace: number[] = [];
