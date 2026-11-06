@@ -1,10 +1,17 @@
 /**
  * 健澜AI原生医院操作系统OS - P5-2/P5-4 WORM E2E（国密硬化版，精简写调用）
- * 同进程连跑两轮不重启。
+ *
+ * 运行前提（P5-17 加）：
+ * - 本测试要求 BFF 进程是【新启动】的。同一 BFF 进程重复跑会出现 purge 后的验签失败假红
+ *   （purge 把旧公钥移出验签环 → 历史段 k1/k2 验签失败 → 6 条散乱红）。
+ * - beforeAll 会检查 keyring 当前 active key 是否存在；不存在则直接 throw（1 条前置失败），
+ *   而不是让 6 条用例散乱红。
+ * - afterAll 会快照 keyring；若本次跑改变了 keyring（rotate/purge），控制台 warn 提示
+ *   "下次在同进程上跑会假红"。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { beforeAll, describe, expect, it } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import * as crypto from 'node:crypto';
 
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
@@ -44,6 +51,10 @@ const SALT = Date.now().toString(36) + Math.floor(Math.random()*1000);
 const admin = sign(['admin'], '管理员', `admin-${SALT}`);
 const doctor = sign(['doctor'], '医生', `doc-${SALT}`);
 
+let keyringBefore: string[] = [];
+
+interface KeysResponse { keySource?: string; signerKeyId?: string }
+
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
@@ -51,15 +62,40 @@ beforeAll(async () => {
   // env 模式按设计不支持 rotate（worm-env-rotate-not-supported），purge 会走 cannot-purge-active，
   // 9 条用例会散落失败。这里直接抛错，把 9 条红灯收敛成 1 条前置条件失败。
   const ks = await call('GET','/api/v1/worm/keys',{token:admin});
-  if (ks.data?.keySource === 'env') {
+  const ksData = ks.data as KeysResponse | null;
+  if (ksData?.keySource === 'env') {
     throw new Error(
       'E2E 前置条件不满足：BFF 以 WORM_SM2_PRIVATE_KEY/PUBLIC_KEY 启动（EnvKeyProvider），'
       + '该模式按设计不支持 rotate（worm-env-rotate-not-supported），purge 会因此走 cannot-purge-active。'
       + '请用未设置 WORM_SM2_* 的 BFF 环境运行本 E2E。'
     );
   }
+  // P5-17 前置自检：当前 active signerKeyId 必须存在。
+  // 同进程重复跑时，purge 会把上一轮 seal 用的 key 移出验签环，导致 verify 永久 broken。
+  // 把这条收敛成 1 条前置失败，而不是 6 条散乱红。
+  if (!ksData?.signerKeyId) {
+    throw new Error(
+      'E2E 前置条件不满足：当前 BFF 的 keyring 不含 active signer key（可能已跑过多轮 purge）。'
+      + '请重启 BFF 后重跑。'
+    );
+  }
+  keyringBefore = [ksData.signerKeyId];
   // 每轮开始前清探针
   await call('POST','/api/v1/worm/_probes/reset',{token:admin,body:{}});
+});
+
+afterAll(async () => {
+  // P5-17：跑完后快照 keyring，若本次跑改变了 active key，warn 提示下次同进程会假红
+  try {
+    const ks = await call('GET','/api/v1/worm/keys',{token:admin});
+    const after = (ks.data as KeysResponse | null)?.signerKeyId;
+    if (after && keyringBefore[0] && after !== keyringBefore[0]) {
+      console.warn(
+        `[worm-e2e] 本次跑已改变 keyring active key: ${keyringBefore[0]} → ${after}。`
+        + '下次在同一 BFF 进程上跑会因 purge 后的验签失败出现假红，请重启 BFF。'
+      );
+    }
+  } catch { /* afterAll 失败不影响主结果 */ }
 });
 
 describe('P5-4 keys 不泄露私钥', () => {
