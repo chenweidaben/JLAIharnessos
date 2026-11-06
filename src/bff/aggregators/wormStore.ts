@@ -238,10 +238,16 @@ export class FileWormStore implements WormStore {
 
 let _store: WormStore | null = null;
 let _loggedBackend = false;
-export function getWormBackendInfo(): { backend: 'fs' | 'memory'; dir: string } {
-  if (process.env.WORM_BACKEND === 'fs') {
+export function getWormBackendInfo(): { backend: 'fs' | 'memory' | 's3'; dir: string } {
+  const backend = process.env.WORM_BACKEND ?? 'memory';
+  if (backend === 'fs') {
     const dir = path.resolve(process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
     return { backend: 'fs', dir };
+  }
+  if (backend === 's3') {
+    const bucket = process.env.S3_BUCKET ?? '(missing S3_BUCKET)';
+    const dir = path.resolve(process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
+    return { backend: 's3', dir: `s3://${bucket} + local fs ${dir}` };
   }
   return { backend: 'memory', dir: '(in-process memory; not persisted)' };
 }
@@ -270,6 +276,12 @@ export function getWormStore(): WormStore {
   if (!_store) {
     if (process.env.WORM_BACKEND === 'fs') {
       _store = new FileWormStore();
+    } else if (process.env.WORM_BACKEND === 's3') {
+      // s3 是异步后端。这里返回一个 MemoryWormStore 作为 sync 诊断 shim（供 storeInfo / __resetStore
+      // 等同步路径使用）；真实异步 seal/get/list 路径走 wormArchiveAggregator.store() → createWormStore()。
+      // 启动时打 warning，提示"同步路径看到的是内存 shim，不是真实 S3 后端"。
+      _store = new MemoryWormStore();
+      console.warn('[worm] WORM_BACKEND=s3: sync getWormStore() returning in-memory shim for diagnostics only; real seal path uses async store() with layered(S3, fs).');
     } else {
       _store = new MemoryWormStore();
     }
@@ -279,7 +291,9 @@ export function getWormStore(): WormStore {
     const info = getWormBackendInfo();
     if (info.backend === 'fs') {
       console.info(`[worm] backend=fs dir=${info.dir}`);
-    } else {
+    } else if (info.backend === 's3') {
+      console.info(`[worm] backend=s3 remote=${info.dir}`);
+    } else if (info.backend === 'memory') {
       console.warn(`[worm] backend=memory — segments are NOT persisted; restart will re-archive already-sealed events and BREAK the cross-segment chain. Set WORM_BACKEND=fs for production.`);
     }
   }

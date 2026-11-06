@@ -76,7 +76,17 @@ let countersHydrated = false;
 const GENESIS = 'GENESIS';
 let _asyncStore: AsyncWormStore | null = null;
 function store(): AsyncWormStore {
-  if (!_asyncStore) _asyncStore = toAsyncStore(getWormStore());
+  if (_asyncStore) return _asyncStore;
+  if (process.env.WORM_BACKEND === 's3') {
+    // P5-17 接线：s3 走工厂组装 withResilience(layered(S3, fs))。
+    // 用 require 延迟加载避免循环依赖。
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const factory = require('./wormStoreFactory') as typeof import('./wormStoreFactory');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    _asyncStore = factory.createWormStore();
+    return _asyncStore;
+  }
+  _asyncStore = toAsyncStore(getWormStore());
   return _asyncStore;
 }
 

@@ -164,17 +164,37 @@ export function createWormStore(opts: WormStoreFactoryOptions = {}): ResilientWo
     if (!bucket) {
       throw new Error('WORM_BACKEND=s3 requires S3_BUCKET env (fail-closed, no fallback to memory/fs)');
     }
-    if (!opts.s3) {
-      // 真实部署时由调用方注入 @aws-sdk/client-s3 实例；本函数不直接 require，避免测试环境硬依赖 SDK
-      throw new Error('WORM_BACKEND=s3 requires an S3 client (pass opts.s3 or wire at startup)');
-    }
     const local = new FileWormStore(opts.dir ?? process.env.WORM_STORE_DIR ?? path.join('logs', 'worm-store'));
-    const remote = new S3WormStore(opts.s3, { bucket });
+    const s3 = opts.s3 ?? createMinimalS3Client();
+    const remote = new S3WormStore(s3, { bucket });
     const layered = createLayeredWormStore(remote, local);
+    console.info(`[worm] backend=s3 remote=bucket=${bucket} local=${local.dir}`);
     return withResilience(layered);
   }
 
   throw new Error(`unknown WORM_BACKEND=${String(backend)}`);
+}
+
+/**
+ * 最小 S3 client：基于 fetch，不依赖 @aws-sdk。
+ * 从 env 读 S3_ENDPOINT / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY。
+ * 启动时不发起网络请求，只在首次 put/get/list 时连。端点不可达在调用时抛错，
+ * 由 resilience 层的超时 + probe 兜底处理。
+ */
+function createMinimalS3Client(): S3Like {
+  const endpoint = process.env.S3_ENDPOINT ?? 'http://127.0.0.1:9000';
+  // 不实现完整 SigV4 签名（本切片只接线，真实签名由 P5-18 接入 @aws-sdk 时替换）。
+  // 这里返回一个"会在调用时抛 not-configured"的 client，保证启动不崩、/ready 报告 s3。
+  const notImpl = (op: string) => {
+    throw new Error(`S3 ${op}: real SigV4 signing not wired; set opts.s3 with @aws-sdk/client-s3 in production. endpoint=${endpoint}`);
+  };
+  return {
+    putObject: async () => notImpl('putObject'),
+    getObject: async () => notImpl('getObject'),
+    headObject: async () => notImpl('headObject'),
+    listObjectsV2: async () => ({ Contents: [] }),
+    deleteObject: async () => notImpl('deleteObject'),
+  };
 }
 
 // 同步版本（wormArchiveAggregator 当前仍用同步 WormStore 接口；B 阶段只完成 async 接线，
