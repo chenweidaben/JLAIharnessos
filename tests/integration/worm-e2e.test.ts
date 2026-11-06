@@ -309,7 +309,36 @@ describe('P5-6 自动调度 + 跨段检索', () => {
     }});
     expect([200, 201]).toContain(rep.httpStatus);
     const sealRes = await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
-    // seal 可能因无新事件返 200 no-events（前序已封过），此时直接搜既有段即可
+    // P5-19: 显式断言 seal 结果，避免"no-events"被静默放过
+    expect([200, 201]).toContain(sealRes.httpStatus);
+    if (sealRes.httpStatus === 200 && sealRes.data.ok !== true) {
+      // 审计 hook 异步落 pending 池的窗口：seal 200 no-events，等段出现
+      console.log(`[P5-6] seal 未产段 (ok=${sealRes.data.ok} error=${sealRes.data.error})，轮询 store/info`);
+    }
+    // P5-19: 有界等待 segmentCount>=1，记录每次轮询值，超时主动 seal 再等
+    const trace: number[] = [];
+    const pollUntilSegment = async (maxMs: number): Promise<number> => {
+      const deadline = Date.now() + maxMs;
+      let backoff = 200;
+      while (Date.now() < deadline) {
+        const info = await call('GET','/api/v1/worm/store/info',{token:admin});
+        const n = info.data.segmentCount ?? 0;
+        trace.push(n);
+        if (n >= 1) return n;
+        await new Promise((r) => setTimeout(r, backoff));
+        backoff = Math.min(backoff + 150, 500);
+      }
+      return -1;
+    };
+    let segN = await pollUntilSegment(5000);
+    if (segN < 1) {
+      console.log(`[P5-6] 轮询 5s 仍 segmentCount=0，主动 seal 一次再等。trace=${JSON.stringify(trace)}`);
+      await call('POST','/api/v1/worm/segments/seal',{token:admin,body:{}});
+      segN = await pollUntilSegment(5000);
+      if (segN < 1) {
+        throw new Error(`[P5-6] segmentCount 始终为 0，trace=${JSON.stringify(trace)}`);
+      }
+    }
     const r = await call('GET','/api/v1/worm/search?limit=10',{token:admin});
     expect(r.httpStatus).toBe(200);
     expect(r.data.total).toBeGreaterThanOrEqual(1);
