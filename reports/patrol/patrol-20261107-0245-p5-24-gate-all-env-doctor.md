@@ -107,3 +107,26 @@ P5-22 踩过：`Bun.spawnSync(['bun','test',...])` 从 bun 进程内 spawn bun�
 E2E 用 `WORM_BACKEND=memory` + `AUDIT_STORE=pg` 正是 unsafe combo。非 production 只 console.error 不阻断，但重启后段丢失、跨段链断裂。这是 `WORM_BACKEND` 默认值（当前 `memory`）的实际代价。
 
 `AUDIT_BACKFILL_LIMIT` A/B/C 三案挂起：主线启动时显式传 10000 是**临时口径不是方案**。
+
+---
+
+## 7. PowerShell 5.1 编码陷阱（教训）
+
+**现象**：`b5676bdd` 给 `gate-unit.ps1` / `gate-e2e.ps1` 加了带中文全角括号的错误信息，文件是 UTF-8 **无 BOM**。PowerShell 5.1 用系统 ANSI（GBK）解码 → 中文多字节序列被错误切分 → **字符串引号配对失效** → 整个文件解析失败：
+
+```
+The string is missing the terminator: ".
+Missing closing '}' in statement block.
+```
+
+**影响**：P5-23 本来能跑的脚本变成完全不可运行，`gate-all.ps1` 里 gate-unit / gate-e2e 两项 FAIL。
+
+**修法（两条都要）**：
+1. 文件存 **UTF-8 带 BOM**（`[IO.File]::WriteAllText(path, s, (New-Object Text.UTF8Encoding $true))`）
+2. **PowerShell 脚本的字符串一律英文，中文只放注释**（注释被 GBK 误解不影响语法）
+
+**验证方法**：
+- `[IO.File]::ReadAllBytes($f)[0..2]` 是不是 `EF BB BF`
+- 排掉注释行后 `Select-String '[^\x00-\x7F]'` 应为 0 命中
+
+**为什么记这条**：BOM 可能被某些编辑器/CI 剥掉，只靠 BOM 不够稳；字符串英文是双保险。
