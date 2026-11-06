@@ -40,7 +40,8 @@ console.log(`[brand-scan] paths=${paths.join(',')}`);
 console.log(`[brand-scan] words=${wordsLower.length} (case-insensitive, source=${wordsFile})`);
 
 // 收集文件
-const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'logs', '.next', 'build', 'coverage']);
+// 排除构建产物目录（按目录名在任意层级匹配；logs/coverage 不排除，因为 src/ 下可能有真文件）
+const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '.next', 'build']);
 const files: string[] = [];
 function walk(dir: string): void {
   let entries: string[];
