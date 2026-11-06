@@ -87,6 +87,17 @@ for (const f of files) {
     if (!byFile[rel]) byFile[rel] = [];
     byFile[rel].push({ word: orig, count });
   }
+  // P5-19: 独立扫 gangos_ 前缀（metric 命名 backlog，不在词表里）
+  {
+    let count = 0;
+    let idx = hay.indexOf(BACKLOG_PREFIX);
+    while (idx >= 0) { count++; idx = hay.indexOf(BACKLOG_PREFIX, idx + 1); }
+    if (count > 0) {
+      backlogHits += count;
+      if (!byFile[rel]) byFile[rel] = [];
+      byFile[rel].push({ word: BACKLOG_PREFIX + '<prefix>', count });
+    }
+  }
 }
 
 console.log(`[brand-scan] files=${files.length} (skipped dirs: ${[...SKIP_DIRS].join('/')})`);
