@@ -8,7 +8,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';import * as path from 'node:path';
+import { execSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';import * as path from 'node:path';
 import { platform } from 'node:process';
 import { WormSegment } from './wormArchiveAggregator.js';
 
@@ -120,9 +121,9 @@ export class FileWormStore implements WormStore {
    */
   private autoDetect(): void {
     try {
-      const st = require('node:fs').statSync(this.dir);
+      const st = statSync(this.dir);
       if (st.mtimeMs === this.lastScanMtimeMs) return;
-      const names = require('node:fs').readdirSync(this.dir).filter((n: string) => n.endsWith('.json'));
+      const names = readdirSync(this.dir).filter((n: string) => n.endsWith('.json'));
       if (st.mtimeMs !== this.lastScanMtimeMs || names.length !== this.lastFileCount) {
         this.refresh();
       }
@@ -154,7 +155,7 @@ export class FileWormStore implements WormStore {
       } catch { /* 损坏文件跳过 */ }
     }
     this.segments.sort((a, b) => a.seq - b.seq);
-    try { this.lastScanMtimeMs = require('node:fs').statSync(this.dir).mtimeMs; } catch { /* ignore */ }
+    try { this.lastScanMtimeMs = statSync(this.dir).mtimeMs; } catch { /* ignore */ }
     this.lastFileCount = fileCount;
   }
 
@@ -174,9 +175,7 @@ export class FileWormStore implements WormStore {
     writeFileSync(p, JSON.stringify(segment, null, 2), 'utf8');
     if (platform === 'win32') {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const cp = require('node:child_process') as { execSync: (cmd: string, opts?: unknown) => unknown };
-        cp.execSync(`attrib +R "${p}"`, { stdio: 'ignore' });
+        execSync(`attrib +R "${p}"`, { stdio: 'ignore' });
       } catch { /* 忽略 */ }
     }
     this.segments.push(segment);
@@ -304,3 +303,4 @@ export function __resetWormStore(): void {
   if (_store instanceof MemoryWormStore) _store.__clear();
   _store = null;
 }
+
