@@ -12,7 +12,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import {
   getPendingEvents, verifyChainSync, __sealDisabled, type AuditEvent,
 } from './auditEventAggregator.js';
-import { getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
+import { getWormBackendInfo, getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
 
 // sm-crypto 真国密
@@ -596,6 +596,22 @@ export async function verify(scope: 'all' | 'real' = 'all'): Promise<VerifyResul
 /* ------------------------------ store info ------------------------------ */
 
 export async function storeInfo(): Promise<{ kind: string; segmentCount: number; dir?: string; writable: boolean; oldestSeq: number | null; newestSeq: number | null }> {
+  if (process.env.WORM_BACKEND === 's3') {
+    // s3 模式走 async store（layered(S3, fs)），保证读路径与写路径一致
+    const asyncStore = store();
+    const all = await asyncStore.list();
+    const oldest = all.length ? all[0].fromSeq : null;
+    const newest = all.length ? all[all.length - 1].toSeq : null;
+    const info = getWormBackendInfo();
+    return {
+      kind: 's3',
+      segmentCount: all.length,
+      dir: info.dir,
+      writable: true,
+      oldestSeq: oldest,
+      newestSeq: newest,
+    };
+  }
   const s = getWormStore();
   const all = s.list();
   const oldest = all.length ? all[0].fromSeq : null;
@@ -613,6 +629,10 @@ export async function storeInfo(): Promise<{ kind: string; segmentCount: number;
 /* ------------------------------ 工具 ------------------------------ */
 
 export function __resetStore(): void {
+  if (process.env.WORM_BACKEND === 's3') {
+    // s3 模式不支持同步 reset（会清掉 local fs 但 S3 远端还在）。测试请用独立 store 或 afterAll DROP。
+    throw new Error('__resetStore: WORM_BACKEND=s3 not supported; reset local+remote together via test harness');
+  }
   // Memory store：清空；File store：由单测指定临时目录，不删磁盘文件
   const s = getWormStore();
   if (s.kind === 'memory') {

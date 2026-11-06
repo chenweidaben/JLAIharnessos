@@ -191,9 +191,10 @@ describe('createWormStore fail-closed', () => {
   test('WORM_BACKEND=s3 缺 S3_BUCKET → 抛错不回落', () => {
     expect(() => createWormStore({ backend: 's3', s3: new MockS3() })).toThrow(/S3_BUCKET/);
   });
-  test('WORM_BACKEND=s3 缺 s3 client → 用最小 stub，调用时抛 SigV4-not-wired', async () => {
-    // 启动时不抛（保证 BFF 能起来、/ready 报告 s3）；首次调用抛 not-wired 错误
+  test('WORM_BACKEND=s3 缺 s3 client → 用最小 fetch client，端点不可达时抛网络错', async () => {
+    // 启动时不抛（保证 BFF 能起来、/ready 报告 s3）；首次调用时因端点不可达抛 fetch 错误
+    delete process.env.S3_ENDPOINT;
     const store = createWormStore({ backend: 's3', bucket: 'x' });
-    await expect(store.put(makeSegment(1))).rejects.toThrow(/SigV4/);
+    await expect(store.put(makeSegment(1))).rejects.toThrow();
   });
 });

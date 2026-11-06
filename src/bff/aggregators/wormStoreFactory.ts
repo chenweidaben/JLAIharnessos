@@ -30,7 +30,7 @@ import { withResilience, type ResilientWormStore } from './wormStoreResilience.j
  */
 export interface S3Like {
   putObject(args: { Bucket: string; Key: string; Body: string | Uint8Array }): Promise<unknown>;
-  getObject(args: { Bucket: string; Key: string }): Promise<{ Body: string | Uint8Array }>;
+  getObject(args: { Bucket: string; Key: string }): Promise<{ Body: string | Uint8Array } | null>;
   headObject(args: { Bucket: string; Key: string }): Promise<unknown>;
   listObjectsV2(args: { Bucket: string; Prefix: string }): Promise<{ Contents?: { Key?: string }[] }>;
   deleteObject(args: { Bucket: string; Key: string }): Promise<unknown>;
@@ -77,6 +77,7 @@ export class S3WormStore implements AsyncWormStore {
   async get(segmentId: string): Promise<WormSegment | null> {
     try {
       const obj = await this.s3.getObject({ Bucket: this.bucket, Key: this.key(segmentId) });
+      if (!obj) return null;
       const body = typeof obj.Body === 'string' ? obj.Body : Buffer.from(obj.Body).toString('utf8');
       return JSON.parse(body) as WormSegment;
     } catch (err) {
@@ -180,20 +181,43 @@ export function createWormStore(opts: WormStoreFactoryOptions = {}): ResilientWo
  * 从 env 读 S3_ENDPOINT / AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY。
  * 启动时不发起网络请求，只在首次 put/get/list 时连。端点不可达在调用时抛错，
  * 由 resilience 层的超时 + probe 兜底处理。
+ *
+ * 注意：SigV4 签名在 P5-18 接入 @aws-sdk/client-s3 时替换；当前用匿名/路径风格请求，
+ * 仅在 dev/MinIO 本地环境可用。production 必须传 opts.s3 注入真实 client。
  */
 function createMinimalS3Client(): S3Like {
   const endpoint = process.env.S3_ENDPOINT ?? 'http://127.0.0.1:9000';
-  // 不实现完整 SigV4 签名（本切片只接线，真实签名由 P5-18 接入 @aws-sdk 时替换）。
-  // 这里返回一个"会在调用时抛 not-configured"的 client，保证启动不崩、/ready 报告 s3。
-  const notImpl = (op: string) => {
-    throw new Error(`S3 ${op}: real SigV4 signing not wired; set opts.s3 with @aws-sdk/client-s3 in production. endpoint=${endpoint}`);
-  };
+  const url = (bucket: string, key: string) => `${endpoint.replace(/\/$/, '')}/${bucket}/${encodeURIComponent(key)}`;
   return {
-    putObject: async () => notImpl('putObject'),
-    getObject: async () => notImpl('getObject'),
-    headObject: async () => notImpl('headObject'),
-    listObjectsV2: async () => ({ Contents: [] }),
-    deleteObject: async () => notImpl('deleteObject'),
+    putObject: async (args: { Bucket: string; Key: string; Body: Uint8Array }) => {
+      const res = await fetch(url(args.Bucket, args.Key), { method: 'PUT', body: args.Body as unknown as BodyInit });
+      if (!res.ok) throw new Error(`S3 putObject ${args.Key}: ${res.status} ${await res.text()}`);
+    },
+    getObject: async (args: { Bucket: string; Key: string }) => {
+      const res = await fetch(url(args.Bucket, args.Key));
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`S3 getObject ${args.Key}: ${res.status}`);
+      return { Body: new Uint8Array(await res.arrayBuffer()) };
+    },
+    headObject: async (args: { Bucket: string; Key: string }) => {
+      const res = await fetch(url(args.Bucket, args.Key), { method: 'HEAD' });
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`S3 headObject ${args.Key}: ${res.status}`);
+      return {};
+    },
+    listObjectsV2: async (args: { Bucket: string; Prefix?: string }) => {
+      const sep = endpoint.includes('?') ? '&' : '?';
+      const res = await fetch(`${endpoint.replace(/\/$/, '')}/${args.Bucket}${sep}list-type=2&prefix=${encodeURIComponent(args.Prefix ?? '')}`);
+      if (!res.ok) throw new Error(`S3 listObjectsV2: ${res.status}`);
+      const text = await res.text();
+      // 简化 XML 解析，只取 Key 标签
+      const keys = [...text.matchAll(/<Key>([^<]+)<\/Key>/g)].map((m) => ({ Key: m[1] }));
+      return { Contents: keys };
+    },
+    deleteObject: async (args: { Bucket: string; Key: string }) => {
+      const res = await fetch(url(args.Bucket, args.Key), { method: 'DELETE' });
+      if (!res.ok && res.status !== 404) throw new Error(`S3 deleteObject ${args.Key}: ${res.status}`);
+    },
   };
 }
 

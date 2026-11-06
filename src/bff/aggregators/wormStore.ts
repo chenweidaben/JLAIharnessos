@@ -273,15 +273,18 @@ export function assertWormAuditCombo(
   return { ok: true, message: '' };
 }
 export function getWormStore(): WormStore {
+  if (process.env.WORM_BACKEND === 's3') {
+    // s3 是异步后端，同步路径一律不接 Memory shim（P5-17 教训：读写分裂比明确不可用更危险）。
+    // 所有读/写必须走 wormArchiveAggregator.store() → createWormStore()（async）。
+    // 任何新代码想在同步上下文读 WORM 段，必须自己改 async 或走 HTTP handler。
+    throw new Error(
+      'WORM_BACKEND=s3: sync getWormStore() is not available. '
+      + 'Use wormArchiveAggregator async store() path (which wires createWormStore with layered(S3, fs)).',
+    );
+  }
   if (!_store) {
     if (process.env.WORM_BACKEND === 'fs') {
       _store = new FileWormStore();
-    } else if (process.env.WORM_BACKEND === 's3') {
-      // s3 是异步后端。这里返回一个 MemoryWormStore 作为 sync 诊断 shim（供 storeInfo / __resetStore
-      // 等同步路径使用）；真实异步 seal/get/list 路径走 wormArchiveAggregator.store() → createWormStore()。
-      // 启动时打 warning，提示"同步路径看到的是内存 shim，不是真实 S3 后端"。
-      _store = new MemoryWormStore();
-      console.warn('[worm] WORM_BACKEND=s3: sync getWormStore() returning in-memory shim for diagnostics only; real seal path uses async store() with layered(S3, fs).');
     } else {
       _store = new MemoryWormStore();
     }
@@ -291,8 +294,6 @@ export function getWormStore(): WormStore {
     const info = getWormBackendInfo();
     if (info.backend === 'fs') {
       console.info(`[worm] backend=fs dir=${info.dir}`);
-    } else if (info.backend === 's3') {
-      console.info(`[worm] backend=s3 remote=${info.dir}`);
     } else if (info.backend === 'memory') {
       console.warn(`[worm] backend=memory — segments are NOT persisted; restart will re-archive already-sealed events and BREAK the cross-segment chain. Set WORM_BACKEND=fs for production.`);
     }
