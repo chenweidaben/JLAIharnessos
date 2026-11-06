@@ -44,14 +44,14 @@ export interface AuditEvent {
 }
 
 const events: AuditEvent[] = [];
-const GENESIS = 'GENESIS';
+export const GENESIS = 'GENESIS';
 
 function pick<T extends string>(v: unknown, allowed: readonly T[], label: string): T {
   if (typeof v !== 'string' || !(allowed as readonly string[]).includes(v)) throw new AuditError(400, `${label} 非法：${String(v)}`);
   return v as T;
 }
 
-function canonical(e: Omit<AuditEvent, 'hash'>): string {
+export function canonical(e: Omit<AuditEvent, 'hash'>): string {
   // 固定字段顺序序列化（不含 hash 自身），保证跨语言可重算
   return JSON.stringify({
     eventId: e.eventId, seq: e.seq, occurredAt: e.occurredAt,
@@ -62,7 +62,7 @@ function canonical(e: Omit<AuditEvent, 'hash'>): string {
   });
 }
 
-function computeHash(prevHash: string, payload: string): string {
+export function computeHash(prevHash: string, payload: string): string {
   return createHash('sha256').update(prevHash + '|' + payload, 'utf8').digest('hex');
 }
 

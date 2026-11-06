@@ -8,6 +8,23 @@ import { spawn, ChildProcess } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import postgres from 'postgres';
+import { createHash } from 'node:crypto';
+
+// 本地复制 GENESIS / canonical / computeHash，避免 setup 阶段 import BFF 模块
+// （setup 在 BFF 启动前跑，import 会触发 BFF 模块初始化）
+const GENESIS = 'GENESIS';
+function canonical(e: { eventId: string; seq: number; occurredAt: string; actorId: string; actorRole: string; action: string; module: string; resourceType: string; resourceId: string; patientId: string | null; result: string; errorCode: string | null; ip: string; userAgent: string; prevHash: string }): string {
+  return JSON.stringify({
+    eventId: e.eventId, seq: e.seq, occurredAt: e.occurredAt,
+    actorId: e.actorId, actorRole: e.actorRole, action: e.action, module: e.module,
+    resourceType: e.resourceType, resourceId: e.resourceId,
+    patientId: e.patientId, result: e.result, errorCode: e.errorCode,
+    ip: e.ip, userAgent: e.userAgent, prevHash: e.prevHash,
+  });
+}
+function computeHash(prevHash: string, payload: string): string {
+  return createHash('sha256').update(prevHash + '|' + payload, 'utf8').digest('hex');
+}
 
 const REPO_ROOT = path.resolve(import.meta.dir, '..', '..');
 const PORT = 8081;
@@ -43,15 +60,40 @@ export async function setupSchema(): Promise<void> {
   for (const stmt of ddl.split(';').map(s => s.trim()).filter(s => s && !s.startsWith('--'))) {
     try { await sql.unsafe(stmt); } catch (e) { /* ignore idempotent notices */ }
   }
-  // P5-20: 播种 3 条 audit 事件，让 BFF 启动时 backfillPending 能取出事件
-  // 否则 WORM seal 会出空段，P5-6 search total=0
+  // P5-22: 播种 3 条真实哈希链事件（不是假哈希）
+  // 第一条 prevHash = GENESIS，之后 prevHash = 前一条 hash
+  // 这样正常 seal 用例的 sourceChainValid = true
   const now = new Date().toISOString();
+  let prevHash = GENESIS;
   for (let i = 1; i <= 3; i++) {
+    // event_id 是 uuid 类型，用 gen_random_uuid()；但 computeHash 需要 eventId 字符串
+    // 所以先查出生成的 uuid，再算 hash
+    const base = {
+      eventId: `seed-event-${i}`, seq: i, occurredAt: now,
+      actorId: `seed-admin-${i}`, actorRole: 'admin', action: 'seed' as const,
+      module: 'worm-e2e', resourceType: 'test', resourceId: `seed-${i}`,
+      patientId: null, result: 'success' as const, errorCode: null,
+      ip: '127.0.0.1', userAgent: 'e2e-seed', prevHash,
+    };
+    // 用占位 uuid 字符串算 hash（实际 DB 存 gen_random_uuid()）
+    // 注意：这会导致 verifyChainSync 重算时 eventId 不匹配！
+    // 所以必须让 DB 里的 event_id 与计算时用的一致。
+    // 改用：先 INSERT 拿 uuid，再 UPDATE prev_hash/hash
     await sql.unsafe(
       `INSERT INTO ${SCHEMA}.events (seq, event_id, occurred_at, actor_id, actor_role, action, module, resource_type, resource_id, patient_id, result, ip, user_agent, prev_hash, hash)
-       VALUES ($1, gen_random_uuid(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
-      [i, now, `seed-admin-${i}`, 'admin', 'seed', 'worm-e2e', 'test', `seed-${i}`, null, 'success', '127.0.0.1', 'e2e-seed', `prev-${i}`, `hash-${i}`]
+       VALUES ($1, gen_random_uuid(), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, '', '')`,
+      [i, now, base.actorId, base.actorRole, base.action, base.module,
+       base.resourceType, base.resourceId, null, base.result, base.ip, base.userAgent]
     );
+    // 查回真实 uuid
+    const [row] = await sql`SELECT event_id FROM ${sql(SCHEMA)}.events WHERE seq = ${i}`;
+    base.eventId = row.eventId;
+    const hash = computeHash(prevHash, canonical(base));
+    await sql.unsafe(
+      `UPDATE ${SCHEMA}.events SET prev_hash = $1, hash = $2 WHERE seq = $3`,
+      [prevHash, hash, i]
+    );
+    prevHash = hash;
   }
   await sql.end();
 }

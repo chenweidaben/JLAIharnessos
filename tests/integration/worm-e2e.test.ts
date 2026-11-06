@@ -182,6 +182,7 @@ describe('seal + 国密字段', () => {
     expect(r.data.digestSm3).toMatch(/^[0-9a-f]{64}$/);
     expect(r.data.sm4Encrypted).toBe(true);
     expect(r.data.sm2Signature?.length).toBeGreaterThan(0);
+    expect(r.data.sourceChainValid).toBe(true);
     seg1 = r.data.segmentId ?? null;
   });
 });
