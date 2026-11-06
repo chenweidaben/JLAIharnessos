@@ -7124,7 +7124,7 @@ import('./aggregators/auditEventStore').then((m) => {
   if (n && typeof n === 'object' && 'filled' in n) {
     console.log(`[audit] backfill done: filled=${n.filled} total=${n.total} truncated=${n.truncated}`);
   }
-}).catch((e) => { console.error('[audit] init failed:', e?.message ?? e); });
+}).catch((e: unknown) => { console.error('[audit] init failed:', e instanceof Error ? e.message : String(e)); });
 
 void initDatabase().then(() => {
   // eslint-disable-next-line no-console
@@ -7149,7 +7149,7 @@ const server = Bun.serve({
     });
     try {
       const result = await Promise.race([
-        handleFetch(req, bunServer) as Promise<Response | undefined>,
+        handleFetch(req, bunServer),
         timeoutPromise,
       ]);
       return result ?? new Response(null, { status: 101 });
@@ -7236,3 +7236,4 @@ process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
 export { broadcast, ok, server };
+
