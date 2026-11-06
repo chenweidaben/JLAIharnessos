@@ -164,3 +164,22 @@ ode 而非 process.execPath（bun execFileSync 大输出 maxBuffer 不生效）
 ### 工作区清理
 - 预存改动 auth.ts（demo-admin 口令）+ LoginPage.tsx（演示账号文案）非本批，已 stash（stash@{0}）
 - 工作区回到干净态，lint-diff exit 0
+
+---
+
+## 10. 工作区 WIP 处置（等用户确认，stash 不 pop/drop）
+
+### git status --porcelain（干净态）
+工作区 tracked 文件无改动。uth.ts + LoginPage.tsx 两处非本批 WIP 已 stash 保存。
+
+### stash@{0} 内容摘要（口令值不写入简报）
+- src/bff/routes/auth.ts +1 行：在 DEMO_CREDENTIALS 表新增 dmin 演示账号，口令为硬编码明文（与同表 demo-doctor/demo-nurse/demo-pharmacist 同模式，均为演示种子，生产无此表）
+- web/src/pages/LoginPage.tsx 改 1 行：演示账号文案从"admin / 任意 6 位以上密码"改为明示固定口令
+- 文件 mtime：2026-11-06 15:54:18（本任务期间），非用户手动外部改动
+- **安全提示**：硬编码明文口令虽为演示表，但 dmin 账号权限与 demo-admin 相同，提交前应确认此 demo 账号是否预期暴露
+
+### 19 errors 来源（pop 后逐文件 eslint）
+- uth.ts 9 errors / 1 warning：全部为文件既有 lint 债（no-unnecessary-type-assertion×1、prefer-nullish-coalescing×3、prefer-optional-chain×3、array-type×2），**+1 行 credential 本身未新增 lint 错误**
+- LoginPage.tsx 10 errors / 1 warning：全部为文件既有 lint 债（no-floating-promises×2、no-misused-promises×7、array-type×1），**文案改动本身未新增 lint 错误**
+- 合计 19 errors / 2 warnings = 两文件既有债，与 WIP 改动无关
+- 已 re-stash，工作区回到干净态
