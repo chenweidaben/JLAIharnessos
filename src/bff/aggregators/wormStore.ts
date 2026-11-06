@@ -8,8 +8,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import * as path from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';import * as path from 'node:path';
 import { platform } from 'node:process';
 import { WormSegment } from './wormArchiveAggregator.js';
 
@@ -219,6 +218,21 @@ export class FileWormStore implements WormStore {
   countBySigner(keyId: string): number {
     this.autoDetect();
     return this.bySigner.get(keyId) ?? 0;
+  }
+
+  /** P5-17 分层 store 补传成功后从 local 删除段 */
+  delete(segmentId: string): void {
+    const p = this.safePath(segmentId);
+    try { unlinkSync(p); } catch { /* 已删忽略 */ }
+    const seg = this.byId.get(segmentId);
+    if (seg) {
+      this.byId.delete(segmentId);
+      this.segments = this.segments.filter((s) => s.segmentId !== segmentId);
+      const k = seg.signerKeyId ?? '';
+      const n = (this.bySigner.get(k) ?? 0) - 1;
+      if (n <= 0) this.bySigner.delete(k);
+      else this.bySigner.set(k, n);
+    }
   }
 }
 

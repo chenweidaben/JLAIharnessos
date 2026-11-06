@@ -11,6 +11,7 @@
 
 import type { AsyncWormStore, WormStore } from './wormStore.js';
 import type { WormSegment } from './wormArchiveAggregator.js';
+import type { ProbeableStore } from './wormStoreResilience.js';
 
 export interface LayeredStoreOptions {
   /** 发现 local 有 remote 没有的段时，是否自动补传（默认 true） */
@@ -56,11 +57,20 @@ interface DeletableWormStore extends WormStore {
  * - local：本地 fs 同步兜底（断网时仍可读可写，恢复后补传）
  */
 export function createLayeredWormStore(
-  remote: AsyncWormStore,
+  remote: AsyncWormStore & Partial<ProbeableStore>,
   local: DeletableWormStore,
   opts: LayeredStoreOptions = {},
-): AsyncWormStore & { sweep(): Promise<SweepResult> } {
+): AsyncWormStore & { sweep(): Promise<SweepResult> } & Partial<ProbeableStore> {
   const autoRepair = opts.autoRepair !== false;
+
+  /** probe 转发到 remote：resilience 装饰层在 put 超时后会调 inner.probe；
+   *  组合顺序为 withResilience(layered(s3, fs))，inner 是 layered，所以必须由 layered 转发。 */
+  async function probe(segmentId: string): Promise<boolean> {
+    if (typeof remote.probe === 'function') return remote.probe(segmentId);
+    // remote 不支持 probe（本地 mock 兜底）：用 get 判断
+    const seg = await remote.get(segmentId);
+    return seg !== null;
+  }
 
   /** 比对同 id 两侧 hash；不一致直接抛错（绝不返回任何一侧） */
   function assertNoDivergence(remoteSeg: WormSegment | null, localSeg: WormSegment | null): void {
@@ -169,5 +179,5 @@ export function createLayeredWormStore(
     return result;
   }
 
-  return { put, get, list, countBySigner, refresh, newestSeq, sweep };
+  return { put, get, list, countBySigner, refresh, newestSeq, sweep, probe };
 }
