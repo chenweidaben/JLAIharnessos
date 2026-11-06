@@ -10,6 +10,7 @@
  * - 合计与基线不符 → warn 但不 exit（集合随切片增长）
  * - 打印每文件存在性 + 合计三元 + exit code
  */
+import { execSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -55,15 +56,31 @@ if (anyMissing) {
 }
 
 function runOne(paths: string[]): { pass: number; fail: number; expect: number; exit: number } {
-  const r = Bun.spawnSync(['bun', 'test', ...paths], { cwd: REPO_ROOT, stdout: 'pipe', stderr: 'pipe' });
-  const out = r.stdout.toString() + r.stderr.toString();
-  const sl = out.split('\n').filter(l => /^\s*\d+\s+(pass|fail|expect)/.test(l));
-  return {
-    pass: parseInt((sl.find(l => l.includes('pass')) || '0').match(/\d+/)?.[0] || '0', 10),
-    fail: parseInt((sl.find(l => l.includes('fail')) || '0').match(/\d+/)?.[0] || '0', 10),
-    expect: parseInt((sl.find(l => l.includes('expect')) || '0').match(/\d+/)?.[0] || '0', 10),
-    exit: r.exitCode ?? 1,
-  };
+  // 用 execSync 从外部 shell 跑，避免 Bun.spawnSync 从 bun 内 spawn bun 的状态污染
+  try {
+    const out = execSync(`bun test ${paths.join(' ')}`, {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      timeout: 120_000,
+      env: { ...process.env, BUN_RUN_MAIN: '' },
+    });
+    const sl = out.split('\n').filter(l => /^\s*\d+\s+(pass|fail|expect)/.test(l));
+    return {
+      pass: parseInt((sl.find(l => l.includes('pass')) || '0').match(/\d+/)?.[0] || '0', 10),
+      fail: parseInt((sl.find(l => l.includes('fail')) || '0').match(/\d+/)?.[0] || '0', 10),
+      expect: parseInt((sl.find(l => l.includes('expect')) || '0').match(/\d+/)?.[0] || '0', 10),
+      exit: 0,
+    };
+  } catch (e: any) {
+    const out = e.stdout?.toString() || '';
+    const sl = out.split('\n').filter(l => /^\s*\d+\s+(pass|fail|expect)/.test(l));
+    return {
+      pass: parseInt((sl.find(l => l.includes('pass')) || '0').match(/\d+/)?.[0] || '0', 10),
+      fail: parseInt((sl.find(l => l.includes('fail')) || '0').match(/\d+/)?.[0] || '0', 10),
+      expect: parseInt((sl.find(l => l.includes('expect')) || '0').match(/\d+/)?.[0] || '0', 10),
+      exit: 1,
+    };
+  }
 }
 
 console.log('\n=== 运行 bun test（分两批，避免跨文件污染）===');
