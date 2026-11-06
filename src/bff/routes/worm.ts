@@ -57,7 +57,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, unknown>;
+      const b = await c.body<Record<string, unknown>>();
       const from = typeof b.from === 'string' ? b.from : undefined;
       const to = typeof b.to === 'string' ? b.to : undefined;
       const r = await seal({ from, to });
@@ -175,8 +175,8 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, unknown>;
-      const keyId = String(b.keyId ?? '');
+      const b = await c.body<Record<string, unknown>>();
+      const keyId = typeof b.keyId === 'string' ? b.keyId : '';
       if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
       const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
       const r = getKeyProvider().retire(keyId);
@@ -191,12 +191,12 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, unknown>;
+      const b = await c.body<Record<string, unknown>>();
       // P5-11：二次确认，避免误删
       if (b.confirm !== 'PURGE') {
         return json(fail(ErrorCode.BAD_REQUEST, 'confirm-required'), 400);
       }
-      const keyId = String(b.keyId ?? '');
+      const keyId = typeof b.keyId === 'string' ? b.keyId : '';
       if (!keyId) return json(fail(ErrorCode.BAD_REQUEST, 'keyId 必填'), 400);
       const { getKeyProvider } = await import('../aggregators/wormKeyProvider');
       const r = await getKeyProvider().purge(keyId);
@@ -236,8 +236,8 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const demo = requireDemo(c); if (demo) return demo;
-      const b = (await c.body()) as Record<string, unknown>;
-      const segmentId = String(b.segmentId ?? '');
+      const b = await c.body<Record<string, unknown>>();
+      const segmentId = typeof b.segmentId === 'string' ? b.segmentId : '';
       if (!segmentId) return json(fail(ErrorCode.BAD_REQUEST, 'segmentId 必填'), 400);
       const probe = await createProbe(segmentId);
       if (!probe) return json(fail(ErrorCode.NOT_FOUND, '段不存在'), 404);
@@ -251,8 +251,8 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const demo = requireDemo(c); if (demo) return demo;
-      const b = (await c.body()) as Record<string, unknown>;
-      const probeId = String(b.probeId ?? '');
+      const b = await c.body<Record<string, unknown>>();
+      const probeId = typeof b.probeId === 'string' ? b.probeId : '';
       if (!probeId) return json(fail(ErrorCode.BAD_REQUEST, 'probeId 必填'), 400);
       const okFlag = tamperProbeDigest(probeId);
       if (!okFlag) return json(fail(ErrorCode.NOT_FOUND, 'probe 不存在'), 404);
@@ -266,8 +266,8 @@ export const wormRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
       const demo = requireDemo(c); if (demo) return demo;
-      const b = (await c.body()) as Record<string, unknown>;
-      const probeId = String(b.probeId ?? '');
+      const b = await c.body<Record<string, unknown>>();
+      const probeId = typeof b.probeId === 'string' ? b.probeId : '';
       if (!probeId) return json(fail(ErrorCode.BAD_REQUEST, 'probeId 必填'), 400);
       const okFlag = tamperProbeSignature(probeId);
       if (!okFlag) return json(fail(ErrorCode.NOT_FOUND, 'probe 不存在'), 404);
@@ -320,7 +320,7 @@ export const wormRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, unknown>;
+      const b = await c.body<Record<string, unknown>>();
       const cfg = setAutoConfig({
         enabled: typeof b.enabled === 'boolean' ? b.enabled : undefined,
         intervalMs: typeof b.intervalMs === 'number' ? b.intervalMs : undefined,
