@@ -14,7 +14,7 @@ describe('VendorCHISAdapter', () => {
   it('应返回正确元信息', () => {
     const adapter = new VendorCHISAdapter();
     const meta = adapter.getMetadata();
-    expect(meta.vendor).toBe('东华医为');
+    expect(meta.vendor).toBe('HIS厂商C');
     expect(meta.type).toBe('his');
   });
 
@@ -26,9 +26,9 @@ describe('VendorCHISAdapter', () => {
 });
 
 describe('VendorBHISAdapter', () => {
-  it('应返回创业慧康元信息', () => {
+  it('应返回厂商B元信息', () => {
     const adapter = new VendorBHISAdapter();
-    expect(adapter.getMetadata().vendor).toBe('创业慧康');
+    expect(adapter.getMetadata().vendor).toBe('HIS厂商B');
   });
 
   it('新接口方法应抛出未实现', async () => {
@@ -38,16 +38,16 @@ describe('VendorBHISAdapter', () => {
 });
 
 describe('VendorDHISAdapter', () => {
-  it('应返回联众元信息', () => {
+  it('应返回厂商D元信息', () => {
     const adapter = new VendorDHISAdapter();
-    expect(adapter.getMetadata().vendor).toBe('联众智慧');
+    expect(adapter.getMetadata().vendor).toBe('HIS厂商D');
   });
 });
 
 describe('VendorEHISAdapter', () => {
-  it('应返回智业元信息', () => {
+  it('应返回厂商E元信息', () => {
     const adapter = new VendorEHISAdapter();
-    expect(adapter.getMetadata().vendor).toBe('智业软件');
+    expect(adapter.getMetadata().vendor).toBe('HIS厂商E');
   });
 
   it('取消医嘱应抛出未实现', async () => {

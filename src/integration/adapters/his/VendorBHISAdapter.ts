@@ -5,13 +5,13 @@
  */
 
 /**
- * 健澜科技数智医院智能体 - 创业慧康HIS适配器（骨架）
+ * 健澜科技数智医院智能体 - HIS厂商B适配器（骨架）
  *
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 创业慧康（B-Soft）HIS系统适配器骨架。
- * 创业慧康是国内头部医疗信息化厂商，核心产品"创业慧康智慧医院"，
+ * HIS厂商B系统适配器骨架（脱敏代称）。
+ * 厂商B为头部HIS供应商之一，其主力产品为区域智慧医院平台，
  * 集成方式以 RESTful API + HL7 为主，支持区域卫生平台对接。
  *
  * 本文件为骨架实现，包含认证流程、字段映射配置与全部接口方法骨架。
@@ -48,7 +48,7 @@ import type {
   PatientSyncResult,
 } from './HISAdapter';
 
-/** 创业慧康HIS适配器配置 */
+/** HIS厂商B适配器配置 */
 export interface VendorBHISConfig extends Partial<AdapterConfig> {
   /** 应用ID */
   appId?: string;
@@ -59,10 +59,10 @@ export interface VendorBHISConfig extends Partial<AdapterConfig> {
 }
 
 /**
- * 创业慧康HIS适配器（骨架）
+ * HIS厂商B适配器（骨架）
  *
  * TODO: 完成实际对接：
- * 1. 创业慧康开放平台 OAuth2 认证
+ * 1. 厂商B开放平台 OAuth2 认证
  * 2. 患者/医嘱/费用 API 调用
  * 3. HL7 ADT 事件接收
  */
@@ -72,20 +72,20 @@ export class VendorBHISAdapter extends BaseAdapter implements HISAdapter {
 
   constructor(config: VendorBHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
-      id: config.id ?? 'his-chuangye',
+      id: config.id ?? 'his-vendor-b',
       type: 'his',
-      vendor: '创业慧康',
-      version: config.version ?? 'B-Soft 9.0',
-      name: config.name ?? '创业慧康HIS适配器',
-      description: '对接创业慧康HIS系统',
-      endpoint: config.endpoint ?? 'https://his-api.hospital.com/bsoft',
+      vendor: 'HIS厂商B',
+      version: config.version ?? 'v9.0',
+      name: config.name ?? 'HIS厂商B适配器',
+      description: '对接HIS厂商B系统',
+      endpoint: config.endpoint ?? 'https://his-api.hospital.com/vendor-b',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
       auth: {
         type: 'oauth2',
         clientId: config.appId,
         clientSecret: config.appSecret,
-        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/bsoft'}/oauth2/token`,
+        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/vendor-b'}/oauth2/token`,
         ...config.auth,
       },
       fieldMapping: {
@@ -109,10 +109,10 @@ export class VendorBHISAdapter extends BaseAdapter implements HISAdapter {
     return {
       id: this.config.id,
       type: 'his',
-      vendor: '创业慧康',
+      vendor: 'HIS厂商B',
       version: this.config.version,
-      name: '创业慧康HIS适配器',
-      description: '对接创业慧康HIS系统',
+      name: 'HIS厂商B适配器',
+      description: '对接HIS厂商B系统',
       supportedProtocols: ['rest', 'hl7'],
     };
   }

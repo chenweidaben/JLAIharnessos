@@ -5,13 +5,13 @@
  */
 
 /**
- * 健澜科技数智医院智能体 - 智业软件HIS适配器（骨架）
+ * 健澜科技数智医院智能体 - HIS厂商E适配器（骨架）
  *
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 智业软件（VendorE）HIS系统适配器骨架。
- * 智业软件在华南地区市场占有率较高，核心产品"智业数字化医院"，
+ * HIS厂商E系统适配器骨架（脱敏代称）。
+ * 厂商E在华南地区市场占有率较高，其主力产品为数字化医院平台，
  * 集成以 REST API + HL7 为主。
  *
  * 本文件为骨架实现，包含认证流程、字段映射配置与全部接口方法骨架。
@@ -48,7 +48,7 @@ import type {
   PatientSyncResult,
 } from './HISAdapter';
 
-/** 智业HIS适配器配置 */
+/** HIS厂商E适配器配置 */
 export interface VendorEHISConfig extends Partial<AdapterConfig> {
   appId?: string;
   appSecret?: string;
@@ -56,7 +56,7 @@ export interface VendorEHISConfig extends Partial<AdapterConfig> {
 }
 
 /**
- * 智业软件HIS适配器（骨架）
+ * HIS厂商E适配器（骨架）
  *
  * TODO: 完成实际对接。
  */
@@ -66,20 +66,20 @@ export class VendorEHISAdapter extends BaseAdapter implements HISAdapter {
 
   constructor(config: VendorEHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
-      id: config.id ?? 'his-zhiye',
+      id: config.id ?? 'his-vendor-e',
       type: 'his',
-      vendor: '智业软件',
-      version: config.version ?? 'ZY 7.0',
-      name: config.name ?? '智业HIS适配器',
-      description: '对接智业软件HIS系统',
-      endpoint: config.endpoint ?? 'https://his-api.hospital.com/zhiye',
+      vendor: 'HIS厂商E',
+      version: config.version ?? 'v7.0',
+      name: config.name ?? 'HIS厂商E适配器',
+      description: '对接HIS厂商E系统',
+      endpoint: config.endpoint ?? 'https://his-api.hospital.com/vendor-e',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
       auth: {
         type: 'oauth2',
         clientId: config.appId,
         clientSecret: config.appSecret,
-        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/zhiye'}/oauth2/token`,
+        tokenUrl: `${config.endpoint ?? 'https://his-api.hospital.com/vendor-e'}/oauth2/token`,
         ...config.auth,
       },
       fieldMapping: {
@@ -98,10 +98,10 @@ export class VendorEHISAdapter extends BaseAdapter implements HISAdapter {
     return {
       id: this.config.id,
       type: 'his',
-      vendor: '智业软件',
+      vendor: 'HIS厂商E',
       version: this.config.version,
-      name: '智业HIS适配器',
-      description: '对接智业软件HIS系统',
+      name: 'HIS厂商E适配器',
+      description: '对接HIS厂商E系统',
       supportedProtocols: ['rest', 'hl7'],
     };
   }

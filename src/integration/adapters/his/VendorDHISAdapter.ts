@@ -5,13 +5,13 @@
  */
 
 /**
- * 健澜科技数智医院智能体 - 联众智慧HIS适配器（骨架）
+ * 健澜科技数智医院智能体 - HIS厂商D适配器（骨架）
  *
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 北京联众智慧（Lizong）HIS系统适配器骨架。
- * 联众智慧在区域医疗与基层医疗市场有较高占有率，
+ * HIS厂商D系统适配器骨架（脱敏代称）。
+ * 厂商D在区域医疗与基层医疗市场有较高占有率，
  * 集成以 REST API + WebService 为主。
  *
  * 本文件为骨架实现，包含认证流程、字段映射配置与全部接口方法骨架。
@@ -48,7 +48,7 @@ import type {
   PatientSyncResult,
 } from './HISAdapter';
 
-/** 联众HIS适配器配置 */
+/** HIS厂商D适配器配置 */
 export interface VendorDHISConfig extends Partial<AdapterConfig> {
   appId?: string;
   appSecret?: string;
@@ -56,7 +56,7 @@ export interface VendorDHISConfig extends Partial<AdapterConfig> {
 }
 
 /**
- * 联众智慧HIS适配器（骨架）
+ * HIS厂商D适配器（骨架）
  *
  * TODO: 完成实际对接。
  */
@@ -66,19 +66,19 @@ export class VendorDHISAdapter extends BaseAdapter implements HISAdapter {
 
   constructor(config: VendorDHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
-      id: config.id ?? 'his-lianzhong',
+      id: config.id ?? 'his-vendor-d',
       type: 'his',
-      vendor: '联众智慧',
-      version: config.version ?? 'LZ 6.0',
-      name: config.name ?? '联众HIS适配器',
-      description: '对接联众智慧HIS系统',
+      vendor: 'HIS厂商D',
+      version: config.version ?? 'v6.0',
+      name: config.name ?? 'HIS厂商D适配器',
+      description: '对接HIS厂商D系统',
       endpoint: config.endpoint ?? 'https://his-api.hospital.com/lz',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
       auth: {
         type: 'apiKey',
         apiKey: config.appId,
-        apiKeyHeader: 'X-LZ-AppKey',
+        apiKeyHeader: 'X-Vendor-D-AppKey',
         ...config.auth,
       },
       fieldMapping: {
@@ -97,10 +97,10 @@ export class VendorDHISAdapter extends BaseAdapter implements HISAdapter {
     return {
       id: this.config.id,
       type: 'his',
-      vendor: '联众智慧',
+      vendor: 'HIS厂商D',
       version: this.config.version,
-      name: '联众HIS适配器',
-      description: '对接联众智慧HIS系统',
+      name: 'HIS厂商D适配器',
+      description: '对接HIS厂商D系统',
       supportedProtocols: ['rest', 'soap'],
     };
   }

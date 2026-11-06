@@ -5,18 +5,18 @@
  */
 
 /**
- * 健澜科技数智医院智能体 - 东华HIS适配器（骨架）
+ * 健澜科技数智医院智能体 - HIS厂商C适配器（骨架）
  *
  * 版权所有 (c) 2026 健澜科技
  * 本文件为健澜科技专有技术文档，未经授权不得复制、传播或用于其他用途。
  *
- * 东华医为（DHC）HIS系统适配器骨架。
- * 东华医为是国内头部HIS厂商，核心产品"东华数字化医院"，
+ * HIS厂商C系统适配器骨架（脱敏代称）。
+ * 厂商C为头部HIS供应商之一，其主力产品为大型集团化数字医院平台，
  * 传统集成以 WebService（SOAP）为主，新一代提供 REST 开放平台。
  *
  * 本文件为骨架实现，包含：
  * - 认证流程（OAuth2 / WebService Token）
- * - 字段映射配置（东华字段 → 健澜内部模型）
+ * - 字段映射配置（厂商C字段 → 健澜内部模型）
  * - 全部接口方法骨架（抛出未实现错误）
  *
  * @module integration/adapters/his/VendorCHISAdapter
@@ -51,21 +51,21 @@ import type {
   PatientSyncResult,
 } from './HISAdapter';
 
-/** 东华HIS适配器配置 */
+/** HIS厂商C适配器配置 */
 export interface VendorCHISConfig extends Partial<AdapterConfig> {
-  /** 东华应用ID */
+  /** 厂商C应用ID */
   appId?: string;
-  /** 东华应用密钥 */
+  /** 厂商C应用密钥 */
   appSecret?: string;
   /** 机构代码 */
   orgCode?: string;
 }
 
 /**
- * 东华HIS适配器（骨架）
+ * HIS厂商C适配器（骨架）
  *
  * TODO: 完成实际对接：
- * 1. 东华 WebService/REST 认证
+ * 1. 厂商C WebService/REST 认证
  * 2. 患者、医嘱、费用 API 调用
  * 3. HL7 ADT 事件接收
  */
@@ -75,12 +75,12 @@ export class VendorCHISAdapter extends BaseAdapter implements HISAdapter {
 
   constructor(config: VendorCHISConfig = {}) {
     const adapterConfig = createDefaultAdapterConfig({
-      id: config.id ?? 'his-donghua',
+      id: config.id ?? 'his-vendor-c',
       type: 'his',
-      vendor: '东华医为',
-      version: config.version ?? 'DHC 8.0',
-      name: config.name ?? '东华HIS适配器',
-      description: '对接东华医为HIS系统',
+      vendor: 'HIS厂商C',
+      version: config.version ?? 'v8.0',
+      name: config.name ?? 'HIS厂商C适配器',
+      description: '对接HIS厂商C系统',
       endpoint: config.endpoint ?? 'https://his-api.hospital.com/dhc',
       timeout: config.timeout ?? 30000,
       protocol: 'rest',
@@ -122,10 +122,10 @@ export class VendorCHISAdapter extends BaseAdapter implements HISAdapter {
     return {
       id: this.config.id,
       type: 'his',
-      vendor: '东华医为',
+      vendor: 'HIS厂商C',
       version: this.config.version,
-      name: '东华HIS适配器',
-      description: '对接东华医为HIS系统',
+      name: 'HIS厂商C适配器',
+      description: '对接HIS厂商C系统',
       supportedProtocols: ['rest', 'soap', 'hl7'],
     };
   }
