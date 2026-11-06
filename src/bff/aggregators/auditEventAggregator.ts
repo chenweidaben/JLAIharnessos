@@ -9,6 +9,7 @@
  */
 
 import { createHash, randomUUID } from 'node:crypto';
+import { bffMetrics } from '../observability/metrics';
 import { getAuditStore, __resetAuditStore, type AppendResult } from './auditEventStore';
 
 export class AuditError extends Error {
@@ -135,8 +136,15 @@ export async function queryEvents(q: QueryInput): Promise<{ rows: AuditEvent[]; 
   if (q.action) rows = rows.filter((e) => e.action === q.action);
   if (q.result) rows = rows.filter((e) => e.result === q.result);
   if (q.patientId) rows = rows.filter((e) => e.patientId === q.patientId);
-  if (q.from) rows = rows.filter((e) => e.occurredAt >= (q.from as string));
-  if (q.to) rows = rows.filter((e) => e.occurredAt <= (q.to as string));
+  if (q.from) {
+    // 在 if 分支内取 const，TS 闭包外不再 narrowing，用局部变量保留类型
+    const from: string = q.from;
+    rows = rows.filter((e) => e.occurredAt >= from);
+  }
+  if (q.to) {
+    const to: string = q.to;
+    rows = rows.filter((e) => e.occurredAt <= to);
+  }
   return { rows: rows.slice(offset, offset + limit), total: rows.length };
 }
 
@@ -270,8 +278,6 @@ export async function backfillPending(fromSeq: number): Promise<BackfillResult> 
   } catch (err) {
     console.error(`[audit] backfill failed:`, err instanceof Error ? err.message : String(err));
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { bffMetrics } = require('../observability/metrics') as typeof import('../observability/metrics');
       bffMetrics.auditPersistFailed.inc();
     } catch { /* ignore */ }
     return { filled: 0, total: 0, truncated: false };
