@@ -142,7 +142,9 @@ reports/*.csv
 # 另路 consult 巡检产物（由对应任务自行收口；本主线不代提交。2026-11-06 08:23 轮误纳入后撤回）
 reports/consult-deepen/
 reports/consult-rebuild/
-# 另路 patrol 定时巡检产物（每小时槽位简报，本主线不代提交；
-# 用排除模式自动放行本批自己的 p5 切片简报，不依赖 git add -f）
-reports/patrol/*
+# 另路 patrol 定时巡检产物：只忽略"patrol-YYYYMMDD-HHMM.md"这种无后缀小时报。
+# 不能用 reports/patrol/* 全量忽略——本主线自己的交付物（*-mainline.md 每轮简报、*-p5-*.md 切片简报）
+# 也会被一起踢出索引（2026-11-06 10:23 轮已踩到：42 份主线简报 + 6 份切片聚合简报被撤出跟踪）。
+reports/patrol/patrol-????????-????.md
+!reports/patrol/patrol-*-mainline.md
 !reports/patrol/patrol-*-p5-*.md
