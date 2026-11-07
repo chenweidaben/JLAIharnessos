@@ -43,10 +43,10 @@
 | 适配器 | 文件 |
 | --- | --- |
 | HIS厂商C HIS | `VendorXHISAdapter.ts` |
-| 东华 HIS | `vendorBHISAdapter.ts` |
-| 创业 HIS | `vendorDHISAdapter.ts` |
-| 联众 HIS | `vendorEHISAdapter.ts` |
-| 智业 HIS | `vendorFHISAdapter.ts` |
+| HIS厂商B HIS | `VendorBHISAdapter.ts` |
+| HIS厂商C HIS | `VendorCHISAdapter.ts` |
+| HIS厂商D HIS | `VendorDHISAdapter.ts` |
+| HIS厂商E HIS | `VendorEHISAdapter.ts` |
 | Mock | `HISMockAdapter.ts` |
 
 ## 错误码
