@@ -6,6 +6,8 @@
 #               line decoding to "RE:<pattern>" = .NET regex, case-sensitive (boundary-safe brand terms).
 # Scope note: default scope is product code (src,web/src). Documentation (docs/, reports/) is scanned
 #             separately on demand via -Paths "." and its residue is tracked as doc debt, not code debt.
+#             The code/doc label is segment-based, so a -Paths target outside the repo root (snapshot,
+#             fixture) is still classified correctly instead of being counted wholesale as code.
 
 param(
   [string]$Paths = "src,web/src"
@@ -107,7 +109,10 @@ foreach ($p in $pathList) {
 }
 
 foreach ($v in $hardViolations) {
-  if ($v.file -like 'docs\*' -or $v.file -like 'reports\*' -or $v.file -notlike '*\*') { $scopeDoc++ } else { $scopeCode++ }
+  # Segment-based match: a scan target outside the repo root keeps an absolute $rel, where the old
+  # 'docs\*' prefix test never matched and every hit was mislabelled as code. Matching the 'docs' /
+  # 'reports' segment (or a directory-less root file) labels correctly for in-repo and external scans.
+  if ($v.file -match '(^|\\)docs\\' -or $v.file -match '(^|\\)reports\\' -or $v.file -notmatch '\\') { $scopeDoc++ } else { $scopeCode++ }
 }
 
 Write-Host ""
