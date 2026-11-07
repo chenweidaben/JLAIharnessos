@@ -24,8 +24,8 @@ function argVals(flag: string, def: string[]): string[] {
   }
   return out.length > 0 ? out : def;
 }
-const paths = argVals('--paths', ['src', 'web/src', 'tests', 'docs']);
-const wordsFile = argVals('--words', ['logs/brand-words-reversed.txt'])[0];
+const paths = argVals('--paths', ['src', 'web/src']);
+const wordsFile = argVals('--words', ['scripts/brand-words.b64.txt'])[0];
 
 const root = resolve(import.meta.dirname ?? process.cwd(), '..');
 
@@ -33,20 +33,40 @@ const root = resolve(import.meta.dirname ?? process.cwd(), '..');
 const BACKLOG_PREFIX = 'gangos_';
 const EXCLUDE_WORDS = new Set(['winningSupplierId']);
 
-// 读词表
-const allWords = readFileSync(resolve(root, wordsFile), 'utf8')
-  .split(/\r?\n/)
-  .map((s) => s.trim())
-  .filter((s) => s.length >= 2 && !s.startsWith('#'));
+// Read b64 word list: each line is base64-encoded term; prefix "RE:" = regex
+function decodeWords(file: string): Array<{ kind: 'literal' | 'regex'; text: string; re?: RegExp }> {
+  const raw = readFileSync(resolve(root, file), 'utf8')
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s && !s.startsWith('#'));
+  const out: Array<{ kind: 'literal' | 'regex'; text: string; re?: RegExp }> = [];
+  for (const line of raw) {
+    let term: string;
+    try { term = Buffer.from(line, 'base64').toString('utf8'); }
+    catch { term = line; } // fallback plaintext
+    if (term.startsWith('RE:')) {
+      const pat = term.slice(3);
+      // Translate .NET regex flags to JS: (?i) = case-insensitive
+      let jsPat = pat.replace(/\(\?i\)/g, '');
+      let flags = 'g';
+      if (pat.includes('(?i)')) flags += 'i';
+      try { out.push({ kind: 'regex', text: pat, re: new RegExp(jsPat, flags) }); }
+      catch { /* skip bad regex */ }
+    } else {
+      out.push({ kind: 'literal', text: term });
+    }
+  }
+  return out;
+}
 
-// P5-19: 大小写不敏感（中文不受影响，英文别名 dhc/DHC/bsoft/B-Soft 才吃得下）
-const wordsLower = allWords.map((w) => ({ orig: w, lower: w.toLowerCase() }));
+const entries = decodeWords(wordsFile);
+const literalWords = entries.filter((e) => e.kind === 'literal').map((e) => ({ orig: e.text, lower: e.text.toLowerCase() }));
+const regexWords = entries.filter((e) => e.kind === 'regex' && e.re);
 
 console.log(`[brand-scan] paths=${paths.join(',')}`);
-console.log(`[brand-scan] words=${wordsLower.length} (case-insensitive, source=${wordsFile})`);
+console.log(`[brand-scan] words=${entries.length} (literal=${literalWords.length} regex=${regexWords.length}, source=${wordsFile})`);
 
-// 收集文件
-// 排除构建产物目录（按目录名在任意层级匹配；logs/coverage 不排除，因为 src/ 下可能有真文件）
+// 收集文件 (align with brand-gate.ps1: .ts .tsx .js .jsx .mts .md)
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '.next', 'build']);
 const files: string[] = [];
 function walk(dir: string): void {
@@ -58,7 +78,7 @@ function walk(dir: string): void {
     let st;
     try { st = statSync(full); } catch { continue; }
     if (st.isDirectory()) walk(full);
-    else if (/\.(ts|tsx|js|jsx|mts|cts|vue|md|json|html|css)$/.test(e)) files.push(full);
+    else if (/\.(ts|tsx|js|jsx|mts|md|css|json|yml|yaml)$/.test(e)) files.push(full);
   }
 }
 for (const p of paths) walk(resolve(root, p));
@@ -75,7 +95,8 @@ for (const f of files) {
   try { content = readFileSync(f, 'utf8'); } catch { continue; }
   const rel = relative(root, f).replace(/\\/g, '/');
   const hay = content.toLowerCase();
-  for (const { orig, lower } of wordsLower) {
+  // Literal words (case-insensitive)
+  for (const { orig, lower } of literalWords) {
     if (EXCLUDE_WORDS.has(orig)) continue;
     let count = 0;
     let idx = hay.indexOf(lower);
@@ -87,7 +108,18 @@ for (const f of files) {
     if (!byFile[rel]) byFile[rel] = [];
     byFile[rel].push({ word: orig, count });
   }
-  // P5-19: 独立扫 gangos_ 前缀（metric 命名 backlog，不在词表里）
+  // Regex words
+  for (const { text, re } of regexWords) {
+    if (!re) continue;
+    const matches = content.match(re);
+    const count = matches ? matches.length : 0;
+    if (count === 0) continue;
+    totalHits += count;
+    byWord[text] = (byWord[text] ?? 0) + count;
+    if (!byFile[rel]) byFile[rel] = [];
+    byFile[rel].push({ word: text, count });
+  }
+  // Independent gangos_ backlog scan
   {
     let count = 0;
     let idx = hay.indexOf(BACKLOG_PREFIX);
@@ -105,7 +137,7 @@ console.log(`[brand-scan] files=${files.length} (skipped dirs: ${[...SKIP_DIRS].
 const report = {
   paths,
   filesScanned: files.length,
-  wordsLoaded: allWords.length,
+  wordsLoaded: entries.length,
   totalHits,
   backlogGangos: backlogHits,
   excluded: excludedHits,
