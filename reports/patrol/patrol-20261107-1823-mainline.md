@@ -78,7 +78,7 @@
 
 - 双推 `gitcode` + `mirror` exit 0；`ls-remote` 四 ref 逐位核对全等 `ca7a703f`，与本地 HEAD 一致。
 - 未推 `origin`、未推 `heagentos`、未打 tag。
-- 本简报自身另起一笔提交并再次双推，收口 SHA 以推送后核对值写在第七节。
+- 本简报自身另起一笔提交并再次双推；该笔提交后 HEAD 再前进一格（唯一变化是新增本简报），四 ref 核对的实测四行 SHA 全等，回执留在 `logs\patrol-1823-push-gitcode.txt` 与 `logs\patrol-1823-push-mirror.txt`。
 
 ## 6. 仓库卫生
 
