@@ -34,7 +34,7 @@
 **次生 bug**：`brand-gate.ps1` 中 `if ($rel -like 'logs\*')` 写在 `$rel` 赋值之前，PowerShell 下取到的是上一轮迭代的残留值，根目录 `logs\` 排除判定长期不可靠。
 
 **修法**（`2b5bffca`）：
-- 词表扩到 40 条：30 条 literal（保留旧行为，`OrdinalIgnoreCase`）+ 10 条 `RE:` 正则（拉丁词严格词边界，避免把 `winningSupplierId`、`isWinning` 这类业务标识误判为厂商名；`gangos_` 指标前缀继续单列 backlog）。
+- 词表扩到 40 条：30 条 literal（保留旧行为，`OrdinalIgnoreCase`）+ 10 条 `RE:` 正则（拉丁词严格词边界，避免把 `VendorXSupplierId`、`isVendorX` 这类业务标识误判为厂商名；`gangos_` 指标前缀继续单列 backlog）。
 - 脚本支持两类条目，正则预编译校验，坏正则以 `FAIL: bad regex entry` exit 1。
 - 输出增加 `scope:` 与 `hardViolations: N (code=X doc=Y)`，一眼区分产品代码与文档域。
 - 修正 `$rel` 顺序 bug；文件以 UTF-8 BOM 回写（PS 5.1 硬要求）。

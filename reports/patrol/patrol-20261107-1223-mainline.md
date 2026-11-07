@@ -29,12 +29,12 @@
 
 **取证**：`git status` 出现 19 条 `MM`（索引与工作区同时改），逐文件 `1:1` 对称替换。读 `git diff --cached -U0` 实际内容后确认方向是**代称 → 真名**，例如：
 
-- `docs/api/adapters/01-his-adapter.md`：`HIS厂商C、东华…` → `卫宁、东华…`
-- `docs/architecture/01-PRD-产品需求.md`：`HIS厂商C` → `卫宁 WiNEX`、`HIS厂商B` → `创业慧康`
+- `docs/api/adapters/01-his-adapter.md`：`HIS厂商C、东华…` → `HIS厂商C、东华…`
+- `docs/architecture/01-PRD-产品需求.md`：`HIS厂商C` → `HIS厂商C VENDOR_PLATFORM`、`HIS厂商B` → `HIS厂商B`
 
 这与 10:23 轮 `9b068a80` 是同一类事故的**第二次**，且这次是留在索引里的在制品。
 
-**处置**：先用 `git grep -l` 确认 HEAD 的 docs 干净（真名命中文件数 0、代称命中 10 文件），再把 19 个路径用显式 pathspec `git checkout HEAD --` 恢复。恢复后 `git grep 卫宁 -- docs` 文件数 0，`git status` 由 167 行降到 148 行（即回到既有的 44 条 `_m2xx` 在制品 + 9 条 `pgdata` 漂移 + 其余）。
+**处置**：先用 `git grep -l` 确认 HEAD 的 docs 干净（真名命中文件数 0、代称命中 10 文件），再把 19 个路径用显式 pathspec `git checkout HEAD --` 恢复。恢复后 `git grep HIS厂商C -- docs` 文件数 0，`git status` 由 167 行降到 148 行（即回到既有的 44 条 `_m2xx` 在制品 + 9 条 `pgdata` 漂移 + 其余）。
 
 **遗留判断**：两次同形态事故说明有一个环节在跑"代称 → 真名"的反向替换脚本，尚未定位到具体执行者（两次都发生在组织侧提交前后）。下一轮须先查这条链，否则每轮都要手工回退。
 

@@ -42,11 +42,11 @@
 
 | 适配器 | 文件 |
 | --- | --- |
-| HIS厂商C HIS | `WeiningHISAdapter.ts` |
-| 东华 HIS | `DonghuaHISAdapter.ts` |
-| 创业 HIS | `ChuangyeHISAdapter.ts` |
-| 联众 HIS | `LianzhongHISAdapter.ts` |
-| 智业 HIS | `ZhiyeHISAdapter.ts` |
+| HIS厂商C HIS | `VendorXHISAdapter.ts` |
+| 东华 HIS | `vendorBHISAdapter.ts` |
+| 创业 HIS | `vendorDHISAdapter.ts` |
+| 联众 HIS | `vendorEHISAdapter.ts` |
+| 智业 HIS | `vendorFHISAdapter.ts` |
 | Mock | `HISMockAdapter.ts` |
 
 ## 错误码

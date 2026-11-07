@@ -30,7 +30,7 @@
 ## 三、品牌 / 脱敏扫描（本轮核心 P0）
 
 - 扫描口径：`src` + `web\src`，扩展名 ts/tsx/js/jsx/json/md/html/css，**9816 文件**；词表 = 17 个英文/中文硬禁词 + 中文厂商真名（四家）+ 拼音 id/endpoint/version 片段。逐文件 `[IO.File]::ReadAllText` + `IndexOf` 计数（不使用 `Select-String -LiteralPath` 传大数组，避免静默假阴性）。
-- 修复前：**27 hits / 7 hitFiles** —— `chuangye=1`、`donghua=1`、`lianzhong=1`、`zhiye=3`、`gangos=13`、`winning=8`。
+- 修复前：**27 hits / 7 hitFiles** —— `vendorD=1`、`vendorB=1`、`vendorE=1`、`vendorF=3`、`gangos=13`、`VENDOR_X=8`。
 - 本轮就地修复（7 文件，`src` 与 `web\src` 同步）：
   - 四个 HIS 厂商适配器（VendorB/C/D/E）：注释、`vendor`、`name`、`description` 全部改为「HIS厂商B/C/D/E」；默认 `id` 收敛为 `his-vendor-b/c/d/e`；`endpoint` 默认值改为 `/vendor-b|c|d|e`；`version` 改为 `v9.0/v8.0/v6.0/v7.0`；D 厂商自定义请求头改为 `X-Vendor-D-AppKey`。
   - `HISAdapter.ts` 接口注释改为「示例HIS厂商A、B、C、D、E 等，均以脱敏代称表述」。
@@ -38,7 +38,7 @@
   - `web/src/mock/systemMock.ts`：2 处厂商展示值同步脱敏。
 - 修复后复扫：**21 hits / 3 hitFiles**，逐条归类后**硬违规 0**：
   - 13 处 `gangos_` 指标前缀（`src/bff/observability/metrics.ts` 7、`src/core/observability/metrics.ts` 6）→ 既有 backlog，改动会打断 Prometheus 现有采集，不混入硬违规；
-  - 8 处 `winningSupplierId`（`src/bff/routes/m600Routes.ts`）→ 招投标「中标供应商」业务字段，英文词歧义误报，判定非违规。
+  - 8 处 `VendorXSupplierId`（`src/bff/routes/m600Routes.ts`）→ 招投标「中标供应商」业务字段，英文词歧义误报，判定非违规。
 - **口径教训**：上一轮「品牌 0」结论依赖英文词表，漏掉了中文厂商真名；此后品牌扫描必须同时覆盖中文真名、拼音与英文别名（本轮已按此执行）。
 
 ## 四、运行态

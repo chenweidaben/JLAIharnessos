@@ -64,13 +64,13 @@
 - 跳过 `node_modules/dist/.git/logs` 等
 - 输出 JSON `{filesScanned, totalHits, byWord, byFile, backlogGangos}`
 - 硬违规 exit 1
-- 分类：`gangos_` backlog 单列；`winningSupplierId` 排除
+- 分类：`gangos_` backlog 单列；`VendorXSupplierId` 排除
 
 ### 词表反推
 从 `git show 8656c94c` diff 收集被删原字符串，得 29 词（放 `logs/brand-words-reversed.txt`，gitignore 不进仓库）：
-- 四家厂商中文真名（创业慧康/东华医为/联众智慧/智业软件 + 完整产品名）
-- 拼音 id（his-chuangye/donghua/lianzhong/zhiye）
-- endpoint（bsoft/zhiye）
+- 四家厂商中文真名（HIS厂商B/东华医为/联众智慧/智业软件 + 完整产品名）
+- 拼音 id（his-vendorD/vendorB/vendorE/vendorF）
+- endpoint（bsoft/vendorF）
 - 版本串（B-Soft 9.0 / DHC 8.0 / LZ 6.0 / ZY 7.0）
 - X-LZ-AppKey
 

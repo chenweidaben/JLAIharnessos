@@ -1,6 +1,6 @@
 # HIS 适配器 API
 
-> 对应源码：`src/integration/adapters/his/HISAdapter.ts`、`WeiningHISAdapter.ts`、`DonghuaHISAdapter.ts` 等
+> 对应源码：`src/integration/adapters/his/HISAdapter.ts`、`VendorXHISAdapter.ts`、`VendorYHISAdapter.ts` 等
 
 ## 概述
 
@@ -21,7 +21,7 @@ HIS 适配器封装与医院信息系统（挂号、收费、医嘱、患者主�
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| `vendor` | enum | weining/donghua/chuangye/lianzhong/zhiye/mock |
+| `vendor` | enum | vendorC/vendorB/vendorD/vendorE/vendorF/mock |
 | `endpoint` | string | HIS 接口地址 |
 | `appId / appSecret` | string | 认证凭据 |
 | `timeoutMs` | number | 超时，默认 5000 |

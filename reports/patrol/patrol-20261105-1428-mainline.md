@@ -70,7 +70,7 @@ BFF：`pid 13180`，`bun.exe run src/bff/index.ts`，启动 `2026-11-05 14:37:11
 
 ## 6. 品牌与路由
 
-- 品牌硬禁词 17 词（`gang-os`、`gangos-`、`Gang-OS`、`GangOS`、`Jianlan OS`、`杠OS`、`建兰`、`卫宁`、`Winning`、`WiNEX`、`WiNGPT`、`Weining`、`Chuangye`、`Donghua`、`Lianzhong`、`Zhiye`、`weining`）：遍历 `src` + `web/src` 共 **9809** 个文件，逐文件 `ReadAllText` + `IndexOf(Ordinal)`，**命中 0**（`gangos_` 存量指标名属专项 backlog，未计入硬违规）。
+- 品牌硬禁词 17 词（`gang-os`、`gangos-`、`Gang-OS`、`GangOS`、`Jianlan OS`、`杠OS`、`建兰`、`HIS厂商C`、`VENDOR_X`、`VENDOR_PLATFORM`、`VENDOR_AI`、`vendorC`、`vendorD`、`vendorB`、`vendorE`、`vendorF`、`vendorC`）：遍历 `src` + `web/src` 共 **9809** 个文件，逐文件 `ReadAllText` + `IndexOf(Ordinal)`，**命中 0**（`gangos_` 存量指标名属专项 backlog，未计入硬违规）。
 - 路由体检 `node logs/route-audit.cjs`：`routePathDeclarations=2870`、`uniquePaths=2870`、`duplicatePaths=0`、`lazyImports=2863`、`lazyMissing=0`。本轮未新增路由（仅新增 admin 的 rotate 路由已在 P5-8 提交内），无悬空 lazy import。
 
 ## 7. 仓库卫生

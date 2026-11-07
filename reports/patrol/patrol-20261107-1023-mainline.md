@@ -29,7 +29,7 @@
 
 ## 三、本轮 P0：上一笔组织侧提交把脱敏改了回去（已修）
 
-**取证**：`git show --numstat 9b068a80` = 19 个 docs 文件 + 74/-74，外加 `reports/patrol/...p5-30...md` +74。抽样 diff 显示 `-HIS厂商C、东华…` → `+卫宁、东华…`，即 P5-28 已完成的工作被反向改回。
+**取证**：`git show --numstat 9b068a80` = 19 个 docs 文件 + 74/-74，外加 `reports/patrol/...p5-30...md` +74。抽样 diff 显示 `-HIS厂商C、东华…` → `+HIS厂商C、东华…`，即 P5-28 已完成的工作被反向改回。
 
 **逐版短名计数（docs 域 309 文件）**：
 
@@ -80,7 +80,7 @@ docs scope：`filesScanned 294`、`hardViolations 0 (code=0 doc=0)`、`backlogGa
 | 英文供应链标识（小写） | `docs` YAML 示例、`src\bff\routes\m600Routes.ts` | 文档 2 处 / 代码 8 处（后者是业务字段名，属正则刻意的排除项） |
 | 代称重复行标签 | `docs\technical\04-…` 表格两行同代称 | 2 行 |
 
-本轮**没有**擅自扩词表：`东软` 在 `web\src\mock\systemMock.ts` 有 2 处，直接加词会把默认 scope 打红；`winning` 一类拉丁词若改大小写不敏感，会误伤 `winningSupplierId` 业务标识。扩表属口径变更，需先定"短名清单 + 边界规则 + 代称映射"，已作为 P5-31 交组织侧出方案。
+本轮**没有**擅自扩词表：`东软` 在 `web\src\mock\systemMock.ts` 有 2 处，直接加词会把默认 scope 打红；`VENDOR_X` 一类拉丁词若改大小写不敏感，会误伤 `VendorXSupplierId` 业务标识。扩表属口径变更，需先定"短名清单 + 边界规则 + 代称映射"，已作为 P5-31 交组织侧出方案。
 
 ## 六、运行态（10:40 实测）
 

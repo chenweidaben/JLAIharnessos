@@ -45,7 +45,7 @@
 
 ### 词表
 从 `8656c94c` + `c5bcdc25` 两个脱敏 commit diff 合并反推，**30 词**（放 `logs/brand-words-reversed.txt`，不进仓库）：
-- 中文真名（创业慧康/东华医为/联众智慧/智业软件 + 产品名）
+- 中文真名（HIS厂商B/东华医为/联众智慧/智业软件 + 产品名）
 - 拼音 id（his-chuangye/donghua/lianzhong/zhiye）
 - endpoint（bsoft/dhc/zhiye）
 - 版本串（B-Soft 9.0 / DHC 8.0 / LZ 6.0 / ZY 7.0）

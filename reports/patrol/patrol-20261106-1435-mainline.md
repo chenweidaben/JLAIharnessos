@@ -33,10 +33,10 @@ E2E 隔离做法：`HTTP_PORT=8081` 另起 bun 进程（`server.ts` 只认 `HTTP
 - 组织侧脚本 `bun run scripts/brand-scan.mts --paths 'src web/src tests'`：`filesScanned=12127 / wordsLoaded=29 / totalHits=0 / backlogGangos=0`，exit 0。
 - 主线独立复扫（`src` + `web/src`，9816 文件，逐文件 `ReadAllText` + `ToLowerInvariant` + `IndexOf` 计数，四套词表：中文真名 / 中文简称 / 拼音 / 英文别名）：
   - 首扫 24 hits / 5 文件；修复后 21 hits / 3 文件。
-  - 修复后剩余全部为既定口径内项：`gangos` 13 处（指标前缀 backlog，改动会打断 Prometheus 采集，单列不计硬违规）、`winning` 8 处（`winningSupplierId` 招投标业务字段，误报排除）。
+  - 修复后剩余全部为既定口径内项：`gangos` 13 处（指标前缀 backlog，改动会打断 Prometheus 采集，单列不计硬违规）、`VENDOR_X` 8 处（`VendorXSupplierId` 招投标业务字段，误报排除）。
   - **硬违规 0**。
 - **本轮就地修复的 2 处真残留（P0）**：
-  1. `src/integration/adapters/his/VendorCHISAdapter.ts` L84/L91：默认 `endpoint` / `tokenUrl` 仍带厂商简称路径（整串 URL 未进替换表，与 12:27 轮 `zhiye` 同类漏网）→ 改为 `/vendor-c`。
+  1. `src/integration/adapters/his/VendorCHISAdapter.ts` L84/L91：默认 `endpoint` / `tokenUrl` 仍带厂商简称路径（整串 URL 未进替换表，与 12:27 轮 `vendorF` 同类漏网）→ 改为 `/vendor-c`。
   2. `web/src/pages/demo/ArchitecturePage.tsx` L149：「4 大厂商骨架」一行同时列出三家对标厂商中文简称 → 改为 `HIS厂商B / C / D / E`。
 - **组织侧假绿根因（第二次复现）**：`scripts/brand-scan.mts` L67 用 `content.indexOf(w)`（大小写敏感 Ordinal），而词表 `logs/brand-words-reversed.txt` 仅 29 词且不含中文简称 `东华/智业/联众` 与小写别名 `dhc`；同时 `gangos_` 前缀命中被归入 backlog 后不计入 `totalHits`，导致「0 命中」既不覆盖大写变体、也无法自证覆盖范围。12:27 轮沉淀的「词表必须含中文真名/拼音/英文别名」经验未落到脚本里，属同一条经验第二次被绕过。
 - 误报登记：`zy ` / `lz ` 在 router、aggregator 中的 60+ 处命中为普通英文单词子串（`lazy` 等），非违规。

@@ -26,7 +26,7 @@
 | --- | --- | --- | --- |
 | source | enum | 是 | medical_record/order/prescription |
 | bizId | string | 是 | 业务单据ID |
-| target | string | 否 | 目标 HIS（Weining/Donghua/Chuangye/Lianzhong/Zhiye） |
+| target | string | 否 | 目标 HIS（vendorC/vendorB/vendorD/vendorE/vendorF） |
 
 ## 输出参数
 

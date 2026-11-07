@@ -60,7 +60,7 @@
 17 词 Ordinal 逐文件扫描 `src` + `web/src`（扩展名 ts/tsx/js/jsx/json/md/html/css）：
 
 - **文件数 9,806，命中 0**
-- 词表：`gang-os`、`gangos-`、`Gang-OS`、`GangOS`、`Jianlan OS`、`杠OS`、`建兰`、`卫宁`、`Winning`、`WiNEX`、`WiNGPT`、`Weining`、`Chuangye`、`Donghua`、`Lianzhong`、`Zhiye`、`weining`
+- 词表：`gang-os`、`gangos-`、`Gang-OS`、`GangOS`、`Jianlan OS`、`杠OS`、`建兰`、`HIS厂商C`、`VENDOR_X`、`VENDOR_PLATFORM`、`VENDOR_AI`、`vendorC`、`vendorD`、`vendorB`、`vendorE`、`vendorF`、`vendorC`
 - `gangos_` 存量指标名属专项 backlog（13 处），不计硬违规。
 
 文件数演进：P5-1 9,800 → P5-2 9,802 → 本轮 9,806（P5-2 探针修复 + P5-3 新增 4 文件）。

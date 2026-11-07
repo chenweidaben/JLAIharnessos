@@ -46,7 +46,7 @@
 - **HL7 v2.x**：16种消息类型（ADT/ORM/ORU/MDM/BAR/DFT/SIU/RDE/RDS/RAS）
 - **FHIR R4**：22种资源类型 + REST + OAuth2 + SMART
 - **DICOM**：标签字典 + QIDO/WADO/STOW + OHIF/Cornerstone Viewer
-- **HIS适配器**：五大厂商适配（卫宁/东华/创业慧康/联众/智业）
+- **HIS适配器**：五大厂商适配（HIS厂商C/东华/HIS厂商B/联众/智业）
 - **消息总线**：Kafka抽象 + 死信队列 + 持久化 + 延迟投递
 
 ## 🎨 UI/交互
