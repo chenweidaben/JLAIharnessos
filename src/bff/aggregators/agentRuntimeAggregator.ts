@@ -199,13 +199,27 @@ export async function startAgentRun(
 /**
  * 等待工作流进入 waiting_human：轮询引擎状态。
  * 工作流在 human 节点挂起时状态机转为 waiting_human，据此快速返回。
+ *
+ * 终止条件必须是"二选一"，不能只看 waiting_human：
+ * 无 human 节点的流程会直接跑完，此时 Promise.race 由 handle.result 先兑现，
+ * 若本函数仍以 while(true) 轮询，就会留下一个永不退出的 25ms 轮询器——
+ * 每成功跑一次智能体泄漏一个，累积后持续占用 CPU 并拖慢事件循环。
  */
 async function waitingForHuman(
   handle: ReturnType<Orchestrator['engine']['run']>,
-): Promise<{ kind: 'waiting' }> {
+): Promise<{ kind: 'waiting' } | { kind: 'done'; r: Awaited<ReturnType<Orchestrator['engine']['run']>['result']> }> {
   while (true) {
-    if (handle.getState() === 'waiting_human') return { kind: 'waiting' };
-    await new Promise((r) => setTimeout(r, 25));
+    const state = handle.getState();
+    if (state === 'waiting_human') return { kind: 'waiting' };
+    if (state === 'completed' || state === 'failed' || state === 'cancelled') {
+      // 终态：不会再有 human 节点，直接交出运行结果，避免遗留轮询器
+      return { kind: 'done', r: await handle.result };
+    }
+    const tick = await Promise.race([
+      handle.result.then((r) => ({ settled: true as const, r })),
+      new Promise<{ settled: false }>((resolve) => setTimeout(() => resolve({ settled: false }), 25)),
+    ]);
+    if (tick.settled) return { kind: 'done', r: tick.r };
   }
 }
 
