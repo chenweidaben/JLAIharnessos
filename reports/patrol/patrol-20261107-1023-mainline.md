@@ -122,7 +122,9 @@ docs scope：`filesScanned 294`、`hardViolations 0 (code=0 doc=0)`、`backlogGa
 | `master` | `7753bbee96a13ac18a549e94c0e3db275bbdb04a` | 同 | 同 |
 | `consult-agent-m86` | 同 | 同 | 同 |
 
-四 ref 逐位一致。未推 `origin` / `heagentos`，未打 tag。日志：`patrol-1023-push-*.txt`、`patrol-1023-lsremote-*.txt`。
+四 ref 逐位一致（功能提交 `7753bbee`）。随后提交本简报又前进一笔（`docs(patrol)`），该笔已再次双推并用 `ls-remote` 实测四 ref 与本地 HEAD 逐位一致，故最终四 ref = "含本简报的提交"，其父即 `7753bbee`。
+
+未推 `origin` / `heagentos`，未打 tag。日志：`patrol-1023-push-*.txt`、`patrol-1023-push2-*.txt`、`patrol-1023-lsremote-*.txt`。
 
 ## 十、遗留风险与待拍板
 
