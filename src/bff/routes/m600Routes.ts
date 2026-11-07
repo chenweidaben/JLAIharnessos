@@ -39,7 +39,7 @@ interface PrRecord {
   approvalNote: string | null;
   tenderNo: string | null;
   tenderDate: string | null;
-  winningSupplierId: string | null;
+  VendorXSupplierId: string | null;
   contractAmount: number | null;
   createdAt: string;
 }
@@ -86,7 +86,7 @@ function seedPr(): void {
       approvalNote: null,
       tenderNo: null,
       tenderDate: null,
-      winningSupplierId: null,
+      VendorXSupplierId: null,
       contractAmount: null,
       createdAt: iso(60 * 24 * (30 - i)),
     });
@@ -173,7 +173,7 @@ async function handlePrCreate(c: Ctx): Promise<Response> {
     approvalNote: null,
     tenderNo: null,
     tenderDate: null,
-    winningSupplierId: null,
+    VendorXSupplierId: null,
     contractAmount: null,
     createdAt: now,
   });
@@ -238,11 +238,11 @@ async function handlePrTender(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { tenderNo, tenderDate, winningSupplierId, contractAmount } = body as Record<string, unknown>;
+  const { tenderNo, tenderDate, VendorXSupplierId, contractAmount } = body as Record<string, unknown>;
   if (
     typeof tenderNo !== 'string' || !tenderNo.trim() ||
     typeof tenderDate !== 'string' || !tenderDate.trim() ||
-    typeof winningSupplierId !== 'string' || !winningSupplierId.trim()
+    typeof VendorXSupplierId !== 'string' || !VendorXSupplierId.trim()
   ) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }
@@ -257,7 +257,7 @@ async function handlePrTender(c: Ctx): Promise<Response> {
 
   rec.tenderNo = tenderNo.trim();
   rec.tenderDate = tenderDate.trim();
-  rec.winningSupplierId = winningSupplierId.trim();
+  rec.VendorXSupplierId = VendorXSupplierId.trim();
   rec.contractAmount = typeof contractAmount === 'number' ? contractAmount : rec.estimatedAmount;
   rec.status = 'tendered';
   return json(ok(rec), 200);

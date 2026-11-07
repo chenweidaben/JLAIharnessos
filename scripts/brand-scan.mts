@@ -6,7 +6,7 @@
  *
  * 逐文件 fs.readFileSync + String.indexOf(Ordinal) 计数，禁止 regex/grep 数千路径。
  * 输出 {files, totalHits, byWord, byFile}。
- * 分类：硬违规 exit 1；gangos_ backlog 单列；winningSupplierId 类排除。
+ * 分类：硬违规 exit 1；gangos_ backlog 单列；VendorXSupplierId 类排除。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -31,7 +31,7 @@ const root = resolve(import.meta.dirname ?? process.cwd(), '..');
 
 // 排除项
 const BACKLOG_PREFIX = 'gangos_';
-const EXCLUDE_WORDS = new Set(['winningSupplierId']);
+const EXCLUDE_WORDS = new Set(['VendorXSupplierId']);
 
 // Read b64 word list: each line is base64-encoded term; prefix "RE:" = regex
 function decodeWords(file: string): Array<{ kind: 'literal' | 'regex'; text: string; re?: RegExp }> {

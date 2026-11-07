@@ -334,7 +334,7 @@ TOOLS = [
          risk="medium", confirm=True, double=False, perm=["integration:write"], roles=["admin", "doctor"],
          params=[("source", "enum", "是", "medical_record/order/prescription"),
                  ("bizId", "string", "是", "业务单据ID"),
-                 ("target", "string", "否", "目标 HIS（Weining/Donghua/Chuangye/Lianzhong/Zhiye）")],
+                 ("target", "string", "否", "目标 HIS（vendorC/vendorB/vendorD/vendorE/vendorF）")],
          out=[("syncId", "string", "同步任务ID"), ("status", "string", "success/failed"),
               ("mappedFields", "number", "映射字段数")],
          errors=[("HIS_UNAVAILABLE", "HIS 接口不可用"),
