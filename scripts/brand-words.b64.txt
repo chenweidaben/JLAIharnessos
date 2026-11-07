@@ -1,6 +1,6 @@
-# scripts/brand-words.b64.txt - brand word list (one base64-encoded UTF-8 term per line)
-# Encoding keeps vendor real names out of plaintext in tracked files; brand-gate.ps1 decodes at load.
-# Regenerate: see reports/patrol briefing; do not store plaintext names in the repo.
+# brand word list - one base64 entry per line (UTF-8 decoded)
+# plain entry = literal vendor string (case-insensitive)
+# RE: prefix = .NET regex, case-sensitive (boundary-safe brand terms)
 5Yib5Lia5oWn5bq3
 5Yib5Lia5oWn5bq35pm65oWn5Yy76Zmi
 5Yib5Lia5oWn5bq3SElT6YCC6YWN5Zmo
@@ -31,3 +31,13 @@ aHR0cHM6Ly9oaXMtYXBpLmhvc3BpdGFsLmNvbS96aGl5ZQ==
 TFogNi4w
 WC1MWi1BcHBLZXk=
 WlkgNy4w
+UkU6KD88IVtBLVphLXowLTlfXSlHYW5nT1MoPyFbQS1aYS16MC05X10p
+UkU6KD9pKWdhbmctb3M=
+UkU6KD9pKUppYW5sYW4gT1M=
+UkU65p2gT1M=
+UkU65bu65YWw
+UkU65Y2r5a6B
+UkU6KD88IVtBLVphLXowLTlfXSlXaW5uaW5nKD8hW0EtWmEtejAtOV9dKQ==
+UkU6V2lORVg=
+UkU6V2lOR1BU
+UkU6KD9pKWdhbmdvcy0=

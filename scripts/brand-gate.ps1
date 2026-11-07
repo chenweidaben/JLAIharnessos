@@ -2,6 +2,10 @@
 # Usage: .\scripts\brand-gate.ps1 [-Paths "src,web/src"]
 # Exit: 0 = no hard violations, 1 = hard violations found or wordlist/path error
 # Word list lives in scripts\brand-words.b64.txt (base64 per line) so the gate runs on any clone.
+# Entry format: plain line = literal vendor string (case-insensitive, legacy behaviour).
+#               line decoding to "RE:<pattern>" = .NET regex, case-sensitive (boundary-safe brand terms).
+# Scope note: default scope is product code (src,web/src). Documentation (docs/, reports/) is scanned
+#             separately on demand via -Paths "." and its residue is tracked as doc debt, not code debt.
 
 param(
   [string]$Paths = "src,web/src"
@@ -14,33 +18,51 @@ Set-Location $repoRoot
 $BACKLOG_PREFIX = 'gangos_'
 $allowedExt = @('.ts', '.tsx', '.js', '.jsx', '.mts', '.md', '.css', '.json', '.yml', '.yaml')
 
-$words = @()
+$entries = @()
 $b64File = Join-Path $repoRoot 'scripts\brand-words.b64.txt'
 $plainFile = Join-Path $repoRoot 'logs\brand-words-reversed.txt'
 if (Test-Path -LiteralPath $b64File) {
   foreach ($line in [IO.File]::ReadAllLines($b64File, [Text.Encoding]::UTF8)) {
     $s = $line.Trim()
     if (-not $s -or $s.StartsWith('#')) { continue }
-    try { $words += [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($s)) }
+    try { $dec = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($s)) }
     catch { Write-Host "FAIL: bad base64 line in word list"; exit 1 }
+    if ($dec.StartsWith('RE:')) {
+      try { $re = [regex]$dec.Substring(3); [void]$re.IsMatch('probe') }
+      catch { Write-Host "FAIL: bad regex entry in word list"; exit 1 }
+      $entries += [PSCustomObject]@{ kind = 'regex'; text = $dec.Substring(3); re = $re; label = 'RE' }
+    } else {
+      $entries += [PSCustomObject]@{ kind = 'literal'; text = $dec; re = $null; label = 'LIT' }
+    }
   }
 } elseif (Test-Path -LiteralPath $plainFile) {
   foreach ($line in [IO.File]::ReadAllLines($plainFile, [Text.Encoding]::UTF8)) {
     $s = $line.Trim()
-    if ($s -and -not $s.StartsWith('#')) { $words += $s }
+    if ($s -and -not $s.StartsWith('#')) {
+      $entries += [PSCustomObject]@{ kind = 'literal'; text = $s; re = $null; label = 'LIT' }
+    }
   }
 } else {
   Write-Host "FAIL: word list not found (scripts\brand-words.b64.txt)"
   exit 1
 }
-if ($words.Count -eq 0) { Write-Host "FAIL: word list empty"; exit 1 }
-Write-Host "words loaded: $($words.Count)"
+if ($entries.Count -eq 0) { Write-Host "FAIL: word list empty"; exit 1 }
+$litCount = @($entries | Where-Object { $_.kind -eq 'literal' }).Count
+$reCount = @($entries | Where-Object { $_.kind -eq 'regex' }).Count
+Write-Host "words loaded: $($entries.Count) (literal=$litCount regex=$reCount)"
 
 $pathList = $Paths -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
 $filesScanned = 0
 $hardViolations = @()
 $backlogHits = 0
 $backlogFiles = @()
+$scopeCode = 0
+$scopeDoc = 0
+
+function Get-LineNo([string]$content, [int]$index) {
+  $pre = $content.Substring(0, $index)
+  return ($pre.Length - $pre.Replace([string][char]10, '').Length) + 1
+}
 
 foreach ($p in $pathList) {
   $full = if ([IO.Path]::IsPathRooted($p)) { $p } else { Join-Path $repoRoot $p }
@@ -52,21 +74,27 @@ foreach ($p in $pathList) {
   $files = Get-ChildItem -Path $full -Recurse -File -ErrorAction SilentlyContinue |
     Where-Object { $allowedExt -contains $_.Extension.ToLower() -and $_.FullName -notmatch '\\node_modules\\' }
   foreach ($f in $files) {
-    # Skip only the repo-root logs directory; nested product pages named logs must be scanned.
-    if ($rel -like 'logs\*') { continue }
-    $filesScanned++
     $rel = $f.FullName
     if ($rel.StartsWith($repoRoot)) { $rel = $rel.Substring($repoRoot.Length + 1) }
     $rel = $rel -replace '/', '\'
+    # Skip only the repo-root logs directory; nested product pages named logs must be scanned.
+    if ($rel -like 'logs\*') { continue }
+    $filesScanned++
     $content = [IO.File]::ReadAllText($f.FullName, [Text.Encoding]::UTF8)
 
-    foreach ($w in $words) {
-      $idx = 0
-      while (($idx = $content.IndexOf($w, $idx, [StringComparison]::OrdinalIgnoreCase)) -ge 0) {
-        $pre = $content.Substring(0, $idx)
-        $lineNo = ($pre.Length - $pre.Replace("`n", '').Length) + 1
-        $hardViolations += [PSCustomObject]@{ file = $rel; line = $lineNo; word = $w }
-        $idx += [Math]::Max(1, $w.Length)
+    foreach ($e in $entries) {
+      if ($e.kind -eq 'literal') {
+        $idx = 0
+        while (($idx = $content.IndexOf($e.text, $idx, [StringComparison]::OrdinalIgnoreCase)) -ge 0) {
+          $lineNo = Get-LineNo $content $idx
+          $hardViolations += [PSCustomObject]@{ file = $rel; line = $lineNo; word = $e.text }
+          $idx += [Math]::Max(1, $e.text.Length)
+        }
+      } else {
+        foreach ($mm in $e.re.Matches($content)) {
+          $lineNo = Get-LineNo $content $mm.Index
+          $hardViolations += [PSCustomObject]@{ file = $rel; line = $lineNo; word = $e.text }
+        }
       }
     }
 
@@ -78,10 +106,15 @@ foreach ($p in $pathList) {
   }
 }
 
+foreach ($v in $hardViolations) {
+  if ($v.file -like 'docs\*' -or $v.file -like 'reports\*' -or $v.file -notlike '*\*') { $scopeDoc++ } else { $scopeCode++ }
+}
+
 Write-Host ""
 Write-Host "=== brand-gate result ==="
+Write-Host "scope: $Paths"
 Write-Host "filesScanned: $filesScanned"
-Write-Host "hardViolations: $($hardViolations.Count)"
+Write-Host "hardViolations: $($hardViolations.Count) (code=$scopeCode doc=$scopeDoc)"
 foreach ($v in $hardViolations) {
   Write-Host "  HARD: $($v.file):$($v.line) word=$($v.word)"
 }
