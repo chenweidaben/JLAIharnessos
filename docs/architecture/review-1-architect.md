@@ -74,7 +74,7 @@
 - 起步用 **Spring Boot 3.5.x（最低 3.5.3，Java 21 LTS）** + **Spring Modulith 1.4.x**，单进程内按 Maven 模块隔离：
 
 ```
-gangos-trading/
+健澜AI原生医院操作系统OS-trading/
 ├── mod-emp/          # EMPI 患者主索引
 ├── mod-reg/          # 挂号
 ├── mod-charge/       # 收费
@@ -323,7 +323,7 @@ client
   ▼
 APISIX / Nginx
   ▼
-gangos-gateway (TS, port 8080)
+健澜AI原生医院操作系统OS-gateway (TS, port 8080)
   ├── /api/v2/emp/*   → svc-emp (Java, 8081)
   ├── /api/v2/reg/*  → svc-reg (Java, 8082)
   ├── /api/v2/charge/*→ svc-charge (Java, 8083)
@@ -418,7 +418,7 @@ gangos/
 ## 六、对后续 PRD / 架构文档的硬性约束建议（必须写进宪法）
 
 1. **【语言栈收敛】** 系统只允许三种语言：TypeScript（BFF/前端）、Python（AI 层）、Java（核心交易域）。新引入第四种语言必须经架构委员会 2/3 多数通过。
-2. **【模块化单体优先】** 任何新 Java 模块必须先以 Modulith 模块形式存在于 `gangos-trading` 进程内；拆出独立进程的触发条件写入宪法：独立扩缩容 / 独立发布节奏 / 独立数据量 >5000 万行 / 独立合规边界，四选一。
+2. **【模块化单体优先】** 任何新 Java 模块必须先以 Modulith 模块形式存在于 `健澜AI原生医院操作系统OS-trading` 进程内；拆出独立进程的触发条件写入宪法：独立扩缩容 / 独立发布节奏 / 独立数据量 >5000 万行 / 独立合规边界，四选一。
 3. **【禁 Seata AT】** 跨服务一致性只允许「本地消息表 + Saga」，禁止引入 Seata AT/TCC；Seata Server 不进任何生产部署。
 4. **【禁 Istio / Service Mesh】** 12 个月内禁止 sidecar 模式 Mesh；流量治理统一在 APISIX + Sentinel 完成。
 5. **【禁 K8s 一步到位】** Day-180 前禁止完整 K8s；Day-180 后引入 k3s 也必须先有 2 家以上客户付费验证。
@@ -432,4 +432,4 @@ gangos/
 
 ---
 
-*本评审为 Review-1。后续 Review-2 将针对 `gangos-trading` 模块化单体的包结构、Outbox Relay 协议、MCP 工具清单做逐条设计。*
+*本评审为 Review-1。后续 Review-2 将针对 `健澜AI原生医院操作系统OS-trading` 模块化单体的包结构、Outbox Relay 协议、MCP 工具清单做逐条设计。*

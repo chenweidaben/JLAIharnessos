@@ -148,7 +148,7 @@ AI 中台以**能力（Capability）+ 技能（Skill）+ 工具（Tool）**三�
 ## 7. L5 集成与标准、事件驱动
 
 - **标准接口**：FHIR（REST/订阅/批量）、openEHR REST + AQL、HL7 v2.x（ADT/ORM/ORU/MDM…）、DICOM（C-STORE/C-MOVE、DICOMWeb QIDO/WADO/STOW）；
-- **适配器框架**：HIS/EMR/LIS/PACS 适配器统一具备重试、熔断、超时、字段映射、厂商适配（卫宁/东华/创业慧康等）；真实对接前以显式 Mock 运行并标注 `INTEGRATION_USE_MOCK`；
+- **适配器框架**：HIS/EMR/LIS/PACS 适配器统一具备重试、熔断、超时、字段映射、厂商适配（HIS厂商C/东华/HIS厂商B 等）；真实对接前以显式 Mock 运行并标注 `INTEGRATION_USE_MOCK`；
 - **事件驱动**：以 Kafka（或可落地的消息中间件）替换现有内存总线，支持 Topic、分区、消费组、死信队列、延迟投递、幂等消费、Exactly/At-least-once 语义与事务消息；
 - **集成监控**：健康探针、成功率、P95、告警与 Prometheus 导出。
 

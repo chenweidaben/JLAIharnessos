@@ -42,7 +42,7 @@
 
 | 适配器 | 文件 |
 | --- | --- |
-| 卫宁 HIS | `WeiningHISAdapter.ts` |
+| HIS厂商C HIS | `WeiningHISAdapter.ts` |
 | 东华 HIS | `DonghuaHISAdapter.ts` |
 | 创业 HIS | `ChuangyeHISAdapter.ts` |
 | 联众 HIS | `LianzhongHISAdapter.ts` |

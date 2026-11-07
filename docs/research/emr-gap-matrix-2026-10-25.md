@@ -316,7 +316,7 @@
 | P2 前端权限 | 报告行 322 | 页面级权限码 `medicalRecord:compare` 后端目录缺失；路由 5068 未挂路由级守卫；证据 `pages/clinical/medical-record-version-compare-v2/index.tsx:35` | 关联病历版本对比域 |
 | P2 前端孤儿 | 报告行 323 | 21 个候选孤儿页面目录 | 前端结构债 |
 | P2 旁路 Python / Java / 小程序 / 部署观测 | 报告行 324-329 | 与 EMR 弱相关，本轮矩阵不展开 | 弱相关 |
-| P2 品牌残余 | 报告行 330；行 424 | 运行时残余旧称组词面、文件头注释旧称、占位域名 / 镜像路径 / 内部 UID、docs/operations 旧文件名引用；整仓约 1226 行 / 963 文件（含注释与文档）。本轮复核补登 `src/` 内三类基线 P2 残留（仅登记、未改源码）：① 文件头旧产品名「健澜科技数智医院智能体 / 数智医院」：`src/bff/middleware/audit.ts:2`、`src/bff/utils/mask.ts:2`、`src/db/repositories/userRepo.ts:2`、`src/bff/routes/fhir.ts:96`；② 文件头注释旧代号 `GangOS / Jianlan OS`：`src/knowledge-platform/index.ts:2`、`src/knowledge-platform/types.ts:2`；③ `gangos_*` 指标前缀：`src/bff/observability/metrics.ts`（7 行）、`src/core/observability/metrics.ts`（6 行），随遥测重构统一改名，已列 backlog | 品牌合规债，与本矩阵 P0 并列跟踪 |
+| P2 品牌残余 | 报告行 330；行 424 | 运行时残余旧称组词面、文件头注释旧称、占位域名 / 镜像路径 / 内部 UID、docs/operations 旧文件名引用；整仓约 1226 行 / 963 文件（含注释与文档）。本轮复核补登 `src/` 内三类基线 P2 残留（仅登记、未改源码）：① 文件头旧产品名「健澜科技数智医院智能体 / 数智医院」：`src/bff/middleware/audit.ts:2`、`src/bff/utils/mask.ts:2`、`src/db/repositories/userRepo.ts:2`、`src/bff/routes/fhir.ts:96`；② 文件头注释旧代号 `健澜AI原生医院操作系统OS / 健澜AI原生医院操作系统OS`：`src/knowledge-platform/index.ts:2`、`src/knowledge-platform/types.ts:2`；③ `gangos_*` 指标前缀：`src/bff/observability/metrics.ts`（7 行）、`src/core/observability/metrics.ts`（6 行），随遥测重构统一改名，已列 backlog | 品牌合规债，与本矩阵 P0 并列跟踪 |
 
 - 基线测试口径（报告行 26、204-208）：BFF 单元 2038 文件 / 15086 pass / 2 真实失败；集成 136 文件 / 210 pass / 0 fail / 1025 skip；前端 vitest 170 文件 / 1392 pass / 3 失败；集成跳过构成 612 DB 守卫 + 413 describe.skip；本机无 PostgreSQL/Redis、`bunfig.toml` preload 强制 `DEMO_MODE=1`。**本轮未复测上述数字**，仅作基线陈述。
 
