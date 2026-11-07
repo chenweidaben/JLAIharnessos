@@ -3,7 +3,7 @@
 - 仓库：`C:\Users\lenovo\Doubao\chats\2026-09-14\new-chat-1`
 - 分支：`consult-agent-m86`　双推：`gitcode`(JLMEDAIOS) + `mirror`(JLAIharnessos)
 - 本轮起点 HEAD：`4c5cdd9c`（组织侧三轮自交后未推）
-- 本轮收口 HEAD：`2b5bffca`（brand-gate 词表修复，本简报提交后再推一次）
+- 本轮 HEAD 链：`4c5cdd9c`（起点）→ `2b5bffca`（brand-gate 词表修复）→ `7b0ea3de`（本简报）→ 含本补录记录的 commit 为最终 HEAD
 - 结论：五步门禁 5/5 PASS；产品代码域品牌残留 0；文档域残留首次精确量化（1013 处/132 文件），其中产品文档 106 处为真实脱敏债。
 
 ## 一、组织智能体进度
@@ -107,6 +107,18 @@
 推送口径：`git push <remote> consult-agent-m86:master consult-agent-m86`，仅 `gitcode` 与 `mirror`；不推 `origin`（HTTPS token）、不推 `heagentos`、不打 tag。
 
 四 ref 核对：`git ls-remote <remote> refs/heads/master refs/heads/consult-agent-m86`，两端共 4 个 SHA 需与本地 HEAD 逐位相等。核对结果记在 `logs\patrol-0823-lsremote.txt`，最终值见本轮回复（values 与本地 HEAD 一致方可判定收口）。
+
+**核对记录（在 `7b0ea3de` 上执行，2 仓 × 2 ref = 4 处全等）**：
+
+| 远端 | ref | SHA |
+|---|---|---|
+| `gitcode` | `refs/heads/master` | `7b0ea3decf2b860071de5ff8e820d9b0579083d5` |
+| `gitcode` | `refs/heads/consult-agent-m86` | `7b0ea3decf2b860071de5ff8e820d9b0579083d5` |
+| `mirror` | `refs/heads/master` | `7b0ea3decf2b860071de5ff8e820d9b0579083d5` |
+| `mirror` | `refs/heads/consult-agent-m86` | `7b0ea3decf2b860071de5ff8e820d9b0579083d5` |
+
+两仓推送退出码均 0（`7d182f9b..7b0ea3de`，master 与分支各一条）。随后补录本段文字产生 1 个 docs commit 并再次推送，四 ref 随之前移到该 commit；最终值以本轮回复为准。
+
 
 ## 九、遗留风险与下一轮重点
 
