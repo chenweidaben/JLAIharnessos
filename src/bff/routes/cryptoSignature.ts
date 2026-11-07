@@ -7,7 +7,7 @@ const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true'
 
 /**
  * 国密算法接入点（ISmCryptoProvider）说明：
- * - 生产应替换为合规国密 SDK：服务器密码机 HSM / USBKey（如海泰）/ 商密云。
+ * - 生产应替换为合规国密 SDK：服务器密码机 HSM / USBKey（如国产密码机厂商）/ 商密云。
  * - 当前优先使用真实 sm-crypto@0.5.x（纯 JS 国密 SM3，sm3('abc') 标准向量自检通过）；
  *   若运行时加载失败（如 node_modules 被裁剪），自动回退 node:crypto sha256（等长 64 hex）占位。
  * - SM3 摘要：32 字节，64 位 hex；占位 sha256 同长，便于前端与审计库字段对齐。
