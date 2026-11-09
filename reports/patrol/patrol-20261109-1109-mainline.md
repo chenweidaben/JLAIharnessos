@@ -78,7 +78,13 @@ BFF 五端点实测（全部 200）：
 
 ## 7. 双仓推送与 SHA 核对
 
-推送与核对见本简报末尾「推送结果」节（推送后回填）。
+- 推送：`git push gitcode consult-agent-m86:master`、`git push mirror consult-agent-m86:master`，均 `323c38f5..46e23237`。
+- 三端 SHA（均 = `46e232376c16ed77b6907f873840fb0102e1aba7`）：
+  - local HEAD（consult-agent-m86）：`46e23237`
+  - gitcode `refs/heads/master`：`46e23237`
+  - mirror `refs/heads/master`：`46e23237`
+- 两仓 `refs/heads/consult-agent-m86` 分支仍 = `323c38f5`（按模板只推 master，未动功能分支）。
+- 未推 origin / heagentos；未打 tag。
 
 ## 8. 遗留风险与下一轮重点
 
