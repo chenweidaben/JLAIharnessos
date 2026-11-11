@@ -175,7 +175,8 @@ export class FileWormStore implements WormStore {
     writeFileSync(p, JSON.stringify(segment, null, 2), 'utf8');
     if (platform === 'win32') {
       try {
-        execSync(`attrib +R "${p}"`, { stdio: 'ignore' });
+        // 只读属性为 best-effort；并发/杀软扫描下 attrib 子进程可能挂起，加超时兜底，超时/失败不阻断落盘
+        execSync(`attrib +R "${p}"`, { stdio: 'ignore', timeout: 1500, killSignal: 'SIGKILL' });
       } catch { /* 忽略 */ }
     }
     this.segments.push(segment);
