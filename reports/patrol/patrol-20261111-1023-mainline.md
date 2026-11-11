@@ -72,7 +72,10 @@ PG 恢复后复测五端点全 200：/health 2B、/ready 235B、/api/v1/health 1
 
 ## 7. 双仓推送与 SHA
 
-见本轮 commit 后 `git ls-remote` 核对回填（不推 origin / heagentos，不打 tag）。
+- gitcode：`e8991453..0e95469a` master，hooks PASSED。
+- mirror：`e8991453..0e95469a` master，PR 规则旁路。
+- 三端 SHA 核对一致：local = gitcode master = mirror master = `0e95469a69b04eebc3c05224593b8f3bd69a365d`。
+- 未推 origin / heagentos，未打 tag。
 
 ## 8. 下一轮重点
 
