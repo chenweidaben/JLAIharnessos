@@ -126,6 +126,7 @@ const EmergencyPoisoningPage = lazy(() => import('@/pages/emergency/poisoning'))
 const EmergencyRedboxPage = lazy(() => import('@/pages/emergency/redbox'));
 const EmergencyRescuePage = lazy(() => import('@/pages/emergency/rescue'));
 const EmergencyTraumaPage = lazy(() => import('@/pages/emergency/trauma'));
+const EmrEditorPage = lazy(() => import('@/pages/emr-editor'));
 const EmrArchivesPage = lazy(() => import('@/pages/emr/archives'));
 const EmrSignaturesPage = lazy(() => import('@/pages/emr/signatures'));
 const EmrSignTemplatesPage = lazy(() => import('@/pages/emr/sign-templates'));
@@ -9232,6 +9233,7 @@ export default function AppRoutes() {
           <Route path="qc/audits" element={<QcAuditsPage />} />
           <Route path="qc/corrective" element={<QcCorrectivePage />} />
           {/* M354 路由注册 */}
+          <Route path="emr/editor" element={<EmrEditorPage />} />
           <Route path="emr/templates" element={<EmrTemplatesPage />} />
           <Route path="emr/signatures" element={<EmrSignaturesPage />} />
           <Route path="emr/archives" element={<EmrArchivesPage />} />
