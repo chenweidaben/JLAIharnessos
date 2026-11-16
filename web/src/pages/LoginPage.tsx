@@ -211,7 +211,7 @@ export default function LoginPage() {
       layout="vertical"
       onFinish={onFinish}
       requiredMark={false}
-      initialValues={{ username: 'admin', password: 'Jianlan@2026', rememberMe: true }}
+      initialValues={{ username: 'admin', password: 'Demo@Admin1', rememberMe: true }}
     >
       <Form.Item name="username" rules={[{ required: true, message: '请输入工号 / 用户名' }]}>
         <Input
