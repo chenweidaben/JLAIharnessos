@@ -273,7 +273,7 @@ services:
   # Kafka（Bitnami，KRaft 模式单节点，内置 controller，不再依赖 zookeeper）
   # ==========================================================================
   kafka:
-    image: bitnami/kafka:3.8.0-debian-12-r0
+    image: soldevelo/kafka:3.8.1-debian-12-r0
     environment:
       TZ: Asia/Shanghai
       # KRaft：单节点同时承担 controller 与 broker 角色。
