@@ -12,7 +12,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { afterAll, describe, expect, it } from 'bun:test';
+import { afterAll, beforeEach, describe, expect, it } from 'bun:test';
 
 import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView } from '../../src/bff/view/userView.js';
@@ -31,6 +31,7 @@ import {
 import { getMfaService } from '../../src/bff/mfaRuntime.js';
 import { totp } from '../../src/security/mfa/index.js';
 import { authRoutes } from '../../src/bff/routes/auth.js';
+import { __resetRateLimitBuckets } from '../../src/bff/middleware/rateLimit.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
@@ -56,8 +57,13 @@ afterAll(async () => {
   }
 });
 
+// 限流桶为模块级内存状态：用例前还原，避免跨用例累积误伤登录。
+beforeEach(() => __resetRateLimitBuckets());
+
 function makeLoginCtx(username: string, password: string): Ctx {
+  const req = new Request('http://localhost/api/v1/auth/login', { method: 'POST' });
   return {
+    req,
     params: {},
     query: new URLSearchParams(),
     body: async () => ({ username, password }),

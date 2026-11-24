@@ -23,6 +23,18 @@ function clientIpOf(c: Ctx): string {
   );
 }
 
+/**
+ * 测试隔离钩子：清空全局限流桶与登录限流桶。
+ *
+ * 既有内存 Map 在模块级常驻，集成测试在同一进程内反复登录/请求会跨用例累积计数，
+ * 误伤本应放行的用例；测试 beforeEach 调用本钩子还原到干净起始态。
+ * 生产环境不调用；不改变任何阈值与窗口策略。
+ */
+export function __resetRateLimitBuckets(): void {
+  buckets.clear();
+  loginBuckets.clear();
+}
+
 /** 简单按 IP 限流：windowMs 内最多 limit 次 */
 export function rateLimit(c: Ctx, limit = 300, windowMs = 60_000): Response | null {
   // DEMO_MODE 下不限流（本地演示/压测场景）

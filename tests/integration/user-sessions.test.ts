@@ -16,7 +16,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { afterAll, describe, expect, it } from 'bun:test';
+import { afterAll, beforeEach, describe, expect, it } from 'bun:test';
 import {
   closeDbForTest,
   getDb,
@@ -38,6 +38,7 @@ import {
   clearSessionCache,
 } from '../../src/bff/middleware/sessionGuard.js';
 import { verifyJwt } from '../../src/bff/middleware/auth.js';
+import { __resetRateLimitBuckets } from '../../src/bff/middleware/rateLimit.js';
 import type { Ctx } from '../../src/bff/types.js';
 
 let dbAvailable = false;
@@ -59,6 +60,9 @@ if (dbAvailable) {
   const dc = await getUserByUsername('doctor_chen');
   doctorChen = buildAuthView(dc!, await getUserRoleLinks(dc!.id));
 }
+
+// 限流桶为模块级内存状态：用例前还原，避免登录计数跨用例累积触发 429。
+beforeEach(() => __resetRateLimitBuckets());
 
 // 收集测试产生的会话 jti（access/refresh），afterAll 硬删除
 const createdJtis = new Set<string>();
