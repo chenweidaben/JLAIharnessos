@@ -70,12 +70,17 @@
 - 仅 consult 两文件已归类（27 fail = 夹具 userId 句柄落 uuid 外键，DEMO 环境适配问题）。其余 integration 文件未逐文件隔离复跑。
 - 待归类错误码：种子数据类 CHECK/FK/JSON 违规（194 category check、199/209 role_permissions FK、206 role_code check、209 invalid json、297:127 node_type check、339 room_type check ×4），以及业务状态机断言 / 409 冲突 / 权限口径。下一轮低峰逐文件隔离复跑，区分真实代码缺陷与环境/历史遗留。
 
-### 待办 ④ 剩余 4 个列结构漂移 DDL 文件（需对照仓储/类型契约后再改，勿盲目补列）
-- `349-satisfaction-deep.sql`：enum `clinical.pdca_phase` 不存在——实测 `pdca_phase` enum 建在 **medmuse** schema（349 的 DO 块按 typname 不查 schema 命中 medmuse 同名类型而跳过创建 clinical 版）；`clinical.satisfaction_surveys` 现有列与 349 深化列名不一致（现有 emotion_sentiment，缺 channel/emotion_label/emotion_score/five_why_chain/root_cause_code/pdca_phase/nps_category/benchmark_dept）；ADD COLUMN 因 enum 缺失整条回滚导致后续 COMMENT/索引级联报列不存在。
-- `350-data-governance.sql`：本地 `meta.data_quality_rule` 是早期两套列结构（id/dimension/target_schema/target_column/check_type/threshold/params…），新文件用 governance_domain/target_field/rule_expression/threshold_pct/owner_role/remediation；CREATE TABLE IF NOT EXISTS 因表已存在跳过，索引/INSERT 找不到新列。
-- `369-ops-analysis.sql`：本地 `medmuse.ops_forecast` 是旧结构（forecast_date/metric_name/predicted_value/lower_bound/upper_bound/residual_std/confidence_level/history_points/model_method），新文件结构（dept_code/dept_name/domain/metric_key/anchor_period/horizon/target_period/forecast_value/confidence/method）；ops_metric 本地列已齐全。
-- `256-follow-up.sql:32/33`：报 `due_at`、`visit_id` 列不存在，尚未读源码核对。
-- 决策约束：349/350/369 两套列结构以哪套为准，需对照对应 BFF 聚合器/仓储源码契约后决定补列还是改代码，不可凭 DDL 单方臆改。
+### 待办 ④ 剩余 4 个列结构漂移 DDL 文件（已完成生产契约取证；不改表结构，留架构二选一专项）
+本轮逐一对照后端仓储/聚合器/路由源码取证，四个文件均属"DDL 规划新模型/新列覆盖同名旧表，生产代码走旧结构，新模型暂无落库代码"。除 256/369 在旧表上建指向新列的索引时报 42703 外，运行时旧表被 `CREATE TABLE IF NOT EXISTS` 跳过，不构成生产读写故障；本轮不擅自改表结构（牵动外键引用链与生产仓储）。
+
+| 文件 | 生产代码实际契约（取证） | DDL 新模型（无代码读写） |
+|---|---|---|
+| `256-follow-up.sql` | `apptRepo.ts` 读写旧表 `clinical.follow_up_plans`：plan_no / patient_id / appointment_id / scheduled_date / content / status(pending/completed/missed) / assigned_to；术后随访另走独立表 `clinical.postop_pain_followups`（postopFollowupRepo、toolRegistry.listFollowups） | plans 新结构 visit_id / plan_type / timepoint / diagnosis / due_at / reminder_sent_at / completed_at / note；reminders 表本地已与 DDL 一致 |
+| `350-data-governance.sql` | `dataGovernanceAggregator.ts` 为纯函数（规则随样本入参，不触库），类型对齐旧列 check_type / dimension / params；全仓无 SQL 直读 `meta.data_quality_rule`，该表为台账/种子参考 | 新列 governance_domain / target_field / rule_expression / threshold_pct / owner_role / remediation |
+| `369-ops-analysis.sql` | `opsForecast.ts` persistForecast 写旧结构 `medmuse.ops_forecast`：forecast_date / metric_name / predicted_value / lower_bound / upper_bound / residual_std / confidence_level / history_points / model_method，ON CONFLICT (metric_name, forecast_date)；ops_metric 本地列已齐全 | 新结构 dept_code / dept_name / domain / metric_key / anchor_period / horizon / target_period / forecast_value / confidence / method |
+| `349-satisfaction-deep.sql` | `satisfactionRepo.ts` SCOLS 与 `satisfactionSurveyRepo.ts` COLS 读旧列（survey_no/overall/medical/service/environment/process/wait 分、nursing_score/logistics_score/department 等）；`satisfactionDeepAggregator.ts` 纯函数不触库；路由层未 SELECT/INSERT 新扩展列 | 扩展 channel / emotion_label / emotion_score / five_why_chain / root_cause_code / pdca_phase / nps_category / benchmark_dept；enum `pdca_phase` 实测建在 **medmuse** schema（qualityPdcaAggregator 注释亦对齐 medmuse.pdca_phase），349 的 DO 块按 typname 不查 schema 命中 medmuse 同名类型而跳过创建 clinical 版 |
+
+- 决策约束（下轮架构对齐）：每个文件二选一——(A) 新模型改独立表名/独立 schema 与旧表并存，再逐步迁移仓储；(B) 确认新模型为废弃规划，从 DDL 删去未落地列/表块对齐生产旧结构。不可凭 DDL 单方补列到生产旧表。
 
 ### consult 写路径遗留
 - saveThread/saveMessage/saveDraft/saveAudit/saveDocument/saveProfile 内部 id 已改 uuid，但测试夹具 userId 句柄适配（真实模式接入种子真 uuid 用户）未做；orders 单号 order_no 生成规则列为后续增强（契约可空）。
