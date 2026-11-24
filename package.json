@@ -46,6 +46,7 @@
     "bff": "bun run src/bff/server.ts",
     "bff:watch": "bun --watch src/bff/server.ts",
     "typecheck": "tsc --noEmit",
+    "typecheck:web": "bun run --cwd web typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:ci": "eslint . --max-warnings 0",
