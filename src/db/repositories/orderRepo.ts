@@ -8,6 +8,12 @@
  */
 import { getDb, type DbExecutor } from '../pool.js';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** uuid FK 列兜底：仅合法 UUID 落库，否则置 null（文本留痕列单独保留原句柄）。 */
+function validUuidOrNull(value: string | null | undefined): string | null {
+  return typeof value === 'string' && UUID_RE.test(value.trim()) ? value.trim() : null;
+}
+
 export type OrderType =
   | 'drug' | 'lab' | 'imaging' | 'nursing' | 'surgery'
   | 'consult' | 'monitor' | 'nutrition' | 'other' | 'treatment';
@@ -68,9 +74,16 @@ export async function createInpatientOrder(input: {
 }, tx?: DbExecutor): Promise<Order> {
   const db = tx ?? getDb();
   const rows = await db`
-    INSERT INTO clinical.orders (visit_id, order_type, content, dosage, frequency, route, ordered_by)
-    VALUES (${input.visitId}, ${input.orderType}, ${input.content}, ${input.dosage ?? null},
-      ${input.frequency ?? null}, ${input.route ?? null}, ${input.orderedBy ?? input.doctorId ?? null})
+    INSERT INTO clinical.orders (
+      visit_id, order_type, content, dosage, frequency, route, ordered_by,
+      status, category, priority, doctor_id, requires_double_check
+    )
+    VALUES (
+      ${input.visitId}, ${input.orderType}, ${input.content}, ${input.dosage ?? null},
+      ${input.frequency ?? null}, ${input.route ?? null}, ${input.orderedBy ?? input.doctorId ?? null},
+      'pending_review', ${input.category ?? 'short_term'}, ${input.priority ?? 'routine'},
+      ${validUuidOrNull(input.doctorId)}, ${input.requiresDoubleCheck ?? false}
+    )
     RETURNING *
   `;
   return mapOrder(rows[0]);
@@ -129,7 +142,7 @@ export async function cancel(id: string, doctorId: string, reason: string): Prom
 export async function reviewOrder(id: string, doctorId: string, tx?: DbExecutor): Promise<Order | null> {
   const db = tx ?? getDb();
   const rows = await db`
-    UPDATE clinical.orders SET status='active', reviewed_by=${doctorId}, reviewed_at=now(), updated_at=now()
+    UPDATE clinical.orders SET status='active', reviewer_id=${validUuidOrNull(doctorId)}, reviewed_by=${doctorId}, reviewed_at=now(), updated_at=now()
     WHERE id=${id} AND status='pending_review' RETURNING *
   `;
   return rows.length ? mapOrder(rows[0]) : null;
@@ -138,8 +151,8 @@ export async function reviewOrder(id: string, doctorId: string, tx?: DbExecutor)
 export async function rejectOrder(id: string, doctorId: string, reason: string, tx?: DbExecutor): Promise<Order | null> {
   const db = tx ?? getDb();
   const rows = await db`
-    UPDATE clinical.orders SET status='cancelled', cancelled_by=${doctorId}, cancelled_at=now(),
-      cancel_reason=${reason}, updated_at=now()
+    UPDATE clinical.orders SET status='rejected', reject_reason=${reason},
+      cancelled_by=${doctorId}, cancelled_at=now(), updated_at=now()
     WHERE id=${id} AND status='pending_review' RETURNING *
   `;
   return rows.length ? mapOrder(rows[0]) : null;
@@ -148,7 +161,7 @@ export async function rejectOrder(id: string, doctorId: string, reason: string, 
 export async function stopOrder(id: string, tx?: DbExecutor): Promise<Order | null> {
   const db = tx ?? getDb();
   const rows = await db`
-    UPDATE clinical.orders SET status='stopped', updated_at=now()
+    UPDATE clinical.orders SET status='stopped', stop_at=now(), updated_at=now()
     WHERE id=${id} AND status='active' RETURNING *
   `;
   return rows.length ? mapOrder(rows[0]) : null;
@@ -173,10 +186,13 @@ export async function execute(id: string, nurseId: string, result?: string, note
   return mapExec(rows[0]);
 }
 
-/** 临时医嘱单次执行后置位（返回最新 Order 行）。 */
+/** 临时医嘱单次执行后置 executed（CAS active），返回最新 Order 行。 */
 export async function markOrderExecuted(orderId: string, tx?: DbExecutor): Promise<Order | null> {
   const db = tx ?? getDb();
-  const rows = await db`SELECT * FROM clinical.orders WHERE id=${orderId}`;
+  const rows = await db`
+    UPDATE clinical.orders SET status='executed', updated_at=now()
+    WHERE id=${orderId} AND status='active' RETURNING *
+  `;
   return rows.length ? mapOrder(rows[0]) : null;
 }
 
