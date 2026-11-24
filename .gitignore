@@ -46,6 +46,9 @@ tmp/
 *.pid
 *.seed
 
+# PostgreSQL 本地实例数据目录（5433 实例，运行时生成，严禁入库；历史误跟踪已 git rm --cached 取消跟踪，本地文件保留）
+/pgdata/
+
 # 编辑器
 .vscode/
 .idea/
