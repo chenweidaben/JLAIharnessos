@@ -1,6 +1,17 @@
 /**
  * 健澜科技 jlmedaios - 运行病历质控类型（M2-B）
  * 与 BFF src/bff/routes/medicalQc.ts 契约对齐。
+ *
+ * 契约现状（2026-11-25 巡检核实）：
+ *  - GET  /api/v1/medical-qc/queue          → `{ items: QcQueueItem[], total }`，字段与下方 QcQueueItem 一致。
+ *  - GET  /api/v1/medical-qc/records/:id    → 当前仅返回精简视图 `{ nextLevel: number, status?: string }`；
+ *    下方 QcRecordDetail / MedicalRecordQcDto / RecordReviewDto / latestRule 为后端聚合器待组装的目标字段
+ *    （record / visit / patient / reviews），仓储层已具备取数能力，待后端详情视图补齐后打通。
+ *  - POST /records/:id/check                → `{ canPass, score, rule: { blockCount, majorCount?, minorCount? },
+ *    issues: QcIssueDto[], ai: { issues: QcIssueDto[], model, error } }`。
+ *  - 后端缺陷项当前字段为 `code / message / level`；前端 QcIssueDto 预留的 ruleId/category/severity/source
+ *    别名待后端 issue 结构规范化后对齐（见巡检待办，本轮不迁就临时字段重构）。
+ *
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
 

@@ -269,7 +269,12 @@ export default function QcDetail() {
             />
           </Card>
         </Space>
-      ) : null}
+      ) : (
+        <Empty
+          data-testid="qc-detail-empty"
+          description="病历详情暂不可用：当前质控详情接口仅返回待审级别与状态，病历正文、患者信息与签名链待后端详情视图补齐；可先在上方运行规则检查 / AI 辅助检查。"
+        />
+      )}
     </Drawer>
   );
 }
