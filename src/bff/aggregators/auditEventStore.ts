@@ -22,13 +22,14 @@ import type { AuditEvent } from './auditEventAggregator';
  * postgres.js 最小类型形态：只声明本文件用到的几个调用。
  * 模板标签返回任意行数组；调用点再收窄到具体 Row 类型，避免 any 泛滥。
  */
+export interface CursorableQuery<T> extends Promise<T[]> {
+  cursor(rows?: number): AsyncIterableIterator<T[]>;
+}
 export interface PgSql {
-  <T = unknown>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T[]>;
+  <T = unknown>(strings: TemplateStringsArray, ...values: unknown[]): CursorableQuery<T>;
   begin<T>(fn: (tx: PgSql) => Promise<T>): Promise<T>;
-  cursor<T>(batchSize: number): (strings: TemplateStringsArray, ...values: unknown[]) => AsyncIterable<T[]>;
-  join(parts: unknown[], separator: string): unknown;
-  /** 原样片段（用于动态标识符，调用前必须自行完成白名单校验） */
-  unsafe(fragment: string): unknown;
+  /** 原样片段（用于动态标识符/条件片段，调用前必须自行完成白名单校验） */
+  unsafe(fragment: string, args?: unknown[], options?: unknown): unknown;
 }
 // 向后兼容别名
 export type SqlExecutor = PgSql;
@@ -169,6 +170,8 @@ function rowFromDb(r: EventsRow): AuditEvent {
 export class PgAuditStore implements AuditEventStore {
   readonly kind = 'pg' as const;
   private readonly qualifiedTable: ReturnType<PgSql>;
+  /** 白名单校验后的安全标识符字符串，供整条 unsafe 查询拼接表名 */
+  private readonly tableName: string;
   private readonly lockKey: string;
   constructor(private readonly sql: SqlExecutor, schema?: string) {
     // P5-20: AUDIT_DB_SCHEMA 隔离（默认 'audit'，E2E 用 'audit_e2e'）
@@ -177,7 +180,8 @@ export class PgAuditStore implements AuditEventStore {
       throw new Error(`AUDIT_DB_SCHEMA invalid: ${s} (must match ^[a-z_][a-z0-9_]*$)`);
     }
     // 白名单已校验，安全内联为标识符
-    this.qualifiedTable = this.sql.unsafe(`"${s}"."events"`) as ReturnType<PgSql>;
+    this.tableName = `"${s}"."events"`;
+    this.qualifiedTable = this.sql.unsafe(this.tableName) as ReturnType<PgSql>;
     // P5-20 第二步：lock key 参数化，两 schema 不互相阻塞
     this.lockKey = `audit_events_seq_${s}`;
   }
@@ -228,39 +232,42 @@ export class PgAuditStore implements AuditEventStore {
     actorId?: string; module?: string; action?: string; result?: string; patientId?: string;
     from?: string; to?: string;
   }): Promise<{ rows: AuditEvent[]; total: number }> {
-    // 所有过滤进 WHERE；total 用单独 count(*) 走同一 WHERE
-    // postgres.js 模板标签自动参数化，用 WHERE AND ${cond} 片段
-    const conds: ReturnType<PgSql>[] = [this.sql``]; // 占位，后续 AND
-    const and = (frag: unknown) => conds.push(this.sql`AND ${frag}`);
-    if (opts.actorId) and(this.sql`actor_id = ${opts.actorId}`);
-    if (opts.module) and(this.sql`module = ${opts.module}`);
-    if (opts.action) and(this.sql`action = ${opts.action}`);
-    if (opts.result) and(this.sql`result = ${opts.result}`);
-    if (opts.patientId) and(this.sql`patient_id = ${opts.patientId}`);
-    if (opts.from) and(this.sql`occurred_at >= ${opts.from}`);
-    if (opts.to) and(this.sql`occurred_at <= ${opts.to}`);
-    // 第一片是占位空，去掉
-    const where = conds.slice(1);
-    const whereSql = where.length
-      ? this.sql`WHERE ${this.sql.join(where, ' ')}`
-      : this.sql``;
+    // 所有过滤进 WHERE；total 用单独 count(*) 走同一 WHERE。
+    // postgres.js 3.4.x 连接池实例未挂载 sql.join，这里列名固定白名单、
+    // 值一律走 $n 参数占位，条件片段用 unsafe 内联（与仓内 QueryBuilder 同构）。
+    const params: unknown[] = [];
+    const conds: string[] = [];
+    const eq = (col: string, val: unknown) => { params.push(val); conds.push(`${col} = $${params.length}`); };
+    const cmp = (col: string, op: string, val: unknown) => { params.push(val); conds.push(`${col} ${op} $${params.length}`); };
+    if (opts.actorId) eq('actor_id', opts.actorId);
+    if (opts.module) eq('module', opts.module);
+    if (opts.action) eq('action', opts.action);
+    if (opts.result) eq('result', opts.result);
+    if (opts.patientId) eq('patient_id', opts.patientId);
+    if (opts.from) cmp('occurred_at', '>=', opts.from);
+    if (opts.to) cmp('occurred_at', '<=', opts.to);
 
-    const totalRows = await this.sql<{ count: string | number }>`SELECT COUNT(*)::bigint AS count FROM ${this.qualifiedTable} ${whereSql}`;
+    const whereClause = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+    // 整条语句 + 参数数组交给 unsafe 绑定；带参片段嵌模板不会合并 args，
+    // 会报 "bind message supplies 0 parameters"。表名是白名单校验过的标识符。
+    const totalRows = await this.sql.unsafe(
+      `SELECT COUNT(*)::bigint AS count FROM ${this.tableName} ${whereClause}`,
+      params,
+    ) as { count: string | number }[];
     const total = Number(totalRows[0]?.count ?? 0);
 
-    const rows = await this.sql<EventsRow>`
-      SELECT * FROM ${this.qualifiedTable} ${whereSql}
-      ORDER BY seq DESC
-      LIMIT ${opts.limit} OFFSET ${opts.offset}
-    `;
+    const rows = await this.sql.unsafe(
+      `SELECT * FROM ${this.tableName} ${whereClause} ORDER BY seq DESC LIMIT ${opts.limit} OFFSET ${opts.offset}`,
+      params,
+    ) as EventsRow[];
     return { rows: rows.map(rowFromDb), total };
   }
 
   async *streamAll(): AsyncIterable<AuditEvent[]> {
-    // postgres.js cursor：每 500 条一批
-    const cursor = this.sql.cursor<EventsRow>(500)`SELECT * FROM ${this.qualifiedTable} ORDER BY seq ASC`;
-    // eslint-disable-next-line no-unreachable-loop
-    for await (const batch of cursor) {
+    // postgres.js 3.4.x：cursor 是 Query 实例方法（sql`…`.cursor(rows)），
+    // 并非 sql.cursor(rows) 顶层方法；每 500 条一批异步迭代。
+    const query = this.sql<EventsRow>`SELECT * FROM ${this.qualifiedTable} ORDER BY seq ASC`;
+    for await (const batch of query.cursor(500)) {
       yield batch.map(rowFromDb);
     }
   }
