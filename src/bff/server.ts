@@ -6753,7 +6753,7 @@ startMedmuseScheduler();
 const chatClients = new Set<Bun.ServerWebSocket<unknown>>();
 
 function broadcast(event: string, payload: unknown, seq?: number): void {
-  // seq �?outbox 数字主键（仅经发件箱发布的事件携带），客户端据此重连补拉
+  // seq 为 outbox 数字主键（仅经发件箱发布的事件携带），客户端据此重连补拉
   const frame = JSON.stringify({
     event,
     timestamp: Date.now(),
@@ -6786,7 +6786,7 @@ const outboxRelay = new OutboxRelay(
 );
 outboxRelay.start();
 
-/** 校验 WebSocket 升级请求�?Token（query 参数 ?token= �?Sec-WebSocket-Protocol�?*/
+/** 校验 WebSocket 升级请求的 Token（query 参数 ?token= 或 Sec-WebSocket-Protocol） */
 function wsAuthorized(req: Request): boolean {
   const url = new URL(req.url);
   const token =
@@ -6830,7 +6830,7 @@ async function handleAgentStart(
     try {
       ws.send(JSON.stringify({ event, timestamp: Date.now(), payload }));
     } catch {
-      /* ws 已关�?*/
+      /* ws 已关闭 */
     }
   };
 
@@ -6966,7 +6966,7 @@ async function handleFetch(
   // 预读取请求体（写请求），供幂等指纹与 handler 复用同一份数据
   const mayHaveBody = req.method !== 'GET' && req.method !== 'HEAD';
   const rawBody = mayHaveBody ? await req.text() : null;
-  // 直连客户�?IP（Bun 运行时从 socket 解析）；经反向代理时各路由以
+  // 直连客户端 IP（Bun 运行时从 socket 解析）；经反向代理时各路由以
   // x-forwarded-for 首段为准，此值仅作直连兜底
   const socketIp = server.requestIP(req)?.address ?? null;
   const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody, socketIp);
@@ -7029,7 +7029,7 @@ async function handleFetch(
         }
       }
       const handler = r.def.handle;
-      // 错误处理在外、幂等在内：beginProcessing �?handler 任何阶段抛错
+      // 错误处理在外、幂等在内：beginProcessing 后 handler 任何阶段抛错
       // 都转结构化错误信封（带 traceId），不返回 HTML 错误页
       const wrapped = withErrorHandler((c: Ctx) =>
         withIdempotency(c, () => handler(c)));
