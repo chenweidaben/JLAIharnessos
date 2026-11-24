@@ -186,8 +186,8 @@ describe('P0-4 列表与路由表自检', () => {
     expect(listReturnRequests().map((d) => d.dispenseNo)).toEqual(['DISP-0001']);
   });
 
-  it('8 条路由全部 auth:true，前缀 /api/v1/pharmacy/dispense-trade', () => {
-    expect(pharmacyDispenseTradeRoutes.length).toBe(8);
+  it('13 条路由全部 auth:true，前缀 /api/v1/pharmacy/dispense-trade', () => {
+    expect(pharmacyDispenseTradeRoutes.length).toBe(13);
     for (const r of pharmacyDispenseTradeRoutes) {
       expect(r.auth).toBe(true);
       expect(r.path.startsWith('/api/v1/pharmacy/dispense-trade/')).toBe(true);

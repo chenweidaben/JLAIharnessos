@@ -48,6 +48,14 @@ function applyTimeFilter(rows: AuditEvent[], from?: string, to?: string): AuditE
   });
 }
 
+/** 回放/取证包共用过滤：按 actorId / patientId 精确匹配，再按时间窗裁剪。 */
+function applyQueryFilter(rows: AuditEvent[], q: ForensicQuery): AuditEvent[] {
+  let filtered = rows;
+  if (q.actorId) filtered = filtered.filter((e) => e.actorId === q.actorId);
+  if (q.patientId) filtered = filtered.filter((e) => e.patientId === q.patientId);
+  return applyTimeFilter(filtered, q.from, q.to);
+}
+
 export function validateQuery(q: ForensicQuery): string | null {
   if (!q.actorId && !q.patientId) return 'actorId 与 patientId 至少给一个';
   if (q.from && Number.isNaN(new Date(q.from).getTime())) return 'from 不是合法 ISO 时间';
@@ -60,7 +68,7 @@ export function replay(q: ForensicQuery): { rows: AuditEvent[]; total: number } 
   const offset = Math.max(q.offset ?? 0, 0);
   // P5-13：forensic 走内存 pending（与 seal 同源）
   const all = getPendingEvents();
-  const timeFiltered = applyTimeFilter(all, q.from, q.to);
+  const timeFiltered = applyQueryFilter(all, q);
   // 正序
   const asc = timeFiltered.slice().sort((a, b) => a.seq - b.seq);
   return { rows: asc.slice(offset, offset + limit), total: asc.length };
@@ -68,7 +76,7 @@ export function replay(q: ForensicQuery): { rows: AuditEvent[]; total: number } 
 
 export function createPackage(q: ForensicQuery, generatedBy: string): ForensicPackage {
   const all = getPendingEvents();
-  const timeFiltered = applyTimeFilter(all, q.from, q.to).slice().sort((a, b) => a.seq - b.seq);
+  const timeFiltered = applyQueryFilter(all, q).slice().sort((a, b) => a.seq - b.seq);
   const chain = verifyChainSync();
   const pkg: ForensicPackage = {
     packageId: nextId(),

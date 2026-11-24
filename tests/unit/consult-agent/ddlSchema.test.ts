@@ -404,20 +404,22 @@ function splitTopLevel(body: string): string[] {
 
 function parseColumnDef(def: string): ParsedColumn | null {
   const clean = def.replace(/--.*$/, '').trim();
-  const m = /^([a-z_][a-z0-9_]*)\s+([a-z0-9_]+)/i.exec(clean);
+  // 列名支持裸标识符与双引号引用标识符（current_role 为 PostgreSQL 保留字，DDL 中必须加双引号）
+  const m = /^(?:"([a-z_][a-z0-9_]*)"|([a-z_][a-z0-9_]*))\s+([a-z0-9_]+)/i.exec(clean);
   if (!m) return null;
+  const colName = (m[1] ?? m[2]).toLowerCase();
   const ref =
     /REFERENCES\s+([a-z_]+)\.([a-z0-9_]+)\s*\(\s*([a-z_][a-z0-9_]*)\s*\)(?:\s+ON DELETE\s+(CASCADE|SET NULL|RESTRICT|NO ACTION))?/i.exec(
       clean,
     );
   return {
-    name: m[1].toLowerCase(),
-    type: m[2].toLowerCase(),
+    name: colName,
+    type: m[3].toLowerCase(),
     primaryKey: /\bPRIMARY KEY\b/i.test(clean),
     unique: /\bUNIQUE\b/i.test(clean),
     references: ref
       ? {
-          column: m[1].toLowerCase(),
+          column: colName,
           schema: ref[1].toLowerCase(),
           table: ref[2].toLowerCase(),
           refColumn: ref[3].toLowerCase(),

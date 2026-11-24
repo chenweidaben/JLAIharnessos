@@ -237,8 +237,8 @@ describe('P0-5 列表与路由表自检', () => {
     expect(listSettlements().length).toBe(1);
   });
 
-  it('6 条路由全部 auth:true，前缀 /api/v1/inpatient/deposit-settle', () => {
-    expect(inpatientDepositSettleTradeRoutes.length).toBe(6);
+  it('8 条路由全部 auth:true，前缀 /api/v1/inpatient/deposit-settle', () => {
+    expect(inpatientDepositSettleTradeRoutes.length).toBe(8);
     for (const r of inpatientDepositSettleTradeRoutes) {
       expect(r.auth).toBe(true);
       expect(r.path.startsWith('/api/v1/inpatient/deposit-settle/')).toBe(true);

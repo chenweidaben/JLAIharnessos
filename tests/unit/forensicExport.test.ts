@@ -12,10 +12,11 @@ import {
 
 beforeEach(() => { resetAudit(); __resetStore(); });
 
-function seed() {
-  recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'N1', patientId: 'P1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
-  recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'view', module: 'emr', resourceType: 'note', resourceId: 'N2', patientId: 'P1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
-  recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'update', module: 'cds', resourceType: 'check', resourceId: 'C1', patientId: 'P2', result: 'success', ip: '1.1.1.2', userAgent: 'ua' });
+async function seed() {
+  // recordEvent 为 async（写穿 store 后才入 pending 池），必须逐条 await，否则 replay 读到空池。
+  await recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'create', module: 'emr', resourceType: 'note', resourceId: 'N1', patientId: 'P1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
+  await recordEvent({ actorId: 'D1', actorRole: 'doctor', action: 'view', module: 'emr', resourceType: 'note', resourceId: 'N2', patientId: 'P1', result: 'success', ip: '1.1.1.1', userAgent: 'ua' });
+  await recordEvent({ actorId: 'D2', actorRole: 'doctor', action: 'update', module: 'cds', resourceType: 'check', resourceId: 'C1', patientId: 'P2', result: 'success', ip: '1.1.1.2', userAgent: 'ua' });
 }
 
 describe('P4-5 校验', () => {
@@ -34,42 +35,42 @@ describe('P4-5 校验', () => {
 });
 
 describe('P4-5 回放', () => {
-  test('按 actorId 回放 → 只返回该用户事件（正序）', () => {
-    seed();
+  test('按 actorId 回放 → 只返回该用户事件（正序）', async () => {
+    await seed();
     const r = replay({ actorId: 'D1' });
     expect(r.total).toBe(2);
     expect(r.rows[0].actorId).toBe('D1');
     expect(r.rows[1].actorId).toBe('D1');
   });
-  test('按 patientId 反查 → 返回所有访问该患者的操作', () => {
-    seed();
+  test('按 patientId 反查 → 返回所有访问该患者的操作', async () => {
+    await seed();
     const r = replay({ patientId: 'P1' });
     expect(r.total).toBe(2);
   });
-  test('limit/offset 分页', () => {
-    seed();
+  test('limit/offset 分页', async () => {
+    await seed();
     const r = replay({ actorId: 'D1', limit: 1, offset: 1 });
     expect(r.rows.length).toBe(1);
     expect(r.total).toBe(2);
   });
-  test('正序（seq 递增）', () => {
-    seed();
+  test('正序（seq 递增）', async () => {
+    await seed();
     const r = replay({ actorId: 'D1' });
     expect(r.rows[0].seq).toBeLessThan(r.rows[1].seq);
   });
 });
 
 describe('P4-5 取证包', () => {
-  test('生成取证包 → 含 packageId + hashChainValid=true', () => {
-    seed();
+  test('生成取证包 → 含 packageId + hashChainValid=true', async () => {
+    await seed();
     const pkg = createPackage({ actorId: 'D1' }, 'ADMIN');
     expect(pkg.packageId).toMatch(/^FP-/);
     expect(pkg.hashChainValid).toBe(true);
     expect(pkg.eventCount).toBe(2);
     expect(pkg.events.length).toBe(2);
   });
-  test('getPackage 命中；不存在 → null', () => {
-    seed();
+  test('getPackage 命中；不存在 → null', async () => {
+    await seed();
     const pkg = createPackage({ actorId: 'D1' }, 'ADMIN');
     expect(getPackage(pkg.packageId)?.packageId).toBe(pkg.packageId);
     expect(getPackage('FP-nope')).toBeNull();
@@ -79,8 +80,8 @@ describe('P4-5 取证包', () => {
     expect(pkg.eventCount).toBe(0);
     expect(pkg.hashChainValid).toBe(true);
   });
-  test('CSV 含 header 行', () => {
-    seed();
+  test('CSV 含 header 行', async () => {
+    await seed();
     const pkg = createPackage({ actorId: 'D1' }, 'ADMIN');
     const csv = packageToCsv(pkg);
     expect(csv.split('\n')[0]).toMatch(/^seq,occurredAt,actorId/);
