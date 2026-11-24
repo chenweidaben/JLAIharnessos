@@ -36,6 +36,19 @@ INSERT INTO clinical.medmuse_tools (name, description, schema, risk_level) VALUE
 ON CONFLICT (name) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
+-- role_code CHECK 幂等扩展：放开 finance（200 原约束未含医保办岗位）。
+-- 顺序约束：本文件是首个写入 finance 种子的迁移，必须先扩展允许的角色集合再插种子，
+-- 否则空库按编号顺序重放会先违反 200 旧 CHECK。枚举取 200 原 6 码 ∪ finance 全并集，
+-- ADD CONSTRAINT 会校验既有行，不能只写 finance。209-phase3 另有同口径幂等扩展兜底。
+-- ---------------------------------------------------------------------------
+ALTER TABLE clinical.medmuse_agents DROP CONSTRAINT IF EXISTS medmuse_agents_role_code_check;
+ALTER TABLE clinical.medmuse_agents ADD CONSTRAINT medmuse_agents_role_code_check
+  CHECK (role_code IN (
+    'attending', 'resident', 'nurse', 'pharmacist',
+    'medical_director', 'patient', 'finance'
+  ));
+
+-- ---------------------------------------------------------------------------
 -- finance（医保办）agent 种子（M89-F 岗位；角色码对齐 agentRegistry 白名单 finance）
 -- ---------------------------------------------------------------------------
 INSERT INTO clinical.medmuse_agents (role_code, user_id, name, system_prompt) VALUES
