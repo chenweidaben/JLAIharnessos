@@ -166,5 +166,53 @@
 - 追加纯文档笔 `85f19c58`（补本核对段）后再次推送三远端：LOCAL `85f19c581843f4f4ef0ee4d72c78852ec2bd8ad7`，origin / gitcode / mirror **match=True**，ahead=0 / behind=0。
 - `heagentos` 远端仅承载 main，不同步 m86 分支。
 
+### 续轮收口（2026-11-24 21:00 · medical-qc 收尾 / 登录限流隔离 / 回归基线 / DDL 选型 ADR）
+
+#### 专项② medical-qc 收尾落地（承接上轮遗留三项）
+- **resubmit 挂路由**：`POST /api/v1/medical-qc/records/:id/resubmit`，聚合器内部校验作者本人 403、非 returned 409。
+- **AI 检查接入 LLM seam**：`aiOverlay` 由静态兜底改为异步，接入共享 `callRealLLM`；新增 `parseAiIssues`（防御性提取 JSON 数组 issues）与 `buildAiPrompt`（七要素齐备情况 + 正文摘要，要求 JSON 数组输出）；LLM 失败 / 降级 / 解析失败均 fail-open 返回空 issues + 降级标注，规则 canPass / score 不受 AI 影响。
+- **队列字段对齐前端契约**：仓储 `listPendingQcQueue` LEFT JOIN `clinical.patients`，补 record_type / title / status / updated_at / visit_no / mrn / name_masked；聚合器 `QcQueueItem` 对齐前端全字段并映射 `nextLevel`。
+- 门禁：`tsc --noEmit` 0；真实模式 `medical-record-qc` 集成 **12 pass / 0 fail / 52 expect，exit 0**。
+
+#### 专项① 真实模式 integration 隔离归类（本轮串行复跑）
+**修到转绿（真实缺陷 / 夹具隔离 / 种子缺口）**：
+| 文件 | 结果 | 根因与处置 |
+|---|---|---|
+| `mfa-login` | 3/0 | 测试 `makeLoginCtx` 缺 `req`，中间件读 `c.req.headers` 崩溃；补 Request 对象 + 用例前重置限流桶 |
+| `user-sessions` | 14/0 | 登录限流内存桶跨用例累积触发 429；用例前重置限流桶 |
+| `healthCheckReferral` | 5/0 | `clinical.health_check_packages` 种子表空；`144-health-check.sql` 幂等补默认套餐，本地库同步补插一行 |
+| `real-persistence` | 8/0 | 取消原因断言改读顶层 `cancelReason`（生产契约为顶层字段，`detail` 为 jsonb 扩展，无 `detail.cancelReason` 消费方） |
+| `critical-realtime` | 5/0 | outbox Relay 异步时序 flaky，复跑转绿 |
+| `p07TailLogin-e2e` | 6/0 | 429 限流计数污染，限流窗口过期后复跑转绿 |
+
+- **新增测试隔离钩子**：`rateLimit.ts` 导出 `__resetRateLimitBuckets()`，清空全局与登录内存桶（沿用既有 `__reset` 范式，不改变阈值 / 窗口策略）；mfa-login / user-sessions 用例前调用。
+
+**环境前提 / 历史遗留（未改生产策略，如实归类）**：
+| 文件 | 现象 | 归类 |
+|---|---|---|
+| `globalRateLimit-e2e` | 1 fail，110 次 GET 未触顶 429 | 本机回环免流在 dev / DEMO 模式生效；e2e 需 BFF 以非 dev / 非 demo 模式启动才对本机计桶触顶，属环境前提缺口，非生产缺陷 |
+| `surgeryWorkflow-e2e` | 4 fail，首条排班 409 连锁麻醉 / PACU | 长驻 8080 BFF（PID 2956，19:23 启动）内存聚合器 `requests` / `roomBookings` 跨轮残留，OR-9 时段重叠；聚合器有 `__resetStore` 但无 HTTP reset 端点，e2e 无法触达；待重启 BFF 清内存后复跑验证 |
+| `selfScheduling-e2e` | 2 fail | 同因，内存 `slots` / `bookings` 残留；待重启 BFF 复跑 |
+| 其余 nurseEval* / settlement* / escalation / postpartum / paymentSelection 等 | 全量并发下 fail | `CONNECTION_ENDED` 本地 PG 并发断连噪声；串行单跑已绿 |
+
+#### 回归基线对比（真实退出码）
+| 门禁 | 本轮实测 | 上轮基线 | 结论 |
+|---|---|---|---|
+| unit 全量 | **16653 pass / 169 fail / 113 errors**，16822 tests / 2245 files，152.61s，exit 1 | 16653 / 169 / 113，16822 / 2245 | 逐字一致，**无新增回归**；fail/error 集中 web 误纳与历史遗留 |
+| 真实模式 integration 全量 | **1424 pass / 47 skip / 51 fail**，1522 tests / 170 files，233.81s，exit 1 | 1420 / 47 / 54，1521 tests / 170 files | pass +4、fail -3、tests +1（新增 resubmit 用例）；`CONNECTION_ENDED` 136 次与上轮持平；本轮改动相关文件均不在 fail 清单 |
+| 相关子集 unit（限流 + QC + 订单 10 文件） | **111 pass / 0 fail** | — | 无破坏 |
+| `tsc --noEmit` | **0** | 0 | 无类型错误 |
+
+#### 专项④ 四套漂移 DDL 选型 ADR（只方案细化，不改表）
+- 新增 `docs/adr/016-四套漂移DDL选型待决策.md`：四套实测现状（表 / 列 / 行 / 代码读写）+ 两套选型——**A 新模型独立并存迁移**（补落地、双写 / 回填、前端切契约后退役旧结构）与 **B 对齐旧结构、废弃新模型 DDL**——逐套工作量 / 影响面 / 迁移步骤 / 风险 / 回滚，并列待拍板决策点。
+- 红线：拍板前不 ALTER / DROP 既有表与列，不改已上线 BFF / 前端契约，不回填历史数据。
+
+#### 本轮提交链（基线 `747086db` 之后）
+| SHA | 类型 | 说明 |
+|---|---|---|
+| `9f4d2342` | feat(qc) | 三级质控收尾：resubmit 路由、AI 检查接 LLM seam、队列字段对齐前端契约 |
+| `ba7bbca8` | fix(auth) | 限流桶测试隔离钩子，补齐登录 / MFA / 会话夹具 ctx 与计数重置 |
+| `2ab823b3` | fix(test+seed) | 取消原因断言对齐 Order 顶层契约，补体检套餐默认种子 |
+
 ## 工作区既有不入库项
 - docs 99+ 项 CRLF→LF 换行漂移（本轮 `docs/_m235_endpoints.txt`、`docs/_m235_scan.csv` 仍为历史漂移，未纳入提交）；reports/patrol 历史切片未跟踪；`.txt` 取证日志与 schema-backup 备份不入库；仅 mainline 简报按豁免命名入库。
