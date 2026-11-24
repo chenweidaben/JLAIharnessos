@@ -1,5 +1,8 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/medicalQcRepo';
+import { withTx } from '@/db/pool.js';
+import * as recordRepo from '@/db/repositories/medicalRecordRepo.js';
+import * as reviewRepo from '@/db/repositories/medicalRecordReviewRepo.js';
 
 export class MedicalQcError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -66,11 +69,13 @@ export async function rectifyView(view: AuthView, id: string) {
 /* --------------------------------------------------------------------------
  * 三级运行病历质控（M2-B）聚合接口。
  *
- * 说明：本模块当前仅落库了 list/create/rectify 基础质控单；下列 runQcCheck /
- * getQcRecord / submitQcReview / resubmitRecord / getQcQueue 为集成测试
- * （tests/integration/medical-record-qc.test.ts）按 M2-B 契约引用的接口形状。
- * 此处先提供与测试调用一致的类型签名，运行时显式抛“未实现”，待后续按真实
- * 状态机补全。仅作类型对齐，不改变既有 list/create/rectify 行为。
+ * 三级质控状态机：
+ *   submitted ──L1 pass──▶ reviewed ──L2 pass──▶ signed ──L3 pass──▶ archived
+ *   submitted/reviewed/signed ──任何一级 return──▶ returned ──作者重提──▶ submitted
+ *
+ * 规则引擎为确定性纯函数（要素完整性校验），AI 仅作辅助叠加；无可用 LLM 时
+ * 明确降级标注，规则结果不受 AI 影响。状态推进与 review 留痕在同一事务内提交。
+ * 本链路与既有 list/create/rectify 基础质控单相互独立，不改动其行为。
  * ------------------------------------------------------------------------ */
 
 export interface QcIssue {
@@ -105,24 +110,172 @@ export interface QcReviewInput {
   issues?: QcIssue[];
 }
 
-export async function runQcCheck(_view: AuthView, _recordId: string, _useAi?: boolean): Promise<QcCheckResult> {
-  throw new MedicalQcError(501, 'runQcCheck 尚未实现');
+const badRequest = (m: string) => new MedicalQcError(400, m);
+const notFound = (m: string) => new MedicalQcError(404, m);
+const forbidden = (m: string) => new MedicalQcError(403, m);
+const conflict = (m: string) => new MedicalQcError(409, m);
+
+/** 病历结构化要素（完整性规则清单，要素缺失记为阻断缺陷）。 */
+const RULE_FIELDS = [
+  { key: 'chiefComplaint', label: '主诉' },
+  { key: 'presentIllness', label: '现病史' },
+  { key: 'pastHistory', label: '既往史' },
+  { key: 'physicalExam', label: '体格检查' },
+  { key: 'auxiliaryExam', label: '辅助检查' },
+  { key: 'diagnosis', label: '诊断' },
+  { key: 'treatment', label: '诊疗处理' },
+] as const;
+
+/** 各状态当前待审级别：submitted/returned 回到 1 级，reviewed 待 2 级，signed 待 3 级。 */
+const NEXT_LEVEL: Record<string, number> = { submitted: 1, returned: 1, reviewed: 2, signed: 3 };
+
+/** 通过后状态推进映射。 */
+const PASS_NEXT: Record<string, recordRepo.MedicalRecordStatus> = {
+  submitted: 'reviewed',
+  reviewed: 'signed',
+  signed: 'archived',
+};
+
+function isBlank(v: unknown): boolean {
+  return v == null || (typeof v === 'string' && v.trim() === '');
 }
 
-export async function getQcRecord(_view: AuthView, _recordId: string): Promise<QcRecordView> {
-  throw new MedicalQcError(501, 'getQcRecord 尚未实现');
+/** 确定性规则判定：要素缺失即阻断缺陷，返回缺陷清单 / 阻断数 / 得分 / 是否可通过。 */
+function evaluateRule(content: Record<string, unknown>): {
+  issues: QcIssue[];
+  blockCount: number;
+  majorCount: number;
+  minorCount: number;
+  score: number;
+  canPass: boolean;
+} {
+  const issues: QcIssue[] = [];
+  for (const field of RULE_FIELDS) {
+    if (isBlank(content[field.key])) {
+      issues.push({ code: `missing_${field.key}`, message: `${field.label}未填写`, level: 'block' });
+    }
+  }
+  const blockCount = issues.length;
+  const score = Math.max(0, 100 - blockCount * 20);
+  return { issues, blockCount, majorCount: 0, minorCount: 0, score, canPass: blockCount === 0 };
 }
 
+/** AI 辅助叠加：当前未接入可用 LLM，按契约返回三属性齐全的降级结构（规则结果不受 AI 影响）。 */
+function aiOverlay(useAi: boolean): QcCheckResult['ai'] {
+  if (!useAi) return { issues: [], model: null, error: null };
+  return { issues: [], model: null, error: '未接入可用 LLM，本次仅执行规则检查' };
+}
+
+/** 规则检查（只读，不落库）：返回规则判定 + AI 辅助降级结构。 */
+export async function runQcCheck(_view: AuthView, recordId: string, useAi?: boolean): Promise<QcCheckResult> {
+  const record = await recordRepo.getMedicalRecordById(recordId);
+  if (!record) throw notFound('病历不存在');
+  const rule = evaluateRule(record.content);
+  return {
+    canPass: rule.canPass,
+    score: rule.score,
+    rule: { blockCount: rule.blockCount, majorCount: rule.majorCount, minorCount: rule.minorCount },
+    issues: rule.issues,
+    ai: aiOverlay(Boolean(useAi)),
+  };
+}
+
+/** 病历质控视图：当前状态与下一待审级别。 */
+export async function getQcRecord(_view: AuthView, recordId: string): Promise<QcRecordView> {
+  const record = await recordRepo.getMedicalRecordById(recordId);
+  if (!record) throw notFound('病历不存在');
+  return { nextLevel: NEXT_LEVEL[record.status] ?? 0, status: record.status };
+}
+
+/**
+ * 提交一条质控结论（通过 / 退回）。
+ * 校验顺序：质控权限 → 入参合法性 → 病历存在 → 职责分离 → 级别匹配 → 缺陷门禁；
+ * review 留痕与病历状态推进在同一事务内提交。
+ */
 export async function submitQcReview(
-  _view: AuthView, _recordId: string, _body: QcReviewInput,
+  view: AuthView, recordId: string, body: QcReviewInput,
 ): Promise<{ newStatus: string }> {
-  throw new MedicalQcError(501, 'submitQcReview 尚未实现');
+  if (!view.permissions.includes('medical_record:audit')) {
+    throw forbidden('缺少病历质控权限 medical_record:audit');
+  }
+
+  const decision = body.decision;
+  if (decision !== 'pass' && decision !== 'return') {
+    throw badRequest('decision 必须为 pass / return');
+  }
+  const level = Number(body.level);
+  if (!Number.isInteger(level) || level < 1 || level > 3) {
+    throw badRequest('level 必须为 1 / 2 / 3');
+  }
+
+  const record = await recordRepo.getMedicalRecordById(recordId);
+  if (!record) throw notFound('病历不存在');
+
+  // 职责分离：质控人不得为病历作者本人。
+  if (record.authorId && view.id === record.authorId) {
+    throw forbidden('质控人不得为病历作者本人');
+  }
+
+  const expectedLevel = NEXT_LEVEL[record.status];
+  if (expectedLevel === undefined) throw conflict('当前病历状态不可提交质控结论');
+  if (level !== expectedLevel) {
+    throw conflict(`越级质控：当前为 ${record.status} 状态，应提交第 ${expectedLevel} 级结论`);
+  }
+
+  const rule = evaluateRule(record.content);
+
+  // 缺陷门禁：带阻断缺陷直接通过，须显式确认并写明理由与缺陷清单。
+  if (decision === 'pass' && rule.blockCount > 0) {
+    const acknowledged = body.acknowledgeIssues === true;
+    const issuesProvided = Array.isArray(body.issues) && body.issues.length > 0;
+    const commentProvided = typeof body.comment === 'string' && body.comment.trim() !== '';
+    if (!acknowledged || !issuesProvided || !commentProvided) {
+      throw conflict('存在阻断缺陷，通过须显式确认（acknowledgeIssues）并写明理由与缺陷清单');
+    }
+  }
+
+  const newStatus: recordRepo.MedicalRecordStatus =
+    decision === 'return' ? 'returned' : PASS_NEXT[record.status];
+  if (!newStatus) throw conflict('当前病历状态不可推进');
+
+  const reviewIssues = (
+    decision === 'pass' && rule.blockCount > 0 ? body.issues ?? rule.issues : rule.issues
+  ) as Record<string, unknown>[];
+
+  await withTx(async (tx) => {
+    await reviewRepo.insertReview({
+      recordId: record.id,
+      reviewLevel: expectedLevel,
+      decision,
+      reviewerId: view.id,
+      comment: body.comment ? body.comment.trim() : null,
+      issues: reviewIssues.map((i) => ({ ...i })),
+      ruleIssueCount: rule.blockCount,
+      aiIssueCount: 0,
+      aiAssisted: false,
+      aiModel: null,
+    }, tx);
+    await recordRepo.updateMedicalRecordStatus(record.id, newStatus, view.id, tx);
+  });
+
+  return { newStatus };
 }
 
-export async function resubmitRecord(_view: AuthView, _recordId: string): Promise<{ status: string }> {
-  throw new MedicalQcError(501, 'resubmitRecord 尚未实现');
+/** 作者本人对退回病历重新提交：returned → submitted，非作者 403。 */
+export async function resubmitRecord(view: AuthView, recordId: string): Promise<{ status: string }> {
+  const record = await recordRepo.getMedicalRecordById(recordId);
+  if (!record) throw notFound('病历不存在');
+  if (!record.authorId || view.id !== record.authorId) {
+    throw forbidden('仅病历作者本人可重新提交');
+  }
+  if (record.status !== 'returned') throw conflict('仅退回（returned）状态的病历可重新提交');
+  await recordRepo.updateMedicalRecordStatus(record.id, 'submitted', record.authorId);
+  return { status: 'submitted' };
 }
 
-export async function getQcQueue(_view: AuthView): Promise<{ items: QcQueueItem[] }> {
-  throw new MedicalQcError(501, 'getQcQueue 尚未实现');
+/** 待质控队列：全院范围（dataScope=all 或 admin 角色）全量；其余仅见本科室病历。 */
+export async function getQcQueue(view: AuthView): Promise<{ items: QcQueueItem[] }> {
+  const scopeAll = view.dataScope === 'all' || view.rawRoles.includes('admin');
+  const rows = await recordRepo.listPendingQcQueue({ deptName: scopeAll ? null : view.deptName });
+  return { items: rows.map((r) => ({ recordId: r.recordId, department: r.department })) };
 }

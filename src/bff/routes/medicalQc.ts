@@ -1,7 +1,11 @@
 ﻿import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
-import { listView, createView, rectifyView, MedicalQcError } from '../aggregators/medicalQcAggregator.js';
+import {
+  listView, createView, rectifyView, MedicalQcError,
+  getQcRecord, runQcCheck, submitQcReview, getQcQueue,
+} from '../aggregators/medicalQcAggregator.js';
+import type { QcReviewInput } from '../aggregators/medicalQcAggregator.js';
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 列表返回内存空兜底。 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -79,7 +83,12 @@ async function requester(c: Ctx): Promise<AuthView | null> {
 
 function mapError(err: unknown): Response {
   if (err instanceof MedicalQcError) {
-    const code = err.status === 403 ? ErrorCode.FORBIDDEN : err.status === 409 ? ErrorCode.CONFLICT : ErrorCode.BAD_REQUEST;
+    const code =
+      err.status === 401 ? ErrorCode.UNAUTHORIZED :
+      err.status === 403 ? ErrorCode.FORBIDDEN :
+      err.status === 404 ? ErrorCode.NOT_FOUND :
+      err.status === 409 ? ErrorCode.CONFLICT :
+      ErrorCode.BAD_REQUEST;
     return json(fail(code, err.message), err.status);
   }
   return json(fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '失败'), 500);
@@ -90,8 +99,10 @@ export const medicalQcRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       if (isDemo) return json(ok(listQueueView(), 'ok', c.traceId));
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      // 真实库队列查询暂未提供，兜底返回内存 demo 队列，保证前端可渲染。
-      return json(ok(listQueueView(), 'ok', c.traceId));
+      try {
+        const queue = await getQcQueue(view);
+        return json(ok({ items: queue.items, total: queue.items.length }, 'ok', c.traceId));
+      } catch (e) { return mapError(e); }
     } },
   { method: 'GET', path: '/api/v1/medical-qc', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
@@ -108,5 +119,32 @@ export const medicalQcRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try { return json(ok(await rectifyView(view, c.params.id))); } catch (e) { return mapError(e); }
+    } },
+  // ------------------------------ M2-B 三级运行病历质控 ------------------------------
+  { method: 'GET', path: '/api/v1/medical-qc/records/:id', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await getQcRecord(view, c.params.id))); } catch (e) { return mapError(e); }
+    } },
+  { method: 'POST', path: '/api/v1/medical-qc/records/:id/check', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      const body = await c.body<Record<string, unknown>>();
+      try { return json(ok(await runQcCheck(view, c.params.id, body?.useAi === true))); } catch (e) { return mapError(e); }
+    } },
+  { method: 'POST', path: '/api/v1/medical-qc/records/:id/review', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      const body = await c.body<Partial<QcReviewInput>>();
+      try {
+        const input = {
+          decision: body.decision,
+          level: Number(body.level),
+          comment: body.comment,
+          acknowledgeIssues: body.acknowledgeIssues,
+          issues: body.issues,
+        } as QcReviewInput;
+        return json(ok(await submitQcReview(view, c.params.id, input)));
+      } catch (e) { return mapError(e); }
     } },
 ];
