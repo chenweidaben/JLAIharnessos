@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS clinical.clinical_improvement_tasks (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   source          text NOT NULL DEFAULT 'drg_attribution' CHECK (source IN ('drg_attribution','quality_safety','other')),
   visit_id        uuid NULL,
+  patient_id      uuid NULL,
   group_code      text NULL,
   category        text NULL,
   title           text NOT NULL,
@@ -20,8 +21,12 @@ CREATE TABLE IF NOT EXISTS clinical.clinical_improvement_tasks (
   created_at      timestamptz NOT NULL DEFAULT now()
 );
 
+-- 幂等：兼容历史库补 patient_id（患者级工单，无就诊上下文时 visit_id 可为空）
+ALTER TABLE clinical.clinical_improvement_tasks ADD COLUMN IF NOT EXISTS patient_id uuid NULL;
+
 CREATE INDEX IF NOT EXISTS idx_improvement_assignee ON clinical.clinical_improvement_tasks(assignee_id, status);
 CREATE INDEX IF NOT EXISTS idx_improvement_source ON clinical.clinical_improvement_tasks(source, visit_id);
+CREATE INDEX IF NOT EXISTS idx_improvement_patient ON clinical.clinical_improvement_tasks(source, patient_id);
 
 -- 权限码
 INSERT INTO iam.permissions (code, name, module, description) VALUES

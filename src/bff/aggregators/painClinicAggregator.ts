@@ -96,10 +96,11 @@ export async function recordView(
     }, tx);
 
     let escalationWorkOrderCreated = false;
-    if (escalate && !(await hasOpenTask(input.patientId.trim(), 'pain', tx))) {
+    if (escalate && !(await hasOpenTask(input.patientId.trim(), 'pain', tx, { by: 'patient' }))) {
       await createTask({
         source: 'pain',
         visitId: record.visitId ?? null,
+        patientId: input.patientId.trim(),
         title: '镇痛方案调整',
         finding: `当前NRS=${current} 爆发痛=${breakthrough} 需升级镇痛`,
         assigneeId: auth.id,

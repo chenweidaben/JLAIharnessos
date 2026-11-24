@@ -54,10 +54,10 @@ export async function recordAdverseView(
     }, tx);
     let taskId: string | null = null;
     if (severe) {
-      const exists = await hasOpenTask(r.patientId, 'oncology', tx);
+      const exists = await hasOpenTask(r.patientId, 'oncology', tx, { by: 'patient' });
       if (!exists) {
         const t = await createTask({
-          source: 'oncology', visitId: null,
+          source: 'oncology', visitId: null, patientId: r.patientId,
           title: `CTCAE grade${r.grade} ${r.term}`,
           finding: `patient=${r.patientId} cycle=${r.cycleId} term=${r.term} grade=${r.grade}`,
           assigneeId: auth.id, createdBy: auth.id,

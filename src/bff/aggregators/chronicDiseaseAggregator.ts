@@ -58,10 +58,10 @@ export async function recordVitalsView(
     }, tx);
     let taskId: string | null = null;
     if (level === 'abnormal' || level === 'critical') {
-      const exists = await hasOpenTask(r.patientId, 'chronic', tx);
+      const exists = await hasOpenTask(r.patientId, 'chronic', tx, { by: 'patient' });
       if (!exists) {
         const t = await createTask({
-          source: 'chronic', visitId: null,
+          source: 'chronic', visitId: null, patientId: r.patientId,
           title: `Chronic ${disease} ${level}`,
           finding: `sbp=${r.sbp} dbp=${r.dbp} fpg=${r.fastingGlucose} hba1c=${r.hba1c} level=${level}`,
           assigneeId: auth.id, createdBy: auth.id,
