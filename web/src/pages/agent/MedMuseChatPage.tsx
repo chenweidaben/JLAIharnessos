@@ -63,7 +63,7 @@ const ROLE_OPTIONS = [
   { value: 'resident', label: '住院医师' },
   { value: 'nurse', label: '护士' },
   { value: 'pharmacist', label: '药师' },
-  { value: 'insurance_officer', label: '医保办' },
+  { value: 'finance', label: '医保办' },
   { value: 'patient', label: '患者' },
 ] as const;
 
