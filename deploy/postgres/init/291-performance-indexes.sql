@@ -38,9 +38,8 @@ CREATE INDEX IF NOT EXISTS idx_patients_hospital_created
   ON clinical.patients (hospital_id, created_at DESC)
   WHERE deleted_at IS NULL;
 
-COMMENT ON INDEX idx_patients_hospital_created IS
-  '【生产化收尾】患者管理端按院列近期建档患者（hospital_id 等值 + created_at 倒序，partial 软删）；'
-  || '只加 1 条窄 btree，不影响 mrn 唯一约束 / 身份证哈希查重 / GIN 姓名模糊 / GIN 标签 四条写入热路径。';
+COMMENT ON INDEX clinical.idx_patients_hospital_created IS
+  '【生产化收尾】患者管理端按院列近期建档患者（hospital_id 等值 + created_at 倒序，partial 软删）；只加 1 条窄 btree，不影响 mrn 唯一约束 / 身份证哈希查重 / GIN 姓名模糊 / GIN 标签 四条写入热路径。';
 
 -- ---------------------------------------------------------------------------
 -- 2. 就诊：患者 360 拉某患者「在诊/在院」就诊流水
@@ -54,9 +53,8 @@ COMMENT ON INDEX idx_patients_hospital_created IS
 CREATE INDEX IF NOT EXISTS idx_visits_patient_status_admit
   ON clinical.visits (patient_id, status, admit_at DESC);
 
-COMMENT ON INDEX idx_visits_patient_status_admit IS
-  '【生产化收尾】患者360/医生工作台按患者拉在诊就诊（patient_id 等值 + status 等值 + admit_at 倒序）；'
-  || 'visits 为一次就诊一行的低频写表，写放大可忽略，不影响 visit_no 唯一约束与科室看板索引。';
+COMMENT ON INDEX clinical.idx_visits_patient_status_admit IS
+  '【生产化收尾】患者360/医生工作台按患者拉在诊就诊（patient_id 等值 + status 等值 + admit_at 倒序）；visits 为一次就诊一行的低频写表，写放大可忽略，不影响 visit_no 唯一约束与科室看板索引。';
 
 -- ---------------------------------------------------------------------------
 -- 3. 处方头：就诊详情拉「待审/已发」处方列表
@@ -70,9 +68,8 @@ COMMENT ON INDEX idx_visits_patient_status_admit IS
 CREATE INDEX IF NOT EXISTS idx_rx_visit_status_created
   ON clinical.prescriptions (visit_id, status, created_at DESC);
 
-COMMENT ON INDEX idx_rx_visit_status_created IS
-  '【生产化收尾】就诊详情/药师审方按就诊拉处方（visit_id 等值 + status 等值 + created_at 倒序）；'
-  || '处方为低频业务写，窄 btree 写放大极低，不影响 rx_no 唯一约束与 audit_result jsonb 写入。';
+COMMENT ON INDEX clinical.idx_rx_visit_status_created IS
+  '【生产化收尾】就诊详情/药师审方按就诊拉处方（visit_id 等值 + status 等值 + created_at 倒序）；处方为低频业务写，窄 btree 写放大极低，不影响 rx_no 唯一约束与 audit_result jsonb 写入。';
 
 -- ---------------------------------------------------------------------------
 -- 4. 病历文书：就诊详情拉「按时间倒序」的文书列表
@@ -86,9 +83,8 @@ COMMENT ON INDEX idx_rx_visit_status_created IS
 CREATE INDEX IF NOT EXISTS idx_records_visit_created
   ON clinical.medical_records (visit_id, created_at DESC);
 
-COMMENT ON INDEX idx_records_visit_created IS
-  '【生产化收尾】EMR 就诊时间线按就诊拉文书（visit_id 等值 + created_at 倒序）；'
-  || '文书以 INSERT 为主，窄 btree 仅在写入时维护一次，不影响 record_type+status 质控索引与 content/全文 GIN。';
+COMMENT ON INDEX clinical.idx_records_visit_created IS
+  '【生产化收尾】EMR 就诊时间线按就诊拉文书（visit_id 等值 + created_at 倒序）；文书以 INSERT 为主，窄 btree 仅在写入时维护一次，不影响 record_type+status 质控索引与 content/全文 GIN。';
 
 -- ---------------------------------------------------------------------------
 -- 5. 医护通知：已在 263-notifications.sql 覆盖，本脚本不加新索引

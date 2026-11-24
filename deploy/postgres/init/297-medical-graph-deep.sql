@@ -51,12 +51,12 @@ BEGIN
       AND c.conname = 'medical_graph_node_node_type_check'
   ) THEN
     ALTER TABLE clinical.medical_graph_node
-      DROP CONSTRAINT clinical.medical_graph_node_node_type_check;
+      DROP CONSTRAINT medical_graph_node_node_type_check;
   END IF;
 END $$;
 
 ALTER TABLE clinical.medical_graph_node
-  ADD CONSTRAINT clinical.medical_graph_node_node_type_check
+  ADD CONSTRAINT medical_graph_node_node_type_check
   CHECK (node_type IN ('disease', 'symptom', 'drug', 'exam', 'surgery', 'department'));
 
 COMMENT ON COLUMN clinical.medical_graph_node.node_type IS
@@ -76,12 +76,12 @@ BEGIN
       AND c.conname = 'medical_graph_edge_relation_type_check'
   ) THEN
     ALTER TABLE clinical.medical_graph_edge
-      DROP CONSTRAINT clinical.medical_graph_edge_relation_type_check;
+      DROP CONSTRAINT medical_graph_edge_relation_type_check;
   END IF;
 END $$;
 
 ALTER TABLE clinical.medical_graph_edge
-  ADD CONSTRAINT clinical.medical_graph_edge_relation_type_check
+  ADD CONSTRAINT medical_graph_edge_relation_type_check
   CHECK (relation_type IN (
     'disease_has_symptom',        -- 疾病 → 症状
     'disease_treated_by_drug',    -- 疾病 → 药物
@@ -99,8 +99,7 @@ ALTER TABLE clinical.medical_graph_edge
   ADD COLUMN IF NOT EXISTS qualifier text NOT NULL DEFAULT '';
 
 COMMENT ON COLUMN clinical.medical_graph_edge.qualifier IS
-  '关系细分：disease_has_symptom→常见/鉴别；disease_treated_by_drug→一线/二线；'
-  || 'disease_needs_exam→必做/选做；disease_visit_department→首诊/转诊；其余关系留空';
+  '关系细分：disease_has_symptom→常见/鉴别；disease_treated_by_drug→一线/二线；disease_needs_exam→必做/选做；disease_visit_department→首诊/转诊；其余关系留空';
 
 -- 按关系类型 + qualifier 联合检索（BFF 按「一线用药」「首诊科室」过滤）
 CREATE INDEX IF NOT EXISTS idx_medical_graph_edge_rel_qual

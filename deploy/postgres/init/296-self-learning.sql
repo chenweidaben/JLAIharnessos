@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS medmuse.strategy_weight_log (
   new_weights        jsonb       NOT NULL,
   adopted_count      int         NOT NULL DEFAULT 0,
   rejected_count     int         NOT NULL DEFAULT 0,
-  adopted_rate       double      NOT NULL DEFAULT 0,
-  adjustment_ratio   double      NOT NULL DEFAULT 0,
+  adopted_rate       double precision NOT NULL DEFAULT 0,
+  adjustment_ratio   double precision NOT NULL DEFAULT 0,
   accepted_delta     numeric     NOT NULL DEFAULT 0,
   rejected_delta     numeric     NOT NULL DEFAULT 0,
   -- applied = 本次权重已生效；held = 样本不足 / 调整被 hold，未上线

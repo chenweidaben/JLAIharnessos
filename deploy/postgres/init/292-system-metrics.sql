@@ -34,7 +34,7 @@ CREATE SCHEMA IF NOT EXISTS medmuse;
 CREATE TABLE IF NOT EXISTS medmuse.system_metrics (
   id           bigserial PRIMARY KEY,
   metric_type  text         NOT NULL,
-  metric_value double       NOT NULL,
+  metric_value double precision NOT NULL,
   tags         jsonb        NOT NULL DEFAULT '{}'::jsonb,
   recorded_at  timestamptz  NOT NULL DEFAULT now(),
   created_at   timestamptz  NOT NULL DEFAULT now()

@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS medmuse.hospital_kpi (
   -- green 达标 / yellow 待改进 / red 未达标
   status          text        NOT NULL DEFAULT 'yellow',
   -- 达成率（actual/target 或 target/actual，由方向决定），应用层计算后留痕
-  achievement_rate double     NOT NULL DEFAULT 0,
+  achievement_rate double precision NOT NULL DEFAULT 0,
   -- 样本量（该周期参与统计的出院/门诊/问卷基数），便于解释可信度
   sample_size     int         NOT NULL DEFAULT 0,
   recorded_at     timestamptz NOT NULL DEFAULT now(),

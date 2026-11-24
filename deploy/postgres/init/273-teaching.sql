@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS clinical.teaching_attendance (
   plan_id        uuid NOT NULL REFERENCES clinical.teaching_plan(id) ON DELETE CASCADE,
   student_id     text NOT NULL,                               -- 学员工号/学号
   attended       boolean NOT NULL DEFAULT false,              -- 是否到勤
-  attendance_date date   date NOT NULL DEFAULT CURRENT_DATE,  -- 授课日期
+  attendance_date date NOT NULL DEFAULT CURRENT_DATE,          -- 授课日期
   credits_earned numeric(6,1) NOT NULL DEFAULT 0 CHECK (credits_earned >= 0),  -- 考勤合格认定学分
   recorded_at    timestamptz NOT NULL DEFAULT now()
 );

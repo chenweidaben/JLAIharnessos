@@ -93,9 +93,9 @@ CREATE INDEX IF NOT EXISTS idx_blood_deep_effect
 -- ---------------------------------------------------------------------------
 -- 2. 权限码（幂等）：输血深化只读看板
 -- ---------------------------------------------------------------------------
-INSERT INTO auth.permission (code, name, description)
+INSERT INTO iam.permissions (code, name, module, description)
 VALUES
-  ('blood:deep:view', '输血深化查看', '查看输血管理四阶段零差错质控看板')
+  ('blood:deep:view', '输血深化查看', 'blood_deep', '查看输血管理四阶段零差错质控看板')
 ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------

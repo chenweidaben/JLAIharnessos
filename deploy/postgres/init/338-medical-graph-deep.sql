@@ -50,8 +50,7 @@ ALTER TABLE clinical.medical_graph_edge
     CHECK (positive_rate IS NULL OR positive_rate BETWEEN 0 AND 1);
 
 COMMENT ON COLUMN clinical.medical_graph_edge.positive_rate IS
-  '症状阳性率 0~1：disease_has_symptom 边表示「该病患者中出现该症状的比例」；'
-  || '其余关系类型留空。Personal Agent 据此做验后概率粗估。';
+  '症状阳性率 0~1：disease_has_symptom 边表示「该病患者中出现该症状的比例」；其余关系类型留空。Personal Agent 据此做验后概率粗估。';
 
 -- 按阳性率排序（Personal Agent 症状排序 / 鉴别诊断加权）
 CREATE INDEX IF NOT EXISTS idx_medical_graph_edge_posrate
@@ -71,12 +70,12 @@ BEGIN
       AND c.conname = 'medical_graph_edge_relation_type_check'
   ) THEN
     ALTER TABLE clinical.medical_graph_edge
-      DROP CONSTRAINT clinical.medical_graph_edge_relation_type_check;
+      DROP CONSTRAINT medical_graph_edge_relation_type_check;
   END IF;
 END $$;
 
 ALTER TABLE clinical.medical_graph_edge
-  ADD CONSTRAINT clinical.medical_graph_edge_relation_type_check
+  ADD CONSTRAINT medical_graph_edge_relation_type_check
   CHECK (relation_type IN (
     'disease_has_symptom',        -- 疾病 → 症状
     'disease_treated_by_drug',    -- 疾病 → 药物
@@ -199,5 +198,4 @@ WHERE e.relation_type = 'disease_has_symptom'
   AND e.positive_rate IS NOT NULL;
 
 COMMENT ON VIEW clinical.medical_graph_deep_coverage IS
-  'M147-A/M169-A 知识图谱深化覆盖度：节点按类型、边按关系+qualifier 统计，'
-  || '末行统计已标注阳性率的症状边数。';
+  'M147-A/M169-A 知识图谱深化覆盖度：节点按类型、边按关系+qualifier 统计，末行统计已标注阳性率的症状边数。';

@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS medmuse.personal_growth_snapshot (
   ai_accepted         int          NOT NULL DEFAULT 0,
   skill_tags          jsonb        NOT NULL DEFAULT '[]'::jsonb,
   helped_colleagues   int          NOT NULL DEFAULT 0,
-  growth_score        double       NOT NULL DEFAULT 0,
+  growth_score        double precision NOT NULL DEFAULT 0,
   badges              jsonb        NOT NULL DEFAULT '[]'::jsonb,
   recorded_at         timestamptz  NOT NULL DEFAULT now(),
   created_at          timestamptz  NOT NULL DEFAULT now(),
