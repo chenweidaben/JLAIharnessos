@@ -32,6 +32,17 @@ function isConsultDemoMode(): boolean {
   return process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 }
 
+/** uuid 标准格式（含大小写）。 */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * 读路径前置校验：uuid 形参非标准 uuid（空串 / 空白 / 前缀句柄）时不绑定到 uuid 列，
+ * 避免 Postgres 抛 22P02 把"记录不存在 / 无归属"语义升级成 500；非法值在仓储层短路。
+ */
+function isUuidHandle(value: string | null | undefined): value is string {
+  return typeof value === 'string' && UUID_RE.test(value.trim());
+}
+
 /**
  * 把领域对象包装为 postgres.js JSON 参数。
  * 边界处统一放宽类型（与 pool.ts 同款处理），核心域模型自身保持强类型。
@@ -207,6 +218,7 @@ function mapDocumentRow(row: Record<string, unknown>): ConsultDocument {
 /** 非 DEMO 咨询仓储：consult schema 六表读写（迁移 380–385） */
 class PostgresConsultRepo implements ConsultAgentPort {
   async findThread(threadId: string, userId: string): Promise<ConsultThread | null> {
+    if (!isUuidHandle(threadId) || !isUuidHandle(userId)) return null;
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.threads
@@ -217,6 +229,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async listThreads(userId: string): Promise<ConsultThread[]> {
+    if (!isUuidHandle(userId)) return [];
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.threads
@@ -230,7 +243,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       INSERT INTO consult.threads
-        (id, user_id, patient_id, title, status, intent, safety_level, current_role,
+        (id, user_id, patient_id, title, status, intent, safety_level, "current_role",
          meta, closed_at, created_at, updated_at)
       VALUES (
         ${thread.id}, ${thread.userId}, ${thread.patientId}, ${thread.title}, ${thread.status},
@@ -244,7 +257,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
         status = EXCLUDED.status,
         intent = EXCLUDED.intent,
         safety_level = EXCLUDED.safety_level,
-        current_role = EXCLUDED.current_role,
+        "current_role" = EXCLUDED."current_role",
         meta = EXCLUDED.meta,
         closed_at = EXCLUDED.closed_at,
         updated_at = EXCLUDED.updated_at
@@ -254,6 +267,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async listMessages(threadId: string): Promise<ConsultMessage[]> {
+    if (!isUuidHandle(threadId)) return [];
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.messages
@@ -282,6 +296,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async listDrafts(threadId: string, kind: ConsultDraft['kind']): Promise<ConsultDraft[]> {
+    if (!isUuidHandle(threadId)) return [];
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.diagnosis_prescription_drafts
@@ -322,6 +337,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async listAudit(threadId: string): Promise<ConsultAuditEntry[]> {
+    if (!isUuidHandle(threadId)) return [];
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.audit_trail
@@ -347,6 +363,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async getProfile(userId: string): Promise<ConsultProfileMemory> {
+    if (!isUuidHandle(userId)) return createProfileMemory(userId);
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.profile_memory
@@ -375,6 +392,7 @@ class PostgresConsultRepo implements ConsultAgentPort {
   }
 
   async listDocuments(threadId: string): Promise<ConsultDocument[]> {
+    if (!isUuidHandle(threadId)) return [];
     const db = getDb();
     const rows = await db<Record<string, unknown>[]>`
       SELECT * FROM consult.documents

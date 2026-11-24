@@ -91,8 +91,8 @@ const { createConsultAgentRepo } = await import('../../../src/db/repositories/co
 // ---------------------------------------------------------------------------
 
 const TS = '2026-10-26T08:00:00.000Z';
-const TEST_USER_ID = 'user-001';
-const TEST_THREAD_ID = 'thread-001';
+const TEST_USER_ID = '11111111-1111-4111-8111-111111111111';
+const TEST_THREAD_ID = '22222222-2222-4222-8222-222222222222';
 const TEST_TRACE_ID = 'trace-001';
 
 const evidenceItem: EvidenceItem = {
@@ -461,7 +461,7 @@ describe('PostgresConsultRepo.findThread', () => {
     state.rows = [threadRowMinimal()];
     const repo = makeRepo();
 
-    const thread = await repo.findThread('thread-002', TEST_USER_ID);
+    const thread = await repo.findThread('33333333-3333-4333-8333-333333333333', TEST_USER_ID);
 
     expect(thread).not.toBeNull();
     if (!thread) return;
@@ -476,7 +476,7 @@ describe('PostgresConsultRepo.findThread', () => {
     state.rows = [];
     const repo = makeRepo();
 
-    const thread = await repo.findThread('thread-x', TEST_USER_ID);
+    const thread = await repo.findThread('44444444-4444-4444-8444-444444444444', TEST_USER_ID);
 
     expect(thread).toBeNull();
     expect(state.calls).toHaveLength(1);
@@ -556,7 +556,7 @@ describe('PostgresConsultRepo.saveThread', () => {
     const call = latestCall();
     expect(call.normalized).toContain('INSERT INTO consult.threads');
     expect(call.normalized).toContain(
-      '(id, user_id, patient_id, title, status, intent, safety_level, current_role, meta, closed_at, created_at, updated_at)',
+      '(id, user_id, patient_id, title, status, intent, safety_level, "current_role", meta, closed_at, created_at, updated_at)',
     );
     expect(call.normalized).toContain('ON CONFLICT (id) DO UPDATE SET');
     expect(call.normalized).toContain('RETURNING *');

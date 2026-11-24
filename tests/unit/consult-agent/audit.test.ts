@@ -112,7 +112,7 @@ describe('audit createAuditEntry 条目构造与默认值', () => {
     expect(entry.durationMs).toBeNull();
     expect(entry.evidenceCount).toBeNull();
     expect(entry.errorClass).toBeNull();
-    expect(entry.id).toMatch(/^audit_/);
+    expect(entry.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     expect(entry.createdAt).toBeTruthy();
     expect(entry.detail).toEqual({});
   });

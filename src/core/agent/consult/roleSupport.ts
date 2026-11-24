@@ -12,9 +12,13 @@ import { randomUUID } from 'node:crypto';
 import type { EvidenceItem, RoleKind } from './types';
 import { DISCLAIMER } from './types';
 
-/** 生成带前缀的短 ID（进程内演示与测试使用；落库主键由仓储层 UUID 生成规则决定） */
-export function newId(prefix = 'id'): string {
-  return `${prefix}_${randomUUID().replace(/-/g, '').slice(0, 12)}`;
+/**
+ * 生成标准 RFC 4122 UUID，作为 consult 会话 / 消息 / 草稿 / 审计 / 文档 / 画像主键，
+ * 与 consult 六表 uuid 主键与外键列对齐（前缀句柄无法写入 uuid 列，会触发 22P02）。
+ * prefix 形参保留仅为调用点兼容，不再进入取值。
+ */
+export function newId(_prefix: string = 'id'): string {
+  return randomUUID();
 }
 
 /** 当前时刻 ISO 8601 字符串 */
