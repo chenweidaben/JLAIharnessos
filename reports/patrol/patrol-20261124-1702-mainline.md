@@ -14,6 +14,10 @@
 | `b2f14ff1` | fix(db) | 工单表补 `patient_id` 列并对齐患者级查重写路径 |
 | `bf70525a` | fix(consult) | 主键改标准 uuid 并前置拦截非法句柄，修正 `current_role` 关键字引用 |
 | `7565bbbb` | fix(db) | 修复 init DDL 重放缺陷（注释/类型/约束名/列名），10 个文件 |
+| `9a4ee77f` | fix(db) | 输血申请可写列白名单补齐配血四字段 |
+| `70b5eb52` | fix(db) | 问诊会话可写列白名单补齐接诊/结束/取消四字段 |
+| `40730b67` | fix(db) | 住院医嘱状态机落库对齐（初始待审核/审核人/驳回终态/执行停止置位 + uuid FK 兜底守卫） |
+| `6e6463c1` | docs(patrol) | 续轮收口 inpatient-care 9 fail→0，补白名单复核与门禁留痕 |
 
 ### 待办 ① 工单表 patient_id（已收口）
 - 现象：`clinical_improvement_tasks` 缺 `patient_id`，2 处 42703 来自测试 afterAll 清理 SQL（按 patient_id 删工单）。
@@ -61,11 +65,12 @@
 | 后端 `bun test tests/unit` 全量（续轮回归） | 16653 pass / 169 fail / 113 errors，16822 tests / 2245 files，154.39s，**退出码 1**；与基线 **逐字一致**，orderRepo 改动无新增回归 |
 
 ## 推送与远端核对（本轮实测）
-- 推送前：三远端均 `f3e3694e`，本地领先 3、落后 0。
-- 推送：origin（https）`f3e3694e..7565bbbb`；mirror（ssh GitHub）`f3e3694e..7565bbbb`；gitcode（ssh）与 origin 同仓，up-to-date。ssh 仅 post-quantum 密钥交换告警，不影响连通。
+- 推送前：三远端均 `e2aa6fd4`，本地领先 4、落后 0。
+- 推送：origin（https）`e2aa6fd4..6e6463c1`；mirror（ssh GitHub）`e2aa6fd4..6e6463c1`；gitcode（ssh）与 origin 同仓，up-to-date。ssh 仅 post-quantum 密钥交换告警，不影响连通。
 - `git ls-remote` 逐字核对：
-  - LOCAL `7565bbbb413b78dd434e59c8083adce72af32d4f`
-  - origin `7565bbbb…` match=True；gitcode `7565bbbb…` match=True；mirror `7565bbbb…` match=True。
+  - LOCAL `6e6463c1642607c9419e32da15cd27756dcd03e1`
+  - origin `6e6463c1…` match=True；gitcode `6e6463c1…` match=True；mirror `6e6463c1…` match=True。
+  - 三远端 ahead=0 / behind=0。
 - `heagentos` 远端仅承载 main，不同步 m86 分支。
 
 ## 遗留待办（如实记录，未编造通过结论）
