@@ -17,6 +17,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
 // DEMO_MODE 必须在任何 aggregator 模块被请求 getEnv() 之前就位。
+// 快照被本用例删除的 DATABASE_URL，afterAll 原样还原，避免污染同进程后续用例。
+const __originalDatabaseUrl = process.env.DATABASE_URL;
 process.env.DEMO_MODE = '1';
 delete process.env.DATABASE_URL;
 
@@ -85,6 +87,11 @@ describe('DEMO_MODE guard', () => {
   afterAll(() => {
     // 还原，避免污染同进程后续用例
     delete process.env.DEMO_MODE;
+    if (__originalDatabaseUrl === undefined) {
+      delete process.env.DATABASE_URL;
+    } else {
+      process.env.DATABASE_URL = __originalDatabaseUrl;
+    }
     _resetEnvCache();
   });
 
