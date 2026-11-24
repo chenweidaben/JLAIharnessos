@@ -25,9 +25,11 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
-| department | string | 是 | 科室 |
-| doctorId | string | 否 | 医生 |
-| scheduleTime | string | 是 | 预约时段 |
+| department | string | 是 | 预约科室 |
+| doctorId | string | 否 | 指定医生ID（缺省由科室首个可用医生匹配） |
+| date | string(YYYY-MM-DD) | 是 | 就诊日期 |
+| timeSlot | string | 否 | 时间段（如 08:00-09:00），缺省自动选择最早有余号时段 |
+| visitType | enum(初诊/复诊/急诊/健康体检) | 否 | 就诊类型，默认 复诊 |
 
 ## 输出参数
 
@@ -57,7 +59,9 @@
   "name": "appointment_registration",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "department": "呼吸内科",
+  "date": "2026-12-01",
+  "visitType": "复诊"
 }
 }
 ```

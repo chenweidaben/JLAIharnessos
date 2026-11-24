@@ -26,16 +26,16 @@
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
 | encounterId | string | 是 | 就诊ID |
-| items[] | array | 是 | 检验项目列表 |
-| clinicalIndication | string | 否 | 临床指征 |
-| urgent | boolean | 否 | 是否急诊加急 |
+| testItems | array&lt;object&gt; | 是 | 检验项目列表（至少 1 项），元素：`{ testCode: enum(BLOOD_ROUTINE/BIOCHEMISTRY/CARDIAC_ENZYME/COAGULATION/THYROID), testName?: string, specimenType?: string, urgency: enum(常规/紧急/立即，默认常规) }` |
+| clinicalDiagnosis | string | 否 | 临床诊断/开单原因 |
+| priority | enum(常规/紧急/立即) | 否 | 申请优先级，默认 常规 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 检验申请ID |
-| status | string | 已提交/待采样 |
+| orderStatus | enum(已提交/已审核/被阻止) | 申请状态 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -59,7 +59,12 @@
   "name": "order_lab_test",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "encounterId": "E20260916001",
+  "testItems": [
+    { "testCode": "BLOOD_ROUTINE", "urgency": "常规" }
+  ],
+  "clinicalDiagnosis": "发热待查",
+  "priority": "常规"
 }
 }
 ```

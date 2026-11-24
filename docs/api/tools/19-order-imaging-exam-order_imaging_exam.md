@@ -26,17 +26,18 @@
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
 | encounterId | string | 是 | 就诊ID |
-| examType | enum | 是 | CT/MR/DR/超声/内镜等 |
-| bodyPart | string | 是 | 检查部位 |
-| clinicalIndication | string | 否 | 临床指征 |
-| urgent | boolean | 否 | 是否加急 |
+| examType | enum(CT/MRI/X光/超声/内镜) | 是 | 检查类型 |
+| examBodyPart | string | 是 | 检查部位（如胸部/头颅/腹部），至少 2 个字符 |
+| clinicalQuestion | string | 是 | 临床问题/检查目的，至少 2 个字符 |
+| contrast | boolean | 否 | 是否增强（使用造影剂），默认 false |
+| urgency | enum(常规/紧急/立即) | 否 | 检查紧急程度，默认 常规 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 检查申请ID |
-| appointmentTime | string | 预约时间 |
+| scheduledTime | string | 预约时间 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -60,7 +61,12 @@
   "name": "order_imaging_exam",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "encounterId": "E20260916001",
+  "examType": "CT",
+  "examBodyPart": "胸部",
+  "clinicalQuestion": "排查肺部感染",
+  "contrast": false,
+  "urgency": "常规"
 }
 }
 ```

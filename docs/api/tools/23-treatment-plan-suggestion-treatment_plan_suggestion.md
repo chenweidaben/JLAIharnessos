@@ -24,16 +24,20 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 是 | 患者ID |
-| diagnosis | string | 是 | 确定/疑似诊断 |
-| patientFactors | object | 否 | 年龄/合并症/肝肾功能等 |
+| patientId | string | 否 | 患者ID |
+| diagnosis | string | 是 | 主要诊断 |
+| severity | enum(轻度/中度/重度/危重) | 否 | 严重程度 |
+| comorbidities | array&lt;string&gt; | 否 | 合并症 |
+| allergies | array&lt;string&gt; | 否 | 过敏史 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| plans[] | array | 治疗方案（推荐用药/疗程/监测点） |
-| references | array | 指南/文献来源 |
+| pharmacological[] | array | 药物治疗方案（用药/剂量/频次/途径/疗程/依据/监测） |
+| nonPharmacological[] | array | 非药物治疗方案 |
+| lifestyle[] | array | 生活方式干预 |
+| guidelineReferences[] | array | 指南/文献来源 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -54,8 +58,8 @@
 {
   "name": "treatment_plan_suggestion",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "diagnosis": "社区获得性肺炎",
+  "severity": "中度"
 }
 }
 ```

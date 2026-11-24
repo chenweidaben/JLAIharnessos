@@ -24,15 +24,15 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| currentDrugs | array<string> | 是 | 当前用药列表 |
-| proposedDrugs | array<string> | 是 | 拟用药物列表 |
+| drugs | array&lt;object&gt; | 是 | 药品列表（至少 2 种），元素：`{ drugName: string, dosage?: string, frequency?: string }` |
+| patientId | string | 否 | 患者ID（用于考虑患者过敏史、基础疾病等因素） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | interactions[] | array | 相互作用（药物对/风险等级/机制/建议） |
-| overallRisk | enum | safe/caution/contraindicated |
+| overallRisk | enum(无风险/低风险/中风险/高风险/禁忌) | 总体风险等级 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -53,8 +53,10 @@
 {
   "name": "drug_interaction_check",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "drugs": [
+    { "drugName": "阿司匹林" },
+    { "drugName": "华法林" }
+  ]
 }
 }
 ```

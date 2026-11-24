@@ -26,9 +26,10 @@
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
 | encounterId | string | 是 | 就诊ID |
-| items[] | array | 是 | 处方明细（药品/规格/剂量/用法/数量） |
-| diagnosis | string | 是 | 临床诊断 |
-| prescriptionType | enum | 否 | 普通/特殊/麻醉，默认普通 |
+| prescriptionType | enum(西药/中成药/中药饮片) | 是 | 处方类型 |
+| drugs | array&lt;object&gt; | 是 | 药品明细列表（至少 1 种），元素：`{ drugName: string, specification: string, dosage: string, frequency: string, days: integer, quantity: integer, usage: string }` |
+| diagnosis | string | 否 | 临床诊断 |
+| doctorId | string | 否 | 开方医师ID（缺省取当前登录用户） |
 
 ## 输出参数
 
@@ -61,7 +62,19 @@
   "name": "create_prescription",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "encounterId": "E20260916001",
+  "prescriptionType": "西药",
+  "drugs": [
+    {
+      "drugName": "阿莫西林胶囊",
+      "specification": "0.25g/粒",
+      "dosage": "0.5g",
+      "frequency": "tid",
+      "days": 7,
+      "quantity": 21,
+      "usage": "口服，每日三次，每次2粒"
+    }
+  ]
 }
 }
 ```

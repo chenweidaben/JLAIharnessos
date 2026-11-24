@@ -24,14 +24,16 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| encounterId | string | 是 | 就诊ID |
-| recordType | enum | 否 | 病历类型：门诊/住院/病程/出院小结，默认全部 |
+| patientId | string | 是 | 患者ID |
+| encounterId | string | 否 | 就诊ID（获取该次就诊全部病历） |
+| recordType | string | 否 | 文书类型（门诊病历/入院记录/病程记录/出院小结等） |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| encounterId | string | 就诊ID |
 | records[] | array | 病历列表（标题/内容/书写人/时间） |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。

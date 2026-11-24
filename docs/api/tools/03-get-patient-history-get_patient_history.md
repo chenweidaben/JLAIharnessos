@@ -25,17 +25,17 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者唯一ID |
-| visitType | enum | 否 | 就诊类型：outpatient/emergency/inpatient/physical_exam/followup |
-| startDate | string(YYYY-MM-DD) | 否 | 起始日期 |
-| endDate | string(YYYY-MM-DD) | 否 | 截止日期 |
-| page/pageSize | integer | 否 | 分页参数 |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
+| visitType | enum(门诊/住院/急诊/手术/全部) | 否 | 就诊类型筛选，默认 全部 |
+| limit | integer | 否 | 返回条数上限 1-100，默认 20 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | total | number | 记录总数 |
-| data[] | array | 就诊史条目（诊断/科室/日期/摘要） |
+| visits[] | array | 就诊史条目（诊断/科室/日期/摘要） |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -57,8 +57,7 @@
 {
   "name": "get_patient_history",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "patientId": "P20260001"
 }
 }
 ```

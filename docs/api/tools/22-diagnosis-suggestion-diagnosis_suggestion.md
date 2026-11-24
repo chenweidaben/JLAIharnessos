@@ -24,15 +24,18 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 是 | 患者ID |
-| symptoms | array<string> | 是 | 症状/体征列表 |
-| labResults | array | 否 | 关键检验结果 |
+| patientId | string | 否 | 患者ID |
+| symptoms | array&lt;string&gt; | 是 | 症状列表（至少 1 项） |
+| signs | array&lt;string&gt; | 否 | 体征列表 |
+| labResults | array&lt;object&gt; | 否 | 检验结果，元素：`{ testName: string, value: string\|number, abnormal?: boolean }` |
+| imagingFindings | string | 否 | 影像所见 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| suggestions[] | array | 鉴别诊断（诊断/置信度/依据） |
+| possibleDiagnoses[] | array | 可能诊断列表（诊断/ICD-10/概率/置信度/支持与不支持证据） |
+| differentialDiagnosis[] | array | 鉴别诊断列表 |
 | disclaimer | string | 仅供参考，需医生确认 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
@@ -54,8 +57,7 @@
 {
   "name": "diagnosis_suggestion",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "symptoms": ["胸痛", "发热", "咳嗽"]
 }
 }
 ```

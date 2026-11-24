@@ -24,15 +24,18 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| department | string | 否 | 科室（为空则全院） |
-| period | string | 是 | 统计周期 |
+| department | string | 是 | 科室名称（如心血管内科） |
+| startDate | string | 是 | 开始日期或月份（YYYY-MM 或 YYYY-MM-DD） |
+| endDate | string | 是 | 结束日期或月份（YYYY-MM 或 YYYY-MM-DD） |
+| metrics | array&lt;string&gt; | 否 | 关注指标列表（缺省返回全部核心指标） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| metrics | object | 运营指标集合 |
-| trend | array | 环比趋势 |
+| dataPoints[] | array | 运营指标月度数据点 |
+| summary | object | 汇总指标 |
+| insights[] | array | 运营解读 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -53,8 +56,9 @@
 {
   "name": "department_operation_analysis",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "department": "心血管内科",
+  "startDate": "2026-09",
+  "endDate": "2026-11"
 }
 }
 ```

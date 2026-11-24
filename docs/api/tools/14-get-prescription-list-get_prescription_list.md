@@ -24,9 +24,11 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 否 | 患者ID |
-| status | enum | 否 | 待审核/已审核/已发药/已作废 |
-| page/pageSize | integer | 否 | 分页 |
+| patientId | string | 是 | 患者ID |
+| encounterId | string | 否 | 就诊ID |
+| status | enum(全部/待审核/已审核/已发药/已驳回/已退回) | 否 | 处方状态筛选，默认 全部 |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 

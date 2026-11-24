@@ -25,15 +25,18 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
-| testItem | string | 否 | 检验项目名称 |
-| startDate/endDate | string | 否 | 时间范围 |
+| encounterId | string | 否 | 就诊ID |
+| testType | string | 否 | 检验类型/项目名称（如"血常规""生化""心肌酶""葡萄糖"等） |
+| itemName | string | 否 | 具体检验项目名称筛选（如"白细胞计数""肌酐"） |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| results[] | array | 检验结果（项目/结果/单位/参考区间/异常标志） |
-| criticalFlags | array | 危急值标记 |
+| reports[] | array | 检验报告列表（项目/结果/单位/参考区间/异常标志） |
+| criticalValues[] | array | 危急值汇总列表 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 

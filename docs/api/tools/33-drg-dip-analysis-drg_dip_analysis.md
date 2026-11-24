@@ -24,14 +24,18 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| period | string | 是 | 统计周期 |
-| groupCode | string | 否 | DRG/DIP 病组 |
+| patientId | string | 否 | 患者ID |
+| encounterId | string | 否 | 就诊/住院ID |
+| department | string | 否 | 科室 |
+| drgGroup | string | 否 | DRG分组码（如 FM1/ES1/BR1） |
+| timeRange | string | 否 | 时间范围（月份，如 2026-09） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| groups[] | array | 病组分析（权重/费用/盈亏/住院日） |
+| cases[] | array | 分组病例分析（权重/费用/盈亏/住院日） |
+| insights[] | array | DRG/DIP 运营解读 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 

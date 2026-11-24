@@ -24,16 +24,17 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| orderId | string | 是 | 待作废医嘱ID |
-| reason | string | 是 | 作废原因（必填） |
+| orderId | string | 是 | 医嘱ID |
+| patientId | string | 是 | 患者ID（二次校验） |
+| reason | string | 是 | 取消/停止/更改原因 |
+| cancelType | enum(取消/停止/更改) | 是 | 操作类型：取消（未执行）/停止（执行中）/更改（调整方案） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 医嘱ID |
-| status | string | 作废后状态 |
-| notifiedRoles | array | 已通知的角色 |
+| status | enum(已取消/已停止/已更改/取消被阻止/待上级审核) | 操作后状态 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -57,8 +58,10 @@
 {
   "name": "cancel_order",
   "input": {
+  "orderId": "O20260001",
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "reason": "患者主诉缓解，停止继续给药",
+  "cancelType": "停止"
 }
 }
 ```

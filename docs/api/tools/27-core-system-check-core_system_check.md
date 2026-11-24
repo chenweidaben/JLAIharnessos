@@ -24,8 +24,9 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| department | string | 否 | 科室 |
-| period | string | 否 | 统计周期 |
+| department | string | 否 | 科室（缺省全部科室） |
+| timeRange | object | 否 | 统计时间范围，`{ from: string, to: string }`（ISO 日期） |
+| checkType | enum(三级查房/疑难病例讨论/死亡病例讨论/术前讨论/交接班/全部) | 否 | 检查的核心制度类型，默认 全部 |
 
 ## 输出参数
 
@@ -52,8 +53,7 @@
 {
   "name": "core_system_check",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "checkType": "三级查房"
 }
 }
 ```

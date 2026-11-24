@@ -25,20 +25,18 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
-| encounterId | string | 是 | 就诊ID |
-| chiefComplaint | string | 是 | 主诉 |
-| presentIllness | string | 否 | 现病史 |
-| recordType | enum | 否 | 门诊病历/入院记录/病程记录，默认门诊病历 |
-| templateId | string | 否 | 引用病历模板ID |
+| encounterId | string | 否 | 就诊ID |
+| recordType | string | 是 | 文书类型（如"门诊病历""入院记录""病程记录""出院小结"） |
+| keyPoints | array&lt;object&gt; | 是 | 问诊要点列表（至少 1 条），元素：`{ category: enum(主诉/现病史/既往史/体格检查/辅助检查/诊断/处理/其他), content: string }` |
+| templateId | string | 否 | 使用的病历模板ID |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| recordId | string | 生成的草稿ID |
+| draftId | string | 草稿ID（临时存储，未归档） |
 | content | string | AI 生成的病历正文 |
 | confidence | number | 内容置信度 |
-| requiresConfirm | boolean | 需医生确认 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -62,7 +60,11 @@
   "name": "generate_medical_record",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "recordType": "门诊病历",
+  "keyPoints": [
+    { "category": "主诉", "content": "发热 3 天" },
+    { "category": "现病史", "content": "3 天前无明显诱因发热，伴咳嗽" }
+  ]
 }
 }
 ```

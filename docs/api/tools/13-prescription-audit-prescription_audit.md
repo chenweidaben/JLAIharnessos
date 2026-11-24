@@ -25,15 +25,16 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | prescriptionId | string | 是 | 待审核处方ID |
-| decision | enum | 是 | approve/reject |
-| reviewNote | string | 否 | 审核意见/退回原因 |
+| action | enum(approve/reject/return) | 是 | 审核动作：approve通过 / reject驳回 / return退回修改 |
+| auditComment | string | 否 | 审核意见（驳回/退回时建议必填） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | prescriptionId | string | 处方ID |
-| status | string | 审核后状态 |
+| previousStatus | string | 审核前状态 |
+| currentStatus | string | 审核后状态 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -55,8 +56,9 @@
 {
   "name": "prescription_audit",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "prescriptionId": "R20260001",
+  "action": "approve",
+  "auditComment": "用药合理，审核通过"
 }
 }
 ```

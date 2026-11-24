@@ -24,17 +24,18 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| source | enum | 是 | medical_record/order/prescription |
-| bizId | string | 是 | 业务单据ID |
-| target | string | 否 | 目标 HIS（vendorC/vendorB/vendorD/vendorE/vendorF） |
+| dataType | enum(患者信息/医嘱/处方/病历/费用) | 是 | 同步数据类型 |
+| dataContent | object | 是 | 待同步的结构化数据内容（对象或字符串） |
+| syncMode | enum(实时/批量) | 否 | 同步模式，默认 实时 |
+| patientId | string | 否 | 患者ID |
+| encounterId | string | 否 | 就诊ID |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| syncId | string | 同步任务ID |
-| status | string | success/failed |
-| mappedFields | number | 映射字段数 |
+| hisRecordId | string | HIS侧记录ID |
+| validation | object | 数据校验结果（是否通过 + 校验项） |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -57,8 +58,10 @@
 {
   "name": "sync_to_his",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "dataType": "医嘱",
+  "dataContent": { "orderId": "O20260001" },
+  "syncMode": "实时",
+  "patientId": "P20260001"
 }
 }
 ```

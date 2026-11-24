@@ -24,15 +24,17 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| studyId | string | 是 | 检查检查号/Study Instance UID |
+| patientId | string | 是 | 患者ID |
+| studyInstanceUid | string | 否 | Study Instance UID（指定检查） |
+| seriesInstanceUid | string | 否 | Series Instance UID（指定序列） |
+| examId | string | 否 | 检查号（备选定位） |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| study | object | 影像检查元数据 |
-| series[] | array | 序列列表 |
-| retrieveUrl | string | WADO-RS 调阅句柄 |
+| studies[] | array | 影像检查元数据列表（内含 seriesList 序列列表） |
+| note | string | 说明：本工具仅返回 DICOM 元数据，不传输真实影像像素数据 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -54,8 +56,7 @@
 {
   "name": "view_dicom",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "patientId": "P20260001"
 }
 }
 ```

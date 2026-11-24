@@ -24,16 +24,18 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| messageType | enum | 是 | ADT^A04/ORM^O01/ORU^R01 等 |
-| payload | object | 是 | 消息业务载荷 |
-| destination | string | 是 | 接收端 MLLP 地址 host:port |
+| messageType | enum(ADT/ORM/ORU/MDM) | 是 | HL7消息类型 |
+| messageTrigger | enum(A01/A04/O01/R01/T01/T02) | 是 | 触发事件（A01入院/A04门诊登记/O01检验申请/R01检验结果/T01/T02病历） |
+| messageContent | object | 是 | 结构化消息内容，元素：`{ patientId?: string, patientName?: string, encounterId?: string, orderId?: string, testName?: string, department?: string, note?: string }` |
+| targetSystem | enum(HIS/LIS/PACS/EMR) | 是 | 目标系统 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| messageControlId | string | 消息控制ID |
-| ack | object | 下游 ACK 响应 |
+| messageControlId | string | 消息控制ID（MSH-10） |
+| ackCode | enum(AA/AE/AR/未收到ACK) | HL7应答码 |
+| ackMessage | string | 应答说明 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -55,8 +57,10 @@
 {
   "name": "hl7_message_send",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "messageType": "ORM",
+  "messageTrigger": "O01",
+  "messageContent": { "patientId": "P20260001", "orderId": "O20260001", "testName": "血常规" },
+  "targetSystem": "LIS"
 }
 }
 ```

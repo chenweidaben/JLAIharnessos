@@ -24,10 +24,12 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 否 | 患者ID |
+| patientId | string | 是 | 患者ID |
 | encounterId | string | 否 | 就诊ID |
-| status | enum | 否 | 已开立/执行中/已停止/已作废 |
-| orderType | enum | 否 | 药品/检查/检验/治疗/护理/手术 |
+| status | enum(全部/待审核/已开立/执行中/已完成/已取消/已驳回) | 否 | 医嘱状态筛选，默认 全部 |
+| orderType | string | 否 | 医嘱类型（药品/检查/检验/治疗/护理/手术等） |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 

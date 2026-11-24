@@ -24,14 +24,14 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| drugName | string | 否 | 药品名称（模糊） |
-| drugCode | string | 否 | 药品编码 |
+| drugName | string | 是 | 药品通用名（支持模糊匹配，如"阿司匹林""二甲双胍"） |
+| infoType | enum(all/indication/dosage/adverse/contraindication/precaution/interaction) | 否 | 查询信息类型：all全部 / indication适应症 / dosage用法用量 / adverse不良反应 / contraindication禁忌 / precaution注意事项 / interaction相互作用，默认 all |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| drugs[] | array | 药品字典条目 |
+| drugName | string | 匹配到的药品通用名（返回为单对象，非数组；其余字段按 infoType 裁剪：分类/剂型/规格/医保类别/匹配方式/免责声明及说明书条目） |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -52,8 +52,8 @@
 {
   "name": "get_drug_info",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "drugName": "阿司匹林",
+  "infoType": "all"
 }
 }
 ```

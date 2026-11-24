@@ -24,8 +24,10 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| period | string | 是 | 统计周期 |
-| department | string | 否 | 科室 |
+| department | string | 否 | 科室（缺省返回全院指标） |
+| startDate | string | 是 | 开始月份/日期（YYYY-MM 或 YYYY-MM-DD） |
+| endDate | string | 是 | 结束月份/日期（YYYY-MM 或 YYYY-MM-DD） |
+| indicatorType | enum(全部/效率/安全/质量/合理用药) | 否 | 指标类别，默认 全部 |
 
 ## 输出参数
 
@@ -52,8 +54,9 @@
 {
   "name": "medical_quality_indicators",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "startDate": "2026-09",
+  "endDate": "2026-11",
+  "indicatorType": "全部"
 }
 }
 ```

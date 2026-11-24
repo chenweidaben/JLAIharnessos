@@ -25,15 +25,15 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | orderId | string | 是 | 待审核医嘱ID |
-| decision | enum | 是 | approve/reject |
-| comment | string | 否 | 审核意见 |
+| action | enum(approve/reject/return) | 是 | 审核动作：approve通过/reject驳回/return退回修改 |
+| auditComment | string | 否 | 审核意见 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | orderId | string | 医嘱ID |
-| status | string | 审核后状态 |
+| auditResult | enum(已通过/已驳回/已退回修改) | 审核结果 |
 | auditedBy | string | 审核人 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
@@ -56,8 +56,9 @@
 {
   "name": "order_audit",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "orderId": "O20260001",
+  "action": "approve",
+  "auditComment": "指征明确，审核通过"
 }
 }
 ```

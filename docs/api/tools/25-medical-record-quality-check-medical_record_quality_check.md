@@ -24,15 +24,16 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| encounterId | string | 是 | 就诊ID |
-| checkItems | array<string> | 否 | 指定检查项（默认全部） |
+| recordId | string | 否 | 病历ID（与 recordContent 二选一） |
+| recordContent | string | 否 | 病历正文内容（与 recordId 二选一） |
+| checkType | enum(完整性质控/规范性质控/逻辑质控) | 否 | 质控类型，缺省全部检查 |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| score | number | 质控得分 |
-| defects[] | array | 缺陷项（位置/级别/建议） |
+| qcScore | number | 质控得分（百分制） |
+| issues[] | array | 缺陷项（位置/级别/建议） |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -53,8 +54,8 @@
 {
   "name": "medical_record_quality_check",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "recordId": "MR20260001",
+  "checkType": "完整性质控"
 }
 }
 ```

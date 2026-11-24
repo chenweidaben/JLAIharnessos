@@ -24,8 +24,10 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| department | string | 否 | 科室名称 |
-| templateType | enum | 否 | 模板类型：门诊/入院/病程/手术记录 |
+| templateId | string | 否 | 指定模板ID（如 TPL-OP-001） |
+| department | string | 否 | 科室（获取科室定制模板，默认取当前医生科室） |
+| recordType | string | 否 | 文书类型（门诊初诊病历/入院记录/首次病程记录/出院记录等） |
+| keyword | string | 否 | 关键词搜索 |
 
 ## 输出参数
 
@@ -52,8 +54,7 @@
 {
   "name": "get_medical_template",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "recordType": "门诊初诊病历"
 }
 }
 ```

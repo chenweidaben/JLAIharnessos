@@ -24,15 +24,13 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 是 | 患者ID |
-| encounterId | string | 是 | 就诊ID |
+| frontPageData | object | 是 | 病案首页数据对象，内含：`patientId`（必填）、`mainDiagnosis`（必填）、`secondaryDiagnoses?`、`mainIcd10?`、`surgeries[]?`、`dischargeDisposition`（enum 正常出院/转院/转科/自动出院/死亡/其他，必填）、`totalCost`（必填）、`insuranceType?` |
 
 ## 输出参数
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| issues[] | array | 首页逻辑问题 |
-| pass | boolean | 是否通过 |
+| defects[] | array | 首页逻辑问题 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -53,8 +51,12 @@
 {
   "name": "medical_record_front_page_check",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "frontPageData": {
+    "patientId": "P20260001",
+    "mainDiagnosis": "社区获得性肺炎",
+    "dischargeDisposition": "正常出院",
+    "totalCost": 8600
+  }
 }
 }
 ```

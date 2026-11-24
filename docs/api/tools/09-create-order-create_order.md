@@ -68,7 +68,10 @@
   "name": "create_order",
   "input": {
   "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "encounterId": "E20260916001",
+  "orderType": "检验",
+  "orderContent": "血常规+CRP",
+  "clinicalIndication": "发热待查"
 }
 }
 ```

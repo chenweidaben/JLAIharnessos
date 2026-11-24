@@ -24,8 +24,11 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
-| patientId | string | 是 | 患者ID |
-| dataTypes | array<string> | 否 | 数据类型：record/order/result |
+| patientId | string | 是 | 患者ID（必填） |
+| dataType | enum(门诊病历/住院病历/病程记录/手术记录/知情同意) | 否 | 获取的病历类型，默认 门诊病历 |
+| encounterId | string | 否 | 就诊ID |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 

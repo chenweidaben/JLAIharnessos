@@ -25,7 +25,9 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者唯一ID |
-| includeHistory | boolean | 否 | 是否包含就诊史，默认 false |
+| includeHistory | boolean | 否 | 是否包含既往病史摘要，默认 false |
+| includeMedications | boolean | 否 | 是否包含当前用药，默认 true |
+| includeAllergies | boolean | 否 | 是否包含过敏史，默认 true |
 
 ## 输出参数
 
@@ -34,9 +36,8 @@
 | patientId | string | 患者ID |
 | name | string | 脱敏姓名 |
 | gender/age | string/number | 性别与年龄 |
-| allergyHistory | array | 过敏史列表 |
+| allergies | array | 过敏史列表 |
 | currentMedications | array | 当前用药列表 |
-| encounters | array | 就诊记录摘要 |
 
 > 统一返回包装：`{ "success": boolean, "data": ... , "error": { code, message, details? } }`。
 
@@ -58,8 +59,7 @@
 {
   "name": "get_patient_detail",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "patientId": "P20260001"
 }
 }
 ```

@@ -25,7 +25,10 @@
 | 字段 | 类型 | 必填 | 说明 |
 | --- | --- | --- | --- |
 | patientId | string | 是 | 患者ID |
-| studyId | string | 否 | 影像检查号 |
+| encounterId | string | 否 | 就诊ID |
+| examType | enum(全部/CT/MRI/X光/超声/内镜/病理/核医学/其他) | 否 | 检查类型筛选，默认 全部 |
+| startDate | string(YYYY-MM-DD) | 否 | 开始日期 |
+| endDate | string(YYYY-MM-DD) | 否 | 结束日期 |
 
 ## 输出参数
 

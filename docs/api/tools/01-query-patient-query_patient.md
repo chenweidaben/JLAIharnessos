@@ -64,8 +64,7 @@
 {
   "name": "query_patient",
   "input": {
-  "patientId": "P20260001",
-  "encounterId": "E20260916001"
+  "patientId": "P20260001"
 }
 }
 ```
