@@ -112,7 +112,8 @@ describe('M7-E WebSocket 重连补拉', () => {
     s2.open(); // 重连，触发 recoverGap
     await vi.advanceTimersByTimeAsync(0); // flush recoverGap 的 microtask
 
-    expect(get).toHaveBeenCalledWith('/api/v1/outbox/events', {
+    // request 实例 baseURL 已带 /api/v1，源码传相对路径；mock 的 get 收到原始相对路径
+    expect(get).toHaveBeenCalledWith('/outbox/events', {
       after_id: 5,
       limit: 100,
     });
