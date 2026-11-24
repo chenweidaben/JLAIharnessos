@@ -160,6 +160,18 @@ ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reviewer_id uuid REFERENCES
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reviewed_at timestamptz;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reject_reason text;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS requires_double_check boolean NOT NULL DEFAULT false;
+-- 医嘱仓储（orderRepo）写/读路径对齐：剂量/频次/途径/开立人与取消留痕字段。
+-- 开立/取消人以文本落库，兼容用户 ID 与系统占位（如 'system'），不做强外键约束。
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS dosage text;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS frequency text;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS route text;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS ordered_by text;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS cancelled_by text;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS cancelled_at timestamptz;
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS cancel_reason text;
+-- order_no 与仓储 Order.orderNo 可空契约对齐：建表期的 NOT NULL 放宽为可空
+-- （编号生成规则作为后续增强，当前写路径不强制必填；UNIQUE 保留，多 NULL 允许）。
+ALTER TABLE clinical.orders ALTER COLUMN order_no DROP NOT NULL;
 
 -- 扩展医嘱状态机：
 --   pending_review 待审核 / active 有效 / executed 已执行(完成) / stopped 已停止 /

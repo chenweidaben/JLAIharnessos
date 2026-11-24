@@ -136,7 +136,7 @@ CREATE INDEX idx_rx_items_drug ON clinical.prescription_items(drug_name);
 CREATE TABLE clinical.orders (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   visit_id      uuid NOT NULL REFERENCES clinical.visits(id),
-  order_no      text NOT NULL UNIQUE,
+  order_no      text UNIQUE,
   order_type    text NOT NULL CHECK (order_type IN ('drug','lab','imaging','treatment','nursing','diet','other')),
   content       text NOT NULL,
   detail        jsonb NOT NULL DEFAULT '{}',

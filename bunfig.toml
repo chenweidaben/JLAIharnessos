@@ -5,8 +5,16 @@
 # 未经书面许可不得修改、复制或分发。
 
 [test]
-# 排除前端 web/ 目录下的测试文件（前端测试由 web/ 目录独立工具链运行）
-pathIgnorePatterns = ["web/**"]
+# 排除前端 web/ 目录下的测试文件（前端测试由 web/ 目录独立工具链 vitest 运行）。
+# 注意：Bun 1.2.0 的位置参数 filter 为纯子串包含匹配、无前缀锚定（前缀锚定自 1.2.10 起，
+# 见 oven-sh/bun#5969），且 pathIgnorePatterns 不会对 filter 已命中的路径二次过滤；
+# 下列模式在递归扫描阶段剪枝兜底。根治需升级 Bun ≥1.2.10 后改用 `./tests/unit` 前缀锚定。
+# 仅排除根目录 web/ 及其 tests 子树，不影响后端 tests/web/smoke.test.ts。
+pathIgnorePatterns = [
+  "web/**",
+  "web/tests/**",
+  "**/web/tests/**",
+]
 
 # 覆盖率统计口径：仅 src，排除遗留 Ink 终端 UI（src/ui）、测试与脚本自身（glob 模式）
 coverageSkipTestFiles = true
