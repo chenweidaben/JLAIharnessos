@@ -57,6 +57,8 @@
 | chronicDisease + oncology 真实模式复跑 | 11 pass / 0 fail，**退出码 0**，42703 清零 |
 | consult 两集成文件真实模式 | 20 pass / 27 fail；22P02=22（夹具 userId 句柄落外键），42601=0；fail 定性环境适配，非生产缺陷 |
 | integration `DEMO_MODE=0 / TEST_REAL=1` 全量 | **1357 pass / 164 fail / 0 errors**，1521 tests / 170 files，254.24s，**退出码 1**；较基线 1330/191/2 改善，42703/42601/23502(order_no) 已清零 |
+| inpatient-care 真实模式复跑（续轮） | **49 pass / 0 fail**，165 expect，16.86s，**退出码 0**；原 9 fail 全部转绿 |
+| 后端 `bun test tests/unit` 全量（续轮回归） | 16653 pass / 169 fail / 113 errors，16822 tests / 2245 files，154.39s，**退出码 1**；与基线 **逐字一致**，orderRepo 改动无新增回归 |
 
 ## 推送与远端核对（本轮实测）
 - 推送前：三远端均 `f3e3694e`，本地领先 3、落后 0。
@@ -77,6 +79,15 @@
     - **权限/职责分离/数据范围口径**：medical-record-qc 非作者重提 403、科室医生只见本科室病历；其余 403/401 多为用例内断言期望状态码，需逐文件甄别是真实鉴权缺陷还是断言口径。
     - **业务规则判定**：bloodQuality 疗效评估（显效/部分有效/无效/缺复查无法判定）阈值与样本口径。
 - 下一轮低峰逐文件隔离复跑上述高 fail 文件（bloodQuality 13 / internetPrescription 10 / inpatient-care 9 / medical-record-qc 8 / internetDelivery 7 / transfusion 7 / p07TailLogin 6 / internetPayment 6 / paymentSelection 5…），取期望 vs 实际 diff，区分真实代码缺陷（修到转绿）与环境/历史遗留（如实归类）。基线日志：`integ_real3.txt`。
+
+#### 续轮收口：inpatient-care 9 fail → 0（真实代码缺陷，已修）
+根因集中在 `orderRepo.ts` 建单/状态推进落库漂移，DDL 默认值与聚合器状态机契约不一致：
+- **初始态漂移**：`createInpatientOrder` INSERT 不显式写 `status`，落 DDL 默认 `'active'`；而在院医嘱契约为 `pending_review`（医师审核后才转 active），导致 `reviewOrder/rejectOrder` 的 CAS `WHERE status='pending_review'` 落空、连锁 409。仓储 INSERT 补齐 `status='pending_review'`、`category`、`priority`、`doctor_id`、`requires_double_check`（原仅写 visit_id/type/content/dosage/frequency/route/ordered_by，category/priority/双人核对标识均落 DDL 默认值）。
+- **审核人列漂移**：`reviewOrder` 仅写 `reviewed_by`(text)，而 `mapOrder.reviewerId` 读 `reviewer_id`(uuid FK)；UPDATE 补齐 `reviewer_id=${doctorId}`，`reviewed_by` 留痕保留。
+- **驳回终态漂移**：`rejectOrder` 原置 `status='cancelled'` + `cancel_reason`，契约/测试终态为 `'rejected'` + `reject_reason`；对齐为 `status='rejected'`、`reject_reason`，驳回人复用 `cancelled_by/cancelled_at` 留痕（表无 rejected_by 列）。
+- **执行/停止置位落空**：`markOrderExecuted` 原仅 SELECT 不更新（临时医嘱单次执行后未置 executed）；改为 CAS active→`executed`。`stopOrder` 未写 `stop_at`；UPDATE 补 `stop_at=now()`。
+- 复用面核对：仓储 `reviewOrder` 另被 ams/pathway/vte 三聚合器签名流程复用，`stopOrder/markOrderExecuted` 仅住院聚合器调用；全量 unit 回归 16653/169/113 与基线逐字一致，无新增回归。
+- 白名单复核（同类"禁止更新的列"遗漏排查）：`lisRepo` LAB_REQUEST/LAB_SPECIMEN、`risRepo` IMAGING_REQUEST、`transfusionRepo` TRANSFUSION_REQUEST、`apptRepo`、`consultationRepo` 六个可写列白名单逐一对照聚合器写路径字段，除本轮已补的输血配血四列、问诊会话四列外，其余字段均已在白名单内，无新遗漏。
 
 ### 待办 ④ 剩余 4 个列结构漂移 DDL 文件（已完成生产契约取证；不改表结构，留架构二选一专项）
 本轮逐一对照后端仓储/聚合器/路由源码取证，四个文件均属"DDL 规划新模型/新列覆盖同名旧表，生产代码走旧结构，新模型暂无落库代码"。除 256/369 在旧表上建指向新列的索引时报 42703 外，运行时旧表被 `CREATE TABLE IF NOT EXISTS` 跳过，不构成生产读写故障；本轮不擅自改表结构（牵动外键引用链与生产仓储）。
