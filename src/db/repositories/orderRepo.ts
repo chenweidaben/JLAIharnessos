@@ -7,6 +7,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toJson } from './helpers.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** uuid FK 列兜底：仅合法 UUID 落库，否则置 null（文本留痕列单独保留原句柄）。 */
@@ -76,13 +77,14 @@ export async function createInpatientOrder(input: {
   const rows = await db`
     INSERT INTO clinical.orders (
       visit_id, order_type, content, dosage, frequency, route, ordered_by,
-      status, category, priority, doctor_id, requires_double_check
+      status, category, priority, doctor_id, requires_double_check, detail
     )
     VALUES (
       ${input.visitId}, ${input.orderType}, ${input.content}, ${input.dosage ?? null},
       ${input.frequency ?? null}, ${input.route ?? null}, ${input.orderedBy ?? input.doctorId ?? null},
       'pending_review', ${input.category ?? 'short_term'}, ${input.priority ?? 'routine'},
-      ${validUuidOrNull(input.doctorId)}, ${input.requiresDoubleCheck ?? false}
+      ${validUuidOrNull(input.doctorId)}, ${input.requiresDoubleCheck ?? false},
+      ${db.json(toJson(input.detail ?? {}))}
     )
     RETURNING *
   `;
