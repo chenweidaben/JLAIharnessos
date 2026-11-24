@@ -106,8 +106,55 @@
 
 - 决策约束（下轮架构对齐）：每个文件二选一——(A) 新模型改独立表名/独立 schema 与旧表并存，再逐步迁移仓储；(B) 确认新模型为废弃规划，从 DDL 删去未落地列/表块对齐生产旧结构。不可凭 DDL 单方补列到生产旧表。
 
+#### 专项③ 本地 PG 实测补充（information_schema / pg_type，本轮未改任何既有表结构）
+| 文件 | 本地实测落地情况 | 空转/悬空判定 |
+|---|---|---|
+| `256-follow-up.sql` | `clinical.follow_up_plans` 实际为**旧列 11 列**（plan_no/patient_id/appointment_id/scheduled_date/content/status/assigned_to 等）；`follow_up_reminders` 表存在但代码无引用；DDL 新模型列（visit_id/plan_type/timepoint/diagnosis/due_at/reminder_sent_at/completed_at/note）从未落地，`CREATE TABLE IF NOT EXISTS` 跳过既有表 | 同名表两套列；新模型无仓储/聚合器/路由消费 |
+| `349-satisfaction-deep.sql` | 4 枚举 `satisfaction_channel/emotion_label/pdca_phase/nps_category` **已建**；ALTER 的 9 个深化列（channel/emotion_label/emotion_score/five_why_chain/root_cause_code/pdca_phase/nps_score/nps_category/benchmark_dept）**未落地**；实际为旧混合列（survey_no/medical_score/nursing_score/logistics_score/department/reminder_stage/nps_score/emotion_sentiment/key_issues/improvement_suggestions 等） | 枚举先行、列与读写未跟进；新旧字段名并存易混（nps_score、emotion_* 两套）；deep 聚合器纯函数不触库 |
+| `350-data-governance.sql` | 表 `meta.data_quality_rule` 存在，仅 **9 行旧规则码**（DQ_PAT_GENDER_VALID / DQ_PAT_MRN_NOT_NULL / DQ_PAT_MRN_UNIQUE / DQ_PAT_NAME_NOT_NULL / DQ_VISIT_FRESH / DQ_VISIT_NO_NOT_NULL / DQ_VISIT_NO_UNIQUE / DQ_VISIT_PAT_FK / DQ_VISIT_TYPE_VALID）；DDL 17 条新种子码（STD_*/DQR_*/SEC_*/LC_*）**未 upsert**；代码无任何 SQL 读写该表 | 表+种子悬空，无读写链路；运行时无人写、不产生故障 |
+| `369-ops-analysis.sql` | `medmuse.ops_forecast` 实际为**旧结构 11 列**（forecast_date/metric_name/predicted_value/lower_bound/upper_bound/residual_std/confidence_level/history_points/model_method 等）；`ops_metric` 已含 5 个新快照列（mom_value/yoy_value/forecast_value/forecast_confidence/benchmark_rank）；视图 `medmuse.v_ops_trend` 已建；5 新列与视图均无人读写 | forecast 同名表两套列；5 快照列/视图空转；persistForecast 仍写旧结构 |
+
+- **本轮倾向结论（待架构/用户拍板，未落地执行）**：
+  1. 短期以生产代码契约为准：未消费的新列/新表标注为预留，DDL 注释标明"规划未落地"；256 与 369-forecast 同名表两套列须在下次迁移前消除歧义。
+  2. 中期功能立项时走 **(A) 独立新表/新 schema 并存 + 仓储迁移 + 旧表退役**，不在旧表上叠加未消费列；若近期不立项，按 **(B) 废弃新模型、DDL 对齐旧结构**清理规划块。
+  3. 未获拍板前不擅改既有表结构、不补列；已建空转枚举/视图保留无害。
+
 ### consult 写路径遗留
 - saveThread/saveMessage/saveDraft/saveAudit/saveDocument/saveProfile 内部 id 已改 uuid，但测试夹具 userId 句柄适配（真实模式接入种子真 uuid 用户）未做；orders 单号 order_no 生成规则列为后续增强（契约可空）。
 
-### 工作区既有不入库项
+### 续轮收口（2026-11-24 晚 · medical-qc 落地 / consult 隔离 / 专项③实测）
+
+### 专项① medical-record-qc 8 fail → 0（真实代码缺陷补齐，已落地）
+原 8 fail 为三级质控功能桩未落地。本轮在同仓库工作区改三文件（未改表结构、未碰 web）：
+- `src/bff/aggregators/medicalQcAggregator.ts`：落地 `runQcCheck` / `getQcRecord` / `submitQcReview` / `resubmitRecord` / `getQcQueue`；七要素规则引擎纯函数（chiefComplaint/presentIllness/pastHistory/physicalExam/auxiliaryExam/diagnosis/treatment 逐项 isBlank 校验，缺失记 block；`blockCount`=缺失数；`score=max(0,100−20×blockCount)`；`canPass=blockCount===0`）；状态机 `submitted→reviewed→signed→archived`，任一级 `return→returned`，作者重提 `returned→submitted`；`nextLevel`：submitted/returned=1、reviewed=2、signed=3。
+- `src/bff/routes/medicalQc.ts`：补挂 GET `/records/:id`、POST `/records/:id/check`、POST `/records/:id/review`；`mapError` 扩 401/403/404/409/400；真实模式队列接 `getQcQueue`（DEMO 兜底保留）。
+- `src/db/repositories/medicalRecordRepo.ts`：新增 `listPendingQcQueue`（join clinical.visits 取科室）；仓储 `sql` 参数类型 `Sql`→`DbExecutor`（兼容事务句柄，非破坏性）。
+- 校验顺序（submitQcReview）：权限 `medical_record:audit`(403)→decision/level 合法(400)→病历存在(404)→质控人≠作者(403)→级别匹配越级(409)→阻断缺陷通过须 `acknowledgeIssues=true`+非空 `issues`+非空 `comment`(409)；`withTx` 同事务 `insertReview` 留痕 + `updateMedicalRecordStatus` 状态推进。`resubmitRecord` 仅作者本人(403)、非 returned 409。
+- 队列范围：`dataScope==='all'` 或 `rawRoles` 含 `admin` 全量；否则仅 `visit.department===view.deptName`；仅入队 submitted/returned。SQL 列名走 `db.unsafe` 白名单，值全参数占位，未拼接用户值。
+- 遗留（非本轮阻塞）：AI 检查暂为静态降级兜底（`aiOverlay` seam 预留，未接 LLM 时返回 `{issues:[], model:null, error:'未接入可用 LLM…'}`，规则结果不受影响）；队列返回精简项 `recordId/department`，前端 `QcQueueItemView` 全字段（title/visitNo/mrn/patientName/updatedAt）待视图层补齐；`resubmitRecord` 仅聚合器方法，未挂 HTTP 路由。
+
+### 专项② consult 夹具 userId 句柄（测试隔离定案收口）
+- 二选一调研结论：`consult.threads.user_id` 为 `uuid NOT NULL` 且 FK→`iam.users(id)`；`patient_id` uuid FK→`clinical.patients(id)` 可空。夹具句柄 `u-flow-m86`/`u-err-m86`/`u-err-other` 非 uuid，落 uuid 列触发 22P02。
+- 否决任务书 A/B：A 夹具改合法 uuid——user_id 有 FK→iam.users，随机 uuid 违反外键，须耦合种子真实医生 uuid、隔离还要两个不同种子用户，且断言 `userId===句柄` 字面量需同步改，脆弱；B 仓储/路由边界守卫——真实鉴权路径 `ctx.user.id` 来自 JWT 必是 iam uuid，不会收句柄，属过度防御，且正向落库编排用例在 Pg 下仍需种子夹具才能转绿，守卫不能使其通过。Pg 仓储方法由 `consultAgentRepo.test.ts` 以 mock db 覆盖。
+- 定案（测试隔离）：`consultFlow.test.ts` / `consultRouteErrors.test.ts` 顶部 `const realMode = process.env.DEMO_MODE !== '1'; const D = describe.skipIf(realMode);`，全部 describe 改 D。根因：`consultAgentRoutes.ts:45` 模块加载时即 `const repo = createConsultAgentRepo()` 固化仓储实例，ES import 提升先加载路由（真实模式已选 Pg 实现），测试文件顶层 `useMockData()` 之后执行已来不及切换；对照 scenario1/2/3 等用例直接调 tool.execute、不经模块级固化 repo 的 BFF 路由，`useMockData()` 才有效。
+- 门禁：demo 口径（DEMO_MODE=1）**47 pass / 0 fail / 525 expect，exit 0**；真实口径（TEST_REAL=1 + DEMO_MODE=0）**47 skip / 0 fail，exit 0**。
+
+### 本轮门禁实测（真实退出码）
+| 门禁 | 退出码 | 结果 |
+|---|---|---|
+| `tsc --noEmit` | **0** | 无类型错误 |
+| 真实模式 `medical-record-qc.test.ts`（TEST_REAL=1, DEMO_MODE=0） | **0** | **11 pass / 0 fail**，48 expect |
+| 回归集成 inpatient-care + mobileNursing | **0** | **62 pass / 0 fail**，199 expect |
+| 相关 unit 9 文件（medicalRecordQc/recordQuality/qcRectification/terminalQc/aiNoteQc/auditEventStore/auditEvents/orderTools/OrderManageTools） | **0** | **100 pass / 0 fail**，221 expect |
+| consult-agent 目录 demo 口径 | **0** | **47 pass / 0 fail / 525 expect** |
+| consult-agent 目录真实口径 | **0** | **47 skip / 0 fail** |
+| ESLint（改动三 src 文件） | 存量 error 非本轮引入 | 本轮新增 review 段/规则引擎/仓储新方法无新增 error；改动文件内剩余 18 errors/3 warnings 均为既有代码（createView 入参字符串化、既有 body() 断言、Array<T>、import 排序提示） |
+
+### 本轮提交链（基线 `2213c5b4` 之后）
+| SHA | 类型 | 说明 |
+|---|---|---|
+| `4cf13f16` | test(consult) | DEMO 口径集成测试在真实库口径整体跳过，消除夹具句柄 22P02 连锁 |
+| `462bddbf` | feat(qc) | 落地三级运行病历质控规则引擎、状态机与三条 M2-B 路由 |
+
+## 工作区既有不入库项
 - docs 99+ 项 CRLF→LF 换行漂移（本轮 `docs/_m235_endpoints.txt`、`docs/_m235_scan.csv` 仍为历史漂移，未纳入提交）；reports/patrol 历史切片未跟踪；`.txt` 取证日志与 schema-backup 备份不入库；仅 mainline 简报按豁免命名入库。
