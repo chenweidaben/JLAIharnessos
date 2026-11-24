@@ -83,15 +83,23 @@ export async function updateMedicalRecordStatus(
   return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
 }
 
-/** 待三级质控队列项（病历 + 就诊科室）。 */
+/** 待三级质控队列项（病历 + 就诊 + 患者脱敏信息，对齐前端 QcQueueItem 契约）。 */
 export interface QcQueueRecord {
   recordId: string;
+  recordType: string;
+  title: string;
+  status: MedicalRecordStatus;
   department: string;
+  visitNo: string;
+  mrn: string;
+  patientName: string;
+  updatedAt: string;
 }
 
 /**
  * 待质控病历队列（M2-B）：仅纳入 submitted / returned 状态、未软删病历，
- * 关联就诊取科室。deptName 为空时返回全量（全院数据范围），否则按科室过滤。
+ * 关联就诊取科室/就诊号，左联患者取 MRN 与脱敏姓名。deptName 为空时返回全量
+ * （全院数据范围），否则按科室过滤。
  */
 export async function listPendingQcQueue(
   options: { deptName?: string | null },
@@ -99,17 +107,27 @@ export async function listPendingQcQueue(
 ): Promise<QcQueueRecord[]> {
   const db = sql ?? getDb();
   const rows = await db`
-    SELECT m.id AS record_id, v.department AS department
+    SELECT m.id AS record_id, m.record_type AS record_type, m.title AS title, m.status AS status,
+      m.updated_at AS updated_at, v.department AS department, v.visit_no AS visit_no,
+      p.mrn AS mrn, p.name_masked AS patient_name
     FROM clinical.medical_records m
     JOIN clinical.visits v ON v.id = m.visit_id
+    LEFT JOIN clinical.patients p ON p.id = v.patient_id
     WHERE m.deleted_at IS NULL
       AND m.status IN ('submitted', 'returned')
-      ${options.deptName ? db`AND v.department = ${options.deptName}` : db``}
+    ${options.deptName ? db`AND v.department = ${options.deptName}` : db``}
     ORDER BY m.updated_at DESC
   `;
   return (rows as Record<string, unknown>[]).map((r) => ({
     recordId: String(r.record_id),
-    department: String(r.department),
+    recordType: r.record_type ? String(r.record_type) : '',
+    title: r.title ? String(r.title) : '',
+    status: (r.status as MedicalRecordStatus) ?? 'submitted',
+    department: r.department ? String(r.department) : '',
+    visitNo: r.visit_no ? String(r.visit_no) : '',
+    mrn: r.mrn ? String(r.mrn) : '',
+    patientName: r.patient_name ? String(r.patient_name) : '',
+    updatedAt: r.updated_at ? String(r.updated_at) : '',
   }));
 }
 

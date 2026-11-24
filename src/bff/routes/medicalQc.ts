@@ -3,7 +3,7 @@ import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   listView, createView, rectifyView, MedicalQcError,
-  getQcRecord, runQcCheck, submitQcReview, getQcQueue,
+  getQcRecord, runQcCheck, submitQcReview, resubmitRecord, getQcQueue,
 } from '../aggregators/medicalQcAggregator.js';
 import type { QcReviewInput } from '../aggregators/medicalQcAggregator.js';
 
@@ -146,5 +146,10 @@ export const medicalQcRoutes: RouteDef[] = [
         } as QcReviewInput;
         return json(ok(await submitQcReview(view, c.params.id, input)));
       } catch (e) { return mapError(e); }
+    } },
+  { method: 'POST', path: '/api/v1/medical-qc/records/:id/resubmit', auth: true,
+    handle: async (c: Ctx): Promise<Response> => {
+      const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
+      try { return json(ok(await resubmitRecord(view, c.params.id))); } catch (e) { return mapError(e); }
     } },
 ];

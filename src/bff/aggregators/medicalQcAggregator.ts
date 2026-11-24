@@ -3,6 +3,7 @@ import * as repo from '@/db/repositories/medicalQcRepo';
 import { withTx } from '@/db/pool.js';
 import * as recordRepo from '@/db/repositories/medicalRecordRepo.js';
 import * as reviewRepo from '@/db/repositories/medicalRecordReviewRepo.js';
+import { callRealLLM } from './llmClientAggregator.js';
 
 export class MedicalQcError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -99,7 +100,15 @@ export interface QcRecordView {
 
 export interface QcQueueItem {
   recordId: string;
+  recordType: string;
+  title: string;
+  status: string;
+  nextLevel: number | null;
   department: string;
+  visitNo: string;
+  mrn: string;
+  patientName: string;
+  updatedAt: string;
 }
 
 export interface QcReviewInput {
@@ -160,13 +169,74 @@ function evaluateRule(content: Record<string, unknown>): {
   return { issues, blockCount, majorCount: 0, minorCount: 0, score, canPass: blockCount === 0 };
 }
 
-/** AI 辅助叠加：当前未接入可用 LLM，按契约返回三属性齐全的降级结构（规则结果不受 AI 影响）。 */
-function aiOverlay(useAi: boolean): QcCheckResult['ai'] {
-  if (!useAi) return { issues: [], model: null, error: null };
-  return { issues: [], model: null, error: '未接入可用 LLM，本次仅执行规则检查' };
+/** 从模型输出中防御性提取 AI 缺陷建议数组；非 JSON / 解析失败返回空数组。 */
+function parseAiIssues(content: string): QcIssue[] {
+  let text = content.trim();
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence?.[1]) text = fence[1].trim();
+  const start = text.indexOf('[');
+  const end = text.lastIndexOf(']');
+  if (start < 0 || end <= start) return [];
+  let parsed: unknown;
+  try { parsed = JSON.parse(text.slice(start, end + 1)); } catch { return []; }
+  if (!Array.isArray(parsed)) return [];
+  return parsed.flatMap((item): QcIssue[] => {
+    if (item == null || typeof item !== 'object') return [];
+    const it = item as Record<string, unknown>;
+    const message = typeof it.message === 'string' ? it.message : typeof it.suggestion === 'string' ? String(it.suggestion) : '';
+    if (!message.trim()) return [];
+    const severity = typeof it.severity === 'string' ? it.severity : 'minor';
+    return [{
+      code: typeof it.ruleId === 'string' ? it.ruleId : 'ai_suggestion',
+      message: message.trim(),
+      level: severity === 'block' || severity === 'major' || severity === 'minor' ? severity : 'minor',
+    }];
+  });
 }
 
-/** 规则检查（只读，不落库）：返回规则判定 + AI 辅助降级结构。 */
+/** 构造 AI 质控提示：要素齐备情况 + 正文摘要，要求结构化 JSON 数组输出。 */
+function buildAiPrompt(record: recordRepo.MedicalRecord): string {
+  const sections = RULE_FIELDS.map((f) => {
+    const v = record.content[f.key];
+    const filled = isBlank(v) ? '缺失' : '已填写';
+    const excerpt = typeof v === 'string' ? v.slice(0, 120) : '';
+    return `- ${f.label}（${f.key}）：${filled}${excerpt ? `：${excerpt}` : ''}`;
+  }).join('\n');
+  return [
+    '你是运行病历质控的 AI 辅助审查员。请依据下列病历要素摘要，仅从文书规范性、表述完整性、诊疗逻辑一致性角度给出补充建议；不做诊断、不开具医嘱。',
+    '',
+    '【病历要素】',
+    sections,
+    '',
+    '【输出要求】仅输出一个 JSON 数组，每项形如 {"message":"具体建议","severity":"minor|major","ruleId":"ai_xxx"}；无建议时输出 []。不要输出 JSON 以外的解释。',
+  ].join('\n');
+}
+
+/**
+ * AI 辅助叠加：调用统一 LLM 入口（带超时/重试/fail-open 降级）。
+ * 未配置上游、模型降级或解析失败时，按契约返回空 issues 与降级标注；规则判定与
+ * canPass/score 完全不受 AI 结果影响。
+ */
+async function aiOverlay(record: recordRepo.MedicalRecord, useAi: boolean): Promise<QcCheckResult['ai']> {
+  if (!useAi) return { issues: [], model: null, error: null };
+  let resp;
+  try {
+    resp = await callRealLLM(
+      buildAiPrompt(record),
+      { staffRole: 'medical-qc' },
+      { temperature: 0.2, maxRetries: 1, backoffBaseMs: 0 },
+    );
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    return { issues: [], model: null, error: `AI 调用异常：${reason.slice(0, 120)}` };
+  }
+  if (resp.degraded) {
+    return { issues: [], model: resp.model, error: '模型服务暂不可用，本次 AI 辅助降级，仅执行规则检查' };
+  }
+  return { issues: parseAiIssues(resp.content), model: resp.model, error: null };
+}
+
+/** 规则检查（只读，不落库）：返回规则判定 + AI 辅助叠加结构。 */
 export async function runQcCheck(_view: AuthView, recordId: string, useAi?: boolean): Promise<QcCheckResult> {
   const record = await recordRepo.getMedicalRecordById(recordId);
   if (!record) throw notFound('病历不存在');
@@ -176,7 +246,7 @@ export async function runQcCheck(_view: AuthView, recordId: string, useAi?: bool
     score: rule.score,
     rule: { blockCount: rule.blockCount, majorCount: rule.majorCount, minorCount: rule.minorCount },
     issues: rule.issues,
-    ai: aiOverlay(Boolean(useAi)),
+    ai: await aiOverlay(record, Boolean(useAi)),
   };
 }
 
@@ -277,5 +347,18 @@ export async function resubmitRecord(view: AuthView, recordId: string): Promise<
 export async function getQcQueue(view: AuthView): Promise<{ items: QcQueueItem[] }> {
   const scopeAll = view.dataScope === 'all' || view.rawRoles.includes('admin');
   const rows = await recordRepo.listPendingQcQueue({ deptName: scopeAll ? null : view.deptName });
-  return { items: rows.map((r) => ({ recordId: r.recordId, department: r.department })) };
+  return {
+    items: rows.map((r) => ({
+      recordId: r.recordId,
+      recordType: r.recordType,
+      title: r.title,
+      status: r.status,
+      nextLevel: NEXT_LEVEL[r.status] ?? null,
+      department: r.department,
+      visitNo: r.visitNo,
+      mrn: r.mrn,
+      patientName: r.patientName,
+      updatedAt: r.updatedAt,
+    })),
+  };
 }

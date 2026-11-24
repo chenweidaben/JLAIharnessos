@@ -326,7 +326,12 @@ describe.skipIf(!dbAvailable)('M2-B BFF 路由：权限与信封', () => {
 
     const queueRes = await findRoute('GET', '/api/v1/medical-qc/queue').handle(makeCtx(admin));
     expect(queueRes.status).toBe(200);
-    expect((await queueRes.json()).code).toBe(0);
+    const queueBody = await queueRes.json();
+    expect(queueBody.code).toBe(0);
+    const queueFields = ['recordId', 'recordType', 'title', 'status', 'nextLevel',
+      'department', 'visitNo', 'mrn', 'patientName', 'updatedAt'];
+    expect(queueBody.data.items.every((i: Record<string, unknown>) =>
+      queueFields.every((k) => k in i))).toBe(true);
 
     const checkRes = await findRoute('POST', '/api/v1/medical-qc/records/:id/check').handle(
       makeCtx(admin, { params: { id }, body: { useAi: false } }),
@@ -335,5 +340,21 @@ describe.skipIf(!dbAvailable)('M2-B BFF 路由：权限与信封', () => {
     const checkBody = await checkRes.json();
     expect(checkBody.code).toBe(0);
     expect(checkBody.data.rule).toBeTruthy();
+  });
+
+  it('作者本人经路由重提退回病历 200；非作者 403', async () => {
+    const id = await newSubmittedRecord({ author: doctorChen, department: '心血管内科' });
+    await submitQcReview(admin, id, {
+      decision: 'return', level: 1, comment: '现病史补充诱因与缓解因素',
+    });
+
+    const forbidden = await findRoute('POST', '/api/v1/medical-qc/records/:id/resubmit').handle(
+      makeCtx(admin, { params: { id } }));
+    expect(forbidden.status).toBe(403);
+
+    const resub = await findRoute('POST', '/api/v1/medical-qc/records/:id/resubmit').handle(
+      makeCtx(doctorChen, { params: { id } }));
+    expect(resub.status).toBe(200);
+    expect((await resub.json()).data.status).toBe('submitted');
   });
 });
