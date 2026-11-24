@@ -31,6 +31,13 @@ CREATE TABLE IF NOT EXISTS clinical.health_check_order_items (
 );
 CREATE INDEX IF NOT EXISTS idx_hc_items_order ON clinical.health_check_order_items(order_id);
 
+-- 默认体检套餐种子：保证全新初始化库即可开单/转诊；既有库由本语句幂等补齐。
+INSERT INTO clinical.health_check_packages (name, items, price_cents, active)
+SELECT '基础体检套餐',
+       ARRAY['blood_pressure_high', 'fasting_glucose_high', 'lung_nodule'],
+       29900, true
+WHERE NOT EXISTS (SELECT 1 FROM clinical.health_check_packages);
+
 INSERT INTO iam.permissions (code, name, module, description) VALUES
   ('healthcheck:manage', '体检中心管理', 'healthcheck', '套餐维护/开单/完成项目（admin）'),
   ('healthcheck:view',  '体检中心查看', 'healthcheck', '查看体检单（admin/doctor/nurse）')

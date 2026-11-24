@@ -136,7 +136,7 @@ describe('真实持久化 - 就诊与医嘱', () => {
     });
     const cancelled = await orderRepo.cancelOrder(order2.id, '患者拒绝');
     expect(cancelled?.status).toBe('cancelled');
-    expect(cancelled?.detail.cancelReason).toBe('患者拒绝');
+    expect(cancelled?.cancelReason).toBe('患者拒绝');
   });
 });
 
