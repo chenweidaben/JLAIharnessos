@@ -85,9 +85,9 @@ export class ConcurrencyLimiter {
             ),
           );
         }, this.acquireTimeoutMs);
-        if (typeof waiter.timer === 'object' && 'unref' in waiter.timer) {
-          (waiter.timer as unknown as { unref: () => void }).unref();
-        }
+        // 注意：不对超时定时器 unref——Bun 1.2.0 下 unref 的 setTimeout 回调不会被
+        // 事件循环调度，超时将永久悬挂（信号量排队 hang）。定时器在 release 唤醒时
+        // 由 clearTimeout 清理，不长期持有进程。
       }
       this.queue.push(waiter);
     }).then(() => {

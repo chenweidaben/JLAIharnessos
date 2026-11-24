@@ -273,7 +273,7 @@ async function streamDeepSeek(
   const controller = new AbortController();
   const timeoutMs = Number(process.env.LLM_TIMEOUT_MS) || 60_000;
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  if (timer.unref) timer.unref();
+  // 不对定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，超时 abort 将不触发；finally 中 clearTimeout 清理。
   const onExternalAbort = (): void => controller.abort();
   opts.signal?.addEventListener('abort', onExternalAbort, { once: true });
 

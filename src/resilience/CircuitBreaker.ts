@@ -220,10 +220,8 @@ export class CircuitBreaker {
           ),
         );
       }, this.opts.timeoutMs);
-      // 避免悬挂句柄阻止进程退出
-      if (typeof timer === 'object' && 'unref' in timer) {
-        (timer as unknown as { unref: () => void }).unref();
-      }
+      // 不对超时定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，超时将永不触发；
+      // 定时器在 Promise.race 的 finally 中 clearTimeout 清理，不长期持有进程。
     });
     return Promise.race([fn(), timeout]).finally(() => {
       if (timer) clearTimeout(timer);

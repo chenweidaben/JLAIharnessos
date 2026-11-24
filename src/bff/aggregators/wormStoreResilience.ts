@@ -70,10 +70,7 @@ export function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promis
       (e as { code?: string }).code = 'worm-store-timeout';
       reject(e);
     }, ms);
-    // 不 ref：让 timer 不阻止事件循环退出
-    if (typeof timer === 'object' && timer && 'unref' in timer) {
-      (timer as { unref: () => void }).unref();
-    }
+    // 不对定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，超时将永不触发；finally 中 clearTimeout 清理。
   });
   return Promise.race([p, timeout]).finally(() => {
     if (timer) clearTimeout(timer);

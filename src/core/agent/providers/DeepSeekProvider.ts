@@ -248,8 +248,9 @@ export class DeepSeekProvider {
 
     // 合并外部 signal 与超时 AbortController
     const timeoutController = new AbortController();
+    // 定时器不做 unref：Bun 1.2.0 下 generator 内 unref 定时器不触发（同 sleep 注释）；
+    // 超时定时器在 streamOnce finally 中 clearTimeout 清理，不会长期持有进程。
     const timer = setTimeout(() => timeoutController.abort(), this.config.timeoutMs);
-    if (timer.unref) timer.unref();
     const onExternalAbort = (): void => timeoutController.abort();
     params.signal?.addEventListener('abort', onExternalAbort, { once: true });
 
@@ -547,8 +548,10 @@ export class DeepSeekProvider {
   /** 可中断的退避等待 */
   private sleep(ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve) => {
+      // 注意：此处不可对定时器调用 unref()——Bun 1.2.0 下 async generator 内
+      // unref 后的定时器回调不会被事件循环调度，退避会永久悬挂（重试 hang）。
+      // 退避定时器为短生命周期，resolve 后即结束；abort 时由下方监听 clearTimeout 清理。
       const timer = setTimeout(resolve, ms);
-      if (timer.unref) timer.unref();
       signal?.addEventListener(
         'abort',
         () => {

@@ -521,8 +521,7 @@ export class ToolExecutor {
         error.name = 'TimeoutError';
         reject(error);
       }, timeoutMs);
-      // 允许进程退出
-      if (timer.unref) timer.unref();
+      // 不对定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，工具超时将永不触发。
     });
 
     // 创建执行 Promise

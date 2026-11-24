@@ -214,9 +214,7 @@ export class AsyncQueue<T = unknown, R = unknown> {
             ),
           );
         }, this.backpressureWaitMs);
-        if (typeof waiter.timer === 'object' && 'unref' in waiter.timer) {
-          (waiter.timer as unknown as { unref: () => void }).unref();
-        }
+        // 不对超时定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，背压等待会永久悬挂。
       }
       this.waiters.push(waiter);
     });

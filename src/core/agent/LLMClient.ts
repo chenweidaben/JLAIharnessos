@@ -500,8 +500,8 @@ export class LLMClient implements ILLMClient {
    */
   private sleep(ms: number, signal?: AbortSignal): Promise<void> {
     return new Promise((resolve) => {
+      // 不对定时器 unref：Bun 1.2.0 下 unref 的 setTimeout 回调不被调度，退避会永久悬挂。
       const timer = setTimeout(resolve, ms);
-      if (timer.unref) timer.unref();
       signal?.addEventListener(
         'abort',
         () => {
