@@ -36,6 +36,7 @@ import {
   AgentRuntimeError,
   cancelAgentRun,
   getAgentRun,
+  listAgentRuns,
   startAgentRun,
   listMyHumanTasks,
   getHumanTask,
@@ -136,6 +137,17 @@ if (dbAvailable) {
 
 afterAll(async () => {
   if (!dbAvailable) return;
+  // 先把本 agent 仍挂起（running/pending/waiting_human）的实例经既有取消路径终态落库：
+  // 避免后台 finalize 在后续文件或进程退出窗口才兑现，向已被清理的实例写节点记录撞外键。
+  // 走既有生产 cancel 路径，不改生产事务语义。
+  try {
+    const live = await listAgentRuns(admin, { agentId: humanId, limit: 100 });
+    for (const inst of live) {
+      if (inst.state === 'running' || inst.state === 'pending' || inst.state === 'waiting_human') {
+        try { await cancelAgentRun(admin, inst.id, '集成测试清理'); } catch { /* 已终态则忽略 */ }
+      }
+    }
+  } catch { /* 实例列表不可用则忽略 */ }
   try {
     await removeBuilderAgent(admin, humanId);
   } catch {
