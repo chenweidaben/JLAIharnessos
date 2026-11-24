@@ -233,4 +233,48 @@
 
 ---
 
-*报告生成：M183-P1 权限审计任务（v5.0试点扩展）。数据来源：`src/bff/routes/**`、`src/bff/middleware/auth.ts`、`src/bff/view/userView.ts`、`src/security/auth/RoleDefinitions.ts`、`web/src/router/**`。*
+## 7. DB `iam.role_permissions` 与内存矩阵偏差评估（2026-11-25 00:05 轮补充）
+
+> 本节为 DB 授权行 vs 应用层内存 `ROLE_PERMISSIONS` 的现状量化，**只评估、不落地镜像**。运行时鉴权链路已核对：JWT `permissions` 由 `buildAuthView` 按内存 `ROLE_PERMISSIONS[role]` 扁平合并签发（`userView.ts:539`、`auth.ts:333`），`requirePermissionCode` 比对 JWT `payload.permissions`（`middleware/auth.ts:321`）；**DB `iam.role_permissions` 不参与运行时鉴权决策**，仅被 `roleAdminRepo` 用于管理后台「角色管理」列表/详情的权限码展示与编辑。
+
+### 7.1 现状口径
+- 内存 `ROLE_PERMISSIONS` 共 **11 个**角色：admin / doctor / pharmacist / nurse / technician / ams_officer / researcher / patient / finance / cashier / dept_head。
+- DB `iam.role_permissions` 仅有 **9 个**角色授权行；`cashier`、`dept_head` 为 0 行（上轮已补 `iam.roles` 角色字典与内存映射，DB 授权行未镜像）。
+- DB 授权行无孤儿码（所有 `permission_code` 均在 `iam.permissions` 字典内）；字典共 356 码。
+
+### 7.2 偏差量化（本地库 `jlmedaios` 实测）
+
+| 角色 | 内存码数 | DB 授权行 | 内存有 / DB 无 | DB 有 / 内存无 | 内存码不在字典 |
+|---|---:|---:|---:|---:|---:|
+| admin | 289 | 346 | 29 | 86 | 28 |
+| doctor | 196 | 220 | 24 | 48 | 19 |
+| pharmacist | 27 | 37 | 6 | 16 | 5 |
+| nurse | 130 | 140 | 21 | 31 | 14 |
+| technician | 27 | 21 | 6 | 0 | 2 |
+| ams_officer | 8 | 3 | 5 | 0 | 2 |
+| researcher | 6 | 2 | 4 | 0 | 0 |
+| patient | 6 | 16 | 0 | 10 | 0 |
+| finance | 7 | 2 | 6 | 1 | 1 |
+| cashier | 9 | 0 | 9 | 0 | 7 |
+| dept_head | 199 | 0 | 199 | 0 | 22 |
+
+- 「DB 有 / 内存无」多为旧版 V13 报表码、深水区（`*_deep:*`）、已收敛/下线码；「内存有 / DB 无」多为 v5.0 试点新增的临床/急诊/护理/结算码。两套矩阵是不同时期各自演化，**非简单子集关系**。
+- 内存矩阵中有 **36 个去重权限码未登记进 `iam.permissions` 字典**（镜像到 DB 会触发 `role_permissions.permission_code` 外键 23503 失败），含：4 个报表分组码 `report:clinical/admin/finance/quality:read`，以及 `inpatient:*`、`emergency:*`、`nursing:*`、`ward_round:*`、`inpatient_order:*`、`pharmacy:view/review`、`inventory:view`、`patient_billing:*`、`fee:audit:view`、`settlement:view`、`dept:manage`、`quality:dept:*`、`dept_cockpit:view`、`emr_level5:view`、`system:view` 等。
+
+### 7.3 影响面
+- **运行时鉴权**：不受 DB 授权行影响。cashier / dept_head 登录后权限仍由内存 `ROLE_PERMISSIONS` 正常签发，路由放行/拦截与 DB 行无关。
+- **管理后台展示**：「角色管理」列表/详情的 `permissionCodes` 取自 DB；cashier / dept_head 当前展示为空权限集合，其余 9 角色展示的是历史 DB 子集（与内存矩阵不一致）。此为展示层偏差，不影响实际授权。
+
+### 7.4 镜像可行性结论（待决策，本轮不落地）
+将内存矩阵全量镜像到 DB `role_permissions` 属于「改为以库为准」的语义改造，前置条件尚未具备：
+1. **补字典**：先把 36 个内存缺失码登记进 `iam.permissions`（含 4 个报表分组码与业务码），否则授权行外键失败；
+2. **清冗余**：决策 DB 侧旧版/深水区/已收敛冗余行的去留，避免镜像后两套并存继续漂移；
+3. **定事实来源**：明确运行时鉴权是继续以内存 `ROLE_PERMISSIONS` 为准，还是切换为以 DB `role_permissions` 为准（切换需同步改 `buildAuthView`/JWT 签发口径并补回归）。
+
+在上述三项拍板前，本轮**不写 DB 授权行、不补字典、不清理冗余**，维持现状运行时行为不变。
+
+> 注：M183 §1.1 注 48/49 所述「cashier / dept_head 未进入授权表」的缺口，已在 2026-11-24 轮补入内存 `ROLE_PERMISSIONS`、后端白名单与前端角色字典；DB `role_permissions` 授权行缺口见本节 7.2，属待决策镜像项。
+
+---
+
+*报告生成：M183-P1 权限审计任务（v5.0试点扩展）。数据来源：`src/bff/routes/**`、`src/bff/middleware/auth.ts`、`src/bff/view/userView.ts`、`src/security/auth/RoleDefinitions.ts`、`web/src/router/**`；§7 数据来源：本地库 `iam.roles / iam.permissions / iam.role_permissions` 实测 + `userView.ts` 内存矩阵比对。*
