@@ -252,6 +252,10 @@ describe('DispenseModal CDS block 红色警示与 override 必填', () => {
     expect(payload.lines?.[0].itemId).toBe('it1');
     expect(payload.lines?.[0].quantity).toBe(4);
     expect(payload.lines?.[0].batchNo).toBe('LOT-NEAR');
+    // M190/M197 双人核对流程：发药成功后先进入完成态（按钮转为「完成」），二次点击才关闭弹窗
+    const finish = await screen.findByRole('button', { name: /完\s*成/ });
+    await waitFor(() => expect(finish).toBeEnabled());
+    fireEvent.click(finish);
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 });

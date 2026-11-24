@@ -153,7 +153,8 @@ it('新建申请：必填校验 + 提交调用 apply', async () => {
   expect(m.applyTransfusion).toHaveBeenCalledWith(
     expect.objectContaining({ visitId: 'visit-1', patientId: 'patient-1', bloodType: 'O', component: 'red_cell', unitCount: 2, indication: '重度贫血 Hb 60 g/L' }),
   );
-}, 30000);
+  // 新建申请表单含 3 个 antd Select + 多项输入，jsdom 下交互链偏长；放宽到 45s 避免慢机器边界超时
+}, 45000);
 
 it('requested：交叉配血 → 调用 crossmatch', async () => {
   await openDetail('requested');
