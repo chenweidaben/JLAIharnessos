@@ -171,6 +171,10 @@ const TRANSFUSION_REQUEST_WRITABLE = new Set([
   'cancelled_by',
   'cancelled_at',
   'cancel_reason',
+  'crossmatch_result',
+  'crossmatch_note',
+  'crossmatched_by',
+  'crossmatched_at',
 ]);
 
 export async function patchRequest(
