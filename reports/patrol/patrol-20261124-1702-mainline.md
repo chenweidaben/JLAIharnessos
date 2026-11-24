@@ -56,6 +56,7 @@
 | db/bff 目录回归 | 372 pass / 0 fail，**退出码 0** |
 | chronicDisease + oncology 真实模式复跑 | 11 pass / 0 fail，**退出码 0**，42703 清零 |
 | consult 两集成文件真实模式 | 20 pass / 27 fail；22P02=22（夹具 userId 句柄落外键），42601=0；fail 定性环境适配，非生产缺陷 |
+| integration `DEMO_MODE=0 / TEST_REAL=1` 全量 | **1357 pass / 164 fail / 0 errors**，1521 tests / 170 files，254.24s，**退出码 1**；较基线 1330/191/2 改善，42703/42601/23502(order_no) 已清零 |
 
 ## 推送与远端核对（本轮实测）
 - 推送前：三远端均 `f3e3694e`，本地领先 3、落后 0。
@@ -66,9 +67,16 @@
 - `heagentos` 远端仅承载 main，不同步 m86 分支。
 
 ## 遗留待办（如实记录，未编造通过结论）
-### 待办 ③ 真实模式 integration 191 fail 隔离归类（未完成）
-- 仅 consult 两文件已归类（27 fail = 夹具 userId 句柄落 uuid 外键，DEMO 环境适配问题）。其余 integration 文件未逐文件隔离复跑。
-- 待归类错误码：种子数据类 CHECK/FK/JSON 违规（194 category check、199/209 role_permissions FK、206 role_code check、209 invalid json、297:127 node_type check、339 room_type check ×4），以及业务状态机断言 / 409 冲突 / 权限口径。下一轮低峰逐文件隔离复跑，区分真实代码缺陷与环境/历史遗留。
+### 待办 ③ 真实模式 integration fail 隔离归类（部分完成：基线刷新 + 静态分桶，逐文件隔离下轮）
+- 本轮真实模式全量复跑（TEST_REAL=1 + DEMO_MODE=0，170 文件 / 1521 tests，254.24s，退出码 1）：**1357 pass / 164 fail / 0 errors**。较 15:50 基线（1330 pass / 191 fail / 2 errors）**+27 pass、-27 fail、errors 10→0**，本轮 consult/工单/order_no 修复见效；42703、42601、23502(order_no) 在当前基线已清零。
+- SQL 错误码静态分桶（当前日志 integ_real3.txt）：
+  - `22P02` 22 处（含 invalid input syntax 22 处）：consult 测试夹具登录态 userId 句柄（`u-flow-m86`/`u-err-m86`/`u-err-other`）落 `threads.user_id` uuid 外键，27 个 consult fail 连锁源于此，定性 **DEMO 夹具与真实 schema 不匹配**，非生产缺陷。
+  - `23503` 1 处：`lakehouse.test.ts` 后台 `[agent-runtime] background finalize failed`，`workflow_node_records.instance_id` 引用未持久化/已清理的 instance；该文件全部用例 **(pass)**，属异步后台收尾竞态噪声，不计入 164 fail。
+  - 其余约 137 fail **无 SQL 错误码**，按标题抽样归入业务大类：
+    - 医嘱/处方/质控 **状态机断言**：inpatient-care（待审核→执行中→完成/停止/驳回）、internetPrescription（审方通过/退回/驳回终态闭环）、medical-record-qc（reviewed→signed→archived 签名链、409 缺陷门禁）。
+    - **权限/职责分离/数据范围口径**：medical-record-qc 非作者重提 403、科室医生只见本科室病历；其余 403/401 多为用例内断言期望状态码，需逐文件甄别是真实鉴权缺陷还是断言口径。
+    - **业务规则判定**：bloodQuality 疗效评估（显效/部分有效/无效/缺复查无法判定）阈值与样本口径。
+- 下一轮低峰逐文件隔离复跑上述高 fail 文件（bloodQuality 13 / internetPrescription 10 / inpatient-care 9 / medical-record-qc 8 / internetDelivery 7 / transfusion 7 / p07TailLogin 6 / internetPayment 6 / paymentSelection 5…），取期望 vs 实际 diff，区分真实代码缺陷（修到转绿）与环境/历史遗留（如实归类）。基线日志：`integ_real3.txt`。
 
 ### 待办 ④ 剩余 4 个列结构漂移 DDL 文件（已完成生产契约取证；不改表结构，留架构二选一专项）
 本轮逐一对照后端仓储/聚合器/路由源码取证，四个文件均属"DDL 规划新模型/新列覆盖同名旧表，生产代码走旧结构，新模型暂无落库代码"。除 256/369 在旧表上建指向新列的索引时报 42703 外，运行时旧表被 `CREATE TABLE IF NOT EXISTS` 跳过，不构成生产读写故障；本轮不擅自改表结构（牵动外键引用链与生产仓储）。
