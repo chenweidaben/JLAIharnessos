@@ -80,7 +80,7 @@ INSERT INTO clinical.medmuse_tools (name, description, schema, risk_level) VALUE
   (
     'listFollowups',
     '列出待随访患者与随访日期（逾期优先、按日期升序）',
-    '{"type":"function","function":{"name":"listFollowups","description":"列出待随访患者与随访日期","parameters":{"type":"object","properties":{}}}}}',
+    '{"type":"function","function":{"name":"listFollowups","description":"列出待随访患者与随访日期","parameters":{"type":"object","properties":{}}}}',
     'info'
   ),
   (

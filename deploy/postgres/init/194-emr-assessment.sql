@@ -20,10 +20,10 @@ INSERT INTO clinical.emr_assessment_metrics (metric_code, metric_name, category,
   ('consent_signed', '知情同意书签署率', 'compliance', 1.0, '%'),
   ('discharge_summary_7d', '出院小结7天完成率', 'timeliness', 0.95, '%'),
   ('surgery_record_24h', '手术记录24h完成率', 'timeliness', 0.95, '%'),
-  ('medical_qc_rate', '病历质控覆盖率', 'quality', 0.90, '%'),
-  ('header_verified', '病历首页审核率', 'quality', 1.0, '%'),
+  ('medical_qc_rate', '病历质控覆盖率', 'document_quality', 0.90, '%'),
+  ('header_verified', '病历首页审核率', 'document_quality', 1.0, '%'),
   ('system_uptime', '系统可用率', 'integration', 0.995, '%'),
-  ('data_accuracy', '数据准确率', 'quality', 0.99, '%');
+  ('data_accuracy', '数据准确率', 'integration', 0.99, '%');
 
 INSERT INTO iam.permissions(code, name, module) VALUES
   ('emr_assessment:view', 'EMR评级-查看', 'emr')

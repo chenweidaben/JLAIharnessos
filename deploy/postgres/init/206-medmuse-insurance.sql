@@ -36,11 +36,11 @@ INSERT INTO clinical.medmuse_tools (name, description, schema, risk_level) VALUE
 ON CONFLICT (name) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
--- insurance_officer agent 种子（M89-F 新增岗位）
+-- finance（医保办）agent 种子（M89-F 岗位；角色码对齐 agentRegistry 白名单 finance）
 -- ---------------------------------------------------------------------------
 INSERT INTO clinical.medmuse_agents (role_code, user_id, name, system_prompt) VALUES
   (
-    'insurance_officer', NULL, '医保办智能体',
+    'finance', NULL, '医保办智能体',
     '你是健澜数智医院操作系统的医保办智能助手，负责 DRG/DIP 超支病例汇总、成本异常预警、医保政策解答。只读分析，不直接修改病例。'
   )
 ON CONFLICT (role_code) DO UPDATE

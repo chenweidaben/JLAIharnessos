@@ -88,7 +88,8 @@ INSERT INTO iam.roles (code, name, description) VALUES
   ('technician', '技师',   '检验、检查、影像执行与报告'),
   ('admin',      '管理员', '医务/质控/信息科/院级管理'),
   ('researcher', '科研人员','脱敏数据科研分析'),
-  ('patient',    '患者',   '患者端服务')
+  ('patient',    '患者',   '患者端服务'),
+  ('finance',    '财务/医保','DRG/DIP 超支只读汇总、费用与结算管理（医保办/财务岗）')
 ON CONFLICT (code) DO NOTHING;
 
 -- 权限点种子（与平台关键动作对应）
