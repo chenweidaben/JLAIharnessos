@@ -4,6 +4,7 @@
  * 前缀 /api/v1/self-scheduling：
  *  - GET  /slots?departmentId=&date=&slotType=    查号源
  *  - POST /slots/_seed                            DEMO_MODE 灌号源
+ *  - POST /slots/_reset                           DEMO_MODE 清空内存号源/预约台账（测试钩子）
  *  - POST /bookings                               患者预约
  *  - GET  /bookings?patientId=                    我的预约
  *  - POST /bookings/:bookingId/cancel             取消释放
@@ -16,6 +17,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   SlotError,
   listSlots, seedSlots, createBooking, listBookings, cancelBooking, listDepartments,
+  __resetStore,
 } from '../aggregators/selfSchedulingAggregator.js';
 
 function mapError(err: unknown): Response {
@@ -62,6 +64,20 @@ export const selfSchedulingRoutes: RouteDef[] = [
         const items = Array.isArray(b.items) ? (b.items as Array<Record<string, unknown>>) : [];
         const out = seedSlots(items as Array<{ departmentId: string; doctorId?: string; date: string; timeSlot: any; slotType: any; examType?: any; capacity: number }>);
         return json(ok({ seeded: out.length }));
+      } catch (e) { return mapError(e); }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/self-scheduling/slots/_reset',
+    auth: true,
+    handle: async (): Promise<Response> => {
+      try {
+        if (process.env.DEMO_MODE !== '1') throw new SlotError(403, '_reset 仅 DEMO_MODE 可用');
+        // 演示/测试钩子：清空内存号源与预约台账并复位序号，避免长驻演示进程跨轮次残留。
+        // 不触碰生产容量、过滤与事务语义；生产 DEMO_MODE=0 下 403 不暴露。
+        __resetStore();
+        return json(ok({ reset: true }));
       } catch (e) { return mapError(e); }
     },
   },

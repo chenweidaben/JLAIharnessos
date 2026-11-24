@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { beforeAll, describe, expect, it } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import * as crypto from 'node:crypto';
 
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
@@ -42,6 +42,14 @@ const doctor = sign(['doctor'], '医生', 'doc-ss');
 beforeAll(async () => {
   const health = await fetch(BASE+'/health');
   if (health.status!==200) throw new Error('BFF 未就绪');
+  // 长驻演示进程内存态跨轮次累积：用例前先经 DEMO 守卫 _reset 清空号源/预约台账，
+  // 保证本轮 _seed 从干净状态起，断言的固定计数不受历史残留干扰。
+  await call('POST','/api/v1/self-scheduling/slots/_reset',{token:doctor});
+});
+
+afterAll(async () => {
+  // 收尾再次清空，避免本轮产生的号源/预约残留在演示进程内存中堆积到下一轮。
+  await call('POST','/api/v1/self-scheduling/slots/_reset',{token:doctor});
 });
 
 describe('P3-3 号源池', () => {
