@@ -157,6 +157,7 @@ END $$;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS category text NOT NULL DEFAULT 'short_term'
   CHECK (category IN ('long_term','short_term'));                 -- 长期医嘱 / 临时医嘱
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reviewer_id uuid REFERENCES iam.users(id);
+ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reviewed_by text;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reviewed_at timestamptz;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS reject_reason text;
 ALTER TABLE clinical.orders ADD COLUMN IF NOT EXISTS requires_double_check boolean NOT NULL DEFAULT false;
