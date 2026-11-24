@@ -378,13 +378,23 @@ describe('KnowledgeLifecycleRegistry - 季度评审', () => {
     const registry = new KnowledgeLifecycleRegistry();
     registry.registerBase(makeBase());
     registry.submitForReview('kb-writing-001', '张主任', '科室制度台账', '内部制度检索');
-    registry.approve('kb-writing-001', '分管院长');
+    // 注入固定审批时间基准，评审到期日可按固定日历断言，避免依赖运行当日时间造成漂移
+    registry.approve('kb-writing-001', '分管院长', '2026-10-26T00:00:00.000Z');
 
     const base = registry.getBase('kb-writing-001');
     expect(base?.reviewCycleMonths).toBe(3);
     expect(base?.reviewDueAt).toBeTruthy();
     expect(registry.listReviewDue(new Date('2026-10-26T00:00:00.000Z'))).toEqual([]);
     expect(registry.listReviewDue(new Date('2027-02-01T00:00:00.000Z'))).toHaveLength(1);
+  });
+
+  it('approve 注入非法 ISO 日期应抛校验错误', () => {
+    const registry = new KnowledgeLifecycleRegistry();
+    registry.registerBase(makeBase());
+    registry.submitForReview('kb-writing-001', '张主任', '适用范围', '用途');
+    expect(() =>
+      registry.approve('kb-writing-001', '分管院长', 'not-a-date'),
+    ).toThrow(/KB-001/);
   });
 
   it('recordReview 三结论：continue 顺延、revise 退回 draft、retire 转 deprecated', () => {

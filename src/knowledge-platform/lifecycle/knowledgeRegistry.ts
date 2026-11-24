@@ -449,23 +449,31 @@ export class KnowledgeLifecycleRegistry {
     this.transition(target, 'pending_review', submitter, scopeSummary, 'approved');
   }
 
-  /** 审批通过：pending_review → approved，写 approver/approvedAt 与变更记录；知识库自动推算评审到期日 */
-  approve(id: string, approver: string): void {
+  /**
+   * 审批通过：pending_review → approved，写 approver/approvedAt 与变更记录；知识库自动推算评审到期日。
+   *
+   * @param approvedAt 可选注入的审批时间基准（ISO8601）；缺省取当前时间。注入后评审到期日
+   * （reviewDueAt = approvedAt + reviewCycleMonths）即可在测试中按固定日历断言，避免日期漂移。
+   */
+  approve(id: string, approver: string, approvedAt?: string): void {
     const target = this.resolve(id);
     if (target.record.status !== 'pending_review') {
       throw new Error(`[${KB_ERROR_INVALID_TRANSITION}] 仅 pending_review 状态可审批通过；当前为 ${target.record.status}（${transitionHint(target.record.status)}）`);
     }
-    const approvedAt = nowIso();
+    const resolvedApprovedAt = approvedAt ?? nowIso();
+    if (isNonEmptyString(resolvedApprovedAt) && Number.isNaN(Date.parse(resolvedApprovedAt))) {
+      throw new Error(`[${KB_ERROR_VALIDATION}] approvedAt 必须为合法 ISO8601 日期：${resolvedApprovedAt}`);
+    }
     target.record.approver = approver;
-    target.record.approvedAt = approvedAt;
+    target.record.approvedAt = resolvedApprovedAt;
     if (target.kind === 'base') {
-      target.record.reviewDueAt = addMonths(approvedAt, target.record.reviewCycleMonths);
+      target.record.reviewDueAt = addMonths(resolvedApprovedAt, target.record.reviewCycleMonths);
     }
     this.transition(target, 'approved', approver, `准入审批通过：${approver} 签字留痕`, 'approved');
     const trailRecord = this.trail.find((t) => t.id === id);
     if (trailRecord) {
       trailRecord.approver = approver;
-      trailRecord.approvedAt = approvedAt;
+      trailRecord.approvedAt = resolvedApprovedAt;
       trailRecord.status = 'approved';
     }
   }
