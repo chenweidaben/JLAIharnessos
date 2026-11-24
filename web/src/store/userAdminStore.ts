@@ -32,6 +32,10 @@ export const ADMIN_ROLE_OPTIONS: { code: AdminRoleCode; name: string }[] = [
   { code: 'technician', name: '技师' },
   { code: 'researcher', name: '科研人员' },
   { code: 'patient', name: '患者' },
+  { code: 'ams_officer', name: '抗菌药物管理专员' },
+  { code: 'finance', name: '财务/医保' },
+  { code: 'cashier', name: '收费员' },
+  { code: 'dept_head', name: '科主任' },
 ];
 
 interface UserAdminState {

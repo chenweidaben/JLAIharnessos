@@ -79,6 +79,8 @@ export type RoleCode =
   | 'nurse'
   | 'pharmacist'
   | 'technician'
+  | 'cashier'
+  | 'dept_head'
   | 'patient'
   | 'visitor';
 

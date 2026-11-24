@@ -3,7 +3,7 @@
  *
  * 与后端 adminUserRepo / BFF 路由对齐，真实操作 iam 表。
  * 角色 code 以 iam.roles 实际种子为准（admin/doctor/nurse/pharmacist/
- * technician/researcher/patient）。
+ * technician/researcher/patient/ams_officer/finance/cashier/dept_head）。
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
@@ -16,7 +16,11 @@ export type AdminRoleCode =
   | 'pharmacist'
   | 'technician'
   | 'researcher'
-  | 'patient';
+  | 'patient'
+  | 'ams_officer'
+  | 'finance'
+  | 'cashier'
+  | 'dept_head';
 
 /** iam.user_roles 数据范围 */
 export type AdminDataScope = 'self' | 'department' | 'hospital' | 'all';
