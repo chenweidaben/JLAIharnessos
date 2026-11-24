@@ -155,6 +155,15 @@
 |---|---|---|
 | `4cf13f16` | test(consult) | DEMO 口径集成测试在真实库口径整体跳过，消除夹具句柄 22P02 连锁 |
 | `462bddbf` | feat(qc) | 落地三级运行病历质控规则引擎、状态机与三条 M2-B 路由 |
+| `c70fcaa9` | docs(patrol) | 续轮收口 medical-qc 8 fail→0、consult 真实口径隔离跳过，补专项③实测对照 |
+
+### 推送与远端核对（本轮实测）
+- 推送前：三远端基线 `2213c5b4`，本地领先 3、落后 0。
+- 推送：origin（https）`2213c5b4..c70fcaa9`；mirror（ssh GitHub）`2213c5b4..c70fcaa9`；gitcode（ssh）与 origin 同仓，up-to-date。ssh 仅 post-quantum 密钥交换告警，不影响连通。
+- `git ls-remote` 逐字核对：
+  - LOCAL `c70fcaa91abf00c3cf740841db5af750e3238f6d`
+  - origin / gitcode / mirror 均 `c70fcaa9…`，**match=True**，三远端 **ahead=0 / behind=0**。
+- `heagentos` 远端仅承载 main，不同步 m86 分支。
 
 ## 工作区既有不入库项
 - docs 99+ 项 CRLF→LF 换行漂移（本轮 `docs/_m235_endpoints.txt`、`docs/_m235_scan.csv` 仍为历史漂移，未纳入提交）；reports/patrol 历史切片未跟踪；`.txt` 取证日志与 schema-backup 备份不入库；仅 mainline 简报按豁免命名入库。
