@@ -515,8 +515,9 @@ export class ToolExecutor {
     const timeoutMs = tool.timeout ?? context.timeoutMs ?? TOOL_EXECUTION_CONFIG.DEFAULT_TIMEOUT_MS;
 
     // 创建超时 Promise
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<never>((_, reject) => {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         const error = new Error(`Tool '${tool.name}' execution timed out after ${timeoutMs}ms`);
         error.name = 'TimeoutError';
         reject(error);
@@ -527,27 +528,37 @@ export class ToolExecutor {
     // 创建执行 Promise
     const executePromise = tool.execute(input, context);
 
-    // 如果有中断信号，创建中断 Promise
+    // 如果有中断信号，创建中断 Promise；保存 handler 以便终态后从 signal 移除。
+    let abortPromise: Promise<never> | undefined;
+    let abortHandler: (() => void) | undefined;
     if (context.signal) {
-      const abortPromise = new Promise<never>((_, reject) => {
-        context.signal!.addEventListener(
-          'abort',
-          () => {
-            reject(
-              new MedicalAgentError(
-                ErrorCodes.TOOL_INTERRUPTED,
-                `Tool '${tool.name}' execution was aborted`,
-              ),
-            );
-          },
-          { once: true },
-        );
+      abortPromise = new Promise<never>((_, rejectAbort) => {
+        abortHandler = () => {
+          rejectAbort(
+            new MedicalAgentError(
+              ErrorCodes.TOOL_INTERRUPTED,
+              `Tool '${tool.name}' execution was aborted`,
+            ),
+          );
+        };
+        context.signal!.addEventListener('abort', abortHandler, { once: true });
       });
-
-      return Promise.race([executePromise, timeoutPromise, abortPromise]);
     }
 
-    return Promise.race([executePromise, timeoutPromise]);
+    try {
+      return await (abortPromise
+        ? Promise.race([executePromise, timeoutPromise, abortPromise])
+        : Promise.race([executePromise, timeoutPromise]));
+    } finally {
+      // 无论 race 由执行成功、超时还是中断胜出，都清理超时定时器与中断监听器，
+      // 避免胜出方挂起的 timer 持有到 timeoutMs 后触发、以及监听器残留泄漏。
+      if (timer !== undefined) {
+        clearTimeout(timer);
+      }
+      if (context.signal && abortHandler) {
+        context.signal.removeEventListener('abort', abortHandler);
+      }
+    }
   }
 
   /**

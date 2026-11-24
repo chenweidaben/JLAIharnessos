@@ -158,6 +158,41 @@ describe('ToolExecutor', () => {
       // 实际审计验证在集成测试中进行
       expect(true).toBe(true);
     });
+
+    it('工具成功返回后应清理挂起的超时定时器，不残留到超时触发', async () => {
+      const tool = createTestTool('cleanup_timer_tool', 'low');
+      registry.register(tool);
+      // 配置很长的超时窗口，使定时器在工具快速返回时仍处于挂起态
+      const context = createMockContext({ config: { defaultToolTimeoutMs: 30_000 } });
+
+      const timerIds: Array<ReturnType<typeof setTimeout>> = [];
+      const clearedIds: Array<ReturnType<typeof setTimeout>> = [];
+      const origSetTimeout = globalThis.setTimeout;
+      const origClearTimeout = globalThis.clearTimeout;
+      globalThis.setTimeout = ((...args: Parameters<typeof setTimeout>) => {
+        const id = origSetTimeout(...args);
+        timerIds.push(id);
+        return id;
+      }) as typeof setTimeout;
+      globalThis.clearTimeout = ((id: ReturnType<typeof setTimeout>) => {
+        clearedIds.push(id);
+        return origClearTimeout(id);
+      }) as typeof clearTimeout;
+
+      try {
+        const result = await executor.execute('cleanup_timer_tool', {}, context);
+        expect(result.success).toBe(true);
+      } finally {
+        globalThis.setTimeout = origSetTimeout;
+        globalThis.clearTimeout = origClearTimeout;
+      }
+
+      // 本次执行创建的超时定时器必须在终态后被 clearTimeout 清理
+      expect(timerIds.length).toBeGreaterThan(0);
+      for (const id of timerIds) {
+        expect(clearedIds).toContain(id);
+      }
+    });
   });
 
   describe('executeWithConfirmation - 确认后执行', () => {
