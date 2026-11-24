@@ -16,6 +16,16 @@
 
 import { describe, expect, it } from 'bun:test';
 
+/**
+ * 本文件为 DEMO 进程内仓储口径：夹具用户为非 uuid 句柄（u-flow-m86）、无种子外键用户，
+ * 不连真实库。真实库口径（TEST_REAL=1 + DEMO_MODE=0）下 consult 仓储走 Postgres 实现，
+ * 句柄落 consult.threads.user_id（uuid FK→iam.users）会触发 22P02，正向落库断言亦无种子
+ * 夹具支撑，故在真实库口径下整体跳过；Pg 仓储方法由 tests/unit/consult-agent/consultAgentRepo.test.ts
+ * 以 mock db 覆盖。真实库持久化链路不在本文件范围。
+ */
+const realMode = process.env.DEMO_MODE !== '1';
+const D = describe.skipIf(realMode);
+
 import { newCtx } from '../../../src/bff/middleware/auth.js';
 import { CONSULT_AGENT_PERMISSIONS } from '../../../src/bff/permissions.js';
 import { consultAgentRoutes } from '../../../src/bff/routes/consultAgentRoutes.js';
@@ -153,7 +163,7 @@ function parseSseFrames(raw: string): ParsedFrame[] {
 // E2E 主链路（用例按会话推进顺序执行，共享闭包线程 ID）
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 集成 E2E 主链路（DEMO 进程内仓储）', () => {
+D('consult-agent 集成 E2E 主链路（DEMO 进程内仓储）', () => {
   let doctorThreadId = '';
   let acuteThreadId = '';
   let pharmacistThreadId = '';

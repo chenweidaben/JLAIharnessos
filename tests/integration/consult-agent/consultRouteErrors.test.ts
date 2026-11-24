@@ -28,6 +28,16 @@
 
 import { describe, expect, it } from 'bun:test';
 
+/**
+ * 本文件为 DEMO 进程内仓储口径：夹具用户为非 uuid 句柄（u-err-m86 / u-err-other）、无种子
+ * 外键用户，不连真实库。真实库口径（TEST_REAL=1 + DEMO_MODE=0）下 consult 仓储走 Postgres
+ * 实现，句柄落 consult.threads.user_id（uuid FK→iam.users）触发 22P02，归属隔离等正向落库
+ * 断言亦无种子夹具支撑，故在真实库口径下整体跳过；Pg 仓储方法由
+ * tests/unit/consult-agent/consultAgentRepo.test.ts 以 mock db 覆盖。真实库持久化链路不在本文件范围。
+ */
+const realMode = process.env.DEMO_MODE !== '1';
+const D = describe.skipIf(realMode);
+
 import { newCtx } from '../../../src/bff/middleware/auth.js';
 import { CONSULT_AGENT_PERMISSIONS } from '../../../src/bff/permissions.js';
 import { consultAgentRoutes } from '../../../src/bff/routes/consultAgentRoutes.js';
@@ -223,7 +233,7 @@ function assertDraftRedLines(draft: ConsultDraft): void {
 // 1. 入参校验 400：schema 反例在权限闸之后被拒（非 401 / 403）
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403）', () => {
+D('consult-agent 错误分支 · 入参校验 400（权限闸之后，非 401/403）', () => {
   it('threadCreateSchema：标题超 120 字符 → 400 / 40000，拒绝后不落库', async () => {
     const before = await sharedRepo.listThreads(ERROR_USER_ID);
     const r = await call('POST', '/api/v1/consult-agent/threads', { title: '长'.repeat(121) });
@@ -336,7 +346,7 @@ describe('consult-agent 错误分支 · 入参校验 400（权限闸之后，非
 // 2. 404：线程不存在与归属隔离
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 错误分支 · 404 线程不存在与归属隔离', () => {
+D('consult-agent 错误分支 · 404 线程不存在与归属隔离', () => {
   const MISSING_THREAD_ID = 'thread-err-missing-0001';
 
   const threadScopedCases: {
@@ -444,7 +454,7 @@ describe('consult-agent 错误分支 · 404 线程不存在与归属隔离', () 
 // 3. 创建会话编排分支：首条消息走完编排，返回 thread / messages / draft
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 创建会话编排分支（首条消息走编排，返回 thread/messages/draft）', () => {
+D('consult-agent 创建会话编排分支（首条消息走编排，返回 thread/messages/draft）', () => {
   it('无 initialMessage：返回 idle 线程与空消息列表', async () => {
     const r = await call('POST', '/api/v1/consult-agent/threads', { title: '无首条消息会话' });
     expect(r.status).toBe(200);
@@ -513,7 +523,7 @@ describe('consult-agent 创建会话编排分支（首条消息走编排，返�
 // 4. 409 终态冲突（补既有未覆盖写端点）与流式成功路径
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径', () => {
+D('consult-agent 终态 409 冲突（补既有未覆盖写端点）与流式成功路径', () => {
   it('流式问诊成功路径：200 SSE，帧序列完整，草稿红线成立', async () => {
     const threadId = await saveThread(seedThread());
     const r = await call('POST', `/api/v1/consult-agent/threads/${threadId}/stream`, {
@@ -605,7 +615,7 @@ describe('consult-agent 终态 409 冲突（补既有未覆盖写端点）与流
 // 5. mapConsultError 映射：404 / 409 / 500 分支与 500 脱敏
 // ---------------------------------------------------------------------------
 
-describe('consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 不回显堆栈', () => {
+D('consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 不回显堆栈', () => {
   it('THREAD_NOT_FOUND → 404 / 40400，固定文案，traceId 透传', async () => {
     const r = await call('POST', '/api/v1/consult-agent/threads/thread-err-map-404/messages', {
       content: '探针消息',
@@ -673,7 +683,7 @@ describe('consult-agent mapConsultError 映射：404 / 409 / 500 分支与 500 �
 // 6. 审计落痕与脱敏：字段齐全 / 工具审计白名单 / 无原始入参明文
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 / 无原始入参明文）', () => {
+D('consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 / 无原始入参明文）', () => {
   it('常规问诊：actorRole / traceId / action / threadId 齐全，工具审计字段白名单', async () => {
     const threadId = await saveThread(seedThread());
     const rawPhrase = '探针脱敏专项短语蓝孔雀7319';
@@ -745,7 +755,7 @@ describe('consult-agent 审计落痕与脱敏（字段齐全 / 工具白名单 /
 // 7. 急症旁路互补场景：草稿端点为空 / 回放无草稿帧 / READ 端点可用
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 急症旁路互补场景（草稿端点为空 / 回放无草稿帧 / READ 端点可用）', () => {
+D('consult-agent 急症旁路互补场景（草稿端点为空 / 回放无草稿帧 / READ 端点可用）', () => {
   let acuteThreadId = '';
 
   it('急症线程：草稿查询两端均返回 null，持久化无草稿', async () => {
@@ -828,7 +838,7 @@ describe('consult-agent 急症旁路互补场景（草稿端点为空 / 回放�
 // 8. 草稿红线（路由响应层：发送消息响应与草稿查询响应）
 // ---------------------------------------------------------------------------
 
-describe('consult-agent 草稿红线（路由响应层）', () => {
+D('consult-agent 草稿红线（路由响应层）', () => {
   it('医师诊断草稿：响应与查询两端红线三字段成立，kind=diagnosis', async () => {
     const created = await call('POST', '/api/v1/consult-agent/threads', {});
     const threadId = (created.data as { thread: ConsultThread }).thread.id;
