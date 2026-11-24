@@ -249,6 +249,10 @@ const SESSION_WRITABLE = new Set([
   'last_visit_id',
   'last_visit_at',
   'eligibility_passed',
+  'cancel_reason',
+  'cancelled_at',
+  'accepted_at',
+  'completed_at',
 ]);
 
 export async function advanceSession(
