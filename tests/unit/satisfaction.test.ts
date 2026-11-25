@@ -2,12 +2,13 @@
  * 健澜科技 jlmedaios - 满意度纯函数测试（M63-A + M141-B）
  * Copyright (c) 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
   departmentRanking, dimensionAverage, lowDimension, type SurveyRow,
 } from '../../src/medical-tools/nursing/satisfaction.js';
 // M141-B 匿名患者满意度调查（患者敢说真话）
 import {
+  __resetStore,
   SATISFACTION_DIMENSIONS,
   analyzeSatisfaction,
   createSurvey,
@@ -15,6 +16,8 @@ import {
   submitAnonymousSurvey,
   type SatisfactionDimensionKey,
 } from '../../src/bff/aggregators/satisfactionAggregator';
+
+beforeEach(() => __resetStore());
 
 describe('dimensionAverage', () => {
   it('四维度均分', () => {

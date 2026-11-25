@@ -13,8 +13,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   buildDeepPartyCulture,
   evaluateMedicalEthics,
   organizePartyActivity,
@@ -23,6 +24,8 @@ import {
 } from '../../src/bff/aggregators/partyCultureAggregator';
 
 const HOST = 'bbbb-0000-0000-0000-000000000001';
+
+beforeEach(() => __resetStore());
 
 describe('organizePartyActivity 党建活动组织（反形式主义）', () => {
   it('务实达标：议程充实、应到≥3、有落地事项 → organized，校验全过', () => {

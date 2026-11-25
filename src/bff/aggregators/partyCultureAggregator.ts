@@ -560,3 +560,11 @@ export function listCultureEvents(): TrackedCultureEvent[] {
   out.sort((x, z) => z.eventDate.localeCompare(x.eventDate));
   return out;
 }
+
+/** 测试专用：清空内存党建文化 / 医德台账（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  activityLedger.clear();
+  cultureEventLedger.clear();
+  ethicsEvidenceLedger.clear();
+  ethicsResultLedger.clear();
+}

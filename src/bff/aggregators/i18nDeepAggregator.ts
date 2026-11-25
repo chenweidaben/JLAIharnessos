@@ -769,3 +769,8 @@ export function getDeepBundle(locale: string): Record<string, string> {
   for (const [k, v] of map.entries()) out[k] = v;
   return out;
 }
+
+/** 测试专用：清空内存深切片字典（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  registry.clear();
+}

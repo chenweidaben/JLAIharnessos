@@ -12,8 +12,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   approveStep,
   createApproval,
   listApprovals,
@@ -25,6 +26,8 @@ const APPLICANT = 'aaaaaaaa-0000-0000-0000-000000000001';
 const DIRECTOR = 'bbbbbbbb-0000-0000-0000-000000000002'; // 科室主任
 const VP = 'cccccccc-0000-0000-0000-000000000003'; // 分管院长
 const HR = 'dddddddd-0000-0000-0000-000000000004'; // 人事/财务
+
+beforeEach(() => __resetStore());
 
 describe('createApproval', () => {
   it('组包：返回带 id 的审批单，三级节点铺底、起始 pending、currentStep=0', () => {

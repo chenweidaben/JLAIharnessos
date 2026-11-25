@@ -294,3 +294,8 @@ export async function persistApproval(approval: Approval): Promise<void> {
     // 断库 / 表未迁移：进程内台账仍可用，落库留待重连后补写
   }
 }
+
+/** 测试专用：清空内存审批台账（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  ledger.clear();
+}

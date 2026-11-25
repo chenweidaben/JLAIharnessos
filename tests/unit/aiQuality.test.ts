@@ -6,9 +6,10 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 
 import {
+  __resetStore,
   aiQualityCheck,
   generateQualityReport,
   getQualityLearningRegistry,
@@ -28,6 +29,8 @@ const perfectRecord: RecordContent = {
   dueAt: '2026-10-16T18:00:00+08:00',
   dept: '内科',
 };
+
+beforeEach(() => __resetStore());
 
 describe('M144-D 六项全达标', () => {
   it('要素齐全：满分 100、passed、零 issue', () => {

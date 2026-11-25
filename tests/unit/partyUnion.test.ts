@@ -13,8 +13,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   PARTY_ACTIVITY_TYPES,
   getAnnualActivityReport,
   registerPartyActivity,
@@ -23,6 +24,8 @@ import {
 
 const ORG = 'aaaaaaaa-0000-0000-0000-000000000001';
 const YEAR = 2099; // 远未来年份：年度报告断言不受其他用例台账干扰
+
+beforeEach(() => __resetStore());
 
 describe('registerPartyActivity 活动登记', () => {
   it('组包：返回带 id 的活动，类型/标题/日期/地点原样留痕', () => {
@@ -105,6 +108,10 @@ describe('getAnnualActivityReport 年度报告', () => {
   });
 
   it('按月分布：4 月主题党日计入 monthly[3]，6 月志愿服务计入 monthly[5]', () => {
+    // 用例自装配：与年份切片用例同源的两场 2099 活动；beforeEach 重置后不依赖前序用例残留
+    registerPartyActivity('主题党日', '秋祭英烈主题党日', ORG, '2099-04-05', '烈士陵园', ['赵一', '赵二']);
+    registerPartyActivity('志愿服务', '社区义诊志愿服务', ORG, '2099-06-18', '幸福社区', ['钱一', '钱二', '钱三']);
+
     const rep = getAnnualActivityReport(YEAR);
     expect(rep.monthly).toHaveLength(12);
     expect(rep.monthly[3]).toBeGreaterThanOrEqual(1); // 4 月

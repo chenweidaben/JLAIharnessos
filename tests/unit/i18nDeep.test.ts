@@ -20,8 +20,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   autoTranslateBatch,
   checkTranslationCompleteness,
   DEEP_DEFAULT_LOCALE,
@@ -29,6 +30,8 @@ import {
   getI18nTranslation,
   listDeepKeys,
 } from '../../src/bff/aggregators/i18nDeepAggregator';
+
+beforeEach(() => __resetStore());
 
 describe('getI18nTranslation（翻译查询）', () => {
   it('命中 en-US 专业医学术语（杜绝机翻腔）', () => {

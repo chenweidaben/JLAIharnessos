@@ -362,6 +362,11 @@ export function getQualityLearningRegistry(): QualityFeedbackEntry[] {
   return [...feedbackRegistry.values()];
 }
 
+/** 测试专用：清空内存学习注册表（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  feedbackRegistry.clear();
+}
+
 /* --------------------- 异步视图包装（鉴权 + 持久化） --------------------- */
 
 /** 触发一次 AI 质控审核：鉴权 → 纯函数判定 → 结果留痕 */

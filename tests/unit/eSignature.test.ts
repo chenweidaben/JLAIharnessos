@@ -11,8 +11,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   createSignature,
   getDocumentSignatures,
   verifySignature,
@@ -21,6 +22,8 @@ import {
 
 const STAFF = '11111111-1111-1111-1111-111111111111';
 const INK = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==';
+
+beforeEach(() => __resetStore());
 
 describe('createSignature', () => {
   it('组包并封存：返回带 id / contentHash 的签名，三要素齐全', () => {

@@ -673,3 +673,8 @@ export function generateImprovementSuggestions(
   }
   return out;
 }
+
+/** 测试专用：清空内存匿名问卷台账（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  anonymousLedger.clear();
+}

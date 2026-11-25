@@ -327,3 +327,8 @@ export class SmartFollowupError extends Error {
     this.name = 'SmartFollowupError';
   }
 }
+
+/** 测试专用：清空内存授权注册表（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  consentStore.clear();
+}

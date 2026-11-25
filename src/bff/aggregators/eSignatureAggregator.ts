@@ -207,3 +207,8 @@ export async function persistSignature(sig: Signature): Promise<void> {
     // 断库 / 表未迁移：进程内台账仍可验签与历史查询，电子证据落库留待重连后补写
   }
 }
+
+/** 测试专用：清空内存签名台账（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  ledger.clear();
+}

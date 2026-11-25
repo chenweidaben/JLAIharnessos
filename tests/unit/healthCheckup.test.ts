@@ -7,14 +7,17 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   CheckupError,
   CHECKUP_PACKAGES,
   createCheckupOrder,
   generateCheckupReport,
   recordCheckupResult,
 } from '../../src/bff/aggregators/healthCheckupAggregator.js';
+
+beforeEach(() => __resetStore());
 
 describe('M142-A 体检开单 createCheckupOrder', () => {
   it('合法套餐 + 项目清单，返回带 id 的体检单', () => {

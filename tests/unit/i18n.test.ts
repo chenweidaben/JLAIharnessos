@@ -11,8 +11,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   autoTranslate,
   DEFAULT_LOCALE,
   getMissingTranslations,
@@ -25,6 +26,8 @@ import {
 } from '../../src/bff/aggregators/i18nAggregator';
 
 // 每个用例使用独立的命名空间 key，避免与内置字典互相污染
+beforeEach(() => __resetStore());
+
 describe('translate（翻译查询）', () => {
   it('命中目标语言文案', () => {
     expect(translate('nav.dashboard', 'zh-CN')).toBe('工作台');

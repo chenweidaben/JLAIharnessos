@@ -10,8 +10,9 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { describe, expect, it } from 'bun:test';
+import { beforeEach, describe, expect, it } from 'bun:test';
 import {
+  __resetStore,
   baseRowCount,
   buildDataMart,
   buildPreview,
@@ -22,6 +23,8 @@ import {
   refreshDataMart,
   seedDataMarts,
 } from '../../src/bff/aggregators/dataMartAggregator';
+
+beforeEach(() => __resetStore());
 
 describe('buildDataMart（集市构建）', () => {
   it('按入参构建集市，字段对齐、初始行数非零、状态 ready', () => {

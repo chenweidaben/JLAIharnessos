@@ -313,3 +313,8 @@ export function seedDataMarts(): DataMart[] {
   ];
   return seeds.map(([name, src, freq]) => (registry.has(name) ? { ...registry.get(name)! } : buildDataMart(name, src, freq)));
 }
+
+/** 测试专用：清空内存集市目录（不影响已落库记录；生产写路径不调用） */
+export function __resetStore(): void {
+  registry.clear();
+}

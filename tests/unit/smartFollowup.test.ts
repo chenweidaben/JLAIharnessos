@@ -12,6 +12,7 @@
 
 import { describe, expect, it, beforeEach } from 'bun:test';
 import {
+  __resetStore,
   generateFollowupPlan,
   predictRehospitalizationRisk,
   sendAutoFollowup,
@@ -23,6 +24,8 @@ import {
 
 // 每个用例前清空授权注册表，避免用例间污染
 beforeEach(() => {
+  // 测试专用：清空模块级授权注册表（全量重置，覆盖已知与未知 patientId）
+  __resetStore();
   // 逐一 revoke 已知 patientId（注册表为模块级，测试之间隔离）
   revokeAutoFollowupConsent('pat-0001');
   revokeAutoFollowupConsent('pat-0002');
