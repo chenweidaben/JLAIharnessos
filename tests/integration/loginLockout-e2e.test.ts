@@ -9,7 +9,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-import { beforeAll, describe, expect, it } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import * as crypto from 'node:crypto';
 
 const BASE = process.env.BFF_BASE_URL ?? 'http://127.0.0.1:8080';
@@ -91,4 +91,23 @@ describe('P4-3 IP 防爆破（429）', () => {
     }
     expect(saw429).toBe(true);
   });
+});
+
+// 选项 A：测试侧 afterAll 复用现有 admin /rate-limit/unlock，回收本轮 IP 登录桶与残留账号桶。
+// 长驻 8080 为独立进程，进程内 reset 钩子跨进程不可达；经 HTTP 调既有 admin 路由解锁，
+// 不新增生产端点、不放松生产限流阈值。解锁失败仅静默记录，不掩盖主用例断言结果。
+afterAll(async () => {
+  try {
+    const status = await call('GET', '/api/v1/rate-limit/status', { token: admin });
+    const items: Array<{ type: string; key: string }> = status.data?.items ?? [];
+    for (const it of items) {
+      if (it.type === 'ip-login') {
+        await call('POST', '/api/v1/rate-limit/unlock', { token: admin, body: { key: it.key, type: 'ip' } });
+      } else if (it.type === 'account') {
+        await call('POST', '/api/v1/rate-limit/unlock', { token: admin, body: { key: it.key, type: 'account' } });
+      }
+    }
+  } catch {
+    // 清理钩子失败不抛错，避免掩盖主用例结果
+  }
 });
