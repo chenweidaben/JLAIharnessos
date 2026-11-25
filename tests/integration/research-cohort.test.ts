@@ -17,7 +17,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -137,6 +137,7 @@ afterAll(async () => {
     await db`DELETE FROM clinical.visits WHERE id = ANY(${visitIds})`;
     await db`DELETE FROM clinical.patients WHERE id = ANY(${patientIds})`;
   }
+  await closeDbForTest();
 });
 
 describe.skipIf(!dbAvailable || !realMode)('M5-B 科研专病队列（真实 PostgreSQL）', () => {

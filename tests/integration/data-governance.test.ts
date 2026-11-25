@@ -16,7 +16,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -85,6 +85,7 @@ afterAll(async () => {
       AND column_name = 'blood_type' AND source = 'manual'
   `;
   await scanClassification(admin);
+  await closeDbForTest();
 });
 
 if (!dbAvailable) {

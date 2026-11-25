@@ -17,7 +17,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import { getUserByUsername, getUserRoleLinks } from '../../src/db/repositories/userRepo.js';
 import {
@@ -144,6 +144,7 @@ afterAll(async () => {
   await db`DELETE FROM clinical.patient_profiles WHERE account_id IN ${db(accountIds)}`;
   await db`DELETE FROM clinical.patient_accounts WHERE id IN ${db(accountIds)}`;
   if (patientIds.length) await db`DELETE FROM clinical.patients WHERE id IN ${db(patientIds)}`;
+  await closeDbForTest();
 });
 
 /* ============================ 聚合器层 ============================ */

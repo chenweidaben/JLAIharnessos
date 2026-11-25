@@ -20,7 +20,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, verifyDbConnection } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -153,6 +153,7 @@ afterAll(async () => {
   } catch {
     /* 已删除则忽略 */
   }
+  await closeDbForTest();
 });
 
 describe.skipIf(!dbAvailable || !realMode)('M4-D 人工在环（真实 PostgreSQL）', () => {

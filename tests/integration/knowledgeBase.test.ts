@@ -16,7 +16,7 @@
 
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -93,6 +93,7 @@ afterAll(async () => {
     /* 已删除则忽略 */
   }
   setEmbeddingServiceForTest(null);
+  await closeDbForTest();
 });
 
 describe.skipIf(!dbAvailable || !realMode)('M4-A 知识库管理与 RAG 检索（真实 PostgreSQL）', () => {

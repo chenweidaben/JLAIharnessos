@@ -17,7 +17,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { verifyDbConnection, getDb, type DbExecutor } from '../../src/db/pool.js';
+import { closeDbForTest, verifyDbConnection, getDb, type DbExecutor } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -63,6 +63,7 @@ afterAll(async () => {
   if (createdIds.length > 0) {
     await sql`DELETE FROM iam.tenants WHERE id = ANY(${createdIds})`;
   }
+  await closeDbForTest();
 });
 
 describe.skipIf(!dbAvailable || !realMode)('M5-A 多租户持久化（真实 PostgreSQL）', () => {

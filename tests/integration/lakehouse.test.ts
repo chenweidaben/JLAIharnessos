@@ -17,7 +17,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { verifyDbConnection, getDb } from '../../src/db/pool.js';
+import { closeDbForTest, verifyDbConnection, getDb } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   getUserByUsername,
@@ -62,6 +62,7 @@ if (dbAvailable) {
 afterAll(async () => {
   if (!dbAvailable) return;
   // 恢复测试中被更新的 visit（见增量捕获用例）
+  await closeDbForTest();
 });
 
 if (!dbAvailable) {

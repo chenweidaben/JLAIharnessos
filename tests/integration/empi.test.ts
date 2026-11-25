@@ -92,7 +92,7 @@ function samePair(
 
 afterAll(async () => {
   if (!dbAvailable) return;
-  const { getDb } = await import('../../src/db/pool.js');
+  const { getDb, closeDbForTest } = await import('../../src/db/pool.js');
   const db = getDb();
   for (const id of patientIds) {
     await db`DELETE FROM clinical.patients WHERE id = ${id}`;
@@ -101,6 +101,7 @@ afterAll(async () => {
   // 本测试是唯一调用 runEmpiScan 的地方，故在此清空候选表，避免跨运行累积
   // （empi_links 已随患者 CASCADE 删除，无候选被链接引用）。
   await db`DELETE FROM clinical.empi_match_candidates`;
+  await closeDbForTest();
 });
 
 if (!dbAvailable) {

@@ -16,7 +16,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import { getUserByUsername, getUserRoleLinks } from '../../src/db/repositories/userRepo.js';
 import {
@@ -281,4 +281,5 @@ afterAll(async () => {
   if (accountIds.length) {
     await db`DELETE FROM clinical.patient_accounts WHERE id = ANY(${accountIds})`;
   }
+  await closeDbForTest();
 });
