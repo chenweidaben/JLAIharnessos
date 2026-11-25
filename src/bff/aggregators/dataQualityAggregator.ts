@@ -47,7 +47,7 @@ export interface DataQualityRule {
   /** 达标阈值（百分比 0..100）；完整性默认 95 */
   threshold?: number;
   /** 【准确性】允许的值域（白名单）；给出后非白名单值视为失败 */
-  domain?: ReadonlyArray<unknown>;
+  domain?: readonly unknown[];
   /** 【准确性】格式正则；给出后不匹配的字符串值视为失败 */
   formatRegex?: RegExp;
   /** 【一致性】被引用表的数据行（路由层把被引用表行取出注入） */
@@ -236,12 +236,12 @@ export function checkDataQuality(
         const v = row[field];
         let ok = !isBlank(v);
         if (ok && hasDomain) {
-          ok = (rule.domain as ReadonlyArray<unknown>).some(
+          ok = (rule.domain!).some(
             (allowed) => String(allowed) === String(v),
           );
         }
         if (ok && hasFormat && typeof v === 'string') {
-          ok = (rule.formatRegex as RegExp).test(v);
+          ok = (rule.formatRegex!).test(v);
         }
         if (ok) passed += 1;
         else failedValues.push(sampleOf(v));
@@ -348,7 +348,7 @@ export interface ReportOptions {
   /** 完整性阈值（默认 95） */
   completenessThreshold?: number;
   /** 准确性值域白名单 */
-  accuracyDomain?: ReadonlyArray<unknown>;
+  accuracyDomain?: readonly unknown[];
   /** 准确性格式正则 */
   accuracyRegex?: RegExp;
   /** 可注入时钟（测试用） */
@@ -507,7 +507,7 @@ export function identifyDataIssues(
   const now = options.now ?? new Date();
   const results: QualityResult[] = [];
 
-  const perDimension: Array<Omit<DataQualityRule, 'rows' | 'dimension'> & { dimension: QualityDimension }> = [
+  const perDimension: (Omit<DataQualityRule, 'rows' | 'dimension'> & { dimension: QualityDimension })[] = [
     { dimension: 'completeness', threshold: options.completenessThreshold ?? 95 },
     { dimension: 'uniqueness', pkField: options.pkField ?? field },
     { dimension: 'accuracy', domain: options.accuracyDomain, formatRegex: options.accuracyRegex },
@@ -517,7 +517,7 @@ export function identifyDataIssues(
 
   for (const extra of perDimension) {
     results.push(
-      checkDataQuality(table, field, { ...extra, rows } as DataQualityRule),
+      checkDataQuality(table, field, { ...extra, rows }),
     );
   }
   return identifyDataIssuesInternal(table, results);

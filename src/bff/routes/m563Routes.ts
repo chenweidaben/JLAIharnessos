@@ -107,7 +107,7 @@ async function handleAmsCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, prescriptionId, drugName, drugCategory, reviewResult, reviewComment, reviewer, deptCode } = body as Record<string, unknown>;
+  const { patientId, prescriptionId, drugName, drugCategory, reviewResult, reviewComment, reviewer, deptCode } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

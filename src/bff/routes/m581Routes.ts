@@ -50,8 +50,8 @@ function seedIcu(): void {
   const iso = (offsetMin: number): string => new Date(now - offsetMin * 60_000).toISOString();
 
   const patients = [
-    { pid: 'P-ICU-001', bed: 'ICU-01', gcs: { eye: 4, verbal: 3, motor: 5 }, urine: 1500, drugs: [{ drug: 'NE', rate: 0.2 } as VasoactiveDrug] },
-    { pid: 'P-ICU-002', bed: 'ICU-02', gcs: { eye: 3, verbal: 2, motor: 4 }, urine: 800, drugs: [{ drug: 'DA', rate: 5 } as VasoactiveDrug, { drug: 'NE', rate: 0.1 } as VasoactiveDrug] },
+    { pid: 'P-ICU-001', bed: 'ICU-01', gcs: { eye: 4, verbal: 3, motor: 5 }, urine: 1500, drugs: [{ drug: 'NE', rate: 0.2 }] },
+    { pid: 'P-ICU-002', bed: 'ICU-02', gcs: { eye: 3, verbal: 2, motor: 4 }, urine: 800, drugs: [{ drug: 'DA', rate: 5 }, { drug: 'NE', rate: 0.1 }] },
     { pid: 'P-ICU-003', bed: 'ICU-03', gcs: { eye: 2, verbal: 1, motor: 3 }, urine: 400, drugs: [] as VasoactiveDrug[] },
   ];
 
@@ -119,7 +119,7 @@ async function handleIcuCreate(c: Ctx): Promise<Response> {
 
   const {
     patientId, bedNo, recordTime, gcsScore, vitals, ventilatorMode, vasoactiveDrugs, urineOutput24h, recordedBy,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

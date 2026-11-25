@@ -100,7 +100,7 @@ export interface GapReport {
   /** 整体灯：任一红=红，否则任一黄=黄，否则绿 */
   overall: 'green' | 'yellow' | 'red';
   /** 按类别统计 */
-  byCategory: Array<{
+  byCategory: {
     category: ReviewCategory;
     categoryName: string;
     total: number;
@@ -109,13 +109,13 @@ export interface GapReport {
     unmet: number;
     /** 该类别已达标率 % */
     rate: number;
-  }>;
+  }[];
   /** 差距项（未达标优先，其次待改进；同状态按优先级高→低） */
   gaps: GapItem[];
 }
 
 /** 七大类元数据（顺序即评审手册章节顺序） */
-export const REVIEW_CATEGORIES: Array<{ key: ReviewCategory; name: string }> = [
+export const REVIEW_CATEGORIES: { key: ReviewCategory; name: string }[] = [
   { key: 'hospital_function', name: '医院功能与任务' },
   { key: 'medical_quality', name: '医疗质量安全管理' },
   { key: 'nursing_quality', name: '护理质量管理' },

@@ -169,7 +169,7 @@ function isAssessStatus(v: unknown): v is AssessStatus {
 }
 
 function isAssessDomain(v: unknown): v is AssessDomain {
-  return typeof v === 'string' && (Object.keys(DOMAIN_LABEL) as string[]).includes(v);
+  return typeof v === 'string' && (Object.keys(DOMAIN_LABEL)).includes(v);
 }
 
 function recomputeSummary() {
@@ -222,7 +222,7 @@ export const cryptoAssessCnRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       const { itemId } = c.params;
       if (!itemId) return json(fail(ErrorCode.BAD_REQUEST, 'itemId 必填'), 400);
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const { status, evidence } = body as { status?: unknown; evidence?: unknown };
       if (!isAssessStatus(status)) {
         return json(

@@ -355,7 +355,7 @@ export interface RouteOptimizationResult {
  * @param vehicles 可用车辆 / 配送人
  */
 export function optimizeLogisticsRoute(
-  tasks: Array<Omit<LogisticsTask, 'priority' | 'dueMinute' | 'requiredSkills' | 'dietaryRestrictions'>> & Partial<Point>,
+  tasks: Omit<LogisticsTask, 'priority' | 'dueMinute' | 'requiredSkills' | 'dietaryRestrictions'>[] & Partial<Point>,
   vehicles: Vehicle[],
 ): RouteOptimizationResult {
   const routes: VehicleRoute[] = vehicles.map((v) => ({

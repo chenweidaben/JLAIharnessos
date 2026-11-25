@@ -916,7 +916,7 @@ export function trackNurseGrowth(
 
 /** 月度分桶：start 月 → end 月逐月预生成，周期内经验累加到对应月 */
 function buildGrowthMonthly(
-  items: Array<{ e: NurseExperience; ms: number }>,
+  items: { e: NurseExperience; ms: number }[],
   startMs: number,
   endMs: number,
 ): NurseGrowthPoint[] {

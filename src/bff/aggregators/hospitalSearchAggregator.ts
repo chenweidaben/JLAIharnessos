@@ -27,7 +27,7 @@ export interface HospitalSearchResult extends HospitalKnowledgeEntry {
   /** 命中分：标题命中 +5，正文命中 +2；无关键词浏览时为 0 */
   score: number;
   /** 命中字段标记（title / content），无关键词浏览时为空数组 */
-  matched: Array<'title' | 'content'>;
+  matched: ('title' | 'content')[];
 }
 
 /** 检索响应信封 */
@@ -94,7 +94,7 @@ export function searchHospitalKnowledge(
     const title = entry.title.toLowerCase();
     const content = entry.content.toLowerCase();
     const terms = q.split(/\s+/).filter(Boolean);
-    const matched: Array<'title' | 'content'> = [];
+    const matched: ('title' | 'content')[] = [];
     let score = 0;
     let allHit = true;
 

@@ -49,7 +49,7 @@ const enrStore = new Map<string, EnrollRecord>();
 let enrSeq = 0;
 
 function seedPaths(): void {
-  const rows: Array<Omit<PathRecord, 'id'>> = [
+  const rows: Omit<PathRecord, 'id'>[] = [
     { diseaseCode: 'K35', diseaseName: '急性阑尾炎', deptCode: 'surgery', expectedDays: 7, stages: [...STAGES] },
     { diseaseCode: 'I21', diseaseName: '急性 ST 段抬高心梗', deptCode: 'cardiology', expectedDays: 10, stages: [...STAGES] },
     { diseaseCode: 'J18', diseaseName: '社区获得性肺炎', deptCode: 'internal', expectedDays: 8, stages: [...STAGES] },

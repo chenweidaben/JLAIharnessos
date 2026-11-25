@@ -31,7 +31,7 @@ interface DailyRow {
 }
 
 const DEPTS = ['internal', 'surgery', 'pediatrics', 'obstetrics', 'gynecology', 'orthopedics', 'dermatology', 'ent'];
-const SLOTS: Array<'8-11' | '11-14' | '14-17'> = ['8-11', '11-14', '14-17'];
+const SLOTS: ('8-11' | '11-14' | '14-17')[] = ['8-11', '11-14', '14-17'];
 
 function seedDaily(): DailyRow[] {
   const rows: DailyRow[] = [];

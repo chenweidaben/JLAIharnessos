@@ -48,15 +48,15 @@ export const guideDxRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = await c.body<GuideDxBody>().catch(() => ({} as GuideDxBody));
+        const body = await c.body<GuideDxBody>().catch((): GuideDxBody => ({}));
         const mode = body?.mode ?? 'diagnose';
 
         if (mode === 'diagnose') {
           const symptoms = Array.isArray(body?.symptoms) ? body.symptoms : [];
           const result = guideBasedDiagnosis(
             symptoms,
-            (body?.history ?? {}) as GuideHistoryInput,
-            (body?.labResults ?? {}) as GuideLabResults,
+            (body?.history ?? {}),
+            (body?.labResults ?? {}),
           );
           return json(ok(result));
         }
@@ -64,7 +64,7 @@ export const guideDxRoutes: RouteDef[] = [
         if (mode === 'treatment') {
           const diagnosis = (body?.diagnosis ?? '').trim();
           if (!diagnosis) return json(fail(ErrorCode.BAD_REQUEST, 'treatment 模式需提供 diagnosis'), 400);
-          return json(ok(checkTreatmentGuideline(diagnosis, (body?.treatment ?? {}) as TreatmentPlan)));
+          return json(ok(checkTreatmentGuideline(diagnosis, (body?.treatment ?? {}))));
         }
 
         if (mode === 'suggestion') {

@@ -186,7 +186,7 @@ async function handleFallEvent(c: Ctx): Promise<Response> {
   rec.fallEvent = {
     fallTime: fallTime.trim(),
     location: location.trim(),
-    injuryType: injuryType as InjuryType,
+    injuryType: injuryType,
     bodyPart: bodyPart.trim(),
   };
   return json(ok(rec), 200);

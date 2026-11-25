@@ -17,7 +17,7 @@ export interface BudgetBasis {
 
 /** 决定预算基准与金额：DIP 落组 → score×pointValue；否则 DRG 预算；无 selection → 默认 drg 0。 */
 export function resolveBudgetBasis(sel: SelectionInfo | null): BudgetBasis {
-  if (!sel || sel.selectedPath == null) return { basis: 'drg', budget: Number(sel?.drgExpectedPayment ?? 0) };
+  if (sel?.selectedPath == null) return { basis: 'drg', budget: Number(sel?.drgExpectedPayment ?? 0) };
   const isDip = sel.selectedPath.includes('dip');
   if (isDip) {
     const score = Number(sel.dipScore ?? 0);

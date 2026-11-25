@@ -49,14 +49,14 @@ export const assistantDiagnosisRoutes: RouteDef[] = [
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
-        const body = await c.body<SuggestBody>().catch(() => ({} as SuggestBody));
+        const body = await c.body<SuggestBody>().catch((): SuggestBody => ({}));
         const patientId = (body?.patientId ?? '').trim();
         if (!patientId) {
           return json(fail(ErrorCode.BAD_REQUEST, 'patientId 不能为空'), 400);
         }
         const symptoms = Array.isArray(body?.symptoms) ? body.symptoms : [];
         const labResults = Array.isArray(body?.labResults) ? body.labResults : [];
-        const history = (body?.history ?? {}) as DiagnosisHistoryInput;
+        const history = (body?.history ?? {});
         // 纯函数规则引擎：患者 ID 仅传入，返回时脱敏
         const data = generateDiagnosisSuggestions(patientId, symptoms, labResults, history);
         return json(ok(data));

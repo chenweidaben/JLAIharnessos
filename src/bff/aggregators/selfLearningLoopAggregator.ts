@@ -29,7 +29,7 @@ export interface SelfLearningLoopResult {
     diagnosisAccuracy: number;
     patientSatisfaction: number;
   };
-  flywheel: Array<{ stage: string; value: number }>;
+  flywheel: { stage: string; value: number }[];
 }
 
 /**

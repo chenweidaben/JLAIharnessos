@@ -418,11 +418,11 @@ export interface RecordQualityReport {
   /** 借阅超期数 */
   overdueBorrowCount: number;
   /** 不合格病案清单（供整改） */
-  failedRecords: Array<{
+  failedRecords: {
     recordId: string;
     visitId: string;
     reasons: string[];
-  }>;
+  }[];
 }
 
 /**

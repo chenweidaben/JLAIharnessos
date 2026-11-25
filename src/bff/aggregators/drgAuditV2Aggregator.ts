@@ -24,8 +24,8 @@ export interface DRGRecord {
  * @param records 病案列表
  * @returns 疑似高套分值的记录
  */
-export function detectHighCoding(records: DRGRecord[]): Array<{ recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }> {
-  const alerts: Array<{ recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }> = [];
+export function detectHighCoding(records: DRGRecord[]): { recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }[] {
+  const alerts: { recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }[] = [];
 
   for (const r of records) {
     // 诊断升级：主诊断与合并诊断严重程度不匹配
@@ -69,7 +69,7 @@ export function predictRejectionRisk(record: DRGRecord): { risk: 'low' | 'medium
 export interface DRGAuditReport {
   timeRange: string;
   totalRecords: number;
-  highCodingAlerts: Array<{ recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }>;
+  highCodingAlerts: { recordId: string; reason: string; severity: 'low' | 'medium' | 'high' }[];
   lowAdmissionCount: number;
   breakdownCount: number;
   rejectionRiskDistribution: { low: number; medium: number; high: number };

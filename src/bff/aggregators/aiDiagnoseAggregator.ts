@@ -114,12 +114,12 @@ interface AiRule {
   diagnosis: string;
   icd10: string;
   base: number;
-  symptoms: Array<{ kw: string; weight: number; label: string }>;
+  symptoms: { kw: string; weight: number; label: string }[];
   /** 年龄修正：落在 [minAge,maxAge] 内加权 */
   ageBand?: { minAge: number; maxAge: number; weight: number; label: string };
   /** 性别好发修正 */
   genderBias?: { gender: Exclude<Gender, ''>; weight: number; label: string };
-  history: Array<{ kw: string; weight: number }>;
+  history: { kw: string; weight: number }[];
   exams: string[];
   treatment: string[];
 }

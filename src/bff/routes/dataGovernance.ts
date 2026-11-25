@@ -88,11 +88,11 @@ function guarded<T>(
  * ==========================================================================*/
 
 /** 进程内样本（真实部署由数据平台回写；零新依赖，仅本模块） */
-const SAMPLE_CHECKS: Array<{
+const SAMPLE_CHECKS: {
   table: string;
   field: string;
   rule: GovDataQualityRule;
-}> = [
+}[] = [
   {
     table: 'clinical.patients',
     field: 'mrn',
@@ -134,7 +134,7 @@ const SAMPLE_CHECKS: Array<{
   },
 ];
 
-const ANOMALY_CASES: Array<{ table: string; field: string; value: unknown }> = [
+const ANOMALY_CASES: { table: string; field: string; value: unknown }[] = [
   { table: 'clinical.patients', field: 'age', value: 200 },
   { table: 'clinical.patients', field: 'weight_kg', value: 72.5 },
   { table: 'clinical.observations', field: 'sbp', value: 180 },

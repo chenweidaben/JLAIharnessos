@@ -92,10 +92,10 @@ export async function chatCompletionJson(
     }
 
     const data = (await response.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
+      choices?: { message?: { content?: string } }[];
     };
     const content = data.choices?.[0]?.message?.content;
-    if (!content || !content.trim()) {
+    if (!content?.trim()) {
       throw new LlmTransportError(undefined, '大模型返回空内容');
     }
     return content;

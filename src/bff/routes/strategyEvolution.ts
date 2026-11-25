@@ -63,7 +63,7 @@ async function buildMetricsView(): Promise<unknown> {
     FROM medmuse.recommendation_strategy
     ORDER BY strategy_name, version DESC
   `;
-  const strategies = (strategyRows as Array<Record<string, unknown>>).map(mapRow);
+  const strategies = (strategyRows as Record<string, unknown>[]).map(mapRow);
 
   // 2) 按建议类型聚合反馈计数（M108 学习闭环样本）
   const fbRows = await db`
@@ -73,7 +73,7 @@ async function buildMetricsView(): Promise<unknown> {
   `;
   const stats: Record<string, TypeFeedbackCount> = {};
   let total = 0;
-  for (const row of fbRows as unknown as Array<{ type: string | null; decision: string; n: number }>) {
+  for (const row of fbRows as unknown as { type: string | null; decision: string; n: number }[]) {
     const key = row.type ?? 'unknown';
     if (!stats[key]) stats[key] = { adopted: 0, modified: 0, rejected: 0 };
     if (row.decision === 'adopted') stats[key].adopted += row.n;

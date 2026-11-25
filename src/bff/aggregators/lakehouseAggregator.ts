@@ -67,7 +67,7 @@ async function audit(
 
 export interface PipelineRunSummary {
   mode: RunMode;
-  jobs: Array<{ jobCode: JobCode; rowsRead: number; rowsWritten: number }>;
+  jobs: { jobCode: JobCode; rowsRead: number; rowsWritten: number }[];
 }
 
 function summarize(mode: RunMode, results: JobResult[]): PipelineRunSummary {

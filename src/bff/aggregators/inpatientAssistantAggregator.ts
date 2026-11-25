@@ -91,7 +91,7 @@ export interface TrendOut {
   /** 一句话病情摘要（面向住院医生） */
   summary: string;
   /** 最新关键体征快照 */
-  keySigns: Array<{ label: string; value: string }>;
+  keySigns: { label: string; value: string }[];
 }
 
 export interface SimilarCaseOut extends SimilarCaseInput {
@@ -250,7 +250,7 @@ function buildTrend(vitals: AssistantVitalPoint[], riskLevel: RiskLevel): TrendO
         ? '生命体征出现恶化倾向，建议立即床旁评估并加强监护，必要时启动上级会诊。'
         : '生命体征近期未见明显波动，按既定方案观察，明日复查关键指标。';
 
-  const keySigns: Array<{ label: string; value: string }> = [];
+  const keySigns: { label: string; value: string }[] = [];
   if (last) {
     if (typeof last.temperatureC === 'number') keySigns.push({ label: '体温', value: `${last.temperatureC.toFixed(1)}℃` });
     if (typeof last.heartRate === 'number') keySigns.push({ label: '心率', value: `${last.heartRate} 次/分` });

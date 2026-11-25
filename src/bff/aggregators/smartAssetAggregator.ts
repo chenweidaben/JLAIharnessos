@@ -280,12 +280,12 @@ function normalizeInput(input?: Partial<SmartAssetInput> | null): SmartAssetInpu
 }
 
 /** 子项元数据：键 → 展示名 + 归属维度 */
-const SUB_META: Array<{
+const SUB_META: {
   key: keyof typeof SUB_TARGETS;
   name: string;
   dimension: AssetDimensionKey;
   dimensionName: string;
-}> = [
+}[] = [
   { key: 'doctorExperience', name: '医生经验', dimension: 'experience', dimensionName: '经验资产' },
   { key: 'nurseExperience', name: '护士经验', dimension: 'experience', dimensionName: '经验资产' },
   { key: 'pharmacistExperience', name: '药师经验', dimension: 'experience', dimensionName: '经验资产' },

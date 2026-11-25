@@ -215,7 +215,7 @@ export async function reviewUtilization(
   if (!req) throw notFound('输血申请不存在');
 
   const component = req.component as BloodComponent;
-  const ind = strictIndication(component, (req.indicationMeta ?? {}) as Record<string, unknown>);
+  const ind = strictIndication(component, (req.indicationMeta ?? {}));
   const dos = dosageReasonable(component, req.unitCount, req.urgency);
   const available = await getPatientTestCodes(req.patientId);
   const pre = preTestComplete(available);

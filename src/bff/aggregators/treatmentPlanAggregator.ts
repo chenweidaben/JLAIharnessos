@@ -154,7 +154,7 @@ export interface OptionComparison {
 const TERATOGENIC_DRUGS = ['甲氨蝶呤', '华法林', '阿托伐他汀', '辛伐他汀', '利巴韦林'];
 
 /** 内置相互作用规则表：[药A, 药B, 级别, 标题, 建议] */
-const INTERACTION_RULES: Array<[string, string, InteractionFinding['level'], string, string]> = [
+const INTERACTION_RULES: [string, string, InteractionFinding['level'], string, string][] = [
   ['华法林', '阿司匹林', 'high', '华法林 + 阿司匹林：出血风险叠加', '联用显著升高消化道/颅内出血风险，需心内科/药师评估抗栓强度，必要时降级单药。'],
   ['依那普利', '螺内酯', 'high', 'ACEI + 保钾利尿剂：高钾血症', '联用易致高钾血症，需密切监测血钾，肾功能不全者慎用或换用噻嗪类。'],
   ['辛伐他汀', '克拉霉素', 'high', '辛伐他汀 + 克拉霉素：横纹肌溶解风险', '大环内酯类抑制 CYP3A4 升高他汀血药浓度，抗感染期暂停他汀或换用普伐他汀。'],
@@ -402,7 +402,7 @@ export function checkDrugInteraction(currentMeds: string[], newMeds: string[]): 
   const next = (Array.isArray(newMeds) ? newMeds : []).map(norm).filter(Boolean);
 
   // 待检组合：在用×在用 + 在用×新增 + 新增×新增
-  const pairs: Array<[string, string]> = [];
+  const pairs: [string, string][] = [];
   const pushAll = (list: string[]) => {
     for (let i = 0; i < list.length; i += 1) {
       for (let j = i + 1; j < list.length; j += 1) pairs.push([list[i], list[j]]);

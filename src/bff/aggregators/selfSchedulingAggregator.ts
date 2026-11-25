@@ -82,7 +82,7 @@ export function listSlots(q: { departmentId?: string; date?: string; slotType?: 
   return arr.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.timeSlot.localeCompare(b.timeSlot)));
 }
 
-export function seedSlots(items: Array<Omit<Slot, 'slotId' | 'booked' | 'status'>>): Slot[] {
+export function seedSlots(items: Omit<Slot, 'slotId' | 'booked' | 'status'>[]): Slot[] {
   const out: Slot[] = [];
   for (const it of items) {
     if (!TIME_SLOTS.includes(it.timeSlot)) throw new SlotError(400, `timeSlot 非法：${it.timeSlot}`);

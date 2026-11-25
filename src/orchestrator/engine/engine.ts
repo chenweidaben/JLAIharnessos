@@ -198,7 +198,7 @@ export class WorkflowEngine {
     }
     const stateMachine = new WorkflowStateMachine(WorkflowState.VALIDATED);
     const ctx = new WorkflowContext({
-      input: (options.input ?? resumeSnapshot?.context.input ?? {}) as Record<string, unknown>,
+      input: (options.input ?? resumeSnapshot?.context.input ?? {}),
       variables: { ...(wf.variables ?? {}), ...(resumeSnapshot?.context.vars ?? {}) },
       patient: resumeSnapshot?.context.patient ?? options.patient,
       user: resumeSnapshot?.context.user ?? options.user,

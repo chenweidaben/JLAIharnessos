@@ -82,7 +82,7 @@ export const financeRoutes: RouteDef[] = [
 
       try {
         const txn = recordTransaction(
-          body.type ?? ('income' as FinanceType),
+          body.type ?? ('income'),
           body.category ?? '',
           typeof body.amount === 'number' ? body.amount : Number(body.amount),
           body.dept ?? '',

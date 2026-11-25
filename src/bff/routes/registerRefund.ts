@@ -18,7 +18,7 @@ export const registerRefundRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/outpatient/registrations/:id/refund', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'registration-refunded' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id, status: 'registration-refunded', reason: (body as { reason?: string }).reason ?? 'demo', refundedAt: new Date().toISOString() }));
     } },
 ];

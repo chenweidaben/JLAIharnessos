@@ -225,7 +225,7 @@ export function buildDataMart(
   if (!martName || !/^[a-z][a-z0-9_]{2,63}$/.test(martName)) {
     throw badRequest('martName 须为小写字母开头、含字母数字下划线的 3-64 位标识');
   }
-  if (!sourceTable || !sourceTable.includes('.')) {
+  if (!sourceTable?.includes('.')) {
     throw badRequest('sourceTable 须为 schema.table 全限定名');
   }
   if (refreshFreq !== 'daily' && refreshFreq !== 'weekly' && refreshFreq !== 'monthly') {
@@ -303,7 +303,7 @@ export function getDataMartDetail(martName: string): DataMartDetail | null {
  * （持续优化：后续改为从 dws.data_mart 表启动加载。）
  */
 export function seedDataMarts(): DataMart[] {
-  const seeds: Array<[string, string, RefreshFreq]> = [
+  const seeds: [string, string, RefreshFreq][] = [
     ['opd_ops_daily', 'dwd.visit_detail', 'daily'],
     ['opd_ops_weekly', 'dws.dept_daily_summary', 'weekly'],
     ['opd_ops_monthly', 'ads.hospital_daily_metrics', 'monthly'],

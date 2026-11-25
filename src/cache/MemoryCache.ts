@@ -147,7 +147,7 @@ export class MemoryCache implements ICache {
     return true;
   }
 
-  async mget<T = CacheValue>(keys: string[]): Promise<Array<T | null>> {
+  async mget<T = CacheValue>(keys: string[]): Promise<(T | null)[]> {
     return Promise.all(keys.map((k) => this.get<T>(k)));
   }
 

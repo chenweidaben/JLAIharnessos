@@ -66,7 +66,7 @@ export const qualitySafetyRoutes: RouteDef[] = [
         const firstIssue = tracked.find((t) => t.severity === 'red') ?? tracked.find((t) => t.severity === 'yellow');
         const improvement = generateQualityImprovement(
           firstIssue ? firstIssue.summary : '质量指标距国家达标线存在差距',
-          '方法' as RootCause,
+          '方法',
         );
 
         return json(ok({

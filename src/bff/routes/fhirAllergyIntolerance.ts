@@ -8,19 +8,19 @@ interface FhirAllergyIntolerance {
   resourceType: 'AllergyIntolerance';
   id: string;
   meta: { versionId: string; lastUpdated: string };
-  clinicalStatus: { coding: Array<{ system: string; code: string; display: string }>; text: string };
-  verificationStatus: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  clinicalStatus: { coding: { system: string; code: string; display: string }[]; text: string };
+  verificationStatus: { coding: { system: string; code: string; display: string }[]; text: string };
   type?: 'allergy' | 'intolerance';
-  category?: Array<'food' | 'medication' | 'environment' | 'biologic'>;
+  category?: ('food' | 'medication' | 'environment' | 'biologic')[];
   criticality: 'low' | 'high' | 'unable-to-assess';
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   patient: { reference: string };
   recordedDate?: string;
-  reaction?: Array<{
-    manifestation: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
+  reaction?: {
+    manifestation: { coding: { system: string; code: string; display: string }[]; text: string }[];
     description?: string;
     severity?: 'mild' | 'moderate' | 'severe';
-  }>;
+  }[];
 }
 
 const demoAllergies: FhirAllergyIntolerance[] = [

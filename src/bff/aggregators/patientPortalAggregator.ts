@@ -31,7 +31,7 @@ export interface PortalView {
 /** 患者登录后门户首页聚合（自限域：须 patient 角色且绑定 patient_profiles）。 */
 export async function portalView(auth: AuthView): Promise<PortalView> {
   assertPermission(auth, 'patient_portal:view');
-  const roleCodes = (auth.roles as Array<{ code?: string; name?: string }>).map((r) => r.code ?? r.name ?? String(r));
+  const roleCodes = (auth.roles as { code?: string; name?: string }[]).map((r) => r.code ?? r.name ?? String(r));
   if (!roleCodes.includes('patient')) throw forbidden('仅患者角色可访问');
 
   // v5.0试点扩展（M200遗留修复）：DEMO_MODE 下返回确定性非零门户种子

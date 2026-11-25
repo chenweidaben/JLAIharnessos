@@ -577,11 +577,11 @@ export function recommendFromMUSE(
 export function compareWithPeer(
   staffId: string,
   self: DoctorMUSEProfile,
-  peerGroup: Array<{
+  peerGroup: {
     totalExperiences: number;
     successRate: number;
     categoryCounts: Record<DoctorExperienceCategory, number>;
-  }> | null | undefined,
+  }[] | null | undefined,
 ): PeerComparison {
   const peers = peerGroup ?? [];
 

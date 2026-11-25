@@ -46,7 +46,7 @@ export interface MedicalRecordContent {
   /** 诊疗计划 */
   treatmentPlan: string;
   /** 用药列表：药名 + 用药指征 */
-  medications: Array<{ name: string; indication?: string }>;
+  medications: { name: string; indication?: string }[];
 }
 
 /** 单条规则审核结果 */
@@ -245,7 +245,7 @@ function checkTreatmentPlan(text: string): RecordCheckItem {
 
 /** 规则5：用药指征 —— 每条用药均须写明用药指征 */
 function checkMedicationIndication(
-  medications: Array<{ name: string; indication?: string }>,
+  medications: { name: string; indication?: string }[],
 ): RecordCheckItem {
   const list = Array.isArray(medications) ? medications : [];
   if (list.length === 0) {
@@ -388,7 +388,7 @@ export async function runAudit(
       created_by    AS "createdBy",
       created_at    AS "createdAt"
   `;
-  const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+  const row = (rows as unknown as Record<string, unknown>[])[0];
   if (!row) throw new RecordQualityError(500, '质控审核结果写入未返回');
 
   return {

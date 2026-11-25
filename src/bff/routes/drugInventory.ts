@@ -11,7 +11,7 @@ import { listView } from '../aggregators/drugInventoryAggregator.js';
 
 /** 解析 threshold query：非法/缺省返回 undefined（聚合器内用默认阈值） */
 function parseThreshold(raw: string | null): number | undefined {
-  if (!raw || !raw.trim()) return undefined;
+  if (!raw?.trim()) return undefined;
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : undefined;
 }

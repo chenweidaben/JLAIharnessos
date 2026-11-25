@@ -107,7 +107,7 @@ export function buildORTwins3D(date: string, rooms: ORRoom[]): ORTwins3DResult {
 export function simulateORFlow(
   date: string,
   orId: string,
-): Array<{ phase: string; progress: number; estimatedMinutes: number }> {
+): { phase: string; progress: number; estimatedMinutes: number }[] {
   return [
     { phase: '麻醉诱导', progress: 0.8, estimatedMinutes: 15 },
     { phase: '消毒铺巾', progress: 0.6, estimatedMinutes: 10 },

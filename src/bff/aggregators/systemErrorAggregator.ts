@@ -47,9 +47,9 @@ export interface ErrorAggregation {
   /** 今日（本地自然日）新增错误数 */
   todayCount: number;
   /** 近 7 天每日错误数趋势（含今日，最旧在前） */
-  trend: Array<{ date: string; count: number }>;
+  trend: { date: string; count: number }[];
   /** 高频错误类型 Top5（按次数倒序） */
-  topTypes: Array<{ errorType: string; count: number }>;
+  topTypes: { errorType: string; count: number }[];
   /** 未闭环错误总数 */
   unresolved: number;
 }
@@ -155,7 +155,7 @@ export function aggregateErrors(
   }
 
   // 近 7 天趋势：构造完整日期轴（含零值），最旧在前
-  const trend: Array<{ date: string; count: number }> = [];
+  const trend: { date: string; count: number }[] = [];
   for (let i = TREND_DAYS - 1; i >= 0; i -= 1) {
     const d = new Date(now);
     d.setDate(now.getDate() - i);

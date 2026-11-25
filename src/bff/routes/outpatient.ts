@@ -108,7 +108,7 @@ function mapCatalogs() {
 const demoBundles = new Map<string, Record<string, any>>();
 async function seedDemoBundle(id: string): Promise<Record<string, any>> {
   if (demoBundles.has(id)) return demoBundles.get(id)!;
-  const list = (await getWaitingQueue(null)) as Array<Record<string, any>>;
+  const list = (await getWaitingQueue(null)) as Record<string, any>[];
   const hit = list.find((x) => x.encounterId === id);
   const bundle: Record<string, any> = {
     encounterId: id,

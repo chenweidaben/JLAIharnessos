@@ -96,7 +96,7 @@ const REGION_KEYWORDS: readonly string[] = [
 ];
 
 // ---- 病种关键词 -> 重点专科映射：基层医生填「胸痛/脑梗」也能匹配到承接专科 -------
-const CONDITION_TO_SPECIALTY: ReadonlyArray<{ keywords: string[]; specialty: string }> = [
+const CONDITION_TO_SPECIALTY: readonly { keywords: string[]; specialty: string }[] = [
   { keywords: ['胸痛', '心梗', '心肌梗死', '冠心病', '高血压', '心衰', '心律失常'], specialty: '心血管内科' },
   { keywords: ['卒中', '脑梗', '脑出血', '偏瘫', '脑外伤'], specialty: '神经外科' },
   { keywords: ['癫痫', '帕金森', '头痛', '脑炎'], specialty: '神经内科' },

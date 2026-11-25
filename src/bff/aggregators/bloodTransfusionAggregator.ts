@@ -24,7 +24,7 @@ export interface TransfusionRecord {
  */
 export function detectBloodTransfusionReaction(record: TransfusionRecord): { hasReaction: boolean; severity: 'none' | 'mild' | 'severe' } {
   if (!record.reaction) return { hasReaction: false, severity: 'none' };
-  const severeReactions: Array<NonNullable<TransfusionRecord['reaction']>> = ['hemolysis', 'bacterial'];
+  const severeReactions: NonNullable<TransfusionRecord['reaction']>[] = ['hemolysis', 'bacterial'];
   if (severeReactions.includes(record.reaction)) return { hasReaction: true, severity: 'severe' };
   return { hasReaction: true, severity: 'mild' };
 }

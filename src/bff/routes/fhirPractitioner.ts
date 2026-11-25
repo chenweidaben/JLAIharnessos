@@ -9,13 +9,13 @@ interface FhirPractitioner {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   active: boolean;
-  identifier: Array<{ system: string; value: string }>;
-  name: Array<{ use: string; family: string; given: string[]; text: string }>;
-  telecom: Array<{ system: string; value: string; use: string }>;
-  qualification: Array<{
-    code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  identifier: { system: string; value: string }[];
+  name: { use: string; family: string; given: string[]; text: string }[];
+  telecom: { system: string; value: string; use: string }[];
+  qualification: {
+    code: { coding: { system: string; code: string; display: string }[]; text: string };
     period?: { start: string };
-  }>;
+  }[];
 }
 
 const demoPractitioners: FhirPractitioner[] = [

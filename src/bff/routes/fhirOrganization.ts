@@ -11,8 +11,8 @@ interface FhirOrganization {
   active: boolean;
   name: string;
   alias: string[];
-  telecom: Array<{ system: string; value: string; use: string }>;
-  address: Array<{ use: string; line: string[]; city: string; state: string; postalCode: string }>;
+  telecom: { system: string; value: string; use: string }[];
+  address: { use: string; line: string[]; city: string; state: string; postalCode: string }[];
   partOf: { reference: string; display: string } | null;
 }
 

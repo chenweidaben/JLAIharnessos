@@ -128,7 +128,7 @@ async function handleFupCreate(c: Ctx): Promise<Response> {
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
   const { patientId, visitId, planType, nextFollowUpDate, followUpDeptCode, responsibleDoctorId } =
-    body as Record<string, unknown>;
+    body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

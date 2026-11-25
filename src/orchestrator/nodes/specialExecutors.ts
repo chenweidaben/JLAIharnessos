@@ -213,9 +213,9 @@ export class NotifyNodeExecutor implements NodeExecutor {
 // ============================================================================
 
 function extractIdentifier(ctx: NodeExecutorContext['ctx'], field: 'patientId' | 'visitId'): string | undefined {
-  const patient = ctx.patient as Record<string, unknown>;
-  const user = ctx.user as Record<string, unknown>;
-  const variables = ctx.getVariables() as Record<string, unknown>;
+  const patient = ctx.patient;
+  const user = ctx.user;
+  const variables = ctx.getVariables();
   const value =
     patient[field] ??
     user[field] ??

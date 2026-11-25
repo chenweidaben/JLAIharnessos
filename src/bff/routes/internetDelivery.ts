@@ -85,7 +85,7 @@ function patientGuard(
 
 async function readBody<T>(c: Ctx): Promise<T> {
   try {
-    return (await c.body()) as T;
+    return (await c.body());
   } catch {
     return {} as T;
   }

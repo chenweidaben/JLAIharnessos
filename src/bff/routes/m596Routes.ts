@@ -29,7 +29,7 @@ interface CaseRow {
 }
 
 const ROOMS = Array.from({ length: 10 }, (_, i) => `OR${String(i + 1).padStart(2, '0')}`);
-const LEVELS: Array<'1' | '2' | '3' | '4'> = ['1', '2', '3', '4'];
+const LEVELS: ('1' | '2' | '3' | '4')[] = ['1', '2', '3', '4'];
 
 function seedCases(): CaseRow[] {
   const rows: CaseRow[] = [];

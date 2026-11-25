@@ -150,7 +150,7 @@ export const integrationDeepRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<DeepParseBody>().catch(() => ({} as DeepParseBody))) ?? {};
+        const body = (await c.body<DeepParseBody>().catch((): DeepParseBody => ({}))) ?? {};
         const standard = (STANDARDS as readonly string[]).includes(String(body.standard ?? 'hl7v2x'))
           ? (body.standard as IntegrationStandard)
           : 'hl7v2x';
@@ -197,7 +197,7 @@ export const integrationDeepRoutes: RouteDef[] = [
             return json(fail(ErrorCode.BAD_REQUEST, 'fhir-r4 需指定 resourceType'), 400);
           }
           const data = body.data ?? {};
-          const resource = buildFHIRR4(resourceType, data as never);
+          const resource = buildFHIRR4(resourceType, data);
           const validation = validateIntegrationMessage(resource, 'fhir-r4');
 
           await persistDeepLog({

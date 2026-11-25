@@ -140,7 +140,7 @@ export class PromptMetricsAggregator {
     const rejected = records.filter((r) => r.outcome === 'rejected').length;
     const modifiedCharsList = records
       .filter((r) => r.outcome === 'modified' && typeof r.modifiedChars === 'number')
-      .map((r) => r.modifiedChars as number);
+      .map((r) => r.modifiedChars!);
     const schemaFailures = records.filter((r) => r.schemaFailure === true).length;
 
     const safe = (numerator: number) => (calls === 0 ? 0 : numerator / calls);

@@ -109,7 +109,7 @@ export function validateSchedule(
   // 二、休假冲突
   for (const a of assignments) {
     const leave = leaveByNurse.get(a.nurseId);
-    if (leave && leave.has(a.date)) {
+    if (leave?.has(a.date)) {
       violations.push({
         type: 'leave_conflict',
         nurseId: a.nurseId,

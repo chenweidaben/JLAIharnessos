@@ -105,7 +105,7 @@ export interface BedOccupantSummary {
   nursingLevel: string;
   attendingDoctorId: string | null;
   admittedAt: string | null;
-  allergies: Array<Record<string, unknown>>;
+  allergies: Record<string, unknown>[];
   tags: string[];
 }
 
@@ -132,7 +132,7 @@ export interface WardBedMap {
 }
 
 export interface BedMapResponse {
-  campuses: Array<{ code: string; name: string }>;
+  campuses: { code: string; name: string }[];
   wards: WardBedMap[];
   generatedAt: string;
 }
@@ -157,7 +157,7 @@ export interface InpatientListItem {
   attendingDoctorId: string | null;
   admittedAt: string | null;
   daysInHospital: number;
-  allergies: Array<Record<string, unknown>>;
+  allergies: Record<string, unknown>[];
   tags: string[];
 }
 
@@ -511,8 +511,8 @@ export interface AdmitInput {
     gender: '男' | '女' | '未知' | '未说明';
     birthDate?: string | null;
     bloodType?: string | null;
-    allergies?: Array<Record<string, unknown>>;
-    pastHistory?: Array<Record<string, unknown>>;
+    allergies?: Record<string, unknown>[];
+    pastHistory?: Record<string, unknown>[];
     tags?: string[];
   };
   wardId: string;

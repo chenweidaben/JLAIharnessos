@@ -139,7 +139,7 @@ async function handleSupplierCreate(c: Ctx): Promise<Response> {
   const {
     supplierName, unifiedSocialCreditCode, contactPerson, contactPhone, address,
     category, businessLicenseNo, expiryDate, registeredCapital,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof supplierName !== 'string' || !supplierName.trim() ||
@@ -206,7 +206,7 @@ async function handleSupplierAudit(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { auditorId, auditResult, auditNote } = body as Record<string, unknown>;
+  const { auditorId, auditResult, auditNote } = body;
   if (typeof auditorId !== 'string' || !auditorId.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }
@@ -219,7 +219,7 @@ async function handleSupplierAudit(c: Ctx): Promise<Response> {
     return json({ code: 409, message: 'already_audited' }, 409);
   }
 
-  rec.auditResult = auditResult as AuditResult;
+  rec.auditResult = auditResult;
   rec.auditorId = auditorId.trim();
   rec.auditedAt = new Date().toISOString();
   rec.auditNote = typeof auditNote === 'string' && auditNote.trim() ? auditNote.trim() : null;
@@ -266,7 +266,7 @@ async function handleSupplierBlacklist(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { reason, blacklistedBy } = body as Record<string, unknown>;
+  const { reason, blacklistedBy } = body;
   if (typeof reason !== 'string' || !reason.trim() || typeof blacklistedBy !== 'string' || !blacklistedBy.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }

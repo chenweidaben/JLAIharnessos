@@ -150,7 +150,7 @@ export async function resolveAlert(
   if (!existing) throw notFound('危急值告警不存在');
   if (!canAccess(auth, existing.department)) throw forbidden('无权处理该科室危急值');
   if (existing.status !== 'acked') throw conflict('仅已签收(acked)的告警可处置闭环');
-  if (!note || !note.trim()) throw badRequest('处置记录不能为空');
+  if (!note?.trim()) throw badRequest('处置记录不能为空');
 
   const updated = await withTx(async (tx) => {
     const u = await setStatus(

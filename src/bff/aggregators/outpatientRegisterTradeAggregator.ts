@@ -103,7 +103,7 @@ export function reserveSlot(input: {
   sweepExpired(now);
 
   const slot = slots.get(input.slotId);
-  if (slot && slot.activeReservationId) {
+  if (slot?.activeReservationId) {
     throw new OutpatientRegisterTradeError(409, '号源已被占用');
   }
 

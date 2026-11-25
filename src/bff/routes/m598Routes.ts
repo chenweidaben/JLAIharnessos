@@ -101,7 +101,7 @@ async function handleReceive(c: Ctx): Promise<Response> {
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
   const { drugCode, drugName, specification, batchNumber, expiryDate, quantity, supplierId, receivedBy } =
-    body as Record<string, unknown>;
+    body;
 
   if (
     typeof drugCode !== 'string' || !drugCode.trim() ||
@@ -153,7 +153,7 @@ async function handleIssue(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { batchNumber, quantity, destination, issuedBy } = body as Record<string, unknown>;
+  const { batchNumber, quantity, destination, issuedBy } = body;
   if (
     typeof batchNumber !== 'string' || !batchNumber.trim() ||
     typeof quantity !== 'number' || quantity <= 0 ||

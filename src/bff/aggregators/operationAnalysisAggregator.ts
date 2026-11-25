@@ -199,7 +199,7 @@ const safeDiv = (a: number, b: number): number => (b > 0 ? a / b : 0);
 
 /** 把明细按合计归一化为占比（合计为 0 时各项为 0） */
 function toStructure<T extends object>(breakdown: T): T {
-  const entries = Object.entries(breakdown) as Array<[string, number]>;
+  const entries = Object.entries(breakdown) as [string, number][];
   const total = entries.reduce((sum, [, v]) => sum + v, 0);
   const out: Record<string, number> = {};
   for (const [k, v] of entries) {
@@ -332,13 +332,13 @@ export function benchmarkOperation(
     d.cost.labor + d.cost.drug + d.cost.consumable + d.cost.depreciation;
 
   /** 方向性：true 表示数值越高越好 */
-  const metrics: Array<{
+  const metrics: {
     metric: string;
     label: string;
     deptValue: number;
     peerAvg: number;
     higherBetter: boolean;
-  }> = [
+  }[] = [
     { metric: 'revenueTotal', label: '收入合计(万元)', deptValue: round1(rev(dept)), peerAvg: round1(avg(rev)), higherBetter: true },
     { metric: 'costTotal', label: '成本合计(万元)', deptValue: round1(cst(dept)), peerAvg: round1(avg(cst)), higherBetter: false },
     { metric: 'margin', label: '收支结余率', deptValue: round2(safeDiv(rev(dept) - cst(dept), rev(dept))), peerAvg: round2(avg((d) => safeDiv(rev(d) - cst(d), rev(d)))), higherBetter: true },

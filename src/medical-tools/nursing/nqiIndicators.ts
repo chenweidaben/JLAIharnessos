@@ -110,7 +110,7 @@ export function computeIndicators(
   });
 
   // 待接入指标：有手工录入则采用，否则标注 pending_manual
-  const pending: Array<{ code: string; name: string; unit: string; denominatorDef: string }> = [
+  const pending: { code: string; name: string; unit: string; denominatorDef: string }[] = [
     { code: 'NQI_PRESSURE_INJURY', name: '院内二期及以上压力性损伤发生率', unit: '%', denominatorDef: '住院患者数' },
     { code: 'NQI_FALL_INCIDENT', name: '跌倒发生率', unit: '%', denominatorDef: '住院患者数' },
     { code: 'NQI_UNPLANNED_EXTUBATION', name: '非计划拔管率', unit: '%', denominatorDef: '留置管路患者数' },

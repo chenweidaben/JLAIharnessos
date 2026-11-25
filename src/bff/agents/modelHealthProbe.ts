@@ -269,7 +269,7 @@ export function aggregateHealthWindow(
 
   const latencySamples = inWindow
     .filter((event) => event.available && typeof event.latencyMs === 'number' && Number.isFinite(event.latencyMs) && event.latencyMs >= 0)
-    .map((event) => event.latencyMs as number);
+    .map((event) => event.latencyMs!);
   const avgLatencyMs =
     latencySamples.length > 0
       ? Math.round((latencySamples.reduce((sum, value) => sum + value, 0) / latencySamples.length) * 10) / 10

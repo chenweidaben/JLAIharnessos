@@ -17,7 +17,7 @@ import { DISCLAIMER } from './types';
  * 与 consult 六表 uuid 主键与外键列对齐（前缀句柄无法写入 uuid 列，会触发 22P02）。
  * prefix 形参保留仅为调用点兼容，不再进入取值。
  */
-export function newId(_prefix: string = 'id'): string {
+export function newId(_prefix = 'id'): string {
   return randomUUID();
 }
 

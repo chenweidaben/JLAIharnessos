@@ -57,7 +57,7 @@ export interface LogVerifyReport {
   findings: LogPIIFinding[];
   summary: LogVerifySummary;
   /** 修复对照：问题日志「脱敏前 → 脱敏后」逐行样例 */
-  redactionSamples: Array<{ before: string; after: string }>;
+  redactionSamples: { before: string; after: string }[];
 }
 
 /** safeErrorResponse() 返回的安全错误视图 */
@@ -169,7 +169,7 @@ function normalizeEnv(env: string): 'production' | 'other' {
 function inferHttpStatus(error: unknown): number {
   if (typeof error === 'object' && error !== null) {
     const rec = error as Record<string, unknown>;
-    const s = (rec.status ?? rec.statusCode) as unknown;
+    const s = (rec.status ?? rec.statusCode);
     if (typeof s === 'number' && s >= 400 && s <= 599) return s;
   }
   return 500;
@@ -248,7 +248,7 @@ export function verifyNoPIIInLog(sampleLogs?: readonly string[]): LogVerifyRepor
   const lines = sampleLogs && sampleLogs.length > 0 ? sampleLogs : BASELINE_LOG_SAMPLES;
 
   const findings: LogPIIFinding[] = [];
-  const redactionSamples: Array<{ before: string; after: string }> = [];
+  const redactionSamples: { before: string; after: string }[] = [];
   let idCard = 0;
   let phone = 0;
   let bankCard = 0;

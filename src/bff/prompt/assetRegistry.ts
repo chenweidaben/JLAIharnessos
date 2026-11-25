@@ -218,7 +218,7 @@ export function validatePromptAsset(asset: unknown): string[] {
   if (metrics === undefined || metrics === null || typeof metrics !== 'object') {
     errors.push('字段 metrics 缺失或不是对象');
   } else {
-    const numericKeys: Array<keyof PromptMetrics> = [
+    const numericKeys: (keyof PromptMetrics)[] = [
       'calls',
       'adoptionRate',
       'modificationRate',
@@ -392,7 +392,7 @@ export class PromptAssetRegistry {
     if (!entryA || !entryB) {
       throw new Error(`[PA-006] 资产「${id}」缺少变更记录：${versionA} / ${versionB}`);
     }
-    const pairs: Array<[string, unknown, unknown]> = [
+    const pairs: [string, unknown, unknown][] = [
       ['operator', entryA.operator, entryB.operator],
       ['summary', entryA.summary, entryB.summary],
       ['diffRef', entryA.diffRef, entryB.diffRef],

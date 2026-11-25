@@ -153,8 +153,8 @@ function toStockItem(row: inventoryRepo.Inventory): DrugStockItem {
  * @param threshold 可选阈值 query 覆盖；缺省 DEFAULT_STOCK_THRESHOLD
  */
 export async function listView(threshold?: number): Promise<DrugInventoryView> {
-  const t = Number.isFinite(threshold) && (threshold as number) > 0
-    ? Math.floor(threshold as number)
+  const t = Number.isFinite(threshold) && (threshold!) > 0
+    ? Math.floor(threshold!)
     : DEFAULT_STOCK_THRESHOLD;
 
   let items: DrugStockItem[] = [];

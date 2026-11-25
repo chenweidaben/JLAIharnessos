@@ -39,7 +39,7 @@ export function identifySlowQueries(queries: QueryMetric[]): QueryMetric[] {
  */
 export function suggestCacheStrategy(
   table: string,
-  queryPatterns: Array<{ pattern: string; frequency: number }>,
+  queryPatterns: { pattern: string; frequency: number }[],
 ): { strategy: string; ttlSeconds: number; reason: string } {
   const readHeavy = queryPatterns.filter((p) => p.frequency > 100).length > 0;
   if (readHeavy) {

@@ -146,7 +146,7 @@ async function handleRaCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, assessmentType, score, assessedBy, notes, assessedAt } = body as Record<string, unknown>;
+  const { patientId, assessmentType, score, assessedBy, notes, assessedAt } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -228,7 +228,7 @@ async function handleRaProgress(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { progressDate, progressScore, progressNotes, therapistId } = body as Record<string, unknown>;
+  const { progressDate, progressScore, progressNotes, therapistId } = body;
   if (
     typeof progressDate !== 'string' || !progressDate.trim() ||
     typeof progressScore !== 'number' ||

@@ -8,11 +8,11 @@ export class LosPredError extends Error {
 // 本地启发式预测
 function predict(age: number, diagnosis: string, comorbidities: number): {
   losDays: number; cost: number; riskLevel: 'low'|'medium'|'high';
-  factors: Array<{factor: string; impact: string}>; confidence: number;
+  factors: {factor: string; impact: string}[]; confidence: number;
 } {
   let baseLos = 5;
   let baseCost = 8000;
-  const factors: Array<{factor: string; impact: string}> = [];
+  const factors: {factor: string; impact: string}[] = [];
 
   if (age > 65) { baseLos += 2; baseCost += 3000; factors.push({factor: `高龄(${age}岁)`, impact: '住院天数+2天，费用+3000'}); }
   if (comorbidities > 2) { baseLos += 3; baseCost += 5000; factors.push({factor: `合并症多(${comorbidities}种)`, impact: '住院天数+3天，费用+5000'}); }

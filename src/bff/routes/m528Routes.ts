@@ -201,7 +201,7 @@ async function handleAssessmentCreate(c: Ctx): Promise<Response> {
 
   const scoresValid =
     scores !== null && typeof scores === 'object' && !Array.isArray(scores) &&
-    Object.keys(scores as Record<string, unknown>).length > 0 &&
+    Object.keys(scores).length > 0 &&
     Object.values(scores as Record<string, unknown>).every((v) => typeof v === 'number' && Number.isFinite(v));
 
   if (!visitId || !patientId || !level || !assessorId || !assessorName || !scoresValid || !SCALE_KEYS.includes(scaleKey as ScaleKey)) {

@@ -83,7 +83,7 @@ export const aiFeedbackRoutes: RouteDef[] = [
       }
 
       // 异步落库，不 await：立刻返回，写失败在 persistFeedback 内部吞掉
-      persistFeedback({ ...body, doctorDecision: body.doctorDecision as DoctorDecision });
+      persistFeedback({ ...body, doctorDecision: body.doctorDecision });
       return json(
         ok({ accepted: true }, '反馈已接收，将异步用于推荐权重学习'),
       );
@@ -106,7 +106,7 @@ export const aiFeedbackRoutes: RouteDef[] = [
           LIMIT 500
         `;
         const history: Feedback[] = (
-          rows as unknown as Array<{ suggestionType: string; doctorDecision: DoctorDecision }>
+          rows as unknown as { suggestionType: string; doctorDecision: DoctorDecision }[]
         )
           .filter((r) => r && r.doctorDecision)
           .map((r) => ({ suggestionType: r.suggestionType ?? 'unknown', doctorDecision: r.doctorDecision }));

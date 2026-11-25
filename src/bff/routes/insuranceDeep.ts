@@ -145,7 +145,7 @@ export const insuranceDeepRoutes: RouteDef[] = [
             FROM clinical.insurance_rejection
             WHERE (${period}::text IS NULL OR period_key = ${period})
             LIMIT 500
-          `) as Array<Omit<RejectionCase, 'note'>>;
+          `) as Omit<RejectionCase, 'note'>[];
           rejections = (rejRows ?? []).map((r) => ({ ...r }));
         } catch {
           rejections = [];

@@ -58,7 +58,7 @@ export interface RationalDrugUseReport {
   injectionRateInpatient: number;
   essentialDrugRate: number;
   adjuvantDrugRatio: number;
-  irrationalPrescriptions: Array<{ drugName: string; issues: string[] }>;
+  irrationalPrescriptions: { drugName: string; issues: string[] }[];
   suggestions: string[];
 }
 

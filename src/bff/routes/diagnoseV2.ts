@@ -38,7 +38,7 @@ interface DiagnoseV2Body {
   labResults?: V2LabResult[];
   patientFeatures?: V2PatientFeatures;
   mode?: 'library' | 'differential' | 'treatment' | 'all';
-  newDiseases?: Array<{ diagnosis: string; icd10?: string; specialty?: '神经' | '泌尿' | '血液' | '风湿免疫' }>;
+  newDiseases?: { diagnosis: string; icd10?: string; specialty?: '神经' | '泌尿' | '血液' | '风湿免疫' }[];
   targetDiagnosis?: string;
 }
 
@@ -49,7 +49,7 @@ export const diagnoseV2Routes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<DiagnoseV2Body>().catch(() => ({}))) as DiagnoseV2Body;
+        const body = (await c.body<DiagnoseV2Body>().catch((): DiagnoseV2Body => ({}))) as DiagnoseV2Body;
 
         const symptoms = Array.isArray(body?.symptoms) ? body.symptoms : [];
         const history = body?.history ?? [];

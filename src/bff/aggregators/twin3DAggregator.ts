@@ -394,7 +394,7 @@ function buildRoom3D(buildingId: string, floorInfo: { floor: string; z: number }
   const patientMarkers: PatientMarker3D[] = beds
     .filter((b) => b.patientRef)
     .map((b) => ({
-      patientRef: b.patientRef as string,
+      patientRef: b.patientRef!,
       position: { x: b.position.x + 18, y: b.position.y + 10, z: zFloor + 0.9 },
     }));
 

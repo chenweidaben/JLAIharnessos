@@ -6782,11 +6782,10 @@ async function handleFetch(
     if (!wsUser) {
       return new Response('unauthorized', { status: 401 });
     }
-    // RFC 6455：客户端携 Sec-WebSocket-Protocol（bearer.<token>）时，服务端必须回显其一，
-    // 否则浏览器判定握手失败。取首段回显（客户端只发一个）。
-    const offered = req.headers.get('sec-websocket-protocol')?.split(',')[0]?.trim();
-    const upgradeHeaders = offered ? { 'Sec-WebSocket-Protocol': offered } : undefined;
-    if (server.upgrade(req, { data: { path: '/ws/chat', user: wsUser }, headers: upgradeHeaders })) {
+    // RFC 6455：子协议（bearer.<token>）由 Bun upgrade 按请求自动回显；此处不再手动
+    // 重复设置 Sec-WebSocket-Protocol，否则会与内置回显叠加，使响应头值出现两段相同
+    // 子协议，浏览器/undici 握手判定为重复协议头而拒绝连接。
+    if (server.upgrade(req, { data: { path: '/ws/chat', user: wsUser } })) {
       return undefined;
     }
     return new Response('upgrade failed', { status: 426 });

@@ -56,7 +56,7 @@ export const aiDrugReviewRoutes: RouteDef[] = [
       );
 
       // 误拦反馈留痕：若药师在本次请求中标记某条告警误拦，构造反馈记录随响应回传
-      const feedback = body.falsePositive && body.falsePositive.findingId
+      const feedback = body.falsePositive?.findingId
         ? buildFalsePositiveFeedback(
             review.prescriptionId,
             body.falsePositive.findingId,

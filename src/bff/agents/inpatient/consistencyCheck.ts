@@ -23,7 +23,7 @@ export interface ConsistencyContext {
 }
 
 /** 合成诊断-用药粗匹配表（离线展示口径，不接真实药典） */
-const DIAGNOSIS_MEDICATION_FAMILY: ReadonlyArray<{ diagnosis: string; family: string }> = [
+const DIAGNOSIS_MEDICATION_FAMILY: readonly { diagnosis: string; family: string }[] = [
   { diagnosis: '高血压', family: '降压' },
   { diagnosis: '糖尿病', family: '降糖' },
   { diagnosis: '肺炎', family: '抗菌' },

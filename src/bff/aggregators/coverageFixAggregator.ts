@@ -87,12 +87,12 @@ export interface CoverageGapReport {
   /** 逐模块缺口清单 */
   modules: CoverageGapItem[];
   /** 三域汇总 */
-  byDomain: Array<{
+  byDomain: {
     domain: ClinicalDomain;
     label: string;
     modules: number;
     uncoveredLines: number;
-  }>;
+  }[];
   /** 全部缺口行数合计 */
   totalUncoveredLines: number;
   /** 当前是否已达标 */
@@ -391,7 +391,7 @@ export function identifyCoverageGap(
  */
 const FIX_BLUEPRINTS: Record<
   string,
-  Array<{ scenario: string; technique: FixTechnique; lines: number }>
+  { scenario: string; technique: FixTechnique; lines: number }[]
 > = {
   'src/bff/aggregators/transfusionReactionAggregator.ts': [
     { scenario: '不良反应上报→判定→处置→归档主状态机全分支', technique: 'state_machine', lines: 8 },

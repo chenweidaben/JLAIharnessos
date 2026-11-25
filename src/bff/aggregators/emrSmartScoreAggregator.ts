@@ -90,7 +90,7 @@ export interface ScoreResult {
 // ============================================================================
 
 /** 六维定义：权重固定，勿随意调整——公平性来自稳定标尺 */
-export const DIMENSIONS: ReadonlyArray<{ key: DimensionKey; label: string; maxScore: number }> = [
+export const DIMENSIONS: readonly { key: DimensionKey; label: string; maxScore: number }[] = [
   { key: 'chiefComplaint', label: '主诉完整性', maxScore: 10 },
   { key: 'historyOfPresentIllness', label: '现病史逻辑性', maxScore: 20 },
   { key: 'diagnosis', label: '诊断准确性', maxScore: 20 },
@@ -109,7 +109,7 @@ const DIMENSION_MAP = new Map(DIMENSIONS.map((d) => [d.key, d]));
  * 诊断 → 预期治疗药物类别映射（用于"用药合理性"实质判定）。
  * key 为诊断命中关键词，value 为该诊断下应出现的代表药/药类关键词。
  */
-const DIAGNOSIS_EXPECTED_DRUGS: ReadonlyArray<{ diagKeywords: string[]; drugKeywords: string[]; label: string }> = [
+const DIAGNOSIS_EXPECTED_DRUGS: readonly { diagKeywords: string[]; drugKeywords: string[]; label: string }[] = [
   { diagKeywords: ['高血压'], drugKeywords: ['氨氯地平', '硝苯地平', '缬沙坦', '氯沙坦', '美托洛尔', '比索洛尔', '贝那普利', '厄贝沙坦'], label: '降压药' },
   { diagKeywords: ['糖尿病'], drugKeywords: ['二甲双胍', '格列美脲', '格列齐特', '胰岛素', '阿卡波糖', '达格列净'], label: '降糖药' },
   { diagKeywords: ['冠心病', '心绞痛', '心肌梗死'], drugKeywords: ['阿司匹林', '氯吡格雷', '阿托伐他汀', '瑞舒伐他汀', '硝酸甘油'], label: '抗血小板/调脂/抗心绞痛药' },
@@ -118,7 +118,7 @@ const DIAGNOSIS_EXPECTED_DRUGS: ReadonlyArray<{ diagKeywords: string[]; drugKeyw
 ];
 
 /** 诊断 → 预期关键检查映射（用于"检查适宜性"实质判定） */
-const DIAGNOSIS_EXPECTED_EXAMS: ReadonlyArray<{ diagKeywords: string[]; examKeywords: string[]; label: string }> = [
+const DIAGNOSIS_EXPECTED_EXAMS: readonly { diagKeywords: string[]; examKeywords: string[]; label: string }[] = [
   { diagKeywords: ['胸痛', '心绞痛', '冠心病', '心肌梗死'], examKeywords: ['心电图', '肌钙蛋白', '心肌酶', '冠脉CT', '冠脉造影', '心脏超声'], label: '心电图/心肌损伤标志物' },
   { diagKeywords: ['肺炎', '感染', '发热', '支气管炎'], examKeywords: ['血常规', 'CRP', 'C反应蛋白', '胸片', '胸部CT', '降钙素原'], label: '血常规/炎症指标' },
   { diagKeywords: ['糖尿病'], examKeywords: ['血糖', '糖化血红蛋白', 'C肽', '糖耐量'], label: '血糖/糖化血红蛋白' },
@@ -126,7 +126,7 @@ const DIAGNOSIS_EXPECTED_EXAMS: ReadonlyArray<{ diagKeywords: string[]; examKeyw
 ];
 
 /** 潜在高风险联用（需在病历中见合理说明，否则扣分） */
-const RISKY_COMBOS: ReadonlyArray<{ drugs: string[]; reason: string }> = [
+const RISKY_COMBOS: readonly { drugs: string[]; reason: string }[] = [
   { drugs: ['阿司匹林', '华法林'], reason: '抗血小板与抗凝联用增加出血风险，需注明适应证与监测计划' },
   { drugs: ['阿司匹林', '利伐沙班'], reason: '抗血小板与口服抗凝联用增加出血风险，需注明适应证与监测计划' },
   { drugs: ['布洛芬', '阿司匹林'], reason: '两种非甾体/抗血小板药叠加，胃肠与出血风险升高' },
@@ -174,7 +174,7 @@ function extractSection(text: string, heading: string): string {
 }
 
 /** 是否命中任一关键词 */
-function hitAny(text: string, keywords: ReadonlyArray<string>): string | null {
+function hitAny(text: string, keywords: readonly string[]): string | null {
   for (const kw of keywords) {
     if (text.includes(kw)) return kw;
   }

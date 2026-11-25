@@ -87,7 +87,7 @@ interface DeptRule {
   deptCode: string;
   deptName: string;
   /** 关键词命中权重 */
-  keywords: Array<{ word: string; weight: number }>;
+  keywords: { word: string; weight: number }[];
   /** 命中后给患者的理由模板 */
   reason: string;
 }
@@ -275,7 +275,7 @@ const DEPT_RULES: DeptRule[] = [
 /* ------------------------------------------------------------------ */
 
 /** 依据宪法与急诊分诊规范：出现以下任一关键词 → 建议立即急诊/120。 */
-const EMERGENCY_KEYWORDS: Array<{ word: string; level: UrgencyLevel }> = [
+const EMERGENCY_KEYWORDS: { word: string; level: UrgencyLevel }[] = [
   { word: '胸痛', level: 'emergency' },
   { word: '压榨感', level: 'emergency' },
   { word: '偏瘫', level: 'emergency' },

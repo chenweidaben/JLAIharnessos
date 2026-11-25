@@ -518,7 +518,7 @@ export function selectModel(req: RouteRequest, options?: SelectModelOptions): Ro
   let stickyKey: StickyKey = 'none';
   let stickyBucket: number | undefined;
 
-  if (activeSticky && activeSticky.stickyKey) {
+  if (activeSticky?.stickyKey) {
     stickyKey = activeSticky.stickyKey;
     const identifier = stickyKey === 'patientId' ? req.patientId ?? '' : req.visitId ?? '';
     stickyBucket = consistentHashBucket(identifier, group.length);

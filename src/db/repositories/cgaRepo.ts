@@ -52,7 +52,7 @@ export async function createAssessment(
       (${input.visitId}, ${input.adlScore}, ${input.iadlScore}, ${input.mmseScore},
        ${input.fallRisk}, ${input.mnaScore}, ${input.gdsScore}, ${input.riskLevel}, ${input.assessor})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<CgaAssessment[]> {
@@ -66,5 +66,5 @@ export async function getLatestByVisit(visitId: string, tx: DbExecutor = getDb()
   const rows = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.cga_assessments
     WHERE visit_id=${visitId} ORDER BY created_at DESC, id DESC LIMIT 1`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

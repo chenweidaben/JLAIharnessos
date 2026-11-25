@@ -181,7 +181,7 @@ export function identifySlowRoutes(
 
 /** 从 SQL 文本中抓取主表名（FROM 后第一个标识符，可带 schema.） */
 function extractTable(sqlLower: string): string {
-  const m = sqlLower.match(/\bfrom\s+([a-z_][a-z0-9_.]*)/i);
+  const m = /\bfrom\s+([a-z_][a-z0-9_.]*)/i.exec(sqlLower);
   return m ? m[1] : '';
 }
 
@@ -189,7 +189,7 @@ function extractTable(sqlLower: string): string {
 function extractWhereColumns(sqlLower: string): string[] {
   const cols = new Set<string>();
   const re = /\bwhere\b([\s\S]*?)(\border\s+by\b|\bgroup\s+by\b|\blimit\b|$)/i;
-  const m = sqlLower.match(re);
+  const m = re.exec(sqlLower);
   if (!m) return [];
   const body = m[1];
   const colRe = /([a-z_][a-z0-9_]*)\s*(?:=|>=|<=|>|<|in\s*\()/gi;
@@ -203,7 +203,7 @@ function extractWhereColumns(sqlLower: string): string[] {
 
 /** 抓取 ORDER BY 列 */
 function extractOrderColumns(sqlLower: string): string[] {
-  const m = sqlLower.match(/\border\s+by\s+([a-z0-9_,\s.]+?)(\blimit\b|$)/i);
+  const m = /\border\s+by\s+([a-z0-9_,\s.]+?)(\blimit\b|$)/i.exec(sqlLower);
   if (!m) return [];
   return m[1]
     .split(',')

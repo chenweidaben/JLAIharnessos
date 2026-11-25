@@ -121,7 +121,7 @@ function rejectUnsafe(value: unknown, path: string, seen: Set<unknown>): void {
   seen.delete(value);
 }
 
-function desensitizePlain(value: unknown, seen: Set<unknown> = new Set()): unknown {
+function desensitizePlain(value: unknown, seen = new Set<unknown>()): unknown {
   if (value === null || value === undefined) return value;
   if (typeof value === 'string') return desensitizeText(value);
   if (typeof value === 'number' || typeof value === 'boolean') return value;
@@ -145,7 +145,7 @@ function extractRuntimeContext(
   completedNodes: Record<string, NodeRecord>,
 ): RuntimeContextSnapshot {
   if (isWorkflowContext(source)) {
-    const raw = source.snapshot() as Record<string, unknown>;
+    const raw = source.snapshot();
     const records = Array.isArray(raw.records) ? raw.records : [];
     const lastOutputs: Record<string, unknown> = {};
     for (const record of records as NodeRecord[]) {

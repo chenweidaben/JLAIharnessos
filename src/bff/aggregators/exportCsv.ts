@@ -31,7 +31,7 @@ export type CsvCell = string | number | boolean | null | undefined;
 export function escapeCell(value: CsvCell): string {
   if (value === null || value === undefined) return '';
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  const s = value as string;
+  const s = value;
   if (/[",\r\n]/.test(s)) {
     return '"' + s.replace(/"/g, '""') + '"';
   }

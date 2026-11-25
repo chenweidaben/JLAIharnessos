@@ -56,11 +56,11 @@ export interface QualityMetricDef {
 /** 深度质量管理体系输出 */
 export interface DeepQualitySystem {
   generatedAt: string;
-  domains: Array<{
+  domains: {
     code: QualityDomain;
     name: string;
     metrics: QualityMetricDef[];
-  }>;
+  }[];
   totalMetrics: number;
   summary: Record<QualityDomain, number>;
 }
@@ -262,7 +262,7 @@ export function buildDeepQualitySystem(nowIso?: string): DeepQualitySystem {
  */
 export function predictQualityTrend(
   metric: QualityMetricDef,
-  history: Array<{ value: number; period?: string }> | number[],
+  history: { value: number; period?: string }[] | number[],
   days: number,
 ): QualityTrend {
   const values = history.map((h) => (typeof h === 'number' ? h : h.value));
@@ -410,11 +410,11 @@ export function identifyQualityRisk(
 // ---------------------------------------------------------------------------
 
 /** 改进措施规则库：按指标 code 映射到可落地措施 + 责任岗 */
-const IMPROVEMENT_RULES: Array<{
+const IMPROVEMENT_RULES: {
   match: RegExp;
   measure: string;
   owner: string;
-}> = [
+}[] = [
   { match: /MR_GRADE_A/i, measure: '开展病历内涵质控专项：运行病历质控前置、三级医师查房记录闭环、缺陷病历 24h 内反馈返修', owner: '质控科 / 病案室' },
   { match: /SURGICAL_COMPLICATION/i, measure: '落实手术安全核查与围术期管理：术前多学科讨论、术后并发症日清单追踪、主刀医师分级授权再评估', owner: '医务科 / 外科教研室' },
   { match: /HAI|院感/i, measure: '强化手卫生依从性督查、器械消毒灭菌溯源、多重耐药菌隔离与环境物表采样闭环', owner: '院感科' },

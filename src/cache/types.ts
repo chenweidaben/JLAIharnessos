@@ -59,7 +59,7 @@ export interface ICache {
   renewIfValue(key: string, token: string, ttlMs: number): Promise<boolean>;
 
   /** 批量读取（与 keys 顺序对齐，缺失为 null） */
-  mget<T = CacheValue>(keys: string[]): Promise<Array<T | null>>;
+  mget<T = CacheValue>(keys: string[]): Promise<(T | null)[]>;
 
   /** 按 glob 模式删除（如 jianlan:agent:*），返回删除数量；生产用 scan 不用 keys */
   deletePattern(pattern: string): Promise<number>;
@@ -72,6 +72,6 @@ export interface ICache {
 }
 
 /** 统一键命名：jianlan:<domain>:<...>，避免与其他服务冲突并便于按域清理 */
-export function cacheKey(domain: string, ...parts: Array<string | number>): string {
+export function cacheKey(domain: string, ...parts: (string | number)[]): string {
   return ['jianlan', domain, ...parts.map((p) => String(p))].join(':');
 }

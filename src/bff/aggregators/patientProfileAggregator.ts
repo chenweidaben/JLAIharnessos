@@ -216,7 +216,7 @@ export function summarizeVisits(visits: readonly ProfileVisit[]): string {
   const now = Date.now();
   const recent = visits
     .filter((v) => v.admitAt !== null)
-    .filter((v) => now - new Date(v.admitAt as string).getTime() <= ONE_YEAR_MS)
+    .filter((v) => now - new Date(v.admitAt!).getTime() <= ONE_YEAR_MS)
     .sort((a, b) => (b.admitAt ?? '').localeCompare(a.admitAt ?? ''));
 
   if (recent.length === 0) return `共累计就诊${visits.length}次，近12个月无就诊记录。`;
@@ -278,7 +278,7 @@ export function buildPatientProfile(
   const reactions = new Set<string>();
   for (const o of orders) {
     const detailText = o.detail && typeof o.detail.reaction === 'string'
-      ? (o.detail.reaction as string)
+      ? (o.detail.reaction)
       : '';
     const haystack = `${o.note ?? ''} ${detailText}`;
     const hit = matchReaction(haystack);
@@ -288,7 +288,7 @@ export function buildPatientProfile(
   /* ---- 偏好治疗：近 6 个月主导科室 + 医嘱类型 ---- */
   const nowMs = new Date(now).getTime();
   const recent = visits.filter(
-    (v) => v.admitAt !== null && nowMs - new Date(v.admitAt as string).getTime() <= HALF_YEAR_MS,
+    (v) => v.admitAt !== null && nowMs - new Date(v.admitAt).getTime() <= HALF_YEAR_MS,
   );
   let preferredTreatment = '暂无足够就诊数据，偏好治疗方式待积累。';
   if (recent.length > 0) {

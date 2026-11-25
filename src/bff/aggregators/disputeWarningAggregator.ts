@@ -43,10 +43,10 @@ export interface MedicalDisputeWarningReport {
   complaintRate: number;
   disputeRate: number;
   totalCompensation: number;
-  highRiskDepts: Array<{ dept: string; count: number }>;
-  highRiskDoctors: Array<{ doctor: string; count: number }>;
-  disputeCauses: Array<{ cause: string; count: number }>;
-  predictedRiskCases: Array<{ patientId: string; level: string; reason: string }>;
+  highRiskDepts: { dept: string; count: number }[];
+  highRiskDoctors: { doctor: string; count: number }[];
+  disputeCauses: { cause: string; count: number }[];
+  predictedRiskCases: { patientId: string; level: string; reason: string }[];
   suggestions: string[];
 }
 

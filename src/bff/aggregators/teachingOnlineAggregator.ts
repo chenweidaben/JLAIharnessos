@@ -92,7 +92,7 @@ export interface LearningProgress {
 /** buildOnlineLearningPlatform 返回 */
 export interface OnlineLearningPlatform {
   /** 全部分类（含课程数） */
-  categories: Array<{ key: CourseCategory; name: string; count: number }>;
+  categories: { key: CourseCategory; name: string; count: number }[];
   /** 当前筛选后的课程目录（不传 category 则全量） */
   courses: OnlineCourse[];
   /** 当前筛选分类（未传 = all） */
@@ -346,7 +346,7 @@ function extractKeySentences(content: string, n: number): string[] {
 /** 从句子里挖一个「关键概念」：取前若干字符作为题干锚点 */
 function anchorOf(sentence: string): string {
   // 取前 12~20 字作为概念锚点
-  const m = sentence.match(/^[^，,。；：:]{4,24}/);
+  const m = /^[^，,。；：:]{4,24}/.exec(sentence);
   return m ? m[0] : sentence.slice(0, 16);
 }
 

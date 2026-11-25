@@ -171,6 +171,16 @@ async function runMigrationFile(sql: Sql, filePath: string, version: string): Pr
   const statements = splitSqlStatements(content);
 
   await sql.begin(async (tx) => {
+    // 多副本并发启动护栏：事务级咨询锁串行化同一文件的迁移执行。
+    // pg_advisory_xact_lock 绑定当前事务连接（postgres.js begin 保证同连接），
+    // 提交/回滚时自动释放，崩溃也不会残留锁。锁 ID 取 'JLM1' 的固定哈希。
+    await tx`SELECT pg_advisory_xact_lock(0x4A4C4D31)`;
+    // 拿到锁后复查：另一副本可能已在我们等待期间完成该迁移
+    const dup = await tx`
+      SELECT version FROM ${sql(MIGRATION_TABLE)} WHERE version = ${version}
+    `;
+    if (dup.length > 0) return;
+
     for (const stmt of statements) {
       await tx.unsafe(stmt);
     }
@@ -198,8 +208,8 @@ export async function runMigrations(migrationsDir: string = MIGRATIONS_DIR): Pro
     .filter((f) => f.endsWith('.sql'))
     .sort((a, b) => {
       // 提取数字前缀，按数字排序（而非字符串排序）
-      const numA = parseInt(a.match(/^(\d+)/)?.[1] ?? '0', 10);
-      const numB = parseInt(b.match(/^(\d+)/)?.[1] ?? '0', 10);
+      const numA = parseInt((/^(\d+)/.exec(a))?.[1] ?? '0', 10);
+      const numB = parseInt((/^(\d+)/.exec(b))?.[1] ?? '0', 10);
       if (numA !== numB) return numA - numB;
       return a.localeCompare(b);
     });

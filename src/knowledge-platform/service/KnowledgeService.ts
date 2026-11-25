@@ -246,7 +246,7 @@ export class KnowledgeService {
     this.terminology.load(this.terms);
   }
 
-  listSources(): Array<{ sourceId: string; count: number; latest?: string }> {
+  listSources(): { sourceId: string; count: number; latest?: string }[] {
     return [...this.termsBySource.entries()].map(([sourceId, list]) => ({
       sourceId,
       count: list.length,
@@ -276,7 +276,7 @@ export class KnowledgeService {
 
   search(query: string, kbIds?: string[], opts: { tenantId?: string; topK?: number; minScore?: number } = {}): RetrievalResponse {
     const t0 = Date.now();
-    const kbScope = kbIds && kbIds.length ? kbIds : [...this.kbs.keys()];
+    const kbScope = kbIds?.length ? kbIds : [...this.kbs.keys()];
     // 合并所选 KB 的检索权重
     const firstKb = kbScope.map((id) => this.kbs.get(id)).find(Boolean);
     const hits = this.retriever.search(query, {
@@ -306,7 +306,7 @@ export class KnowledgeService {
     return this.search(query, [kbId], { topK });
   }
 
-  graphQuery(entityName: string, maxHops = 2): { entity?: GraphEntity; neighbors: Array<{ name: string; type: string; relation: string }>; path: string[][] } {
+  graphQuery(entityName: string, maxHops = 2): { entity?: GraphEntity; neighbors: { name: string; type: string; relation: string }[]; path: string[][] } {
     const id = this.graph.resolve(entityName);
     if (!id) return { neighbors: [], path: [] };
     const entity = this.graph.getEntity(id);

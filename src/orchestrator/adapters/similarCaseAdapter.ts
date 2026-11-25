@@ -33,7 +33,7 @@ export interface SimilarCaseQueryDeps {
   auditService?: AiAuditService;
 }
 
-function firstNonEmpty(...values: Array<unknown>): string | undefined {
+function firstNonEmpty(...values: unknown[]): string | undefined {
   for (const value of values) {
     if (typeof value === 'string' && value.trim().length > 0) return value;
     if (typeof value === 'number' && Number.isFinite(value)) return String(value);

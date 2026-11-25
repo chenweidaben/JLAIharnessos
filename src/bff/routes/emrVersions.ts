@@ -51,7 +51,7 @@ export const emrVersionsRoutes: RouteDef[] = [
         return json(ok(createNote({
           visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
           title: String(b.title ?? ''), noteType: String(b.noteType ?? ''),
-          content: (b.content ?? {}) as Record<string, string>,
+          content: (b.content ?? {}),
           roles: c.user?.roles ?? [], authorId: c.user?.id ?? '',
           authorRole: (c.user?.roles ?? [])[0] ?? 'unknown',
         })));

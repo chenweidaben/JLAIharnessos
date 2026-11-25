@@ -170,7 +170,7 @@ async function handleScCreate(c: Ctx): Promise<Response> {
   const {
     patientId, operationId, surgeonName, surgeonTitle, consentItems,
     patientSignature, guardianSignature, signatureDate, consentValidUntil, operationDate,
-  } = body as Record<string, unknown>;
+  } = body;
 
   // 必填字段校验
   if (
@@ -215,8 +215,8 @@ async function handleScCreate(c: Ctx): Promise<Response> {
     surgeonName: surgeonName.trim(),
     surgeonTitle: surgeonTitle.trim(),
     consentItems: items,
-    patientSignature: hasPatientSig ? (patientSignature as string).trim() : null,
-    guardianSignature: hasGuardianSig ? (guardianSignature as string).trim() : null,
+    patientSignature: hasPatientSig ? (patientSignature).trim() : null,
+    guardianSignature: hasGuardianSig ? (guardianSignature).trim() : null,
     signatureDate: signatureDate.trim(),
     consentValidUntil: consentValidUntil.trim(),
     operationDate: operationDate.trim(),

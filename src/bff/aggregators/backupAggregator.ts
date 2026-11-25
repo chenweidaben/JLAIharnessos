@@ -196,7 +196,7 @@ export function importSystemData(jsonData: string | unknown): RestoredBackup {
 
   // 完整性复核：重算校验和并与信封自带值比对
   const expected = fnv1aHex(canonicalize(normalized));
-  if (expected !== (env.checksum as string).toLowerCase()) {
+  if (expected !== (env.checksum).toLowerCase()) {
     throw new Error('备份文件校验和不匹配：文件可能已损坏或被篡改');
   }
 

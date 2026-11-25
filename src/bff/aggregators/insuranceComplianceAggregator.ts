@@ -285,7 +285,7 @@ export function buildHistoryViolations(
 ): HistoryViolationItem[] {
   if (!Array.isArray(history)) return [];
   return history
-    .filter((h) => !!h && typeof h === 'object' && typeof (h as HistoryViolationInput).detail === 'string')
+    .filter((h) => !!h && typeof h === 'object' && typeof (h).detail === 'string')
     .map((h) => ({
       date: String(h.date ?? ''),
       type: String(h.type ?? ''),

@@ -278,10 +278,10 @@ export async function listSurveysForStaff(input: {
   // M198 空数据修复：DEMO_MODE 下返回确定性演示评价明细。
   if (process.env.DEMO_MODE === '1') {
     const demo: SatisfactionSurvey[] = [
-      { id: 'demo-sv-01', surveyNo: 'SV-20261018-001', patientId: 'P001', visitId: 'V001', consultId: null, sourceType: 'outpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 4, processScore: 5, waitScore: 4, comment: '医生很耐心，解释清楚。', status: 'submitted', submittedBy: '患者A', submittedAt: '2026-10-18 11:30' } as SatisfactionSurvey,
-      { id: 'demo-sv-02', surveyNo: 'SV-20261018-002', patientId: 'P002', visitId: 'V002', consultId: null, sourceType: 'outpatient', overallScore: 4, medicalScore: 4, serviceScore: 5, environmentScore: 4, processScore: 4, waitScore: 3, comment: '挂号等待稍久，整体满意。', status: 'submitted', submittedBy: '患者B', submittedAt: '2026-10-18 14:20' } as SatisfactionSurvey,
-      { id: 'demo-sv-03', surveyNo: 'SV-20261017-003', patientId: 'P003', visitId: 'V003', consultId: null, sourceType: 'inpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 5, processScore: 5, waitScore: 5, comment: '住院期间护士照护周到。', status: 'submitted', submittedBy: '患者C', submittedAt: '2026-10-17 16:00' } as SatisfactionSurvey,
-      { id: 'demo-sv-04', surveyNo: 'SV-20261017-004', patientId: 'P004', visitId: null, consultId: 'C001', sourceType: 'consultation', overallScore: 4, medicalScore: 5, serviceScore: 4, environmentScore: 4, processScore: 4, waitScore: 4, comment: '会诊意见专业。', status: 'submitted', submittedBy: '患者D', submittedAt: '2026-10-17 10:15' } as SatisfactionSurvey,
+      { id: 'demo-sv-01', surveyNo: 'SV-20261018-001', patientId: 'P001', visitId: 'V001', consultId: null, sourceType: 'outpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 4, processScore: 5, waitScore: 4, comment: '医生很耐心，解释清楚。', status: 'submitted', submittedBy: '患者A', submittedAt: '2026-10-18 11:30' },
+      { id: 'demo-sv-02', surveyNo: 'SV-20261018-002', patientId: 'P002', visitId: 'V002', consultId: null, sourceType: 'outpatient', overallScore: 4, medicalScore: 4, serviceScore: 5, environmentScore: 4, processScore: 4, waitScore: 3, comment: '挂号等待稍久，整体满意。', status: 'submitted', submittedBy: '患者B', submittedAt: '2026-10-18 14:20' },
+      { id: 'demo-sv-03', surveyNo: 'SV-20261017-003', patientId: 'P003', visitId: 'V003', consultId: null, sourceType: 'inpatient', overallScore: 5, medicalScore: 5, serviceScore: 5, environmentScore: 5, processScore: 5, waitScore: 5, comment: '住院期间护士照护周到。', status: 'submitted', submittedBy: '患者C', submittedAt: '2026-10-17 16:00' },
+      { id: 'demo-sv-04', surveyNo: 'SV-20261017-004', patientId: 'P004', visitId: null, consultId: 'C001', sourceType: 'consultation', overallScore: 4, medicalScore: 5, serviceScore: 4, environmentScore: 4, processScore: 4, waitScore: 4, comment: '会诊意见专业。', status: 'submitted', submittedBy: '患者D', submittedAt: '2026-10-17 10:15' },
     ];
     if (input.sourceType) return demo.filter((s) => s.sourceType === input.sourceType);
     if (input.patientId) return demo.filter((s) => s.patientId === input.patientId);
@@ -316,7 +316,7 @@ export async function getSatisfactionStats(
       processAvg: 4.4,
       waitAvg: 4.2,
       positiveRate: 0.91,
-    } as SatisfactionStats;
+    };
   }
   return getSurveyStats(sourceType);
 }
@@ -341,10 +341,10 @@ export type SatisfactionDimensionKey =
   | 'cost_transparency';
 
 /** 维度元数据：key + 中文标签（与 SQL CHECK 注释对齐） */
-export const SATISFACTION_DIMENSIONS: ReadonlyArray<{
+export const SATISFACTION_DIMENSIONS: readonly {
   key: SatisfactionDimensionKey;
   label: string;
-}> = [
+}[] = [
   { key: 'registration_convenience', label: '挂号便捷度' },
   { key: 'doctor_attitude', label: '医生态度' },
   { key: 'nurse_attitude', label: '护士态度' },
@@ -362,12 +362,12 @@ export interface SatisfactionQuestionnaire {
   /** visit_id 的 SHA-256 哈希（带盐），服务端不存 visit_id 明文 */
   visitIdHash: string;
   /** 六道题（key + 中文标签 + 1-5 量表） */
-  dimensions: Array<{
+  dimensions: {
     key: SatisfactionDimensionKey;
     label: string;
     scaleMin: 1;
     scaleMax: 5;
-  }>;
+  }[];
   /** 问卷生成时间 */
   createdAt: string;
 }
@@ -460,7 +460,7 @@ export function createSurvey(visitId: string): SatisfactionQuestionnaire {
 function assertScores(scores: Record<string, unknown>): Record<SatisfactionDimensionKey, number> {
   const out = {} as Record<SatisfactionDimensionKey, number>;
   for (const key of DIMENSION_KEYS) {
-    const v = (scores as Record<string, unknown>)[key];
+    const v = (scores)[key];
     if (typeof v !== 'number' || !Number.isInteger(v) || v < 1 || v > 5) {
       const label = SATISFACTION_DIMENSIONS.find((d) => d.key === key)?.label ?? key;
       throw new Error(`维度「${label}」评分必须为 1-5 的整数`);

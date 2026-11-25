@@ -51,11 +51,11 @@ interface OpenAiTool {
 interface OpenAiMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string | null;
-  tool_calls?: Array<{
+  tool_calls?: {
     id: string;
     type: 'function';
     function: { name: string; arguments: string };
-  }>;
+  }[];
   tool_call_id?: string;
 }
 
@@ -75,10 +75,10 @@ interface OpenAiChoiceDelta {
 
 /** SSE 流式 chunk */
 interface OpenAiChunk {
-  choices?: Array<{
+  choices?: {
     delta?: OpenAiChoiceDelta;
     finish_reason?: string | null;
-  }>;
+  }[];
   usage?: { prompt_tokens?: number; completion_tokens?: number };
 }
 

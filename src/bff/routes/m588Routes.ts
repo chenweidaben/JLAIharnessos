@@ -95,7 +95,7 @@ async function handleRptCreate(c: Ctx): Promise<Response> {
   const {
     patientId, reportType, reportTitle, reportContent, reportDate,
     reportingDoctor, reportingDoctorAt, reviewingDoctor, reviewingDoctorAt,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

@@ -136,7 +136,7 @@ export function computeOverview(departmentId?: string, from?: string, to?: strin
   const pressureUlcers = nursing.filter((e) => e.type === 'pressure-ulcer').length;
 
   const acked = crit.filter((e) => e.ackMin !== null);
-  const ackMinNums = acked.map((e) => e.ackMin as number);
+  const ackMinNums = acked.map((e) => e.ackMin!);
 
   const roundRequired = rd.reduce((s, e) => s + e.required, 0);
   const roundCompleted = rd.reduce((s, e) => s + e.completed, 0);

@@ -194,7 +194,7 @@ async function handleAeReview(c: Ctx): Promise<Response> {
 
   rec.rootCause = rootCause.trim();
   rec.improvementAction = improvementAction.trim();
-  rec.reviewResult = reviewResult as 'accepted' | 'rejected';
+  rec.reviewResult = reviewResult;
   rec.reviewedBy = reviewedBy.trim();
   rec.reviewedAt = new Date().toISOString();
   rec.status = 'closed';

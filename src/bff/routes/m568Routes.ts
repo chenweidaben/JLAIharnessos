@@ -121,7 +121,7 @@ async function handleMtaCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { doctorId, techName, techLevel, authorizedBy, authorizedAt, expiresAt } = body as Record<string, unknown>;
+  const { doctorId, techName, techLevel, authorizedBy, authorizedAt, expiresAt } = body;
 
   if (
     typeof doctorId !== 'string' || !doctorId.trim() ||

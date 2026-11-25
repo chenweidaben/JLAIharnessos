@@ -141,7 +141,7 @@ export interface StaffMember {
   /** 本周允许的加班上限（小时） */
   maxOvertimeAllowed: number;
   /** 可上的班次 */
-  availableShifts: Array<'day' | 'night' | 'swing'>;
+  availableShifts: ('day' | 'night' | 'swing')[];
 }
 
 /** 班次人力需求（入参） */
@@ -484,7 +484,7 @@ export function getResourceUtilization(
     bedUtilization * 0.4 + orUtilization * 0.3 + staffUtilization * 0.3;
 
   // 找瓶颈：取利用率最高的维度；都 < 0.8 视为均衡
-  const scored: Array<{ key: 'beds' | 'or' | 'staff'; v: number }> = [
+  const scored: { key: 'beds' | 'or' | 'staff'; v: number }[] = [
     { key: 'beds', v: bedUtilization },
     { key: 'or', v: orUtilization },
     { key: 'staff', v: staffUtilization },

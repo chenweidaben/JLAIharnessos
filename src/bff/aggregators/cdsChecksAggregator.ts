@@ -29,7 +29,7 @@ export interface MedInput {
 
 // ---------- 规则库 ----------
 // 剂量超量（硬编码阈值，单位为 mg/24h 或 mg/kg）
-const DOSE_RULES: Array<{ drug: string; maxMg: number; perKg?: boolean; msg: string }> = [
+const DOSE_RULES: { drug: string; maxMg: number; perKg?: boolean; msg: string }[] = [
   { drug: 'paracetamol', maxMg: 4000, msg: '对乙酰氨基酚 >4g/24h 肝损伤风险' },
   { drug: 'warfarin', maxMg: 10, msg: '华法林 >10mg/日 出血高风险' },
   { drug: 'insulin', maxMg: 1, perKg: true, msg: '胰岛素 >1U/kg/日 低血糖风险' },
@@ -37,13 +37,13 @@ const DOSE_RULES: Array<{ drug: string; maxMg: number; perKg?: boolean; msg: str
   { drug: 'metformin', maxMg: 2550, msg: '二甲双胍 >2550mg/日 乳酸酸中毒风险' },
 ];
 // 给药途径禁忌
-const ROUTE_RULES: Array<{ drug: string; badRoute: string; msg: string }> = [
+const ROUTE_RULES: { drug: string; badRoute: string; msg: string }[] = [
   { drug: 'metoprolol', badRoute: 'iv-push', msg: '美托洛尔不可静脉推注（需稀释慢滴）' },
   { drug: 'amoxicillin', badRoute: 'intrathecal', msg: '阿莫西林不可鞘内注射' },
   { drug: 'atenolol', badRoute: 'iv', msg: '阿替洛尔无静脉剂型，不可 IV 给药' },
 ];
 // 疗程超限
-const DURATION_RULES: Array<{ drug: string; maxDays: number; msg: string }> = [
+const DURATION_RULES: { drug: string; maxDays: number; msg: string }[] = [
   { drug: 'ibuprofen', maxDays: 14, msg: 'NSAID 布洛芬 >14 天需评估胃肠/肾风险' },
   { drug: 'amoxicillin', maxDays: 14, msg: '抗生素阿莫西林 >14 天未评估' },
   { drug: 'omeprazole', maxDays: 56, msg: 'PPI 奥美拉唑 >8 周需评估长期使用' },
@@ -52,7 +52,7 @@ const DURATION_RULES: Array<{ drug: string; maxDays: number; msg: string }> = [
 const PREGNANT_FORBIDDEN = ['atorvastatin', 'lisinopril', 'warfarin', 'isotretinoin', 'ribavirin'];
 const RENAL_DRUGS = ['digoxin', 'gentamicin', 'metformin'];
 // 药物相互作用（≥20 对）
-const INTERACTIONS: Array<[string, string, string]> = [
+const INTERACTIONS: [string, string, string][] = [
   ['warfarin', 'ibuprofen', '华法林+NSAID 出血风险↑'],
   ['warfarin', 'aspirin', '华法林+阿司匹林 出血风险↑'],
   ['warfarin', 'amiodarone', '华法林+胺碘酮 INR↑↑'],
@@ -75,7 +75,7 @@ const INTERACTIONS: Array<[string, string, string]> = [
   ['phenytoin', 'warfarin', '苯妥英+华法林 INR 不稳定'],
 ];
 // 静脉 Y-site 配伍禁忌（≥10 对）
-const IV_INCOMPAT: Array<[string, string, string]> = [
+const IV_INCOMPAT: [string, string, string][] = [
   ['cefepime', 'acyclovir', '头孢吡肟+阿昔洛韦 Y-site 沉淀'],
   ['phenytoin', 'furosemide', '苯妥英+呋塞米 Y-site 沉淀'],
   ['ampicillin', 'fluconazole', '氨苄西林+氟康唑 Y-site 不相容'],
@@ -94,7 +94,7 @@ const THERAPY_CLASS: Record<string, string> = {
   metoprolol: 'beta-blocker', atenolol: 'beta-blocker', bisoprolol: 'beta-blocker',
 };
 // 诊断-用药禁忌
-const DIAG_CONTRA: Array<{ drug: string; diag: string; msg: string }> = [
+const DIAG_CONTRA: { drug: string; diag: string; msg: string }[] = [
   { drug: 'metoprolol', diag: 'asthma', msg: '哮喘患者禁用非选择性 β 阻滞剂（可致支气管痉挛）' },
   { drug: 'primaquine', diag: 'g6pd-deficiency', msg: 'G6PD 缺乏患者禁用伯氨喹（溶血）' },
   { drug: 'hydrochlorothiazide', diag: 'gout', msg: '痛风患者慎用噻嗪类利尿剂（升高尿酸）' },
@@ -172,7 +172,7 @@ export function evaluateMedication(input: MedInput): CdsResult {
 }
 
 // ---------- 危急值 ----------
-const CRITICAL: Array<{ code: string; lo: number; hi: number; msg: string }> = [
+const CRITICAL: { code: string; lo: number; hi: number; msg: string }[] = [
   { code: 'K', lo: 3.0, hi: 6.0, msg: '血钾危急值' },
   { code: 'glucose', lo: 2.8, hi: 22.0, msg: '血糖危急值' },
   { code: 'hgb', lo: 60, hi: 0, msg: '血红蛋白危急值' },

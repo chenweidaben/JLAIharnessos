@@ -9,11 +9,11 @@ interface FhirSpecimen {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'available' | 'unavailable' | 'not-requested' | 'unsatisfactory' | 'entered-in-error';
-  type: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  type: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string; display: string };
   receivedTime: string;
   collection: { collectedDateTime: string };
-  container: Array<{ type: { coding: Array<{ system: string; code: string; display: string }>; text: string } }>;
+  container: { type: { coding: { system: string; code: string; display: string }[]; text: string } }[];
 }
 
 const demoSpecimens: FhirSpecimen[] = [

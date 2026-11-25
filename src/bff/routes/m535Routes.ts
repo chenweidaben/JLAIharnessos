@@ -176,7 +176,7 @@ async function handleCfuCreate(c: Ctx): Promise<Response> {
     uncontrolled,
     needsPhysicianReview: uncontrolled,
     nextFollowUpAt: nextFollowUpAt.trim(),
-    notes: notes == null || !notes.trim() ? null : (notes as string).trim(),
+    notes: !notes?.trim() ? null : (notes).trim(),
     followedUpAt: new Date().toISOString(),
   };
   cfuStore.set(record.id, record);

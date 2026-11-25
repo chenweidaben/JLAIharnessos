@@ -245,7 +245,7 @@ function scoreToGrade(score: number): 'A' | 'B' | 'C' | 'D' {
 export function verifyContrastCompliance(): ComplianceResult {
   const palette = fixContrastIssues();
 
-  const usage: Array<{ foreground: string; background: string; usage: string }> = [
+  const usage: { foreground: string; background: string; usage: string }[] = [
     { foreground: FIXED_ACCENT, background: BODY_BACKGROUND, usage: '强调色链接 on 白底（修复后）' },
     {
       foreground: FIXED_SECONDARY_TEXT,

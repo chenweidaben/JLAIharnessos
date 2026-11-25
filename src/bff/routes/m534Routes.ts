@@ -41,7 +41,7 @@ const REGIONS: Region[] = ['head', 'chest', 'abdomen', 'extremity', 'neck', 'ext
 const nissStore = new Map<string, TraumaNissRecord>();
 let nissSeq = 3;
 
-function calcNiss(injuries: Array<{ aisScore: number }>): number {
+function calcNiss(injuries: { aisScore: number }[]): number {
   const top3 = injuries.slice().sort((a, b) => b.aisScore - a.aisScore).slice(0, 3);
   return top3.reduce((acc, it) => acc + it.aisScore * it.aisScore, 0);
 }

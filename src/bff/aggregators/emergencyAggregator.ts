@@ -354,7 +354,7 @@ export async function triage(
     triageRepo.completeTriage(
       visitId,
       {
-        vitals: form.vitals as Record<string, unknown>,
+        vitals: form.vitals,
         gcsEye: assessment.gcs?.eye ?? null,
         gcsVerbal: assessment.gcs?.verbal ?? null,
         gcsMotor: assessment.gcs?.motor ?? null,
@@ -410,7 +410,7 @@ export interface AiTriageAdvice {
 
 /** 从模型输出中提取 JSON（兼容 ```json 包裹） */
 function extractJson(raw: string): string {
-  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(raw);
   const text = fence ? fence[1] : raw;
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
@@ -442,7 +442,7 @@ async function chatOnce(system: string, user: string): Promise<string> {
       signal: controller.signal,
     });
     if (!response.ok) throw new Error(`LLM ${response.status}`);
-    const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     return data.choices?.[0]?.message?.content ?? '';
   } finally {
     clearTimeout(timer);
@@ -696,7 +696,7 @@ export async function addResusEvent(
     'emergency.resuscitation.event',
     'resuscitations',
     resusId,
-    event as unknown as Record<string, unknown>,
+    event,
     resuscitation.patientId,
   );
   return { resuscitation };
@@ -718,7 +718,7 @@ export async function addResusMedication(
     'emergency.resuscitation.medication',
     'resuscitations',
     resusId,
-    med as unknown as Record<string, unknown>,
+    med,
     resuscitation.patientId,
   );
   return { resuscitation };
@@ -843,7 +843,7 @@ export async function updateObservation(
     'emergency.observation.update',
     'observations',
     obsId,
-    patch as Record<string, unknown>,
+    patch,
     observation.patientId,
   );
   return { observation };

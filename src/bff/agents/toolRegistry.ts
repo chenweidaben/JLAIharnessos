@@ -450,10 +450,10 @@ function db(): Sql {
  * 直接参数化查询 clinical.visits JOIN clinical.patients 取脱敏姓名。
  */
 export async function listManagedPatients(doctorId: string): Promise<ManagedPatientRow[]> {
-  const rows = await db()<Array<{
+  const rows = await db()<{
     id: string; patient_id: string; patient_name: string;
     ward: string | null; bed_no: string | null; chief_complaint: string | null;
-  }>>`
+  }[]>`
     SELECT v.id, v.patient_id, p.name_masked AS patient_name,
            v.ward, v.bed_no, v.chief_complaint
     FROM clinical.visits v
@@ -812,10 +812,10 @@ export class DefaultToolExecutor implements ToolExecutor {
     _args: Record<string, unknown>,
     ctx: ToolContext,
   ): Promise<ToolExecuteResult> {
-    const rows = await db()<Array<{
+    const rows = await db()<{
       id: string; visit_id: string; patient_name: string;
       content: string; created_at: string; priority: string;
-    }>>`
+    }[]>`
       SELECT o.id, o.visit_id, p.name_masked AS patient_name,
              o.content, o.created_at, o.priority
       FROM clinical.orders o
@@ -883,11 +883,11 @@ export class DefaultToolExecutor implements ToolExecutor {
       return { ok: true, result: { tasks: [], total: 0 } };
     }
     const ids = top.map((t) => t.prescriptionId);
-    const rows = await db()<Array<{
+    const rows = await db()<{
       task_id: string; prescription_id: string; visit_id: string;
       patient_name: string; drug_name: string | null; dosage: string | null;
       status: string; created_at: string;
-    }>>`
+    }[]>`
       SELECT t.id AS task_id, t.prescription_id, r.visit_id,
              p.name_masked AS patient_name,
              (SELECT item.drug_name FROM clinical.prescription_items item
@@ -933,19 +933,19 @@ export class DefaultToolExecutor implements ToolExecutor {
     const comment = typeof args.comment === 'string' ? args.comment : '';
 
     // 配伍禁忌粗筛：取该处方所有药品名，两两比对规则表
-    const items = await db()<Array<{ drug_name: string }>>`
+    const items = await db()<{ drug_name: string }[]>`
       SELECT drug_name FROM clinical.prescription_items
       WHERE prescription_id = ${prescriptionId}
     `;
     const drugNames = Array.from(new Set(items.map((i) => i.drug_name)));
-    const interactionWarnings: Array<{
+    const interactionWarnings: {
       drugA: string; drugB: string; severity: string; description: string; recommendation: string | null;
-    }> = [];
+    }[] = [];
     if (drugNames.length >= 2) {
-      const rules = await db()<Array<{
+      const rules = await db()<{
         drug_a: string; drug_b: string; severity: string;
         description: string; recommendation: string | null;
-      }>>`
+      }[]>`
         SELECT drug_a, drug_b, severity, description, recommendation
         FROM clinical.medmuse_drug_interactions
       `;
@@ -1163,10 +1163,10 @@ export class DefaultToolExecutor implements ToolExecutor {
     _args: Record<string, unknown>,
     _ctx: ToolContext,
   ): Promise<ToolExecuteResult> {
-    const rows = await db()<Array<{
+    const rows = await db()<{
       visit_id: string; patient_id: string; patient_name: string;
       timepoint: string | null; due_at: string;
-    }>>`
+    }[]>`
       SELECT f.visit_id, v.patient_id, p.name_masked AS patient_name,
              f.timepoint, f.due_at
       FROM clinical.postop_pain_followups f

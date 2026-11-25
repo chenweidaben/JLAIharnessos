@@ -81,7 +81,7 @@ function toErrorResponse(e: unknown): Response | null {
 
 /** 把 Tenant 节点映射为聚合器入参（院区数量由存储实时统计） */
 function toRaw(t: Tenant, campusCount: number): SuperAdminHospitalRaw {
-  const cfg = (t.config ?? {}) as Record<string, unknown>;
+  const cfg = (t.config ?? {});
   return {
     id: t.id,
     name: t.name,

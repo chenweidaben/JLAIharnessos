@@ -74,7 +74,7 @@ export const weightEvolutionRoutes: RouteDef[] = [
         );
       }
 
-      const feedbackStats = (body.feedbackStats ?? {}) as FeedbackStats;
+      const feedbackStats = (body.feedbackStats ?? {});
       const strategyName = body.strategyName?.trim() || 'default-mix';
 
       try {

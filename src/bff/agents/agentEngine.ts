@@ -59,12 +59,12 @@ export interface RunAgentTurnResult {
   reply: string;
   confidence: Confidence;
   disclaimer: string;
-  newMessages: Array<{
+  newMessages: {
     role: 'user' | 'agent' | 'tool';
     content: string;
     toolCalls?: unknown;
     toolResult?: unknown;
-  }>;
+  }[];
   pendingApproval?: PendingApprovalInfo;
   cached?: boolean;
 }

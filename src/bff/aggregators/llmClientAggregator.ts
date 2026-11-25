@@ -288,17 +288,17 @@ export async function callRealLLM(
   const apiUrl = (options.apiUrl ?? '').trim().replace(/\/+$/, '') || preset.defaultApiUrl;
   const apiKey = (options.apiKey ?? '').trim();
   const model = (options.model ?? '').trim() || preset.defaultModel;
-  const timeoutMs = Number.isInteger(options.timeoutMs) && (options.timeoutMs as number) > 0
-    ? (options.timeoutMs as number)
+  const timeoutMs = Number.isInteger(options.timeoutMs) && (options.timeoutMs!) > 0
+    ? (options.timeoutMs!)
     : DEFAULT_TIMEOUT_MS;
-  const maxRetries = Number.isInteger(options.maxRetries) && (options.maxRetries as number) >= 0
-    ? (options.maxRetries as number)
+  const maxRetries = Number.isInteger(options.maxRetries) && (options.maxRetries!) >= 0
+    ? (options.maxRetries!)
     : DEFAULT_MAX_RETRIES;
-  const backoffBaseMs = Number.isFinite(options.backoffBaseMs as number) ? (options.backoffBaseMs as number) : DEFAULT_BACKOFF_BASE_MS;
+  const backoffBaseMs = Number.isFinite(options.backoffBaseMs!) ? (options.backoffBaseMs!) : DEFAULT_BACKOFF_BASE_MS;
   const temperature = options.temperature ?? 0.2;
   const maxContextTokens =
-    Number.isInteger(options.maxContextTokens) && (options.maxContextTokens as number) > 0
-      ? (options.maxContextTokens as number)
+    Number.isInteger(options.maxContextTokens) && (options.maxContextTokens!) > 0
+      ? (options.maxContextTokens!)
       : DEFAULT_MAX_CONTEXT_TOKENS;
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
 
@@ -358,7 +358,7 @@ async function callOnce(
     }
     const data = (await resp.json()) as {
       model?: string;
-      choices?: Array<{ message?: { content?: string | null } }>;
+      choices?: { message?: { content?: string | null } }[];
       usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
     };
     const content = data.choices?.[0]?.message?.content ?? '';

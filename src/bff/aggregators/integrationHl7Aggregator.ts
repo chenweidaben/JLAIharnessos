@@ -60,7 +60,7 @@ export interface HL7Segment {
   /** 段名：MSH / EVN / PID / PV1 / ORC / OBR / OBX / FT1 ... */
   name: string;
   /** 字段数组，下标与 HL7 字段号对齐（1-based，fields[0] 保留不用） */
-  fields: Array<HL7FieldValue | undefined>;
+  fields: (HL7FieldValue | undefined)[];
 }
 
 /** 从 OBX 段提取的一条检验结果 */
@@ -364,7 +364,7 @@ export function parseHL7Message(rawMessage: string): ParsedMessage {
   const segments: HL7Segment[] = rawSegments.map((rawSeg, idx) => {
     const parts = rawSeg.split(delim.field);
     const name = parts[0] ?? '';
-    const fields: Array<HL7FieldValue | undefined> = [];
+    const fields: (HL7FieldValue | undefined)[] = [];
     // MSH 段：parts[1] 是 MSH-2（编码字符），需偏移对齐到字段号 2
     // 非 MSH 段：parts[1] 即第 1 字段
     const isMsh = name === 'MSH';

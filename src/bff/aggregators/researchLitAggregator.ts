@@ -76,7 +76,7 @@ export interface LiteratureSummary {
   /** 按期刊计数 */
   byJournal: Record<string, number>;
   /** 主题标签（按命中频次降序） */
-  themeTags: Array<{ tag: string; count: number }>;
+  themeTags: { tag: string; count: number }[];
   /** 跨文献关键结论 */
   keyFindings: string[];
   /** 出现过的方法学谱系 */
@@ -121,7 +121,7 @@ export interface GrantFramework {
   title: string;
   sections: GrantSection[];
   /** 经费预算占比（合计 100） */
-  budgetOutline: Array<{ item: string; ratio: number }>;
+  budgetOutline: { item: string; ratio: number }[];
   /** 执行周期（月） */
   durationMonths: number;
 }
@@ -134,7 +134,7 @@ export interface GrantFramework {
 // ===========================================================================
 
 /** 主题词表：用于摘要自动总结的主题标签命中 */
-const THEME_LEXICON: Array<{ tag: string; terms: string[] }> = [
+const THEME_LEXICON: { tag: string; terms: string[] }[] = [
   { tag: '人工智能', terms: ['artificial intelligence', 'AI', 'intelligence'] },
   { tag: '深度学习', terms: ['deep learning', 'neural network', 'convolutional', 'deep neural'] },
   { tag: '医学影像', terms: ['imaging', 'radiograph', 'retinal', 'OCT', 'mammograph', 'skin', 'X-ray', 'chest'] },
@@ -692,8 +692,8 @@ const FUNDING_PROFILE: Record<
   {
     category: string;
     durationMonths: number;
-    budget: Array<{ item: string; ratio: number }>;
-    sections: Array<Omit<GrantSection, 'bullets'> & { bullets: string[] }>;
+    budget: { item: string; ratio: number }[];
+    sections: (Omit<GrantSection, 'bullets'> & { bullets: string[] })[];
   }
 > = {
   国自然: {

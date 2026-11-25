@@ -508,7 +508,7 @@ export function listDeepTasks(status?: string): DeepLogisticsTask[] {
  * 输入任意带坐标的任务列表，输出有序站点 + 全程里程；空输入安全兜底。
  */
 export function optimizeLogisticsRoute(
-  tasks: ReadonlyArray<Pick<DeepLogisticsTask, 'id' | 'location' | 'x' | 'y'>>,
+  tasks: readonly Pick<DeepLogisticsTask, 'id' | 'location' | 'x' | 'y'>[],
 ): OptimizedRoute {
   const unvisited = tasks.map((t) => ({ ...t }));
   const stops: RouteStop[] = [];
@@ -568,7 +568,7 @@ function emptyEfficiency(period: string): LogisticsEfficiency {
  * @param period today | 7d | 30d（缺省 7d）
  * @param now 参考时间，测试可注入；缺省取系统当前时间
  */
-export function getLogisticsEfficiency(period: string = '7d', now: Date = new Date()): LogisticsEfficiency {
+export function getLogisticsEfficiency(period = '7d', now: Date = new Date()): LogisticsEfficiency {
   const p = PERIOD_DAYS[period] !== undefined ? period : '7d';
   const out = emptyEfficiency(p);
   if (deepTaskStore.length === 0) return out;

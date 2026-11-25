@@ -166,7 +166,7 @@ function asRole(r: unknown): HospitalStaffRole {
 /** 取 ISO 时间的统计月前缀（YYYY-MM）；空/非法返回空串（不进趋势） */
 function periodOf(iso?: string): string {
   if (!iso) return '';
-  const m = String(iso).match(/^(\d{4}-\d{2})/);
+  const m = /^(\d{4}-\d{2})/.exec(String(iso));
   return m ? m[1] : '';
 }
 

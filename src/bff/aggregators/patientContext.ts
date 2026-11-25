@@ -35,7 +35,7 @@ function presentIllnessText(pi: unknown): string {
   const o = asRecord(pi);
   const parts: string[] = [];
   // 每项：[标签, 候选键列表]（首选对齐门诊表单 ConsultationForm 实际落库键，别名用于兼容历史数据）
-  const labelMap: Array<[string, string[]]> = [
+  const labelMap: [string, string[]][] = [
     ['起病时间', ['onsetTime']],
     ['诱因', ['trigger']],
     ['主要症状', ['mainSymptom', 'symptomDetail']],
@@ -61,7 +61,7 @@ function presentIllnessText(pi: unknown): string {
 function pastHistoryText(ph: unknown): string {
   const o = asRecord(ph);
   const parts: string[] = [];
-  const labelMap: Array<[string, string[]]> = [
+  const labelMap: [string, string[]][] = [
     ['既往疾病', ['diseases', 'disease']],
     ['手术史', ['surgery']],
     ['外伤/输血史', ['traumaTransfusion', 'trauma']],

@@ -79,7 +79,7 @@ async function authenticateThirdPartyKey(c: Ctx): Promise<AuthedThirdPartyKey | 
         AND expires_at > now()
       LIMIT 1
     `;
-    row = (rows as unknown as Array<Record<string, unknown>>)[0] ?? null;
+    row = (rows as unknown as Record<string, unknown>[])[0] ?? null;
   } catch {
     // 库不可用/表未迁移：拒绝一切开放请求（故障默认关闭，fail-closed）
     return json(fail(ErrorCode.UNAUTHORIZED, UNAUTHORIZED_MSG, c.traceId), 401);

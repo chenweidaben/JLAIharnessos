@@ -104,12 +104,12 @@ async function handleDoseCheck(c: Ctx): Promise<Response> {
   // DEMO 种子：老年患者（78 岁）提示减量
   const mockPatientAge = 78;
 
-  const warnings: Array<{
+  const warnings: {
     level: string;
     message: string;
     currentDose: string;
     recommendedDose: string;
-  }> = [];
+  }[] = [];
 
   if (mockPatientAge > 75) {
     warnings.push({

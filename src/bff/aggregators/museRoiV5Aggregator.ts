@@ -31,7 +31,7 @@ const MODEL_PRICING: Record<string, { in: number; out: number }> = {
  * @returns 成本（元）
  */
 export function calculateAICostV5(tokensIn: number, tokensOut: number, model: string): number {
-  const pricing = MODEL_PRICING[model] ?? MODEL_PRICING["deepseek"];
+  const pricing = MODEL_PRICING[model] ?? MODEL_PRICING.deepseek;
   const cost = (tokensIn / 1000) * pricing.in + (tokensOut / 1000) * pricing.out;
   return Math.round(cost * 10000) / 10000;
 }

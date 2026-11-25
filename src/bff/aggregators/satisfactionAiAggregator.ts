@@ -136,7 +136,7 @@ export const ISSUE_LABEL: Readonly<Record<IssueCategory, string>> = {
 };
 
 /** 正面词典 */
-const POSITIVE_LEXICON: ReadonlyArray<string> = [
+const POSITIVE_LEXICON: readonly string[] = [
   '满意', '谢谢', '感谢', '周到', '耐心', '清楚', '专业', '赞',
   '不错', '贴心', '认真', '负责', '热情', '温暖', '好评',
 ];
@@ -150,7 +150,7 @@ function normalize(text: string): string {
 }
 
 /** 统计一条评论命中的关键词数量 */
-function countHits(text: string, lex: ReadonlyArray<string>): number {
+function countHits(text: string, lex: readonly string[]): number {
   let n = 0;
   for (const kw of lex) {
     if (text.includes(kw.toLowerCase())) n += 1;
@@ -191,7 +191,7 @@ function severityOf(count: number): KeyIssue['severity'] {
  *   - negativeRatio ≥ 0.2 → 'neutral'
  *   - 其余（含 total=0）→ 'positive'（无负面信号视为正面基线）
  */
-export function analyzeSatisfactionFeedback(comments: ReadonlyArray<string>): SentimentResult {
+export function analyzeSatisfactionFeedback(comments: readonly string[]): SentimentResult {
   const clean = (comments || []).map((c) => normalize(c)).filter((c) => c.length > 0);
   let positiveCount = 0;
   let neutralCount = 0;
@@ -223,7 +223,7 @@ export function analyzeSatisfactionFeedback(comments: ReadonlyArray<string>): Se
  * @param comments 自由文本评论数组
  * @returns 按命中条数倒序的 KeyIssue 列表（空数组表示无负面信号）
  */
-export function extractKeyIssues(comments: ReadonlyArray<string>): KeyIssue[] {
+export function extractKeyIssues(comments: readonly string[]): KeyIssue[] {
   const clean = (comments || []).map((c) => normalize(c)).filter((c) => c.length > 0);
   const buckets = new Map<IssueCategory, { count: number; samples: string[] }>();
 
@@ -285,7 +285,7 @@ const ISSUE_ACTIONS: Readonly<Record<IssueCategory, string>> = {
  * @returns 按优先级（high → medium → low）与均分升序排列的改进计划
  */
 export function generateImprovementPlan(
-  lowScoreDepts: ReadonlyArray<LowScoreDept>,
+  lowScoreDepts: readonly LowScoreDept[],
 ): ImprovementPlan[] {
   const input = (lowScoreDepts || []).slice();
   const plans: ImprovementPlan[] = input.map((d) => {

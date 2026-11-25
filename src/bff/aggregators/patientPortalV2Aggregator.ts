@@ -123,9 +123,9 @@ export function listAdminNotifs(): AdminNotification[] { return [...adminNotifs]
 
 // ---------- Seed (DEMO_MODE) ----------
 export function seed(patientId: string, input: {
-  reports?: Array<Omit<Report, 'reportId' | 'patientId' | 'readAt'>>;
-  payments?: Array<Omit<PaymentRecord, 'paymentId' | 'patientId'>>;
-  reminders?: Array<Omit<Reminder, 'reminderId' | 'patientId' | 'status'>>;
+  reports?: Omit<Report, 'reportId' | 'patientId' | 'readAt'>[];
+  payments?: Omit<PaymentRecord, 'paymentId' | 'patientId'>[];
+  reminders?: Omit<Reminder, 'reminderId' | 'patientId' | 'status'>[];
 }): { reports: number; payments: number; reminders: number } {
   let r = 0, p = 0, m = 0;
   for (const x of input.reports ?? []) { reports.push({ ...x, reportId: gen('RP'), patientId, readAt: null }); r++; }

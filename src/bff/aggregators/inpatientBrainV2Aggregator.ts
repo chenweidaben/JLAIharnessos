@@ -24,20 +24,20 @@ export interface InpatientInput {
   /** 今日新入院数 */
   admittedToday: number;
   /** 医生列表（管床数+医嘱数+手术量） */
-  doctors: Array<{
+  doctors: {
     doctorId: string;
     name: string;
     bedsManaged: number;
     ordersToday: number;
     surgeriesToday: number;
-  }>;
+  }[];
   /** 护士列表（管床数+护理操作数） */
-  nurses: Array<{
+  nurses: {
     nurseId: string;
     name: string;
     bedsManaged: number;
     nursingActionsToday: number;
-  }>;
+  }[];
 }
 
 /** 床位预测 */
@@ -60,8 +60,8 @@ export interface InpatientBrainV2Result {
   dept: string;
   date: string;
   bedOccupancyRate: number;
-  doctorLoad: Array<{ doctorId: string; name: string; loadIndex: number; level: 'low' | 'medium' | 'high' }>;
-  nurseLoad: Array<{ nurseId: string; name: string; loadIndex: number; level: 'low' | 'medium' | 'high' }>;
+  doctorLoad: { doctorId: string; name: string; loadIndex: number; level: 'low' | 'medium' | 'high' }[];
+  nurseLoad: { nurseId: string; name: string; loadIndex: number; level: 'low' | 'medium' | 'high' }[];
   forecast: BedForecast[];
   suggestions: OptimizationSuggestion[];
 }

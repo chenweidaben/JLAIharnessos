@@ -256,7 +256,7 @@ export function assignRoomsAndTimes(reqs: SurgeryRequest[]): ScheduleItem[] {
         surgeonLabel: shortId(r.surgeonId, '医'),
         status: r.status,
         room,
-        date: r.plannedDate as string,
+        date: r.plannedDate!,
         startMinute: cursor,
         durationMin,
       });
@@ -322,7 +322,7 @@ export async function listView(date: string): Promise<ScheduleBoard> {
       day: buildDayView(anchor, items, true),
       week: buildWeekView(weekStart, items, true),
       demo: true,
-    } as any;
+    };
   }
   const anchor = isValidDateStr(date) ? date : toStr(new Date());
   const weekStart = mondayOf(anchor);
@@ -482,7 +482,7 @@ export function optimizeSurgerySchedule(
   // 1. 入参清洗：去重 id、丢弃非法时长、无房间直接返回
   const seen = new Set<string>();
   const valid = requests.filter((r) => {
-    if (!r || !r.id || seen.has(r.id)) return false;
+    if (!r?.id || seen.has(r.id)) return false;
     seen.add(r.id);
     return r.durationMin > 0;
   });

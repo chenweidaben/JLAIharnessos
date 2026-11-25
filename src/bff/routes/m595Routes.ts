@@ -80,8 +80,8 @@ const TRANSFERS: TransferRow[] = [
 ];
 
 // 30 天每日床位（用 ward 占用数 × 波动模拟）
-function seedDailyOccupancy(): Array<{ date: string; totalBeds: number; occupiedBeds: number }> {
-  const rows: Array<{ date: string; totalBeds: number; occupiedBeds: number }> = [];
+function seedDailyOccupancy(): { date: string; totalBeds: number; occupiedBeds: number }[] {
+  const rows: { date: string; totalBeds: number; occupiedBeds: number }[] = [];
   const start = new Date('2026-09-22T00:00:00+08:00');
   const totalLicensed = WARDS.reduce((s, w) => s + w.licensedBeds, 0);
   const totalOccupied = WARDS.reduce((s, w) => s + w.occupiedBeds, 0);

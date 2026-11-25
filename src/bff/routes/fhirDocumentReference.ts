@@ -9,12 +9,12 @@ interface FhirDocumentReference {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'current' | 'superseded' | 'entered-in-error';
-  type: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  type: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string; display: string };
   date: string;
-  author: Array<{ reference: string; display: string }>;
+  author: { reference: string; display: string }[];
   description: string;
-  content: Array<{ attachment: { contentType: string; url: string; title: string } }>;
+  content: { attachment: { contentType: string; url: string; title: string } }[];
 }
 
 const demoDocumentReferences: FhirDocumentReference[] = [

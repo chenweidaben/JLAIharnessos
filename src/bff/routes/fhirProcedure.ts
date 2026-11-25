@@ -9,12 +9,12 @@ interface FhirProcedure {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'preparation' | 'in-progress' | 'not-done' | 'on-hold' | 'stopped' | 'completed' | 'entered-in-error' | 'unknown';
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string };
   encounter?: { reference: string };
   performedDateTime?: string;
-  performer?: Array<{ actor: { reference: string; display?: string } }>;
-  outcome?: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  performer?: { actor: { reference: string; display?: string } }[];
+  outcome?: { coding: { system: string; code: string; display: string }[]; text: string };
 }
 
 const demoProcedures: FhirProcedure[] = [

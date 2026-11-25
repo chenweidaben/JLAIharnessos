@@ -29,7 +29,7 @@ const badRequest = (m: string) => new SafetyChecklistError(400, m);
 const unauthorized = (m: string) => new SafetyChecklistError(401, m);
 
 /** 四阶段定义（顺序即展示顺序） */
-export const CHECKLIST_PHASES: ReadonlyArray<{ phase: SafetyChecklistPhase; title: string }> = [
+export const CHECKLIST_PHASES: readonly { phase: SafetyChecklistPhase; title: string }[] = [
   { phase: 'pre_op', title: '术前核查' },
   { phase: 'anesthesia', title: '麻醉实施前核查' },
   { phase: 'pre_incision', title: '切皮前 Time-out' },

@@ -14,7 +14,7 @@ import {
 } from "../aggregators/emrSignatureV14Aggregator.js";
 
 /** 内存态签名记录集（演示用，生产环境应持久化） */
-const signatureState: Map<string, { authorId: string; noteHash: string; signature: string; signedAt: string }> = new Map();
+const signatureState = new Map<string, { authorId: string; noteHash: string; signature: string; signedAt: string }>();
 
 export const emrSignatureV14Routes: RouteDef[] = [
   {

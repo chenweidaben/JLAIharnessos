@@ -9,13 +9,13 @@ interface FhirDiagnosticReport {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'registered' | 'partial' | 'preliminary' | 'final' | 'amended' | 'corrected' | 'appended' | 'cancelled' | 'entered-in-error' | 'unknown';
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string };
   encounter?: { reference: string };
   issued: string;
   conclusion?: string;
-  conclusionCode?: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
-  result: Array<{ reference: string; display?: string }>;
+  conclusionCode?: { coding: { system: string; code: string; display: string }[]; text: string }[];
+  result: { reference: string; display?: string }[];
 }
 
 const demoReports: FhirDiagnosticReport[] = [

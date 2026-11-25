@@ -6,10 +6,10 @@ export class MedReviewError extends Error {
 }
 
 // 本地规则审查（确定性，不依赖外部LLM）
-function runLocalRules(drugName: string, patientAge?: number, allergies?: string[]): Array<{
+function runLocalRules(drugName: string, patientAge?: number, allergies?: string[]): {
   reviewType: string; severity: string; message: string; suggestion?: string;
-}> {
-  const alerts: Array<{reviewType: string; severity: string; message: string; suggestion?: string}> = [];
+}[] {
+  const alerts: {reviewType: string; severity: string; message: string; suggestion?: string}[] = [];
   const d = drugName.toLowerCase();
 
   // 规则1：华法林 + 阿司匹林 = 出血风险
@@ -29,7 +29,7 @@ function runLocalRules(drugName: string, patientAge?: number, allergies?: string
     });
   }
   // 规则3：药物过敏
-  if (allergies && allergies.some(a => d.includes(a.toLowerCase()))) {
+  if (allergies?.some(a => d.includes(a.toLowerCase()))) {
     alerts.push({
       reviewType: 'allergy', severity: 'critical',
       message: `患者对${drugName}有过敏史`,

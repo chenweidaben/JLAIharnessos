@@ -61,7 +61,7 @@ export interface EffectiveTemplate {
   rejectedOverrides: string[];
 }
 
-const SCOPE_PRIORITY: ReadonlyArray<TemplateScope> = ['personal', 'department', 'hospital', 'national'];
+const SCOPE_PRIORITY: readonly TemplateScope[] = ['personal', 'department', 'hospital', 'national'];
 
 /**
  * 判断某条模板在给定上下文中是否归属该层级。

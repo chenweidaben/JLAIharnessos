@@ -75,7 +75,7 @@ async function handleList(c: Ctx): Promise<Response> {
       FROM medmuse.system_config
       ORDER BY category, key
     `;
-    const all = (rows as unknown as Array<Record<string, unknown>>).map(toEntry);
+    const all = (rows as unknown as Record<string, unknown>[]).map(toEntry);
     // 纯函数分类筛选（单测覆盖）；空 category 返回全量
     const items = filterByCategory(category, all);
     return json(ok({ total: items.length, items }));
@@ -139,7 +139,7 @@ async function handleUpsert(c: Ctx): Promise<Response> {
         updated_at  AS "updated_at",
         updated_by  AS "updated_by"
     `;
-    const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+    const row = (rows as unknown as Record<string, unknown>[])[0];
     if (!row) {
       return json(fail(ErrorCode.INTERNAL_ERROR, '配置写入未返回结果'), 500);
     }

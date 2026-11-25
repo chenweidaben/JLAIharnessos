@@ -56,7 +56,7 @@ async function handleCreateRoute(c: Ctx): Promise<Response> {
   const timeoutMs = typeof body.timeoutMs === 'number' ? body.timeoutMs : 5000;
   const description = typeof body.description === 'string' ? body.description : '';
 
-  if (!routePath || !routePath.startsWith('/')) {
+  if (!routePath?.startsWith('/')) {
     return json(fail(ErrorCode.BAD_REQUEST, 'routePath 必须以 / 开头'), 400);
   }
   if (!METHODS.includes(method)) {
@@ -91,7 +91,7 @@ async function handleCreateRoute(c: Ctx): Promise<Response> {
         status AS "status",
         circuit_state AS "circuitState"
     `;
-    const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+    const row = (rows as unknown as Record<string, unknown>[])[0];
     if (!row) {
       return json(fail(ErrorCode.INTERNAL_ERROR, '路由写入未返回结果'), 500);
     }
@@ -99,7 +99,7 @@ async function handleCreateRoute(c: Ctx): Promise<Response> {
   } catch (err) {
     const msg = err instanceof Error ? err.message : '';
     // 唯一约束冲突：(route_path, method) 重复
-    if (/api_routes_path_method_uniq/.test(msg)) {
+    if (msg.includes('api_routes_path_method_uniq')) {
       return json(fail(ErrorCode.CONFLICT, '该路径+方法的路由已存在'), 409);
     }
     return json(fail(ErrorCode.INTERNAL_ERROR, '登记路由失败：' + msg), 500);
@@ -165,14 +165,14 @@ async function handleCreateExternal(c: Ctx): Promise<Response> {
         description AS "description",
         status AS "status"
     `;
-    const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+    const row = (rows as unknown as Record<string, unknown>[])[0];
     if (!row) {
       return json(fail(ErrorCode.INTERNAL_ERROR, '外部系统写入未返回结果'), 500);
     }
     return json(ok(row, '外部系统已登记'));
   } catch (err) {
     const msg = err instanceof Error ? err.message : '';
-    if (/api_gateway_systems_name_uniq/.test(msg)) {
+    if (msg.includes('api_gateway_systems_name_uniq')) {
       return json(fail(ErrorCode.CONFLICT, '同名外部系统已存在'), 409);
     }
     return json(fail(ErrorCode.INTERNAL_ERROR, '登记外部系统失败：' + msg), 500);

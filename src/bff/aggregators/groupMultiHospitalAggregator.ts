@@ -270,9 +270,9 @@ export function buildGroupDashboard(
   input?: GroupInput,
   nowIso: string = new Date().toISOString(),
 ): GroupDashboard {
-  const members: GroupMember[] = Array.isArray(input?.members) ? input!.members : [];
-  const metrics: HospitalMetricSnapshot[] = Array.isArray(input?.metrics) ? input!.metrics : [];
-  const standards: GroupStandard[] = Array.isArray(input?.standards) ? input!.standards : [];
+  const members: GroupMember[] = Array.isArray(input?.members) ? input.members : [];
+  const metrics: HospitalMetricSnapshot[] = Array.isArray(input?.metrics) ? input.metrics : [];
+  const standards: GroupStandard[] = Array.isArray(input?.standards) ? input.standards : [];
 
   // 指标按 hospitalId 建索引（同一周期每院一行；多行取最新 period 一行）
   const metricByHospital = new Map<string, HospitalMetricSnapshot>();
@@ -430,7 +430,7 @@ export function optimizeGroupResource(
   const meta = RESOURCE_META[resourceType as ResourceType];
   const empty: ResourceSuggestion = {
     groupId,
-    resourceType: (resourceType as ResourceType) ?? ('expert' as ResourceType),
+    resourceType: (resourceType as ResourceType) ?? ('expert'),
     resourceName: meta?.name ?? '未知资源',
     asOf: nowIso,
     demo: true,

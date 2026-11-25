@@ -586,28 +586,28 @@ export function optimizePatientRoute(
     let cur: string | null = null;
     let best = Infinity;
     for (const z of seed.zones) {
-      if (!visited.has(z.code) && (dist.get(z.code) as number) < best) {
-        best = dist.get(z.code) as number;
+      if (!visited.has(z.code) && (dist.get(z.code)!) < best) {
+        best = dist.get(z.code)!;
         cur = z.code;
       }
     }
     if (cur === null || cur === end) break;
     visited.add(cur);
 
-    const curZone = zoneMap.get(cur) as ZoneSeed;
+    const curZone = zoneMap.get(cur)!;
     for (const nb of curZone.neighbors) {
       const nbZone = zoneMap.get(nb);
       if (!nbZone || visited.has(nb)) continue;
       const w = edgeWeight(curZone, nbZone);
-      const nd = (dist.get(cur) as number) + w;
-      if (nd < (dist.get(nb) as number)) {
+      const nd = (dist.get(cur)!) + w;
+      if (nd < (dist.get(nb)!)) {
         dist.set(nb, nd);
         prev.set(nb, cur);
       }
     }
   }
 
-  const endDist = dist.get(end) as number;
+  const endDist = dist.get(end)!;
   if (!Number.isFinite(endDist)) {
     throw new Error(`optimizePatientRoute: ${start} 与 ${end} 之间无连通路径`);
   }
@@ -619,11 +619,11 @@ export function optimizePatientRoute(
     path.unshift(walk);
     walk = prev.get(walk) ?? null;
   }
-  const pathNames = path.map((c) => (zoneMap.get(c) as ZoneSeed).name);
+  const pathNames = path.map((c) => (zoneMap.get(c)!).name);
 
   // 拥堵等级：按路径平均拥挤惩罚判定
   const avgCrowd =
-    path.slice(1).reduce((s, code) => s + (zoneMap.get(code) as ZoneSeed).crowdBaseline, 0) /
+    path.slice(1).reduce((s, code) => s + (zoneMap.get(code)!).crowdBaseline, 0) /
     Math.max(1, path.length - 1);
   const congestion: OptimizedRoute['congestion'] =
     avgCrowd >= 200 ? 'crowded' : avgCrowd >= 100 ? 'moderate' : 'smooth';

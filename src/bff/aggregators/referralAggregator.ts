@@ -93,7 +93,7 @@ let referralSeq = 0;
  * 覆盖三态：待接收 / 已接收 / 已完成，三种方向各一。
  */
 function seedDemoReferrals(): void {
-  const seeds: Array<Omit<Referral, 'id'>> = [
+  const seeds: Omit<Referral, 'id'>[] = [
     { patientId: 'P001', fromDept: '社区卫生服务中心', toDept: '心血管内科', direction: '上转', reason: '胸痛待查，需上级医院冠脉评估', expectedDate: '2026-10-20', status: '待接收', acceptingDoctor: null, acceptedAt: null, outcome: null, completedAt: null, createdAt: '2026-10-18 09:00' },
     { patientId: 'P002', fromDept: '普外科', toDept: '康复医学科', direction: '下转', reason: '术后恢复期康复治疗', expectedDate: '2026-10-19', status: '已接收', acceptingDoctor: 'u_2001', acceptedAt: '2026-10-18 15:00', outcome: null, completedAt: null, createdAt: '2026-10-17 10:00' },
     { patientId: 'P003', fromDept: '呼吸内科', toDept: 'ICU', direction: '院内转科', reason: '呼吸衰竭需转入 ICU 监护', expectedDate: '2026-10-18', status: '已完成', acceptingDoctor: 'u_2002', acceptedAt: '2026-10-18 08:00', outcome: '病情稳定转回普通病房', completedAt: '2026-10-19 10:00', createdAt: '2026-10-17 16:00' },

@@ -22,7 +22,7 @@ export interface XdsDocument {
   createdAt: string;
 }
 
-export const DOCUMENT_TYPES: Array<{ code: string; display: string }> = [
+export const DOCUMENT_TYPES: { code: string; display: string }[] = [
   { code: '34133-9', display: 'Summary（患者摘要）' },
   { code: '11506-3', display: 'History and physical note（病程记录）' },
   { code: '18748-4', display: 'Radiology study report（影像报告）' },
@@ -94,12 +94,12 @@ export interface QueryInput {
   offset?: number;
 }
 
-export function query(q: QueryInput): { rows: Array<Omit<XdsDocument, 'content'>>; total: number } {
+export function query(q: QueryInput): { rows: Omit<XdsDocument, 'content'>[]; total: number } {
   let arr = Array.from(docs.values());
   if (q.patientId) arr = arr.filter((d) => d.patientId === q.patientId);
   if (q.documentType) arr = arr.filter((d) => d.documentType === q.documentType);
-  if (q.from) arr = arr.filter((d) => d.createdAt >= (q.from as string));
-  if (q.to) arr = arr.filter((d) => d.createdAt <= (q.to as string));
+  if (q.from) arr = arr.filter((d) => d.createdAt >= (q.from!));
+  if (q.to) arr = arr.filter((d) => d.createdAt <= (q.to!));
   arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const total = arr.length;
   const limit = Math.min(Math.max(q.limit ?? 50, 1), 200);
@@ -126,7 +126,7 @@ export function getContent(documentId: string): { content: string; contentHash: 
   return { content: d.content, contentHash: d.contentHash, hashValid: recomputed === d.contentHash };
 }
 
-export function listTypes(): Array<{ code: string; display: string }> {
+export function listTypes(): { code: string; display: string }[] {
   return DOCUMENT_TYPES.slice();
 }
 

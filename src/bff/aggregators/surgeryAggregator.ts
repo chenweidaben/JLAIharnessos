@@ -104,11 +104,11 @@ function buildDemoSurgeryList(): SurgeryRequest[] {
     patient: true, procedure: true, anesthesiaMethod: true,
     surgeon: true, antibiotic: true, skinTest: true,
   };
-  const rows: Array<Partial<SurgeryRequest> & {
+  const rows: (Partial<SurgeryRequest> & {
     id: string; requestNo: string; visitId: string; patientId: string;
     surgeryType: string; plannedProcedure: string; diagnosis: string | null;
     plannedDate: string | null; department: string; status: SurgeryStatus;
-  }> = [
+  })[] = [
     { id: 'demo-surg-01', requestNo: 'SUR20261019001', visitId: 'demo-visit-s01', patientId: 'demo-pat-s01', surgeryType: 'elective', plannedProcedure: '腹腔镜胆囊切除术', diagnosis: '胆囊结石伴慢性胆囊炎', plannedDate: today, department: '普外科', status: 'discharged', anesthesiaMethod: '全身麻醉', precheck: fullPrecheck, precheckedAt: `${today} 07:30`, startedAt: `${today} 08:00`, endedAt: `${today} 09:40`, surgeonSignedAt: `${today} 09:50`, anesthetistSignedAt: `${today} 09:48` },
     { id: 'demo-surg-02', requestNo: 'SUR20261019002', visitId: 'demo-visit-s02', patientId: 'demo-pat-s02', surgeryType: 'elective', plannedProcedure: '全髋关节置换术（左侧）', diagnosis: '左股骨颈骨折', plannedDate: today, department: '骨科', status: 'maintenance', anesthesiaMethod: '椎管内麻醉', precheck: fullPrecheck, precheckedAt: `${today} 08:10`, startedAt: `${today} 08:45`, surgeonSignedAt: null, anesthetistSignedAt: null },
     { id: 'demo-surg-03', requestNo: 'SUR20261019003', visitId: 'demo-visit-s03', patientId: 'demo-pat-s03', surgeryType: 'emergency', plannedProcedure: '剖腹探查+脾切除术', diagnosis: '外伤性脾破裂', plannedDate: today, department: '普外科', status: 'induction', anesthesiaMethod: '全身麻醉', precheck: fullPrecheck, precheckedAt: `${today} 09:20`, startedAt: `${today} 09:55`, surgeonSignedAt: null, anesthetistSignedAt: null },

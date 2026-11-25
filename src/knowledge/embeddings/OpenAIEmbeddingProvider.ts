@@ -25,7 +25,7 @@ export interface OpenAIEmbeddingConfig {
 }
 
 interface EmbeddingResponse {
-  data?: Array<{ embedding?: number[]; index?: number }>;
+  data?: { embedding?: number[]; index?: number }[];
   model?: string;
 }
 

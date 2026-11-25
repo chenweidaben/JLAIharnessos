@@ -75,7 +75,7 @@ export class AsyncQueue<T = unknown, R = unknown> {
   private closed = false;
 
   /** backpressure 等待者：当队列腾出空位时唤醒 */
-  private readonly waiters: Array<{ resolve: () => void; timer: ReturnType<typeof setTimeout> | undefined }> = [];
+  private readonly waiters: { resolve: () => void; timer: ReturnType<typeof setTimeout> | undefined }[] = [];
 
   constructor(options: AsyncQueueOptions<T, R>) {
     if (options.concurrency !== undefined && options.concurrency <= 0) {

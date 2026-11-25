@@ -129,7 +129,7 @@ async function buildView(
     WHERE staff_id = ${staffId}
     ORDER BY created_at DESC
     LIMIT 200
-  `) as Array<Record<string, unknown>>;
+  `) as Record<string, unknown>[];
   const recentDecisions: MuseHomeDecision[] = decRows.map((r) => ({
     decision: typeof r.decision === 'string' ? r.decision : '',
     outcome:

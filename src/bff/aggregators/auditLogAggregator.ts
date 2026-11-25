@@ -93,7 +93,7 @@ export async function auditDistribution() {
 /** 近 N 天趋势 */
 export async function auditTrend(days = 7) {
   if (process.env.DEMO_MODE === '1') {
-    const out: Array<{ date: string; total: number; abnormal: number }> = [];
+    const out: { date: string; total: number; abnormal: number }[] = [];
     const today = new Date();
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(today.getTime() - i * 86400_000);

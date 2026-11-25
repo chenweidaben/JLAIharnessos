@@ -22,7 +22,7 @@ import type {
 const FILLER_WORDS = ['嗯', '啊', '呃', '哦', '那个', '就是', '然后', '这个', '怎么说呢', '好像', '大概', '其实', '对吧', '是吧'];
 
 /** 术语同义词字典（仅展示归一；不据此做诊断改写） */
-const TERM_SYNONYMS: ReadonlyArray<[RegExp, string]> = [
+const TERM_SYNONYMS: readonly [RegExp, string][] = [
   [/血压高/g, '高血压'],
   [/头疼/g, '头痛'],
   [/拉肚子/g, '腹泻'],
@@ -33,7 +33,7 @@ const TERM_SYNONYMS: ReadonlyArray<[RegExp, string]> = [
 ];
 
 /** 初诊必备章节关键词与中文标签 */
-const INITIAL_SECTIONS: ReadonlyArray<[string, RegExp]> = [
+const INITIAL_SECTIONS: readonly [string, RegExp][] = [
   ['主诉', /主诉|主要不适/],
   ['现病史', /现病史|发病以来|症状出现/],
   ['既往史', /既往史|既往|以前得过|过敏史/],
@@ -42,7 +42,7 @@ const INITIAL_SECTIONS: ReadonlyArray<[string, RegExp]> = [
 ];
 
 /** 复诊必备章节关键词与中文标签 */
-const FOLLOW_UP_SECTIONS: ReadonlyArray<[string, RegExp]> = [
+const FOLLOW_UP_SECTIONS: readonly [string, RegExp][] = [
   ['诊疗经过', /诊疗经过|治疗经过|上次治疗/],
   ['病情变化', /病情变化|好转|加重|缓解/],
   ['查体', /查体|体格检查|查体所见/],
@@ -72,12 +72,12 @@ function normalizeTerms(text: string): string {
 
 /** 相对时间词解析为日期偏移（天）；无法识别返回 null */
 function relativeOffsetDays(segment: string): number | null {
-  if (/昨天/.test(segment)) return -1;
-  if (/前天/.test(segment)) return -2;
+  if (segment.includes('昨天')) return -1;
+  if (segment.includes('前天')) return -2;
   if (/今天|本周/.test(segment)) return 0;
-  if (/三天前/.test(segment)) return -3;
+  if (segment.includes('三天前')) return -3;
   if (/一周前|上周/.test(segment)) return -7;
-  if (/两周前/.test(segment)) return -14;
+  if (segment.includes('两周前')) return -14;
   return null;
 }
 

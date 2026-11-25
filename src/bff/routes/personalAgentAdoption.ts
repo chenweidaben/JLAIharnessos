@@ -30,7 +30,7 @@ function buildDemoRows(doctorId: string): RecommendationRow[] {
   const now = Date.now();
   const dayMs = 24 * 3600 * 1000;
   const types = ['diagnosis', 'drug', 'pathway', 'lab', 'image'];
-  const outcomes: Array<RecommendationRow['outcome']> = ['adopted', 'modified', 'rejected', 'pending'];
+  const outcomes: RecommendationRow['outcome'][] = ['adopted', 'modified', 'rejected', 'pending'];
   const rows: RecommendationRow[] = [];
   for (let i = 0; i < 60; i++) {
     const t = types[i % types.length];
@@ -89,14 +89,14 @@ export const personalAgentAdoptionRoutes: RouteDef[] = [
               AND recommended_at <= ${to.toISOString()}
             ORDER BY recommended_at DESC
           `;
-          rows = (dbRows as unknown as Array<{
+          rows = (dbRows as unknown as {
             id: string;
             doctor_id: string;
             suggestion_type: string;
             suggestion_title: string;
             outcome: RecommendationRow['outcome'];
             recommended_at: string;
-          }>).map((r) => ({
+          }[]).map((r) => ({
             id: r.id,
             doctorId: r.doctor_id,
             suggestionType: r.suggestion_type,

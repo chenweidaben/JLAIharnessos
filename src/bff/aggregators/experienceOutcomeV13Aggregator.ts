@@ -69,7 +69,7 @@ export function computeEffectSizeV13(
  */
 export function rankEvidenceV13(
   experiencesWithEffect: EvidenceExpV13[],
-): Array<EvidenceExpV13 & { strength: "strong" | "moderate" | "weak" | "inconclusive" }> {
+): (EvidenceExpV13 & { strength: "strong" | "moderate" | "weak" | "inconclusive" })[] {
   return experiencesWithEffect
     .map((e) => {
       const abs = Math.abs(e.effectSize);

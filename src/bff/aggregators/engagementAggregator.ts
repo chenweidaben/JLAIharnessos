@@ -25,7 +25,7 @@ export interface EngagementReport {
   result: string;
   isAbnormal: boolean;
   status: ReportStatus;
-  pushChannels: Array<'in-app' | 'sms'>;
+  pushChannels: ('in-app' | 'sms')[];
   issuedAt: string;
   pushedAt?: string;
   readAt?: string;

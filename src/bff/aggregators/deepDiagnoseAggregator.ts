@@ -131,20 +131,20 @@ interface DiseaseRule {
   icd10: string;
   specialty: Specialty;
   base: number;
-  symptoms: Array<{ kw: string; weight: number; label: string }>;
+  symptoms: { kw: string; weight: number; label: string }[];
   /** 体征提示：key 取自 DeepVitals，operator 与阈值 */
-  vitals?: Array<{
+  vitals?: {
     field: keyof DeepVitals;
     op: '>=' | '<=';
     threshold: number;
     weight: number;
     label: string;
-  }>;
+  }[];
   /** 年龄带修正 */
   ageBand?: { minAge: number; maxAge: number; weight: number; label: string };
   /** 病史关键词 */
-  history: Array<{ kw: string; weight: number; label: string }>;
-  labs: Array<Omit<LabTest, 'priority'> & { priority: LabTest['priority'] }>;
+  history: { kw: string; weight: number; label: string }[];
+  labs: (Omit<LabTest, 'priority'> & { priority: LabTest['priority'] })[];
   imaging: Imaging[];
   /** 与主诊断的鉴别要点 */
   discriminator: string;
@@ -550,7 +550,7 @@ function scoreAll(
   history: DeepHistory,
 ): Scored[] {
   const symList = Array.isArray(symptoms) ? symptoms : [];
-  const feat = features ?? ({} as PatientFeatures);
+  const feat = features ?? ({});
   const hist = history ?? {};
 
   const age = Number.isFinite(feat.age) ? Math.max(0, Math.floor(feat.age ?? 0)) : 0;
@@ -606,10 +606,10 @@ function scoreAll(
 /** 红旗症状扫描（独立于具体规则） */
 function scanRisks(symText: string): DeepRisk[] {
   const risks: DeepRisk[] = [];
-  if (/胸痛/.test(symText) && /大汗|濒死|压榨|放射|持续/.test(symText)) {
+  if (symText.includes('胸痛') && /大汗|濒死|压榨|放射|持续/.test(symText)) {
     risks.push({ level: 'critical', title: '高危胸痛', detail: '伴大汗/濒死感/放射痛，警惕急性冠脉事件，立即急诊评估。' });
   }
-  if (/呼吸困难|喘憋|发绀/.test(symText) && /突发/.test(symText)) {
+  if (/呼吸困难|喘憋|发绀/.test(symText) && symText.includes('突发')) {
     risks.push({ level: 'critical', title: '突发呼吸窘迫', detail: '突发呼吸困难警惕肺栓塞/气胸，立即评估氧合。' });
   }
   if (/呕血|黑便|血便/.test(symText)) {

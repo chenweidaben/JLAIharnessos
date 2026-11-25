@@ -45,7 +45,7 @@ export function shouldSummarize(
  * 关键实体关键词组。命中即视为需要在摘要中保留的「诊疗节点」：
  *   诊断结论 / 医嘱·治疗决定 / 审批结论。
  */
-const KEY_PATTERNS: ReadonlyArray<{ tag: string; regex: RegExp }> = [
+const KEY_PATTERNS: readonly { tag: string; regex: RegExp }[] = [
   { tag: '诊断', regex: /(诊断|疑似|考虑为?|鉴别诊断|确诊|排除.{0,8}(?:诊断|病)|临床判断|拟诊)/ },
   { tag: '医嘱·决定', regex: /(医嘱|开立|处方|用药|给药|治疗方案|治疗计划|决定|同意|确认执行|下达|停用)/ },
   { tag: '审批结论', regex: /(审批|批准|通过|驳回|拒绝|退回|工单|审批单|需?要审批|已批准|不予)/ },

@@ -30,7 +30,7 @@ export interface RegionalCollaborationResult {
   date: string;
   institutions: InstitutionResource[];
   referrals: ReferralSuggestion[];
-  sharedCases: Array<{ caseId: string; hospital: string; diagnosis: string; resolution: string }>;
+  sharedCases: { caseId: string; hospital: string; diagnosis: string; resolution: string }[];
 }
 
 /**

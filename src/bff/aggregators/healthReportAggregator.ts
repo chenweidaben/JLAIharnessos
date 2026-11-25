@@ -69,7 +69,7 @@ export interface HealthReport {
  */
 export function buildHealthReport(
   errors: number,
-  slowQueries: ReadonlyArray<unknown> | number,
+  slowQueries: readonly unknown[] | number,
   feedbackRate: number,
 ): HealthReport {
   /* 错误率：归一化到 [0,100]，两位小数 */

@@ -265,7 +265,7 @@ export function predictRehospitalizationRisk(patientId: string, disease: string)
 // 纯函数：自动随访发送网关
 // ============================================================================
 
-const ALLOWED_CHANNELS: ReadonlyArray<FollowupChannel> = ['sms', 'wechat', 'phone'];
+const ALLOWED_CHANNELS: readonly FollowupChannel[] = ['sms', 'wechat', 'phone'];
 
 /**
  * AI能力深化：自动随访发送网关。
@@ -298,7 +298,7 @@ export function sendAutoFollowup(
   }
 
   // 闸口 3：模板
-  if (!template || !template.trim()) {
+  if (!template?.trim()) {
     return { patientId, channel, template, success: false, skippedReason: 'invalid_template' };
   }
 

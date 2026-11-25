@@ -24,7 +24,7 @@ export interface RoundReport {
   reportDate: string;
   summary: string;
   abnormalPatients: ManagedPatientRow[];
-  pendingTasks: Array<{ kind: string; visitId: string; detail: string }>;
+  pendingTasks: { kind: string; visitId: string; detail: string }[];
   patientCount: number;
   createdAt: string;
 }
@@ -54,13 +54,13 @@ export async function generateRoundReport(doctorId: string): Promise<RoundReport
   );
 
   const abnormalPatients: ManagedPatientRow[] = [];
-  const pendingTasks: Array<{ kind: string; visitId: string; detail: string }> = [];
+  const pendingTasks: { kind: string; visitId: string; detail: string }[] = [];
 
   // 未审病历草稿计数
   let draftsPending = 0;
   patients.forEach((p, i) => {
     const det = detailResults[i];
-    if (!det || !det.ok) return;
+    if (!det?.ok) return;
     const r = det.result as { latestNoteDraft?: { status?: string } | null };
     if (r.latestNoteDraft && r.latestNoteDraft.status === 'draft') {
       draftsPending += 1;
@@ -100,11 +100,11 @@ export async function generateRoundReport(doctorId: string): Promise<RoundReport
     `${draftsPending} 份病历待审，` +
     `${consultPending} 例会诊待处理。`;
 
-  const rows = await db()<Array<{
+  const rows = await db()<{
     id: string; doctor_id: string; report_date: string; summary: string;
     abnormal_patients: unknown; pending_tasks: unknown; patient_count: number;
     created_at: string;
-  }>>`
+  }[]>`
     INSERT INTO clinical.medmuse_round_reports
       (doctor_id, report_date, summary, abnormal_patients, pending_tasks, patient_count)
     VALUES (
@@ -129,7 +129,7 @@ export async function generateRoundReport(doctorId: string): Promise<RoundReport
     reportDate: row.report_date,
     summary: row.summary,
     abnormalPatients: (row.abnormal_patients as ManagedPatientRow[]) ?? [],
-    pendingTasks: (row.pending_tasks as Array<{ kind: string; visitId: string; detail: string }>) ?? [],
+    pendingTasks: (row.pending_tasks as { kind: string; visitId: string; detail: string }[]) ?? [],
     patientCount: row.patient_count,
     createdAt: row.created_at,
   };
@@ -143,20 +143,20 @@ export async function listRoundReports(
   date?: string,
 ): Promise<RoundReport[]> {
   const rows = date
-    ? await db()<Array<{
+    ? await db()<{
         id: string; doctor_id: string; report_date: string; summary: string;
         abnormal_patients: unknown; pending_tasks: unknown; patient_count: number;
         created_at: string;
-      }>>`
+      }[]>`
         SELECT * FROM clinical.medmuse_round_reports
         WHERE doctor_id = ${doctorId} AND report_date = ${date}
         ORDER BY report_date DESC
       `
-    : await db()<Array<{
+    : await db()<{
         id: string; doctor_id: string; report_date: string; summary: string;
         abnormal_patients: unknown; pending_tasks: unknown; patient_count: number;
         created_at: string;
-      }>>`
+      }[]>`
         SELECT * FROM clinical.medmuse_round_reports
         WHERE doctor_id = ${doctorId}
         ORDER BY report_date DESC
@@ -167,7 +167,7 @@ export async function listRoundReports(
     reportDate: r.report_date,
     summary: r.summary,
     abnormalPatients: (r.abnormal_patients as ManagedPatientRow[]) ?? [],
-    pendingTasks: (r.pending_tasks as Array<{ kind: string; visitId: string; detail: string }>) ?? [],
+    pendingTasks: (r.pending_tasks as { kind: string; visitId: string; detail: string }[]) ?? [],
     patientCount: r.patient_count,
     createdAt: r.created_at,
   }));

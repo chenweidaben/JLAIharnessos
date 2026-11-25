@@ -27,7 +27,7 @@ export interface OpenApiSchema {
   maximum?: number;
   minimum?: number;
   example?: unknown;
-  enum?: Array<string | number>;
+  enum?: (string | number)[];
   properties?: Record<string, OpenApiSchema>;
   required?: string[];
   items?: OpenApiSchema;
@@ -54,7 +54,7 @@ export interface OpenApiOperation {
   };
   responses: Record<string, { description: string; content?: Record<string, unknown> }>;
   /** 公开接口显式置空以覆盖全局 Bearer 安全要求 */
-  security?: Array<Record<string, string[]>>;
+  security?: Record<string, string[]>[];
 }
 
 export interface OpenApi3 {
@@ -65,8 +65,8 @@ export interface OpenApi3 {
     description: string;
     license: { name: string; identifier?: string };
   };
-  servers: Array<{ url: string; description?: string }>;
-  tags: Array<{ name: string; description: string }>;
+  servers: { url: string; description?: string }[];
+  tags: { name: string; description: string }[];
   paths: Record<string, Record<string, OpenApiOperation>>;
   components: {
     securitySchemes: Record<
@@ -75,7 +75,7 @@ export interface OpenApi3 {
     >;
     schemas: Record<string, OpenApiSchema>;
   };
-  security: Array<Record<string, string[]>>;
+  security: Record<string, string[]>[];
 }
 
 /* ============================================================================

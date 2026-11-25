@@ -127,7 +127,7 @@ async function handleDrCreate(c: Ctx): Promise<Response> {
   const {
     patientId, admissionDate, deathDate, deathCause, diagnosisBeforeDeath,
     diagnosisAfterDeath, resuscitationMeasures, attendingDoctor, recordingDoctor,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

@@ -51,7 +51,7 @@ export interface CostAccountingReport {
   costStructure: { personnel: number; drugs: number; consumables: number; depreciation: number; overhead: number };
   budget: number;
   costControlRate: number;
-  diseaseCosts: Array<{ disease: string; cost: number }>;
+  diseaseCosts: { disease: string; cost: number }[];
   suggestions: string[];
 }
 

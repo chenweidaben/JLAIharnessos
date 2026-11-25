@@ -88,7 +88,7 @@ export interface IndicatorCard {
   /** 相对目标的偏差（actual - target，带符号，供前端展示） */
   deviation: number;
   /** 该指标逐月序列（与传入 points 同序） */
-  series: Array<{ month: string; value: number }>;
+  series: { month: string; value: number }[];
 }
 
 /** 整页监控结论 */

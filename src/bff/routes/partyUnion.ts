@@ -81,7 +81,7 @@ async function handleCreate(c: Ctx): Promise<Response> {
       400,
     );
   }
-  if (!body.title || !body.title.trim()) {
+  if (!body.title?.trim()) {
     return json(fail(ErrorCode.BAD_REQUEST, '活动标题 title 不能为空', c.traceId), 400);
   }
 

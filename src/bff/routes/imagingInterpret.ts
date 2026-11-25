@@ -92,7 +92,7 @@ export const imagingInterpretRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/imaging-interpret/generate/:reportId',
     handle: guarded('imaging:interpret:sign', async (c, view) => {
-      const body = await c.body<{ mode?: string }>().catch(() => ({} as { mode?: string }));
+      const body = await c.body<{ mode?: string }>().catch((): { mode?: string } => ({}));
       return generateForReport(c.params.reportId, audienceOf(c), body?.mode ?? 'auto', view);
     }),
     auth: true,

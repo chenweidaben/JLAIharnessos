@@ -245,7 +245,7 @@ export const aiIcuMonitorRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/ai-icu/beds/:bedId/alerts', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const bedId = c.params.bedId;
-      await c.body().catch(() => ({} as Record<string, unknown>));
+      await c.body().catch(() => ({}));
       const resolved = resolveProvider(c);
       if ('badRequest' in resolved) return resolved.badRequest;
       const provider: IPredictionProvider = resolved;

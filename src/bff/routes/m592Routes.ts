@@ -133,7 +133,7 @@ async function handleMgCreate(c: Ctx): Promise<Response> {
 
   const {
     patientId, medicationName, dosage, frequency, route, timing, sideEffects, precautions, counseledBy,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -186,7 +186,7 @@ async function handleMgAdherence(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { adherent, missedDoses, sideEffectExperienced } = body as Record<string, unknown>;
+  const { adherent, missedDoses, sideEffectExperienced } = body;
 
   if (typeof adherent !== 'string' || !VALID_ADHERENTS.includes(adherent as Adherent)) {
     return json({ code: 400, message: 'invalid_adherent' }, 400);

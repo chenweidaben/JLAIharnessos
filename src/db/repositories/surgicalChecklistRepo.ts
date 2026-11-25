@@ -51,7 +51,7 @@ export async function createChecklist(surgeryId: string): Promise<SurgicalCheckl
     VALUES (${surgeryId})
     ON CONFLICT (surgery_id) DO UPDATE SET surgery_id = EXCLUDED.surgery_id
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export type Stage = 'signin' | 'timeout' | 'signout';
@@ -82,7 +82,7 @@ export async function updateStage(id: string, stage: Stage, input: StageInput, s
       status = ${status}
     WHERE id=${id}
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getBySurgery(surgeryId: string): Promise<SurgicalChecklist | null> {
@@ -90,7 +90,7 @@ export async function getBySurgery(surgeryId: string): Promise<SurgicalChecklist
   const rows = await db`
     SELECT ${db.unsafe(COLS)} FROM clinical.surgical_checklists
     WHERE surgery_id=${surgeryId} LIMIT 1`;
-  return rows.length ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapRow(rows[0]) : null;
 }
 
 export async function getById(id: string): Promise<SurgicalChecklist | null> {
@@ -98,7 +98,7 @@ export async function getById(id: string): Promise<SurgicalChecklist | null> {
   const rows = await db`
     SELECT ${db.unsafe(COLS)} FROM clinical.surgical_checklists
     WHERE id=${id} LIMIT 1`;
-  return rows.length ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapRow(rows[0]) : null;
 }
 
 export async function getLatestByVisit(visitId: string): Promise<SurgicalChecklist | null> {
@@ -112,5 +112,5 @@ export async function getLatestByVisit(visitId: string): Promise<SurgicalCheckli
     WHERE sr.visit_id=${visitId}
     ORDER BY sc.created_at DESC
     LIMIT 1`;
-  return rows.length ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapRow(rows[0]) : null;
 }

@@ -138,7 +138,7 @@ export async function disputeRun(id: string, auth: AuthView, note: string): Prom
   const existing = await getRunById(id);
   if (!existing) throw notFound('对账批次不存在');
   if (existing.status !== 'draft') throw conflict('仅待复核(draft)的批次可挂起');
-  if (!note || !note.trim()) throw badRequest('挂起原因不能为空');
+  if (!note?.trim()) throw badRequest('挂起原因不能为空');
   const updated = await withTx(async (tx) =>
     setStatus(id, 'disputed', { reviewedBy: auth.id, note: note.trim() }, tx),
   );

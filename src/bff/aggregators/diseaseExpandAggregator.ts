@@ -431,7 +431,7 @@ export interface ExpandedDiseaseLibrary {
   /** 本次成功入库的病种 */
   added: DiseaseEntry[];
   /** 本次被拒收的病种及原因（【安全与运营】留痕，供医学委员会复核） */
-  rejected: Array<{ name: string; reason: string }>;
+  rejected: { name: string; reason: string }[];
   /** 入库后病种总数 */
   total: number;
   disclaimer: string;
@@ -442,10 +442,10 @@ export interface ExpandedDiseaseLibrary {
  * 【安全与运营】任何新病种必须满足：病名/ICD-10/专科/至少 1 条典型症状齐备，
  * 且不得与库内已有病种重名；否则拒收并记录原因，严禁带病上线。
  */
-export function expandDiseaseLibrary(newDiseases?: Array<Partial<DiseaseEntry>>): ExpandedDiseaseLibrary {
+export function expandDiseaseLibrary(newDiseases?: Partial<DiseaseEntry>[]): ExpandedDiseaseLibrary {
   const library: DiseaseEntry[] = BASE_DISEASE_LIBRARY.map(cloneEntry);
   const added: DiseaseEntry[] = [];
-  const rejected: Array<{ name: string; reason: string }> = [];
+  const rejected: { name: string; reason: string }[] = [];
   const known = new Set(library.map((d) => normalizeName(d.name)));
 
   const list = Array.isArray(newDiseases) ? newDiseases : [];
@@ -490,10 +490,10 @@ export function expandDiseaseLibrary(newDiseases?: Array<Partial<DiseaseEntry>>)
         : [],
       furtherExams: Array.isArray(raw?.furtherExams)
         ? raw.furtherExams.map((f) => ({
-            category: (f?.category ?? '实验室') as FurtherExam['category'],
+            category: (f?.category ?? '实验室'),
             name: String(f?.name ?? ''),
             purpose: String(f?.purpose ?? ''),
-            urgency: (f?.urgency ?? 'routine') as ExamUrgency,
+            urgency: (f?.urgency ?? 'routine'),
           }))
         : [],
       populationNote: raw?.populationNote,
@@ -640,7 +640,7 @@ export interface DifferentialAttachResult {
   /** 更新后的病种条目副本（纯函数，不改原词典） */
   entry: DiseaseEntry | null;
   /** 因校验被忽略的条目 */
-  skipped: Array<{ diagnosis: string; reason: string }>;
+  skipped: { diagnosis: string; reason: string }[];
   disclaimer: string;
 }
 
@@ -666,7 +666,7 @@ export function addDifferentialDiagnosis(
 
   const entry = cloneEntry(found);
   const knownDx = new Set(entry.differential.map((d) => normalizeName(d.diagnosis)));
-  const skipped: Array<{ diagnosis: string; reason: string }> = [];
+  const skipped: { diagnosis: string; reason: string }[] = [];
 
   for (const item of Array.isArray(differentialList) ? differentialList : []) {
     const dx = (item?.diagnosis ?? '').toString().trim();

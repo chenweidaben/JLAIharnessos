@@ -31,7 +31,7 @@ export const emrSmartScoreRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<EmrScoreBody>().catch(() => ({} as EmrScoreBody))) ?? {};
+        const body = (await c.body<EmrScoreBody>().catch((): EmrScoreBody => ({}))) ?? {};
         const recordContent = typeof body.recordContent === 'string' ? body.recordContent : '';
         if (!recordContent.trim()) {
           return json(fail(ErrorCode.BAD_REQUEST, 'recordContent 不能为空'), 400);

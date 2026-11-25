@@ -39,7 +39,7 @@ export const anesthesiaPreopVisitRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/anesthesia/preop/:visitId', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.visitId, status: 'ok' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { asaLevel?: string; history?: string; allergyHistory?: string; airwayAssessment?: string; anesthesiaPlan?: string };
       if (b.asaLevel && !(ASA_LEVELS as readonly string[]).includes(b.asaLevel)) {
         return json(fail(ErrorCode.BAD_REQUEST, `asaLevel 必须为 ${ASA_LEVELS.join('/')}`), 400);

@@ -169,7 +169,7 @@ export class SkillRegistry {
       if (query.tag && !skill.manifest.tags.includes(query.tag)) continue;
       if (query.roles && query.roles.length > 0) {
         const allowed = skill.manifest.roles.some((r) =>
-          (query.roles as string[]).includes(r),
+          (query.roles!).includes(r),
         );
         if (!allowed) continue;
       }

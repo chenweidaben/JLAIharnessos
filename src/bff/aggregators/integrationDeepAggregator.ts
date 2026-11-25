@@ -61,7 +61,7 @@ export interface DeepSegment {
   /** 段名：MSH / EVN / PID / PV1 / ORC / OBR / OBX ... */
   name: string;
   /** 字段数组，下标与 HL7 字段号对齐（1-based，fields[0] 保留不用） */
-  fields: Array<{ raw: string; matrix: string[][][] } | undefined>;
+  fields: ({ raw: string; matrix: string[][][] } | undefined)[];
 }
 
 /** 从 OBX 段提取的一条观察结果（ORU^R30） */
@@ -238,18 +238,18 @@ export interface DeepIntegrationCapability {
   /** 合规声明 */
   compliance: string;
   /** 支持的协议族清单 */
-  standards: Array<{
+  standards: {
     code: IntegrationStandard;
     version: string;
     /** 业务事件 / 资源 / SOP / 仪器能力明细 */
     detail: string;
-  }>;
+  }[];
   /** HL7 v2.x 扩展触发事件白名单 */
   hl7Events: readonly string[];
   /** FHIR R4 支持资源白名单 */
   fhirResources: readonly FHIRR4ResourceType[];
   /** DICOM 标准 SOP Class 白名单（UID -> 名称） */
-  dicomSopClasses: ReadonlyArray<{ uid: string; name: string }>;
+  dicomSopClasses: readonly { uid: string; name: string }[];
   /** LIS 双向通信方向 */
   lisDirections: string[];
 }
@@ -281,7 +281,7 @@ export const DEEP_FHIR_RESOURCES: readonly FHIRR4ResourceType[] = [
  * DICOM 标准 SOP Class UID 白名单（DICOM PS3.6）。
  * 「持续优化与新场景」：新增影像设备类型时在此登记 UID 即可。
  */
-export const DEEP_DICOM_SOP_CLASSES: ReadonlyArray<{ uid: string; name: string }> = [
+export const DEEP_DICOM_SOP_CLASSES: readonly { uid: string; name: string }[] = [
   { uid: '1.2.840.10008.5.1.4.1.1.2', name: 'CT Image Storage' },
   { uid: '1.2.840.10008.5.1.4.1.1.4', name: 'MR Image Storage' },
   { uid: '1.2.840.10008.5.1.4.1.1.6.1', name: 'US Image Storage' },
@@ -743,7 +743,7 @@ export function validateIntegrationMessage(
 
   if (standard === 'dicom') {
     const d = (message ?? {}) as DICOMStudyDescriptor;
-    if (!d.sopClassUid || !/^1\.2\.840\.10008\./.test(d.sopClassUid)) {
+    if (!d.sopClassUid?.startsWith("1.2.840.10008.")) {
       errors.push('DICOM SOP Class UID 缺失或非标准根（应为 1.2.840.10008.*）');
     }
     if (!d.modality || !(DEEP_DICOM_MODALITIES as readonly string[]).includes(d.modality)) {

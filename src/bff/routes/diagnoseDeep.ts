@@ -39,7 +39,7 @@ interface DiagnoseDeepBody {
   labResults?: DeepLabResult[];
   patientFeatures?: DeepPatientFeatures;
   mode?: 'library' | 'differential' | 'treatment' | 'consistency' | 'all';
-  newDiseases?: Array<{ diagnosis: string; icd10?: string; specialty?: '消化' | '呼吸' | '心血管' | '内分泌' }>;
+  newDiseases?: { diagnosis: string; icd10?: string; specialty?: '消化' | '呼吸' | '心血管' | '内分泌' }[];
   targetDiagnosis?: string;
 }
 
@@ -50,7 +50,7 @@ export const diagnoseDeepRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<DiagnoseDeepBody>().catch(() => ({}))) as DiagnoseDeepBody;
+        const body = (await c.body<DiagnoseDeepBody>().catch((): DiagnoseDeepBody => ({}))) as DiagnoseDeepBody;
 
         const symptoms = Array.isArray(body?.symptoms) ? body.symptoms : [];
         const history = body?.history ?? [];

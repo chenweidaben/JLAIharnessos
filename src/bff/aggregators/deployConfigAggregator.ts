@@ -60,7 +60,7 @@ export interface BackupPolicy {
   /** 每周异地副本的星期几（0=周日），默认 0（周日凌晨） */
   offsiteWeeklyDay: number;
   /** 备份任务清单（名称 / cron / 目标） */
-  jobs: Array<{ name: string; schedule: string; target: string }>;
+  jobs: { name: string; schedule: string; target: string }[];
   /** 是否每月做一次恢复演练（在隔离环境还原并校验） */
   verifyRestoreMonthly: boolean;
 }

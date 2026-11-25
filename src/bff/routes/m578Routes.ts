@@ -189,7 +189,7 @@ async function handleMdtCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, visitId, requestDeptCode, reason, clinicalQuestion, participatingDepts } = body as Record<string, unknown>;
+  const { patientId, visitId, requestDeptCode, reason, clinicalQuestion, participatingDepts } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -253,7 +253,7 @@ async function handleMdtSchedule(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { scheduledAt, meetingRoom, moderator } = body as Record<string, unknown>;
+  const { scheduledAt, meetingRoom, moderator } = body;
 
   if (
     typeof scheduledAt !== 'string' || !scheduledAt.trim() ||
@@ -294,7 +294,7 @@ async function handleMdtFinalize(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { consensusOpinion, followUpPlan, finalizedBy } = body as Record<string, unknown>;
+  const { consensusOpinion, followUpPlan, finalizedBy } = body;
 
   if (
     typeof consensusOpinion !== 'string' || !consensusOpinion.trim() ||

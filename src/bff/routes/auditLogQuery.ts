@@ -29,7 +29,7 @@ async function loadFromDb(c: Ctx): Promise<AuditLogRow[]> {
       ORDER BY seq DESC
       LIMIT 10000
     `;
-    return (rows as unknown as Array<{
+    return (rows as unknown as {
       seq: number;
       actor_name: string;
       actor_role: string;
@@ -41,7 +41,7 @@ async function loadFromDb(c: Ctx): Promise<AuditLogRow[]> {
       user_agent: string | null;
       hospital_id: string | null;
       created_at: string;
-    }>).map((r) => ({
+    }[]).map((r) => ({
       seq: Number(r.seq),
       actorName: r.actor_name ?? '',
       actorRole: r.actor_role ?? '',

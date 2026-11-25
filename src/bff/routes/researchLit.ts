@@ -74,7 +74,7 @@ export const researchLitRoutes: RouteDef[] = [
       if (denied) return denied;
       try {
         const body = (await c.body()) as {
-          items?: Array<{ abstract: string; year?: number; journal?: string; keywords?: string[] }>;
+          items?: { abstract: string; year?: number; journal?: string; keywords?: string[] }[];
         };
         if (!body || !Array.isArray(body.items) || body.items.length === 0) {
           return badRequest('请求体须包含 items 数组（每项含 abstract）');

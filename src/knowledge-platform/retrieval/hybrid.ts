@@ -37,12 +37,12 @@ export class KeywordIndex {
     this.avgLen = this.docs.reduce((s, d) => s + d.length, 0) / Math.max(1, this.docs.length);
   }
 
-  search(query: string, topK: number): Array<{ chunk: KnowledgeChunk; score: number }> {
+  search(query: string, topK: number): { chunk: KnowledgeChunk; score: number }[] {
     const qTokens = tokenize(query);
     const k1 = 1.5;
     const b = 0.75;
     const N = this.docs.length;
-    const scored: Array<{ chunk: KnowledgeChunk; score: number }> = [];
+    const scored: { chunk: KnowledgeChunk; score: number }[] = [];
     for (const doc of this.docs) {
       let score = 0;
       for (const qt of qTokens) {
@@ -64,7 +64,7 @@ export class KeywordIndex {
 
 /** 向量索引（内存余弦） */
 export class VectorIndex {
-  private items: Array<{ chunk: KnowledgeChunk; vector: number[] }> = [];
+  private items: { chunk: KnowledgeChunk; vector: number[] }[] = [];
   constructor(private encoder: Encoder) {}
 
   add(chunk: KnowledgeChunk): void {
@@ -72,7 +72,7 @@ export class VectorIndex {
     this.items.push({ chunk, vector });
   }
 
-  search(query: string, topK: number): Array<{ chunk: KnowledgeChunk; score: number }> {
+  search(query: string, topK: number): { chunk: KnowledgeChunk; score: number }[] {
     const qv = this.encoder.embed(query);
     return this.items
       .map((it) => ({ chunk: it.chunk, score: this.encoder.cosine(qv, it.vector) }))
@@ -143,7 +143,7 @@ export class HybridRetriever {
 
   /** RRF 融合：score = Σ weight / (rrfK + rank) */
   private rrf(
-    rankedLists: Array<{ list: Array<{ id: string; hit: RetrievalHit }>; weight: number }>,
+    rankedLists: { list: { id: string; hit: RetrievalHit }[]; weight: number }[],
     rrfK: number,
   ): Map<string, { hit: RetrievalHit; score: number }> {
     const fused = new Map<string, { hit: RetrievalHit; score: number }>();
@@ -171,7 +171,7 @@ export class HybridRetriever {
     };
 
     // 路 1：向量
-    const vectorList: Array<{ id: string; hit: RetrievalHit }> = [];
+    const vectorList: { id: string; hit: RetrievalHit }[] = [];
     for (const s of stores) {
       for (const r of s.vec.search(query, candidateK)) {
         if (!inScope(r.chunk)) continue;
@@ -181,7 +181,7 @@ export class HybridRetriever {
     vectorList.sort((a, b) => b.hit.score - a.hit.score).splice(candidateK);
 
     // 路 2：关键词 BM25（归一化到 0-1 近似）
-    const kwList: Array<{ id: string; hit: RetrievalHit }> = [];
+    const kwList: { id: string; hit: RetrievalHit }[] = [];
     for (const s of stores) {
       const raw = s.kw.search(query, candidateK);
       const max = raw[0]?.score ?? 1;
@@ -231,8 +231,8 @@ export class HybridRetriever {
     };
   }
 
-  private graphRecall(query: string, topK: number): Array<{ id: string; hit: RetrievalHit }> {
-    const out: Array<{ id: string; hit: RetrievalHit }> = [];
+  private graphRecall(query: string, topK: number): { id: string; hit: RetrievalHit }[] {
+    const out: { id: string; hit: RetrievalHit }[] = [];
     const seen = new Set<string>();
     // 在图谱实体名/别名中扫描查询命中
     for (const entity of this.graph.entities.values()) {

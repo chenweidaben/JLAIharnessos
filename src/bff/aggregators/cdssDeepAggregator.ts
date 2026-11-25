@@ -655,7 +655,7 @@ export function prioritizeCDSSAlerts(alerts: CDSSAlert[]): CDSSAlertBundle {
       mergeIndex.set(key, merged.length);
       merged.push({ ...a, relatedTo: [...a.relatedTo] });
     } else {
-      const target = merged[idx]!;
+      const target = merged[idx];
       target.mergedCount += 1;
       for (const r of a.relatedTo) {
         if (!target.relatedTo.includes(r)) target.relatedTo.push(r);

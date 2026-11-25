@@ -91,7 +91,7 @@ export const labInterpretRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/lab-interpret/generate/:visitId',
     handle: guarded('lab:interpret:sign', async (c, view) => {
-      const body = await c.body<{ mode?: string }>().catch(() => ({} as { mode?: string }));
+      const body = await c.body<{ mode?: string }>().catch((): { mode?: string } => ({}));
       return generateForVisit(c.params.visitId, audienceOf(c), body?.mode ?? 'auto', view);
     }),
     auth: true,

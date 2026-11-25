@@ -46,7 +46,7 @@ export const aiDiagnoseRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = await c.body<AiDiagnoseBody>().catch(() => ({} as AiDiagnoseBody));
+        const body = await c.body<AiDiagnoseBody>().catch((): AiDiagnoseBody => ({}));
         const mode = body?.mode === 'feedback' ? 'feedback' : 'generate';
 
         if (mode === 'feedback') {
@@ -68,7 +68,7 @@ export const aiDiagnoseRoutes: RouteDef[] = [
           body?.patientGender === 'male' || body?.patientGender === 'female'
             ? body.patientGender
             : '';
-        const history = (body?.history ?? {}) as AiHistoryInput;
+        const history = (body?.history ?? {});
         const suggestion = aiDiagnose(symptoms, patientAge, gender, history);
         return json(ok(suggestion));
       } catch (e) {

@@ -53,7 +53,7 @@ export class CacheAside {
     if (!opts.forceRefresh) {
       const cached = await this.cache.get<T | typeof NULL_PLACEHOLDER>(key);
       if (cached === NULL_PLACEHOLDER) return null as T;
-      if (cached !== null && cached !== undefined) return cached as T;
+      if (cached !== null && cached !== undefined) return cached;
 
       // singleflight：合并并发回源
       const existing = this.inflight.get(key) as Promise<T> | undefined;
@@ -74,7 +74,7 @@ export class CacheAside {
       }
     })();
 
-    this.inflight.set(key, loadPromise as Promise<unknown>);
+    this.inflight.set(key, loadPromise);
     return loadPromise;
   }
 

@@ -140,7 +140,7 @@ function valueOf(key: ScoreKey, raw: RawOpsMetrics, derived: DerivedOpsMetrics):
   switch (key) {
     case 'highLevelRatio': return derived.highLevelRatio;
     case 'profitMargin': return derived.profitMargin;
-    default: return raw[key as keyof RawOpsMetrics] as number;
+    default: return raw[key as keyof RawOpsMetrics];
   }
 }
 

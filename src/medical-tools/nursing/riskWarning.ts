@@ -133,7 +133,7 @@ export interface WarningAssessment {
   level: RiskLevel;
   totalScore: number;
   /** 该评估关联的预防措施状态列表 */
-  preventions: Array<{ status: string }>;
+  preventions: { status: string }[];
 }
 
 export interface RiskWarning {

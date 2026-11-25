@@ -45,7 +45,7 @@ function seedIc(): void {
   const now = Date.now();
   const iso = (offsetMin: number): string => new Date(now - offsetMin * 60_000).toISOString();
 
-  const categories: Array<{ cat: IcCategory; items: Array<[string, string, IcStatus]> }> = [
+  const categories: { cat: IcCategory; items: [string, string, IcStatus][] }[] = [
     {
       cat: 'infrastructure',
       items: [
@@ -165,7 +165,7 @@ async function handleIcUpdate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { status, evidenceUrl, updatedBy } = body as Record<string, unknown>;
+  const { status, evidenceUrl, updatedBy } = body;
 
   if (
     typeof status !== 'string' || !VALID_STATUSES.includes(status as IcStatus) ||

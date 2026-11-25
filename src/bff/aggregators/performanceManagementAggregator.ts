@@ -75,9 +75,9 @@ export interface PerfManagementReport {
   dept: string;
   timeRange: string;
   deptScore: number;
-  deptRanking: Array<{ dept: string; score: number }>;
-  doctorRanking: Array<{ doctor: string; dept: string; score: number }>;
-  nurseRanking: Array<{ nurse: string; dept: string; score: number }>;
+  deptRanking: { dept: string; score: number }[];
+  doctorRanking: { doctor: string; dept: string; score: number }[];
+  nurseRanking: { nurse: string; dept: string; score: number }[];
   suggestions: string[];
 }
 

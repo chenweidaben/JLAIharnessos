@@ -44,7 +44,7 @@ export interface ClinicalPathwayReportV2 {
   variationRate: number;
   losComparison: { pathway: number; nonPathway: number; reduction: number };
   costComparison: { pathway: number; nonPathway: number; reduction: number };
-  variationReasons: Array<{ reason: string; count: number }>;
+  variationReasons: { reason: string; count: number }[];
   complianceScore: number;
   suggestions: string[];
 }

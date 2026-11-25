@@ -350,7 +350,7 @@ export interface StandardizationResult {
   code?: string;
   sourceId?: string;
   confidence: number;
-  candidates: Array<{ name: string; code: string; sourceId: string; score: number }>;
+  candidates: { name: string; code: string; sourceId: string; score: number }[];
 }
 
 // ============================================================================
@@ -375,6 +375,6 @@ export interface QualityReport {
   /** 字段完整率（0-1） */
   fieldCompleteness: number;
   /** 重复/缺失/异常明细（仅记录数量与示例） */
-  issues: Array<{ type: string; count: number; sample?: string }>;
+  issues: { type: string; count: number; sample?: string }[];
   score: number;
 }

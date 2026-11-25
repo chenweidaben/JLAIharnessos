@@ -90,7 +90,7 @@ async function loadAllDiagnoses(): Promise<Map<string, PatientDiagnosisRow[]>> {
     FROM clinical.diagnoses
   `;
   const map = new Map<string, PatientDiagnosisRow[]>();
-  for (const r of rows as Array<Record<string, unknown>>) {
+  for (const r of rows as Record<string, unknown>[]) {
     const pid = String(r.patient_id);
     const item: PatientDiagnosisRow = {
       patientId: pid,
@@ -337,7 +337,7 @@ export interface CohortStats {
   total: number;
   byGender: Record<string, number>;
   ageBuckets: Record<string, number>;
-  topTags: Array<{ tag: string; count: number }>;
+  topTags: { tag: string; count: number }[];
 }
 
 /** 队列统计：总数、性别分布、年龄段分布、高频标签 */
@@ -393,7 +393,7 @@ export async function getResearchCohortStats(
 export async function exportCohortDataset(
   auth: AuthView,
   id: string,
-): Promise<Array<Record<string, unknown>>> {
+): Promise<Record<string, unknown>[]> {
   const cohort = await getCohortById(id);
   if (!cohort) throw notFound('队列不存在');
   const members = await listCohortMembers(id, { limit: 10000 });
@@ -459,7 +459,7 @@ export interface ResearchReport {
   /** 按状态计数 */
   byStatus: Record<ResearchProjectStatus, number>;
   /** 按承担科室汇总 */
-  byDept: Array<{ dept: string; count: number; funding: number }>;
+  byDept: { dept: string; count: number; funding: number }[];
   /** 当年项目经费合计（万元） */
   totalFunding: number;
   /** 平均进度（0~100，四舍五入） */

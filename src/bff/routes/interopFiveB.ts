@@ -133,7 +133,7 @@ export const interopFiveBRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const { itemId } = c.params;
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const { score, evidence } = body as { score?: unknown; evidence?: unknown };
       if (typeof score !== 'number' || Number.isNaN(score)) {
         return json(fail(ErrorCode.BAD_REQUEST, 'score 必填且为数字（0-100）'), 400);

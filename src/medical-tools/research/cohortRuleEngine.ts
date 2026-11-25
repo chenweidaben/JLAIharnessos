@@ -47,13 +47,13 @@ export interface ResearchProfile {
   gender: string;
   age: number | null;
   tags: string[];
-  diagnoses: Array<{ name: string; code: string | null; confirmed: boolean }>;
-  labResults: Array<{
+  diagnoses: { name: string; code: string | null; confirmed: boolean }[];
+  labResults: {
     itemCode: string | null;
     itemName: string;
     numericValue: number | null;
     abnormalFlag: string | null;
-  }>;
+  }[];
 }
 
 export interface EvaluationResult {
@@ -145,7 +145,7 @@ export function evaluateCohort(
   if (exc.tags && tagsMatch(profile.tags, exc.tags)) {
     exclusionReasons.push('排除标签命中');
   }
-  if (exc.labs && exc.labs.some((c) => labConditionMatches(profile.labResults, c))) {
+  if (exc.labs?.some((c) => labConditionMatches(profile.labResults, c))) {
     exclusionReasons.push('排除检验条件命中');
   }
   if (exclusionReasons.length > 0) {

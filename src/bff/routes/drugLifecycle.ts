@@ -37,7 +37,7 @@ export const drugLifecycleRoutes: RouteDef[] = [
       if (!c.user) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
         const batchNo = c.params.batchNo ?? '';
-        const body = (await c.body<{ reason?: string }>().catch(() => ({}))) as { reason?: string };
+        const body = (await c.body<{ reason?: string }>().catch((): { reason?: string } => ({}))) as { reason?: string };
         const reason = typeof body.reason === 'string' && body.reason.trim() ? body.reason.trim() : '药监/临床通报召回';
         const result = recallDrugBatch(batchNo, reason);
         if (result.result === 'not_found') {

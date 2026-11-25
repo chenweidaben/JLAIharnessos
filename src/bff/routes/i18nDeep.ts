@@ -41,7 +41,7 @@ interface TranslateBody {
 }
 
 async function handleTranslatePost(c: Ctx): Promise<Response> {
-  const body = await c.body<TranslateBody>().catch(() => ({} as TranslateBody));
+  const body = await c.body<TranslateBody>().catch((): TranslateBody => ({}));
   const keys = Array.isArray(body?.keys) ? body.keys.filter((k) => typeof k === 'string') : [];
   const targetLocale = typeof body?.targetLocale === 'string' && body.targetLocale
     ? body.targetLocale

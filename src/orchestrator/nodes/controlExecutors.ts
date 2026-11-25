@@ -189,7 +189,7 @@ export class ParallelNodeExecutor implements NodeExecutor {
     return this.mapWithConcurrency(cfg.branches, Math.max(1, cfg.concurrency ?? cfg.branches.length), async (b) => {
       const r = await nc.runner.runPath(b.entryNode, b.name);
       if (r.cancelled) throw new WorkflowCancelledError();
-      return { name: b.name, status: (r.suspended ? 'rejected' : 'fulfilled') as 'fulfilled' | 'rejected', output: r.output, error: r.suspended ? '人工挂起未在并行中支持' : undefined };
+      return { name: b.name, status: (r.suspended ? 'rejected' : 'fulfilled'), output: r.output, error: r.suspended ? '人工挂起未在并行中支持' : undefined };
     });
   }
 

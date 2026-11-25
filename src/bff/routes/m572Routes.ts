@@ -154,7 +154,7 @@ async function handleToCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, testType, testItem, clinicalDiagnosis, urgency, requestedBy } = body as Record<string, unknown>;
+  const { patientId, testType, testItem, clinicalDiagnosis, urgency, requestedBy } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

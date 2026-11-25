@@ -138,7 +138,7 @@ export function addStaffHospitalBinding(staffId: string, hospitalId: string): vo
 
 /** 批量注水归属目录（BFF 启动时从 iam.users.hospital_id 加载） */
 export function seedStaffDirectory(
-  entries: ReadonlyArray<{ staffId: string; hospitalId: string }>,
+  entries: readonly { staffId: string; hospitalId: string }[],
 ): void {
   for (const e of entries) addStaffHospitalBinding(e.staffId, e.hospitalId);
 }

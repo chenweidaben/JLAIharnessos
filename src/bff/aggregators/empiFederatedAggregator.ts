@@ -104,7 +104,7 @@ export interface MatchResult {
   matched: boolean;
   masterPatientId?: string;
   confidence: 'exact' | 'probable' | 'none';
-  candidates: Array<{ masterPatientId: string; reason: string; score: number }>;
+  candidates: { masterPatientId: string; reason: string; score: number }[];
 }
 
 export function match(q: { idCard?: string; name?: string; birthDate?: string; gender?: 'M' | 'F'; phone?: string }): MatchResult {

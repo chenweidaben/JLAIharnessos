@@ -340,7 +340,7 @@ function detectNamingIssues(masked: string): NamingIssue[] {
     const name = im[1] ?? im[2] ?? '';
     if (!name || name.startsWith('_')) continue;
     // 允许常量 UPPER_SNAKE_CASE
-    if (/^[A-Z][\w$]*$/.test(name) && /_/.test(name)) continue;
+    if (/^[A-Z][\w$]*$/.test(name) && name.includes('_')) continue;
     const line = lineAt(masked, im.index);
     if (/^[a-z]+(_[a-z0-9]+)+$/.test(name)) {
       issues.push({
@@ -487,7 +487,7 @@ export function refactorComplexFunctions(code: string, threshold = COMPLEXITY_RE
       extractAs = `${fn.name}Strategy`;
     } else if (branches >= 3) {
       action = '把条件判断块提取为独立的小函数，并在分支入口加早退卫语句（guard clause）';
-      extractAs = `resolve${fn.name[0]!.toUpperCase()}${fn.name.slice(1)}`;
+      extractAs = `resolve${fn.name[0].toUpperCase()}${fn.name.slice(1)}`;
     } else {
       action = '拆分超长参数准备与副作用调用为命名清晰的子函数，单一职责';
       extractAs = `${fn.name}Step`;
@@ -513,7 +513,7 @@ export function refactorComplexFunctions(code: string, threshold = COMPLEXITY_RE
  * 同指纹出现于 >=2 个不同位置即判定为重复块。
  */
 export function detectDuplicateCode(
-  codebase: Array<{ file: string; code: string }>,
+  codebase: { file: string; code: string }[],
   minLines = DUPLICATE_MIN_LINES,
 ): DuplicateBlock[] {
   if (!Array.isArray(codebase)) {

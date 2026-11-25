@@ -101,8 +101,8 @@ function round4(v: number): number {
  * ------------------------------------------------------------------------- */
 export interface DeepOperationAnalysisBlueprint {
   principles: string[];
-  domains: Array<{ key: OpsDomain; name: string; metrics: MetricSpec[] }>;
-  analyses: Array<{ key: string; name: string; description: string }>;
+  domains: { key: OpsDomain; name: string; metrics: MetricSpec[] }[];
+  analyses: { key: string; name: string; description: string }[];
 }
 
 /** 输出四域指标目录与三类分析口径，作为全院统一口径（不拍脑袋） */
@@ -395,7 +395,7 @@ export interface ForecastReport {
 
 /** 由历史 period 推断下一个 period（支持 YYYY-MM 与 YYYY-Qn） */
 function nextPeriod(period: string, step: number): string {
-  const m = period.match(/^(\d{4})-(\d{2})$/);
+  const m = /^(\d{4})-(\d{2})$/.exec(period);
   if (m) {
     const y = Number(m[1]);
     const mo = Number(m[2]) - 1 + step;
@@ -403,7 +403,7 @@ function nextPeriod(period: string, step: number): string {
     const nm = ((mo % 12) + 12) % 12 + 1;
     return `${ny}-${String(nm).padStart(2, '0')}`;
   }
-  const q = period.match(/^(\d{4})-Q([1-4])$/);
+  const q = /^(\d{4})-Q([1-4])$/.exec(period);
   if (q) {
     const y = Number(q[1]);
     const qq = (Number(q[2]) - 1) + step;

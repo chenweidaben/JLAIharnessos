@@ -149,7 +149,7 @@ export const BACKUP_SCORE_LINE = 60;
 export const DEFAULT_REQUIRED_COVERAGE = 2;
 
 /** 培训课程规则库：技能关键字 → 课程映射（零外部数据，纯规则） */
-const COURSE_CATALOG: Array<{ match: RegExp; course: string; hours: number }> = [
+const COURSE_CATALOG: { match: RegExp; course: string; hours: number }[] = [
   { match: /介入|导管|PCI/i, course: '心血管介入诊疗进阶（导管室准入实训）', hours: 40 },
   { match: /重症|ICU|呼吸机/i, course: '重症医学高级生命支持（BLS/ACLS 复训）', hours: 24 },
   { match: /超声|超声心动/i, course: '床旁超声诊断进阶（POCUS  workshop）', hours: 32 },

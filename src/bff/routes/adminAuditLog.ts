@@ -66,7 +66,7 @@ async function handleList(c: Ctx): Promise<Response> {
       LIMIT ${RECENT_LIMIT}
     `;
 
-    const logs = (rows as unknown as Array<Omit<DataAccessLog, 'accessedAt'> & { accessedAt: unknown }>).map(
+    const logs = (rows as unknown as (Omit<DataAccessLog, 'accessedAt'> & { accessedAt: unknown })[]).map(
       (r) => ({
         id: Number(r.id),
         staffId: r.staffId ?? '',

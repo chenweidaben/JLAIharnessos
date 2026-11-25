@@ -90,7 +90,7 @@ export const antibioticDeepRoutes: RouteDef[] = [
               purpose,
               specialApproved: c.query.get('specialApproved') === '1',
               incisionClass: incisionRaw === 'I' || incisionRaw === 'II' || incisionRaw === 'III'
-                ? (incisionRaw as IncisionClass)
+                ? (incisionRaw)
                 : undefined,
               timingMinutes: c.query.get('timingMin') ? Number(c.query.get('timingMin')) : undefined,
               prophylaxisDurationHours: c.query.get('periDurationH')

@@ -12,18 +12,18 @@ interface FhirMedicationRequest {
   intent: 'proposal' | 'plan' | 'order' | 'option' | 'instance-order';
   priority: 'routine' | 'urgent' | 'stat';
   medicationCodeableConcept: {
-    coding: Array<{ system: string; code: string; display: string }>;
+    coding: { system: string; code: string; display: string }[];
     text: string;
   };
   subject: { reference: string; display?: string };
   encounter?: { reference: string };
   authoredOn: string;
-  dosageInstruction: Array<{
+  dosageInstruction: {
     text: string;
     timing: { repeat: { frequency: number; period: number; periodUnit: 'd' | 'h' | 'min' } };
-    route: { coding: Array<{ code: string; display: string }>; text: string };
-    doseAndRate: Array<{ doseQuantity: { value: number; unit: string; system: string; code: string } }>;
-  }>;
+    route: { coding: { code: string; display: string }[]; text: string };
+    doseAndRate: { doseQuantity: { value: number; unit: string; system: string; code: string } }[];
+  }[];
   dispenseRequest: {
     quantity: { value: number; unit: string };
     expectedSupplyDuration: { value: number; unit: string };

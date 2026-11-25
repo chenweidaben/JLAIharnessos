@@ -52,7 +52,7 @@ export interface Reminder {
 // ============================================================================
 
 /** 术后随访时间点（距手术/出院日） */
-const POSTOP_RULES: ReadonlyArray<{ type: FollowUpPlanType; days: number; label: string }> = [
+const POSTOP_RULES: readonly { type: FollowUpPlanType; days: number; label: string }[] = [
   { type: 'postop_1w', days: 7, label: '术后1周' },
   { type: 'postop_1m', days: 30, label: '术后1月' },
   { type: 'postop_3m', days: 90, label: '术后3月' },

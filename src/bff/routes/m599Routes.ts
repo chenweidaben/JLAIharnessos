@@ -147,7 +147,7 @@ async function handleSupRequest(c: Ctx): Promise<Response> {
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
   const { supplyCode, supplyName, category, quantity, requestDeptCode, requestedBy } =
-    body as Record<string, unknown>;
+    body;
 
   if (
     typeof supplyCode !== 'string' || !supplyCode.trim() ||
@@ -200,7 +200,7 @@ async function handleSupApprove(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { approvedBy, status, approveNote, secondApproverId } = body as Record<string, unknown>;
+  const { approvedBy, status, approveNote, secondApproverId } = body;
   if (typeof approvedBy !== 'string' || !approvedBy.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }
@@ -221,7 +221,7 @@ async function handleSupApprove(c: Ctx): Promise<Response> {
     rec.secondApproverId = secondApproverId.trim();
   }
 
-  rec.status = status as SupStatus;
+  rec.status = status;
   rec.approvedBy = approvedBy.trim();
   rec.approvedAt = new Date().toISOString();
   rec.approveNote = typeof approveNote === 'string' && approveNote.trim() ? approveNote.trim() : null;
@@ -245,7 +245,7 @@ async function handleSupIssue(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { issuedBy, actualQuantity } = body as Record<string, unknown>;
+  const { issuedBy, actualQuantity } = body;
   if (typeof issuedBy !== 'string' || !issuedBy.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }

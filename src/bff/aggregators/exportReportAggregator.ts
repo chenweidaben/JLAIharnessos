@@ -424,9 +424,9 @@ function buildDemoRows(type: CenterReportType, baseDate: string): Record<string,
 
   // 科室绩效：按综合得分降序后回填排名
   if (type === 'dept_perf') {
-    rows.sort((a, b) => Number(b['totalScore']) - Number(a['totalScore']));
+    rows.sort((a, b) => Number(b.totalScore) - Number(a.totalScore));
     rows.forEach((r, idx) => {
-      r['rank'] = idx + 1;
+      r.rank = idx + 1;
     });
   }
   return rows;
@@ -531,7 +531,7 @@ export function generateReport(
 
   // 1) 全量演示数据 → 2) 科室筛选
   let rows = buildDemoRows(t, baseDate);
-  if (department) rows = rows.filter((r) => r['department'] === department);
+  if (department) rows = rows.filter((r) => r.department === department);
 
   const stamp = baseDate.replace(/-/g, '');
 

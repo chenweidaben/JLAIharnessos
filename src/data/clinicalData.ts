@@ -187,7 +187,7 @@ function toDateOnly(iso: string | null | undefined): string | null {
 
 /** 把 DB 里以 jsonb 存的过敏史归一化为 MockPatient.allergies 结构。 */
 function normalizeAllergies(
-  raw: Array<Record<string, unknown>>,
+  raw: Record<string, unknown>[],
 ): MockPatient['allergies'] {
   return raw.map((r) => ({
     allergen: String(r.allergen ?? ''),
@@ -198,7 +198,7 @@ function normalizeAllergies(
 }
 
 function normalizePastHistory(
-  raw: Array<Record<string, unknown>>,
+  raw: Record<string, unknown>[],
 ): MockPatient['pastHistory'] {
   return raw.map((r) => ({
     disease: String(r.disease ?? ''),
@@ -266,7 +266,7 @@ async function mapDbPatientToDto(
 
 async function mapDbOrderToDto(o: orderRepo.Order): Promise<MockOrder> {
   const visit = await visitRepo.getVisitById(o.visitId);
-  const detail = (o.detail ?? {}) as Record<string, unknown>;
+  const detail = (o.detail ?? {});
   return {
     orderId: o.id,
     patientId: visit?.patientId ?? '',
@@ -704,7 +704,7 @@ export const clinicalData = {
             : r.abnormalFlag === 'L'
               ? '危急低'
               : '正常'
-          : (flagText as MockLabReport['items'][number]['abnormalFlag']),
+          : (flagText),
       });
     }
     return Array.from(byPanel.values());

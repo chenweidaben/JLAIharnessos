@@ -81,8 +81,8 @@ function findNode(idOrLabel: string): GraphNode | undefined {
 }
 
 /** 邻接表（无向，便于路径搜索） */
-function neighborsOf(id: string): Array<{ node: GraphNode; relation: Relation; direction: 'out' | 'in' }> {
-  const out: Array<{ node: GraphNode; relation: Relation; direction: 'out' | 'in' }> = [];
+function neighborsOf(id: string): { node: GraphNode; relation: Relation; direction: 'out' | 'in' }[] {
+  const out: { node: GraphNode; relation: Relation; direction: 'out' | 'in' }[] = [];
   for (const e of demoEdges) {
     if (e.source === id) {
       const t = demoNodes.find((n) => n.id === e.target);
@@ -96,9 +96,9 @@ function neighborsOf(id: string): Array<{ node: GraphNode; relation: Relation; d
 }
 
 /** DFS 找 1~maxHops 跳路径（最多返回 6 条，按跳数升序） */
-function findPaths(fromId: string, toId: string, maxHops = 2): Array<Array<{ id: string; label: string; relation?: Relation }>> {
-  const results: Array<Array<{ id: string; label: string; relation?: Relation }>> = [];
-  const dfs = (cur: string, target: string, visited: Set<string>, path: Array<{ id: string; label: string; relation?: Relation }>, depth: number): void => {
+function findPaths(fromId: string, toId: string, maxHops = 2): { id: string; label: string; relation?: Relation }[][] {
+  const results: { id: string; label: string; relation?: Relation }[][] = [];
+  const dfs = (cur: string, target: string, visited: Set<string>, path: { id: string; label: string; relation?: Relation }[], depth: number): void => {
     if (depth > maxHops) return;
     for (const nb of neighborsOf(cur)) {
       if (visited.has(nb.node.id)) continue;

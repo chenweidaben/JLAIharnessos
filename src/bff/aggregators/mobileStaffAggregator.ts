@@ -23,7 +23,7 @@ export type StaffRole = 'doctor' | 'nurse' | 'admin' | (string & {});
 /** 今日待办条目。 */
 export interface StaffTodo {
   /** 稳定标识：order_review 待审医嘱 / rounds 待查房 / chart 待病历。 */
-  key: 'order_review' | 'rounds' | 'chart' | string;
+  key: 'order_review' | 'rounds' | 'chart' | (string & {});
   /** 主文案（大字号卡片标题）。 */
   label: string;
   /** 角标数量（未读/待处理条数，纯函数默认 0）。 */
@@ -61,7 +61,7 @@ export interface StaffQuickAction {
 export interface StaffNotification {
   key: string;
   /** critical_value 危急值 / consult 会诊 / approval 审批。 */
-  type: 'critical_value' | 'consult' | 'approval' | string;
+  type: 'critical_value' | 'consult' | 'approval' | (string & {});
   title: string;
   preview: string;
   /** high 危急值红 / mid 会诊橙 / low 审批蓝。 */
@@ -209,8 +209,8 @@ export interface OptimizedData {
 }
 
 interface RawPageData {
-  patients?: Array<Partial<MobilePatient> & { visitId?: string }>;
-  notifications?: Array<Partial<StaffNotification> & { key?: string }>;
+  patients?: (Partial<MobilePatient> & { visitId?: string })[];
+  notifications?: (Partial<StaffNotification> & { key?: string })[];
 }
 
 /** 通知等级权重：危急值 > 会诊 > 审批。 */
@@ -238,10 +238,10 @@ export function optimizeForMobile(pageData: RawPageData): OptimizedData {
   const patients: MobilePatient[] = rawPatients
     .filter((p) => typeof p.visitId === 'string' && p.visitId.length > 0)
     .map((p) => ({
-      visitId: p.visitId as string,
+      visitId: p.visitId!,
       nameMasked: p.nameMasked ?? '***',
       bedNo: p.bedNo ?? '-',
-      group: (p.group === 'new_today' ? 'new_today' : 'mine') as MobilePatient['group'],
+      group: p.group === 'new_today' ? ('new_today' as const) : ('mine' as const),
       acuity: typeof p.acuity === 'number' && p.acuity >= 1 ? p.acuity : 1,
       ...(p.hint ? { hint: p.hint } : {}),
     }))

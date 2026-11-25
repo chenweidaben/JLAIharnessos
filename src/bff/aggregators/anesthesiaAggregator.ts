@@ -12,7 +12,7 @@ export interface AnesthesiaRecord {
   asaGrade: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI';
   anesthesiaType: 'general' | 'regional' | 'local';
   duration: number;
-  complications?: Array<'circulation' | 'respiratory' | 'neurological' | 'allergy'>;
+  complications?: ('circulation' | 'respiratory' | 'neurological' | 'allergy')[];
 }
 
 /**

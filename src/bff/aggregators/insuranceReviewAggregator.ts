@@ -325,7 +325,7 @@ export function reviewInsuranceSettlement(
   // 最高严重度
   let top: Severity | 'none' = 'none';
   for (const iss of result.issues) {
-    if (top === 'none' || SEVERITY_RANK[iss.severity] > SEVERITY_RANK[top as Severity]) {
+    if (top === 'none' || SEVERITY_RANK[iss.severity] > SEVERITY_RANK[top]) {
       top = iss.severity;
     }
   }

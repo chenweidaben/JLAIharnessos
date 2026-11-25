@@ -46,7 +46,7 @@ interface ErTriageRecord {
 const triageStore = new Map<string, ErTriageRecord>();
 let triageSeq = 2;
 
-const VITAL_KEYS: Array<keyof Vitals> = ['temperature', 'pulse', 'respiration', 'sbp', 'dbp', 'spo2', 'gcs'];
+const VITAL_KEYS: (keyof Vitals)[] = ['temperature', 'pulse', 'respiration', 'sbp', 'dbp', 'spo2', 'gcs'];
 
 function waitAreaOf(level: TriageLevel): WaitArea {
   if (level === 'level1' || level === 'level2') return 'resuscitation';
@@ -155,13 +155,13 @@ async function handleTriageCreate(c: Ctx): Promise<Response> {
   const record: ErTriageRecord = {
     id: `TRI-${String(triageSeq).padStart(3, '0')}`,
     visitId: visitId.trim(),
-    level: level as TriageLevel,
+    level: level,
     vitals,
     chiefComplaint: chiefComplaint.trim(),
     objective: objectiveStr,
     needsUpgrade: escalateReason != null,
     escalateReason,
-    waitArea: waitAreaOf(level as TriageLevel),
+    waitArea: waitAreaOf(level),
     triagedAt: new Date().toISOString(),
   };
   triageStore.set(record.id, record);

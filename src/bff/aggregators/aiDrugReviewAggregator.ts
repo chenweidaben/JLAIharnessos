@@ -85,8 +85,8 @@ export interface FalsePositiveFeedback {
 /** 统计口径：一次已落库审核的最小摘要（供 getDrugReviewStats 纯函数聚合） */
 export interface ReviewRecord {
   overallRisk: RiskLevel | 'none';
-  findings: Array<{ dimension: ReviewDimension; level: RiskLevel }>;
-  falsePositiveFeedbacks: Array<{ findingId: string }>;
+  findings: { dimension: ReviewDimension; level: RiskLevel }[];
+  falsePositiveFeedbacks: { findingId: string }[];
 }
 
 /** 误拦率与五维分布统计 */
@@ -94,7 +94,7 @@ export interface DrugReviewStats {
   period: string;
   totalReviews: number;
   byLevel: { high: number; medium: number; low: number };
-  dimensionBreakdown: Array<{ dimension: ReviewDimension; count: number }>;
+  dimensionBreakdown: { dimension: ReviewDimension; count: number }[];
   /** 误拦反馈条数（留痕累计） */
   falsePositiveFeedbacks: number;
   /** 误拦率 = 误拦反馈条数 / 告警总条数，越低越准（0~1，保留 4 位小数） */
@@ -241,7 +241,7 @@ function levelRank(l: RiskLevel): number {
 
 function higher(a: RiskLevel | 'none', b: RiskLevel): RiskLevel | 'none' {
   if (a === 'none') return b;
-  return levelRank(a as RiskLevel) >= levelRank(b) ? a : b;
+  return levelRank(a) >= levelRank(b) ? a : b;
 }
 
 function findingId(prefix: string, drug: string, related = ''): string {

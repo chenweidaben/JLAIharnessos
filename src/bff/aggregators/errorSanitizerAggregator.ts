@@ -218,7 +218,7 @@ export interface ErrorMaskingSelfTest {
 export function runErrorMaskingSelfTest(): ErrorMaskingSelfTest {
   const samples: MaskingSample[] = [];
 
-  const cases: Array<{ label: string; err: unknown }> = [
+  const cases: { label: string; err: unknown }[] = [
     {
       label: '数据库连接失败（含堆栈/路径/SQL/内网IP）',
       err: new Error(

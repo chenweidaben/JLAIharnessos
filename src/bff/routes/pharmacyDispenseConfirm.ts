@@ -18,14 +18,14 @@ export const pharmacyDispenseConfirmRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/pharmacy/dispense/confirm', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'dispensed' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { prescriptionId?: string; pharmacistA?: string; pharmacistB?: string };
       return json(ok({ demo: true, id: b.prescriptionId ?? 'demo-rx', status: 'dispensed', pharmacistA: b.pharmacistA ?? 'demo-a', pharmacistB: b.pharmacistB ?? 'demo-b', dispensedAt: new Date().toISOString() }));
     } },
   { method: 'POST', path: '/api/v1/pharmacy/dispense/return', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'return-requested' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: 'demo-ret-' + Date.now(), status: 'return-requested', reason: (body as { reason?: string }).reason ?? 'demo' }));
     } },
 ];

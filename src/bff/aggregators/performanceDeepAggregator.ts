@@ -135,13 +135,13 @@ export interface BenchmarkResult {
   /** 全院科室总数 */
   deptCount: number;
   /** 逐维对比本科室与全院平均分的差值（正=优于平均） */
-  dimensionVsAverage: Array<{
+  dimensionVsAverage: {
     code: DimensionCode;
     label: string;
     self: number;
     average: number;
     delta: number;
-  }>;
+  }[];
 }
 
 /** identifyPerformanceGap 产出的单条差距 */

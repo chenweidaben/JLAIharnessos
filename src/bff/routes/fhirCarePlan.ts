@@ -15,15 +15,15 @@ interface FhirCarePlan {
   subject: { reference: string };
   encounter?: { reference: string };
   period?: { start: string; end?: string };
-  activity?: Array<{
+  activity?: {
     detail: {
-      code?: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+      code?: { coding: { system: string; code: string; display: string }[]; text: string };
       status: 'not-started' | 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'on-hold';
       description?: string;
       scheduledString?: string;
     };
-  }>;
-  goal?: Array<{ reference: string }>;
+  }[];
+  goal?: { reference: string }[];
 }
 
 const demoCarePlans: FhirCarePlan[] = [

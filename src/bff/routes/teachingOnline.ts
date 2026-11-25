@@ -58,7 +58,7 @@ async function handleCourses(c: Ctx): Promise<Response> {
   }
 
   // M171-B：在线学习平台视图
-  const category = c.query.get('category') || undefined;
+  const category = c.query.get('category') ?? undefined;
   const platform = buildOnlineLearningPlatform(category);
   return json(
     ok({
@@ -89,7 +89,7 @@ async function handleQuizSubmit(c: Ctx): Promise<Response> {
 
   try {
     const body =
-      (await c.body<QuizSubmitBody>().catch(() => ({} as QuizSubmitBody))) ?? {};
+      (await c.body<QuizSubmitBody>().catch((): QuizSubmitBody => ({}))) ?? {};
     if (!body.courseId || !body.studentId) {
       return json(
         fail(ErrorCode.BAD_REQUEST, 'courseId 与 studentId 均为必填', c.traceId),

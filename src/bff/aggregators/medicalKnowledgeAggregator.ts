@@ -69,7 +69,7 @@ export interface MedicalKnowledgeEntry {
   /** 关键要点（bullet，答案中以列表呈现） */
   keyPoints: string[];
   /** 来源（指南 / 教材名称 + 年份） */
-  sources: Array<{ name: string; year?: string; publisher?: string }>;
+  sources: { name: string; year?: string; publisher?: string }[];
   /** 证据强度 0~1（0.9 = 指南强推荐，0.5 = 专家共识） */
   evidenceLevel: number;
 }

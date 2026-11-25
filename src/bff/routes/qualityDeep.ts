@@ -68,7 +68,7 @@ const qualityReadings: Record<string, MetricReading[]> = {
 };
 
 /** 重点指标近 6 期历史（用于趋势外推；真实部署从 quality_metric_deep 表按 period 回读） */
-const qualityHistory: Record<string, Array<{ period: string; value: number }>> = {
+const qualityHistory: Record<string, { period: string; value: number }[]> = {
   AUDDS: [
     { period: '2026-05', value: 44 },
     { period: '2026-06', value: 45.2 },

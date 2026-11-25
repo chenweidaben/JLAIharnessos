@@ -61,7 +61,7 @@ export interface ReviewStats {
  *  - rationalRate 保留 1 位小数的百分数（0~100）。
  */
 export function summarizeResults(
-  records: Array<Pick<repo.PrescriptionReview, 'result'>>,
+  records: Pick<repo.PrescriptionReview, 'result'>[],
   pendingCount = 0,
 ): ReviewStats {
   const list = Array.isArray(records) ? records : [];

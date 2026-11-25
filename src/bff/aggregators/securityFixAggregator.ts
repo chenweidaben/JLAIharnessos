@@ -241,7 +241,7 @@ function scanXssFile(file: CodeFile): {
 
   lines.forEach((raw, idx) => {
     const line = raw;
-    if (!/dangerouslySetInnerHTML/.test(line)) return;
+    if (!line.includes('dangerouslySetInnerHTML')) return;
     dangerously += 1;
 
     let m: RegExpExecArray | null;

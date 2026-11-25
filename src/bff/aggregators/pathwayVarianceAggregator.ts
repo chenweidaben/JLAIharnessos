@@ -141,7 +141,7 @@ export async function recordView(
 ): Promise<PathwayVariance> {
   assertPermission(auth, VARIANCE_PERM);
   assertUuid(input.visitId, '就诊');
-  if (!input.reason || !input.reason.trim()) throw badRequest('变异原因不能为空');
+  if (!input.reason?.trim()) throw badRequest('变异原因不能为空');
   const varianceType = (input.varianceType ?? 'neutral').trim() || 'neutral';
   if (!VARIANCE_TYPES.has(varianceType)) {
     throw badRequest('变异类型须为 positive / negative / neutral');

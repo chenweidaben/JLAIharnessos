@@ -146,7 +146,7 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
       try {
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
-        const rawItems = Array.isArray(b.items) ? b.items as Array<Record<string, unknown>> : [];
+        const rawItems = Array.isArray(b.items) ? b.items as Record<string, unknown>[] : [];
         return json(ok(settleDischarge({
           visitId: String(b.visitId ?? ''),
           operatorId: view.id,
@@ -181,7 +181,7 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
       try {
         assertCashier(c.user?.roles ?? []);
         const b = (await c.body()) as Record<string, unknown>;
-        const rawItems = Array.isArray(b.items) ? b.items as Array<Record<string, unknown>> : [];
+        const rawItems = Array.isArray(b.items) ? b.items as Record<string, unknown>[] : [];
         return json(ok(settleMid({
           visitId: String(b.visitId ?? ''),
           patientId: String(b.patientId ?? ''),

@@ -11,8 +11,8 @@ interface FhirAppointment {
   status: 'proposed' | 'pending' | 'booked' | 'arrived' | 'fulfilled' | 'cancelled' | 'noshow';
   start: string;
   end: string;
-  participant: Array<{ actor: { reference: string; display: string }; status: 'accepted' | 'declined' | 'needs-action' }>;
-  reasonCode: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  participant: { actor: { reference: string; display: string }; status: 'accepted' | 'declined' | 'needs-action' }[];
+  reasonCode: { coding: { system: string; code: string; display: string }[]; text: string };
   description: string;
 }
 

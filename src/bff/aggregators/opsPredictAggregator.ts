@@ -180,18 +180,18 @@ export interface TransferAdvice {
 
 export interface ResourceAllocationResult {
   /** 按资源轧差后的明细 */
-  gaps: Array<{
+  gaps: {
     resource: string;
     required: number;
     available: number;
     net: number;
     status: 'surplus' | 'balanced' | 'shortage';
-  }>;
+  }[];
   transfers: TransferAdvice[];
   /** 整体平衡分 0~1（1=供需完全匹配） */
   balanceScore: number;
   /** 仍未被调拨覆盖的缺口 */
-  unmet: Array<{ resource: string; amount: number }>;
+  unmet: { resource: string; amount: number }[];
   notes: string[];
 }
 
@@ -345,7 +345,7 @@ function runPrediction(history: HistoryPoint[], days: number, opts: RunOptions):
 
     // 法定假日压减（如国庆/春节门诊量骤降）
     let holidayApplied = false;
-    if (opts.holidaySet && opts.holidaySet.has(projDate)) {
+    if (opts.holidaySet?.has(projDate)) {
       point *= opts.holidayFactor ?? 0.35;
       holidayApplied = true;
       holidayHits += 1;
@@ -601,13 +601,13 @@ export function recommendResourceAllocation(
 
   const gaps: ResourceAllocationResult['gaps'] = [];
   const transfers: TransferAdvice[] = [];
-  const unmet: Array<{ resource: string; amount: number }> = [];
+  const unmet: { resource: string; amount: number }[] = [];
 
   for (const [resource, perDept] of deptLedger) {
     let required = 0;
     let available = 0;
-    const surplusPool: Array<{ dept: string; amount: number }> = [];
-    const deficitList: Array<{ dept: string; amount: number }> = [];
+    const surplusPool: { dept: string; amount: number }[] = [];
+    const deficitList: { dept: string; amount: number }[] = [];
 
     for (const [dept, cell] of perDept) {
       required += cell.demand;

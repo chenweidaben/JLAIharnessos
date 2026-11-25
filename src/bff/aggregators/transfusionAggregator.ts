@@ -181,12 +181,12 @@ export async function applyTransfusion(
  */
 function buildDemoTransfusionList(): TransfusionRequest[] {
   const today = '2026-10-19';
-  const rows: Array<Partial<TransfusionRequest> & {
+  const rows: (Partial<TransfusionRequest> & {
     id: string; requestNo: string; visitId: string; patientId: string;
     department: string; applicantId: string; indication: string;
     bloodType: string; component: string; unitCount: number;
     urgency: string; status: TransfusionStatus;
-  }> = [
+  })[] = [
     { id: 'demo-blood-01', requestNo: 'BLOOD20261019001', visitId: 'demo-visit-b01', patientId: 'demo-pat-b01', department: '普外科', applicantId: 'u_2001', indication: '术后切口渗血 Hb 68 g/L，伴心悸乏力', indicationMeta: { hb: 68, activeBleeding: true, bloodLoss: 400 }, bloodType: 'A', component: 'red_cell', unitCount: 2, urgency: 'urgent', status: 'transfusing', crossmatchResult: '相合', crossmatchNote: '凝聚胺法 相合', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 09:30`, batchNo: 'BATCH20261019-01', dispensedBy: 'u_2003', dispensedAt: `${today} 09:50` },
     { id: 'demo-blood-02', requestNo: 'BLOOD20261019002', visitId: 'demo-visit-b02', patientId: 'demo-pat-b02', department: '消化内科', applicantId: 'u_2001', indication: '上消化道出血 Hb 55 g/L', indicationMeta: { hb: 55, activeBleeding: true, bloodLoss: 800 }, bloodType: 'O', component: 'red_cell', unitCount: 4, urgency: 'emergency', status: 'dispensed', crossmatchResult: '相合', crossmatchNote: '凝聚胺法 相合', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 10:10`, batchNo: 'BATCH20261019-02', dispensedBy: 'u_2003', dispensedAt: `${today} 10:25` },
     { id: 'demo-blood-03', requestNo: 'BLOOD20261019003', visitId: 'demo-visit-b03', patientId: 'demo-pat-b03', department: '心血管外科', applicantId: 'u_2001', indication: 'CABG 术中备血小板 PLT 45 ×10^9/L', indicationMeta: { plt: 45 }, bloodType: 'AB', component: 'platelet', unitCount: 1, urgency: 'urgent', status: 'crossmatched', crossmatchResult: '相合', crossmatchNote: 'RhD 同型', crossmatchedBy: 'u_2004', crossmatchedAt: `${today} 11:00`, batchNo: null, dispensedBy: null, dispensedAt: null },
@@ -336,7 +336,7 @@ export async function completeTransfusion(
     await patchTransfusion(String(transfusion.id), {
       status: 'completed',
       end_at: new Date().toISOString(),
-      vital_signs: (input.vitalSigns ?? {}) as Record<string, unknown>,
+      vital_signs: (input.vitalSigns ?? {}),
     }, tx);
     const updated = await patchRequest(id, { status: 'completed' }, tx);
     await recordChainAudit({

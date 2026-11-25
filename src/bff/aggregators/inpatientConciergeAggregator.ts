@@ -104,7 +104,7 @@ function assertAccess(actor: { roles: string[]; id: string }, patientId: string,
   if (roles.includes('family')) {
     const key = `${patientId}|${actor.id}`;
     const auth = authorizations.get(key);
-    if (!auth || !auth.scope.includes(scope)) {
+    if (!auth?.scope.includes(scope)) {
       throw new ConciergeError(403, `家属 ${actor.id} 对患者 ${patientId} 无 ${scope} 代办授权`);
     }
     return;

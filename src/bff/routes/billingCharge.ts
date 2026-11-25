@@ -19,13 +19,13 @@ export const billingChargeRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/billing/charges', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'charged' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: 'demo-bill-' + Date.now(), status: 'charged', payload: body }));
     } },
   { method: 'POST', path: '/api/v1/billing/refund', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'refunded' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: 'demo-refund-' + Date.now(), status: 'refunded', reason: (body as { reason?: string }).reason ?? 'demo' }));
     } },
   { method: 'POST', path: '/api/v1/billing/receipt', auth: true,

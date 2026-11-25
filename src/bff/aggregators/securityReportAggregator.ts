@@ -21,8 +21,8 @@ const XSS_PATTERNS = [
  * @param inputs 用户输入列表
  * @returns 存在 XSS 风险的输入
  */
-export function detectXSSVulnerability(inputs: string[]): Array<{ input: string; risk: string }> {
-  const risks: Array<{ input: string; risk: string }> = [];
+export function detectXSSVulnerability(inputs: string[]): { input: string; risk: string }[] {
+  const risks: { input: string; risk: string }[] = [];
   for (const input of inputs) {
     for (const pattern of XSS_PATTERNS) {
       if (pattern.test(input)) {
@@ -56,7 +56,7 @@ export function checkSQLInjectionSafe(query: string): boolean {
 /** 安全报告输出 */
 export interface SecurityReport {
   timeRange: string;
-  xssFindings: Array<{ input: string; risk: string }>;
+  xssFindings: { input: string; risk: string }[];
   csrfCoverage: number;
   sqliCoverage: number;
   phiMaskingRate: number;

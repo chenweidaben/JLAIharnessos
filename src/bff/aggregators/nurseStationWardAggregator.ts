@@ -87,21 +87,21 @@ export interface PdaDenial {
 
 export interface WardExecutionSheet {
   visitId: string | null;
-  pendingItems: Array<{
+  pendingItems: {
     orderId: string;
     visitId: string;
     patientId: string;
     patientName: string;
     content: string;
     status: string;
-  }>;
-  executedItems: Array<{
+  }[];
+  executedItems: {
     execId: string;
     slipNo: string;
     orderIds: string[];
     patientId: string;
     executedAt: number;
-  }>;
+  }[];
   vitalsCount: number;
   nursingRecordsCount: number;
   generatedAt: number;
@@ -406,7 +406,7 @@ function seedDemo(): void {
   pdaExecutions.clear();
   pdaDenials.length = 0;
 
-  const seedVitals: Array<[string, string, number, number, number, number, number]> = [
+  const seedVitals: [string, string, number, number, number, number, number][] = [
     // visitId, patientId, temp, hr, sbp, dbp, hoursAgo
     ['VISIT-A100', 'PT-P001', 36.6, 78, 120, 78, 2],
     ['VISIT-B200', 'PT-P002', 37.1, 84, 128, 82, 4],
@@ -428,7 +428,7 @@ function seedDemo(): void {
     });
   }
 
-  const seedNotes: Array<[string, string, NursingRecordType, string, number]> = [
+  const seedNotes: [string, string, NursingRecordType, string, number][] = [
     ['VISIT-A100', 'PT-P001', 'shift_handover', '白班交班：患者神志清，输液通畅，夜间无不适。', 3],
     ['VISIT-B200', 'PT-P002', 'nursing_note', '雾化吸入后咳嗽减轻，继续观察呼吸频率。', 5],
   ];

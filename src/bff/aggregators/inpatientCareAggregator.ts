@@ -384,7 +384,7 @@ export async function executeCareTask(
       const full = await tx`
         SELECT * FROM clinical.nursing_tasks WHERE id = ${taskId}
       `;
-      const dedup = mapPlainTask(full[0] as Record<string, unknown>);
+      const dedup = mapPlainTask(full[0]);
       await recordChainAudit(
         {
           actorId: auth.id, actorRole: auth.rawRoles.join(','), actorDept: auth.deptName,

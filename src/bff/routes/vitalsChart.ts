@@ -3,7 +3,7 @@ import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
-const demoVitals: Record<string, Array<Record<string, unknown>>> = {
+const demoVitals: Record<string, Record<string, unknown>[]> = {
   'demo-patient-001': [
     { ts: '2026-11-03T06:00:00+08:00', temp: 36.6, pulse: 78, resp: 18, systolic: 120, diastolic: 78, weight: 62.5, intake: 0, output: 0 },
     { ts: '2026-11-03T10:00:00+08:00', temp: 36.8, pulse: 80, resp: 18, systolic: 122, diastolic: 80, weight: 62.5, intake: 200, output: 150 },
@@ -22,7 +22,7 @@ export const vitalsChartRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/vitals', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'recorded' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: 'demo-vitals-' + Date.now(), status: 'recorded', payload: body }));
     } },
 ];

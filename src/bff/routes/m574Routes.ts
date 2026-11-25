@@ -175,7 +175,7 @@ async function handleAdmCreate(c: Ctx): Promise<Response> {
   const {
     patientId, visitId, admissionDate, mainChiefComplaint, presentIllnessHistory,
     pastHistory, personalHistory, familyHistory, physicalExamination, admissionDiagnosis, creatingDoctor,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

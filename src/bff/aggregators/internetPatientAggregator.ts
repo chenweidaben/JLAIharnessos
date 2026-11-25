@@ -140,7 +140,7 @@ export async function bindPhone(
 }
 
 /** 列出账号下就诊人（脱敏视图） */
-export async function listMyProfiles(accountId: string): Promise<Array<{
+export async function listMyProfiles(accountId: string): Promise<{
   id: string;
   relation: string;
   nameMasked: string | null;
@@ -149,7 +149,7 @@ export async function listMyProfiles(accountId: string): Promise<Array<{
   isDefault: boolean;
   patientId: string | null;
   delegatedScopes: string[];
-}>> {
+}[]> {
   const profiles = await listProfilesRepo(accountId);
   return profiles.map((p) => ({
     id: p.id,

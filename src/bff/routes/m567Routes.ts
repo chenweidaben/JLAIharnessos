@@ -120,7 +120,7 @@ async function handleIprCreate(c: Ctx): Promise<Response> {
   const {
     patientId, admissionDate, dischargeDate, mainDiagnosisCode, mainDiagnosisName,
     otherDiagnoses, mainOperationCode, dischargeStatus, totalCost, insuranceType,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

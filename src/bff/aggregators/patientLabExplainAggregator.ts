@@ -375,7 +375,7 @@ export async function explainLabReportByReportId(
   reportId: string,
   patientProfile: PatientProfile = {},
 ): Promise<LabExplainResult & { reportId: string; itemCount: number }> {
-  if (!reportId || !reportId.trim()) {
+  if (!reportId?.trim()) {
     throw new PatientLabExplainError(400, 'BAD_REQUEST', '缺少报告号 reportId');
   }
   const db = getDb();

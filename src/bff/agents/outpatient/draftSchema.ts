@@ -103,7 +103,7 @@ function validateCitation(entry: unknown, path: string, errors: string[]): Citat
     errors.push(`${path} 须为对象`);
     return null;
   }
-  const fields: Array<keyof Pick<Citation, 'refId' | 'chunkId' | 'title' | 'sectionPath' | 'sourceName' | 'quotedExcerpt'>> = [
+  const fields: (keyof Pick<Citation, 'refId' | 'chunkId' | 'title' | 'sectionPath' | 'sourceName' | 'quotedExcerpt'>)[] = [
     'refId',
     'chunkId',
     'title',

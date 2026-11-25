@@ -47,7 +47,7 @@ export async function createPlan(
       (${input.visitId}, ${input.dischargeGuidance}, ${input.medicationSummary},
        ${input.followupDate}, ${input.followupDepartment}, ${input.createdBy})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function pushToPatient(id: string, tx: DbExecutor = getDb()): Promise<DischargePlan> {
@@ -55,13 +55,13 @@ export async function pushToPatient(id: string, tx: DbExecutor = getDb()): Promi
     UPDATE clinical.discharge_plans SET status='pushed' WHERE id=${id} AND status='planned'
     RETURNING ${tx.unsafe(COLS)}`;
   if (rows.length === 0) throw new Error('出院计划不存在或已推送');
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function getByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<DischargePlan | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.discharge_plans WHERE visit_id=${visitId} LIMIT 1`;
-  return rows.length === 0 ? null : map(rows[0] as Record<string, unknown>);
+  return rows.length === 0 ? null : map(rows[0]);
 }
 
 export async function listByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<DischargePlan[]> {

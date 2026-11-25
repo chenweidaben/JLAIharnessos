@@ -17,8 +17,8 @@ import { shortId } from '../util';
 
 export interface GraphImportPayload {
   sourceId: string;
-  entities: Array<{ name: string; type: EntityType; aliases?: string[]; codes?: GraphEntity['codes']; properties?: Record<string, string | number | boolean> }>;
-  relations?: Array<{ from: string; to: string; type: string; weight?: number; properties?: Record<string, string | number | boolean> }>;
+  entities: { name: string; type: EntityType; aliases?: string[]; codes?: GraphEntity['codes']; properties?: Record<string, string | number | boolean> }[];
+  relations?: { from: string; to: string; type: string; weight?: number; properties?: Record<string, string | number | boolean> }[];
   provenance: SourceProvenance;
 }
 
@@ -93,7 +93,7 @@ export class KnowledgeGraph {
     return rel;
   }
 
-  neighbors(entityId: string, relationTypes?: string[]): Array<{ entity: GraphEntity; relation: GraphRelation }> {
+  neighbors(entityId: string, relationTypes?: string[]): { entity: GraphEntity; relation: GraphRelation }[] {
     const edges = this.adjacency.get(entityId) ?? [];
     return edges
       .filter((e) => !relationTypes || relationTypes.includes(e.relation.type))
@@ -102,12 +102,12 @@ export class KnowledgeGraph {
   }
 
   /** BFS 多跳扩展，返回命中实体与路径（用于图谱召回与解释） */
-  expand(startName: string, maxHops = 2, relationTypes?: string[]): Array<{ entity: GraphEntity; path: string[]; depth: number }> {
+  expand(startName: string, maxHops = 2, relationTypes?: string[]): { entity: GraphEntity; path: string[]; depth: number }[] {
     const startId = this.resolve(startName);
     if (!startId) return [];
     const visited = new Set<string>([startId]);
-    const out: Array<{ entity: GraphEntity; path: string[]; depth: number }> = [];
-    const queue: Array<{ id: string; depth: number; path: string[] }> = [
+    const out: { entity: GraphEntity; path: string[]; depth: number }[] = [];
+    const queue: { id: string; depth: number; path: string[] }[] = [
       { id: startId, depth: 0, path: [startName] },
     ];
     while (queue.length) {

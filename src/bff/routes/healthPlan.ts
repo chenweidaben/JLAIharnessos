@@ -77,7 +77,7 @@ export const healthPlanRoutes: RouteDef[] = [
       } catch {
         return json(fail(ErrorCode.BAD_REQUEST, '请求体不是合法 JSON', c.traceId), 400);
       }
-      if (!body || !body.planId || !body.activity) {
+      if (!body?.planId || !body.activity) {
         return json(
           fail(ErrorCode.BAD_REQUEST, '请求体应为 { planId, activity: { type, ... } }', c.traceId),
           400,

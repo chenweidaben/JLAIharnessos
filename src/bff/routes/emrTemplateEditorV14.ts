@@ -15,7 +15,7 @@ import {
 } from "../aggregators/emrTemplateEditorV14Aggregator.js";
 
 /** 内存态模板布局集（演示用，生产环境应持久化） */
-const layoutState: Map<string, TemplateLayoutV14> = new Map();
+const layoutState = new Map<string, TemplateLayoutV14>();
 
 export const emrTemplateEditorV14Routes: RouteDef[] = [
   {

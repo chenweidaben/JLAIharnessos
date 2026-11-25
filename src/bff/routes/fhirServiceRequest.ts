@@ -10,14 +10,14 @@ interface FhirServiceRequest {
   meta: { versionId: string; lastUpdated: string };
   status: 'draft' | 'active' | 'on-hold' | 'revoked' | 'completed' | 'entered-in-error' | 'unknown';
   intent: 'proposal' | 'plan' | 'order' | 'option' | 'directive' | 'filler-order' | 'instance-order' | 'original-order' | 'reflex-order';
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string };
   encounter?: { reference: string };
   authoredOn: string;
   requester?: { reference: string; display?: string };
-  performer?: Array<{ reference: string; display?: string }>;
+  performer?: { reference: string; display?: string }[];
   occurrenceDateTime?: string;
-  reasonCode?: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
+  reasonCode?: { coding: { system: string; code: string; display: string }[]; text: string }[];
 }
 
 const demoServiceRequests: FhirServiceRequest[] = [

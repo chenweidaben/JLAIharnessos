@@ -46,7 +46,7 @@ import {
 const isDemoMode = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
 /** v5.0试点扩展：演示校验结果（全部通过、无问题项） */
-const demoValidation = { valid: true, issues: [] as Array<{ severity: string; code: string; message: string }> };
+const demoValidation = { valid: true, issues: [] as { severity: string; code: string; message: string }[] };
 
 /** v5.0试点扩展：构造一条演示智能体（字段与 AgentRecord 对齐） */
 function demoAgent(agentId: string): AgentRecord {

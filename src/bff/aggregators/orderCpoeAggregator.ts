@@ -469,7 +469,7 @@ export function createOrderSet(input: CreateOrderSetInput): OrderSetResult {
   let totalFeeCents = 0;
   for (let i = 0; i < input.orders.length; i += 1) {
     const it = input.orders[i];
-    if (!it || !it.content) throw new OrderCpoeError(400, `成套医嘱第 ${i + 1} 条内容必填`);
+    if (!it?.content) throw new OrderCpoeError(400, `成套医嘱第 ${i + 1} 条内容必填`);
     const orderType = assertOrderType(it.orderType);
     assertFeeCents(it.feeCents);
     orderSeq += 1;

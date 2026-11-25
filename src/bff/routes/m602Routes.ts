@@ -21,14 +21,14 @@ interface ShiftRecord {
   startTime: string;
   endTime: string;
   role: StaffRole;
-  swapRequests: Array<{
+  swapRequests: {
     id: string;
     requestedBy: string;
     targetStaffId: string;
     reason: string;
     status: SwapStatus;
     requestedAt: string;
-  }>;
+  }[];
   createdAt: string;
 }
 
@@ -111,7 +111,7 @@ async function handleShiftCreate(c: Ctx): Promise<Response> {
   let body: Record<string, unknown> | null = null;
   try { body = await c.body<Record<string, unknown>>(); } catch { body = null; }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
-  const { staffId, staffName, deptCode, shiftDate, shiftType, startTime, endTime, role } = body as Record<string, unknown>;
+  const { staffId, staffName, deptCode, shiftDate, shiftType, startTime, endTime, role } = body;
   if (typeof staffId !== 'string' || typeof shiftDate !== 'string' || typeof shiftType !== 'string') {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }

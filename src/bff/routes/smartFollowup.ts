@@ -61,7 +61,7 @@ export const smartFollowupRoutes: RouteDef[] = [
         };
         const result = sendAutoFollowup(
           body.patientId ?? '',
-          (body.channel ?? 'sms') as FollowupChannel,
+          (body.channel ?? 'sms'),
           body.template ?? '',
         );
         const status = result.success ? 200 : 422;

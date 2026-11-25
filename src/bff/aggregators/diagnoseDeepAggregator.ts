@@ -96,16 +96,16 @@ interface DiseaseRule {
   diagnosis: string;
   icd10: string;
   specialty: DeepSpecialty;
-  symptoms: Array<{ kw: string; weight: number; label: string }>;
-  vitals?: Array<{
+  symptoms: { kw: string; weight: number; label: string }[];
+  vitals?: {
     field: keyof DeepVitals;
     op: '>=' | '<=';
     threshold: number;
     weight: number;
     label: string;
-  }>;
+  }[];
   ageBand?: { minAge: number; maxAge: number; weight: number; label: string };
-  history: Array<{ kw: string; weight: number; label: string }>;
+  history: { kw: string; weight: number; label: string }[];
   expectedLabs: ExpectedLab[];
   treatment: {
     meds: TreatmentMed[];
@@ -114,7 +114,7 @@ interface DiseaseRule {
     specialPopulation: string;
   };
   /** 与易混淆疾病的鉴别要点 */
-  discriminators: Array<{ with: string; how: string }>;
+  discriminators: { with: string; how: string }[];
 }
 
 const BUILTIN_DISEASES: DiseaseRule[] = [
@@ -747,7 +747,7 @@ function fnv1a(input: string): string {
 const DISCLAIMER =
   '本建议由 AI 规则引擎基于症状/病史/化验启发式生成，仅供临床参考，不构成诊断结论；辅助诊断，最终由医生确认。';
 
-function textOfSymptoms(symptoms: Array<{ name: string; onset?: string }>): string {
+function textOfSymptoms(symptoms: { name: string; onset?: string }[]): string {
   return (symptoms ?? [])
     .map((s) => `${s?.name ?? ''} ${s?.onset ?? ''}`)
     .join(' ')
@@ -760,7 +760,7 @@ function textOfHistory(history: string[] | { chronicDiseases?: string[]; notes?:
   return [...(h.chronicDiseases ?? []), h.notes ?? ''].join(' ').toLowerCase();
 }
 
-function labText(labs: DeepLabResult[]): Array<{ kw: string; abnormal: string; name: string }> {
+function labText(labs: DeepLabResult[]): { kw: string; abnormal: string; name: string }[] {
   return (labs ?? []).map((l) => ({
     kw: (l?.name ?? '').toLowerCase(),
     abnormal: (l?.abnormal ?? '').toLowerCase(),
@@ -770,7 +770,7 @@ function labText(labs: DeepLabResult[]): Array<{ kw: string; abnormal: string; n
 
 /** 化验是否命中某条 expectedLab（名称关键词 + 异常方向） */
 function matchLab(
-  labs: Array<{ kw: string; abnormal: string; name: string }>,
+  labs: { kw: string; abnormal: string; name: string }[],
   expected: ExpectedLab,
 ): { hit: boolean; conflict: boolean; label: string } {
   for (const l of labs) {
@@ -814,7 +814,7 @@ export interface ExpandedLibrary {
  *                    丰富字段（本函数只做登记与去重，不做临床推理）。
  */
 export function expandDiagnosisLibrary(
-  newDiseases: Array<Partial<DiseaseRule> & { diagnosis: string; icd10?: string; specialty?: DeepSpecialty }> = [],
+  newDiseases: (Partial<DiseaseRule> & { diagnosis: string; icd10?: string; specialty?: DeepSpecialty })[] = [],
 ): ExpandedLibrary {
   const base: DiseaseRule[] = BUILTIN_DISEASES;
   const seen = new Set(base.map((d) => d.diagnosis));
@@ -877,7 +877,7 @@ export interface DifferentialCandidate {
   /** 化验命中证据 */
   labEvidence: string[];
   /** 与易混淆疾病的鉴别要点 */
-  discriminators: Array<{ with: string; how: string }>;
+  discriminators: { with: string; how: string }[];
 }
 
 export interface DifferentialResult {
@@ -898,7 +898,7 @@ export interface DifferentialResult {
  * @param labResults 化验结果
  */
 export function improveDifferentialDiagnosis(
-  symptoms: Array<{ name: string; onset?: string }> = [],
+  symptoms: { name: string; onset?: string }[] = [],
   history: string[] | { chronicDiseases?: string[]; notes?: string } = [],
   labResults: DeepLabResult[] = [],
 ): DifferentialResult {
@@ -961,16 +961,16 @@ export function improveDifferentialDiagnosis(
 
   // 红旗扫描
   const alerts: string[] = [];
-  if (/撕裂/.test(symText) && /胸/.test(symText)) {
+  if (symText.includes('撕裂') && symText.includes('胸')) {
     alerts.push('突发撕裂样胸背痛：警惕主动脉夹层，立即 CTA 评估并控制血压/心率。');
   }
-  if (/呼吸困难/.test(symText) && (/咯血/.test(symText) || /突发/.test(symText))) {
+  if (symText.includes('呼吸困难') && (symText.includes('咯血') || symText.includes('突发'))) {
     alerts.push('突发呼吸困难伴咯血/低氧：警惕肺栓塞，建议 D-二聚体与 CTPA。');
   }
-  if (/呕血/.test(symText) || (/黑便/.test(symText))) {
+  if (symText.includes('呕血') || (symText.includes('黑便'))) {
     alerts.push('呕血/黑便：警惕消化道出血，评估血流动力学稳定性。');
   }
-  if (/晕厥/.test(symText) && (/心悸/.test(symText) || /胸痛/.test(symText))) {
+  if (symText.includes('晕厥') && (symText.includes('心悸') || symText.includes('胸痛'))) {
     alerts.push('晕厥伴心悸/胸痛：警惕恶性心律失常或心源性晕厥，立即心电图。');
   }
   if (alerts.length === 0) alerts.push('未识别到紧急红旗信号，仍以执业医师面诊为准。');
@@ -1093,7 +1093,7 @@ export interface ConsistencyResult {
  */
 export function checkDiagnosisConsistency(
   diagnosis: string,
-  symptoms: Array<{ name: string; onset?: string }> = [],
+  symptoms: { name: string; onset?: string }[] = [],
   labResults: DeepLabResult[] = [],
 ): ConsistencyResult {
   const key = (diagnosis ?? '').trim().toLowerCase();

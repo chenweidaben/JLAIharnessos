@@ -237,7 +237,7 @@ export async function loadActiveOrders(_view: AuthView, visitId: string): Promis
 
 async function runReview(view: AuthView, visitId: string) {
   if (!view.permissions.includes('drug_review:view')) throw new DrugReviewError(403, '无权限');
-  if (!visitId || !visitId.trim()) throw new DrugReviewError(400, 'visitId 必填');
+  if (!visitId?.trim()) throw new DrugReviewError(400, 'visitId 必填');
   const orders = await loadActiveOrders(view, visitId.trim());
   const issues = scanOrders(orders);
   return {

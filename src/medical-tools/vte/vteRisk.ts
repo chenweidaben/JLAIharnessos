@@ -293,7 +293,7 @@ export interface MismatchWarning {
  */
 export function detectPreventionMismatch(
   vteLevel: VteLevel,
-  preventions: Array<{ status: string }>,
+  preventions: { status: string }[],
 ): MismatchWarning {
   if (vteLevel !== 'high' && vteLevel !== 'very_high') {
     return { mismatch: false, reason: '' };

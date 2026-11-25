@@ -140,7 +140,7 @@ export const opsDeepRoutes: RouteDef[] = [
         const raw = emptyRaw();
         for (const r of rows) {
           const field = FIELD[r.metric_key];
-          if (field) (raw[field] as number) = Number(r.metric_value);
+          if (field) (raw[field]) = Number(r.metric_value);
         }
 
         return json(ok({

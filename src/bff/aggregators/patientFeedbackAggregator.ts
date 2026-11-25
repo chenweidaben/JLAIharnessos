@@ -70,7 +70,7 @@ export interface FeedbackAnalysis {
  * 问题关键词词典：把自由文本意见映射到有限的问题类别。
  * 依据宪法：用患者听得懂的词，把意见结构化，才能真正拿来改进。
  */
-const ISSUE_DICT: ReadonlyArray<{ key: string; label: string; keywords: string[] }> = [
+const ISSUE_DICT: readonly { key: string; label: string; keywords: string[] }[] = [
   { key: 'wait', label: '候诊等待', keywords: ['等待', '候诊', '排队', '等太久', '时间长', '慢'] },
   { key: 'attitude', label: '服务态度', keywords: ['态度', '冷漠', '凶', '不耐烦', '敷衍', '不理'] },
   { key: 'cost', label: '费用收费', keywords: ['费用', '收费', '贵', '报销', '太贵', '价钱'] },

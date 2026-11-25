@@ -124,7 +124,7 @@ async function handleFuCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, dischargeDate, nextFollowUpDate, followUpType, assignedTo, notes } = body as Record<string, unknown>;
+  const { patientId, dischargeDate, nextFollowUpDate, followUpType, assignedTo, notes } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

@@ -324,7 +324,7 @@ const STAGE_GOAL: Record<OnboardingStageKey, string> = {
 const STAGE_ORDER: OnboardingStageKey[] = ['day1', 'week1', 'month1', 'month3'];
 
 /** 第1天任务：所有岗位同构（开机流程） */
-const DAY1_TASKS: ReadonlyArray<Omit<OnboardingTask, 'taskId'>> = [
+const DAY1_TASKS: readonly Omit<OnboardingTask, 'taskId'>[] = [
   {
     title: '首次登录并修改初始密码',
     description: '用工号 + 初始密码登录，在「个人设置」里改成只有你知道的强密码。',
@@ -348,7 +348,7 @@ const DAY1_TASKS: ReadonlyArray<Omit<OnboardingTask, 'taskId'>> = [
 ];
 
 /** 第1周任务：按岗位差异化 */
-const WEEK1_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<OnboardingTask, 'taskId'>>> = {
+const WEEK1_TASKS_BY_ROLE: Record<OnboardingRole, readonly Omit<OnboardingTask, 'taskId'>[]> = {
   doctor: [
     {
       title: '研读科室常见病诊疗规范',
@@ -420,7 +420,7 @@ const WEEK1_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<OnboardingT
 };
 
 /** 第1月任务：按岗位差异化（跟随上级 + 记录第一条经验） */
-const MONTH1_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<OnboardingTask, 'taskId'>>> = {
+const MONTH1_TASKS_BY_ROLE: Record<OnboardingRole, readonly Omit<OnboardingTask, 'taskId'>[]> = {
   doctor: [
     {
       title: '跟随上级查房并记录查房要点',
@@ -472,7 +472,7 @@ const MONTH1_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<Onboarding
 };
 
 /** 第3月任务：按岗位差异化（独立处理常见病 + 智慧度成长对比） */
-const MONTH3_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<OnboardingTask, 'taskId'>>> = {
+const MONTH3_TASKS_BY_ROLE: Record<OnboardingRole, readonly Omit<OnboardingTask, 'taskId'>[]> = {
   doctor: [
     {
       title: '独立处理 5 例以上常见病门诊',
@@ -528,7 +528,7 @@ const MONTH3_TASKS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<Onboarding
 /** 把自由文本任务列表打上稳定 taskId（{stage}-{idx}） */
 function withTaskId(
   stageKey: OnboardingStageKey,
-  list: ReadonlyArray<Omit<OnboardingTask, 'taskId'>>,
+  list: readonly Omit<OnboardingTask, 'taskId'>[],
 ): OnboardingTask[] {
   return list.map((t, idx) => ({ ...t, taskId: `${stageKey}-${idx + 1}` }));
 }
@@ -785,7 +785,7 @@ export interface HomepageConfig {
 /* --------------------------- M155-D 引导步文案池 --------------------------- */
 
 /** 第1天：开机三件套（所有岗位同构） */
-const DAY1_STEPS: ReadonlyArray<Omit<GuideStep, 'stage'>> = [
+const DAY1_STEPS: readonly Omit<GuideStep, 'stage'>[] = [
   {
     stepId: 'day1-login',
     title: '用初始密码登录',
@@ -816,7 +816,7 @@ const DAY1_STEPS: ReadonlyArray<Omit<GuideStep, 'stage'>> = [
 ];
 
 /** 第1周：核心功能（医嘱 / 病历 / 处方，按岗位差异化） */
-const WEEK1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep, 'stage'>>> = {
+const WEEK1_STEPS_BY_ROLE: Record<OnboardingRole, readonly Omit<GuideStep, 'stage'>[]> = {
   doctor: [
     { stepId: 'week1-order', title: '开具你的第一张医嘱', description: '在医嘱页给一位测试患者下一组常规医嘱，体验草稿→提交→执行流。', target: '/order', highlight: 'order-board', skippable: true, dismissable: true },
     { stepId: 'week1-emr', title: '写一份标准病历', description: '打开电子病历，用模板完成一份首次病程记录，对照质控要点自查。', target: '/emr', highlight: 'emr-editor', skippable: true, dismissable: true },
@@ -840,7 +840,7 @@ const WEEK1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep, 
 };
 
 /** 第1月：高级功能（AI 助手 + 经验沉淀，按岗位差异化） */
-const MONTH1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep, 'stage'>>> = {
+const MONTH1_STEPS_BY_ROLE: Record<OnboardingRole, readonly Omit<GuideStep, 'stage'>[]> = {
   doctor: [
     { stepId: 'month1-ai-assistant', title: '让 AI 助手帮你写一段病程', description: '在 Personal Agent 里说「帮我写一段术后首次病程」，对照你自己的版本改一改。', target: '/workbench', highlight: 'agent-chat', skippable: true, dismissable: true },
     { stepId: 'month1-experience', title: '沉淀你的第一条临床经验', description: '把你本周踩过的一个坑，写成「如果再遇到，我会……」归档进经验库。', target: '/knowledge', highlight: 'experience-form', skippable: true, dismissable: true },
@@ -860,14 +860,14 @@ const MONTH1_STEPS_BY_ROLE: Record<OnboardingRole, ReadonlyArray<Omit<GuideStep,
 };
 
 /** 第3月：效率提升（快捷键 + 批量操作 + 个性化，所有岗位同构） */
-const MONTH3_STEPS: ReadonlyArray<Omit<GuideStep, 'stage'>> = [
+const MONTH3_STEPS: readonly Omit<GuideStep, 'stage'>[] = [
   { stepId: 'month3-shortcuts', title: '记住 3 个高频快捷键', description: '按 Ctrl+/ 呼出快捷键面板，挑你这一周用得最多的 3 个记下来。', target: '/workbench', highlight: 'shortcut-panel', skippable: true, dismissable: true },
   { stepId: 'month3-batch', title: '试一次批量操作', description: '在待办或医嘱列表里勾选多条，用批量处理一次搞定，别再一条条点。', target: '/workbench', highlight: 'batch-toolbar', skippable: true, dismissable: true },
   { stepId: 'month3-homepage', title: '把工作台改成你喜欢的样子', description: '在工作台右上角「自定义」里把不常用的卡片收起来，常用的置顶。', target: '/workbench', highlight: 'homepage-customize', skippable: true, dismissable: true },
 ];
 
 /** 快捷键目录 */
-const SHORTCUT_CATALOG: ReadonlyArray<Shortcut> = [
+const SHORTCUT_CATALOG: readonly Shortcut[] = [
   { key: 'Ctrl+K', label: '全局搜索（患者 / 病历 / 菜单）', page: 'all', when: 'all' },
   { key: 'Ctrl+/', label: '呼出 / 收起快捷键面板', page: 'all', when: 'all' },
   { key: 'Esc', label: '关闭浮层 / 取消当前操作', page: 'all', when: 'all' },

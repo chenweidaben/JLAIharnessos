@@ -102,7 +102,7 @@ export function getResource(rt: string, id: string, roles: string[], actorId: st
   return res;
 }
 
-export function listResources(rt: string, roles: string[], actorId: string): { resourceType: string; type: string; total: number; entry: Array<{ resource: unknown }> } {
+export function listResources(rt: string, roles: string[], actorId: string): { resourceType: string; type: string; total: number; entry: { resource: unknown }[] } {
   const s = rtStore(rt);
   let arr = [...s.values()];
   // patient 角色仅能看自己

@@ -213,7 +213,7 @@ export const ISSUE_LEXICON: Readonly<Record<Exclude<IssueCategory, 'other'>, str
 };
 
 /** 表扬正面词典 */
-const PRAISE_LEXICON: ReadonlyArray<string> = [
+const PRAISE_LEXICON: readonly string[] = [
   '满意', '谢谢', '感谢', '周到', '耐心', '清楚', '专业', '赞', '不错', '贴心', '认真', '负责', '热情', '温暖', '好评',
 ];
 
@@ -343,7 +343,7 @@ export function analyzeSatisfactionRootCause(issue: {
   const comments = (issue.sampleComments ?? []).map((c) => normalize(c)).filter(Boolean);
 
   let rootCause: RootCauseCode = defaultCause;
-  let refinedBy: string = '';
+  let refinedBy = '';
 
   // 类别内关键词细化：等待类问题可能是号源问题也可能是流程问题
   if (category === 'wait_time' || category === 'appointment') {
@@ -503,8 +503,8 @@ export function trackImprovementEffect(input: ImprovementEffectInput): Improveme
  * @returns 四阶段闭环视图
  */
 export function buildSatisfactionLoop(
-  surveyData: ReadonlyArray<SatisfactionSignal>,
-  improvements?: ReadonlyArray<ImprovementEffectInput>,
+  surveyData: readonly SatisfactionSignal[],
+  improvements?: readonly ImprovementEffectInput[],
 ): SatisfactionLoop {
   const signals = (surveyData ?? []).slice();
 

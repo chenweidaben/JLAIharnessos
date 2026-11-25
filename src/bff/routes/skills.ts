@@ -240,7 +240,7 @@ async function dryRun(c: Ctx): Promise<Response> {
 
 function catalogRoute(c: Ctx): Response {
   const { catalog: cat } = ensureRegistry();
-  return json(ok({ roles: ALL_SKILL_ROLES, tools: [...cat!.tools], agents: [...cat!.agents] }));
+  return json(ok({ roles: ALL_SKILL_ROLES, tools: [...cat.tools], agents: [...cat.agents] }));
 }
 
 /** 版本列表 */

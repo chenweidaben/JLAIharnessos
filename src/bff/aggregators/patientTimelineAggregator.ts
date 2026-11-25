@@ -88,7 +88,7 @@ export function summarize(patientId: string): {
 }
 
 /** DEMO_MODE 测试桩灌样本 */
-export function seed(patientId: string, samples: Array<Omit<TimelineEvent, 'eventId' | 'patientId'>>): TimelineEvent[] {
+export function seed(patientId: string, samples: Omit<TimelineEvent, 'eventId' | 'patientId'>[]): TimelineEvent[] {
   return samples.map((s) => recordEvent({ ...s, patientId }));
 }
 

@@ -10,13 +10,13 @@ interface FhirEncounter {
   meta: { versionId: string; lastUpdated: string };
   status: 'planned' | 'arrived' | 'triaged' | 'in-progress' | 'onleave' | 'finished' | 'cancelled';
   class: { system: string; code: string; display: string };
-  type: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
+  type: { coding: { system: string; code: string; display: string }[]; text: string }[];
   subject: { reference: string; display?: string };
   period: { start: string; end?: string };
-  location: Array<{ location: { reference: string; display: string }; period: { start: string } }>;
+  location: { location: { reference: string; display: string }; period: { start: string } }[];
   hospitalization: {
-    admitSource: { coding: Array<{ code: string; display: string }>; text: string };
-    dischargeDisposition?: { coding: Array<{ code: string; display: string }>; text: string };
+    admitSource: { coding: { code: string; display: string }[]; text: string };
+    dischargeDisposition?: { coding: { code: string; display: string }[]; text: string };
   };
   serviceProvider: { reference: string; display: string };
 }

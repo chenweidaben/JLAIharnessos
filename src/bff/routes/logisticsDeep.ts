@@ -59,7 +59,7 @@ export const logisticsDeepRoutes: RouteDef[] = [
     path: '/api/v1/logistics/deep-dispatch',
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
-      const body = await c.body<DeepDispatchBody>().catch(() => ({} as DeepDispatchBody));
+      const body = await c.body<DeepDispatchBody>().catch((): DeepDispatchBody => ({}));
 
       const tasks = Array.isArray(body?.tasks) ? body.tasks : [];
       const resources = Array.isArray(body?.resources) ? body.resources : [];

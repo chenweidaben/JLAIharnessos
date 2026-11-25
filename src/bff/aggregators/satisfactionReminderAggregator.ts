@@ -55,7 +55,7 @@ export async function scanView(auth: AuthView): Promise<{ pushed: number }> {
 }
 
 /** 患者查自己待填问卷通知。 */
-export async function myPendingView(auth: AuthView): Promise<{ items: Array<{ id: string; title: string; body: string; createdAt: string }> }> {
+export async function myPendingView(auth: AuthView): Promise<{ items: { id: string; title: string; body: string; createdAt: string }[] }> {
   assertPermission(auth, 'satisfaction:notify');
   const list = await listByPatient(auth.id);
   return {

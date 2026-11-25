@@ -172,7 +172,7 @@ function evaluateRule(content: Record<string, unknown>): {
 /** 从模型输出中防御性提取 AI 缺陷建议数组；非 JSON / 解析失败返回空数组。 */
 function parseAiIssues(content: string): QcIssue[] {
   let text = content.trim();
-  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(text);
   if (fence?.[1]) text = fence[1].trim();
   const start = text.indexOf('[');
   const end = text.lastIndexOf(']');

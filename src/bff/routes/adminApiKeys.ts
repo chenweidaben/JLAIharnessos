@@ -92,7 +92,7 @@ async function handleCreate(c: Ctx): Promise<Response> {
         expires_at  AS "expires_at",
         created_at  AS "created_at"
     `;
-    const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+    const row = (rows as unknown as Record<string, unknown>[])[0];
     return json(
       ok({
         id: String(row?.id ?? ''),
@@ -165,7 +165,7 @@ async function handleList(c: Ctx): Promise<Response> {
       ORDER BY created_at DESC
       LIMIT 500
     `;
-    const items = (rows as unknown as Array<Record<string, unknown>>).map((r) => ({
+    const items = (rows as unknown as Record<string, unknown>[]).map((r) => ({
       id: String(r.id ?? ''),
       keyPrefix: typeof r.keyPrefix === 'string' ? r.keyPrefix : '',
       name: typeof r.name === 'string' ? r.name : '',

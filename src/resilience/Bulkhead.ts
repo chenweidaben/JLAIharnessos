@@ -119,7 +119,7 @@ export class Bulkhead {
   }
 
   /** 全部资源指标快照 */
-  allMetrics(): Array<ReturnType<Bulkhead['metrics']>> {
+  allMetrics(): ReturnType<Bulkhead['metrics']>[] {
     return [...this.resources.keys()].map((r) => this.metrics(r));
   }
 

@@ -34,8 +34,8 @@ import {
 export interface OpsMonitorView {
   monitoring: ReturnType<typeof buildIntelligentMonitoring>;
   anomalies: ReturnType<typeof detectAnomaly>;
-  alerts: Array<ReturnType<typeof generateOpsAlert>>;
-  remediations: Array<ReturnType<typeof autoRemediate>>;
+  alerts: ReturnType<typeof generateOpsAlert>[];
+  remediations: ReturnType<typeof autoRemediate>[];
 }
 
 export const opsMonitorRoutes: RouteDef[] = [

@@ -88,7 +88,7 @@ function patientGuard(
 
 async function readBody<T>(c: Ctx): Promise<T> {
   try {
-    return (await c.body()) as T;
+    return (await c.body());
   } catch {
     return {} as T;
   }
@@ -116,7 +116,7 @@ export const internetPaymentRoutes: RouteDef[] = [
         }
         const result = await createPaymentByPatient(guard.accountId, guard.patientId, {
           prescriptionId: body.prescriptionId,
-          channel: channel as 'wechat' | 'alipay' | 'bank_card' | 'mock',
+          channel: channel,
           idempotencyKey: body.idempotencyKey,
         });
         return json(ok(result));

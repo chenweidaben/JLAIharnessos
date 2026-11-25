@@ -221,8 +221,8 @@ export function trackDrugBatch(
  * @param days 预警窗口（天）；非法/非正按 DEFAULT_EXPIRY_DAYS 处理
  */
 export function detectExpiringDrugs(days: number): ExpiringBatch[] {
-  const window = Number.isFinite(days) && (days as number) > 0
-    ? Math.floor(days as number)
+  const window = Number.isFinite(days) && (days) > 0
+    ? Math.floor(days)
     : DEFAULT_EXPIRY_DAYS;
 
   const result: ExpiringBatch[] = [];

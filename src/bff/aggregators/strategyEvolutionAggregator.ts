@@ -100,7 +100,7 @@ export function evolveWeights(
   const entries = Object.entries(currentWeights);
   if (entries.length === 0) return { ...currentWeights };
 
-  const adjusted: Array<[string, number]> = entries.map(([type, w]) => {
+  const adjusted: [string, number][] = entries.map(([type, w]) => {
     const fb = feedback[type];
     if (!fb) return [type, w];
     const rate = adoptionRateOf(fb);

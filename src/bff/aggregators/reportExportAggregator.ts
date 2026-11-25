@@ -355,16 +355,16 @@ export function exportReport(
   const startDate = filters.startDate || '2026-10-01';
   const endDate = filters.endDate || startDate;
   const department = filters.department?.trim() || '';
-  const page = Number.isFinite(filters.page) && (filters.page as number) > 0 ? Math.floor(filters.page as number) : 1;
+  const page = Number.isFinite(filters.page) && (filters.page!) > 0 ? Math.floor(filters.page!) : 1;
   const rawSize =
-    Number.isFinite(filters.pageSize) && (filters.pageSize as number) > 0
-      ? Math.floor(filters.pageSize as number)
+    Number.isFinite(filters.pageSize) && (filters.pageSize!) > 0
+      ? Math.floor(filters.pageSize!)
       : DEFAULT_PAGE_SIZE;
   const pageSize = Math.min(Math.max(rawSize, 1), MAX_PAGE_SIZE);
 
   // 1) 全量演示数据 → 2) 科室筛选（真实场景下推到 SQL WHERE）
   const all = buildDemoDataset(type, startDate, endDate);
-  const filtered = department ? all.filter((r) => r['department'] === department) : all;
+  const filtered = department ? all.filter((r) => r.department === department) : all;
   const totalRows = filtered.length;
 
   // 3) 分页切片：大数据量只序列化当前页，避免一次性卡死

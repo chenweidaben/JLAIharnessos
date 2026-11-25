@@ -161,7 +161,7 @@ export function computeTrends(
       if (!h.itemCode || h.itemCode !== cur.itemCode) continue;
       if (!h.resultTime || !cur.resultTime) continue;
       if (h.resultTime >= cur.resultTime) continue;
-      if (!previous || (h.resultTime as string) > (previous.resultTime as string)) previous = h;
+      if (!previous || (h.resultTime) > (previous.resultTime!)) previous = h;
     }
 
     const prevVal = previous ? toNum(previous.numericValue) : null;
@@ -337,7 +337,7 @@ export class LlmShapeError extends Error {
 /** 从可能被 ```json 包裹的模型输出中提取 JSON 对象文本。 */
 export function extractJsonText(raw: string): string {
   let text = raw.trim();
-  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(text);
   if (fence?.[1]) text = fence[1].trim();
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');

@@ -11,7 +11,7 @@ interface FhirLocation {
   status: 'active' | 'suspended' | 'inactive';
   name: string;
   mode: 'instance' | 'kind';
-  physicalType: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  physicalType: { coding: { system: string; code: string; display: string }[]; text: string };
   address: { use: string; line: string[]; city: string; state: string; postalCode: string };
   managingOrganization: { reference: string; display: string };
 }

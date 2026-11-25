@@ -103,7 +103,7 @@ interface PathwayDictionaryEntry {
   costBreakdown: CostItem[];
 }
 
-const PATHWAY_DICTIONARY: ReadonlyArray<PathwayDictionaryEntry> = [
+const PATHWAY_DICTIONARY: readonly PathwayDictionaryEntry[] = [
   {
     pathwayId: 'chd-stent',
     pathwayCode: 'CHD-PCI',

@@ -115,7 +115,7 @@ export function clearAgentContextCache(): void {
 async function safeStoredPreference(
   doctorId: string | null | undefined,
 ): Promise<DoctorPreference | null> {
-  if (!doctorId || !doctorId.trim()) return null;
+  if (!doctorId?.trim()) return null;
   try {
     return await getStoredPreference(doctorId.trim());
   } catch (e) {
@@ -137,7 +137,7 @@ async function safeStoredPreference(
 async function safePatientProfile(
   patientId: string | null | undefined,
 ): Promise<PatientProfile | null> {
-  if (!patientId || !patientId.trim()) return null;
+  if (!patientId?.trim()) return null;
   try {
     const rows = await getDb()<PatientProfileRow[]>`
       SELECT chronic_conditions, drug_reactions, preferred_treatment,
@@ -179,7 +179,7 @@ async function safePatientProfile(
 async function safeDeptKnowledge(
   deptCode: string | null | undefined,
 ): Promise<DeptKnowledgeEntry[]> {
-  if (!deptCode || !deptCode.trim()) return [];
+  if (!deptCode?.trim()) return [];
   try {
     const rows = await getDb()<DeptKnowledgeRow[]>`
       SELECT title, content, knowledge_type

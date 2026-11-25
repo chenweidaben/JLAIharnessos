@@ -242,7 +242,7 @@ export function fast(input: StrokeScaleInput): FastResult {
 /* ======================== 主诉关键词分级 =========================== */
 
 /** 主诉关键词 → 级别（按严重程度分组，命中即返回该组级别） */
-const COMPLAINT_KEYWORDS: Array<{ level: TriageLevel; words: string[] }> = [
+const COMPLAINT_KEYWORDS: { level: TriageLevel; words: string[] }[] = [
   {
     level: 1,
     words: [

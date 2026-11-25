@@ -178,11 +178,11 @@ export interface SatisfactionPrediction {
  * 约 10 分钟、检查检验（等叫号+采样+等报告）约 45 分钟；
  * 预约挂号与离院为流程动作，随访为离院后动作，基准等待记 0。
  */
-export const JOURNEY_NODES: ReadonlyArray<{
+export const JOURNEY_NODES: readonly {
   code: JourneyNodeCode;
   name: string;
   benchmarkWaitMinutes: number;
-}> = [
+}[] = [
   { code: 'appointment', name: '预约挂号', benchmarkWaitMinutes: 0 },
   { code: 'triaging', name: '分诊候诊', benchmarkWaitMinutes: 30 },
   { code: 'consultation', name: '就诊', benchmarkWaitMinutes: 0 },

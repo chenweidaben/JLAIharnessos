@@ -2,14 +2,14 @@
 
 export interface PathwayRec {
   id: string; visitId: string; diagnosis: string; pathwayName: string; pathwayCode: string | null;
-  steps: Array<{day: number; action: string; responsible: string}>;
+  steps: {day: number; action: string; responsible: string}[];
   expectedDays: number | null; confidence: number | null;
   status: 'pending'|'accepted'|'rejected'; acceptedAt: string | null;
 }
 
 export async function create(input: {
   visitId: string; diagnosis: string; pathwayName: string; pathwayCode?: string;
-  steps: Array<{day: number; action: string; responsible: string}>;
+  steps: {day: number; action: string; responsible: string}[];
   expectedDays: number; confidence: number;
 }): Promise<PathwayRec> {
   const db = getDb();
@@ -41,7 +41,7 @@ function mapRow(r: Record<string, unknown>): PathwayRec {
   return {
     id: r.id as string, visitId: r.visit_id as string, diagnosis: r.diagnosis as string,
     pathwayName: r.pathway_name as string, pathwayCode: r.pathway_code as string | null,
-    steps: (r.steps as Array<{day: number; action: string; responsible: string}>) ?? [],
+    steps: (r.steps as {day: number; action: string; responsible: string}[]) ?? [],
     expectedDays: r.expected_days as number | null, confidence: r.confidence as number | null,
     status: r.status as 'pending'|'accepted'|'rejected', acceptedAt: r.accepted_at as string | null,
   };

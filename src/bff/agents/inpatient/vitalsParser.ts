@@ -50,7 +50,7 @@ function makeVital(partial: Omit<ParsedVital, 'flag' | 'critical' | 'needsManual
 }
 
 function parseBloodPressure(segment: string): ParsedVital | null {
-  const match = segment.match(/血压\s*([0-9]{2,3})\s*[/／]\s*([0-9]{2,3})\s*(mmHg|毫米汞柱)?/);
+  const match = /血压\s*([0-9]{2,3})\s*[/／]\s*([0-9]{2,3})\s*(mmHg|毫米汞柱)?/.exec(segment);
   if (!match) return null;
   const systolic = Number(match[1]);
   const diastolic = Number(match[2]);
@@ -72,7 +72,7 @@ function parseBloodPressure(segment: string): ParsedVital | null {
 }
 
 function parseHeartRate(segment: string): ParsedVital | null {
-  const match = segment.match(/(?:心率|脉搏)\s*([0-9]{2,3})\s*(次\/分|\/min|\/分)?/);
+  const match = /(?:心率|脉搏)\s*([0-9]{2,3})\s*(次\/分|\/min|\/分)?/.exec(segment);
   if (!match) return null;
   const value = Number(match[1]);
   if (!Number.isFinite(value)) return null;
@@ -84,7 +84,7 @@ function parseHeartRate(segment: string): ParsedVital | null {
 }
 
 function parseTemperature(segment: string): ParsedVital | null {
-  const match = segment.match(/体温\s*([0-9]+(?:\.[0-9]+)?)\s*(℃|°C|℉|度)?/);
+  const match = /体温\s*([0-9]+(?:\.[0-9]+)?)\s*(℃|°C|℉|度)?/.exec(segment);
   if (!match) return null;
   const rawValue = Number(match[1]);
   if (!Number.isFinite(rawValue)) return null;
@@ -113,7 +113,7 @@ function parseTemperature(segment: string): ParsedVital | null {
 }
 
 function parseRespiration(segment: string): ParsedVital | null {
-  const match = segment.match(/呼吸\s*([0-9]{1,3})\s*(次\/分|\/min|\/分)?/);
+  const match = /呼吸\s*([0-9]{1,3})\s*(次\/分|\/min|\/分)?/.exec(segment);
   if (!match) return null;
   const value = Number(match[1]);
   if (!Number.isFinite(value)) return null;
@@ -125,7 +125,7 @@ function parseRespiration(segment: string): ParsedVital | null {
 }
 
 function parseOxygenSaturation(segment: string): ParsedVital | null {
-  const match = segment.match(/血氧\s*([0-9]{2,3})\s*%?/);
+  const match = /血氧\s*([0-9]{2,3})\s*%?/.exec(segment);
   if (!match) return null;
   const value = Number(match[1]);
   if (!Number.isFinite(value)) return null;
@@ -144,7 +144,7 @@ function parseOxygenSaturation(segment: string): ParsedVital | null {
 }
 
 function parseGlucose(segment: string): ParsedVital | null {
-  const match = segment.match(/血糖\s*([0-9]+(?:\.[0-9]+)?)\s*(mmol\/L|mg\/dL)?/);
+  const match = /血糖\s*([0-9]+(?:\.[0-9]+)?)\s*(mmol\/L|mg\/dL)?/.exec(segment);
   if (!match) return null;
   const rawValue = Number(match[1]);
   if (!Number.isFinite(rawValue)) return null;
@@ -170,7 +170,7 @@ function parseGlucose(segment: string): ParsedVital | null {
   );
 }
 
-const PARSERS: Array<(segment: string) => ParsedVital | null> = [
+const PARSERS: ((segment: string) => ParsedVital | null)[] = [
   parseBloodPressure,
   parseHeartRate,
   parseTemperature,

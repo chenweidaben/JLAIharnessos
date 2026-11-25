@@ -129,7 +129,7 @@ export function getChannelTemplate(type: GreenChannelType): ChannelTemplate {
 }
 
 /** 全部通道类型（供前端下拉） */
-export function listChannelTypes(): Array<{ type: GreenChannelType; name: string; subtypes: string[] }> {
+export function listChannelTypes(): { type: GreenChannelType; name: string; subtypes: string[] }[] {
   return Object.values(TEMPLATES).map((t) => ({ type: t.type, name: t.name, subtypes: t.subtypes }));
 }
 
@@ -159,7 +159,7 @@ export interface ChannelMetrics {
 export function computeMetrics(
   type: GreenChannelType,
   arriveTime: Date | string,
-  nodes: Array<{ nodeKey: string; targetMinutes: number | null; actualTime: Date | string | null }>,
+  nodes: { nodeKey: string; targetMinutes: number | null; actualTime: Date | string | null }[],
 ): ChannelMetrics {
   const overdue: Record<string, boolean> = {};
   for (const n of nodes) {

@@ -70,7 +70,7 @@ export const statReportRoutes: RouteDef[] = [
       const body = await c.body<SubmitBody>();
       if (!body.reportType) throw new StatReportError(400, 'BAD_REQUEST', '缺少 reportType');
       if (!body.period) throw new StatReportError(400, 'BAD_REQUEST', '缺少 period');
-      const data = (body.data ?? {}) as StatData;
+      const data = (body.data ?? {});
       return submitStatReport(body.reportType, body.period, data);
     }), auth: true,
   },

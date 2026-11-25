@@ -61,8 +61,8 @@ export const selfSchedulingRoutes: RouteDef[] = [
       try {
         if (process.env.DEMO_MODE !== '1') throw new SlotError(403, '_seed 仅 DEMO_MODE 可用');
         const b = (await c.body()) as Record<string, unknown>;
-        const items = Array.isArray(b.items) ? (b.items as Array<Record<string, unknown>>) : [];
-        const out = seedSlots(items as Array<{ departmentId: string; doctorId?: string; date: string; timeSlot: any; slotType: any; examType?: any; capacity: number }>);
+        const items = Array.isArray(b.items) ? (b.items as Record<string, unknown>[]) : [];
+        const out = seedSlots(items as { departmentId: string; doctorId?: string; date: string; timeSlot: any; slotType: any; examType?: any; capacity: number }[]);
         return json(ok({ seeded: out.length }));
       } catch (e) { return mapError(e); }
     },

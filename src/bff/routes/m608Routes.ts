@@ -70,7 +70,7 @@ export const m608Routes: RouteDef[] = [
       if (authErr) return authErr;
       let body: { admissionNo: string; totalAmount: number } | null = null;
       try { body = await c.body<{ admissionNo: string; totalAmount: number }>(); } catch { body = null; }
-      if (!body || !body.admissionNo || !body.totalAmount || body.totalAmount <= 0) {
+      if (!body?.admissionNo || !body.totalAmount || body.totalAmount <= 0) {
         return json({ code: 400, message: 'admissionNo and totalAmount required' }, 400);
       }
       const newId = `ST${String(settlements.length + 1).padStart(3, '0')}`;

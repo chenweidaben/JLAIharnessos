@@ -41,7 +41,7 @@ const EMPTY_DRAFT: AiRecordDraft = {
 /** 从可能被 ```json 包裹的模型输出中提取 JSON 对象文本 */
 function extractJson(raw: string): string {
   let text = raw.trim();
-  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(text);
   if (fence?.[1]) text = fence[1].trim();
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
@@ -87,7 +87,7 @@ async function chatOnce(system: string, user: string): Promise<string> {
       throw new Error(`DeepSeek API 错误 ${response.status}: ${detail.slice(0, 200)}`);
     }
     const data = (await response.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
+      choices?: { message?: { content?: string } }[];
     };
     return data.choices?.[0]?.message?.content ?? '';
   } finally {

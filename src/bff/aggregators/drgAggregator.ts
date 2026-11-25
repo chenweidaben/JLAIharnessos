@@ -198,7 +198,7 @@ export async function rejectResult(
   if (!existing) throw notFound('分组结果不存在');
   if (!canAccess(auth, existing.department)) throw forbidden('无权访问该科室病例');
   if (existing.status !== 'grouped') throw conflict('仅待复核(grouped)的结果可退回');
-  if (!reason || !reason.trim()) throw badRequest('退回原因不能为空');
+  if (!reason?.trim()) throw badRequest('退回原因不能为空');
   const updated = await withTx(async (tx) =>
     setResultStatus(id, ['grouped'], 'rejected', { rejectReason: reason.trim() }, tx),
   );

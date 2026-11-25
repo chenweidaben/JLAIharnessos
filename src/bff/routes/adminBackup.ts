@@ -77,7 +77,7 @@ async function handleExport(c: Ctx): Promise<Response> {
   if (resolved instanceof Response) return resolved;
 
   const data: Record<string, unknown[]> = {};
-  const skipped: Array<{ table: string; reason: string }> = [];
+  const skipped: { table: string; reason: string }[] = [];
 
   for (const logical of resolved.allowed) {
     const physical = ALLOWED_TABLES[logical];

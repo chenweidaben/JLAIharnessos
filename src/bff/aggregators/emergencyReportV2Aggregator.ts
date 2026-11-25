@@ -70,7 +70,7 @@ export function classifyEmergencyTriage(patient: EmergencyPatientV2): TriageLeve
  * @param records 历史急诊记录
  * @returns 预测需求
  */
-export function predictEmergencyResourceNeed(records: Array<{ arrivalHour: number; triage: TriageLevelV2 }>): {
+export function predictEmergencyResourceNeed(records: { arrivalHour: number; triage: TriageLevelV2 }[]): {
   predictedI: number;
   predictedII: number;
   predictedIII: number;

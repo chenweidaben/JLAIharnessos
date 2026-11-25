@@ -120,10 +120,10 @@ async function resolveDrug(item: PrescriptionItem, tx: DbExecutor) {
  * newDrugs：本处方药品通用名。
  */
 async function buildFacts(
-  patient: { id: string; gender: string; birthDate: string | null; allergies: Array<Record<string, unknown>> },
+  patient: { id: string; gender: string; birthDate: string | null; allergies: Record<string, unknown>[] },
   visit: Visit,
   rx: Prescription,
-  itemGeneric: ReadonlyArray<string>,
+  itemGeneric: readonly string[],
   tx: DbExecutor,
 ): Promise<CdsFacts> {
   const allergies = patient.allergies
@@ -186,7 +186,7 @@ interface CdsEvaluation {
  *  - strict=false（预览）：缺失药品以处方名称兜底，不阻断预览。
  */
 async function evaluateCds(
-  patient: { id: string; gender: string; birthDate: string | null; allergies: Array<Record<string, unknown>> },
+  patient: { id: string; gender: string; birthDate: string | null; allergies: Record<string, unknown>[] },
   visit: Visit,
   rx: Prescription,
   executor: DbExecutor,
@@ -296,7 +296,7 @@ export async function dispensePrescription(
           `CDS 拦截（${blocks.map((b) => b.ruleId).join(',')}），请复核或由医师填写 override 原因后发药`);
       }
       overrideAuthor = await resolveOverrideAuthor(input.overrideAuthorId ?? rx.prescriberId);
-      overrideReason = input.overrideReason!.trim();
+      overrideReason = input.overrideReason.trim();
     }
 
     // 逐项扣库存 + 流水 + 发药记录（同事务，任一不足整体回滚）
@@ -419,7 +419,7 @@ function demoPrescription(
 
 /** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 待发药/待审方队列。 */
 function demoQueue(status: Prescription['status']): QueueItem[] {
-  const rows: Array<[string, string, string, string, string, number]> = [
+  const rows: [string, string, string, string, string, number][] = [
     ['演示患者A', '心血管内科', 'RX-MET-500', '盐酸二甲双胍片', '0.5g×20片', 2],
     ['演示患者B', '呼吸内科', 'RX-AMOX-250', '阿莫西林胶囊', '0.25g×24粒', 1],
     ['演示患者C', '消化内科', 'RX-OME-20', '奥美拉唑肠溶胶囊', '20mg×14粒', 2],
@@ -436,7 +436,7 @@ function demoQueue(status: Prescription['status']): QueueItem[] {
 
 /** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 发药记录。 */
 function demoDispensings(): Dispensing[] {
-  const drugs: Array<[string, string, string, number]> = [
+  const drugs: [string, string, string, number][] = [
     ['RX-MET-500', '盐酸二甲双胍片', '0.5g×20片', 2],
     ['RX-AMOX-250', '阿莫西林胶囊', '0.25g×24粒', 1],
     ['RX-OME-20', '奥美拉唑肠溶胶囊', '20mg×14粒', 2],

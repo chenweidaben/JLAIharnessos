@@ -89,7 +89,7 @@ export interface PatientMuseView {
 export const FOLLOWUP_DUE_DAYS = 90;
 
 /** 关键词 → 偏好标签映射（命中即打标，顺序即标签稳定顺序） */
-const KEYWORD_TAG_RULES: ReadonlyArray<{ keyword: string; tag: string }> = [
+const KEYWORD_TAG_RULES: readonly { keyword: string; tag: string }[] = [
   { keyword: '糖尿病', tag: '血糖管理' },
   { keyword: '高血压', tag: '血压监测' },
   { keyword: '冠心病', tag: '心血管随访' },
@@ -114,7 +114,7 @@ function clean(v: unknown): string {
  * 有序去重：保持首次出现顺序，剔除空串。
  * 纯函数：不修改入参数组。
  */
-function uniquePreserveOrder(items: Array<string | null | undefined>): string[] {
+function uniquePreserveOrder(items: (string | null | undefined)[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
   for (const raw of items) {
@@ -379,7 +379,7 @@ export interface VisitPreferences {
   preferredDoctor?: string;
   preferredDept?: string;
   paymentMethod: PaymentMethod;
-  reminderChannels: Array<'sms' | 'wechat' | 'voice'>;
+  reminderChannels: ('sms' | 'wechat' | 'voice')[];
 }
 
 /** 健康目标四大类 */
@@ -637,7 +637,7 @@ export interface RecordedPatientExperience {
 }
 
 /** 关键词 → 标签词典 */
-const TAG_DICT: ReadonlyArray<{ tag: string; keywords: string[] }> = [
+const TAG_DICT: readonly { tag: string; keywords: string[] }[] = [
   { tag: '低血糖', keywords: ['心慌', '出冷汗', '手抖', '饥饿', '低血糖'] },
   { tag: '高血糖', keywords: ['口渴', '多饮', '多尿', '血糖高', '口干'] },
   { tag: '血压', keywords: ['头晕', '头胀', '血压', '头痛'] },

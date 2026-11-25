@@ -391,7 +391,7 @@ export function autoLearnFromFeedback(
       dimension: dim,
       incidents: row.incidents,
       totalDeduction: row.points,
-      reinforcementLevel: level as 1 | 2 | 3,
+      reinforcementLevel: level,
       action: `自动强化质控薄弱环节「${dim}」：本周期累计扣 ${row.points} 分（${row.incidents} 起），强化等级 L${level}（增加日抽样与科室复盘频次）`,
     });
   }

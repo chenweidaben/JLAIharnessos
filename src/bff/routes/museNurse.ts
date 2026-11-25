@@ -101,7 +101,7 @@ async function buildView(nurseId: string) {
   // 风险事件流：护理记忆中带风险等级的记录即护士识别到的风险（单表自洽）
   const riskEvents: NurseRiskEvent[] = careRecords
     .filter((r) => !!r.riskLevel)
-    .map((r) => ({ riskLevel: r.riskLevel as string, createdAt: r.createdAt ?? null }));
+    .map((r) => ({ riskLevel: r.riskLevel!, createdAt: r.createdAt ?? null }));
 
   return buildNurseMuse(nurseId, careRecords, riskEvents);
 }
@@ -128,7 +128,7 @@ function demoView(nurseId: string, nurseName: string) {
   ];
   const riskEvents: NurseRiskEvent[] = careRecords
     .filter((r) => !!r.riskLevel)
-    .map((r) => ({ riskLevel: r.riskLevel as string, createdAt: r.createdAt ?? null }));
+    .map((r) => ({ riskLevel: r.riskLevel!, createdAt: r.createdAt ?? null }));
 
   return buildNurseMuse(nurseId, careRecords, riskEvents);
 }

@@ -258,7 +258,7 @@ export function trackQualityIndicator(
   dept: string,
   period: string,
 ): TrackedQualityIndicator {
-  if (!indicator || !indicator.code) {
+  if (!indicator?.code) {
     throw new QualitySafetyError(400, '指标编码不能为空');
   }
   if (!indicator.name?.trim()) throw new QualitySafetyError(400, '指标名不能为空');

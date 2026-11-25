@@ -104,8 +104,8 @@ export async function listDefinitionsView(
 
 export async function upsertDefinitionView(auth: AuthView, input: PathwayDefinitionInput) {
   assertPermission(auth, 'pathway:manage');
-  if (!input.pathwayCode || !input.pathwayCode.trim()) throw badRequest('路径编码不能为空');
-  if (!input.name || !input.name.trim()) throw badRequest('路径名称不能为空');
+  if (!input.pathwayCode?.trim()) throw badRequest('路径编码不能为空');
+  if (!input.name?.trim()) throw badRequest('路径名称不能为空');
   return withTx(async (tx) => {
     const def = await upsertDefinition(input, tx);
     await recordChainAudit(
@@ -411,7 +411,7 @@ export async function skipFormItemView(
   if (input.status !== 'skipped' && input.status !== 'replaced') {
     throw badRequest('status 须为 skipped 或 replaced');
   }
-  if (!input.note || !input.note.trim()) throw badRequest('跳过/替代原因不能为空');
+  if (!input.note?.trim()) throw badRequest('跳过/替代原因不能为空');
   const note = input.note.trim();
 
   const enrollment = await loadEnrollmentForMutate(enrollmentId);
@@ -450,7 +450,7 @@ export async function recordVariationView(
   assertPermission(auth, 'pathway:manage');
   assertUuid(enrollmentId, '入径记录');
   if (!VARIATION_CATEGORIES.includes(input.category)) throw badRequest('变异分类取值非法');
-  if (!input.description || !input.description.trim()) throw badRequest('变异说明不能为空');
+  if (!input.description?.trim()) throw badRequest('变异说明不能为空');
 
   const enrollment = await getEnrollmentById(enrollmentId);
   if (!enrollment) throw notFound('入径记录不存在');
@@ -513,7 +513,7 @@ async function actualValues(visitId: string): Promise<{ los: number | null; fee:
 export async function withdrawView(auth: AuthView, enrollmentId: string, input: { reason: string }) {
   assertPermission(auth, 'pathway:manage');
   assertUuid(enrollmentId, '入径记录');
-  if (!input.reason || !input.reason.trim()) throw badRequest('退出原因不能为空');
+  if (!input.reason?.trim()) throw badRequest('退出原因不能为空');
 
   const enrollment = await getEnrollmentById(enrollmentId);
   if (!enrollment) throw notFound('入径记录不存在');

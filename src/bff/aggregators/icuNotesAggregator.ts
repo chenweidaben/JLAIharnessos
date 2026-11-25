@@ -219,7 +219,7 @@ export function recordScore(input: ScoreInput): IcuScore {
   const s: IcuScore = {
     scoreId: `ICS-${String(scoreSeq).padStart(4, '0')}`,
     visitId: input.visitId,
-    scoreType: input.scoreType as IcuScore['scoreType'],
+    scoreType: input.scoreType,
     totalScore: total,
     components: calc.components,
     recordedAt: input.recordedAt,

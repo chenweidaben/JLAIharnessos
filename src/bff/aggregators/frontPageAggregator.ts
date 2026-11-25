@@ -71,14 +71,14 @@ const SURGICAL_HINT = /切除术|置换术|修补|骨折|阑尾炎|胆囊|造瘘
 export function evaluateFrontPageDefects(f: {
   primaryDiagnosis?: string | null;
   primaryDiagnosisCode?: string | null;
-  operations?: Array<Record<string, unknown>>;
+  operations?: Record<string, unknown>[];
   admitAt?: string | null;
   dischargeAt?: string | null;
 }): FrontPageDefect[] {
   const defects: FrontPageDefect[] = [];
-  if (!f.primaryDiagnosis || !f.primaryDiagnosis.trim()) {
+  if (!f.primaryDiagnosis?.trim()) {
     defects.push({ field: 'primaryDiagnosis', severity: 'block', message: '主诊断缺失' });
-  } else if (!f.primaryDiagnosisCode || !f.primaryDiagnosisCode.trim()) {
+  } else if (!f.primaryDiagnosisCode?.trim()) {
     defects.push({ field: 'primaryDiagnosisCode', severity: 'major', message: '主诊断 ICD 编码缺失' });
   }
   if (!f.admitAt) defects.push({ field: 'admitAt', severity: 'major', message: '入院时间缺失' });
@@ -171,7 +171,7 @@ const QUEUE_ALL: FrontPageStatus[] = ['draft', 'coding', 'qc'];
 
 /** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 病案首页队列，确定性固定数据。 */
 function demoFrontPageQueue(): FrontPageQueueRow[] {
-  const rows: Array<[string, string, string, FrontPageStatus, string | null, string]> = [
+  const rows: [string, string, string, FrontPageStatus, string | null, string][] = [
     ['演示患者A', '心血管内科', '冠心病急性发作', 'coding', 'I21.400', '2026-10-19T08:20:00.000Z'],
     ['演示患者B', '呼吸内科', '社区获得性肺炎', 'coding', 'J15.900', '2026-10-19T08:45:00.000Z'],
     ['演示患者C', '普外科', '急性阑尾炎', 'draft', null, '2026-10-19T09:05:00.000Z'],
@@ -239,8 +239,8 @@ export interface SaveCodingBody {
   version: number;
   primaryDiagnosis?: string | null;
   primaryDiagnosisCode?: string | null;
-  secondaryDiagnoses?: Array<Record<string, unknown>>;
-  operations?: Array<Record<string, unknown>>;
+  secondaryDiagnoses?: Record<string, unknown>[];
+  operations?: Record<string, unknown>[];
   totalFee?: number | string | null;
 }
 

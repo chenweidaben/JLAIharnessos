@@ -56,7 +56,7 @@ export async function getByPlanId(dischargePlanId: string, tx: DbExecutor = getD
   const rows = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.followup_appointments
     WHERE discharge_plan_id=${dischargePlanId} LIMIT 1`;
-  return rows.length === 0 ? null : map(rows[0] as Record<string, unknown>);
+  return rows.length === 0 ? null : map(rows[0]);
 }
 
 /** 占用号源：插预约 + 该 schedule 任意一个 open slot booked_count+1（余量保证>0）。 */
@@ -75,7 +75,7 @@ export async function bookFollowup(
     VALUES
       (${input.dischargePlanId}, ${input.scheduleId}, ${input.appointmentDate}, ${input.department}, ${input.bookedBy})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function cancel(id: string, tx: DbExecutor = getDb()): Promise<FollowupAppt> {
@@ -83,7 +83,7 @@ export async function cancel(id: string, tx: DbExecutor = getDb()): Promise<Foll
     UPDATE clinical.followup_appointments SET status='cancelled' WHERE id=${id} AND status='booked'
     RETURNING ${tx.unsafe(COLS)}`;
   if (rows.length === 0) throw new Error('复诊预约不存在或已取消');
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<FollowupAppt[]> {

@@ -88,7 +88,7 @@ export const OCR_SUMMARY_MAX_LINES = 12;
  * 空文本返回固定提示。返回长度严格小于等于输入（折叠后）。
  */
 export function summarizeOcrResult(ocrText: string): string {
-  if (!ocrText || !ocrText.trim()) {
+  if (!ocrText?.trim()) {
     return '（OCR 文本为空，未能从报告中提取到检验信息）';
   }
 

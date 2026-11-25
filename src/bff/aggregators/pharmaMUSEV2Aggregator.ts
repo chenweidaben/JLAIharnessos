@@ -9,7 +9,7 @@
  */
 
 /** 已知禁忌对 */
-const CONTRAINDICATED_PAIRS: Array<[string, string]> = [
+const CONTRAINDICATED_PAIRS: [string, string][] = [
   ['warfarin', 'aspirin'],
   ['simvastatin', 'gemfibrozil'],
   ['metformin', 'contrast_dye'],
@@ -70,9 +70,9 @@ export interface PharmaMUSEV2Result {
   pharmacistId: string;
   date: string;
   interactionAlerts: InteractionAlert[];
-  inventoryAlerts: Array<{ drugName: string; reason: string; level: 'low' | 'medium' | 'high' }>;
+  inventoryAlerts: { drugName: string; reason: string; level: 'low' | 'medium' | 'high' }[];
   consultRecommendations: string[];
-  caseLibrary: Array<{ caseId: string; prescriptionIssue: string; resolution: string }>;
+  caseLibrary: { caseId: string; prescriptionIssue: string; resolution: string }[];
 }
 
 /**
@@ -92,7 +92,7 @@ export function buildPharmaMUSE(
 ): PharmaMUSEV2Result {
   const interactionAlerts = checkDrugInteraction(prescriptionDrugs);
 
-  const inventoryAlerts: Array<{ drugName: string; reason: string; level: 'low' | 'medium' | 'high' }> = [];
+  const inventoryAlerts: { drugName: string; reason: string; level: 'low' | 'medium' | 'high' }[] = [];
   for (const item of inventory) {
     if (item.currentStock < item.minStock * 0.5) {
       inventoryAlerts.push({ drugName: item.drugName, reason: '严重低库存', level: 'high' });

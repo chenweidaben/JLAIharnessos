@@ -130,7 +130,7 @@ export const permissionAdminRoutes: RouteDef[] = [
             defaultScope: body.defaultScope as DataScope | undefined,
             requireMfa: body.requireMfa,
             riskLevel: body.riskLevel,
-            roleScopes: body.roleScopes as Partial<Record<RoleCode, DataScope>> | undefined,
+            roleScopes: body.roleScopes,
           },
           toOperator(c),
         );

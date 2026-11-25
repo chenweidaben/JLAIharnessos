@@ -9,21 +9,21 @@ interface FhirCondition {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   clinicalStatus: {
-    coding: Array<{ system: string; code: 'active' | 'recurrence' | 'inactive' | 'resolved' | 'remission'; display: string }>;
+    coding: { system: string; code: 'active' | 'recurrence' | 'inactive' | 'resolved' | 'remission'; display: string }[];
     text: string;
   };
   verificationStatus: {
-    coding: Array<{ system: string; code: 'unconfirmed' | 'provisional' | 'differential' | 'confirmed' | 'refuted' | 'entered-in-error'; display: string }>;
+    coding: { system: string; code: 'unconfirmed' | 'provisional' | 'differential' | 'confirmed' | 'refuted' | 'entered-in-error'; display: string }[];
     text: string;
   };
-  category: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
-  severity?: { coding: Array<{ system: string; code: 'mild' | 'moderate' | 'severe'; display: string }>; text: string };
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  category: { coding: { system: string; code: string; display: string }[]; text: string }[];
+  severity?: { coding: { system: string; code: 'mild' | 'moderate' | 'severe'; display: string }[]; text: string };
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string; display?: string };
   encounter?: { reference: string };
   onsetDateTime?: string;
   abatementDateTime?: string;
-  note?: Array<{ text: string }>;
+  note?: { text: string }[];
 }
 
 const demoConditions: FhirCondition[] = [

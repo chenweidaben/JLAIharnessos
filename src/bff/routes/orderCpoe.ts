@@ -74,7 +74,7 @@ export const orderCpoeRoutes: RouteDef[] = [
       try {
         assertCan(actor(c), 'write');
         const b = (await c.body()) as Record<string, unknown>;
-        const rawOrders = Array.isArray(b.orders) ? b.orders as Array<Record<string, unknown>> : [];
+        const rawOrders = Array.isArray(b.orders) ? b.orders as Record<string, unknown>[] : [];
         return json(ok(createOrderSet({
           visitId: String(b.visitId ?? ''),
           patientId: b.patientId ? String(b.patientId) : undefined,

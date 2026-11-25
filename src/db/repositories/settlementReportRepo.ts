@@ -33,14 +33,14 @@ export async function upsertSummary(input: {
       point_value=EXCLUDED.point_value, insurance_settlement=EXCLUDED.insurance_settlement,
       patient_out_of_pocket=EXCLUDED.patient_out_of_pocket, computed_at=now()
     RETURNING id, period, drg_cases, dip_cases, total_score, point_value, insurance_settlement, patient_out_of_pocket`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function getSummary(period: string): Promise<SummaryRow | null> {
   const rows = await db`
     SELECT id, period, drg_cases, dip_cases, total_score, point_value, insurance_settlement, patient_out_of_pocket
     FROM clinical.settlement_monthly_summary WHERE period=${period}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 export async function listSummaries(): Promise<SummaryRow[]> {

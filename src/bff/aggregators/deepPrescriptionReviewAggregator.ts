@@ -325,7 +325,7 @@ function contains(name: string, key: string): boolean {
 export function parseDosageToMg(dosage: string | null | undefined): number | null {
   if (!dosage) return null;
   const s = String(dosage).toLowerCase().replace(/\s+/g, '');
-  const m = s.match(/([0-9]+(?:\.[0-9]+)?)(mg|g|ml)/);
+  const m = /([0-9]+(?:\.[0-9]+)?)(mg|g|ml)/.exec(s);
   if (!m) return null;
   const value = Number(m[1]);
   if (!Number.isFinite(value)) return null;
@@ -373,7 +373,7 @@ function detectInteractions(
 ): InteractionIssue[] {
   const out: InteractionIssue[] = [];
   const rxNames = rx.map((d) => d.name);
-  const pool: Array<{ name: string; isCurrent: boolean }> = [
+  const pool: { name: string; isCurrent: boolean }[] = [
     ...rxNames.map((n) => ({ name: n, isCurrent: false })),
     ...currentMeds.map((n) => ({ name: n, isCurrent: true })),
   ];
@@ -454,7 +454,7 @@ function detectDoseIssues(rx: ReviewDrug[], patient: ReviewPatientInfo): DoseIss
         });
       }
       if (rule.pediatricMgPerKg != null && isChild && hasWeight && single != null) {
-        const mgPerKg = single / (patient.weightKg as number);
+        const mgPerKg = single / (patient.weightKg!);
         if (mgPerKg > rule.pediatricMgPerKg) {
           out.push({
             drug: drug.name, level: 'warning', kind: 'pediatricMgPerKg',
@@ -474,7 +474,7 @@ function detectDuplicateTherapy(
   currentMeds: string[],
 ): DuplicateIssue[] {
   const out: DuplicateIssue[] = [];
-  const pool: Array<{ name: string; isCurrent: boolean }> = [
+  const pool: { name: string; isCurrent: boolean }[] = [
     ...rx.map((d) => ({ name: d.name, isCurrent: false })),
     ...currentMeds.map((n) => ({ name: n, isCurrent: true })),
   ];
@@ -536,8 +536,8 @@ export function deepPrescriptionReview(
   currentMedications: string[] | null | undefined,
   allergies: string[] | null | undefined,
 ): ReviewReport {
-  const rx: ReviewDrug[] = Array.isArray(prescription?.drugs) ? prescription!.drugs : [];
-  const diagnoses: string[] = Array.isArray(prescription?.diagnoses) ? prescription!.diagnoses! : [];
+  const rx: ReviewDrug[] = Array.isArray(prescription?.drugs) ? prescription.drugs : [];
+  const diagnoses: string[] = Array.isArray(prescription?.diagnoses) ? prescription.diagnoses : [];
   const patient: ReviewPatientInfo = patientInfo ?? {};
   const currentMeds: string[] = Array.isArray(currentMedications) ? currentMedications : [];
   const allergyList: string[] = Array.isArray(allergies) ? allergies : [];
@@ -565,7 +565,7 @@ export function deepPrescriptionReview(
     }
   }
 
-  const all: Array<{ level: RiskLevel }> = [
+  const all: { level: RiskLevel }[] = [
     ...interactions, ...contraindications, ...allergyHits,
     ...doseIssues, ...duplicateTherapy, ...specialPopulation,
   ];

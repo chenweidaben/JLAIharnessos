@@ -39,7 +39,7 @@ interface MetricRow {
 
 /** 生成近 N 个月的 period 键（YYYY-MM），从指定月份往前推 */
 function recentPeriods(latest: string, n: number): string[] {
-  const m = latest.match(/^(\d{4})-(\d{2})$/);
+  const m = /^(\d{4})-(\d{2})$/.exec(latest);
   if (!m) return [];
   const y = Number(m[1]);
   const mo = Number(m[2]) - 1;

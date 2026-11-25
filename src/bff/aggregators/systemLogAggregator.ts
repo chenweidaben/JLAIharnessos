@@ -125,8 +125,8 @@ export function sanitizeMetadata(input: unknown): Record<string, unknown> {
     if (typeof (val as { toISOString?: unknown }).toISOString === 'function') {
       return (val as Date).toISOString();
     }
-    if (seen.has(val as object)) return '[Circular]';
-    seen.add(val as object);
+    if (seen.has(val)) return '[Circular]';
+    seen.add(val);
     if (Array.isArray(val)) return val.slice(0, 64).map((v) => walk(v, depth + 1));
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(val as Record<string, unknown>)) {

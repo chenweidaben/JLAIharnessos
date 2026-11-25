@@ -212,7 +212,7 @@ export const cryptoSignatureRoutes: RouteDef[] = [
     path: '/api/v1/crypto/signatures',
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const { targetType, targetId, staffId, staffName, level, contentHash } = body as {
         targetType?: string; targetId?: string; staffId?: string; staffName?: string;
         level?: string; contentHash?: string;
@@ -300,7 +300,7 @@ export const cryptoSignatureRoutes: RouteDef[] = [
     path: '/api/v1/crypto/signatures/verify',
     auth: true,
     handle: async (_c: Ctx): Promise<Response> => {
-      const body = await _c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await _c.body().catch(() => ({}));
       const { signatureId, contentHash } = body as { signatureId?: string; contentHash?: string };
       if (!signatureId || typeof signatureId !== 'string') {
         return json(fail(ErrorCode.BAD_REQUEST, 'signatureId 必填'), 400);

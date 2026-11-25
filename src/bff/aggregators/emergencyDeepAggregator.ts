@@ -461,13 +461,13 @@ export function optimizeEmergencyDrillSchedule(
           : `按${p.riskLevel === 'high' ? '高危' : p.riskLevel === 'medium' ? '中危' : '低危'} ${intervalDays} 天周期排期`
         : '从未演练，立即排入首轮实战演练',
       overdue,
-    } as DrillScheduleItem & { overdue: boolean };
+    };
   });
 
   // 逾期最急在前：已逾期(overdue)优先，其次距今天数小者
   return items.sort((a, b) => {
-    const ax = a as DrillScheduleItem & { overdue: boolean };
-    const bx = b as DrillScheduleItem & { overdue: boolean };
+    const ax = a;
+    const bx = b;
     if (ax.overdue !== bx.overdue) return ax.overdue ? -1 : 1;
     return a.daysUntil - b.daysUntil;
   });

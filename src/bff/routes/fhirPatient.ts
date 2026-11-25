@@ -9,12 +9,12 @@ interface FhirPatient {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   active: boolean;
-  identifier: Array<{ system: string; value: string }>;
-  name: Array<{ use: string; family: string; given: string[]; text: string }>;
+  identifier: { system: string; value: string }[];
+  name: { use: string; family: string; given: string[]; text: string }[];
   gender: 'male' | 'female' | 'other' | 'unknown';
   birthDate: string;
-  telecom: Array<{ system: string; value: string; use: string }>;
-  address: Array<{ use: string; line: string[]; city: string; state: string; postalCode: string }>;
+  telecom: { system: string; value: string; use: string }[];
+  address: { use: string; line: string[]; city: string; state: string; postalCode: string }[];
 }
 
 const demoPatients: FhirPatient[] = [

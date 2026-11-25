@@ -139,7 +139,7 @@ export function closureState(
 }
 
 /** 上报之后必须补齐的五段留痕。 */
-const REQUIRED_LINKS: ReadonlyArray<{ key: 'assessedAt' | 'treatedAt' | 'recordedAt' | 'summarizedAt'; name: string }> = [
+const REQUIRED_LINKS: readonly { key: 'assessedAt' | 'treatedAt' | 'recordedAt' | 'summarizedAt'; name: string }[] = [
   { key: 'assessedAt', name: '评估' },
   { key: 'treatedAt', name: '处置' },
   { key: 'recordedAt', name: '记录' },

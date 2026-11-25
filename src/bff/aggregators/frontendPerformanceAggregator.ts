@@ -137,7 +137,7 @@ export function analyzeBundleSize(stats: BundleStats): BundleAnalysis {
 
   for (const raw of list) {
     const size = safeNum(raw?.size);
-    const gzip = gzipOf(raw as BundleChunk);
+    const gzip = gzipOf(raw);
     const name = typeof raw?.name === 'string' ? raw.name : '';
     const isEntry = raw?.isEntry === true;
     const isVendor = raw?.isVendor === true;

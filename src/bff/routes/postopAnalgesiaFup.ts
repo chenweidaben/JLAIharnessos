@@ -21,7 +21,7 @@ export const postopAnalgesiaFupRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/postop/analgesia/:visitId', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.visitId, status: 'ok' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { vas?: number; ramsay?: number; sideEffects?: string[]; pcaPressCount?: number };
       if (b.vas !== undefined && (b.vas < 0 || b.vas > 10)) {
         return json(fail(ErrorCode.BAD_REQUEST, 'vas 须为 0-10'), 400);

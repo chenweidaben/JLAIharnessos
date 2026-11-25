@@ -143,9 +143,9 @@ async function handleOcCreate(c: Ctx): Promise<Response> {
     chiefComplaint: chiefComplaint.trim(),
     urgency: urg,
     preferredDoctorId:
-      preferredDoctorId == null || !preferredDoctorId.trim()
+      !preferredDoctorId?.trim()
         ? null
-        : (preferredDoctorId as string).trim(),
+        : (preferredDoctorId).trim(),
     attachments: attachArr,
     priority,
     needsNurseTriage,

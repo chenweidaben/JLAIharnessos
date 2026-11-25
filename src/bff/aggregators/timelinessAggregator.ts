@@ -12,11 +12,11 @@ export class TimelinessError extends Error {
  * 字段与 clinical.document_timeliness mapRow 输出一致（camelCase）。
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
-function buildDemoTimeliness(): Array<{
+function buildDemoTimeliness(): {
   id: string; visitId: string; docType: string; requiredMinutes: number;
   createdAt: string; dueAt: string; completedAt: string | null;
   status: 'pending' | 'ontime' | 'late'; lateMinutes: number | null;
-}> {
+}[] {
   const now = Date.now();
   const iso = (ts: number) => new Date(ts).toISOString();
   const h = 60 * 60 * 1000;

@@ -23,11 +23,11 @@ import { getEnv } from '../config/env';
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
-  tool_calls?: Array<{
+  tool_calls?: {
     id: string;
     type: 'function';
     function: { name: string; arguments: string };
-  }>;
+  }[];
   tool_call_id?: string;
 }
 
@@ -51,7 +51,7 @@ export interface AgentReply {
   content: string;
   confidence: Confidence;
   disclaimer: string;
-  toolCalls: Array<{ id: string; name: string; args: Record<string, unknown> }>;
+  toolCalls: { id: string; name: string; args: Record<string, unknown> }[];
   degraded: boolean;
 }
 
@@ -255,15 +255,15 @@ export class OpenAICompatibleModelProvider implements ModelProvider {
         throw new Error(`upstream ${resp.status}: ${text.slice(0, 200)}`);
       }
       const data = (await resp.json()) as {
-        choices?: Array<{
+        choices?: {
           message?: {
             content?: string | null;
-            tool_calls?: Array<{
+            tool_calls?: {
               id: string;
               function?: { name?: string; arguments?: string };
-            }>;
+            }[];
           };
-        }>;
+        }[];
       };
       const message = data.choices?.[0]?.message;
       const toolCalls = (message?.tool_calls ?? [])

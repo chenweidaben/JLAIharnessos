@@ -260,7 +260,7 @@ export function calculateForecastAccuracy(forecast: ForecastPoint[], actual: His
 
   for (const f of forecast) {
     if (!actualMap.has(f.date)) continue;
-    const a = actualMap.get(f.date) as number;
+    const a = actualMap.get(f.date)!;
     if (!Number.isFinite(a)) continue;
     const err = a - f.value;
     errs.push(err);

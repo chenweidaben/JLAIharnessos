@@ -532,7 +532,7 @@ export interface GovDataQualityRule {
   params?: {
     min?: number;
     max?: number;
-    allowed?: Array<string | number>;
+    allowed?: (string | number)[];
     pattern?: string;
     maxAgeHours?: number;
     referenceDate?: string;
@@ -579,7 +579,7 @@ export interface DeepDataGovernance {
   totalItems: number;
   totalControls: number;
   summary: Record<GovernanceDomain, number>;
-  maturityModel: Array<{ level: number; name: string; description: string }>;
+  maturityModel: { level: number; name: string; description: string }[];
   recommendedRuleCount: number;
 }
 

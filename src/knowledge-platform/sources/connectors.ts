@@ -121,7 +121,7 @@ export class ApiConnector implements Connector {
  */
 export class DatabaseConnector implements Connector {
   readonly kind = 'database' as const;
-  constructor(private sqlRunner?: (sql: string) => Promise<Array<Record<string, unknown>>>) {}
+  constructor(private sqlRunner?: (sql: string) => Promise<Record<string, unknown>[]>) {}
 
   async fetch(config: ConnectorConfig, _provenance: SourceProvenance, kbId: string): Promise<RawDocument[]> {
     if (!this.sqlRunner) throw new Error('未注入数据库执行器（sqlRunner），数据库接入不可用');
@@ -146,7 +146,7 @@ export class CrawlerConnector implements Connector {
     const allow = config.allowedDomains ?? [];
     const visited = new Set<string>();
     const out: RawDocument[] = [];
-    const queue: Array<{ url: string; depth: number }> = [{ url: config.target, depth: 0 }];
+    const queue: { url: string; depth: number }[] = [{ url: config.target, depth: 0 }];
     while (queue.length) {
       const { url, depth } = queue.shift()!;
       if (visited.has(url)) continue;
@@ -197,7 +197,7 @@ export class ConnectorRegistry {
     if (!c) throw new Error(`未注册的接入器类型: ${kind}`);
     return c;
   }
-  static withDefaults(opts?: { sqlRunner?: (sql: string) => Promise<Array<Record<string, unknown>>> }): ConnectorRegistry {
+  static withDefaults(opts?: { sqlRunner?: (sql: string) => Promise<Record<string, unknown>[]> }): ConnectorRegistry {
     const reg = new ConnectorRegistry();
     reg.register(new FileConnector());
     reg.register(new ApiConnector());

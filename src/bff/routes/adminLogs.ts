@@ -83,7 +83,7 @@ async function handleList(c: Ctx): Promise<Response> {
       LIMIT ${RECENT_LIMIT}
     `;
 
-    const logs = (rows as unknown as Array<{
+    const logs = (rows as unknown as {
       id: unknown;
       level: string;
       module: string;
@@ -91,7 +91,7 @@ async function handleList(c: Ctx): Promise<Response> {
       metadata: unknown;
       staffId: string;
       createdAt: unknown;
-    }>).map((r) => ({
+    }[]).map((r) => ({
       id: Number(r.id),
       level: (VALID_LEVELS.has(r.level) ? r.level : 'info') as LogLevel,
       module: r.module ?? '',

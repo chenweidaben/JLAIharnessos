@@ -136,7 +136,7 @@ export const officeDeepRoutes: RouteDef[] = [
         ]);
 
         // 取第一条待办公文做流转演示（无待办公文时给空样例）
-        const docRow = (pendingDocs as Array<Record<string, unknown>>)[0];
+        const docRow = (pendingDocs as Record<string, unknown>[])[0];
         const doc: OfficeDocument = docRow
           ? {
               id: String(docRow.id), title: String(docRow.title),
@@ -148,7 +148,7 @@ export const officeDeepRoutes: RouteDef[] = [
         const approval = routeApproval(doc, demoApprovers());
 
         // 会议预订样例：用第一条 open meeting 检测冲突
-        const mtgRow = (openMeetings as Array<Record<string, unknown>>)[0];
+        const mtgRow = (openMeetings as Record<string, unknown>[])[0];
         const meeting: MeetingRequest = mtgRow
           ? {
               id: String(mtgRow.id), title: String(mtgRow.title),
@@ -157,7 +157,7 @@ export const officeDeepRoutes: RouteDef[] = [
               attendees: Number(mtgRow.attendees ?? 0),
             }
           : demoMeeting();
-        const bookings: RoomBooking[] = (openMeetings as Array<Record<string, unknown>>)
+        const bookings: RoomBooking[] = (openMeetings as Record<string, unknown>[])
           .filter((r) => String(r.id) !== meeting.id)
           .map((r) => ({
             id: String(r.id), room: String(r.room),
@@ -166,7 +166,7 @@ export const officeDeepRoutes: RouteDef[] = [
         const meetingResult = scheduleMeeting(meeting, bookings);
 
         // 督办任务跟踪
-        const supervision = (openTasks as Array<Record<string, unknown>>).map((r) =>
+        const supervision = (openTasks as Record<string, unknown>[]).map((r) =>
           trackSupervisionTask({
             id: String(r.id), title: String(r.title), ownerDept: String(r.owner_dept ?? ''),
             assignedAt: String(r.assigned_at), dueAt: String(r.due_at),

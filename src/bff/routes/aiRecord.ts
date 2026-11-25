@@ -66,7 +66,7 @@ async function handleImprove(c: Ctx): Promise<Response> {
   // 仅取六段已知键，防御性过滤，避免注入多余字段
   const raw = body.sections as Record<string, unknown>;
   const pick = (k: keyof AiRecordGenSections): string =>
-    typeof raw[k] === 'string' ? (raw[k] as string) : '';
+    typeof raw[k] === 'string' ? (raw[k]) : '';
   const sections: AiRecordGenSections = {
     chiefComplaint: pick('chiefComplaint'),
     presentIllness: pick('presentIllness'),

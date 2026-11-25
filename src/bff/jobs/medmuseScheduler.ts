@@ -84,7 +84,7 @@ function db(): Sql {
 /** 当前在院（ongoing）住院就诊 ID 列表；查询失败返回空表 */
 async function listOngoingInpatientVisitIds(): Promise<string[]> {
   try {
-    const rows = await db()<Array<{ id: string }>>`
+    const rows = await db()<{ id: string }[]>`
       SELECT id FROM clinical.visits
       WHERE status = 'ongoing' AND visit_type = 'inpatient'
     `;
@@ -97,7 +97,7 @@ async function listOngoingInpatientVisitIds(): Promise<string[]> {
 /** 当前有在院住院患者的医师 ID 去重列表；查询失败返回空表 */
 async function listOngoingDoctorIds(): Promise<string[]> {
   try {
-    const rows = await db()<Array<{ attending_doctor_id: string }>>`
+    const rows = await db()<{ attending_doctor_id: string }[]>`
       SELECT DISTINCT attending_doctor_id FROM clinical.visits
       WHERE status = 'ongoing' AND visit_type = 'inpatient'
         AND attending_doctor_id IS NOT NULL
@@ -195,7 +195,7 @@ async function runEveningTodos(): Promise<string> {
   let qcErrorCount = 0;
   let qcRecordCount = 0;
   try {
-    const rows = await db()<Array<{ issues: TerminalQcIssue[] }>>`
+    const rows = await db()<{ issues: TerminalQcIssue[] }[]>`
       SELECT issues FROM clinical.terminal_qc
       WHERE created_at >= current_date
     `;

@@ -118,7 +118,7 @@ function pad2(n: number): string {
 /** 取 ISO 时间的统计月前缀（YYYY-MM）；空/非法返回空串（不进任何月桶） */
 function periodOf(iso?: string): string {
   if (!iso) return '';
-  const m = String(iso).match(/^(\d{4}-\d{2})/);
+  const m = /^(\d{4}-\d{2})/.exec(String(iso));
   return m ? m[1] : '';
 }
 

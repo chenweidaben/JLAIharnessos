@@ -8,7 +8,7 @@ export class PathwayError extends Error {
 // 本地路径模板
 function matchPathway(diagnosis: string): {
   pathwayName: string; pathwayCode: string; expectedDays: number;
-  steps: Array<{day: number; action: string; responsible: string}>; confidence: number;
+  steps: {day: number; action: string; responsible: string}[]; confidence: number;
 } | null {
   const d = diagnosis.toLowerCase();
   if (d.includes('肺炎') || d.includes('pneumonia')) {

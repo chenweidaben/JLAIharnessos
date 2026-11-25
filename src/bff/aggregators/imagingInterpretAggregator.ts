@@ -272,7 +272,7 @@ export async function rejectInterpretation(
   if (!existing) throw notFound('影像解读记录不存在');
   if (!canAccess(auth, existing.department)) throw forbidden('无权访问放射科影像报告');
   if (existing.status !== 'pending_review') throw conflict('仅待复核(pending_review)的影像解读可退回');
-  if (!reason || !reason.trim()) throw badRequest('退回原因不能为空');
+  if (!reason?.trim()) throw badRequest('退回原因不能为空');
   const updated = await withTx(async (tx) =>
     setStatus(id, ['pending_review'], 'rejected', { rejectReason: reason.trim() }, tx),
   );

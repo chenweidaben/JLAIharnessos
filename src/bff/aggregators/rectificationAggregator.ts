@@ -238,7 +238,7 @@ export async function submitRectification(
     );
 
     const updated = await getTaskForUpdate(taskId, tx);
-    return updated as RectificationTask;
+    return updated!;
   });
 }
 
@@ -294,7 +294,7 @@ export async function reviewRectification(
     );
 
     const updated = await getTaskForUpdate(taskId, tx);
-    return updated as RectificationTask;
+    return updated!;
   });
 }
 

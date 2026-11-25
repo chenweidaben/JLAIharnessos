@@ -18,13 +18,13 @@ export const dischargeSettleRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/discharge/settle', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'settled' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: (body as { dischargeId?: string }).dischargeId ?? 'demo-dis', status: 'settled', settledAt: new Date().toISOString() }));
     } },
   { method: 'POST', path: '/api/v1/discharge/refund', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'deposit-refunded' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id ?? 'demo-dis', status: 'deposit-refunded', amount: (body as { amount?: number }).amount ?? 0 }));
     } },
   { method: 'POST', path: '/api/v1/discharge/reprint', auth: true,

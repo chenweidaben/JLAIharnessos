@@ -104,17 +104,17 @@ function scoreOutstanding(r: WardRow): number {
  */
 function buildDemoWardBoard(): {
   items: WardRow[];
-  pendingOrders: Array<Record<string, unknown>>;
-  nursingTasks: Array<Record<string, unknown>>;
+  pendingOrders: Record<string, unknown>[];
+  nursingTasks: Record<string, unknown>[];
 } {
   const today = '2026-10-19';
-  const base: Array<{
+  const base: {
     visitId: string; patientName: string; bedNo: string; department: string;
     diagnosis: string; nursingLevel: string; admittedAt: string;
     temperature: number; sbp: number; pulse: number;
     ioBalance24h: number; pendingMeds: number; activeTubes: number;
     riskLevel: string; unresolvedHardCds: number;
-  }> = [
+  }[] = [
     { visitId: 'demo-visit-01', patientName: '王*英', bedNo: '08床', department: '心血管内科', diagnosis: '冠心病 急性ST段抬高型心肌梗死', nursingLevel: '特级护理', admittedAt: '2026-10-17 09:30', temperature: 36.8, sbp: 128, pulse: 78, ioBalance24h: 350, pendingMeds: 3, activeTubes: 2, riskLevel: 'high', unresolvedHardCds: 1 },
     { visitId: 'demo-visit-02', patientName: '李*国', bedNo: '09床', department: '心血管内科', diagnosis: '高血压3级（很高危）', nursingLevel: '一级护理', admittedAt: '2026-10-18 14:05', temperature: 37.1, sbp: 158, pulse: 88, ioBalance24h: -120, pendingMeds: 2, activeTubes: 1, riskLevel: 'high', unresolvedHardCds: 0 },
     { visitId: 'demo-visit-03', patientName: '张*华', bedNo: '10床', department: '呼吸内科', diagnosis: '社区获得性肺炎', nursingLevel: '一级护理', admittedAt: '2026-10-18 20:40', temperature: 38.6, sbp: 118, pulse: 96, ioBalance24h: 200, pendingMeds: 2, activeTubes: 1, riskLevel: 'medium', unresolvedHardCds: 1 },
@@ -168,8 +168,8 @@ function buildDemoWardBoard(): {
 /** 护士站在院一览（按未处理项数倒序）。 */
 export async function getWardBoard(auth: AuthView, perm: string): Promise<{
   items: WardRow[];
-  pendingOrders?: Array<Record<string, unknown>>;
-  nursingTasks?: Array<Record<string, unknown>>;
+  pendingOrders?: Record<string, unknown>[];
+  nursingTasks?: Record<string, unknown>[];
 }> {
   assertPermission(auth, perm);
   // v5.0试点扩展（M188空数据修复）：DEMO_MODE 下直接返回确定性演示种子，

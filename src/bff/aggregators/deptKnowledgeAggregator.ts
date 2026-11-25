@@ -144,7 +144,7 @@ export function recordUsage(
 
 /** 确定性演示知识条目（DEMO_MODE / 空库兜底用） */
 function demoEntries(deptCode: string, type: KnowledgeType): DeptKnowledgeEntry[] {
-  const seed: Record<KnowledgeType, Array<Pick<DeptKnowledgeEntry, 'title' | 'content' | 'successRate' | 'usageCount'>>> = {
+  const seed: Record<KnowledgeType, Pick<DeptKnowledgeEntry, 'title' | 'content' | 'successRate' | 'usageCount'>[]> = {
     pathway: [
       { title: '社区获得性肺炎路径', content: 'CAP 经验性抗感染 + 48~72h 复评，退热平稳后序贯口服。', successRate: 0.92, usageCount: 128 },
       { title: '2 型糖尿病入院路径', content: '入院即糖代谢评估，二甲双胍耐受前提下优先口服，防低血糖。', successRate: 0.84, usageCount: 96 },

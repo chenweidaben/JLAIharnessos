@@ -262,7 +262,7 @@ export class PermissionConfigStore {
     // 撤销：以"生效列表"为准移除该角色
     merged.allowedRoles = normalizeRoles(currentRoles.filter((r) => r !== role));
 
-    if (merged.roleScopes && merged.roleScopes[role] !== undefined) {
+    if (merged.roleScopes?.[role] !== undefined) {
       const nextScopes = { ...merged.roleScopes };
       delete nextScopes[role];
       merged.roleScopes = nextScopes;

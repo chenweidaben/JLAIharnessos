@@ -106,7 +106,7 @@ async function handleHeAssign(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, topic, assignedBy } = body as Record<string, unknown>;
+  const { patientId, topic, assignedBy } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -166,7 +166,7 @@ async function handleHeFeedback(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { rating, comments } = body as Record<string, unknown>;
+  const { rating, comments } = body;
   if (typeof rating !== 'number' || rating < 1 || rating > 5) {
     return json({ code: 400, message: 'rating_out_of_range' }, 400);
   }

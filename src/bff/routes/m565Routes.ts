@@ -115,7 +115,7 @@ async function handleAnesCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { operationId, anesthesiaType, anesthetistId, inductionTime, maintenanceTime, recoveryTime, asa, vitalsDuringSurgery } = body as Record<string, unknown>;
+  const { operationId, anesthesiaType, anesthetistId, inductionTime, maintenanceTime, recoveryTime, asa, vitalsDuringSurgery } = body;
 
   if (
     typeof operationId !== 'string' || !operationId.trim() ||

@@ -75,14 +75,14 @@ function mapGender(g: string): 'male' | 'female' | 'unknown' {
 }
 
 /** 从 jsonb 过敏数组提取物质名称 */
-function mapAllergies(list: Array<Record<string, unknown>>): string[] {
+function mapAllergies(list: Record<string, unknown>[]): string[] {
   return list.map((a) =>
     String(a.substance ?? a.drug ?? a.allergen ?? a.name ?? ''),
   ).filter(Boolean);
 }
 
 /** 从既往史提取慢性病 */
-function mapChronic(list: Array<Record<string, unknown>>): string[] {
+function mapChronic(list: Record<string, unknown>[]): string[] {
   return list.map((h) => String(h.disease ?? h.name ?? h.diagnosis ?? '')).filter(Boolean);
 }
 
@@ -170,11 +170,11 @@ function mapQueueStatus(v: Visit): 'waiting' | 'in_consult' | 'visited' | 'passe
 function buildDemoWaitingQueue(dept: string | null): unknown[] {
   const now = Date.now();
   const regTime = (minAgo: number) => new Date(now - minAgo * 60000).toISOString();
-  const rows: Array<{
+  const rows: {
     encounterId: string; ticketNo: string; name: string; gender: 'male' | 'female';
     age: number; chief: string; status: 'waiting' | 'in_consult' | 'visited' | 'passed';
     waitMin: number; registerMinAgo: number; deptName: string; doctor: string;
-  }> = [
+  }[] = [
     { encounterId: 'demo-op-1', ticketNo: 'MZ20261019001', name: '张*', gender: 'male', age: 45, chief: '反复咳嗽咳痰1周', status: 'waiting', waitMin: 12, registerMinAgo: 12, deptName: '呼吸内科', doctor: '王医生' },
     { encounterId: 'demo-op-2', ticketNo: 'MZ20261019002', name: '李*', gender: 'female', age: 58, chief: '头晕伴血压升高3天', status: 'waiting', waitMin: 9, registerMinAgo: 9, deptName: '心血管内科', doctor: '陈医生' },
     { encounterId: 'demo-op-3', ticketNo: 'MZ20261019003', name: '王*', gender: 'male', age: 33, chief: '右上腹痛6小时', status: 'waiting', waitMin: 6, registerMinAgo: 6, deptName: '消化内科', doctor: '刘医生' },
@@ -541,7 +541,7 @@ export async function addOrder(
   if (!visit) return null;
   await createOrder({
     visitId,
-    orderType: data.kind as OrderType,
+    orderType: data.kind,
     content: data.name,
     detail: {
       catalogId: data.catalogId,
@@ -620,7 +620,7 @@ async function reviewPrescription(
   if ((hasName(/阿司匹林/) || hasName(/氯吡格雷/)) && (hasName(/华法林/) || hasName(/达比加群/))) {
     warnings.push(ruleDanger('抗血小板+抗凝', '联用显著增加出血风险，须严密监测。'));
   }
-  const statins = names.filter((n) => /他汀/.test(n));
+  const statins = names.filter((n) => n.includes('他汀'));
   if (statins.length > 1) warnings.push(ruleWarn('重复同类药', `不建议同时使用 ${statins.join('、')}。`));
   if (hasName(/美托洛尔/) && hasName(/氨氯地平/) === false) {
     // no-op，保留扩展位

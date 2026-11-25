@@ -680,7 +680,7 @@ export async function getSettlementDetail(
       reason: String(r.reason),
       refundedBy: r.refunded_by ? String(r.refunded_by) : null,
       refundedAt: String(r.refunded_at), createdAt: String(r.created_at),
-    } as Refund;
+    };
   });
   const sagaLog = await listSagaLog(settlementId);
   return { settlement, items, invoice, refunds, sagaLog };
@@ -690,7 +690,7 @@ const QUEUE_STATUSES: SettlementStatus[] = ['unpaid', 'paid', 'partially_refunde
 
 /** v5.0试点扩展（M183-C demo种子）：DEMO_MODE 收费结算队列，确定性固定数据。 */
 function demoSettlements(): Settlement[] {
-  const rows: Array<[string, SettlementStatus, PaymentMethod, string, string]> = [
+  const rows: [string, SettlementStatus, PaymentMethod, string, string][] = [
     ['心血管内科', 'unpaid', 'cash', '1286.50', '2026-10-19T08:30:00.000Z'],
     ['呼吸内科', 'paid', 'wechat', '862.00', '2026-10-19T08:55:00.000Z'],
     ['普外科', 'unpaid', 'alipay', '2340.00', '2026-10-19T09:10:00.000Z'],

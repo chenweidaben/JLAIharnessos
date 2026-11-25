@@ -150,7 +150,7 @@ async function handleOncCreate(c: Ctx): Promise<Response> {
     nextTreatmentAt: nextTreatmentAt.trim(),
     cea,
     ct_score: ctScore,
-    notes: notes == null || !notes.trim() ? null : (notes as string).trim(),
+    notes: !notes?.trim() ? null : (notes).trim(),
     needsUrgentReview: isUrgent(nowMs, tnmStage as TnmStage, nextTreatmentAt.trim()),
     followedUpAt: new Date(nowMs).toISOString(),
   };

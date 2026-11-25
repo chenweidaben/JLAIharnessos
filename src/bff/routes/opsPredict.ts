@@ -57,7 +57,7 @@ function parseHistory(raw: string | null): HistoryPoint[] | null {
   try {
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return null;
-    return (parsed as Array<Record<string, unknown>>)
+    return (parsed as Record<string, unknown>[])
       .filter((p) => p && typeof p.date === 'string' && Number.isFinite(Number(p.value)))
       .map((p) => ({ date: String(p.date).slice(0, 10), value: Number(p.value) }));
   } catch {

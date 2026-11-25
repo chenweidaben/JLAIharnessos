@@ -80,7 +80,7 @@ export async function rankingView(auth: AuthView): Promise<{ ranks: DepartmentRa
 }
 
 /** 按就诊列出问卷（含低分维度标记）。 */
-export async function listSurveyView(auth: AuthView, visitId: string): Promise<{ items: Array<SurveyRow & { avg: number; lowDims: string[] }> }> {
+export async function listSurveyView(auth: AuthView, visitId: string): Promise<{ items: (SurveyRow & { avg: number; lowDims: string[] })[] }> {
   assertPermission(auth, 'satisfaction:view');
   if (!UUID_RE.test(visitId.trim())) throw badRequest('就诊标识非法');
   const visit = await getVisitById(visitId.trim());

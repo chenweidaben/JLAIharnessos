@@ -200,9 +200,9 @@ interface TableDef {
   description: string;
   columns: ColumnDef[];
   /** 上游来源表（血缘） */
-  sources: Array<{ table: string; note: string }>;
+  sources: { table: string; note: string }[];
   /** 下游应用（血缘） */
-  applications: Array<{ table: string; note: string }>;
+  applications: { table: string; note: string }[];
 }
 
 const SENS_LABEL: Record<SensitivityLevel, string> = {

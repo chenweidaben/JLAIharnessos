@@ -46,29 +46,16 @@ function buildCurrentFeedback(): DeepFeedbackData {
 
   const medication = Array.from({ length: 12 }, (_, i) => ({
     prescriptionId: `RX-${i}`,
-    judgement: (i < 5 ? 'appropriate' : i < 8 ? 'suboptimal' : 'wrong') as
-      | 'appropriate'
-      | 'suboptimal'
-      | 'wrong',
-    issueType: (i < 5 ? undefined : i < 8 ? 'dose' : i < 10 ? 'interaction' : 'interaction') as
-      | 'dose'
-      | 'interaction'
-      | 'indication'
-      | 'duplication'
-      | undefined,
+    judgement: i < 5 ? ('appropriate' as const) : i < 8 ? ('suboptimal' as const) : ('wrong' as const),
+    issueType: i < 5 ? undefined : i < 8 ? ('dose' as const) : ('interaction' as const),
   }));
 
   const nursing = Array.from({ length: 10 }, (_, i) => ({
     eventId: `AE-${i}`,
-    riskType: (i < 4 ? 'fall' : i < 7 ? 'pressure_ulcer' : 'medication_error') as
-      | 'fall'
-      | 'pressure_ulcer'
-      | 'medication_error'
-      | 'infection'
-      | 'other',
+    riskType: i < 4 ? ('fall' as const) : i < 7 ? ('pressure_ulcer' as const) : ('medication_error' as const),
     // 前 7 起被预警，后 3 起漏报 → sensitivity 0.7，低于 0.8 目标，阈值下调
     warned: i < 7,
-    severity: (i < 3 ? 'low' : i < 8 ? 'medium' : 'high') as 'low' | 'medium' | 'high',
+    severity: i < 3 ? ('low' as const) : i < 8 ? ('medium' as const) : ('high' as const),
   }));
 
   const management = [
@@ -97,7 +84,7 @@ function buildPreviousFeedback(): DeepFeedbackData {
   }));
   const medication = Array.from({ length: 12 }, (_, i) => ({
     prescriptionId: `PRE-RX-${i}`,
-    judgement: (i < 10 ? 'appropriate' : 'suboptimal') as 'appropriate' | 'suboptimal' | 'wrong',
+    judgement: i < 10 ? ('appropriate' as const) : ('suboptimal' as const),
     issueType: undefined as 'dose' | 'interaction' | 'indication' | 'duplication' | undefined,
   }));
   const nursing = Array.from({ length: 10 }, (_, i) => ({

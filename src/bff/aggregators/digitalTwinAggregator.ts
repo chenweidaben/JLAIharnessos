@@ -289,7 +289,7 @@ function buildRoom(buildingId: string, floor: string, seed: RoomSeed): TwinRoom 
   // 脱敏患者位置：占用床旁放一个标记（不存任何 PII）
   const patientMarkers: TwinPatientMarker[] = beds
     .filter((b) => b.patientRef)
-    .map((b) => ({ patientRef: b.patientRef as string, x: b.x + 18, y: b.y + 10 }));
+    .map((b) => ({ patientRef: b.patientRef!, x: b.x + 18, y: b.y + 10 }));
 
   return {
     roomId: `${buildingId}-${floor}-${seed.roomCode}`,

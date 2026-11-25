@@ -112,7 +112,7 @@ export const selfLearningRoutes: RouteDef[] = [
             ORDER BY created_at DESC
             LIMIT 500
           `;
-          rows = (dbRows as unknown as Array<Record<string, unknown>>).map((r) => ({
+          rows = (dbRows as unknown as Record<string, unknown>[]).map((r) => ({
             strategyId: String(r.strategyId ?? ''),
             runDate: String(r.runDate ?? ''),
             oldWeights: asWeightMap(r.oldWeights),

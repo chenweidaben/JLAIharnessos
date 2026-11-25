@@ -74,7 +74,7 @@ export interface Trend {
 /** 采纳率趋势图数据 */
 export interface AdoptionRateChart {
   /** 逐日采纳率序列（日期升序） */
-  series: Array<{ date: string; rate: number }>;
+  series: { date: string; rate: number }[];
   /** 最新一日采纳率 [0,1]，无样本为 0 */
   current: number;
   /** 今日 vs 昨日趋势 */
@@ -98,7 +98,7 @@ export interface WeightDistributionChart {
 /** 知识增长曲线图数据 */
 export interface KnowledgeGrowthChart {
   /** 逐日累计条目数序列（日期升序） */
-  series: Array<{ date: string; count: number }>;
+  series: { date: string; count: number }[];
   /** 知识条目总数 */
   total: number;
   /** 今日 vs 昨日（当日净增条目数口径） */
@@ -227,7 +227,7 @@ export function buildLearningDashboard(
     const key = dayKey(e.createdAt);
     perDay[key] = (perDay[key] ?? 0) + 1;
   }
-  const growthSeries: Array<{ date: string; count: number }> = [];
+  const growthSeries: { date: string; count: number }[] = [];
   let acc = 0;
   for (const date of Object.keys(perDay).sort()) {
     acc += perDay[date];

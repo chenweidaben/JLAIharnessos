@@ -33,15 +33,15 @@ type ExpandMode = 'library' | 'accuracy' | 'differential' | 'examine';
 interface ExpandBody {
   mode?: ExpandMode;
   // library
-  newDiseases?: Array<{
+  newDiseases?: {
     name?: string;
     icd10?: string;
     specialty?: string;
     typicalSymptoms?: string[];
-  }>;
+  }[];
   // accuracy
   currentModel?: ModelDiseaseStat[];
-  feedback?: Array<{ disease?: string; correct?: boolean; doctorFinalDiagnosis?: string }>;
+  feedback?: { disease?: string; correct?: boolean; doctorFinalDiagnosis?: string }[];
   // differential
   disease?: string;
   differential?: DifferentialEntry[];
@@ -57,7 +57,7 @@ export const diseaseExpandRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<ExpandBody>().catch(() => ({} as ExpandBody))) ?? ({} as ExpandBody);
+        const body = (await c.body<ExpandBody>().catch((): ExpandBody => ({}))) ?? ({});
         const mode: ExpandMode =
           body.mode === 'library' || body.mode === 'accuracy' || body.mode === 'differential'
             ? body.mode

@@ -66,20 +66,20 @@ async function handlePost(c: Ctx): Promise<Response> {
       throw new PdcaError(400, '缺少 action 字段（create / advance / effect）');
     }
     if (body.action === 'create') {
-      const b = body as CreateBody;
+      const b = body;
       if (!b.target) throw new PdcaError(400, '缺少 target 量化目标');
       const project = createPDCAProject(b.name ?? '', b.dept ?? '', b.leader ?? '', b.target);
       return json(ok(project, 'PDCA 项目已创建'));
     }
     if (body.action === 'advance') {
-      const b = body as AdvanceBody;
+      const b = body;
       if (!b.project) throw new PdcaError(400, '缺少 project');
       if (!b.nextPhase) throw new PdcaError(400, '缺少 nextPhase');
       const next = advancePDCAPhase(b.project, b.nextPhase, { note: b.note });
       return json(ok(next, `已推进到 ${next.phase} 阶段`));
     }
     if (body.action === 'effect') {
-      const b = body as EffectBody;
+      const b = body;
       if (!b.project) throw new PdcaError(400, '缺少 project');
       const effect = calculatePDCAEffect(b.project);
       return json(ok(effect, '效果计算完成'));

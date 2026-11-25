@@ -49,7 +49,7 @@ export async function createConsult(
       (${input.visitId}, ${input.consultType}, ${input.nutritionDiagnosis}, ${input.plan},
        ${input.caloriesPerDay}, ${input.followupDays}, ${input.dietitian})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function recordFollowup(id: string, tx: DbExecutor = getDb()): Promise<NutritionConsult> {
@@ -57,7 +57,7 @@ export async function recordFollowup(id: string, tx: DbExecutor = getDb()): Prom
     UPDATE clinical.nutrition_consults SET status='followed_up' WHERE id=${id}
     RETURNING ${tx.unsafe(COLS)}`;
   if (rows.length === 0) throw new Error('会诊记录不存在');
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<NutritionConsult[]> {

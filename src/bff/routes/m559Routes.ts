@@ -185,7 +185,7 @@ async function handleNsCreate(c: Ctx): Promise<Response> {
     const o = x as NurseAssignment;
     return (
       typeof o.nurseId === 'string' && Boolean(o.nurseId) &&
-      typeof o.shift === 'string' && SHIFTS.includes(o.shift as Shift) &&
+      typeof o.shift === 'string' && SHIFTS.includes(o.shift) &&
       typeof o.date === 'string' && Boolean(o.date)
     );
   });

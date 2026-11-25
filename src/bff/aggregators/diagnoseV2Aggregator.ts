@@ -89,16 +89,16 @@ interface V2DiseaseRule {
   diagnosis: string;
   icd10: string;
   specialty: V2Specialty;
-  symptoms: Array<{ kw: string; weight: number; label: string }>;
-  vitals?: Array<{
+  symptoms: { kw: string; weight: number; label: string }[];
+  vitals?: {
     field: keyof V2Vitals;
     op: '>=' | '<=';
     threshold: number;
     weight: number;
     label: string;
-  }>;
+  }[];
   ageBand?: { minAge: number; maxAge: number; weight: number; label: string };
-  history: Array<{ kw: string; weight: number; label: string }>;
+  history: { kw: string; weight: number; label: string }[];
   expectedLabs: V2ExpectedLab[];
   treatment: {
     meds: V2TreatmentMed[];
@@ -106,7 +106,7 @@ interface V2DiseaseRule {
     monitoring: string[];
     specialPopulation: string;
   };
-  discriminators: Array<{ with: string; how: string }>;
+  discriminators: { with: string; how: string }[];
 }
 
 const BUILTIN_DISEASES_V2: V2DiseaseRule[] = [
@@ -678,7 +678,7 @@ function round2(n: number): number {
 const DISCLAIMER_V2 =
   '本建议由 AI 规则引擎基于症状/病史/化验启发式生成，仅供临床参考，不构成诊断结论；辅助诊断，最终由医生确认。';
 
-function textOfSymptomsV2(symptoms: Array<{ name: string; onset?: string }>): string {
+function textOfSymptomsV2(symptoms: { name: string; onset?: string }[]): string {
   return (symptoms ?? [])
     .map((s) => `${s?.name ?? ''} ${s?.onset ?? ''}`)
     .join(' ')
@@ -691,7 +691,7 @@ function textOfHistoryV2(history: string[] | { chronicDiseases?: string[]; notes
   return [...(h.chronicDiseases ?? []), h.notes ?? ''].join(' ').toLowerCase();
 }
 
-function labTextV2(labs: V2LabResult[]): Array<{ kw: string; abnormal: string; name: string }> {
+function labTextV2(labs: V2LabResult[]): { kw: string; abnormal: string; name: string }[] {
   return (labs ?? []).map((l) => ({
     kw: (l?.name ?? '').toLowerCase(),
     abnormal: (l?.abnormal ?? '').toLowerCase(),
@@ -700,7 +700,7 @@ function labTextV2(labs: V2LabResult[]): Array<{ kw: string; abnormal: string; n
 }
 
 function matchLabV2(
-  labs: Array<{ kw: string; abnormal: string; name: string }>,
+  labs: { kw: string; abnormal: string; name: string }[],
   expected: V2ExpectedLab,
 ): { hit: boolean; conflict: boolean; label: string } {
   for (const l of labs) {
@@ -741,7 +741,7 @@ export interface ExpandedLibraryV2 {
  * @param newDiseases 外部追加病种元数据
  */
 export function expandDiagnosisLibraryV2(
-  newDiseases: Array<Partial<V2DiseaseRule> & { diagnosis: string; icd10?: string; specialty?: V2Specialty }> = [],
+  newDiseases: (Partial<V2DiseaseRule> & { diagnosis: string; icd10?: string; specialty?: V2Specialty })[] = [],
 ): ExpandedLibraryV2 {
   const base: V2DiseaseRule[] = BUILTIN_DISEASES_V2;
   const seen = new Set(base.map((d) => d.diagnosis));
@@ -800,7 +800,7 @@ export interface DifferentialCandidateV2 {
   likelihood: number;
   evidence: string[];
   labEvidence: string[];
-  discriminators: Array<{ with: string; how: string }>;
+  discriminators: { with: string; how: string }[];
 }
 
 export interface DifferentialResultV2 {
@@ -816,7 +816,7 @@ export interface DifferentialResultV2 {
  *   化验方向与预期矛盾时扣分。并扫描神经/出血/尿潴留等高风险红旗。
  */
 export function improveDifferentialDiagnosisV2(
-  symptoms: Array<{ name: string; onset?: string }> = [],
+  symptoms: { name: string; onset?: string }[] = [],
   history: string[] | { chronicDiseases?: string[]; notes?: string } = [],
   labResults: V2LabResult[] = [],
 ): DifferentialResultV2 {
@@ -885,16 +885,16 @@ export function improveDifferentialDiagnosisV2(
   if (/剧烈头痛|呕吐/.test(symText) && (/高血压|意识/.test(symText))) {
     alerts.push('突发剧烈头痛伴呕吐/意识改变：警惕脑出血/蛛网膜下腔出血，立即头颅 CT。');
   }
-  if (/抽搐/.test(symText) && /意识丧失/.test(symText)) {
+  if (symText.includes('抽搐') && symText.includes('意识丧失')) {
     alerts.push('抽搐伴意识丧失：若持续>5 分钟为癫痫持续状态，立即地西泮静推并保护气道。');
   }
-  if (/腰痛|绞痛/.test(symText) && /血尿/.test(symText)) {
+  if (/腰痛|绞痛/.test(symText) && symText.includes('血尿')) {
     alerts.push('腰腹绞痛伴血尿：警惕上尿路结石梗阻，评估有无感染/肾功能损害。');
   }
-  if (/发热/.test(symText) && (/瘀斑|出血/.test(symText))) {
+  if (symText.includes('发热') && (/瘀斑|出血/.test(symText))) {
     alerts.push('发热伴皮肤瘀斑/出血：警惕急性白血病/感染相关凝血障碍，紧急血常规+凝血功能。');
   }
-  if (/腰痛/.test(symText) && /尿频|尿急/.test(symText) && /发热/.test(symText)) {
+  if (symText.includes('腰痛') && /尿频|尿急/.test(symText) && symText.includes('发热')) {
     alerts.push('腰痛伴膀胱刺激征+发热：警惕急性肾盂肾炎/尿源性脓毒症，尽早抗感染。');
   }
   if (alerts.length === 0) alerts.push('未识别到紧急红旗信号，仍以执业医师面诊为准。');

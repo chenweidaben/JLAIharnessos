@@ -305,7 +305,7 @@ export interface KpiSummary {
   yellow: number;
   red: number;
   passRate: number;
-  byDimension: Array<{
+  byDimension: {
     dimension: KpiDimension;
     dimensionLabel: string;
     total: number;
@@ -313,7 +313,7 @@ export interface KpiSummary {
     yellow: number;
     red: number;
     avgScore: number;
-  }>;
+  }[];
 }
 
 export function summarizeKpi(results: KpiResult[]): KpiSummary {

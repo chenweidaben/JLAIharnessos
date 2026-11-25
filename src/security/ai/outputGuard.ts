@@ -40,14 +40,14 @@ const SENSITIVE_REDLINE_PATTERNS: RegExp[] = [
 ];
 
 /** 诊断/建议/治疗类结论句关键词（无引用检测使用） */
-const CLAIM_SENTENCE_KEYWORDS: RegExp =
+const CLAIM_SENTENCE_KEYWORDS =
   /(诊断|拟诊|鉴别诊断|建议|考虑|治疗方案|用药|处方|手术|检查建议|处置|转诊)/;
 
 /** 引用编号格式：[1]、[12] */
-const CITATION_REF_PATTERN: RegExp = /\[\d+\]/;
+const CITATION_REF_PATTERN = /\[\d+\]/;
 
 /** 中文句子切分 */
-const SENTENCE_SPLITTER: RegExp = /[。！？；\n]/;
+const SENTENCE_SPLITTER = /[。！？；\n]/;
 
 export interface OutboundGuardConfig {
   /** 追加覆盖的确定性红线词（与内置词表合并） */
@@ -331,7 +331,7 @@ function truncate(text: string, max: number): string {
 }
 
 /** 规则执行顺序（与技术文档 3.6.4 规则集编号一致） */
-const RULE_CHAIN: Array<(ic: InternalContext) => void> = [
+const RULE_CHAIN: ((ic: InternalContext) => void)[] = [
   checkFictionalIdentity,
   checkContradiction,
   checkCertaintyRedline,

@@ -33,7 +33,7 @@ const WAIT_TYPES: ReadonlySet<string> = new Set([
 ]);
 
 function toLocation(raw: string | null): FlowLocation | null {
-  if (!raw || !raw.trim()) return null;
+  if (!raw?.trim()) return null;
   const v = raw.trim();
   // 形如 code:gate_hall 视为节点 code，否则按名称片段匹配
   if (v.startsWith('code:')) return { code: v.slice(5) };

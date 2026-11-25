@@ -78,7 +78,7 @@ let seq = 0;
 
 function pickSeverity(v: unknown): Severity {
   if (v !== 'mild' && v !== 'moderate' && v !== 'severe') throw new TriageError(400, `severity 非法：${String(v)}`);
-  return v as Severity;
+  return v;
 }
 
 // ---------- Questionnaire ----------

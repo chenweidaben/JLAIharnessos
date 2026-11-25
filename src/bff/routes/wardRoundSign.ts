@@ -18,7 +18,7 @@ export const wardRoundSignRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/ward-rounds/:id/sign', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'signed' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const level = (body as { level?: string }).level ?? 'attending';
       if (!['resident', 'attending', 'chief'].includes(level)) {
         return json(fail(ErrorCode.BAD_REQUEST, 'level 必须为 resident|attending|chief'), 400);
@@ -28,7 +28,7 @@ export const wardRoundSignRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/ward-rounds/:id/return', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'returned' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id, status: 'returned', reason: (body as { reason?: string }).reason ?? 'demo', returnedAt: new Date().toISOString() }));
     } },
 ];

@@ -146,11 +146,11 @@ function seedExperiences(): DoctorExperience[] {
  * 同行聚合统计（仅指标，不含任何同行经验内容）。
  * 真实环境由 medmuse.doctor_muse_stats 按科室聚合后注入。
  */
-function seedPeerGroup(staffId: string): Array<{
+function seedPeerGroup(staffId: string): {
   totalExperiences: number;
   successRate: number;
   categoryCounts: Record<DoctorExperienceCategory, number>;
-}> {
+}[] {
   void staffId;
   return [
     {

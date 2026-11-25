@@ -83,13 +83,11 @@ export interface DeliveryResult {
 }
 
 /** 注入的传输层（测试可替换为假函数） */
-export interface WebhookTransport {
-  (url: string, body: string, signature: string): Promise<{
+export type WebhookTransport = (url: string, body: string, signature: string) => Promise<{
     ok: boolean;
     statusCode?: number;
     error?: string;
   }>;
-}
 
 /** triggerWebhook 可选项 */
 export interface TriggerOptions {
@@ -157,7 +155,7 @@ export function registerWebhook(
   const seen = new Set<WebhookEvent>();
   for (const e of events) {
     assertEvent(e);
-    seen.add(e as WebhookEvent);
+    seen.add(e);
   }
   const stamp = new Date().toISOString();
   return {
@@ -258,7 +256,7 @@ export async function triggerWebhook(
   options: TriggerOptions = {},
 ): Promise<DeliveryResult[]> {
   assertEvent(event);
-  const ev = event as WebhookEvent;
+  const ev = event;
   const list = Array.isArray(options.webhooks) ? options.webhooks : [];
   const send = options.send ?? defaultTransport;
   const maxRetries = Math.max(1, options.maxRetries ?? 5);

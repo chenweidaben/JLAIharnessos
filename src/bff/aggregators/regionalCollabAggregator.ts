@@ -151,7 +151,7 @@ const LEVEL_RANK: Record<HospitalLevel, number> = {
 };
 
 /** 病种关键词 -> 承接专科（基层医生填「胸痛/脑梗」也能命中） */
-const CONDITION_TO_SPECIALTY: ReadonlyArray<{ keywords: string[]; specialty: string }> = [
+const CONDITION_TO_SPECIALTY: readonly { keywords: string[]; specialty: string }[] = [
   { keywords: ['胸痛', '心梗', '冠心病', '心衰', '心律失常'], specialty: '心血管内科' },
   { keywords: ['卒中', '脑梗', '脑出血', '偏瘫', '脑外伤'], specialty: '神经外科' },
   { keywords: ['癫痫', '帕金森', '头痛', '脑炎'], specialty: '神经内科' },
@@ -232,7 +232,7 @@ export function registerGroupHospital(input: {
     hospitalId,
     groupId,
     name,
-    level: input.level as HospitalLevel,
+    level: input.level,
     region: (input.region ?? '').trim() || '本地',
     specialties: (input.specialties ?? []).map((s) => (s ?? '').trim()).filter(Boolean),
     expertSlots: Math.max(0, Math.floor(Number(input.expertSlots ?? 0))),

@@ -269,7 +269,7 @@ export function evaluateBadges(input: {
 }): AchievementBadge[] {
   const { totalSuccess, totalFailure, aiAdoptionRate, aiSuggested, helpedColleagues, growthDirection, currentMonth, earliestBadgeMonth } = input;
 
-  const defs: Array<{ code: string; name: string; description: string; earned: boolean; earnedAt: string | null }> = [
+  const defs: { code: string; name: string; description: string; earned: boolean; earnedAt: string | null }[] = [
     {
       code: 'first_lesson',
       name: '初露锋芒',

@@ -73,7 +73,7 @@ export async function evaluateCdsView(
   const alerts = evaluateCds(input.order, input.allergies ?? [], input.activeOrders ?? []);
   const hardBlock = hasHardBlock(alerts);
   if (hardBlock && !(input.overrideReason ?? '').trim()) {
-    throw new OrderCdsError(422, 'CDS_BLOCKED', 'CDS hard 拦截：须填写 override_reason 方可放行', alerts as unknown[]);
+    throw new OrderCdsError(422, 'CDS_BLOCKED', 'CDS hard 拦截：须填写 override_reason 方可放行', alerts);
   }
 
   return withTx(async (tx) => {
@@ -96,7 +96,7 @@ export async function evaluateCdsView(
 export async function overrideAlertView(auth: AuthView, alertId: string, reason: string) {
   assertPermission(auth, 'cds:override');
   assertUuid(alertId, '告警');
-  if (!reason || !reason.trim()) throw badRequest('override_reason 必填');
+  if (!reason?.trim()) throw badRequest('override_reason 必填');
   const alert = await getAlertById(alertId);
   if (!alert) throw notFound('告警不存在');
   const visit = await loadVisit(auth, alert.visitId);

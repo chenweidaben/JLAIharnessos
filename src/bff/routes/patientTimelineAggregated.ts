@@ -76,8 +76,8 @@ export const patientTimelineAggregatedRoutes: RouteDef[] = [
         if (process.env.DEMO_MODE !== '1') throw new TimelineError(403, '_seed 仅 DEMO_MODE 可用');
         const b = (await c.body()) as Record<string, unknown>;
         const p = String(b.patientId ?? '');
-        const samples = Array.isArray(b.samples) ? (b.samples as Array<Record<string, unknown>>) : [];
-        const out = seed(p, samples as Array<{ visitId: string; type: 'lab'|'imaging'|'medication'|'surgery'|'nursing'|'cds'|'encounter'; time: string; summary: string; detailRef: string }>);
+        const samples = Array.isArray(b.samples) ? (b.samples as Record<string, unknown>[]) : [];
+        const out = seed(p, samples as { visitId: string; type: 'lab'|'imaging'|'medication'|'surgery'|'nursing'|'cds'|'encounter'; time: string; summary: string; detailRef: string }[]);
         return json(ok({ seeded: out.length }));
       } catch (e) { return mapError(e); }
     },

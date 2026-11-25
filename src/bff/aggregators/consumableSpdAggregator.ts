@@ -555,7 +555,7 @@ export interface DepartmentConsumption {
  * 纯函数：相同入参必得相同出参；消耗事件为内置确定性台账。
  */
 export function trackConsumableConsumption(
-  department: string = 'or',
+  department = 'or',
   period: ConsumptionPeriod = 'month',
 ): DepartmentConsumption {
   const known = DEPT_NAME[department] !== undefined;

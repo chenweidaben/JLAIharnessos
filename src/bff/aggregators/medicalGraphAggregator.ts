@@ -74,7 +74,7 @@ export interface GraphNode {
   /** 概念简述 */
   description: string;
   /** 来源：指南 / 教材名称 + 年份（可溯源） */
-  sources: Array<{ name: string; year?: string }>;
+  sources: { name: string; year?: string }[];
   /** 证据强度 0~1 */
   evidenceLevel: number;
 }
@@ -614,7 +614,7 @@ export interface Diagnosis {
   /** 必做检查节点 */
   requiredExams: GraphNode[];
   /** 疾病来源指南 */
-  sources: Array<{ name: string; year?: string }>;
+  sources: { name: string; year?: string }[];
 }
 
 /** 把某疾病的出边按关系类型 + qualifier 分桶 */
@@ -787,7 +787,7 @@ export interface DeepMedicalGraph {
   /** 全部边 */
   edges: GraphEdge[];
   /** 节点分层：layer 0=根疾病，layer 1=一跳邻接，依此类推 */
-  layers: Array<{ layer: number; nodeIds: string[] }>;
+  layers: { layer: number; nodeIds: string[] }[];
   /** 实际展开深度（入参 depth 被 clamp 后的值） */
   depth: number;
   /** 是否命中根疾病 */
@@ -813,7 +813,7 @@ export interface DeepMedicalGraph {
  */
 export function buildDeepMedicalGraph(
   disease: string,
-  depth: number = 2,
+  depth = 2,
 ): DeepMedicalGraph {
   const empty: DeepMedicalGraph = {
     disease: null,
@@ -922,7 +922,7 @@ export interface TraversalResult {
 export function traverseGraph(
   startNode: string,
   relation?: string | null,
-  depth: number = 1,
+  depth = 1,
 ): TraversalResult {
   const rel = asRelation(relation ?? null);
   const empty: TraversalResult = {
@@ -998,7 +998,7 @@ export interface RelatedDisease {
  * @param disease 疾病中文名或 id
  * @param topK    返回条数，默认 5，最大 10
  */
-export function findRelatedDiseases(disease: string, topK: number = 5): RelatedDisease[] {
+export function findRelatedDiseases(disease: string, topK = 5): RelatedDisease[] {
   const root = NODE_BY_ID.get((disease ?? '').trim()) ?? resolveNode(disease ?? '');
   if (!root || root.type !== 'disease') return [];
 

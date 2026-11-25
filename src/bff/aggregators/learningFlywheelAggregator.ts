@@ -40,20 +40,20 @@ export interface LearningFlywheelResult {
   /** 飞轮转速：每日平均采纳数（采纳率 × 日均推荐数） */
   flywheelVelocity: number;
   /** 趋势线数据（按日期升序） */
-  trend: Array<{
+  trend: {
     date: string;
     recommendations: number;
     adopted: number;
     adoptionRate: number;
     knowledge: number;
-  }>;
+  }[];
   /** 四个飞轮环节的当前值（供环形图） */
-  stages: Array<{
+  stages: {
     key: string;
     label: string;
     value: number;
     description: string;
-  }>;
+  }[];
 }
 
 /**

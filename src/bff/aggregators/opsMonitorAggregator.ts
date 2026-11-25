@@ -149,7 +149,7 @@ export interface OpsAlert {
   level: 'P1' | 'P2' | 'P3';
   title: string;
   content: string;
-  channel: Array<'phone' | 'sms' | 'im' | 'email'>;
+  channel: ('phone' | 'sms' | 'im' | 'email')[];
   /** 去重键：同类异常 30 分钟内不重复打扰 */
   dedupKey: string;
   /** 是否要求当班运维确认闭环 */

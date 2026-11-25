@@ -18,7 +18,7 @@ export const pdaMedAdminRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/med-admin/scan', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ matched: true }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { patientBarcode?: string; drugBarcode?: string; orderNo?: string };
       return json(ok({ demo: true, matched: true, patientBarcode: b.patientBarcode ?? 'demo-p', drugBarcode: b.drugBarcode ?? 'demo-d', orderNo: b.orderNo ?? 'demo-o', scannedAt: new Date().toISOString() }));
     } },

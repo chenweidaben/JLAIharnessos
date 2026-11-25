@@ -336,7 +336,7 @@ export function calculateSystemIntelligenceScore(
 export function getIntelligenceTrend(
   hospitalId: string,
   days: number,
-  history: Array<{ date: string; metrics: IntelligenceMetrics }> = [],
+  history: { date: string; metrics: IntelligenceMetrics }[] = [],
 ): IntelligenceTrend {
   const points: IntelligenceTrendPoint[] = history.map((h) => {
     const s = calculateSystemIntelligenceScore(hospitalId, h.metrics, h.date);
@@ -393,7 +393,7 @@ const counter: IntelligenceMetrics = {
 };
 
 /** 滚动历史序列（由旧到新） */
-const historyBuffer: Array<{ date: string; metrics: IntelligenceMetrics }> = [];
+const historyBuffer: { date: string; metrics: IntelligenceMetrics }[] = [];
 
 /** 记录一条经验沉淀 */
 export function recordExperience(count = 1): void {
@@ -455,6 +455,6 @@ export function collectRawMetrics(): { metrics: IntelligenceMetrics; demo: boole
 }
 
 /** 读取历史缓冲（路由层拼趋势用） */
-export function collectHistory(): Array<{ date: string; metrics: IntelligenceMetrics }> {
+export function collectHistory(): { date: string; metrics: IntelligenceMetrics }[] {
   return historyBuffer.map((h) => ({ date: h.date, metrics: { ...h.metrics } }));
 }

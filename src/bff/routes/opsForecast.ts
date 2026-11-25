@@ -47,7 +47,7 @@ async function loadOutpatientHistory(): Promise<HistoryPoint[]> {
       AND created_at >= now() - interval '${LOOKBACK_DAYS} days'
     GROUP BY 1 ORDER BY 1
   `;
-  return (rows as Array<Record<string, unknown>>).map(mapPoint);
+  return (rows as Record<string, unknown>[]).map(mapPoint);
 }
 
 /** 床位负荷：按日统计当日入院在院（住院）人次 */
@@ -61,7 +61,7 @@ async function loadBedHistory(): Promise<HistoryPoint[]> {
       AND admit_at >= now() - interval '${LOOKBACK_DAYS} days'
     GROUP BY 1 ORDER BY 1
   `;
-  return (rows as Array<Record<string, unknown>>).map(mapPoint);
+  return (rows as Record<string, unknown>[]).map(mapPoint);
 }
 
 /** 手术量：按日统计已排手术台次（取消不计） */
@@ -74,7 +74,7 @@ async function loadSurgeryHistory(): Promise<HistoryPoint[]> {
       AND schedule_date >= now() - interval '${LOOKBACK_DAYS} days'
     GROUP BY 1 ORDER BY 1
   `;
-  return (rows as Array<Record<string, unknown>>).map(mapPoint);
+  return (rows as Record<string, unknown>[]).map(mapPoint);
 }
 
 /** 最近一批预测 upsert 落库（按 metric_name + forecast_date 覆盖写） */

@@ -100,7 +100,7 @@ export function processView(
   note: string,
   at: string = new Date().toISOString(),
 ): CriticalClosure {
-  if (!note || !note.trim()) throw badRequest('处置记录不能为空');
+  if (!note?.trim()) throw badRequest('处置记录不能为空');
   ensureTransition(closureState(record), 'processed');
   return { ...record, processedAt: at, processedBy: doctorId, processedNote: note.trim() };
 }

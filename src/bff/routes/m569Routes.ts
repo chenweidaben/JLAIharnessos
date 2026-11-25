@@ -128,7 +128,7 @@ async function handleRefCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, fromDeptCode, toDeptCode, referralReason, triageLevel, referredBy } = body as Record<string, unknown>;
+  const { patientId, fromDeptCode, toDeptCode, referralReason, triageLevel, referredBy } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -217,7 +217,7 @@ async function handleRefComplete(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { treatmentSummary, dischargeDisposition } = body as Record<string, unknown>;
+  const { treatmentSummary, dischargeDisposition } = body;
   if (
     typeof treatmentSummary !== 'string' || !treatmentSummary.trim() ||
     typeof dischargeDisposition !== 'string' || !dischargeDisposition.trim()

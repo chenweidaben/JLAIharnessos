@@ -93,11 +93,11 @@ export interface RunChatTurnOptions {
 interface OpenAiMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string | null;
-  tool_calls?: Array<{
+  tool_calls?: {
     id: string;
     type: 'function';
     function: { name: string; arguments: string };
-  }>;
+  }[];
   tool_call_id?: string;
 }
 
@@ -108,10 +108,10 @@ interface OpenAiToolCallDelta {
 }
 
 interface OpenAiChunk {
-  choices?: Array<{
+  choices?: {
     delta?: { content?: string | null; tool_calls?: OpenAiToolCallDelta[] };
     finish_reason?: string | null;
-  }>;
+  }[];
 }
 
 interface PendingToolCall {
@@ -210,7 +210,7 @@ function buildToolContext(opts: RunChatTurnOptions, conversationId: string): Med
   const medicalUser: MedicalUser = {
     userId: opts.userId ?? 'u_anonymous',
     name: opts.userName ?? '临床医生',
-    role: 'doctor' as MedicalRole,
+    role: 'doctor',
     department: '内科',
     permissions: [],
     loginTime: Date.now(),
@@ -523,7 +523,7 @@ export async function runChatTurn(
     const assistantMsg = await appendMessage(conversationId, {
       role: 'assistant',
       content: first.text || null,
-      toolCalls: storedCalls as unknown as Array<Record<string, unknown>>,
+      toolCalls: storedCalls as unknown as Record<string, unknown>[],
     });
 
     // 6.2 组装回传给模型的 assistant + tool 消息

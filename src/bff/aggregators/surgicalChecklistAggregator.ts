@@ -55,7 +55,7 @@ export async function stageView(auth: AuthView, id: string, stage: 'signin' | 't
     timeoutComplete: stage === 'timeout' ? true : Boolean(candidate.timeoutComplete),
     signoutComplete: stage === 'signout' ? true : Boolean(candidate.signoutComplete),
   };
-  const state = toState(merged as Parameters<typeof toState>[0]);
+  const state = toState(merged);
   const status = missingItems(state).length === 0 && isPassed(state) ? 'passed' : 'failed';
   return updateStage(id, stage, input, status);
 }

@@ -41,7 +41,7 @@ export const assistantLabRoutes: RouteDef[] = [
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
-        const body = await c.body<InterpretBody>().catch(() => ({} as InterpretBody));
+        const body = await c.body<InterpretBody>().catch((): InterpretBody => ({}));
         const patientId = (body?.patientId ?? '').trim();
         const results = Array.isArray(body?.results) ? body.results : [];
         const prevResults = Array.isArray(body?.prevResults) ? body.prevResults : [];

@@ -60,7 +60,7 @@ export interface AdoptionRateResult {
   /** 拒绝率 = rejected / totalResolved；无已处置样本时为 null */
   rejectionRate: number | null;
   /** 按推荐类型分组的明细 */
-  byType: Array<{
+  byType: {
     suggestionType: string;
     total: number;
     adopted: number;
@@ -68,7 +68,7 @@ export interface AdoptionRateResult {
     rejected: number;
     pending: number;
     rate: number | null;
-  }>;
+  }[];
 }
 
 /**

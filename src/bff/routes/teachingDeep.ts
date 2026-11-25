@@ -63,7 +63,7 @@ async function handleExam(c: Ctx): Promise<Response> {
   if (denied) return denied;
 
   try {
-    const body = (await c.body<ExamBody>().catch(() => ({} as ExamBody))) ?? {};
+    const body = (await c.body<ExamBody>().catch((): ExamBody => ({}))) ?? {};
     if (!body.studentId || !body.courseId) {
       return json(
         fail(ErrorCode.BAD_REQUEST, 'studentId 与 courseId 均为必填', c.traceId),

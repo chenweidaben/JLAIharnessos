@@ -15,7 +15,7 @@ import {
 } from "../aggregators/emrIcdCodingV14Aggregator.js";
 
 /** 内存态编码记录集（演示用，生产环境应持久化） */
-const codingState: Map<string, IcdCodeSuggestionV14[]> = new Map();
+const codingState = new Map<string, IcdCodeSuggestionV14[]>();
 
 export const emrIcdCodingV14Routes: RouteDef[] = [
   {

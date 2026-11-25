@@ -286,7 +286,7 @@ export async function saveAssessment(auth: AuthView, body: SaveAssessmentInput) 
       break;
     }
     case 'nutrition': {
-      const r = nutritionRisk(body.answers as never);
+      const r = nutritionRisk(body.answers);
       riskAssessment = { nutrition: { score: r.score, highRisk: r.highRisk } };
       break;
     }

@@ -57,19 +57,19 @@ export function extractPresentIllnessTimeline(text: string): { onsetTime?: strin
   const events: string[] = [];
   let onsetTime: string | undefined;
   let durationDays: number | undefined;
-  const dayMatch = text.match(/(\d+)\s*天前/);
+  const dayMatch = /(\d+)\s*天前/.exec(text);
   if (dayMatch) {
     onsetTime = dayMatch[0];
     durationDays = Number(dayMatch[1]);
     events.push(dayMatch[0]);
   }
-  const weekMatch = text.match(/(\d+)\s*周前/);
+  const weekMatch = /(\d+)\s*周前/.exec(text);
   if (weekMatch) {
     onsetTime = onsetTime ?? weekMatch[0];
     durationDays = durationDays ?? Number(weekMatch[1]) * 7;
     events.push(weekMatch[0]);
   }
-  const monthMatch = text.match(/(\d+)\s*月前/);
+  const monthMatch = /(\d+)\s*月前/.exec(text);
   if (monthMatch) {
     onsetTime = onsetTime ?? monthMatch[0];
     durationDays = durationDays ?? Number(monthMatch[1]) * 30;
@@ -85,7 +85,7 @@ export function extractPresentIllnessTimeline(text: string): { onsetTime?: strin
  * @returns 诊断词数组
  */
 export function extractDiagnoses(text: string): string[] {
-  const match = text.match(/(?:初步诊断|入院诊断|诊断)[：:]\s*([^\n]+)/);
+  const match = /(?:初步诊断|入院诊断|诊断)[：:]\s*([^\n]+)/.exec(text);
   if (!match) return [];
   return match[1]
     .split(/[;；,，]/)
@@ -100,7 +100,7 @@ export function extractDiagnoses(text: string): string[] {
  * @returns 药名数组
  */
 export function extractMedications(text: string): string[] {
-  const match = text.match(/(?:用药|医嘱)[：:]\s*([^\n]+)/);
+  const match = /(?:用药|医嘱)[：:]\s*([^\n]+)/.exec(text);
   const source = match ? match[1] : text;
   return MEDICATION_KEYWORDS.filter((m) => source.includes(m));
 }
@@ -112,7 +112,7 @@ export function extractMedications(text: string): string[] {
  * @returns 手术操作词数组
  */
 export function extractProcedures(text: string): string[] {
-  const match = text.match(/(?:手术|操作)[：:]\s*([^\n]+)/);
+  const match = /(?:手术|操作)[：:]\s*([^\n]+)/.exec(text);
   const source = match ? match[1] : text;
   return PROCEDURE_KEYWORDS.filter((p) => source.includes(p));
 }

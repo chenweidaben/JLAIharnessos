@@ -104,7 +104,7 @@ async function handleMrqCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { recordId, deptCode, qualifierId, score, issues } = body as Record<string, unknown>;
+  const { recordId, deptCode, qualifierId, score, issues } = body;
 
   if (
     typeof recordId !== 'string' || !recordId.trim() ||

@@ -77,7 +77,7 @@ export interface DailyStatement {
   visitId: string;
   patientId: string;
   statementDate: string;     // yyyy-mm-dd
-  items: Array<{ name: string; amountCents: number }>;
+  items: { name: string; amountCents: number }[];
   totalCents: number;         // 累计费用（整数分）
   depositBalanceCents: number;
   pushedBy?: string;
@@ -292,7 +292,7 @@ export function assessDepositWarning(input: {
 export function settleDischarge(input: {
   visitId: string;
   operatorId: string;
-  items: Array<{ name: string; quantity: number; unitPriceCents: number }>;
+  items: { name: string; quantity: number; unitPriceCents: number }[];
   now?: number;
 }): SettlementRecord {
   const now = input.now ?? Date.now();
@@ -395,7 +395,7 @@ function todayStr(now: number): string {
 export function settleMid(input: {
   visitId: string;
   patientId: string;
-  items: Array<{ name: string; cents: number }>;
+  items: { name: string; cents: number }[];
   operatorId: string;
   operatorNote?: string;
   idempotencyKey?: string;

@@ -9,11 +9,11 @@ interface FhirMedicationAdministration {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'in-progress' | 'not-done' | 'on-hold' | 'completed' | 'cancelled' | 'entered-in-error' | 'stopped' | 'unknown';
-  medicationCodeableConcept: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  medicationCodeableConcept: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string; display: string };
   effectivePeriod: { start: string; end: string };
-  dosage: { text: string; route: { coding: Array<{ system: string; code: string; display: string }> } };
-  performer: Array<{ actor: { reference: string; display: string } }>;
+  dosage: { text: string; route: { coding: { system: string; code: string; display: string }[] } };
+  performer: { actor: { reference: string; display: string } }[];
 }
 
 const demoMedicationAdministrations: FhirMedicationAdministration[] = [

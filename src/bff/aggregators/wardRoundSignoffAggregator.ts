@@ -101,7 +101,7 @@ export function createNote(input: CreateNoteInput): SignoffNote {
   requireRoles(input.roles, ['resident']);
   if (!input.visitId) throw new WardRoundSignoffError(400, 'visitId 必填');
   if (!input.patientId) throw new WardRoundSignoffError(400, 'patientId 必填');
-  if (!input.content || !input.content.trim()) throw new WardRoundSignoffError(400, '病程内容 content 必填');
+  if (!input.content?.trim()) throw new WardRoundSignoffError(400, '病程内容 content 必填');
 
   // 行级绑定：visitId ↔ patientId（复用既有校验）
   assertVisitPatientBinding(input.visitId, input.patientId);

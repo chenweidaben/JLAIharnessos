@@ -118,7 +118,7 @@ async function handlePsychCreate(c: Ctx): Promise<Response> {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }
 
-  const inst = instrument as Instrument;
+  const inst = instrument;
   const expectedLen = INSTRUMENT_LENGTH[inst];
   if (answers.length !== expectedLen) {
     return json({ code: 400, message: 'invalid payload' }, 400);

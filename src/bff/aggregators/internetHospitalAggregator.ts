@@ -509,8 +509,8 @@ export function routePrescriptionToPharmacy(
 
   // 4) 选最近一家
   candidates.sort((a, b) => a.distanceKm - b.distanceKm);
-  const best = candidates[0]!.pharmacy;
-  const distanceKm = candidates[0]!.distanceKm;
+  const best = candidates[0].pharmacy;
+  const distanceKm = candidates[0].distanceKm;
 
   // 5) 配送方式：2km 内可到店自取，否则同城快递
   const channel: 'self_pick' | 'express' = distanceKm <= 2 ? 'self_pick' : 'express';
@@ -865,7 +865,7 @@ export function routePrescriptionSmart(
 
   // —— 麻精毒放：只能院部中心药房自取，禁快递 ——
   if (prescription.controlledSubstance) {
-    const hospital = pharmacies.find((p) => p.pharmacyId === 'ph-hospital') ?? pharmacies[0]!;
+    const hospital = pharmacies.find((p) => p.pharmacyId === 'ph-hospital') ?? pharmacies[0];
     const dist = roughDistanceKm(patientLocation, hospital);
     base.routed = true;
     base.pharmacyId = hospital.pharmacyId;
@@ -885,7 +885,7 @@ export function routePrescriptionSmart(
     .sort((a, b) => a.dist - b.dist);
 
   // 冷链优先选冷链 capable 的最近药房
-  let chosen = candidates[0]!;
+  let chosen = candidates[0];
   if (prescription.coldChain) {
     const cold = candidates.find((c) => c.p.coldChainCapable);
     if (cold) chosen = cold;
@@ -918,13 +918,13 @@ export interface JourneyStep {
 /** trackOnlinePatientJourney 输出 */
 export interface OnlinePatientJourney {
   patientId: string;
-  steps: Array<{
+  steps: {
     step: string;
     name: string;
     done: boolean;
     doneAt: string | null;
     note: string;
-  }>;
+  }[];
   /** 已完成节点数 */
   doneCount: number;
   /** 总节点数 */
@@ -936,7 +936,7 @@ export interface OnlinePatientJourney {
 }
 
 /** 标准七节点旅程定义 */
-const JOURNEY_DEFS: ReadonlyArray<{ step: string; name: string }> = [
+const JOURNEY_DEFS: readonly { step: string; name: string }[] = [
   { step: 'archive', name: '在线建档' },
   { step: 'consult', name: '在线问诊' },
   { step: 'prescribe', name: '复诊开方' },

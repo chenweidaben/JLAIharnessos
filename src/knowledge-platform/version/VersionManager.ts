@@ -42,7 +42,7 @@ export function scoreTerms(sourceId: string, entries: TermEntry[], requiredField
   for (const e of entries) {
     codeSeen.set(e.code, (codeSeen.get(e.code) ?? 0) + 1);
     for (const f of requiredFields) {
-      const value = f === 'name' ? e.name : f === 'code' ? e.code : (e.fields[f] as unknown);
+      const value = f === 'name' ? e.name : f === 'code' ? e.code : (e.fields[f]);
       if (value === undefined || value === null || value === '') {
         missingField++;
         break;

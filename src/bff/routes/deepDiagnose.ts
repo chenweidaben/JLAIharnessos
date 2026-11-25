@@ -46,7 +46,7 @@ export const deepDiagnoseRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<DeepDiagnoseBody>().catch(() => ({}))) as DeepDiagnoseBody;
+        const body = (await c.body<DeepDiagnoseBody>().catch((): DeepDiagnoseBody => ({}))) as DeepDiagnoseBody;
 
         const features: PatientFeatures = body?.features ?? {};
         const symptoms = Array.isArray(body?.symptoms) ? body.symptoms : [];

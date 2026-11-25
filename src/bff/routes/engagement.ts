@@ -158,13 +158,13 @@ export const engagementRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const out: Record<string, unknown> = {};
         if (Array.isArray(b.reports)) {
-          out.reports = (b.reports as Array<Record<string, unknown>>).map((r) => publishReport({
+          out.reports = (b.reports as Record<string, unknown>[]).map((r) => publishReport({
             patientId: String(r.patientId ?? ''), visitId: String(r.visitId ?? ''),
             type: r.type, title: String(r.title ?? ''), result: String(r.result ?? ''), isAbnormal: Boolean(r.isAbnormal),
           }));
         }
         if (Array.isArray(b.lowSatisfaction)) {
-          out.tickets = (b.lowSatisfaction as Array<Record<string, unknown>>).map((x) => autoCreateLowSatisfactionTicket(
+          out.tickets = (b.lowSatisfaction as Record<string, unknown>[]).map((x) => autoCreateLowSatisfactionTicket(
             String(x.patientId ?? ''), String(x.surveyId ?? ''), String(x.comment ?? ''),
           ));
         }

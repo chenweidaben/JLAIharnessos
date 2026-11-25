@@ -50,16 +50,16 @@ export const assistantRecordDraftRoutes: RouteDef[] = [
       const view = await requester(c);
       if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
-        const body = await c.body<DraftBody>().catch(() => ({} as DraftBody));
+        const body = await c.body<DraftBody>().catch((): DraftBody => ({}));
         const visitId = (body?.visitId ?? '').trim();
         if (!visitId) {
           return json(fail(ErrorCode.BAD_REQUEST, 'visitId 不能为空'), 400);
         }
         // 【AI能力升级】纯函数规则引擎：医师仅作为操作人记录日志，草稿不落库
-        const patientInfo = (body?.patientInfo ?? {}) as DraftPatientInfo;
-        const symptoms = Array.isArray(body?.symptoms) ? body!.symptoms!.map(String) : [];
-        const labs = Array.isArray(body?.labs) ? body!.labs! : [];
-        const diagnosis = Array.isArray(body?.diagnosis) ? body!.diagnosis!.map(String) : [];
+        const patientInfo = (body?.patientInfo ?? {});
+        const symptoms = Array.isArray(body?.symptoms) ? body.symptoms.map(String) : [];
+        const labs = Array.isArray(body?.labs) ? body.labs : [];
+        const diagnosis = Array.isArray(body?.diagnosis) ? body.diagnosis.map(String) : [];
         const data = generateMedicalRecordDraft(visitId, patientInfo, symptoms, labs, diagnosis);
         return json(ok(data));
       } catch (e) {

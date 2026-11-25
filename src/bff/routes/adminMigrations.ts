@@ -51,8 +51,8 @@ function sortSqlFiles(files: string[]): string[] {
   return files
     .filter((f) => f.endsWith('.sql'))
     .sort((a, b) => {
-      const numA = parseInt(a.match(/^(\d+)/)?.[1] ?? '0', 10);
-      const numB = parseInt(b.match(/^(\d+)/)?.[1] ?? '0', 10);
+      const numA = parseInt((/^(\d+)/.exec(a))?.[1] ?? '0', 10);
+      const numB = parseInt((/^(\d+)/.exec(b))?.[1] ?? '0', 10);
       if (numA !== numB) return numA - numB;
       return a.localeCompare(b);
     });

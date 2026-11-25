@@ -159,7 +159,7 @@ async function handleApptCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, doctorId, deptCode, appointmentDate, timeSlot, visitType, source } = body as Record<string, unknown>;
+  const { patientId, doctorId, deptCode, appointmentDate, timeSlot, visitType, source } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -220,7 +220,7 @@ async function handleApptCancel(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { cancelReason, cancelledBy } = body as Record<string, unknown>;
+  const { cancelReason, cancelledBy } = body;
   if (
     typeof cancelReason !== 'string' || !cancelReason.trim() ||
     typeof cancelledBy !== 'string' || !cancelledBy.trim()

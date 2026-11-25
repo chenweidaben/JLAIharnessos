@@ -204,7 +204,7 @@ interface FileBaseline {
   /** 分支覆盖率 0..1，默认随行覆盖率微降 */
   branchRate?: number;
   /** 函数段明细（仅重点文件给出） */
-  segments?: ReadonlyArray<Omit<SegmentCoverage, 'coveredLines' | 'lineRate' | 'hot'>>;
+  segments?: readonly Omit<SegmentCoverage, 'coveredLines' | 'lineRate' | 'hot'>[];
 }
 
 /**

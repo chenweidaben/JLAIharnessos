@@ -145,12 +145,12 @@ export interface SystemIntelligenceDashboard {
 }
 
 /** 指标元数据：键 → 中文名与对应的绝对阈值 */
-const METRIC_META: Array<{
+const METRIC_META: {
   key: MetricKey;
   name: string;
   warn: (t: IntelligenceThresholds) => number;
   crit: (t: IntelligenceThresholds) => number;
-}> = [
+}[] = [
   {
     key: 'llmSuccessRate',
     name: '大模型成功率',

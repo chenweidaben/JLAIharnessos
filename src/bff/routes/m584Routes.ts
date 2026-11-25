@@ -124,7 +124,7 @@ async function handleHrGenerate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { reportType, period } = body as Record<string, unknown>;
+  const { reportType, period } = body;
 
   if (typeof period !== 'string' || !period.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
@@ -173,7 +173,7 @@ async function handleHrSubmit(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { submittedBy, targetSystem } = body as Record<string, unknown>;
+  const { submittedBy, targetSystem } = body;
   if (
     typeof submittedBy !== 'string' || !submittedBy.trim() ||
     typeof targetSystem !== 'string' || !targetSystem.trim()

@@ -333,7 +333,7 @@ export function evaluateRules(
   rules?: readonly RuleDefinition[],
 ): DrgAuditResult {
   const out: DrgAuditResult = { riskLevel: 'low', hitCount: 0, blocked: false, hits: [] };
-  if (visit && visit.visitId) out.visitId = visit.visitId;
+  if (visit?.visitId) out.visitId = visit.visitId;
   if (!visit) return out;
 
   const enabled = enabledRuleCodes(rules);

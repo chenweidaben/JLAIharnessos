@@ -272,7 +272,7 @@ export function createLLMAdapter(config: LLMAdapterConfig = {}): LLMAdapter {
       }
       const data = (await resp.json()) as {
         model?: string;
-        choices?: Array<{ message?: { content?: string | null } }>;
+        choices?: { message?: { content?: string | null } }[];
         usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
       };
       const content = data.choices?.[0]?.message?.content ?? '';

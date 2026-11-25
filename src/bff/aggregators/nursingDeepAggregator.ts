@@ -370,7 +370,7 @@ export function identifyNursingRisk(ward: string, patients: RiskPatient[]): Nurs
  * 护理质量报告：基础/危重护理合格率 + 不良事件分级 + 培训 + 科研，
  * 质量出问题先查流程与人力，不先扣护士钱。
  */
-export function generateNursingQualityReport(period: string = '2026Q3'): NursingQualityReport {
+export function generateNursingQualityReport(period = '2026Q3'): NursingQualityReport {
   const trainings = TRAINING_LEDGER[period] ?? [];
   const sanji = trainings.filter((t, i) => i === 0)[0]; // 第一条=三基三严
   const specialty = trainings.filter((t, i) => i === 1)[0]; // 第二条=专科技能

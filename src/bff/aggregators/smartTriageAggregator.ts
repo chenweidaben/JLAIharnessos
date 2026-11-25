@@ -256,7 +256,7 @@ export interface SmartTriageResult {
  * 覆盖：急性冠脉综合征、呼吸衰竭、脑卒中、大出血、意识障碍、急性中毒、
  * 严重过敏/创伤、精神危机等危及生命的表现。
  */
-const RED_FLAG_KEYWORDS: ReadonlyArray<{ keyword: string; reason: string }> = [
+const RED_FLAG_KEYWORDS: readonly { keyword: string; reason: string }[] = [
   { keyword: '胸痛', reason: '急性冠脉综合征可能' },
   { keyword: '胸口压榨', reason: '急性冠脉综合征可能' },
   { keyword: '胸闷伴大汗', reason: '急性冠脉综合征可能' },
@@ -293,7 +293,7 @@ const RED_FLAG_KEYWORDS: ReadonlyArray<{ keyword: string; reason: string }> = [
 ];
 
 /** 非红旗症状 → 建议科室（确定性规则，数据中台维护）。 */
-const DEPT_RULES: ReadonlyArray<{ keywords: string[]; dept: string }> = [
+const DEPT_RULES: readonly { keywords: string[]; dept: string }[] = [
   { keywords: ['头痛', '头晕', '眩晕', '失眠', '肢体麻木'], dept: '神经内科' },
   { keywords: ['心慌', '心悸', '血压高', '高血压', '胸闷'], dept: '心血管内科' },
   { keywords: ['咳嗽', '咳痰', '发烧', '发热', '感冒', '咽痛'], dept: '呼吸内科' },
@@ -326,7 +326,7 @@ const LEVEL_ACTION: Record<TriageLevel, string> = {
 function normalizeDurationDays(input: number | string | undefined | null): number {
   if (input === undefined || input === null || input === '') return 0;
   if (typeof input === 'number' && Number.isFinite(input)) return Math.max(0, input);
-  const m = String(input).trim().match(/(\d+(?:\.\d+)?)\s*(小时|天|日|周|个月|月)?/);
+  const m = /(\d+(?:\.\d+)?)\s*(小时|天|日|周|个月|月)?/.exec(String(input).trim());
   if (!m) return 0;
   const value = parseFloat(m[1]);
   const unit = m[2];
@@ -457,7 +457,7 @@ export interface PatientHealthJourney {
   summary: string;
 }
 
-const JOURNEY_STAGE_DEFS: ReadonlyArray<{ key: string; title: string; description: string; nextAction: string }> = [
+const JOURNEY_STAGE_DEFS: readonly { key: string; title: string; description: string; nextAction: string }[] = [
   { key: 'intake', title: '健康建档', description: '建立电子健康档案，采集基础病史与家族史', nextAction: '完善基本信息与联系人' },
   { key: 'screening', title: '风险筛查', description: '慢病/肿瘤/心理风险筛查与指标评估', nextAction: '完成风险问卷与体检预约' },
   { key: 'diagnosis', title: '诊断评估', description: '专科检查、检验与鉴别诊断', nextAction: '携带报告复诊解读' },
@@ -535,7 +535,7 @@ export interface PatientNeedsPrediction {
 }
 
 /** 各阶段对应的典型患者需求（数据中台与AI大脑规则库）。 */
-const STAGE_NEEDS: Record<string, ReadonlyArray<Omit<PatientNeed, 'dueInDays'>>> = {
+const STAGE_NEEDS: Record<string, readonly Omit<PatientNeed, 'dueInDays'>[]> = {
   intake: [
     { type: 'appointment', priority: 'medium', title: '完善健康档案', detail: '补充既往病史、用药与过敏史，提升导诊准确度' },
     { type: 'education', priority: 'low', title: '就医须知宣教', detail: '了解门诊流程、医保报销与报告查询方式' },

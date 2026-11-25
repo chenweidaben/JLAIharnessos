@@ -30,7 +30,7 @@ export interface QcContext {
 export const COPY_PASTE_THRESHOLD = 80;
 
 /** 诊断方向与兼容用药关键词粗匹配字典（合成占位，不接真实药典） */
-const DIAGNOSIS_MEDICATION_MAP: ReadonlyArray<{ diagnosis: string; medications: string[] }> = [
+const DIAGNOSIS_MEDICATION_MAP: readonly { diagnosis: string; medications: string[] }[] = [
   { diagnosis: '高血压', medications: ['降压', '氨氯地平', '缬沙坦', '美托洛尔', '硝苯地平'] },
   { diagnosis: '糖尿病', medications: ['二甲双胍', '胰岛素', '降糖', '格列美脲', '瑞格列奈'] },
   { diagnosis: '冠心病', medications: ['阿司匹林', '他汀', '美托洛尔', '氯吡格雷'] },
@@ -156,7 +156,7 @@ function checkTimelineConsistency(
   const datePattern = /(\d{4})-(\d{2})-(\d{2})/;
   for (const section of [draft.presentIllness, draft.auxiliaryExams, draft.historyIllness]) {
     if (!section) continue;
-    const match = section.match(datePattern);
+    const match = datePattern.exec(section);
     if (!match) continue;
     const year = Number(match[1]);
     if (year < 1900 || year > new Date().getFullYear() + 1) {
@@ -234,7 +234,7 @@ function checkIcdDiagnosisMedicationMatch(draft: OutpatientRecordDraft, context:
 
 /** 4. 复制粘贴检测：跨章节 80 字以上重复片段检出 */
 function checkCopyPaste(draft: OutpatientRecordDraft): QcFinding[] {
-  const sections: Array<[string, string]> = [
+  const sections: [string, string][] = [
     ['主诉', draft.chiefComplaint],
     ['现病史', draft.presentIllness],
     ['既往史', draft.historyIllness],

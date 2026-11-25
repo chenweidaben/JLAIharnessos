@@ -137,7 +137,7 @@ async function handlePrCreate(c: Ctx): Promise<Response> {
   const {
     itemName, category, specification, estimatedQuantity, estimatedUnitPrice,
     budgetCode, requestDeptCode, requestedBy, requestedJustification,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof itemName !== 'string' || !itemName.trim() ||
@@ -197,7 +197,7 @@ async function handlePrApprove(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { approverId, approvalLevel, status, approvalNote } = body as Record<string, unknown>;
+  const { approverId, approvalLevel, status, approvalNote } = body;
   if (typeof approverId !== 'string' || !approverId.trim()) {
     return json({ code: 400, message: 'invalid payload' }, 400);
   }
@@ -213,10 +213,10 @@ async function handlePrApprove(c: Ctx): Promise<Response> {
     return json({ code: 400, message: 'requires_hospital_director_approval' }, 400);
   }
 
-  rec.status = status as PrStatus;
+  rec.status = status;
   rec.approverId = approverId.trim();
   rec.approvedAt = new Date().toISOString();
-  rec.approvalLevel = approvalLevel as ApprovalLevel;
+  rec.approvalLevel = approvalLevel;
   rec.approvalNote = typeof approvalNote === 'string' && approvalNote.trim() ? approvalNote.trim() : null;
   return json(ok(rec), 200);
 }
@@ -238,7 +238,7 @@ async function handlePrTender(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { tenderNo, tenderDate, VendorXSupplierId, contractAmount } = body as Record<string, unknown>;
+  const { tenderNo, tenderDate, VendorXSupplierId, contractAmount } = body;
   if (
     typeof tenderNo !== 'string' || !tenderNo.trim() ||
     typeof tenderDate !== 'string' || !tenderDate.trim() ||

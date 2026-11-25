@@ -255,7 +255,7 @@ export async function rejectSpecialView(
 ) {
   assertPermission(auth, 'ams:approve');
   assertUuid(approvalId, '审批单');
-  if (!reason || !reason.trim()) throw badRequest('驳回原因不能为空');
+  if (!reason?.trim()) throw badRequest('驳回原因不能为空');
   const existing = await getSpecialById(approvalId);
   if (!existing) throw notFound('特殊使用级审批单不存在');
   return withTx(async (tx) => {
@@ -477,7 +477,7 @@ export async function signReviewView(auth: AuthView, id: string, note: string) {
 export async function returnReviewView(auth: AuthView, id: string, note: string) {
   assertPermission(auth, 'ams:review');
   assertUuid(id, '点评');
-  if (!note || !note.trim()) throw badRequest('退回原因不能为空');
+  if (!note?.trim()) throw badRequest('退回原因不能为空');
   const review = await getReviewById(id);
   if (!review) throw notFound('点评记录不存在');
   return withTx(async (tx) => {

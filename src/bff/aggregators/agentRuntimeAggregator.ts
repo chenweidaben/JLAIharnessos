@@ -113,7 +113,7 @@ export async function startAgentRun(
   const versionRecord = body.version
     ? await getVersion(agentId, body.version)
     : await getLatestPublishedVersion(agentId);
-  if (!versionRecord || !versionRecord.published) {
+  if (!versionRecord?.published) {
     throw conflict(body.version ? `版本 ${body.version} 不存在或未发布` : '智能体尚无已发布版本');
   }
   const agentDef = versionRecord.definition as unknown as AgentDefinition;
@@ -137,7 +137,7 @@ export async function startAgentRun(
 
   // 装配确定性演示运行时（注册智能体声明的工具/知识库兜底）
   const { orchestrator, humanHandler } = buildDemoOrchestrator(agentDef);
-  orchestrator.registry.register(agentDef, versionRecord.prompts as Record<string, string>);
+  orchestrator.registry.register(agentDef, versionRecord.prompts);
 
   const wf = agentDef.workflows.find((w) => w.meta.id === agentDef.entryWorkflow);
   if (!wf) {
@@ -502,7 +502,7 @@ export async function resolveMyHumanTask(
 
   const handler = liveHumanHandlers.get(task.instanceId);
   let updated: HumanTaskRecord | null = null;
-  if (handler && handler.isLive(taskId)) {
+  if (handler?.isLive(taskId)) {
     // 工作流在本进程等待：持久化 + 解除内存挂起
     updated = await handler.resolveByDbTaskId(taskId, {
       approved: body.approved,
@@ -568,7 +568,7 @@ function buildDemoOrchestrator(agentDef: AgentDefinition): {
   }
 
   // 注册智能体声明的知识库：登记并加入一条演示文档
-  const rag = deps.rag as MockRagRetriever;
+  const rag = deps.rag;
   for (const kbName of agentDef.knowledgeBases ?? []) {
     rag.addKnowledgeBase(kbName);
     rag.addDoc({

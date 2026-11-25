@@ -68,7 +68,7 @@ async function buildInsightsView(): Promise<unknown> {
     ORDER BY insight_date DESC, metric_name
     LIMIT 50
   `;
-  const cards = (rows as Array<Record<string, unknown>>).map(mapRow);
+  const cards = (rows as Record<string, unknown>[]).map(mapRow);
   return { cards, total: cards.length };
 }
 

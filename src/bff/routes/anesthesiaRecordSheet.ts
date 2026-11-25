@@ -62,7 +62,7 @@ export const anesthesiaRecordSheetRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/anesthesia/records', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'ok' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { surgeryId?: string; vitals?: unknown; drugs?: unknown; fluidIn?: unknown; fluidOut?: unknown };
       return json(ok({
         demo: true,
@@ -79,7 +79,7 @@ export const anesthesiaRecordSheetRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/anesthesia/records/:id/sign', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'signed' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({
         demo: true,
         id: c.params.id,

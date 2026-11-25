@@ -77,7 +77,7 @@ export class SkillOrchestratorAdapter {
     return this.registry
       .list({ tenantId, enabledOnly: true })
       .filter((s) => s.manifest.triggers?.schedule)
-      .map((s) => ({ skill: s, cron: s.manifest.triggers!.schedule! }));
+      .map((s) => ({ skill: s, cron: s.manifest.triggers.schedule! }));
   }
 }
 

@@ -73,7 +73,7 @@ async function handleSimulate(c: Ctx): Promise<Response> {
   if (denied) return denied;
 
   try {
-    const body = (await c.body<SimulateBody>().catch(() => ({} as SimulateBody))) ?? {};
+    const body = (await c.body<SimulateBody>().catch((): SimulateBody => ({}))) ?? {};
 
     const scenario: DeepFlowScenario = FLOW_SCENARIOS.includes(
       body.scenario as DeepFlowScenario,

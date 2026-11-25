@@ -9,9 +9,9 @@ interface FhirMedication {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'active' | 'inactive' | 'entered-in-error' | 'unknown';
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
-  form?: { coding: Array<{ system: string; code: string; display: string }>; text: string };
-  ingredient?: Array<{ itemCodeableConcept: { coding: Array<{ system: string; code: string; display: string }>; text: string }; strength?: { value: number; unit: string; system: string; code: string } }>;
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
+  form?: { coding: { system: string; code: string; display: string }[]; text: string };
+  ingredient?: { itemCodeableConcept: { coding: { system: string; code: string; display: string }[]; text: string }; strength?: { value: number; unit: string; system: string; code: string } }[];
 }
 
 const demoMedications: FhirMedication[] = [

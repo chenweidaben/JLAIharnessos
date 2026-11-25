@@ -72,7 +72,7 @@ export async function submitMetric(input: SubmitInput): Promise<AmMetric> {
       prophylaxis_reasonable = EXCLUDED.prophylaxis_reasonable,
       submitted_by = EXCLUDED.submitted_by
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByMonth(month: string): Promise<AmMetric[]> {

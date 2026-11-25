@@ -6,8 +6,8 @@ export class DiagnosisError extends Error {
 }
 
 // 本地规则匹配（确定性）
-function matchDiagnoses(chiefComplaint: string, symptoms: string[]): Array<{diagnosis: string; confidence: number; icd10: string}> {
-  const results: Array<{diagnosis: string; confidence: number; icd10: string}> = [];
+function matchDiagnoses(chiefComplaint: string, symptoms: string[]): {diagnosis: string; confidence: number; icd10: string}[] {
+  const results: {diagnosis: string; confidence: number; icd10: string}[] = [];
   const text = (chiefComplaint + ' ' + symptoms.join(' ')).toLowerCase();
 
   if (text.includes('胸痛') || text.includes('chest pain')) {
@@ -190,9 +190,9 @@ interface DiagnosisRule {
   icd10: string;
   /** 先验基础分（须叠加至少一条命中才有资格入选） */
   base: number;
-  symptomHits: Array<{ kw: string; weight: number; label: string }>;
-  labHits: Array<{ marker: string; direction: 'high' | 'low'; weight: number; label: string }>;
-  historyHits: Array<{ kw: string; weight: number }>;
+  symptomHits: { kw: string; weight: number; label: string }[];
+  labHits: { marker: string; direction: 'high' | 'low'; weight: number; label: string }[];
+  historyHits: { kw: string; weight: number }[];
   exams: string[];
 }
 

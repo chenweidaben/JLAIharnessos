@@ -232,7 +232,7 @@ export function buildAdminMuse(
   // 逐条清洗 + 解析生效度量
   const rows = clean.map((d, idx) => {
     const own = toMetric(d.resultMetric);
-    const effective = measured.has(d.id) ? (measured.get(d.id) as number) : own;
+    const effective = measured.has(d.id) ? (measured.get(d.id)!) : own;
     const outcome = normalizeOutcome(d.outcome);
     const metric = effective ?? 0;
     return {

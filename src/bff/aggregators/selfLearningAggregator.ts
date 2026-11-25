@@ -341,7 +341,7 @@ export function getSelfLearningLog(
       rejectedCount: r.rejectedCount,
       adoptedRate: r.adoptedRate,
       adjustmentRatio: r.adjustmentRatio,
-      status: (r.status === 'held' ? 'held' : 'applied') as LogEntry['status'],
+      status: r.status === 'held' ? ('held' as const) : ('applied' as const),
       createdAt: r.createdAt,
     }))
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));

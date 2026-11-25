@@ -267,20 +267,20 @@ export const CHANNEL_LABEL: Readonly<Record<SatisfactionChannel, string>> = {
 };
 
 /** 正面情感词典 */
-const POSITIVE_LEXICON: ReadonlyArray<string> = [
+const POSITIVE_LEXICON: readonly string[] = [
   '满意', '谢谢', '感谢', '周到', '耐心', '清楚', '专业', '赞', '不错', '贴心',
   '认真', '负责', '热情', '温暖', '好评', '舒服', '放心', '顺利', '快', '整洁',
 ];
 
 /** 负面情感词典 */
-const NEGATIVE_LEXICON: ReadonlyArray<string> = [
+const NEGATIVE_LEXICON: readonly string[] = [
   '差', '慢', '久', '贵', '乱', '脏', '吵', '挤', '疼', '痛',
   '排队', '等待', '不耐烦', '冷漠', '敷衍', '态度', '投诉', '失望', '恼火', '生气',
   '跑断腿', '麻烦', '繁琐', '反复', '不清', '不懂', '没人管', '不作为',
 ];
 
 /** 问题类别词典（与 M165-C 对齐） */
-const CATEGORY_LEXICON: ReadonlyArray<{ category: string; label: string; keywords: string[] }> = [
+const CATEGORY_LEXICON: readonly { category: string; label: string; keywords: string[] }[] = [
   { category: 'wait_time', label: '等待/排队', keywords: ['排队', '等待', '候诊', '太久', '半天', '等了', '等很久', '排长队', '人太多', '慢'] },
   { category: 'staff_attitude', label: '医护态度', keywords: ['态度差', '态度恶劣', '不耐烦', '冷漠', '敷衍', '甩脸', '态度不好', '说话难听', '凶'] },
   { category: 'cost', label: '费用透明度', keywords: ['贵', '乱收费', '收费高', '费用高', '报销难', '发票', '隐形消费', '不合理收费'] },
@@ -468,8 +468,8 @@ export function analyzeFiveWhy(input: {
  * @param pdcaActions 已入库的 PDCA 改进事项
  */
 export function buildDeepSatisfactionLoop(
-  signals: ReadonlyArray<DeepSatisfactionSignal>,
-  pdcaActions?: ReadonlyArray<PdcaAction>,
+  signals: readonly DeepSatisfactionSignal[],
+  pdcaActions?: readonly PdcaAction[],
 ): DeepSatisfactionLoop {
   const list = (signals ?? []).slice();
 
@@ -569,7 +569,7 @@ export function buildDeepSatisfactionLoop(
  */
 export function analyzeSatisfactionTrend(
   dept: string,
-  series: ReadonlyArray<TrendPoint>,
+  series: readonly TrendPoint[],
 ): SatisfactionTrend {
   const points = (series ?? []).slice().sort((a, b) => a.period.localeCompare(b.period));
   if (points.length === 0) {
@@ -619,10 +619,10 @@ export function analyzeSatisfactionTrend(
  */
 export function benchmarkSatisfaction(
   self: SelfBenchmark,
-  peers: ReadonlyArray<PeerBenchmark>,
+  peers: readonly PeerBenchmark[],
 ): SatisfactionBenchmark {
   // 把 self 与 peers 放一起按均分排序，求位次
-  const all: Array<{ name: string; avgScore: number; negativeRatio: number; nps: number; isSelf: boolean }> = [
+  const all: { name: string; avgScore: number; negativeRatio: number; nps: number; isSelf: boolean }[] = [
     { name: self.dept, avgScore: self.avgScore, negativeRatio: self.negativeRatio, nps: self.nps, isSelf: true },
     ...peers.map((p) => ({ ...p, isSelf: false })),
   ];
@@ -658,7 +658,7 @@ export function benchmarkSatisfaction(
  */
 export function generatePatientVoiceReport(
   period: string,
-  signals: ReadonlyArray<DeepSatisfactionSignal>,
+  signals: readonly DeepSatisfactionSignal[],
 ): PatientVoiceReport {
   const list = (signals ?? []).slice();
 

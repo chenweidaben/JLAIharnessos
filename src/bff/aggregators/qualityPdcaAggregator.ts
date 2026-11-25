@@ -69,7 +69,7 @@ export interface PDCAProject {
   doRecords: PDCAFlowRecord[];
   check: { before: MetricSample; after: MetricSample } | null;
   act: { standardized: string[]; carryover: string };
-  phaseHistory: Array<{ phase: PDCAPhase; enteredAt: string; note?: string }>;
+  phaseHistory: { phase: PDCAPhase; enteredAt: string; note?: string }[];
   /** Act 完成且无遗留问题时闭环 */
   closed: boolean;
   createdAt: string;
@@ -150,10 +150,10 @@ export function createPDCAProject(
   target: PDCAQuantTarget,
   opts?: { id?: string; now?: string },
 ): PDCAProject {
-  if (!name || !name.trim()) throw new PdcaError(400, '项目名称不能为空');
-  if (!dept || !dept.trim()) throw new PdcaError(400, '责任科室不能为空');
-  if (!leader || !leader.trim()) throw new PdcaError(400, '项目负责人不能为空');
-  if (!target || !target.metric) throw new PdcaError(400, '量化目标缺少指标名');
+  if (!name?.trim()) throw new PdcaError(400, '项目名称不能为空');
+  if (!dept?.trim()) throw new PdcaError(400, '责任科室不能为空');
+  if (!leader?.trim()) throw new PdcaError(400, '项目负责人不能为空');
+  if (!target?.metric) throw new PdcaError(400, '量化目标缺少指标名');
   assertFiniteNum(target.baseline, '基线值');
   assertFiniteNum(target.goal, '目标值');
   if (target.direction !== 'lower_better' && target.direction !== 'higher_better') {

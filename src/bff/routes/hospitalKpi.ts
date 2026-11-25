@@ -81,7 +81,7 @@ function demoPrevObservations(): KpiObservations {
 }
 
 /** 从 DB 行归一为观测映射 { kpi_code: actual_value } */
-function rowsToObservations(rows: Array<Record<string, unknown>>): KpiObservations {
+function rowsToObservations(rows: Record<string, unknown>[]): KpiObservations {
   const obs: KpiObservations = {};
   for (const r of rows) {
     const code = String(r.kpiCode ?? '');
@@ -122,7 +122,7 @@ async function handleHospitalKpi(c: Ctx): Promise<Response> {
         SELECT kpi_code AS "kpiCode", actual_value AS "actualValue"
         FROM medmuse.hospital_kpi
         WHERE hospital_id = ${hospitalId} AND period = ${period}
-      `) as unknown as Array<Record<string, unknown>>;
+      `) as unknown as Record<string, unknown>[];
       currentObs = rowsToObservations(dbRows);
       usingDemo = Object.keys(currentObs).length === 0;
       if (usingDemo) currentObs = demoObservations();
@@ -143,7 +143,7 @@ async function handleHospitalKpi(c: Ctx): Promise<Response> {
           SELECT kpi_code AS "kpiCode", actual_value AS "actualValue"
           FROM medmuse.hospital_kpi
           WHERE hospital_id = ${hospitalId} AND period = ${prevPeriodRaw}
-        `) as unknown as Array<Record<string, unknown>>;
+        `) as unknown as Record<string, unknown>[];
         prevObs = rowsToObservations(prevRows);
       }
       const prevResults = calculateHospitalKPI(prevPeriodRaw, prevObs);

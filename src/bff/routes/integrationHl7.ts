@@ -89,7 +89,7 @@ export const integrationHl7Routes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<ParseBody>().catch(() => ({} as ParseBody))) ?? {};
+        const body = (await c.body<ParseBody>().catch((): ParseBody => ({}))) ?? {};
         const rawMessage = typeof body.rawMessage === 'string' ? body.rawMessage : '';
         if (!rawMessage.trim()) {
           return json(fail(ErrorCode.BAD_REQUEST, 'rawMessage 不能为空'), 400);
@@ -124,7 +124,7 @@ export const integrationHl7Routes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       try {
-        const body = (await c.body<BuildBody>().catch(() => ({} as BuildBody))) ?? {};
+        const body = (await c.body<BuildBody>().catch((): BuildBody => ({}))) ?? {};
         const resourceType = body.resourceType;
         if (!resourceType || !FHIR_R4_SCHEMAS[resourceType]) {
           return json(
@@ -132,10 +132,10 @@ export const integrationHl7Routes: RouteDef[] = [
             400,
           );
         }
-        const data = (body.data ?? {}) as Record<string, unknown>;
+        const data = (body.data ?? {});
 
         // 纯函数装配 FHIR R4 资源
-        const resource = buildFHIRResource(resourceType, data as never) as FHIRResource;
+        const resource = buildFHIRResource(resourceType, data);
 
         // 可选：按标准 schema 校验
         const validation = body.validate === false

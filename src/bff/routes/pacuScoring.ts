@@ -32,7 +32,7 @@ export const pacuScoringRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/pacu/:visitId', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.visitId, status: 'ok' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       const b = body as { consciousness?: number; breathing?: number; movement?: number };
       if (!inStewardRange(b.consciousness) || !inStewardRange(b.breathing) || !inStewardRange(b.movement)) {
         return json(fail(ErrorCode.BAD_REQUEST, 'consciousness/breathing/movement 各须为 0-2'), 400);

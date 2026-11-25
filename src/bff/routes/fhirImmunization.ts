@@ -9,13 +9,13 @@ interface FhirImmunization {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'completed' | 'entered-in-error' | 'not-done';
-  vaccineCode: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  vaccineCode: { coding: { system: string; code: string; display: string }[]; text: string };
   patient: { reference: string };
   encounter?: { reference: string };
   occurrenceDateTime: string;
   lotNumber?: string;
-  site?: { coding: Array<{ system: string; code: string; display: string }>; text: string };
-  performer?: Array<{ actor: { reference: string; display?: string } }>;
+  site?: { coding: { system: string; code: string; display: string }[]; text: string };
+  performer?: { actor: { reference: string; display?: string } }[];
 }
 
 const demoImmunizations: FhirImmunization[] = [

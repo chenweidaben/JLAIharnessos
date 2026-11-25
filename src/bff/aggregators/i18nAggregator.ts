@@ -185,10 +185,10 @@ function lookup(key: string, locale: string): string | null {
   seedI18n();
   const target = normalize(locale);
   const targetMap = registry.get(target);
-  if (targetMap && targetMap.has(key)) return targetMap.get(key) as string;
+  if (targetMap?.has(key)) return targetMap.get(key)!;
   if (target !== DEFAULT_LOCALE) {
     const defMap = registry.get(DEFAULT_LOCALE);
-    if (defMap && defMap.has(key)) return defMap.get(key) as string;
+    if (defMap?.has(key)) return defMap.get(key)!;
   }
   return null;
 }
@@ -260,7 +260,7 @@ export function autoTranslate(key: string, sourceLocale: string, targetLocale: s
   // 长短语优先替换，避免子串抢先命中
   const phrases = Array.from(rules.keys()).sort((a, b) => b.length - a.length);
   for (const phrase of phrases) {
-    out = out.split(phrase).join(rules.get(phrase) as string);
+    out = out.split(phrase).join(rules.get(phrase));
   }
   return out;
 }

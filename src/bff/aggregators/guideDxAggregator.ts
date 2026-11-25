@@ -127,7 +127,7 @@ export interface TreatmentCheck {
   /** 指南要求的一线治疗/必选药物 */
   requiredFirstLine: string[];
   /** 问题清单 */
-  issues: Array<{ level: 'error' | 'warning' | 'info'; message: string }>;
+  issues: { level: 'error' | 'warning' | 'info'; message: string }[];
   /** 符合度评分 0~100 */
   score: number;
 }
@@ -412,8 +412,8 @@ function assessChd(symText: string, history: GuideHistoryInput, lab: GuideLabRes
 
   const typicalChestPain = /胸痛|胸闷/.test(symText) && /压榨|放射|活动|硝酸|持续/.test(symText);
   const riskFactors =
-    (/高血压/.test(histText) ? 1 : 0) +
-    (/糖尿病/.test(histText) ? 1 : 0) +
+    (histText.includes('高血压') ? 1 : 0) +
+    (histText.includes('糖尿病') ? 1 : 0) +
     (/高血脂|血脂异常/.test(histText) ? 1 : 0) +
     (history.smoking ? 1 : 0);
 
@@ -669,7 +669,7 @@ export function deviationFromGuideline(
   const actualText = actual.join(' ').toLowerCase();
 
   // 指南要求但实际缺失的关键项（按病种挑"必选"核心）
-  const mustHaves: Array<{ kw: string; label: string }> = [];
+  const mustHaves: { kw: string; label: string }[] = [];
   if (key === 'hypertension') {
     mustHaves.push({ kw: '生活方式', label: '生活方式干预' });
     mustHaves.push({ kw: '氨氯地平|缬沙坦|氯沙坦|厄贝沙坦|普利|ACEI|ARB|噻嗪|吲达帕胺|利尿剂|CCB', label: '指南推荐降压药' });
@@ -697,7 +697,7 @@ export function deviationFromGuideline(
   }
 
   // 实际治疗里超指南/需警惕的项（简单黑名单：明确不推荐用于该病种）
-  const blacklist: Array<{ kw: string; reason: string }> = [];
+  const blacklist: { kw: string; reason: string }[] = [];
   if (key === 'pneumonia') {
     blacklist.push({ kw: '莫西沙星.*氨基糖苷', reason: 'CAP 不推荐常规联合氨基糖苷类（耳肾毒性，非必要）' });
   }

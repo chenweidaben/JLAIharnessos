@@ -126,7 +126,7 @@ export interface MedicationLearningResult {
   /** 错误率 [0,1] */
   wrongRate: number;
   /** 不合理类型分布 */
-  issueBreakdown: Array<{ issueType: NonNullable<MedicationReviewSample['issueType']>; count: number }>;
+  issueBreakdown: { issueType: NonNullable<MedicationReviewSample['issueType']>; count: number }[];
   action: string;
 }
 
@@ -574,7 +574,7 @@ export function crossValidateLearning(
     /** 训练集准确率（用于过拟合判定，可选） */
     trainAccuracy?: number;
   },
-  testData: Array<{ modelPredicted: boolean; actual: boolean }>,
+  testData: { modelPredicted: boolean; actual: boolean }[],
 ): CrossValidationResult {
   let tp = 0;
   let fp = 0;
@@ -676,7 +676,7 @@ export function generateEvolutionReport(period: DeepPeriod): EvolutionReport {
 
   /* 成熟度评分 */
   let evolutionScore = 0;
-  const dims: Array<{ samples: number; metric: number }> = [
+  const dims: { samples: number; metric: number }[] = [
     { samples: learning.diagnosis.samples, metric: learning.diagnosis.accuracy },
     { samples: learning.medication.samples, metric: learning.medication.appropriateRate },
     { samples: learning.nursing.samples, metric: learning.nursing.sensitivity },

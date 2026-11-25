@@ -572,10 +572,10 @@ export function searchMedicalKnowledge(query: string, topK = 5): KnowledgeEntry[
 export function generateCitation(source: Partial<Citation> | null | undefined): Citation {
   const s = source ?? {};
   return {
-    sourceType: (s.sourceType as CitationSourceType) ?? 'textbook',
+    sourceType: (s.sourceType!) ?? 'textbook',
     title: typeof s.title === 'string' && s.title.trim() ? s.title.trim() : '未注明出处',
     publisher: typeof s.publisher === 'string' && s.publisher.trim() ? s.publisher.trim() : '未注明出版方',
-    year: Number.isFinite(s.year) && (s.year as number) > 1900 ? Math.floor(s.year as number) : new Date().getFullYear(),
+    year: Number.isFinite(s.year) && (s.year!) > 1900 ? Math.floor(s.year!) : new Date().getFullYear(),
     edition: s.edition ? String(s.edition) : undefined,
     url: s.url ? String(s.url) : undefined,
   };

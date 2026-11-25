@@ -286,7 +286,7 @@ export function validateKnowledgeBaseMeta(meta: unknown): string[] {
   if (!KNOWLEDGE_DOMAINS.includes(m.domain as KnowledgeDomain))
     errors.push(`[${KB_ERROR_VALIDATION}] domain 必须为六知识域之一：${KNOWLEDGE_DOMAINS.join(' / ')}`);
   if (!isStringArray(m.tags)) errors.push(`[${KB_ERROR_VALIDATION}] tags 必须为字符串数组`);
-  if (!isStringArray(m.specialty) || (m.specialty as string[]).length === 0)
+  if (!isStringArray(m.specialty) || (m.specialty).length === 0)
     errors.push(`[${KB_ERROR_VALIDATION}] specialty 必须为非空专科标签数组`);
   if (m.patientScope !== 'none')
     errors.push(`[${KB_ERROR_PATIENT_SCOPE}] patientScope 必须固定为 'none'，患者级索引归 S-13 独立建模`);
@@ -294,7 +294,7 @@ export function validateKnowledgeBaseMeta(meta: unknown): string[] {
     errors.push(`[${KB_ERROR_VALIDATION}] status 必须为知识状态机合法状态`);
   if (typeof m.reviewCycleMonths !== 'number' || m.reviewCycleMonths < 1)
     errors.push(`[${KB_ERROR_VALIDATION}] reviewCycleMonths 必须为不小于 1 的数值`);
-  if (m.status === 'approved' && (!isNonEmptyString(m.approver as string) || !isNonEmptyString(m.approvedAt as string)))
+  if (m.status === 'approved' && (!isNonEmptyString(m.approver) || !isNonEmptyString(m.approvedAt)))
     errors.push(`[${KB_ERROR_VALIDATION}] approved 状态知识库必须有 approver 与 approvedAt`);
 
   return errors;
@@ -317,27 +317,27 @@ export function validateKnowledgeEntry(entry: unknown, lookupBaseOwnerDepartment
   // 六要素逐项拦截
   const origin = e.origin as Record<string, unknown> | undefined;
   // 1. 来源：sourceId / sourceName / fetchedAt
-  if (!origin || !isNonEmptyString(origin.sourceId as string))
+  if (!origin || !isNonEmptyString(origin.sourceId))
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「来源」：origin.sourceId 必填`);
-  if (!origin || !isNonEmptyString(origin.sourceName as string))
+  if (!origin || !isNonEmptyString(origin.sourceName))
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「来源」：origin.sourceName 必填`);
-  if (!origin || !isNonEmptyString(origin.fetchedAt as string))
+  if (!origin || !isNonEmptyString(origin.fetchedAt))
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「来源」：origin.fetchedAt 必填`);
   // 2. 章节：sectionTitle
-  if (!isNonEmptyString(e.sectionTitle as string))
+  if (!isNonEmptyString(e.sectionTitle))
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「章节」：sectionTitle 必填`);
   // 3. 机构：origin.publisher 或归属科室（知识库 ownerDepartment）二选一
   const publisher = origin?.publisher;
   const departmentOk = isNonEmptyString(lookupBaseOwnerDepartment);
-  if (!isNonEmptyString(publisher as string) && !departmentOk)
+  if (!isNonEmptyString(publisher) && !departmentOk)
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「机构」：origin.publisher 或知识库 ownerDepartment 必填`);
   // 4. 生效日期：effectiveDate
-  if (!isNonEmptyString(e.effectiveDate as string))
+  if (!isNonEmptyString(e.effectiveDate))
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「生效日期」：effectiveDate 必填`);
-  else if (Number.isNaN(Date.parse(e.effectiveDate as string)))
+  else if (Number.isNaN(Date.parse(e.effectiveDate)))
     errors.push(`[${KB_ERROR_VALIDATION}] effectiveDate 必须为合法 ISO8601 日期`);
   // 5. 专科：specialty 非空数组
-  if (!isStringArray(e.specialty) || (e.specialty as string[]).length === 0)
+  if (!isStringArray(e.specialty) || (e.specialty).length === 0)
     errors.push(`[${KB_ERROR_MISSING_ELEMENT}] 六要素缺失「专科」：specialty 必须为非空数组`);
   // 6. 密级：securityLevel 枚举
   if (!SECURITY_LEVELS.includes(e.securityLevel as SecurityLevel))
@@ -345,11 +345,11 @@ export function validateKnowledgeEntry(entry: unknown, lookupBaseOwnerDepartment
 
   // 其余结构必填
   for (const field of ['id', 'knowledgeBaseId', 'title', 'owner', 'content', 'versionRef'] as const) {
-    if (!isNonEmptyString(e[field] as string)) errors.push(`[${KB_ERROR_VALIDATION}] 条目 ${field} 必须为非空字符串`);
+    if (!isNonEmptyString(e[field])) errors.push(`[${KB_ERROR_VALIDATION}] 条目 ${field} 必须为非空字符串`);
   }
   if (!KNOWLEDGE_STATUSES.includes(e.status as KnowledgeStatus))
     errors.push(`[${KB_ERROR_VALIDATION}] status 必须为知识状态机合法状态`);
-  if (e.status === 'approved' && (!isNonEmptyString(e.approver as string) || !isNonEmptyString(e.approvedAt as string)))
+  if (e.status === 'approved' && (!isNonEmptyString(e.approver) || !isNonEmptyString(e.approvedAt)))
     errors.push(`[${KB_ERROR_VALIDATION}] approved 状态条目必须有 approver 与 approvedAt`);
 
   return errors;

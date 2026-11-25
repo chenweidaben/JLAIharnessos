@@ -46,7 +46,7 @@ const CHUNK_SIZE = 8;
 /** 请求体 */
 interface AssistantLlmChatBody {
   message?: string;
-  history?: Array<{ role?: string; content?: string }>;
+  history?: { role?: string; content?: string }[];
   provider?: string;
   patientSummary?: string;
   deptCode?: string;

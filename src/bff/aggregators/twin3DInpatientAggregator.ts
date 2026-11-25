@@ -361,7 +361,7 @@ function deriveLoadLevel(seed: NurseStationSeed): NurseStationLoad['loadLevel'] 
  *
  * 纯函数：相同入参必得相同布局（generatedAt 为调用时刻，不参与布局逻辑）。
  */
-export function buildTwin3DInpatient(buildingId: string = 'inpatient'): InpatientTwin {
+export function buildTwin3DInpatient(buildingId = 'inpatient'): InpatientTwin {
   // 试点边界：入参楼宇名不影响模型——v5.0 先住院试点，不做全院重建
   void buildingId;
 
@@ -369,7 +369,7 @@ export function buildTwin3DInpatient(buildingId: string = 'inpatient'): Inpatien
     const rooms: InpatientRoom3D[] = INPATIENT_BUILDING.rooms
       .filter((r) => roomBelongsToInpatientFloor(r, f.floor))
       .map((r) => buildInpatientRoom(f, r));
-    const nsSeed = INPATIENT_BUILDING.nurseStations.find((n) => n.floor === f.floor) as NurseStationSeed;
+    const nsSeed = INPATIENT_BUILDING.nurseStations.find((n) => n.floor === f.floor)!;
     const nurseStation: NurseStationLoad = {
       stationId: nsSeed.stationId,
       stationName: nsSeed.stationName,

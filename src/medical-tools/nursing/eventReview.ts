@@ -35,9 +35,9 @@ export interface FallReviewInput {
 export function missingFallReviewFields(input: FallReviewInput): string[] {
   const missing: string[] = [];
   if (!input.occurredAt) missing.push('occurredAt');
-  if (!input.location || !input.location.trim()) missing.push('location');
-  if (!input.circumstances || !input.circumstances.trim()) missing.push('circumstances');
-  if (!input.injuries || !input.injuries.trim()) missing.push('injuries');
+  if (!input.location?.trim()) missing.push('location');
+  if (!input.circumstances?.trim()) missing.push('circumstances');
+  if (!input.injuries?.trim()) missing.push('injuries');
   if (input.familyNotified === undefined || input.familyNotified === null) missing.push('familyNotified');
   return missing;
 }

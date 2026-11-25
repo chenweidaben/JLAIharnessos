@@ -652,11 +652,11 @@ export function getI18nTranslation(
   const target = normalizeLocale(locale);
   const targetMap = registry.get(target);
   let raw: string | undefined;
-  if (targetMap && targetMap.has(key)) {
+  if (targetMap?.has(key)) {
     raw = targetMap.get(key);
   } else if (target !== DEEP_DEFAULT_LOCALE) {
     const defMap = registry.get(DEEP_DEFAULT_LOCALE);
-    if (defMap && defMap.has(key)) raw = defMap.get(key);
+    if (defMap?.has(key)) raw = defMap.get(key);
   }
   if (raw === undefined) return key;
   return interpolate(raw, params);
@@ -682,8 +682,8 @@ export function autoTranslateBatch(
 
   const out: TranslatedMap = {};
   for (const key of keys) {
-    if (tgtMap && tgtMap.has(key)) {
-      out[key] = tgtMap.get(key) as string;
+    if (tgtMap?.has(key)) {
+      out[key] = tgtMap.get(key)!;
       continue;
     }
     const srcText = srcMap?.get(key);

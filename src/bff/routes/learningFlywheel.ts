@@ -70,13 +70,13 @@ export const learningFlywheelRoutes: RouteDef[] = [
             GROUP BY DATE(recommended_at)
             ORDER BY date ASC
           `;
-          points = (rows as unknown as Array<{
+          points = (rows as unknown as {
             date: string;
             recommendations: number;
             adopted: number;
             rejected: number;
             knowledge_accumulated: number;
-          }>).map((r) => ({
+          }[]).map((r) => ({
             date: String(r.date),
             recommendations: Number(r.recommendations),
             adopted: Number(r.adopted),

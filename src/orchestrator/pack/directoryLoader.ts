@@ -84,7 +84,7 @@ export async function loadAgentPackageFromDir(dir: string): Promise<LoadedAgentD
 async function loadCatalogIds(rootDir: string): Promise<Set<string> | null> {
   try {
     const text = await readFile(join(rootDir, 'manifest.json'), 'utf8');
-    const manifest = JSON.parse(text) as { agents?: Array<{ id: string }> };
+    const manifest = JSON.parse(text) as { agents?: { id: string }[] };
     return new Set((manifest.agents ?? []).map((agent) => agent.id));
   } catch {
     return null;

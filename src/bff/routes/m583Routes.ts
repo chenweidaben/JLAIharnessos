@@ -46,7 +46,7 @@ function seedDm(): void {
   const now = Date.now();
   const iso = (offsetMin: number): string => new Date(now - offsetMin * 60_000).toISOString();
 
-  const seeds: Array<{ dictType: DictType; localCode: string; localName: string; nationalCode: string; nationalName: string }> = [];
+  const seeds: { dictType: DictType; localCode: string; localName: string; nationalCode: string; nationalName: string }[] = [];
   for (let i = 1; i <= 10; i++) {
     seeds.push({ dictType: 'dept', localCode: `DEP-${String(i).padStart(3, '0')}`, localName: `本地科室${i}`, nationalCode: `50.${i}`, nationalName: `国家科室${i}` });
   }
@@ -115,7 +115,7 @@ async function handleDmCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { dictType, localCode, localName, nationalCode, nationalName } = body as Record<string, unknown>;
+  const { dictType, localCode, localName, nationalCode, nationalName } = body;
 
   if (
     typeof localCode !== 'string' || !localCode.trim() ||

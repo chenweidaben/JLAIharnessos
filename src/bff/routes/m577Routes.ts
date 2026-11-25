@@ -109,7 +109,7 @@ async function handleTnCreate(c: Ctx): Promise<Response> {
   const {
     patientId, visitId, fromDeptCode, toDeptCode, transferReason,
     transferDiagnosis, conditionAtTransfer, handoverNotes, transferringDoctor, transferTime,
-  } = body as Record<string, unknown>;
+  } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||

@@ -497,8 +497,8 @@ export function buildDeepEquipmentMgmt(now: Date = new Date()): Record<string, u
   let openFaultCost = 0;
 
   const maintenanceAlerts: MaintenanceSchedule[] = [];
-  const expiredCerts: Array<{ equipmentId: string; assetNo: string; name: string; validUntil: string; overdueDays: number }> = [];
-  const devices: Array<Record<string, unknown>> = [];
+  const expiredCerts: { equipmentId: string; assetNo: string; name: string; validUntil: string; overdueDays: number }[] = [];
+  const devices: Record<string, unknown>[] = [];
 
   for (const eq of deepEquipmentStore) {
     // 台账五段

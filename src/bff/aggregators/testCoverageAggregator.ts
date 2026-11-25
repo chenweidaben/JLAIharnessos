@@ -559,7 +559,7 @@ export function classifyAdminSubmodule(path: string): AdminSubmodule {
   const base = s.split('/').pop() ?? s;
 
   // 1. 备份恢复
-  if (/(^|\/)(backup|restore)/.test(base) || /backuprestor/.test(base)) {
+  if (/(^|\/)(backup|restore)/.test(base) || base.includes('backuprestor')) {
     return 'backupRestore';
   }
 
@@ -885,7 +885,7 @@ export interface DoctorTestCoverage {
   /** 按子域分桶统计 */
   bySubdomain: Record<DoctorSubdomain, DoctorSubdomainCoverage>;
   /** 未覆盖源文件清单（保持入参顺序） */
-  uncoveredFiles: Array<{ path: string; subdomain: DoctorSubdomain }>;
+  uncoveredFiles: { path: string; subdomain: DoctorSubdomain }[];
 }
 
 /** doctor 五域键（用于遍历） */
@@ -1021,7 +1021,7 @@ export function getDoctorTestCoverage(
     };
   }
 
-  const uncoveredFiles: Array<{ path: string; subdomain: DoctorSubdomain }> = [];
+  const uncoveredFiles: { path: string; subdomain: DoctorSubdomain }[] = [];
   let covered = 0;
 
   for (const sf of sourceFiles) {

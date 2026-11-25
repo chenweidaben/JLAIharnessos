@@ -124,7 +124,7 @@ async function handlePayCreate(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { patientId, billId, amount, feeType, payMethod } = body as Record<string, unknown>;
+  const { patientId, billId, amount, feeType, payMethod } = body;
 
   if (
     typeof patientId !== 'string' || !patientId.trim() ||
@@ -181,7 +181,7 @@ async function handlePayRefund(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { refundReason, refundAmount, refundedBy } = body as Record<string, unknown>;
+  const { refundReason, refundAmount, refundedBy } = body;
 
   if (
     typeof refundReason !== 'string' || !refundReason.trim() ||

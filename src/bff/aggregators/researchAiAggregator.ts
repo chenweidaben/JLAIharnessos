@@ -102,8 +102,8 @@ export function descriptive(values: number[]): DescriptiveStats {
   const mean = values.reduce((s, v) => s + v, 0) / n;
   const median =
     n % 2 === 1
-      ? sorted[(n - 1) / 2]!
-      : (sorted[n / 2 - 1]! + sorted[n / 2]!) / 2;
+      ? sorted[(n - 1) / 2]
+      : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
   const variance =
     n > 1
       ? values.reduce((s, v) => s + (v - mean) ** 2, 0) / (n - 1) // 样本方差（分母 n-1）
@@ -113,8 +113,8 @@ export function descriptive(values: number[]): DescriptiveStats {
     mean: round4(mean),
     median: round4(median),
     sd: variance === null ? null : round4(Math.sqrt(variance)),
-    min: sorted[0]!,
-    max: sorted[n - 1]!,
+    min: sorted[0],
+    max: sorted[n - 1],
   };
 }
 
@@ -129,9 +129,9 @@ function logGamma(z: number): number {
     771.32342877765313, -176.61502916214059, 12.507343278686905,
     -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7,
   ];
-  let l = coef[0]!;
+  let l = coef[0];
   for (let i = 1; i <= 8; i++) {
-    l += coef[i]! / (z + i - 1);
+    l += coef[i] / (z + i - 1);
   }
   const t = z + 6.5;
   return (
@@ -304,18 +304,18 @@ export function chiSquareTest(table: number[][], label: string): ChiSquareResult
   if (rows < 2 || cols < 2) return null;
   const rowSums = table.map((r) => r.reduce((s, v) => s + v, 0));
   const colSums = Array.from({ length: cols }, (_, j) =>
-    table.reduce((s, r) => s + r[j]!, 0),
+    table.reduce((s, r) => s + r[j], 0),
   );
   const N = rowSums.reduce((s, v) => s + v, 0);
   if (N === 0) return null;
   const expected = table.map((r, i) =>
-    r.map((_, j) => (rowSums[i]! * colSums[j]!) / N),
+    r.map((_, j) => (rowSums[i] * colSums[j]) / N),
   );
   let chi2 = 0;
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
-      const e = expected[i]![j]!;
-      if (e > 0) chi2 += (table[i]![j]! - e) ** 2 / e;
+      const e = expected[i][j];
+      if (e > 0) chi2 += (table[i][j] - e) ** 2 / e;
     }
   }
   const df = (rows - 1) * (cols - 1);
@@ -507,8 +507,8 @@ export function autoStatisticalAnalysis(input: {
   );
   if (valueGroups.length === 2) {
     tTest = welchTTest(
-      valueGroups[0]!.name, valueGroups[0]!.values ?? [],
-      valueGroups[1]!.name, valueGroups[1]!.values ?? [],
+      valueGroups[0].name, valueGroups[0].values ?? [],
+      valueGroups[1].name, valueGroups[1].values ?? [],
     );
   }
 
@@ -518,8 +518,8 @@ export function autoStatisticalAnalysis(input: {
     (g) => typeof g.events === 'number' && typeof g.nonEvents === 'number',
   );
   if (rateGroups.length === 2) {
-    const g1 = rateGroups[0]!;
-    const g2 = rateGroups[1]!;
+    const g1 = rateGroups[0];
+    const g2 = rateGroups[1];
     chiSquare = chiSquareTest(
       [
         [g1.events ?? 0, g1.nonEvents ?? 0],

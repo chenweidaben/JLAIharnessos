@@ -186,7 +186,7 @@ function adviceFor(item: string, flag: CheckupFlag): string {
 /** 把参考区间字符串（如 "90-120"、"3.9-6.1"）解析为上下限 */
 function parseRange(refRange: string): { low: number; high: number } | null {
   if (!refRange) return null;
-  const m = refRange.trim().match(/([0-9]+(?:\.[0-9]+)?)\s*[-~—]\s*([0-9]+(?:\.[0-9]+)?)/);
+  const m = /([0-9]+(?:\.[0-9]+)?)\s*[-~—]\s*([0-9]+(?:\.[0-9]+)?)/.exec(refRange.trim());
   if (!m) return null;
   return { low: Number(m[1]), high: Number(m[2]) };
 }
@@ -271,7 +271,7 @@ export function recordCheckupResult(
 ): CheckupResult {
   const order = orders.get(checkupId);
   if (!order) throw notFound(`体检单不存在：${String(checkupId)}`);
-  if (!item || !item.trim()) throw badRequest('item 不能为空');
+  if (!item?.trim()) throw badRequest('item 不能为空');
   if (typeof value !== 'number' || Number.isNaN(value)) throw badRequest('value 必须是数字');
 
   const resolved = resolveFlag(item.trim(), value, refRange ?? '', flag);
@@ -350,7 +350,7 @@ export function generateCheckupReport(checkupId: string): CheckupReport {
 /* ====================== 路由层辅助（读，纯包装） ====================== */
 
 /** 管理端：列出全部体检单 */
-export function listCheckupOrdersView(): Array<Omit<CheckupOrder, never> & { resultCount: number }> {
+export function listCheckupOrdersView(): (Omit<CheckupOrder, never> & { resultCount: number })[] {
   return [...orders.values()]
     .sort((a, b) => b.orderedAt.localeCompare(a.orderedAt))
     .map((o) => ({ ...o, resultCount: (resultsByCheckup.get(o.id) ?? []).length }));

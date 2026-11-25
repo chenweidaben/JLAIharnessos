@@ -18,7 +18,7 @@ export const orderVerifyRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/orders/:id/verify', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'verified' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id, status: 'verified', verifier: (body as { verifier?: string }).verifier ?? 'demo-nurse', verifiedAt: new Date().toISOString() }));
     } },
   { method: 'POST', path: '/api/v1/orders/:id/stop', auth: true,
@@ -29,7 +29,7 @@ export const orderVerifyRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/orders/:id/reject', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'rejected' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id, status: 'rejected', reason: (body as { reason?: string }).reason ?? 'demo-reason' }));
     } },
   { method: 'POST', path: '/api/v1/orders/:id/complete', auth: true,

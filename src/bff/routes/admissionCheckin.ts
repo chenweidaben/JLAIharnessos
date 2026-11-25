@@ -18,7 +18,7 @@ export const admissionCheckinRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/admissions/:id/assign-bed', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ id: c.params.id, status: 'bed-assigned' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: c.params.id, status: 'bed-assigned', bedNo: (body as { bedNo?: string }).bedNo ?? 'demo-bed-301-2', assignedAt: new Date().toISOString() }));
     } },
   { method: 'POST', path: '/api/v1/admissions/:id/wristband', auth: true,

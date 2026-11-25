@@ -97,7 +97,7 @@ export class RedisCache implements ICache {
     return Number(res) === 1;
   }
 
-  async mget<T = CacheValue>(keys: string[]): Promise<Array<T | null>> {
+  async mget<T = CacheValue>(keys: string[]): Promise<(T | null)[]> {
     if (keys.length === 0) return [];
     const raws = await this.client.mget(...keys);
     return raws.map((r) => {

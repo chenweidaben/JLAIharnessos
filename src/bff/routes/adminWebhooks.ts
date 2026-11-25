@@ -110,7 +110,7 @@ async function handleList(c: Ctx): Promise<Response> {
       FROM medmuse.webhooks
       ORDER BY id DESC
     `;
-    const items = (rows as unknown as Array<Record<string, unknown>>).map(toView);
+    const items = (rows as unknown as Record<string, unknown>[]).map(toView);
     return json(ok({ total: items.length, items, events: WEBHOOK_EVENTS }));
   } catch (err) {
     return json(
@@ -186,7 +186,7 @@ async function handleCreate(c: Ctx): Promise<Response> {
         created_at     AS "created_at",
         updated_at     AS "updated_at"
     `;
-    const row = (rows as unknown as Array<Record<string, unknown>>)[0];
+    const row = (rows as unknown as Record<string, unknown>[])[0];
     if (!row) {
       return json(fail(ErrorCode.INTERNAL_ERROR, 'webhook 写入未返回结果'), 500);
     }

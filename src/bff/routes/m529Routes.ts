@@ -179,7 +179,7 @@ async function handleCourseCreate(c: Ctx): Promise<Response> {
 
   const nowIso = new Date().toISOString();
   courseSeq += 1;
-  const highRisk = (baselineScore as number) >= 40;
+  const highRisk = (baselineScore) >= 40;
   const record: VteCourse = {
     id: `VTE-${String(courseSeq).padStart(3, '0')}`,
     patientId,
@@ -187,17 +187,17 @@ async function handleCourseCreate(c: Ctx): Promise<Response> {
     drugCode: drugCode as DrugCode,
     dose,
     route: routeMed as RouteMed,
-    startAt: startAt as string,
-    plannedStopAt: plannedStopAt as string,
+    startAt: startAt,
+    plannedStopAt: plannedStopAt,
     actualStopAt: null,
     status: 'active',
-    bleedingScore: baselineScore as number,
+    bleedingScore: baselineScore,
     highRisk,
     requiresReview: highRisk,
     reviewedBy: null,
     timeline: [
-      { action: 'created', operator: patientName as string, at: nowIso },
-      { action: 'started', operator: patientName as string, at: nowIso },
+      { action: 'created', operator: patientName, at: nowIso },
+      { action: 'started', operator: patientName, at: nowIso },
     ],
   };
   courseStore.set(record.id, record);

@@ -42,7 +42,7 @@ async function buildView(): Promise<{ demo: boolean; dashboard: ReturnType<typeo
   const fbRows = (await db`
     SELECT suggestion_type, doctor_decision, created_at
     FROM medmuse.ai_feedback_log
-  `) as Array<Record<string, unknown>>;
+  `) as Record<string, unknown>[];
   const feedbackLog: FeedbackRow[] = fbRows.map((r) => ({
     suggestionType: (r.suggestion_type as string | null) ?? null,
     decision: (r.doctor_decision as string) ?? '',
@@ -52,7 +52,7 @@ async function buildView(): Promise<{ demo: boolean; dashboard: ReturnType<typeo
   // 2) 策略版本（仅激活版本参与权重分布）
   const stRows = (await db`
     SELECT weights_json, active FROM medmuse.recommendation_strategy
-  `) as Array<Record<string, unknown>>;
+  `) as Record<string, unknown>[];
   const strategies: StrategyRow[] = stRows.map((r) => ({
     weights: (r.weights_json as Record<string, number>) ?? {},
     active: Boolean(r.active),
@@ -61,16 +61,16 @@ async function buildView(): Promise<{ demo: boolean; dashboard: ReturnType<typeo
   // 3a) 知识库新增条目（增长曲线）
   const kbRows = (await db`
     SELECT created_at FROM knowledge.documents
-  `) as Array<Record<string, unknown>>;
+  `) as Record<string, unknown>[];
   const entries = kbRows.map((r) => ({
     createdAt: (r.created_at as string) ?? new Date().toISOString(),
   }));
 
   // 3b) 画像覆盖率：今日快照 + 历史日指标序列
-  const profiled = Number(((await db`SELECT count(*)::int AS n FROM medmuse.patient_learning_profile`) as unknown as Array<{ n: number }>)[0]?.n ?? 0);
+  const profiled = Number(((await db`SELECT count(*)::int AS n FROM medmuse.patient_learning_profile`) as unknown as { n: number }[])[0]?.n ?? 0);
   const total = Number(
     ((await db`SELECT count(DISTINCT patient_id)::int AS n
-       FROM medmuse.ai_feedback_log WHERE patient_id IS NOT NULL`) as unknown as Array<{ n: number }>)[0]?.n ?? 0,
+       FROM medmuse.ai_feedback_log WHERE patient_id IS NOT NULL`) as unknown as { n: number }[])[0]?.n ?? 0,
   );
   const todayRate = total > 0 ? profiled / total : 0;
 
@@ -80,7 +80,7 @@ async function buildView(): Promise<{ demo: boolean; dashboard: ReturnType<typeo
     WHERE metric_name = 'patient_profile_coverage'
     ORDER BY metric_date DESC
     LIMIT 14
-  `) as Array<Record<string, unknown>>;
+  `) as Record<string, unknown>[];
   const coverageSeries: CoveragePoint[] = histRows
     .map((r) => ({
       date: String(r.metric_date),
@@ -110,7 +110,7 @@ function demoDashboard(): ReturnType<typeof buildLearningDashboard> {
   };
   const feedbackLog: FeedbackRow[] = [];
   // 近 3 天反馈：采纳率逐日上升 0.60 -> 0.72 -> 0.80
-  const plan: Array<[number, number, number, number]> = [
+  const plan: [number, number, number, number][] = [
     // [偏移天数, 采纳, 修改, 拒绝]
     [2, 60, 12, 28],
     [1, 72, 14, 14],

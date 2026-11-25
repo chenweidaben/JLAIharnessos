@@ -242,7 +242,7 @@ export function buildPharmacyAssistant(
   const drugs = normalizeDrugs(data?.drugs);
   const allergies = normalizeAllergies(data?.allergies);
   const historyBlocks = normalizeHistory(data?.historyBlocks);
-  const patient = (data?.patient ?? {}) as AssistantPatient;
+  const patient = (data?.patient ?? {});
 
   // 1. 相互作用：规则双方均在处方药品中出现即命中
   const interactions: Interaction[] = [];

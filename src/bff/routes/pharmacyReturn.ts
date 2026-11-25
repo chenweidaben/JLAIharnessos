@@ -17,13 +17,13 @@ export const pharmacyReturnRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/pharmacy/return', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'return-submitted' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: 'demo-rt-' + Date.now(), status: 'return-submitted', payload: body }));
     } },
   { method: 'POST', path: '/api/v1/pharmacy/return/audit', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       if (!isDemo) return json(ok({ status: 'audited' }));
-      const body = await c.body().catch(() => ({} as Record<string, unknown>));
+      const body = await c.body().catch(() => ({}));
       return json(ok({ demo: true, id: (body as { returnId?: string }).returnId ?? 'demo-rt', status: 'audited', approved: (body as { approved?: boolean }).approved ?? true }));
     } },
   { method: 'POST', path: '/api/v1/pharmacy/return/stock-in', auth: true,

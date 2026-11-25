@@ -199,7 +199,7 @@ function makeRng(seed: number): () => number {
 
 /* ============================== 词料池 ============================== */
 
-const DEPARTMENT_POOL: Array<[string, string]> = [
+const DEPARTMENT_POOL: [string, string][] = [
   ['心内科', 'XNK'],
   ['呼吸内科', 'HXNK'],
   ['消化内科', 'XHNK'],
@@ -239,7 +239,7 @@ const DIAGNOSES = [
   '偏头痛',
 ];
 
-const DRUGS: Array<[string, string]> = [
+const DRUGS: [string, string][] = [
   ['硝苯地平控释片', '30mg qd'],
   ['二甲双胍缓释片', '0.5g bid'],
   ['阿莫西林胶囊', '0.5g tid'],

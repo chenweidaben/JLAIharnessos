@@ -16,7 +16,7 @@ export type DimensionKeyV2 =
   | 'security'
   | 'interconnect';
 
-export const DIMENSIONS_V2: Array<{ key: DimensionKeyV2; name: string; maxScore: number }> = [
+export const DIMENSIONS_V2: { key: DimensionKeyV2; name: string; maxScore: number }[] = [
   { key: 'medical_quality', name: '医疗质量', maxScore: 100 },
   { key: 'nursing', name: '护理管理', maxScore: 100 },
   { key: 'medtech', name: '医技管理', maxScore: 100 },

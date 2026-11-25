@@ -240,13 +240,13 @@ export function promoteToHospital(
 /** 确定性演示基线种子（新员工入职 / 空库兜底用，依据宪法第七章） */
 const BASELINE_SEED: Record<
   KnowledgeRole,
-  Array<{
+  {
     title: string;
     content: string;
     isLesson: boolean;
     successRate: number;
     usageCount: number;
-  }>
+  }[]
 > = {
   doctor: [
     {

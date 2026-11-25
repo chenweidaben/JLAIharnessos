@@ -450,7 +450,7 @@ export async function contraindicate(
 ): Promise<VtePrevention> {
   assertPermission(auth, 'vte:prevent');
   assertUuid(id, '预防措施');
-  if (!reason || !reason.trim()) throw badRequest('禁忌/停用原因不能为空');
+  if (!reason?.trim()) throw badRequest('禁忌/停用原因不能为空');
   const prevention = await getPreventionById(id);
   if (!prevention) throw notFound('预防措施不存在');
   return withTx(async (tx) => {
@@ -573,7 +573,7 @@ export async function extractFactors(
   input: { scale: VteScale; text: string },
 ) {
   assertPermission(auth, 'vte:assess');
-  if (!input.text || !input.text.trim()) throw badRequest('病历文本不能为空');
+  if (!input.text?.trim()) throw badRequest('病历文本不能为空');
   if (input.scale !== 'caprini' && input.scale !== 'padua') throw badRequest('scale 须为 caprini 或 padua');
   try {
     const result = await extractVteFactors(input.scale, input.text);

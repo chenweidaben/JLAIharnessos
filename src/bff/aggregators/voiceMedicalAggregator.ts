@@ -227,11 +227,11 @@ export async function convert(
         aiGenerated: false,
       },
       // 事务句柄运行时支持全部查询方法，仅类型缺少客户端级方法，安全转换
-      tx as unknown as Sql,
+      tx,
     );
     // 医师本人签名：draft → signed，signed_by 为本人
     const signed = await updateMedicalRecordStatus(
-      record.id, 'signed', auth.id, tx as unknown as Sql,
+      record.id, 'signed', auth.id, tx,
     );
     if (!signed) throw conflict('病历签名失败：状态已变更');
 

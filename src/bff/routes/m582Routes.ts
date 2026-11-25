@@ -136,7 +136,7 @@ async function handleEmpiMerge(c: Ctx): Promise<Response> {
   }
   if (!body) return json({ code: 400, message: 'invalid payload' }, 400);
 
-  const { sourceMpi, targetMpi, mergeReason, mergedBy } = body as Record<string, unknown>;
+  const { sourceMpi, targetMpi, mergeReason, mergedBy } = body;
 
   if (
     typeof sourceMpi !== 'string' || !sourceMpi.trim() ||

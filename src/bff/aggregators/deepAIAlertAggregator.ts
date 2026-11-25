@@ -347,13 +347,13 @@ export function prioritizeAIAlert(alerts: DeepAIAlert[]): DeepAIAlert[] {
 // ---------------------------------------------------------------------------
 
 /** 处置措施规则库：按预警 code 映射到具体措施 + 责任岗 + 第一步动作 */
-const ACTION_RULES: Array<{
+const ACTION_RULES: {
   match: RegExp;
   measure: string;
   owner: string;
   firstStep: string;
   target: string;
-}> = [
+}[] = [
   { match: /RECORD_DEFECT/i, measure: '运行病历质控前置：48h 内拉出缺陷病历清单反馈主管医师返修，缺陷率偏高医师纳入一对一带教与月度通报', owner: '质控科 / 病案室', firstStep: '立即导出本周缺陷病历清单，按科室与主管医师分组', target: '病历缺陷率回落至 ≤5%' },
   { match: /PRESCRIPTION_IRRATIONAL/i, measure: '处方前置审核药师 100% 拦截：不合理处方当日反馈医师修正，周度不合理处方专项点评并约谈 Top3 科室', owner: '药学部', firstStep: '调取当日前置审核拦截记录，定位高频不合理用药类别', target: '不合理处方率回落至 ≤3%' },
   { match: /SURGICAL_COMPLICATION/i, measure: '围术期并发症日清单追踪：主刀 24h 内根因分析（RCA），复核手术分级授权与术前讨论执行率', owner: '医务科 / 外科教研室', firstStep: '逐例登记近 7 日并发症，按术式与主刀分层', target: '手术并发症发生率回落至 ≤3%' },

@@ -60,14 +60,14 @@ export async function createScreening(
        ${input.bBmi}, ${input.aAge}, ${input.nNeck}, ${input.gGender},
        ${input.score}, ${input.riskLevel}, ${input.assessor})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function getLatestByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<StopBangScreening | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.stopbang_screenings
     WHERE visit_id=${visitId} ORDER BY created_at DESC, id DESC LIMIT 1`;
-  return rows.length === 0 ? null : map(rows[0] as Record<string, unknown>);
+  return rows.length === 0 ? null : map(rows[0]);
 }
 
 export async function listByVisit(visitId: string, tx: DbExecutor = getDb()): Promise<StopBangScreening[]> {

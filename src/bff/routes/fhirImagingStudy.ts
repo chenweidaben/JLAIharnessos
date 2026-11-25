@@ -12,14 +12,14 @@ interface FhirImagingStudy {
   subject: { reference: string; display: string };
   started: string;
   numberOfSeries: number;
-  modality: Array<{ coding: Array<{ system: string; code: string; display: string }> }>;
-  series: Array<{
+  modality: { coding: { system: string; code: string; display: string }[] }[];
+  series: {
     number: number;
-    modality: { coding: Array<{ system: string; code: string; display: string }> };
+    modality: { coding: { system: string; code: string; display: string }[] };
     description: string;
     numberOfInstances: number;
-    bodySite: { coding: Array<{ system: string; code: string; display: string }> };
-  }>;
+    bodySite: { coding: { system: string; code: string; display: string }[] };
+  }[];
 }
 
 const demoImagingStudies: FhirImagingStudy[] = [

@@ -213,14 +213,12 @@ export interface WritebackResult {
 }
 
 /** 写回适配器接口（后续接真实 EMR/审计/状态仓储；阶段①不直写 DB） */
-export interface WritebackAdapter {
-  (payload: {
+export type WritebackAdapter = (payload: {
     target: string;
     patientId?: string;
     visitId?: string;
     data: Record<string, unknown>;
-  }): Promise<WritebackResult>;
-}
+  }) => Promise<WritebackResult>;
 
 /** 工作流引擎运行时依赖 */
 export interface WorkflowRuntime {

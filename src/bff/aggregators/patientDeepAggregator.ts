@@ -477,7 +477,7 @@ export interface PatientPreferences {
   /** 是否有家属陪同 */
   accompanied?: boolean;
   /** 提醒渠道：sms / wechat / voice */
-  reminderChannels?: Array<'sms' | 'wechat' | 'voice'>;
+  reminderChannels?: ('sms' | 'wechat' | 'voice')[];
   /** 偏好科室/医生（可空） */
   preferredDoctorName?: string;
 }
@@ -495,7 +495,7 @@ export interface PersonalizedService {
   /** 叫号优先级（elderly 优先） */
   queuePriority: 'normal' | 'priority';
   /** 提醒渠道列表 */
-  reminderChannels: Array<'sms' | 'wechat' | 'voice'>;
+  reminderChannels: ('sms' | 'wechat' | 'voice')[];
   /** 为该患者生成的一句欢迎语（老人也能听懂） */
   greeting: string;
 }

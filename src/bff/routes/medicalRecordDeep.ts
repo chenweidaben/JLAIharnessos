@@ -213,7 +213,7 @@ export const medicalRecordDeepRoutes: RouteDef[] = [
           if (r.primary_dx_icd10) {
             diagnoses.push({ code: r.primary_dx_icd10, name: r.primary_dx_name ?? '', rank: 'principal' });
           }
-          for (const s of (Array.isArray(r.secondary_dx_icd10s) ? r.secondary_dx_icd10s : []) as Array<{ code?: string; name?: string }>) {
+          for (const s of (Array.isArray(r.secondary_dx_icd10s) ? r.secondary_dx_icd10s : []) as { code?: string; name?: string }[]) {
             diagnoses.push({ code: s.code ?? '', name: s.name ?? '', rank: 'secondary' });
           }
           const surgeries: RecordSurgery[] =

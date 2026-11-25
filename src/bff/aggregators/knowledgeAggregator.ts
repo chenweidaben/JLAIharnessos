@@ -354,7 +354,7 @@ export async function retrieve(
   const chunks: KnowledgeChunk[] = await listAllChunks(options.kbIds);
   if (chunks.length === 0) return [];
 
-  const scored: Array<{ chunk: KnowledgeChunk; vectorScore: number; keywordScore: number }> = [];
+  const scored: { chunk: KnowledgeChunk; vectorScore: number; keywordScore: number }[] = [];
   for (const c of chunks) {
     const vec = Array.isArray(c.embedding) && c.embedding.length > 0 ? c.embedding : null;
     const vectorScore = vec ? cosineSimilarity(queryVector, vec) : 0;

@@ -114,8 +114,8 @@ export const auditEventRoutes: RouteDef[] = [
         const roles = c.user?.roles ?? [];
         if (!roles.includes('admin')) throw new AuditError(403, '_seed 仅 admin');
         const b = (await c.body()) as Record<string, unknown>;
-        const items = Array.isArray(b.items) ? (b.items as Array<Record<string, unknown>>) : [];
-        const out: Array<{ seeded: boolean; reason?: string }> = [];
+        const items = Array.isArray(b.items) ? (b.items as Record<string, unknown>[]) : [];
+        const out: { seeded: boolean; reason?: string }[] = [];
         for (const it of items) {
           const r = await recordEvent({
             actorId: String(it.actorId ?? ''), actorRole: it.actorRole, action: it.action,

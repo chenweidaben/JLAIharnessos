@@ -9,13 +9,13 @@ interface FhirObservation {
   id: string;
   meta: { versionId: string; lastUpdated: string };
   status: 'registered' | 'preliminary' | 'final' | 'amended' | 'cancelled' | 'entered-in-error' | 'unknown';
-  category: Array<{ coding: Array<{ system: string; code: string; display: string }> }>;
-  code: { coding: Array<{ system: string; code: string; display: string }>; text: string };
+  category: { coding: { system: string; code: string; display: string }[] }[];
+  code: { coding: { system: string; code: string; display: string }[]; text: string };
   subject: { reference: string };
   effectiveDateTime: string;
   valueQuantity?: { value: number; unit: string; system: string; code: string };
-  valueCodeableConcept?: { coding: Array<{ system: string; code: string; display: string }>; text: string };
-  interpretation?: Array<{ coding: Array<{ system: string; code: string; display: string }>; text: string }>;
+  valueCodeableConcept?: { coding: { system: string; code: string; display: string }[]; text: string };
+  interpretation?: { coding: { system: string; code: string; display: string }[]; text: string }[];
 }
 
 const demoObservations: FhirObservation[] = [

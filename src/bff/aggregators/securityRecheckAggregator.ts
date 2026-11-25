@@ -528,15 +528,15 @@ export interface SecurityFixTracking {
   previousAt: string;
   currentAt: string;
   /** 已闭环（fail/warn → pass） */
-  fixed: Array<{ id: string; title: string; from: ComplianceStatus; to: ComplianceStatus }>;
+  fixed: { id: string; title: string; from: ComplianceStatus; to: ComplianceStatus }[];
   /** 部分整改（fail → warn） */
-  improved: Array<{ id: string; title: string; from: ComplianceStatus; to: ComplianceStatus }>;
+  improved: { id: string; title: string; from: ComplianceStatus; to: ComplianceStatus }[];
   /** 回退/漂移（pass → warn/fail） */
-  regressed: Array<{ id: string; title: string; from: ComplianceStatus; to: ComplianceStatus; detail: string }>;
+  regressed: { id: string; title: string; from: ComplianceStatus; to: ComplianceStatus; detail: string }[];
   /** 仍未闭环（fail → fail） */
-  stillFailing: Array<{ id: string; title: string; detail: string }>;
+  stillFailing: { id: string; title: string; detail: string }[];
   /** 本轮新增项（上轮无此 id） */
-  newItems: Array<{ id: string; title: string; status: ComplianceStatus }>;
+  newItems: { id: string; title: string; status: ComplianceStatus }[];
   /** 已下架项（本轮无此 id） */
   removedItems: string[];
   /** 达标率变化（百分点，当前 - 上轮） */
@@ -549,8 +549,8 @@ export interface SecurityFixTracking {
  * 只要带 checks[].id/status/title 即可工作。
  */
 export function trackSecurityFixes(
-  previousReport: { generatedAt?: string; recheckAt?: string; summary?: { passRate: number }; checks: Array<{ id: string; title: string; status: ComplianceStatus; detail?: string }> },
-  currentReport: { generatedAt?: string; recheckAt?: string; summary?: { passRate: number }; checks: Array<{ id: string; title: string; status: ComplianceStatus; detail?: string }> },
+  previousReport: { generatedAt?: string; recheckAt?: string; summary?: { passRate: number }; checks: { id: string; title: string; status: ComplianceStatus; detail?: string }[] },
+  currentReport: { generatedAt?: string; recheckAt?: string; summary?: { passRate: number }; checks: { id: string; title: string; status: ComplianceStatus; detail?: string }[] },
 ): SecurityFixTracking {
   const prevMap = new Map(previousReport.checks.map((c) => [c.id, c]));
   const currMap = new Map(currentReport.checks.map((c) => [c.id, c]));

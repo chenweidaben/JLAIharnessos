@@ -165,7 +165,7 @@ const failureRegistry: MigrationDescriptor[] = [];
 
 /** 登记一次迁移失败（由路由层在 POST 执行失败时调用） */
 export function recordMigrationFailure(desc: MigrationDescriptor): void {
-  if (!desc || !desc.version) return;
+  if (!desc?.version) return;
   // 同版本号去重：若已存在旧失败记录，先移除再追加（保持最新）
   for (let i = failureRegistry.length - 1; i >= 0; i--) {
     if (failureRegistry[i].version === desc.version) {
