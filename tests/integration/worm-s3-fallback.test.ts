@@ -193,9 +193,18 @@ describe('createWormStore fail-closed', () => {
   });
   test('WORM_BACKEND=s3 缺 s3 client → 用最小 fetch client，端点不可达时抛网络错', async () => {
     // 启动时不抛（保证 BFF 能起来、/ready 报告 s3）；首次调用时因端点不可达抛 fetch 错误
+    const originalS3Endpoint = process.env.S3_ENDPOINT;
     delete process.env.S3_ENDPOINT;
-    const store = createWormStore({ backend: 's3', bucket: 'x' });
-    await expect(store.put(makeSegment(1))).rejects.toThrow();
+    try {
+      const store = createWormStore({ backend: 's3', bucket: 'x' });
+      await expect(store.put(makeSegment(1))).rejects.toThrow();
+    } finally {
+      if (originalS3Endpoint === undefined) {
+        delete process.env.S3_ENDPOINT;
+      } else {
+        process.env.S3_ENDPOINT = originalS3Endpoint;
+      }
+    }
   });
 });
 

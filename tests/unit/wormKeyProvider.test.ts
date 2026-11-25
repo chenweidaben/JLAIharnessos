@@ -22,6 +22,8 @@ const ORIGINAL_ENV: Record<string, string | undefined> = {
   DEMO_MODE: process.env.DEMO_MODE,
   WORM_FILE_KEY: process.env.WORM_FILE_KEY,
   WORM_SM4_KEY: process.env.WORM_SM4_KEY,
+  WORM_SM2_PRIVATE_KEY: process.env.WORM_SM2_PRIVATE_KEY,
+  WORM_SM2_PUBLIC_KEY: process.env.WORM_SM2_PUBLIC_KEY,
 };
 function restoreEnv(key: string): void {
   const v = ORIGINAL_ENV[key];

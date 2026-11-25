@@ -37,6 +37,7 @@ const seq = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 
 let dbAvailable = false;
 const realMode = process.env.DEMO_MODE !== '1';
+let originalLlmApiKey: string | undefined;
 let admin: AuthView;
 let doctorChen: AuthView;
 let radDoc: AuthView;
@@ -70,7 +71,8 @@ try {
 }
 
 if (dbAvailable) {
-  // 测试确定性：未配置 LLM，验证降级路径
+  // 测试确定性：未配置 LLM，验证降级路径；快照原值，afterAll 还原避免污染同进程后续用例
+  originalLlmApiKey = process.env.LLM_API_KEY;
   delete process.env.LLM_API_KEY;
 
   const load = async (username: string): Promise<AuthView> => {
@@ -141,6 +143,11 @@ if (dbAvailable) {
 
 afterAll(async () => {
   if (dbAvailable) {
+    if (originalLlmApiKey === undefined) {
+      delete process.env.LLM_API_KEY;
+    } else {
+      process.env.LLM_API_KEY = originalLlmApiKey;
+    }
     const db = getDb();
     await db`DELETE FROM clinical.imaging_interpretations WHERE report_id IN (${reportDraftId}, ${reportPublishedId})`;
     await db`DELETE FROM clinical.imaging_reports WHERE id IN (${reportDraftId}, ${reportPublishedId})`;

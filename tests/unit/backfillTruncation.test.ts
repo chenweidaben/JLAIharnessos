@@ -29,10 +29,13 @@ function fakeEvent(seq: number): AuditEvent {
   } as AuditEvent;
 }
 
+const ORIGINAL_BACKFILL_LIMIT = process.env.AUDIT_BACKFILL_LIMIT;
+
 afterEach(() => {
   __resetSealDisabled();
   __resetAuditStore(null);
-  delete process.env.AUDIT_BACKFILL_LIMIT;
+  if (ORIGINAL_BACKFILL_LIMIT === undefined) delete process.env.AUDIT_BACKFILL_LIMIT;
+  else process.env.AUDIT_BACKFILL_LIMIT = ORIGINAL_BACKFILL_LIMIT;
 });
 
 describe('backfillPending fail-closed', () => {
