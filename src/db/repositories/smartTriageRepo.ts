@@ -8,6 +8,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { DepartmentRecommendation } from '../../knowledge/rules/departmentTriageRules.js';
+import { toText } from '../rowText.js';
 
 /** 导诊会话行 */
 export interface TriageSessionRow {
@@ -47,37 +48,37 @@ export interface PreliminaryConsultationRow {
 function mapSession(r: Record<string, unknown>): TriageSessionRow {
   return {
     id: String(r.id),
-    accountId: r.account_id ? String(r.account_id) : null,
-    patientId: r.patient_id ? String(r.patient_id) : null,
+    accountId: r.account_id ? toText(r.account_id) : null,
+    patientId: r.patient_id ? toText(r.patient_id) : null,
     symptoms: String(r.symptoms),
     dialog: (r.dialog as TriageSessionRow['dialog']) ?? [],
     recommendations: (r.recommendations as TriageSessionRow['recommendations']) ?? [],
-    chosenDepartment: r.chosen_department ? String(r.chosen_department) : null,
+    chosenDepartment: r.chosen_department ? toText(r.chosen_department) : null,
     engineType: r.engine_type as TriageSessionRow['engineType'],
     status: r.status as TriageSessionRow['status'],
     createdAt: String(r.created_at),
-    completedAt: r.completed_at ? String(r.completed_at) : null,
+    completedAt: r.completed_at ? toText(r.completed_at) : null,
   };
 }
 
 function mapPreliminary(r: Record<string, unknown>): PreliminaryConsultationRow {
   return {
     id: String(r.id),
-    triageSessionId: r.triage_session_id ? String(r.triage_session_id) : null,
-    accountId: r.account_id ? String(r.account_id) : null,
-    patientId: r.patient_id ? String(r.patient_id) : null,
-    targetDepartment: r.target_department ? String(r.target_department) : null,
-    chiefComplaint: r.chief_complaint ? String(r.chief_complaint) : null,
-    presentIllness: r.present_illness ? String(r.present_illness) : null,
-    pastHistory: r.past_history ? String(r.past_history) : null,
-    medications: r.medications ? String(r.medications) : null,
-    allergies: r.allergies ? String(r.allergies) : null,
+    triageSessionId: r.triage_session_id ? toText(r.triage_session_id) : null,
+    accountId: r.account_id ? toText(r.account_id) : null,
+    patientId: r.patient_id ? toText(r.patient_id) : null,
+    targetDepartment: r.target_department ? toText(r.target_department) : null,
+    chiefComplaint: r.chief_complaint ? toText(r.chief_complaint) : null,
+    presentIllness: r.present_illness ? toText(r.present_illness) : null,
+    pastHistory: r.past_history ? toText(r.past_history) : null,
+    medications: r.medications ? toText(r.medications) : null,
+    allergies: r.allergies ? toText(r.allergies) : null,
     structured: (r.structured as Record<string, unknown>) ?? {},
-    reportText: r.report_text ? String(r.report_text) : null,
+    reportText: r.report_text ? toText(r.report_text) : null,
     engineType: r.engine_type as PreliminaryConsultationRow['engineType'],
     status: r.status as PreliminaryConsultationRow['status'],
     createdAt: String(r.created_at),
-    completedAt: r.completed_at ? String(r.completed_at) : null,
+    completedAt: r.completed_at ? toText(r.completed_at) : null,
   };
 }
 
@@ -101,7 +102,7 @@ export async function createTriageSession(
     )
     RETURNING *
   `;
-  return mapSession(rows[0] as Record<string, unknown>);
+  return mapSession(rows[0]);
 }
 
 export async function getTriageSessionById(
@@ -112,7 +113,7 @@ export async function getTriageSessionById(
   const rows = await db`
     SELECT * FROM clinical.triage_sessions WHERE id = ${id}
   `;
-  return rows.length ? mapSession(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapSession(rows[0]) : null;
 }
 
 export async function appendDialogAndChoose(
@@ -137,7 +138,7 @@ export async function appendDialogAndChoose(
     WHERE id = ${id}
     RETURNING *
   `;
-  return rows.length ? mapSession(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapSession(rows[0]) : null;
 }
 
 export async function listTriageSessions(
@@ -198,7 +199,7 @@ export async function createPreliminaryConsultation(
     )
     RETURNING *
   `;
-  return mapPreliminary(rows[0] as Record<string, unknown>);
+  return mapPreliminary(rows[0]);
 }
 
 export async function getPreliminaryConsultationById(
@@ -209,7 +210,7 @@ export async function getPreliminaryConsultationById(
   const rows = await db`
     SELECT * FROM clinical.preliminary_consultations WHERE id = ${id}
   `;
-  return rows.length ? mapPreliminary(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapPreliminary(rows[0]) : null;
 }
 
 export async function listPreliminaryConsultations(
@@ -238,5 +239,5 @@ export async function markPreliminaryConsumed(
     SET status = 'consumed' WHERE id = ${id}
     RETURNING *
   `;
-  return rows.length ? mapPreliminary(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapPreliminary(rows[0]) : null;
 }

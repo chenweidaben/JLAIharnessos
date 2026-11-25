@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Referral {
   id: string; orderId: string; abnormalItem: string;
@@ -13,7 +14,7 @@ const COLS = `id, order_id, abnormal_item, finding_detail, suggested_department,
 function rmap(r: Record<string, unknown>): Referral {
   return {
     id: String(r.id), orderId: String(r.order_id), abnormalItem: String(r.abnormal_item),
-    findingDetail: r.finding_detail ? String(r.finding_detail) : null,
+    findingDetail: r.finding_detail ? toText(r.finding_detail) : null,
     suggestedDepartment: String(r.suggested_department),
     appointmentStatus: String(r.appointment_status), createdAt: String(r.created_at),
   };

@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface CdiReview {
   id: string;
@@ -23,7 +24,7 @@ function mapRow(r: Record<string, unknown>): CdiReview {
   return {
     id: String(r.id),
     patientId: String(r.patient_id),
-    visitId: r.visit_id == null ? null : String(r.visit_id),
+    visitId: r.visit_id == null ? null : toText(r.visit_id),
     drugName: String(r.drug_name),
     reviewType: String(r.review_type),
     severity: String(r.severity),
@@ -52,7 +53,7 @@ export async function recordReview(input: RecordInput): Promise<CdiReview> {
     VALUES (${input.patientId}, ${input.visitId ?? null}, ${input.drugName}, ${input.reviewType},
       ${input.severity}, ${input.message}, ${input.reviewedBy})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByPatient(patientId: string): Promise<CdiReview[]> {
@@ -67,5 +68,5 @@ export async function resolveReview(id: string): Promise<CdiReview> {
   const db = getDb();
   const rows = await db`
     UPDATE clinical.cdi_reviews SET resolved=true WHERE id=${id} RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }

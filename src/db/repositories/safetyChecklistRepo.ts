@@ -5,6 +5,7 @@
  */
 import { getDb } from '../../db/pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type SafetyChecklistPhase = 'pre_op' | 'anesthesia' | 'pre_incision' | 'post_op';
 
@@ -29,8 +30,8 @@ const COLS = `id, surgery_id, phase, items, signed_by, signed_at`;
 function asItems(raw: unknown): SafetyChecklistItem[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((r: Record<string, unknown>) => ({
-    key: String(r.key ?? ''),
-    label: String(r.label ?? ''),
+    key: toText(r.key ?? ''),
+    label: toText(r.label ?? ''),
     required: Boolean(r.required),
     checked: Boolean(r.checked),
   }));
@@ -42,7 +43,7 @@ function mapRow(r: Record<string, unknown>): SafetyChecklistRow {
     surgeryId: String(r.surgery_id),
     phase: String(r.phase) as SafetyChecklistPhase,
     items: asItems(r.items),
-    signedBy: r.signed_by == null ? null : String(r.signed_by),
+    signedBy: r.signed_by == null ? null : toText(r.signed_by),
     signedAt: r.signed_at == null ? null : new Date(r.signed_at as string | Date).toISOString(),
   };
 }
@@ -80,5 +81,5 @@ export async function upsertSigned(input: SignInput): Promise<SafetyChecklistRow
       signed_by = EXCLUDED.signed_by,
       signed_at = now()
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }

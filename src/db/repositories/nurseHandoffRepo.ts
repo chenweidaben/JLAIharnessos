@@ -8,6 +8,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type HandoffShift = 'day' | 'evening' | 'night';
 
@@ -34,11 +35,11 @@ const COLS = `id, ward_id, shift, patient_id, summary, created_by, created_at`;
 function map(row: Record<string, unknown>): NurseHandoff {
   return {
     id: String(row.id),
-    wardId: row.ward_id ? String(row.ward_id) : null,
+    wardId: row.ward_id ? toText(row.ward_id) : null,
     shift: row.shift as HandoffShift,
-    patientId: row.patient_id ? String(row.patient_id) : null,
-    summary: String(row.summary ?? ''),
-    createdBy: row.created_by ? String(row.created_by) : null,
+    patientId: row.patient_id ? toText(row.patient_id) : null,
+    summary: toText(row.summary ?? ''),
+    createdBy: row.created_by ? toText(row.created_by) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -51,7 +52,7 @@ export async function createHandoff(input: NewNurseHandoff, db?: DbExecutor): Pr
     VALUES (${input.wardId ?? null}, ${input.shift}, ${input.patientId ?? null},
       ${input.summary}, ${input.createdBy})
     RETURNING ${exec.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 /** 按病区列交班记录（时间倒序）；wardId 为空时返回全量最近记录。 */

@@ -4,6 +4,7 @@
  */
 import { getDb } from '../pool.js';
 import type { PeriodCase } from '../../medical-tools/operations/settlementDrilldown.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -25,8 +26,8 @@ export async function listPeriodCases(_period: string): Promise<PeriodCase[]> {
   return rows.map((r: Record<string, unknown>) => {
     const settlement = Number(r.settlement ?? 0);
     return {
-      department: String(r.department ?? 'unknown'),
-      doctorId: String(r.doctor_id ?? ''),
+      department: toText(r.department ?? 'unknown'),
+      doctorId: toText(r.doctor_id ?? ''),
       settlement,
       overspend: Boolean(r.overspend),
       drugCost: 0,

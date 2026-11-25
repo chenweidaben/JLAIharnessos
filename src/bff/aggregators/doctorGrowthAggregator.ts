@@ -141,7 +141,7 @@ const TAG_MASTERY_COUNT = 5;
 const DECISION_STEP = 25;
 
 /** 四维雷达关键词词典（命中标签文本即记一次加权命中） */
-const RADAR_KEYWORDS: ReadonlyArray<{ dim: keyof RadarScores; words: readonly string[] }> = [
+const RADAR_KEYWORDS: readonly { dim: keyof RadarScores; words: readonly string[] }[] = [
   { dim: 'diagnosis', words: ['诊断', '鉴别', '读片', '影像', '检验', '病情评估', '分诊', '查体'] },
   { dim: 'medication', words: ['药', '抗凝', '抗生素', '处方', '剂量', '相互作用', '输液', '给药'] },
   { dim: 'communication', words: ['沟通', '告知', '谈话', '患方', '满意度', '宣教', '知情', '安抚'] },
@@ -274,7 +274,7 @@ function emptyProfile(): DoctorGrowthProfile {
 
 /** 月度成长分桶：从 start 月到 end 月逐月填充，区间内决策累加到对应月 */
 function buildMonthlyGrowth(
-  items: Array<{ atMs: number; outcome: GrowthOutcome }>,
+  items: { atMs: number; outcome: GrowthOutcome }[],
   startMs: number,
   endMs: number,
 ): MonthlyGrowthPoint[] {
@@ -346,7 +346,7 @@ function buildSuccessTrend(monthly: MonthlyGrowthPoint[]): SuccessTrend {
 
 /** 教训闭环：失败教训若在后续出现同 tag 的成功决策，则记一次闭环 */
 function buildLessonImprovement(
-  items: Array<{ outcome: GrowthOutcome; tag: string; lesson: string }>,
+  items: { outcome: GrowthOutcome; tag: string; lesson: string }[],
 ): LessonImprovement {
   let lessonsRecorded = 0;
   let failureLessons = 0;
@@ -375,7 +375,7 @@ function buildLessonImprovement(
 }
 
 /** 专长标签：按出现频次降序、次键字典序，限量 MAX_EXPERTISE_TAGS */
-function buildExpertiseTags(items: Array<{ tag: string }>): ExpertiseTag[] {
+function buildExpertiseTags(items: { tag: string }[]): ExpertiseTag[] {
   const freq = new Map<string, number>();
   for (const it of items) {
     if (!it.tag) continue;
@@ -389,7 +389,7 @@ function buildExpertiseTags(items: Array<{ tag: string }>): ExpertiseTag[] {
 
 /** 成长里程碑：首决策 / 首成功 / 首教训 / 标签专精 / 累计决策步长 */
 function buildMilestones(
-  items: Array<{ atText: string; outcome: GrowthOutcome; tag: string; lesson: string }>,
+  items: { atText: string; outcome: GrowthOutcome; tag: string; lesson: string }[],
 ): GrowthMilestone[] {
   const out: GrowthMilestone[] = [];
   if (items.length === 0) return out;

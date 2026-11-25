@@ -7,6 +7,7 @@
 
 import { getDb, type DbExecutor, withTx } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type PrescriptionStatus = 'draft' | 'pending_review' | 'approved' | 'rejected' | 'dispensed' | 'cancelled';
 
@@ -35,13 +36,13 @@ const ITEM_COLS = `id, drug_code, drug_name, specification, dosage, dosage_unit,
 function mapRxRow(row: Record<string, unknown>): Omit<Prescription, 'items'> {
   return {
     id: String(row.id), visitId: String(row.visit_id), rxNo: String(row.rx_no),
-    prescriberId: row.prescriber_id ? String(row.prescriber_id) : null,
+    prescriberId: row.prescriber_id ? toText(row.prescriber_id) : null,
     status: row.status as PrescriptionStatus,
-    reviewerId: row.reviewer_id ? String(row.reviewer_id) : null,
-    reviewLevel: row.review_level ? String(row.review_level) : null,
-    riskLevel: row.risk_level ? String(row.risk_level) : null,
+    reviewerId: row.reviewer_id ? toText(row.reviewer_id) : null,
+    reviewLevel: row.review_level ? toText(row.review_level) : null,
+    riskLevel: row.risk_level ? toText(row.risk_level) : null,
     auditResult: (row.audit_result as Record<string, unknown>) ?? {},
-    counsel: row.counsel ? String(row.counsel) : null,
+    counsel: row.counsel ? toText(row.counsel) : null,
     totalFee: row.total_fee !== null ? Number(row.total_fee) : null,
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
@@ -49,16 +50,16 @@ function mapRxRow(row: Record<string, unknown>): Omit<Prescription, 'items'> {
 
 function mapItemRow(row: Record<string, unknown>): PrescriptionItem {
   return {
-    id: String(row.id), drugCode: row.drug_code ? String(row.drug_code) : null,
-    drugName: String(row.drug_name), specification: row.specification ? String(row.specification) : null,
+    id: String(row.id), drugCode: row.drug_code ? toText(row.drug_code) : null,
+    drugName: String(row.drug_name), specification: row.specification ? toText(row.specification) : null,
     dosage: row.dosage !== null ? Number(row.dosage) : null,
-    dosageUnit: row.dosage_unit ? String(row.dosage_unit) : null,
-    frequency: row.frequency ? String(row.frequency) : null,
-    route: row.route ? String(row.route) : null,
+    dosageUnit: row.dosage_unit ? toText(row.dosage_unit) : null,
+    frequency: row.frequency ? toText(row.frequency) : null,
+    route: row.route ? toText(row.route) : null,
     daysSupply: row.days_supply !== null ? Number(row.days_supply) : null,
     quantity: row.quantity !== null ? Number(row.quantity) : null,
-    quantityUnit: row.quantity_unit ? String(row.quantity_unit) : null,
-    skinTest: Boolean(row.skin_test), remark: row.remark ? String(row.remark) : null,
+    quantityUnit: row.quantity_unit ? toText(row.quantity_unit) : null,
+    skinTest: Boolean(row.skin_test), remark: row.remark ? toText(row.remark) : null,
   };
 }
 
@@ -77,7 +78,7 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: D
         ${tx.json(toJson(input.auditResult ?? {}))})
       RETURNING ${tx.unsafe(RX_COLS)}
     `;
-    const rx = mapRxRow(rxRows[0] as Record<string, unknown>);
+    const rx = mapRxRow(rxRows[0]);
     const items: PrescriptionItem[] = [];
     for (const item of input.items) {
       const itemRows = await tx`
@@ -85,7 +86,7 @@ export async function createPrescription(input: PrescriptionCreateInput, sql?: D
         VALUES (${rx.id}, ${item.drugCode ?? null}, ${item.drugName}, ${item.specification ?? null}, ${item.dosage ?? null}, ${item.dosageUnit ?? null}, ${item.frequency ?? null}, ${item.route ?? null}, ${item.daysSupply ?? null}, ${item.quantity ?? null}, ${item.quantityUnit ?? null}, ${item.skinTest}, ${item.remark ?? null})
         RETURNING ${tx.unsafe(ITEM_COLS)}
       `;
-      items.push(mapItemRow(itemRows[0] as Record<string, unknown>));
+      items.push(mapItemRow(itemRows[0]));
     }
     return { ...rx, items };
   });
@@ -95,7 +96,7 @@ export async function getPrescriptionById(id: string, sql?: DbExecutor): Promise
   const db = sql ?? getDb();
   const rxRows = await db`SELECT ${db.unsafe(RX_COLS)} FROM clinical.prescriptions WHERE id = ${id}`;
   if (rxRows.length === 0) return null;
-  const rx = mapRxRow(rxRows[0] as Record<string, unknown>);
+  const rx = mapRxRow(rxRows[0]);
   const itemRows = await db`SELECT ${db.unsafe(ITEM_COLS)} FROM clinical.prescription_items WHERE prescription_id = ${id} ORDER BY created_at`;
   return { ...rx, items: (itemRows as Record<string, unknown>[]).map(mapItemRow) };
 }

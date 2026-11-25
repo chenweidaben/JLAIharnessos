@@ -6,6 +6,7 @@
 
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type VisitType = 'outpatient' | 'emergency' | 'inpatient' | 'checkup';
 export type VisitStatus = 'ongoing' | 'discharged' | 'transferred' | 'cancelled';
@@ -54,17 +55,17 @@ function mapRow(row: Record<string, unknown>): Visit {
   return {
     id: String(row.id), patientId: String(row.patient_id), visitNo: String(row.visit_no),
     visitType: row.visit_type as VisitType, department: String(row.department),
-    ward: row.ward ? String(row.ward) : null, bedNo: row.bed_no ? String(row.bed_no) : null,
-    wardId: row.ward_id ? String(row.ward_id) : null,
-    bedId: row.bed_id ? String(row.bed_id) : null,
-    attendingDoctorId: row.attending_doctor_id ? String(row.attending_doctor_id) : null,
-    chiefComplaint: row.chief_complaint ? String(row.chief_complaint) : null,
+    ward: row.ward ? toText(row.ward) : null, bedNo: row.bed_no ? toText(row.bed_no) : null,
+    wardId: row.ward_id ? toText(row.ward_id) : null,
+    bedId: row.bed_id ? toText(row.bed_id) : null,
+    attendingDoctorId: row.attending_doctor_id ? toText(row.attending_doctor_id) : null,
+    chiefComplaint: row.chief_complaint ? toText(row.chief_complaint) : null,
     consultationDetail: normalizeConsultationDetail(row.consultation_detail),
-    status: row.status as VisitStatus, triageLevel: row.triage_level ? String(row.triage_level) : null,
-    admitAt: row.admit_at ? String(row.admit_at) : null,
-    dischargeAt: row.discharge_at ? String(row.discharge_at) : null,
-    drgGroup: row.drg_group ? String(row.drg_group) : null,
-    dipGroup: row.dip_group ? String(row.dip_group) : null,
+    status: row.status as VisitStatus, triageLevel: row.triage_level ? toText(row.triage_level) : null,
+    admitAt: row.admit_at ? toText(row.admit_at) : null,
+    dischargeAt: row.discharge_at ? toText(row.discharge_at) : null,
+    drgGroup: row.drg_group ? toText(row.drg_group) : null,
+    dipGroup: row.dip_group ? toText(row.dip_group) : null,
     totalFee: row.total_fee !== null ? Number(row.total_fee) : null,
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
@@ -93,7 +94,7 @@ export async function createVisit(input: VisitCreateInput, sql?: DbExecutor): Pr
     )
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /**
@@ -144,7 +145,7 @@ export async function updateVisit(
 export async function getVisitById(id: string, sql?: DbExecutor): Promise<Visit | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.visits WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getVisitsByPatient(
@@ -181,7 +182,7 @@ export async function updateVisitStatus(id: string, status: VisitStatus, sql?: S
     UPDATE clinical.visits SET status = ${status}, discharge_at = COALESCE(discharge_at, ${dischargeAt ?? null}), updated_at = now()
     WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 更新主诉与结构化问诊明细 */
@@ -198,5 +199,5 @@ export async function updateVisitConsultation(
         updated_at = now()
     WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

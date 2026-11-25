@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface PiccMaintenance {
   id: string;
@@ -29,8 +30,8 @@ function mapRow(r: Record<string, unknown>): PiccMaintenance {
     lastMaintainedAt: String(r.last_maintained_at),
     dressingChanged: Boolean(r.dressing_changed),
     flushed: Boolean(r.flushed),
-    complication: r.complication == null ? null : String(r.complication),
-    notes: r.notes == null ? null : String(r.notes),
+    complication: r.complication == null ? null : toText(r.complication),
+    notes: r.notes == null ? null : toText(r.notes),
     nurse: String(r.nurse),
     createdAt: String(r.created_at),
   };
@@ -56,7 +57,7 @@ export async function recordMaintenance(input: RecordInput): Promise<PiccMainten
     VALUES (${input.patientId}, ${input.deviceType}, ${input.insertedAt}, ${input.lastMaintainedAt},
       ${input.dressingChanged}, ${input.flushed}, ${input.complication}, ${input.notes}, ${input.nurse})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByPatient(patientId: string): Promise<PiccMaintenance[]> {

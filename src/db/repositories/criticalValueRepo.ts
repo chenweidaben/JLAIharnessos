@@ -13,6 +13,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type CriticalStatus = 'raised' | 'acked' | 'resolved';
 
@@ -55,19 +56,19 @@ function mapRow(row: Record<string, unknown>): CriticalAlert {
     patientId: String(row.patient_id),
     department: String(row.department),
     itemName: String(row.item_name),
-    itemCode: row.item_code ? String(row.item_code) : null,
-    value: row.value != null ? String(row.value) : null,
-    unit: row.unit ? String(row.unit) : null,
-    refLow: row.ref_low != null ? String(row.ref_low) : null,
-    refHigh: row.ref_high != null ? String(row.ref_high) : null,
-    flag: row.flag ? String(row.flag) : null,
+    itemCode: row.item_code ? toText(row.item_code) : null,
+    value: row.value != null ? toText(row.value) : null,
+    unit: row.unit ? toText(row.unit) : null,
+    refLow: row.ref_low != null ? toText(row.ref_low) : null,
+    refHigh: row.ref_high != null ? toText(row.ref_high) : null,
+    flag: row.flag ? toText(row.flag) : null,
     status: row.status as CriticalStatus,
     raisedAt: String(row.raised_at),
-    ackedBy: row.acked_by ? String(row.acked_by) : null,
-    ackedAt: row.acked_at ? String(row.acked_at) : null,
-    resolvedBy: row.resolved_by ? String(row.resolved_by) : null,
-    resolvedAt: row.resolved_at ? String(row.resolved_at) : null,
-    dispositionNote: row.disposition_note ? String(row.disposition_note) : null,
+    ackedBy: row.acked_by ? toText(row.acked_by) : null,
+    ackedAt: row.acked_at ? toText(row.acked_at) : null,
+    resolvedBy: row.resolved_by ? toText(row.resolved_by) : null,
+    resolvedAt: row.resolved_at ? toText(row.resolved_at) : null,
+    dispositionNote: row.disposition_note ? toText(row.disposition_note) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -110,7 +111,7 @@ export async function scanAndRaise(
 export async function getById(id: string, sql?: DbExecutor): Promise<CriticalAlert | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.critical_value_alerts WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export interface CriticalListRow {
@@ -150,9 +151,9 @@ export async function listAlerts(
     patientName: String(r.name_masked),
     department: String(r.department),
     itemName: String(r.item_name),
-    value: r.value != null ? String(r.value) : null,
-    unit: r.unit ? String(r.unit) : null,
-    flag: r.flag ? String(r.flag) : null,
+    value: r.value != null ? toText(r.value) : null,
+    unit: r.unit ? toText(r.unit) : null,
+    flag: r.flag ? toText(r.flag) : null,
     status: r.status as CriticalStatus,
     raisedAt: String(r.raised_at),
   }));
@@ -173,7 +174,7 @@ export async function setStatus(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapRow(locked[0] as Record<string, unknown>);
+  const current = mapRow(locked[0]);
   if (!fromStatuses.includes(current.status)) return null;
 
   const rows = await tx`
@@ -187,7 +188,7 @@ export async function setStatus(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function countAlerts(sql?: DbExecutor): Promise<number> {
@@ -222,14 +223,14 @@ const CLOSURE_COLS = `
 function mapClosure(row: Record<string, unknown>): CriticalClosure {
   return {
     id: String(row.id),
-    notifiedAt: row.notified_at ? String(row.notified_at) : null,
-    doctorAcceptedAt: row.doctor_accepted_at ? String(row.doctor_accepted_at) : null,
-    doctorAcceptedBy: row.doctor_accepted_by ? String(row.doctor_accepted_by) : null,
-    processedAt: row.processed_at ? String(row.processed_at) : null,
-    processedBy: row.processed_by ? String(row.processed_by) : null,
-    processedNote: row.processed_note ? String(row.processed_note) : null,
-    closedAt: row.closed_at ? String(row.closed_at) : null,
-    closedBy: row.closed_by ? String(row.closed_by) : null,
+    notifiedAt: row.notified_at ? toText(row.notified_at) : null,
+    doctorAcceptedAt: row.doctor_accepted_at ? toText(row.doctor_accepted_at) : null,
+    doctorAcceptedBy: row.doctor_accepted_by ? toText(row.doctor_accepted_by) : null,
+    processedAt: row.processed_at ? toText(row.processed_at) : null,
+    processedBy: row.processed_by ? toText(row.processed_by) : null,
+    processedNote: row.processed_note ? toText(row.processed_note) : null,
+    closedAt: row.closed_at ? toText(row.closed_at) : null,
+    closedBy: row.closed_by ? toText(row.closed_by) : null,
   };
 }
 
@@ -244,7 +245,7 @@ export async function lockClosureById(
     WHERE id = ${id}
     FOR UPDATE
   `;
-  return rows.length > 0 ? mapClosure(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapClosure(rows[0]) : null;
 }
 
 /** 整行覆写闭环留痕字段（聚合器纯函数产出完整记录后整体落库）。 */
@@ -266,7 +267,7 @@ export async function updateClosure(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(CLOSURE_COLS)}
   `;
-  return mapClosure(rows[0] as Record<string, unknown>);
+  return mapClosure(rows[0]);
 }
 
 /**

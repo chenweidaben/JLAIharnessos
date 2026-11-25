@@ -40,7 +40,7 @@ const CATEGORY_META: Readonly<Record<TeachingCategory, { label: string; assessLi
 };
 
 /** 四类教学的判别关键词（命中即归类；顺序优先匹配更具体的口径） */
-const CATEGORY_KEYWORDS: ReadonlyArray<{ cat: TeachingCategory; words: readonly string[] }> = [
+const CATEGORY_KEYWORDS: readonly { cat: TeachingCategory; words: readonly string[] }[] = [
   { cat: 'three_basics', words: ['三基', '三严', '基础理论', '基本知识', '基本技能'] },
   { cat: 'residency', words: ['规培', '住院医师', '住培', '规范化培训'] },
   { cat: 'internship', words: ['实习', '见习'] },

@@ -6,6 +6,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface DoctorSchedule {
   id: string;
@@ -33,7 +34,7 @@ export async function createSchedule(input: { doctorId: string; department?: str
     VALUES (${input.doctorId}, ${input.department ?? null}, ${input.workDate}, ${input.note ?? null}, ${input.createdBy ?? null})
     RETURNING id, doctor_id, department, work_date, note, created_at`;
   const r = rows[0] as Record<string, unknown>;
-  return { id: String(r.id), doctorId: String(r.doctor_id), department: r.department ? String(r.department) : null, workDate: String(r.work_date), note: r.note ? String(r.note) : null, createdAt: String(r.created_at) };
+  return { id: String(r.id), doctorId: String(r.doctor_id), department: r.department ? toText(r.department) : null, workDate: String(r.work_date), note: r.note ? toText(r.note) : null, createdAt: String(r.created_at) };
 }
 
 export async function addSlot(scheduleId: string, slotStart: string, slotEnd: string, totalQuota: number, sql?: DbExecutor): Promise<AppointmentSlot> {
@@ -42,7 +43,7 @@ export async function addSlot(scheduleId: string, slotStart: string, slotEnd: st
     INSERT INTO clinical.appointment_slots (schedule_id, slot_start, slot_end, total_quota)
     VALUES (${scheduleId}, ${slotStart}, ${slotEnd}, ${totalQuota})
     RETURNING id, schedule_id, slot_start, slot_end, total_quota, booked_count, status`;
-  return mapSlot(rows[0] as Record<string, unknown>);
+  return mapSlot(rows[0]);
 }
 
 function mapRowToSlot(r: Record<string, unknown>): AppointmentSlot {
@@ -90,7 +91,7 @@ export async function bookSlotWithAppointment(
     WHERE id = ${slotId} AND status = 'open' AND booked_count < total_quota
     RETURNING id, schedule_id, slot_start, slot_end, total_quota, booked_count, status`;
   if (rows.length === 0) return null;
-  const slot = mapRowToSlot(rows[0] as Record<string, unknown>);
+  const slot = mapRowToSlot(rows[0]);
   await tx`
     INSERT INTO clinical.appointments (appointment_no, patient_id, scheduled_at, department, purpose, status, slot_id)
     VALUES (${appointmentNo}, ${booking.patientId}, ${slot.slotStart}, ${booking.department ?? 'TBD'}, ${booking.purpose ?? 'booked via slot'}, 'scheduled', ${slotId})`;
@@ -108,11 +109,11 @@ export async function cancelBookingWithAppointment(slotId: string, tx: DbExecuto
     SET booked_count = booked_count - 1
     WHERE id = ${slotId} AND booked_count > 0
     RETURNING id, schedule_id, slot_start, slot_end, total_quota, booked_count, status`;
-  return rows.length > 0 ? mapRowToSlot(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRowToSlot(rows[0]) : null;
 }
 
 export async function getSlotById(slotId: string, sql?: DbExecutor): Promise<AppointmentSlot | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT id, schedule_id, slot_start, slot_end, total_quota, booked_count, status FROM clinical.appointment_slots WHERE id = ${slotId}`;
-  return rows.length > 0 ? mapRowToSlot(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRowToSlot(rows[0]) : null;
 }

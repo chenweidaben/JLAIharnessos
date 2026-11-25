@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface PainClinicRecord {
   id: string;
@@ -26,14 +27,14 @@ function map(r: Record<string, unknown>): PainClinicRecord {
   return {
     id: String(r.id),
     patientId: String(r.patient_id),
-    visitId: r.visit_id ? String(r.visit_id) : null,
+    visitId: r.visit_id ? toText(r.visit_id) : null,
     baselineNrs: Number(r.baseline_nrs),
     currentNrs: Number(r.current_nrs),
     breakthroughCount: Number(r.breakthrough_count),
     analgesic: String(r.analgesic),
-    doseNote: r.dose_note ? String(r.dose_note) : null,
+    doseNote: r.dose_note ? toText(r.dose_note) : null,
     titrationRound: Number(r.titration_round),
-    adjustmentSuggestion: r.adjustment_suggestion ? String(r.adjustment_suggestion) : null,
+    adjustmentSuggestion: r.adjustment_suggestion ? toText(r.adjustment_suggestion) : null,
     recordedBy: String(r.recorded_by),
     createdAt: String(r.created_at),
   };
@@ -56,7 +57,7 @@ export async function createRecord(
        ${input.breakthroughCount}, ${input.analgesic}, ${input.doseNote ?? null},
        ${input.titrationRound}, ${input.adjustmentSuggestion}, ${input.recordedBy})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByPatient(patientId: string, tx: DbExecutor = getDb()): Promise<PainClinicRecord[]> {
@@ -70,5 +71,5 @@ export async function getLatest(patientId: string, tx: DbExecutor = getDb()): Pr
   const rows = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.pain_clinic_records
     WHERE patient_id=${patientId} ORDER BY created_at DESC, id DESC LIMIT 1`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

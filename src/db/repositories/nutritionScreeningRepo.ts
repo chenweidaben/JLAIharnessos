@@ -6,6 +6,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface NutritionScreening {
   id: string;
@@ -31,7 +32,7 @@ function map(row: Record<string, unknown>): NutritionScreening {
     ageBonus: Number(row.age_bonus),
     totalScore: Number(row.total_score),
     nutritionRisk: Boolean(row.nutrition_risk),
-    resultNote: row.result_note ? String(row.result_note) : null,
+    resultNote: row.result_note ? toText(row.result_note) : null,
     createdBy: String(row.created_by),
     createdAt: String(row.created_at),
   };

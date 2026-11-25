@@ -14,6 +14,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import type { Audience, DeepSource, LlmStatus } from '../../medical-tools/interpret/interpretEngine.js';
+import { toText } from '../rowText.js';
 
 export type ImagingInterpStatus = 'pending_review' | 'signed' | 'rejected';
 
@@ -87,21 +88,21 @@ function mapRow(row: Record<string, unknown>): ImagingInterpretation {
     patientId: String(row.patient_id),
     department: String(row.department),
     audience: (row.audience as Audience) ?? 'doctor',
-    modality: row.modality ? String(row.modality) : null,
+    modality: row.modality ? toText(row.modality) : null,
     examName: String(row.exam_name),
-    bodyPart: row.body_part ? String(row.body_part) : null,
+    bodyPart: row.body_part ? toText(row.body_part) : null,
     explainedFindings: asArr(row.explained_findings),
-    overallDirection: row.overall_direction ? String(row.overall_direction) : null,
-    plainLanguageSummary: row.plain_language_summary ? String(row.plain_language_summary) : null,
+    overallDirection: row.overall_direction ? toText(row.overall_direction) : null,
+    plainLanguageSummary: row.plain_language_summary ? toText(row.plain_language_summary) : null,
     recommendations: asArr(row.recommendations),
     deepSource: (row.deep_source as DeepSource) ?? 'rule',
-    model: row.model ? String(row.model) : null,
+    model: row.model ? toText(row.model) : null,
     llmStatus: (row.llm_status as LlmStatus) ?? 'rule_only',
     status: row.status as ImagingInterpStatus,
     generatedAt: String(row.generated_at),
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -126,13 +127,13 @@ export async function getImagingReport(
     id: String(r.id),
     visitId: String(r.visit_id),
     patientId: String(r.patient_id),
-    modality: r.modality ? String(r.modality) : null,
+    modality: r.modality ? toText(r.modality) : null,
     examName: String(r.exam_name),
-    bodyPart: r.body_part ? String(r.body_part) : null,
-    findings: r.findings ? String(r.findings) : null,
-    impression: r.impression ? String(r.impression) : null,
+    bodyPart: r.body_part ? toText(r.body_part) : null,
+    findings: r.findings ? toText(r.findings) : null,
+    impression: r.impression ? toText(r.impression) : null,
     status: String(r.status),
-    reportTime: r.report_time ? String(r.report_time) : null,
+    reportTime: r.report_time ? toText(r.report_time) : null,
   };
 }
 
@@ -194,7 +195,7 @@ export async function upsertImagingInterpretation(
       reject_reason = NULL
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /* -------------------------------- 查询 -------------------------------- */
@@ -209,7 +210,7 @@ export async function getByReport(
     SELECT ${db.unsafe(COLS)} FROM clinical.imaging_interpretations
     WHERE report_id = ${reportId} AND audience = ${audience}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getById(
@@ -218,7 +219,7 @@ export async function getById(
 ): Promise<ImagingInterpretation | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.imaging_interpretations WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export interface ImagingInterpListRow {
@@ -289,7 +290,7 @@ export async function setStatus(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapRow(locked[0] as Record<string, unknown>);
+  const current = mapRow(locked[0]);
   if (!fromStatuses.includes(current.status)) return null;
 
   const rows = await tx`
@@ -301,5 +302,5 @@ export async function setStatus(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

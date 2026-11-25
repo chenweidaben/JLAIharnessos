@@ -6,6 +6,7 @@
 
 import { getDb, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface LabResult {
   id: string; visitId: string; patientId: string; reportNo: string | null;
@@ -29,18 +30,18 @@ const SELECT_COLS = `id, visit_id, patient_id, report_no, panel_name, item_name,
 function mapRow(row: Record<string, unknown>): LabResult {
   return {
     id: String(row.id), visitId: String(row.visit_id), patientId: String(row.patient_id),
-    reportNo: row.report_no ? String(row.report_no) : null,
-    panelName: row.panel_name ? String(row.panel_name) : null,
-    itemName: String(row.item_name), itemCode: row.item_code ? String(row.item_code) : null,
-    specimen: row.specimen ? String(row.specimen) : null,
-    value: row.value ? String(row.value) : null,
+    reportNo: row.report_no ? toText(row.report_no) : null,
+    panelName: row.panel_name ? toText(row.panel_name) : null,
+    itemName: String(row.item_name), itemCode: row.item_code ? toText(row.item_code) : null,
+    specimen: row.specimen ? toText(row.specimen) : null,
+    value: row.value ? toText(row.value) : null,
     numericValue: row.numeric_value !== null ? Number(row.numeric_value) : null,
-    unit: row.unit ? String(row.unit) : null,
+    unit: row.unit ? toText(row.unit) : null,
     refLow: row.ref_low !== null ? Number(row.ref_low) : null,
     refHigh: row.ref_high !== null ? Number(row.ref_high) : null,
-    abnormalFlag: row.abnormal_flag ? String(row.abnormal_flag) : null,
+    abnormalFlag: row.abnormal_flag ? toText(row.abnormal_flag) : null,
     isCritical: Boolean(row.is_critical),
-    resultTime: row.result_time ? String(row.result_time) : null,
+    resultTime: row.result_time ? toText(row.result_time) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -55,7 +56,7 @@ export async function createLabResult(input: LabResultCreateInput, sql?: Sql): P
       ${input.abnormalFlag ?? null}, ${input.isCritical ?? false}, ${input.resultTime ?? new Date().toISOString()})
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getLabResultsByVisit(

@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface PacuRecord {
   id: string; visitId: string;
@@ -17,10 +18,10 @@ function map(r: Record<string, unknown>): PacuRecord {
     id: String(r.id), visitId: String(r.visit_id),
     activity: Number(r.activity), respiration: Number(r.respiration), circulation: Number(r.circulation),
     consciousness: Number(r.consciousness), spo2: Number(r.spo2),
-    enteredAt: String(r.entered_at), exitedAt: r.exited_at ? String(r.exited_at) : null,
+    enteredAt: String(r.entered_at), exitedAt: r.exited_at ? toText(r.exited_at) : null,
     delayedRecovery: Boolean(r.delayed_recovery),
-    dischargeDestination: r.discharge_destination ? String(r.discharge_destination) : null,
-    note: r.note ? String(r.note) : null,
+    dischargeDestination: r.discharge_destination ? toText(r.discharge_destination) : null,
+    note: r.note ? toText(r.note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

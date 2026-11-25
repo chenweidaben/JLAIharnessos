@@ -24,7 +24,7 @@ import { type Encoder, estimateTokens, shortId, tokenize } from '../util';
 export interface ParsedDocument {
   title: string;
   text: string;
-  sections: Array<{ heading: string; level: number; start: number }>;
+  sections: { heading: string; level: number; start: number }[];
 }
 
 /** 从文本中识别标题层级（支持 markdown、中文"第X章/一、"、数字编号） */
@@ -32,7 +32,7 @@ export function detectHeadings(text: string): ParsedDocument['sections'] {
   const lines = text.split(/\r?\n/);
   const sections: ParsedDocument['sections'] = [];
   let offset = 0;
-  const patterns: Array<[RegExp, number]> = [
+  const patterns: [RegExp, number][] = [
     [/^#{1,3}\s+.+/, 0], // markdown，层级另行计算
     [/^第[一二三四五六七八九十百0-9]+[章节部分].*/, 1],
     [/^[一二三四五六七八九十]+[、.].*/, 2],
@@ -41,7 +41,7 @@ export function detectHeadings(text: string): ParsedDocument['sections'] {
   for (const line of lines) {
     const md = /^#{1,3}\s+(.+)/.exec(line);
     if (md) {
-      sections.push({ heading: md[1].trim(), level: (line.match(/^#+/)?.[0].length ?? 1), start: offset });
+      sections.push({ heading: md[1].trim(), level: ((/^#+/.exec(line))?.[0].length ?? 1), start: offset });
     } else {
       for (const [re, level] of patterns.slice(1)) {
         if (re.test(line.trim())) {
@@ -124,7 +124,7 @@ export function cleanText(text: string): string {
 // 3. 切分
 // ----------------------------------------------------------------------------
 
-export function chunkText(text: string, sections: ParsedDocument['sections'], opts: ChunkOptions): Array<{ content: string; sectionPath?: string; index: number }> {
+export function chunkText(text: string, sections: ParsedDocument['sections'], opts: ChunkOptions): { content: string; sectionPath?: string; index: number }[] {
   const size = opts.chunkSize ?? 800;
   const overlap = opts.overlap ?? 80;
 
@@ -147,9 +147,9 @@ function sectionPathAt(sections: ParsedDocument['sections'], offset: number): st
   return current;
 }
 
-function splitBySections(text: string, sections: ParsedDocument['sections']): Array<{ content: string; sectionPath?: string; index: number }> {
+function splitBySections(text: string, sections: ParsedDocument['sections']): { content: string; sectionPath?: string; index: number }[] {
   const bounds = sections.map((s) => s.start).concat([text.length]);
-  const out: Array<{ content: string; sectionPath?: string; index: number }> = [];
+  const out: { content: string; sectionPath?: string; index: number }[] = [];
   for (let i = 0; i < sections.length; i++) {
     const seg = text.slice(bounds[i], bounds[i + 1]).trim();
     if (seg) out.push({ content: seg, sectionPath: sections[i].heading, index: out.length });
@@ -158,9 +158,9 @@ function splitBySections(text: string, sections: ParsedDocument['sections']): Ar
   return out;
 }
 
-function splitBySentence(text: string, size: number, overlap: number): Array<{ content: string; sectionPath?: string; index: number }> {
+function splitBySentence(text: string, size: number, overlap: number): { content: string; sectionPath?: string; index: number }[] {
   const sentences = text.split(/(?<=[。！？!?；;\n])/);
-  const out: Array<{ content: string; index: number }> = [];
+  const out: { content: string; index: number }[] = [];
   let buf = '';
   for (const s of sentences) {
     if ((buf + s).length > size && buf) {
@@ -174,8 +174,8 @@ function splitBySentence(text: string, size: number, overlap: number): Array<{ c
   return out.length ? out : [{ content: text, index: 0 }];
 }
 
-function slidingWindow(text: string, size: number, overlap: number): Array<{ content: string; sectionPath?: string; index: number }> {
-  const out: Array<{ content: string; index: number }> = [];
+function slidingWindow(text: string, size: number, overlap: number): { content: string; sectionPath?: string; index: number }[] {
+  const out: { content: string; index: number }[] = [];
   let start = 0;
   while (start < text.length) {
     const end = Math.min(text.length, start + size);
@@ -191,7 +191,7 @@ function slidingWindow(text: string, size: number, overlap: number): Array<{ con
 // 4. 标准化（医学书写归一）
 // ----------------------------------------------------------------------------
 
-const NORMALIZE_RULES: Array<[RegExp, string]> = [
+const NORMALIZE_RULES: [RegExp, string][] = [
   [/[\u3000\s]+/g, ''],
   [/Ⅱ/g, 'II'],
   [/Ⅲ/g, 'III'],
@@ -213,12 +213,12 @@ export function normalizeTerm(raw: string): string {
 // ----------------------------------------------------------------------------
 
 export interface ExtractionResult {
-  entities: Array<{ name: string; type: string }>;
-  relations: Array<{ from: string; to: string; type: string }>;
+  entities: { name: string; type: string }[];
+  relations: { from: string; to: string; type: string }[];
 }
 
 /** 内置高置信医学线索词（用于离线演示，生产由知识图谱实体词典驱动） */
-const LEXICON: Array<[RegExp, string]> = [
+const LEXICON: [RegExp, string][] = [
   [/[一-鿿]{2,8}(综合征|症|炎|瘤|癌|病|结石|梗阻|衰竭|骨折|损伤)/g, 'disease'],
   [/[一-鿿]{1,8}(疼痛|发热|咳嗽|水肿|头晕|恶心|呕吐|腹泻|便秘|黄疸|心悸|呼吸困难|乏力)/g, 'symptom'],
   [/[一-鿿]{2,12}(片|胶囊|注射液|颗粒|口服液|滴丸|软膏|喷雾剂|糖浆|混悬液)/g, 'drug'],
@@ -226,7 +226,7 @@ const LEXICON: Array<[RegExp, string]> = [
   [/(切除术|吻合术|造影术|支架植入术|引流术|缝合术)/g, 'procedure'],
 ];
 
-const RELATION_PATTERNS: Array<[RegExp, string]> = [
+const RELATION_PATTERNS: [RegExp, string][] = [
   [/([一-鿿]{2,10}(?:片|胶囊|注射液|颗粒))[^。；]*(?:治疗|用于|改善)([一-鿿]{2,12}(?:综合征|症|炎|病|瘤|癌))/g, 'treats'],
   [/([一-鿿]{2,10}(?:综合征|症|炎|病))[^。；]*(?:表现为|出现|伴)([一-鿿]{1,8}(?:疼痛|发热|咳嗽|水肿))/g, 'has_symptom'],
   [/([一-鿿]{2,10}(?:片|胶囊))[^。；]*(?:禁忌|禁用|不宜)([一-鿿]{2,10})/g, 'contraindicates'],

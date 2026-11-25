@@ -14,6 +14,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { EfficacyGrade, UtilizationConclusion } from '../../medical-tools/quality/bloodUtilizationQuality.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 疗效评估
@@ -55,18 +56,18 @@ function mapEff(row: Record<string, unknown>): EfficacyAssessment {
     requestId: String(row.request_id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    assessedBy: row.assessed_by ? String(row.assessed_by) : null,
+    assessedBy: row.assessed_by ? toText(row.assessed_by) : null,
     component: String(row.component),
     preMetric: numOrNull(row.pre_metric),
     postMetric: numOrNull(row.post_metric),
-    metricUnit: row.metric_unit ? String(row.metric_unit) : null,
+    metricUnit: row.metric_unit ? toText(row.metric_unit) : null,
     expectedDelta: numOrNull(row.expected_delta),
     actualDelta: numOrNull(row.actual_delta),
     efficacyGrade: row.efficacy_grade as EfficacyGrade,
-    preResultId: row.pre_result_id ? String(row.pre_result_id) : null,
-    postResultId: row.post_result_id ? String(row.post_result_id) : null,
-    note: row.note ? String(row.note) : null,
-    assessedAt: row.assessed_at ? String(row.assessed_at) : null,
+    preResultId: row.pre_result_id ? toText(row.pre_result_id) : null,
+    postResultId: row.post_result_id ? toText(row.post_result_id) : null,
+    note: row.note ? toText(row.note) : null,
+    assessedAt: row.assessed_at ? toText(row.assessed_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -122,7 +123,7 @@ export async function upsertEfficacy(
       assessed_at = now(),
       updated_at = now()
     RETURNING ${tx.unsafe(EFF_COLS)}`;
-  return { assessment: mapEff(rows[0] as Record<string, unknown>), created };
+  return { assessment: mapEff(rows[0]), created };
 }
 
 export async function getEfficacyByTransfusion(
@@ -133,7 +134,7 @@ export async function getEfficacyByTransfusion(
   const rows = await db`
     SELECT ${db.unsafe(EFF_COLS)} FROM clinical.transfusion_efficacy_assessments
     WHERE transfusion_id = ${transfusionId}`;
-  return rows.length > 0 ? mapEff(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapEff(rows[0]) : null;
 }
 
 export async function listEfficacy(
@@ -187,15 +188,15 @@ function mapUtil(row: Record<string, unknown>): UtilizationReview {
     requestId: String(row.request_id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
     indicationCompliant: Boolean(row.indication_compliant),
     dosageCompliant: Boolean(row.dosage_compliant),
     preTestComplete: Boolean(row.pre_test_complete),
     efficacyGrade: row.efficacy_grade ? (row.efficacy_grade as EfficacyGrade) : null,
     conclusion: row.conclusion as UtilizationConclusion,
     issues: (row.issues ?? []) as string[],
-    conclusionNote: row.conclusion_note ? String(row.conclusion_note) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
+    conclusionNote: row.conclusion_note ? toText(row.conclusion_note) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -243,7 +244,7 @@ export async function upsertUtilization(
       reviewed_at = now(),
       updated_at = now()
     RETURNING ${tx.unsafe(UTIL_COLS)}`;
-  return { review: mapUtil(rows[0] as Record<string, unknown>), created };
+  return { review: mapUtil(rows[0]), created };
 }
 
 export async function getUtilizationByRequest(
@@ -254,7 +255,7 @@ export async function getUtilizationByRequest(
   const rows = await db`
     SELECT ${db.unsafe(UTIL_COLS)} FROM clinical.blood_utilization_reviews
     WHERE request_id = ${requestId}`;
-  return rows.length > 0 ? mapUtil(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapUtil(rows[0]) : null;
 }
 
 export async function listUtilization(

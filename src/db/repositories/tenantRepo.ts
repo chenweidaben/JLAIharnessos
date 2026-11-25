@@ -13,6 +13,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { Tenant, TenantId } from '../../tenant/types';
+import { toText } from '../rowText.js';
 
 const TENANT_COLS = `
   id, name, level, parent_id, enabled, config, created_at, updated_at, deleted_at
@@ -23,12 +24,12 @@ function mapTenant(row: Record<string, unknown>): Tenant {
     id: String(row.id),
     name: String(row.name),
     level: row.level as Tenant['level'],
-    parentId: row.parent_id ? String(row.parent_id) : undefined,
+    parentId: row.parent_id ? toText(row.parent_id) : undefined,
     enabled: Boolean(row.enabled),
     config: (row.config ?? {}) as Record<string, unknown>,
     createdAt: String(row.created_at),
-    updatedAt: row.updated_at ? String(row.updated_at) : undefined,
-    deletedAt: row.deleted_at ? String(row.deleted_at) : undefined,
+    updatedAt: row.updated_at ? toText(row.updated_at) : undefined,
+    deletedAt: row.deleted_at ? toText(row.deleted_at) : undefined,
   };
 }
 
@@ -47,7 +48,7 @@ export async function getTenantById(id: TenantId, sql?: DbExecutor): Promise<Ten
   const rows = await db`
     SELECT ${db.unsafe(TENANT_COLS)} FROM iam.tenants WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapTenant(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTenant(rows[0]) : null;
 }
 
 /**
@@ -74,5 +75,5 @@ export async function upsertTenant(node: Tenant, sql?: DbExecutor): Promise<Tena
       deleted_at = EXCLUDED.deleted_at
     RETURNING ${db.unsafe(TENANT_COLS)}
   `;
-  return mapTenant(rows[0] as Record<string, unknown>);
+  return mapTenant(rows[0]);
 }

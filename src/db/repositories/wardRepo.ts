@@ -7,6 +7,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------- 院区 -------------------------------- */
 
@@ -27,7 +28,7 @@ function mapCampus(row: Record<string, unknown>): Campus {
     id: String(row.id),
     code: String(row.code),
     name: String(row.name),
-    address: row.address ? String(row.address) : null,
+    address: row.address ? toText(row.address) : null,
     status: row.status as Campus['status'],
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -49,7 +50,7 @@ export async function getCampusByCode(code: string, sql?: DbExecutor): Promise<C
   const rows = await db`
     SELECT ${db.unsafe(CAMPUS_COLS)} FROM clinical.campuses WHERE code = ${code}
   `;
-  return rows.length > 0 ? mapCampus(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCampus(rows[0]) : null;
 }
 
 /* ------------------------------- 病区 -------------------------------- */
@@ -79,9 +80,9 @@ function mapWard(row: Record<string, unknown>): Ward {
     name: String(row.name),
     department: String(row.department),
     campusId: String(row.campus_id),
-    floor: row.floor ? String(row.floor) : null,
-    nurseStation: row.nurse_station ? String(row.nurse_station) : null,
-    director: row.director ? String(row.director) : null,
+    floor: row.floor ? toText(row.floor) : null,
+    nurseStation: row.nurse_station ? toText(row.nurse_station) : null,
+    director: row.director ? toText(row.director) : null,
     status: row.status as Ward['status'],
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -115,11 +116,11 @@ export async function listWards(query: WardQuery = {}, sql?: DbExecutor): Promis
 export async function getWardById(id: string, sql?: DbExecutor): Promise<Ward | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(WARD_COLS)} FROM clinical.wards w WHERE w.id = ${id}`;
-  return rows.length > 0 ? mapWard(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapWard(rows[0]) : null;
 }
 
 export async function getWardByCode(code: string, sql?: DbExecutor): Promise<Ward | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(WARD_COLS)} FROM clinical.wards w WHERE w.code = ${code}`;
-  return rows.length > 0 ? mapWard(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapWard(rows[0]) : null;
 }

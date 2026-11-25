@@ -52,7 +52,7 @@ const CATEGORY_META: Readonly<
 };
 
 /** 五类疫苗的判别关键词（命中即归类；顺序优先匹配更具体的口径） */
-const CATEGORY_KEYWORDS: ReadonlyArray<{ cat: VaccineCategory; words: readonly string[] }> = [
+const CATEGORY_KEYWORDS: readonly { cat: VaccineCategory; words: readonly string[] }[] = [
   { cat: 'hepb', words: ['乙肝', '乙型肝炎', '肝疫苗'] },
   { cat: 'hpv', words: ['hpv', '人乳头瘤', '宫颈癌疫苗'] },
   { cat: 'covid', words: ['新冠', 'covid', '冠状病毒', '灭活疫苗', '腺病毒'] },

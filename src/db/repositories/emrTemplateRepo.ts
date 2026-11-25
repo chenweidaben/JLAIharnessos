@@ -19,6 +19,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type TemplateScope = 'national' | 'hospital' | 'department' | 'personal';
 export type TemplateStatus = 'draft' | 'pending_review' | 'published' | 'deprecated';
@@ -91,19 +92,19 @@ function mapTemplate(row: Record<string, unknown>): EmrTemplate {
     id: String(row.id),
     name: String(row.name),
     scope: (row.scope as TemplateScope) ?? 'hospital',
-    departmentId: row.department_id ? String(row.department_id) : null,
-    hospitalId: row.hospital_id ? String(row.hospital_id) : null,
-    userId: row.user_id ? String(row.user_id) : null,
-    parentId: row.parent_id ? String(row.parent_id) : null,
-    recordType: String(row.record_type ?? ''),
-    content: String(row.content ?? ''),
+    departmentId: row.department_id ? toText(row.department_id) : null,
+    hospitalId: row.hospital_id ? toText(row.hospital_id) : null,
+    userId: row.user_id ? toText(row.user_id) : null,
+    parentId: row.parent_id ? toText(row.parent_id) : null,
+    recordType: toText(row.record_type ?? ''),
+    content: toText(row.content ?? ''),
     fields: asFields(row.fields),
     status: (row.status as TemplateStatus) ?? 'published',
     version: Number(row.version ?? 1),
-    dueRule: row.due_rule ? String(row.due_rule) : null,
-    responsibleRole: row.responsible_role ? String(row.responsible_role) : null,
-    triggerEvent: row.trigger_event ? String(row.trigger_event) : null,
-    deprecatedAt: row.deprecated_at ? String(row.deprecated_at) : null,
+    dueRule: row.due_rule ? toText(row.due_rule) : null,
+    responsibleRole: row.responsible_role ? toText(row.responsible_role) : null,
+    triggerEvent: row.trigger_event ? toText(row.trigger_event) : null,
+    deprecatedAt: row.deprecated_at ? toText(row.deprecated_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at ?? row.created_at),
   };
@@ -118,12 +119,12 @@ function mapReview(row: Record<string, unknown>): EmrTemplateReview {
   return {
     id: String(row.id),
     templateId: String(row.template_id),
-    reviewerId: row.reviewer_id ? String(row.reviewer_id) : null,
+    reviewerId: row.reviewer_id ? toText(row.reviewer_id) : null,
     action: row.action as TemplateReviewAction,
-    comment: row.comment ? String(row.comment) : null,
+    comment: row.comment ? toText(row.comment) : null,
     snapshotVersion: row.snapshot_version != null ? Number(row.snapshot_version) : null,
     snapshotFields: asFields(row.snapshot_fields),
-    prevHash: row.prev_hash ? String(row.prev_hash) : null,
+    prevHash: row.prev_hash ? toText(row.prev_hash) : null,
     curHash: String(row.cur_hash),
     createdAt: String(row.created_at),
   };
@@ -175,7 +176,7 @@ export async function createTemplate(
     )
     RETURNING ${db.unsafe(TEMPLATE_COLS)}
   `;
-  return mapTemplate(rows[0] as Record<string, unknown>);
+  return mapTemplate(rows[0]);
 }
 
 /* ------------------------------- 查询 -------------------------------- */
@@ -185,7 +186,7 @@ export async function getTemplateById(id: string, sql?: DbExecutor): Promise<Emr
   const rows = await db`
     SELECT ${db.unsafe(TEMPLATE_COLS)} FROM clinical.emr_template WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapTemplate(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTemplate(rows[0]) : null;
 }
 
 export interface ListPublishedTemplatesOpts {
@@ -248,7 +249,7 @@ export async function transitionTemplateStatus(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapTemplate(locked[0] as Record<string, unknown>);
+  const current = mapTemplate(locked[0]);
   if (current.version !== expectedVersion) return null;
   if (!fromStatuses.includes(current.status)) return null;
 
@@ -336,7 +337,7 @@ export async function insertTemplateReview(
     )
     RETURNING ${tx.unsafe(REVIEW_COLS)}
   `;
-  return mapReview(rows[0] as Record<string, unknown>);
+  return mapReview(rows[0]);
 }
 
 /** 按模板列全部审核留痕（时间正序，还原哈希链）。 */

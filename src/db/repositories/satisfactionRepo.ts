@@ -9,6 +9,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type SatisfactionSource = 'outpatient' | 'inpatient' | 'consultation';
 
@@ -53,8 +54,8 @@ function mapS(r: Record<string, unknown>): SatisfactionSurvey {
     id: String(r.id),
     surveyNo: String(r.survey_no),
     patientId: String(r.patient_id),
-    visitId: r.visit_id ? String(r.visit_id) : null,
-    consultId: r.consult_id ? String(r.consult_id) : null,
+    visitId: r.visit_id ? toText(r.visit_id) : null,
+    consultId: r.consult_id ? toText(r.consult_id) : null,
     sourceType: r.source_type as SatisfactionSource,
     overallScore: Number(r.overall_score),
     medicalScore: Number(r.medical_score),
@@ -62,9 +63,9 @@ function mapS(r: Record<string, unknown>): SatisfactionSurvey {
     environmentScore: Number(r.environment_score),
     processScore: Number(r.process_score),
     waitScore: Number(r.wait_score),
-    comment: r.comment ? String(r.comment) : null,
+    comment: r.comment ? toText(r.comment) : null,
     status: 'submitted',
-    submittedBy: r.submitted_by ? String(r.submitted_by) : null,
+    submittedBy: r.submitted_by ? toText(r.submitted_by) : null,
     submittedAt: String(r.submitted_at),
   };
 }

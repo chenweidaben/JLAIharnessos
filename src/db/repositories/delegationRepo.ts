@@ -6,6 +6,7 @@
  * 版权所有（c）2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface DelegationRow {
   id: string;
@@ -40,7 +41,7 @@ function mapRow(r: Record<string, unknown>): DelegationRow {
     scopes: parseJsonbArray(r.scopes),
     action: r.action as DelegationRow['action'],
     status: r.status as DelegationRow['status'],
-    note: r.note ? String(r.note) : null,
+    note: r.note ? toText(r.note) : null,
     createdAt: String(r.created_at),
   };
 }
@@ -71,7 +72,7 @@ export async function insertDelegation(
     )
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /** 同步 patient_profiles 的授权范围（与历史同事务）。 */

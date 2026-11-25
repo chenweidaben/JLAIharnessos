@@ -6,14 +6,15 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface Drug {
   id: string; drugCode: string; genericName: string; brandName: string | null;
   specification: string; dosageForm: string; route: string | null; unit: string;
   price: number | null; manufacturer: string | null; category: string | null;
   pregnancyCat: string | null; controlled: boolean;
-  ingredients: Array<Record<string, unknown>>; contraindications: string | null;
-  adverseReactions: string | null; interactions: Array<Record<string, unknown>>;
+  ingredients: Record<string, unknown>[]; contraindications: string | null;
+  adverseReactions: string | null; interactions: Record<string, unknown>[];
   status: 'active' | 'inactive' | 'deprecated'; createdAt: string; updatedAt: string;
 }
 
@@ -22,18 +23,18 @@ const SELECT_COLS = `id, drug_code, generic_name, brand_name, specification, dos
 function mapRow(row: Record<string, unknown>): Drug {
   return {
     id: String(row.id), drugCode: String(row.drug_code), genericName: String(row.generic_name),
-    brandName: row.brand_name ? String(row.brand_name) : null,
+    brandName: row.brand_name ? toText(row.brand_name) : null,
     specification: String(row.specification), dosageForm: String(row.dosage_form),
-    route: row.route ? String(row.route) : null, unit: String(row.unit),
+    route: row.route ? toText(row.route) : null, unit: String(row.unit),
     price: row.price !== null ? Number(row.price) : null,
-    manufacturer: row.manufacturer ? String(row.manufacturer) : null,
-    category: row.category ? String(row.category) : null,
-    pregnancyCat: row.pregnancy_cat ? String(row.pregnancy_cat) : null,
+    manufacturer: row.manufacturer ? toText(row.manufacturer) : null,
+    category: row.category ? toText(row.category) : null,
+    pregnancyCat: row.pregnancy_cat ? toText(row.pregnancy_cat) : null,
     controlled: Boolean(row.controlled),
-    ingredients: (row.ingredients as Array<Record<string, unknown>>) ?? [],
-    contraindications: row.contraindications ? String(row.contraindications) : null,
-    adverseReactions: row.adverse_reactions ? String(row.adverse_reactions) : null,
-    interactions: (row.interactions as Array<Record<string, unknown>>) ?? [],
+    ingredients: (row.ingredients as Record<string, unknown>[]) ?? [],
+    contraindications: row.contraindications ? toText(row.contraindications) : null,
+    adverseReactions: row.adverse_reactions ? toText(row.adverse_reactions) : null,
+    interactions: (row.interactions as Record<string, unknown>[]) ?? [],
     status: row.status as Drug['status'],
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
@@ -42,7 +43,7 @@ function mapRow(row: Record<string, unknown>): Drug {
 export async function getDrugByCode(drugCode: string, sql?: DbExecutor): Promise<Drug | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.drug_catalog WHERE drug_code = ${drugCode} AND status = 'active'`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function searchDrugs(keyword: string, limit = 20, sql?: DbExecutor): Promise<Drug[]> {
@@ -72,5 +73,5 @@ export async function createDrug(input: Omit<Drug, 'id' | 'createdAt' | 'updated
       ${input.adverseReactions ?? null}, ${db.json(toJson(input.interactions))}, ${input.status})
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }

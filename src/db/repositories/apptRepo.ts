@@ -9,6 +9,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { buildSafeSetClause } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type ApptStatus = 'scheduled' | 'confirmed' | 'completed' | 'absent' | 'cancelled';
 
@@ -52,12 +53,12 @@ function mapA(r: Record<string, unknown>): Appointment {
     id: String(r.id),
     appointmentNo: String(r.appointment_no),
     patientId: String(r.patient_id),
-    visitId: r.visit_id ? String(r.visit_id) : null,
+    visitId: r.visit_id ? toText(r.visit_id) : null,
     scheduledAt: String(r.scheduled_at),
     department: String(r.department),
     purpose: String(r.purpose),
     status: r.status as ApptStatus,
-    cancelReason: r.cancel_reason ? String(r.cancel_reason) : null,
+    cancelReason: r.cancel_reason ? toText(r.cancel_reason) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -67,11 +68,11 @@ function mapP(r: Record<string, unknown>): FollowUpPlan {
     id: String(r.id),
     planNo: String(r.plan_no),
     patientId: String(r.patient_id),
-    appointmentId: r.appointment_id ? String(r.appointment_id) : null,
+    appointmentId: r.appointment_id ? toText(r.appointment_id) : null,
     scheduledDate: String(r.scheduled_date),
     content: String(r.content),
     status: r.status as FollowUpPlan['status'],
-    assignedTo: r.assigned_to ? String(r.assigned_to) : null,
+    assignedTo: r.assigned_to ? toText(r.assigned_to) : null,
     createdAt: String(r.created_at),
   };
 }
@@ -81,24 +82,24 @@ export async function createAppointment(
   tx: DbExecutor,
 ): Promise<{ appt: Appointment; created: boolean }> {
   const ex = await tx`SELECT ${tx.unsafe(ACOLS)} FROM clinical.appointments WHERE appointment_no = ${input.appointmentNo}`;
-  if (ex.length > 0) return { appt: mapA(ex[0] as Record<string, unknown>), created: false };
+  if (ex.length > 0) return { appt: mapA(ex[0]), created: false };
   const rows = await tx`
     INSERT INTO clinical.appointments (appointment_no, patient_id, scheduled_at, department, purpose, created_by)
     VALUES (${input.appointmentNo}, ${input.patientId}, ${input.scheduledAt}, ${input.department ?? '门诊'}, ${input.purpose}, ${input.createdBy})
     RETURNING ${tx.unsafe(ACOLS)}
   `;
-  return { appt: mapA(rows[0] as Record<string, unknown>), created: true };
+  return { appt: mapA(rows[0]), created: true };
 }
 
 export async function getApptById(id: string, sql?: DbExecutor): Promise<Appointment | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(ACOLS)} FROM clinical.appointments WHERE id = ${id}`;
-  return rows.length > 0 ? mapA(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapA(rows[0]) : null;
 }
 
 export async function lockAppt(id: string, tx: DbExecutor): Promise<Appointment | null> {
   const rows = await tx`SELECT ${tx.unsafe(ACOLS)} FROM clinical.appointments WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapA(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapA(rows[0]) : null;
 }
 
 export async function listAppts(sql?: DbExecutor): Promise<Appointment[]> {
@@ -135,18 +136,18 @@ export async function createPlan(
     VALUES (${input.planNo}, ${input.patientId}, ${input.appointmentId ?? null}, ${input.scheduledDate}, ${input.content}, ${input.createdBy})
     RETURNING ${tx.unsafe(PCOLS)}
   `;
-  return mapP(rows[0] as Record<string, unknown>);
+  return mapP(rows[0]);
 }
 
 export async function getPlanById(id: string, sql?: DbExecutor): Promise<FollowUpPlan | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(PCOLS)} FROM clinical.follow_up_plans WHERE id = ${id}`;
-  return rows.length > 0 ? mapP(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapP(rows[0]) : null;
 }
 
 export async function lockPlan(id: string, tx: DbExecutor): Promise<FollowUpPlan | null> {
   const rows = await tx`SELECT ${tx.unsafe(PCOLS)} FROM clinical.follow_up_plans WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapP(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapP(rows[0]) : null;
 }
 
 export async function listPlans(sql?: DbExecutor): Promise<FollowUpPlan[]> {

@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Barthel {
   id: string; visitId: string;
@@ -20,7 +21,7 @@ function map(r: Record<string, unknown>): Barthel {
     bowel: Number(r.bowel), bladder: Number(r.bladder), toileting: Number(r.toileting),
     transfer: Number(r.transfer), walking: Number(r.walking), stairs: Number(r.stairs),
     totalScore: Number(r.total_score), dependencyLevel: String(r.dependency_level),
-    note: r.note ? String(r.note) : null,
+    note: r.note ? toText(r.note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

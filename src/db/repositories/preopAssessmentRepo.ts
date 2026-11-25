@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface PreopAssessment {
   id: string; visitId: string; asaGrade: string;
@@ -16,7 +17,7 @@ function map(r: Record<string, unknown>): PreopAssessment {
     id: String(r.id), visitId: String(r.visit_id), asaGrade: String(r.asa_grade),
     npoConfirmed: Boolean(r.npo_confirmed), allergyChecked: Boolean(r.allergy_checked),
     consentSigned: Boolean(r.consent_signed),
-    assessmentNote: r.assessment_note ? String(r.assessment_note) : null,
+    assessmentNote: r.assessment_note ? toText(r.assessment_note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

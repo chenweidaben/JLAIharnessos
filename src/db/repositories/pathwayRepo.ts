@@ -16,6 +16,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import type { FormItemType, VariationCategory, VariationType } from '../../medical-tools/pathway/pathwayRules.js';
+import { toText } from '../rowText.js';
 
 /** 12 位十六进制后缀：避免编号在高并发/重跑下命中唯一约束。 */
 function randomSuffix(): string {
@@ -62,7 +63,7 @@ function mapDef(row: Record<string, unknown>): PathwayDefinition {
     id: String(row.id),
     pathwayCode: String(row.pathway_code),
     name: String(row.name),
-    icdCode: row.icd_code ? String(row.icd_code) : null,
+    icdCode: row.icd_code ? toText(row.icd_code) : null,
     applicableDepartments: (row.applicable_departments as string[]) ?? [],
     standardLos: row.standard_los !== null && row.standard_los !== undefined ? Number(row.standard_los) : null,
     inclusionCriteria: (row.inclusion_criteria as string[]) ?? [],
@@ -70,7 +71,7 @@ function mapDef(row: Record<string, unknown>): PathwayDefinition {
     dischargeCriteria: (row.discharge_criteria as string[]) ?? [],
     version: String(row.version),
     status: row.status as 'active' | 'retired',
-    sourceKnowledgeId: row.source_knowledge_id ? String(row.source_knowledge_id) : null,
+    sourceKnowledgeId: row.source_knowledge_id ? toText(row.source_knowledge_id) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -94,7 +95,7 @@ export async function getDefinitionById(
 ): Promise<PathwayDefinition | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(DEF_COLS)} FROM clinical.pathway_definitions WHERE id = ${id}`;
-  return rows.length > 0 ? mapDef(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapDef(rows[0]) : null;
 }
 
 export async function getDefinitionByCode(
@@ -102,7 +103,7 @@ export async function getDefinitionByCode(
 ): Promise<PathwayDefinition | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(DEF_COLS)} FROM clinical.pathway_definitions WHERE pathway_code = ${code}`;
-  return rows.length > 0 ? mapDef(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapDef(rows[0]) : null;
 }
 
 export async function listDefinitions(
@@ -203,7 +204,7 @@ export async function getFormItemById(
 ): Promise<PathwayFormItem | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(FORM_COLS)} FROM clinical.pathway_form_items WHERE id = ${id}`;
-  return rows.length > 0 ? mapFormItem(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapFormItem(rows[0]) : null;
 }
 
 export interface FormItemInput {
@@ -235,7 +236,7 @@ export async function upsertFormItem(
   const rows = await tx`
     SELECT ${tx.unsafe(FORM_COLS)} FROM clinical.pathway_form_items
     WHERE pathway_id = ${pathwayId} AND stage_day = ${input.stageDay} AND item_code = ${input.itemCode}`;
-  return mapFormItem(rows[0] as Record<string, unknown>);
+  return mapFormItem(rows[0]);
 }
 
 // ---------------------------------------------------------------------------
@@ -295,23 +296,23 @@ function mapEnrollment(row: Record<string, unknown>): PathwayEnrollment {
     id: String(row.id),
     enrollmentNo: String(row.enrollment_no),
     pathwayId: String(row.pathway_id),
-    pathwayCode: row.pathway_code ? String(row.pathway_code) : null,
-    pathwayName: row.pathway_name ? String(row.pathway_name) : null,
+    pathwayCode: row.pathway_code ? toText(row.pathway_code) : null,
+    pathwayName: row.pathway_name ? toText(row.pathway_name) : null,
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    patientName: row.patient_name ? String(row.patient_name) : null,
+    patientName: row.patient_name ? toText(row.patient_name) : null,
     enrollmentDiagnosis: String(row.enrollment_diagnosis),
-    diagnosisCode: row.diagnosis_code ? String(row.diagnosis_code) : null,
+    diagnosisCode: row.diagnosis_code ? toText(row.diagnosis_code) : null,
     status: row.status as EnrollmentStatus,
     enrolledBy: String(row.enrolled_by),
-    enrolledByName: row.enrolled_by_name ? String(row.enrolled_by_name) : null,
+    enrolledByName: row.enrolled_by_name ? toText(row.enrolled_by_name) : null,
     enrolledAt: String(row.enrolled_at),
-    completedBy: row.completed_by ? String(row.completed_by) : null,
-    completedAt: row.completed_at ? String(row.completed_at) : null,
+    completedBy: row.completed_by ? toText(row.completed_by) : null,
+    completedAt: row.completed_at ? toText(row.completed_at) : null,
     dischargeCriteriaMet: row.discharge_criteria_met ? (row.discharge_criteria_met as string[]) : null,
-    withdrawnBy: row.withdrawn_by ? String(row.withdrawn_by) : null,
-    withdrawnAt: row.withdrawn_at ? String(row.withdrawn_at) : null,
-    withdrawReason: row.withdraw_reason ? String(row.withdraw_reason) : null,
+    withdrawnBy: row.withdrawn_by ? toText(row.withdrawn_by) : null,
+    withdrawnAt: row.withdrawn_at ? toText(row.withdrawn_at) : null,
+    withdrawReason: row.withdraw_reason ? toText(row.withdraw_reason) : null,
     actualLos: row.actual_los !== null && row.actual_los !== undefined ? Number(row.actual_los) : null,
     actualFee: row.actual_fee !== null && row.actual_fee !== undefined ? Number(row.actual_fee) : null,
     createdAt: String(row.created_at),
@@ -323,7 +324,7 @@ export async function getEnrollmentById(
 ): Promise<PathwayEnrollment | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(ENR_COLS)} ${db.unsafe(ENR_FROM)} WHERE e.id = ${id}`;
-  return rows.length > 0 ? mapEnrollment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapEnrollment(rows[0]) : null;
 }
 
 /** 同就诊同路径是否已有在径/完成记录（UNIQUE(visit_id, pathway_id)）。 */
@@ -334,7 +335,7 @@ export async function getEnrollmentByVisitPathway(
   const rows = await db`
     SELECT ${db.unsafe(ENR_COLS)} ${db.unsafe(ENR_FROM)}
     WHERE e.visit_id = ${visitId} AND e.pathway_id = ${pathwayId}`;
-  return rows.length > 0 ? mapEnrollment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapEnrollment(rows[0]) : null;
 }
 
 export async function listEnrollments(
@@ -443,10 +444,10 @@ function mapExecution(row: Record<string, unknown>): PathwayExecution {
     formItemId: String(row.form_item_id),
     stageDay: Number(row.stage_day),
     status: row.status as ExecutionStatus,
-    orderId: row.order_id ? String(row.order_id) : null,
-    note: row.note ? String(row.note) : null,
-    executedBy: row.executed_by ? String(row.executed_by) : null,
-    executedAt: row.executed_at ? String(row.executed_at) : null,
+    orderId: row.order_id ? toText(row.order_id) : null,
+    note: row.note ? toText(row.note) : null,
+    executedBy: row.executed_by ? toText(row.executed_by) : null,
+    executedAt: row.executed_at ? toText(row.executed_at) : null,
   };
 }
 
@@ -467,7 +468,7 @@ export async function getExecutionByItem(
   const rows = await db`
     SELECT ${db.unsafe(EXE_COLS)} FROM clinical.pathway_executions
     WHERE enrollment_id = ${enrollmentId} AND form_item_id = ${formItemId}`;
-  return rows.length > 0 ? mapExecution(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapExecution(rows[0]) : null;
 }
 
 /** 入径时为路径全部表单项建立 pending 执行记录（幂等：已存在则不重复建）。 */
@@ -492,7 +493,7 @@ export async function markExecutionExecuted(
         executed_at = now(), updated_at = now()
     WHERE id = ${executionId} AND status = 'pending'
     RETURNING ${tx.unsafe(EXE_COLS)}`;
-  return rows.length > 0 ? mapExecution(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapExecution(rows[0]) : null;
 }
 
 /** CAS pending -> skipped/replaced：记录说明与执行人。 */
@@ -505,7 +506,7 @@ export async function markExecutionSkipped(
         executed_at = now(), updated_at = now()
     WHERE id = ${executionId} AND status = 'pending'
     RETURNING ${tx.unsafe(EXE_COLS)}`;
-  return rows.length > 0 ? mapExecution(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapExecution(rows[0]) : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -545,7 +546,7 @@ function mapVariation(row: Record<string, unknown>): PathwayVariation {
     category: row.category as VariationCategory,
     description: String(row.description),
     recordedBy: String(row.recorded_by),
-    recordedByName: row.recorded_by_name ? String(row.recorded_by_name) : null,
+    recordedByName: row.recorded_by_name ? toText(row.recorded_by_name) : null,
     recordedAt: String(row.recorded_at),
     handled: Boolean(row.handled),
   };
@@ -582,7 +583,7 @@ export async function getVariationById(
 ): Promise<PathwayVariation | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(VAR_COLS)} ${db.unsafe(VAR_FROM)} WHERE v.id = ${id}`;
-  return rows.length > 0 ? mapVariation(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapVariation(rows[0]) : null;
 }
 
 export async function listVariationsByEnrollment(
@@ -681,7 +682,7 @@ export async function listDiagnosedInpatientVisits(
       AND v.admit_at >= ${from} AND v.admit_at < ${to}`;
   return (rows as Record<string, unknown>[]).map((r) => ({
     visitId: String(r.visit_id),
-    diagnosisCode: r.diagnosis_code ? String(r.diagnosis_code) : null,
+    diagnosisCode: r.diagnosis_code ? toText(r.diagnosis_code) : null,
   }));
 }
 
@@ -721,12 +722,12 @@ export async function listEligibleCandidates(sql?: DbExecutor): Promise<Eligible
   return (rows as Record<string, unknown>[]).map((r) => ({
     visitId: String(r.visit_id),
     patientId: String(r.patient_id),
-    patientName: r.patient_name ? String(r.patient_name) : null,
+    patientName: r.patient_name ? toText(r.patient_name) : null,
     department: String(r.department),
     status: String(r.status),
-    admitAt: r.admit_at ? String(r.admit_at) : null,
+    admitAt: r.admit_at ? toText(r.admit_at) : null,
     diagnosisName: String(r.diagnosis_name),
-    diagnosisCode: r.diagnosis_code ? String(r.diagnosis_code) : null,
+    diagnosisCode: r.diagnosis_code ? toText(r.diagnosis_code) : null,
     alreadyEnrolledPathwayIds: (r.enrolled_ids as string[]) ?? [],
   }));
 }

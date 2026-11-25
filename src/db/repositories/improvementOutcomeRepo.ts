@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -19,7 +20,7 @@ function map(r: Record<string, unknown>): ReviewRow {
     baselineVisits: Number(r.baseline_visits), baselineOverspendRate: String(r.baseline_overspend_rate),
     followupVisits: Number(r.followup_visits), followupOverspendRate: String(r.followup_overspend_rate),
     followupReadmitRate: String(r.followup_readmit_rate),
-    verdict: String(r.verdict), evaluatedAt: r.evaluated_at == null ? null : String(r.evaluated_at),
+    verdict: String(r.verdict), evaluatedAt: r.evaluated_at == null ? null : toText(r.evaluated_at),
     createdAt: String(r.created_at),
   };
 }
@@ -37,14 +38,14 @@ export async function upsertReview(
       followup_visits=EXCLUDED.followup_visits, followup_overspend_rate=EXCLUDED.followup_overspend_rate,
       followup_readmit_rate=EXCLUDED.followup_readmit_rate, verdict=EXCLUDED.verdict, evaluated_at=now()
     RETURNING id, task_id, cohort_window_days, baseline_visits, baseline_overspend_rate, followup_visits, followup_overspend_rate, followup_readmit_rate, verdict, evaluated_at, created_at`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function getByTask(taskId: string, tx: DbExecutor = db): Promise<ReviewRow | null> {
   const rows = await tx`
     SELECT id, task_id, cohort_window_days, baseline_visits, baseline_overspend_rate, followup_visits, followup_overspend_rate, followup_readmit_rate, verdict, evaluated_at, created_at
     FROM clinical.improvement_outcome_reviews WHERE task_id=${taskId}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 export async function listByVerdict(verdict: string): Promise<ReviewRow[]> {

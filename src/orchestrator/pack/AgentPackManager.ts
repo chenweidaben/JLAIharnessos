@@ -83,7 +83,7 @@ export class AgentPackManager {
     let checksumValid = false;
     if (rawPkg?.checksum) {
       const { checksum: _c, ...withoutChecksum } = rawPkg;
-      const expected = this.computeChecksum(withoutChecksum as Omit<AgentPackage, 'checksum'>);
+      const expected = this.computeChecksum(withoutChecksum);
       checksumValid = expected === rawPkg.checksum;
     }
 

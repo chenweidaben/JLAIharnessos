@@ -18,6 +18,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type NursingLevel = 'special' | 'level1' | 'level2' | 'level3';
 export type RiskLevel = 'none' | 'low' | 'medium' | 'high';
@@ -85,15 +86,15 @@ function mapRecord(row: Record<string, unknown>): NursingRecord {
     vitals: (row.vitals as Record<string, unknown>) ?? {},
     intake: (row.intake as Record<string, unknown>) ?? {},
     output: (row.output as Record<string, unknown>) ?? {},
-    measures: row.measures ? String(row.measures) : null,
+    measures: row.measures ? toText(row.measures) : null,
     pressureSoreRisk: row.pressure_sore_risk as RiskLevel,
     fallRisk: row.fall_risk as RiskLevel,
     riskAssessment: (row.risk_assessment as Record<string, unknown>) ?? {},
     aiAssisted: Boolean(row.ai_assisted),
     status: row.status as 'draft' | 'signed',
-    nurseId: row.nurse_id ? String(row.nurse_id) : null,
-    signedBy: row.signed_by ? String(row.signed_by) : null,
-    signedAt: row.signed_at ? String(row.signed_at) : null,
+    nurseId: row.nurse_id ? toText(row.nurse_id) : null,
+    signedBy: row.signed_by ? toText(row.signed_by) : null,
+    signedAt: row.signed_at ? toText(row.signed_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -127,13 +128,13 @@ export async function createNursingRecord(
     )
     RETURNING ${exec.unsafe(RECORD_COLS)}
   `;
-  return mapRecord(rows[0] as Record<string, unknown>);
+  return mapRecord(rows[0]);
 }
 
 export async function getNursingRecordById(id: string, db?: DbExecutor): Promise<NursingRecord | null> {
   const exec = db ?? getDb();
   const rows = await exec`SELECT ${exec.unsafe(RECORD_COLS)} FROM clinical.nursing_records WHERE id = ${id}`;
-  return rows.length > 0 ? mapRecord(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRecord(rows[0]) : null;
 }
 
 /** 某就诊护理记录（时间倒序）。 */
@@ -163,7 +164,7 @@ export async function signNursingRecord(
     WHERE id = ${id} AND status = 'draft' AND nurse_id = ${signerId}
     RETURNING ${exec.unsafe(RECORD_COLS)}
   `;
-  return rows.length > 0 ? mapRecord(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRecord(rows[0]) : null;
 }
 
 /* -------------------------------- 护理任务 ------------------------------- */
@@ -208,9 +209,9 @@ function mapTask(row: Record<string,unknown>): NursingTask {
     scheduledAt: String(row.scheduled_at),
     status: row.status as NursingTaskStatus,
     idempotencyKey: String(row.idempotency_key),
-    result: row.result ? String(row.result) : null,
-    executedBy: row.executed_by ? String(row.executed_by) : null,
-    executedAt: row.executed_at ? String(row.executed_at) : null,
+    result: row.result ? toText(row.result) : null,
+    executedBy: row.executed_by ? toText(row.executed_by) : null,
+    executedAt: row.executed_at ? toText(row.executed_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -241,13 +242,13 @@ export async function createNursingTask(input: NursingTaskInput, db?: DbExecutor
     )
     RETURNING ${exec.unsafe(TASK_COLS)}
   `;
-  return mapTask(rows[0] as Record<string, unknown>);
+  return mapTask(rows[0]);
 }
 
 export async function getNursingTaskById(id: string, db?: DbExecutor): Promise<NursingTask | null> {
   const exec = db ?? getDb();
   const rows = await exec`SELECT ${exec.unsafe(TASK_COLS)} FROM clinical.nursing_tasks WHERE id = ${id}`;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }
 
 export async function getNursingTaskByIdem(
@@ -257,7 +258,7 @@ export async function getNursingTaskByIdem(
   const rows = await exec`
     SELECT ${exec.unsafe(TASK_COLS)} FROM clinical.nursing_tasks WHERE idempotency_key = ${idempotencyKey}
   `;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }
 
 /** 某就诊护理任务（按计划时间）。 */
@@ -287,7 +288,7 @@ export async function executeNursingTask(
     WHERE id = ${id} AND status = 'pending'
     RETURNING ${exec.unsafe(TASK_COLS)}
   `;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }
 
 /** 取消护理任务：pending → cancelled。 */
@@ -299,5 +300,5 @@ export async function cancelNursingTask(id: string, db?: DbExecutor): Promise<Nu
     WHERE id = ${id} AND status = 'pending'
     RETURNING ${exec.unsafe(TASK_COLS)}
   `;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }

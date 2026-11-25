@@ -158,7 +158,7 @@ const STAGE_PROGRESS: Record<MilestoneStage, number> = {
 };
 
 /** 内置科室年度种子课题：科研管理页在 DB 未迁移时的真实演示口径 */
-const SEED_PORTFOLIO: ReadonlyArray<ResearchProjectDeep> = [
+const SEED_PORTFOLIO: readonly ResearchProjectDeep[] = [
   {
     id: 'PRJ-2026-NEU-001', projectNo: 'NSFC-2026-001',
     title: '基于多组学的脑小血管病影像标志物研究', dept: 'NEU', year: 2026,
@@ -237,7 +237,7 @@ const SEED_PORTFOLIO: ReadonlyArray<ResearchProjectDeep> = [
 ];
 
 /** 全量种子课题（路由层里程碑登记内存台账的初始数据；断库时可真实回读） */
-export const SEED_PROJECTS: ReadonlyArray<ResearchProjectDeep> = SEED_PORTFOLIO;
+export const SEED_PROJECTS: readonly ResearchProjectDeep[] = SEED_PORTFOLIO;
 
 /* ------------------------------------------------------------------ */
 /* 工具函数                                                            */
@@ -405,7 +405,7 @@ export function trackProjectMilestone(
 export function buildResearchPortfolio(
   dept: unknown,
   year: unknown,
-  projects?: ReadonlyArray<ResearchProjectDeep>,
+  projects?: readonly ResearchProjectDeep[],
 ): ResearchPortfolio {
   const deptCode = toText(dept);
   if (!deptCode) throw new Error('承担科室 dept 不能为空');
@@ -545,11 +545,11 @@ export interface MatchedPaper {
 /** 研究趋势分析产物 */
 export interface ReviewTrend {
   /** 按年分布（升序） */
-  byYear: Array<{ year: number; count: number }>;
+  byYear: { year: number; count: number }[];
   /** 热点关键词（频次降序，top 8） */
-  hotKeywords: Array<{ tag: string; count: number }>;
+  hotKeywords: { tag: string; count: number }[];
   /** 热点演变：命中文献按年份三等分的早期/中期/近期标签 */
-  evolution: Array<{ band: string; topTags: Array<{ tag: string; count: number }> }>;
+  evolution: { band: string; topTags: { tag: string; count: number }[] }[];
 }
 
 /** 不同研究方法对比产物 */
@@ -589,7 +589,7 @@ function classifyMethod(keywords: string[]): MethodTag {
 
 /** 截取摘要首句作为自动要点（不归纳、不外推） */
 function firstSentence(abstract: string, max = 90): string {
-  const hit = abstract.match(/[^。.!?！？]+[。.!?！？]?/);
+  const hit = /[^。.!?！？]+[。.!?！？]?/.exec(abstract);
   const s = (hit ? hit[0] : abstract).trim();
   return s.length > max ? `${s.slice(0, max)}…` : s;
 }
@@ -702,7 +702,7 @@ export function buildLiteratureReview(
     const c = new Map<string, number>();
     for (const p of slice) for (const kw of p.keywords) c.set(kw, (c.get(kw) ?? 0) + 1);
     return {
-      band: slice.length ? `${label}（${slice[0]!.year}—${slice[slice.length - 1]!.year}）` : label,
+      band: slice.length ? `${label}（${slice[0].year}—${slice[slice.length - 1].year}）` : label,
       topTags: [...c.entries()]
         .map(([tag, count]) => ({ tag, count }))
         .sort((a, b) => b.count - a.count)
@@ -755,7 +755,7 @@ export interface ExperimentDesign {
   method: ExperimentMethod;
   designLabel: string;
   hypothesis: string;
-  arms: Array<{ name: string; description: string }>;
+  arms: { name: string; description: string }[];
   primaryEndpoint: string;
   secondaryEndpoints: string[];
   inclusion: string[];
@@ -884,7 +884,7 @@ export interface StatisticalPlan {
   alpha: number;
   power: number;
   primaryAnalysis: string;
-  tests: Array<{ purpose: string; test: string; rationale: string }>;
+  tests: { purpose: string; test: string; rationale: string }[];
   multiplicity: string;
   missingData: string;
   sensitivityAnalysis: string[];
@@ -898,7 +898,7 @@ export interface StatisticalPlan {
  * alpha 固定 0.05、检验效能 0.80，不输出任何伪造 p 值。
  */
 export function generateStatisticalPlan(design: ExperimentDesign): StatisticalPlan {
-  if (!design || !design.designLabel) {
+  if (!design?.designLabel) {
     throw new Error('实验设计对象 design 不能为空（先调用 designExperiment）');
   }
   const base = {

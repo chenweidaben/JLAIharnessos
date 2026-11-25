@@ -5,6 +5,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface PainAssessment {
   id: string;
@@ -25,8 +26,8 @@ function map(row: Record<string, unknown>): PainAssessment {
     visitId: String(row.visit_id),
     score: Number(row.score),
     assessType: String(row.assess_type),
-    location: row.location ? String(row.location) : null,
-    note: row.note ? String(row.note) : null,
+    location: row.location ? toText(row.location) : null,
+    note: row.note ? toText(row.note) : null,
     createdBy: String(row.created_by),
     createdAt: String(row.created_at),
   };

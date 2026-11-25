@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Plan {
   id: string; patientId: string; disease: string;
@@ -33,7 +34,7 @@ function vmap(r: Record<string, unknown>): Vitals {
     fastingGlucose: r.fasting_glucose == null ? null : Number(r.fasting_glucose),
     hba1c: r.hba1c == null ? null : Number(r.hba1c),
     measuredAt: String(r.measured_at),
-    note: r.note ? String(r.note) : null,
+    note: r.note ? toText(r.note) : null,
     createdBy: String(r.created_by),
   };
 }
@@ -114,7 +115,7 @@ function rmap(r: Record<string, unknown>): ChronicDiseaseRecordRow {
     heartRate: r.heart_rate == null ? null : Number(r.heart_rate),
     ldl: r.ldl == null ? null : Number(r.ldl),
     measuredAt: String(r.measured_at),
-    note: r.note ? String(r.note) : null,
+    note: r.note ? toText(r.note) : null,
   };
 }
 

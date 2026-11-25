@@ -10,6 +10,7 @@
  */
 
 import { getDb } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** 点评结论：合理 / 不合理 / 超常 */
 export type ReviewResult = 'rational' | 'irrational' | 'abnormal';
@@ -67,8 +68,8 @@ export async function listPending(limit = 50): Promise<PendingPrescription[]> {
     prescriptionId: String(r.prescription_id),
     rxNo: String(r.rx_no),
     visitId: String(r.visit_id),
-    prescriberId: r.prescriber_id ? String(r.prescriber_id) : null,
-    riskLevel: r.risk_level ? String(r.risk_level) : null,
+    prescriberId: r.prescriber_id ? toText(r.prescriber_id) : null,
+    riskLevel: r.risk_level ? toText(r.risk_level) : null,
     createdAt: String(r.created_at),
   }));
 }
@@ -88,9 +89,9 @@ function mapRow(r: Record<string, unknown>): PrescriptionReview {
   return {
     id: String(r.id),
     prescriptionId: String(r.prescription_id),
-    reviewerId: r.reviewer_id ? String(r.reviewer_id) : null,
+    reviewerId: r.reviewer_id ? toText(r.reviewer_id) : null,
     result: r.result as ReviewResult,
-    comment: r.comment != null ? String(r.comment) : null,
+    comment: r.comment != null ? toText(r.comment) : null,
     reviewedAt: String(r.reviewed_at),
   };
 }

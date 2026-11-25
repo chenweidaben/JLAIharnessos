@@ -14,6 +14,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import type { Audience, DeepSource, LlmStatus } from '../../medical-tools/interpret/interpretEngine.js';
+import { toText } from '../rowText.js';
 
 export type LabInterpStatus = 'pending_review' | 'signed' | 'rejected';
 
@@ -100,19 +101,19 @@ function mapRow(row: Record<string, unknown>): LabInterpretation {
     engineVersion: String(row.engine_version),
     status: row.status as LabInterpStatus,
     generatedAt: String(row.generated_at),
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
     audience: (row.audience as Audience) ?? 'doctor',
     deepSource: (row.deep_source as DeepSource) ?? 'rule',
-    model: row.model ? String(row.model) : null,
-    overallImpression: row.overall_impression ? String(row.overall_impression) : null,
+    model: row.model ? toText(row.model) : null,
+    overallImpression: row.overall_impression ? toText(row.overall_impression) : null,
     itemExplanations: asArr(row.item_explanations),
     trends: asArr(row.trends),
     recommendations: asArr(row.recommendations),
-    plainLanguageSummary: row.plain_language_summary ? String(row.plain_language_summary) : null,
+    plainLanguageSummary: row.plain_language_summary ? toText(row.plain_language_summary) : null,
     llmStatus: (row.llm_status as LlmStatus) ?? 'rule_only',
   };
 }
@@ -134,15 +135,15 @@ export async function listLabResultsByVisit(
   return (rows as Record<string, unknown>[]).map((r) => ({
     id: String(r.id),
     itemName: String(r.item_name),
-    itemCode: r.item_code ? String(r.item_code) : null,
-    value: r.value != null ? String(r.value) : null,
-    numericValue: r.numeric_value != null ? String(r.numeric_value) : null,
-    unit: r.unit ? String(r.unit) : null,
-    refLow: r.ref_low != null ? String(r.ref_low) : null,
-    refHigh: r.ref_high != null ? String(r.ref_high) : null,
-    abnormalFlag: r.abnormal_flag ? String(r.abnormal_flag) : null,
+    itemCode: r.item_code ? toText(r.item_code) : null,
+    value: r.value != null ? toText(r.value) : null,
+    numericValue: r.numeric_value != null ? toText(r.numeric_value) : null,
+    unit: r.unit ? toText(r.unit) : null,
+    refLow: r.ref_low != null ? toText(r.ref_low) : null,
+    refHigh: r.ref_high != null ? toText(r.ref_high) : null,
+    abnormalFlag: r.abnormal_flag ? toText(r.abnormal_flag) : null,
     isCritical: Boolean(r.is_critical),
-    resultTime: r.result_time ? String(r.result_time) : null,
+    resultTime: r.result_time ? toText(r.result_time) : null,
   }));
 }
 
@@ -178,11 +179,11 @@ export async function listLabHistoryByPatient(
     LIMIT ${limit}
   `;
   return (rows as Record<string, unknown>[]).map((r) => ({
-    itemCode: r.item_code ? String(r.item_code) : null,
+    itemCode: r.item_code ? toText(r.item_code) : null,
     itemName: String(r.item_name),
-    numericValue: r.numeric_value != null ? String(r.numeric_value) : null,
-    unit: r.unit ? String(r.unit) : null,
-    resultTime: r.result_time ? String(r.result_time) : null,
+    numericValue: r.numeric_value != null ? toText(r.numeric_value) : null,
+    unit: r.unit ? toText(r.unit) : null,
+    resultTime: r.result_time ? toText(r.result_time) : null,
   }));
 }
 
@@ -259,7 +260,7 @@ export async function upsertInterpretation(
       reject_reason = NULL
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /* -------------------------------- 查询 -------------------------------- */
@@ -274,13 +275,13 @@ export async function getByVisit(
     SELECT ${db.unsafe(COLS)} FROM clinical.lab_interpretations
     WHERE visit_id = ${visitId} AND audience = ${audience}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getById(id: string, sql?: DbExecutor): Promise<LabInterpretation | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.lab_interpretations WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export interface InterpListRow {
@@ -355,7 +356,7 @@ export async function setStatus(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapRow(locked[0] as Record<string, unknown>);
+  const current = mapRow(locked[0]);
   if (!fromStatuses.includes(current.status)) return null;
 
   const rows = await tx`
@@ -367,7 +368,7 @@ export async function setStatus(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /* -------------------------------- 计数 -------------------------------- */

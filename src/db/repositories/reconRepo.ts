@@ -12,6 +12,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type ReconStatus = 'draft' | 'confirmed' | 'disputed';
 
@@ -70,11 +71,11 @@ function mapRun(row: Record<string, unknown>): ReconRun {
     discrepancyItems: Number(row.discrepancy_items),
     totalPosted: String(row.total_posted),
     totalExpected: String(row.total_expected),
-    createdBy: row.created_by ? String(row.created_by) : null,
+    createdBy: row.created_by ? toText(row.created_by) : null,
     createdAt: String(row.created_at),
-    confirmedBy: row.confirmed_by ? String(row.confirmed_by) : null,
-    confirmedAt: row.confirmed_at ? String(row.confirmed_at) : null,
-    note: row.note ? String(row.note) : null,
+    confirmedBy: row.confirmed_by ? toText(row.confirmed_by) : null,
+    confirmedAt: row.confirmed_at ? toText(row.confirmed_at) : null,
+    note: row.note ? toText(row.note) : null,
     updatedAt: String(row.updated_at),
   };
 }
@@ -83,17 +84,17 @@ function mapItem(row: Record<string, unknown>): ReconItem {
   return {
     id: String(row.id),
     runId: String(row.run_id),
-    feeItemId: row.fee_item_id ? String(row.fee_item_id) : null,
-    itemCode: row.item_code ? String(row.item_code) : null,
-    itemName: row.item_name ? String(row.item_name) : null,
+    feeItemId: row.fee_item_id ? toText(row.fee_item_id) : null,
+    itemCode: row.item_code ? toText(row.item_code) : null,
+    itemName: row.item_name ? toText(row.item_name) : null,
     quantity: String(row.quantity),
-    postedUnitPrice: row.posted_unit_price != null ? String(row.posted_unit_price) : null,
+    postedUnitPrice: row.posted_unit_price != null ? toText(row.posted_unit_price) : null,
     postedAmount: String(row.posted_amount),
-    catalogPrice: row.catalog_price != null ? String(row.catalog_price) : null,
+    catalogPrice: row.catalog_price != null ? toText(row.catalog_price) : null,
     expectedAmount: String(row.expected_amount),
     diff: String(row.diff),
     matched: Boolean(row.matched),
-    note: row.note ? String(row.note) : null,
+    note: row.note ? toText(row.note) : null,
   };
 }
 
@@ -123,12 +124,12 @@ export async function fetchChargedFeeLines(sql?: DbExecutor): Promise<FeeLine[]>
   `;
   return (rows as Record<string, unknown>[]).map((r) => ({
     feeItemId: String(r.fee_item_id),
-    itemCode: r.item_code ? String(r.item_code) : null,
-    itemName: r.item_name ? String(r.item_name) : null,
+    itemCode: r.item_code ? toText(r.item_code) : null,
+    itemName: r.item_name ? toText(r.item_name) : null,
     quantity: String(r.quantity),
-    postedUnitPrice: r.posted_unit_price != null ? String(r.posted_unit_price) : null,
+    postedUnitPrice: r.posted_unit_price != null ? toText(r.posted_unit_price) : null,
     postedAmount: String(r.posted_amount),
-    catalogPrice: r.catalog_price != null ? String(r.catalog_price) : null,
+    catalogPrice: r.catalog_price != null ? toText(r.catalog_price) : null,
   }));
 }
 
@@ -176,7 +177,7 @@ export async function upsertRun(
       confirmed_at = NULL
     RETURNING ${tx.unsafe(RUN_COLS)}
   `;
-  const run = mapRun(runRows[0] as Record<string, unknown>);
+  const run = mapRun(runRows[0]);
 
   await tx`DELETE FROM clinical.reconciliation_items WHERE run_id = ${run.id}`;
   for (const line of input.lines) {
@@ -197,7 +198,7 @@ export async function upsertRun(
 export async function getRunById(id: string, sql?: DbExecutor): Promise<ReconRun | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(RUN_COLS)} FROM clinical.reconciliation_runs WHERE id = ${id}`;
-  return rows.length > 0 ? mapRun(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRun(rows[0]) : null;
 }
 
 export async function listRuns(sql?: DbExecutor): Promise<ReconRun[]> {
@@ -221,7 +222,7 @@ export async function setStatus(
 ): Promise<ReconRun | null> {
   const locked = await tx`SELECT ${tx.unsafe(RUN_COLS)} FROM clinical.reconciliation_runs WHERE id = ${id} FOR UPDATE`;
   if (locked.length === 0) return null;
-  const current = mapRun(locked[0] as Record<string, unknown>);
+  const current = mapRun(locked[0]);
   if (current.status !== 'draft') return null;
   const rows = await tx`
     UPDATE clinical.reconciliation_runs SET
@@ -232,7 +233,7 @@ export async function setStatus(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(RUN_COLS)}
   `;
-  return rows.length > 0 ? mapRun(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRun(rows[0]) : null;
 }
 
 export async function countRuns(sql?: DbExecutor): Promise<number> {

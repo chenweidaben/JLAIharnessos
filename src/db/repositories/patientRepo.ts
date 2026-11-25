@@ -8,6 +8,7 @@
 
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface Patient {
   id: string;
@@ -19,8 +20,8 @@ export interface Patient {
   idCardHash: string | null;
   phoneEnc: string | null;
   bloodType: string | null;
-  allergies: Array<Record<string, unknown>>;
-  pastHistory: Array<Record<string, unknown>>;
+  allergies: Record<string, unknown>[];
+  pastHistory: Record<string, unknown>[];
   tags: string[];
   dataLevel: number;
   createdAt: string;
@@ -36,8 +37,8 @@ export interface PatientCreateInput {
   idCardHash?: string | null;
   phoneEnc?: string | null;
   bloodType?: string | null;
-  allergies?: Array<Record<string, unknown>>;
-  pastHistory?: Array<Record<string, unknown>>;
+  allergies?: Record<string, unknown>[];
+  pastHistory?: Record<string, unknown>[];
   tags?: string[];
   dataLevel?: number;
 }
@@ -53,14 +54,14 @@ function mapRow(row: Record<string, unknown>): Patient {
     id: String(row.id),
     mrn: String(row.mrn),
     nameMasked: String(row.name_masked),
-    nameEnc: row.name_enc ? String(row.name_enc) : null,
+    nameEnc: row.name_enc ? toText(row.name_enc) : null,
     gender: String(row.gender),
-    birthDate: row.birth_date ? String(row.birth_date) : null,
-    idCardHash: row.id_card_hash ? String(row.id_card_hash) : null,
-    phoneEnc: row.phone_enc ? String(row.phone_enc) : null,
-    bloodType: row.blood_type ? String(row.blood_type) : null,
-    allergies: (row.allergies as Array<Record<string, unknown>>) ?? [],
-    pastHistory: (row.past_history as Array<Record<string, unknown>>) ?? [],
+    birthDate: row.birth_date ? toText(row.birth_date) : null,
+    idCardHash: row.id_card_hash ? toText(row.id_card_hash) : null,
+    phoneEnc: row.phone_enc ? toText(row.phone_enc) : null,
+    bloodType: row.blood_type ? toText(row.blood_type) : null,
+    allergies: (row.allergies as Record<string, unknown>[]) ?? [],
+    pastHistory: (row.past_history as Record<string, unknown>[]) ?? [],
     tags: (row.tags as string[]) ?? [],
     dataLevel: Number(row.data_level),
     createdAt: String(row.created_at),
@@ -83,7 +84,7 @@ export async function createPatient(input: PatientCreateInput, sql?: DbExecutor)
     )
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -97,7 +98,7 @@ export async function getPatientById(id: string, sql?: DbExecutor): Promise<Pati
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
     WHERE id = ${id} AND deleted_at IS NULL
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getPatientByMrn(mrn: string, sql?: DbExecutor): Promise<Patient | null> {
@@ -106,7 +107,7 @@ export async function getPatientByMrn(mrn: string, sql?: DbExecutor): Promise<Pa
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
     WHERE mrn = ${mrn} AND deleted_at IS NULL
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 按身份证哈希查找患者（EMPI 去重/绑定） */
@@ -116,7 +117,7 @@ export async function getPatientByIdCardHash(idCardHash: string, sql?: DbExecuto
     SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.patients
     WHERE id_card_hash = ${idCardHash} AND deleted_at IS NULL
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export interface PatientQuery {

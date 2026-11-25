@@ -6,6 +6,7 @@
 
 import { getDb, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type DiagnosisKind = 'primary' | 'secondary' | 'differential';
 
@@ -41,12 +42,12 @@ function mapRow(row: Record<string, unknown>): Diagnosis {
     id: String(row.id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    code: row.code ? String(row.code) : null,
+    code: row.code ? toText(row.code) : null,
     name: String(row.name),
     kind: row.kind as DiagnosisKind,
     confirmed: Boolean(row.confirmed),
-    note: row.note ? String(row.note) : null,
-    doctorId: row.doctor_id ? String(row.doctor_id) : null,
+    note: row.note ? toText(row.note) : null,
+    doctorId: row.doctor_id ? toText(row.doctor_id) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -61,13 +62,13 @@ export async function createDiagnosis(input: DiagnosisCreateInput, sql?: Sql): P
       ${input.doctorId ?? null})
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getDiagnosisById(id: string, sql?: Sql): Promise<Diagnosis | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.diagnoses WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getDiagnosesByVisit(visitId: string, sql?: Sql): Promise<Diagnosis[]> {
@@ -94,7 +95,7 @@ export async function updateDiagnosisConfirmed(
     UPDATE clinical.diagnoses SET confirmed = ${confirmed}, updated_at = now()
     WHERE id = ${id} RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function deleteDiagnosis(id: string, sql?: Sql): Promise<boolean> {

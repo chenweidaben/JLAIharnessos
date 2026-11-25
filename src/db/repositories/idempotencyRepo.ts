@@ -14,6 +14,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type IdempotencyStatus = 'processing' | 'completed';
 
@@ -47,7 +48,7 @@ function mapRow(row: Record<string, unknown>): IdempotencyRecord {
     responseStatus: row.response_status != null ? Number(row.response_status) : null,
     responseBody: row.response_body ?? null,
     createdAt: String(row.created_at),
-    completedAt: row.completed_at ? String(row.completed_at) : null,
+    completedAt: row.completed_at ? toText(row.completed_at) : null,
   };
 }
 
@@ -84,7 +85,7 @@ export async function beginProcessing(
         FROM clinical.idempotency_keys
         WHERE idempotency_key = ${input.idempotencyKey} AND user_id = ${input.userId}`;
       if (rows.length === 0) throw err;
-      return { outcome: 'exists', record: mapRow(rows[0] as Record<string, unknown>) };
+      return { outcome: 'exists', record: mapRow(rows[0]) };
     }
     throw err;
   }
@@ -135,5 +136,5 @@ export async function getRecord(
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)}
     FROM clinical.idempotency_keys
     WHERE idempotency_key = ${idempotencyKey} AND user_id = ${userId}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

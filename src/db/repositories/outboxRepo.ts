@@ -17,6 +17,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type OutboxStatus = 'pending' | 'processing' | 'published' | 'dead';
 
@@ -52,16 +53,16 @@ function mapRow(row: Record<string, unknown>): OutboxEvent {
     id: Number(row.id),
     eventId: String(row.event_id),
     eventType: String(row.event_type),
-    aggregateType: row.aggregate_type != null ? String(row.aggregate_type) : null,
-    aggregateId: row.aggregate_id != null ? String(row.aggregate_id) : null,
+    aggregateType: row.aggregate_type != null ? toText(row.aggregate_type) : null,
+    aggregateId: row.aggregate_id != null ? toText(row.aggregate_id) : null,
     payload: row.payload ?? null,
     status: row.status as OutboxStatus,
     attempts: Number(row.attempts),
     createdAt: String(row.created_at),
-    lockedAt: row.locked_at ? String(row.locked_at) : null,
-    publishedAt: row.published_at ? String(row.published_at) : null,
-    lastError: row.last_error ? String(row.last_error) : null,
-    deadAt: row.dead_at ? String(row.dead_at) : null,
+    lockedAt: row.locked_at ? toText(row.locked_at) : null,
+    publishedAt: row.published_at ? toText(row.published_at) : null,
+    lastError: row.last_error ? toText(row.last_error) : null,
+    deadAt: row.dead_at ? toText(row.dead_at) : null,
   };
 }
 

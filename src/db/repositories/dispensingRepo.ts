@@ -10,6 +10,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface Dispensing {
   id: string;
@@ -56,19 +57,19 @@ function mapRow(row: Record<string, unknown>): Dispensing {
   return {
     id: String(row.id),
     prescriptionId: String(row.prescription_id),
-    itemId: row.item_id ? String(row.item_id) : null,
-    drugId: row.drug_id ? String(row.drug_id) : null,
-    drugCode: row.drug_code ? String(row.drug_code) : null,
+    itemId: row.item_id ? toText(row.item_id) : null,
+    drugId: row.drug_id ? toText(row.drug_id) : null,
+    drugCode: row.drug_code ? toText(row.drug_code) : null,
     drugName: String(row.drug_name),
     warehouse: String(row.warehouse),
-    batchNo: row.batch_no ? String(row.batch_no) : null,
+    batchNo: row.batch_no ? toText(row.batch_no) : null,
     quantity: Number(row.quantity),
-    unit: row.unit ? String(row.unit) : null,
+    unit: row.unit ? toText(row.unit) : null,
     dispensedBy: String(row.dispensed_by),
     dispensedAt: String(row.dispensed_at),
     idempotencyKey: String(row.idempotency_key),
-    overrideReason: row.override_reason ? String(row.override_reason) : null,
-    overrideBy: row.override_by ? String(row.override_by) : null,
+    overrideReason: row.override_reason ? toText(row.override_reason) : null,
+    overrideBy: row.override_by ? toText(row.override_by) : null,
     cdsHits: (row.cds_hits as Record<string, unknown>[]) ?? [],
     createdAt: String(row.created_at),
   };
@@ -96,13 +97,13 @@ export async function insertDispensingOnce(
     RETURNING ${tx.unsafe(COLS)}
   `;
   if (rows.length > 0) {
-    return { dispensing: mapRow(rows[0] as Record<string, unknown>), inserted: true };
+    return { dispensing: mapRow(rows[0]), inserted: true };
   }
   const existing = await tx`
     SELECT ${tx.unsafe(COLS)} FROM clinical.prescription_dispensings
     WHERE idempotency_key = ${input.idempotencyKey}
   `;
-  return { dispensing: mapRow(existing[0] as Record<string, unknown>), inserted: false };
+  return { dispensing: mapRow(existing[0]), inserted: false };
 }
 
 /** 按处方列出发药记录。 */

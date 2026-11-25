@@ -10,6 +10,7 @@
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
 import type { CohortCriteria } from '../../medical-tools/research/cohortRuleEngine.js';
+import { toText } from '../rowText.js';
 
 export interface ResearchCohort {
   id: string;
@@ -65,11 +66,11 @@ function mapCohort(row: Record<string, unknown>): ResearchCohort {
     id: String(row.id),
     name: String(row.name),
     disease: String(row.disease),
-    diseaseCode: row.disease_code ? String(row.disease_code) : null,
+    diseaseCode: row.disease_code ? toText(row.disease_code) : null,
     criteria: parseJson<CohortCriteria>(row.criteria, { include: {}, exclude: {} }),
     status: row.status as ResearchCohort['status'],
-    createdBy: row.created_by ? String(row.created_by) : null,
-    lastRunAt: row.last_run_at ? String(row.last_run_at) : null,
+    createdBy: row.created_by ? toText(row.created_by) : null,
+    lastRunAt: row.last_run_at ? toText(row.last_run_at) : null,
     lastRunAdded: Number(row.last_run_added ?? 0),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -101,7 +102,7 @@ export async function createCohort(
     )
     RETURNING ${db.unsafe(COHORT_COLS)}
   `;
-  return mapCohort(rows[0] as Record<string, unknown>);
+  return mapCohort(rows[0]);
 }
 
 export async function getCohortById(id: string, sql?: DbExecutor): Promise<ResearchCohort | null> {
@@ -109,7 +110,7 @@ export async function getCohortById(id: string, sql?: DbExecutor): Promise<Resea
   const rows = await db`
     SELECT ${db.unsafe(COHORT_COLS)} FROM clinical.research_cohorts WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapCohort(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCohort(rows[0]) : null;
 }
 
 export async function listCohorts(
@@ -162,7 +163,7 @@ export async function setCohortStatus(
     WHERE id = ${id}
     RETURNING ${db.unsafe(COHORT_COLS)}
   `;
-  return rows.length > 0 ? mapCohort(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCohort(rows[0]) : null;
 }
 
 /** 记录最近一次运行结果（新增数、时间） */

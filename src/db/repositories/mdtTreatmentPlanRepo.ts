@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface TreatmentPlan {
   id: string;
@@ -25,9 +26,9 @@ function mapRow(r: Record<string, unknown>): TreatmentPlan {
     visitId: String(r.visit_id),
     planType: String(r.plan_type),
     draft: String(r.draft),
-    scheduledAt: r.scheduled_at == null ? null : String(r.scheduled_at),
+    scheduledAt: r.scheduled_at == null ? null : toText(r.scheduled_at),
     status: String(r.status),
-    confirmedBy: r.confirmed_by == null ? null : String(r.confirmed_by),
+    confirmedBy: r.confirmed_by == null ? null : toText(r.confirmed_by),
     createdAt: String(r.created_at),
   };
 }
@@ -46,7 +47,7 @@ export async function createFromMdt(input: CreateInput): Promise<TreatmentPlan> 
       (mdt_consult_id, visit_id, plan_type, draft)
     VALUES (${input.mdtConsultId}, ${input.visitId}, ${input.planType}, ${input.draft})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function confirmPlan(id: string, scheduledAt: string, confirmedBy: string): Promise<TreatmentPlan> {
@@ -55,7 +56,7 @@ export async function confirmPlan(id: string, scheduledAt: string, confirmedBy: 
     UPDATE clinical.mdt_treatment_plans
     SET status='confirmed', scheduled_at=${scheduledAt}, confirmed_by=${confirmedBy}
     WHERE id=${id} RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByVisit(visitId: string): Promise<TreatmentPlan[]> {

@@ -18,6 +18,7 @@ import {
   type ChannelNodeTemplate,
   type GreenChannelType,
 } from '@/emergency/greenChannelTemplate.js';
+import { toText } from '../rowText.js';
 
 /* ============================== 类型 ============================== */
 
@@ -74,7 +75,7 @@ function mapNode(row: Record<string, unknown>, arriveIso: string, overdueMap: Re
     nodeKey: String(row.node_key),
     label: String(row.label),
     targetMinutes: row.target_minutes == null ? null : Number(row.target_minutes),
-    actualTime: row.actual_time ? String(row.actual_time) : null,
+    actualTime: row.actual_time ? toText(row.actual_time) : null,
     sortOrder: Number(row.sort_order),
     overdue: Boolean(overdueMap[String(row.node_key)]),
   };
@@ -87,17 +88,17 @@ function mapHead(row: Record<string, unknown>): Omit<GreenChannel, 'nodes'> {
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     type: String(row.type) as GreenChannelType,
-    subtype: String(row.subtype ?? ''),
+    subtype: toText(row.subtype ?? ''),
     status: String(row.status) as GreenChannel['status'],
     arriveTime: String(row.arrive_time),
     activateTime: String(row.activate_time),
-    endTime: row.end_time ? String(row.end_time) : null,
+    endTime: row.end_time ? toText(row.end_time) : null,
     notifiedTeams: (row.notified_teams as string[]) ?? [],
     dbnMinutes: row.dbn_minutes == null ? null : Number(row.dbn_minutes),
     dctMinutes: row.dct_minutes == null ? null : Number(row.dct_minutes),
     dntMinutes: row.dnt_minutes == null ? null : Number(row.dnt_minutes),
-    outcome: row.outcome ? String(row.outcome) : null,
-    qualityNote: row.quality_note ? String(row.quality_note) : null,
+    outcome: row.outcome ? toText(row.outcome) : null,
+    qualityNote: row.quality_note ? toText(row.quality_note) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -210,7 +211,7 @@ export async function closeChannel(
       WHERE id = ${channelId}
       RETURNING *
     `;
-    return (await hydrate(rows[0], sql))!;
+    return (await hydrate(rows[0], sql));
   });
 }
 
@@ -250,7 +251,7 @@ export async function listChannels(
       rows = await sql`SELECT * FROM clinical.green_channels ORDER BY activate_time DESC`;
     }
     const out: GreenChannel[] = [];
-    for (const r of rows) out.push((await hydrate(r, sql))!);
+    for (const r of rows) out.push((await hydrate(r, sql)));
     return out;
   });
 }

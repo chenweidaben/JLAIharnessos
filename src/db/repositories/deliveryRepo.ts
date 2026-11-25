@@ -16,6 +16,7 @@
  */
 
 import { getDb, withTx, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* -------------------------------- 类型 -------------------------------- */
 
@@ -75,22 +76,22 @@ function mapDelivery(r: Record<string, unknown>): PrescriptionDelivery {
     deliveryNo: String(r.delivery_no),
     rxId: String(r.rx_id),
     patientId: String(r.patient_id),
-    accountId: r.account_id != null ? String(r.account_id) : null,
+    accountId: r.account_id != null ? toText(r.account_id) : null,
     channel: r.channel as DeliveryChannel,
     status: r.status as DeliveryStatus,
-    courierCompany: r.courier_company != null ? String(r.courier_company) : null,
-    trackingNo: r.tracking_no != null ? String(r.tracking_no) : null,
-    addressSnapshot: r.address_snapshot != null ? String(r.address_snapshot) : null,
-    pickupCode: r.pickup_code != null ? String(r.pickup_code) : null,
-    createdBy: r.created_by != null ? String(r.created_by) : null,
-    fulfilledBy: r.fulfilled_by != null ? String(r.fulfilled_by) : null,
-    confirmedBy: r.confirmed_by != null ? String(r.confirmed_by) : null,
-    cancelledBy: r.cancelled_by != null ? String(r.cancelled_by) : null,
+    courierCompany: r.courier_company != null ? toText(r.courier_company) : null,
+    trackingNo: r.tracking_no != null ? toText(r.tracking_no) : null,
+    addressSnapshot: r.address_snapshot != null ? toText(r.address_snapshot) : null,
+    pickupCode: r.pickup_code != null ? toText(r.pickup_code) : null,
+    createdBy: r.created_by != null ? toText(r.created_by) : null,
+    fulfilledBy: r.fulfilled_by != null ? toText(r.fulfilled_by) : null,
+    confirmedBy: r.confirmed_by != null ? toText(r.confirmed_by) : null,
+    cancelledBy: r.cancelled_by != null ? toText(r.cancelled_by) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
-    fulfilledAt: r.fulfilled_at != null ? String(r.fulfilled_at) : null,
-    confirmedAt: r.confirmed_at != null ? String(r.confirmed_at) : null,
-    cancelledAt: r.cancelled_at != null ? String(r.cancelled_at) : null,
+    fulfilledAt: r.fulfilled_at != null ? toText(r.fulfilled_at) : null,
+    confirmedAt: r.confirmed_at != null ? toText(r.confirmed_at) : null,
+    cancelledAt: r.cancelled_at != null ? toText(r.cancelled_at) : null,
   };
 }
 
@@ -108,7 +109,7 @@ export async function getDeliveryById(
 ): Promise<PrescriptionDelivery | null> {
   const rows = await db`SELECT ${db.unsafe(DELIVERY_COLS)}
     FROM clinical.prescription_deliveries WHERE id = ${id}`;
-  return rows.length ? mapDelivery(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapDelivery(rows[0]) : null;
 }
 
 export async function getOpenDeliveryByRx(
@@ -119,7 +120,7 @@ export async function getOpenDeliveryByRx(
     FROM clinical.prescription_deliveries
     WHERE rx_id = ${rxId} AND status <> 'cancelled'
     ORDER BY created_at DESC LIMIT 1`;
-  return rows.length ? mapDelivery(rows[0] as Record<string, unknown>) : null;
+  return rows.length ? mapDelivery(rows[0]) : null;
 }
 
 export async function listDeliveriesByPatient(
@@ -176,7 +177,7 @@ export async function createDelivery(
     VALUES (${input.deliveryNo}, ${input.rxId}, ${input.patientId}, ${input.accountId},
             ${input.channel}, 'created', ${input.addressSnapshot}, ${input.pickupCode}, ${input.createdBy})
     RETURNING ${db.unsafe(DELIVERY_COLS)}`;
-    return { result: 'created', delivery: mapDelivery(rows[0] as Record<string, unknown>) };
+    return { result: 'created', delivery: mapDelivery(rows[0]) };
   } catch (err) {
     // 部分唯一索引冲突（并发建单）→ 回查既有单
     if (

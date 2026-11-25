@@ -7,6 +7,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { CdsRuleCode, CdsSeverity } from '../../medical-tools/order/cdsRules.js';
+import { toText } from '../rowText.js';
 
 export interface OrderCdsAlert {
   id: string;
@@ -32,8 +33,8 @@ function map(row: Record<string, unknown>): OrderCdsAlert {
     ruleCode: row.rule_code as CdsRuleCode,
     severity: row.severity as CdsSeverity,
     message: String(row.message),
-    overrideBy: row.override_by ? String(row.override_by) : null,
-    overrideReason: row.override_reason ? String(row.override_reason) : null,
+    overrideBy: row.override_by ? toText(row.override_by) : null,
+    overrideReason: row.override_reason ? toText(row.override_reason) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -52,7 +53,7 @@ export async function insertAlert(input: NewAlert, tx: DbExecutor): Promise<Orde
     INSERT INTO clinical.order_cds_alerts (order_id, visit_id, patient_id, rule_code, severity, message)
     VALUES (${input.orderId}, ${input.visitId}, ${input.patientId}, ${input.ruleCode}, ${input.severity}, ${input.message})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByOrder(orderId: string, sql?: DbExecutor): Promise<OrderCdsAlert[]> {
@@ -83,11 +84,11 @@ export async function overrideAlert(id: string, by: string, reason: string, tx: 
     UPDATE clinical.order_cds_alerts SET override_by = ${by}, override_reason = ${reason}
     WHERE id = ${id}
     RETURNING ${tx.unsafe(COLS)}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 export async function getAlertById(id: string, sql?: DbExecutor): Promise<OrderCdsAlert | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.order_cds_alerts WHERE id = ${id}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

@@ -17,6 +17,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 // ============================================================================
 // 类型
@@ -330,18 +331,18 @@ function mapAgent(row: Record<string, unknown>): AgentRecord {
     id: String(row.id),
     agentId: String(row.agent_id),
     name: String(row.name),
-    nameEn: row.name_en != null ? String(row.name_en) : null,
+    nameEn: row.name_en != null ? toText(row.name_en) : null,
     category: String(row.category),
     riskLevel: String(row.risk_level),
-    description: String(row.description ?? ''),
+    description: toText(row.description ?? ''),
     tags: parseJsonb<string[]>(row.tags, []),
     allowedRoles: parseJsonb<string[]>(row.allowed_roles, []),
     tools: parseJsonb<string[]>(row.tools, []),
     knowledgeBases: parseJsonb<string[]>(row.knowledge_bases, []),
     builtin: Boolean(row.builtin),
     status: String(row.status),
-    currentVersion: row.current_version != null ? String(row.current_version) : null,
-    ownerId: row.owner_id != null ? String(row.owner_id) : null,
+    currentVersion: row.current_version != null ? toText(row.current_version) : null,
+    ownerId: row.owner_id != null ? toText(row.owner_id) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -354,11 +355,11 @@ function mapVersion(row: Record<string, unknown>): AgentVersionRecord {
     version: String(row.version),
     definition: parseJsonb<Record<string, unknown>>(row.definition, {}),
     prompts: parseJsonb<Record<string, string>>(row.prompts, {}),
-    checksum: row.checksum != null ? String(row.checksum) : null,
-    changelog: row.changelog != null ? String(row.changelog) : null,
+    checksum: row.checksum != null ? toText(row.checksum) : null,
+    changelog: row.changelog != null ? toText(row.changelog) : null,
     published: Boolean(row.published),
-    publishedBy: row.published_by != null ? String(row.published_by) : null,
-    publishedAt: row.published_at != null ? String(row.published_at) : null,
+    publishedBy: row.published_by != null ? toText(row.published_by) : null,
+    publishedAt: row.published_at != null ? toText(row.published_at) : null,
     createdAt: String(row.created_at),
   };
 }

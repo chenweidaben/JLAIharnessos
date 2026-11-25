@@ -17,6 +17,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type BedStatus = 'available' | 'occupied' | 'maintenance' | 'isolation';
 export type BedType = 'standard' | 'isolation' | 'icu' | 'resuscitation';
@@ -46,12 +47,12 @@ function mapBed(row: Record<string, unknown>): Bed {
     id: String(row.id),
     wardId: String(row.ward_id),
     bedNo: String(row.bed_no),
-    roomNo: row.room_no ? String(row.room_no) : null,
+    roomNo: row.room_no ? toText(row.room_no) : null,
     bedType: row.bed_type as BedType,
     status: row.status as BedStatus,
-    currentVisitId: row.current_visit_id ? String(row.current_visit_id) : null,
-    currentPatientId: row.current_patient_id ? String(row.current_patient_id) : null,
-    occupiedAt: row.occupied_at ? String(row.occupied_at) : null,
+    currentVisitId: row.current_visit_id ? toText(row.current_visit_id) : null,
+    currentPatientId: row.current_patient_id ? toText(row.current_patient_id) : null,
+    occupiedAt: row.occupied_at ? toText(row.occupied_at) : null,
     sortOrder: Number(row.sort_order),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -89,7 +90,7 @@ export async function listBedsByWard(wardId: string, sql?: DbExecutor): Promise<
 export async function getBedById(id: string, sql?: DbExecutor): Promise<Bed | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(BED_COLS)} FROM clinical.beds WHERE id = ${id}`;
-  return rows.length > 0 ? mapBed(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapBed(rows[0]) : null;
 }
 
 export async function countBedsByStatus(
@@ -174,7 +175,7 @@ export async function allocateBed(
       '该床位已被占用或处于维护/隔离状态，请改选其他床位',
     );
   }
-  return mapBed(rows[0] as Record<string, unknown>);
+  return mapBed(rows[0]);
 }
 
 /* ----------------------------- 原子释放 ------------------------------ */
@@ -197,7 +198,7 @@ export async function releaseBed(
     WHERE id = ${input.bedId} AND current_visit_id = ${input.visitId}
     RETURNING ${tx.unsafe(BED_COLS)}
   `;
-  if (rows.length > 0) return mapBed(rows[0] as Record<string, unknown>);
+  if (rows.length > 0) return mapBed(rows[0]);
   // 未匹配：床不存在或已不占用该 visit，返回当前状态供上层判断
   return getBedById(input.bedId, tx);
 }
@@ -226,5 +227,5 @@ export async function setBedStatus(
       '床位占用中，无法变更状态（请先出院或换床）',
     );
   }
-  return mapBed(rows[0] as Record<string, unknown>);
+  return mapBed(rows[0]);
 }

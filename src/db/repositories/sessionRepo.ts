@@ -15,6 +15,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface UserSession {
   id: number;
@@ -37,15 +38,15 @@ function mapRow(row: Record<string, unknown>): UserSession {
   return {
     id: Number(row.id),
     jti: String(row.jti),
-    refreshJti: row.refresh_jti != null ? String(row.refresh_jti) : null,
+    refreshJti: row.refresh_jti != null ? toText(row.refresh_jti) : null,
     userId: String(row.user_id),
     issuedAt: String(row.issued_at),
     accessExpiresAt: String(row.access_expires_at),
     refreshExpiresAt: String(row.refresh_expires_at),
-    revokedAt: row.revoked_at != null ? String(row.revoked_at) : null,
-    revokeReason: row.revoke_reason != null ? String(row.revoke_reason) : null,
-    ip: row.ip != null ? String(row.ip) : null,
-    userAgent: row.user_agent != null ? String(row.user_agent) : null,
+    revokedAt: row.revoked_at != null ? toText(row.revoked_at) : null,
+    revokeReason: row.revoke_reason != null ? toText(row.revoke_reason) : null,
+    ip: row.ip != null ? toText(row.ip) : null,
+    userAgent: row.user_agent != null ? toText(row.user_agent) : null,
   };
 }
 
@@ -73,7 +74,7 @@ export async function createSession(
        ${input.accessExpiresAt.toISOString()}, ${input.refreshExpiresAt.toISOString()},
        ${input.ip}, ${input.userAgent})
     RETURNING ${db.unsafe(SELECT_COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /**
@@ -91,7 +92,7 @@ export async function getActiveByJti(
     WHERE jti = ${jti}
       AND revoked_at IS NULL
       AND access_expires_at > now()`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /**
@@ -109,7 +110,7 @@ export async function getActiveByRefreshJti(
     WHERE refresh_jti = ${refreshJti}
       AND revoked_at IS NULL
       AND refresh_expires_at > now()`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 按 jti 吊销会话（主动登出），返回是否命中。 */

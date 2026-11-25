@@ -6,6 +6,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type MedicalRecordType = 'outpatient' | 'admission' | 'progress' | 'operative' | 'discharge' | 'front_page';
 export type MedicalRecordStatus = 'draft' | 'submitted' | 'reviewed' | 'signed' | 'archived' | 'returned';
@@ -14,7 +15,7 @@ export interface MedicalRecord {
   id: string; visitId: string; recordType: MedicalRecordType; title: string;
   content: Record<string, unknown>; plainText: string | null; authorId: string | null;
   aiGenerated: boolean; aiModel: string | null; status: MedicalRecordStatus;
-  qualityScore: number | null; qualityIssues: Array<Record<string, unknown>>;
+  qualityScore: number | null; qualityIssues: Record<string, unknown>[];
   signedAt: string | null; signedBy: string | null; version: number; createdAt: string; updatedAt: string;
 }
 
@@ -30,14 +31,14 @@ function mapRow(row: Record<string, unknown>): MedicalRecord {
   return {
     id: String(row.id), visitId: String(row.visit_id), recordType: row.record_type as MedicalRecordType,
     title: String(row.title), content: (row.content as Record<string, unknown>) ?? {},
-    plainText: row.plain_text ? String(row.plain_text) : null,
-    authorId: row.author_id ? String(row.author_id) : null,
-    aiGenerated: Boolean(row.ai_generated), aiModel: row.ai_model ? String(row.ai_model) : null,
+    plainText: row.plain_text ? toText(row.plain_text) : null,
+    authorId: row.author_id ? toText(row.author_id) : null,
+    aiGenerated: Boolean(row.ai_generated), aiModel: row.ai_model ? toText(row.ai_model) : null,
     status: row.status as MedicalRecordStatus,
     qualityScore: row.quality_score !== null ? Number(row.quality_score) : null,
-    qualityIssues: (row.quality_issues as Array<Record<string, unknown>>) ?? [],
-    signedAt: row.signed_at ? String(row.signed_at) : null,
-    signedBy: row.signed_by ? String(row.signed_by) : null,
+    qualityIssues: (row.quality_issues as Record<string, unknown>[]) ?? [],
+    signedAt: row.signed_at ? toText(row.signed_at) : null,
+    signedBy: row.signed_by ? toText(row.signed_by) : null,
     version: Number(row.version), createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
 }
@@ -50,13 +51,13 @@ export async function createMedicalRecord(input: MedicalRecordCreateInput, sql?:
       ${input.plainText ?? null}, ${input.authorId ?? null}, ${input.aiGenerated ?? false}, ${input.aiModel ?? null})
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getMedicalRecordById(id: string, sql?: DbExecutor): Promise<MedicalRecord | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM clinical.medical_records WHERE id = ${id} AND deleted_at IS NULL`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getMedicalRecordsByVisit(
@@ -80,7 +81,7 @@ export async function updateMedicalRecordStatus(
       signed_by = COALESCE(signed_by, ${signedBy ?? null}), updated_at = now()
     WHERE id = ${id} AND deleted_at IS NULL RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 待三级质控队列项（病历 + 就诊 + 患者脱敏信息，对齐前端 QcQueueItem 契约）。 */
@@ -120,14 +121,14 @@ export async function listPendingQcQueue(
   `;
   return (rows as Record<string, unknown>[]).map((r) => ({
     recordId: String(r.record_id),
-    recordType: r.record_type ? String(r.record_type) : '',
-    title: r.title ? String(r.title) : '',
+    recordType: r.record_type ? toText(r.record_type) : '',
+    title: r.title ? toText(r.title) : '',
     status: (r.status as MedicalRecordStatus) ?? 'submitted',
-    department: r.department ? String(r.department) : '',
-    visitNo: r.visit_no ? String(r.visit_no) : '',
-    mrn: r.mrn ? String(r.mrn) : '',
-    patientName: r.patient_name ? String(r.patient_name) : '',
-    updatedAt: r.updated_at ? String(r.updated_at) : '',
+    department: r.department ? toText(r.department) : '',
+    visitNo: r.visit_no ? toText(r.visit_no) : '',
+    mrn: r.mrn ? toText(r.mrn) : '',
+    patientName: r.patient_name ? toText(r.patient_name) : '',
+    updatedAt: r.updated_at ? toText(r.updated_at) : '',
   }));
 }
 
@@ -145,5 +146,5 @@ export async function updateMedicalRecordContent(
         version = version + 1, updated_at = now()
     WHERE id = ${id} AND deleted_at IS NULL RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

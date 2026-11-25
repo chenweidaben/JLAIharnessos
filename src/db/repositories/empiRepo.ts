@@ -9,6 +9,7 @@
 
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type IdentifierDomain =
   | 'mrn' | 'id_card' | 'insurance' | 'phone' | 'wechat' | 'outer';
@@ -70,8 +71,8 @@ function mapIdentifier(row: Record<string, unknown>): PatientIdentifier {
     patientId: String(row.patient_id),
     domain: row.identifier_domain as IdentifierDomain,
     identifierHash: String(row.identifier_hash),
-    identifierLast4: row.identifier_last4 ? String(row.identifier_last4) : null,
-    source: String(row.source ?? 'local'),
+    identifierLast4: row.identifier_last4 ? toText(row.identifier_last4) : null,
+    source: toText(row.source ?? 'local'),
     createdAt: String(row.created_at),
   };
 }
@@ -84,8 +85,8 @@ function mapCandidate(row: Record<string, unknown>): MatchCandidate {
     matchScore: Number(row.match_score ?? 0),
     matchReasons: parseJson<string[]>(row.match_reasons, []),
     status: row.status as MatchCandidate['status'],
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -95,8 +96,8 @@ function mapLink(row: Record<string, unknown>): EmpiLink {
     id: String(row.id),
     masterPatientId: String(row.master_patient_id),
     linkedPatientId: String(row.linked_patient_id),
-    candidateId: row.candidate_id ? String(row.candidate_id) : null,
-    createdBy: row.created_by ? String(row.created_by) : null,
+    candidateId: row.candidate_id ? toText(row.candidate_id) : null,
+    createdBy: row.created_by ? toText(row.created_by) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -124,7 +125,7 @@ export async function registerIdentifier(
     ON CONFLICT (identifier_domain, identifier_hash) DO NOTHING
     RETURNING ${db.unsafe(IDENT_COLS)}
   `;
-  return rows.length > 0 ? mapIdentifier(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapIdentifier(rows[0]) : null;
 }
 
 export async function listIdentifiersByPatient(
@@ -179,7 +180,7 @@ export async function insertCandidate(
     ON CONFLICT (patient_a_id, patient_b_id) DO NOTHING
     RETURNING ${db.unsafe(CANDIDATE_COLS)}
   `;
-  return rows.length > 0 ? mapCandidate(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCandidate(rows[0]) : null;
 }
 
 export async function getCandidateById(
@@ -191,7 +192,7 @@ export async function getCandidateById(
     SELECT ${db.unsafe(CANDIDATE_COLS)} FROM clinical.empi_match_candidates
     WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapCandidate(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCandidate(rows[0]) : null;
 }
 
 export async function listCandidates(
@@ -231,7 +232,7 @@ export async function reviewCandidate(
     WHERE id = ${id}
     RETURNING ${db.unsafe(CANDIDATE_COLS)}
   `;
-  return rows.length > 0 ? mapCandidate(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCandidate(rows[0]) : null;
 }
 
 /* ----------------------------- 逻辑链接 ----------------------------- */
@@ -256,7 +257,7 @@ export async function insertLink(
     ON CONFLICT (linked_patient_id) DO NOTHING
     RETURNING ${db.unsafe(LINK_COLS)}
   `;
-  return rows.length > 0 ? mapLink(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapLink(rows[0]) : null;
 }
 
 export async function listLinks(sql?: Sql): Promise<EmpiLink[]> {
@@ -276,7 +277,7 @@ export async function getLinkByLinkedPatient(
     SELECT ${db.unsafe(LINK_COLS)} FROM clinical.empi_links
     WHERE linked_patient_id = ${patientId}
   `;
-  return rows.length > 0 ? mapLink(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapLink(rows[0]) : null;
 }
 
 /**
@@ -292,5 +293,5 @@ export async function getLinkByPatient(
     SELECT ${db.unsafe(LINK_COLS)} FROM clinical.empi_links
     WHERE master_patient_id = ${patientId} OR linked_patient_id = ${patientId}
   `;
-  return rows.length > 0 ? mapLink(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapLink(rows[0]) : null;
 }

@@ -14,6 +14,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
 import type { TranscriptSegment } from '../../voice/types.js';
+import { toText } from '../rowText.js';
 
 export type VoiceDictationStatus = 'draft' | 'converted' | 'discarded';
 export type AudioFormat = 'wav' | 'mp3' | 'm4a' | 'pcm' | 'ogg';
@@ -86,16 +87,16 @@ function mapRow(row: Record<string, unknown>): VoiceDictation {
     audioFormat: row.audio_format ? (row.audio_format as AudioFormat) : null,
     durationMs: row.duration_ms != null ? Number(row.duration_ms) : null,
     asrProvider: String(row.asr_provider),
-    rawTranscript: String(row.raw_transcript ?? ''),
-    normalizedText: String(row.normalized_text ?? ''),
+    rawTranscript: toText(row.raw_transcript ?? ''),
+    normalizedText: toText(row.normalized_text ?? ''),
     segments: arr<TranscriptSegment>(row.segments),
     corrections: arr<VoiceTermCorrection>(row.corrections),
     medicationMentions: arr<VoiceMedicationMention>(row.medication_mentions),
     warnings: arr<string>(row.warnings).map((w) => String(w)),
     avgConfidence: row.avg_confidence != null ? Number(row.avg_confidence) : null,
     status: row.status as VoiceDictationStatus,
-    resultingRecordId: row.resulting_record_id ? String(row.resulting_record_id) : null,
-    convertedAt: row.converted_at ? String(row.converted_at) : null,
+    resultingRecordId: row.resulting_record_id ? toText(row.resulting_record_id) : null,
+    convertedAt: row.converted_at ? toText(row.converted_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -120,7 +121,7 @@ export async function createDictation(
       ${input.avgConfidence ?? null})
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getDictationById(
@@ -130,7 +131,7 @@ export async function getDictationById(
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)}
     FROM clinical.voice_dictations WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export interface ListDictationFilters {
@@ -171,7 +172,7 @@ export async function markConverted(
     WHERE id = ${id} AND status = 'draft'
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 作废：draft → discarded（CAS，重复作废返回 null）。 */
@@ -186,5 +187,5 @@ export async function markDiscarded(
     WHERE id = ${id} AND status = 'draft'
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

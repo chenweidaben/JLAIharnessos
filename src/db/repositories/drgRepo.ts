@@ -13,6 +13,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type DrgResultStatus = 'grouped' | 'confirmed' | 'rejected';
 
@@ -100,26 +101,26 @@ function mapResult(row: Record<string, unknown>): DrgGroupResult {
   return {
     id: String(row.id),
     visitId: String(row.visit_id),
-    frontPageId: row.front_page_id ? String(row.front_page_id) : null,
+    frontPageId: row.front_page_id ? toText(row.front_page_id) : null,
     patientId: String(row.patient_id),
     department: String(row.department),
-    primaryDxCode: row.primary_dx_code ? String(row.primary_dx_code) : null,
+    primaryDxCode: row.primary_dx_code ? toText(row.primary_dx_code) : null,
     hasOrp: Boolean(row.has_orp),
     groupCode: String(row.group_code),
-    groupName: row.group_name ? String(row.group_name) : null,
-    mdc: row.mdc ? String(row.mdc) : null,
+    groupName: row.group_name ? toText(row.group_name) : null,
+    mdc: row.mdc ? toText(row.mdc) : null,
     grouperVersion: String(row.grouper_version),
     weight: String(row.weight),
     estimatedPayment: String(row.estimated_payment),
-    totalFee: row.total_fee != null ? String(row.total_fee) : null,
-    balance: row.balance != null ? String(row.balance) : null,
+    totalFee: row.total_fee != null ? toText(row.total_fee) : null,
+    balance: row.balance != null ? toText(row.balance) : null,
     explanation: asObj(row.explanation),
     status: row.status as DrgResultStatus,
-    groupedBy: row.grouped_by ? String(row.grouped_by) : null,
+    groupedBy: row.grouped_by ? toText(row.grouped_by) : null,
     groupedAt: String(row.grouped_at),
-    confirmedBy: row.confirmed_by ? String(row.confirmed_by) : null,
-    confirmedAt: row.confirmed_at ? String(row.confirmed_at) : null,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
+    confirmedBy: row.confirmed_by ? toText(row.confirmed_by) : null,
+    confirmedAt: row.confirmed_at ? toText(row.confirmed_at) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -199,7 +200,7 @@ export async function upsertGroupResult(
       reject_reason = NULL
     RETURNING ${tx.unsafe(RESULT_COLS)}
   `;
-  return mapResult(rows[0] as Record<string, unknown>);
+  return mapResult(rows[0]);
 }
 
 /* ------------------------------- 查询 -------------------------------- */
@@ -212,7 +213,7 @@ export async function getResultByVisit(
   const rows = await db`
     SELECT ${db.unsafe(RESULT_COLS)} FROM clinical.drg_group_results WHERE visit_id = ${visitId}
   `;
-  return rows.length > 0 ? mapResult(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapResult(rows[0]) : null;
 }
 
 export async function getResultById(
@@ -223,7 +224,7 @@ export async function getResultById(
   const rows = await db`
     SELECT ${db.unsafe(RESULT_COLS)} FROM clinical.drg_group_results WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapResult(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapResult(rows[0]) : null;
 }
 
 export interface DrgResultListRow {
@@ -276,13 +277,13 @@ export async function listDrgResults(
     patientId: String(r.patient_id),
     patientName: String(r.name_masked),
     department: String(r.department),
-    primaryDxCode: r.primary_dx_code ? String(r.primary_dx_code) : null,
+    primaryDxCode: r.primary_dx_code ? toText(r.primary_dx_code) : null,
     groupCode: String(r.group_code),
-    groupName: r.group_name ? String(r.group_name) : null,
+    groupName: r.group_name ? toText(r.group_name) : null,
     weight: String(r.weight),
     estimatedPayment: String(r.estimated_payment),
-    totalFee: r.total_fee != null ? String(r.total_fee) : null,
-    balance: r.balance != null ? String(r.balance) : null,
+    totalFee: r.total_fee != null ? toText(r.total_fee) : null,
+    balance: r.balance != null ? toText(r.balance) : null,
     status: r.status as DrgResultStatus,
     updatedAt: String(r.updated_at),
   }));
@@ -306,7 +307,7 @@ export async function setResultStatus(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapResult(locked[0] as Record<string, unknown>);
+  const current = mapResult(locked[0]);
   if (!fromStatuses.includes(current.status)) return null;
 
   const rows = await tx`
@@ -318,7 +319,7 @@ export async function setResultStatus(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(RESULT_COLS)}
   `;
-  return rows.length > 0 ? mapResult(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapResult(rows[0]) : null;
 }
 
 /* ------------------------------- 计数 -------------------------------- */

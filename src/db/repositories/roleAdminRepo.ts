@@ -15,6 +15,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** 角色视图（含权限码、用户数） */
 export interface RoleDetail {
@@ -77,7 +78,7 @@ function mapRoleRow(row: Record<string, unknown>): Omit<RoleDetail, 'permissionC
   return {
     code: String(row.code),
     name: String(row.name),
-    description: row.description ? String(row.description) : null,
+    description: row.description ? toText(row.description) : null,
     isSystem: Boolean(row.is_system),
     createdAt: String(row.created_at),
   };
@@ -152,7 +153,7 @@ export async function getRole(code: string, db: DbExecutor = getDb()): Promise<R
     FROM iam.roles WHERE code = ${code}
   `;
   if (rows.length === 0) return null;
-  const base = mapRoleRow(rows[0] as Record<string, unknown>);
+  const base = mapRoleRow(rows[0]);
   const [perms, counts] = await Promise.all([
     loadRolePermissions(db, [base.code]),
     loadRoleUserCounts(db, [base.code]),
@@ -177,7 +178,7 @@ export async function listRoleUsers(code: string, db: DbExecutor = getDb()): Pro
     id: String(r.id),
     username: String(r.username),
     realName: String(r.name),
-    department: r.department ? String(r.department) : null,
+    department: r.department ? toText(r.department) : null,
     status: String(r.status),
   }));
 }
@@ -193,7 +194,7 @@ export async function listPermissions(db: DbExecutor = getDb()): Promise<Permiss
     code: String(r.code),
     name: String(r.name),
     module: String(r.module),
-    description: r.description ? String(r.description) : null,
+    description: r.description ? toText(r.description) : null,
   }));
 }
 

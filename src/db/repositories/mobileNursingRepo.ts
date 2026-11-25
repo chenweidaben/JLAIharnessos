@@ -17,6 +17,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* --------------------------- 腕带定位患者 ------------------------------ */
 
@@ -51,11 +52,11 @@ export async function getInpatientVisitByNo(
     visitId: String(r.visit_id),
     visitNo: String(r.visit_no),
     patientId: String(r.patient_id),
-    bedNo: r.bed_no ? String(r.bed_no) : null,
-    ward: r.ward ? String(r.ward) : null,
+    bedNo: r.bed_no ? toText(r.bed_no) : null,
+    ward: r.ward ? toText(r.ward) : null,
     department: String(r.department),
     patientName: String(r.name_masked),
-    attendingDoctorId: r.attending_doctor_id ? String(r.attending_doctor_id) : null,
+    attendingDoctorId: r.attending_doctor_id ? toText(r.attending_doctor_id) : null,
   };
 }
 
@@ -239,7 +240,7 @@ export async function listSbarDeptRows(
     visitId: String(r.visit_id),
     visitNo: String(r.visit_no),
     patientName: String(r.name_masked),
-    bedNo: r.bed_no ? String(r.bed_no) : null,
+    bedNo: r.bed_no ? toText(r.bed_no) : null,
     pendingTasks: Number(r.pending_tasks),
     activeDrugOrders: Number(r.active_drug_orders),
     latestVitals: (r.latest_vitals as Record<string, unknown>) ?? {},

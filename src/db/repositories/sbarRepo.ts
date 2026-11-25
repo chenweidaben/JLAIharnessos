@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface SbarHandoff {
   id: string;
@@ -34,8 +35,8 @@ function mapRow(r: Record<string, unknown>): SbarHandoff {
     assessment: String(r.a_assessment),
     recommendation: String(r.r_recommendation),
     status: String(r.status),
-    receiverUuid: r.receiver_uuid == null ? null : String(r.receiver_uuid),
-    receivedAt: r.received_at == null ? null : String(r.received_at),
+    receiverUuid: r.receiver_uuid == null ? null : toText(r.receiver_uuid),
+    receivedAt: r.received_at == null ? null : toText(r.received_at),
     handoffBy: String(r.handoff_by),
     createdAt: String(r.created_at),
   };
@@ -60,7 +61,7 @@ export async function createHandoff(input: CreateInput): Promise<SbarHandoff> {
     VALUES (${input.visitId}, ${input.fromUnit}, ${input.toUnit}, ${input.situation}, ${input.background},
       ${input.assessment}, ${input.recommendation}, ${input.handoffBy})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function receiveHandoff(id: string, receiverUuid: string): Promise<SbarHandoff> {
@@ -70,7 +71,7 @@ export async function receiveHandoff(id: string, receiverUuid: string): Promise<
     SET status='received', receiver_uuid=${receiverUuid}, received_at=now()
     WHERE id=${id} AND status='pending'
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function closeHandoff(id: string): Promise<SbarHandoff> {
@@ -79,7 +80,7 @@ export async function closeHandoff(id: string): Promise<SbarHandoff> {
     UPDATE clinical.sbar_handoffs SET status='closed'
     WHERE id=${id} AND status='received'
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByVisit(visitId: string): Promise<SbarHandoff[]> {

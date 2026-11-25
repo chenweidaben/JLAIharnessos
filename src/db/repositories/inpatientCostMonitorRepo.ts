@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -16,11 +17,11 @@ export interface MonitorRow {
 function map(r: Record<string, unknown>): MonitorRow {
   return {
     id: String(r.id), visitId: String(r.visit_id),
-    groupCode: r.group_code == null ? null : String(r.group_code),
-    budgetCost: r.budget_cost == null ? null : String(r.budget_cost),
+    groupCode: r.group_code == null ? null : toText(r.group_code),
+    budgetCost: r.budget_cost == null ? null : toText(r.budget_cost),
     budgetBasis: r.budget_basis === 'dip' ? 'dip' : 'drg',
     accumulatedCost: String(r.accumulated_cost),
-    ratio: r.ratio == null ? null : String(r.ratio),
+    ratio: r.ratio == null ? null : toText(r.ratio),
     level: String(r.level),
     dischargeReviewReminded: Boolean(r.discharge_review_reminded),
     lastSnapshotAt: String(r.last_snapshot_at),
@@ -39,7 +40,7 @@ export async function upsertSnapshot(
       accumulated_cost = EXCLUDED.accumulated_cost, ratio = EXCLUDED.ratio,
       level = EXCLUDED.level, last_snapshot_at = now()
     RETURNING id, visit_id, group_code, budget_cost, budget_basis, accumulated_cost, ratio, level, discharge_review_reminded, last_snapshot_at`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listMonitors(): Promise<MonitorRow[]> {
@@ -54,7 +55,7 @@ export async function getByVisit(visitId: string, tx: DbExecutor = db): Promise<
   const rows = await tx`
     SELECT id, visit_id, group_code, budget_cost, budget_basis, accumulated_cost, ratio, level, discharge_review_reminded, last_snapshot_at
     FROM clinical.inpatient_cost_monitor WHERE visit_id=${visitId}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** CAS：未提醒 → 已提醒。0 行即幂等重复。 */
@@ -63,5 +64,5 @@ export async function markDischargeReminded(visitId: string, tx: DbExecutor = db
     UPDATE clinical.inpatient_cost_monitor SET discharge_review_reminded=true
     WHERE visit_id=${visitId} AND discharge_review_reminded=false
     RETURNING id, visit_id, group_code, budget_cost, budget_basis, accumulated_cost, ratio, level, discharge_review_reminded, last_snapshot_at`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

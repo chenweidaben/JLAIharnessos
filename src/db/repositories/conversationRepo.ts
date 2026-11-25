@@ -6,6 +6,7 @@
 
 import { getDb, type Sql, withTx } from '../pool.js';
 import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type MessageRole = 'user' | 'assistant' | 'tool' | 'system';
 
@@ -17,14 +18,14 @@ export interface Conversation {
 
 export interface ConversationMessage {
   id: string; conversationId: string; messageNo: string; role: MessageRole;
-  content: string | null; toolCalls: Array<Record<string, unknown>>;
+  content: string | null; toolCalls: Record<string, unknown>[];
   toolCallId: string | null; toolName: string | null; tokensIn: number; tokensOut: number;
   latencyMs: number | null; error: string | null; createdAt: string;
 }
 
 export interface MessageCreateInput {
   role: MessageRole; content?: string | null;
-  toolCalls?: Array<Record<string, unknown>>; toolCallId?: string | null;
+  toolCalls?: Record<string, unknown>[]; toolCallId?: string | null;
   toolName?: string | null; tokensIn?: number; tokensOut?: number;
   latencyMs?: number | null; error?: string | null;
 }
@@ -35,11 +36,11 @@ const MSG_COLS = `id, conversation_id, message_no, role, content, tool_calls, to
 function mapConvRow(row: Record<string, unknown>): Conversation {
   return {
     id: String(row.id), conversationNo: String(row.conversation_no),
-    userId: row.user_id ? String(row.user_id) : null,
-    patientId: row.patient_id ? String(row.patient_id) : null,
+    userId: row.user_id ? toText(row.user_id) : null,
+    patientId: row.patient_id ? toText(row.patient_id) : null,
     title: String(row.title), status: row.status as Conversation['status'],
     messageCount: Number(row.message_count),
-    lastMessageAt: row.last_message_at ? String(row.last_message_at) : null,
+    lastMessageAt: row.last_message_at ? toText(row.last_message_at) : null,
     metadata: (row.metadata as Record<string, unknown>) ?? {},
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
@@ -49,13 +50,13 @@ function mapMsgRow(row: Record<string, unknown>): ConversationMessage {
   return {
     id: String(row.id), conversationId: String(row.conversation_id),
     messageNo: String(row.message_no), role: row.role as MessageRole,
-    content: row.content ? String(row.content) : null,
-    toolCalls: (row.tool_calls as Array<Record<string, unknown>>) ?? [],
-    toolCallId: row.tool_call_id ? String(row.tool_call_id) : null,
-    toolName: row.tool_name ? String(row.tool_name) : null,
+    content: row.content ? toText(row.content) : null,
+    toolCalls: (row.tool_calls as Record<string, unknown>[]) ?? [],
+    toolCallId: row.tool_call_id ? toText(row.tool_call_id) : null,
+    toolName: row.tool_name ? toText(row.tool_name) : null,
     tokensIn: Number(row.tokens_in), tokensOut: Number(row.tokens_out),
     latencyMs: row.latency_ms !== null ? Number(row.latency_ms) : null,
-    error: row.error ? String(row.error) : null, createdAt: String(row.created_at),
+    error: row.error ? toText(row.error) : null, createdAt: String(row.created_at),
   };
 }
 
@@ -73,19 +74,19 @@ export async function createConversation(input: {
       ${input.title ?? '新对话'}, ${db.json(toJson(input.metadata ?? {}))})
     RETURNING ${db.unsafe(CONV_COLS)}
   `;
-  return mapConvRow(rows[0] as Record<string, unknown>);
+  return mapConvRow(rows[0]);
 }
 
 export async function getConversationById(id: string, sql?: Sql): Promise<Conversation | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(CONV_COLS)} FROM agent.conversations WHERE id = ${id} AND status != 'deleted'`;
-  return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapConvRow(rows[0]) : null;
 }
 
 export async function getConversationByNo(no: string, sql?: Sql): Promise<Conversation | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(CONV_COLS)} FROM agent.conversations WHERE conversation_no = ${no} AND status != 'deleted'`;
-  return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapConvRow(rows[0]) : null;
 }
 
 export async function listConversations(
@@ -104,7 +105,7 @@ export async function updateConversationTitle(id: string, title: string, sql?: S
     UPDATE agent.conversations SET title = ${title}, updated_at = now()
     WHERE id = ${id} AND status != 'deleted' RETURNING ${db.unsafe(CONV_COLS)}
   `;
-  return rows.length > 0 ? mapConvRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapConvRow(rows[0]) : null;
 }
 
 export async function appendMessage(
@@ -119,7 +120,7 @@ export async function appendMessage(
       RETURNING ${tx.unsafe(MSG_COLS)}
     `;
     await tx`UPDATE agent.conversations SET message_count = message_count + 1, last_message_at = now(), updated_at = now() WHERE id = ${conversationId}`;
-    return mapMsgRow(msgRows[0] as Record<string, unknown>);
+    return mapMsgRow(msgRows[0]);
   });
 }
 

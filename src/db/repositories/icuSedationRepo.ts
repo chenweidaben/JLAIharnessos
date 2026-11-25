@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Sedation {
   id: string; visitId: string; rassScore: number; targetRass: number;
@@ -15,8 +16,8 @@ function map(r: Record<string, unknown>): Sedation {
     id: String(r.id), visitId: String(r.visit_id),
     rassScore: Number(r.rass_score), targetRass: Number(r.target_rass),
     onVentilator: Boolean(r.on_ventilator),
-    sedativeDrug: r.sedative_drug ? String(r.sedative_drug) : null,
-    note: r.note ? String(r.note) : null,
+    sedativeDrug: r.sedative_drug ? toText(r.sedative_drug) : null,
+    note: r.note ? toText(r.note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

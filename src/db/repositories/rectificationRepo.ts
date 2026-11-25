@@ -14,6 +14,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------ 类型 ------------------------------ */
 
@@ -76,9 +77,9 @@ function mapTask(row: Record<string, unknown>): RectificationTask {
   return {
     id: String(row.id),
     recordId: String(row.record_id),
-    visitId: row.visit_id != null ? String(row.visit_id) : null,
+    visitId: row.visit_id != null ? toText(row.visit_id) : null,
     defectRuleId: String(row.defect_rule_id),
-    defectSection: row.defect_section != null ? String(row.defect_section) : null,
+    defectSection: row.defect_section != null ? toText(row.defect_section) : null,
     defectMessage: String(row.defect_message),
     defectType: String(row.defect_type) as RectificationDefectType,
     defectLevel: String(row.defect_level) as RectificationDefectLevel,
@@ -86,17 +87,17 @@ function mapTask(row: Record<string, unknown>): RectificationTask {
     assigneeId: String(row.assignee_id),
     createdById: String(row.created_by),
     status: String(row.status) as RectificationStatus,
-    rectifyContent: row.rectify_content != null ? String(row.rectify_content) : null,
-    rectifyNote: row.rectify_note != null ? String(row.rectify_note) : null,
-    rectifiedAt: row.rectified_at != null ? String(row.rectified_at) : null,
+    rectifyContent: row.rectify_content != null ? toText(row.rectify_content) : null,
+    rectifyNote: row.rectify_note != null ? toText(row.rectify_note) : null,
+    rectifiedAt: row.rectified_at != null ? toText(row.rectified_at) : null,
     reviewResult:
       row.review_result === 'approved' ? 'approved'
       : row.review_result === 'rejected' ? 'rejected'
       : null,
-    reviewNote: row.review_note != null ? String(row.review_note) : null,
-    reviewedBy: row.reviewed_by != null ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at != null ? String(row.reviewed_at) : null,
-    deadline: row.deadline != null ? String(row.deadline) : null,
+    reviewNote: row.review_note != null ? toText(row.review_note) : null,
+    reviewedBy: row.reviewed_by != null ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at != null ? toText(row.reviewed_at) : null,
+    deadline: row.deadline != null ? toText(row.deadline) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -126,13 +127,13 @@ export async function createRectificationTask(
     ON CONFLICT (record_id, defect_rule_id) DO NOTHING
     RETURNING ${db.unsafe(TASK_COLS)}`;
   if (rows.length > 0) {
-    return { task: mapTask(rows[0] as Record<string, unknown>), created: true };
+    return { task: mapTask(rows[0]), created: true };
   }
   // 已存在：回查
   const existing = await db`
     SELECT ${db.unsafe(TASK_COLS)} FROM quality.rectification_tasks
     WHERE record_id = ${input.recordId} AND defect_rule_id = ${input.defectRuleId}`;
-  return { task: mapTask(existing[0] as Record<string, unknown>), created: false };
+  return { task: mapTask(existing[0]), created: false };
 }
 
 /* ------------------------------ 查询 ------------------------------ */
@@ -145,7 +146,7 @@ export async function getTaskById(
   const rows = await db`
     SELECT ${db.unsafe(TASK_COLS)} FROM quality.rectification_tasks
     WHERE id = ${id}`;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }
 
 /** FOR UPDATE 锁行（事务内），供状态机读取当前状态。 */
@@ -156,7 +157,7 @@ export async function getTaskForUpdate(
   const rows = await tx`
     SELECT ${tx.unsafe(TASK_COLS)} FROM quality.rectification_tasks
     WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapTask(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTask(rows[0]) : null;
 }
 
 /* ------------------------ 带 join 的展示视图 ------------------------ */
@@ -184,12 +185,12 @@ function mapTaskView(row: Record<string, unknown>): RectificationTaskView {
   const base = mapTask(row);
   return {
     ...base,
-    mrn: row.x_mrn != null ? String(row.x_mrn) : null,
-    patientName: row.x_patient_name != null ? String(row.x_patient_name) : null,
-    visitNo: row.x_visit_no != null ? String(row.x_visit_no) : null,
-    dept: row.x_dept != null ? String(row.x_dept) : null,
-    assigneeName: row.x_assignee_name != null ? String(row.x_assignee_name) : null,
-    createdByName: row.x_created_by_name != null ? String(row.x_created_by_name) : null,
+    mrn: row.x_mrn != null ? toText(row.x_mrn) : null,
+    patientName: row.x_patient_name != null ? toText(row.x_patient_name) : null,
+    visitNo: row.x_visit_no != null ? toText(row.x_visit_no) : null,
+    dept: row.x_dept != null ? toText(row.x_dept) : null,
+    assigneeName: row.x_assignee_name != null ? toText(row.x_assignee_name) : null,
+    createdByName: row.x_created_by_name != null ? toText(row.x_created_by_name) : null,
   };
 }
 
@@ -261,7 +262,7 @@ export async function getTaskViewById(
     LEFT JOIN iam.users au ON au.id = t.assignee_id
     LEFT JOIN iam.users cu ON cu.id = t.created_by
     WHERE t.id = ${id}`;
-  return rows.length > 0 ? mapTaskView(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapTaskView(rows[0]) : null;
 }
 
 /* ------------------------------ 状态机写操作 ------------------------------ */

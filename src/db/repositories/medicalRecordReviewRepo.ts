@@ -9,6 +9,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type ReviewDecision = 'pass' | 'return';
 
@@ -19,7 +20,7 @@ export interface RecordReview {
   decision: ReviewDecision;
   reviewerId: string;
   comment: string | null;
-  issues: Array<Record<string, unknown>>;
+  issues: Record<string, unknown>[];
   ruleIssueCount: number;
   aiIssueCount: number;
   aiAssisted: boolean;
@@ -33,7 +34,7 @@ export interface ReviewCreateInput {
   decision: ReviewDecision;
   reviewerId: string;
   comment?: string | null;
-  issues: Array<Record<string, unknown>>;
+  issues: Record<string, unknown>[];
   ruleIssueCount: number;
   aiIssueCount: number;
   aiAssisted: boolean;
@@ -50,12 +51,12 @@ function mapRow(row: Record<string, unknown>): RecordReview {
     reviewLevel: Number(row.review_level),
     decision: row.decision as ReviewDecision,
     reviewerId: String(row.reviewer_id),
-    comment: row.comment ? String(row.comment) : null,
-    issues: (row.issues as Array<Record<string, unknown>>) ?? [],
+    comment: row.comment ? toText(row.comment) : null,
+    issues: (row.issues as Record<string, unknown>[]) ?? [],
     ruleIssueCount: Number(row.rule_issue_count),
     aiIssueCount: Number(row.ai_issue_count),
     aiAssisted: Boolean(row.ai_assisted),
-    aiModel: row.ai_model ? String(row.ai_model) : null,
+    aiModel: row.ai_model ? toText(row.ai_model) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -74,7 +75,7 @@ export async function insertReview(input: ReviewCreateInput, sql?: DbExecutor): 
     )
     RETURNING ${db.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /** 按病历列全部质控记录（时间正序，便于还原签名链）。 */

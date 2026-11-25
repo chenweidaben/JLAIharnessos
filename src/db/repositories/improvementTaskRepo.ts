@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -15,14 +16,14 @@ export interface TaskRow {
 function map(r: Record<string, unknown>): TaskRow {
   return {
     id: String(r.id), source: String(r.source),
-    visitId: r.visit_id == null ? null : String(r.visit_id),
-    patientId: r.patient_id == null ? null : String(r.patient_id),
-    groupCode: r.group_code == null ? null : String(r.group_code),
-    category: r.category == null ? null : String(r.category),
+    visitId: r.visit_id == null ? null : toText(r.visit_id),
+    patientId: r.patient_id == null ? null : toText(r.patient_id),
+    groupCode: r.group_code == null ? null : toText(r.group_code),
+    category: r.category == null ? null : toText(r.category),
     title: String(r.title), finding: String(r.finding),
     assigneeId: String(r.assignee_id), status: String(r.status),
-    dueDate: r.due_date == null ? null : String(r.due_date),
-    resolutionNote: r.resolution_note == null ? null : String(r.resolution_note),
+    dueDate: r.due_date == null ? null : toText(r.due_date),
+    resolutionNote: r.resolution_note == null ? null : toText(r.resolution_note),
     createdAt: String(r.created_at),
   };
 }
@@ -37,7 +38,7 @@ export async function createTask(
     INSERT INTO clinical.clinical_improvement_tasks (source, visit_id, patient_id, group_code, category, title, finding, assignee_id, due_date, created_by)
     VALUES (${input.source ?? 'drg_attribution'}, ${input.visitId ?? null}, ${input.patientId ?? null}, ${input.groupCode ?? null}, ${input.category ?? null}, ${input.title}, ${input.finding}, ${input.assigneeId}, ${input.dueDate ?? null}, ${input.createdBy})
     RETURNING ${db.unsafe(ROW_COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listByAssignee(assigneeId: string): Promise<TaskRow[]> {
@@ -58,7 +59,7 @@ export async function getTask(id: string, tx: DbExecutor = db): Promise<TaskRow 
   const rows = await tx`
     SELECT ${db.unsafe(ROW_COLS)}
     FROM clinical.clinical_improvement_tasks WHERE id=${id}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** 幂等：查某主体在某 source 下是否已有 open/accepted/in_progress 工单。
@@ -91,5 +92,5 @@ export async function transitionStatus(
       SET status=${to}, resolution_note=${resolutionNote ?? null}
       WHERE id=${id} AND status=${expectedFrom}
       RETURNING ${db.unsafe(ROW_COLS)}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

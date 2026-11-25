@@ -7,6 +7,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { RiskLevel } from '../../medical-tools/nursing/eventReview.js';
+import { toText } from '../rowText.js';
 
 export interface EventReview {
   id: string;
@@ -34,14 +35,14 @@ function map(row: Record<string, unknown>): EventReview {
     eventId: String(row.event_id),
     visitId: String(row.visit_id),
     occurredAt: String(row.occurred_at),
-    location: row.location ? String(row.location) : null,
-    circumstances: row.circumstances ? String(row.circumstances) : null,
-    injuries: row.injuries ? String(row.injuries) : null,
+    location: row.location ? toText(row.location) : null,
+    circumstances: row.circumstances ? toText(row.circumstances) : null,
+    injuries: row.injuries ? toText(row.injuries) : null,
     witness: row.witness === null ? null : row.witness === true,
-    firstAid: row.first_aid ? String(row.first_aid) : null,
+    firstAid: row.first_aid ? toText(row.first_aid) : null,
     familyNotified: row.family_notified === null ? null : row.family_notified === true,
     riskRescoreLevel: (row.risk_rescore_level as RiskLevel | null) ?? null,
-    followUpPlan: row.follow_up_plan ? String(row.follow_up_plan) : null,
+    followUpPlan: row.follow_up_plan ? toText(row.follow_up_plan) : null,
     reviewedBy: String(row.reviewed_by),
     createdAt: String(row.created_at),
   };
@@ -73,13 +74,13 @@ export async function insertReview(input: NewReview, tx: DbExecutor): Promise<Ev
       ${input.firstAid ?? null}, ${input.familyNotified ?? null}, ${input.riskRescoreLevel ?? null},
       ${input.followUpPlan ?? null}, ${input.reviewedBy})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function getReviewByEventId(eventId: string, sql?: DbExecutor): Promise<EventReview | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.nursing_event_reviews WHERE event_id = ${eventId}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** 按就诊列评估；visit_id 为 uuid，TS 条件拼接。 */

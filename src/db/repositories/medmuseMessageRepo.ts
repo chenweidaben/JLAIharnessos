@@ -14,6 +14,7 @@
 
 import { getDb } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type MedmuseMessageRole = 'user' | 'agent' | 'tool';
 export type MedmuseConfidence = 'high' | 'medium' | 'low';
@@ -79,17 +80,17 @@ export function normalizeMessageInput(input: MedmuseMessageInput): Required<Omit
 export function mapMessageRow(row: Record<string, unknown>): MedmuseMessage {
   return {
     id: String(row.id),
-    sessionId: String(row.session_id ?? row.sessionId ?? ''),
+    sessionId: toText(row.session_id ?? row.sessionId ?? ''),
     role: (row.role ?? 'user') as MedmuseMessageRole,
-    content: row.content != null ? String(row.content) : '',
+    content: row.content != null ? toText(row.content) : '',
     toolCalls: row.tool_calls ?? row.toolCalls ?? [],
     toolResult: row.tool_result ?? row.toolResult ?? null,
     confidence: (row.confidence ?? 'medium') as MedmuseConfidence,
-    disclaimer: row.disclaimer ? String(row.disclaimer) : MEDMUSE_DEFAULT_DISCLAIMER,
-    systemPromptVersion: row.system_prompt_version ? String(row.system_prompt_version) : '1.0',
-    idempotencyKey: row.idempotency_key != null ? String(row.idempotency_key) : null,
-    readAt: row.read_at != null ? String(row.read_at) : (row.readAt != null ? String(row.readAt) : null),
-    createdAt: row.created_at != null ? String(row.created_at) : String(row.createdAt ?? new Date().toISOString()),
+    disclaimer: row.disclaimer ? toText(row.disclaimer) : MEDMUSE_DEFAULT_DISCLAIMER,
+    systemPromptVersion: row.system_prompt_version ? toText(row.system_prompt_version) : '1.0',
+    idempotencyKey: row.idempotency_key != null ? toText(row.idempotency_key) : null,
+    readAt: row.read_at != null ? toText(row.read_at) : (row.readAt != null ? toText(row.readAt) : null),
+    createdAt: row.created_at != null ? toText(row.created_at) : toText(row.createdAt ?? new Date().toISOString()),
   };
 }
 

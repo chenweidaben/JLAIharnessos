@@ -12,6 +12,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 变异登记
@@ -33,7 +34,7 @@ const VAR_COLS = `
 function mapVariance(row: Record<string, unknown>): PathwayVariance {
   return {
     id: String(row.id),
-    pathwayId: row.pathway_id ? String(row.pathway_id) : null,
+    pathwayId: row.pathway_id ? toText(row.pathway_id) : null,
     visitId: String(row.visit_id),
     reason: String(row.reason),
     varianceType: String(row.variance_type),
@@ -56,7 +57,7 @@ export async function createVariance(
       (pathway_id, visit_id, reason, variance_type)
     VALUES (${input.pathwayId ?? null}, ${input.visitId}, ${input.reason}, ${input.varianceType})
     RETURNING ${tx.unsafe(VAR_COLS)}`;
-  return mapVariance(rows[0] as Record<string, unknown>);
+  return mapVariance(rows[0]);
 }
 
 export async function listVariances(

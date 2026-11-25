@@ -6,6 +6,7 @@
 
 import { getDb, type Sql } from '../pool.js';
 import { dynamicSelect, QueryBuilder } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface User {
   id: string; username: string; name: string; employeeNo: string | null;
@@ -19,11 +20,11 @@ const SELECT_COLS = `id, username, name, employee_no, department, title, role, s
 function mapRow(row: Record<string, unknown>): User {
   return {
     id: String(row.id), username: String(row.username), name: String(row.name),
-    employeeNo: row.employee_no ? String(row.employee_no) : null,
-    department: row.department ? String(row.department) : null,
-    title: row.title ? String(row.title) : null, role: String(row.role),
+    employeeNo: row.employee_no ? toText(row.employee_no) : null,
+    department: row.department ? toText(row.department) : null,
+    title: row.title ? toText(row.title) : null, role: String(row.role),
     status: row.status as User['status'], mfaEnabled: Boolean(row.mfa_enabled),
-    lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
+    lastLoginAt: row.last_login_at ? toText(row.last_login_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -38,14 +39,14 @@ export async function getUserById(id: string, sql?: Sql): Promise<User | null> {
   if (process.env.DEMO_MODE === '1') return DEMO_USER;
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE id = ${id} AND deleted_at IS NULL`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function getUserByUsername(username: string, sql?: Sql): Promise<User | null> {
   if (process.env.DEMO_MODE === '1') return DEMO_USER;
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SELECT_COLS)} FROM iam.users WHERE username = ${username} AND deleted_at IS NULL`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 export async function listUsersByDepartment(department: string, limit = 100, sql?: Sql): Promise<User[]> {
@@ -72,6 +73,6 @@ export async function getUserRoleLinks(userId: string, sql?: Sql): Promise<UserR
   return (rows as Record<string, unknown>[]).map((r) => ({
     roleCode: String(r.role_code),
     dataScope: String(r.data_scope) as UserRoleLink['dataScope'],
-    scopeValue: r.scope_value ? String(r.scope_value) : null,
+    scopeValue: r.scope_value ? toText(r.scope_value) : null,
   }));
 }

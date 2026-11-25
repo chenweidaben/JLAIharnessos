@@ -15,6 +15,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import type { RiskType, RiskLevel } from '../../medical-tools/nursing/riskWarning.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 评估
@@ -49,9 +50,9 @@ function mapAssessment(row: Record<string, unknown>): NursingRiskAssessment {
     items: (row.items as Record<string, unknown>) ?? {},
     totalScore: Number(row.total_score),
     level: row.level as RiskLevel,
-    note: row.note ? String(row.note) : null,
-    assessedBy: row.assessed_by ? String(row.assessed_by) : null,
-    assessedAt: row.assessed_at ? String(row.assessed_at) : null,
+    note: row.note ? toText(row.note) : null,
+    assessedBy: row.assessed_by ? toText(row.assessed_by) : null,
+    assessedAt: row.assessed_at ? toText(row.assessed_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -84,13 +85,13 @@ export async function createAssessment(input: NursingRiskAssessmentInput, tx: Db
       ${input.note ?? null}, ${input.assessedBy}
     )
     RETURNING ${tx.unsafe(ASSESS_COLS)}`;
-  return mapAssessment(rows[0] as Record<string, unknown>);
+  return mapAssessment(rows[0]);
 }
 
 export async function getAssessmentById(id: string, sql?: DbExecutor): Promise<NursingRiskAssessment | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(ASSESS_COLS)} FROM clinical.nursing_risk_assessments WHERE id = ${id}`;
-  return rows.length > 0 ? mapAssessment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAssessment(rows[0]) : null;
 }
 
 /** 某就诊某风险类型最新一条评估（当前评估）。 */
@@ -102,7 +103,7 @@ export async function getLatestAssessmentByVisit(
     SELECT ${db.unsafe(ASSESS_COLS)} FROM clinical.nursing_risk_assessments
     WHERE visit_id = ${visitId} AND risk_type = ${riskType}
     ORDER BY assessed_at DESC, created_at DESC LIMIT 1`;
-  return rows.length > 0 ? mapAssessment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAssessment(rows[0]) : null;
 }
 
 export async function listAssessments(
@@ -173,9 +174,9 @@ function mapPrevention(row: Record<string, unknown>): NursingRiskPrevention {
     measureCode: String(row.measure_code),
     measureDesc: String(row.measure_desc),
     status: row.status as PreventionStatus,
-    executedBy: row.executed_by ? String(row.executed_by) : null,
-    executedAt: row.executed_at ? String(row.executed_at) : null,
-    signature: row.signature ? String(row.signature) : null,
+    executedBy: row.executed_by ? toText(row.executed_by) : null,
+    executedAt: row.executed_at ? toText(row.executed_at) : null,
+    signature: row.signature ? toText(row.signature) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -192,13 +193,13 @@ export async function createPrevention(input: NursingRiskPreventionInput, tx: Db
     INSERT INTO clinical.nursing_risk_preventions (assessment_id, measure_code, measure_desc, status)
     VALUES (${input.assessmentId}, ${input.measureCode}, ${input.measureDesc}, 'suggested')
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return mapPrevention(rows[0] as Record<string, unknown>);
+  return mapPrevention(rows[0]);
 }
 
 export async function getPreventionById(id: string, sql?: DbExecutor): Promise<NursingRiskPrevention | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(PREV_COLS)} FROM clinical.nursing_risk_preventions WHERE id = ${id}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 export async function listPreventions(
@@ -240,7 +241,7 @@ export async function acceptPrevention(id: string, tx: DbExecutor): Promise<Nurs
     SET status = 'accepted', updated_at = now()
     WHERE id = ${id} AND status = 'suggested'
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 /**
@@ -256,7 +257,7 @@ export async function executePrevention(
         signature = ${signature}, updated_at = now()
     WHERE id = ${id} AND status = 'accepted'
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 /** 取消：suggested/accepted -> cancelled（CAS）。 */
@@ -266,7 +267,7 @@ export async function cancelPrevention(id: string, tx: DbExecutor): Promise<Nurs
     SET status = 'cancelled', updated_at = now()
     WHERE id = ${id} AND status IN ('suggested','accepted')
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -296,9 +297,9 @@ function mapEvent(row: Record<string, unknown>): NursingRiskEvent {
     visitId: String(row.visit_id),
     riskType: row.risk_type as RiskType,
     eventType: row.event_type as RiskEventType,
-    description: row.description ? String(row.description) : null,
-    recordedBy: row.recorded_by ? String(row.recorded_by) : null,
-    occurredAt: row.occurred_at ? String(row.occurred_at) : null,
+    description: row.description ? toText(row.description) : null,
+    recordedBy: row.recorded_by ? toText(row.recorded_by) : null,
+    occurredAt: row.occurred_at ? toText(row.occurred_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -321,7 +322,7 @@ export async function createEvent(input: NursingRiskEventInput, tx: DbExecutor):
       ${input.recordedBy}, ${input.occurredAt ?? tx`now()`}
     )
     RETURNING ${tx.unsafe(EVENT_COLS)}`;
-  return mapEvent(rows[0] as Record<string, unknown>);
+  return mapEvent(rows[0]);
 }
 
 export async function listEvents(

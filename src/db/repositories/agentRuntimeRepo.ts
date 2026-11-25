@@ -18,6 +18,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 // ============================================================================
 // 类型
@@ -324,22 +325,22 @@ function mapInstance(row: Record<string, unknown>): WorkflowInstanceRecord {
     id: String(row.id),
     instanceNo: String(row.instance_no),
     agentId: String(row.agent_id),
-    agentVersion: row.agent_version != null ? String(row.agent_version) : null,
+    agentVersion: row.agent_version != null ? toText(row.agent_version) : null,
     workflowId: String(row.workflow_id),
     state: String(row.state),
-    triggerType: row.trigger_type != null ? String(row.trigger_type) : null,
-    traceId: row.trace_id != null ? String(row.trace_id) : null,
+    triggerType: row.trigger_type != null ? toText(row.trigger_type) : null,
+    traceId: row.trace_id != null ? toText(row.trace_id) : null,
     input: parseJsonb<Record<string, unknown>>(row.input, {}),
     output: parseJsonb<Record<string, unknown> | null>(row.output, null),
     contextVars: parseJsonb<Record<string, unknown>>(row.context_vars, {}),
-    errorCode: row.error_code != null ? String(row.error_code) : null,
-    errorMessage: row.error_message != null ? String(row.error_message) : null,
-    actorId: row.actor_id != null ? String(row.actor_id) : null,
-    patientRef: row.patient_ref != null ? String(row.patient_ref) : null,
+    errorCode: row.error_code != null ? toText(row.error_code) : null,
+    errorMessage: row.error_message != null ? toText(row.error_message) : null,
+    actorId: row.actor_id != null ? toText(row.actor_id) : null,
+    patientRef: row.patient_ref != null ? toText(row.patient_ref) : null,
     tokensIn: Number(row.tokens_in ?? 0),
     tokensOut: Number(row.tokens_out ?? 0),
     startedAt: String(row.started_at),
-    finishedAt: row.finished_at != null ? String(row.finished_at) : null,
+    finishedAt: row.finished_at != null ? toText(row.finished_at) : null,
     durationMs: row.duration_ms != null ? Number(row.duration_ms) : null,
   };
 }
@@ -354,10 +355,10 @@ function mapNodeRecord(row: Record<string, unknown>): NodeRecord {
     attempts: Number(row.attempts ?? 0),
     input: parseJsonb<Record<string, unknown> | null>(row.input, null),
     output: parseJsonb<Record<string, unknown> | null>(row.output, null),
-    errorCode: row.error_code != null ? String(row.error_code) : null,
-    errorMessage: row.error_message != null ? String(row.error_message) : null,
-    startedAt: row.started_at != null ? String(row.started_at) : null,
-    finishedAt: row.finished_at != null ? String(row.finished_at) : null,
+    errorCode: row.error_code != null ? toText(row.error_code) : null,
+    errorMessage: row.error_message != null ? toText(row.error_message) : null,
+    startedAt: row.started_at != null ? toText(row.started_at) : null,
+    finishedAt: row.finished_at != null ? toText(row.finished_at) : null,
     durationMs: row.duration_ms != null ? Number(row.duration_ms) : null,
   };
 }
@@ -365,16 +366,16 @@ function mapNodeRecord(row: Record<string, unknown>): NodeRecord {
 function mapInvocation(row: Record<string,unknown>): InvocationRecord {
   return {
     id: String(row.id),
-    traceId: row.trace_id != null ? String(row.trace_id) : null,
+    traceId: row.trace_id != null ? toText(row.trace_id) : null,
     agentId: String(row.agent_id),
-    agentVersion: row.agent_version != null ? String(row.agent_version) : null,
-    actorId: row.actor_id != null ? String(row.actor_id) : null,
-    triggerType: row.trigger_type != null ? String(row.trigger_type) : null,
+    agentVersion: row.agent_version != null ? toText(row.agent_version) : null,
+    actorId: row.actor_id != null ? toText(row.actor_id) : null,
+    triggerType: row.trigger_type != null ? toText(row.trigger_type) : null,
     status: String(row.status),
     tokensIn: Number(row.tokens_in ?? 0),
     tokensOut: Number(row.tokens_out ?? 0),
     latencyMs: row.latency_ms != null ? Number(row.latency_ms) : null,
-    errorCode: row.error_code != null ? String(row.error_code) : null,
+    errorCode: row.error_code != null ? toText(row.error_code) : null,
     createdAt: String(row.created_at),
   };
 }

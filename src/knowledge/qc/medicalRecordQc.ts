@@ -15,14 +15,14 @@
 export type QcIssueCategory = 'completeness' | 'timeliness' | 'defect';
 export type QcSeverity = 'block' | 'major' | 'minor';
 
-export type QcIssue = {
+export interface QcIssue {
   ruleId: string;
   category: QcIssueCategory;
   severity: QcSeverity;
   section?: string;
   message: string;
   source: 'rule' | 'ai';
-};
+}
 
 export interface QcContext {
   /** 触发时限计算的事件时间（如入院/出院时间，ISO） */

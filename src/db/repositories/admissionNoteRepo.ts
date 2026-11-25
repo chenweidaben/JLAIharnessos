@@ -1,3 +1,4 @@
+import { toText } from '../rowText.js';
 ﻿import { getDb } from '../pool.js';
 
 export interface AdmissionNote {
@@ -20,10 +21,10 @@ export async function upsert(input: Record<string, unknown>): Promise<AdmissionN
       (visit_id, chief_complaint, present_illness, past_history, personal_history, family_history,
        physical_exam, auxiliary_exam, preliminary_diagnosis, treatment_plan, attending_doctor)
     VALUES (${String(input.visitId)}, ${String(input.chiefComplaint)}, ${String(input.presentIllness)},
-      ${input.pastHistory ? String(input.pastHistory) : null}, ${input.personalHistory ? String(input.personalHistory) : null},
-      ${input.familyHistory ? String(input.familyHistory) : null}, ${input.physicalExam ? String(input.physicalExam) : null},
-      ${input.auxiliaryExam ? String(input.auxiliaryExam) : null}, ${String(input.preliminaryDiagnosis)},
-      ${input.treatmentPlan ? String(input.treatmentPlan) : null}, ${input.attendingDoctor ? String(input.attendingDoctor) : null})
+      ${input.pastHistory ? toText(input.pastHistory) : null}, ${input.personalHistory ? toText(input.personalHistory) : null},
+      ${input.familyHistory ? toText(input.familyHistory) : null}, ${input.physicalExam ? toText(input.physicalExam) : null},
+      ${input.auxiliaryExam ? toText(input.auxiliaryExam) : null}, ${String(input.preliminaryDiagnosis)},
+      ${input.treatmentPlan ? toText(input.treatmentPlan) : null}, ${input.attendingDoctor ? toText(input.attendingDoctor) : null})
     ON CONFLICT (visit_id) DO UPDATE SET
       chief_complaint=EXCLUDED.chief_complaint, present_illness=EXCLUDED.present_illness,
       past_history=EXCLUDED.past_history, personal_history=EXCLUDED.personal_history,

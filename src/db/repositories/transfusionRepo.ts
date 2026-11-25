@@ -15,6 +15,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { buildSafeSetClause } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type TransfusionStatus =
   | 'requested' | 'crossmatched' | 'dispensed' | 'transfusing'
@@ -81,17 +82,17 @@ function mapRow(row: Record<string, unknown>): TransfusionRequest {
     unitCount: Number(row.unit_count),
     urgency: String(row.urgency),
     status: row.status as TransfusionStatus,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
-    crossmatchResult: row.crossmatch_result ? String(row.crossmatch_result) : null,
-    crossmatchNote: row.crossmatch_note ? String(row.crossmatch_note) : null,
-    crossmatchedBy: row.crossmatched_by ? String(row.crossmatched_by) : null,
-    crossmatchedAt: row.crossmatched_at ? String(row.crossmatched_at) : null,
-    batchNo: row.batch_no ? String(row.batch_no) : null,
-    dispensedBy: row.dispensed_by ? String(row.dispensed_by) : null,
-    dispensedAt: row.dispensed_at ? String(row.dispensed_at) : null,
-    cancelledBy: row.cancelled_by ? String(row.cancelled_by) : null,
-    cancelledAt: row.cancelled_at ? String(row.cancelled_at) : null,
-    cancelReason: row.cancel_reason ? String(row.cancel_reason) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
+    crossmatchResult: row.crossmatch_result ? toText(row.crossmatch_result) : null,
+    crossmatchNote: row.crossmatch_note ? toText(row.crossmatch_note) : null,
+    crossmatchedBy: row.crossmatched_by ? toText(row.crossmatched_by) : null,
+    crossmatchedAt: row.crossmatched_at ? toText(row.crossmatched_at) : null,
+    batchNo: row.batch_no ? toText(row.batch_no) : null,
+    dispensedBy: row.dispensed_by ? toText(row.dispensed_by) : null,
+    dispensedAt: row.dispensed_at ? toText(row.dispensed_at) : null,
+    cancelledBy: row.cancelled_by ? toText(row.cancelled_by) : null,
+    cancelledAt: row.cancelled_at ? toText(row.cancelled_at) : null,
+    cancelReason: row.cancel_reason ? toText(row.cancel_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -202,7 +203,7 @@ export async function listStock(sql?: DbExecutor): Promise<BloodStock[]> {
     component: String(r.component),
     batchNo: String(r.batch_no),
     units: Number(r.units),
-    expiryDate: r.expiry_date ? String(r.expiry_date) : null,
+    expiryDate: r.expiry_date ? toText(r.expiry_date) : null,
   }));
 }
 

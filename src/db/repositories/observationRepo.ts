@@ -10,6 +10,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ============================== 类型 ============================== */
 
@@ -62,16 +63,16 @@ function mapRow(row: Record<string, unknown>): Observation {
     obsNo: String(row.obs_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    bedNo: row.bed_no ? String(row.bed_no) : null,
+    bedNo: row.bed_no ? toText(row.bed_no) : null,
     startTime: String(row.start_time),
-    endTime: row.end_time ? String(row.end_time) : null,
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
+    endTime: row.end_time ? toText(row.end_time) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
     nursingLevel: String(row.nursing_level),
     vitals: (row.vitals as Record<string, unknown>) ?? {},
-    ivStatus: row.iv_status ? String(row.iv_status) : null,
+    ivStatus: row.iv_status ? toText(row.iv_status) : null,
     pendingTasks: (row.pending_tasks as ObsTask[]) ?? [],
     status: String(row.status) as ObsStatus,
-    expectedOutcome: row.expected_outcome ? String(row.expected_outcome) : null,
+    expectedOutcome: row.expected_outcome ? toText(row.expected_outcome) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };

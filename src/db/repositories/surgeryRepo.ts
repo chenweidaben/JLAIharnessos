@@ -12,6 +12,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type SurgeryStatus =
   | 'requested' | 'scheduled' | 'prechecked' | 'induction'
@@ -57,20 +58,20 @@ function map(row: Record<string, unknown>): SurgeryRequest {
     patientId: String(row.patient_id),
     surgeryType: String(row.surgery_type),
     plannedProcedure: String(row.planned_procedure),
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
-    plannedDate: row.planned_date ? String(row.planned_date) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
+    plannedDate: row.planned_date ? toText(row.planned_date) : null,
     department: String(row.department),
-    surgeonId: row.surgeon_id ? String(row.surgeon_id) : null,
-    anesthetistId: row.anesthetist_id ? String(row.anesthetist_id) : null,
-    anesthesiaMethod: row.anesthesia_method ? String(row.anesthesia_method) : null,
+    surgeonId: row.surgeon_id ? toText(row.surgeon_id) : null,
+    anesthetistId: row.anesthetist_id ? toText(row.anesthetist_id) : null,
+    anesthesiaMethod: row.anesthesia_method ? toText(row.anesthesia_method) : null,
     status: row.status as SurgeryStatus,
     precheck: (row.precheck as Record<string, unknown>) ?? {},
-    precheckedAt: row.prechecked_at ? String(row.prechecked_at) : null,
-    startedAt: row.started_at ? String(row.started_at) : null,
-    endedAt: row.ended_at ? String(row.ended_at) : null,
-    surgeonSignedAt: row.surgeon_signed_at ? String(row.surgeon_signed_at) : null,
-    anesthetistSignedAt: row.anesthetist_signed_at ? String(row.anesthetist_signed_at) : null,
-    cancelReason: row.cancel_reason ? String(row.cancel_reason) : null,
+    precheckedAt: row.prechecked_at ? toText(row.prechecked_at) : null,
+    startedAt: row.started_at ? toText(row.started_at) : null,
+    endedAt: row.ended_at ? toText(row.ended_at) : null,
+    surgeonSignedAt: row.surgeon_signed_at ? toText(row.surgeon_signed_at) : null,
+    anesthetistSignedAt: row.anesthetist_signed_at ? toText(row.anesthetist_signed_at) : null,
+    cancelReason: row.cancel_reason ? toText(row.cancel_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -91,7 +92,7 @@ export async function createRequest(
   tx: DbExecutor,
 ): Promise<{ req: SurgeryRequest; created: boolean }> {
   const existing = await tx`SELECT ${tx.unsafe(COLS)} FROM clinical.surgery_requests WHERE request_no = ${input.requestNo}`;
-  if (existing.length > 0) return { req: map(existing[0] as Record<string, unknown>), created: false };
+  if (existing.length > 0) return { req: map(existing[0]), created: false };
   const rows = await tx`
     INSERT INTO clinical.surgery_requests (
       request_no, visit_id, patient_id, surgery_type, planned_procedure, diagnosis,
@@ -103,19 +104,19 @@ export async function createRequest(
     )
     RETURNING ${tx.unsafe(COLS)}
   `;
-  return { req: map(rows[0] as Record<string, unknown>), created: true };
+  return { req: map(rows[0]), created: true };
 }
 
 export async function getById(id: string, sql?: DbExecutor): Promise<SurgeryRequest | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(COLS)} FROM clinical.surgery_requests WHERE id = ${id}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** FOR UPDATE 取行，供状态机推进。 */
 export async function lockById(id: string, tx: DbExecutor): Promise<SurgeryRequest | null> {
   const rows = await tx`SELECT ${tx.unsafe(COLS)} FROM clinical.surgery_requests WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 export async function listRequests(sql?: DbExecutor): Promise<SurgeryRequest[]> {

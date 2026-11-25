@@ -13,6 +13,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export type AdministrationStatus = 'administered' | 'held' | 'refused';
 
@@ -60,11 +61,11 @@ function mapRow(row: Record<string, unknown>): Administration {
     slot: String(row.slot),
     idempotencyKey: String(row.idempotency_key),
     status: row.status as AdministrationStatus,
-    dose: row.dose ? String(row.dose) : null,
+    dose: row.dose ? toText(row.dose) : null,
     administeredBy: String(row.administered_by),
-    checkedBy: row.checked_by ? String(row.checked_by) : null,
+    checkedBy: row.checked_by ? toText(row.checked_by) : null,
     administeredAt: String(row.administered_at),
-    note: row.note ? String(row.note) : null,
+    note: row.note ? toText(row.note) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -106,7 +107,7 @@ export async function createAdministration(
     )
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 /** 幂等读取：按医嘱 + 幂等键查找已存在执行记录（并发冲突后用于返回既有记录）。 */
@@ -118,7 +119,7 @@ export async function findAdministration(
     SELECT ${exec.unsafe(SELECT_COLS)} FROM clinical.order_administrations
     WHERE order_id = ${orderId} AND idempotency_key = ${idempotencyKey}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /**
@@ -145,10 +146,10 @@ export async function insertAdministrationOnce(
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
   if (rows.length > 0) {
-    return { admin: mapRow(rows[0] as Record<string, unknown>), inserted: true };
+    return { admin: mapRow(rows[0]), inserted: true };
   }
   const existing = await findAdministration(input.orderId, input.idempotencyKey, exec);
-  return { admin: existing as Administration, inserted: false };
+  return { admin: existing!, inserted: false };
 }
 
 /** 列出某医嘱全部执行记录（按时间正序，供在院医嘱视图展示执行史）。 */

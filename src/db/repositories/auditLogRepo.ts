@@ -13,6 +13,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** 审计日志视图 */
 export interface AuditLogView {
@@ -55,17 +56,17 @@ export interface PagedAuditLogs {
 function mapRow(row: Record<string, unknown>): AuditLogView {
   return {
     seq: Number(row.seq),
-    traceId: row.trace_id != null ? String(row.trace_id) : null,
-    actorId: row.actor_id != null ? String(row.actor_id) : null,
-    actorName: row.actor_name != null ? String(row.actor_name) : null,
-    actorRole: row.actor_role != null ? String(row.actor_role) : null,
+    traceId: row.trace_id != null ? toText(row.trace_id) : null,
+    actorId: row.actor_id != null ? toText(row.actor_id) : null,
+    actorName: row.actor_name != null ? toText(row.actor_name) : null,
+    actorRole: row.actor_role != null ? toText(row.actor_role) : null,
     action: String(row.action),
-    resourceType: row.resource_type != null ? String(row.resource_type) : null,
-    resourceId: row.resource_id != null ? String(row.resource_id) : null,
+    resourceType: row.resource_type != null ? toText(row.resource_type) : null,
+    resourceId: row.resource_id != null ? toText(row.resource_id) : null,
     result: String(row.result),
-    riskLevel: row.risk_level != null ? String(row.risk_level) : null,
-    clientIp: row.client_ip != null ? String(row.client_ip) : null,
-    userAgent: row.user_agent != null ? String(row.user_agent) : null,
+    riskLevel: row.risk_level != null ? toText(row.risk_level) : null,
+    clientIp: row.client_ip != null ? toText(row.client_ip) : null,
+    userAgent: row.user_agent != null ? toText(row.user_agent) : null,
     detail: (row.detail as Record<string, unknown>) ?? {},
     createdAt: String(row.created_at),
   };
@@ -123,7 +124,7 @@ export async function getAuditLog(seq: number, sql?: DbExecutor): Promise<AuditL
   const rows = await db`
     SELECT ${db.unsafe(SELECT_COLS)} FROM audit.audit_logs WHERE seq = ${seq}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 概览统计：今日操作 / 异常（denied+failure）/ 高危 / 累计 */

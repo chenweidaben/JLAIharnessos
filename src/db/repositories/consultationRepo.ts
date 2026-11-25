@@ -10,6 +10,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { buildSafeSetClause } from './helpers.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -72,18 +73,18 @@ function mapSession(r: Record<string, unknown>): ConsultationSession {
     accountId: String(r.account_id),
     profileId: String(r.profile_id),
     patientId: String(r.patient_id),
-    doctorId: r.doctor_id ? String(r.doctor_id) : null,
+    doctorId: r.doctor_id ? toText(r.doctor_id) : null,
     department: String(r.department),
     visitType: 'followup',
     status: r.status as ConsultationStatus,
     eligibilityPassed: Boolean(r.eligibility_passed),
-    lastVisitId: r.last_visit_id ? String(r.last_visit_id) : null,
-    lastVisitAt: r.last_visit_at ? String(r.last_visit_at) : null,
-    chiefComplaint: r.chief_complaint ? String(r.chief_complaint) : null,
-    cancelReason: r.cancel_reason ? String(r.cancel_reason) : null,
-    acceptedAt: r.accepted_at ? String(r.accepted_at) : null,
-    completedAt: r.completed_at ? String(r.completed_at) : null,
-    cancelledAt: r.cancelled_at ? String(r.cancelled_at) : null,
+    lastVisitId: r.last_visit_id ? toText(r.last_visit_id) : null,
+    lastVisitAt: r.last_visit_at ? toText(r.last_visit_at) : null,
+    chiefComplaint: r.chief_complaint ? toText(r.chief_complaint) : null,
+    cancelReason: r.cancel_reason ? toText(r.cancel_reason) : null,
+    acceptedAt: r.accepted_at ? toText(r.accepted_at) : null,
+    completedAt: r.completed_at ? toText(r.completed_at) : null,
+    cancelledAt: r.cancelled_at ? toText(r.cancelled_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -94,7 +95,7 @@ function mapMessage(r: Record<string, unknown>): ConsultationMessage {
     id: String(r.id),
     sessionId: String(r.session_id),
     senderType: r.sender_type as ConsultationMessage['senderType'],
-    senderId: r.sender_id ? String(r.sender_id) : null,
+    senderId: r.sender_id ? toText(r.sender_id) : null,
     msgType: r.msg_type as ConsultationMessage['msgType'],
     content: String(r.content),
     createdAt: String(r.created_at),
@@ -203,7 +204,7 @@ export async function findOpenSession(
        AND status IN ('pending','in_consultation')
      LIMIT 1
   `;
-  return rows.length > 0 ? mapSession(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSession(rows[0]) : null;
 }
 
 /** 创建会话 */
@@ -233,7 +234,7 @@ export async function createSession(
     )
     RETURNING ${tx.unsafe(SESSION_COLS)}
   `;
-  return mapSession(rows[0] as Record<string, unknown>);
+  return mapSession(rows[0]);
 }
 
 /**
@@ -297,7 +298,7 @@ export async function insertMessage(
     )
     RETURNING ${tx.unsafe(MESSAGE_COLS)}
   `;
-  return mapMessage(rows[0] as Record<string, unknown>);
+  return mapMessage(rows[0]);
 }
 
 /** 列出会话消息（按时间升序） */
@@ -337,7 +338,7 @@ export async function getLastCompletedVisit(
   return {
     id: String(r.id),
     department: String(r.department),
-    dischargeAt: r.discharge_at ? String(r.discharge_at) : null,
+    dischargeAt: r.discharge_at ? toText(r.discharge_at) : null,
   };
 }
 
@@ -381,9 +382,9 @@ export async function listConsultableDoctors(
   return (rows as Record<string, unknown>[]).map((r) => ({
     userId: String(r.user_id),
     name: String(r.name),
-    title: r.title ? String(r.title) : null,
-    department: r.department ? String(r.department) : null,
-    practiceScope: r.practice_scope ? String(r.practice_scope) : null,
+    title: r.title ? toText(r.title) : null,
+    department: r.department ? toText(r.department) : null,
+    practiceScope: r.practice_scope ? toText(r.practice_scope) : null,
     practiceYears: r.practice_years ? Number(r.practice_years) : null,
   }));
 }

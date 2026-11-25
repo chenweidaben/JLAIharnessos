@@ -8,17 +8,18 @@
  */
 
 import { getDb } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** date/time/timestamptz 经 postgres.js 返回 Date，统一格式化为 ISO 日期/时间串 */
 function isoDate(v: unknown): string {
   if (v == null) return '';
   if (v instanceof Date) return v.toISOString().slice(0, 10);
-  return String(v).slice(0, 10);
+  return toText(v).slice(0, 10);
 }
 function isoTime(v: unknown): string {
   if (v == null) return '';
   if (v instanceof Date) return v.toISOString().slice(11, 19);
-  return String(v).slice(0, 8);
+  return toText(v).slice(0, 8);
 }
 
 export interface ShiftDefinitionRow {
@@ -81,9 +82,9 @@ export async function listShiftDefinitions(wardId: string | null): Promise<Shift
         WHERE status='active' AND (ward_id IS NULL OR ward_id = ${wardId}) ORDER BY start_time`
     : await db`SELECT * FROM clinical.nursing_shift_definitions WHERE status='active' AND ward_id IS NULL ORDER BY start_time`;
   return rows.map((r: Record<string, unknown>) => ({
-    id: String(r.id), wardId: r.ward_id ? String(r.ward_id) : null, code: String(r.code),
+    id: String(r.id), wardId: r.ward_id ? toText(r.ward_id) : null, code: String(r.code),
     name: String(r.name), startTime: isoTime(r.start_time), endTime: isoTime(r.end_time),
-    color: r.color ? String(r.color) : null, isNight: Boolean(r.is_night),
+    color: r.color ? toText(r.color) : null, isNight: Boolean(r.is_night),
     hours: Number(r.hours), status: String(r.status),
   }));
 }
@@ -103,9 +104,9 @@ export async function listSchedules(opts: { wardId?: string; from?: string; to?:
   return rows.map((r: Record<string, unknown>) => ({
     id: String(r.id), wardId: String(r.ward_id), scheduleDate: isoDate(r.schedule_date),
     nurseId: String(r.nurse_id), shiftId: String(r.shift_id),
-    shiftName: r.shift_name ? String(r.shift_name) : null, status: String(r.status),
-    publishedBy: r.published_by ? String(r.published_by) : null,
-    publishedAt: r.published_at ? String(r.published_at) : null, createdAt: String(r.created_at),
+    shiftName: r.shift_name ? toText(r.shift_name) : null, status: String(r.status),
+    publishedBy: r.published_by ? toText(r.published_by) : null,
+    publishedAt: r.published_at ? toText(r.published_at) : null, createdAt: String(r.created_at),
   }));
 }
 
@@ -151,7 +152,7 @@ export async function listLeave(opts: { nurseId?: string; from?: string; to?: st
     ORDER BY leave_date`;
   return rows.map((r: Record<string, unknown>) => ({
     id: String(r.id), nurseId: String(r.nurse_id), leaveDate: isoDate(r.leave_date),
-    leaveType: String(r.leave_type), reason: r.reason ? String(r.reason) : null,
+    leaveType: String(r.leave_type), reason: r.reason ? toText(r.reason) : null,
     status: String(r.status), createdAt: String(r.created_at),
   }));
 }
@@ -181,13 +182,13 @@ export async function listIndicators(): Promise<IndicatorRow[]> {
   const db = getDb();
   const rows = await db`SELECT * FROM clinical.nursing_indicators ORDER BY sort_order`;
   return rows.map((r: Record<string, unknown>) => ({
-    code: String(r.code), name: String(r.name), category: r.category ? String(r.category) : null,
-    numeratorDef: r.numerator_def ? String(r.numerator_def) : null,
-    denominatorDef: r.denominator_def ? String(r.denominator_def) : null,
-    unit: r.unit ? String(r.unit) : null, direction: String(r.direction),
-    frequency: r.frequency ? String(r.frequency) : null, sourceType: String(r.source_type),
+    code: String(r.code), name: String(r.name), category: r.category ? toText(r.category) : null,
+    numeratorDef: r.numerator_def ? toText(r.numerator_def) : null,
+    denominatorDef: r.denominator_def ? toText(r.denominator_def) : null,
+    unit: r.unit ? toText(r.unit) : null, direction: String(r.direction),
+    frequency: r.frequency ? toText(r.frequency) : null, sourceType: String(r.source_type),
     threshold: r.threshold != null ? Number(r.threshold) : null,
-    description: r.description ? String(r.description) : null, sortOrder: Number(r.sort_order),
+    description: r.description ? toText(r.description) : null, sortOrder: Number(r.sort_order),
   }));
 }
 
@@ -200,11 +201,11 @@ export async function listIndicatorValues(period: string, wardId: string | null)
     ORDER BY indicator_code`;
   return rows.map((r: Record<string, unknown>) => ({
     id: String(r.id), indicatorCode: String(r.indicator_code),
-    wardId: r.ward_id ? String(r.ward_id) : null, period: String(r.period),
-    numerator: r.numerator != null ? String(r.numerator) : null,
-    denominator: r.denominator != null ? String(r.denominator) : null,
-    value: r.value != null ? String(r.value) : null, source: String(r.source),
-    note: r.note ? String(r.note) : null, enteredBy: r.entered_by ? String(r.entered_by) : null,
+    wardId: r.ward_id ? toText(r.ward_id) : null, period: String(r.period),
+    numerator: r.numerator != null ? toText(r.numerator) : null,
+    denominator: r.denominator != null ? toText(r.denominator) : null,
+    value: r.value != null ? toText(r.value) : null, source: String(r.source),
+    note: r.note ? toText(r.note) : null, enteredBy: r.entered_by ? toText(r.entered_by) : null,
     createdAt: String(r.created_at),
   }));
 }

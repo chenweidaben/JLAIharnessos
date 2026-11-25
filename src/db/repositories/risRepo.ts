@@ -17,6 +17,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { buildSafeSetClause, toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 目录：检查项目 / 设备 / 时段
@@ -83,9 +84,9 @@ function mapExam(row: Record<string, unknown>): ImagingExam {
     examCode: String(row.exam_code),
     name: String(row.name),
     modality: String(row.modality),
-    bodyPart: row.body_part ? String(row.body_part) : null,
+    bodyPart: row.body_part ? toText(row.body_part) : null,
     execDepartment: String(row.exec_department),
-    defaultDeviceId: row.default_device_id ? String(row.default_device_id) : null,
+    defaultDeviceId: row.default_device_id ? toText(row.default_device_id) : null,
     price: Number(row.price),
     needsScheduling: Boolean(row.needs_scheduling),
     durationMinutes: Number(row.duration_minutes),
@@ -101,7 +102,7 @@ function mapDevice(row: Record<string, unknown>): ImagingDevice {
     deviceCode: String(row.device_code),
     name: String(row.name),
     modality: String(row.modality),
-    room: row.room ? String(row.room) : null,
+    room: row.room ? toText(row.room) : null,
     isActive: Boolean(row.is_active),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -142,14 +143,14 @@ export async function getExamById(id: string, sql?: DbExecutor): Promise<Imaging
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(EXAM_COLS)} FROM clinical.imaging_exams WHERE id = ${id}`;
-  return rows.length > 0 ? mapExam(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapExam(rows[0]) : null;
 }
 
 export async function getDeviceById(id: string, sql?: DbExecutor): Promise<ImagingDevice | null> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(DEVICE_COLS)} FROM clinical.imaging_devices WHERE id = ${id}`;
-  return rows.length > 0 ? mapDevice(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapDevice(rows[0]) : null;
 }
 
 export async function createExam(
@@ -241,7 +242,7 @@ export async function listSlots(
 export async function lockSlotById(id: string, tx: DbExecutor): Promise<ImagingDeviceSlot | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(SLOT_COLS)} FROM clinical.imaging_device_slots WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapSlot(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSlot(rows[0]) : null;
 }
 
 /** 预约成功：booked_count +1（调用方已在锁内校验 booked_count < capacity）。 */
@@ -297,14 +298,14 @@ function mapRequest(row: Record<string, unknown>): ImagingRequest {
     requestNo: String(row.request_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    orderedBy: row.ordered_by ? String(row.ordered_by) : null,
+    orderedBy: row.ordered_by ? toText(row.ordered_by) : null,
     urgency: String(row.urgency),
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
-    chiefComplaint: row.chief_complaint ? String(row.chief_complaint) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
+    chiefComplaint: row.chief_complaint ? toText(row.chief_complaint) : null,
     status: String(row.status),
-    cancelledBy: row.cancelled_by ? String(row.cancelled_by) : null,
-    cancelledAt: row.cancelled_at ? String(row.cancelled_at) : null,
-    cancelReason: row.cancel_reason ? String(row.cancel_reason) : null,
+    cancelledBy: row.cancelled_by ? toText(row.cancelled_by) : null,
+    cancelledAt: row.cancelled_at ? toText(row.cancelled_at) : null,
+    cancelReason: row.cancel_reason ? toText(row.cancel_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -355,13 +356,13 @@ export async function getRequestById(id: string, sql?: DbExecutor): Promise<Imag
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(REQUEST_COLS)} FROM clinical.imaging_requests WHERE id = ${id}`;
-  return rows.length > 0 ? mapRequest(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRequest(rows[0]) : null;
 }
 
 export async function lockRequestById(id: string, tx: DbExecutor): Promise<ImagingRequest | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(REQUEST_COLS)} FROM clinical.imaging_requests WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapRequest(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRequest(rows[0]) : null;
 }
 
 export async function getRequestItems(requestId: string, tx?: DbExecutor): Promise<ImagingRequestItem[]> {
@@ -455,8 +456,8 @@ function mapAppointment(row: Record<string, unknown>): ImagingAppointment {
     deviceId: String(row.device_id),
     scheduledStart: String(row.scheduled_start),
     status: String(row.status),
-    checkedInAt: row.checked_in_at ? String(row.checked_in_at) : null,
-    createdBy: row.created_by ? String(row.created_by) : null,
+    checkedInAt: row.checked_in_at ? toText(row.checked_in_at) : null,
+    createdBy: row.created_by ? toText(row.created_by) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -481,20 +482,20 @@ export async function insertAppointment(
       (${input.appointmentNo}, ${input.requestId}, ${input.examId}, ${input.slotId},
        ${input.deviceId}, ${input.scheduledStart}, ${input.createdBy})
     RETURNING ${tx.unsafe(APPOINTMENT_COLS)}`;
-  return mapAppointment(rows[0] as Record<string, unknown>);
+  return mapAppointment(rows[0]);
 }
 
 export async function getAppointmentById(id: string, sql?: DbExecutor): Promise<ImagingAppointment | null> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(APPOINTMENT_COLS)} FROM clinical.imaging_appointments WHERE id = ${id}`;
-  return rows.length > 0 ? mapAppointment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAppointment(rows[0]) : null;
 }
 
 export async function lockAppointmentById(id: string, tx: DbExecutor): Promise<ImagingAppointment | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(APPOINTMENT_COLS)} FROM clinical.imaging_appointments WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapAppointment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAppointment(rows[0]) : null;
 }
 
 export async function patchAppointment(
@@ -592,20 +593,20 @@ export async function insertStudy(
       (${input.studyUid}, ${input.appointmentId}, ${input.requestId}, ${input.examId},
        ${input.deviceId}, ${input.modality}, ${input.performedBy})
     RETURNING ${tx.unsafe(STUDY_COLS)}`;
-  return mapStudy(rows[0] as Record<string, unknown>);
+  return mapStudy(rows[0]);
 }
 
 export async function getStudyById(id: string, sql?: DbExecutor): Promise<ImagingStudy | null> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(STUDY_COLS)} FROM clinical.imaging_studies WHERE id = ${id}`;
-  return rows.length > 0 ? mapStudy(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapStudy(rows[0]) : null;
 }
 
 export async function lockStudyById(id: string, tx: DbExecutor): Promise<ImagingStudy | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(STUDY_COLS)} FROM clinical.imaging_studies WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapStudy(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapStudy(rows[0]) : null;
 }
 
 export async function listStudies(
@@ -633,7 +634,7 @@ export async function setStudyImages(
     SET image_refs = ${tx.json(imageRefs)}::jsonb, updated_at = now()
     WHERE id = ${id}
     RETURNING ${tx.unsafe(STUDY_COLS)}`;
-  return mapStudy(rows[0] as Record<string, unknown>);
+  return mapStudy(rows[0]);
 }
 
 // ---------------------------------------------------------------------------
@@ -685,33 +686,33 @@ function mapImagingReport(row: Record<string, unknown>): ImagingReport {
   const imageRefs = Array.isArray(rawImgs) ? (rawImgs as unknown[]).map(String) : [];
   return {
     id: String(row.id),
-    reportNo: row.report_no ? String(row.report_no) : null,
+    reportNo: row.report_no ? toText(row.report_no) : null,
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    studyUid: row.study_uid ? String(row.study_uid) : null,
-    modality: row.modality ? String(row.modality) : null,
+    studyUid: row.study_uid ? toText(row.study_uid) : null,
+    modality: row.modality ? toText(row.modality) : null,
     examName: String(row.exam_name),
-    bodyPart: row.body_part ? String(row.body_part) : null,
-    findings: row.findings ? String(row.findings) : null,
-    impression: row.impression ? String(row.impression) : null,
+    bodyPart: row.body_part ? toText(row.body_part) : null,
+    findings: row.findings ? toText(row.findings) : null,
+    impression: row.impression ? toText(row.impression) : null,
     aiFindings: row.ai_findings ?? null,
     isCritical: Boolean(row.is_critical),
-    reportTime: row.report_time ? String(row.report_time) : null,
+    reportTime: row.report_time ? toText(row.report_time) : null,
     imageRefs,
     status: String(row.status),
-    requestId: row.request_id ? String(row.request_id) : null,
-    appointmentId: row.appointment_id ? String(row.appointment_id) : null,
-    studyId: row.study_id ? String(row.study_id) : null,
-    examId: row.exam_id ? String(row.exam_id) : null,
-    writtenBy: row.written_by ? String(row.written_by) : null,
-    submittedAt: row.submitted_at ? String(row.submitted_at) : null,
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
-    publishedBy: row.published_by ? String(row.published_by) : null,
-    publishedAt: row.published_at ? String(row.published_at) : null,
-    returnedBy: row.returned_by ? String(row.returned_by) : null,
-    returnedAt: row.returned_at ? String(row.returned_at) : null,
-    returnReason: row.return_reason ? String(row.return_reason) : null,
+    requestId: row.request_id ? toText(row.request_id) : null,
+    appointmentId: row.appointment_id ? toText(row.appointment_id) : null,
+    studyId: row.study_id ? toText(row.study_id) : null,
+    examId: row.exam_id ? toText(row.exam_id) : null,
+    writtenBy: row.written_by ? toText(row.written_by) : null,
+    submittedAt: row.submitted_at ? toText(row.submitted_at) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
+    publishedBy: row.published_by ? toText(row.published_by) : null,
+    publishedAt: row.published_at ? toText(row.published_at) : null,
+    returnedBy: row.returned_by ? toText(row.returned_by) : null,
+    returnedAt: row.returned_at ? toText(row.returned_at) : null,
+    returnReason: row.return_reason ? toText(row.return_reason) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -758,13 +759,13 @@ export async function getImagingReportById(id: string, sql?: DbExecutor): Promis
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(IR_COLS)} FROM clinical.imaging_reports WHERE id = ${id}`;
-  return rows.length > 0 ? mapImagingReport(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapImagingReport(rows[0]) : null;
 }
 
 export async function lockImagingReportById(id: string, tx: DbExecutor): Promise<ImagingReport | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(IR_COLS)} FROM clinical.imaging_reports WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapImagingReport(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapImagingReport(rows[0]) : null;
 }
 
 /** imaging_reports 无 updated_at 列，通用 UPDATE 仅 SET 指定字段。 */
@@ -824,5 +825,5 @@ export async function setReportAiFindings(
     SET ai_findings = ${tx.json(toJson(aiFindings))}::jsonb
     WHERE id = ${id}
     RETURNING ${tx.unsafe(IR_COLS)}`;
-  return mapImagingReport(rows[0] as Record<string, unknown>);
+  return mapImagingReport(rows[0]);
 }

@@ -9,6 +9,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -96,13 +97,13 @@ const PRACT_COLS = `
 function mapAccount(r: Record<string, unknown>): PatientAccount {
   return {
     id: String(r.id),
-    openid: r.openid ? String(r.openid) : null,
-    unionid: r.unionid ? String(r.unionid) : null,
+    openid: r.openid ? toText(r.openid) : null,
+    unionid: r.unionid ? toText(r.unionid) : null,
     channel: String(r.channel),
-    phoneEnc: r.phone_enc ? String(r.phone_enc) : null,
-    phoneHash: r.phone_hash ? String(r.phone_hash) : null,
+    phoneEnc: r.phone_enc ? toText(r.phone_enc) : null,
+    phoneHash: r.phone_hash ? toText(r.phone_hash) : null,
     status: r.status as PatientAccount['status'],
-    lastLoginAt: r.last_login_at ? String(r.last_login_at) : null,
+    lastLoginAt: r.last_login_at ? toText(r.last_login_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -129,21 +130,21 @@ function mapProfile(r: Record<string, unknown>): PatientProfile {
   return {
     id: String(r.id),
     accountId: String(r.account_id),
-    patientId: r.patient_id ? String(r.patient_id) : null,
+    patientId: r.patient_id ? toText(r.patient_id) : null,
     relation: r.relation as PatientProfile['relation'],
-    nameEnc: r.name_enc ? String(r.name_enc) : null,
-    nameMasked: r.name_masked ? String(r.name_masked) : null,
-    idCardEnc: r.id_card_enc ? String(r.id_card_enc) : null,
-    idCardHash: r.id_card_hash ? String(r.id_card_hash) : null,
-    gender: r.gender ? String(r.gender) : null,
-    birthDate: r.birth_date ? String(r.birth_date) : null,
+    nameEnc: r.name_enc ? toText(r.name_enc) : null,
+    nameMasked: r.name_masked ? toText(r.name_masked) : null,
+    idCardEnc: r.id_card_enc ? toText(r.id_card_enc) : null,
+    idCardHash: r.id_card_hash ? toText(r.id_card_hash) : null,
+    gender: r.gender ? toText(r.gender) : null,
+    birthDate: r.birth_date ? toText(r.birth_date) : null,
     authLevel: Number(r.auth_level),
-    guardianId: r.guardian_id ? String(r.guardian_id) : null,
+    guardianId: r.guardian_id ? toText(r.guardian_id) : null,
     isDefault: Boolean(r.is_default),
     delegatedScopes: parseJsonbArray(r.delegated_scopes),
-    delegationGrantedAt: r.delegation_granted_at ? String(r.delegation_granted_at) : null,
-    delegationRevokedAt: r.delegation_revoked_at ? String(r.delegation_revoked_at) : null,
-    verifiedAt: r.verified_at ? String(r.verified_at) : null,
+    delegationGrantedAt: r.delegation_granted_at ? toText(r.delegation_granted_at) : null,
+    delegationRevokedAt: r.delegation_revoked_at ? toText(r.delegation_revoked_at) : null,
+    verifiedAt: r.verified_at ? toText(r.verified_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -153,16 +154,16 @@ function mapPractitioner(r: Record<string, unknown>): InternetPractitioner {
   return {
     id: String(r.id),
     userId: String(r.user_id),
-    practitionerNo: r.practitioner_no ? String(r.practitioner_no) : null,
+    practitionerNo: r.practitioner_no ? toText(r.practitioner_no) : null,
     practitionerType: r.practitioner_type as InternetPractitioner['practitionerType'],
-    practiceScope: r.practice_scope ? String(r.practice_scope) : null,
+    practiceScope: r.practice_scope ? toText(r.practice_scope) : null,
     practiceYears: r.practice_years != null ? Number(r.practice_years) : null,
     auditStatus: r.audit_status as InternetPractitioner['auditStatus'],
-    auditReason: r.audit_reason ? String(r.audit_reason) : null,
-    approvedAt: r.approved_at ? String(r.approved_at) : null,
-    approvedBy: r.approved_by ? String(r.approved_by) : null,
-    validFrom: r.valid_from ? String(r.valid_from) : null,
-    validTo: r.valid_to ? String(r.valid_to) : null,
+    auditReason: r.audit_reason ? toText(r.audit_reason) : null,
+    approvedAt: r.approved_at ? toText(r.approved_at) : null,
+    approvedBy: r.approved_by ? toText(r.approved_by) : null,
+    validFrom: r.valid_from ? toText(r.valid_from) : null,
+    validTo: r.valid_to ? toText(r.valid_to) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -176,14 +177,14 @@ function mapPractitioner(r: Record<string, unknown>): InternetPractitioner {
 export async function getAccountByOpenid(openid: string, db?: DbExecutor): Promise<PatientAccount | null> {
   const ex = db ?? getDb();
   const rows = await ex`SELECT ${ex.unsafe(ACCT_COLS)} FROM clinical.patient_accounts WHERE openid = ${openid}`;
-  return rows.length > 0 ? mapAccount(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAccount(rows[0]) : null;
 }
 
 /** 按手机号哈希查找账号 */
 export async function getAccountByPhoneHash(phoneHash: string, db?: DbExecutor): Promise<PatientAccount | null> {
   const ex = db ?? getDb();
   const rows = await ex`SELECT ${ex.unsafe(ACCT_COLS)} FROM clinical.patient_accounts WHERE phone_hash = ${phoneHash}`;
-  return rows.length > 0 ? mapAccount(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAccount(rows[0]) : null;
 }
 
 /** 创建患者账号（幂等：openid 已存在则回查） */
@@ -208,7 +209,7 @@ export async function createAccount(input: {
             ${input.phoneEnc ?? null}, ${input.phoneHash ?? null})
     RETURNING ${tx.unsafe(ACCT_COLS)}
   `;
-  return { account: mapAccount(rows[0] as Record<string, unknown>), created: true };
+  return { account: mapAccount(rows[0]), created: true };
 }
 
 /** 更新登录时间/状态 */
@@ -253,13 +254,13 @@ export async function listProfiles(accountId: string, db?: DbExecutor): Promise<
 export async function getProfileById(id: string, db?: DbExecutor): Promise<PatientProfile | null> {
   const ex = db ?? getDb();
   const rows = await ex`SELECT ${ex.unsafe(PROFILE_COLS)} FROM clinical.patient_profiles WHERE id = ${id}`;
-  return rows.length > 0 ? mapProfile(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapProfile(rows[0]) : null;
 }
 
 /** 按 id 查找就诊人并加行锁 */
 export async function lockProfile(id: string, tx: DbExecutor): Promise<PatientProfile | null> {
   const rows = await tx`SELECT ${tx.unsafe(PROFILE_COLS)} FROM clinical.patient_profiles WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapProfile(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapProfile(rows[0]) : null;
 }
 
 /** 按身份证哈希查找就诊人（用于 EMPI 去重） */
@@ -270,7 +271,7 @@ export async function getProfileByIdCardHash(idCardHash: string, db?: DbExecutor
      WHERE id_card_hash = ${idCardHash}
      LIMIT 1
   `;
-  return rows.length > 0 ? mapProfile(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapProfile(rows[0]) : null;
 }
 
 /** 创建就诊人 */
@@ -299,7 +300,7 @@ export async function createProfile(input: {
     )
     RETURNING ${tx.unsafe(PROFILE_COLS)}
   `;
-  return mapProfile(rows[0] as Record<string, unknown>);
+  return mapProfile(rows[0]);
 }
 
 /** 行级更新就诊人（认证等级、EMPI 绑定、监护人等） */
@@ -341,8 +342,8 @@ export async function insertRealnameRecord(input: {
     verifyType: String(r.verify_type),
     provider: String(r.provider),
     status: r.status as RealnameRecord['status'],
-    reason: r.reason ? String(r.reason) : null,
-    traceId: r.trace_id ? String(r.trace_id) : null,
+    reason: r.reason ? toText(r.reason) : null,
+    traceId: r.trace_id ? toText(r.trace_id) : null,
     createdAt: String(r.created_at),
   };
 }
@@ -361,7 +362,7 @@ export async function nextInternetPatientNo(tx: DbExecutor): Promise<string> {
 export async function getPractitionerByUserId(userId: string, db?: DbExecutor): Promise<InternetPractitioner | null> {
   const ex = db ?? getDb();
   const rows = await ex`SELECT ${ex.unsafe(PRACT_COLS)} FROM iam.internet_practitioners WHERE user_id = ${userId}`;
-  return rows.length > 0 ? mapPractitioner(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPractitioner(rows[0]) : null;
 }
 
 /** 列出线上资质（可按审核状态过滤） */
@@ -376,7 +377,7 @@ export async function listPractitioners(status?: string, db?: DbExecutor): Promi
 /** 行锁查找线上资质 */
 export async function lockPractitioner(id: string, tx: DbExecutor): Promise<InternetPractitioner | null> {
   const rows = await tx`SELECT ${tx.unsafe(PRACT_COLS)} FROM iam.internet_practitioners WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapPractitioner(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPractitioner(rows[0]) : null;
 }
 
 /** 提交线上资质申请（幂等：用户已有申请则回查） */
@@ -408,7 +409,7 @@ export async function upsertPractitioner(input: {
          WHERE id = ${existing.id}
         RETURNING ${tx.unsafe(PRACT_COLS)}
       `;
-      return { practitioner: mapPractitioner(rows[0] as Record<string, unknown>), created: false };
+      return { practitioner: mapPractitioner(rows[0]), created: false };
     }
     const keys = ['practitioner_no', 'practitioner_type', 'practice_scope', 'practice_years', 'valid_from', 'valid_to'];
     const sets = keys.map((k, i) => `${k} = $${i + 2}`);
@@ -430,7 +431,7 @@ export async function upsertPractitioner(input: {
     )
     RETURNING ${tx.unsafe(PRACT_COLS)}
   `;
-  return { practitioner: mapPractitioner(rows[0] as Record<string, unknown>), created: true };
+  return { practitioner: mapPractitioner(rows[0]), created: true };
 }
 
 /** 审核线上资质（pending -> approved/rejected） */
@@ -450,5 +451,5 @@ export async function reviewPractitioner(
      WHERE id = ${id}
     RETURNING ${tx.unsafe(PRACT_COLS)}
   `;
-  return mapPractitioner(rows[0] as Record<string, unknown>);
+  return mapPractitioner(rows[0]);
 }

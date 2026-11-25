@@ -17,6 +17,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type WardRoundType = 'routine' | 'superior' | 'attending' | 'chief' | 'director';
 export type WardRoundStatus = 'draft' | 'signed' | 'countersigned' | 'returned';
@@ -78,20 +79,20 @@ function mapRow(row: Record<string, unknown>): WardRound {
     roundType: row.round_type as WardRoundType,
     isSuperior: Boolean(row.is_superior),
     roundAt: String(row.round_at),
-    symptomChange: row.symptom_change ? String(row.symptom_change) : null,
+    symptomChange: row.symptom_change ? toText(row.symptom_change) : null,
     physicalExam: (row.physical_exam as Record<string, unknown>) ?? {},
     assessment: String(row.assessment),
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
-    planAdjustment: row.plan_adjustment ? String(row.plan_adjustment) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
+    planAdjustment: row.plan_adjustment ? toText(row.plan_adjustment) : null,
     aiAssisted: Boolean(row.ai_assisted),
     aiSuggestion: (row.ai_suggestion as Record<string, unknown>) ?? {},
     status: row.status as WardRoundStatus,
-    authorId: row.author_id ? String(row.author_id) : null,
-    signedBy: row.signed_by ? String(row.signed_by) : null,
-    signedAt: row.signed_at ? String(row.signed_at) : null,
-    countersignedBy: row.countersigned_by ? String(row.countersigned_by) : null,
-    countersignedAt: row.countersigned_at ? String(row.countersigned_at) : null,
-    returnReason: row.return_reason ? String(row.return_reason) : null,
+    authorId: row.author_id ? toText(row.author_id) : null,
+    signedBy: row.signed_by ? toText(row.signed_by) : null,
+    signedAt: row.signed_at ? toText(row.signed_at) : null,
+    countersignedBy: row.countersigned_by ? toText(row.countersigned_by) : null,
+    countersignedAt: row.countersigned_at ? toText(row.countersigned_at) : null,
+    returnReason: row.return_reason ? toText(row.return_reason) : null,
     version: Number(row.version ?? 1),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -125,13 +126,13 @@ export async function createWardRound(input: WardRoundInput, db?: DbExecutor): P
     )
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getWardRoundById(id: string, db?: DbExecutor): Promise<WardRound | null> {
   const exec = db ?? getDb();
   const rows = await exec`SELECT ${exec.unsafe(SELECT_COLS)} FROM clinical.ward_rounds WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 某就诊查房记录（时间倒序）。 */
@@ -171,7 +172,7 @@ export async function signWardRound(
     WHERE id = ${id} AND status = 'draft' AND author_id = ${signerId}
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /**
@@ -190,7 +191,7 @@ export async function countersignWardRound(
       AND author_id IS DISTINCT FROM ${superiorId}
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /** 上级退回：draft/signed → returned，记录退回原因。 */
@@ -205,5 +206,5 @@ export async function returnWardRound(
     WHERE id = ${id} AND status IN ('draft','signed')
     RETURNING ${exec.unsafe(SELECT_COLS)}
   `;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }

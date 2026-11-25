@@ -11,6 +11,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ============================== 类型 ============================== */
 
@@ -54,7 +55,7 @@ export interface Resuscitation {
   events: ResusEvent[];
   vitalTrend: VitalPoint[];
   medications: ResusMedication[];
-  team: Array<Record<string, unknown>>;
+  team: Record<string, unknown>[];
   outcome: string | null;
   summary: string | null;
   createdAt: string;
@@ -70,7 +71,7 @@ export interface StartResusInput {
   leadDoctorId?: string | null;
   leadNurseId?: string | null;
   startTime?: string;
-  team?: Array<Record<string, unknown>>;
+  team?: Record<string, unknown>[];
 }
 
 /* ============================= 映射 ============================== */
@@ -81,20 +82,20 @@ function mapRow(row: Record<string, unknown>): Resuscitation {
     resusNo: String(row.resus_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    bedNo: row.bed_no ? String(row.bed_no) : null,
-    bedId: row.bed_id ? String(row.bed_id) : null,
+    bedNo: row.bed_no ? toText(row.bed_no) : null,
+    bedId: row.bed_id ? toText(row.bed_id) : null,
     startTime: String(row.start_time),
-    endTime: row.end_time ? String(row.end_time) : null,
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
-    leadDoctorId: row.lead_doctor_id ? String(row.lead_doctor_id) : null,
-    leadNurseId: row.lead_nurse_id ? String(row.lead_nurse_id) : null,
+    endTime: row.end_time ? toText(row.end_time) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
+    leadDoctorId: row.lead_doctor_id ? toText(row.lead_doctor_id) : null,
+    leadNurseId: row.lead_nurse_id ? toText(row.lead_nurse_id) : null,
     status: String(row.status) as ResusStatus,
     events: (row.events as ResusEvent[]) ?? [],
     vitalTrend: (row.vital_trend as VitalPoint[]) ?? [],
     medications: (row.medications as ResusMedication[]) ?? [],
-    team: (row.team as Array<Record<string, unknown>>) ?? [],
-    outcome: row.outcome ? String(row.outcome) : null,
-    summary: row.summary ? String(row.summary) : null,
+    team: (row.team as Record<string, unknown>[]) ?? [],
+    outcome: row.outcome ? toText(row.outcome) : null,
+    summary: row.summary ? toText(row.summary) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };

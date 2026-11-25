@@ -9,6 +9,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** 状态机：open 待整改 → fixed 已整改待复核 → reviewed 复核通过 → closed 关闭 */
 export type QcRectificationStatus = 'open' | 'fixed' | 'reviewed' | 'closed';
@@ -41,12 +42,12 @@ const COLS = `id, issue_id, assignee_id, status, note, created_at, closed_at`;
 function map(row: Record<string, unknown>): QcRectification {
   return {
     id: String(row.id),
-    issueId: row.issue_id ? String(row.issue_id) : null,
-    assigneeId: row.assignee_id ? String(row.assignee_id) : null,
+    issueId: row.issue_id ? toText(row.issue_id) : null,
+    assigneeId: row.assignee_id ? toText(row.assignee_id) : null,
     status: row.status as QcRectificationStatus,
-    note: row.note != null ? String(row.note) : null,
+    note: row.note != null ? toText(row.note) : null,
     createdAt: String(row.created_at),
-    closedAt: row.closed_at ? String(row.closed_at) : null,
+    closedAt: row.closed_at ? toText(row.closed_at) : null,
   };
 }
 
@@ -60,7 +61,7 @@ export async function createRectification(
     VALUES (${input.issueId ?? null}, ${input.assigneeId ?? null},
       ${input.note ?? null}, 'open')
     RETURNING ${exec.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 /** 看板全量列表（时间倒序，前端按 status 分列）。 */
@@ -95,5 +96,5 @@ export async function transitionRectification(
         closed_at = COALESCE(${patch.closedAt ?? null}, closed_at)
     WHERE id = ${id}
     RETURNING ${exec.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }

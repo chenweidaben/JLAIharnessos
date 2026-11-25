@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Infection {
   id: string; visitId: string; infectionType: string; pathogen: string | null;
@@ -13,10 +14,10 @@ const COLS = `id, visit_id, infection_type, pathogen, report_date, status, isola
 function rmap(r: Record<string, unknown>): Infection {
   return {
     id: String(r.id), visitId: String(r.visit_id), infectionType: String(r.infection_type),
-    pathogen: r.pathogen != null ? String(r.pathogen) : null,
+    pathogen: r.pathogen != null ? toText(r.pathogen) : null,
     reportDate: new Date(String(r.report_date)).toISOString().slice(0, 10),
     status: String(r.status), isolationRequired: Boolean(r.isolation_required),
-    note: r.note != null ? String(r.note) : null,
+    note: r.note != null ? toText(r.note) : null,
     reportedBy: String(r.reported_by), createdAt: String(r.created_at),
   };
 }

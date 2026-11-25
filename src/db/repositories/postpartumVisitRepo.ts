@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface PostpartumVisit {
   id: string; motherVisitId: string; babyVisitId: string | null;
@@ -14,13 +15,13 @@ const COLS = `id, mother_visit_id, baby_visit_id, postpartum_day, breastfeeding_
 function map(r: Record<string, unknown>): PostpartumVisit {
   return {
     id: String(r.id), motherVisitId: String(r.mother_visit_id),
-    babyVisitId: r.baby_visit_id ? String(r.baby_visit_id) : null,
+    babyVisitId: r.baby_visit_id ? toText(r.baby_visit_id) : null,
     postpartumDay: Number(r.postpartum_day),
     breastfeedingScore: Number(r.breastfeeding_score),
     jaundiceTcb: r.jaundice_tcb == null ? null : Number(r.jaundice_tcb),
     jaundiceVisual: String(r.jaundice_visual),
     motherTempC: r.mother_temp_c == null ? null : Number(r.mother_temp_c),
-    note: r.note ? String(r.note) : null,
+    note: r.note ? toText(r.note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

@@ -15,6 +15,7 @@
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import * as patientRepo from './patientRepo.js';
 import type { EmergencyStatus } from '@/emergency/stateMachine.js';
+import { toText } from '../rowText.js';
 
 /* ============================== 类型 ============================== */
 
@@ -55,7 +56,7 @@ export interface NewPatientInput {
   birthDate?: string | null;
   mrn?: string;
   bloodType?: string | null;
-  allergies?: Array<Record<string, unknown>>;
+  allergies?: Record<string, unknown>[];
   tags?: string[];
 }
 
@@ -124,10 +125,10 @@ function mapTriage(row: Record<string, unknown>): EmergencyTriage {
     triageNo: String(row.triage_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    triageNurseId: row.triage_nurse_id ? String(row.triage_nurse_id) : null,
+    triageNurseId: row.triage_nurse_id ? toText(row.triage_nurse_id) : null,
     arriveTime: String(row.arrive_time),
-    triageTime: row.triage_time ? String(row.triage_time) : null,
-    chiefComplaint: row.chief_complaint ? String(row.chief_complaint) : null,
+    triageTime: row.triage_time ? toText(row.triage_time) : null,
+    chiefComplaint: row.chief_complaint ? toText(row.chief_complaint) : null,
     vitals: (row.vitals as Record<string, unknown>) ?? {},
     gcsEye: n(row.gcs_eye),
     gcsVerbal: n(row.gcs_verbal),
@@ -142,7 +143,7 @@ function mapTriage(row: Record<string, unknown>): EmergencyTriage {
     vitalScore: n(row.vital_score),
     complaintScore: n(row.complaint_score),
     totalScore: n(row.total_score),
-    basis: row.basis ? String(row.basis) : null,
+    basis: row.basis ? toText(row.basis) : null,
     confirmed: Boolean(row.confirmed),
     greenChannelActive: Boolean(row.green_channel_active),
     emStatus: String(row.em_status) as EmergencyStatus,
@@ -157,11 +158,11 @@ function mapDisposition(row: Record<string, unknown>): Disposition {
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     disposition: String(row.disposition) as DispositionCode,
-    destination: row.destination ? String(row.destination) : null,
-    wardId: row.ward_id ? String(row.ward_id) : null,
-    bedId: row.bed_id ? String(row.bed_id) : null,
-    remark: row.remark ? String(row.remark) : null,
-    operatorId: row.operator_id ? String(row.operator_id) : null,
+    destination: row.destination ? toText(row.destination) : null,
+    wardId: row.ward_id ? toText(row.ward_id) : null,
+    bedId: row.bed_id ? toText(row.bed_id) : null,
+    remark: row.remark ? toText(row.remark) : null,
+    operatorId: row.operator_id ? toText(row.operator_id) : null,
     dispositionTime: String(row.disposition_time),
     createdAt: String(row.created_at),
   };

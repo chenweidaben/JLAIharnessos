@@ -14,6 +14,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { pbkdf2Hash } from '@/security/encryption/HashUtils.js';
+import { toText } from '../rowText.js';
 
 export type AdminUserStatus = 'active' | 'disabled' | 'locked' | 'leave';
 
@@ -89,16 +90,16 @@ function mapUserRow(row: Record<string, unknown>): Omit<AdminUser, 'roleCodes' |
     id: String(row.id),
     username: String(row.username),
     realName: String(row.name),
-    employeeNo: row.employee_no ? String(row.employee_no) : null,
+    employeeNo: row.employee_no ? toText(row.employee_no) : null,
     gender: (row.gender as AdminUser['gender']) ?? 'unknown',
-    deptCode: row.department ? String(row.department) : null,
-    title: row.title ? String(row.title) : null,
-    position: row.position ? String(row.position) : null,
-    phone: row.phone ? String(row.phone) : null,
-    email: row.email ? String(row.email) : null,
+    deptCode: row.department ? toText(row.department) : null,
+    title: row.title ? toText(row.title) : null,
+    position: row.position ? toText(row.position) : null,
+    phone: row.phone ? toText(row.phone) : null,
+    email: row.email ? toText(row.email) : null,
     status: row.status as AdminUserStatus,
     mfaEnabled: Boolean(row.mfa_enabled),
-    lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
+    lastLoginAt: row.last_login_at ? toText(row.last_login_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -189,7 +190,7 @@ export async function getAdminUser(id: string, db: DbExecutor = getDb()): Promis
     WHERE id = ${id} AND deleted_at IS NULL
   `;
   if (rows.length === 0) return null;
-  const base = mapUserRow(rows[0] as Record<string, unknown>);
+  const base = mapUserRow(rows[0]);
   const links = await loadRoleLinks(db, [base.id]);
   return assemble(base, links.get(base.id));
 }

@@ -17,6 +17,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { buildSafeSetClause } from './helpers.js';
 import type { AbnormalFlag } from '../../medical-tools/lab/lisWorkflow.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 目录：面板 / 项目
@@ -72,7 +73,7 @@ function mapPanel(row: Record<string, unknown>): LabPanel {
     id: String(row.id),
     code: String(row.code),
     name: String(row.name),
-    specimenType: row.specimen_type ? String(row.specimen_type) : null,
+    specimenType: row.specimen_type ? toText(row.specimen_type) : null,
     execDepartment: String(row.exec_department),
     price: Number(row.price),
     isActive: Boolean(row.is_active),
@@ -86,8 +87,8 @@ function mapItem(row: Record<string, unknown>): LabItem {
     id: String(row.id),
     code: String(row.code),
     name: String(row.name),
-    specimenType: row.specimen_type ? String(row.specimen_type) : null,
-    unit: row.unit ? String(row.unit) : null,
+    specimenType: row.specimen_type ? toText(row.specimen_type) : null,
+    unit: row.unit ? toText(row.unit) : null,
     refLow: numOrNull(row.ref_low),
     refHigh: numOrNull(row.ref_high),
     critLow: numOrNull(row.crit_low),
@@ -167,7 +168,7 @@ export async function getPanelById(id: string, sql?: DbExecutor): Promise<LabPan
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(PANEL_COLS)} FROM clinical.lab_panels WHERE id = ${id}`;
-  return rows.length > 0 ? mapPanel(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPanel(rows[0]) : null;
 }
 
 /** 联表查询时带 i. 前缀的项目列（与 ITEM_COLS 对应）。 */
@@ -256,14 +257,14 @@ function mapRequest(row: Record<string, unknown>): LabRequest {
     requestNo: String(row.request_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    orderedBy: row.ordered_by ? String(row.ordered_by) : null,
+    orderedBy: row.ordered_by ? toText(row.ordered_by) : null,
     urgency: String(row.urgency),
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
-    note: row.note ? String(row.note) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
+    note: row.note ? toText(row.note) : null,
     status: String(row.status),
-    cancelledBy: row.cancelled_by ? String(row.cancelled_by) : null,
-    cancelledAt: row.cancelled_at ? String(row.cancelled_at) : null,
-    cancelReason: row.cancel_reason ? String(row.cancel_reason) : null,
+    cancelledBy: row.cancelled_by ? toText(row.cancelled_by) : null,
+    cancelledAt: row.cancelled_at ? toText(row.cancelled_at) : null,
+    cancelReason: row.cancel_reason ? toText(row.cancel_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -317,13 +318,13 @@ export async function getRequestById(id: string, sql?: DbExecutor): Promise<LabR
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(REQUEST_COLS)} FROM clinical.lab_requests WHERE id = ${id}`;
-  return rows.length > 0 ? mapRequest(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRequest(rows[0]) : null;
 }
 
 export async function lockRequestById(id: string, tx: DbExecutor): Promise<LabRequest | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(REQUEST_COLS)} FROM clinical.lab_requests WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapRequest(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRequest(rows[0]) : null;
 }
 
 export async function getRequestItems(requestId: string, tx?: DbExecutor): Promise<LabRequestItem[]> {
@@ -334,8 +335,8 @@ export async function getRequestItems(requestId: string, tx?: DbExecutor): Promi
   return (rows as Record<string, unknown>[]).map((r) => ({
     id: String(r.id),
     requestId: String(r.request_id),
-    panelId: r.panel_id ? String(r.panel_id) : null,
-    itemId: r.item_id ? String(r.item_id) : null,
+    panelId: r.panel_id ? toText(r.panel_id) : null,
+    itemId: r.item_id ? toText(r.item_id) : null,
     createdAt: String(r.created_at),
   }));
 }
@@ -420,17 +421,17 @@ function mapSpecimen(row: Record<string, unknown>): LabSpecimen {
     requestId: String(row.request_id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    panelId: row.panel_id ? String(row.panel_id) : null,
+    panelId: row.panel_id ? toText(row.panel_id) : null,
     specimenType: String(row.specimen_type),
     status: String(row.status),
-    collectedBy: row.collected_by ? String(row.collected_by) : null,
-    collectedAt: row.collected_at ? String(row.collected_at) : null,
-    collectionSite: row.collection_site ? String(row.collection_site) : null,
-    receivedBy: row.received_by ? String(row.received_by) : null,
-    receivedAt: row.received_at ? String(row.received_at) : null,
-    rejectedBy: row.rejected_by ? String(row.rejected_by) : null,
-    rejectedAt: row.rejected_at ? String(row.rejected_at) : null,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
+    collectedBy: row.collected_by ? toText(row.collected_by) : null,
+    collectedAt: row.collected_at ? toText(row.collected_at) : null,
+    collectionSite: row.collection_site ? toText(row.collection_site) : null,
+    receivedBy: row.received_by ? toText(row.received_by) : null,
+    receivedAt: row.received_at ? toText(row.received_at) : null,
+    rejectedBy: row.rejected_by ? toText(row.rejected_by) : null,
+    rejectedAt: row.rejected_at ? toText(row.rejected_at) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -454,20 +455,20 @@ export async function insertSpecimen(
       (${input.specimenNo}, ${input.requestId}, ${input.visitId}, ${input.patientId},
        ${input.panelId ?? null}, ${input.specimenType})
     RETURNING ${tx.unsafe(SPECIMEN_COLS)}`;
-  return mapSpecimen(rows[0] as Record<string, unknown>);
+  return mapSpecimen(rows[0]);
 }
 
 export async function getSpecimenById(id: string, sql?: DbExecutor): Promise<LabSpecimen | null> {
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(SPECIMEN_COLS)} FROM clinical.lab_specimens WHERE id = ${id}`;
-  return rows.length > 0 ? mapSpecimen(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSpecimen(rows[0]) : null;
 }
 
 export async function lockSpecimenById(id: string, tx: DbExecutor): Promise<LabSpecimen | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(SPECIMEN_COLS)} FROM clinical.lab_specimens WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapSpecimen(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSpecimen(rows[0]) : null;
 }
 
 /** lab_specimens 允许动态更新的列白名单 */
@@ -570,19 +571,19 @@ function mapReport(row: Record<string, unknown>): LabReport {
     requestId: String(row.request_id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    specimenId: row.specimen_id ? String(row.specimen_id) : null,
-    panelId: row.panel_id ? String(row.panel_id) : null,
-    panelName: row.panel_name ? String(row.panel_name) : null,
+    specimenId: row.specimen_id ? toText(row.specimen_id) : null,
+    panelId: row.panel_id ? toText(row.panel_id) : null,
+    panelName: row.panel_name ? toText(row.panel_name) : null,
     status: String(row.status),
-    enteredBy: row.entered_by ? String(row.entered_by) : null,
-    reviewedBy: row.reviewed_by ? String(row.reviewed_by) : null,
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
-    publishedBy: row.published_by ? String(row.published_by) : null,
-    publishedAt: row.published_at ? String(row.published_at) : null,
-    returnedBy: row.returned_by ? String(row.returned_by) : null,
-    returnedAt: row.returned_at ? String(row.returned_at) : null,
-    returnReason: row.return_reason ? String(row.return_reason) : null,
-    reportTime: row.report_time ? String(row.report_time) : null,
+    enteredBy: row.entered_by ? toText(row.entered_by) : null,
+    reviewedBy: row.reviewed_by ? toText(row.reviewed_by) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
+    publishedBy: row.published_by ? toText(row.published_by) : null,
+    publishedAt: row.published_at ? toText(row.published_at) : null,
+    returnedBy: row.returned_by ? toText(row.returned_by) : null,
+    returnedAt: row.returned_at ? toText(row.returned_at) : null,
+    returnReason: row.return_reason ? toText(row.return_reason) : null,
+    reportTime: row.report_time ? toText(row.report_time) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -630,13 +631,13 @@ export async function getReportById(id: string, sql?: DbExecutor): Promise<LabRe
   const db = sql ?? getDb();
   const rows = await db`
     SELECT ${db.unsafe(REPORT_COLS)} FROM clinical.lab_reports WHERE id = ${id}`;
-  return rows.length > 0 ? mapReport(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapReport(rows[0]) : null;
 }
 
 export async function lockReportById(id: string, tx: DbExecutor): Promise<LabReport | null> {
   const rows = await tx`
     SELECT ${tx.unsafe(REPORT_COLS)} FROM clinical.lab_reports WHERE id = ${id} FOR UPDATE`;
-  return rows.length > 0 ? mapReport(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapReport(rows[0]) : null;
 }
 
 export async function patchReport(
@@ -752,19 +753,19 @@ export async function upsertResult(
     result: {
       id: String(r.id),
       reportId: String(r.report_id),
-      requestId: r.request_id ? String(r.request_id) : null,
-      specimenId: r.specimen_id ? String(r.specimen_id) : null,
-      itemCode: r.item_code ? String(r.item_code) : null,
+      requestId: r.request_id ? toText(r.request_id) : null,
+      specimenId: r.specimen_id ? toText(r.specimen_id) : null,
+      itemCode: r.item_code ? toText(r.item_code) : null,
       itemName: String(r.item_name),
-      value: r.value != null ? String(r.value) : null,
+      value: r.value != null ? toText(r.value) : null,
       numericValue: r.numeric_value != null ? Number(r.numeric_value) : null,
-      unit: r.unit ? String(r.unit) : null,
+      unit: r.unit ? toText(r.unit) : null,
       refLow: r.ref_low != null ? Number(r.ref_low) : null,
       refHigh: r.ref_high != null ? Number(r.ref_high) : null,
-      abnormalFlag: r.abnormal_flag ? String(r.abnormal_flag) : null,
+      abnormalFlag: r.abnormal_flag ? toText(r.abnormal_flag) : null,
       isCritical: Boolean(r.is_critical),
-      resultTime: r.result_time ? String(r.result_time) : null,
-      enteredBy: r.entered_by ? String(r.entered_by) : null,
+      resultTime: r.result_time ? toText(r.result_time) : null,
+      enteredBy: r.entered_by ? toText(r.entered_by) : null,
     },
   };
 }
@@ -780,18 +781,18 @@ export async function getResultsByReport(reportId: string, tx?: DbExecutor): Pro
   return (rows as Record<string, unknown>[]).map((r) => ({
     id: String(r.id),
     reportId: String(r.report_id),
-    requestId: r.request_id ? String(r.request_id) : null,
-    specimenId: r.specimen_id ? String(r.specimen_id) : null,
-    itemCode: r.item_code ? String(r.item_code) : null,
+    requestId: r.request_id ? toText(r.request_id) : null,
+    specimenId: r.specimen_id ? toText(r.specimen_id) : null,
+    itemCode: r.item_code ? toText(r.item_code) : null,
     itemName: String(r.item_name),
-    value: r.value != null ? String(r.value) : null,
+    value: r.value != null ? toText(r.value) : null,
     numericValue: r.numeric_value != null ? Number(r.numeric_value) : null,
-    unit: r.unit ? String(r.unit) : null,
+    unit: r.unit ? toText(r.unit) : null,
     refLow: r.ref_low != null ? Number(r.ref_low) : null,
     refHigh: r.ref_high != null ? Number(r.ref_high) : null,
-    abnormalFlag: r.abnormal_flag ? String(r.abnormal_flag) : null,
+    abnormalFlag: r.abnormal_flag ? toText(r.abnormal_flag) : null,
     isCritical: Boolean(r.is_critical),
-    resultTime: r.result_time ? String(r.result_time) : null,
-    enteredBy: r.entered_by ? String(r.entered_by) : null,
+    resultTime: r.result_time ? toText(r.result_time) : null,
+    enteredBy: r.entered_by ? toText(r.entered_by) : null,
   }));
 }

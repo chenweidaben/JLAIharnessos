@@ -13,6 +13,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { MedAdminStatus, MedErrorType } from '../../medical-tools/nursing/medAdminCheck.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 类型
@@ -62,19 +63,19 @@ function mapRow(row: Record<string, unknown>): MedAdministration {
     patientId: String(row.patient_id),
     medName: String(row.med_name),
     dose: String(row.dose),
-    route: String(row.route ?? ''),
-    medFreq: String(row.med_freq ?? ''),
+    route: toText(row.route ?? ''),
+    medFreq: toText(row.med_freq ?? ''),
     checkPatient: row.check_patient === true,
     checkMed: row.check_med === true,
     checkDose: row.check_dose === true,
     checkTime: row.check_time === true,
     checkExpire: row.check_expire === true,
     highRisk: row.high_risk === true,
-    doubleCheckBy: row.double_check_by ? String(row.double_check_by) : null,
+    doubleCheckBy: row.double_check_by ? toText(row.double_check_by) : null,
     administeredBy: String(row.administered_by),
     signature: String(row.signature),
     cdsBlocked: row.cds_blocked === true,
-    overrideReason: row.override_reason ? String(row.override_reason) : null,
+    overrideReason: row.override_reason ? toText(row.override_reason) : null,
     status: row.status as MedAdminStatus,
     errorType: (row.error_type as MedErrorType | null) ?? null,
     occurredAt: String(row.occurred_at),
@@ -132,13 +133,13 @@ export async function createMedAdmin(input: MedAdminInput, tx: DbExecutor): Prom
       ${input.errorType ?? null}, ${input.occurredAt ?? new Date().toISOString()}, ${input.idempotencyKey}
     )
     RETURNING ${tx.unsafe(ADMIN_COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function getMedAdminById(id: string, sql?: DbExecutor): Promise<MedAdministration | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(ADMIN_COLS)} FROM clinical.med_administrations WHERE id = ${id}`;
-  return rows.length > 0 ? mapRow(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRow(rows[0]) : null;
 }
 
 /**

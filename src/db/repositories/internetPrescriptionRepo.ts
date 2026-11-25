@@ -11,6 +11,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -100,18 +101,18 @@ function mapRx(r: Record<string, unknown>): Omit<EPrescription, 'items'> {
     profileId: String(r.profile_id),
     patientId: String(r.patient_id),
     prescriberId: String(r.prescriber_id),
-    department: r.department ? String(r.department) : null,
+    department: r.department ? toText(r.department) : null,
     status: r.status as EPrescriptionStatus,
-    riskLevel: r.risk_level ? String(r.risk_level) : null,
-    counsel: r.counsel ? String(r.counsel) : null,
+    riskLevel: r.risk_level ? toText(r.risk_level) : null,
+    counsel: r.counsel ? toText(r.counsel) : null,
     totalFee: r.total_fee !== null && r.total_fee !== undefined ? Number(r.total_fee) : null,
     idempotencyKey: String(r.idempotency_key),
-    reviewerId: r.reviewer_id ? String(r.reviewer_id) : null,
-    auditComment: r.audit_comment ? String(r.audit_comment) : null,
-    auditedAt: r.audited_at ? String(r.audited_at) : null,
-    returnReason: r.return_reason ? String(r.return_reason) : null,
-    cancelledBy: r.cancelled_by ? String(r.cancelled_by) : null,
-    cancelledAt: r.cancelled_at ? String(r.cancelled_at) : null,
+    reviewerId: r.reviewer_id ? toText(r.reviewer_id) : null,
+    auditComment: r.audit_comment ? toText(r.audit_comment) : null,
+    auditedAt: r.audited_at ? toText(r.audited_at) : null,
+    returnReason: r.return_reason ? toText(r.return_reason) : null,
+    cancelledBy: r.cancelled_by ? toText(r.cancelled_by) : null,
+    cancelledAt: r.cancelled_at ? toText(r.cancelled_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -120,18 +121,18 @@ function mapRx(r: Record<string, unknown>): Omit<EPrescription, 'items'> {
 function mapItem(r: Record<string, unknown>): EPrescriptionItem {
   return {
     id: String(r.id),
-    drugCode: r.drug_code ? String(r.drug_code) : null,
+    drugCode: r.drug_code ? toText(r.drug_code) : null,
     drugName: String(r.drug_name),
-    specification: r.specification ? String(r.specification) : null,
+    specification: r.specification ? toText(r.specification) : null,
     dosage: r.dosage !== null && r.dosage !== undefined ? Number(r.dosage) : null,
-    dosageUnit: r.dosage_unit ? String(r.dosage_unit) : null,
-    frequency: r.frequency ? String(r.frequency) : null,
-    route: r.route ? String(r.route) : null,
+    dosageUnit: r.dosage_unit ? toText(r.dosage_unit) : null,
+    frequency: r.frequency ? toText(r.frequency) : null,
+    route: r.route ? toText(r.route) : null,
     daysSupply: r.days_supply !== null && r.days_supply !== undefined ? Number(r.days_supply) : null,
     quantity: r.quantity !== null && r.quantity !== undefined ? Number(r.quantity) : null,
-    quantityUnit: r.quantity_unit ? String(r.quantity_unit) : null,
+    quantityUnit: r.quantity_unit ? toText(r.quantity_unit) : null,
     skinTest: Boolean(r.skin_test),
-    remark: r.remark ? String(r.remark) : null,
+    remark: r.remark ? toText(r.remark) : null,
   };
 }
 
@@ -154,7 +155,7 @@ export async function getEPrescriptionByIdem(
     SELECT ${exec.unsafe(RX_COLS)} FROM clinical.internet_prescriptions
     WHERE idempotency_key = ${idempotencyKey}
   `;
-  return rows.length > 0 ? mapRx(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapRx(rows[0]) : null;
 }
 
 export async function getEPrescriptionById(
@@ -165,7 +166,7 @@ export async function getEPrescriptionById(
     SELECT ${exec.unsafe(RX_COLS)} FROM clinical.internet_prescriptions WHERE id = ${id}
   `;
   if (rows.length === 0) return null;
-  const rx = mapRx(rows[0] as Record<string, unknown>);
+  const rx = mapRx(rows[0]);
   const itemRows = await exec`
     SELECT ${exec.unsafe(ITEM_COLS)} FROM clinical.internet_prescription_items
     WHERE prescription_id = ${id} ORDER BY created_at
@@ -270,7 +271,7 @@ export async function createEPrescription(
     )
     RETURNING ${exec.unsafe(RX_COLS)}
   `;
-  const rx = mapRx(rxRows[0] as Record<string, unknown>);
+  const rx = mapRx(rxRows[0]);
   const items: EPrescriptionItem[] = [];
   for (const item of input.items) {
     const itemRows = await exec`
@@ -285,7 +286,7 @@ export async function createEPrescription(
       )
       RETURNING ${exec.unsafe(ITEM_COLS)}
     `;
-    items.push(mapItem(itemRows[0] as Record<string, unknown>));
+    items.push(mapItem(itemRows[0]));
   }
   return { ...rx, items };
 }

@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface EdObservation {
   id: string;
@@ -25,7 +26,7 @@ function mapRow(r: Record<string, unknown>): EdObservation {
     triageLevel: String(r.triage_level),
     enteredAt: new Date(r.entered_at as string | Date).toISOString(),
     dischargedAt: r.discharged_at == null ? null : new Date(r.discharged_at as string | Date).toISOString(),
-    disposition: r.disposition == null ? null : String(r.disposition),
+    disposition: r.disposition == null ? null : toText(r.disposition),
     status: String(r.status),
     registeredBy: String(r.registered_by),
     createdAt: new Date(r.created_at as string | Date).toISOString(),
@@ -44,7 +45,7 @@ export async function registerObservation(input: RegisterInput): Promise<EdObser
     INSERT INTO clinical.ed_observations (patient_id, triage_level, registered_by)
     VALUES (${input.patientId}, ${input.triageLevel}, ${input.registeredBy})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function closeObservation(id: string, disposition: string): Promise<EdObservation> {
@@ -54,7 +55,7 @@ export async function closeObservation(id: string, disposition: string): Promise
     SET status='closed', discharged_at=now(), disposition=${disposition}
     WHERE id=${id} AND status='observing'
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listActive(): Promise<EdObservation[]> {

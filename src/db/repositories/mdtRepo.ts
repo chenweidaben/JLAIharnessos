@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface MdtConsult {
   id: string;
@@ -27,10 +28,10 @@ function mapRow(r: Record<string, unknown>): MdtConsult {
     title: String(r.title),
     reason: String(r.reason),
     departments: (r.departments as string[] | null) ?? [],
-    scheduledAt: r.scheduled_at == null ? null : String(r.scheduled_at),
+    scheduledAt: r.scheduled_at == null ? null : toText(r.scheduled_at),
     status: String(r.status),
-    minutes: r.minutes == null ? null : String(r.minutes),
-    conclusion: r.conclusion == null ? null : String(r.conclusion),
+    minutes: r.minutes == null ? null : toText(r.minutes),
+    conclusion: r.conclusion == null ? null : toText(r.conclusion),
     requestedBy: String(r.requested_by),
     createdAt: String(r.created_at),
   };
@@ -51,7 +52,7 @@ export async function createConsult(input: CreateInput): Promise<MdtConsult> {
       (visit_id, title, reason, departments, requested_by)
     VALUES (${input.visitId}, ${input.title}, ${input.reason}, ${input.departments}, ${input.requestedBy})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function schedule(id: string, scheduledAt: string): Promise<MdtConsult> {
@@ -59,7 +60,7 @@ export async function schedule(id: string, scheduledAt: string): Promise<MdtCons
   const rows = await db`
     UPDATE clinical.mdt_consults SET scheduled_at=${scheduledAt}, status='scheduled'
     WHERE id=${id} RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function recordMinutes(id: string, minutes: string, conclusion: string): Promise<MdtConsult> {
@@ -67,7 +68,7 @@ export async function recordMinutes(id: string, minutes: string, conclusion: str
   const rows = await db`
     UPDATE clinical.mdt_consults SET minutes=${minutes}, conclusion=${conclusion}, status='concluded'
     WHERE id=${id} RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByVisit(visitId: string): Promise<MdtConsult[]> {

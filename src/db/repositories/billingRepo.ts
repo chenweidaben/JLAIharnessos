@@ -15,6 +15,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 /* -------------------------------- 类型 -------------------------------- */
 
@@ -160,14 +161,14 @@ function mapFee(row: Record<string, unknown>): FeeItem {
   return {
     id: String(row.id), patientId: String(row.patient_id),
     visitId: String(row.visit_id), category: row.category as FeeCategory,
-    itemCode: row.item_code ? String(row.item_code) : null,
+    itemCode: row.item_code ? toText(row.item_code) : null,
     itemName: String(row.item_name),
     quantity: String(row.quantity), unitPrice: String(row.unit_price),
     amount: String(row.amount), sourceType: row.source_type as FeeSourceType,
-    sourceId: row.source_id ? String(row.source_id) : null,
+    sourceId: row.source_id ? toText(row.source_id) : null,
     priceSource: row.price_source as FeeItem['priceSource'],
     status: row.status as FeeItemStatus,
-    settlementId: row.settlement_id ? String(row.settlement_id) : null,
+    settlementId: row.settlement_id ? toText(row.settlement_id) : null,
     department: String(row.department),
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
@@ -181,10 +182,10 @@ function mapSettlement(row: Record<string, unknown>): Settlement {
     version: Number(row.version), paymentMethod: row.payment_method as PaymentMethod,
     totalAmount: String(row.total_amount), paidAmount: String(row.paid_amount),
     refundedAmount: String(row.refunded_amount),
-    paidBy: row.paid_by ? String(row.paid_by) : null,
-    paidAt: row.paid_at ? String(row.paid_at) : null,
-    voidedBy: row.voided_by ? String(row.voided_by) : null,
-    voidedAt: row.voided_at ? String(row.voided_at) : null,
+    paidBy: row.paid_by ? toText(row.paid_by) : null,
+    paidAt: row.paid_at ? toText(row.paid_at) : null,
+    voidedBy: row.voided_by ? toText(row.voided_by) : null,
+    voidedAt: row.voided_at ? toText(row.voided_at) : null,
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
 }
@@ -196,9 +197,9 @@ function mapInvoice(row: Record<string, unknown>): Invoice {
     visitId: String(row.visit_id), invoiceType: row.invoice_type as Invoice['invoiceType'],
     totalAmount: String(row.total_amount), refundedAmount: String(row.refunded_amount),
     status: row.status as Invoice['status'],
-    issuedBy: row.issued_by ? String(row.issued_by) : null,
+    issuedBy: row.issued_by ? toText(row.issued_by) : null,
     issuedAt: String(row.issued_at),
-    voidedAt: row.voided_at ? String(row.voided_at) : null,
+    voidedAt: row.voided_at ? toText(row.voided_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -207,11 +208,11 @@ function mapRefund(row: Record<string, unknown>): Refund {
   return {
     id: String(row.id), refundNo: String(row.refund_no),
     settlementId: String(row.settlement_id),
-    invoiceId: row.invoice_id ? String(row.invoice_id) : null,
+    invoiceId: row.invoice_id ? toText(row.invoice_id) : null,
     patientId: String(row.patient_id), visitId: String(row.visit_id),
     feeItemId: String(row.fee_item_id), amount: String(row.amount),
     reason: String(row.reason),
-    refundedBy: row.refunded_by ? String(row.refunded_by) : null,
+    refundedBy: row.refunded_by ? toText(row.refunded_by) : null,
     refundedAt: String(row.refunded_at), createdAt: String(row.created_at),
   };
 }
@@ -281,7 +282,7 @@ export async function insertFeeItem(
     RETURNING ${tx.unsafe(FEE_COLS)}
   `;
   if (inserted.length > 0) {
-    return { item: mapFee(inserted[0] as Record<string, unknown>), created: true };
+    return { item: mapFee(inserted[0]), created: true };
   }
   if (input.sourceId) {
     const existing = await tx`
@@ -289,7 +290,7 @@ export async function insertFeeItem(
       WHERE source_type = ${input.sourceType} AND source_id = ${input.sourceId}
     `;
     if (existing.length > 0) {
-      return { item: mapFee(existing[0] as Record<string, unknown>), created: false };
+      return { item: mapFee(existing[0]), created: false };
     }
   }
   // 理论不可达（无 source_id 且未插入）
@@ -299,7 +300,7 @@ export async function insertFeeItem(
 export async function getFeeItemById(id: string, sql?: DbExecutor): Promise<FeeItem | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(FEE_COLS)} FROM clinical.fee_items WHERE id = ${id}`;
-  return rows.length > 0 ? mapFee(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapFee(rows[0]) : null;
 }
 
 /** 按就诊列费用（可按状态过滤）。 */
@@ -389,7 +390,7 @@ export async function markFeeItemRefunded(
     WHERE id = ${feeItemId} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapFee(locked[0] as Record<string, unknown>);
+  const current = mapFee(locked[0]);
   if (current.status !== 'settled') return null;
 
   const rows = await tx`
@@ -397,7 +398,7 @@ export async function markFeeItemRefunded(
     WHERE id = ${feeItemId} AND status = 'settled'
     RETURNING ${tx.unsafe(FEE_COLS)}
   `;
-  return rows.length > 0 ? mapFee(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapFee(rows[0]) : null;
 }
 
 /* ============================== 结算单 ============================== */
@@ -423,7 +424,7 @@ export async function insertSettlement(
     )
     RETURNING ${tx.unsafe(SETTLEMENT_COLS)}
   `;
-  return mapSettlement(rows[0] as Record<string, unknown>);
+  return mapSettlement(rows[0]);
 }
 
 export async function getSettlementById(
@@ -432,7 +433,7 @@ export async function getSettlementById(
 ): Promise<Settlement | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(SETTLEMENT_COLS)} FROM clinical.settlements WHERE id = ${id}`;
-  return rows.length > 0 ? mapSettlement(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSettlement(rows[0]) : null;
 }
 
 /** 结算单队列：默认 unpaid + paid + partially_refunded（在途/近期）。 */
@@ -463,7 +464,7 @@ export async function paySettlement(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapSettlement(locked[0] as Record<string,unknown>);
+  const current = mapSettlement(locked[0]);
   if (current.version !== expectedVersion) return null;
   if (current.status !== 'unpaid') return null;
 
@@ -474,7 +475,7 @@ export async function paySettlement(
     WHERE id = ${id} AND status = 'unpaid' AND version = ${expectedVersion}
     RETURNING ${tx.unsafe(SETTLEMENT_COLS)}
   `;
-  return rows.length > 0 ? mapSettlement(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSettlement(rows[0]) : null;
 }
 
 /**
@@ -496,7 +497,7 @@ export async function applyRefundToSettlement(
     WHERE id = ${id}
     RETURNING ${tx.unsafe(SETTLEMENT_COLS)}
   `;
-  return mapSettlement(rows[0] as Record<string, unknown>);
+  return mapSettlement(rows[0]);
 }
 
 /**
@@ -513,7 +514,7 @@ export async function voidSettlement(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapSettlement(locked[0] as Record<string,unknown>);
+  const current = mapSettlement(locked[0]);
   if (current.version !== expectedVersion) return null;
   if (current.status !== 'unpaid') return null;
 
@@ -524,7 +525,7 @@ export async function voidSettlement(
     WHERE id = ${id} AND status = 'unpaid' AND version = ${expectedVersion}
     RETURNING ${tx.unsafe(SETTLEMENT_COLS)}
   `;
-  return rows.length > 0 ? mapSettlement(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSettlement(rows[0]) : null;
 }
 
 /* ============================== 票据 ============================== */
@@ -550,7 +551,7 @@ export async function insertInvoice(input: InvoiceCreateInput, tx: DbExecutor): 
     )
     RETURNING ${tx.unsafe(INVOICE_COLS)}
   `;
-  return mapInvoice(rows[0] as Record<string, unknown>);
+  return mapInvoice(rows[0]);
 }
 
 export async function getInvoiceBySettlement(
@@ -562,7 +563,7 @@ export async function getInvoiceBySettlement(
     SELECT ${db.unsafe(INVOICE_COLS)} FROM clinical.invoices
     WHERE settlement_id = ${settlementId} ORDER BY created_at DESC
   `;
-  return rows.length > 0 ? mapInvoice(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapInvoice(rows[0]) : null;
 }
 
 /** 退费联动：累计票据 refunded_amount。 */
@@ -577,7 +578,7 @@ export async function applyRefundToInvoice(
     WHERE id = ${invoiceId}
     RETURNING ${tx.unsafe(INVOICE_COLS)}
   `;
-  return mapInvoice(rows[0] as Record<string, unknown>);
+  return mapInvoice(rows[0]);
 }
 
 /* ============================== 退费记录 ============================== */
@@ -605,7 +606,7 @@ export async function insertRefund(input: RefundCreateInput, tx: DbExecutor): Pr
     )
     RETURNING ${tx.unsafe(REFUND_COLS)}
   `;
-  return mapRefund(rows[0] as Record<string, unknown>);
+  return mapRefund(rows[0]);
 }
 
 /* ============================== Saga 日志 ============================== */

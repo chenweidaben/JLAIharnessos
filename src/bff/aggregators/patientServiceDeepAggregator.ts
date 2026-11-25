@@ -69,17 +69,17 @@ export interface ServiceCard {
   /** 大图标名（前端按名渲染 antd 图标） */
   icon: string;
   /** 该大类下的子类入口（如 专家号/普通号/检查号） */
-  subEntries: Array<{ code: string; label: string; note: string }>;
+  subEntries: { code: string; label: string; note: string }[];
 }
 
 /** 健康档案汇总：历次就诊 / 用药 / 检查 */
 export interface HealthArchive {
   /** 历次就诊摘要 */
-  visits: Array<{ date: string; deptName: string; diagnosis: string; doctor: string }>;
+  visits: { date: string; deptName: string; diagnosis: string; doctor: string }[];
   /** 长期用药 */
-  medications: Array<{ name: string; dose: string; freq: string }>;
+  medications: { name: string; dose: string; freq: string }[];
   /** 近期检查 */
-  recentExams: Array<{ date: string; item: string; status: string }>;
+  recentExams: { date: string; item: string; status: string }[];
 }
 
 /** 院内导航点位 */
@@ -113,12 +113,12 @@ export interface FullService {
 /* ------------------------------------------------------------------ */
 
 /** 科室字典：编码 → 名称 + 主治症状关键词（用于智能导诊匹配） */
-const DEPT_CATALOG: ReadonlyArray<{
+const DEPT_CATALOG: readonly {
   code: string;
   name: string;
   keywords: string[];
-  doctors: Array<{ id: string; name: string; title: DoctorTitle; reason: string; scheduleTags: string[] }>;
-}> = [
+  doctors: { id: string; name: string; title: DoctorTitle; reason: string; scheduleTags: string[] }[];
+}[] = [
   {
     code: 'NEU',
     name: '神经内科',
@@ -167,12 +167,12 @@ const DEPT_CATALOG: ReadonlyArray<{
 ];
 
 /** 红旗症状：命中即强制急诊 / 120 提示（导诊安全红线） */
-const RED_FLAG_KEYWORDS: ReadonlyArray<string> = [
+const RED_FLAG_KEYWORDS: readonly string[] = [
   '胸痛剧烈', '意识不清', '昏迷', '大出血', '呼吸困难', '中风', '摔倒不起',
 ];
 
 /** 院内导航点位字典（大字路线，无障碍优先） */
-const WAYPOINT_CATALOG: ReadonlyArray<Waypoint> = [
+const WAYPOINT_CATALOG: readonly Waypoint[] = [
   { code: 'W-NEU', name: '神经内科门诊', category: 'dept', location: '门诊楼 3 楼东区', routeText: '进门诊楼乘东侧无障碍电梯到 3 楼，左转到底', accessible: true },
   { code: 'W-CAR', name: '心血管内科门诊', category: 'dept', location: '门诊楼 3 楼西区', routeText: '进门诊楼乘东侧无障碍电梯到 3 楼，右转到底', accessible: true },
   { code: 'W-RES', name: '呼吸科门诊', category: 'dept', location: '门诊楼 2 楼东区', routeText: '进门诊楼乘东侧无障碍电梯到 2 楼，左转', accessible: true },
@@ -182,7 +182,7 @@ const WAYPOINT_CATALOG: ReadonlyArray<Waypoint> = [
 ];
 
 /** 服务入口六张卡片（老人友好：大图标 + 大字 + 一句话） */
-const SERVICE_CARDS: ReadonlyArray<ServiceCard> = [
+const SERVICE_CARDS: readonly ServiceCard[] = [
   {
     kind: 'appointment',
     title: '预约挂号',

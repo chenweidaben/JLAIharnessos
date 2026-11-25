@@ -7,6 +7,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import type { IoDirection } from '../../medical-tools/nursing/ioBalance.js';
+import { toText } from '../rowText.js';
 
 export type IoCategory =
   | 'oral' | 'tube_feed' | 'iv' | 'blood_product'
@@ -35,7 +36,7 @@ function map(row: Record<string, unknown>): IoRecord {
     category: row.category as IoCategory,
     amountMl: Number(row.amount_ml),
     recordTime: String(row.record_time),
-    note: row.note ? String(row.note) : null,
+    note: row.note ? toText(row.note) : null,
     recordedBy: String(row.recorded_by),
   };
 }
@@ -58,7 +59,7 @@ export async function insertIoRecord(input: NewIoRecord, tx: DbExecutor): Promis
     VALUES (${input.visitId}, ${input.patientId}, ${input.direction}, ${input.category},
       ${input.amountMl}, ${input.recordTime ?? new Date().toISOString()}, ${input.note ?? null}, ${input.recordedBy})
     RETURNING ${tx.unsafe(COLS)}`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 /** 按就诊列；visit_id 为 uuid，TS 条件拼接；可选时间窗。 */

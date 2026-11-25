@@ -3,6 +3,7 @@
  * Copyright (c) 杭州健澜科技有限公司
  */
 import { getDb } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface TransfusionReaction {
   id: string;
@@ -22,7 +23,7 @@ function mapRow(r: Record<string, unknown>): TransfusionReaction {
   return {
     id: String(r.id),
     patientId: String(r.patient_id),
-    transfusionId: r.transfusion_id == null ? null : String(r.transfusion_id),
+    transfusionId: r.transfusion_id == null ? null : toText(r.transfusion_id),
     reactionType: String(r.reaction_type),
     severity: String(r.severity),
     symptoms: String(r.symptoms),
@@ -50,7 +51,7 @@ export async function reportReaction(input: ReportInput): Promise<TransfusionRea
     VALUES (${input.patientId}, ${input.transfusionId ?? null}, ${input.reactionType}, ${input.severity},
       ${input.symptoms}, ${input.blocked ?? false}, ${input.reportedBy})
     RETURNING ${db.unsafe(COLS)}`;
-  return mapRow(rows[0] as Record<string, unknown>);
+  return mapRow(rows[0]);
 }
 
 export async function listByPatient(patientId: string): Promise<TransfusionReaction[]> {

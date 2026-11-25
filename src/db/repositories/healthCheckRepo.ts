@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Package { id: string; name: string; items: string[]; priceCents: number; active: boolean; }
 export interface Order { id: string; packageId: string; patientId: string; appointmentDate: string; status: string; createdAt: string; }
@@ -19,7 +20,7 @@ function omap(r: Record<string, unknown>): Order {
   return { id: String(r.id), packageId: String(r.package_id), patientId: String(r.patient_id), appointmentDate: String(r.appointment_date), status: String(r.status), createdAt: String(r.created_at) };
 }
 function imap(r: Record<string, unknown>): OrderItem {
-  return { id: String(r.id), orderId: String(r.order_id), itemName: String(r.item_name), completed: Boolean(r.completed), completedAt: r.completed_at ? String(r.completed_at) : null };
+  return { id: String(r.id), orderId: String(r.order_id), itemName: String(r.item_name), completed: Boolean(r.completed), completedAt: r.completed_at ? toText(r.completed_at) : null };
 }
 
 export async function listPackages(): Promise<Package[]> {

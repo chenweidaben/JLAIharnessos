@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -15,8 +16,8 @@ function map(r: Record<string, unknown>): PharmacyTask {
   return {
     id: String(r.id), prescriptionId: String(r.prescription_id), patientId: String(r.patient_id),
     status: String(r.status),
-    assignedPharmacist: r.assigned_pharmacist == null ? null : String(r.assigned_pharmacist),
-    completedAt: r.completed_at == null ? null : String(r.completed_at),
+    assignedPharmacist: r.assigned_pharmacist == null ? null : toText(r.assigned_pharmacist),
+    completedAt: r.completed_at == null ? null : toText(r.completed_at),
     createdAt: String(r.created_at),
   };
 }
@@ -31,7 +32,7 @@ export async function createTask(
     VALUES (${input.prescriptionId}, ${input.patientId})
     ON CONFLICT (prescription_id) DO UPDATE SET prescription_id = EXCLUDED.prescription_id
     RETURNING id, prescription_id, patient_id, status, assigned_pharmacist, completed_at, created_at`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 export async function listPending(): Promise<PharmacyTask[]> {
@@ -45,7 +46,7 @@ export async function getTaskById(id: string, tx: DbExecutor = db): Promise<Phar
   const rows = await tx`
     SELECT id, prescription_id, patient_id, status, assigned_pharmacist, completed_at, created_at
     FROM clinical.pharmacy_dispense_tasks WHERE id=${id}`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** CAS pending → completed。 */
@@ -55,5 +56,5 @@ export async function completeTask(id: string, pharmacistId: string, tx: DbExecu
     SET status='completed', assigned_pharmacist=${pharmacistId}, completed_at=now()
     WHERE id=${id} AND status='pending'
     RETURNING id, prescription_id, patient_id, status, assigned_pharmacist, completed_at, created_at`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }

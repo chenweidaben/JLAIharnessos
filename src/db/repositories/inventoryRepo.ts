@@ -10,6 +10,7 @@
 
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export interface Inventory {
   id: string;
@@ -32,13 +33,13 @@ function mapRow(row: Record<string, unknown>): Inventory {
   return {
     id: String(row.id),
     drugId: String(row.drug_id),
-    drugCode: row.drug_code ? String(row.drug_code) : null,
-    genericName: row.generic_name ? String(row.generic_name) : null,
+    drugCode: row.drug_code ? toText(row.drug_code) : null,
+    genericName: row.generic_name ? toText(row.generic_name) : null,
     warehouse: String(row.warehouse),
-    batchNo: row.batch_no ? String(row.batch_no) : null,
+    batchNo: row.batch_no ? toText(row.batch_no) : null,
     quantity: Number(row.quantity),
     unit: String(row.unit),
-    expiryDate: row.expiry_date ? String(row.expiry_date) : null,
+    expiryDate: row.expiry_date ? toText(row.expiry_date) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -138,7 +139,7 @@ const upd = await tx`
     FROM clinical.drug_inventory i JOIN clinical.drug_catalog d ON d.id = i.drug_id
     WHERE i.id = ${targetId}
   `;
-  return { inventory: mapRow(full[0] as Record<string, unknown>) };
+  return { inventory: mapRow(full[0]) };
 }
 
 export interface MovementInput {
@@ -184,7 +185,7 @@ export async function receiveStock(
       FROM clinical.drug_inventory i JOIN clinical.drug_catalog d ON d.id = i.drug_id
       WHERE i.id = ${id}
     `;
-    const inv = mapRow(full[0] as Record<string, unknown>);
+    const inv = mapRow(full[0]);
     await insertMovement(tx, {
       drugId: input.drugId, warehouse: input.warehouse, batchNo: input.batchNo ?? null,
       changeQty: input.qty, balanceAfter: inv.quantity, reason: 'receive', actorId: input.actorId,
@@ -213,15 +214,15 @@ const MOV_COLS = `id, drug_id, warehouse, batch_no, change_qty, balance_after, r
 function mapMovement(row: Record<string, unknown>): Movement {
   return {
     id: String(row.id),
-    drugId: row.drug_id ? String(row.drug_id) : null,
+    drugId: row.drug_id ? toText(row.drug_id) : null,
     warehouse: String(row.warehouse),
-    batchNo: row.batch_no ? String(row.batch_no) : null,
+    batchNo: row.batch_no ? toText(row.batch_no) : null,
     changeQty: Number(row.change_qty),
     balanceAfter: row.balance_after !== null ? Number(row.balance_after) : null,
     reason: String(row.reason),
-    refType: row.ref_type ? String(row.ref_type) : null,
-    refId: row.ref_id ? String(row.ref_id) : null,
-    actorId: row.actor_id ? String(row.actor_id) : null,
+    refType: row.ref_type ? toText(row.ref_type) : null,
+    refId: row.ref_id ? toText(row.ref_id) : null,
+    actorId: row.actor_id ? toText(row.actor_id) : null,
     createdAt: String(row.created_at),
   };
 }

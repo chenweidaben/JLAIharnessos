@@ -7,6 +7,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ----------------------------- 入院记录 ------------------------------ */
 
@@ -47,16 +48,16 @@ function mapAdmission(row: Record<string, unknown>): Admission {
     admissionNo: String(row.admission_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    wardId: row.ward_id ? String(row.ward_id) : null,
-    bedId: row.bed_id ? String(row.bed_id) : null,
+    wardId: row.ward_id ? toText(row.ward_id) : null,
+    bedId: row.bed_id ? toText(row.bed_id) : null,
     department: String(row.department),
-    admittingDoctorId: row.admitting_doctor_id ? String(row.admitting_doctor_id) : null,
+    admittingDoctorId: row.admitting_doctor_id ? toText(row.admitting_doctor_id) : null,
     admissionType: row.admission_type as AdmissionType,
     source: row.source as AdmissionSource,
-    diagnosis: row.diagnosis ? String(row.diagnosis) : null,
+    diagnosis: row.diagnosis ? toText(row.diagnosis) : null,
     conditionOnAdmission: row.condition_on_admission as ConditionLevel,
     admittedAt: String(row.admitted_at),
-    dischargedAt: row.discharged_at ? String(row.discharged_at) : null,
+    dischargedAt: row.discharged_at ? toText(row.discharged_at) : null,
     status: row.status as AdmissionStatus,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
@@ -91,7 +92,7 @@ export async function createAdmission(input: AdmissionCreateInput, tx: DbExecuto
     )
     RETURNING ${tx.unsafe(ADMISSION_COLS)}
   `;
-  return mapAdmission(rows[0] as Record<string, unknown>);
+  return mapAdmission(rows[0]);
 }
 
 export async function getAdmissionByVisit(visitId: string, sql?: DbExecutor): Promise<Admission | null> {
@@ -99,7 +100,7 @@ export async function getAdmissionByVisit(visitId: string, sql?: DbExecutor): Pr
   const rows = await db`
     SELECT ${db.unsafe(ADMISSION_COLS)} FROM clinical.admissions WHERE visit_id = ${visitId}
   `;
-  return rows.length > 0 ? mapAdmission(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAdmission(rows[0]) : null;
 }
 
 /** 转科后更新入院记录的当前床位/病区（保持 status=admitted） */
@@ -115,7 +116,7 @@ export async function updateAdmissionLocation(
     WHERE visit_id = ${visitId}
     RETURNING ${tx.unsafe(ADMISSION_COLS)}
   `;
-  return rows.length > 0 ? mapAdmission(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAdmission(rows[0]) : null;
 }
 
 /** 出院：置状态与出院时间 */
@@ -130,7 +131,7 @@ export async function markAdmissionDischarged(
     WHERE visit_id = ${visitId}
     RETURNING ${tx.unsafe(ADMISSION_COLS)}
   `;
-  return rows.length > 0 ? mapAdmission(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAdmission(rows[0]) : null;
 }
 
 /* ----------------------------- ADT 事件 ------------------------------ */
@@ -165,14 +166,14 @@ function mapAdtEvent(row: Record<string, unknown>): AdtEvent {
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     eventType: row.event_type as AdtEventType,
-    fromWardId: row.from_ward_id ? String(row.from_ward_id) : null,
-    toWardId: row.to_ward_id ? String(row.to_ward_id) : null,
-    fromBedId: row.from_bed_id ? String(row.from_bed_id) : null,
-    toBedId: row.to_bed_id ? String(row.to_bed_id) : null,
-    fromDepartment: row.from_department ? String(row.from_department) : null,
-    toDepartment: row.to_department ? String(row.to_department) : null,
-    reason: row.reason ? String(row.reason) : null,
-    operatorId: row.operator_id ? String(row.operator_id) : null,
+    fromWardId: row.from_ward_id ? toText(row.from_ward_id) : null,
+    toWardId: row.to_ward_id ? toText(row.to_ward_id) : null,
+    fromBedId: row.from_bed_id ? toText(row.from_bed_id) : null,
+    toBedId: row.to_bed_id ? toText(row.to_bed_id) : null,
+    fromDepartment: row.from_department ? toText(row.from_department) : null,
+    toDepartment: row.to_department ? toText(row.to_department) : null,
+    reason: row.reason ? toText(row.reason) : null,
+    operatorId: row.operator_id ? toText(row.operator_id) : null,
     eventAt: String(row.event_at),
     createdAt: String(row.created_at),
   };
@@ -208,7 +209,7 @@ export async function createAdtEvent(input: AdtEventInput, tx: DbExecutor): Prom
     )
     RETURNING ${tx.unsafe(ADT_COLS)}
   `;
-  return mapAdtEvent(rows[0] as Record<string, unknown>);
+  return mapAdtEvent(rows[0]);
 }
 
 export async function listAdtEvents(visitId: string, sql?: DbExecutor): Promise<AdtEvent[]> {
@@ -241,7 +242,7 @@ export interface InpatientRecordRow {
   diagnosis: string | null;
   condition: ConditionLevel | null;
   admittedAt: string | null;
-  allergies: Array<Record<string, unknown>>;
+  allergies: Record<string, unknown>[];
   tags: string[];
 }
 
@@ -289,18 +290,18 @@ export async function findCurrentInpatients(
     mrn: String(r.mrn),
     nameMasked: String(r.name_masked),
     gender: String(r.gender),
-    birthDate: r.birth_date ? String(r.birth_date) : null,
+    birthDate: r.birth_date ? toText(r.birth_date) : null,
     department: String(r.department),
-    wardId: r.ward_id ? String(r.ward_id) : null,
-    wardName: r.ward_name ? String(r.ward_name) : null,
-    bedId: r.bed_id ? String(r.bed_id) : null,
-    bedNo: r.bed_no ? String(r.bed_no) : null,
-    roomNo: r.room_no ? String(r.room_no) : null,
-    attendingDoctorId: r.attending_doctor_id ? String(r.attending_doctor_id) : null,
-    diagnosis: r.diagnosis ? String(r.diagnosis) : null,
+    wardId: r.ward_id ? toText(r.ward_id) : null,
+    wardName: r.ward_name ? toText(r.ward_name) : null,
+    bedId: r.bed_id ? toText(r.bed_id) : null,
+    bedNo: r.bed_no ? toText(r.bed_no) : null,
+    roomNo: r.room_no ? toText(r.room_no) : null,
+    attendingDoctorId: r.attending_doctor_id ? toText(r.attending_doctor_id) : null,
+    diagnosis: r.diagnosis ? toText(r.diagnosis) : null,
     condition: r.condition ? (r.condition as ConditionLevel) : null,
-    admittedAt: r.admitted_at ? String(r.admitted_at) : null,
-    allergies: (r.allergies as Array<Record<string, unknown>>) ?? [],
+    admittedAt: r.admitted_at ? toText(r.admitted_at) : null,
+    allergies: (r.allergies as Record<string, unknown>[]) ?? [],
     tags: (r.tags as string[]) ?? [],
   }));
 }

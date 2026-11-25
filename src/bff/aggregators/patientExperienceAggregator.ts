@@ -120,24 +120,24 @@ export interface ImprovementAction {
 
 /** 深度患者体验目录（看板静态口径） */
 export interface DeepExperienceCatalog {
-  dimensions: Array<{
+  dimensions: {
     code: ExperienceDimension;
     label: string;
-    subItems: Array<{ code: string; label: string; target: string }>;
-  }>;
-  scoreBand: Array<{ min: number; level: string; label: string }>;
+    subItems: { code: string; label: string; target: string }[];
+  }[];
+  scoreBand: { min: number; level: string; label: string }[];
 }
 
 /* ------------------------------------------------------------------ */
 /* 常量：关键词 → 痛点映射                                              */
 /* ------------------------------------------------------------------ */
 
-const PAIN_KEYWORDS: Array<{
+const PAIN_KEYWORDS: {
   code: PainPointCode;
   dimension: ExperienceDimension;
   label: string;
   keywords: string[];
-}> = [
+}[] = [
   { code: 'appt_wait', dimension: 'appointment', label: '预约等待过长', keywords: ['预约等', '挂号等', '号源抢不到', '约不上', '放号太慢'] },
   { code: 'appt_channel', dimension: 'appointment', label: '预约渠道不畅', keywords: ['只能窗口', '电话打不通', '线上约不了', '没有小程序'] },
   { code: 'triage_long', dimension: 'visit', label: '分诊排队久', keywords: ['分诊排队', '分诊台慢', '先分诊再排队'] },

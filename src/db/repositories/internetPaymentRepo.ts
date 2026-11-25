@@ -14,6 +14,7 @@
 
 import { getDb, withTx, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 /* -------------------------------- 类型 -------------------------------- */
 
@@ -89,11 +90,11 @@ function mapPayment(r: Record<string, unknown>): OnlinePayment {
     channel: String(r.channel),
     status: r.status as OnlinePaymentStatus,
     idempotencyKey: String(r.idempotency_key),
-    channelTxnNo: r.channel_txn_no ? String(r.channel_txn_no) : null,
-    paidBy: r.paid_by ? String(r.paid_by) : null,
-    paidAt: r.paid_at ? String(r.paid_at) : null,
-    cancelledBy: r.cancelled_by ? String(r.cancelled_by) : null,
-    cancelledAt: r.cancelled_at ? String(r.cancelled_at) : null,
+    channelTxnNo: r.channel_txn_no ? toText(r.channel_txn_no) : null,
+    paidBy: r.paid_by ? toText(r.paid_by) : null,
+    paidAt: r.paid_at ? toText(r.paid_at) : null,
+    cancelledBy: r.cancelled_by ? toText(r.cancelled_by) : null,
+    cancelledAt: r.cancelled_at ? toText(r.cancelled_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -111,9 +112,9 @@ function mapInvoice(r: Record<string, unknown>): EInvoice {
     medicarePaid: String(r.medicare_paid),
     selfPaid: String(r.self_paid),
     status: r.status as EInvoice['status'],
-    reversalOf: r.reversal_of ? String(r.reversal_of) : null,
-    reversedAt: r.reversed_at ? String(r.reversed_at) : null,
-    issuedBy: r.issued_by ? String(r.issued_by) : null,
+    reversalOf: r.reversal_of ? toText(r.reversal_of) : null,
+    reversedAt: r.reversed_at ? toText(r.reversed_at) : null,
+    issuedBy: r.issued_by ? toText(r.issued_by) : null,
     issuedAt: String(r.issued_at),
     createdAt: String(r.created_at),
   };
@@ -135,23 +136,23 @@ export async function createOnlinePayment(
        ${input.amount}, ${input.medicarePaid}, ${input.selfPaid}, ${input.channel}, ${input.idempotencyKey})
     RETURNING *
   `;
-  return mapPayment(rows[0] as Record<string, unknown>);
+  return mapPayment(rows[0]);
 }
 
 export async function getOnlinePaymentById(id: string, db?: DbExecutor): Promise<OnlinePayment | null> {
   const d = db ?? getDb();
   const rows = await d`SELECT * FROM clinical.online_payments WHERE id = ${id}`;
-  return rows.length > 0 ? mapPayment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPayment(rows[0]) : null;
 }
 
 export async function getOnlinePaymentByPayNo(payNo: string): Promise<OnlinePayment | null> {
   const rows = await getDb()`SELECT * FROM clinical.online_payments WHERE pay_no = ${payNo}`;
-  return rows.length > 0 ? mapPayment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPayment(rows[0]) : null;
 }
 
 export async function getOnlinePaymentByIdempotency(key: string): Promise<OnlinePayment | null> {
   const rows = await getDb()`SELECT * FROM clinical.online_payments WHERE idempotency_key = ${key}`;
-  return rows.length > 0 ? mapPayment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPayment(rows[0]) : null;
 }
 
 /** 一来源的在途支付单（pending/processing） */
@@ -164,7 +165,7 @@ export async function getOpenPaymentBySource(
       AND status IN ('pending','processing')
     LIMIT 1
   `;
-  return rows.length > 0 ? mapPayment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPayment(rows[0]) : null;
 }
 
 /** CAS 状态推进：仅 from 状态可转 to，行锁防并发。返回 null 表示状态冲突。 */
@@ -194,7 +195,7 @@ export async function transitionPayment(
     WHERE id = ${id} AND status IN ${d([...from])}
     RETURNING *
   `;
-  return rows.length > 0 ? mapPayment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPayment(rows[0]) : null;
 }
 
 export async function listPaymentsByPatient(accountId: string, patientId: string): Promise<OnlinePayment[]> {
@@ -241,17 +242,17 @@ export async function createEInvoice(
        ${input.amount}, ${input.medicarePaid}, ${input.selfPaid}, ${input.issuedBy})
     RETURNING *
   `;
-  return mapInvoice(rows[0] as Record<string, unknown>);
+  return mapInvoice(rows[0]);
 }
 
 export async function getEInvoiceByPaymentId(paymentId: string): Promise<EInvoice | null> {
   const rows = await getDb()`SELECT * FROM clinical.e_invoices WHERE payment_id = ${paymentId}`;
-  return rows.length > 0 ? mapInvoice(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapInvoice(rows[0]) : null;
 }
 
 export async function getEInvoiceById(id: string): Promise<EInvoice | null> {
   const rows = await getDb()`SELECT * FROM clinical.e_invoices WHERE id = ${id}`;
-  return rows.length > 0 ? mapInvoice(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapInvoice(rows[0]) : null;
 }
 
 /** 冲红：issued → reversed，绑定 reversal_of（原票据 id），返回 null 表示状态冲突。 */
@@ -270,7 +271,7 @@ export async function reverseEInvoice(
     WHERE id = ${id} AND status = 'issued'
     RETURNING *
   `;
-  return rows.length > 0 ? mapInvoice(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapInvoice(rows[0]) : null;
 }
 
 export async function listInvoicesByPatient(accountId: string, patientId: string): Promise<EInvoice[]> {

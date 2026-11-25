@@ -15,6 +15,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 // ============================================================================
 // 类型
@@ -248,17 +249,17 @@ function mapHumanTask(row: Record<string, unknown>): HumanTaskRecord {
     instanceId: String(row.instance_id),
     nodeId: String(row.node_id),
     title: String(row.title),
-    instructions: row.instructions != null ? String(row.instructions) : null,
+    instructions: row.instructions != null ? toText(row.instructions) : null,
     assigneeRoles: parseJsonb<string[]>(row.assignee_roles, []),
     assigneeUsers: parseJsonb<string[]>(row.assignee_users, []),
     formSchema: parseJsonb<Record<string, unknown>>(row.form_schema, {}),
     reviewData: row.review_data ?? null,
     status: String(row.status),
     resolution: parseJsonb<HumanTaskRecord['resolution']>(row.resolution, null),
-    claimedBy: row.claimed_by != null ? String(row.claimed_by) : null,
-    resolvedBy: row.resolved_by != null ? String(row.resolved_by) : null,
-    dueAt: row.due_at != null ? String(row.due_at) : null,
+    claimedBy: row.claimed_by != null ? toText(row.claimed_by) : null,
+    resolvedBy: row.resolved_by != null ? toText(row.resolved_by) : null,
+    dueAt: row.due_at != null ? toText(row.due_at) : null,
     createdAt: String(row.created_at),
-    resolvedAt: row.resolved_at != null ? String(row.resolved_at) : null,
+    resolvedAt: row.resolved_at != null ? toText(row.resolved_at) : null,
   };
 }

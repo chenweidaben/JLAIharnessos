@@ -20,6 +20,7 @@ import type {
   FactorItem,
   BleedingFactor,
 } from '../../medical-tools/vte/vteRisk.js';
+import { toText } from '../rowText.js';
 
 // ---------------------------------------------------------------------------
 // 评估
@@ -58,7 +59,7 @@ function mapAssessment(row: Record<string, unknown>): VteAssessment {
     id: String(row.id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    department: row.department ? String(row.department) : null,
+    department: row.department ? toText(row.department) : null,
     assessmentNo: String(row.assessment_no),
     scale: row.scale as VteScale,
     occasion: String(row.occasion),
@@ -69,9 +70,9 @@ function mapAssessment(row: Record<string, unknown>): VteAssessment {
     bleedingFactors: (row.bleeding_factors as BleedingFactor[]) ?? [],
     alertRaised: Boolean(row.alert_raised),
     version: Number(row.version),
-    assessedBy: row.assessed_by ? String(row.assessed_by) : null,
-    assessedAt: row.assessed_at ? String(row.assessed_at) : null,
-    note: row.note ? String(row.note) : null,
+    assessedBy: row.assessed_by ? toText(row.assessed_by) : null,
+    assessedAt: row.assessed_at ? toText(row.assessed_at) : null,
+    note: row.note ? toText(row.note) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -114,13 +115,13 @@ export async function createAssessment(input: VteAssessmentInput, tx: DbExecutor
       ${input.assessedBy}, now(), ${input.note ?? null}
     )
     RETURNING ${tx.unsafe(ASSESS_COLS)}`;
-  return mapAssessment(rows[0] as Record<string, unknown>);
+  return mapAssessment(rows[0]);
 }
 
 export async function getAssessmentById(id: string, sql?: DbExecutor): Promise<VteAssessment | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(ASSESS_COLS)} FROM clinical.vte_assessments WHERE id = ${id}`;
-  return rows.length > 0 ? mapAssessment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAssessment(rows[0]) : null;
 }
 
 /** 某就诊最新一条评估（当前评估）。 */
@@ -132,7 +133,7 @@ export async function getLatestAssessmentByVisit(
     SELECT ${db.unsafe(ASSESS_COLS)} FROM clinical.vte_assessments
     WHERE visit_id = ${visitId}
     ORDER BY assessed_at DESC, created_at DESC LIMIT 1`;
-  return rows.length > 0 ? mapAssessment(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapAssessment(rows[0]) : null;
 }
 
 export async function listAssessments(
@@ -211,21 +212,21 @@ function mapPrevention(row: Record<string, unknown>): VtePrevention {
     id: String(row.id),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    assessmentId: row.assessment_id ? String(row.assessment_id) : null,
+    assessmentId: row.assessment_id ? toText(row.assessment_id) : null,
     preventionNo: String(row.prevention_no),
     category: row.category as VtePreventionCategory,
     method: String(row.method),
     status: row.status as VtePreventionStatus,
-    dosage: row.dosage ? String(row.dosage) : null,
-    frequency: row.frequency ? String(row.frequency) : null,
-    orderId: row.order_id ? String(row.order_id) : null,
-    nursingTaskId: row.nursing_task_id ? String(row.nursing_task_id) : null,
-    suggestedBy: row.suggested_by ? String(row.suggested_by) : null,
-    confirmedBy: row.confirmed_by ? String(row.confirmed_by) : null,
-    executedBy: row.executed_by ? String(row.executed_by) : null,
-    confirmedAt: row.confirmed_at ? String(row.confirmed_at) : null,
-    executedAt: row.executed_at ? String(row.executed_at) : null,
-    contraindicationNote: row.contraindication_note ? String(row.contraindication_note) : null,
+    dosage: row.dosage ? toText(row.dosage) : null,
+    frequency: row.frequency ? toText(row.frequency) : null,
+    orderId: row.order_id ? toText(row.order_id) : null,
+    nursingTaskId: row.nursing_task_id ? toText(row.nursing_task_id) : null,
+    suggestedBy: row.suggested_by ? toText(row.suggested_by) : null,
+    confirmedBy: row.confirmed_by ? toText(row.confirmed_by) : null,
+    executedBy: row.executed_by ? toText(row.executed_by) : null,
+    confirmedAt: row.confirmed_at ? toText(row.confirmed_at) : null,
+    executedAt: row.executed_at ? toText(row.executed_at) : null,
+    contraindicationNote: row.contraindication_note ? toText(row.contraindication_note) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -259,13 +260,13 @@ export async function createPrevention(input: VtePreventionInput, tx: DbExecutor
       ${input.dosage ?? null}, ${input.frequency ?? null}, ${input.suggestedBy}
     )
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return mapPrevention(rows[0] as Record<string, unknown>);
+  return mapPrevention(rows[0]);
 }
 
 export async function getPreventionById(id: string, sql?: DbExecutor): Promise<VtePrevention | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(PREV_COLS)} FROM clinical.vte_preventions WHERE id = ${id}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 export async function listPreventions(
@@ -292,7 +293,7 @@ export async function confirmPrevention(
         confirmed_at = now(), updated_at = now()
     WHERE id = ${id} AND status = 'suggested'
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 /** 护士执行机械预防：suggested -> executed（CAS），绑定护理任务。 */
@@ -305,7 +306,7 @@ export async function executePrevention(
         executed_at = now(), updated_at = now()
     WHERE id = ${id} AND status = 'suggested'
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 /** 标记禁忌/停用。 */
@@ -317,7 +318,7 @@ export async function contraindicatePrevention(
     SET status = 'contraindicated', contraindication_note = ${note}, updated_at = now()
     WHERE id = ${id} AND status IN ('suggested','confirmed')
     RETURNING ${tx.unsafe(PREV_COLS)}`;
-  return rows.length > 0 ? mapPrevention(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPrevention(rows[0]) : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -350,13 +351,13 @@ function mapOutcome(row: Record<string, unknown>): VteOutcome {
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     eventType: String(row.event_type),
-    severity: row.severity ? String(row.severity) : null,
+    severity: row.severity ? toText(row.severity) : null,
     source: String(row.source),
-    imagingReportId: row.imaging_report_id ? String(row.imaging_report_id) : null,
-    labResultId: row.lab_result_id ? String(row.lab_result_id) : null,
-    description: row.description ? String(row.description) : null,
-    recordedBy: row.recorded_by ? String(row.recorded_by) : null,
-    occurredAt: row.occurred_at ? String(row.occurred_at) : null,
+    imagingReportId: row.imaging_report_id ? toText(row.imaging_report_id) : null,
+    labResultId: row.lab_result_id ? toText(row.lab_result_id) : null,
+    description: row.description ? toText(row.description) : null,
+    recordedBy: row.recorded_by ? toText(row.recorded_by) : null,
+    occurredAt: row.occurred_at ? toText(row.occurred_at) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -386,7 +387,7 @@ export async function createOutcome(input: VteOutcomeInput, tx: DbExecutor): Pro
       ${input.occurredAt ?? null}
     )
     RETURNING ${tx.unsafe(OUTCOME_COLS)}`;
-  return mapOutcome(rows[0] as Record<string, unknown>);
+  return mapOutcome(rows[0]);
 }
 
 export async function listOutcomes(

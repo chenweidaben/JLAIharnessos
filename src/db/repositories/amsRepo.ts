@@ -15,6 +15,7 @@
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import type { AbxLevel, PharmClass } from '../../medical-tools/ams/amsRules.js';
+import { toText } from '../rowText.js';
 
 /** 12 位十六进制（48 位加密随机）后缀：避免编号在高并发/重跑下命中唯一约束。 */
 function randomSuffix(): string {
@@ -49,12 +50,12 @@ function mapCatalog(row: Record<string, unknown>): AntibioticCatalog {
     id: String(row.id),
     drugId: String(row.drug_id),
     drugCode: String(row.drug_code),
-    genericName: row.generic_name ? String(row.generic_name) : null,
+    genericName: row.generic_name ? toText(row.generic_name) : null,
     atcLevel: row.atc_level as AbxLevel,
     pharmClass: row.pharm_class as PharmClass,
     ddd: Number(row.ddd),
     dddUnit: String(row.ddd_unit),
-    defaultRoute: row.default_route ? String(row.default_route) : null,
+    defaultRoute: row.default_route ? toText(row.default_route) : null,
   };
 }
 
@@ -81,7 +82,7 @@ export async function getCatalogByDrugId(
     FROM clinical.antibiotic_catalog ac
     JOIN clinical.drug_catalog dc ON dc.id = ac.drug_id
     WHERE ac.drug_id = ${drugId}`;
-  return rows.length > 0 ? mapCatalog(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapCatalog(rows[0]) : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -110,14 +111,14 @@ function mapGrant(row: Record<string, unknown>): PrescriberGrant {
   return {
     id: String(row.id),
     prescriberId: String(row.prescriber_id),
-    prescriberName: row.prescriber_name ? String(row.prescriber_name) : null,
-    prescriberUsername: row.prescriber_username ? String(row.prescriber_username) : null,
-    prescriberTitle: row.prescriber_title ? String(row.prescriber_title) : null,
+    prescriberName: row.prescriber_name ? toText(row.prescriber_name) : null,
+    prescriberUsername: row.prescriber_username ? toText(row.prescriber_username) : null,
+    prescriberTitle: row.prescriber_title ? toText(row.prescriber_title) : null,
     maxLevel: row.max_level as AbxLevel,
-    grantedBy: row.granted_by ? String(row.granted_by) : null,
+    grantedBy: row.granted_by ? toText(row.granted_by) : null,
     status: row.status as 'active' | 'revoked',
     grantedAt: String(row.granted_at),
-    expiresAt: row.expires_at ? String(row.expires_at) : null,
+    expiresAt: row.expires_at ? toText(row.expires_at) : null,
   };
 }
 
@@ -130,7 +131,7 @@ export async function getGrantByPrescriber(
     FROM clinical.ams_prescriber_grants g
     LEFT JOIN iam.users u ON u.id = g.prescriber_id
     WHERE g.prescriber_id = ${prescriberId}`;
-  return rows.length > 0 ? mapGrant(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapGrant(rows[0]) : null;
 }
 
 export async function listGrants(sql?: DbExecutor): Promise<PrescriberGrant[]> {
@@ -207,19 +208,19 @@ function mapSpecial(row: Record<string, unknown>): SpecialApproval {
     approvalNo: String(row.approval_no),
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
-    patientName: row.patient_name ? String(row.patient_name) : null,
+    patientName: row.patient_name ? toText(row.patient_name) : null,
     prescriberId: String(row.prescriber_id),
     drugId: String(row.drug_id),
-    drugName: row.drug_name ? String(row.drug_name) : null,
-    indication: row.indication ? String(row.indication) : null,
-    consultationOpinion: row.consultation_opinion ? String(row.consultation_opinion) : null,
-    consultantId: row.consultant_id ? String(row.consultant_id) : null,
-    approverId: row.approver_id ? String(row.approver_id) : null,
+    drugName: row.drug_name ? toText(row.drug_name) : null,
+    indication: row.indication ? toText(row.indication) : null,
+    consultationOpinion: row.consultation_opinion ? toText(row.consultation_opinion) : null,
+    consultantId: row.consultant_id ? toText(row.consultant_id) : null,
+    approverId: row.approver_id ? toText(row.approver_id) : null,
     status: row.status as 'pending' | 'approved' | 'rejected',
-    orderId: row.order_id ? String(row.order_id) : null,
-    rejectReason: row.reject_reason ? String(row.reject_reason) : null,
+    orderId: row.order_id ? toText(row.order_id) : null,
+    rejectReason: row.reject_reason ? toText(row.reject_reason) : null,
     createdAt: String(row.created_at),
-    approvedAt: row.approved_at ? String(row.approved_at) : null,
+    approvedAt: row.approved_at ? toText(row.approved_at) : null,
   };
 }
 
@@ -265,7 +266,7 @@ export async function getSpecialById(
     SELECT ${db.unsafe(SPECIAL_COLS)}
     ${db.unsafe(SPECIAL_FROM)}
     WHERE sa.id = ${id}`;
-  return rows.length > 0 ? mapSpecial(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSpecial(rows[0]) : null;
 }
 
 /** 审批通过（CAS pending -> approved），绑定 approver 与后续医嘱。 */
@@ -318,7 +319,7 @@ export async function getApprovedSpecial(
     ${db.unsafe(SPECIAL_FROM)}
     WHERE sa.visit_id = ${visitId} AND sa.drug_id = ${drugId} AND sa.status = 'approved'
     ORDER BY sa.approved_at DESC NULLS LAST, sa.created_at DESC LIMIT 1`;
-  return rows.length > 0 ? mapSpecial(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapSpecial(rows[0]) : null;
 }
 
 /** 特殊审批列表（可按状态过滤）。 */
@@ -368,17 +369,17 @@ function mapReview(row: Record<string, unknown>): AmsReview {
     id: String(row.id),
     reviewNo: String(row.review_no),
     reviewType: row.review_type as ReviewType,
-    targetId: row.target_id ? String(row.target_id) : null,
+    targetId: row.target_id ? toText(row.target_id) : null,
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     result: row.result as 'rational' | 'irrational',
     issueTypes: (row.issue_types as string[]) ?? [],
     detail: (row.detail as Record<string, unknown>) ?? {},
     status: row.status as 'pending_review' | 'signed' | 'returned',
-    reviewerId: row.reviewer_id ? String(row.reviewer_id) : null,
-    reviewNote: row.review_note ? String(row.review_note) : null,
+    reviewerId: row.reviewer_id ? toText(row.reviewer_id) : null,
+    reviewNote: row.review_note ? toText(row.review_note) : null,
     createdAt: String(row.created_at),
-    reviewedAt: row.reviewed_at ? String(row.reviewed_at) : null,
+    reviewedAt: row.reviewed_at ? toText(row.reviewed_at) : null,
   };
 }
 
@@ -410,7 +411,7 @@ export async function createReview(
       ${tx.json(toJson(input.detail ?? {}))}
     )
     RETURNING ${tx.unsafe(REVIEW_COLS)}`;
-  return mapReview(rows[0] as Record<string, unknown>);
+  return mapReview(rows[0]);
 }
 
 export async function getReviewById(
@@ -418,7 +419,7 @@ export async function getReviewById(
 ): Promise<AmsReview | null> {
   const db = sql ?? getDb();
   const rows = await db`SELECT ${db.unsafe(REVIEW_COLS)} FROM clinical.ams_reviews WHERE id = ${id}`;
-  return rows.length > 0 ? mapReview(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapReview(rows[0]) : null;
 }
 
 export async function listReviews(
@@ -444,7 +445,7 @@ export async function signReview(
         reviewed_at = now(), updated_at = now()
     WHERE id = ${id} AND status = 'pending_review'
     RETURNING ${tx.unsafe(REVIEW_COLS)}`;
-  return rows.length > 0 ? mapReview(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapReview(rows[0]) : null;
 }
 
 /** 退回（CAS pending_review -> returned）。 */
@@ -457,7 +458,7 @@ export async function returnReview(
         reviewed_at = now(), updated_at = now()
     WHERE id = ${id} AND status = 'pending_review'
     RETURNING ${tx.unsafe(REVIEW_COLS)}`;
-  return rows.length > 0 ? mapReview(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapReview(rows[0]) : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -500,13 +501,13 @@ function mapUsage(row: Record<string, unknown>, ddds: number): AmsUsageRecord {
     visitId: String(row.visit_id),
     patientId: String(row.patient_id),
     drugId: String(row.drug_id),
-    drugName: row.drug_name ? String(row.drug_name) : null,
-    orderId: row.order_id ? String(row.order_id) : null,
+    drugName: row.drug_name ? toText(row.drug_name) : null,
+    orderId: row.order_id ? toText(row.order_id) : null,
     purpose: row.purpose as 'prophylactic' | 'therapeutic',
     dose: Number(row.dose),
     doseUnit: String(row.dose_unit),
-    frequency: row.frequency ? String(row.frequency) : null,
-    route: row.route ? String(row.route) : null,
+    frequency: row.frequency ? toText(row.frequency) : null,
+    route: row.route ? toText(row.route) : null,
     usageDays: Number(row.usage_days),
     totalAmount: row.total_amount !== null && row.total_amount !== undefined ? Number(row.total_amount) : null,
     cultureSent: Boolean(row.culture_sent),
@@ -555,7 +556,7 @@ export async function createUsage(
 export async function listUsage(
   filter: { visitId?: string; drugId?: string } = {},
   sql?: DbExecutor,
-): Promise<Array<AmsUsageRecord & { ddd: number }>> {
+): Promise<(AmsUsageRecord & { ddd: number })[]> {
   const db = sql ?? getDb();
   // 动态条件：仅在过滤值存在时加入，避免空字符串被强制转换为 uuid 绑定失败。
   type Fragment = ReturnType<DbExecutor>;

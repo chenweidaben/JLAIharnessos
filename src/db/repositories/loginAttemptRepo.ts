@@ -9,6 +9,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /** 登录日志视图 */
 export interface LoginAttemptView {
@@ -64,13 +65,13 @@ function mapRow(row: Record<string, unknown>): LoginAttemptView {
   return {
     id: Number(row.id),
     username: String(row.username),
-    userId: row.user_id != null ? String(row.user_id) : null,
-    realName: row.real_name != null ? String(row.real_name) : null,
-    department: row.department != null ? String(row.department) : null,
+    userId: row.user_id != null ? toText(row.user_id) : null,
+    realName: row.real_name != null ? toText(row.real_name) : null,
+    department: row.department != null ? toText(row.department) : null,
     success: Boolean(row.success),
-    failReason: row.fail_reason != null ? String(row.fail_reason) : null,
-    ip: row.ip != null ? String(row.ip) : null,
-    userAgent: row.user_agent != null ? String(row.user_agent) : null,
+    failReason: row.fail_reason != null ? toText(row.fail_reason) : null,
+    ip: row.ip != null ? toText(row.ip) : null,
+    userAgent: row.user_agent != null ? toText(row.user_agent) : null,
     online: Boolean(row.online),
     createdAt: String(row.created_at),
   };

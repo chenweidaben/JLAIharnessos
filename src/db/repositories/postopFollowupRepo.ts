@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Followup {
   id: string; visitId: string; timepoint: string; dueAt: string;
@@ -13,9 +14,9 @@ const COLS = `id, visit_id, timepoint, due_at, completed_at, pain_score, work_or
 function map(r: Record<string, unknown>): Followup {
   return {
     id: String(r.id), visitId: String(r.visit_id), timepoint: String(r.timepoint),
-    dueAt: String(r.due_at), completedAt: r.completed_at ? String(r.completed_at) : null,
+    dueAt: String(r.due_at), completedAt: r.completed_at ? toText(r.completed_at) : null,
     painScore: r.pain_score == null ? null : Number(r.pain_score),
-    workOrderId: r.work_order_id ? String(r.work_order_id) : null,
+    workOrderId: r.work_order_id ? toText(r.work_order_id) : null,
     createdAt: String(r.created_at),
   };
 }

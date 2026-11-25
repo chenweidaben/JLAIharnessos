@@ -8,6 +8,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -84,24 +85,24 @@ function mapOrder(r: Record<string, unknown>): ReferralOrder {
     id: String(r.id),
     referralNo: String(r.referral_no),
     direction: r.direction as ReferralDirection,
-    patientId: r.patient_id ? String(r.patient_id) : null,
-    profileId: r.profile_id ? String(r.profile_id) : null,
-    patientName: r.patient_name ? String(r.patient_name) : null,
-    gender: r.gender ? String(r.gender) : null,
-    birthDate: r.birth_date ? String(r.birth_date) : null,
+    patientId: r.patient_id ? toText(r.patient_id) : null,
+    profileId: r.profile_id ? toText(r.profile_id) : null,
+    patientName: r.patient_name ? toText(r.patient_name) : null,
+    gender: r.gender ? toText(r.gender) : null,
+    birthDate: r.birth_date ? toText(r.birth_date) : null,
     sourceOrg: String(r.source_org),
-    sourceDept: r.source_dept ? String(r.source_dept) : null,
-    sourceDoctor: r.source_doctor ? String(r.source_doctor) : null,
+    sourceDept: r.source_dept ? toText(r.source_dept) : null,
+    sourceDoctor: r.source_doctor ? toText(r.source_doctor) : null,
     targetOrg: String(r.target_org),
-    targetDept: r.target_dept ? String(r.target_dept) : null,
+    targetDept: r.target_dept ? toText(r.target_dept) : null,
     reason: String(r.reason),
     urgency: r.urgency as 'normal' | 'urgent',
     status: r.status as ReferralStatus,
-    encounterId: r.encounter_id ? String(r.encounter_id) : null,
-    acceptedBy: r.accepted_by ? String(r.accepted_by) : null,
-    acceptedAt: r.accepted_at ? String(r.accepted_at) : null,
-    rejectedReason: r.rejected_reason ? String(r.rejected_reason) : null,
-    createdBy: r.created_by ? String(r.created_by) : null,
+    encounterId: r.encounter_id ? toText(r.encounter_id) : null,
+    acceptedBy: r.accepted_by ? toText(r.accepted_by) : null,
+    acceptedAt: r.accepted_at ? toText(r.accepted_at) : null,
+    rejectedReason: r.rejected_reason ? toText(r.rejected_reason) : null,
+    createdBy: r.created_by ? toText(r.created_by) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
   };
@@ -113,9 +114,9 @@ function mapDoc(r: Record<string, unknown>): ReferralDocument {
     referralId: String(r.referral_id),
     docType: r.doc_type as ReferralDocType,
     title: String(r.title),
-    contentRef: r.content_ref ? String(r.content_ref) : null,
-    contentText: r.content_text ? String(r.content_text) : null,
-    sourceOrg: r.source_org ? String(r.source_org) : null,
+    contentRef: r.content_ref ? toText(r.content_ref) : null,
+    contentText: r.content_text ? toText(r.content_text) : null,
+    sourceOrg: r.source_org ? toText(r.source_org) : null,
     receivedAt: String(r.received_at),
     createdAt: String(r.created_at),
   };
@@ -178,7 +179,7 @@ export async function insertReferral(
     )
     RETURNING ${tx.unsafe(ORDER_COLS)}
   `;
-  return mapOrder(rows[0] as Record<string, unknown>);
+  return mapOrder(rows[0]);
 }
 
 /** 按 id 查找转诊单。 */
@@ -190,7 +191,7 @@ export async function getReferralById(
   const rows = await ex`
     SELECT ${ex.unsafe(ORDER_COLS)} FROM clinical.referral_orders WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapOrder(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapOrder(rows[0]) : null;
 }
 
 /** 按 id 查找并加行锁。 */
@@ -202,7 +203,7 @@ export async function lockReferral(
     SELECT ${tx.unsafe(ORDER_COLS)} FROM clinical.referral_orders
      WHERE id = ${id} FOR UPDATE
   `;
-  return rows.length > 0 ? mapOrder(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapOrder(rows[0]) : null;
 }
 
 /** 列出转诊单（可按方向/状态过滤，最新在前）。 */
@@ -300,7 +301,7 @@ export async function insertReferralDocument(
     )
     RETURNING ${tx.unsafe(DOC_COLS)}
   `;
-  return mapDoc(rows[0] as Record<string, unknown>);
+  return mapDoc(rows[0]);
 }
 
 /** 列出转诊单的全部随附资料。 */

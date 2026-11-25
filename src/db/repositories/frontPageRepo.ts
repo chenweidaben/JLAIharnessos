@@ -15,6 +15,7 @@
 import { createHash } from 'node:crypto';
 import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
+import { toText } from '../rowText.js';
 
 export type FrontPageStatus = 'draft' | 'coding' | 'qc' | 'archived';
 export type ReviewDecision = 'pass' | 'return';
@@ -38,8 +39,8 @@ export interface FrontPage {
   bedNo: string | null;
   primaryDiagnosis: string | null;
   primaryDiagnosisCode: string | null;
-  secondaryDiagnoses: Array<Record<string, unknown>>;
-  operations: Array<Record<string, unknown>>;
+  secondaryDiagnoses: Record<string, unknown>[];
+  operations: Record<string, unknown>[];
   totalFee: string | null;
   codedBy: string | null;
   codedAt: string | null;
@@ -72,12 +73,12 @@ const PAGE_COLS = `
   archived_by, archived_at, created_at, updated_at
 `;
 
-function asArray(v: unknown): Array<Record<string, unknown>> {
-  if (Array.isArray(v)) return v as Array<Record<string, unknown>>;
+function asArray(v: unknown): Record<string, unknown>[] {
+  if (Array.isArray(v)) return v as Record<string, unknown>[];
   if (typeof v === 'string' && v.trim()) {
     try {
       const p: unknown = JSON.parse(v);
-      return Array.isArray(p) ? (p as Array<Record<string, unknown>>) : [];
+      return Array.isArray(p) ? (p as Record<string, unknown>[]) : [];
     } catch {
       return [];
     }
@@ -93,21 +94,21 @@ function mapPage(row: Record<string, unknown>): FrontPage {
     department: String(row.department),
     status: row.status as FrontPageStatus,
     version: Number(row.version),
-    admitAt: row.admit_at ? String(row.admit_at) : null,
-    dischargeAt: row.discharge_at ? String(row.discharge_at) : null,
-    ward: row.ward ? String(row.ward) : null,
-    bedNo: row.bed_no ? String(row.bed_no) : null,
-    primaryDiagnosis: row.primary_diagnosis ? String(row.primary_diagnosis) : null,
-    primaryDiagnosisCode: row.primary_diagnosis_code ? String(row.primary_diagnosis_code) : null,
+    admitAt: row.admit_at ? toText(row.admit_at) : null,
+    dischargeAt: row.discharge_at ? toText(row.discharge_at) : null,
+    ward: row.ward ? toText(row.ward) : null,
+    bedNo: row.bed_no ? toText(row.bed_no) : null,
+    primaryDiagnosis: row.primary_diagnosis ? toText(row.primary_diagnosis) : null,
+    primaryDiagnosisCode: row.primary_diagnosis_code ? toText(row.primary_diagnosis_code) : null,
     secondaryDiagnoses: asArray(row.secondary_diagnoses),
     operations: asArray(row.operations),
-    totalFee: row.total_fee != null ? String(row.total_fee) : null,
-    codedBy: row.coded_by ? String(row.coded_by) : null,
-    codedAt: row.coded_at ? String(row.coded_at) : null,
+    totalFee: row.total_fee != null ? toText(row.total_fee) : null,
+    codedBy: row.coded_by ? toText(row.coded_by) : null,
+    codedAt: row.coded_at ? toText(row.coded_at) : null,
     defects: asArray(row.defects) as unknown as FrontPageDefect[],
     qualityScore: row.quality_score != null ? Number(row.quality_score) : null,
-    archivedBy: row.archived_by ? String(row.archived_by) : null,
-    archivedAt: row.archived_at ? String(row.archived_at) : null,
+    archivedBy: row.archived_by ? toText(row.archived_by) : null,
+    archivedAt: row.archived_at ? toText(row.archived_at) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -125,9 +126,9 @@ function mapReview(row: Record<string, unknown>): FrontPageReview {
     reviewerId: String(row.reviewer_id),
     decision: row.decision as ReviewDecision,
     defects: asArray(row.defects) as unknown as FrontPageDefect[],
-    comment: row.comment ? String(row.comment) : null,
+    comment: row.comment ? toText(row.comment) : null,
     signatureAt: String(row.signature_at),
-    prevHash: row.prev_hash ? String(row.prev_hash) : null,
+    prevHash: row.prev_hash ? toText(row.prev_hash) : null,
     curHash: String(row.cur_hash),
     createdAt: String(row.created_at),
   };
@@ -144,8 +145,8 @@ export interface FrontPageCreateInput {
   ward?: string | null;
   bedNo?: string | null;
   primaryDiagnosis?: string | null;
-  secondaryDiagnoses?: Array<Record<string, unknown>>;
-  operations?: Array<Record<string, unknown>>;
+  secondaryDiagnoses?: Record<string, unknown>[];
+  operations?: Record<string, unknown>[];
   totalFee?: number | string | null;
   defects?: FrontPageDefect[];
 }
@@ -177,14 +178,14 @@ export async function upsertFrontPage(
     RETURNING ${tx.unsafe(PAGE_COLS)}
   `;
   if (inserted.length > 0) {
-    return { page: mapPage(inserted[0] as Record<string, unknown>), created: true };
+    return { page: mapPage(inserted[0]), created: true };
   }
   // 并发/重复汇聚：回查既有首页（不覆盖编码/质控进度）
   const existing = await tx`
     SELECT ${tx.unsafe(PAGE_COLS)} FROM clinical.medical_record_front_pages
     WHERE visit_id = ${input.visitId}
   `;
-  return { page: mapPage(existing[0] as Record<string, unknown>), created: false };
+  return { page: mapPage(existing[0]), created: false };
 }
 
 /* ------------------------------- 查询 -------------------------------- */
@@ -194,7 +195,7 @@ export async function getFrontPageById(id: string, sql?: DbExecutor): Promise<Fr
   const rows = await db`
     SELECT ${db.unsafe(PAGE_COLS)} FROM clinical.medical_record_front_pages WHERE id = ${id}
   `;
-  return rows.length > 0 ? mapPage(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPage(rows[0]) : null;
 }
 
 export async function getFrontPageByVisit(visitId: string, sql?: DbExecutor): Promise<FrontPage | null> {
@@ -202,7 +203,7 @@ export async function getFrontPageByVisit(visitId: string, sql?: DbExecutor): Pr
   const rows = await db`
     SELECT ${db.unsafe(PAGE_COLS)} FROM clinical.medical_record_front_pages WHERE visit_id = ${visitId}
   `;
-  return rows.length > 0 ? mapPage(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? mapPage(rows[0]) : null;
 }
 
 export interface FrontPageQueueRow {
@@ -245,7 +246,7 @@ export async function listFrontPages(
     department: String(r.department),
     status: r.status as FrontPageStatus,
     version: Number(r.version),
-    primaryDiagnosis: r.primary_diagnosis ? String(r.primary_diagnosis) : null,
+    primaryDiagnosis: r.primary_diagnosis ? toText(r.primary_diagnosis) : null,
     updatedAt: String(r.updated_at),
   }));
 }
@@ -255,8 +256,8 @@ export async function listFrontPages(
 export interface TransitionPatch {
   primaryDiagnosis?: string | null;
   primaryDiagnosisCode?: string | null;
-  secondaryDiagnoses?: Array<Record<string, unknown>>;
-  operations?: Array<Record<string, unknown>>;
+  secondaryDiagnoses?: Record<string, unknown>[];
+  operations?: Record<string, unknown>[];
   totalFee?: number | string | null;
   defects?: FrontPageDefect[];
   qualityScore?: number | null;
@@ -285,7 +286,7 @@ export async function transitionFrontPage(
     WHERE id = ${id} FOR UPDATE
   `;
   if (locked.length === 0) return null;
-  const current = mapPage(locked[0] as Record<string, unknown>);
+  const current = mapPage(locked[0]);
   if (current.version !== expectedVersion) return null;
   if (!fromStatuses.includes(current.status)) return null;
 
@@ -375,7 +376,7 @@ export async function insertFrontPageReview(
     )
     RETURNING ${tx.unsafe(REVIEW_COLS)}
   `;
-  return mapReview(rows[0] as Record<string, unknown>);
+  return mapReview(rows[0]);
 }
 
 /** 按首页列全部质控签名留痕（时间正序，还原签名链）。 */

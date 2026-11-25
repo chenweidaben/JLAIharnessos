@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 export interface Anticoag {
   id: string; visitId: string; drug: string; startDate: string;
@@ -14,9 +15,9 @@ function rmap(r: Record<string, unknown>): Anticoag {
   return {
     id: String(r.id), visitId: String(r.visit_id), drug: String(r.drug),
     startDate: new Date(String(r.start_date)).toISOString().slice(0, 10),
-    endDate: r.end_date != null ? new Date(String(r.end_date)).toISOString().slice(0, 10) : null,
+    endDate: r.end_date != null ? new Date(toText(r.end_date)).toISOString().slice(0, 10) : null,
     plannedDays: Number(r.planned_days), bleedingScore: Number(r.bleeding_score),
-    active: Boolean(r.active), note: r.note != null ? String(r.note) : null,
+    active: Boolean(r.active), note: r.note != null ? toText(r.note) : null,
     createdBy: String(r.created_by), createdAt: String(r.created_at),
   };
 }

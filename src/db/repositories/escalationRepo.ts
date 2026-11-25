@@ -3,6 +3,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, type DbExecutor } from '../pool.js';
+import { toText } from '../rowText.js';
 
 const db = getDb();
 
@@ -13,7 +14,7 @@ export interface EscalatedTask {
 function map(r: Record<string, unknown>): EscalatedTask {
   return {
     id: String(r.id),
-    parentTaskId: r.parent_task_id == null ? null : String(r.parent_task_id),
+    parentTaskId: r.parent_task_id == null ? null : toText(r.parent_task_id),
     escalationLevel: Number(r.escalation_level),
     title: String(r.title), assigneeId: String(r.assignee_id), status: String(r.status),
   };
@@ -26,7 +27,7 @@ export async function getLatestEscalation(parentTaskId: string, tx: DbExecutor =
     FROM clinical.clinical_improvement_tasks
     WHERE parent_task_id=${parentTaskId}
     ORDER BY escalation_level DESC LIMIT 1`;
-  return rows.length > 0 ? map(rows[0] as Record<string, unknown>) : null;
+  return rows.length > 0 ? map(rows[0]) : null;
 }
 
 /** 创建升级单。 */
@@ -38,7 +39,7 @@ export async function createEscalatedTask(
     INSERT INTO clinical.clinical_improvement_tasks (source, visit_id, group_code, category, title, finding, assignee_id, escalation_level, parent_task_id, created_by)
     VALUES (${input.source ?? 'drg_attribution'}, NULL, NULL, NULL, ${input.title}, ${input.finding}, ${input.assigneeId}, ${input.escalationLevel}, ${input.parentTaskId}, ${input.createdBy})
     RETURNING id, parent_task_id, escalation_level, title, assignee_id, status`;
-  return map(rows[0] as Record<string, unknown>);
+  return map(rows[0]);
 }
 
 /** 升级链：取 parent + 所有子单。 */

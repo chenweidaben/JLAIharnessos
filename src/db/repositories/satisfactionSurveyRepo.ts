@@ -4,6 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb, withTx } from '../../db/pool.js';
+import { toText } from '../rowText.js';
 
 export interface SurveyRow {
   id: string;
@@ -34,15 +35,15 @@ export interface SubmitInput {
 function mapRow(r: Record<string, unknown>): SurveyRow {
   return {
     id: String(r.id),
-    visitId: r.visit_id ? String(r.visit_id) : '',
+    visitId: r.visit_id ? toText(r.visit_id) : '',
     patientId: String(r.patient_id),
     medicalScore: Number(r.medical_score),
     nursingScore: r.nursing_score == null ? null : Number(r.nursing_score),
     logisticsScore: r.logistics_score == null ? null : Number(r.logistics_score),
     environmentScore: Number(r.environment_score),
-    comment: r.comment == null ? null : String(r.comment),
-    department: r.department ? String(r.department) : '',
-    submittedBy: r.submitted_by ? String(r.submitted_by) : '',
+    comment: r.comment == null ? null : toText(r.comment),
+    department: r.department ? toText(r.department) : '',
+    submittedBy: r.submitted_by ? toText(r.submitted_by) : '',
     createdAt: String(r.created_at),
   };
 }
@@ -63,7 +64,7 @@ export async function submitSurvey(input: SubmitInput): Promise<SurveyRow> {
         ${input.medicalScore}, ${input.nursingScore}, ${input.environmentScore}, ${input.logisticsScore}, ${input.medicalScore},
         ${input.nursingScore}, ${input.logisticsScore}, ${input.department}, ${input.comment ?? null}, ${input.submittedBy}
       ) RETURNING ${q.unsafe(COLS)}`;
-    return mapRow(rows[0] as Record<string, unknown>);
+    return mapRow(rows[0]);
   });
 }
 
