@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Layout, List, Spin, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -32,7 +33,7 @@ export default function EmrClinicalPathQcPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-clinical-path-qc?patientId=P001", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

@@ -16,7 +16,7 @@ export const isDemoMode: boolean = import.meta.env.VITE_DEMO_MODE === '1';
 /** BFF REST 基址：开发态由 Vite 代理到 8080；生产为完整域名 */
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api/v1';
 
-/** WebSocket 基址（/ws/chat，连接时自动附加 ?token=） */
+/** WebSocket 基址（/ws/chat，token 经 Sec-WebSocket-Protocol 子协议传递，不拼 URL） */
 export const WS_URL: string =
   import.meta.env.VITE_WS_URL ?? 'ws://127.0.0.1:5173/ws/chat';
 

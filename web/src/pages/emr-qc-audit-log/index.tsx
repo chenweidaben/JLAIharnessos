@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, Space, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -30,7 +31,7 @@ export default function EmrQcAuditLogPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = noteIdFilter
           ? `/api/v1/emr-qc-audit-log?noteId=${noteIdFilter}`
           : "/api/v1/emr-qc-audit-log";

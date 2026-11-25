@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Card, Col, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
 import type { DefectByDeptItemV14, DefectByTypeV14 } from "@/bff/aggregators/emrDefectStatsV14Aggregator";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -22,7 +23,7 @@ export default function EmrDefectStatsPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-defect-stats", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

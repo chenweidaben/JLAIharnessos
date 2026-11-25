@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, List, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -46,7 +47,7 @@ export default function EmrEventTimelinePage() {
   useEffect(() => {
     const fetchTimeline = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-event-timeline", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -64,7 +65,7 @@ export default function EmrEventTimelinePage() {
   const doBuild = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-event-timeline", {
         method: "POST",
         headers: {

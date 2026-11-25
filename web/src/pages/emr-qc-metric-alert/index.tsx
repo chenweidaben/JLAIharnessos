@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Layout, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -31,7 +32,7 @@ export default function EmrQcMetricAlertPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-metric-alert", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

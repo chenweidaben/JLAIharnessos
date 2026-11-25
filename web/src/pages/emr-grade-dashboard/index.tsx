@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Badge, Card, Col, Layout, Progress, Row, Spin, Statistic, Tag, Typography } from "antd";
 import type { GradeProgressItemV14 } from "@/bff/aggregators/emrGradeDashboardV14Aggregator";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -27,7 +28,7 @@ export default function EmrGradeDashboardPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-grade-dashboard", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

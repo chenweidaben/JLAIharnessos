@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Card, Col, Layout, Row, Statistic, Tag, Typography, message } from "antd";
 import { BugOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -25,7 +26,7 @@ export default function EmrQcStatDashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-stat-dashboard", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

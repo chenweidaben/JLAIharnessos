@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, Select, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -39,7 +40,7 @@ export default function EmrNlpTimeRelationPage() {
   useEffect(() => {
     const fetchNlp = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-nlp-time-relation", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -57,7 +58,7 @@ export default function EmrNlpTimeRelationPage() {
   const doExtract = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-nlp-time-relation", {
         method: "POST",
         headers: {

@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, List, message, Spin, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -27,7 +28,7 @@ export default function EmrTermDictPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-term-dict", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -50,7 +51,7 @@ export default function EmrTermDictPage() {
       return;
     }
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-term-dict/suggest", {
         method: "POST",
         headers: {

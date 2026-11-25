@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Form, Input, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -28,7 +29,7 @@ export default function EmrQcTrainingCoursePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-training-course", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -50,7 +51,7 @@ export default function EmrQcTrainingCoursePage() {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-training-course", {
         method: "POST",
         headers: {

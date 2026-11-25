@@ -53,13 +53,16 @@ function getJwtSecret(): string {
     throw new Error('[security] 生产环境必须通过 JWT_SECRET 环境变量注入 JWT 密钥');
   }
   console.warn('[security] JWT_SECRET 未设置，使用开发态默认密钥（仅限本地开发）');
-  return 'dev-only-insecure-jwt-secret-change-me';
+  // 与 tests/integration/* 的默认密钥统一，避免本地起服务后集成测试验签失败
+  return 'local-dev-jwt-secret-jlmedaios-2026';
 }
 
 /** 生成 JWT 唯一标识（jti），供会话管理与令牌吊销使用 */
 export function newJti(): string {
   return crypto.randomUUID();
 }
+
+const JWT_ISSUER = 'jianlan-bff';
 
 /**
  * 签发 JWT（开发/登录路由用）。
@@ -73,7 +76,7 @@ export function signJwt(
   const now = Math.floor(Date.now() / 1000);
   const jti = payload.jti ?? newJti();
   const body = b64urlEncode(
-    JSON.stringify({ ...payload, jti, iss: 'jianlan-bff', nbf: now, exp: now + expiresInSec }),
+    JSON.stringify({ ...payload, jti, iss: JWT_ISSUER, nbf: now, exp: now + expiresInSec }),
   );
   const data = `${header}.${body}`;
   const sig = crypto.createHmac('sha256', getJwtSecret()).update(data).digest();
@@ -110,6 +113,7 @@ export function verifyJwt(token: string): JwtPayload | null {
   }
 
   const now = Math.floor(Date.now() / 1000);
+  if (payload.iss !== JWT_ISSUER) return null;
   if (payload.nbf && now < payload.nbf) return null;
   if (payload.exp && now >= payload.exp) return null;
   return payload;
@@ -298,7 +302,7 @@ function matchReportGroupWildcard(userPerms: string[], code: string): boolean {
   for (const p of userPerms) {
     if (p === 'report:*') return true;
     const domains = REPORT_GROUP_DOMAINS[p];
-    if (domains && domains.has(domainKey)) return true;
+    if (domains?.has(domainKey)) return true;
   }
   return false;
 }
@@ -318,7 +322,7 @@ export function requirePermissionCode(c: Ctx, code: string): Response | null {
     return json(fail(ErrorCode.UNAUTHORIZED, '未登录或登录已过期', c.traceId), 401);
   }
   if (c.user.roles.includes('admin')) return null;
-  if (c.user.permissions && c.user.permissions.includes(code)) return null;
+  if (c.user.permissions?.includes(code)) return null;
   // v5.0试点扩展（P1权限码收敛）：分组码通配（仅 :read）
   if (c.user.permissions && matchReportGroupWildcard(c.user.permissions, code)) return null;
   return json(
@@ -342,7 +346,7 @@ export function newCtx(
     rawBody,
     body: async () => {
       // 优先使用预读取的原始 body（保证幂等指纹与 handler 读取一致）
-      const text = rawBody !== null ? rawBody : await req.text();
+      const text = rawBody ?? await req.text();
       try {
         return JSON.parse(text) as never;
       } catch {

@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, Select, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -29,7 +30,7 @@ export default function EmrDataDictPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const params = new URLSearchParams();
         if (keyword) params.set("keyword", keyword);
         if (category) params.set("category", category);

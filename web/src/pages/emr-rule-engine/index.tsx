@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, message, Space, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -24,7 +25,7 @@ export default function EmrRuleEnginePage() {
 
   const handleExecute = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-rule-engine/execute", {
         method: "POST",
         headers: {

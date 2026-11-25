@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { Button, Card, Layout, List, Statistic, Tag, Typography, message } from "antd";
 import { Input } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -40,7 +41,7 @@ export default function EmrQcAiSimilarRecordDetailPage() {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-ai-similar-record-detail", {
         method: "POST",
         headers: {

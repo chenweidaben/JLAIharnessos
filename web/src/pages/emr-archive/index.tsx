@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, message, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -27,7 +28,7 @@ export default function EmrArchivePage() {
 
   const fetchList = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-archive", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
@@ -48,7 +49,7 @@ export default function EmrArchivePage() {
 
   const handleSeal = async (record: ArchiveItem) => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch(`/api/v1/emr-archive/${record.recordId}/seal`, {
         method: "POST",
         headers: { Authorization: token ? `Bearer ${token}` : "" },

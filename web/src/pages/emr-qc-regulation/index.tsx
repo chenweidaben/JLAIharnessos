@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Input, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -31,7 +32,7 @@ export default function EmrQcRegulationPage() {
 
   const doSearch = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const url = keyword
         ? `/api/v1/emr-qc-regulation?keyword=${encodeURIComponent(keyword)}`
         : "/api/v1/emr-qc-regulation";

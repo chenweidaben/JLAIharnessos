@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Checkbox, Input, InputNumber, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -46,7 +47,7 @@ export default function EmrQcRuleEditorPage() {
   useEffect(() => {
     const fetchEditor = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-rule-editor", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -64,7 +65,7 @@ export default function EmrQcRuleEditorPage() {
   const doValidate = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-rule-editor", {
         method: "POST",
         headers: {

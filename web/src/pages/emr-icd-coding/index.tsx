@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Input, Layout, List, message, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -27,7 +28,7 @@ export default function EmrIcdCodingPage() {
       return;
     }
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-icd-coding", {
         method: "POST",
         headers: {

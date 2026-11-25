@@ -37,10 +37,12 @@ export async function computeRequestHash(
 }
 
 function clientIp(ctx: Ctx): string {
-  return (
-    ctx.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    '127.0.0.1'
-  );
+  // 仅可信反代部署（TRUST_PROXY=1）时采信 XFF，防匿名作用域被伪造
+  if (process.env.TRUST_PROXY === '1') {
+    const fwd = ctx.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    if (fwd) return fwd;
+  }
+  return '127.0.0.1';
 }
 
 /** 构造 JSON 响应（重放与错误均复用统一信封/内容类型）。 */

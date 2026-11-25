@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Layout, Row, Select, Switch, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -44,7 +45,7 @@ export default function EmrAiWritingSuggestPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-writing-suggest", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -62,7 +63,7 @@ export default function EmrAiWritingSuggestPage() {
   const doSuggest = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-writing-suggest", {
         method: "POST",
         headers: {

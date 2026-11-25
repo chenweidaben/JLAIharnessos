@@ -12,7 +12,10 @@
  */
 
 import { type Ctx, ErrorCode, fail, json } from '../types';
-import { takeReadToken, takeWriteToken } from '../aggregators/loginLockoutAggregator.js';
+import {
+  takeReadTokenAsync,
+  takeWriteTokenAsync,
+} from '../aggregators/loginLockoutAggregator.js';
 
 const SKIP_PREFIXES = [
   '/health', '/ready', '/metrics', '/livez', '/version', '/ws/',
@@ -20,18 +23,30 @@ const SKIP_PREFIXES = [
 ];
 const SKIP_EXACT = new Set(['/api/v1/health', '/api/v1/system/health']);
 
+/**
+ * 取客户端 IP。
+ *
+ * 安全口径（防 XFF 伪造绕过限流/封禁）：
+ *  - 仅当部署在可信反代之后（TRUST_PROXY=1）时才采信 x-forwarded-for 首段；
+ *  - 否则一律使用 socket IP（c.clientIp），客户端自报的 XFF 头不可信——
+ *    攻击者只要轮换 X-Forwarded-For 即可让每个请求落入新限流桶，等同无限流。
+ */
 function ipOf(c: Ctx): string {
-  return (
-    c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    c.clientIp ||
-    '127.0.0.1'
-  );
+  const trustProxy = process.env.TRUST_PROXY === '1';
+  if (trustProxy) {
+    const fwd = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    if (fwd) return fwd;
+  }
+  return c.clientIp ?? '127.0.0.1';
 }
 
 /**
  * 在 server.ts 路由分发前调用。返回非 null Response 则直接 429 短路。
+ *
+ * 异步版：装配了分布式后端（initDistributedRateLimit）时走 Redis 固定窗口，
+ * 多副本部署计数一致；未装配或 Redis 故障时自动回落进程内实现。
  */
-export function globalRateLimit(c: Ctx): Response | null {
+export async function globalRateLimitAsync(c: Ctx): Promise<Response | null> {
   const url = new URL(c.req.url, 'http://internal');
   const path = url.pathname;
   if (!path.startsWith('/api/v1/')) return null;
@@ -52,7 +67,7 @@ export function globalRateLimit(c: Ctx): Response | null {
   if (isLocal && devMode && noProxy) return null;
 
   const method = c.req.method.toUpperCase();
-  const retrySec = method === 'GET' ? takeReadToken(ip) : takeWriteToken(ip);
+  const retrySec = method === 'GET' ? await takeReadTokenAsync(ip) : await takeWriteTokenAsync(ip);
   if (retrySec === null) return null;
 
   const res = json(fail(ErrorCode.RATE_LIMITED, `请求过于频繁，请 ${retrySec}s 后再试`), 429);

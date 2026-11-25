@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, List, Select, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -38,7 +39,7 @@ export default function EmrTemplateRecommendPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-template-recommend", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -56,7 +57,7 @@ export default function EmrTemplateRecommendPage() {
   const doRecommend = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-template-recommend", {
         method: "POST",
         headers: {

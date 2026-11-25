@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Input, Layout, Select, Statistic, Table, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -35,7 +36,7 @@ export default function EmrQcRectifyVerifyPage() {
 
   const submit = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-rectify-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },

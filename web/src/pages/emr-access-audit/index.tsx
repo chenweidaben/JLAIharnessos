@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Checkbox, Layout, Select, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -40,7 +41,7 @@ export default function EmrAccessAuditPage() {
   useEffect(() => {
     const fetchAudit = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-access-audit", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -58,7 +59,7 @@ export default function EmrAccessAuditPage() {
   const doLog = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-access-audit", {
         method: "POST",
         headers: {

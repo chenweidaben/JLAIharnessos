@@ -27,6 +27,7 @@ import {
   Typography,
 } from "antd";
 import { getTemplateCatalog, type MedicalTemplate } from "@/knowledge/templates/templateCatalog";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -45,7 +46,7 @@ const SCENARIO_LABEL: Record<string, string> = {
 
 async function apiFetch(path: string, options?: RequestInit): Promise<Response | null> {
   try {
-    const token = localStorage.getItem("token") ?? "";
+    const token = tokenStorage.getAccessToken();
     const resp = await fetch(path, {
       ...options,
       headers: {

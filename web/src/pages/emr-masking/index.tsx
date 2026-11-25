@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Col, Divider, Layout, message, Row, Spin, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -25,7 +26,7 @@ export default function EmrMaskingPage() {
     setLoading(true);
     setRole(selectedRole);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch(`/api/v1/emr-masking/demo001?role=${selectedRole}`, {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });

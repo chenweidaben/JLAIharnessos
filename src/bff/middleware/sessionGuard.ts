@@ -78,7 +78,7 @@ export async function checkSessionActive(jti: string): Promise<boolean> {
 export async function enforceSession(c: Ctx): Promise<void> {
   // 非生产演示模式无会话台账，跳过 jti 查库，避免误杀合法 JWT；生产环境不得跳过
   if (!isProductionEnv() && isDemoModeEnabled()) return;
-  if (!c.user || !c.user.jti) return;
+  if (!c.user?.jti) return;
   const active = await checkSessionActive(c.user.jti);
   if (!active) c.user = null;
 }

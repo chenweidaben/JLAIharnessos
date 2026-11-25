@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Card, Layout, List, Tag, Typography, message } from "antd";
 import { ArrowUpOutlined, ArrowDownOutlined, MinusOutlined } from "@ant-design/icons";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -30,7 +31,7 @@ export default function EmrQcDeptTrendAnalysisPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-dept-trend-analysis", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

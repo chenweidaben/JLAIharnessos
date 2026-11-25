@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, List, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -49,7 +50,7 @@ export default function EmrArchiveSearchPage() {
   useEffect(() => {
     const fetchSearch = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-archive-search", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -67,7 +68,7 @@ export default function EmrArchiveSearchPage() {
   const doSearch = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-archive-search", {
         method: "POST",
         headers: {

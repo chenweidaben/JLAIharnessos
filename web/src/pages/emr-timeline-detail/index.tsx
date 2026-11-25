@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Layout, Spin, Tag, Timeline, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -41,7 +42,7 @@ export default function EmrTimelineDetailPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-timeline-detail/demo001", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

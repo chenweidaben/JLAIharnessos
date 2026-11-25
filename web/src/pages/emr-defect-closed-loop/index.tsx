@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, DatePicker, Layout, Select, Statistic, Tag, Typography, message } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,7 +44,7 @@ export default function EmrDefectClosedLoopPage() {
   useEffect(() => {
     const fetchTrack = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-defect-closed-loop", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -61,7 +62,7 @@ export default function EmrDefectClosedLoopPage() {
   const doTrack = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-defect-closed-loop", {
         method: "POST",
         headers: {

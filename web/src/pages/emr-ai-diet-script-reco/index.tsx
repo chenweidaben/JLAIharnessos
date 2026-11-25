@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, InputNumber, Layout, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,7 +44,7 @@ export default function EmrAiDietScriptRecoPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-diet-script-reco", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -61,7 +62,7 @@ export default function EmrAiDietScriptRecoPage() {
   const doReco = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-diet-script-reco", {
         method: "POST",
         headers: {

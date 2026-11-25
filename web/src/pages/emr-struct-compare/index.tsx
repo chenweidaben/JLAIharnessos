@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -38,7 +39,7 @@ export default function EmrStructComparePage() {
   useEffect(() => {
     const fetchCompare = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-struct-compare", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -56,7 +57,7 @@ export default function EmrStructComparePage() {
   const doCompare = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-struct-compare", {
         method: "POST",
         headers: {

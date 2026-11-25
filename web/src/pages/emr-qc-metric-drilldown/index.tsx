@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Layout, Select, Spin, Table, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -32,7 +33,7 @@ export default function EmrQcMetricDrilldownPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const query = dept ? `?dept=${encodeURIComponent(dept)}` : "";
         const resp = await fetch(`/api/v1/emr-qc-metric-drilldown${query}`, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },

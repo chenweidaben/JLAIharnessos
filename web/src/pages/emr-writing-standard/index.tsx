@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, List, Spin, Tag, Typography } from "antd";
 import { StarFilled } from "@ant-design/icons";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -29,7 +30,7 @@ export default function EmrWritingStandardPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = keyword
           ? `/api/v1/emr-writing-standard?keyword=${encodeURIComponent(keyword)}`
           : "/api/v1/emr-writing-standard";

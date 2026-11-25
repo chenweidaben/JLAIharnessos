@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, List, message, Radio, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -36,7 +37,7 @@ export default function EmrTrainingPage() {
 
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const answerArray = questions.map((q) => answers[q.id] ?? -1);
       const resp = await fetch("/api/v1/emr-training/submit", {
         method: "POST",

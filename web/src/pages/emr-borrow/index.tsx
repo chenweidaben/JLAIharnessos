@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Form, Input, Layout, message, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -34,7 +35,7 @@ export default function EmrBorrowPage() {
 
   const fetchList = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-borrow", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
@@ -56,7 +57,7 @@ export default function EmrBorrowPage() {
   const handleApply = async () => {
     try {
       const values = await form.validateFields();
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-borrow", {
         method: "POST",
         headers: {

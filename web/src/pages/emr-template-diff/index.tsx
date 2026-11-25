@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Col, Layout, List, Spin, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -27,7 +28,7 @@ export default function EmrTemplateDiffPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-template-diff/TPL001?from=v1.0&to=v2.0", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

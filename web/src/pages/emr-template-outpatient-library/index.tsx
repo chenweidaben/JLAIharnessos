@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, List, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,7 +44,7 @@ export default function EmrTemplateOutpatientLibraryPage() {
   useEffect(() => {
     const fetchLibrary = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-template-outpatient-library", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -61,7 +62,7 @@ export default function EmrTemplateOutpatientLibraryPage() {
   const doSearch = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-template-outpatient-library", {
         method: "POST",
         headers: {

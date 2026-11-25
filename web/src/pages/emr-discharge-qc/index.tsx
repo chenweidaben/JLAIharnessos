@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Checkbox, Layout, Spin, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -29,7 +30,7 @@ export default function EmrDischargeQcPage() {
   const check = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-discharge-qc", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },

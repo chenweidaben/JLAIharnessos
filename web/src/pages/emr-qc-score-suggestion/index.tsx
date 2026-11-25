@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Input, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -39,7 +40,7 @@ export default function EmrQcScoreSuggestionPage() {
   const generate = async () => {
     try {
       const score = Number(scoreInput) || 0;
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-score-suggestion", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },

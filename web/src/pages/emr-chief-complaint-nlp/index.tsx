@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -41,7 +42,7 @@ export default function EmrChiefComplaintNlpPage() {
   useEffect(() => {
     const fetchNlp = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-chief-complaint-nlp", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -59,7 +60,7 @@ export default function EmrChiefComplaintNlpPage() {
   const doExtract = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-chief-complaint-nlp", {
         method: "POST",
         headers: {

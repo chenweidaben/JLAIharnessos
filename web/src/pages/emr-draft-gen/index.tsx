@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Col, Form, Input, Layout, message, Row, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -22,7 +23,7 @@ export default function EmrDraftGenPage() {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-draft-gen", {
         method: "POST",
         headers: {

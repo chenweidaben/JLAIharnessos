@@ -1,36 +1,33 @@
 /**
- * 健澜科技数智医院智能�?- BFF HTTP/WebSocket 服务�? *
+ * 健澜科技数智医院智能体 - BFF HTTP/WebSocket 服务器
  * 基于 Bun 原生运行时，零额外依赖：
- *  - REST：统丢� /api/v1 前缀，聚合后端服务并适配前端
- *  - WS�?ws/chat 对话流式与告警推送（霢�鉴权�? *  - 中间件：认证 / 限流 / CSRF / 安全�?/ 日志 / 错误处理
+ *  - REST：统一 /api/v1 前缀，聚合后端服务并适配前端
+ *  - WS：/ws/chat 对话流式与告警推送（需鉴权）
+ *  - 中间件：认证 / 限流 / CSRF / 安全头 / 日志 / 错误处理
  *
  * 启动：bun run src/bff/server.ts
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { attachUser, newCtx, requireAuth, requireRole, verifyJwt } from './middleware/auth';
+import { attachUser, newCtx, requireAuth, requireRole } from './middleware/auth';
 import { verifyCsrf } from './middleware/csrf';
 import { withErrorHandler } from './middleware/error';
 import { auditOperation } from './middleware/audit';
 import { auditEventHook } from './middleware/auditEventHook'; // P4-2：内存哈希链审计 after-hook
 import { logRequest } from './middleware/log';
 import { rateLimit } from './middleware/rateLimit';
-import { globalRateLimit } from './middleware/globalRateLimit'; // P4-4：通用 read/write 限流全局挂载
+import { globalRateLimitAsync } from './middleware/globalRateLimit'; // P4-4：通用 read/write 限流全局挂载
 import { withSecurityHeaders } from './middleware/securityHeaders';
 import { tenantContextMiddleware } from './middleware/tenant';
 import { withIdempotency } from './middleware/idempotency';
 import { enforceSession } from './middleware/sessionGuard';
 import { assertProductionNotDemoMode } from './config/runtimeEnv';
-import { runChatTurn } from './aggregators/chatAggregator';
 import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
+import { broadcast, chatClients, createWsHandlers, wsAuthorize } from './wsChat';
 import { OutboxRelay } from './outboxRelay';
 import { autoMigrate, closeDb, verifyDbConnection } from '@/db';
-import {
-  createConversation,
-  getConversationById,
-} from '@/db/repositories/conversationRepo';
 import { authRoutes } from './routes/auth';
 import { mfaLoginRoutes } from './routes/mfa';
 import { permissionAdminRoutes } from './routes/admin/permissions';
@@ -6748,26 +6745,8 @@ startMedmuseScheduler();
 // 【生产化收尾】M145-C：系统指标周期采样（内存/CPU + 派生 API 延迟/错误率），
 // 超阈值（P95>1s / 错误率>1% / 内存>90%）由仪表盘接口实时评估并告警。
 // ============================================================================
-// WebSocket�?ws/chat）��?鉴权后升�?// ============================================================================
-
-const chatClients = new Set<Bun.ServerWebSocket<unknown>>();
-
-function broadcast(event: string, payload: unknown, seq?: number): void {
-  // seq 为 outbox 数字主键（仅经发件箱发布的事件携带），客户端据此重连补拉
-  const frame = JSON.stringify({
-    event,
-    timestamp: Date.now(),
-    payload,
-    ...(seq !== undefined ? { seq } : {}),
-  });
-  for (const ws of chatClients) {
-    try {
-      ws.send(frame);
-    } catch {
-      chatClients.delete(ws);
-    }
-  }
-}
+// WebSocket（/ws/chat）：鉴权后升级
+// ============================================================================
 
 // 影像 AI critical 发现复用同一 /ws/chat critical:alert 通道推送危急值
 setCriticalAlertSink(broadcast);
@@ -6786,89 +6765,6 @@ const outboxRelay = new OutboxRelay(
 );
 outboxRelay.start();
 
-/** 校验 WebSocket 升级请求的 Token（query 参数 ?token= 或 Sec-WebSocket-Protocol） */
-function wsAuthorized(req: Request): boolean {
-  const url = new URL(req.url);
-  const token =
-    url.searchParams.get('token') ??
-    (req.headers.get('sec-websocket-protocol') ?? '').replace(/^bearer\./i, '');
-  if (!token) return false;
-  // JWT 格式
-  if (token.split('.').length === 3) return verifyJwt(token) !== null;
-  // 弢�发��演�?token
-  const isProd = (process.env.NODE_ENV ?? 'development') === 'production';
-  if (
-    !isProd &&
-    (token.startsWith('jt-') || token.startsWith('jr-') || token === 'bff-access-token')
-  ) {
-    return true;
-  }
-  return false;
-}
-
-/** 前端�?/ws/chat 下发的帧（兼�?event / action、顶�?/ payload 两种位置�?*/
-interface IncomingFrame {
-  event?: string;
-  action?: string;
-  conversationId?: string;
-  content?: string;
-  payload?: { conversationId?: string; content?: string };
-}
-
-/**
- * agent:start 处理：会话不存在则创建，调用 chatAggregator.runChatTurn 跑真�?LLM�? * 流式增量�?agent:delta 推��，结束�?agent:done（失败推 agent:error）��? * 扢�有消息在 runChatTurn 内部落库�? */
-async function handleAgentStart(
-  ws: Bun.ServerWebSocket<unknown>,
-  frame: IncomingFrame,
-): Promise<void> {
-  const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
-  let conversationId = frame.conversationId ?? frame.payload?.conversationId ?? '';
-  // 前端 agent:start 通常只带 conversationId；缺省让 LLM 产出真实问候，避免空消息报错
-  const content = (frame.payload?.content ?? frame.content ?? '').trim() || '您好，请介绍一下健澜AI原生医院操作系统OS可以为我提供哪些临床辅助能力。';
-
-  const send = (event: string, payload: unknown): void => {
-    try {
-      ws.send(JSON.stringify({ event, timestamp: Date.now(), payload }));
-    } catch {
-      /* ws 已关闭 */
-    }
-  };
-
-  try {
-    // 会话不存在则先创建
-    let conv = conversationId ? await getConversationById(conversationId) : null;
-    if (!conv) {
-      conv = await createConversation({ userId: 'ws-user', title: 'WebSocket 会话' });
-      conversationId = conv.id;
-      send('agent:conversation', { conversationId });
-    }
-
-    const result = await runChatTurn(conversationId, content, {
-      onDelta: (delta) =>
-        send('agent:delta', { conversationId, messageId, delta, done: false }),
-      onToolEvent: (ev) => send('agent:tool', { conversationId, messageId, ...ev }),
-    });
-
-    if (result.error) {
-      send('agent:error', {
-        conversationId,
-        messageId,
-        code: result.error.code,
-        message: result.error.message,
-      });
-    }
-    send('agent:done', { conversationId, messageId });
-  } catch (e) {
-    send('agent:error', {
-      conversationId,
-      messageId,
-      code: 'AGENT_FAILED',
-      message: e instanceof Error ? e.message : String(e),
-    });
-    send('agent:done', { conversationId, messageId });
-  }
-}
-
 // ============================================================================
 // Fetch 入口
 // ============================================================================
@@ -6880,12 +6776,19 @@ async function handleFetch(
   const url = new URL(req.url);
   const startedAt = Date.now();
 
-  // WebSocket 升级（需鉴权）
+  // WebSocket 升级（需鉴权）；通过后把用户身份挂到连接 data 上，供消息处理做会话归属校验
   if (url.pathname === '/ws/chat' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
-    if (!wsAuthorized(req)) {
+    const wsUser = wsAuthorize(req);
+    if (!wsUser) {
       return new Response('unauthorized', { status: 401 });
     }
-    if (server.upgrade(req, { data: { path: '/ws/chat' } })) return undefined;
+    // RFC 6455：客户端携 Sec-WebSocket-Protocol（bearer.<token>）时，服务端必须回显其一，
+    // 否则浏览器判定握手失败。取首段回显（客户端只发一个）。
+    const offered = req.headers.get('sec-websocket-protocol')?.split(',')[0]?.trim();
+    const upgradeHeaders = offered ? { 'Sec-WebSocket-Protocol': offered } : undefined;
+    if (server.upgrade(req, { data: { path: '/ws/chat', user: wsUser }, headers: upgradeHeaders })) {
+      return undefined;
+    }
     return new Response('upgrade failed', { status: 426 });
   }
 
@@ -6971,14 +6874,14 @@ async function handleFetch(
   const socketIp = server.requestIP(req)?.address ?? null;
   const ctx: Ctx = newCtx(req, {}, url.searchParams, rawBody, socketIp);
   attachUser(ctx);
-  // M7-F：校验会话是否已登出/被吊锢�（异步，�?jti 查会话台账）
+  // M7-F：校验会话是否已登出/被吊销（异步，按 jti 查会话台账）
   await enforceSession(ctx);
 
   let status = 200;
   let routeLabel = 'unmatched';
   try {
     // P4-4：通用 read/write 限流（GET 100/min、写 30/min，按 IP）
-    const globalLimited = globalRateLimit(ctx);
+    const globalLimited = await globalRateLimitAsync(ctx);
     if (globalLimited) {
       status = 429;
       return withSecurityHeaders(globalLimited);
@@ -7098,6 +7001,25 @@ const port = Number(process.env.HTTP_PORT ?? 8080);
 // P0 启动期 fail-closed：生产环境禁止开启演示模式，命中即抛错退出，不绑定端口、不进入请求循环
 assertProductionNotDemoMode();
 
+// 分布式限流/锁定后端装配：REDIS_URL 可用时走 Redis（多副本一致），
+// 未配置或探测失败时 createCache 内部自动降级内存并告警；任何异常不阻塞启动。
+void import('@/cache/factory').then(async (m) => {
+  try {
+    const services = await m.createCacheServices();
+    const { initDistributedRateLimit, isDistributedRateLimit } = await import(
+      './aggregators/loginLockoutAggregator'
+    );
+    initDistributedRateLimit(services.degraded ? null : services.rateLimiter);
+    // eslint-disable-next-line no-console
+    console.log(
+      `[jianlan-bff] rate-limit backend=${isDistributedRateLimit() ? 'redis(跨副本一致)' : 'memory(单进程)'}`,
+    );
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('[jianlan-bff] 分布式限流后端装配失败，回落进程内存模式:', e instanceof Error ? e.message : String(e));
+  }
+});
+
 // 启动横幅：明确打印 DEMO_MODE 状态，便于运维在日志第一行识别运行模式
 // eslint-disable-next-line no-console
 console.log(
@@ -7150,8 +7072,9 @@ const server = Bun.serve({
   port,
   async fetch(req, bunServer) {
     // P0 修复：全局 10 秒超时保护，防止慢请求阻塞事件循环
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     const timeoutPromise = new Promise<Response>((resolve) => {
-      setTimeout(() => {
+      timeoutHandle = setTimeout(() => {
         resolve(new Response(
           JSON.stringify({ code: 503, message: 'Request timeout (10s)', traceId: 'timeout' }),
           { status: 503, headers: { 'content-type': 'application/json' } },
@@ -7165,44 +7088,20 @@ const server = Bun.serve({
       ]);
       return result ?? new Response(null, { status: 101 });
     } catch (err) {
+      // 内部错误详情只落服务端日志，不向客户端回传（防 schema/栈信息外泄）
+      // eslint-disable-next-line no-console
+      console.error('[bff] unhandled error:', err);
       return new Response(
-        JSON.stringify({ code: 500, message: String(err) }),
+        JSON.stringify({ code: 500, message: 'Internal Server Error' }),
         { status: 500, headers: { 'content-type': 'application/json' } },
       );
+    } finally {
+      // 竞速结束后清理超时定时器，避免每个请求残留 10s timer
+      if (timeoutHandle) clearTimeout(timeoutHandle);
     }
   },
-  websocket: {
-    open(ws) {
-      chatClients.add(ws);
-      metrics.wsConnections.inc();
-    },
-    message(ws: Bun.ServerWebSocket<unknown>, raw: string | Buffer) {
-      let parsed: IncomingFrame = {};
-      try {
-        parsed = JSON.parse(String(raw)) as IncomingFrame;
-      } catch {
-        /* ignore */
-      }
-      // 兼容前端事件帧（event）与早期 action
-      const kind = parsed.event ?? parsed.action;
+  websocket: createWsHandlers(),
 
-      if (kind === 'heartbeat' || kind === 'ping') {
-        ws.send(
-          JSON.stringify({ event: 'heartbeat', timestamp: Date.now(), payload: { ok: true } }),
-        );
-        return;
-      }
-
-      if (kind === 'agent:start' || kind === 'start_stream') {
-        // 真实 LLM 流式：会话不存在则创建，runChatTurn 内部落库并回调推送
-        void handleAgentStart(ws, parsed);
-      }
-    },
-    close(ws) {
-      chatClients.delete(ws);
-      metrics.wsConnections.dec();
-    },
-  },
 });
 
 // 演示用：非生产环境周期性推送模拟危急值告警
@@ -7241,7 +7140,8 @@ function shutdown(signal: string): void {
   }
   void server.stop(false);
   void closeDb().catch(() => { /* ignore */ });
-  // 给在途同步响应一个极短收尾窗口后逢��?  setTimeout(() => process.exit(0), 500);
+  // 给在途同步响应一个极短收尾窗口后强制退出
+  setTimeout(() => process.exit(0), 500);
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));

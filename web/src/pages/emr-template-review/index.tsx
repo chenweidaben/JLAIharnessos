@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, message, Table, Tag, Typography } from "antd";
 import type { ReviewRecordV14 } from "@/bff/aggregators/emrTemplateReviewV14Aggregator";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -25,7 +26,7 @@ export default function EmrTemplateReviewPage() {
 
   const fetchList = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-template-review", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
@@ -46,7 +47,7 @@ export default function EmrTemplateReviewPage() {
 
   const handleAction = async (record: ReviewRecordV14, action: "approve" | "reject") => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch(`/api/v1/emr-template-review/${record.id}`, {
         method: "PUT",
         headers: {

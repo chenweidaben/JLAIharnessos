@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { Button, Card, Layout, Statistic, Tag, Typography, message } from "antd";
 import { Input } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -38,7 +39,7 @@ export default function EmrQcAiQaAssistantPage() {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-ai-qa-assistant", {
         method: "POST",
         headers: {

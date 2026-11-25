@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, List, message, Space, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -24,7 +25,7 @@ export default function EmrRootCausePage() {
 
   const handleAnalyze = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-root-cause", {
         method: "POST",
         headers: {

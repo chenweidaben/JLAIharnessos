@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, message, Space, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -18,7 +19,7 @@ export default function EmrPrintLayoutPage() {
 
   const handleTestPrint = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-print-layout/render", {
         method: "POST",
         headers: {

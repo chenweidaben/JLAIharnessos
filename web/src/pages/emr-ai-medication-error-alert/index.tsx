@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Input, InputNumber, Layout, Row, Switch, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -45,7 +46,7 @@ export default function EmrAiMedicationErrorAlertPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-medication-error-alert", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -63,7 +64,7 @@ export default function EmrAiMedicationErrorAlertPage() {
   const doAlert = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-medication-error-alert", {
         method: "POST",
         headers: {

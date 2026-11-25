@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,7 +44,7 @@ export default function EmrQcDefectAutoRoutePage() {
   useEffect(() => {
     const fetchDefect = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-defect-auto-route", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -61,7 +62,7 @@ export default function EmrQcDefectAutoRoutePage() {
   const doRoute = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-defect-auto-route", {
         method: "POST",
         headers: {

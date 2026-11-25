@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -37,7 +38,7 @@ export default function EmrAiPatientEduPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-patient-edu", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -55,7 +56,7 @@ export default function EmrAiPatientEduPage() {
   const doGenerate = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-patient-edu", {
         method: "POST",
         headers: {

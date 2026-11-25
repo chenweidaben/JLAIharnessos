@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, Select, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -30,7 +31,7 @@ export default function EmrQcOpLogPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const params = new URLSearchParams();
         if (operator) params.set("operator", operator);
         if (action) params.set("action", action);

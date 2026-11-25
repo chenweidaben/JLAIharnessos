@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Input, Layout, Row, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -46,7 +47,7 @@ export default function EmrAiRecordHomogeneityComparePage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-record-homogeneity-compare", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -64,7 +65,7 @@ export default function EmrAiRecordHomogeneityComparePage() {
   const doCompare = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-record-homogeneity-compare", {
         method: "POST",
         headers: {

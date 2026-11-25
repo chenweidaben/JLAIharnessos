@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Layout, Row, Select, Spin, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -28,7 +29,7 @@ export default function EmrQcExpertPoolPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = dept
           ? `/api/v1/emr-qc-expert-pool?dept=${encodeURIComponent(dept)}`
           : "/api/v1/emr-qc-expert-pool";

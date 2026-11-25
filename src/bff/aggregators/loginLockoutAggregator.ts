@@ -47,7 +47,7 @@ export class RateLimitError extends Error {
 // ---------- Account lockout ----------
 export function checkAccountLockout(username: string): AccountState | null {
   const s = accounts.get(username);
-  if (!s || !s.lockedUntil) return null;
+  if (!s?.lockedUntil) return null;
   if (new Date(s.lockedUntil).getTime() < Date.now()) {
     // 锁已过期，自动解锁
     accounts.delete(username);
@@ -130,6 +130,46 @@ function takeBucket(map: Map<string, Bucket>, key: string, limit: number, window
   return null;
 }
 
+/* ---------- 周期清扫（防内存无界增长） ----------
+ * readBuckets/writeBuckets/ipLogin/accounts 均为模块级常驻 Map：
+ * 每个唯一 key（IP / 用户名）都会留下条目，长跑或遭遇 XFF/随机用户名探测时
+ * 会无限增长。这里每 5 分钟清扫一次过期条目：
+ *  - 限流桶：windowStart 超过 2 个窗口未活动即删除；
+ *  - ipLogin：hits 全部滑出窗口且未在封禁期即删除；
+ *  - accounts：未锁定即删除（锁定中的保留到自然过期解锁）。
+ */
+const SWEEP_INTERVAL_MS = 5 * 60_000;
+
+function sweepMaps(): void {
+  const now = Date.now();
+  for (const [k, b] of readBuckets) {
+    if (now - b.windowStart > 2 * GEN_WINDOW_MS) readBuckets.delete(k);
+  }
+  for (const [k, b] of writeBuckets) {
+    if (now - b.windowStart > 2 * GEN_WINDOW_MS) writeBuckets.delete(k);
+  }
+  for (const [k, s] of ipLogin) {
+    const banned = s.bannedUntil && new Date(s.bannedUntil).getTime() > now;
+    const active = s.hits.some((t) => now - t < IP_LOGIN_WINDOW_MS);
+    if (!banned && !active) ipLogin.delete(k);
+  }
+  for (const [k, s] of accounts) {
+    const locked = s.lockedUntil && new Date(s.lockedUntil).getTime() > now;
+    if (!locked) accounts.delete(k);
+  }
+}
+
+// 模块级定时器；unref 避免阻止进程退出（Bun/Node 均支持）
+const sweepTimer = setInterval(sweepMaps, SWEEP_INTERVAL_MS);
+if (typeof sweepTimer === 'object' && sweepTimer && 'unref' in sweepTimer) {
+  (sweepTimer as { unref: () => void }).unref();
+}
+
+/** 测试钩子：停止清扫定时器（集成测试进程退出用） */
+export function _stopRateLimitSweeper(): void {
+  clearInterval(sweepTimer);
+}
+
 export function takeReadToken(ip: string): number | null {
   return takeBucket(readBuckets, ip, READ_LIMIT, GEN_WINDOW_MS);
 }
@@ -164,4 +204,170 @@ export function listStatus(): StatusItem[] {
 
 export function __resetStore(): void {
   accounts.clear(); ipLogin.clear(); readBuckets.clear(); writeBuckets.clear();
+}
+
+/* ============================================================================
+ * 分布式后端（Redis，多副本共享）
+ *
+ * 进程内 Map 版本在多实例部署时各副本独立计数，限流/锁定被横向打散失效。
+ * server 启动时装配 createCacheServices() 并调用 initDistributedRateLimit()：
+ *  - REDIS_URL 可用 → 走 Redis 固定窗口（incrAndExpire 原子），跨副本一致；
+ *  - 未配置/连接失败/运行时故障 → 自动回落进程内实现（限流不中断，降级为单机语义）。
+ * ==========================================================================*/
+
+import type { RateLimiter } from '../../cache/RateLimiter.js';
+
+let distributed: RateLimiter | null = null;
+
+/** 装配分布式限流后端（服务启动时调用一次；传 null 显式回退内存模式） */
+export function initDistributedRateLimit(limiter: RateLimiter | null): void {
+  distributed = limiter;
+}
+
+/** 当前是否处于分布式（跨副本一致）模式 */
+export function isDistributedRateLimit(): boolean {
+  return distributed !== null;
+}
+
+export async function takeReadTokenAsync(ip: string): Promise<number | null> {
+  if (!distributed) return takeReadToken(ip);
+  try {
+    const r = await distributed.consume('bff-read', ip, { limit: READ_LIMIT, windowMs: GEN_WINDOW_MS });
+    return r.allowed ? null : Math.max(1, Math.ceil(r.resetMs / 1000));
+  } catch {
+    return takeReadToken(ip); // Redis 故障降级内存，限流不中断
+  }
+}
+
+export async function takeWriteTokenAsync(ip: string): Promise<number | null> {
+  if (!distributed) return takeWriteToken(ip);
+  try {
+    const r = await distributed.consume('bff-write', ip, { limit: WRITE_LIMIT, windowMs: GEN_WINDOW_MS });
+    return r.allowed ? null : Math.max(1, Math.ceil(r.resetMs / 1000));
+  } catch {
+    return takeWriteToken(ip);
+  }
+}
+
+/**
+ * 通用分布式固定窗口取牌：超限返回重试秒数，放行返回 null。
+ * 未装配分布式后端时返回 'no-distributed' 哨兵，由调用方回落进程内实现。
+ */
+export async function takeTokenAsync(
+  scope: string,
+  identity: string,
+  limit: number,
+  windowMs: number,
+): Promise<number | null | 'no-distributed'> {
+  if (!distributed) return 'no-distributed';
+  try {
+    const r = await distributed.consume(scope, identity, { limit, windowMs });
+    return r.allowed ? null : Math.max(1, Math.ceil(r.resetMs / 1000));
+  } catch {
+    return 'no-distributed'; // Redis 故障：调用方回落进程内实现
+  }
+}
+
+// ---------- Account lockout（分布式） ----------
+
+export async function checkAccountLockoutAsync(username: string): Promise<AccountState | null> {
+  if (!distributed) return checkAccountLockout(username);
+  try {
+    const fails = await distributed.peek('login-fail', username, ACCOUNT_LOCK_MS);
+    if (fails < ACCOUNT_FAIL_THRESHOLD) return null;
+    // lockedUntil 仅作展示估计，真实过期由 Redis 键 TTL 控制
+    return {
+      key: username,
+      fails,
+      firstFailAt: '',
+      lockedUntil: new Date(Date.now() + ACCOUNT_LOCK_MS).toISOString(),
+    };
+  } catch {
+    return checkAccountLockout(username);
+  }
+}
+
+export async function recordAccountFailureAsync(username: string): Promise<AccountState> {
+  if (!distributed) return recordAccountFailure(username);
+  try {
+    const r = await distributed.consume('login-fail', username, {
+      limit: Number.MAX_SAFE_INTEGER, // 计数不拦截，仅观察阈值
+      windowMs: ACCOUNT_LOCK_MS,
+    });
+    const locked = r.count >= ACCOUNT_FAIL_THRESHOLD;
+    return {
+      key: username,
+      fails: r.count,
+      firstFailAt: new Date().toISOString(),
+      lockedUntil: locked ? new Date(Date.now() + r.resetMs).toISOString() : undefined,
+    };
+  } catch {
+    return recordAccountFailure(username);
+  }
+}
+
+export async function resetAccountFailuresAsync(username: string): Promise<void> {
+  if (!distributed) return resetAccountFailures(username);
+  try {
+    await distributed.reset('login-fail', username);
+  } catch {
+    resetAccountFailures(username);
+  }
+}
+
+export async function adminUnlockAccountAsync(username: string): Promise<boolean> {
+  if (!distributed) return adminUnlockAccount(username);
+  try {
+    const fails = await distributed.peek('login-fail', username, ACCOUNT_LOCK_MS);
+    await distributed.reset('login-fail', username);
+    return fails > 0;
+  } catch {
+    return adminUnlockAccount(username);
+  }
+}
+
+// ---------- IP login throttle（分布式） ----------
+
+export async function checkIpLoginAsync(ip: string): Promise<IpLoginState | null> {
+  if (!distributed) return checkIpLogin(ip);
+  try {
+    const ms = await distributed.bannedMs('login-ip', ip);
+    if (ms === null) return null;
+    return { key: ip, hits: [], bannedUntil: new Date(Date.now() + ms).toISOString() };
+  } catch {
+    return checkIpLogin(ip);
+  }
+}
+
+export async function recordIpLoginHitAsync(ip: string): Promise<IpLoginState> {
+  if (!distributed) return recordIpLoginHit(ip);
+  try {
+    const banned = await distributed.bannedMs('login-ip', ip);
+    if (banned !== null) {
+      return { key: ip, hits: [], bannedUntil: new Date(Date.now() + banned).toISOString() };
+    }
+    const r = await distributed.consume('login-ip', ip, {
+      limit: IP_LOGIN_THRESHOLD,
+      windowMs: IP_LOGIN_WINDOW_MS,
+    });
+    if (!r.allowed) {
+      await distributed.ban('login-ip', ip, IP_LOGIN_BAN_MS);
+      return { key: ip, hits: [], bannedUntil: new Date(Date.now() + IP_LOGIN_BAN_MS).toISOString() };
+    }
+    return { key: ip, hits: [] };
+  } catch {
+    return recordIpLoginHit(ip);
+  }
+}
+
+export async function adminUnlockIpAsync(ip: string): Promise<boolean> {
+  if (!distributed) return adminUnlockIp(ip);
+  try {
+    const banned = await distributed.bannedMs('login-ip', ip);
+    await distributed.unban('login-ip', ip);
+    await distributed.reset('login-ip', ip);
+    return banned !== null;
+  } catch {
+    return adminUnlockIp(ip);
+  }
 }

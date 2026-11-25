@@ -4,6 +4,7 @@
  */
 
 import { type ApiResponse, type Ctx, ErrorCode, fail, json } from '../types';
+import { takeTokenAsync } from '../aggregators/loginLockoutAggregator.js';
 
 const buckets = new Map<string, number[]>();
 
@@ -14,13 +15,25 @@ const loginBuckets = new Map<string, number[]>();
 const LOGIN_LIMIT = 5;
 const LOGIN_WINDOW_MS = 60_000;
 
-/** 提取客户端 IP（与全局限流一致：x-forwarded-for 首段优先，回退 socket IP） */
+/**
+ * 惰性清理过期限流桶：桶 Map 键永不删除会导致长跑/探测场景下内存无界增长。
+ * 仅在桶数量超过阈值时触发全量清扫（摊还成本，正常流量零开销）。
+ */
+const BUCKET_EVICT_THRESHOLD = 10_000;
+function evictStaleBuckets(map: Map<string, number[]>, windowMs: number, now: number): void {
+  if (map.size <= BUCKET_EVICT_THRESHOLD) return;
+  for (const [key, hits] of map) {
+    if (!hits.some((t) => now - t < windowMs)) map.delete(key);
+  }
+}
+
+/** 提取客户端 IP（仅 TRUST_PROXY=1 时采信 x-forwarded-for 首段，防伪造绕过限流） */
 function clientIpOf(c: Ctx): string {
-  return (
-    c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    c.clientIp ||
-    '127.0.0.1'
-  );
+  if (process.env.TRUST_PROXY === '1') {
+    const fwd = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+    if (fwd) return fwd;
+  }
+  return c.clientIp ?? '127.0.0.1';
 }
 
 /**
@@ -44,6 +57,7 @@ export function rateLimit(c: Ctx, limit = 300, windowMs = 60_000): Response | nu
   const hits = (buckets.get(ip) ?? []).filter((t) => now - t < windowMs);
   hits.push(now);
   buckets.set(ip, hits);
+  evictStaleBuckets(buckets, windowMs, now);
   if (hits.length > limit) {
     return json(
       fail<ApiResponse>(ErrorCode.RATE_LIMITED, '请求过于频繁，请稍后再试', c.traceId),
@@ -69,6 +83,7 @@ export function loginRateLimit(c: Ctx): Response | null {
   const hits = (loginBuckets.get(ip) ?? []).filter((t) => now - t < LOGIN_WINDOW_MS);
   hits.push(now);
   loginBuckets.set(ip, hits);
+  evictStaleBuckets(loginBuckets, LOGIN_WINDOW_MS, now);
   if (hits.length > LOGIN_LIMIT) {
     return json(
       fail<ApiResponse>(
@@ -80,4 +95,22 @@ export function loginRateLimit(c: Ctx): Response | null {
     );
   }
   return null;
+}
+
+/**
+ * 登录限流异步版：装配分布式后端时走 Redis（多副本一致），否则回落进程内实现。
+ * 登录路由（async handler）应优先使用本函数。
+ */
+export async function loginRateLimitAsync(c: Ctx): Promise<Response | null> {
+  if (process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true') return null;
+  const ip = clientIpOf(c);
+  const retrySec = await takeTokenAsync('bff-login', ip, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+  if (retrySec === 'no-distributed') return loginRateLimit(c);
+  if (retrySec === null) return null;
+  const res = json(
+    fail<ApiResponse>(ErrorCode.RATE_LIMITED, '登录尝试过于频繁，请 1 分钟后再试', c.traceId),
+    429,
+  );
+  res.headers.set('Retry-After', String(retrySec));
+  return res;
 }

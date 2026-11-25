@@ -207,6 +207,7 @@ export class ExpressionError extends Error {
 
 class Parser {
   private pos = 0;
+  private depth = 0;
   constructor(private readonly tokens: Token[], private readonly src: string) {}
 
   private peek(): Token {
@@ -235,15 +236,23 @@ class Parser {
 
   // 三目：a ? b : c（右结合）
   private parseConditional(): AstNode {
-    const test = this.parseLogical();
-    if (this.peek().type === 'question') {
-      this.next();
-      const consequent = this.parseConditional();
-      this.expect('colon');
-      const alternate = this.parseConditional();
-      return { kind: 'conditional', test, consequent, alternate };
+    if (++this.depth > MAX_DEPTH) {
+      this.depth--;
+      throw new ExpressionError(`表达式嵌套过深（>${MAX_DEPTH} 层）`, this.src);
     }
-    return test;
+    try {
+      const test = this.parseLogical();
+      if (this.peek().type === 'question') {
+        this.next();
+        const consequent = this.parseConditional();
+        this.expect('colon');
+        const alternate = this.parseConditional();
+        return { kind: 'conditional', test, consequent, alternate };
+      }
+      return test;
+    } finally {
+      this.depth--;
+    }
   }
 
   private parseLogical(): AstNode {
@@ -462,6 +471,25 @@ const SAFE_FUNCTIONS = new Set<string>([
   'empty',
 ]);
 
+/**
+ * 安全字符串化：null/undefined → ''；对象 → JSON（与 renderTemplate 一致），
+ * 避免 String(obj) 退化成 '[object Object]'（既无意义又可能误导 DSL 判断）。
+ */
+function toSafeString(v: unknown): string {
+  if (v === null || v === undefined) return '';
+  switch (typeof v) {
+    case 'string':
+      return v;
+    case 'number':
+    case 'boolean':
+    case 'bigint':
+      return String(v);
+    default:
+      // 对象 → JSON（与 renderTemplate 一致），避免 '[object Object]' 退化
+      return JSON.stringify(v) ?? '';
+  }
+}
+
 function callSafeFunction(name: string, args: unknown[]): unknown {
   switch (name) {
     case 'exists':
@@ -477,20 +505,20 @@ function callSafeFunction(name: string, args: unknown[]): unknown {
     }
     case 'contains': {
       const [coll, item] = args;
-      if (typeof coll === 'string') return coll.includes(String(item));
+      if (typeof coll === 'string') return coll.includes(toSafeString(item));
       if (isArray(coll)) return coll.includes(item);
       return false;
     }
     case 'lower':
-      return String(args[0] ?? '').toLowerCase();
+      return toSafeString(args[0]).toLowerCase();
     case 'upper':
-      return String(args[0] ?? '').toUpperCase();
+      return toSafeString(args[0]).toUpperCase();
     case 'trim':
-      return String(args[0] ?? '').trim();
+      return toSafeString(args[0]).trim();
     case 'startsWith':
-      return String(args[0] ?? '').startsWith(String(args[1] ?? ''));
+      return toSafeString(args[0]).startsWith(toSafeString(args[1]));
     case 'endsWith':
-      return String(args[0] ?? '').endsWith(String(args[1] ?? ''));
+      return toSafeString(args[0]).endsWith(toSafeString(args[1]));
     case 'now':
       return Date.now();
     case 'sum':
@@ -513,7 +541,7 @@ function callSafeFunction(name: string, args: unknown[]): unknown {
       return Number.isNaN(num) ? null : num;
     }
     case 'toString':
-      return args[0] === null || args[0] === undefined ? '' : String(args[0]);
+      return toSafeString(args[0]);
     case 'round': {
       const digits = args[1] === undefined ? 0 : Number(args[1]);
       const f = 10 ** digits;
@@ -532,9 +560,23 @@ function callSafeFunction(name: string, args: unknown[]): unknown {
 export type ExpressionContext = Record<string, unknown>;
 
 class Evaluator {
+  private depth = 0;
+
   constructor(private readonly context: ExpressionContext) {}
 
   eval(node: AstNode): unknown {
+    if (++this.depth > MAX_DEPTH) {
+      this.depth--;
+      throw new ExpressionError(`表达式嵌套过深（>${MAX_DEPTH} 层）`, '');
+    }
+    try {
+      return this.evalNode(node);
+    } finally {
+      this.depth--;
+    }
+  }
+
+  private evalNode(node: AstNode): unknown {
     switch (node.kind) {
       case 'literal':
         return node.value;
@@ -619,7 +661,7 @@ class Evaluator {
     switch (node.op) {
       case '+':
         // 字符串拼接或数值相加
-        if (typeof l === 'string' || typeof r === 'string') return String(l ?? '') + String(r ?? '');
+        if (typeof l === 'string' || typeof r === 'string') return toSafeString(l) + toSafeString(r);
         return Number(l) + Number(r);
       case '-':
         return Number(l) - Number(r);
@@ -630,13 +672,16 @@ class Evaluator {
       case '%':
         return Number(l) % Number(r);
       case '==':
+        // eslint-disable-next-line eqeqeq -- DSL 语义：宽松相等（类型强制）
+        return l == r;
       case '===':
-        // eslint-disable-next-line eqeqeq
-        return l === r || l == r;
+        // 严格相等：类型不同直接 false（与 JS 语义一致）
+        return l === r;
       case '!=':
+        // eslint-disable-next-line eqeqeq -- DSL 语义：宽松不等
+        return l != r;
       case '!==':
-        // eslint-disable-next-line eqeqeq
-        return l !== r && l != r;
+        return l !== r;
       case '>':
         return Number(l) > Number(r);
       case '>=':
@@ -661,15 +706,29 @@ class Evaluator {
 // 对外 API
 // ============================================================================
 
-/** AST 缓存（同一表达式只解析一次） */
+/** AST 缓存（同一表达式只解析一次；有上限，防表达式文本受外部影响时内存无界增长） */
+const AST_CACHE_MAX = 500;
 const astCache = new Map<string, AstNode>();
+
+/** 单条表达式最大长度（防超长输入造成的解析/求值资源消耗） */
+const MAX_EXPR_LENGTH = 2000;
+/** 解析/求值最大嵌套深度（防深层嵌套表达式耗尽调用栈） */
+const MAX_DEPTH = 64;
 
 /** 解析表达式为 AST（内部使用，也可供校验器预检） */
 export function parseExpression(expr: string): AstNode {
   const cached = astCache.get(expr);
   if (cached) return cached;
+  if (expr.length > MAX_EXPR_LENGTH) {
+    throw new ExpressionError(`表达式超长（>${MAX_EXPR_LENGTH} 字符）`, expr);
+  }
   const tokens = tokenize(expr);
   const ast = new Parser(tokens, expr).parse();
+  if (astCache.size >= AST_CACHE_MAX) {
+    // FIFO 淘汰最旧条目（Map 迭代序即插入序）
+    const oldest = astCache.keys().next();
+    if (!oldest.done) astCache.delete(oldest.value);
+  }
   astCache.set(expr, ast);
   return ast;
 }
@@ -713,8 +772,6 @@ export function renderTemplate(template: string, context: ExpressionContext): st
   if (typeof template !== 'string') return '';
   return template.replace(/\$\{([^}]+)\}/g, (_match, inner: string) => {
     const v = evaluateExpression(inner.trim(), context);
-    if (v === null || v === undefined) return '';
-    if (typeof v === 'object') return JSON.stringify(v);
-    return String(v);
+    return toSafeString(v);
   });
 }

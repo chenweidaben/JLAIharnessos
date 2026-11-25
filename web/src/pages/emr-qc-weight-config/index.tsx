@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, Slider, Spin, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -23,7 +24,7 @@ export default function EmrQcWeightConfigPage() {
     setLoading(true);
     try {
       const items = Object.entries(weights).map(([dimension, weight]) => ({ dimension, weight }));
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-weight-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },

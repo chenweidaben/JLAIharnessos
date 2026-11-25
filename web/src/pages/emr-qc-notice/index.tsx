@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, List, Select, Spin, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -29,7 +30,7 @@ export default function EmrQcNoticePage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = typeFilter
           ? `/api/v1/emr-qc-notice?type=${encodeURIComponent(typeFilter)}`
           : "/api/v1/emr-qc-notice";

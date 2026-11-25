@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Col, Layout, Row, Statistic, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -29,7 +30,7 @@ export default function EmrQcDailyReportPage() {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-daily-report", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

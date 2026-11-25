@@ -18,7 +18,7 @@ const MAX_ENTRIES = 100;
 class LruCache {
   private store = new Map<string, CacheEntry>();
 
-  get(key: string): unknown | null {
+  get(key: string): unknown {
     const entry = this.store.get(key);
     if (!entry) return null;
     if (Date.now() > entry.expiresAt) {

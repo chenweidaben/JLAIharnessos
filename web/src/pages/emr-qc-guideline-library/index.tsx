@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Input, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -25,7 +26,7 @@ export default function EmrQcGuidelineLibraryPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = specialty
           ? `/api/v1/emr-qc-guideline-library?specialty=${encodeURIComponent(specialty)}`
           : "/api/v1/emr-qc-guideline-library";

@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Col, Layout, List, Row, Statistic, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -30,7 +31,7 @@ export default function EmrSmartReportPage() {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-smart-report", {
         method: "POST",
         headers: {

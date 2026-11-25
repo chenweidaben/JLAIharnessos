@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Col, Layout, Row, Spin, Statistic, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -29,7 +30,7 @@ export default function EmrQualityScorePage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-quality-score", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });

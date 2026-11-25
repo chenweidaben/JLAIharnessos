@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, Table, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -25,7 +26,7 @@ export default function EmrQcAuditLogRecordPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-audit-log-record", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -42,7 +43,7 @@ export default function EmrQcAuditLogRecordPage() {
 
   const search = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const url = keyword
         ? `/api/v1/emr-qc-audit-log-record?keyword=${encodeURIComponent(keyword)}`
         : "/api/v1/emr-qc-audit-log-record";

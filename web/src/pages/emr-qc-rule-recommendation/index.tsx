@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, List, Tag, Typography, message } from "antd";
 import type { RuleRecommendationV14, RecommendationContextV14, RecommendationResultV14, RecommendationReportV14 } from "@/bff/aggregators/emrQcRuleRecommendationV14Aggregator";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -32,7 +33,7 @@ export default function EmrQcRuleRecommendationPage() {
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-rule-recommendation", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -50,7 +51,7 @@ export default function EmrQcRuleRecommendationPage() {
   const doRecommend = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-rule-recommendation", {
         method: "POST",
         headers: {

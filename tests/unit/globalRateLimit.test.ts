@@ -9,7 +9,7 @@ import { __resetStore as resetAudit, queryEvents } from '../../src/bff/aggregato
 import { __resetAuditStore } from '../../src/bff/aggregators/auditEventStore';
 import { __resetStore as resetLockout, takeReadToken, takeWriteToken } from '../../src/bff/aggregators/loginLockoutAggregator';
 import { auditEventHook } from '../../src/bff/middleware/auditEventHook';
-import { globalRateLimit } from '../../src/bff/middleware/globalRateLimit';
+import { globalRateLimitAsync } from '../../src/bff/middleware/globalRateLimit';
 import type { Ctx } from '../../src/bff/types';
 
 beforeEach(() => { resetAudit(); __resetAuditStore(null); resetLockout(); });
@@ -43,15 +43,15 @@ describe('P4-4 通用限流桶', async () => {
     expect(takeWriteToken('1.2.3.7')).not.toBeNull();
   });
   test('globalRateLimit 白名单 /health 不限', async () => {
-    const r = globalRateLimit(makeCtx({ method: 'GET', url: '/health', ip: '5.5.5.5' }));
+    const r = await globalRateLimitAsync(makeCtx({ method: 'GET', url: '/health', ip: '5.5.5.5' }));
     expect(r).toBeNull();
   });
   test('globalRateLimit /api/v1/audit/* 不限', async () => {
-    const r = globalRateLimit(makeCtx({ method: 'GET', url: '/api/v1/audit/events', ip: '5.5.5.5' }));
+    const r = await globalRateLimitAsync(makeCtx({ method: 'GET', url: '/api/v1/audit/events', ip: '5.5.5.5' }));
     expect(r).toBeNull();
   });
   test('globalRateLimit 非 /api/v1/ 前缀不拦', async () => {
-    const r = globalRateLimit(makeCtx({ method: 'POST', url: '/ws/chat', ip: '5.5.5.5' }));
+    const r = await globalRateLimitAsync(makeCtx({ method: 'POST', url: '/ws/chat', ip: '5.5.5.5' }));
     expect(r).toBeNull();
   });
 });
@@ -67,18 +67,18 @@ describe('P4-4 本机回环免流门控（反代安全）', async () => {
   });
   test('开发+无代理 → 127.0.0.1 免流', async () => {
     process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
-    expect(globalRateLimit(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' }))).toBeNull();
+    expect(await globalRateLimitAsync(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' }))).toBeNull();
   });
   test('DEMO_MODE=1+无代理 → 127.0.0.1 免流', async () => {
     delete process.env.NODE_ENV; process.env.DEMO_MODE = '1'; delete process.env.TRUST_PROXY;
-    expect(globalRateLimit(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '::ffff:127.0.0.1' }))).toBeNull();
+    expect(await globalRateLimitAsync(makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '::ffff:127.0.0.1' }))).toBeNull();
   });
   test('生产（NODE_ENV=production）→ 127.0.0.1 仍受限流', async () => {
     process.env.NODE_ENV = 'production'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
     const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' });
     // 连续打 101 次，第 101 次应 429
     let last: Response | null = null;
-    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    for (let i = 0; i < 101; i++) last = await globalRateLimitAsync(ctx);
     expect(last).not.toBeNull();
     expect(last!.status).toBe(429);
   });
@@ -86,7 +86,7 @@ describe('P4-4 本机回环免流门控（反代安全）', async () => {
     process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; process.env.TRUST_PROXY = '1';
     const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1' });
     let last: Response | null = null;
-    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    for (let i = 0; i < 101; i++) last = await globalRateLimitAsync(ctx);
     expect(last).not.toBeNull();
     expect(last!.status).toBe(429);
   });
@@ -95,7 +95,7 @@ describe('P4-4 本机回环免流门控（反代安全）', async () => {
     process.env.NODE_ENV = 'development'; delete process.env.DEMO_MODE; delete process.env.TRUST_PROXY;
     const ctx = makeCtx({ method: 'GET', url: '/api/v1/worm/segments', ip: '127.0.0.1', xff: '127.0.0.1' });
     let last: Response | null = null;
-    for (let i = 0; i < 101; i++) last = globalRateLimit(ctx);
+    for (let i = 0; i < 101; i++) last = await globalRateLimitAsync(ctx);
     expect(last).not.toBeNull();
     expect(last!.status).toBe(429);
   });

@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Layout, Statistic, Switch, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -40,7 +41,7 @@ export default function EmrHomepageCompletePage() {
   useEffect(() => {
     const fetchCheck = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-homepage-complete", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -58,7 +59,7 @@ export default function EmrHomepageCompletePage() {
   const doCheck = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-homepage-complete", {
         method: "POST",
         headers: {

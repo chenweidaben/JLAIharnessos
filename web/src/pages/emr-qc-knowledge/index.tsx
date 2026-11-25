@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Layout, List, Spin, Tag, Typography, Input } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -36,7 +37,7 @@ export default function EmrQcKnowledgePage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = keyword
           ? `/api/v1/emr-qc-knowledge?keyword=${encodeURIComponent(keyword)}`
           : "/api/v1/emr-qc-knowledge";

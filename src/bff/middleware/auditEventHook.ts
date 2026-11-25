@@ -92,7 +92,7 @@ export async function auditEventHook(input: HookInput): Promise<void> {
     if (ARCHIVE_CONTROL_PATHS.has(path)) return;
 
     // method → action；P4-4：登录/登出路径特例
-    const action: AuditAction = PATH_ACTION_OVERRIDE[path] ?? (METHOD_TO_ACTION[method] ?? ('view' as AuditAction));
+    const action: AuditAction = PATH_ACTION_OVERRIDE[path] ?? METHOD_TO_ACTION[method] ?? 'view';
 
     // 段切分：['api','v1','<module>','<resourceType>','<resourceId>',...]
     const segs = path.split('/').filter(Boolean);
@@ -118,7 +118,7 @@ export async function auditEventHook(input: HookInput): Promise<void> {
     // 越权探测（401 无 token）也要记
     const result = pickResult(status);
 
-    const ip = ctx.clientIp || '0.0.0.0';
+    const ip = ctx.clientIp ?? '0.0.0.0';
     const userAgent = ctx.req.headers?.get?.('user-agent') ?? 'unknown';
 
     // P5-13：async 写穿。失败只 log/metric，不阻断业务（业务已在 finally 前完成）

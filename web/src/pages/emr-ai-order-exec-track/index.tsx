@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, InputNumber, Layout, Row, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -47,7 +48,7 @@ export default function EmrAiOrderExecTrackPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-order-exec-track", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -65,7 +66,7 @@ export default function EmrAiOrderExecTrackPage() {
   const doTrack = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-order-exec-track", {
         method: "POST",
         headers: {

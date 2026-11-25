@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Layout, List, Row, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -47,7 +48,7 @@ export default function EmrQcDeptRankListPage() {
   useEffect(() => {
     const fetchBase = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-qc-dept-rank-list", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -65,7 +66,7 @@ export default function EmrQcDeptRankListPage() {
   const doRank = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-dept-rank-list", {
         method: "POST",
         headers: {

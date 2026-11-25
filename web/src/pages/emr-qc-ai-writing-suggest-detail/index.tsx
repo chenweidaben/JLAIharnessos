@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Form, Input, Layout, List, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -36,7 +37,7 @@ export default function EmrQcAiWritingSuggestDetailPage() {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-ai-writing-suggest-detail", {
         method: "POST",
         headers: {

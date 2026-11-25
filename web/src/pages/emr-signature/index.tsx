@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Badge, Button, Card, Input, Layout, message, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -26,7 +27,7 @@ export default function EmrSignaturePage() {
 
   const fetchList = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-signature/demo001", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
@@ -59,7 +60,7 @@ export default function EmrSignaturePage() {
       return;
     }
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch(`/api/v1/emr-signature/${noteIdInput.trim()}`, {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });

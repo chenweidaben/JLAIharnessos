@@ -63,6 +63,31 @@ export class RateLimiter {
     await this.cache.del(cacheKey('ratelimit', scope, identity));
   }
 
+  /**
+   * 封禁指定身份 ttlMs（如登录防爆破的超限封禁）。
+   * 与计数桶分离存储，跨实例生效（底层 ICache 为 Redis 时）。
+   */
+  async ban(scope: string, identity: string, ttlMs: number): Promise<void> {
+    await this.cache.set(
+      cacheKey('ratelimit', 'ban', scope, identity),
+      { until: Date.now() + ttlMs },
+      ttlMs,
+    );
+  }
+
+  /** 查询封禁剩余毫秒；未封禁或已过期返回 null */
+  async bannedMs(scope: string, identity: string): Promise<number | null> {
+    const v = await this.cache.get<{ until: number }>(cacheKey('ratelimit', 'ban', scope, identity));
+    if (!v || typeof v.until !== 'number') return null;
+    const ms = v.until - Date.now();
+    return ms > 0 ? ms : null;
+  }
+
+  /** 解除封禁（管理员解锁） */
+  async unban(scope: string, identity: string): Promise<void> {
+    await this.cache.del(cacheKey('ratelimit', 'ban', scope, identity));
+  }
+
   // ------------------------------------------------------------------
   // 以下为第二阶段（jlmedaios 高并发）新增的"加法"能力，向后兼容，
   // 不改动上方既有固定窗口方法与导出签名。

@@ -48,8 +48,11 @@ class WebSocketClient {
     this.manuallyClosed = false;
 
     const token = tokenStorage.getAccessToken();
-    const url = token ? `${this.url}?token=${encodeURIComponent(token)}` : this.url;
-    this.ws = new WebSocket(url);
+    // 通过 Sec-WebSocket-Protocol 递 token，避免出现在 URL（访问日志/浏览器历史）中；
+    // 服务端 wsAuthorize 解析 bearer.<token> 前缀并回显子协议完成握手
+    this.ws = token
+      ? new WebSocket(this.url, [`bearer.${token}`])
+      : new WebSocket(this.url);
 
     this.ws.onopen = () => {
       this.connecting = false;

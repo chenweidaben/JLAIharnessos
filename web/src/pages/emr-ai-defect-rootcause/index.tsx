@@ -10,6 +10,7 @@
  */
 import { useEffect, useState } from "react";
 import { Alert, Button, Card, Col, Input, Layout, Row, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -52,7 +53,7 @@ export default function EmrAiDefectRootcausePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-ai-defect-rootcause", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -78,7 +79,7 @@ export default function EmrAiDefectRootcausePage() {
   const doAnalyze = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-ai-defect-rootcause", {
         method: "POST",
         headers: {

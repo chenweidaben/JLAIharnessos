@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Card, Input, Layout, Spin, Table, Tag, Typography } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -28,7 +29,7 @@ export default function EmrIndicatorDictPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const url = keyword
           ? `/api/v1/emr-indicator-dict?keyword=${encodeURIComponent(keyword)}`
           : "/api/v1/emr-indicator-dict";

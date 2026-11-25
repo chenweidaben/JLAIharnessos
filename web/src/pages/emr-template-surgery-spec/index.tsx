@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { Button, Card, Checkbox, Layout, List, Statistic, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -40,7 +41,7 @@ export default function EmrTemplateSurgerySpecPage() {
   useEffect(() => {
     const fetchSpec = async () => {
       try {
-        const token = localStorage.getItem("token") ?? "";
+        const token = tokenStorage.getAccessToken();
         const resp = await fetch("/api/v1/emr-template-surgery-spec", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
@@ -58,7 +59,7 @@ export default function EmrTemplateSurgerySpecPage() {
   const doValidate = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-template-surgery-spec", {
         method: "POST",
         headers: {

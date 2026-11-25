@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Form, Input, Layout, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -27,7 +28,7 @@ export default function EmrQcExpertOnlineReviewPage() {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-expert-online-review", {
         method: "POST",
         headers: {

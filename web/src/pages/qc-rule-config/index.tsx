@@ -19,6 +19,7 @@ import {
   Typography,
 } from "antd";
 import type { QcRuleConfigV14 } from "@/bff/aggregators/qcRuleConfigV14Aggregator";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -40,7 +41,7 @@ const SEVERITY_COLOR: Record<string, string> = {
 
 async function apiFetch(path: string, options?: RequestInit): Promise<Response | null> {
   try {
-    const token = localStorage.getItem("token") ?? "";
+    const token = tokenStorage.getAccessToken();
     const resp = await fetch(path, {
       ...options,
       headers: {

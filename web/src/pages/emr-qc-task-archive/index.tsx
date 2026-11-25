@@ -7,6 +7,7 @@
  */
 import { useState } from "react";
 import { Button, Card, Layout, Table, Tag, Typography, message } from "antd";
+import { tokenStorage } from "@/utils/auth";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -44,7 +45,7 @@ function ArchiveButton({ taskId, reviewer, result }: { taskId: string; reviewer:
 
   const archive = async () => {
     try {
-      const token = localStorage.getItem("token") ?? "";
+      const token = tokenStorage.getAccessToken();
       const resp = await fetch("/api/v1/emr-qc-task-archive", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },

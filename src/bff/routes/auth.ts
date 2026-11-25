@@ -26,11 +26,11 @@ import {
   revokeByRefreshJti,
 } from '@/db/repositories/sessionRepo';
 import { recordLoginAttempt } from '@/db/repositories/loginAttemptRepo';
-import { loginRateLimit } from '../middleware/rateLimit';
-// P4-3：账号锁定 + IP 防爆破（等保三级）
+import { loginRateLimitAsync } from '../middleware/rateLimit';
+// P4-3：账号锁定 + IP 防爆破（等保三级）；异步版优先走 Redis 分布式后端（多副本一致），故障自动回落进程内
 import {
-  checkAccountLockout, recordAccountFailure, resetAccountFailures,
-  checkIpLogin, recordIpLoginHit,
+  checkAccountLockoutAsync, recordAccountFailureAsync, resetAccountFailuresAsync,
+  checkIpLoginAsync, recordIpLoginHitAsync,
 } from '../aggregators/loginLockoutAggregator';
 import { markSessionRevoked } from '../middleware/sessionGuard';
 import { buildAuthView, ROLE_PERMISSIONS, type AuthView } from '../view/userView';
@@ -98,7 +98,7 @@ const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true'
  */
 const DEMO_CRED_SALT = 'jianlan-demo-scrypt-salt-v1';
 function demoPwHash(password: string): Buffer {
-  return scryptSync(password, DEMO_CRED_SALT, 64) as Buffer;
+  return scryptSync(password, DEMO_CRED_SALT, 64);
 }
 /** username -> 明文口令（仅演示种子，生产无此表） */
 const DEMO_CREDENTIALS: Record<string, string> = {
@@ -123,13 +123,23 @@ export function verifyDemoPassword(username: string, password: string): boolean 
 
 /** 提取登录终端信息（IP 取代理转发头，UA 截断存储）。 */
 function requestEndpoint(c: Ctx): { ip: string | null; userAgent: string | null } {
-  // 经反向代理（nginx 等）时取 x-forwarded-for 首段；直连时回退到 socket IP。
-  const fwd = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
+  // 仅在可信反代部署（TRUST_PROXY=1）时采信 x-forwarded-for 首段；
+  // 否则客户端可自报 XFF 伪造来源 IP，绕过登录防爆破与 IP 封禁。
+  const trustProxy = process.env.TRUST_PROXY === '1';
+  const fwd = trustProxy
+    ? // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空串也需回退 null，语义上确需 ||
+      (c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null)
+    : null;
   const ua = c.req.headers.get('user-agent') ?? '';
   return {
-    ip: fwd || c.clientIp || null,
+    ip: fwd ?? c.clientIp ?? null,
     userAgent: ua ? ua.slice(0, 256) : null,
   };
+}
+
+/** 登录防爆破取 IP：与 requestEndpoint 同一 TRUST_PROXY 口径，防 XFF 伪造绕过封禁。 */
+function loginClientIp(c: Ctx): string {
+  return requestEndpoint(c).ip ?? 'unknown';
 }
 
 /** 登录/MFA 成功后登记会话（演示模式无库，跳过）。导出供 MFA 登录复用。 */
@@ -163,7 +173,7 @@ export async function registerSession(
 async function loadViewByUsername(username: string): Promise<AuthView | null> {
   if (isDemo) return demoViewFor(username);
   const user = await getUserByUsername(username);
-  if (!user || user.status !== 'active') return null;
+  if (user?.status !== 'active') return null;
   const links = await getUserRoleLinks(user.id);
   return buildAuthView(user, links);
 }
@@ -178,7 +188,7 @@ export async function loadViewById(id: string): Promise<AuthView | null> {
     return demoViewFor(map[id] ?? 'doctor_chen');
   }
   const user = await getUserById(id);
-  if (!user || user.status !== 'active') return null;
+  if (user?.status !== 'active') return null;
   const links = await getUserRoleLinks(user.id);
   return buildAuthView(user, links);
 }
@@ -223,18 +233,18 @@ export const authRoutes: RouteDef[] = [
     method: 'POST',
     path: '/api/v1/auth/login',
     handle: async (c: Ctx) => {
-      // 登录专用限流：5 次/分钟/IP（防暴力破解/撞库）
-      const limited = loginRateLimit(c);
+      // 登录专用限流：5 次/分钟/IP（防暴力破解/撞库）；分布式后端可用时跨副本一致
+      const limited = await loginRateLimitAsync(c);
       if (limited) return limited;
 
-      // P4-3：IP 登录防爆破（1min >20 次 → 5min 封禁）
-      const ipAddr = c.req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || c.clientIp || '127.0.0.1';
-      const ipBanned = checkIpLogin(ipAddr);
+      // P4-3：IP 登录防爆破（1min >20 次 → 5min 封禁）；取 IP 与 requestEndpoint 同口径（TRUST_PROXY 门控 XFF）
+      const ipAddr = loginClientIp(c);
+      const ipBanned = await checkIpLoginAsync(ipAddr);
       if (ipBanned?.bannedUntil) {
         const retrySec = Math.max(1, Math.ceil((new Date(ipBanned.bannedUntil).getTime() - Date.now()) / 1000));
         return json(fail(42900, `登录尝试过于频繁，请 ${retrySec}s 后再试`), 429);
       }
-      recordIpLoginHit(ipAddr);
+      await recordIpLoginHitAsync(ipAddr);
 
       const body = await c.body<{ username?: string; password?: string }>();
       if (!body.username || !body.password) {
@@ -242,7 +252,7 @@ export const authRoutes: RouteDef[] = [
       }
       const loginUsername0 = body.username.trim();
       // P4-3：账号锁定检查（连续失败 5 次锁 15min）
-      const locked = checkAccountLockout(loginUsername0);
+      const locked = await checkAccountLockoutAsync(loginUsername0);
       if (locked?.lockedUntil) {
         const retrySec = Math.max(1, Math.ceil((new Date(locked.lockedUntil).getTime() - Date.now()) / 1000));
         return json(fail(42300, `账号已锁定，请 ${retrySec}s 后再试`), 423);
@@ -253,7 +263,7 @@ export const authRoutes: RouteDef[] = [
       const view = await loadViewByUsername(loginUsername);
       if (!view) {
         // P4-3：账号失败计数
-        recordAccountFailure(loginUsername);
+        await recordAccountFailureAsync(loginUsername);
         // 记录失败登录（用户不存在/停用/口令错误统一文案，防枚举）
         if (!isDemo) {
           const ep = requestEndpoint(c);
@@ -271,11 +281,11 @@ export const authRoutes: RouteDef[] = [
       // P0-7 收尾：DEMO 模式下真实校验口令（scrypt 哈希），不再任意放行。
       // 用户名未登记或口令错误统一 401 code=40101，不区分原因（防枚举）。
       if (isDemo && !verifyDemoPassword(loginUsername, body.password)) {
-        recordAccountFailure(loginUsername);
+        await recordAccountFailureAsync(loginUsername);
         return json(fail(40101, '用户名或密码错误'), 401);
       }
       // P4-3：登录成功清零失败计数
-      resetAccountFailures(loginUsername);
+      await resetAccountFailuresAsync(loginUsername);
 
       // M3-C：若用户已启用 MFA，密码通过后不直接发令牌，改发第二因子挑战。
       // 客户端凭 challengeId 调 POST /api/v1/auth/login/mfa 提交 TOTP/备份码后才换发令牌。
@@ -376,7 +386,7 @@ export const authRoutes: RouteDef[] = [
     handle: async (c: Ctx) => {
       const body = await c.body<{ refreshToken?: string }>();
       const payload = body.refreshToken ? verifyJwt(body.refreshToken) : null;
-      if (!payload || !payload.jti) {
+      if (!payload?.jti) {
         return json(fail(ErrorCode.UNAUTHORIZED, 'refreshToken 无效或已过期'), 401);
       }
       // 校验 refresh 会话是否仍有效（登出/轮换后旧 refresh 被吊销）
@@ -452,10 +462,10 @@ export const authRoutes: RouteDef[] = [
         return codes.some((x) => perms.has(x));
       };
       // 与 SideMenu.navItems 对齐的最小菜单描述（分组与顶层项）
-      const menuDef: Array<{
+      const menuDef: {
         id: string; title: string; path?: string; perm?: string | string[];
-        children?: Array<{ id: string; title: string; path: string; perm?: string | string[] }>;
-      }> = [
+        children?: { id: string; title: string; path: string; perm?: string | string[] }[];
+      }[] = [
         { id: 'dashboard', title: '工作台', path: '/dashboard', perm: 'dashboard:view' },
         { id: 'patients', title: '患者管理', path: '/patients', perm: 'patient:view' },
         { id: 'ai-report', title: 'AI 辅诊', path: '/imaging/ai/report', perm: 'imaging:view' },
