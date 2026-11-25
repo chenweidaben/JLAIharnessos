@@ -22,7 +22,8 @@ logger = logging.getLogger("ai_access")
 logger.setLevel(logging.INFO)
 
 # P9 安全加固：API_KEYS 从环境变量读取，保留 dev 默认值
-# 生产环境：export AI_API_KEYS="key1,key2,key3"
+# 生产环境：export AI_API_KEYS="key1,name1,limit1;key2,name2,limit2"
+# （兼容旧格式 key1:name1:limit1,key2:name2:limit2）
 _default_keys = {
     "ak_mock_client_001": {
         "clientName": "mock-client-001",
@@ -36,18 +37,26 @@ _default_keys = {
     }
 }
 
+_IS_PRODUCTION = os.getenv("APP_ENV", "development").lower() in ("production", "prod")
+
 _env_keys = os.getenv("AI_API_KEYS", "")
 if _env_keys:
     # 从环境变量解析：格式 key1:name1:limit1,key2:name2:limit2
     API_KEYS = {}
     for item in _env_keys.split(","):
         parts = item.strip().split(":")
-        if len(parts) >= 1:
+        if len(parts) >= 1 and parts[0]:
             API_KEYS[parts[0]] = {
                 "clientName": parts[1] if len(parts) > 1 else "env-client",
                 "scopes": ["ai/*"],
                 "rateLimitPerMin": int(parts[2]) if len(parts) > 2 else 60
             }
+elif _IS_PRODUCTION:
+    # P0 安全红线：生产环境禁止回落到硬编码 mock key，直接拒绝启动。
+    raise RuntimeError(
+        "APP_ENV=production 但未配置 AI_API_KEYS 环境变量，"
+        "拒绝使用内置 mock API Key 启动。请配置 AI_API_KEYS 后重启。"
+    )
 else:
     API_KEYS = _default_keys
 
@@ -96,6 +105,11 @@ def check_ip_rate_limit(ip: str) -> bool:
     """
     now = time.time()
     if ip not in _ip_request_counts:
+        # 内存护栏：IP 桶数量上限，超出时惰性驱逐最旧的空桶，防无界增长
+        if len(_ip_request_counts) > 10000:
+            stale = [k for k, v in _ip_request_counts.items() if not v or now - v[-1] >= 60]
+            for k in stale:
+                del _ip_request_counts[k]
         _ip_request_counts[ip] = []
     _ip_request_counts[ip] = [t for t in _ip_request_counts[ip] if now - t < 60]
     if len(_ip_request_counts[ip]) >= IP_RATE_LIMIT_PER_MIN:
@@ -113,14 +127,14 @@ async def api_key_auth(request: Request) -> HTTPAuthorizationCredentials:
     Raises:
         HTTPException: 401/429
     """
+    # 先按路径过滤：非 /ai/* 路由不消耗 IP 限流配额
+    if not request.url.path.startswith("/ai/"):
+        return None
+
     # P9 安全加固：per-IP 限流检查
     client_ip = request.client.host if request.client else "unknown"
     if not check_ip_rate_limit(client_ip):
         raise HTTPException(status_code=429, detail="IP rate limit exceeded")
-
-    # 跳过非 /ai/* 路由
-    if not request.url.path.startswith("/ai/"):
-        return None
 
     credentials = await security(request)
     if not credentials:

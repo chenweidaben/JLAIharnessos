@@ -1,14 +1,15 @@
 """
 健澜科技 jlmedaios AI 服务 - 审计日志中间件。
 
-# 生产接 ELK / Loki，当前本地 mock audit.json
+# 生产接 ELK / Loki，当前本地 JSONL 审计文件
 
 合规红线：
-- 记录所有 /ai/* 请求到本地 audit.json
+- 记录所有 /ai/* 请求到本地审计文件（按日轮转，JSONL 格式）
 - Bearer token 脱敏为 sk_x****
-- 保留≥180天
+- 保留≥180天（由外部日志采集/清理策略执行，本服务按日落盘便于归档）
 """
 
+import asyncio
 import json
 import time
 from datetime import datetime
@@ -17,7 +18,12 @@ from pathlib import Path
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
-AUDIT_FILE = Path("./data/audit.json")
+AUDIT_DIR = Path("./data")
+
+
+def _audit_file_for_today() -> Path:
+    """按日轮转的审计文件路径：./data/audit-YYYYMMDD.jsonl"""
+    return AUDIT_DIR / f"audit-{datetime.now():%Y%m%d}.jsonl"
 
 
 def _mask_token(auth_header: str) -> str:
@@ -35,20 +41,20 @@ def _mask_token(auth_header: str) -> str:
 
 
 def _write_audit(entry: dict):
-    """写入 audit.json（追加到 list）。"""
-    AUDIT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    """
+    追加一行 JSONL 到当日审计文件。
 
-    data = []
-    if AUDIT_FILE.exists():
-        try:
-            with open(AUDIT_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except (json.JSONDecodeError, IOError):
-            data = []
-
-    data.append(entry)
-    with open(AUDIT_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    P0 修复：原实现每请求「读全文件 → 解析 → 追加 → 整体重写」，存在：
+    1. O(n) 全量重写，文件越大越慢；
+    2. 并发请求 read-modify-write 竞态，互相覆盖丢日志；
+    3. 文件无界增长。
+    改为 append 模式单行写入：O(1)、POSIX 下 <PIPE_BUF 的写原子性、天然支持轮转。
+    """
+    path = _audit_file_for_today()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(entry, ensure_ascii=False)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
 
 class AuditMiddleware(BaseHTTPMiddleware):
@@ -83,7 +89,11 @@ class AuditMiddleware(BaseHTTPMiddleware):
             "status_code": response.status_code
         }
 
-        # 异步写入，不阻塞响应
-        _write_audit(entry)
+        # 同步文件 I/O 放到线程池，避免阻塞事件循环
+        try:
+            await asyncio.to_thread(_write_audit, entry)
+        except Exception:
+            # 审计写盘失败不应中断业务响应
+            pass
 
         return response

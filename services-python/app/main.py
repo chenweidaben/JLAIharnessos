@@ -6,8 +6,11 @@
 - 所有 PHI 字段必须先过 sensitive.mask_phi 脱敏
 """
 
-from fastapi import FastAPI, Request, HTTPException
+import os
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import health, nlp, cdss, imaging, encounter_memory, ai_qc, ai_triage, ai_cds, ai_learning, ai_similar_cases, nlp_extract, imaging_ai, prediction, ai_brain, knowledge_graph, ai_scheduling, ai_quality_insight, ai_emergency_triage, monitoring, ai_diagnosis, ai_prescription_review, ai_medical_scribe, ai_medication_adherence, ai_health_brain, ai_resource_optimization, ai_symptom_check, ai_quality_forecast, ai_clinical_notes, ai_risk_score, ai_data_quality, ai_teaching_assistant, ai_patient_satisfaction, ai_disease_prediction, ai_hospital_operation, ai_knowledge_inference, ai_imaging_report, ai_surgery_risk, ai_nursing_decision, ai_infection_warning, ai_discharge_readiness, ai_pain_assessment, ai_workflow_optimizer, ai_dashboard_insight, ai_consent_assistant, ai_medical_quality, ai_system_health, ai_capacity_planning, ai_anomaly_detection, ai_cost_optimization, ai_data_privacy, ai_ehr_assessment, ai_interconnection_assessment, ai_security_monitoring, ai_data_catalog, ai_model_monitoring, ai_patient_cohort, ai_clinical_guideline, ai_medication_safety, ai_revenue_forecast, ai_knowledge_reasoning, ai_data_augmentation, ai_twin_simulation, ai_iot_monitoring, ai_federated_learning, ai_blockchain_verify, ai_doctor_assistant, ai_patient_assistant, ai_executive_insight, ai_nursing_report, ai_doctor_note, ai_lab_quality, ai_radiology_report, ai_or_report, ai_er_triage, ai_icu_monitoring, ai_icu_alert, ai_dialysis_monitoring, ai_rehabilitation_plan, ai_nutrition_plan, ai_dermatology_diagnosis, ai_retina_screening, ai_hearing_screening, ai_dental_diagnosis
 from app.core.api_key_auth import API_KEYS, check_rate_limit
@@ -18,13 +21,25 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# CORS 中间件（开发阶段允许所有源）
+# P0 修复：CORS 白名单从环境变量读取（AI_CORS_ORIGINS，逗号分隔）。
+# 生产环境严禁 "*"（尤其与 allow_credentials 组合 = 任意站点可携带凭据跨域）。
+# 未配置时仅放行本地开发端口。
+_default_origins = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
+_is_production = os.getenv("APP_ENV", "development").lower() in ("production", "prod")
+_cors_origins = [o.strip() for o in os.getenv("AI_CORS_ORIGINS", "").split(",") if o.strip()]
+if not _cors_origins:
+    if _is_production:
+        # 生产未配置 CORS 白名单：不放行任何跨域来源（宁可拒绝也不裸奔）
+        _cors_origins = []
+    else:
+        _cors_origins = [o.strip() for o in _default_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-Id"],
 )
 
 # 审计日志中间件（记录所有 /ai/* 请求到 audit.json，生产接 ELK/Loki）
@@ -44,13 +59,15 @@ async def api_key_middleware(request: Request, call_next):
     path = request.url.path
     if path.startswith("/ai/"):
         auth = request.headers.get("Authorization", "")
+        # P0 修复：函数式中间件里 raise HTTPException 不会被 ExceptionMiddleware
+        # 捕获（它在用户中间件内侧），会冒泡成 500。必须直接返回 JSONResponse。
         if not auth.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Missing Bearer Token")
-        api_key = auth.replace("Bearer ", "")
+            return JSONResponse(status_code=401, content={"detail": "Missing Bearer Token"})
+        api_key = auth[len("Bearer "):].strip()
         if api_key not in API_KEYS:
-            raise HTTPException(status_code=401, detail="Invalid API Key")
+            return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
         if not check_rate_limit(api_key):
-            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+            return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
 
     response = await call_next(request)
 
