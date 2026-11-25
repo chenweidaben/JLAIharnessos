@@ -17,7 +17,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, verifyDbConnection } from '../../src/db/pool.js';
 import { type AuthView } from '../../src/bff/view/userView.js';
 import {
   loginWithWechat,
@@ -239,4 +239,5 @@ afterAll(async () => {
   const { getDb } = await import('../../src/db/pool.js');
   const db = getDb();
   await db`DELETE FROM clinical.patient_accounts WHERE id = ANY(${accountIds})`;
+  await closeDbForTest();
 });

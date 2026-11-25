@@ -18,7 +18,7 @@
 
 import { afterAll, describe, expect, it } from 'bun:test';
 
-import { getDb, verifyDbConnection } from '../../src/db/pool.js';
+import { closeDbForTest, getDb, verifyDbConnection } from '../../src/db/pool.js';
 import { buildAuthView, type AuthView } from '../../src/bff/view/userView.js';
 import { getUserById, getUserByUsername, getUserRoleLinks } from '../../src/db/repositories/userRepo.js';
 import {
@@ -241,6 +241,7 @@ afterAll(async () => {
     if (tempDoctorIds.length) {
       await db`DELETE FROM iam.users WHERE id IN ${db(tempDoctorIds)}`;
     }
+    await closeDbForTest();
   }
 });
 

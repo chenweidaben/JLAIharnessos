@@ -17,6 +17,25 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { afterAll } from 'bun:test';
+import { closeDbForTest } from '../../src/db/pool.js';
+
 if (process.env.TEST_REAL !== '1') {
   process.env.DEMO_MODE = '1';
 }
+
+// 进程级连接池兜底（测试基础设施层，不改动生产池上限/重连策略）：
+//
+// 背景：bun test 在单进程内顺序执行多个测试文件，主池为模块级单例，跨文件
+// 复用。逐文件 afterAll 关池是约定而非强制；若某文件漏关，残留连接会留在池内，
+// 进程退出时可能形成句柄泄漏或进程悬挂。实证 bun 1.2.0 中，在 preload 模块
+// 注册的 afterAll 钩子在整轮测试结束后全局执行一次（非每文件一次），适合作为
+// 最后一道安全网。
+//
+// closeDbForTest 在 _sql 为 null 时直接返回：纯 mock/unit 进程从未 getDb()，
+// 不建池、无副作用；真实模式进程在所有文件收尾后优雅关闭主池。afterEach 级别
+// 统一回收不可行（M48-A：bun 1.2 Windows afterEach 阶段主池读循环不 pump，
+// 池上查询会永久挂起），故兜底只挂进程末尾 afterAll，不介入用例之间。
+afterAll(async () => {
+  await closeDbForTest();
+});
