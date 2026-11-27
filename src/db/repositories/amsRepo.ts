@@ -184,11 +184,6 @@ export interface SpecialApproval {
   approvedAt: string | null;
 }
 
-const SPECIAL_BASE_COLS = `
-  id, approval_no, visit_id, patient_id, prescriber_id, drug_id, indication,
-  consultation_opinion, consultant_id, approver_id, status, order_id, reject_reason,
-  created_at, approved_at
-`;
 const SPECIAL_COLS = `
   sa.id, sa.approval_no, sa.visit_id, sa.patient_id, sa.prescriber_id, sa.drug_id,
   sa.indication, sa.consultation_opinion, sa.consultant_id, sa.approver_id, sa.status,

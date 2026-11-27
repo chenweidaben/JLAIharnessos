@@ -36,7 +36,6 @@ function pick<T extends string>(v: unknown, allowed: readonly T[], label: string
 
 const REPORT_TYPES: readonly ReportType[] = ['lab', 'imaging', 'prescription', 'bill-summary'];
 const CHANNELS: readonly ReminderChannel[] = ['in-app', 'sms', 'wechat'];
-const METHODS: readonly PaymentRecord['method'][] = ['wechat', 'alipay', 'cash', 'insurance'];
 
 function gen(prefix: string): string { seq += 1; return `${prefix}-${String(seq).padStart(5, '0')}`; }
 

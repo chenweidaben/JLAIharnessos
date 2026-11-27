@@ -210,7 +210,7 @@ function knowledgeOf(item: LabResultItem): ItemKnowledge | null {
   const code = (item.itemCode ?? '').toUpperCase();
   if (code && ITEM_KNOWLEDGE[code]) return ITEM_KNOWLEDGE[code];
   const name = (item.itemName ?? '').replace(/\s/g, '');
-  for (const [key, val] of Object.entries(ITEM_KNOWLEDGE)) {
+  for (const [, val] of Object.entries(ITEM_KNOWLEDGE)) {
     if (name.includes(val.what.slice(0, 2))) return val;
   }
   // 用名称反查常见项目名。

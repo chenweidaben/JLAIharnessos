@@ -56,8 +56,6 @@ export interface SchemaCheckContext {
   riskLevel?: 'low' | 'medium' | 'high';
 }
 
-const SUPPORTED_TYPES = ['object', 'array', 'string', 'number', 'boolean', 'null'] as const;
-
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

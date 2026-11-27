@@ -76,7 +76,6 @@ export function buildRagTuningV5Report(
   chunks: { retrievalCount: number; hit: boolean }[],
   topK: number,
 ): RagTuningV5Report {
-  const totalRetrievals = chunks.reduce((s, c) => s + c.retrievalCount, 0);
   const hits = chunks.filter((c) => c.hit).length;
   const avgHitRate = chunks.length > 0
     ? Math.round((hits / chunks.length) * 1000) / 10

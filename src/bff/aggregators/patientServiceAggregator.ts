@@ -67,18 +67,6 @@ const TYPE_BY_LABEL: Readonly<Record<string, ServiceType>> = {
   转诊预约: 'referral_appointment',
 };
 
-/**
- * 【预防保健与患者服务】状态机：合法流转边。
- * 已创建 → 已分派 → 已解决 → 已关闭；终态（已关闭）不可再流转。
- * 保护患者：未分派不得径行解决；未解决不得要求患者回访。
- */
-const NEXT_STATUS: Readonly<Record<ServiceStatus, readonly ServiceStatus[]>> = {
-  created: ['assigned'],
-  assigned: ['resolved'],
-  resolved: ['closed'],
-  closed: [],
-};
-
 /** 限时处理窗口：48 小时（毫秒）。超时未处理即升级提醒。 */
 export const SLA_WINDOW_MS = 48 * 60 * 60 * 1000;
 

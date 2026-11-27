@@ -212,11 +212,6 @@ export const ISSUE_LEXICON: Readonly<Record<Exclude<IssueCategory, 'other'>, str
   treatment_effect: ['没效果', '复发', '误诊', '治不好', '没治好', '不见好', '越治越重'],
 };
 
-/** 表扬正面词典 */
-const PRAISE_LEXICON: readonly string[] = [
-  '满意', '谢谢', '感谢', '周到', '耐心', '清楚', '专业', '赞', '不错', '贴心', '认真', '负责', '热情', '温暖', '好评',
-];
-
 /** 根因中文释义 */
 const ROOT_CAUSE_LABEL: Readonly<Record<RootCauseCode, string>> = {
   staffing_gap: '人力配置不足',

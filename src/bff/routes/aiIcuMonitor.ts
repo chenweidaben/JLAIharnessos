@@ -66,8 +66,6 @@ interface IPredictionProvider {
   predictSedation(input: MonitorInput): SedationSuggestion;
 }
 
-const ventilatorModes = ['SIMV-PC', 'PSV', 'BiPAP', 'A/C VC', 'CPAP'];
-
 const demoBeds: IcuBed[] = [
   { bedId: 'ICU-A-01', patientId: 'P-1001', patientName: '张**', sofaScore: 6, sepsisRisk: 'high', ventilatorMode: 'SIMV-PC', aiSuggestion: '脓毒症风险升高，建议复查乳酸并评估液体复苏', updatedAt: '2026-11-04 04:20' },
   { bedId: 'ICU-A-02', patientId: 'P-1002', patientName: '李**', sofaScore: 3, sepsisRisk: 'low', ventilatorMode: 'PSV', aiSuggestion: '生命体征平稳，维持现有镇静深度', updatedAt: '2026-11-04 04:21' },

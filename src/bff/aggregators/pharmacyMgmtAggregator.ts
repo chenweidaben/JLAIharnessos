@@ -205,16 +205,6 @@ export interface PharmacyReport {
 
 /* ============================== 内置规则常量 ============================== */
 
-/** 不合理处方类型中文映射 */
-const IRRATIONAL_LABEL: Record<IrrationalType, string> = {
-  dosage: '剂量不适宜',
-  indication: '适应症不适宜',
-  interaction: '联用禁忌',
-  duplication: '重复用药',
-  administration: '给药途径不适宜',
-  other: '其他不适宜',
-};
-
 /** 妊娠禁忌药品关键词（命中且患者妊娠 → 不合理） */
 const PREGNANCY_CONTRAINDICATED = [
   '异维A酸', '利巴韦林', '华法林', '甲氨蝶呤', '四环素', '喹诺酮', '左氧氟沙星',

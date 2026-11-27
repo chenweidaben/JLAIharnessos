@@ -585,14 +585,6 @@ interface MetricsGroup {
   abnormalCounts: Record<AbnormalKind, number>;
 }
 
-const ABNORMAL_KINDS: readonly AbnormalKind[] = [
-  'timeout',
-  'circuit-open',
-  'schema-failure',
-  'manual-handover',
-  'tool-error',
-];
-
 function emptyAbnormalCounts(): Record<AbnormalKind, number> {
   return {
     'timeout': 0,

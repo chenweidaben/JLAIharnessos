@@ -164,8 +164,6 @@ export function optimizeSchedule(
   const workByWeek = new Map<string, Map<string, number>>(); // staffId -> weekKey -> count
   const nightByWeek = new Map<string, Map<string, number>>();
 
-  const staffById = new Map(staff.map((s) => [s.id, s]));
-
   const bump = (table: Map<string, Map<string, number>>, staffId: string, week: string) => {
     if (!table.has(staffId)) table.set(staffId, new Map());
     const m = table.get(staffId)!;

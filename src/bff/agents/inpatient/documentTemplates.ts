@@ -133,7 +133,6 @@ function statusFromDeadline(now: Date, deadline: Date, missing: boolean): Schedu
 
 /** 计算单类文书时限状态；缺少时间上下文时返回 missing-context，不抛异常 */
 export function evaluateSchedule(context: ScheduleContext): ScheduleReminder {
-  const template = DOCUMENT_TEMPLATES[context.documentType];
   const now = parseDate(context.currentTime);
 
   if (!now) {

@@ -85,10 +85,6 @@ export const OPS_METRIC_CATALOG: MetricSpec[] = [
   { key: 'insurance_denial_rate', name: '医保拒付率', unit: '0..1', domain: 'finance', direction: 'lower_better' },
 ];
 
-const SPEC_BY_KEY: Record<string, MetricSpec> = Object.fromEntries(
-  OPS_METRIC_CATALOG.map((s) => [s.key, s]),
-);
-
 function round2(v: number): number {
   return Math.round(v * 100) / 100;
 }

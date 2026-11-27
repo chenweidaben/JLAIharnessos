@@ -18,7 +18,6 @@ import { requireAuth } from '../middleware/auth';
 import { json, ok, type Ctx, type RouteDef } from '../types';
 
 type OrderType = 'medication' | 'lab' | 'imaging' | 'procedure' | 'nursing';
-const ORDER_TYPES: OrderType[] = ['medication', 'lab', 'imaging', 'procedure', 'nursing'];
 
 type OrdStatus = 'draft' | 'reviewed' | 'executed' | 'cancelled';
 type ReviewResult = 'approve' | 'reject';

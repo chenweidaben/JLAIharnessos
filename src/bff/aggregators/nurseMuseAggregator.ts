@@ -924,7 +924,6 @@ function buildGrowthMonthly(
   const buckets = new Map<string, NurseGrowthPoint>();
   let cursor = new Date(startMs);
   cursor.setUTCDate(1);
-  const endMonth = new Date(endMs);
   let guard = 0;
   while (cursor.getTime() <= endMs && guard < 1200) {
     const key = msToMonthKey(cursor.getTime());

@@ -301,7 +301,6 @@ export interface RuleLevelResult {
  */
 export function ruleSuggestedLevel(input: TriageAssessmentInput): RuleLevelResult {
   const v = input.vitals;
-  const reasons: string[] = [];
   const n = news2(v);
   const cLevel = complaintLevel(input.chiefComplaint);
 

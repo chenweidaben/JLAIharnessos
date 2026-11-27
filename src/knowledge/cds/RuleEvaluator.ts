@@ -21,16 +21,6 @@ import type {
 /** 字段解析出的原始值类型 */
 type ResolvedValue = number | string | boolean | readonly unknown[] | undefined;
 
-/** 列表型字段集合（contains 表示“任一项子串命中”） */
-const LIST_FIELDS = new Set([
-  'allergies',
-  'currentDrugs',
-  'newDrugs',
-  'diagnoses',
-  'symptoms',
-  'signs',
-]);
-
 /**
  * 规则评估器：纯函数式，无状态，可单条或批量复用。
  */

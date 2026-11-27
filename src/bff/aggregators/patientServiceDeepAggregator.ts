@@ -261,13 +261,6 @@ export function maskPatientId(patientId: string): string {
   return `${id.slice(0, 2)}****${id.slice(-2)}`;
 }
 
-/** 由患者 id 派生一个稳定的 0..99 种子（纯函数，同一患者结果稳定） */
-function seedOf(patientId: string): number {
-  let h = 0;
-  for (let i = 0; i < patientId.length; i++) h = (h * 31 + patientId.charCodeAt(i)) >>> 0;
-  return h % 100;
-}
-
 /* ------------------------------------------------------------------ */
 /* 对外纯函数                                                          */
 /* ------------------------------------------------------------------ */
@@ -283,7 +276,6 @@ function seedOf(patientId: string): number {
 export function buildPatientFullService(patientId: unknown): FullService {
   const raw = toText(patientId);
   if (!raw) throw new Error('患者标识 patientId 不能为空');
-  const seed = seedOf(raw);
 
   return {
     patientId: maskPatientId(raw),
