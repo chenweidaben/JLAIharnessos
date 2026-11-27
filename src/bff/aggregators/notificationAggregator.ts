@@ -21,6 +21,7 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -297,7 +298,10 @@ export async function listNotifications(
       pageSize,
     };
   } catch (e) {
-    console.warn('[notifications] 列表读取失败，降级为空列表:', e instanceof Error ? e.message : e);
+    rootLogger.warn('[notifications] 列表读取失败，降级为空列表', {
+      staffId,
+      error: e instanceof Error ? e.message : String(e),
+    });
     return { items: [], total: 0, unread: 0, page, pageSize };
   }
 }
@@ -323,7 +327,11 @@ export async function markNotificationRead(
     const row = rows[0];
     return row ? rowToNotification(row) : null;
   } catch (e) {
-    console.warn('[notifications] 已读标记失败:', e instanceof Error ? e.message : e);
+    rootLogger.warn('[notifications] 已读标记失败', {
+      staffId,
+      id,
+      error: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }

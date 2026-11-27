@@ -18,6 +18,7 @@
  */
 
 import { decryptField, encryptField } from '../../security/encryption/FieldCipher.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -110,7 +111,10 @@ function rowToMessage(r: StoredImMessage): ImMessage {
     content = decryptField(r.contentCipher);
   } catch (e) {
     // 密文被篡改 / 密钥错误：不抛断整条会话，回退占位串并告警
-    console.warn('[im] 消息解密失败，已回退占位串:', e instanceof Error ? e.message : e);
+    rootLogger.warn('[im] 消息解密失败，已回退占位串', {
+      messageId: r.id,
+      error: e instanceof Error ? e.message : String(e),
+    });
     content = '[消息解密失败]';
   }
   return {

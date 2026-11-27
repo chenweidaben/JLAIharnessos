@@ -6,6 +6,7 @@
  */
 
 import type { AgentEvent, AgentEventType } from '@/types';
+import { rootLogger } from '../logging/Logger';
 
 /**
  * 事件订阅回调
@@ -190,7 +191,11 @@ export class AgentEventBus {
     try {
       handler(event);
     } catch (error) {
-      console.error('[AgentEventBus] subscriber error:', error);
+      rootLogger.error('[AgentEventBus] subscriber error', {
+        eventType: event.type,
+        sessionId: event.sessionId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

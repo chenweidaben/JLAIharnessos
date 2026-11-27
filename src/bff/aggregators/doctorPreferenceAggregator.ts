@@ -16,6 +16,7 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /* ------------------------------------------------------------------ */
 /* 类型                                                                */
@@ -221,7 +222,10 @@ export async function getStoredPreference(
       updatedAt: asDate(row.updated_at),
     };
   } catch (e) {
-    console.warn('[doctor-preference] 读取失败，降级为空偏好:', e instanceof Error ? e.message : e);
+    rootLogger.warn('[doctor-preference] 读取失败，降级为空偏好', {
+      doctorId,
+      error: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }
@@ -293,7 +297,10 @@ export async function rebuildStoredPreference(
     pref = buildDoctorPreference(orders, exams);
     await upsertPreference(doctorId, pref);
   } catch (e) {
-    console.warn('[doctor-preference] 偏好重算失败，保留原偏好:', e instanceof Error ? e.message : e);
+    rootLogger.warn('[doctor-preference] 偏好重算失败，保留原偏好', {
+      doctorId,
+      error: e instanceof Error ? e.message : String(e),
+    });
     const stored = await getStoredPreference(doctorId);
     if (stored) {
       pref = {

@@ -18,6 +18,7 @@
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { join } from 'node:path';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 export interface KeyOp {
   at: string;
@@ -72,7 +73,9 @@ function migrateLegacyIfPresent(): void {
     renameSync(oldP, oldP + '.migrated');
   } catch (e) {
     // 迁移失败不阻断主流程，但留痕；下次启动再试
-    console.warn('[worm-key-ops] 旧格式迁移失败:', (e as Error).message);
+    rootLogger.warn('[worm-key-ops] 旧格式迁移失败', {
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -84,7 +87,11 @@ export function appendKeyOp(op: KeyOpInput): void {
     mkdirSync(storeDir(), { recursive: true });
     appendFileSync(instanceOpsPath(), JSON.stringify(record) + '\n', 'utf8');
   } catch (e) {
-    console.warn('[worm-key-ops] 运维审计写入失败，本条记录已丢失:', (e as Error).message);
+    rootLogger.warn('[worm-key-ops] 运维审计写入失败，本条记录已丢失', {
+      action: op.action,
+      keyId: op.keyId,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -207,7 +214,10 @@ export function cleanupOldKeyOps(opts: { dryRun?: boolean; retentionDays?: numbe
       unlinkSync(p);
       result.removed++;
     } catch (e) {
-      console.warn('[worm-key-ops] 清理旧文件失败:', name, (e as Error).message);
+      rootLogger.warn('[worm-key-ops] 清理旧文件失败', {
+        fileName: name,
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }
   return result;
