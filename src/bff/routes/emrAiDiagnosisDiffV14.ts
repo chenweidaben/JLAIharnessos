@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI鉴别诊断支持 V14 路由（M550-B）
  *
@@ -37,7 +38,7 @@ export const emrAiDiagnosisDiffV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDiagnosisDiffInputV14 = {
-        symptom: String(obj?.symptom ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
         age: Number(obj?.age ?? 0),
       };
       const result = diffDiagnosisByAi(input);

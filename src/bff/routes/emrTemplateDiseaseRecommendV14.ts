@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病种模板智能推荐 V14 路由（M525-B）
  *
@@ -40,8 +41,8 @@ export const emrTemplateDiseaseRecommendV14Routes: RouteDef[] = [
         ? body.templates.map((t: unknown) => {
             const obj = t as Record<string, unknown>;
             return {
-              name: String(obj?.name ?? ""),
-              dept: String(obj?.dept ?? ""),
+              name: toText(obj?.name ?? ""),
+              dept: toText(obj?.dept ?? ""),
               matchScore: Number(obj?.matchScore ?? 0),
             };
           })

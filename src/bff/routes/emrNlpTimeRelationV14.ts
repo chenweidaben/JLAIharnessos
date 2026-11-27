@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历 NLP 时间关系提取 V14 路由（M531-C）
  *
@@ -37,8 +38,8 @@ export const emrNlpTimeRelationV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: NlpTimeRelationInputV14 = {
-        eventA: String(obj?.eventA ?? ""),
-        eventB: String(obj?.eventB ?? ""),
+        eventA: toText(obj?.eventA ?? ""),
+        eventB: toText(obj?.eventB ?? ""),
         relationType: (obj?.relationType ?? "同时") as NlpTimeRelationInputV14["relationType"],
       };
       const result = extractTimeRelation(input);

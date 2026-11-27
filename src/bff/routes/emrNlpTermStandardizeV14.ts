@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历 NLP 术语标准化 V14 路由（M531-B）
  *
@@ -37,7 +38,7 @@ export const emrNlpTermStandardizeV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: NlpTermStandardizeInputV14 = {
-        rawTerm: String(obj?.rawTerm ?? ""),
+        rawTerm: toText(obj?.rawTerm ?? ""),
         aliases: (obj?.aliases ?? {}) as Record<string, string>,
       };
       const result = standardizeMedicalTerm(input);

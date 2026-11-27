@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历调阅日志审计 V14 路由（M534-B）
  *
@@ -37,8 +38,8 @@ export const emrAccessAuditLogV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AccessAuditLogInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        operator: String(obj?.operator ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        operator: toText(obj?.operator ?? ""),
         action: (obj?.action ?? "查看") as AccessAuditLogInputV14["action"],
       };
       const result = logAccessEvent(input);

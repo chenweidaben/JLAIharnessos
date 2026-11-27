@@ -27,6 +27,8 @@ import {
   type LearningCurveDecision,
 } from '../aggregators/deptLearningCurveAggregator.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：走进程内样例，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -52,7 +54,7 @@ interface MemoryRow {
 /** 把 DB 决策记忆行塑形为聚合器入参 */
 function toDecision(r: MemoryRow): LearningCurveDecision {
   return {
-    staffId: String(r.staff_id ?? ''),
+    staffId: toText(r.staff_id ?? ''),
     // 依据宪法第七章 7.2：科室维度待 staff_muse_profile 接入 dept_code 后按科室拆分
     // （当前与 museHospital 同口径，先全院聚合兜底，不炸路由）
     deptCode: '',

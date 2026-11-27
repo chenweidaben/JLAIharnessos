@@ -20,6 +20,8 @@ import {
   publishReport, listReports, markReportRead,
   createTicket, listTickets, addComment, updateTicketStatus, autoCreateLowSatisfactionTicket,
 } from '../aggregators/engagementAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof EngagementError) {
@@ -47,8 +49,8 @@ export const engagementRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(publishReport({
-          patientId: String(b.patientId ?? ''), visitId: String(b.visitId ?? ''),
-          type: b.type, title: String(b.title ?? ''), result: String(b.result ?? ''),
+          patientId: toText(b.patientId ?? ''), visitId: toText(b.visitId ?? ''),
+          type: b.type, title: toText(b.title ?? ''), result: toText(b.result ?? ''),
           isAbnormal: Boolean(b.isAbnormal),
         })));
       } catch (e) { return mapError(e); }
@@ -87,12 +89,12 @@ export const engagementRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = String(b.patientId ?? '');
+        const patientId = toText(b.patientId ?? '');
         assertPatientScope(c, patientId);
         return json(ok(createTicket({
           patientId,
-          source: b.source, relatedSurveyId: b.relatedSurveyId === undefined ? undefined : String(b.relatedSurveyId),
-          subject: String(b.subject ?? ''), description: String(b.description ?? ''),
+          source: b.source, relatedSurveyId: b.relatedSurveyId === undefined ? undefined : toText(b.relatedSurveyId),
+          subject: toText(b.subject ?? ''), description: toText(b.description ?? ''),
         })));
       } catch (e) { return mapError(e); }
     },
@@ -126,7 +128,7 @@ export const engagementRoutes: RouteDef[] = [
         return json(ok(addComment(
           String(c.params?.ticketId ?? ''),
           c.user?.id ?? '', roles.join(','),
-          String(b.content ?? ''),
+          toText(b.content ?? ''),
         )));
       } catch (e) { return mapError(e); }
     },
@@ -142,8 +144,8 @@ export const engagementRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(updateTicketStatus(
           String(c.params?.ticketId ?? ''),
-          String(b.status ?? ''),
-          b.comment === undefined ? undefined : String(b.comment),
+          toText(b.status ?? ''),
+          b.comment === undefined ? undefined : toText(b.comment),
         )));
       } catch (e) { return mapError(e); }
     },
@@ -159,13 +161,13 @@ export const engagementRoutes: RouteDef[] = [
         const out: Record<string, unknown> = {};
         if (Array.isArray(b.reports)) {
           out.reports = (b.reports as Record<string, unknown>[]).map((r) => publishReport({
-            patientId: String(r.patientId ?? ''), visitId: String(r.visitId ?? ''),
-            type: r.type, title: String(r.title ?? ''), result: String(r.result ?? ''), isAbnormal: Boolean(r.isAbnormal),
+            patientId: toText(r.patientId ?? ''), visitId: toText(r.visitId ?? ''),
+            type: r.type, title: toText(r.title ?? ''), result: toText(r.result ?? ''), isAbnormal: Boolean(r.isAbnormal),
           }));
         }
         if (Array.isArray(b.lowSatisfaction)) {
           out.tickets = (b.lowSatisfaction as Record<string, unknown>[]).map((x) => autoCreateLowSatisfactionTicket(
-            String(x.patientId ?? ''), String(x.surveyId ?? ''), String(x.comment ?? ''),
+            toText(x.patientId ?? ''), toText(x.surveyId ?? ''), toText(x.comment ?? ''),
           ));
         }
         return json(ok(out));

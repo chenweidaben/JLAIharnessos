@@ -20,6 +20,8 @@
  * ==========================================================================*/
 
 import { type DbExecutor } from '../db/pool.js';
+import { toText } from '../db/rowText.js';
+
 
 export type QualityDimension =
   | 'completeness'
@@ -137,7 +139,7 @@ export async function checkRule(
     }
 
     case 'valid_regex': {
-      const pattern = String(rule.params.pattern ?? '');
+      const pattern = toText(rule.params.pattern ?? '');
       statParams = [pattern];
       sampleParams = [pattern];
       statSql = `
@@ -154,9 +156,9 @@ export async function checkRule(
     }
 
     case 'fk_exists': {
-      const refSchema = String(rule.params.ref_schema ?? '');
-      const refTable = String(rule.params.ref_table ?? '');
-      const refColumn = String(rule.params.ref_column ?? 'id');
+      const refSchema = toText(rule.params.ref_schema ?? '');
+      const refTable = toText(rule.params.ref_table ?? '');
+      const refColumn = toText(rule.params.ref_column ?? 'id');
       const ref = qualified(refSchema, refTable);
       const refCol = qi(refColumn);
       statSql = `
@@ -175,7 +177,7 @@ export async function checkRule(
     }
 
     case 'conditional_not_null': {
-      const condition = String(rule.params.condition ?? 'true');
+      const condition = toText(rule.params.condition ?? 'true');
       statSql = `
         SELECT count(*) FILTER (WHERE ${condition}) AS total,
                count(*) FILTER (WHERE ${condition} AND ${col} IS NULL) AS failed

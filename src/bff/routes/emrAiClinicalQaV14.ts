@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI临床问答 V14 路由（M545-A）
  *
@@ -37,7 +38,7 @@ export const emrAiClinicalQaV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiClinicalQaInputV14 = {
-        question: String(obj?.question ?? ""),
+        question: toText(obj?.question ?? ""),
       };
       const result = askClinicalQa(input);
       const report = buildAiClinicalQaReport(result);

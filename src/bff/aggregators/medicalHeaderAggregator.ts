@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/medicalHeaderRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class MedicalHeaderError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -17,23 +19,23 @@ export async function upsertView(view: AuthView, body: Record<string, unknown>) 
   if (!body.patientName) throw new MedicalHeaderError(400, '患者姓名必填');
   if (!body.admissionDate) throw new MedicalHeaderError(400, '入院日期必填');
   return repo.upsert({
-    visitId: String(body.visitId), patientName: String(body.patientName),
-    admissionDate: String(body.admissionDate),
-    gender: body.gender ? String(body.gender) : undefined,
-    birthDate: body.birthDate ? String(body.birthDate) : undefined,
-    idCard: body.idCard ? String(body.idCard) : undefined,
-    dischargeDate: body.dischargeDate ? String(body.dischargeDate) : undefined,
-    deptName: body.deptName ? String(body.deptName) : undefined,
-    wardName: body.wardName ? String(body.wardName) : undefined,
-    attendingDoctor: body.attendingDoctor ? String(body.attendingDoctor) : undefined,
-    primaryDiagnosis: body.primaryDiagnosis ? String(body.primaryDiagnosis) : undefined,
+    visitId: toText(body.visitId), patientName: toText(body.patientName),
+    admissionDate: toText(body.admissionDate),
+    gender: body.gender ? toText(body.gender) : undefined,
+    birthDate: body.birthDate ? toText(body.birthDate) : undefined,
+    idCard: body.idCard ? toText(body.idCard) : undefined,
+    dischargeDate: body.dischargeDate ? toText(body.dischargeDate) : undefined,
+    deptName: body.deptName ? toText(body.deptName) : undefined,
+    wardName: body.wardName ? toText(body.wardName) : undefined,
+    attendingDoctor: body.attendingDoctor ? toText(body.attendingDoctor) : undefined,
+    primaryDiagnosis: body.primaryDiagnosis ? toText(body.primaryDiagnosis) : undefined,
     secondaryDiagnoses: body.secondaryDiagnoses ? body.secondaryDiagnoses as string[] : undefined,
     operationCodes: body.operationCodes ? body.operationCodes as string[] : undefined,
     operationNames: body.operationNames ? body.operationNames as string[] : undefined,
     icd10Codes: body.icd10Codes ? body.icd10Codes as string[] : undefined,
     totalCost: body.totalCost ? Number(body.totalCost) : undefined,
-    insuranceType: body.insuranceType ? String(body.insuranceType) : undefined,
-    dischargeStatus: body.dischargeStatus ? String(body.dischargeStatus) : undefined,
+    insuranceType: body.insuranceType ? toText(body.insuranceType) : undefined,
+    dischargeStatus: body.dischargeStatus ? toText(body.dischargeStatus) : undefined,
   });
 }
 

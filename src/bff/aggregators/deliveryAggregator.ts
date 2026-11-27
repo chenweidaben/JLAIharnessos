@@ -38,6 +38,8 @@ import {
   listLabInterpretations,
 } from '../../db/repositories/reportRepo.js';
 import type { AuthView } from '../view/userView.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class InternetDeliveryError extends Error {
   constructor(
@@ -233,18 +235,18 @@ export async function listPaidRxForDelivery(): Promise<EPrescription[]> {
     profileId: String(r.profile_id),
     patientId: String(r.patient_id),
     prescriberId: String(r.prescriber_id),
-    department: r.department != null ? String(r.department) : null,
+    department: r.department != null ? toText(r.department) : null,
     status: String(r.status) as EPrescription['status'],
-    riskLevel: r.risk_level != null ? String(r.risk_level) : null,
-    counsel: r.counsel != null ? String(r.counsel) : null,
+    riskLevel: r.risk_level != null ? toText(r.risk_level) : null,
+    counsel: r.counsel != null ? toText(r.counsel) : null,
     totalFee: r.total_fee != null ? Number(r.total_fee) : null,
     idempotencyKey: String(r.idempotency_key),
-    reviewerId: r.reviewer_id != null ? String(r.reviewer_id) : null,
-    auditComment: r.audit_comment != null ? String(r.audit_comment) : null,
-    auditedAt: r.audited_at != null ? String(r.audited_at) : null,
-    returnReason: r.return_reason != null ? String(r.return_reason) : null,
-    cancelledBy: r.cancelled_by != null ? String(r.cancelled_by) : null,
-    cancelledAt: r.cancelled_at != null ? String(r.cancelled_at) : null,
+    reviewerId: r.reviewer_id != null ? toText(r.reviewer_id) : null,
+    auditComment: r.audit_comment != null ? toText(r.audit_comment) : null,
+    auditedAt: r.audited_at != null ? toText(r.audited_at) : null,
+    returnReason: r.return_reason != null ? toText(r.return_reason) : null,
+    cancelledBy: r.cancelled_by != null ? toText(r.cancelled_by) : null,
+    cancelledAt: r.cancelled_at != null ? toText(r.cancelled_at) : null,
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at),
     items: [],

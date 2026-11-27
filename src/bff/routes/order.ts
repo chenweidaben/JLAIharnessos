@@ -11,6 +11,8 @@ import {
   listOrders,
   listExecutions,
 } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -55,13 +57,13 @@ export const orderRoutes: RouteDef[] = [
         assertCan(actor(c), 'write');
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createOrder({
-          visitId: String(b.visitId ?? ''),
-          patientId: b.patientId ? String(b.patientId) : undefined,
-          orderType: String(b.orderType ?? 'other'),
-          content: String(b.content ?? ''),
-          dosage: b.dosage ? String(b.dosage) : undefined,
-          frequency: b.frequency ? String(b.frequency) : undefined,
-          route: b.route ? String(b.route) : undefined,
+          visitId: toText(b.visitId ?? ''),
+          patientId: b.patientId ? toText(b.patientId) : undefined,
+          orderType: toText(b.orderType ?? 'other'),
+          content: toText(b.content ?? ''),
+          dosage: b.dosage ? toText(b.dosage) : undefined,
+          frequency: b.frequency ? toText(b.frequency) : undefined,
+          route: b.route ? toText(b.route) : undefined,
           feeCents: typeof b.feeCents === 'number' ? b.feeCents : 0,
           orderedBy: c.user!.id,
           orderedByName: c.user!.name,
@@ -76,7 +78,7 @@ export const orderRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(cancelOrder({
           orderId: c.params.id,
-          reason: String(b.reason ?? ''),
+          reason: toText(b.reason ?? ''),
           cancelledBy: c.user!.id,
         })));
       } catch (e) { return mapError(e); }
@@ -91,7 +93,7 @@ export const orderRoutes: RouteDef[] = [
           orderId: c.params.id,
           executedBy: c.user!.id,
           executedByName: c.user!.name,
-          note: b.note ? String(b.note) : undefined,
+          note: b.note ? toText(b.note) : undefined,
         })));
       } catch (e) { return mapError(e); }
     } },

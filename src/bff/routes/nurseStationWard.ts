@@ -22,6 +22,8 @@ import {
   recordVitals,
   writeNursingRecord,
 } from '../aggregators/nurseStationWardAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function actorOf(c: Ctx): { roles: string[]; permissions: string[] } {
   return {
@@ -51,8 +53,8 @@ export const nurseStationWardRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         const rec = pdaExecuteBySlip({
-          slipNo: String(b.slipNo ?? ''),
-          scannedPatientId: String(b.scannedPatientId ?? ''),
+          slipNo: toText(b.slipNo ?? ''),
+          scannedPatientId: toText(b.scannedPatientId ?? ''),
           executedBy: c.user?.id ?? 'unknown',
           executedByName: c.user?.name,
           actor: actorOf(c),
@@ -70,8 +72,8 @@ export const nurseStationWardRoutes: RouteDef[] = [
         assertCan(actorOf(c), 'execute');
         const b = (await c.body()) as Record<string, unknown>;
         const rec = recordVitals({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
           temperatureC: Number(b.temperatureC),
           heartRateBpm: Number(b.heartRateBpm),
           sbp: Number(b.sbp),
@@ -92,10 +94,10 @@ export const nurseStationWardRoutes: RouteDef[] = [
         assertCan(actorOf(c), 'execute');
         const b = (await c.body()) as Record<string, unknown>;
         const rec = writeNursingRecord({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          recordType: String(b.recordType ?? ''),
-          content: String(b.content ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          recordType: toText(b.recordType ?? ''),
+          content: toText(b.content ?? ''),
           writtenBy: c.user?.id ?? 'unknown',
           writtenByName: c.user?.name,
         });

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI肠内营养支持建议 V14 路由（M564-C）
  *
@@ -37,8 +38,8 @@ export const emrAiEnteralNutritionSuggestV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiEnteralNutritionSuggestInputV14 = {
-        swallowing: String(obj?.swallowing ?? ""),
-        gutFunction: String(obj?.gutFunction ?? ""),
+        swallowing: toText(obj?.swallowing ?? ""),
+        gutFunction: toText(obj?.gutFunction ?? ""),
       };
       const result = suggestEnteralNutritionByAi(input);
       const report = buildAiEnteralNutritionSuggestReport(result);

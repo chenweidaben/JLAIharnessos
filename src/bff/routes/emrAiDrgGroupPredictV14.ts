@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI DRG 分组预测 V14 路由（M552-A）
  *
@@ -37,7 +38,7 @@ export const emrAiDrgGroupPredictV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDrgGroupPredictInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         hasSurgery: Boolean(obj?.hasSurgery ?? false),
       };
       const result = predictDrgGroupByAi(input);

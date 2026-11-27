@@ -29,6 +29,8 @@ import {
   listSettlements,
 } from '../aggregators/inpatientDepositSettleAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -96,11 +98,11 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(payDeposit({
-          visitId: String(b.visitId ?? ''),
+          visitId: toText(b.visitId ?? ''),
           amountCents: typeof b.amountCents === 'number' ? b.amountCents : NaN,
-          payMethod: String(b.payMethod ?? ''),
+          payMethod: toText(b.payMethod ?? ''),
           operatorId: view.id,
-          receiptNo: b.receiptNo ? String(b.receiptNo) : undefined,
+          receiptNo: b.receiptNo ? toText(b.receiptNo) : undefined,
         })));
       } catch (e) { return mapError(e); }
     },
@@ -148,10 +150,10 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const rawItems = Array.isArray(b.items) ? b.items as Record<string, unknown>[] : [];
         return json(ok(settleDischarge({
-          visitId: String(b.visitId ?? ''),
+          visitId: toText(b.visitId ?? ''),
           operatorId: view.id,
           items: rawItems.map((it) => ({
-            name: String(it.name ?? ''),
+            name: toText(it.name ?? ''),
             quantity: typeof it.quantity === 'number' ? it.quantity : NaN,
             unitPriceCents: typeof it.unitPriceCents === 'number' ? it.unitPriceCents : NaN,
           })),
@@ -183,15 +185,15 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const rawItems = Array.isArray(b.items) ? b.items as Record<string, unknown>[] : [];
         return json(ok(settleMid({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
           items: rawItems.map((it) => ({
-            name: String(it.name ?? ''),
+            name: toText(it.name ?? ''),
             cents: typeof it.cents === 'number' ? it.cents : NaN,
           })),
           operatorId: c.user?.id ?? 'unknown',
-          operatorNote: b.operatorNote ? String(b.operatorNote) : undefined,
-          idempotencyKey: b.idempotencyKey ? String(b.idempotencyKey) : undefined,
+          operatorNote: b.operatorNote ? toText(b.operatorNote) : undefined,
+          idempotencyKey: b.idempotencyKey ? toText(b.idempotencyKey) : undefined,
         })));
       } catch (e) { return mapError(e); }
     },
@@ -205,9 +207,9 @@ export const inpatientDepositSettleTradeRoutes: RouteDef[] = [
         assertCashier(c.user?.roles ?? []);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(pushDailyStatement({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          statementDate: b.statementDate ? String(b.statementDate) : undefined,
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          statementDate: b.statementDate ? toText(b.statementDate) : undefined,
           operatorId: c.user?.id ?? 'unknown',
         })));
       } catch (e) { return mapError(e); }

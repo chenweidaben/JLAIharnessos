@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI术后镇痛方案推荐 V14 路由（M562-D）
  *
@@ -37,7 +38,7 @@ export const emrAiPostopAnalgesiaRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiPostopAnalgesiaRecoInputV14 = {
-        surgeryType: String(obj?.surgeryType ?? ""),
+        surgeryType: toText(obj?.surgeryType ?? ""),
         painScore: Number(obj?.painScore ?? 0),
       };
       const result = recommendPostopAnalgesiaByAi(input);

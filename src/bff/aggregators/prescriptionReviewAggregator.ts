@@ -16,6 +16,8 @@
 
 import type { AuthView } from '../view/userView.js';
 import * as repo from '../../db/repositories/prescriptionReviewRepo.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class PrescriptionReviewError extends Error {
   constructor(public status: number, message: string) {
@@ -102,15 +104,15 @@ export async function listView(view: AuthView) {
 /** 提交一条点评（POST /api/v1/prescription-review） */
 export async function reviewView(view: AuthView, body: Record<string, unknown>) {
   requireUser(view);
-  const prescriptionId = String(body.prescriptionId ?? '').trim();
+  const prescriptionId = toText(body.prescriptionId ?? '').trim();
   if (!prescriptionId) throw new PrescriptionReviewError(400, 'prescriptionId 必填');
 
-  const result = String(body.result ?? '') as ReviewResult;
+  const result = toText(body.result ?? '') as ReviewResult;
   if (!REVIEW_RESULTS.includes(result)) {
     throw new PrescriptionReviewError(400, 'result 必须为 rational / irrational / abnormal 之一');
   }
 
-  const comment = body.comment != null ? String(body.comment).trim() : '';
+  const comment = body.comment != null ? toText(body.comment).trim() : '';
   const created = await repo.create({
     prescriptionId,
     reviewerId: view.id,

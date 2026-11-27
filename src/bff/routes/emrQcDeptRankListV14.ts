@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 科室质控排名（避让版）V14 路由（M542-B）
  *
@@ -39,7 +40,7 @@ export const emrQcDeptRankListV14Routes: RouteDef[] = [
       const rawDepts = Array.isArray(obj?.depts) ? (obj.depts as unknown[]) : [];
       const depts: { name: string; score: number }[] = rawDepts.map((d) => {
         const item = d as Record<string, unknown>;
-        return { name: String(item?.name ?? ""), score: Number(item?.score ?? 0) };
+        return { name: toText(item?.name ?? ""), score: Number(item?.score ?? 0) };
       });
       const input: QcDeptRankListInputV14 = { depts };
       const result = rankQcDeptList(input);

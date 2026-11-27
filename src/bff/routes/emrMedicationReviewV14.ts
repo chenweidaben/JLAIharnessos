@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历合理用药审查 V14 路由（M537-A）
  *
@@ -37,7 +38,7 @@ export const emrMedicationReviewV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: MedicationReviewInputV14 = {
-        drugName: String(obj?.drugName ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
         dosage: Number(obj?.dosage ?? 0),
         hasAllergy: Boolean(obj?.hasAllergy ?? false),
       };

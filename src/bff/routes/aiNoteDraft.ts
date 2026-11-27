@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { listView, generateView, reviewView, AiNoteError } from '../aggregators/aiNoteDraftAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -35,7 +37,7 @@ export const aiNoteDraftRoutes: RouteDef[] = [
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(await reviewView(view, c.params.id, String(b.status ?? ''), b.doctorEdit ? String(b.doctorEdit) : undefined)));
+        return json(ok(await reviewView(view, c.params.id, toText(b.status ?? ''), b.doctorEdit ? toText(b.doctorEdit) : undefined)));
       } catch (e) { return mapError(e); }
     } },
 ];

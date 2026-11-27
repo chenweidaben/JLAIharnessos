@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检验危急值智能提醒 V14 路由（M561-D，M561 收官）
  *
@@ -37,7 +38,7 @@ export const emrAiLabCriticalAlertV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiLabCriticalAlertInputV14 = {
-        testName: String(obj?.testName ?? ""),
+        testName: toText(obj?.testName ?? ""),
         value: Number(obj?.value ?? 0),
         lowLimit: Number(obj?.lowLimit ?? 0),
         highLimit: Number(obj?.highLimit ?? 0),

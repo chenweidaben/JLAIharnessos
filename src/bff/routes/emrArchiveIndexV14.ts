@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历归档索引 V14 路由（M533-C）
  *
@@ -37,9 +38,9 @@ export const emrArchiveIndexV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: ArchiveIndexEntryInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        patientName: String(obj?.patientName ?? ""),
-        archiveDate: String(obj?.archiveDate ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        patientName: toText(obj?.patientName ?? ""),
+        archiveDate: toText(obj?.archiveDate ?? ""),
       };
       const result = buildArchiveIndexEntry(input);
       const report = buildArchiveIndexReport({ entryCount: 1 });

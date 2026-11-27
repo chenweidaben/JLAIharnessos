@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/consultRequestRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class ConsultError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -11,10 +13,10 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.reason) throw new ConsultError(400, '会诊原因必填');
   if (!body.consultingDept) throw new ConsultError(400, '会诊科室必填');
   return repo.create({
-    visitId: String(body.visitId), consultType: String(body.consultType ?? 'routine'),
-    requestingDept: String(body.requestingDept ?? '内科'), requestingDoctor: view.id,
-    consultingDept: String(body.consultingDept), reason: String(body.reason),
-    clinicalInfo: body.clinicalInfo ? String(body.clinicalInfo) : undefined,
+    visitId: toText(body.visitId), consultType: toText(body.consultType ?? 'routine'),
+    requestingDept: toText(body.requestingDept ?? '内科'), requestingDoctor: view.id,
+    consultingDept: toText(body.consultingDept), reason: toText(body.reason),
+    clinicalInfo: body.clinicalInfo ? toText(body.clinicalInfo) : undefined,
   });
 }
 

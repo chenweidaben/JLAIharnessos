@@ -31,6 +31,8 @@ import {
   identifyBiasRisk,
   recommendStatisticalMethod,
 } from '../aggregators/researchPipelineAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 export const researchPipelineRoutes: RouteDef[] = [
   {
@@ -71,7 +73,7 @@ export const researchPipelineRoutes: RouteDef[] = [
         }
 
         // 可选：研究设计 → 统计方法推荐 + 偏倚风险识别
-        if (body.studyDesign != null && String(body.studyDesign).trim()) {
+        if (body.studyDesign != null && toText(body.studyDesign).trim()) {
           payload.statRecommendation = recommendStatisticalMethod(
             body.studyDesign,
             body.dataType ?? 'continuous',

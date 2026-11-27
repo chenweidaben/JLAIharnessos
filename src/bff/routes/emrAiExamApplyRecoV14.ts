@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检查申请智能推荐 V14 路由（M561-A）
  *
@@ -37,8 +38,8 @@ export const emrAiExamApplyRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiExamApplyRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        symptom: String(obj?.symptom ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
       };
       const result = recommendExamApplyByAi(input);
       const report = buildAiExamApplyRecoReport(result);

@@ -14,6 +14,7 @@
  */
 
 import type { LabResultRow } from '../../db/repositories/labInterpretRepo.js';
+import { toText } from '../../db/rowText.js';
 
 export type Audience = 'doctor' | 'patient';
 export type DeepSource = 'rule' | 'llm' | 'llm_fallback';
@@ -81,7 +82,7 @@ export function interpretLabResults(results: LabResultRow[]): EngineOutcome {
   const parts: string[] = [];
   parts.push(`共 ${n} 项检验，异常 ${abn} 项，其中危急值 ${crit} 项。`);
   if (crit > 0) {
-    const names = criticalItems.map((c) => `${c.item}(${c.value}${c.unit ?? ''})`).join('、');
+    const names = criticalItems.map((c) => `${c.item}(${c.value}${toText(c.unit)})`).join('、');
     parts.push(`危急项：${names}，建议立即复核临床并通知开单医师。`);
   } else if (abn > 0) {
     const names = abnormalItems.map((c) => `${c.item}(${c.flag})`).join('、');

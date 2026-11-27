@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI慢病管理计划推荐 V14 路由（M563-D）
  *
@@ -37,8 +38,8 @@ export const emrAiChronicCarePlanRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiChronicCarePlanRecoInputV14 = {
-        disease: String(obj?.disease ?? ""),
-        controlStatus: String(obj?.controlStatus ?? ""),
+        disease: toText(obj?.disease ?? ""),
+        controlStatus: toText(obj?.controlStatus ?? ""),
       };
       const result = recommendChronicCarePlanByAi(input);
       const report = buildAiChronicCarePlanRecoReport(result);

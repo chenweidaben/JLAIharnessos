@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历模板智能推荐 V14 路由（M539-A）
  *
@@ -37,8 +38,8 @@ export const emrTemplateRecommendV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: TemplateRecommendInputV14 = {
-        dept: String(obj?.dept ?? ""),
-        recordType: String(obj?.recordType ?? ""),
+        dept: toText(obj?.dept ?? ""),
+        recordType: toText(obj?.recordType ?? ""),
       };
       const result = recommendTemplate(input);
       const report = buildTemplateRecommendReport(result);

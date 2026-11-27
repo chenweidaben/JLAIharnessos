@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI病区交班报告生成 V14 路由（M557-D，M557 收官）
  *
@@ -37,7 +38,7 @@ export const emrAiShiftReportGenV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiShiftReportGenInputV14 = {
-        ward: String(obj?.ward ?? ""),
+        ward: toText(obj?.ward ?? ""),
         patientCount: Number(obj?.patientCount ?? 0),
         criticalCount: Number(obj?.criticalCount ?? 0),
       };

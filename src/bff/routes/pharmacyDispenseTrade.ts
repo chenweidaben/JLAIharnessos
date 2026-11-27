@@ -34,6 +34,8 @@ import {
   listPrescriptions,
 } from '../aggregators/pharmacyDispenseTradeAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -86,8 +88,8 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createPrepackBatch({
-          deptCode: String(b.deptCode ?? ''),
-          period: String(b.period ?? ''),
+          deptCode: toText(b.deptCode ?? ''),
+          period: toText(b.period ?? ''),
           orderIds: Array.isArray(b.orderIds) ? b.orderIds.map(String) : [],
         })));
       } catch (e) { return mapError(e); }
@@ -130,10 +132,10 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(confirmDispense({
-          orderId: String(b.orderId ?? ''),
-          batchNo: String(b.batchNo ?? ''),
-          dispenserId: String(b.dispenserId ?? ''),
-          checkerId: String(b.checkerId ?? ''),
+          orderId: toText(b.orderId ?? ''),
+          batchNo: toText(b.batchNo ?? ''),
+          dispenserId: toText(b.dispenserId ?? ''),
+          checkerId: toText(b.checkerId ?? ''),
           signedAt: typeof b.signedAt === 'number' ? b.signedAt : undefined,
         })));
       } catch (e) { return mapError(e); }
@@ -163,8 +165,8 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(requestReturn({
-          dispenseNo: String(b.dispenseNo ?? ''),
-          reason: String(b.reason ?? ''),
+          dispenseNo: toText(b.dispenseNo ?? ''),
+          reason: toText(b.reason ?? ''),
           quantity: typeof b.quantity === 'number' ? b.quantity : NaN,
         })));
       } catch (e) { return mapError(e); }
@@ -184,7 +186,7 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
           dispenseNo: c.params.dispenseNo,
           approved: Boolean(b.approved),
           approverId: view.id,
-          note: b.note ? String(b.note) : undefined,
+          note: b.note ? toText(b.note) : undefined,
         })));
       } catch (e) { return mapError(e); }
     },
@@ -211,11 +213,11 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createPrescription({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          patientName: String(b.patientName ?? ''),
-          drugName: String(b.drugName ?? ''),
-          specification: String(b.specification ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          patientName: toText(b.patientName ?? ''),
+          drugName: toText(b.drugName ?? ''),
+          specification: toText(b.specification ?? ''),
           quantity: Number(b.quantity),
           unitFeeCents: Number(b.unitFeeCents),
           actor: actorOf(c),
@@ -234,8 +236,8 @@ export const pharmacyDispenseTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(reviewPrescription({
           rxNo: c.params.rxNo,
-          decision: String(b.decision ?? '') as 'approve' | 'reject',
-          comment: b.comment ? String(b.comment) : undefined,
+          decision: toText(b.decision ?? '') as 'approve' | 'reject',
+          comment: b.comment ? toText(b.comment) : undefined,
           actor: actorOf(c),
           reviewerId: c.user?.id ?? 'unknown',
           reviewerName: c.user?.name,

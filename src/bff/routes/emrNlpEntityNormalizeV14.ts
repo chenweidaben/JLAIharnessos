@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历 NLP 实体归一化 V14 路由（M531-A）
  *
@@ -37,7 +38,7 @@ export const emrNlpEntityNormalizeV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: NlpEntityNormalizeInputV14 = {
-        rawEntity: String(obj?.rawEntity ?? ""),
+        rawEntity: toText(obj?.rawEntity ?? ""),
         dictionary: (obj?.dictionary ?? {}) as Record<string, string>,
       };
       const result = normalizeEntityToCode(input);

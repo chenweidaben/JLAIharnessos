@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病程关键节点标记 V14 路由（M538-B）
  *
@@ -37,7 +38,7 @@ export const emrCourseNodeV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: CourseNodeInputV14 = {
-        nodeType: String(obj?.nodeType ?? "入院") as CourseNodeInputV14["nodeType"],
+        nodeType: toText(obj?.nodeType ?? "入院") as CourseNodeInputV14["nodeType"],
         day: Number(obj?.day ?? 0),
       };
       const result = markCourseNode(input);

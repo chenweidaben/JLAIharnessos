@@ -10,6 +10,8 @@
  */
 
 import { getEncounter } from './outpatientAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 type Dict = Record<string, unknown>;
 
@@ -102,9 +104,9 @@ export async function buildPatientContextBlock(
 
   // 基本信息
   const demographics: string[] = [];
-  if (patient.name) demographics.push(String(patient.name));
-  if (patient.gender) demographics.push(`${patient.gender}`);
-  if (patient.age !== undefined && patient.age !== null) demographics.push(`${patient.age}岁`);
+  if (patient.name) demographics.push(toText(patient.name));
+  if (patient.gender) demographics.push(toText(patient.gender));
+  if (patient.age !== undefined && patient.age !== null) demographics.push(`${toText(patient.age)}岁`);
   if (demographics.length > 0) lines.push(`- 患者：${demographics.join('，')}`);
 
   const allergies = asList(patient.allergies)
@@ -158,7 +160,7 @@ export async function buildPatientContextBlock(
       const name = str(drug.genericName);
       const dose = str(line.dose);
       const freq = str(line.frequency);
-      const days = line.days ? `${line.days}天` : '';
+      const days = line.days ? `${toText(line.days)}天` : '';
       return [name, dose, freq, days].filter(Boolean).join(' ');
     });
   });

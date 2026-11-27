@@ -44,6 +44,8 @@ import * as prescriptionRepo from '../db/repositories/prescriptionRepo.js';
 import * as medicalRecordRepo from '../db/repositories/medicalRecordRepo.js';
 import * as labResultRepo from '../db/repositories/labResultRepo.js';
 import * as drugRepo from '../db/repositories/drugRepo.js';
+import { toText } from '../db/rowText.js';
+
 
 // ============================================================================
 // 运行模式判定
@@ -190,10 +192,10 @@ function normalizeAllergies(
   raw: Record<string, unknown>[],
 ): MockPatient['allergies'] {
   return raw.map((r) => ({
-    allergen: String(r.allergen ?? ''),
-    reaction: String(r.reaction ?? ''),
+    allergen: toText(r.allergen ?? ''),
+    reaction: toText(r.reaction ?? ''),
     severity: (r.severity as MockPatient['allergies'][number]['severity']) ?? '轻度',
-    recordedAt: r.recordedAt ? String(r.recordedAt) : '',
+    recordedAt: r.recordedAt ? toText(r.recordedAt) : '',
   }));
 }
 
@@ -201,8 +203,8 @@ function normalizePastHistory(
   raw: Record<string, unknown>[],
 ): MockPatient['pastHistory'] {
   return raw.map((r) => ({
-    disease: String(r.disease ?? ''),
-    diagnosedAt: r.diagnosedAt ? String(r.diagnosedAt) : null,
+    disease: toText(r.disease ?? ''),
+    diagnosedAt: r.diagnosedAt ? toText(r.diagnosedAt) : null,
     status: (r.status as MockPatient['pastHistory'][number]['status']) ?? '未愈',
   }));
 }
@@ -226,9 +228,9 @@ async function mapDbPatientToDto(
   const currentMedications = drugOrders
     .filter((o) => o.orderType === 'drug')
     .map((o) => ({
-      drugName: String(o.detail.drug ?? o.content.split(' ')[0] ?? o.content),
-      dosage: String(o.detail.dosage ?? ''),
-      frequency: String(o.detail.frequency ?? ''),
+      drugName: toText(o.detail.drug ?? o.content.split(' ')[0] ?? o.content),
+      dosage: toText(o.detail.dosage ?? ''),
+      frequency: toText(o.detail.frequency ?? ''),
       startDate: toDateOnly(o.startAt) ?? new Date().toISOString().slice(0, 10),
       prescribingDoctor: o.doctorId ? String(o.doctorId) : '医生',
     }));
@@ -273,15 +275,15 @@ async function mapDbOrderToDto(o: orderRepo.Order): Promise<MockOrder> {
     encounterId: o.visitId,
     orderType: mapOrderType(o.orderType),
     itemName: o.content,
-    dosage: detail.dosage ? String(detail.dosage) : null,
-    frequency: detail.frequency ? String(detail.frequency) : null,
+    dosage: detail.dosage ? toText(detail.dosage) : null,
+    frequency: detail.frequency ? toText(detail.frequency) : null,
     status: mapOrderStatus(o.status),
     priority: mapOrderPriority(o.priority ?? 'routine'),
     startDate: toDateOnly(o.startAt) ?? new Date().toISOString().slice(0, 10),
     endDate: toDateOnly(o.stopAt),
     prescribingDoctor: o.doctorId ? String(o.doctorId) : '医生',
     executedBy: null,
-    clinicalIndication: detail.clinicalIndication ? String(detail.clinicalIndication) : o.content,
+    clinicalIndication: detail.clinicalIndication ? toText(detail.clinicalIndication) : o.content,
   };
 }
 
@@ -483,7 +485,7 @@ export const clinicalData = {
           safetyCheckSummary: '',
           createdAt: rx.createdAt,
           auditedAt: rx.status === 'pending_review' ? null : rx.updatedAt,
-          auditComment: rx.auditResult.comment ? String(rx.auditResult.comment) : null,
+          auditComment: rx.auditResult.comment ? toText(rx.auditResult.comment) : null,
         });
       }
     }

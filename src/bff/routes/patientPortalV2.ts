@@ -26,6 +26,8 @@ import {
   listPayments, listAdminNotifs,
   seed,
 } from '../aggregators/patientPortalV2Aggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof PortalError) {
@@ -84,10 +86,10 @@ export const patientPortalV2Routes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = assertPatientScope(c, String(b.patientId ?? ''));
+        const patientId = assertPatientScope(c, toText(b.patientId ?? ''));
         return json(ok(createBooking({
-          patientId, doctorId: String(b.doctorId ?? ''), departmentId: String(b.departmentId ?? ''),
-          scheduledAt: String(b.scheduledAt ?? ''), note: b.note === undefined ? undefined : String(b.note),
+          patientId, doctorId: toText(b.doctorId ?? ''), departmentId: toText(b.departmentId ?? ''),
+          scheduledAt: toText(b.scheduledAt ?? ''), note: b.note === undefined ? undefined : toText(b.note),
         })));
       } catch (e) { return mapError(e); }
     },
@@ -123,10 +125,10 @@ export const patientPortalV2Routes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = assertPatientScope(c, String(b.patientId ?? ''));
+        const patientId = assertPatientScope(c, toText(b.patientId ?? ''));
         return json(ok(submitSatisfaction({
-          patientId, visitId: String(b.visitId ?? ''), doctorId: String(b.doctorId ?? ''),
-          score: Number(b.score ?? 0), comment: b.comment === undefined ? undefined : String(b.comment),
+          patientId, visitId: toText(b.visitId ?? ''), doctorId: toText(b.doctorId ?? ''),
+          score: Number(b.score ?? 0), comment: b.comment === undefined ? undefined : toText(b.comment),
         })));
       } catch (e) { return mapError(e); }
     },
@@ -175,7 +177,7 @@ export const patientPortalV2Routes: RouteDef[] = [
       try {
         if (process.env.DEMO_MODE !== '1') throw new PortalError(403, '_seed 仅 DEMO_MODE 可用');
         const b = (await c.body()) as Record<string, unknown>;
-        const pid = String(b.patientId ?? '');
+        const pid = toText(b.patientId ?? '');
         return json(ok(seed(pid, {
           reports: Array.isArray(b.reports) ? (b.reports as never[]) : [],
           payments: Array.isArray(b.payments) ? (b.payments as never[]) : [],

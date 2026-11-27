@@ -28,6 +28,8 @@ import {
   bookExam,
   grantAuthorization,
 } from '../aggregators/inpatientConciergeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof ConciergeError) {
@@ -51,9 +53,9 @@ export const inpatientConciergeRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createPreAdmission({
-          patientId: String(b.patientId ?? ''),
+          patientId: toText(b.patientId ?? ''),
           scheduledAdmissionAt: Number(b.scheduledAdmissionAt ?? 0),
-          department: String(b.department ?? ''),
+          department: toText(b.department ?? ''),
           expectedStayDays: Number(b.expectedStayDays ?? 0),
           roles: c.user?.roles ?? [], actorId: c.user?.id ?? '',
         })));
@@ -68,9 +70,9 @@ export const inpatientConciergeRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(grantAuthorization({
-          patientId: String(b.patientId ?? ''),
-          familyMemberId: String(b.familyMemberId ?? ''),
-          familyMemberName: String(b.familyMemberName ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          familyMemberId: toText(b.familyMemberId ?? ''),
+          familyMemberName: toText(b.familyMemberName ?? ''),
           scope: Array.isArray(b.scope) ? (b.scope as string[]) : [],
           roles: c.user?.roles ?? [], actorId: c.user?.id ?? '',
         })));
@@ -115,7 +117,7 @@ export const inpatientConciergeRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(pushEducation({
-          preAdmissionId: pid(c), topic: String(b.topic ?? ''), content: String(b.content ?? ''),
+          preAdmissionId: pid(c), topic: toText(b.topic ?? ''), content: toText(b.content ?? ''),
           pushChannel: b.pushChannel === 'wechat' || b.pushChannel === 'app' ? b.pushChannel : 'sms',
           roles: c.user?.roles ?? [], actorId: c.user?.id ?? '',
         })));
@@ -138,7 +140,7 @@ export const inpatientConciergeRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(listSlots(String(b.examType ?? ''))));
+        return json(ok(listSlots(toText(b.examType ?? ''))));
       } catch (e) { return mapError(e); }
     },
   },
@@ -150,8 +152,8 @@ export const inpatientConciergeRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(bookExam({
-          preAdmissionId: pid(c), examType: String(b.examType ?? ''),
-          slotTime: num(b, 'slotTime') ?? 0, department: String(b.department ?? ''),
+          preAdmissionId: pid(c), examType: toText(b.examType ?? ''),
+          slotTime: num(b, 'slotTime') ?? 0, department: toText(b.department ?? ''),
           roles: c.user?.roles ?? [], actorId: c.user?.id ?? '',
         })));
       } catch (e) { return mapError(e); }

@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/aiNoteDraftRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class AiNoteError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -56,11 +58,11 @@ export async function listView(view: AuthView, visitId: string) {
 export async function generateView(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('ai_note:generate')) throw new AiNoteError(403, '无生成权限');
   if (!body.visitId) throw new AiNoteError(400, 'visitId 必填');
-  const draftType = String(body.draftType ?? 'progress_note');
-  const context = String(body.context ?? '');
+  const draftType = toText(body.draftType ?? 'progress_note');
+  const context = toText(body.context ?? '');
   const content = generateLocalTemplate(draftType, context);
   return repo.create({
-    visitId: String(body.visitId), draftType, promptContext: context,
+    visitId: toText(body.visitId), draftType, promptContext: context,
     generatedContent: content, modelVersion: 'jlmedaios-local-v1',
   });
 }

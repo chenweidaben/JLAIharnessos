@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI复诊提醒 V14 路由（M547-D，M547 收官）
  *
@@ -37,7 +38,7 @@ export const emrAiFollowupRemindV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiFollowupRemindInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         daysSinceDischarge: Number(obj?.daysSinceDischarge ?? 0),
       };
       const result = remindFollowupByAi(input);

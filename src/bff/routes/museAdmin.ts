@@ -25,6 +25,8 @@ import {
   type AdminDecision,
   type AdminDecisionOutcome,
 } from '../aggregators/adminMuseAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：返回样例决策经验，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -95,7 +97,7 @@ async function buildView(
   `) as AdminRow[];
 
   const decisions: AdminDecision[] = rows.map((r) => ({
-    id: typeof r.id === 'string' ? r.id : String(r.id ?? ''),
+    id: typeof r.id === 'string' ? r.id : toText(r.id ?? ''),
     adminId: typeof r.admin_id === 'string' ? r.admin_id : staffId,
     decisionType: typeof r.decision_type === 'string' ? r.decision_type : '',
     context: typeof r.context === 'string' ? r.context : '',

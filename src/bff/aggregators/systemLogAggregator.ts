@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - M132-C 系统日志聚合器（产品化收尾）
  *
@@ -101,7 +102,7 @@ let tempIdSeq = 1;
  * 非法值（含大小写不一致、空串）兜底为 info，保证 CHECK 约束不被违反。
  */
 export function normalizeLevel(level: unknown): LogLevel {
-  const s = String(level ?? '').trim().toLowerCase();
+  const s = toText(level ?? '').trim().toLowerCase();
   if ((VALID_LEVELS as ReadonlySet<string>).has(s)) return s as LogLevel;
   return 'info';
 }

@@ -24,6 +24,7 @@ import type {
   AiVersionSnapshot,
 } from '@/security/audit/aiAudit.js';
 import type { SourceProvenance } from '../types.js';
+import { toText } from '../../db/rowText.js';
 
 // ============================================================================
 // 错误码常量
@@ -252,7 +253,7 @@ export function assertNotPatientDocument(payload: PatientDocumentPayload): Inges
       blockedFields.push(field);
     }
     const metaValue = payload.metadata?.[field];
-    if (metaValue !== undefined && metaValue !== null && `${metaValue}`.trim() !== '') {
+    if (metaValue !== undefined && metaValue !== null && toText(metaValue).trim() !== '') {
       blockedFields.push(`metadata.${field}`);
     }
   }

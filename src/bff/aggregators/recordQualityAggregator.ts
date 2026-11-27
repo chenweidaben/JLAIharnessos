@@ -23,6 +23,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import { getDb } from '@/db/pool.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 质控规则键 */
 export type CheckKey =
@@ -405,6 +407,6 @@ export async function runAudit(
     needsManualReview: audit.needsManualReview,
     status: 'pending',
     createdAt:
-      row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt ?? ''),
+      row.createdAt instanceof Date ? row.createdAt.toISOString() : toText(row.createdAt ?? ''),
   };
 }

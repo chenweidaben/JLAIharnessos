@@ -156,7 +156,8 @@ const doseRecords: DoseRecord[] = [];
 function toText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 /** 把 Date 收敛为本地 YYYY-MM-DD（避免 UTC 偏移导致跨天） */

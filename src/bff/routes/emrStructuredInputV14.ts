@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历结构化录入辅助 V14 路由（M539-B）
  *
@@ -37,8 +38,8 @@ export const emrStructuredInputV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: StructuredInputInputV14 = {
-        rawText: String(obj?.rawText ?? ""),
-        fieldType: String(obj?.fieldType ?? ""),
+        rawText: toText(obj?.rawText ?? ""),
+        fieldType: toText(obj?.fieldType ?? ""),
       };
       const result = assistStructuredInput(input);
       const report = buildStructuredInputReport(result);

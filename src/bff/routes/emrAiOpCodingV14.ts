@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI手术编码建议 V14 路由（M544-B）
  *
@@ -37,7 +38,7 @@ export const emrAiOpCodingV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiOpCodingInputV14 = {
-        opName: String(obj?.opName ?? ""),
+        opName: toText(obj?.opName ?? ""),
       };
       const result = suggestOpCodingByAi(input);
       const report = buildAiOpCodingReport(result);

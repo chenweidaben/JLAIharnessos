@@ -13,6 +13,8 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* ------------------------------- 输入类型 ------------------------------- */
 
@@ -393,16 +395,16 @@ export async function explainLabReportByReportId(
 
   const items: LabResultItem[] = rows.map((r) => ({
     itemName: String(r.item_name),
-    itemCode: r.item_code ? String(r.item_code) : null,
-    value: r.value ? String(r.value) : null,
+    itemCode: r.item_code ? toText(r.item_code) : null,
+    value: r.value ? toText(r.value) : null,
     numericValue: r.numeric_value != null ? Number(r.numeric_value) : null,
-    unit: r.unit ? String(r.unit) : null,
+    unit: r.unit ? toText(r.unit) : null,
     refLow: r.ref_low != null ? Number(r.ref_low) : null,
     refHigh: r.ref_high != null ? Number(r.ref_high) : null,
-    abnormalFlag: r.abnormal_flag ? String(r.abnormal_flag) : null,
+    abnormalFlag: r.abnormal_flag ? toText(r.abnormal_flag) : null,
     isCritical: Boolean(r.is_critical),
-    panelName: r.panel_name ? String(r.panel_name) : null,
-    resultTime: r.result_time ? String(r.result_time) : null,
+    panelName: r.panel_name ? toText(r.panel_name) : null,
+    resultTime: r.result_time ? toText(r.result_time) : null,
   }));
 
   const explained = explainLabResultsForPatient(items, patientProfile);

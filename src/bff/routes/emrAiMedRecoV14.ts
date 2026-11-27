@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI用药建议 V14 路由（M545-C）
  *
@@ -37,7 +38,7 @@ export const emrAiMedRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiMedRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         age: Number(obj?.age ?? 0),
       };
       const result = recommendMedByAi(input);

@@ -38,6 +38,8 @@ import {
   type FHIRR4ResourceType,
   type IntegrationStandard,
 } from '../aggregators/integrationDeepAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：不连 PostgreSQL，不伪造落库 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -105,7 +107,7 @@ async function persistDeepLog(input: {
        channel, std_version, message_profile, encounter_id,
        dicom_sop_class, modality, instrument_id)
     VALUES (
-      ${String(messageControlId)},
+      ${toText(messageControlId)},
       ${parsed?.messageType || channel.toUpperCase()},
       ${parsed?.triggerEvent || '-'},
       ${parsed?.messageEvent || channel},
@@ -129,10 +131,10 @@ async function persistDeepLog(input: {
       ${channel},
       ${stdVersion},
       ${profileOf(channel, parsed)},
-      ${parsed?.visitNumber || (descriptor?.studyInstanceUid ? String(descriptor.studyInstanceUid) : null)},
-      ${descriptor?.sopClassUid ? String(descriptor.sopClassUid) : null},
-      ${descriptor?.modality ? String(descriptor.modality) : null},
-      ${descriptor?.instrumentCode ? String(descriptor.instrumentCode) : null}
+      ${parsed?.visitNumber || (descriptor?.studyInstanceUid ? toText(descriptor.studyInstanceUid) : null)},
+      ${descriptor?.sopClassUid ? toText(descriptor.sopClassUid) : null},
+      ${descriptor?.modality ? toText(descriptor.modality) : null},
+      ${descriptor?.instrumentCode ? toText(descriptor.instrumentCode) : null}
     )
     ON CONFLICT (message_control_id) DO UPDATE SET
       status           = EXCLUDED.status,

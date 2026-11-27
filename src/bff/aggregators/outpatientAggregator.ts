@@ -52,6 +52,8 @@ import {
   type Drug,
 } from '@/db/repositories/drugRepo';
 import { getLabResultsByPatient } from '@/db/repositories/labResultRepo';
+import { toText } from '../../db/rowText.js';
+
 
 /* ------------------------------------------------------------------ */
 /* 通用映射                                                            */
@@ -77,13 +79,13 @@ function mapGender(g: string): 'male' | 'female' | 'unknown' {
 /** 从 jsonb 过敏数组提取物质名称 */
 function mapAllergies(list: Record<string, unknown>[]): string[] {
   return list.map((a) =>
-    String(a.substance ?? a.drug ?? a.allergen ?? a.name ?? ''),
+    toText(a.substance ?? a.drug ?? a.allergen ?? a.name ?? ''),
   ).filter(Boolean);
 }
 
 /** 从既往史提取慢性病 */
 function mapChronic(list: Record<string, unknown>[]): string[] {
-  return list.map((h) => String(h.disease ?? h.name ?? h.diagnosis ?? '')).filter(Boolean);
+  return list.map((h) => toText(h.disease ?? h.name ?? h.diagnosis ?? '')).filter(Boolean);
 }
 
 /** 库存数量 */
@@ -279,13 +281,13 @@ function mapOrder(o: Awaited<ReturnType<typeof getOrdersByVisit>>[number]) {
   return {
     orderId: o.id,
     kind: (['lab', 'imaging', 'treatment'].includes(o.orderType) ? o.orderType : 'lab') as 'lab' | 'imaging' | 'treatment',
-    catalogId: String(o.detail.catalogId ?? ''),
+    catalogId: toText(o.detail.catalogId ?? ''),
     name: o.content,
-    bodyPart: o.detail.bodyPart ? String(o.detail.bodyPart) : undefined,
+    bodyPart: o.detail.bodyPart ? toText(o.detail.bodyPart) : undefined,
     price: Number(o.detail.price ?? 0),
     status: statusMap[o.status],
-    clinicalReason: String(o.detail.clinicalReason ?? ''),
-    note: o.detail.note ? String(o.detail.note) : undefined,
+    clinicalReason: toText(o.detail.clinicalReason ?? ''),
+    note: o.detail.note ? toText(o.detail.note) : undefined,
     createdAt: o.createdAt,
   };
 }
@@ -348,14 +350,14 @@ function mapMedicalRecord(
 ) {
   const c = rec.content;
   const content = {
-    chiefComplaint: String(c.chiefComplaint ?? ''),
-    presentIllness: String(c.presentIllness ?? ''),
-    pastHistory: String(c.pastHistory ?? ''),
-    physicalExam: String(c.physicalExam ?? ''),
-    auxiliaryExam: String(c.auxiliaryExam ?? ''),
-    diagnosis: String(c.diagnosis ?? ''),
-    treatment: String(c.treatment ?? ''),
-    healthEducation: String(c.healthEducation ?? ''),
+    chiefComplaint: toText(c.chiefComplaint ?? ''),
+    presentIllness: toText(c.presentIllness ?? ''),
+    pastHistory: toText(c.pastHistory ?? ''),
+    physicalExam: toText(c.physicalExam ?? ''),
+    auxiliaryExam: toText(c.auxiliaryExam ?? ''),
+    diagnosis: toText(c.diagnosis ?? ''),
+    treatment: toText(c.treatment ?? ''),
+    healthEducation: toText(c.healthEducation ?? ''),
   };
   return {
     recordId: rec.id,
@@ -596,7 +598,7 @@ async function reviewPrescription(
 
   // 1) 过敏
   for (const a of patient.allergies) {
-    const substance = String(a.substance ?? a.drug ?? '');
+    const substance = toText(a.substance ?? a.drug ?? '');
     const hit = drugs.find((d) =>
       substance && (d.genericName.includes(substance) || substance.includes(d.genericName.slice(0, 2))),
     );

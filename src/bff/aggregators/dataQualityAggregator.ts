@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - M159-D 数据质量治理聚合器（中期路线图，纯函数层）
  *
@@ -157,7 +158,7 @@ function sampleOf(v: unknown): unknown {
 function toDate(v: unknown): Date | null {
   if (v === null || v === undefined || v === '') return null;
   if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
-  const d = new Date(String(v));
+  const d = new Date(toText(v));
   return isNaN(d.getTime()) ? null : d;
 }
 

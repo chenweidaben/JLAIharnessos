@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/medicalCopyRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class CopyError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -11,10 +13,10 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.idCardNo) throw new CopyError(400, '身份证号必填');
   if (!body.purpose) throw new CopyError(400, '用途必填');
   return repo.create({
-    visitId: String(body.visitId), applicantName: String(body.applicantName),
-    applicantRelation: String(body.applicantRelation ?? 'patient'),
-    idCardNo: String(body.idCardNo), contactPhone: String(body.contactPhone ?? ''),
-    purpose: String(body.purpose), copies: Number(body.copies ?? 1),
+    visitId: toText(body.visitId), applicantName: toText(body.applicantName),
+    applicantRelation: toText(body.applicantRelation ?? 'patient'),
+    idCardNo: toText(body.idCardNo), contactPhone: toText(body.contactPhone ?? ''),
+    purpose: toText(body.purpose), copies: Number(body.copies ?? 1),
   });
 }
 

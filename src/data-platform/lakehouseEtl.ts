@@ -20,6 +20,8 @@
  * ==========================================================================*/
 
 import { type TransactionSql, withTx } from '../db/pool.js';
+import { toText } from '../db/rowText.js';
+
 
 export type JobCode =
   | 'dwd_visit'
@@ -41,7 +43,7 @@ export interface JobResult {
 function toIso(v: unknown): string | null {
   if (v == null) return null;
   if (v instanceof Date) return v.toISOString();
-  return String(v);
+  return toText(v);
 }
 
 /** 上次成功 watermark 子查询（嵌入 WHERE；数据库端比较，保留微秒精度）。 */

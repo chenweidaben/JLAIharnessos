@@ -25,6 +25,8 @@ import {
   listApproved,
   listExecuted,
 } from '../aggregators/nurseStationTradeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -78,8 +80,8 @@ export const nurseStationTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(reviewOrder({
           orderId: c.params.orderId,
-          decision: String(b.decision ?? '') as 'approve' | 'reject',
-          comment: b.comment ? String(b.comment) : undefined,
+          decision: toText(b.decision ?? '') as 'approve' | 'reject',
+          comment: b.comment ? toText(b.comment) : undefined,
           reviewerId: view.id,
         })));
       } catch (e) { return mapError(e); }
@@ -112,9 +114,9 @@ export const nurseStationTradeRoutes: RouteDef[] = [
         return json(ok(executeAtBedside({
           orderId: c.params.orderId,
           wristband: {
-            patientId: String(wb.patientId ?? ''),
-            scannedPatientId: String(wb.scannedPatientId ?? ''),
-            scannedOrderId: String(wb.scannedOrderId ?? ''),
+            patientId: toText(wb.patientId ?? ''),
+            scannedPatientId: toText(wb.scannedPatientId ?? ''),
+            scannedOrderId: toText(wb.scannedOrderId ?? ''),
           },
           executorId: view.id,
         })));

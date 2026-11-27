@@ -16,6 +16,8 @@ import {
   type ChunkOptions,
 } from '../types';
 import { type Encoder, estimateTokens, shortId, tokenize } from '../util';
+import { toText } from '../../db/rowText.js';
+
 
 // ----------------------------------------------------------------------------
 // 1. 解析：将不同格式归一化为纯文本 + 章节结构（二进制格式给出降级文本提取）
@@ -95,7 +97,7 @@ export function parseDocument(doc: RawDocument): ParsedDocument {
 
 function flattenJsonToText(obj: unknown, prefix = ''): string {
   if (obj == null) return '';
-  if (typeof obj !== 'object') return `${prefix} ${String(obj)}`.trim();
+  if (typeof obj !== 'object') return `${prefix} ${toText(obj)}`.trim();
   if (Array.isArray(obj)) {
     return obj.slice(0, 200).map((it) => flattenJsonToText(it, prefix)).filter(Boolean).join('\n');
   }

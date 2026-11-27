@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 护士 MUSE 专属功能聚合器（M116-A）
  *
@@ -326,7 +327,7 @@ export interface NurseExperience {
 function expText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  return toText(v).trim();
 }
 
 /** expTags：unknown → 去重字符串数组（支持数组或逗号分隔串） */

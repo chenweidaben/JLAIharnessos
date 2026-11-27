@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { createView, listView, acceptView, completeView, ConsultError } from '../aggregators/consultRequestAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 列表返回内存空兜底。 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -43,7 +45,7 @@ export const consultRequestRoutes: RouteDef[] = [
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(await completeView(view, c.params.id, String(b.note ?? ''))));
+        return json(ok(await completeView(view, c.params.id, toText(b.note ?? ''))));
       } catch (e) { return mapError(e); }
     } },
 ];

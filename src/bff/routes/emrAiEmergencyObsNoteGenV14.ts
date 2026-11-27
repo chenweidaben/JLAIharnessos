@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI急诊留观病历生成 V14 路由（M560-C）
  *
@@ -37,9 +38,9 @@ export const emrAiEmergencyObsNoteGenV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiEmergencyObsNoteGenInputV14 = {
-        patientName: String(obj?.patientName ?? ""),
+        patientName: toText(obj?.patientName ?? ""),
         observationHours: Number(obj?.observationHours ?? 0),
-        condition: String(obj?.condition ?? ""),
+        condition: toText(obj?.condition ?? ""),
       };
       const result = genEmergencyObsNoteByAi(input);
       const report = buildAiEmergencyObsNoteGenReport(result);

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI知识推荐 V14 路由（M543-D，M543 收官）
  *
@@ -37,8 +38,8 @@ export const emrAiKnowledgeRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiKnowledgeRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        specialty: String(obj?.specialty ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        specialty: toText(obj?.specialty ?? ""),
       };
       const result = recommendKnowledgeByAi(input);
       const report = buildAiKnowledgeRecoReport(result);

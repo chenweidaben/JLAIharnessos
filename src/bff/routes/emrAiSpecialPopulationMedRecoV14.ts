@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI特殊人群用药推荐 V14 路由（M565-D，M565 收官）
  *
@@ -37,8 +38,8 @@ export const emrAiSpecialPopulationMedRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiSpecialPopulationMedRecoInputV14 = {
-        population: String(obj?.population ?? ""),
-        drugName: String(obj?.drugName ?? ""),
+        population: toText(obj?.population ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
       };
       const result = recommendSpecialPopulationMedByAi(input);
       const report = buildAiSpecialPopulationMedRecoReport(result);

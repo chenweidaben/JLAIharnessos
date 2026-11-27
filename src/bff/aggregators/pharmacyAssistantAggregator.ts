@@ -22,6 +22,8 @@ import type { AuthView } from '../view/userView.js';
 import * as prescriptionRepo from '../../db/repositories/prescriptionRepo.js';
 import * as visitRepo from '../../db/repositories/visitRepo.js';
 import * as patientRepo from '../../db/repositories/patientRepo.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class PharmacyAssistantError extends Error {
   constructor(public status: number, message: string) {
@@ -372,11 +374,11 @@ function extractAllergies(raw: unknown): AssistantAllergy[] {
   for (const item of raw) {
     if (!item || typeof item !== 'object') continue;
     const rec = item as Record<string, unknown>;
-    const allergen = String(rec.allergen ?? rec.name ?? rec.substance ?? '').trim();
+    const allergen = toText(rec.allergen ?? rec.name ?? rec.substance ?? '').trim();
     if (!allergen) continue;
     out.push({
       allergen,
-      reaction: rec.reaction ? String(rec.reaction) : '',
+      reaction: rec.reaction ? toText(rec.reaction) : '',
       severity: (rec.severity as AllergySeverity) ?? 'mild',
     });
   }

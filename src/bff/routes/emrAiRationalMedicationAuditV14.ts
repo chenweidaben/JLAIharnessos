@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI合理用药审查 V14 路由（M554-B）
  *
@@ -37,7 +38,7 @@ export const emrAiRationalMedicationAuditV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiRationalMedicationAuditInputV14 = {
-        drugName: String(obj?.drugName ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
         hasAllergy: Boolean(obj?.hasAllergy ?? false),
       };

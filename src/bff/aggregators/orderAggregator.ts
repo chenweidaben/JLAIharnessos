@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/orderRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class OrderError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -15,10 +17,10 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.visitId) throw new OrderError(400, 'visitId 必填');
   if (!body.content) throw new OrderError(400, '医嘱内容必填');
   return repo.create({
-    visitId: String(body.visitId), orderType: String(body.orderType ?? 'other'),
-    content: String(body.content), dosage: body.dosage ? String(body.dosage) : undefined,
-    frequency: body.frequency ? String(body.frequency) : undefined,
-    route: body.route ? String(body.route) : undefined, orderedBy: view.id,
+    visitId: toText(body.visitId), orderType: toText(body.orderType ?? 'other'),
+    content: toText(body.content), dosage: body.dosage ? toText(body.dosage) : undefined,
+    frequency: body.frequency ? toText(body.frequency) : undefined,
+    route: body.route ? toText(body.route) : undefined, orderedBy: view.id,
   });
 }
 

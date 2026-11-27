@@ -51,6 +51,8 @@ import type {
   RuleHit,
 } from '../../knowledge/cds/Rule.js';
 import { writeESignLog } from '../signing/signLogWriter.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -127,7 +129,7 @@ async function buildFacts(
   tx: DbExecutor,
 ): Promise<CdsFacts> {
   const allergies = patient.allergies
-    .map((a) => (a.allergen ? String(a.allergen) : ''))
+    .map((a) => (a.allergen ? toText(a.allergen) : ''))
     .filter(Boolean);
 
   const current = new Set<string>();

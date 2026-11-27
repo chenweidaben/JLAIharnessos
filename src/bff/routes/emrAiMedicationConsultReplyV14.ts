@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI用药咨询答复 V14 路由（M565-B）
  *
@@ -37,8 +38,8 @@ export const emrAiMedicationConsultReplyV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiMedicationConsultReplyInputV14 = {
-        question: String(obj?.question ?? ""),
-        drugName: String(obj?.drugName ?? ""),
+        question: toText(obj?.question ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
       };
       const result = replyMedicationConsultByAi(input);
       const report = buildAiMedicationConsultReplyReport(result);

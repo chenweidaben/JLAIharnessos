@@ -35,6 +35,8 @@ import {
   type EPrescriptionItem,
 } from '../../db/repositories/internetPrescriptionRepo.js';
 import type { AuthView } from '../view/userView.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class EPrescriptionError extends Error {
   constructor(
@@ -70,18 +72,18 @@ function validateItems(items: unknown): EPrescriptionItem[] {
       throw badRequest('药品名称不能为空（须医生手动选择）');
     }
     return {
-      drugCode: it.drugCode ? String(it.drugCode) : null,
+      drugCode: it.drugCode ? toText(it.drugCode) : null,
       drugName: it.drugName.trim(),
-      specification: it.specification ? String(it.specification) : null,
+      specification: it.specification ? toText(it.specification) : null,
       dosage: it.dosage !== undefined && it.dosage !== null ? Number(it.dosage) : null,
-      dosageUnit: it.dosageUnit ? String(it.dosageUnit) : null,
-      frequency: it.frequency ? String(it.frequency) : null,
-      route: it.route ? String(it.route) : null,
+      dosageUnit: it.dosageUnit ? toText(it.dosageUnit) : null,
+      frequency: it.frequency ? toText(it.frequency) : null,
+      route: it.route ? toText(it.route) : null,
       daysSupply: it.daysSupply !== undefined && it.daysSupply !== null ? Number(it.daysSupply) : null,
       quantity: it.quantity !== undefined && it.quantity !== null ? Number(it.quantity) : null,
-      quantityUnit: it.quantityUnit ? String(it.quantityUnit) : null,
+      quantityUnit: it.quantityUnit ? toText(it.quantityUnit) : null,
       skinTest: Boolean(it.skinTest),
-      remark: it.remark ? String(it.remark) : null,
+      remark: it.remark ? toText(it.remark) : null,
     };
   });
 }

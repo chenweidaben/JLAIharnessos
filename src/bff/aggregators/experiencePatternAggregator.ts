@@ -21,6 +21,8 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 单条经验记录（脱敏标签，不含患者直标身份） */
 export interface ExperienceRecord {
@@ -155,8 +157,8 @@ export async function listExperiencePatterns(): Promise<ExperiencePatternsView> 
     }
 
     const records: ExperienceRecord[] = rows.map((r) => ({
-      condition: String(r.condition_tag ?? ''),
-      outcome: String(r.outcome_tag ?? ''),
+      condition: toText(r.condition_tag ?? ''),
+      outcome: toText(r.outcome_tag ?? ''),
     }));
 
     const { patterns } = discoverExperiencePatterns(records);

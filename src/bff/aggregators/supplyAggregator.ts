@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - M139-C 物资耗材管理聚合器（医院运营管理）
  *
@@ -163,7 +164,7 @@ function toPositiveInt(quantity: unknown, field: string): number {
 
 /** 取台账行，不存在则抛错 */
 function requireItem(itemId: unknown): Stock {
-  const id = String(itemId ?? '').trim();
+  const id = toText(itemId ?? '').trim();
   const s = ledger.get(id);
   if (!s) throw new Error(`物资不存在：${id || '(空编码)'}`);
   return s;

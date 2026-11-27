@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/surgeryRecordRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class SurgeryRecordError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -16,18 +18,18 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.surgeryName) throw new SurgeryRecordError(400, '手术名称必填');
   if (!body.surgeryDate) throw new SurgeryRecordError(400, '手术日期必填');
   return repo.create({
-    visitId: String(body.visitId), surgeryName: String(body.surgeryName),
-    surgeryDate: String(body.surgeryDate), surgeon: view.id,
-    assistant1: body.assistant1 ? String(body.assistant1) : undefined,
-    assistant2: body.assistant2 ? String(body.assistant2) : undefined,
-    anesthesiologist: body.anesthesiologist ? String(body.anesthesiologist) : undefined,
-    incisionType: body.incisionType ? String(body.incisionType) : undefined,
-    diagnosisBefore: body.diagnosisBefore ? String(body.diagnosisBefore) : undefined,
-    diagnosisAfter: body.diagnosisAfter ? String(body.diagnosisAfter) : undefined,
-    procedureDetail: body.procedureDetail ? String(body.procedureDetail) : undefined,
+    visitId: toText(body.visitId), surgeryName: toText(body.surgeryName),
+    surgeryDate: toText(body.surgeryDate), surgeon: view.id,
+    assistant1: body.assistant1 ? toText(body.assistant1) : undefined,
+    assistant2: body.assistant2 ? toText(body.assistant2) : undefined,
+    anesthesiologist: body.anesthesiologist ? toText(body.anesthesiologist) : undefined,
+    incisionType: body.incisionType ? toText(body.incisionType) : undefined,
+    diagnosisBefore: body.diagnosisBefore ? toText(body.diagnosisBefore) : undefined,
+    diagnosisAfter: body.diagnosisAfter ? toText(body.diagnosisAfter) : undefined,
+    procedureDetail: body.procedureDetail ? toText(body.procedureDetail) : undefined,
     bloodLoss: body.bloodLoss ? Number(body.bloodLoss) : undefined,
     bloodTransfusion: body.bloodTransfusion ? Number(body.bloodTransfusion) : undefined,
-    complications: body.complications ? String(body.complications) : undefined,
+    complications: body.complications ? toText(body.complications) : undefined,
   });
 }
 

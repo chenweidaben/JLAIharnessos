@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - M149-D 错误处理与日志完善聚合器（生产质量门禁）
  *
@@ -170,7 +171,7 @@ function normalizeRaw(err: unknown): { code: number; message: string; stack?: st
       stack: typeof o.stack === 'string' ? o.stack : undefined,
     };
   }
-  return { code: 50000, message: String(err) };
+  return { code: 50000, message: toText(err) };
 }
 
 /**

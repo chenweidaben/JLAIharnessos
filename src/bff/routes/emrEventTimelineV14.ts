@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历关键事件时间线 V14 路由（M538-C）
  *
@@ -40,7 +41,7 @@ export const emrEventTimelineV14Routes: RouteDef[] = [
       const eventsRaw = Array.isArray(obj?.events) ? obj.events : [];
       const events: TimelineEventItemV14[] = eventsRaw.map((e: unknown) => {
         const item = e as Record<string, unknown>;
-        return { day: Number(item?.day ?? 0), title: String(item?.title ?? "") };
+        return { day: Number(item?.day ?? 0), title: toText(item?.title ?? "") };
       });
       const input: EventTimelineInputV14 = { events };
       const result = buildEventTimelineList(input);

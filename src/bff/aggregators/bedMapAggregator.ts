@@ -15,6 +15,8 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 床位状态：空床 available / 占床 occupied / 隔离 isolation / 维护 maintenance */
 export type BedMapStatus = 'available' | 'occupied' | 'isolation' | 'maintenance';
@@ -141,29 +143,29 @@ function ageFromBirth(birthDate: string | null): number | null {
 
 function mapRow(row: Record<string, unknown>): BedMapRow {
   const status = row.status as BedMapStatus;
-  const visitId = row.current_visit_id ? String(row.current_visit_id) : null;
-  const patientId = row.current_patient_id ? String(row.current_patient_id) : null;
+  const visitId = row.current_visit_id ? toText(row.current_visit_id) : null;
+  const patientId = row.current_patient_id ? toText(row.current_patient_id) : null;
   const occupied = status === 'occupied' || status === 'isolation';
   return {
     bedId: String(row.id),
     bedNo: String(row.bed_no),
-    roomNo: String(row.room_no ?? '-'),
-    floor: String(row.floor ?? '未分配'),
-    wardId: String(row.ward_id ?? ''),
-    wardName: String(row.ward_name ?? '未分配病区'),
-    department: String(row.department ?? ''),
+    roomNo: toText(row.room_no ?? '-'),
+    floor: toText(row.floor ?? '未分配'),
+    wardId: toText(row.ward_id ?? ''),
+    wardName: toText(row.ward_name ?? '未分配病区'),
+    department: toText(row.department ?? ''),
     status: ['available', 'occupied', 'isolation', 'maintenance'].includes(status)
       ? status
       : 'available',
-    bedType: String(row.bed_type ?? 'standard'),
-    occupiedAt: row.occupied_at ? String(row.occupied_at) : null,
+    bedType: toText(row.bed_type ?? 'standard'),
+    occupiedAt: row.occupied_at ? toText(row.occupied_at) : null,
     patient:
       occupied && patientId
         ? {
             patientId: patientId.slice(0, 8),
-            name: row.name_masked ? String(row.name_masked) : '（未登记）',
-            gender: row.gender ? String(row.gender) : '未知',
-            age: ageFromBirth(row.birth_date ? String(row.birth_date) : null),
+            name: row.name_masked ? toText(row.name_masked) : '（未登记）',
+            gender: row.gender ? toText(row.gender) : '未知',
+            age: ageFromBirth(row.birth_date ? toText(row.birth_date) : null),
             visitId,
           }
         : null,

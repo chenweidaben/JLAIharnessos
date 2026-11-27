@@ -10,6 +10,8 @@ import { WorkflowNodeType, type NodeDefinition } from '../dsl/types.js';
 import type { NodeExecutor, NodeExecutorContext, NodeOutcome } from './types.js';
 import { assertNotCancelled, WorkflowCancelledError } from './types.js';
 import type { RagChunk } from '../engine/runtime.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 解析提示词：文件引用（prompts/xx.md）走加载器，否则视为内联文本 */
 async function resolvePrompt(refOrText: string | undefined, nc: NodeExecutorContext): Promise<string> {
@@ -143,7 +145,7 @@ export class RagNodeExecutor implements NodeExecutor {
       const rawQuery = cfg.query;
       const query = rawQuery.includes('${')
         ? nc.ctx.render(rawQuery)
-        : String(nc.ctx.evaluate(rawQuery) ?? '');
+        : toText(nc.ctx.evaluate(rawQuery) ?? '');
       const chunks = await nc.runtime.rag.retrieve({
         knowledgeBases: cfg.knowledgeBases,
         query,

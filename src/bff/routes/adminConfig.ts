@@ -26,6 +26,8 @@ import {
   filterByCategory,
   type SystemConfigEntry,
 } from '../aggregators/systemConfigAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** DB 行 → 纯函数层 SystemConfigEntry（时间戳归一为 ISO 字符串） */
 function toEntry(row: Record<string, unknown>): SystemConfigEntry {
@@ -36,7 +38,7 @@ function toEntry(row: Record<string, unknown>): SystemConfigEntry {
     description: typeof row.description === 'string' ? row.description : '',
     category: typeof row.category === 'string' ? row.category : 'general',
     updatedAt:
-      updatedAt instanceof Date ? updatedAt.toISOString() : String(updatedAt ?? ''),
+      updatedAt instanceof Date ? updatedAt.toISOString() : toText(updatedAt ?? ''),
     updatedBy: typeof row.updated_by === 'string' ? row.updated_by : '',
   };
 }

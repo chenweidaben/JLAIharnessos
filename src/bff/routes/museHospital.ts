@@ -28,6 +28,8 @@ import {
   type TopicExpert,
 } from '../aggregators/hospitalWisdomAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：走进程内样例，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -76,7 +78,7 @@ function toEntry(r: MemoryRow): HospitalStaffMuseEntry {
   const decision = typeof r.decision === 'string' ? r.decision : '';
   const isFailure = r.outcome === 'failure';
   return {
-    staffId: String(r.staff_id ?? ''),
+    staffId: toText(r.staff_id ?? ''),
     staffName: typeof r.name === 'string' && r.name.trim() ? r.name : '未命名员工',
     role: r.role === 'nurse' || r.role === 'pharmacist' ? r.role : 'doctor',
     deptCode: '',

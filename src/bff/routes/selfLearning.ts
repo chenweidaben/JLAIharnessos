@@ -30,6 +30,8 @@ import {
   type WeightLogRow,
   type WeightMap,
 } from '../aggregators/selfLearningAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：仅计算并返回结果，不写 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -113,15 +115,15 @@ export const selfLearningRoutes: RouteDef[] = [
             LIMIT 500
           `;
           rows = (dbRows as unknown as Record<string, unknown>[]).map((r) => ({
-            strategyId: String(r.strategyId ?? ''),
-            runDate: String(r.runDate ?? ''),
+            strategyId: toText(r.strategyId ?? ''),
+            runDate: toText(r.runDate ?? ''),
             oldWeights: asWeightMap(r.oldWeights),
             newWeights: asWeightMap(r.newWeights),
             adoptedCount: Number(r.adoptedCount ?? 0),
             rejectedCount: Number(r.rejectedCount ?? 0),
             adoptedRate: Number(r.adoptedRate ?? 0),
             adjustmentRatio: Number(r.adjustmentRatio ?? 0),
-            status: String(r.status ?? 'applied'),
+            status: toText(r.status ?? 'applied'),
             createdAt: asIso(r.createdAt),
           }));
         }

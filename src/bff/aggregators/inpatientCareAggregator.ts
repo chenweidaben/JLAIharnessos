@@ -66,6 +66,8 @@ import {
   type Administration,
 } from '../../db/repositories/orderAdministrationRepo.js';
 import { writeESignLog } from '../signing/signLogWriter.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* ------------------------------ 错误类型 ------------------------------- */
 
@@ -261,7 +263,7 @@ async function getRoundOrNull(id: string, tx: DbExecutor): Promise<WardRound | n
   if (rows.length === 0) return null;
   const r = rows[0] as Record<string, unknown>;
   return {
-    status: String(r.status), authorId: r.author_id ? String(r.author_id) : null,
+    status: String(r.status), authorId: r.author_id ? toText(r.author_id) : null,
     isSuperior: Boolean(r.is_superior),
   } as unknown as WardRound;
 }
@@ -419,9 +421,9 @@ function mapPlainTask(row: Record<string, unknown>): NursingTask {
     taskNo: String(row.task_no), taskType: row.task_type as NursingTask['taskType'],
     content: String(row.content), scheduledAt: String(row.scheduled_at),
     status: row.status as NursingTask['status'], idempotencyKey: String(row.idempotency_key),
-    result: row.result ? String(row.result) : null,
-    executedBy: row.executed_by ? String(row.executed_by) : null,
-    executedAt: row.executed_at ? String(row.executed_at) : null,
+    result: row.result ? toText(row.result) : null,
+    executedBy: row.executed_by ? toText(row.executed_by) : null,
+    executedAt: row.executed_at ? toText(row.executed_at) : null,
     createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
 }

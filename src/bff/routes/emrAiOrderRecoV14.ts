@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI医嘱推荐 V14 路由（M546-B）
  *
@@ -37,7 +38,7 @@ export const emrAiOrderRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiOrderRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
       };
       const result = recommendOrderByAi(input);
       const report = buildAiOrderRecoReport(result);

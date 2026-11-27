@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI鉴别诊断 V14 路由（M545-B）
  *
@@ -37,7 +38,7 @@ export const emrAiDiffDxV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDiffDxInputV14 = {
-        symptom: String(obj?.symptom ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
       };
       const result = suggestDiffDx(input);
       const report = buildAiDiffDxReport(result);

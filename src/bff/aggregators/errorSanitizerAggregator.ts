@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - M136-A 错误信息脱敏聚合器
  *
@@ -68,7 +69,7 @@ function normalizeRaw(err: unknown): { rawMessage: string; status: number; code:
     return { rawMessage: message, status, code };
   }
   // string / number / boolean 等原始类型
-  return { rawMessage: String(err), status: 500, code: 50000 };
+  return { rawMessage: toText(err), status: 500, code: 50000 };
 }
 
 /**

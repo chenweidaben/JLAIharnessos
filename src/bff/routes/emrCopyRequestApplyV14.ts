@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历复印申请管理（避让版）V14 路由（M540-A）
  *
@@ -37,9 +38,9 @@ export const emrCopyRequestApplyV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: CopyRequestApplyInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
         pages: Number(obj?.pages ?? 0),
-        purpose: String(obj?.purpose ?? ""),
+        purpose: toText(obj?.purpose ?? ""),
       };
       const result = createCopyRequestApply(input);
       const report = buildCopyRequestApplyReport(result);

@@ -24,6 +24,8 @@ import {
   type DataAccessLog,
   type DataAccessLogFilter,
 } from '../aggregators/auditLogAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 近期窗口：默认只取最近 500 条，纯函数层在此窗口内再做条件过滤 */
 const RECENT_LIMIT = 500;
@@ -77,7 +79,7 @@ async function handleList(c: Ctx): Promise<Response> {
         patientId: r.patientId ?? '',
         // pg 返回时间戳为 Date 对象，统一归一为 ISO 字符串，保证纯函数比较一致
         accessedAt:
-          r.accessedAt instanceof Date ? r.accessedAt.toISOString() : String(r.accessedAt ?? ''),
+          r.accessedAt instanceof Date ? r.accessedAt.toISOString() : toText(r.accessedAt ?? ''),
         ipAddress: r.ipAddress ?? '',
       }),
     );

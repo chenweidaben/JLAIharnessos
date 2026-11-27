@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI出院小结生成 V14 路由（M547-A）
  *
@@ -37,8 +38,8 @@ export const emrAiDischargeSummaryV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDischargeSummaryInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        treatment: String(obj?.treatment ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        treatment: toText(obj?.treatment ?? ""),
       };
       const result = generateDischargeSummaryByAi(input);
       const report = buildAiDischargeSummaryReport(result);

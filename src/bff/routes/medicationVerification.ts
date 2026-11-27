@@ -28,6 +28,8 @@ import {
   discontinueOrder,
   listOrders,
 } from '../aggregators/medicationVerificationAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof MedVerifError) {
@@ -54,9 +56,9 @@ export const medicationVerificationRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createOrder({
-          visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
-          orderNo: String(b.orderNo ?? ''), drugName: String(b.drugName ?? ''),
-          drugCode: String(b.drugCode ?? ''), dose: String(b.dose ?? ''), route: String(b.route ?? ''),
+          visitId: toText(b.visitId ?? ''), patientId: toText(b.patientId ?? ''),
+          orderNo: toText(b.orderNo ?? ''), drugName: toText(b.drugName ?? ''),
+          drugCode: toText(b.drugCode ?? ''), dose: toText(b.dose ?? ''), route: toText(b.route ?? ''),
           scheduledAt: Number(b.scheduledAt ?? 0),
           safetyLevel: Number(b.safetyLevel ?? 1) as 1|2|3|4|5|6,
           isHighAlert: Boolean(b.isHighAlert), roles: c.user?.roles ?? [],
@@ -71,7 +73,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(scanWristband(on(c), String(b.patientIdScanned ?? ''), String(b.nurseId ?? ''), b.witnessNurseId === undefined ? undefined : String(b.witnessNurseId), c.user?.roles ?? [])));
+        return json(ok(scanWristband(on(c), toText(b.patientIdScanned ?? ''), toText(b.nurseId ?? ''), b.witnessNurseId === undefined ? undefined : toText(b.witnessNurseId), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -82,7 +84,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(scanBarcode(on(c), String(b.drugCodeScanned ?? ''), String(b.nurseId ?? ''), b.witnessNurseId === undefined ? undefined : String(b.witnessNurseId), c.user?.roles ?? [])));
+        return json(ok(scanBarcode(on(c), toText(b.drugCodeScanned ?? ''), toText(b.nurseId ?? ''), b.witnessNurseId === undefined ? undefined : toText(b.witnessNurseId), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -93,7 +95,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(execute(on(c), String(b.nurseId ?? ''), b.note === undefined ? undefined : String(b.note), c.user?.roles ?? [])));
+        return json(ok(execute(on(c), toText(b.nurseId ?? ''), b.note === undefined ? undefined : toText(b.note), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -104,7 +106,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(rejectOrder(on(c), String(b.nurseId ?? ''), String(b.reason ?? ''), c.user?.roles ?? [])));
+        return json(ok(rejectOrder(on(c), toText(b.nurseId ?? ''), toText(b.reason ?? ''), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -115,7 +117,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(pauseOrder(on(c), String(b.nurseId ?? ''), String(b.reason ?? ''), c.user?.roles ?? [])));
+        return json(ok(pauseOrder(on(c), toText(b.nurseId ?? ''), toText(b.reason ?? ''), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -126,7 +128,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(resumeOrder(on(c), String(b.nurseId ?? ''), c.user?.roles ?? [])));
+        return json(ok(resumeOrder(on(c), toText(b.nurseId ?? ''), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -137,7 +139,7 @@ export const medicationVerificationRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(discontinueOrder(on(c), String(b.nurseId ?? ''), b.approverId === undefined ? undefined : String(b.approverId), c.user?.roles ?? [])));
+        return json(ok(discontinueOrder(on(c), toText(b.nurseId ?? ''), b.approverId === undefined ? undefined : toText(b.approverId), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },

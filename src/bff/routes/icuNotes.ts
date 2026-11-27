@@ -23,6 +23,8 @@ import {
   listScores,
 } from '../aggregators/icuNotesAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof IcuNotesError || err instanceof OrderCpoeError) {
@@ -45,8 +47,8 @@ export const icuNotesRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(admit({
-          visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
-          reason: String(b.reason ?? ''), acuityLevel: Number(b.acuityLevel ?? 0),
+          visitId: toText(b.visitId ?? ''), patientId: toText(b.patientId ?? ''),
+          reason: toText(b.reason ?? ''), acuityLevel: Number(b.acuityLevel ?? 0),
           plannedVentHours: Number(b.plannedVentHours ?? 0),
           roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 'icu',
         })));
@@ -61,8 +63,8 @@ export const icuNotesRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(discharge({
-          visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
-          disposition: String(b.disposition ?? ''), roles: c.user?.roles ?? [],
+          visitId: toText(b.visitId ?? ''), patientId: toText(b.patientId ?? ''),
+          disposition: toText(b.disposition ?? ''), roles: c.user?.roles ?? [],
         })));
       } catch (e) { return mapError(e); }
     },
@@ -75,7 +77,7 @@ export const icuNotesRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(recordVitals({
-          visitId: vid(c), patientId: String(b.patientId ?? ''),
+          visitId: vid(c), patientId: toText(b.patientId ?? ''),
           recordedAt: Number(b.recordedAt ?? Date.now()),
           heartRate: Number(b.heartRate ?? 0), sbp: Number(b.sbp ?? 0), dbp: Number(b.dbp ?? 0),
           respRate: Number(b.respRate ?? 0), spo2: Number(b.spo2 ?? 0),
@@ -103,8 +105,8 @@ export const icuNotesRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(recordScore({
-          visitId: vid(c), patientId: String(b.patientId ?? ''),
-          scoreType: String(b.scoreType ?? ''),
+          visitId: vid(c), patientId: toText(b.patientId ?? ''),
+          scoreType: toText(b.scoreType ?? ''),
           items: (b.items ?? {}) as Record<string, number>,
           recordedAt: Number(b.recordedAt ?? Date.now()),
           roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 'd',

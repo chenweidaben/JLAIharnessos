@@ -96,7 +96,8 @@ const consults: Consult[] = [];
 function toText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 /** 解析当前时刻（now 可覆盖，便于测试回放） */

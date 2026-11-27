@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检验解读 V14 路由（M545-D，M545 收官）
  *
@@ -37,9 +38,9 @@ export const emrAiLabInterpretV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiLabInterpretInputV14 = {
-        item: String(obj?.item ?? ""),
+        item: toText(obj?.item ?? ""),
         value: Number(obj?.value ?? 0),
-        refRange: String(obj?.refRange ?? ""),
+        refRange: toText(obj?.refRange ?? ""),
       };
       const result = interpretLabByAi(input);
       const report = buildAiLabInterpretReport(result);

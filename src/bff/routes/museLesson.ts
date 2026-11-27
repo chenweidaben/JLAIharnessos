@@ -26,6 +26,8 @@ import {
 } from '../aggregators/lessonRecordAggregator';
 import type { StaffMuseRole } from '../aggregators/staffMuseAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：走进程内内存兜底，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -88,10 +90,10 @@ export const museLessonRoutes: RouteDef[] = [
       }
 
       // 纯函数已校验通过，此处可安全收敛类型
-      const scenario = String(body?.scenario ?? '').trim();
-      const decision = String(body?.decision ?? '').trim();
-      const outcome = String(body?.outcome ?? '').trim() as LessonOutcome;
-      const lessonRaw = String(body?.lesson ?? '').trim();
+      const scenario = toText(body?.scenario ?? '').trim();
+      const decision = toText(body?.decision ?? '').trim();
+      const outcome = toText(body?.outcome ?? '').trim() as LessonOutcome;
+      const lessonRaw = toText(body?.lesson ?? '').trim();
       const lesson = lessonRaw.length > 0 ? lessonRaw : null;
       const tags = parseTags(body?.tags);
       const staffId = c.user.id;
@@ -150,11 +152,11 @@ export const museLessonRoutes: RouteDef[] = [
         return json(
           ok(
             {
-              id: String(row?.id ?? ''),
+              id: toText(row?.id ?? ''),
               persisted: true,
               source: 'manual',
               tags,
-              createdAt: String(row?.created_at ?? ''),
+              createdAt: toText(row?.created_at ?? ''),
             },
             '经验/教训已录入',
             c.traceId,

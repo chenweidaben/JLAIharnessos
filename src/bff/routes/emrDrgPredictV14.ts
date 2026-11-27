@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - DRG 入组预测 V14 路由（M535-C）
  *
@@ -37,7 +38,7 @@ export const emrDrgPredictV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: DrgPredictInputV14 = {
-        mainDiagnosis: String(obj?.mainDiagnosis ?? ""),
+        mainDiagnosis: toText(obj?.mainDiagnosis ?? ""),
         hasSurgery: Boolean(obj?.hasSurgery ?? false),
         age: Number(obj?.age ?? 0),
       };

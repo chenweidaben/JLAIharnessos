@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI麻醉深度监测建议 V14 路由（M562-C）
  *
@@ -37,7 +38,7 @@ export const emrAiAnesthesiaDepthSuggestV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiAnesthesiaDepthSuggestInputV14 = {
-        surgeryType: String(obj?.surgeryType ?? ""),
+        surgeryType: toText(obj?.surgeryType ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
       };
       const result = suggestAnesthesiaDepthByAi(input);

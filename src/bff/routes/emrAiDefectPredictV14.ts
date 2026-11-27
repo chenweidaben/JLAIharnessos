@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI缺陷预测 V14 路由（M543-C）
  *
@@ -37,7 +38,7 @@ export const emrAiDefectPredictV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDefectPredictInputV14 = {
-        recordType: String(obj?.recordType ?? ""),
+        recordType: toText(obj?.recordType ?? ""),
         hasSignature: Boolean(obj?.hasSignature ?? false),
         hasDischarge: Boolean(obj?.hasDischarge ?? false),
       };

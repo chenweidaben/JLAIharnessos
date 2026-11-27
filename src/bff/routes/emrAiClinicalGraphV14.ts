@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI临床知识图谱 V14 路由（M550-A）
  *
@@ -37,7 +38,7 @@ export const emrAiClinicalGraphV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiClinicalGraphInputV14 = {
-        node: String(obj?.node ?? ""),
+        node: toText(obj?.node ?? ""),
       };
       const result = queryClinicalGraphByAi(input);
       const report = buildAiClinicalGraphReport(result);

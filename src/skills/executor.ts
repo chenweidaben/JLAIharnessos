@@ -13,6 +13,8 @@
  */
 
 import type { LoadedSkill, SkillManifest, SkillStep } from './types';
+import { toText } from '../db/rowText.js';
+
 
 // ============================================================================
 // 注入式运行时接口
@@ -127,7 +129,7 @@ function resolveTemplate(value: unknown, scope: Record<string, unknown>): unknow
     // 否则做字符串插值
     return value.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_m, path: string) => {
       const v = lookup(path, scope);
-      return v == null ? '' : String(v);
+      return v == null ? '' : toText(v);
     });
   }
   if (Array.isArray(value)) return value.map((v) => resolveTemplate(v, scope));

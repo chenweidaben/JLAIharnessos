@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI ICD 编码推荐 V14 路由（M551-B）
  *
@@ -37,7 +38,7 @@ export const emrAiIcdRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiIcdRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
       };
       const result = recommendIcdByAi(input);
       const report = buildAiIcdRecoReport(result);

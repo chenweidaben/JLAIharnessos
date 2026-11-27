@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { listView, suggestView, reviewView, DiagnosisError } from '../aggregators/diagnosisSuggestionAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -35,7 +37,7 @@ export const diagnosisSuggestionRoutes: RouteDef[] = [
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(await reviewView(view, c.params.id, Boolean(b.accepted), b.selectedDiagnosis ? String(b.selectedDiagnosis) : undefined)));
+        return json(ok(await reviewView(view, c.params.id, Boolean(b.accepted), b.selectedDiagnosis ? toText(b.selectedDiagnosis) : undefined)));
       } catch (e) { return mapError(e); }
     } },
 ];

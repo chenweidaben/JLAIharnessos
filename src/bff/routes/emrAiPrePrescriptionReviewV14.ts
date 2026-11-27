@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI处方前置审核 V14 路由（M565-A）
  *
@@ -37,7 +38,7 @@ export const emrAiPrePrescriptionReviewV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiPrePrescriptionReviewInputV14 = {
-        drugName: String(obj?.drugName ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
         hasAllergy: Boolean(obj?.hasAllergy ?? false),
       };

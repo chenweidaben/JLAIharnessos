@@ -1,6 +1,8 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/progressNoteRepo';
 import { writeESignLog } from '../signing/signLogWriter.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class NoteError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -17,8 +19,8 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.content) throw new NoteError(400, '内容必填');
   if (!body.noteType) throw new NoteError(400, '记录类型必填');
   return repo.create({
-    visitId: String(body.visitId), noteType: String(body.noteType),
-    content: String(body.content), attendingDoctor: view.id,
+    visitId: toText(body.visitId), noteType: toText(body.noteType),
+    content: toText(body.content), attendingDoctor: view.id,
   });
 }
 

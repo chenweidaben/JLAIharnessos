@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 医生质控个人档案 V14 路由（M542-C）
  *
@@ -37,7 +38,7 @@ export const emrQcDoctorProfileV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: QcDoctorProfileInputV14 = {
-        doctorId: String(obj?.doctorId ?? ""),
+        doctorId: toText(obj?.doctorId ?? ""),
         totalRecords: Number(obj?.totalRecords ?? 0),
         defectCount: Number(obj?.defectCount ?? 0),
         avgScore: Number(obj?.avgScore ?? 0),

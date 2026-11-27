@@ -18,6 +18,8 @@ import {
   verifyClinicalObject,
   listObjectSignatures,
 } from '../aggregators/clinicalSignatureAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof ClinicalSignatureError) {
@@ -40,9 +42,9 @@ export const clinicalSignatureRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         const rec = signClinicalObject({
-          objectType: String(b.objectType ?? ''),
-          objectId: String(b.objectId ?? ''),
-          content: String(b.content ?? ''),
+          objectType: toText(b.objectType ?? ''),
+          objectId: toText(b.objectId ?? ''),
+          content: toText(b.content ?? ''),
           roles: c.user?.roles ?? [],
           signedBy: c.user?.id ?? 'unknown',
           signedByName: c.user?.name,
@@ -60,7 +62,7 @@ export const clinicalSignatureRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const result = verifyClinicalObject({
           signId: c.params.signId,
-          content: b.content ? String(b.content) : undefined,
+          content: b.content ? toText(b.content) : undefined,
         });
         if (!result.valid) {
           return json(fail(ErrorCode.BAD_REQUEST, result.reason ?? '验签失败'), 400);

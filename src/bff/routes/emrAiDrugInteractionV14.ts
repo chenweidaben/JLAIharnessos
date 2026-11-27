@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI用药相互作用审查 V14 路由（M550-C）
  *
@@ -37,8 +38,8 @@ export const emrAiDrugInteractionV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDrugInteractionInputV14 = {
-        drugA: String(obj?.drugA ?? ""),
-        drugB: String(obj?.drugB ?? ""),
+        drugA: toText(obj?.drugA ?? ""),
+        drugB: toText(obj?.drugB ?? ""),
       };
       const result = checkDrugInteractionByAi(input);
       const report = buildAiDrugInteractionReport(result);

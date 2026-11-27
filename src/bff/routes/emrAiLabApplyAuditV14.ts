@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检验申请合理性审查 V14 路由（M561-B）
  *
@@ -37,7 +38,7 @@ export const emrAiLabApplyAuditV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiLabApplyAuditInputV14 = {
-        testName: String(obj?.testName ?? ""),
+        testName: toText(obj?.testName ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
         hasResult: Boolean(obj?.hasResult ?? false),
       };

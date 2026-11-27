@@ -22,6 +22,8 @@ import {
   type GrowthDecision,
 } from '../aggregators/doctorGrowthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：返回样例成长档案，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -59,7 +61,7 @@ async function loadDecisions(staffId: string): Promise<GrowthDecision[]> {
         typeof ctx.experienceTag === 'string'
           ? ctx.experienceTag
           : Array.isArray(ctx.tags)
-            ? String((ctx.tags as unknown[])[0] ?? '')
+            ? toText((ctx.tags as unknown[])[0] ?? '')
             : '',
       lesson: typeof r.lesson === 'string' ? r.lesson : '',
     } satisfies GrowthDecision;

@@ -43,6 +43,8 @@ import {
   type UtilizationConclusion,
   type BloodQualityMetrics,
 } from '../../medical-tools/quality/bloodUtilizationQuality.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class BloodQualityError extends Error {
   constructor(
@@ -194,8 +196,8 @@ async function getPatientTestCodes(patientId: string): Promise<string[]> {
     SELECT DISTINCT item_code, item_name FROM clinical.lab_results WHERE patient_id = ${patientId}`;
   const out: string[] = [];
   for (const r of rows as Record<string, unknown>[]) {
-    if (r.item_code) out.push(String(r.item_code));
-    if (r.item_name) out.push(String(r.item_name));
+    if (r.item_code) out.push(toText(r.item_code));
+    if (r.item_name) out.push(toText(r.item_name));
   }
   return out;
 }

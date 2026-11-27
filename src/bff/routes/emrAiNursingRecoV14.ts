@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI护理建议 V14 路由（M546-A）
  *
@@ -37,7 +38,7 @@ export const emrAiNursingRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiNursingRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         age: Number(obj?.age ?? 0),
       };
       const result = recommendNursingByAi(input);

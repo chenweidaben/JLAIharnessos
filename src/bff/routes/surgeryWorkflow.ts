@@ -23,6 +23,8 @@ import {
   listRequests,
 } from '../aggregators/surgeryWorkflowAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof SurgeryWorkflowError || err instanceof OrderCpoeError) {
@@ -46,12 +48,12 @@ export const surgeryWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createRequest({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          surgeryName: String(b.surgeryName ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          surgeryName: toText(b.surgeryName ?? ''),
           plannedStart: Number(b.plannedStart ?? Date.now()),
           plannedDurationMin: Number(b.plannedDurationMin ?? 0),
-          surgeonId: String(b.surgeonId ?? c.user?.id ?? ''),
+          surgeonId: toText(b.surgeonId ?? c.user?.id ?? ''),
           roles: c.user?.roles ?? [],
         })));
       } catch (e) { return mapError(e); }
@@ -66,7 +68,7 @@ export const surgeryWorkflowRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(scheduleRequest({
           reqId: idFromPath(c),
-          orRoom: String(b.orRoom ?? ''),
+          orRoom: toText(b.orRoom ?? ''),
           scheduledStart: Number(b.scheduledStart ?? 0),
           scheduledEnd: Number(b.scheduledEnd ?? 0),
           roles: c.user?.roles ?? [],
@@ -83,8 +85,8 @@ export const surgeryWorkflowRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(transition({
           reqId: idFromPath(c),
-          toState: String(b.toState ?? ''),
-          note: b.note ? String(b.note) : undefined,
+          toState: toText(b.toState ?? ''),
+          note: b.note ? toText(b.note) : undefined,
           roles: c.user?.roles ?? [],
         })));
       } catch (e) { return mapError(e); }
@@ -100,7 +102,7 @@ export const surgeryWorkflowRoutes: RouteDef[] = [
         return json(ok(recordAnesthesia({
           reqId: idFromPath(c),
           vitals: b.vitals as { hr?: number; sbp?: number; dbp?: number; spo2?: number } | undefined,
-          anesthesiaType: b.anesthesiaType ? String(b.anesthesiaType) : undefined,
+          anesthesiaType: b.anesthesiaType ? toText(b.anesthesiaType) : undefined,
           drugs: Array.isArray(b.drugs) ? (b.drugs as string[]) : undefined,
           fluidsIn: b.fluidsIn === undefined ? undefined : Number(b.fluidsIn),
           fluidsOut: b.fluidsOut === undefined ? undefined : Number(b.fluidsOut),
@@ -120,7 +122,7 @@ export const surgeryWorkflowRoutes: RouteDef[] = [
         return json(ok(recordPacu({
           reqId: idFromPath(c),
           aldreteScore: Number(b.aldreteScore ?? -1),
-          consciousness: String(b.consciousness ?? ''),
+          consciousness: toText(b.consciousness ?? ''),
           painScore: Number(b.painScore ?? -1),
           dischargedToWardAt: b.dischargedToWardAt === undefined ? undefined : Number(b.dischargedToWardAt),
           roles: c.user?.roles ?? [],

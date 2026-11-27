@@ -20,6 +20,8 @@ import {
   type ModelRegistry,
   getModelRegistry,
 } from './modelRegistry.js';
+import { toText } from '../../db/rowText.js';
+
 
 // ============================================================================
 // 类型契约（对齐技术文档 3.2.2 ModelRouteRule / 3.2.4 RouteRequest）
@@ -152,18 +154,18 @@ export function validateRouteRule(rule: unknown): string[] {
   if (typeof r.enabled !== 'boolean') errors.push('字段 enabled 必须为布尔值');
 
   if (r.stickyKey !== undefined && !STICKY_KEYS.includes(r.stickyKey as StickyKey))
-    errors.push(`字段 stickyKey「${String(r.stickyKey)}」非法，合法值：${STICKY_KEYS.join(' / ')}`);
+    errors.push(`字段 stickyKey「${toText(r.stickyKey)}」非法，合法值：${STICKY_KEYS.join(' / ')}`);
 
   const match = r.match as Record<string, unknown> | undefined;
   if (match === undefined || match === null) {
     errors.push('字段 match 缺失或不是对象');
   } else {
     if (match.contextLength !== undefined && !CONTEXT_LENGTHS.includes(match.contextLength as ContextLength))
-      errors.push(`字段 match.contextLength「${String(match.contextLength)}」非法`);
+      errors.push(`字段 match.contextLength「${toText(match.contextLength)}」非法`);
     if (match.latencyTier !== undefined && !PERFORMANCE_TIERS.includes(match.latencyTier as PerformanceTier))
-      errors.push(`字段 match.latencyTier「${String(match.latencyTier)}」非法`);
+      errors.push(`字段 match.latencyTier「${toText(match.latencyTier)}」非法`);
     if (match.costTier !== undefined && !PERFORMANCE_TIERS.includes(match.costTier as PerformanceTier))
-      errors.push(`字段 match.costTier「${String(match.costTier)}」非法`);
+      errors.push(`字段 match.costTier「${toText(match.costTier)}」非法`);
   }
 
   return errors;

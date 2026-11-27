@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 数据报表导出聚合器（M138-D 新业务场景）
  *
@@ -186,7 +187,7 @@ export const CSV_BOM = '﻿';
 export function escapeCsvCell(value: unknown): string {
   if (value === null || value === undefined) return '';
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  const s = String(value);
+  const s = toText(value);
   if (/[",\r\n]/.test(s)) {
     return '"' + s.replace(/"/g, '""') + '"';
   }

@@ -23,6 +23,8 @@ import {
   buildThirdPartyApiKey,
   normalizePermissions,
 } from '../aggregators/thirdPartyApiAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** POST 入参（宽松解析，非法字段在下方逐字段校验） */
 interface CreateKeyBody {
@@ -95,7 +97,7 @@ async function handleCreate(c: Ctx): Promise<Response> {
     const row = (rows as unknown as Record<string, unknown>[])[0];
     return json(
       ok({
-        id: String(row?.id ?? ''),
+        id: toText(row?.id ?? ''),
         // 明文 Key：仅本次返回一次，请对接方立即妥存；后续不再可查
         key: built.key,
         keyPrefix: built.keyPrefix,
@@ -166,7 +168,7 @@ async function handleList(c: Ctx): Promise<Response> {
       LIMIT 500
     `;
     const items = (rows as unknown as Record<string, unknown>[]).map((r) => ({
-      id: String(r.id ?? ''),
+      id: toText(r.id ?? ''),
       keyPrefix: typeof r.keyPrefix === 'string' ? r.keyPrefix : '',
       name: typeof r.name === 'string' ? r.name : '',
       permissions: Array.isArray(r.permissions) ? (r.permissions as string[]) : [],

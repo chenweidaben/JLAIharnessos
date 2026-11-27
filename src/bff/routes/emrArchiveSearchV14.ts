@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历归档检索 V14 路由（M533-D，M533 收官）
  *
@@ -39,7 +40,7 @@ export const emrArchiveSearchV14Routes: RouteDef[] = [
       const obj = body as Record<string, unknown>;
       const records = (obj?.records ?? []) as ArchiveSearchRecordV14[];
       const input: ArchiveSearchInputV14 = {
-        query: String(obj?.query ?? ""),
+        query: toText(obj?.query ?? ""),
         records,
       };
       const result = searchArchiveRecords(input);

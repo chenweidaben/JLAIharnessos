@@ -55,6 +55,8 @@ import {
   insertSagaLog,
   listSagaLog,
 } from '../../db/repositories/billingRepo.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -279,9 +281,9 @@ export async function generateFeeItems(
       const { created } = await insertFeeItem(
         {
           patientId: visit.patientId, visitId: visitId,
-          category: 'drug', itemCode: String(d.drug_code ?? ''),
+          category: 'drug', itemCode: toText(d.drug_code ?? ''),
           itemName: String(d.drug_name),
-          quantity: Number(d.quantity) || 1, unitPrice: String(d.drug_price),
+          quantity: Number(d.quantity) || 1, unitPrice: toText(d.drug_price),
           sourceType: 'drug', sourceId: String(d.item_id),
           priceSource: 'drug', department: visit.department,
         },
@@ -674,11 +676,11 @@ export async function getSettlementDetail(
     return {
       id: String(r.id), refundNo: String(r.refund_no),
       settlementId: String(r.settlement_id),
-      invoiceId: r.invoice_id ? String(r.invoice_id) : null,
+      invoiceId: r.invoice_id ? toText(r.invoice_id) : null,
       patientId: String(r.patient_id), visitId: String(r.visit_id),
       feeItemId: String(r.fee_item_id), amount: String(r.amount),
       reason: String(r.reason),
-      refundedBy: r.refunded_by ? String(r.refunded_by) : null,
+      refundedBy: r.refunded_by ? toText(r.refunded_by) : null,
       refundedAt: String(r.refunded_at), createdAt: String(r.created_at),
     };
   });

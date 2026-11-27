@@ -31,6 +31,8 @@ import {
   type RoomBooking,
   type SupervisionTask,
 } from '../aggregators/officeDeepAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -141,7 +143,7 @@ export const officeDeepRoutes: RouteDef[] = [
           ? {
               id: String(docRow.id), title: String(docRow.title),
               direction: docRow.direction as DocDirection, category: docRow.category as DocCategory,
-              applicantId: String(docRow.applicant_id ?? ''), deptCode: String(docRow.dept_code ?? ''),
+              applicantId: toText(docRow.applicant_id ?? ''), deptCode: toText(docRow.dept_code ?? ''),
               status: docRow.status as DocStatus, currentStep: Number(docRow.current_step ?? 0),
             }
           : demoDocument();
@@ -152,7 +154,7 @@ export const officeDeepRoutes: RouteDef[] = [
         const meeting: MeetingRequest = mtgRow
           ? {
               id: String(mtgRow.id), title: String(mtgRow.title),
-              requesterDept: String(mtgRow.requester_dept ?? ''), room: String(mtgRow.room),
+              requesterDept: toText(mtgRow.requester_dept ?? ''), room: String(mtgRow.room),
               startAt: String(mtgRow.start_at), endAt: String(mtgRow.end_at),
               attendees: Number(mtgRow.attendees ?? 0),
             }
@@ -168,7 +170,7 @@ export const officeDeepRoutes: RouteDef[] = [
         // 督办任务跟踪
         const supervision = (openTasks as Record<string, unknown>[]).map((r) =>
           trackSupervisionTask({
-            id: String(r.id), title: String(r.title), ownerDept: String(r.owner_dept ?? ''),
+            id: String(r.id), title: String(r.title), ownerDept: toText(r.owner_dept ?? ''),
             assignedAt: String(r.assigned_at), dueAt: String(r.due_at),
             progress: Number(r.progress ?? 0),
             updates: Array.isArray(r.updates) ? (r.updates as SupervisionTask['updates']) : [],

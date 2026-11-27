@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - AI 合理用药深度审核聚合器（M144-C）「AI核心能力深化」
  *
@@ -204,7 +205,7 @@ const DOSE_RULES: readonly {
 // ---------------------------------------------------------------------------
 
 function contains(name: unknown, key: string): boolean {
-  return String(name ?? '').includes(key);
+  return toText(name ?? '').includes(key);
 }
 
 function normalizeMed(med: MedInput | null | undefined): DrugEntry | null {

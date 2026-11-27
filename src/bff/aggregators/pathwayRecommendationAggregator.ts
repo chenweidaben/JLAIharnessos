@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/pathwayRecommendationRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class PathwayError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -61,11 +63,11 @@ export async function listView(view: AuthView, visitId: string) {
 export async function recommendView(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('ai_pathway:view')) throw new PathwayError(403, '无权限');
   if (!body.visitId) throw new PathwayError(400, 'visitId 必填');
-  const diagnosis = String(body.diagnosis ?? '');
+  const diagnosis = toText(body.diagnosis ?? '');
   const match = matchPathway(diagnosis);
   if (!match) throw new PathwayError(404, '暂无匹配临床路径');
   return repo.create({
-    visitId: String(body.visitId), diagnosis,
+    visitId: toText(body.visitId), diagnosis,
     pathwayName: match.pathwayName, pathwayCode: match.pathwayCode,
     steps: match.steps, expectedDays: match.expectedDays, confidence: match.confidence,
   });

@@ -22,6 +22,8 @@ import {
   type DqRule,
   checkRule,
 } from '../../data-platform/dataQuality.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -72,7 +74,7 @@ function mapRule(r: Record<string, unknown>): DqRule {
     dimension: r.dimension as DqRule['dimension'],
     targetSchema: String(r.target_schema),
     targetTable: String(r.target_table),
-    targetColumn: r.target_column ? String(r.target_column) : null,
+    targetColumn: r.target_column ? toText(r.target_column) : null,
     checkType: r.check_type as DqRule['checkType'],
     params: (r.params as Record<string, unknown>) ?? {},
     severity: r.severity as DqRule['severity'],
@@ -247,7 +249,7 @@ function mapRun(r: Record<string, unknown>): QualityRunView {
     failedRules: num(r.failed_rules),
     score: num(r.score),
     startedAt: String(r.started_at),
-    finishedAt: r.finished_at ? String(r.finished_at) : null,
+    finishedAt: r.finished_at ? toText(r.finished_at) : null,
   };
 }
 
@@ -308,10 +310,10 @@ export async function getRunResults(
     (r) => ({
       ruleCode: String(r.rule_code),
       ruleName: String(r.rule_name ?? r.rule_code),
-      dimension: String(r.dimension ?? ''),
-      severity: String(r.severity ?? ''),
-      target: `${String(r.target_schema ?? '')}.${String(r.target_table ?? '')}${
-        r.target_column ? '.' + String(r.target_column) : ''
+      dimension: toText(r.dimension ?? ''),
+      severity: toText(r.severity ?? ''),
+      target: `${toText(r.target_schema ?? '')}.${toText(r.target_table ?? '')}${
+        r.target_column ? '.' + toText(r.target_column) : ''
       }`,
       totalRows: num(r.total_rows),
       passedRows: num(r.passed_rows),
@@ -411,8 +413,8 @@ export async function listClassification(
     columnName: String(r.column_name),
     level: num(r.level),
     source: r.source === 'manual' ? 'manual' : 'auto',
-    reason: r.reason ? String(r.reason) : null,
-    overriddenByName: r.overridden_name ? String(r.overridden_name) : null,
+    reason: r.reason ? toText(r.reason) : null,
+    overriddenByName: r.overridden_name ? toText(r.overridden_name) : null,
     updatedAt: String(r.updated_at),
   }));
 }
@@ -475,7 +477,7 @@ export async function overrideClassification(
       columnName: String(row.column_name),
       level: num(row.level),
       source: 'manual',
-      reason: row.reason ? String(row.reason) : null,
+      reason: row.reason ? toText(row.reason) : null,
       overriddenByName: auth.realName,
       updatedAt: String(row.updated_at),
     };

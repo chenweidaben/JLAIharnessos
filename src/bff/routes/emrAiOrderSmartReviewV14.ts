@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI医嘱智能审核 V14 路由（M558-A）
  *
@@ -37,8 +38,8 @@ export const emrAiOrderSmartReviewV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiOrderSmartReviewInputV14 = {
-        drugName: String(obj?.drugName ?? ""),
-        dosage: String(obj?.dosage ?? ""),
+        drugName: toText(obj?.drugName ?? ""),
+        dosage: toText(obj?.dosage ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
       };
       const result = reviewOrderByAi(input);

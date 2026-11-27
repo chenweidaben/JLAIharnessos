@@ -27,6 +27,8 @@ import {
   type KpiResult,
 } from '../aggregators/hospitalKpiAggregator';
 import { tenantService } from '@/tenant';
+import { toText } from '../../db/rowText.js';
+
 
 /** 演示模式开关：与 adminHealth / wisdomDashboard 一致 */
 function demoModeEnabled(): boolean {
@@ -84,7 +86,7 @@ function demoPrevObservations(): KpiObservations {
 function rowsToObservations(rows: Record<string, unknown>[]): KpiObservations {
   const obs: KpiObservations = {};
   for (const r of rows) {
-    const code = String(r.kpiCode ?? '');
+    const code = toText(r.kpiCode ?? '');
     const actual = Number(r.actualValue ?? NaN);
     if (/^C\d{1,2}$/.test(code) && Number.isFinite(actual)) {
       obs[code] = actual;

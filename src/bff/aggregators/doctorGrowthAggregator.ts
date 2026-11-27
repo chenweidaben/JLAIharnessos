@@ -156,7 +156,8 @@ const RADAR_KEYWORDS: readonly { dim: keyof RadarScores; words: readonly string[
 function toText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 /** roundRate：成功率四舍五入到 4 位小数，避免浮点噪声 */

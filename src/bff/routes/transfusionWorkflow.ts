@@ -21,6 +21,8 @@ import {
   listRequests,
 } from '../aggregators/transfusionWorkflowAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof TransfusionWorkflowError || err instanceof OrderCpoeError) {
@@ -42,11 +44,11 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createRequest({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          bloodType: String(b.bloodType ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          bloodType: toText(b.bloodType ?? ''),
           units: Number(b.units ?? 0),
-          indication: String(b.indication ?? ''),
+          indication: toText(b.indication ?? ''),
           roles: c.user?.roles ?? [],
         })));
       } catch (e) { return mapError(e); }
@@ -60,8 +62,8 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(typeBlood({
-          reqId: reqId(c), abo: String(b.abo ?? ''), rh: String(b.rh ?? ''),
-          antibodyScreen: String(b.antibodyScreen ?? ''), roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 't',
+          reqId: reqId(c), abo: toText(b.abo ?? ''), rh: toText(b.rh ?? ''),
+          antibodyScreen: toText(b.antibodyScreen ?? ''), roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 't',
         })));
       } catch (e) { return mapError(e); }
     },
@@ -74,7 +76,7 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(crossmatch({
-          reqId: reqId(c), donorBagNo: String(b.donorBagNo ?? ''),
+          reqId: reqId(c), donorBagNo: toText(b.donorBagNo ?? ''),
           compatibility: b.compatibility === 'incompatible' ? 'incompatible' : 'compatible',
           roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 't',
         })));
@@ -89,7 +91,7 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(issueBlood({
-          reqId: reqId(c), bagNo: String(b.bagNo ?? ''), expiresAt: Number(b.expiresAt ?? 0),
+          reqId: reqId(c), bagNo: toText(b.bagNo ?? ''), expiresAt: Number(b.expiresAt ?? 0),
           roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 't',
         })));
       } catch (e) { return mapError(e); }
@@ -104,10 +106,10 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(bedsideCheck({
           reqId: reqId(c),
-          nurseId: String(b.nurseId ?? ''),
-          witnessNurseId: String(b.witnessNurseId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          bagNo: String(b.bagNo ?? ''),
+          nurseId: toText(b.nurseId ?? ''),
+          witnessNurseId: toText(b.witnessNurseId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          bagNo: toText(b.bagNo ?? ''),
           matched: Boolean(b.matched),
           roles: c.user?.roles ?? [],
         })));
@@ -142,8 +144,8 @@ export const transfusionWorkflowRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(recordReaction({
-          reqId: reqId(c), type: String(b.type ?? ''), severity: Number(b.severity ?? 0),
-          description: String(b.description ?? ''), roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 'n',
+          reqId: reqId(c), type: toText(b.type ?? ''), severity: Number(b.severity ?? 0),
+          description: toText(b.description ?? ''), roles: c.user?.roles ?? [], operatorId: c.user?.id ?? 'n',
         })));
       } catch (e) { return mapError(e); }
     },

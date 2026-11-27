@@ -26,6 +26,8 @@ import {
   type WisdomExperience,
 } from '../aggregators/monthlyWisdomReportAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：走进程内样例，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -71,7 +73,7 @@ function toExperience(r: MemoryRow): WisdomExperience {
   const decision = typeof r.decision === 'string' ? r.decision : '';
   const isFailure = r.outcome === 'failure';
   return {
-    staffId: String(r.staff_id ?? ''),
+    staffId: toText(r.staff_id ?? ''),
     staffName: typeof r.name === 'string' && r.name.trim() ? r.name : '未命名员工',
     deptCode: typeof r.dept_code === 'string' ? r.dept_code : '',
     topic: decision,

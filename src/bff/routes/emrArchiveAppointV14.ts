@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历归档预约 V14 路由（M541-A）
  *
@@ -37,9 +38,9 @@ export const emrArchiveAppointV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: ArchiveAppointInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        appointDate: String(obj?.appointDate ?? ""),
-        operator: String(obj?.operator ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        appointDate: toText(obj?.appointDate ?? ""),
+        operator: toText(obj?.operator ?? ""),
       };
       const result = createArchiveAppoint(input);
       const report = buildArchiveAppointReport(result);

@@ -28,6 +28,8 @@ import {
   reLock,
   listNotes,
 } from '../aggregators/emrVersionsAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof EmrVersionError) {
@@ -49,8 +51,8 @@ export const emrVersionsRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createNote({
-          visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
-          title: String(b.title ?? ''), noteType: String(b.noteType ?? ''),
+          visitId: toText(b.visitId ?? ''), patientId: toText(b.patientId ?? ''),
+          title: toText(b.title ?? ''), noteType: toText(b.noteType ?? ''),
           content: (b.content ?? {}),
           roles: c.user?.roles ?? [], authorId: c.user?.id ?? '',
           authorRole: (c.user?.roles ?? [])[0] ?? 'unknown',
@@ -125,7 +127,7 @@ export const emrVersionsRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(unlockForEdit(nid(c), String(b.reason ?? ''), String(b.approverId ?? ''), c.user?.roles ?? [])));
+        return json(ok(unlockForEdit(nid(c), toText(b.reason ?? ''), toText(b.approverId ?? ''), c.user?.roles ?? [])));
       } catch (e) { return mapError(e); }
     },
   },

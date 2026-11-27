@@ -26,6 +26,8 @@ import {
   type MuseHomeProfile,
   type MuseHomeStats,
 } from '../aggregators/museHomepageAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 无 DB 演示模式：返回样例主页，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -96,7 +98,7 @@ async function buildView(
   const p = profRows[0];
   const profile: MuseHomeProfile = p
     ? {
-        staffId: String(p.staff_id ?? staffId),
+        staffId: toText(p.staff_id ?? staffId),
         name: typeof p.name === 'string' && p.name.trim() ? p.name : '未命名员工',
         role:
           p.role === 'doctor' || p.role === 'nurse' || p.role === 'pharma' || p.role === 'admin'

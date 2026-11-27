@@ -41,6 +41,8 @@ import {
   type CohortCriteria,
   type ResearchProfile,
 } from '../../medical-tools/research/cohortRuleEngine.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -95,7 +97,7 @@ async function loadAllDiagnoses(): Promise<Map<string, PatientDiagnosisRow[]>> {
     const item: PatientDiagnosisRow = {
       patientId: pid,
       name: String(r.name),
-      code: r.code ? String(r.code) : null,
+      code: r.code ? toText(r.code) : null,
       confirmed: Boolean(r.confirmed),
     };
     const arr = map.get(pid) ?? [];
@@ -361,7 +363,7 @@ export async function getResearchCohortStats(
 
   for (const m of members) {
     const snap = m.dataSnapshot;
-    const gender = String(snap.gender ?? '未知');
+    const gender = toText(snap.gender ?? '未知');
     byGender[gender] = (byGender[gender] ?? 0) + 1;
     const age = snap.age as number | null;
     if (age === null || age === undefined) {
@@ -501,7 +503,7 @@ function snapshotProject(p: ResearchProject): ResearchProject {
 
 /** 校验 yyyy-mm-dd 日期串，返回 Date；非法抛错 */
 function parseDate(s: unknown, field: string): Date {
-  const str = String(s ?? '').trim();
+  const str = toText(s ?? '').trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) {
     throw new Error(`${field} 格式应为 yyyy-mm-dd：${str || '(空)'}`);
   }

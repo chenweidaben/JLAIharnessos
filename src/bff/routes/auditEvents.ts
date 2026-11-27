@@ -14,6 +14,8 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   AuditError, recordEvent, queryEvents, exportCsv, verifyChain,
 } from '../aggregators/auditEventAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof AuditError) {
@@ -118,12 +120,12 @@ export const auditEventRoutes: RouteDef[] = [
         const out: { seeded: boolean; reason?: string }[] = [];
         for (const it of items) {
           const r = await recordEvent({
-            actorId: String(it.actorId ?? ''), actorRole: it.actorRole, action: it.action,
-            module: String(it.module ?? ''), resourceType: String(it.resourceType ?? ''),
-            resourceId: String(it.resourceId ?? ''), patientId: it.patientId === undefined ? undefined : String(it.patientId),
-            result: it.result, errorCode: it.errorCode === undefined ? undefined : String(it.errorCode),
-            ip: String(it.ip ?? '10.0.0.1'), userAgent: String(it.userAgent ?? 'seed'),
-            occurredAt: it.occurredAt === undefined ? undefined : String(it.occurredAt),
+            actorId: toText(it.actorId ?? ''), actorRole: it.actorRole, action: it.action,
+            module: toText(it.module ?? ''), resourceType: toText(it.resourceType ?? ''),
+            resourceId: toText(it.resourceId ?? ''), patientId: it.patientId === undefined ? undefined : toText(it.patientId),
+            result: it.result, errorCode: it.errorCode === undefined ? undefined : toText(it.errorCode),
+            ip: toText(it.ip ?? '10.0.0.1'), userAgent: toText(it.userAgent ?? 'seed'),
+            occurredAt: it.occurredAt === undefined ? undefined : toText(it.occurredAt),
           });
           if (!r.result.ok) {
             throw new AuditError(500, `audit-persist-failed: ${r.result.reason ?? 'unknown'}`);

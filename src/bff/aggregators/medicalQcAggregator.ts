@@ -4,6 +4,8 @@ import { withTx } from '@/db/pool.js';
 import * as recordRepo from '@/db/repositories/medicalRecordRepo.js';
 import * as reviewRepo from '@/db/repositories/medicalRecordReviewRepo.js';
 import { callRealLLM } from './llmClientAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class MedicalQcError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -47,15 +49,15 @@ export async function listView(view: AuthView, visitId: string) {
 
 export async function createView(view: AuthView, body: Record<string, unknown>) {
   // v5.0试点扩展（M183-D aggregator stub）：DEMO_MODE 下返回占位记录，不写库
-  if (isDemoMode) return demoRecord(String(body.visitId ?? 'demo-visit'), 'pending');
+  if (isDemoMode) return demoRecord(toText(body.visitId ?? 'demo-visit'), 'pending');
   if (!view.permissions.includes('medical_qc:check')) throw new MedicalQcError(403, '无质控权限');
   if (!body.visitId) throw new MedicalQcError(400, 'visitId 必填');
   if (typeof body.score !== 'number') throw new MedicalQcError(400, '分数必填');
   return repo.create({
-    visitId: String(body.visitId), qcType: String(body.qcType ?? 'round'),
+    visitId: toText(body.visitId), qcType: toText(body.qcType ?? 'round'),
     checker: view.id, score: body.score,
     errors: (body.errors as repo.QcError[]) ?? [],
-    suggestions: body.suggestions ? String(body.suggestions) : undefined,
+    suggestions: body.suggestions ? toText(body.suggestions) : undefined,
   });
 }
 

@@ -25,6 +25,8 @@ import {
   type SystemLogFilter,
 } from '../aggregators/systemLogAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { toText } from '../../db/rowText.js';
+
 
 /** 近期窗口：默认只取最近 1000 条，纯函数层在此窗口内再做条件过滤分页 */
 const RECENT_LIMIT = 1000;
@@ -104,7 +106,7 @@ async function handleList(c: Ctx): Promise<Response> {
       staffId: r.staffId ?? '',
       // pg 返回时间戳为 Date 对象，统一归一为 ISO 字符串，保证纯函数比较一致
       createdAt:
-        r.createdAt instanceof Date ? r.createdAt.toISOString() : String(r.createdAt ?? ''),
+        r.createdAt instanceof Date ? r.createdAt.toISOString() : toText(r.createdAt ?? ''),
     })) as LogEntry[];
 
     // 纯函数过滤 + 分页（单测覆盖），窗口内再按条件收敛

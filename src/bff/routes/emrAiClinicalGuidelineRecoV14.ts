@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI临床指南推荐 V14 路由（M554-D，M554 收官）
  *
@@ -37,8 +38,8 @@ export const emrAiClinicalGuidelineRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiClinicalGuidelineRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        specialty: String(obj?.specialty ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        specialty: toText(obj?.specialty ?? ""),
       };
       const result = recommendClinicalGuidelineByAi(input);
       const report = buildAiClinicalGuidelineRecoReport(result);

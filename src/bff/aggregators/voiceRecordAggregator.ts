@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历 AI 语音录入与智能补全聚合器（M152-B）
  *
@@ -105,7 +106,7 @@ export const MEDICAL_DICTIONARY: readonly DictEntry[] = [
 export function extractTranscript(audio: VoiceAudioInput): string {
   if (typeof audio === 'string') return audio.trim();
   if (audio && typeof audio === 'object' && 'transcript' in audio) {
-    return String((audio as { transcript?: unknown }).transcript ?? '').trim();
+    return toText((audio as { transcript?: unknown }).transcript ?? '').trim();
   }
   // Blob / 其他：无可用转写文本，返回空，不臆造
   return '';

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI生成建议 V14 路由（M543-A）
  *
@@ -37,8 +38,8 @@ export const emrAiSuggestionV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiSuggestionInputV14 = {
-        recordType: String(obj?.recordType ?? ""),
-        symptom: String(obj?.symptom ?? ""),
+        recordType: toText(obj?.recordType ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
       };
       const result = generateAiSuggestion(input);
       const report = buildAiSuggestionReport(result);

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI康复训练方案推荐 V14 路由（M563-B）
  *
@@ -37,8 +38,8 @@ export const emrAiRehabPlanRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiRehabPlanRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        rehabLevel: String(obj?.rehabLevel ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        rehabLevel: toText(obj?.rehabLevel ?? ""),
       };
       const result = recommendRehabPlanByAi(input);
       const report = buildAiRehabPlanRecoReport(result);

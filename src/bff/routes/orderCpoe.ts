@@ -26,6 +26,8 @@ import {
   listOrders,
   listSlips,
 } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof OrderCpoeError) {
@@ -58,8 +60,8 @@ export const orderCpoeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(reviewOrder({
           orderId: c.params.id,
-          decision: String(b.decision ?? ''),
-          comment: b.comment ? String(b.comment) : undefined,
+          decision: toText(b.decision ?? ''),
+          comment: b.comment ? toText(b.comment) : undefined,
           reviewerId: c.user!.id,
           reviewerName: c.user!.name,
         })));
@@ -76,15 +78,15 @@ export const orderCpoeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const rawOrders = Array.isArray(b.orders) ? b.orders as Record<string, unknown>[] : [];
         return json(ok(createOrderSet({
-          visitId: String(b.visitId ?? ''),
-          patientId: b.patientId ? String(b.patientId) : undefined,
-          setName: String(b.setName ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: b.patientId ? toText(b.patientId) : undefined,
+          setName: toText(b.setName ?? ''),
           orders: rawOrders.map((it) => ({
-            orderType: String(it.orderType ?? ''),
-            content: String(it.content ?? ''),
-            dosage: it.dosage ? String(it.dosage) : undefined,
-            frequency: it.frequency ? String(it.frequency) : undefined,
-            route: it.route ? String(it.route) : undefined,
+            orderType: toText(it.orderType ?? ''),
+            content: toText(it.content ?? ''),
+            dosage: it.dosage ? toText(it.dosage) : undefined,
+            frequency: it.frequency ? toText(it.frequency) : undefined,
+            route: it.route ? toText(it.route) : undefined,
             feeCents: typeof it.feeCents === 'number' ? it.feeCents : NaN,
           })),
           orderedBy: c.user!.id,
@@ -103,7 +105,7 @@ export const orderCpoeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(stopOrder({
           orderId: c.params.id,
-          reason: String(b.reason ?? ''),
+          reason: toText(b.reason ?? ''),
           stoppedBy: c.user!.id,
         })));
       } catch (e) { return mapError(e); }

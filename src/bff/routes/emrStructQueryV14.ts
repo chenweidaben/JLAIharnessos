@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历结构化字段查询 V14 路由（M532-A）
  *
@@ -37,7 +38,7 @@ export const emrStructQueryV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: StructQueryInputV14 = {
-        recordType: String(obj?.recordType ?? ""),
+        recordType: toText(obj?.recordType ?? ""),
         availableFields: (obj?.availableFields ?? []) as string[],
         requestedFields: (obj?.requestedFields ?? []) as string[],
       };

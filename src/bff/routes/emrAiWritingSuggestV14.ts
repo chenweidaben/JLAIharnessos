@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI病历书写建议 V14 路由（M553-A）
  *
@@ -37,7 +38,7 @@ export const emrAiWritingSuggestV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiWritingSuggestInputV14 = {
-        recordType: String(obj?.recordType ?? ""),
+        recordType: toText(obj?.recordType ?? ""),
         hasChiefComplaint: Boolean(obj?.hasChiefComplaint ?? false),
       };
       const result = suggestWritingByAi(input);

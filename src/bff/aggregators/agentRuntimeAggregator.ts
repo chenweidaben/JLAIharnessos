@@ -51,6 +51,8 @@ import { createOrchestrator, type Orchestrator } from '../../orchestrator/factor
 import { PersistentHumanTaskHandler } from '../runtime/persistentHumanTaskHandler.js';
 import type { AgentDefinition } from '../../orchestrator/dsl/types.js';
 import type { AuthView } from '../view/userView.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class AgentRuntimeError extends Error {
   constructor(
@@ -667,7 +669,7 @@ function extractNodeRecords(events: readonly unknown[], instanceId: string): Nod
 /** 限制节点输出大小，避免超大 jsonb（超过约 8KB 则截断并标注） */
 function clampPayload(output: unknown): Record<string, unknown> | null {
   if (output == null) return null;
-  if (typeof output !== 'object') return { value: String(output) };
+  if (typeof output !== 'object') return { value: toText(output) };
   try {
     const json = JSON.stringify(output);
     if (json.length <= 8000) return output as Record<string, unknown>;

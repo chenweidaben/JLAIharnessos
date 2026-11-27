@@ -25,6 +25,8 @@ import {
   listQueue,
   listRegistrations,
 } from '../aggregators/outpatientRegisterTradeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -65,8 +67,8 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(reserveSlot({
           slotId: c.params.slotId,
-          patientId: String(b.patientId ?? ''),
-          patientName: String(b.patientName ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          patientName: toText(b.patientName ?? ''),
           ttlSeconds: typeof b.ttlSeconds === 'number' ? b.ttlSeconds : undefined,
         })));
       } catch (e) { return mapError(e); }
@@ -82,7 +84,7 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
       try {
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(releaseSlot(String(b.reservationId ?? ''))));
+        return json(ok(releaseSlot(toText(b.reservationId ?? ''))));
       } catch (e) { return mapError(e); }
     },
   },
@@ -97,9 +99,9 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
         assertStaff(view);
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(register({
-          reservationId: String(b.reservationId ?? ''),
+          reservationId: toText(b.reservationId ?? ''),
           feeCents: typeof b.feeCents === 'number' ? b.feeCents : Number.NaN,
-          paymentMethod: b.paymentMethod ? String(b.paymentMethod) : undefined,
+          paymentMethod: b.paymentMethod ? toText(b.paymentMethod) : undefined,
         })));
       } catch (e) { return mapError(e); }
     },
@@ -129,7 +131,7 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(requestCancel({
           regNo: c.params.regNo,
-          reason: String(b.reason ?? ''),
+          reason: toText(b.reason ?? ''),
         })));
       } catch (e) { return mapError(e); }
     },
@@ -147,7 +149,7 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
         return json(ok(approveCancel({
           regNo: c.params.regNo,
           approved: Boolean(b.approved),
-          approverNote: b.approverNote ? String(b.approverNote) : undefined,
+          approverNote: b.approverNote ? toText(b.approverNote) : undefined,
         })));
       } catch (e) { return mapError(e); }
     },
@@ -164,7 +166,7 @@ export const outpatientRegisterTradeRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(transition({
           regNo: c.params.regNo,
-          action: String(b.action ?? ''),
+          action: toText(b.action ?? ''),
         })));
       } catch (e) { return mapError(e); }
     },

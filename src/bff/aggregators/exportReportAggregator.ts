@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 报表中心导出聚合器（M148-D 产品化收尾）
  *
@@ -326,7 +327,7 @@ export function exportToExcel(
   sheetName: string,
 ): ExportResult {
   const esc = (s: string): string => escapeHtml(s);
-  const cell = (v: unknown): string => esc(v == null ? '' : String(v));
+  const cell = (v: unknown): string => esc(v == null ? '' : toText(v));
 
   const titleRow = `<tr><th colspan="${headers.length}" style="font-size:14px;background:#0a2540;color:#fff;">${esc(sheetName)}</th></tr>`;
   const thRow = `<tr>${headers.map((h) => `<th>${esc(h.title)}</th>`).join('')}</tr>`;

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历借阅归还管理 V14 路由（M534-D，M534 收官）
  *
@@ -37,8 +38,8 @@ export const emrLoanReturnV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: LoanReturnInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        borrowedDate: String(obj?.borrowedDate ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        borrowedDate: toText(obj?.borrowedDate ?? ""),
         returnedDate: (obj?.returnedDate ?? null) as string | null,
       };
       const result = recordLoanReturn(input);

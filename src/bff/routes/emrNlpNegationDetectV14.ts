@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历 NLP 否定检测 V14 路由（M531-D，M531 收官）
  *
@@ -37,8 +38,8 @@ export const emrNlpNegationDetectV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: NlpNegationDetectInputV14 = {
-        sentence: String(obj?.sentence ?? ""),
-        target: String(obj?.target ?? ""),
+        sentence: toText(obj?.sentence ?? ""),
+        target: toText(obj?.target ?? ""),
       };
       const result = detectNegationScope(input);
       const report = buildNlpNegationDetectReport(result);

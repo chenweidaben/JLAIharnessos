@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI膳食处方推荐 V14 路由（M564-B）
  *
@@ -37,7 +38,7 @@ export const emrAiDietScriptRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDietScriptRecoInputV14 = {
-        disease: String(obj?.disease ?? ""),
+        disease: toText(obj?.disease ?? ""),
         calorieNeeds: Number(obj?.calorieNeeds ?? 0),
       };
       const result = recommendDietScriptByAi(input);

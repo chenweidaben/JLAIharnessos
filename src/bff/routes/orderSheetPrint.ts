@@ -17,6 +17,8 @@ import {
   listPrints,
 } from '../aggregators/orderSheetPrintAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof OrderSheetPrintError || err instanceof OrderCpoeError) {
@@ -39,11 +41,11 @@ export const orderSheetPrintRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const range = b.range as { from?: number; to?: number } | undefined;
         return json(ok(printOrderSheet({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          printMode: String(b.printMode ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          printMode: toText(b.printMode ?? ''),
           range: range ? { from: Number(range.from), to: Number(range.to) } : undefined,
-          operatorNote: b.operatorNote ? String(b.operatorNote) : undefined,
+          operatorNote: b.operatorNote ? toText(b.operatorNote) : undefined,
           roles: c.user?.roles ?? [],
           operatorId: c.user?.id ?? 'unknown',
         })));

@@ -14,6 +14,8 @@
 import { type KnowledgeChunk, type RetrievalHit, type TermEntry, type SourceProvenance } from '../types';
 import { type Encoder, tokenize } from '../util';
 import type { KnowledgeGraph } from '../graph/KnowledgeGraph';
+import { toText } from '../../db/rowText.js';
+
 
 interface IndexedChunk {
   chunk: KnowledgeChunk;
@@ -223,7 +225,7 @@ export class HybridRetriever {
       id: chunk.id,
       kind: 'chunk',
       content: chunk.content,
-      title: String(chunk.metadata.title ?? chunk.sectionPath ?? '知识片段'),
+      title: toText(chunk.metadata.title ?? chunk.sectionPath ?? '知识片段'),
       score,
       sectionPath: chunk.sectionPath,
       provenance: chunk.provenance,

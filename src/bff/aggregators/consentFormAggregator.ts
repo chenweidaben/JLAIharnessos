@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/consentFormRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class ConsentError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -16,8 +18,8 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   if (!body.title) throw new ConsentError(400, '标题必填');
   if (!body.content) throw new ConsentError(400, '内容必填');
   return repo.create({
-    visitId: String(body.visitId), consentType: String(body.consentType ?? 'other'),
-    title: String(body.title), content: String(body.content),
+    visitId: toText(body.visitId), consentType: toText(body.consentType ?? 'other'),
+    title: toText(body.title), content: toText(body.content),
   });
 }
 

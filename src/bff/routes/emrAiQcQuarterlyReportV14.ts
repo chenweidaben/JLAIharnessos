@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI质控季报生成 V14 路由（M548-C）
  *
@@ -39,7 +40,7 @@ export const emrAiQcQuarterlyReportV14Routes: RouteDef[] = [
       const input: AiQcQuarterlyReportInputV14 = {
         totalRecords: Number(obj?.totalRecords ?? 0),
         defectCount: Number(obj?.defectCount ?? 0),
-        topDept: String(obj?.topDept ?? ""),
+        topDept: toText(obj?.topDept ?? ""),
       };
       const result = generateQcQuarterlyReportByAi(input);
       const report = buildAiQcQuarterlyReportReport(result);

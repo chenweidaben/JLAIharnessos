@@ -12,6 +12,8 @@ import { getDb } from '../../db/pool.js';
 import type { AuthView } from '../view/userView.js';
 import { listInpatients } from './inpatientAggregator.js';
 import { countUnresolvedHard, listByVisit as listCdsByVisit } from '../../db/repositories/orderCdsRepo.js';
+import { toText } from '../../db/rowText.js';
+
 
 export class NurseStationError extends Error {
   constructor(public status: number, public code: string, message: string) {
@@ -53,7 +55,7 @@ async function latestVitals(visitId: string): Promise<WardRow['latestVitals']> {
     temperature: r.temp ? Number(r.temp) : null,
     sbp: r.sbp ? Number(r.sbp) : null,
     pulse: r.pulse ? Number(r.pulse) : null,
-    recordedAt: r.created_at ? String(r.created_at) : null,
+    recordedAt: r.created_at ? toText(r.created_at) : null,
   };
 }
 

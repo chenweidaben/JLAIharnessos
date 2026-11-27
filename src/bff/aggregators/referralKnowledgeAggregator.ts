@@ -19,6 +19,8 @@
  */
 
 import { getDb } from '../../db/pool.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 单条转诊请求记录（由转诊发起侧回流） */
 export interface ReferralRecord {
@@ -282,9 +284,9 @@ export async function getReferralKnowledgeView(reason: string): Promise<Referral
     }
 
     const patterns: ReferralKnowledgePattern[] = rows.map((r) => ({
-      fromDept: String(r.from_dept ?? ''),
-      toDept: String(r.to_dept ?? ''),
-      referralReason: String(r.referral_reason ?? reason),
+      fromDept: toText(r.from_dept ?? ''),
+      toDept: toText(r.to_dept ?? ''),
+      referralReason: toText(r.referral_reason ?? reason),
       total: 1,
       successRate: Number(r.success_rate) || 0,
       avgDays: Number(r.avg_days) || 0,

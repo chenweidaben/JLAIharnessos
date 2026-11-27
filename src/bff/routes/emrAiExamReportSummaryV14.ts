@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检查报告AI解读摘要 V14 路由（M561-C）
  *
@@ -37,8 +38,8 @@ export const emrAiExamReportSummaryV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiExamReportSummaryInputV14 = {
-        examType: String(obj?.examType ?? ""),
-        findings: String(obj?.findings ?? ""),
+        examType: toText(obj?.examType ?? ""),
+        findings: toText(obj?.findings ?? ""),
       };
       const result = summarizeExamReportByAi(input);
       const report = buildAiExamReportSummaryReport(result);

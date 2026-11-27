@@ -19,6 +19,8 @@ import {
   createQuestionnaire, getQuestionnaire, submitQuestionnaire, reviewQuestionnaire, listQuestionnaires,
   runTriage, listSymptoms,
 } from '../aggregators/smartTriageV2Aggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof TriageError) {
@@ -49,14 +51,14 @@ export const smartTriageV2Routes: RouteDef[] = [
         const roles = c.user?.roles ?? [];
         if (roles.includes('doctor') && !roles.includes('admin')) throw new TriageError(403, 'doctor 不能创建预问诊问卷');
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = String(b.patientId ?? '');
+        const patientId = toText(b.patientId ?? '');
         assertPatientScope(c, patientId);
         return json(ok(createQuestionnaire({
           patientId,
-          visitId: b.visitId === undefined ? undefined : String(b.visitId),
-          appointmentId: b.appointmentId === undefined ? undefined : String(b.appointmentId),
-          chiefComplaint: String(b.chiefComplaint ?? ''),
-          presentIllness: String(b.presentIllness ?? ''),
+          visitId: b.visitId === undefined ? undefined : toText(b.visitId),
+          appointmentId: b.appointmentId === undefined ? undefined : toText(b.appointmentId),
+          chiefComplaint: toText(b.chiefComplaint ?? ''),
+          presentIllness: toText(b.presentIllness ?? ''),
           pastHistory: Array.isArray(b.pastHistory) ? (b.pastHistory as string[]) : [],
           allergyHistory: Array.isArray(b.allergyHistory) ? (b.allergyHistory as string[]) : [],
           currentMeds: Array.isArray(b.currentMeds) ? (b.currentMeds as string[]) : [],
@@ -123,7 +125,7 @@ export const smartTriageV2Routes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = String(b.patientId ?? '');
+        const patientId = toText(b.patientId ?? '');
         assertPatientScope(c, patientId);
         return json(ok(runTriage(patientId, Array.isArray(b.symptomTags) ? (b.symptomTags as string[]) : [])));
       } catch (e) { return mapError(e); }

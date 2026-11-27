@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/diagnosisSuggestionRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class DiagnosisError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -86,12 +88,12 @@ export async function listView(view: AuthView, visitId: string) {
 export async function suggestView(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('ai_diagnosis:view')) throw new DiagnosisError(403, '无权限');
   if (!body.visitId) throw new DiagnosisError(400, 'visitId 必填');
-  const complaint = String(body.chiefComplaint ?? '');
+  const complaint = toText(body.chiefComplaint ?? '');
   const symptoms = body.symptoms ? body.symptoms as string[] : [];
   const suggestions = matchDiagnoses(complaint, symptoms);
   const maxConf = suggestions[0]?.confidence ?? 0;
   return repo.create({
-    visitId: String(body.visitId), chiefComplaint: complaint, symptoms,
+    visitId: toText(body.visitId), chiefComplaint: complaint, symptoms,
     suggestions, confidence: maxConf,
   });
 }

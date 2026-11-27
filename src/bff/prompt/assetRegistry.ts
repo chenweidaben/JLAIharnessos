@@ -14,6 +14,8 @@
  */
 
 import { ETHICS_LAYER_TEXT } from '@/core/agent/SystemPromptBuilder.js';
+import { toText } from '../../db/rowText.js';
+
 
 // ============================================================================
 // 类型契约（对齐技术文档 3.4.2）
@@ -163,7 +165,7 @@ function validateChangeEntry(entry: unknown, path: string): string[] {
   if (e.parentVersion !== undefined && typeof e.parentVersion !== 'string')
     errors.push(`${path}.parentVersion 必须为字符串`);
   if (e.reviewResult !== undefined && !REVIEW_RESULTS.includes(e.reviewResult as (typeof REVIEW_RESULTS)[number]))
-    errors.push(`${path}.reviewResult「${String(e.reviewResult)}」非法`);
+    errors.push(`${path}.reviewResult「${toText(e.reviewResult)}」非法`);
   return errors;
 }
 

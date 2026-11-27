@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI门诊预检分诊 V14 路由（M560-B）
  *
@@ -37,7 +38,7 @@ export const emrAiOutpatientPreTriageV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiOutpatientPreTriageInputV14 = {
-        symptom: String(obj?.symptom ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
         fever: Boolean(obj?.fever ?? false),
       };
       const result = preTriageOutpatientByAi(input);

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历模板版本管理 V14 路由（M539-D）
  *
@@ -40,7 +41,7 @@ export const emrTemplateVersionV14Routes: RouteDef[] = [
       const versionsRaw = Array.isArray(obj?.versions) ? obj.versions : [];
       const versions: TemplateVersionItemV14[] = versionsRaw.map((v: unknown) => {
         const item = v as Record<string, unknown>;
-        return { version: String(item?.version ?? ""), updatedAt: String(item?.updatedAt ?? "") };
+        return { version: toText(item?.version ?? ""), updatedAt: toText(item?.updatedAt ?? "") };
       });
       const input: TemplateVersionInputV14 = { versions };
       const result = listTemplateVersion(input);

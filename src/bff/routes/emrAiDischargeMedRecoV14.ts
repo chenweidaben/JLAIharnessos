@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI出院带药建议 V14 路由（M558-D，M558 收官）
  *
@@ -37,7 +38,7 @@ export const emrAiDischargeMedRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDischargeMedRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         patientAge: Number(obj?.patientAge ?? 0),
       };
       const result = recommendDischargeMedByAi(input);

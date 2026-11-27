@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { listView, reviewView, overrideView, MedReviewError } from '../aggregators/medReviewAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -35,7 +37,7 @@ export const medReviewRoutes: RouteDef[] = [
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
       try {
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(await overrideView(view, c.params.id, String(b.reason ?? ''))));
+        return json(ok(await overrideView(view, c.params.id, toText(b.reason ?? ''))));
       } catch (e) { return mapError(e); }
     } },
 ];

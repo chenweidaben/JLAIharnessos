@@ -39,6 +39,8 @@ import type {
 import { WorkflowCancelledError } from '../nodes/types.js';
 import type { WorkflowRuntime } from './runtime.js';
 import { defaultSleep } from './runtime.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 工作流执行错误 */
 export class WorkflowExecutionError extends Error {
@@ -224,11 +226,11 @@ export class WorkflowEngine {
 
     const patientIdOf = (): string | undefined => {
       const value = ctx.patient.patientId ?? ctx.getVariables().patientId ?? options.patient?.patientId;
-      return value === undefined || value === null || value === '' ? undefined : String(value);
+      return value === undefined || value === null || value === '' ? undefined : toText(value);
     };
     const visitIdOf = (): string | undefined => {
       const value = ctx.patient.visitId ?? ctx.getVariables().visitId ?? options.patient?.visitId;
-      return value === undefined || value === null || value === '' ? undefined : String(value);
+      return value === undefined || value === null || value === '' ? undefined : toText(value);
     };
     const boundaryDeps = (currentNodeId: string | null, state: WorkflowState): SnapshotBoundaryDeps => ({
       instanceId,

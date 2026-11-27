@@ -13,6 +13,8 @@ import { WorkflowNodeType, type NodeDefinition } from '../dsl/types.js';
 import type { NodeExecutor, NodeExecutorContext, NodeOutcome } from './types.js';
 import { assertNotCancelled, WorkflowCancelledError } from './types.js';
 import type { NotifyMessage } from '../engine/runtime.js';
+import { toText } from '../../db/rowText.js';
+
 
 // ============================================================================
 // 格式校验节点
@@ -174,7 +176,7 @@ export class NotifyNodeExecutor implements NodeExecutor {
     const variables = nc.ctx.applyMapping(cfg.variables ?? {});
     const recipient = cfg.recipientExpression.includes('${')
       ? nc.ctx.render(cfg.recipientExpression)
-      : String(nc.ctx.evaluate(cfg.recipientExpression) ?? '');
+      : toText(nc.ctx.evaluate(cfg.recipientExpression) ?? '');
     const preview = nc.ctx.render(cfg.template);
     const message: NotifyMessage = {
       channel: cfg.channel,
@@ -223,7 +225,7 @@ function extractIdentifier(ctx: NodeExecutorContext['ctx'], field: 'patientId' |
     ctx.input[field] ??
     (variables.patient as Record<string, unknown> | undefined)?.[field];
   if (value === undefined || value === null || value === '') return undefined;
-  return String(value);
+  return toText(value);
 }
 
 export class WritebackNodeExecutor implements NodeExecutor {

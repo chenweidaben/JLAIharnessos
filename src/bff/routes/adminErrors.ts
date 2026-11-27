@@ -27,6 +27,8 @@ import {
   aggregateErrors,
   type SystemError,
 } from '../aggregators/systemErrorAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 近期明细窗口：只取最近 200 条，配合 idx_system_error_log_created */
 const RECENT_LIMIT = 200;
@@ -47,15 +49,15 @@ interface ErrorRow {
 function toSystemError(r: ErrorRow): SystemError {
   return {
     id: Number(r.id),
-    errorType: String(r.errorType ?? ''),
-    message: String(r.message ?? ''),
-    stackTrace: String(r.stackTrace ?? ''),
-    route: String(r.route ?? ''),
-    staffId: String(r.staffId ?? ''),
+    errorType: toText(r.errorType ?? ''),
+    message: toText(r.message ?? ''),
+    stackTrace: toText(r.stackTrace ?? ''),
+    route: toText(r.route ?? ''),
+    staffId: toText(r.staffId ?? ''),
     createdAt:
       r.createdAt instanceof Date
         ? r.createdAt.toISOString()
-        : String(r.createdAt ?? ''),
+        : toText(r.createdAt ?? ''),
     resolved: Boolean(r.resolved),
   };
 }

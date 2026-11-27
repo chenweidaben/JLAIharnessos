@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI护理记录生成 V14 路由（M557-A）
  *
@@ -37,9 +38,9 @@ export const emrAiNursingNoteGenV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiNursingNoteGenInputV14 = {
-        patientName: String(obj?.patientName ?? ""),
-        ward: String(obj?.ward ?? ""),
-        vitalSigns: String(obj?.vitalSigns ?? ""),
+        patientName: toText(obj?.patientName ?? ""),
+        ward: toText(obj?.ward ?? ""),
+        vitalSigns: toText(obj?.vitalSigns ?? ""),
       };
       const result = genNursingNoteByAi(input);
       const report = buildAiNursingNoteGenReport(result);

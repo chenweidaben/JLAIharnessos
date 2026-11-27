@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI出院随访计划推荐 V14 路由（M563-C）
  *
@@ -37,7 +38,7 @@ export const emrAiDischargeFollowupRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDischargeFollowupRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         dischargeDay: Number(obj?.dischargeDay ?? 0),
       };
       const result = recommendDischargeFollowupByAi(input);

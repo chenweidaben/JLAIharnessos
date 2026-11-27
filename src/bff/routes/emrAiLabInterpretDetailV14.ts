@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI检验解读明细 V14 路由（M550-D，M550 收官）
  *
@@ -38,7 +39,7 @@ export const emrAiLabInterpretDetailV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiLabInterpretDetailInputV14 = {
-        item: String(obj?.item ?? ""),
+        item: toText(obj?.item ?? ""),
         value: Number(obj?.value ?? 0),
         refLow: Number(obj?.refLow ?? 0),
         refHigh: Number(obj?.refHigh ?? 0),

@@ -164,7 +164,8 @@ function roundRate(rate: number): number {
 function toText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 /**

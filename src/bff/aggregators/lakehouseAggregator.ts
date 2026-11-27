@@ -21,6 +21,8 @@ import {
   runLakehousePipeline,
   runSingleJob,
 } from '../../data-platform/lakehouseEtl.js';
+import { toText } from '../../db/rowText.js';
+
 
 /* -------------------------------- 错误类型 ------------------------------- */
 
@@ -155,11 +157,11 @@ export async function listJobRuns(
     status: String(r.status),
     rowsRead: Number(r.rows_read),
     rowsWritten: Number(r.rows_written),
-    watermarkFrom: r.watermark_from ? String(r.watermark_from) : null,
-    watermarkTo: r.watermark_to ? String(r.watermark_to) : null,
-    errorMessage: r.error_message ? String(r.error_message) : null,
+    watermarkFrom: r.watermark_from ? toText(r.watermark_from) : null,
+    watermarkTo: r.watermark_to ? toText(r.watermark_to) : null,
+    errorMessage: r.error_message ? toText(r.error_message) : null,
     startedAt: String(r.started_at),
-    finishedAt: r.finished_at ? String(r.finished_at) : null,
+    finishedAt: r.finished_at ? toText(r.finished_at) : null,
   }));
 }
 
@@ -185,7 +187,7 @@ export async function listLineage(_auth: AuthView): Promise<LineageView[]> {
     jobCode: String(r.job_code),
     sourceTable: String(r.source_table),
     targetTable: String(r.target_table),
-    transformation: r.transformation ? String(r.transformation) : null,
+    transformation: r.transformation ? toText(r.transformation) : null,
   }));
 }
 

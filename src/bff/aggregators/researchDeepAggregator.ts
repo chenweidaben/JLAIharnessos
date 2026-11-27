@@ -247,7 +247,8 @@ export const SEED_PROJECTS: readonly ResearchProjectDeep[] = SEED_PORTFOLIO;
 function toText(v: unknown): string {
   if (v == null) return '';
   if (typeof v === 'string') return v.trim();
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 /** 数值收敛（非法按 0） */
@@ -604,7 +605,7 @@ function sanitizeYearRange(raw: unknown): ReviewYearRange {
     if (val == null || val === '') continue;
     const n = typeof val === 'number' ? val : Number(val);
     if (!Number.isInteger(n) || n < 1900 || n > 2100) {
-      throw new Error(`年份区间 ${key} 非法：${String(val)}，须为 1900~2100 整数`);
+      throw new Error(`年份区间 ${key} 非法：${toText(val)}，须为 1900~2100 整数`);
     }
     range[key] = n;
   }
@@ -640,7 +641,7 @@ export function buildLiteratureReview(
   let kTop = 10;
   if (topK != null && topK !== '') {
     const n = typeof topK === 'number' ? topK : Number(topK);
-    if (!Number.isInteger(n) || n <= 0) throw new Error(`topK 非法：${String(topK)}，须为正整数`);
+    if (!Number.isInteger(n) || n <= 0) throw new Error(`topK 非法：${toText(topK)}，须为正整数`);
     kTop = Math.min(n, 50);
   }
 

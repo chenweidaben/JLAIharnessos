@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历借阅登记管理 V14 路由（M540-B）
  *
@@ -37,10 +38,10 @@ export const emrBorrowRecordV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: BorrowRecordInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        borrower: String(obj?.borrower ?? ""),
-        dept: String(obj?.dept ?? ""),
-        borrowDate: String(obj?.borrowDate ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        borrower: toText(obj?.borrower ?? ""),
+        dept: toText(obj?.dept ?? ""),
+        borrowDate: toText(obj?.borrowDate ?? ""),
       };
       const result = registerBorrow(input);
       const report = buildBorrowRecordReport(result);

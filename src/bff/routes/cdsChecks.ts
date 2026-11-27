@@ -19,6 +19,8 @@ import {
   listAlerts,
   logOverride,
 } from '../aggregators/cdsChecksAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof CdsError) {
@@ -44,7 +46,7 @@ export const cdsChecksRoutes: RouteDef[] = [
           throw new CdsError(403, '开方预审需 doctor/pharmacist');
         }
         const result = evaluateMedication({
-          drugCode: String(b.drugCode ?? ''), dose: Number(b.dose ?? 0), route: String(b.route ?? 'po'),
+          drugCode: toText(b.drugCode ?? ''), dose: Number(b.dose ?? 0), route: toText(b.route ?? 'po'),
           durationDays: Number(b.durationDays ?? 0), patientAge: Number(b.patientAge ?? 0),
           isPregnant: Boolean(b.isPregnant), hasRenalDysfunction: Boolean(b.hasRenalDysfunction),
           hasHepaticDysfunction: Boolean(b.hasHepaticDysfunction),
@@ -62,8 +64,8 @@ export const cdsChecksRoutes: RouteDef[] = [
         if (result.level === 'warning' && b.force) {
           if (!b.overrideReason) throw new CdsError(400, '强制提交需 overrideReason');
           logOverride({
-            visitId: String(b.visitId ?? ''), drugCode: String(b.drugCode ?? ''),
-            findings: result.findings, overrideReason: String(b.overrideReason),
+            visitId: toText(b.visitId ?? ''), drugCode: toText(b.drugCode ?? ''),
+            findings: result.findings, overrideReason: toText(b.overrideReason),
             doctorId: c.user?.id ?? '',
           });
         }
@@ -79,8 +81,8 @@ export const cdsChecksRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         const a = checkLabCritical({
-          visitId: String(b.visitId ?? ''), patientId: String(b.patientId ?? ''),
-          labCode: String(b.labCode ?? ''), value: Number(b.value ?? 0), unit: String(b.unit ?? ''),
+          visitId: toText(b.visitId ?? ''), patientId: toText(b.patientId ?? ''),
+          labCode: toText(b.labCode ?? ''), value: Number(b.value ?? 0), unit: toText(b.unit ?? ''),
         });
         return json(ok({ triggered: !!a, alert: a }));
       } catch (e) { return mapError(e); }
@@ -96,7 +98,7 @@ export const cdsChecksRoutes: RouteDef[] = [
         if (!(c.user?.roles ?? []).some((r) => r === 'doctor' || r === 'nurse' || r === 'admin')) {
           throw new CdsError(403, '确认告警需 doctor/nurse');
         }
-        return json(ok(acknowledge(aid(c), c.user?.id ?? '', b.note === undefined ? undefined : String(b.note))));
+        return json(ok(acknowledge(aid(c), c.user?.id ?? '', b.note === undefined ? undefined : toText(b.note))));
       } catch (e) { return mapError(e); }
     },
   },

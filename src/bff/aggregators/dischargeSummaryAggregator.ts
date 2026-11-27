@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/dischargeSummaryRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class DischargeError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -15,17 +17,17 @@ export async function getSummary(view: AuthView, visitId: string) {
 export async function upsertSummary(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('discharge_summary:write'))
     throw new DischargeError(403, '无出院小结书写权限');
-  const visitId = String(body.visitId ?? '');
+  const visitId = toText(body.visitId ?? '');
   if (!visitId) throw new DischargeError(400, 'visitId 必填');
   if (!body.admissionDate || !body.dischargeDate) throw new DischargeError(400, '入出院日期必填');
   if (!body.dischargeDiagnoses || !body.admissionDiagnoses) throw new DischargeError(400, '诊断必填');
   if (!body.treatmentCourse || !body.dischargeOrders) throw new DischargeError(400, '治疗经过与出院医嘱必填');
   return repo.upsert({
-    visitId, admissionDate: String(body.admissionDate), dischargeDate: String(body.dischargeDate),
-    dischargeType: String(body.dischargeType ?? 'regular'),
-    dischargeDiagnoses: String(body.dischargeDiagnoses), admissionDiagnoses: String(body.admissionDiagnoses),
-    treatmentCourse: String(body.treatmentCourse), dischargeOrders: String(body.dischargeOrders),
-    followupPlan: body.followupPlan ? String(body.followupPlan) : null,
+    visitId, admissionDate: toText(body.admissionDate), dischargeDate: toText(body.dischargeDate),
+    dischargeType: toText(body.dischargeType ?? 'regular'),
+    dischargeDiagnoses: toText(body.dischargeDiagnoses), admissionDiagnoses: toText(body.admissionDiagnoses),
+    treatmentCourse: toText(body.treatmentCourse), dischargeOrders: toText(body.dischargeOrders),
+    followupPlan: body.followupPlan ? toText(body.followupPlan) : null,
     attendingDoctor: view.id,
   });
 }

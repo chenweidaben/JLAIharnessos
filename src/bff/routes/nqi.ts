@@ -21,6 +21,8 @@ import {
   reportFall, reportPressureUlcer, reportTubeDisplacement, reportRestraint,
   assessRestraint, releaseRestraint, listEvents, upsertStaffing, dashboard,
 } from '../aggregators/nqiAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof NqiError) {
@@ -86,7 +88,7 @@ export const nqiRoutes: RouteDef[] = [
       try {
         requireNurse(c);
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(assessRestraint(eid(c), String(b.at ?? ''), String(b.rationale ?? ''), Array.isArray(b.alternativesTried) ? (b.alternativesTried as string[]) : [])));
+        return json(ok(assessRestraint(eid(c), toText(b.at ?? ''), toText(b.rationale ?? ''), Array.isArray(b.alternativesTried) ? (b.alternativesTried as string[]) : [])));
       } catch (e) { return mapError(e); }
     },
   },
@@ -96,7 +98,7 @@ export const nqiRoutes: RouteDef[] = [
       try {
         requireNurse(c);
         const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(releaseRestraint(eid(c), String(b.removedAt ?? ''))));
+        return json(ok(releaseRestraint(eid(c), toText(b.removedAt ?? ''))));
       } catch (e) { return mapError(e); }
     },
   },
@@ -131,7 +133,7 @@ export const nqiRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(upsertStaffing({
-          departmentId: String(b.departmentId ?? ''), date: String(b.date ?? ''),
+          departmentId: toText(b.departmentId ?? ''), date: toText(b.date ?? ''),
           beds: Number(b.beds ?? 0), nurses: Number(b.nurses ?? 0), inpatients: Number(b.inpatients ?? 0),
         })));
       } catch (e) { return mapError(e); }

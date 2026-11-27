@@ -179,7 +179,8 @@ const IMPROVEMENT_MAP: Record<PainPointCode, Omit<ImprovementAction, 'painPoint'
 function toText(v: unknown): string {
   if (typeof v === 'string') return v.trim();
   if (v == null) return '';
-  return String(v).trim();
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v).trim();
+  return '';
 }
 
 function toNum(v: unknown): number | undefined {

@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { createView, reviewView, completeView, listView, CopyError } from '../aggregators/medicalCopyAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 列表返回内存空兜底。 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -36,7 +38,7 @@ export const medicalCopyRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/medical-copy-requests/:id/review', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await reviewView(view, c.params.id, Boolean(b.approve), b.reason ? String(b.reason) : undefined))); } catch (e) { return mapError(e); }
+      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await reviewView(view, c.params.id, Boolean(b.approve), b.reason ? toText(b.reason) : undefined))); } catch (e) { return mapError(e); }
     } },
   { method: 'POST', path: '/api/v1/medical-copy-requests/:id/complete', auth: true,
     handle: async (c: Ctx): Promise<Response> => {

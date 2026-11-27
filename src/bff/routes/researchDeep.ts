@@ -29,6 +29,8 @@ import {
   type ResearchProjectDeep,
   type ResearchResults,
 } from '../aggregators/researchDeepAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /**
  * 内存课题台账：BFF 进程启动时由种子课题初始化；
@@ -138,7 +140,7 @@ export const researchDeepRoutes: RouteDef[] = [
         const payload: Record<string, unknown> = { review };
 
         // 可选：同传研究问题+方法 → 实验设计 + 统计方案
-        if (body.problem != null && String(body.problem).trim() && body.method != null) {
+        if (body.problem != null && toText(body.problem).trim() && body.method != null) {
           const experiment = designExperiment(body.problem, body.method);
           payload.experiment = experiment;
           payload.statisticalPlan = generateStatisticalPlan(experiment);

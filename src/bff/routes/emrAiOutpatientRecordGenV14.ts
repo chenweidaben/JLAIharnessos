@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI门诊病历智能生成 V14 路由（M558-A）
  *
@@ -37,9 +38,9 @@ export const emrAiOutpatientRecordGenV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiOutpatientRecordGenInputV14 = {
-        patientName: String(obj?.patientName ?? ""),
-        symptom: String(obj?.symptom ?? ""),
-        diagnosis: String(obj?.diagnosis ?? ""),
+        patientName: toText(obj?.patientName ?? ""),
+        symptom: toText(obj?.symptom ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
       };
       const result = genOutpatientRecordByAi(input);
       const report = buildAiOutpatientRecordGenReport(result);

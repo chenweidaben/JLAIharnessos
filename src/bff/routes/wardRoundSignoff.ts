@@ -23,6 +23,8 @@ import {
   noteTrail,
 } from '../aggregators/wardRoundSignoffAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof WardRoundSignoffError) {
@@ -53,9 +55,9 @@ export const wardRoundSignoffRoutes: RouteDef[] = [
       try {
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(createNote({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
-          content: String(b.content ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
+          content: toText(b.content ?? ''),
           roles: c.user?.roles ?? [],
           authorId: c.user?.id ?? 'unknown',
         })));
@@ -72,8 +74,8 @@ export const wardRoundSignoffRoutes: RouteDef[] = [
         return json(ok(reviewNote({
           noteId: c.params.noteId,
           action: b.action === 'reject' ? 'reject' : 'approve',
-          comment: b.comment ? String(b.comment) : undefined,
-          patientId: b.patientId ? String(b.patientId) : undefined,
+          comment: b.comment ? toText(b.comment) : undefined,
+          patientId: b.patientId ? toText(b.patientId) : undefined,
           roles: c.user?.roles ?? [],
           reviewerId: c.user?.id ?? 'unknown',
         })));
@@ -89,8 +91,8 @@ export const wardRoundSignoffRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         return json(ok(chiefSignNote({
           noteId: c.params.noteId,
-          comment: b.comment ? String(b.comment) : undefined,
-          patientId: b.patientId ? String(b.patientId) : undefined,
+          comment: b.comment ? toText(b.comment) : undefined,
+          patientId: b.patientId ? toText(b.patientId) : undefined,
           roles: c.user?.roles ?? [],
           reviewerId: c.user?.id ?? 'unknown',
         })));

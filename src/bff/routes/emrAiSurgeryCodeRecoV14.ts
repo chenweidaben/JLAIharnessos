@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI手术编码推荐 V14 路由（M551-C）
  *
@@ -37,7 +38,7 @@ export const emrAiSurgeryCodeRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiSurgeryCodeRecoInputV14 = {
-        surgeryName: String(obj?.surgeryName ?? ""),
+        surgeryName: toText(obj?.surgeryName ?? ""),
       };
       const result = recommendSurgeryCodeByAi(input);
       const report = buildAiSurgeryCodeRecoReport(result);

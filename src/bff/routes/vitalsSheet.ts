@@ -17,6 +17,8 @@ import {
   getCurve,
 } from '../aggregators/vitalsSheetAggregator.js';
 import { OrderCpoeError } from '../aggregators/orderCpoeAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof VitalsSheetError || err instanceof OrderCpoeError) {
@@ -39,8 +41,8 @@ export const vitalsSheetRoutes: RouteDef[] = [
         const b = (await c.body()) as Record<string, unknown>;
         const num = (k: string) => (b[k] === undefined ? undefined : Number(b[k]));
         return json(ok(recordEntry({
-          visitId: String(b.visitId ?? ''),
-          patientId: String(b.patientId ?? ''),
+          visitId: toText(b.visitId ?? ''),
+          patientId: toText(b.patientId ?? ''),
           temperatureC: num('temperatureC'),
           pulseBpm: num('pulseBpm'),
           respirationRate: num('respirationRate'),

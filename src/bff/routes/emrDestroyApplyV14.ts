@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历销毁登记（避让版）V14 路由（M541-B）
  *
@@ -37,9 +38,9 @@ export const emrDestroyApplyV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: DestroyApplyInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        approver: String(obj?.approver ?? ""),
-        reason: String(obj?.reason ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        approver: toText(obj?.approver ?? ""),
+        reason: toText(obj?.reason ?? ""),
       };
       const result = registerDestroyApply(input);
       const report = buildDestroyApplyReport(result);

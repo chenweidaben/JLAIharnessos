@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI病历逻辑一致性检查 V14 路由（M553-C）
  *
@@ -37,8 +38,8 @@ export const emrAiRecordConsistencyCheckV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiRecordConsistencyCheckInputV14 = {
-        admissionDiagnosis: String(obj?.admissionDiagnosis ?? ""),
-        dischargeDiagnosis: String(obj?.dischargeDiagnosis ?? ""),
+        admissionDiagnosis: toText(obj?.admissionDiagnosis ?? ""),
+        dischargeDiagnosis: toText(obj?.dischargeDiagnosis ?? ""),
       };
       const result = checkRecordConsistencyByAi(input);
       const report = buildAiRecordConsistencyCheckReport(result);

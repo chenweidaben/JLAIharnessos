@@ -16,6 +16,8 @@ import {
   summarize,
   seed,
 } from '../aggregators/patientTimelineAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof TimelineError) {
@@ -75,7 +77,7 @@ export const patientTimelineAggregatedRoutes: RouteDef[] = [
       try {
         if (process.env.DEMO_MODE !== '1') throw new TimelineError(403, '_seed 仅 DEMO_MODE 可用');
         const b = (await c.body()) as Record<string, unknown>;
-        const p = String(b.patientId ?? '');
+        const p = toText(b.patientId ?? '');
         const samples = Array.isArray(b.samples) ? (b.samples as Record<string, unknown>[]) : [];
         const out = seed(p, samples as { visitId: string; type: 'lab'|'imaging'|'medication'|'surgery'|'nursing'|'cds'|'encounter'; time: string; summary: string; detailRef: string }[]);
         return json(ok({ seeded: out.length }));

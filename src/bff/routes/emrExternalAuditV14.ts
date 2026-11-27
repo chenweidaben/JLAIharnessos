@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历外审申请 V14 路由（M540-D）
  *
@@ -37,9 +38,9 @@ export const emrExternalAuditV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: ExternalAuditInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
-        auditOrg: String(obj?.auditOrg ?? ""),
-        purpose: String(obj?.purpose ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
+        auditOrg: toText(obj?.auditOrg ?? ""),
+        purpose: toText(obj?.purpose ?? ""),
       };
       const result = applyExternalAudit(input);
       const report = buildExternalAuditReport(result);

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历时间轴生成 V14 路由（M538-A）
  *
@@ -37,8 +38,8 @@ export const emrTimelineGenerateV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: TimelineGenerateInputV14 = {
-        admissionDate: String(obj?.admissionDate ?? ""),
-        dischargeDate: String(obj?.dischargeDate ?? ""),
+        admissionDate: toText(obj?.admissionDate ?? ""),
+        dischargeDate: toText(obj?.dischargeDate ?? ""),
         eventCount: Number(obj?.eventCount ?? 0),
       };
       const result = generateTimeline(input);

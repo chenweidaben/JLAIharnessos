@@ -19,6 +19,8 @@ import {
   listSlots, seedSlots, createBooking, listBookings, cancelBooking, listDepartments,
   __resetStore,
 } from '../aggregators/selfSchedulingAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 function mapError(err: unknown): Response {
   if (err instanceof SlotError) {
@@ -90,9 +92,9 @@ export const selfSchedulingRoutes: RouteDef[] = [
         const roles = c.user?.roles ?? [];
         if (roles.includes('doctor') && !roles.includes('admin')) throw new SlotError(403, 'doctor 不能代患者预约');
         const b = (await c.body()) as Record<string, unknown>;
-        const patientId = String(b.patientId ?? '');
+        const patientId = toText(b.patientId ?? '');
         assertPatientScope(c, patientId);
-        return json(ok(createBooking(patientId, String(b.slotId ?? ''))));
+        return json(ok(createBooking(patientId, toText(b.slotId ?? ''))));
       } catch (e) { return mapError(e); }
     },
   },

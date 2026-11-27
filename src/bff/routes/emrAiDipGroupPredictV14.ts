@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI DIP 分组预测 V14 路由（M552-B）
  *
@@ -37,7 +38,7 @@ export const emrAiDipGroupPredictV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiDipGroupPredictInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
         cost: Number(obj?.cost ?? 0),
       };
       const result = predictDipGroupByAi(input);

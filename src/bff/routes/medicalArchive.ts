@@ -2,6 +2,8 @@
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { getView, archiveView, sealView, ArchiveError } from '../aggregators/medicalArchiveAggregator.js';
+import { toText } from '../../db/rowText.js';
+
 
 /** 健澜科技：DEMO_MODE 下不连 PostgreSQL，GET 返回内存兜底（不伪造业务数字）。 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -31,11 +33,11 @@ export const medicalArchiveRoutes: RouteDef[] = [
   { method: 'POST', path: '/api/v1/medical-archives', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await archiveView(view, String(b.visitId ?? '')))); } catch (e) { return mapError(e); }
+      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await archiveView(view, toText(b.visitId ?? '')))); } catch (e) { return mapError(e); }
     } },
   { method: 'POST', path: '/api/v1/medical-archives/:visitId/seal', auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const view = await requester(c); if (!view) return json(fail(ErrorCode.UNAUTHORIZED, '未登录'), 401);
-      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await sealView(view, c.params.visitId, String(b.reason ?? '')))); } catch (e) { return mapError(e); }
+      try { const b = (await c.body()) as Record<string, unknown>; return json(ok(await sealView(view, c.params.visitId, toText(b.reason ?? '')))); } catch (e) { return mapError(e); }
     } },
 ];

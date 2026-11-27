@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历常见用语快捷输入 V14 路由（M539-C）
  *
@@ -40,10 +41,10 @@ export const emrQuickPhraseV14Routes: RouteDef[] = [
       const phrasesRaw = Array.isArray(obj?.phrases) ? obj.phrases : [];
       const phrases: PhraseItemV14[] = phrasesRaw.map((p: unknown) => {
         const item = p as Record<string, unknown>;
-        return { id: String(item?.id ?? ""), text: String(item?.text ?? "") };
+        return { id: toText(item?.id ?? ""), text: toText(item?.text ?? "") };
       });
       const input: QuickPhraseInputV14 = {
-        query: String(obj?.query ?? ""),
+        query: toText(obj?.query ?? ""),
         phrases,
       };
       const result = searchQuickPhrase(input);

@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/timelinessRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class TimelinessError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -78,7 +80,7 @@ export async function createView(view: AuthView, body: Record<string, unknown>) 
   };
   const required = requiredMap[body.docType as string] ?? 1440;
   return repo.create({
-    visitId: String(body.visitId), docType: String(body.docType),
+    visitId: toText(body.visitId), docType: toText(body.docType),
     requiredMinutes: required, createdBy: view.id,
   });
 }

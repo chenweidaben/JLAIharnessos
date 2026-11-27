@@ -28,6 +28,8 @@ import {
   hashApiKey,
   maskPatientForOpenApi,
 } from '../aggregators/thirdPartyApiAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 认证通过后注入上下文的第三方凭证身份 */
 interface AuthedThirdPartyKey {
@@ -101,7 +103,7 @@ async function authenticateThirdPartyKey(c: Ctx): Promise<AuthedThirdPartyKey | 
     ? (row.permissions as unknown[]).filter((p): p is string => typeof p === 'string')
     : [];
   return {
-    id: String(row.id ?? ''),
+    id: toText(row.id ?? ''),
     name: typeof row.name === 'string' ? row.name : '',
     permissions,
   };

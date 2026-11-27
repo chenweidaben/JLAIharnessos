@@ -14,6 +14,8 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { toText } from '../../db/rowText.js';
+
 export class FhirR4Error extends Error {
   constructor(public status: number, public code: string, message: string) {
     super(message);
@@ -85,7 +87,7 @@ function stampMeta(res: Record<string, unknown>): Record<string, unknown> {
 export function createResource(rt: string, body: Record<string, unknown>, roles: string[], actorId: string): Record<string, unknown> {
   const s = rtStore(rt);
   if (!body.resourceType) throw new FhirR4Error(400, 'bad', 'POST 体缺 resourceType');
-  if (body.resourceType !== rt) throw new FhirR4Error(400, 'bad', `body.resourceType=${body.resourceType} 与路径 ${rt} 不一致`);
+  if (body.resourceType !== rt) throw new FhirR4Error(400, 'bad', `body.resourceType=${toText(body.resourceType)} 与路径 ${rt} 不一致`);
   const id = typeof body.id === 'string' && body.id ? body.id : `${rt}-${Date.now().toString(36)}`;
   if (s.has(id)) throw new FhirR4Error(409, 'conflict', `资源已存在：${rt}/${id}（重复 POST）`);
   const res = stampMeta({ ...body, id });

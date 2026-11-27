@@ -31,6 +31,8 @@ import {
   WEBHOOK_EVENTS,
   type Webhook,
 } from '../aggregators/webhookAggregator';
+import { toText } from '../../db/rowText.js';
+
 
 /** 列表输出：secret 脱敏为 `ab****yz` */
 function maskSecret(secret: string): string {
@@ -53,12 +55,12 @@ function toView(row: Record<string, unknown>): Record<string, unknown> {
     successCount: Number(row.success_count ?? 0),
     failureCount: Number(row.failure_count ?? 0),
     nextRetryAt:
-      nextRetry instanceof Date ? nextRetry.toISOString() : nextRetry ? String(nextRetry) : null,
+      nextRetry instanceof Date ? nextRetry.toISOString() : nextRetry ? toText(nextRetry) : null,
     createdBy: typeof row.created_by === 'string' ? row.created_by : '',
     createdAt:
-      createdAt instanceof Date ? createdAt.toISOString() : String(createdAt ?? ''),
+      createdAt instanceof Date ? createdAt.toISOString() : toText(createdAt ?? ''),
     updatedAt:
-      updatedAt instanceof Date ? updatedAt.toISOString() : String(updatedAt ?? ''),
+      updatedAt instanceof Date ? updatedAt.toISOString() : toText(updatedAt ?? ''),
   };
 }
 

@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - DIP 分值预测 V14 路由（M535-D）
  *
@@ -37,7 +38,7 @@ export const emrDipPredictV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: DipPredictInputV14 = {
-        mainDiagnosis: String(obj?.mainDiagnosis ?? ""),
+        mainDiagnosis: toText(obj?.mainDiagnosis ?? ""),
         treatmentCount: Number(obj?.treatmentCount ?? 0),
         cost: Number(obj?.cost ?? 0),
       };

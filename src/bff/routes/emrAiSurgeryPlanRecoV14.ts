@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历AI手术方案推荐 V14 路由（M562-B）
  *
@@ -37,8 +38,8 @@ export const emrAiSurgeryPlanRecoV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AiSurgeryPlanRecoInputV14 = {
-        diagnosis: String(obj?.diagnosis ?? ""),
-        severity: String(obj?.severity ?? ""),
+        diagnosis: toText(obj?.diagnosis ?? ""),
+        severity: toText(obj?.severity ?? ""),
       };
       const result = recommendSurgeryPlanByAi(input);
       const report = buildAiSurgeryPlanRecoReport(result);

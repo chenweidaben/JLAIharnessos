@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历调阅申请审批 V14 路由（M534-A）
  *
@@ -37,9 +38,9 @@ export const emrAccessRequestV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: AccessRequestInputV14 = {
-        requestId: String(obj?.requestId ?? ""),
+        requestId: toText(obj?.requestId ?? ""),
         decision: (obj?.decision ?? "批准") as AccessRequestInputV14["decision"],
-        reason: String(obj?.reason ?? ""),
+        reason: toText(obj?.reason ?? ""),
       };
       const result = approveAccessRequest(input);
       const report = buildAccessRequestReport(result);

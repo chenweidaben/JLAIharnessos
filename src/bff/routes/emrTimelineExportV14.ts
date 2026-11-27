@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 病历时间线导出 V14 路由（M538-D）
  *
@@ -37,9 +38,9 @@ export const emrTimelineExportV14Routes: RouteDef[] = [
       const body = await c.req.json();
       const obj = body as Record<string, unknown>;
       const input: TimelineExportInputV14 = {
-        recordId: String(obj?.recordId ?? ""),
+        recordId: toText(obj?.recordId ?? ""),
         eventCount: Number(obj?.eventCount ?? 0),
-        format: String(obj?.format ?? "PDF") as TimelineExportInputV14["format"],
+        format: toText(obj?.format ?? "PDF") as TimelineExportInputV14["format"],
       };
       const result = exportTimeline(input);
       const report = buildTimelineExportReport(result);

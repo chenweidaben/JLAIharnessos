@@ -1,3 +1,4 @@
+import { toText } from '../../db/rowText.js';
 /**
  * 健澜科技 jlmedaios - 移动护理 PDA 端纯函数（M16-A）
  *
@@ -83,7 +84,7 @@ export interface FiveRightsResult {
   mismatches: string[];
 }
 
-const norm = (v: unknown): string => String(v ?? '').trim();
+const norm = (v: unknown): string => toText(v ?? '').trim();
 
 function eq(expected: unknown, actual: unknown): boolean {
   return norm(expected) === norm(actual) && norm(expected) !== '';

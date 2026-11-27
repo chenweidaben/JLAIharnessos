@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/medReviewRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class MedReviewError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -93,14 +95,14 @@ export async function listView(view: AuthView, visitId: string) {
 export async function reviewView(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('med_review:view')) throw new MedReviewError(403, '无权限');
   if (!body.visitId) throw new MedReviewError(400, 'visitId 必填');
-  const drugName = String(body.drugName ?? '');
+  const drugName = toText(body.drugName ?? '');
   const age = body.patientAge ? Number(body.patientAge) : undefined;
   const allergies = body.allergies ? body.allergies as string[] : [];
   const rules = runLocalRules(drugName, age, allergies);
   const results = [];
   for (const r of rules) {
     results.push(await repo.create({
-      visitId: String(body.visitId), orderId: body.orderId ? String(body.orderId) : undefined,
+      visitId: toText(body.visitId), orderId: body.orderId ? toText(body.orderId) : undefined,
       drugName, reviewType: r.reviewType, severity: r.severity,
       message: r.message, suggestion: r.suggestion,
     }));

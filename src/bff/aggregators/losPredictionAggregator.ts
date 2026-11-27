@@ -1,5 +1,7 @@
 ﻿import type { AuthView } from '../view/userView.js';
 import * as repo from '@/db/repositories/losPredictionRepo';
+import { toText } from '../../db/rowText.js';
+
 
 export class LosPredError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -29,11 +31,11 @@ export async function view(view: AuthView, body: Record<string, unknown>) {
   if (!view.permissions.includes('ai_los_pred:view')) throw new LosPredError(403, '无权限');
   if (!body.visitId) throw new LosPredError(400, 'visitId 必填');
   const age = Number(body.age ?? 50);
-  const diagnosis = String(body.diagnosis ?? '');
+  const diagnosis = toText(body.diagnosis ?? '');
   const comorbidities = Number(body.comorbidities ?? 0);
   const p = predict(age, diagnosis, comorbidities);
   return repo.create({
-    visitId: String(body.visitId), predictedLosDays: p.losDays, predictedCost: p.cost,
+    visitId: toText(body.visitId), predictedLosDays: p.losDays, predictedCost: p.cost,
     riskLevel: p.riskLevel, factors: p.factors, confidence: p.confidence,
   });
 }
