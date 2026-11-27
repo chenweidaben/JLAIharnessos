@@ -197,7 +197,6 @@ export function DepartmentManagementScreen({
   const occupiedBeds = beds.filter((b) => b.status === 'occupied');
 
   function bedColor(status: BedStatus): string {
-    const s = BED_MAP[status];
     switch (status) {
       case 'empty':
         return theme.success;

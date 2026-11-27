@@ -167,7 +167,7 @@ export class LocalFileKeyManager implements IKeyManager {
     }
 
     // 生成新密钥
-    const { keyId: newKeyId, key } = await this.generateDataKey('rotation');
+    const { keyId: newKeyId } = await this.generateDataKey('rotation');
     return newKeyId;
   }
 

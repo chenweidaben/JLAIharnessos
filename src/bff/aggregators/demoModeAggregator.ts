@@ -126,7 +126,6 @@ function patientLabel(index: number): string {
  */
 export function maskForDemo(data: unknown): unknown {
   let patientCounter = 0;
-  let doctorCounter = 0;
 
   const walk = (node: unknown, deptHint?: string): unknown => {
     if (node === null || typeof node !== 'object') return node;
@@ -163,7 +162,6 @@ export function maskForDemo(data: unknown): unknown {
       // 2) 医生姓名 → 演示医生-科室名
       if (isDoctorNameKey(lower) && typeof value === 'string') {
         out[key] = `演示医生-${currentDept ?? '内科'}`;
-        doctorCounter++;
         continue;
       }
 

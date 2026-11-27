@@ -124,7 +124,7 @@ export interface WardRoundScreenProps {
 export function WardRoundScreen({ onBack }: WardRoundScreenProps): React.ReactElement {
   const theme = useThemeColors();
   const [selectedPatientIndex, setSelectedPatientIndex] = useState(0);
-  const [rightPanel, setRightPanel] = useState<'vitals' | 'order'>('vitals');
+  const [rightPanel] = useState<'vitals' | 'order'>('vitals');
 
   const currentPatient = MOCK_PATIENT_LIST[selectedPatientIndex];
 

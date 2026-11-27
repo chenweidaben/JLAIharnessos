@@ -180,7 +180,7 @@ export function LabResultPanel({
   title = '检验结果',
 }: LabResultPanelProps): React.ReactElement {
   const theme = useThemeColors();
-  const [selectedCategory, setSelectedCategory] = useState<'全部' | LabCategory>('全部');
+  const [selectedCategory] = useState<'全部' | LabCategory>('全部');
   const [abnormalOnly, setAbnormalOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 

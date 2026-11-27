@@ -38,14 +38,6 @@ const sessionStateMap: Record<SessionState, { label: string; icon: string; color
   error: { label: '错误', icon: '✕', color: 'error' },
 };
 
-const roleLabelMap: Record<CurrentUser['role'], string> = {
-  doctor: '医生',
-  nurse: '护士',
-  pharmacist: '药师',
-  admin: '管理员',
-  'medical-student': '医学生',
-};
-
 // ============================================================================
 // 组件 Props
 // ============================================================================

@@ -130,7 +130,6 @@ function resolve(config: Required<Pick<DeployConfig, 'domain'>> & Partial<Deploy
  */
 export function generateDockerCompose(config: DeployConfig): string {
   const c = resolve(config);
-  const policy = generateBackupPolicy();
 
   const backupBlock = c.enableBackup
     ? `

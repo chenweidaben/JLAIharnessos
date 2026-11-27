@@ -248,12 +248,6 @@ function r2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/** 是否特殊使用级抗菌药物 */
-function isSpecialAntibiotic(drugNames: string[]): boolean {
-  const kw = ['万古霉素', '亚胺培南', '美罗培南', '利奈唑胺', '替加环素'];
-  return drugNames.some((d) => kw.some((k) => d.includes(k)));
-}
-
 /* ============================== 0. 深度药事管理总览 ============================== */
 
 /**

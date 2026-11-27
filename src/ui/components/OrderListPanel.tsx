@@ -174,8 +174,8 @@ export function OrderListPanel({
   title = '医嘱列表',
 }: OrderListPanelProps): React.ReactElement {
   const theme = useThemeColors();
-  const [typeFilter, setTypeFilter] = useState<'全部' | OrderType>('全部');
-  const [statusFilter, setStatusFilter] = useState<'全部' | OrderStatus>('全部');
+  const [typeFilter] = useState<'全部' | OrderType>('全部');
+  const [statusFilter] = useState<'全部' | OrderStatus>('全部');
 
   // 筛选
   const filteredOrders = orders.filter((o) => {

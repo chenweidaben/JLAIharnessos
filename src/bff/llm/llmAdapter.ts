@@ -216,7 +216,6 @@ export function createLLMAdapter(config: LLMAdapterConfig = {}): LLMAdapter {
   let warningCount = 0;
   let degraded = false;
   let healthy: boolean | null = null;
-  let lastCheckedAt: string | null = null;
 
   const recordWarning = (msg: string) => {
     warningCount += 1;
@@ -312,12 +311,10 @@ export function createLLMAdapter(config: LLMAdapterConfig = {}): LLMAdapter {
         const result = await callUpstream(messages, opts?.temperature ?? 0.2);
         degraded = false; // 恢复成功
         healthy = true;
-        lastCheckedAt = new Date().toISOString();
         return result;
       } catch (err) {
         degraded = true;
         healthy = false;
-        lastCheckedAt = new Date().toISOString();
         const reason = err instanceof Error ? err.message : String(err);
         recordWarning(`chat 调用失败，已降级 demo：${reason}`);
         return demoReply(messages, '模型服务暂不可用');
@@ -326,7 +323,6 @@ export function createLLMAdapter(config: LLMAdapterConfig = {}): LLMAdapter {
 
     async health(): Promise<LLMHealth> {
       const checkedAt = new Date().toISOString();
-      lastCheckedAt = checkedAt;
       if (parsed.mode === 'demo') {
         healthy = true; // demo 模式永远"健康"（本地兜底可用）
         return { healthy: true, checkedAt };

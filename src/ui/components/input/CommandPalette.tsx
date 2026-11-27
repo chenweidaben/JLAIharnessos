@@ -190,7 +190,7 @@ export function CommandPalette({
   const theme = useThemeColors();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<string>('全部');
+  const [selectedCategory] = useState<string>('全部');
 
   // 获取所有分类
   const categories = useMemo(() => {

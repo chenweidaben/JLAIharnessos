@@ -7,9 +7,7 @@
  */
 import { requirePermissionCode } from "../middleware/auth.js";
 import { type Ctx, json, ok, type RouteDef } from "../types.js";
-import { advancePdcaPhase, buildPdcaPlan, buildPdcaReport, type PdcaPlanV14 } from "../aggregators/emrQcPdcaPlanV14Aggregator.js";
-
-let samplePlan: PdcaPlanV14 = buildPdcaPlan("降低病历缺陷率", "P");
+import { advancePdcaPhase, buildPdcaPlan, buildPdcaReport } from "../aggregators/emrQcPdcaPlanV14Aggregator.js";
 
 export const emrQcPdcaPlanV14Routes: RouteDef[] = [
   {
@@ -23,7 +21,6 @@ export const emrQcPdcaPlanV14Routes: RouteDef[] = [
       const title = typeof body?.title === "string" ? body.title : "";
       const currentPhase = typeof body?.currentPhase === "string" ? body.currentPhase : "P";
       const plan = buildPdcaPlan(title, currentPhase);
-      samplePlan = plan;
       const report = buildPdcaReport(plan);
       const nextPhase = advancePdcaPhase(currentPhase);
       return json(ok({ plan, report, nextPhase }));

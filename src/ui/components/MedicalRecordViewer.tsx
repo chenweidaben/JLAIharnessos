@@ -123,7 +123,7 @@ export function MedicalRecordViewer({
   maxHeight = 20,
 }: MedicalRecordViewerProps): React.ReactElement {
   const theme = useThemeColors();
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const [scrollOffset] = useState(0);
 
   const qcInfo = qcStatusMap[record.qcStatus];
 

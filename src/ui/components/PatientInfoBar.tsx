@@ -84,7 +84,7 @@ export function PatientInfoBar({
   defaultExpanded = true,
 }: PatientInfoBarProps): React.ReactElement {
   const theme = useThemeColors();
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [expanded] = useState(defaultExpanded);
 
   const statusInfo = patientStatusMap[patient.status];
   const hasAllergies = patient.allergies.length > 0;

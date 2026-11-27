@@ -12,7 +12,6 @@ import { Box, Text, useInput } from 'ink';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useThemeColors } from '../../theme';
-import { formatTime } from '../../utils/formatMedical';
 import type { ChatMessage, ChatMessageRole } from './chatTypes';
 import { StreamingText } from './StreamingText';
 import { ToolCallDisplay } from './ToolCallDisplay';
