@@ -735,15 +735,6 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-function fnv1a(input: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return `deepv2_${(h >>> 0).toString(16).padStart(8, '0')}`;
-}
-
 const DISCLAIMER =
   '本建议由 AI 规则引擎基于症状/病史/化验启发式生成，仅供临床参考，不构成诊断结论；辅助诊断，最终由医生确认。';
 

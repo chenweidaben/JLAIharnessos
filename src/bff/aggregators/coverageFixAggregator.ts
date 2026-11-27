@@ -282,11 +282,6 @@ function clampRate(r: number): number {
   return Math.min(1, Math.max(0, r));
 }
 
-/** 四舍五入到两位小数 */
-function round2(n: number): number {
-  return Math.round(n * 100) / 100;
-}
-
 /** 四舍五入到四位小数（全仓行率用，避免 0.9897 与 0.9902 都被显示成 0.99） */
 function round4(n: number): number {
   return Math.round(n * 10000) / 10000;

@@ -122,12 +122,6 @@ export const DEFAULT_EXPIRY_DAYS = 90;
 // 工具
 // ---------------------------------------------------------------------------
 
-/** 取今天 0 点的 ISO 日期串（YYYY-MM-DD） */
-function todayStr(): string {
-  const d = new Date();
-  return toDateStr(d);
-}
-
 function toDateStr(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
