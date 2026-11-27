@@ -16,6 +16,7 @@
 import { LLMClient } from '../LLMClient';
 import type { ILLMClient } from '../LLMClient';
 
+import { BailianProvider } from './BailianProvider';
 import { DeepSeekProvider } from './DeepSeekProvider';
 
 /**
@@ -33,6 +34,18 @@ export function createLlmClient(): ILLMClient {
       chatModel: process.env.LLM_MODEL,
       reasoningModel: process.env.LLM_REASONING_MODEL,
       timeoutMs: Number(process.env.LLM_TIMEOUT_MS) || undefined,
+    });
+  }
+
+  // 阿里云百炼（DashScope）；同时接受 dashscope / qwen 作为别名
+  if (provider === 'bailian' || provider === 'dashscope' || provider === 'qwen') {
+    return new BailianProvider({
+      apiKey: process.env.BAILIAN_API_KEY ?? process.env.DASHSCOPE_API_KEY,
+      baseURL: process.env.BAILIAN_BASE_URL,
+      chatModel: process.env.BAILIAN_MODEL,
+      reasoningModel: process.env.BAILIAN_REASONING_MODEL,
+      contextWindow: Number(process.env.BAILIAN_CONTEXT_WINDOW) || undefined,
+      timeoutMs: Number(process.env.BAILIAN_TIMEOUT_MS) || undefined,
     });
   }
 
