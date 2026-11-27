@@ -17,12 +17,31 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { afterAll } from 'bun:test';
+import { afterAll, beforeEach } from 'bun:test';
 import { closeDbForTest } from '../../src/db/pool.js';
 
-if (process.env.TEST_REAL !== '1') {
+const REAL_MODE = process.env.TEST_REAL === '1';
+
+if (!REAL_MODE) {
   process.env.DEMO_MODE = '1';
 }
+
+// 全局用例进入前兜底复位演示模式。
+//
+// 背景：bun 1.2.0 在单进程内顺序执行多个测试文件，进程级 `process.env` 跨文件共享。
+// 个别用例在校验非演示 / 生产分支时会临时把 DEMO_MODE 置为 '0' 或删除；其文件内
+// afterEach/afterAll 还原钩子在并发 / 异常时序下可能未彻底生效，残留的非演示取值会
+// 污染后续只读演示用例（如药品 / 知识检索工具误判非演示模式，走进未接 unsafe 的测试态
+// 仓储路径，抛 `db.unsafe is not a function`）。
+//
+// 本钩子是测试基础设施层的隔离兜底：每个用例进入前，若未显式要求真实模式，先把
+// DEMO_MODE 复位为演示模式。用例自身 beforeEach / it 体内的显式赋值在本钩子之后执行，
+// 不会被覆盖；也不在受害消费方硬编码 env 去掩盖污染源。
+beforeEach(() => {
+  if (!REAL_MODE) {
+    process.env.DEMO_MODE = '1';
+  }
+});
 
 // 进程级连接池兜底（测试基础设施层，不改动生产池上限/重连策略）：
 //
