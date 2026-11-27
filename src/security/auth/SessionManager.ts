@@ -257,7 +257,7 @@ export class SessionManager {
   public cleanupExpiredSessions(): number {
     let count = 0;
     const now = new Date();
-    for (const [id, session] of this.sessions) {
+    for (const [, session] of this.sessions) {
       if (session.status === SessionStatus.ACTIVE) {
         const idleMs = now.getTime() - new Date(session.lastActivityAt).getTime();
         const absoluteExpired = new Date(session.expiresAt) <= now;

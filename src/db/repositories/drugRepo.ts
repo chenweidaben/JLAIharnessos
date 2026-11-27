@@ -5,7 +5,7 @@
  */
 
 import { getDb, type DbExecutor } from '../pool.js';
-import { dynamicSelect, QueryBuilder, toJson } from './helpers.js';
+import { toJson } from './helpers.js';
 import { toText } from '../rowText.js';
 
 export interface Drug {

@@ -23,7 +23,7 @@ import { tenantContextMiddleware } from './middleware/tenant';
 import { withIdempotency } from './middleware/idempotency';
 import { enforceSession } from './middleware/sessionGuard';
 import { assertProductionNotDemoMode } from './config/runtimeEnv';
-import { metrics, recordHttpRequest, renderMetrics } from './observability/metrics';
+import { recordHttpRequest, renderMetrics } from './observability/metrics';
 import { setCriticalAlertSink } from './alertBus';
 import { broadcast, chatClients, createWsHandlers, wsAuthorize } from './wsChat';
 import { OutboxRelay } from './outboxRelay';

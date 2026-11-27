@@ -363,7 +363,6 @@ export class ToolExecutor {
     context: MedicalToolContext,
   ): AsyncGenerator<ToolExecutionEvent> {
     const executionId = this.generateExecutionId();
-    const startTime = Date.now();
 
     yield {
       type: 'start',

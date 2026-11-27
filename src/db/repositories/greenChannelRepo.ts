@@ -15,7 +15,6 @@ import { getDb, type DbExecutor } from '../pool.js';
 import {
   computeMetrics,
   getChannelTemplate,
-  type ChannelNodeTemplate,
   type GreenChannelType,
 } from '@/emergency/greenChannelTemplate.js';
 import { toText } from '../rowText.js';

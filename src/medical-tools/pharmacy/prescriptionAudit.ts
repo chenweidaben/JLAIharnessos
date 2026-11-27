@@ -11,7 +11,7 @@
 import { z } from 'zod';
 
 import { buildMedicalTool } from '../framework.js';
-import { clinicalData, isDemoMode, sourceTag } from '../../data/clinicalData.js';
+import { clinicalData, isDemoMode } from '../../data/clinicalData.js';
 import type { MedicalToolContext, ToolResult } from '../types.js';
 import { MedicalToolCategory } from '../types.js';
 import { PRESCRIPTION_STORE } from './drugCatalog.js';

@@ -31,7 +31,6 @@ import {
   evaluateAntibioticRationality,
   type AbxPrescriptionDose,
   type AbxPurpose,
-  type IncisionClass,
 } from '../aggregators/antibioticDeepAggregator';
 import { rootLogger } from '../../core/logging/Logger.js';
 

@@ -1,5 +1,5 @@
 /** 健澜科技：HIS-EMR 一体化 P0 切片（M86-H）。DEMO_MODE 下返回内存演示数据。 */
-import { ErrorCode, fail, json, ok, type Ctx, type RouteDef } from '../types';
+import { json, ok, type Ctx, type RouteDef } from '../types';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 

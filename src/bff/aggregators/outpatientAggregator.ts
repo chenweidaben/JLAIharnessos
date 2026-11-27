@@ -24,7 +24,6 @@ import {
   createOrder,
   cancelOrder,
   getOrdersByVisit,
-  type OrderType,
   type OrderPriority,
 } from '@/db/repositories/orderRepo';
 import {

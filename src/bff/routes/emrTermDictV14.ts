@@ -9,7 +9,6 @@
 import { requirePermissionCode } from "../middleware/auth.js";
 import { type Ctx, json, ok, type RouteDef } from "../types.js";
 import {
-  lookupStandardTerm,
   suggestCorrections,
   STANDARD_TERMS_V14,
 } from "../aggregators/emrTermDictV14Aggregator.js";

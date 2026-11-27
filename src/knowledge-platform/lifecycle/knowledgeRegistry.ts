@@ -401,7 +401,6 @@ export class KnowledgeLifecycleRegistry {
     if (errors.length > 0) throw new Error(`[${KB_ERROR_MISSING_ELEMENT}] 条目校验未通过：${errors.join('；')}`);
     if (this.isKnownId(entry.id)) throw new Error(`[${KB_ERROR_DUPLICATE_ID}] 条目 id「${entry.id}」已存在，禁止重复登记`);
 
-    const now = nowIso();
     const seeded: KnowledgeEntry = {
       ...entry,
       specialty: [...entry.specialty],

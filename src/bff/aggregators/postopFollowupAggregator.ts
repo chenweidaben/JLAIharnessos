@@ -9,7 +9,7 @@ import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
 import { canAccessVisit } from './inpatientCareAggregator.js';
 import { upsertSchedule, listByVisit, completeFollowup, type Followup } from '../../db/repositories/postopFollowupRepo.js';
-import { buildSchedule, shouldEscalate, type Timepoint } from '../../medical-tools/nursing/postopFollowup.js';
+import { buildSchedule, shouldEscalate } from '../../medical-tools/nursing/postopFollowup.js';
 import { createTask, hasOpenTask } from '../../db/repositories/improvementTaskRepo.js';
 import { painTaskFinding, painTaskTitle } from '../../medical-tools/nursing/interventionTask.js';
 

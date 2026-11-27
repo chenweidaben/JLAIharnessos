@@ -13,7 +13,6 @@
 import { requirePermissionCode } from "../middleware/auth.js";
 import { type Ctx, json, ok, type RouteDef } from "../types.js";
 import {
-  assessFireSafetyV5,
   buildSecurityEmergencyV5Report,
   dispatchEmergencyV5,
   type FireCheck,

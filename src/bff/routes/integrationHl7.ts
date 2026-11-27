@@ -24,7 +24,6 @@ import {
   FHIR_R4_SCHEMAS,
   parseHL7Message,
   validateFHIRResource,
-  type FHIRResource,
 } from '../aggregators/integrationHl7Aggregator';
 import { rootLogger } from '../../core/logging/Logger.js';
 

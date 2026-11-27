@@ -12,7 +12,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { withTx, getDb } from '../../db/pool.js';
+import { withTx } from '../../db/pool.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import {
   createTriageSession,

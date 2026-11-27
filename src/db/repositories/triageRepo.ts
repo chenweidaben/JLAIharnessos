@@ -12,7 +12,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司. Licensed under Apache-2.0.
  */
 
-import { getDb, type DbExecutor, type Sql } from '../pool.js';
+import { getDb, type DbExecutor } from '../pool.js';
 import * as patientRepo from './patientRepo.js';
 import type { EmergencyStatus } from '@/emergency/stateMachine.js';
 import { toText } from '../rowText.js';

@@ -12,7 +12,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { getDb, withTx, type DbExecutor } from '../pool.js';
+import { getDb, type DbExecutor } from '../pool.js';
 import { toJson } from './helpers.js';
 import { toText } from '../rowText.js';
 

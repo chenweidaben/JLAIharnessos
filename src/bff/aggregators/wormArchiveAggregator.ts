@@ -12,7 +12,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import {
   getPendingEvents, verifyChainSync, __sealDisabled, type AuditEvent,
 } from './auditEventAggregator.js';
-import { getWormBackendInfo, getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore, type WormStore } from './wormStore.js';
+import { getWormBackendInfo, getWormStore, isValidSegmentId, toAsyncStore, type AsyncWormStore } from './wormStore.js';
 import { getKeyProvider } from './wormKeyProvider.js';
 
 // sm-crypto 真国密（无 @types，用 createRequire + 本地类型声明）

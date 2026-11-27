@@ -114,7 +114,6 @@ function tokenize(expr: string): Token[] {
     }
 
     // 多字符操作符
-    const two = expr.slice(i, i + 3);
     const three = MULTI_OPS.find((op) => op.length === 3 && expr.startsWith(op, i));
     if (three) {
       tokens.push({ type: 'op', value: three, pos: i });

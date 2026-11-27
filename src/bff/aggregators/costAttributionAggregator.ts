@@ -16,7 +16,6 @@ export class CostAttributionError extends Error {
     this.name = 'CostAttributionError';
   }
 }
-const badRequest = (m: string) => new CostAttributionError(400, 'BAD_REQUEST', m);
 const notFound = (m: string) => new CostAttributionError(404, 'NOT_FOUND', m);
 const forbidden = (m: string) => new CostAttributionError(403, 'FORBIDDEN', m);
 

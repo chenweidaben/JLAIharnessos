@@ -50,7 +50,6 @@ import {
   listRequests,
   patchRequest,
   insertAppointment,
-  getAppointmentById,
   lockAppointmentById,
   patchAppointment,
   listAppointments,

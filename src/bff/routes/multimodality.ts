@@ -12,7 +12,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requireAuth } from '../middleware/auth';
 import { parseLabReport } from '../agents/multimodality';
 import { rootLogger } from '../../core/logging/Logger.js';

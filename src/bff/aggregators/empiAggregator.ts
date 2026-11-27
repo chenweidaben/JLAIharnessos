@@ -58,7 +58,6 @@ export class EmpiAggregatorError extends Error {
 }
 const badRequest = (m: string) => new EmpiAggregatorError(400, 'BAD_REQUEST', m);
 const notFound = (m: string) => new EmpiAggregatorError(404, 'NOT_FOUND', m);
-const forbidden = (m: string) => new EmpiAggregatorError(403, 'FORBIDDEN', m);
 const conflict = (m: string) => new EmpiAggregatorError(409, 'CONFLICT', m);
 
 /* ------------------------------ 审计 ------------------------------ */

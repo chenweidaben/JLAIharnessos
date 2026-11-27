@@ -30,7 +30,6 @@ import {
 import {
   computeEventRates,
   missingFallReviewFields,
-  type RiskLevel,
 } from '../../medical-tools/nursing/eventReview.js';
 
 export class EventReviewError extends Error {

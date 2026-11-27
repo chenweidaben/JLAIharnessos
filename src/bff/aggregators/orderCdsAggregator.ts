@@ -31,7 +31,6 @@ export class OrderCdsError extends Error {
 }
 const badRequest = (m: string) => new OrderCdsError(400, 'BAD_REQUEST', m);
 const notFound = (m: string) => new OrderCdsError(404, 'NOT_FOUND', m);
-const conflict = (m: string) => new OrderCdsError(422, 'CDS_BLOCKED', m);
 const forbidden = (m: string) => new OrderCdsError(403, 'FORBIDDEN', m);
 
 function assertPermission(auth: AuthView, perm: string): void {

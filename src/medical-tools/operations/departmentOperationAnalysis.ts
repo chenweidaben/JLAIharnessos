@@ -141,7 +141,6 @@ async function executeDepartmentOperationAnalysis(
         `最新月门诊量${latest.outpatientVisits}人次，环比${outChange >= 0 ? '增长' : '下降'}${Math.abs(outChange)}%`,
       );
     }
-    const bedChange = pctChange(latest.bedOccupancyRate, prev.bedOccupancyRate);
     if (latest.bedOccupancyRate > 95) {
       insights.push(`床位使用率${latest.bedOccupancyRate}%，接近饱和，建议评估扩床或分流`);
     } else if (latest.bedOccupancyRate < 85) {

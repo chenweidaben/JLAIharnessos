@@ -30,7 +30,6 @@ import {
   type ComplianceStatus,
   type DomainBucket,
   type SecurityComplianceReport,
-  USER_SECURITY_DIRECTORY,
   type UserSecurityProfile,
 } from './securityComplianceAggregator';
 

@@ -25,7 +25,6 @@ import {
   trackQualityIndicator,
   type GapItem,
   type QualityIndicatorInput,
-  type RootCause,
 } from '../aggregators/qualitySafetyAggregator';
 import { rootLogger } from '../../core/logging/Logger.js';
 

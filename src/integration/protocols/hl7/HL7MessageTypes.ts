@@ -20,7 +20,6 @@
  */
 
 import { HL7Builder } from './HL7Builder';
-import { HL7Segment } from './HL7Message';
 
 // ============================================================
 // 段结构定义

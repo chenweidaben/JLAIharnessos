@@ -19,7 +19,7 @@
  * Copyright (c) 2026 健澜科技. Licensed under Apache-2.0.
  * ==========================================================================*/
 
-import { type TransactionSql, withTx } from '../db/pool.js';
+import { withTx } from '../db/pool.js';
 import { toText } from '../db/rowText.js';
 
 

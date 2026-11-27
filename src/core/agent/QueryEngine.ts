@@ -6,7 +6,6 @@
  */
 
 import type { MedicalContextData } from '@/core/context/MedicalContextBuilder';
-import { MedicalAgentError } from '@/core/errors';
 import { AgentEventBus } from '@/core/events/AgentEventBus';
 import { MedicalToolContextImpl } from '@/core/tools/MedicalToolContext';
 import { type MedicalToolRegistry } from '@/core/tools/MedicalToolRegistry';

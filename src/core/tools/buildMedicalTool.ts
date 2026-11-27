@@ -5,8 +5,6 @@
  * 本文件为健澜科技专有技术文件，未经授权不得复制、传播或用于其他用途。
  */
 
-import type { z } from 'zod';
-
 import { ErrorCodes, MedicalAgentError } from '@/core/errors';
 import type {
   BuiltMedicalTool,

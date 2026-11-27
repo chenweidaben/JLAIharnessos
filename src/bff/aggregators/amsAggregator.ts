@@ -41,12 +41,10 @@ import {
   listUsage,
 } from '../../db/repositories/amsRepo.js';
 import {
-  titleToMaxLevel,
   prescriberMaxLevel,
   canPrescribe,
   evaluatePerioperative,
   evaluateAntibioticUse,
-  computeDdds,
   computeAud,
   type AbxLevel,
 } from '../../medical-tools/ams/amsRules.js';

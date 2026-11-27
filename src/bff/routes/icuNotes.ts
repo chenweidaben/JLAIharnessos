@@ -36,7 +36,6 @@ function mapError(err: unknown): Response {
 }
 
 const vid = (c: Ctx): string => String(c.params?.visitId ?? '');
-const num = (b: Record<string, unknown>, k: string) => (b[k] === undefined ? undefined : Number(b[k]));
 
 export const icuNotesRoutes: RouteDef[] = [
   {

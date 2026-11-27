@@ -11,7 +11,6 @@ import { type Ctx, json, ok, type RouteDef } from "../types.js";
 import {
   buildTrainingModule,
   scoreExam,
-  type TrainingQuestionV14,
 } from "../aggregators/emrTrainingV14Aggregator.js";
 
 const demoModule = buildTrainingModule("COURSE-QC-001");

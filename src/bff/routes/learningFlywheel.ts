@@ -13,7 +13,7 @@
 
 import { getDb } from '../../db/pool.js';
 import { requirePermissionCode } from '../middleware/auth.js';
-import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types.js';
+import { type Ctx, json, ok, type RouteDef } from '../types.js';
 import {
   buildLearningFlywheel,
   type FlywheelPoint,

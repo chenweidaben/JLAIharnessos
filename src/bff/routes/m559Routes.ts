@@ -109,7 +109,7 @@ function validateAssignments(assignments: NurseAssignment[]): { code: 400 | 409;
     arr.push(a.shift);
     byNurseDate.set(key, arr);
   }
-  for (const [key, shifts] of byNurseDate.entries()) {
+  for (const [, shifts] of byNurseDate.entries()) {
     const unique = new Set(shifts);
     if (unique.size > 1) {
       return { code: 409, message: 'duplicate_shift_same_day' };
@@ -123,7 +123,7 @@ function validateAssignments(assignments: NurseAssignment[]): { code: 400 | 409;
     arr.push({ date: a.date.slice(0, 10), shift: a.shift });
     byNurseDay.set(a.nurseId, arr);
   }
-  for (const [nurseId, entries] of byNurseDay.entries()) {
+  for (const [, entries] of byNurseDay.entries()) {
     entries.sort((a, b) => a.date.localeCompare(b.date));
     for (let i = 0; i < entries.length - 1; i++) {
       if (entries[i].shift === 'night' && entries[i + 1].shift === 'day') {

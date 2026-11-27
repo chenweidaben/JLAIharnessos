@@ -393,7 +393,6 @@ export function listReturnRequests(): DispenseRecord[] {
 import {
   assertCan,
   assertVisitPatientBinding,
-  OrderCpoeError,
   type CpoeActor,
 } from './orderCpoeAggregator.js';
 

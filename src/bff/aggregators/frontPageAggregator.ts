@@ -18,7 +18,7 @@
 
 import type { AuthView } from '../view/userView.js';
 import { getDb, type DbExecutor } from '../../db/pool.js';
-import { getVisitById, type Visit } from '../../db/repositories/visitRepo.js';
+import { getVisitById } from '../../db/repositories/visitRepo.js';
 import { getPatientById } from '../../db/repositories/patientRepo.js';
 import { getDiagnosesByVisit, type Diagnosis } from '../../db/repositories/diagnosisRepo.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';

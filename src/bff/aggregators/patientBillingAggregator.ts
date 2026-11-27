@@ -29,7 +29,6 @@ export class PatientBillingError extends Error {
     this.name = 'PatientBillingError';
   }
 }
-const notFound = (m: string) => new PatientBillingError(404, 'NOT_FOUND', m);
 const forbidden = (m: string) => new PatientBillingError(403, 'FORBIDDEN', m);
 const badRequest = (m: string) => new PatientBillingError(400, 'BAD_REQUEST', m);
 

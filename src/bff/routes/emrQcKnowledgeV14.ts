@@ -9,7 +9,6 @@ import { requirePermissionCode } from "../middleware/auth.js";
 import { type Ctx, json, ok, type RouteDef } from "../types.js";
 import {
   searchQcKnowledge,
-  QC_KB_ENTRIES_V14,
 } from "../../knowledge/emr/qcKnowledgeBaseV14.js";
 
 export const emrQcKnowledgeV14Routes: RouteDef[] = [

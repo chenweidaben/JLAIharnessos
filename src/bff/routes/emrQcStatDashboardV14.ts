@@ -7,7 +7,7 @@
  */
 import { requirePermissionCode } from "../middleware/auth.js";
 import { type Ctx, json, ok, type RouteDef } from "../types.js";
-import { aggregateAllStats, buildStatDashboard } from "../aggregators/emrQcStatDashboardV14Aggregator.js";
+import { aggregateAllStats } from "../aggregators/emrQcStatDashboardV14Aggregator.js";
 
 const sampleDashboard = aggregateAllStats(28, 273, 300, 28.0);
 

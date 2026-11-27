@@ -11,7 +11,7 @@
 
 import { WorkflowNodeType, type NodeDefinition } from '../dsl/types.js';
 import type { NodeExecutor, NodeExecutorContext, NodeOutcome } from './types.js';
-import { assertNotCancelled, WorkflowCancelledError } from './types.js';
+import { assertNotCancelled } from './types.js';
 import type { NotifyMessage } from '../engine/runtime.js';
 import { toText } from '../../db/rowText.js';
 

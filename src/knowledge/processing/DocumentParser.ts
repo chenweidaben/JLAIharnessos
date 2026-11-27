@@ -195,7 +195,6 @@ export class DocumentParser {
           const next = lines[i].trim();
           if (next === '') break;
           if (isTableLine(next)) {
-            const ns = offset;
             const ne = offset + lines[i].length;
             tableLines.push(next);
             tableEnd = ne;

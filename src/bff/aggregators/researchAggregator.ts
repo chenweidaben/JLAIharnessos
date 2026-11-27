@@ -58,7 +58,6 @@ export class ResearchError extends Error {
 }
 const badRequest = (m: string) => new ResearchError(400, 'BAD_REQUEST', m);
 const notFound = (m: string) => new ResearchError(404, 'NOT_FOUND', m);
-const forbidden = (m: string) => new ResearchError(403, 'FORBIDDEN', m);
 const conflict = (m: string) => new ResearchError(409, 'CONFLICT', m);
 
 /* ------------------------------ 工具函数 ------------------------------ */

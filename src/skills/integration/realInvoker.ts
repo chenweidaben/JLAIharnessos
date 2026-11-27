@@ -28,7 +28,7 @@ import type { ILLMClient } from '@/core/agent/LLMClient';
 import type { LoopMessage } from '@/core/agent/loopTypes';
 import { createLlmClient } from '@/core/agent/providers/factory';
 
-import type { SkillInvokers, SkillInvocationResult } from '../executor';
+import type { SkillInvokers } from '../executor';
 
 // ============================================================================
 // 工具执行上下文（最小可用实现）

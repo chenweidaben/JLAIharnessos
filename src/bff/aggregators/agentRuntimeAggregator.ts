@@ -46,7 +46,7 @@ import {
   claimHumanTask,
   type HumanTaskRecord,
 } from '../../db/repositories/humanTaskRepo.js';
-import { createMockRuntimeDeps, MockRagRetriever } from '../../orchestrator/adapters/mockRuntime.js';
+import { createMockRuntimeDeps } from '../../orchestrator/adapters/mockRuntime.js';
 import { createOrchestrator, type Orchestrator } from '../../orchestrator/factory.js';
 import { PersistentHumanTaskHandler } from '../runtime/persistentHumanTaskHandler.js';
 import type { AgentDefinition } from '../../orchestrator/dsl/types.js';
@@ -65,7 +65,6 @@ export class AgentRuntimeError extends Error {
   }
 }
 
-const badRequest = (m: string) => new AgentRuntimeError(400, 'BAD_REQUEST', m);
 const notFound = (m: string) => new AgentRuntimeError(404, 'NOT_FOUND', m);
 const conflict = (m: string) => new AgentRuntimeError(409, 'CONFLICT', m);
 

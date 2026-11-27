@@ -20,7 +20,6 @@ import {
   applyReview,
   createRectificationTask,
   getRectificationStats,
-  getTaskById,
   getTaskForUpdate,
   getTaskViewById,
   listTasksView,

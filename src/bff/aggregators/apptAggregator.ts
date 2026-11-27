@@ -13,7 +13,6 @@ import { withTx } from '../../db/pool.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import {
   createAppointment,
-  getApptById,
   lockAppt,
   listAppts,
   patchAppt,

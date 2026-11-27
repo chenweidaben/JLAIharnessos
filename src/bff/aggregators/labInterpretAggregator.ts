@@ -48,7 +48,6 @@ import {
   chatCompletionJson,
   readLlmConfig,
   LlmNotConfiguredError,
-  LlmTransportError,
 } from '../../medical-tools/interpret/llmClient.js';
 
 // re-export 纯函数，保持 M3-E 旧单测 `import { interpretLabResults } from labInterpretAggregator` 可用。

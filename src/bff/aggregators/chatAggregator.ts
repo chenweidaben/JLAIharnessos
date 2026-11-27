@@ -27,7 +27,6 @@ import {
   createRegistryWithFirstBatch,
 } from '@/medical-tools/registry';
 import type {
-  MedicalRole,
   MedicalToolContext,
   MedicalToolDefinition,
   MedicalUser,

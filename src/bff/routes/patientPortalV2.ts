@@ -23,7 +23,7 @@ import {
   createBooking, listBookings, cancelBooking,
   submitSatisfaction,
   listReminders, markReminderRead,
-  listPayments, listAdminNotifs,
+  listPayments,
   seed,
 } from '../aggregators/patientPortalV2Aggregator.js';
 import { toText } from '../../db/rowText.js';

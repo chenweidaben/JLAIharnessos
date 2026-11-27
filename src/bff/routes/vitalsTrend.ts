@@ -1,7 +1,7 @@
 ﻿import { getUserById, getUserRoleLinks } from '@/db/repositories/userRepo';
 import { buildAuthView, type AuthView } from '../view/userView.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
-import { trendView, VitalsError } from '../aggregators/vitalsTrendAggregator.js';
+import { trendView } from '../aggregators/vitalsTrendAggregator.js';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;

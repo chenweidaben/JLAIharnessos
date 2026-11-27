@@ -25,7 +25,7 @@ import {
   type LessonOutcome,
 } from '../aggregators/lessonRecordAggregator';
 import type { StaffMuseRole } from '../aggregators/staffMuseAggregator';
-import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { toText } from '../../db/rowText.js';
 import { rootLogger } from '../../core/logging/Logger.js';
 

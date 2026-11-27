@@ -11,7 +11,6 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requirePermissionCode } from '../middleware/auth';
 import {
   evaluateCdsView,
-  listByOrderView,
   listByVisitView,
   OrderCdsError,
   overrideAlertView,

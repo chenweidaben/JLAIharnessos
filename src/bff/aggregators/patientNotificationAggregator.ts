@@ -3,7 +3,6 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 import type { AuthView } from '../view/userView.js';
-import { withTx } from '../../db/pool.js';
 import { recordChainAudit } from '../../db/repositories/auditChainRepo.js';
 import { createNotification, listByPatient, markAllRead, markRead, unreadCount } from '../../db/repositories/patientNotificationRepo.js';
 
