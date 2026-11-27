@@ -4,7 +4,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
 import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -14,8 +14,9 @@ import {
 
 let tmpDir = '';
 // 关键：本文件会临时改写进程环境（WORM_KEK / NODE_ENV / DEMO_MODE / WORM_FILE_KEY）。
-// 必须先存原值、afterAll 精确还原——否则后续加载的 wormArchiveAggregator
-// 在 initKeys() 时读不到 DEMO_MODE=1，SM4/SM2 被置空，seal 全返回 key-not-configured。
+// 先存原值、afterEach 逐用例精确还原（afterAll 仅兜底）——否则后续加载的
+// wormArchiveAggregator 在 initKeys() 时读不到 DEMO_MODE=1，SM4/SM2 被置空，
+// seal 全返回 key-not-configured。
 const ORIGINAL_ENV: Record<string, string | undefined> = {
   WORM_KEK: process.env.WORM_KEK,
   NODE_ENV: process.env.NODE_ENV,
@@ -36,9 +37,15 @@ beforeEach(() => {
   delete process.env.NODE_ENV;
   delete process.env.DEMO_MODE;
   delete process.env.WORM_FILE_KEY;
+  __resetKeyProvider(null);
+});
+afterEach(() => {
+  if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
+  for (const k of Object.keys(ORIGINAL_ENV)) restoreEnv(k);
+  __resetKeyProvider(null);
 });
 afterAll(() => {
-  if (tmpDir) rmSync(tmpDir, { recursive: true, force: true });
+  // 兜底：afterEach 已逐用例还原，文件结束后再兜底一次，防单例 / env 跨文件残留
   for (const k of Object.keys(ORIGINAL_ENV)) restoreEnv(k);
   __resetKeyProvider(null);
 });
