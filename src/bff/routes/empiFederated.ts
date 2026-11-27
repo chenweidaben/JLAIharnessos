@@ -14,6 +14,7 @@
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   getMaster, link, listMasters, match, resolve, validateIdCard,
+  type LinkInput,
 } from '../aggregators/empiFederatedAggregator.js';
 
 function requireAdmin(c: Ctx): Response | null {
@@ -30,7 +31,7 @@ export const empiFederatedRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireAdmin(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, any>;
+      const b = await c.body<LinkInput>();
       if (!b.sourceSystem || !b.sourcePatientId) {
         return json(fail(ErrorCode.BAD_REQUEST, 'sourceSystem 与 sourcePatientId 必填'), 400);
       }

@@ -281,14 +281,13 @@ export class FHIRResourceModel {
    */
   set(path: string, value: unknown): this {
     const parts = path.split('.');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let cursor: Record<string, any> = this.resource as Record<string, any>;
+    let cursor: Record<string, unknown> = this.resource;
     for (let i = 0; i < parts.length - 1; i++) {
       const key = parts[i];
       if (typeof cursor[key] !== 'object' || cursor[key] === null) {
         cursor[key] = {};
       }
-      cursor = cursor[key] as Record<string, any>;
+      cursor = cursor[key] as Record<string, unknown>;
     }
     cursor[parts[parts.length - 1]] = value;
     return this;
@@ -381,8 +380,7 @@ export class FHIRResourceModel {
    * 按资源类型校验必填字段（最小集）
    */
   private validateRequiredFields(errors: FHIRValidationIssue[]): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const r = this.resource as Record<string, any>;
+    const r: Record<string, unknown> = this.resource;
     switch (this.resource.resourceType) {
       case 'Patient':
         if (!r.name || !Array.isArray(r.name) || r.name.length === 0) {

@@ -15,6 +15,7 @@
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   DOCUMENT_TYPES, getContent, getMeta, listTypes, query, register, seed,
+  type RegisterInput,
 } from '../aggregators/xdsAggregator.js';
 
 function requireJwt(c: Ctx): Response | null {
@@ -32,7 +33,7 @@ export const xdsRoutes: RouteDef[] = [
     auth: true,
     handle: async (c: Ctx): Promise<Response> => {
       const denied = requireJwt(c); if (denied) return denied;
-      const b = (await c.body()) as Record<string, any>;
+      const b = await c.body<RegisterInput>();
       if (!b.patientId) return json(fail(ErrorCode.BAD_REQUEST, 'patientId 必填'), 400);
       if (!b.title) return json(fail(ErrorCode.BAD_REQUEST, 'title 必填'), 400);
       if (!b.authorId) return json(fail(ErrorCode.BAD_REQUEST, 'authorId 必填'), 400);

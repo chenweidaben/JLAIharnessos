@@ -84,14 +84,13 @@ export class FHIRBuilder {
    */
   set(path: string, value: unknown): this {
     const parts = path.split('.');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let cursor: Record<string, any> = this.resource;
+    let cursor: Record<string, unknown> = this.resource;
     for (let i = 0; i < parts.length - 1; i++) {
       const key = parts[i];
       if (typeof cursor[key] !== 'object' || cursor[key] === null || Array.isArray(cursor[key])) {
         cursor[key] = {};
       }
-      cursor = cursor[key] as Record<string, any>;
+      cursor = cursor[key] as Record<string, unknown>;
     }
     cursor[parts[parts.length - 1]] = value;
     return this;
