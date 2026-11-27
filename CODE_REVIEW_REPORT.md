@@ -114,10 +114,31 @@
   - 注意：`bun test tests/unit` 直接运行时 bun 的路径过滤是**子串匹配**，会把 `web/tests/unit/`（约 1.4 万个 DOM 测试）一并拉入无 jsdom 的 bun 环境运行，造成 169 个环境性失败（localStorage/navigator 不存在）——非真实缺陷，CI 应以分桶或精确路径方式运行。
 - **前端测试（vitest run 全量）**：通过；仅 1 例「新建任务：缺少任务内容时校验拦截」在全量高压下 30 s 超时，**单独复跑通过（11.7 s）**，判定为资源竞争抖动而非缺陷。前端套件普遍单用例 10–90 s（重 jsdom 渲染），建议后续排查 per-test 开销。
 - **ESLint 全仓 --fix**：1 522 处自动修复已应用（554 个文件），存量错误 4 447 → **3 083**。--fix 误删必要断言导致 121 个类型错误（20 个文件），已全部人工修复：catch 回落统一改为 `.catch((): T => ({}))`（21 处），字面量 widening 改用 `as const` 逐分支标注（4 处），冗余联合成员改 `(string & {})` 技巧（2 处）。修复后 **`tsc --noEmit` 0 错误**，触及文件 ESLint 0 错误。
-- **Python 服务 pytest**：1 passed。
+- **Python 服务 pytest**：5 passed（含本轮新增 4 条鉴权回归契约）。
 - **SQL 迁移器**：并发护栏单测无法本地连库验证，逻辑为事务内标准 `pg_advisory_xact_lock` 用法，建议 CI 集成环境补一条双副本并发迁移用例。
 
-### 6.7 第三轮进行事项（截至本报告更新时仍在推进）
+### 6.7 第三轮：存量 lint 深度治理（已完成）
 
-- db 仓储层 `no-base-to-string`（约 1 490 处，`String(unknown)` 可能输出 `[object Object]`）codemod 治理：新增 `src/db/rowText.ts`（`toText`/`toTextOrNull` 安全文本化），逐文件替换并复验。
-- 剩余 3 083 个 lint error 的最终分布与处置（大部分为类型安全风格项，非运行时缺陷）。
+- **新增 `src/db/rowText.ts` 安全文本化工具**：`toText`/`toTextOrNull`——string 原样、number/boolean/bigint 走 `String()`、Date 保持旧格式、对象/数组返回 `''`（**拒绝 `[object Object]` 写入业务字段**）。配套 7 个单元测试锁定语义（`tests/unit/db/rowText.test.ts`，全部通过）。
+- **codemod 全仓治理 `no-base-to-string`**：以 eslint JSON 错误坐标精准替换 `String(unknown)` → `toText(...)`，共 **1 484 处**（db 层 833 + 其余目录 651），自动补相对路径 import；6 处模板字符串插值手工修复（`${unknown}` → `toText(...)`）。
+- **codemod 副作用捕获与回滚**：10 个聚合器文件本就存在本地 `toText(v)`（带 trim 语义），codemod 将其函数体内的 `String(v)` 误替换为自调用，形成**无限递归**隐患；已通过 `tsc` 冲突报错全部捕获，修复为原始类型收窄实现并移除多余 import。教训：批量 codemod 后必须 tsc + 测试双验证。
+- **聚合器目录二次 --fix**：`prefer-nullish-coalescing`/`prefer-optional-chain` 剩余项均位于 `any` 类型上下文（规则无法证明安全故不自动修复），人工评估后保留为基线（风格项、无运行时风险）。
+- **新增 Python 回归测试** `services-python/tests/test_api_key_middleware.py`：锁定「鉴权拒绝返回 401 JSON 而非 500」「非 /ai/ 路由不受影响」「合法 key 不被拦截」四条契约，pytest **5 passed**。
+- **扩展测试面**：`tests/security` 83 passed、`tests/performance` 7 passed、`tests/verification` 通过；`tests/integration` 需真实 BFF+PG 环境（本机无 PG 实例，报 "Failed to connect"），属环境限制而非代码缺陷。
+
+### 6.8 最终验证状态
+
+- `tsc --noEmit`（TS 6.0.2，全仓）：**0 错误**（所有 codemod 与手工修复后复验通过）
+- 后端单元测试分桶复跑：bff 353 / orchestrator 144 / medical-tools 107 / knowledge+knowledge-platform 324 / db（含新增 rowText 7）——**全部 0 失败**
+- ESLint 全仓最终存量：**4 447 → 1 426**（--fix 1 522 处 + codemod 1 484 处 + 手工修复若干），`no-base-to-string` 规则清零；剩余项以 `any` 上下文的类型安全风格项（unsafe-argument/unsafe-assignment/prefer-nullish-coalescing 等）为主，非运行时缺陷，已列入第七节 R-3 定额消减建议
+
+## 七、剩余风险与后续建议（不阻塞上线，建议排期）
+
+| # | 级别 | 事项 |
+|---|------|------|
+| R-1 | P1 | **Java Gateway `AuthFilter` 占位实现**：只查 `X-Auth-Token` 存在性。上线前必须做 JWT 验签或在网络层封禁外部直连 Gateway |
+| R-2 | P2 | 12 个 Java 业务微服务为 H2 内存库开发骨架（console 开启、show-sql、ddl-auto: update），生产化需整体切换 PG 配置基线 |
+| R-3 | P2 | 全仓剩余 lint error（unsafe-argument/unsafe-assignment 等 `any` 流）需按域逐步类型化，建议纳入每迭代定额消减 |
+| R-4 | P2 | 前端测试套件单用例 10–90 s，全量 ~16 分钟，建议排查重渲染开销或分片并行 |
+| R-5 | P3 | `tests/integration` 需要 CI 提供 PG+Redis 服务容器才能纳入门禁 |
+| R-6 | P3 | `bun test <dir>` 子串匹配陷阱：CI 脚本应使用精确路径或分桶执行 |
