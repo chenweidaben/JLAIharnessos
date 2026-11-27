@@ -49,13 +49,13 @@ export const vteAnticoagRoutes: RouteDef[] = [
   {
     method: 'PATCH',
     path: '/api/v1/vte-anticoag/:id/bleeding',
-    handle: guarded(async (c, view) => bleedingView(view, c.params.id, (await c.body() as any).score)),
+    handle: guarded(async (c, view) => bleedingView(view, c.params.id, (await c.body<{ score: number }>()).score)),
     auth: true,
   },
   {
     method: 'POST',
     path: '/api/v1/vte-anticoag/:id/stop',
-    handle: guarded(async (c, view) => stopView(view, c.params.id, (await c.body() as any).endDate)),
+    handle: guarded(async (c, view) => stopView(view, c.params.id, (await c.body<{ endDate: string }>()).endDate)),
     auth: true,
   },
 ];

@@ -105,12 +105,37 @@ function mapCatalogs() {
  * 写操作若直连聚合器会失败并导致前端 setState 后内容"保存即丢失"。
  * 这里按 encounterId 在内存里维护一份可读写 bundle，GET 返回它、POST 更新它，形成闭环。
  */
-const demoBundles = new Map<string, Record<string, any>>();
-async function seedDemoBundle(id: string): Promise<Record<string, any>> {
+interface DemoDiagnosis {
+  id: string; code: string; name: string; kind: string;
+  confirmed: boolean; doctorName: string;
+}
+interface DemoOrder {
+  id: string; kind: string; catalogId: string; name: string;
+  price: number; clinicalReason: string; status: string; cancelReason?: string;
+}
+interface DemoPrescription {
+  id: string;
+  lines: Parameters<typeof submitPrescription>[1]['lines'];
+  counsel: string; status: string; warnings: Record<string, unknown>[];
+  auditComment?: string;
+}
+interface DemoBundle {
+  encounterId: string;
+  patient: unknown;
+  consultation: Record<string, unknown>;
+  diagnoses: DemoDiagnosis[];
+  orders: DemoOrder[];
+  prescriptions: DemoPrescription[];
+  medicalRecord: unknown;
+  cdsReminders: unknown[];
+}
+
+const demoBundles = new Map<string, DemoBundle>();
+async function seedDemoBundle(id: string): Promise<DemoBundle> {
   if (demoBundles.has(id)) return demoBundles.get(id)!;
-  const list = (await getWaitingQueue(null)) as Record<string, any>[];
+  const list = (await getWaitingQueue(null)) as Record<string, unknown>[];
   const hit = list.find((x) => x.encounterId === id);
-  const bundle: Record<string, any> = {
+  const bundle: DemoBundle = {
     encounterId: id,
     patient: hit?.patient ?? {
       patientId: 'demo-pat-x', nameMasked: '待诊患者', gender: 'male', age: 40,
@@ -211,7 +236,7 @@ export const outpatientRoutes: RouteDef[] = [
       const data = await c.body<{ confirmed: boolean }>();
       if (isDemo) {
         const b = await seedDemoBundle(c.params.id);
-        const d = b.diagnoses.find((x: any) => x.id === c.params.did);
+        const d = b.diagnoses.find((x) => x.id === c.params.did);
         if (d) d.confirmed = Boolean(data.confirmed);
         return json(ok(b));
       }
@@ -227,7 +252,7 @@ export const outpatientRoutes: RouteDef[] = [
     handle: async (c) => {
       if (isDemo) {
         const b = await seedDemoBundle(c.params.id);
-        b.diagnoses = b.diagnoses.filter((x: any) => x.id !== c.params.did);
+        b.diagnoses = b.diagnoses.filter((x) => x.id !== c.params.did);
         return json(ok(b));
       }
       return json(ok(await removeDiagnosis(c.params.id, c.params.did)));
@@ -262,7 +287,7 @@ export const outpatientRoutes: RouteDef[] = [
       const data = await c.body<{ reason?: string }>();
       if (isDemo) {
         const b = await seedDemoBundle(c.params.id);
-        const o = b.orders.find((x: any) => x.id === c.params.oid);
+        const o = b.orders.find((x) => x.id === c.params.oid);
         if (o) { o.status = 'cancelled'; o.cancelReason = data.reason ?? '医师撤销'; }
         return json(ok(b));
       }
@@ -303,7 +328,7 @@ export const outpatientRoutes: RouteDef[] = [
       }
       if (isDemo) {
         const b = await seedDemoBundle(c.params.id);
-        const rx = b.prescriptions.find((x: any) => x.id === c.params.pid);
+        const rx = b.prescriptions.find((x) => x.id === c.params.pid);
         if (rx) { rx.status = data.decision === 'approved' ? 'approved' : 'rejected'; rx.auditComment = data.comment ?? ''; }
         return json(ok(b));
       }

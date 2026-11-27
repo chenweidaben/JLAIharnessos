@@ -350,8 +350,7 @@ async function collectDbState(demo: boolean): Promise<HealthSnapshot['db']> {
   }
   const max = Number(process.env.PG_POOL_MAX ?? 20);
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sql = getDb() as any;
+    const sql = getDb();
     const ping = sql`SELECT 1 AS ok` as Promise<unknown>;
     // 探活超时后该 promise 仍可能 reject，吞掉未处理拒绝
     void ping.catch(() => undefined);
@@ -361,8 +360,7 @@ async function collectDbState(demo: boolean): Promise<HealthSnapshot['db']> {
         setTimeout(() => reject(new Error('db ping timeout')), PING_TIMEOUT_MS),
       ),
     ]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const loose = sql as Record<string, unknown>;
+    const loose = sql as unknown as Record<string, unknown>;
     const totalCount = typeof loose.totalCount === 'number' ? loose.totalCount : null;
     const idleCount = typeof loose.idleCount === 'number' ? loose.idleCount : null;
     return { reachable: true, totalCount, idleCount, max };

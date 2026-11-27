@@ -7,6 +7,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import type postgres from 'postgres';
 import type { DbExecutor } from '../pool.js';
 
 /** 动态查询构建器：累积 WHERE 条件与参数 */
@@ -43,9 +44,8 @@ export class QueryBuilder {
   }
 }
 
-/** 将任意对象安全序列化为 postgres.json 可接受的类型 */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function toJson<T>(obj: T): any {
+/** 将任意对象安全序列化为 postgres.json 可接受的类型（JSON 可序列化值） */
+export function toJson<T>(obj: T): postgres.JSONValue {
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -102,7 +102,6 @@ export async function dynamicSelect<T>(
     suffix += ` OFFSET $${qb.getParams(extra).length}`;
   }
   const query = `SELECT ${columns} FROM ${table} ${qb.toClause()} ORDER BY ${orderBy}${suffix}`;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rows = await sql.unsafe(query, qb.getParams(extra) as any[]);
+  const rows = await sql.unsafe(query, qb.getParams(extra));
   return rows as unknown as T[];
 }

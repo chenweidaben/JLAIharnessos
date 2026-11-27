@@ -49,7 +49,7 @@ export const nissRoutes: RouteDef[] = [
   {
     method: 'PATCH',
     path: '/api/v1/niss/:id/status',
-    handle: guarded(async (c, view) => patchStatusView(view, c.params.id, (await c.body() as any).status)),
+    handle: guarded(async (c, view) => patchStatusView(view, c.params.id, (await c.body<{ status: string }>()).status)),
     auth: true,
   },
 ];

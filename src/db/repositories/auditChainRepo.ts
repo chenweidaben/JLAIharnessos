@@ -16,6 +16,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import type postgres from 'postgres';
 import { getDb, type DbExecutor, type Sql } from '../pool.js';
 import { toJson } from './helpers.js';
 
@@ -45,7 +46,7 @@ const UNIQUE_VIOLATION = '23505';
 async function insertChained(
   db: DbExecutor,
   input: ChainAuditInput,
-  detail: string,
+  detail: postgres.JSONValue,
 ): Promise<number> {
   const rows = await db`
     INSERT INTO audit.audit_logs (
@@ -66,7 +67,7 @@ async function insertChained(
 async function insertWithChainLock(
   db: Sql,
   input: ChainAuditInput,
-  detail: string,
+  detail: postgres.JSONValue,
 ): Promise<number> {
   for (let attempt = 1; attempt <= MAX_CHAIN_RETRY; attempt += 1) {
     try {

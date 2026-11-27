@@ -44,7 +44,7 @@ function demoSchedule(weekStart: string): ScheduleItem[] {
       startMinute: p.start,
       durationMin: p.dur,
       demo: true,
-    } as any;
+    };
   });
 }
 

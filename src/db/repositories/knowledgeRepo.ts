@@ -139,7 +139,7 @@ function mapDocument(r: Record<string, unknown>): KnowledgeDocument {
     license: (r.license as string) ?? null,
     content: r.content as string,
     status: r.status as string,
-    metadata: parseJsonb(r.metadata),
+    metadata: parseJsonb<Record<string, unknown>>(r.metadata),
     createdAt: r.created_at as string,
     updatedAt: r.updated_at as string,
   };
@@ -154,22 +154,22 @@ function mapChunk(r: Record<string, unknown>): KnowledgeChunk {
     sectionPath: (r.section_path as string) ?? null,
     content: r.content as string,
     tokenCount: Number(r.token_count ?? 0),
-    embedding: parseJsonb(r.embedding),
-    metadata: parseJsonb(r.metadata),
+    embedding: parseJsonb<number[]>(r.embedding),
+    metadata: parseJsonb<Record<string, unknown>>(r.metadata),
     createdAt: r.created_at as string,
   };
 }
 
-/** jsonb 列可能被驱动解析为对象，也可能返回字符串，统一兜底。 */
-function parseJsonb(v: unknown): any {
+/** jsonb 列可能被驱动解析为对象，也可能返回字符串，统一兜底；目标契约类型由调用点显式标注。 */
+function parseJsonb<T>(v: unknown): T {
   if (typeof v === 'string') {
     try {
-      return JSON.parse(v);
+      return JSON.parse(v) as T;
     } catch {
-      return v;
+      return v as T;
     }
   }
-  return v;
+  return v as T;
 }
 
 // ============================================================================
@@ -251,7 +251,7 @@ export async function insertDocument(input: NewDocument, tx?: DbExecutor): Promi
       ${input.version ?? '1.0.0'}, ${input.docType ?? 'guideline'},
       ${input.authorityLevel ?? null}, ${input.sourceUrl ?? null},
       ${input.license ?? '院内私有'},
-      ${(input.metadata ?? {}) as any}, ${input.content}, 'processing')
+      ${input.metadata ?? {}}, ${input.content}, 'processing')
     RETURNING *`;
   return mapDocument((rows as unknown as Record<string, unknown>[])[0]);
 }
@@ -297,7 +297,7 @@ export async function insertChunks(chunks: NewChunk[], tx?: DbExecutor): Promise
       VALUES (
         ${id}, ${c.documentId}, ${c.kbId}, ${c.chunkIndex},
         ${c.sectionPath ?? null}, ${c.content}, ${c.tokenCount ?? c.content.length},
-        ${c.embedding as any}, ${(c.metadata ?? {}) as any})`;
+        ${c.embedding}, ${c.metadata ?? {}})`;
     inserted++;
   }
   return inserted;

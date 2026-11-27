@@ -24,6 +24,7 @@ import {
   createProfileMemory,
   type SessionRuntime,
 } from '../../core/agent/consult/index.js';
+import type postgres from 'postgres';
 import { getDb, type Sql } from '../pool.js';
 import { toJson } from './helpers.js';
 
@@ -44,14 +45,11 @@ function isUuidHandle(value: string | null | undefined): value is string {
 }
 
 /**
- * 把领域对象包装为 postgres.js JSON 参数。
- * 边界处统一放宽类型（与 pool.ts 同款处理），核心域模型自身保持强类型。
+ * 把领域对象包装为 postgres.js JSON 绑定参数；输入按 unknown 接收，序列化后交 json() 绑定。
  */
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
-function toJsonParam(db: Sql, value: unknown): any {
+function toJsonParam(db: Sql, value: unknown): postgres.Parameter {
   return db.json(toJson(value));
 }
-/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 
 // ============================================================================
 // DEMO 进程内兜底（模块级单例，跨请求保持会话 / 消息 / 草稿 / 审计 / 画像）

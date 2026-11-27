@@ -116,10 +116,11 @@ export const alertsRoutes: RouteDef[] = [
 /* ================================================================== */
 
 /** 磁盘使用率：工作目录所在分区；读取失败保守给中性低值 0.1（不误报红/黄） */
+type StatfsResult = { blocks: bigint | number; bfree: bigint | number };
 function readDiskUsedRatio(): number {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stat = (fs as any).statfsSync(process.cwd()) as { blocks: bigint | number; bfree: bigint | number };
+    const statfs = fs as unknown as { statfsSync: (p: string) => StatfsResult };
+    const stat = statfs.statfsSync(process.cwd());
     const total = Number(stat.blocks);
     const free = Number(stat.bfree);
     if (!Number.isFinite(total) || total <= 0) return 0.1;

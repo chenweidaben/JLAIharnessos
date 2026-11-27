@@ -44,8 +44,7 @@ function demoModeEnabled(): boolean {
 async function probeDbReachable(demo: boolean): Promise<boolean> {
   if (demo) return false;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sql = getDb() as any;
+    const sql = getDb();
     const ping = sql`SELECT 1 AS ok` as Promise<unknown>;
     void ping.catch(() => undefined);
     await Promise.race([

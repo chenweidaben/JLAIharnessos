@@ -15,6 +15,7 @@ import {
   transitionView,
 } from '../aggregators/improvementTaskAggregator';
 import { getChain } from '../../db/repositories/escalationRepo.js';
+import type { TaskStatus } from '../../medical-tools/operations/improvementTask.js';
 
 async function requester(c: Ctx): Promise<AuthView | null> {
   if (!c.user) return null;
@@ -55,5 +56,8 @@ export const improvementTaskRoutes: RouteDef[] = [
   { method: 'GET', path: '/api/v1/improvement-tasks/:id/chain',
     handle: guarded('improvement_task:handle', (c, view) => getChain(c.params.id)), auth: true },
   { method: 'POST', path: '/api/v1/improvement-tasks/:id/transition',
-    handle: guarded('improvement_task:handle', async (c, view) => transitionView(view, c.params.id, (await c.body<{ to: any }>()).to, (await c.body<{ resolutionNote?: string }>()).resolutionNote)), auth: true },
+    handle: guarded('improvement_task:handle', async (c, view) => {
+      const body = await c.body<{ to: TaskStatus; resolutionNote?: string }>();
+      return transitionView(view, c.params.id, body.to, body.resolutionNote);
+    }), auth: true },
 ];

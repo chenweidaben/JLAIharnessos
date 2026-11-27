@@ -47,8 +47,8 @@ export const nqiRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         requireNurse(c);
-        const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(reportFall({ ...b as any, reportedByNurseId: c.user?.id ?? '' })));
+        const b = await c.body<Parameters<typeof reportFall>[0]>();
+        return json(ok(reportFall({ ...b, reportedByNurseId: c.user?.id ?? '' })));
       } catch (e) { return mapError(e); }
     },
   },
@@ -57,8 +57,8 @@ export const nqiRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         requireNurse(c);
-        const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(reportPressureUlcer({ ...b as any, reportedByNurseId: c.user?.id ?? '' })));
+        const b = await c.body<Parameters<typeof reportPressureUlcer>[0]>();
+        return json(ok(reportPressureUlcer({ ...b, reportedByNurseId: c.user?.id ?? '' })));
       } catch (e) { return mapError(e); }
     },
   },
@@ -67,8 +67,8 @@ export const nqiRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         requireNurse(c);
-        const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(reportTubeDisplacement({ ...b as any, reportedByNurseId: c.user?.id ?? '' })));
+        const b = await c.body<Parameters<typeof reportTubeDisplacement>[0]>();
+        return json(ok(reportTubeDisplacement({ ...b, reportedByNurseId: c.user?.id ?? '' })));
       } catch (e) { return mapError(e); }
     },
   },
@@ -77,8 +77,8 @@ export const nqiRoutes: RouteDef[] = [
     handle: async (c: Ctx): Promise<Response> => {
       try {
         requireNurse(c);
-        const b = (await c.body()) as Record<string, unknown>;
-        return json(ok(reportRestraint({ ...b as any, reportedByNurseId: c.user?.id ?? '' })));
+        const b = await c.body<Parameters<typeof reportRestraint>[0]>();
+        return json(ok(reportRestraint({ ...b, reportedByNurseId: c.user?.id ?? '' })));
       } catch (e) { return mapError(e); }
     },
   },
