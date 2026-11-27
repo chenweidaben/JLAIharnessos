@@ -33,6 +33,7 @@ import {
   type AbxPurpose,
   type IncisionClass,
 } from '../aggregators/antibioticDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 逗号分隔字符串 → 去空数组 */
 function splitCsv(raw: string | null): string[] {
@@ -119,7 +120,13 @@ export const antibioticDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '深度抗菌药物管理已加载（分级/使用率/AUD/送检率/合理性，国卫办医发〔2015〕42号口径）'));
       } catch (err) {
-        console.error(`[antibioticDeep] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[antibioticDeep] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '抗菌药物管理计算失败', c.traceId),
           500,

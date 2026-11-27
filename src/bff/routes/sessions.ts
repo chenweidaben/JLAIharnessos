@@ -19,6 +19,7 @@ import {
 import { requirePermissionCode } from '../middleware/auth';
 import { markSessionRevoked } from '../middleware/sessionGuard';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 function present(s: {
   jti: string;
@@ -51,7 +52,13 @@ export const sessionAdminRoutes: RouteDef[] = [
         const sessions = await listActiveSessions(userId);
         return json(ok({ total: sessions.length, items: sessions.map(present) }));
       } catch (err) {
-        console.error(`[bff error] GET /admin/sessions [${c.traceId}]`, err);
+        rootLogger.error('[bff error] GET /admin/sessions 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
           500,
@@ -109,7 +116,13 @@ export const sessionAdminRoutes: RouteDef[] = [
 
         return json(fail(ErrorCode.BAD_REQUEST, '需要提供 jti 或 userId', c.traceId), 400);
       } catch (err) {
-        console.error(`[bff error] POST /admin/sessions/revoke [${c.traceId}]`, err);
+        rootLogger.error('[bff error] POST /admin/sessions/revoke 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
           500,

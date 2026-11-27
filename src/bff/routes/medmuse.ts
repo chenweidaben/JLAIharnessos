@@ -33,6 +33,7 @@ import {
 } from '../agents/medmuseRepo';
 import { TemplateFallbackProvider } from '../agents/modelProvider';
 import { resolveApprovalTicket, expireStaleApprovals } from '../agents/sentinel';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：会话/消息走进程内内存兜底，不连 PostgreSQL、不抛错 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -66,7 +67,13 @@ function mapError(err: unknown, c: Ctx): Response {
   if (msg === 'SELF_APPROVAL_FORBIDDEN') {
     return json(fail(ErrorCode.FORBIDDEN, 'critical 级审批不允许申请人自己批准自己', c.traceId), 403);
   }
-  console.error(`[medmuse error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+  rootLogger.error('[medmuse] 未预期错误', {
+    method: c.req.method,
+    url: c.req.url,
+    traceId: c.traceId,
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
   return json(fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId), 500);
 }
 

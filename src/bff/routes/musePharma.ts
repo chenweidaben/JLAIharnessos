@@ -26,6 +26,7 @@ import {
   type PharmaIntervention,
   type PharmaMuse,
 } from '../aggregators/pharmaMuseAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：返回样例经验页，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -183,7 +184,14 @@ export const musePharmaRoutes: RouteDef[] = [
         return json(ok({ demo: false, staffId: resolved.staffId, ...view }));
       } catch (err) {
         // 数据库未就绪时回退演示数据，不阻断药师工作台（与 pharmacyAuditLearning 一致）
-        console.error(`[musePharma] GET /pharma [${c.traceId}] staff=${resolved.staffId}`, err);
+        rootLogger.error('[musePharma] GET /pharma 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId: resolved.staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         const view = demoPharmaMuse(resolved.staffId);
         return json(ok({ demo: true, staffId: resolved.staffId, ...view }));
       }

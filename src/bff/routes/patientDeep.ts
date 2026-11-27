@@ -26,6 +26,7 @@ import {
   type QueueSnapshot,
   type WaitServiceType,
 } from '../aggregators/patientDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 允许的等待服务类型 */
 const WAIT_TYPES: ReadonlySet<string> = new Set([
@@ -91,7 +92,13 @@ export const patientDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '患者服务深化已加载（老人也能用）'));
       } catch (err) {
-        console.error(`[patientDeep] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[patientDeep] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '患者服务深化计算失败', c.traceId),
           500,

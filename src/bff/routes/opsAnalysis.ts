@@ -27,6 +27,7 @@ import {
   type PeriodMetricSnapshot,
   type TrendType,
 } from '../aggregators/opsAnalysisAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -177,7 +178,13 @@ export const opsAnalysisRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }));
       } catch (err) {
-        console.error(`[opsAnalysis] GET /admin/ops/analysis [${c.traceId}]`, err);
+        rootLogger.error('[opsAnalysis] GET /admin/ops/analysis 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '运营分析加载失败', c.traceId),
           500,

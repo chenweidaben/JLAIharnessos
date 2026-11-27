@@ -24,6 +24,7 @@ import {
   type FeedbackStats,
   type WeightMap,
 } from '../aggregators/weightEvolutionAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：仅计算并返回结果，不写 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -111,7 +112,13 @@ export const weightEvolutionRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[weightEvolution] POST /auto-evolve [${c.traceId}]`, err);
+        rootLogger.error('[weightEvolution] POST /auto-evolve 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

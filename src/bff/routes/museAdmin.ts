@@ -26,6 +26,7 @@ import {
   type AdminDecisionOutcome,
 } from '../aggregators/adminMuseAggregator';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：返回样例决策经验，不连 PostgreSQL */
@@ -167,7 +168,14 @@ export const museAdminRoutes: RouteDef[] = [
         const view = await buildView(resolved.staffId);
         return json(ok({ demo: false, staffId: resolved.staffId, ...view }));
       } catch (err) {
-        console.error(`[museAdmin] GET /admin [${c.traceId}] staff=${resolved.staffId}`, err);
+        rootLogger.error('[museAdmin] GET /admin 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId: resolved.staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '管理员 MUSE 加载失败', c.traceId),
           500,

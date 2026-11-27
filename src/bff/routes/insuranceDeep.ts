@@ -26,6 +26,7 @@ import {
   type InsuranceClaim,
   type RejectionCase,
 } from '../aggregators/insuranceDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -160,7 +161,13 @@ export const insuranceDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }));
       } catch (err) {
-        console.error(`[insuranceDeep] GET /insurance/deep [${c.traceId}]`, err);
+        rootLogger.error('[insuranceDeep] GET /insurance/deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '医保管理深化加载失败', c.traceId),
           500,

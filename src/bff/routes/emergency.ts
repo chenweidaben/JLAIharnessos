@@ -19,6 +19,7 @@ import { EMERGENCY_PERMISSIONS } from '../permissions';
 import { requirePermissionCode, requireRole } from '../middleware/auth';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import * as agg from '../aggregators/emergencyAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 const P = EMERGENCY_PERMISSIONS;
 
@@ -49,7 +50,11 @@ function mapError(e: unknown, traceId: string): Response {
   if (conflict.includes(name)) return json(fail(ErrorCode.CONFLICT, message, traceId), 409);
   if (badRequest.includes(name)) return json(fail(ErrorCode.BAD_REQUEST, message, traceId), 400);
 
-  console.error('[emergency] 未预期错误:', e);
+  rootLogger.error('[emergency] 未预期错误', {
+    traceId,
+    error: e instanceof Error ? e.message : String(e),
+    stack: e instanceof Error ? e.stack : undefined,
+  });
   return json(fail(ErrorCode.INTERNAL_ERROR, '急诊服务内部错误', traceId), 500);
 }
 

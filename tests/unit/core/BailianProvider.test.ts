@@ -291,15 +291,18 @@ describe('factory - createLlmClient', () => {
   it('LLM_PROVIDER=dashscope 与 qwen 别名同样返回 BailianProvider 实例', () => {
     const originalProvider = process.env.LLM_PROVIDER;
     const originalKey = process.env.DASHSCOPE_API_KEY;
-    for (const v of ['dashscope', 'qwen']) {
-      process.env.LLM_PROVIDER = v;
-      process.env.DASHSCOPE_API_KEY = 'sk-test';
-      const client = createLlmClient();
-      expect(client).toBeInstanceOf(BailianProvider);
+    try {
+      for (const v of ['dashscope', 'qwen']) {
+        process.env.LLM_PROVIDER = v;
+        process.env.DASHSCOPE_API_KEY = 'sk-test';
+        const client = createLlmClient();
+        expect(client).toBeInstanceOf(BailianProvider);
+      }
+    } finally {
+      if (originalProvider === undefined) delete process.env.LLM_PROVIDER;
+      else process.env.LLM_PROVIDER = originalProvider;
+      if (originalKey === undefined) delete process.env.DASHSCOPE_API_KEY;
+      else process.env.DASHSCOPE_API_KEY = originalKey;
     }
-    if (originalProvider === undefined) delete process.env.LLM_PROVIDER;
-    else process.env.LLM_PROVIDER = originalProvider;
-    if (originalKey === undefined) delete process.env.DASHSCOPE_API_KEY;
-    else process.env.DASHSCOPE_API_KEY = originalKey;
   });
 });

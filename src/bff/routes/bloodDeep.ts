@@ -28,6 +28,7 @@ import {
   type BloodComponent,
   type TransfusionCondition,
 } from '../aggregators/bloodDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 允许的临床情境 */
 const SCENARIOS: ReadonlySet<string> = new Set([
@@ -118,7 +119,13 @@ export const bloodDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '输血管理深化已加载（适应症/前评估/过程/后评价，零差错人命关天）'));
       } catch (err) {
-        console.error(`[bloodDeep] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[bloodDeep] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '输血深化计算失败', c.traceId),
           500,

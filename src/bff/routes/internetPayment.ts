@@ -34,6 +34,7 @@ import {
   getPatientIdByAccount,
 } from '../aggregators/internetPaymentAggregator';
 import { listMyPrescriptions } from '../aggregators/internetPrescriptionAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 function mapError(err: unknown, c: Ctx): Response {
   if (err instanceof InternetPaymentError) {
@@ -49,7 +50,13 @@ function mapError(err: unknown, c: Ctx): Response {
               : ErrorCode.INTERNAL_ERROR;
     return json(fail(code, err.message, c.traceId), err.status);
   }
-  console.error(`[bff error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+  rootLogger.error('[bff error] 服务端未预期错误', {
+    method: c.req.method,
+    url: c.req.url,
+    traceId: c.traceId,
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
   return json(
     fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
     500,

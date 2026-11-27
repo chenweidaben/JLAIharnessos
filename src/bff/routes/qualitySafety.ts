@@ -27,6 +27,7 @@ import {
   type QualityIndicatorInput,
   type RootCause,
 } from '../aggregators/qualitySafetyAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 内置确定性国家口径指标样例（未接入真实采集时演示用，前端标注 demo） */
 const DEMO_INDICATORS: QualityIndicatorInput[] = [
@@ -80,7 +81,13 @@ export const qualitySafetyRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '质量与安全体系已加载（国家口径指标跟踪/差距分析/根因改进，PDCA·QCC·DMAIC·Lean）'));
       } catch (err) {
-        console.error(`[qualitySafety] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[qualitySafety] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '质量与安全计算失败', c.traceId),
           500,

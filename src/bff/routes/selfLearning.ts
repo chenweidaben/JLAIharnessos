@@ -31,6 +31,7 @@ import {
   type WeightMap,
 } from '../aggregators/selfLearningAggregator';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：仅计算并返回结果，不写 PostgreSQL */
@@ -131,7 +132,13 @@ export const selfLearningRoutes: RouteDef[] = [
         const items = getSelfLearningLog({ days }, rows, Date.now());
         return json(ok({ days, total: items.length, items }));
       } catch (err) {
-        console.error(`[selfLearning] GET /log [${c.traceId}]`, err);
+        rootLogger.error('[selfLearning] GET /log 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,
@@ -211,7 +218,13 @@ export const selfLearningRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[selfLearning] POST /optimize [${c.traceId}]`, err);
+        rootLogger.error('[selfLearning] POST /optimize 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

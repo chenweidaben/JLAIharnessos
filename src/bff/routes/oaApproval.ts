@@ -25,6 +25,7 @@ import {
   type StepAction,
 } from '../aggregators/oaApprovalAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 发起审批请求体 */
 interface CreateBody {
@@ -91,7 +92,13 @@ export const oaApprovalRoutes: RouteDef[] = [
         await persistApproval(approval);
         return json(ok({ approval }, '审批已发起，进入多级审批流程'));
       } catch (err) {
-        console.error(`[oaApproval] POST /approvals [${c.traceId}]`, err);
+        rootLogger.error('[oaApproval] POST /approvals 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.BAD_REQUEST,
@@ -155,7 +162,13 @@ export const oaApprovalRoutes: RouteDef[] = [
         const verb = body.action === 'approve' ? '已通过' : '已驳回';
         return json(ok({ approval }, `当前节点${verb}，流程推进一格`));
       } catch (err) {
-        console.error(`[oaApproval] PUT /:id/approve [${c.traceId}]`, err);
+        rootLogger.error('[oaApproval] PUT /:id/approve 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.CONFLICT,

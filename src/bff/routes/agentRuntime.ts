@@ -34,6 +34,7 @@ import {
   claimMyHumanTask,
   resolveMyHumanTask,
 } from '../aggregators/agentRuntimeAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 // ============================================================================
 // v5.0试点扩展（M183-B）：DEMO_MODE 演示兜底
@@ -122,7 +123,13 @@ function mapError(err: unknown, c: Ctx): Response {
   }
   // 非业务错误（如 DB 连接失败）：服务端记录完整错误（含 traceId），
   // 客户端仅返回通用文案 + traceId，不泄露堆栈/SQL/连接细节（等保三级）。
-  console.error(`[bff error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+  rootLogger.error('[bff error] 服务端未预期错误', {
+    method: c.req.method,
+    url: c.req.url,
+    traceId: c.traceId,
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
   return json(fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId), 500);
 }
 

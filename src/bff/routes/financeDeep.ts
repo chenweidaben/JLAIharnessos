@@ -27,6 +27,7 @@ import {
   type DeepTxn,
   type MonthlyPoint,
 } from '../aggregators/financeDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -164,7 +165,13 @@ export const financeDeepRoutes: RouteDef[] = [
         }));
       } catch (err) {
         // 扩展列未迁移（老库）等：降级为空口径，不暴露内部错误细节给前端
-        console.error(`[financeDeep] GET /finance/deep [${c.traceId}]`, err);
+        rootLogger.error('[financeDeep] GET /finance/deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(ok({
           type: 'finance_deep',
           demo: false,

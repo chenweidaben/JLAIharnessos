@@ -19,6 +19,7 @@ import {
   type DoctorDecision,
   type Feedback,
 } from '../aggregators/aiFeedbackAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 允许的医生决策取值（与表 CHECK 约束一致） */
 const DECISIONS: readonly DoctorDecision[] = ['adopted', 'modified', 'rejected'];
@@ -55,7 +56,13 @@ function persistFeedback(input: Required<Pick<FeedbackBody, 'doctorDecision'>> &
       `;
     } catch (err) {
       // fire-and-forget：记录但不抛出，不阻塞诊疗主流程
-      console.error('[aiFeedback] 反馈落库失败（已忽略）:', err);
+      rootLogger.error('[aiFeedback] 反馈落库失败（已忽略）', {
+        agentRole: input.agentRole ?? null,
+        suggestionType: input.suggestionType ?? null,
+        patientId: input.patientId ?? null,
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
     }
   })();
 }

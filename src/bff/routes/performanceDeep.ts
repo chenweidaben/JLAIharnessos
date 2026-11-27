@@ -31,6 +31,7 @@ import {
   type BenchmarkInput,
   type PerformanceScore,
 } from '../aggregators/performanceDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
 
@@ -147,7 +148,13 @@ export const performanceDeepRoutes: RouteDef[] = [
         };
         return json(ok(view, 'ok'));
       } catch (err) {
-        console.error(`[performanceDeep] GET /admin/performance/kpi [${c.traceId}]`, err);
+        rootLogger.error('[performanceDeep] GET /admin/performance/kpi 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         // 库不可达：降级纯函数数据，不 500
         const score = calculatePerformanceScore(dept, `${year}Q${quarter}`);
         const peers = buildPeerScores(dept, score.period);

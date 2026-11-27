@@ -24,6 +24,7 @@ import {
   type StrategyWeights,
   type TypeFeedbackCount,
 } from '../aggregators/strategyEvolutionAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：返回样例对比，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -177,7 +178,13 @@ export const strategyEvolutionRoutes: RouteDef[] = [
         const view = isDemo ? demoView() : await buildMetricsView();
         return json(ok(view));
       } catch (err) {
-        console.error(`[strategyEvolution] GET /metrics [${c.traceId}]`, err);
+        rootLogger.error('[strategyEvolution] GET /metrics 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '策略对比统计失败', c.traceId),
           500,

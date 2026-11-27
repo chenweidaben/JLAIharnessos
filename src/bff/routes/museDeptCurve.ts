@@ -28,6 +28,7 @@ import {
 } from '../aggregators/deptLearningCurveAggregator.js';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：走进程内样例，不连 PostgreSQL */
@@ -214,7 +215,14 @@ export const museDeptCurveRoutes: RouteDef[] = [
           ),
         );
       } catch (err) {
-        console.error(`[museDeptCurve] GET /dept-curve/${deptCode} [${c.traceId}]`, err);
+        rootLogger.error('[museDeptCurve] GET /dept-curve 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          deptCode,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '科室学习曲线加载失败', c.traceId),
           500,

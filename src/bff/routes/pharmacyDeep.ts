@@ -25,6 +25,7 @@ import {
   predictDrugDemand,
   type Seasonality,
 } from '../aggregators/pharmacyDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 允许的季节情景 */
 const SEASONALITIES: ReadonlySet<string> = new Set([
@@ -94,7 +95,13 @@ export const pharmacyDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '智能药房体系已加载（摆药/审方/库存/用药，真减差错）'));
       } catch (err) {
-        console.error(`[pharmacyDeep] GET /smart [${c.traceId}]`, err);
+        rootLogger.error('[pharmacyDeep] GET /smart 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '智能药房计算失败', c.traceId),
           500,

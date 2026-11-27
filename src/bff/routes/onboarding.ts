@@ -35,6 +35,7 @@ import {
   personalizeHomepage,
   recordOnboardingProgress,
 } from '../aggregators/onboardingAggregator.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** iam 原始角色码 → onboarding 角色（未知回落 doctor，与 aggregator 对齐） */
 function toOnboardingRole(rawRoles: readonly string[]): string {
@@ -94,7 +95,13 @@ export const onboardingRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[user-onboarding error] ${c.req.url} [${c.traceId}]`, err);
+        rootLogger.error('[user-onboarding] 入职向导加载失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '入职向导加载失败', c.traceId),
           500,
@@ -124,7 +131,13 @@ export const onboardingRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[user-onboarding complete error] ${c.req.url} [${c.traceId}]`, err);
+        rootLogger.error('[user-onboarding] 步骤完成状态更新失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '步骤完成状态更新失败', c.traceId),
           500,

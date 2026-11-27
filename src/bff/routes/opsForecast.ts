@@ -23,6 +23,7 @@ import {
   type ForecastResult,
   type HistoryPoint,
 } from '../aggregators/opsForecastAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：不连 PostgreSQL，不伪造业务数字 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -170,7 +171,13 @@ export const opsForecastRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[opsForecast] GET /admin/forecast [${c.traceId}]`, err);
+        rootLogger.error('[opsForecast] GET /admin/forecast 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '运营预测加载失败', c.traceId),
           500,

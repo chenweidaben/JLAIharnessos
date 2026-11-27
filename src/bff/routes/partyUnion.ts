@@ -22,6 +22,7 @@ import {
   registerPartyActivity,
   type PartyActivityType,
 } from '../aggregators/partyUnionAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 登记活动请求体 */
 interface RegisterBody {
@@ -104,7 +105,13 @@ async function handleCreate(c: Ctx): Promise<Response> {
     await persistPartyActivity(activity);
     return json(ok(activity, '活动已登记，留痕完成'), 201);
   } catch (e) {
-    console.error(`[partyUnion] POST /party-union [${c.traceId}]`, e);
+    rootLogger.error('[partyUnion] POST /party-union 失败', {
+      method: c.req.method,
+      url: c.req.url,
+      traceId: c.traceId,
+      error: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+    });
     return json(
       fail(ErrorCode.BAD_REQUEST, e instanceof Error ? e.message : '活动登记失败', c.traceId),
       400,

@@ -296,14 +296,17 @@ describe('factory - createLlmClient', () => {
   const originalKey = process.env.LLM_API_KEY;
 
   it('LLM_PROVIDER=deepseek 时返回 DeepSeekProvider 实例', () => {
-    process.env.LLM_PROVIDER = 'deepseek';
-    process.env.LLM_API_KEY = 'sk-test';
-    const client = createLlmClient();
-    expect(client).toBeInstanceOf(DeepSeekProvider);
-    // 还原，避免污染其他测试
-    if (originalProvider === undefined) delete process.env.LLM_PROVIDER;
-    else process.env.LLM_PROVIDER = originalProvider;
-    if (originalKey === undefined) delete process.env.LLM_API_KEY;
-    else process.env.LLM_API_KEY = originalKey;
+    try {
+      process.env.LLM_PROVIDER = 'deepseek';
+      process.env.LLM_API_KEY = 'sk-test';
+      const client = createLlmClient();
+      expect(client).toBeInstanceOf(DeepSeekProvider);
+    } finally {
+      // 还原，避免污染其他测试
+      if (originalProvider === undefined) delete process.env.LLM_PROVIDER;
+      else process.env.LLM_PROVIDER = originalProvider;
+      if (originalKey === undefined) delete process.env.LLM_API_KEY;
+      else process.env.LLM_API_KEY = originalKey;
+    }
   });
 });

@@ -26,6 +26,7 @@ import {
   type PdcaAction,
   type TrendPoint,
 } from '../aggregators/satisfactionDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 近 N 天窗口 */
 const WINDOW_DAYS = 90;
@@ -107,7 +108,13 @@ export const satisfactionDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '满意度深化闭环已加载（多渠道/情感/5Why/PDCA/NPS，真改进不只登记）'));
       } catch (err) {
-        console.error(`[satisfactionDeep] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[satisfactionDeep] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '满意度深化计算失败', c.traceId),
           500,

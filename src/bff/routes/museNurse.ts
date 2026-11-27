@@ -25,6 +25,7 @@ import {
   type NurseCareRecord,
   type NurseRiskEvent,
 } from '../aggregators/nurseMuseAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：返回样例护理经验页，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -162,7 +163,14 @@ export const museNurseRoutes: RouteDef[] = [
           : await buildView(resolved.nurseId);
         return json(ok({ demo: isDemo, nurseId: resolved.nurseId, ...view }));
       } catch (err) {
-        console.error(`[museNurse] GET /nurse [${c.traceId}] nurse=${resolved.nurseId}`, err);
+        rootLogger.error('[museNurse] GET /nurse 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          nurseId: resolved.nurseId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '护士 MUSE 主页加载失败', c.traceId),
           500,

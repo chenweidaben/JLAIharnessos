@@ -22,6 +22,7 @@ import {
   verifySignature,
 } from '../aggregators/eSignatureAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 提交签名请求体 */
 interface SignBody {
@@ -81,7 +82,13 @@ export const eSignatureRoutes: RouteDef[] = [
         await persistSignature(signature);
         return json(ok({ signature }, '签名成功'));
       } catch (err) {
-        console.error(`[eSignature] POST /sign [${c.traceId}]`, err);
+        rootLogger.error('[eSignature] POST /sign 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.BAD_REQUEST,

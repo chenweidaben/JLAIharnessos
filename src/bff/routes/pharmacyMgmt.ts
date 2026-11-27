@@ -20,6 +20,7 @@ import {
   generatePharmacyReport,
   monitorDrugUse,
 } from '../aggregators/pharmacyMgmtAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 export const pharmacyMgmtRoutes: RouteDef[] = [
   {
@@ -53,7 +54,13 @@ export const pharmacyMgmtRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '药事管理体系已加载（采购/库存/使用/质量，安全无差错）'));
       } catch (err) {
-        console.error(`[pharmacyMgmt] GET /mgmt [${c.traceId}]`, err);
+        rootLogger.error('[pharmacyMgmt] GET /mgmt 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '药事管理计算失败', c.traceId),
           500,

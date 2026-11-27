@@ -28,6 +28,7 @@ import {
   type EducationSection,
   type ReadStats,
 } from '../aggregators/patientEducationAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：仅生成并返回结果，不写 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -111,7 +112,13 @@ async function handleList(c: Ctx): Promise<Response> {
       );
     } catch (err) {
       // 表不存在 / 库未就绪：落到现场生成兜底，不让患者端白屏
-      console.error(`[patientEducation] GET list fallback [${c.traceId}]`, err);
+      rootLogger.error('[patientEducation] GET list fallback 失败', {
+        method: c.req.method,
+        url: c.req.url,
+        traceId: c.traceId,
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
     }
   }
 
@@ -181,7 +188,13 @@ async function handlePush(c: Ctx): Promise<Response> {
 
     return json(ok(result));
   } catch (err) {
-    console.error(`[patientEducation] POST push [${c.traceId}]`, err);
+    rootLogger.error('[patientEducation] POST push 失败', {
+      method: c.req.method,
+      url: c.req.url,
+      traceId: c.traceId,
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+    });
     return json(
       fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '科普推送失败'),
       500,

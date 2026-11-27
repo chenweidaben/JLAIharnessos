@@ -27,6 +27,7 @@ import {
 } from '../aggregators/monthlyWisdomReportAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：走进程内样例，不连 PostgreSQL */
@@ -154,10 +155,15 @@ export const museMonthlyReportRoutes: RouteDef[] = [
         const text = formatWisdomReport(report);
         return json(ok({ demo: isDemo, year: parsed.year, month: parsed.month, report, text }));
       } catch (err) {
-        console.error(
-          `[museMonthlyReport] GET /report/monthly [${c.traceId}] ${parsed.year}-${parsed.month}`,
-          err,
-        );
+        rootLogger.error('[museMonthlyReport] GET /report/monthly 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          year: parsed.year,
+          month: parsed.month,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

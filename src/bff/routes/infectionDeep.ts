@@ -32,6 +32,7 @@ import {
   type MdroStrain,
   type OutbreakCase,
 } from '../aggregators/infectionDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 解析自定义病例串：`type,strain,at;type,strain,at` → OutbreakCase[] */
 function parseCases(raw: string | null): OutbreakCase[] {
@@ -95,7 +96,13 @@ export const infectionDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '深度院感管理已加载（手卫生/聚集预警/同源性/四类国家指标，WS/T 312·313 口径）'));
       } catch (err) {
-        console.error(`[infectionDeep] GET /deep [${c.traceId}]`, err);
+        rootLogger.error('[infectionDeep] GET /deep 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '院感管理计算失败', c.traceId),
           500,

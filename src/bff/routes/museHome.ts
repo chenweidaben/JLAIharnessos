@@ -27,6 +27,7 @@ import {
   type MuseHomeStats,
 } from '../aggregators/museHomepageAggregator';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：返回样例主页，不连 PostgreSQL */
@@ -207,7 +208,14 @@ export const museHomeRoutes: RouteDef[] = [
         const { profile, view } = await buildView(resolved.staffId);
         return json(ok({ demo: false, profile, ...view }));
       } catch (err) {
-        console.error(`[museHome] GET /home [${c.traceId}] staff=${resolved.staffId}`, err);
+        rootLogger.error('[museHome] GET /home 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId: resolved.staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '个人 MUSE 主页加载失败', c.traceId),
           500,

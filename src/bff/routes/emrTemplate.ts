@@ -20,6 +20,7 @@ import {
   listView,
   updateView,
 } from '../aggregators/emrTemplateAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 function mapError(err: unknown, c: Ctx): Response {
   if (err instanceof EmrTemplateError) {
@@ -32,7 +33,13 @@ function mapError(err: unknown, c: Ctx): Response {
     return json(fail(code, err.message, c.traceId), err.status);
   }
   // 非业务错误（如 DB 连接失败）：服务端记录完整错误，客户端仅通用文案 + traceId。
-  console.error(`[bff error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+  rootLogger.error('[bff error] 服务端未预期错误', {
+    method: c.req.method,
+    url: c.req.url,
+    traceId: c.traceId,
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
   return json(
     fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
     500,

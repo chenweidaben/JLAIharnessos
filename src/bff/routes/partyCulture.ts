@@ -19,6 +19,7 @@ import {
   listCultureEvents,
   listOrganizedActivities,
 } from '../aggregators/partyCultureAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** GET /api/v1/party/culture：深度党建文化看板 */
 async function handleGetCulture(c: Ctx): Promise<Response> {
@@ -38,7 +39,13 @@ async function handleGetCulture(c: Ctx): Promise<Response> {
       ),
     );
   } catch (e) {
-    console.error(`[partyCulture] GET /party/culture [${c.traceId}]`, e);
+    rootLogger.error('[partyCulture] GET /party/culture 失败', {
+      method: c.req.method,
+      url: c.req.url,
+      traceId: c.traceId,
+      error: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+    });
     return json(
       fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : '党建文化看板生成失败', c.traceId),
       500,

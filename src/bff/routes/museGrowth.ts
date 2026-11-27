@@ -23,6 +23,7 @@ import {
 } from '../aggregators/doctorGrowthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：返回样例成长档案，不连 PostgreSQL */
@@ -129,7 +130,14 @@ export const museGrowthRoutes: RouteDef[] = [
           ),
         );
       } catch (err) {
-        console.error(`[museGrowth] GET /growth/:staffId [${c.traceId}]`, err);
+        rootLogger.error('[museGrowth] GET /growth/:staffId 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

@@ -22,6 +22,7 @@ import {
   type StaffRole,
 } from '../aggregators/deptMuseAggregator.js';
 import { buildNewHireOnboarding } from '../aggregators/onboardingAggregator.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /**
  * 院内 Personal Agent 经验行快照（演示用，camelCase，与 M114 契约一致）。
@@ -79,7 +80,13 @@ export const museOnboardingRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[muse-onboarding error] ${c.req.url} [${c.traceId}]`, err);
+        rootLogger.error('[muse-onboarding] 入职向导加载失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '入职向导加载失败', c.traceId),
           500,

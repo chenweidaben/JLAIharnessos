@@ -27,6 +27,7 @@ import {
 import type { StaffMuseRole } from '../aggregators/staffMuseAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：走进程内内存兜底，不连 PostgreSQL */
@@ -163,7 +164,13 @@ export const museLessonRoutes: RouteDef[] = [
           ),
         );
       } catch (err) {
-        console.error(`[museLesson error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+        rootLogger.error('[museLesson] 经验/教训录入失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
           500,

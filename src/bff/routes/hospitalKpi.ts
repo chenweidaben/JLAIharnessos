@@ -28,6 +28,7 @@ import {
 } from '../aggregators/hospitalKpiAggregator';
 import { tenantService } from '@/tenant';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 演示模式开关：与 adminHealth / wisdomDashboard 一致 */
@@ -169,7 +170,13 @@ async function handleHospitalKpi(c: Ctx): Promise<Response> {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : '国考指标计算失败';
-    console.error(`[hospitalKpi] GET / [${c.traceId}]`, err);
+    rootLogger.error('[hospitalKpi] GET / 失败', {
+      method: c.req.method,
+      url: c.req.url,
+      traceId: c.traceId,
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+    });
     return json(fail(ErrorCode.INTERNAL_ERROR, message, c.traceId), 500);
   }
 }

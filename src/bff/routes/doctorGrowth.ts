@@ -22,6 +22,7 @@ import {
   type PeerStat,
 } from '../aggregators/doctorGrowthAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -142,7 +143,13 @@ export const doctorGrowthRoutes: RouteDef[] = [
           ),
         );
       } catch (err) {
-        console.error(`[doctorGrowth] GET /growth-profile [${c.traceId}]`, err);
+        rootLogger.error('[doctorGrowth] GET /growth-profile 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

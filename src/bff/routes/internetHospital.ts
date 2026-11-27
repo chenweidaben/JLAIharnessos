@@ -48,6 +48,7 @@ import {
   type SmartPrescription,
   type WaitingPatient,
 } from '../aggregators/internetHospitalAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** M163-D：纯函数抛出的业务错误 → 结构化错误信封 */
 function mapFlowError(err: unknown, c: Ctx): Response {
@@ -74,7 +75,13 @@ function mapError(err: unknown, c: Ctx): Response {
   }
   // 非业务错误（如 DB 连接失败）：服务端记录完整错误（含 traceId），
   // 客户端仅返回通用文案 + traceId，不泄露堆栈/SQL/连接细节（等保三级）。
-  console.error(`[bff error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+  rootLogger.error('[bff error] 服务端未预期错误', {
+    method: c.req.method,
+    url: c.req.url,
+    traceId: c.traceId,
+    error: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
   return json(
     fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId),
     500,
@@ -392,7 +399,13 @@ export const internetHospitalRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }, '互联网医院深化已加载（合规·不违规售药）'));
       } catch (err) {
-        console.error(`[internet/deep] GET [${c.traceId}]`, err);
+        rootLogger.error('[internet/deep] GET 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '互联网医院深化计算失败', c.traceId),
           500,

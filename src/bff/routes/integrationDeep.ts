@@ -39,6 +39,7 @@ import {
   type IntegrationStandard,
 } from '../aggregators/integrationDeepAggregator';
 import { toText } from '../../db/rowText.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 
 /** 无 DB 演示模式：不连 PostgreSQL，不伪造落库 */
@@ -227,7 +228,13 @@ export const integrationDeepRoutes: RouteDef[] = [
 
         return json(ok({ capability, standard, descriptor, validation, logged: !isDemo }));
       } catch (e) {
-        console.error(`[integrationDeep] POST /deep/parse [${c.traceId}]`, e);
+        rootLogger.error('[integrationDeep] POST /deep/parse 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: e instanceof Error ? e.message : String(e),
+          stack: e instanceof Error ? e.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : '深度集成处理失败'),
           500,

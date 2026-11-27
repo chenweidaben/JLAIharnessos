@@ -34,6 +34,7 @@ import {
   type TaskFeedback,
   type Vehicle,
 } from '../aggregators/logisticsDeepAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 interface DeepDispatchBody {
   tasks?: LogisticsTask[];
@@ -115,7 +116,13 @@ export const logisticsDeepRoutes: RouteDef[] = [
           generatedAt: new Date().toISOString(),
         }));
       } catch (err) {
-        console.error(`[logisticsDeep] POST /deep-dispatch [${c.traceId}]`, err);
+        rootLogger.error('[logisticsDeep] POST /deep-dispatch 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '后勤调度计算失败', c.traceId),
           500,

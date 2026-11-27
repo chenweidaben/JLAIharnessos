@@ -26,6 +26,7 @@ import {
   validateFHIRResource,
   type FHIRResource,
 } from '../aggregators/integrationHl7Aggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：不连 PostgreSQL，不伪造落库 */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -109,7 +110,13 @@ export const integrationHl7Routes: RouteDef[] = [
           }),
         );
       } catch (e) {
-        console.error(`[integrationHl7] POST /hl7/parse [${c.traceId}]`, e);
+        rootLogger.error('[integrationHl7] POST /hl7/parse 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: e instanceof Error ? e.message : String(e),
+          stack: e instanceof Error ? e.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : 'HL7 解析失败'),
           500,
@@ -144,7 +151,13 @@ export const integrationHl7Routes: RouteDef[] = [
 
         return json(ok({ resource, validation }));
       } catch (e) {
-        console.error(`[integrationHl7] POST /fhir/build [${c.traceId}]`, e);
+        rootLogger.error('[integrationHl7] POST /fhir/build 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: e instanceof Error ? e.message : String(e),
+          stack: e instanceof Error ? e.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, e instanceof Error ? e.message : 'FHIR 资源装配失败'),
           500,

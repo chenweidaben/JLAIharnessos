@@ -31,6 +31,7 @@ import {
   type NurseExperience,
   type NurseExperienceDraft,
 } from '../aggregators/nurseMuseAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /* ------------------------------------------------------------------ */
 /* 权限解析                                                            */
@@ -143,7 +144,14 @@ export const nurseMuseRoutes: RouteDef[] = [
           }),
         );
       } catch (err) {
-        console.error(`[nurseMuse] GET /nurse/muse/:staffId [${c.traceId}] staff=${staffId}`, err);
+        rootLogger.error('[nurseMuse] GET /nurse/muse/:staffId 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

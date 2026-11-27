@@ -24,6 +24,7 @@ import {
   type MetricPoint,
   type OperationalInsight,
 } from '../aggregators/operationalInsightAggregator';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 无 DB 演示模式：返回样例洞察卡片，不连 PostgreSQL */
 const isDemo = process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
@@ -106,7 +107,13 @@ export const operationalInsightRoutes: RouteDef[] = [
         const view = isDemo ? demoView() : await buildInsightsView();
         return json(ok(view));
       } catch (err) {
-        console.error(`[operationalInsight] GET /operational-insights [${c.traceId}]`, err);
+        rootLogger.error('[operationalInsight] GET /operational-insights 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(ErrorCode.INTERNAL_ERROR, err instanceof Error ? err.message : '运营洞察加载失败', c.traceId),
           500,

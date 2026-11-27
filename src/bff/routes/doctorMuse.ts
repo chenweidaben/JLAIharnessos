@@ -27,6 +27,7 @@ import {
   type MUSEContext,
 } from '../aggregators/doctorMuseAggregator';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 /** 路由响应信封 */
 export interface DoctorMUSEResponse {
@@ -217,7 +218,14 @@ export const doctorMuseRoutes: RouteDef[] = [
         };
         return json(ok(payload, 'Doctor MUSE 个人智能体已加载', c.traceId));
       } catch (err) {
-        console.error(`[doctorMuse] GET /doctor/muse/:staffId [${c.traceId}]`, err);
+        rootLogger.error('[doctorMuse] GET /doctor/muse/:staffId 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          staffId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(
           fail(
             ErrorCode.INTERNAL_ERROR,

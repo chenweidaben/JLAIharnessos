@@ -15,6 +15,7 @@
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import { requireAuth } from '../middleware/auth';
 import { parseLabReport } from '../agents/multimodality';
+import { rootLogger } from '../../core/logging/Logger.js';
 
 export const multimodalityRoutes: RouteDef[] = [
   // ----- 检验报告结构化解析（DEMO） -----
@@ -34,7 +35,13 @@ export const multimodalityRoutes: RouteDef[] = [
         const result = parseLabReport(fileName, mime);
         return json(ok(result));
       } catch (err) {
-        console.error(`[multimodality error] ${c.req.method} ${c.req.url} [${c.traceId}]`, err);
+        rootLogger.error('[multimodality] POST /lab-report 失败', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
         return json(fail(ErrorCode.INTERNAL_ERROR, '服务器内部错误，请联系管理员', c.traceId), 500);
       }
     },
