@@ -42,7 +42,9 @@ function buildSm3Provider(): ISmCryptoProvider {
       };
     }
   } catch (e) {
-    // 运行时不可用（网络/裁剪），保留插槽并回退
+    // 运行时不可用（网络/裁剪），保留插槽并回退。
+    // 安全降级告警需在控制台显著保留：此处理解为生产阻断性风险信号，刻意不迁结构化日志，
+    // 待下方 TODO 落地真实国密 SDK（HSM/USBKey/合规商密）后再一并评估日志口径。
     console.warn('[crypto] sm-crypto 加载失败，回退 sha256 占位 SM3：', (e as Error)?.message);
   }
   // TODO(生产): 替换为真实国密 SM3（服务器密码机 HSM / USBKey / 合规商密 SDK）

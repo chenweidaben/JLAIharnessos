@@ -14,6 +14,7 @@ import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
 import {
   AuditError, recordEvent, queryEvents, exportCsv, verifyChain,
 } from '../aggregators/auditEventAggregator.js';
+import { rootLogger } from '../../core/logging/Logger.js';
 import { toText } from '../../db/rowText.js';
 
 
@@ -67,7 +68,13 @@ export const auditEventRoutes: RouteDef[] = [
         return json(ok(r));
       } catch (e) {
         // 审计查询失败不崩进程：返回 500 + 明确错误码
-        console.error('[audit] queryEvents route failed:', e instanceof Error ? e.message : String(e));
+        rootLogger.error('[audit] queryEvents route failed', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          error: e instanceof Error ? e.message : String(e),
+          stack: e instanceof Error ? e.stack : undefined,
+        });
         return mapError(e);
       }
     },

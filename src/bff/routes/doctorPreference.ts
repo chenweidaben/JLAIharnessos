@@ -15,6 +15,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { rootLogger } from '../../core/logging/Logger.js';
 import {
   getStoredPreference,
   rebuildStoredPreference,
@@ -84,10 +85,14 @@ export const doctorPreferenceRoutes: RouteDef[] = [
 
       // fire-and-forget：立即受理，重算在后台执行，异常仅告警不影响响应
       void rebuildStoredPreference(doctorId).catch((err: unknown) => {
-        console.warn(
-          '[doctor-preference] 后台重算异常:',
-          err instanceof Error ? err.message : err,
-        );
+        rootLogger.warn('[doctor-preference] 后台重算异常', {
+          method: c.req.method,
+          url: c.req.url,
+          traceId: c.traceId,
+          doctorId,
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        });
       });
 
       return json(

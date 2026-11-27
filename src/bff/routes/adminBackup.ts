@@ -16,6 +16,7 @@
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
 
+import { rootLogger } from '../../core/logging/Logger.js';
 import { getDb } from '../../db/pool.js';
 import { requireRole } from '../middleware/auth';
 import { type Ctx, ErrorCode, fail, json, ok, type RouteDef } from '../types';
@@ -96,8 +97,12 @@ async function handleExport(c: Ctx): Promise<Response> {
   const envelope = exportSystemData(resolved.allowed, data);
   // 旁路注入 skipped：不污染纯函数信封，仅在日志/响应头外体现；下载体保持纯净
   if (skipped.length > 0) {
-    // eslint-disable-next-line no-console
-    console.warn(`[backup] 部分表导出为空（已跳过）: ${JSON.stringify(skipped)}`);
+    rootLogger.warn('[backup] 部分表导出为空（已跳过）', {
+      method: c.req.method,
+      url: c.req.url,
+      traceId: c.traceId,
+      skipped,
+    });
   }
   return backupFileResponse(envelope);
 }

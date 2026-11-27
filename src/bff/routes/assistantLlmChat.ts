@@ -23,6 +23,7 @@
  *
  * Copyright (c) 2026 杭州健澜科技有限公司
  */
+import { rootLogger } from '../../core/logging/Logger.js';
 import { ErrorCode, fail, json, type RouteDef } from '../types';
 import {
   callRealLLM,
@@ -109,8 +110,10 @@ export const assistantLlmChatRoutes: RouteDef[] = [
         provider: body?.provider,
         history: normalizeHistory(body?.history),
         onWarning: (m) => {
-          // eslint-disable-next-line no-console
-          console.warn(`[assistantLlmChat] ${m}`);
+          rootLogger.warn('[assistantLlmChat] LLM 警告', {
+            traceId: c.traceId,
+            warning: m,
+          });
         },
       });
 
