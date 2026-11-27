@@ -81,18 +81,6 @@ function seedChk(): void {
 }
 seedChk();
 
-function notFound(kind: string, id: string): Response {
-  return json(
-    {
-      resourceType: 'OperationOutcome',
-      issue: [
-        { severity: 'error', code: 'not-found', diagnostics: `${kind} ${id} not found` },
-      ],
-    },
-    404,
-  );
-}
-
 // ============================== 1. GET /api/v1/surgical-checklists ==============================
 
 async function handleChkList(c: Ctx): Promise<Response> {

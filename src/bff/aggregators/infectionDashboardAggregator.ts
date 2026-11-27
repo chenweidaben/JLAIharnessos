@@ -5,7 +5,7 @@
  */
 import type { AuthView } from '../view/userView.js';
 import {
-  listByMonth, listByDepartment, submitMetric, type InfectionMetric,
+  listByMonth, submitMetric, type InfectionMetric,
 } from '../../db/repositories/infectionDashboardRepo.js';
 import {
   deviceRate, departmentRanking, handHygieneRate, ssiRate, type DeptMetric,

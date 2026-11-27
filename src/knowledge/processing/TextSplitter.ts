@@ -55,19 +55,6 @@ const DRUG_LABEL_SECTIONS = [
 ];
 
 /**
- * 判断文本是否为药品说明书章节标题（形如【适应症】）
- *
- * @param text - 块文本
- * @returns 命中的章节名（不含括号），未命中返回 null
- */
-function matchDrugSection(text: string): string | null {
-  const m = /^【\s*([^】]+)\s*】/.exec(text);
-  if (!m) return null;
-  const name = m[1].trim();
-  return DRUG_LABEL_SECTIONS.some((s) => name.includes(s)) ? name : null;
-}
-
-/**
  * 判断块是否为推荐意见（临床指南）
  *
  * @param text - 块文本

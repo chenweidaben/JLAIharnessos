@@ -80,22 +80,6 @@ async function handleNewbornRecords(c: Ctx): Promise<Response> {
 
 /* ==================== 三、门诊/住院 ==================== */
 
-/** GET /api/v1/outpatient/queue - 门诊叫号 5 条 */
-async function handleOutpatientQueue(c: Ctx): Promise<Response> {
-  const denied = requireAuth(c);
-  if (denied) return denied;
-
-  const queues = [
-    { id: 'OQ-001', dept: '心内科', waitingCount: 12, currentNo: 'A025', avgWaitTime: '18 分钟', doctor: '李***主任医师' },
-    { id: 'OQ-002', dept: '内分泌科', waitingCount: 8, currentNo: 'B018', avgWaitTime: '12 分钟', doctor: '赵***副主任医师' },
-    { id: 'OQ-003', dept: '骨科', waitingCount: 15, currentNo: 'C032', avgWaitTime: '25 分钟', doctor: '陈***主治医师' },
-    { id: 'OQ-004', dept: '呼吸内科', waitingCount: 6, currentNo: 'D010', avgWaitTime: '10 分钟', doctor: '刘***副主任医师' },
-    { id: 'OQ-005', dept: '全科', waitingCount: 4, currentNo: 'E008', avgWaitTime: '8 分钟', doctor: '王***主治医师' },
-  ];
-
-  return json(ok({ queues, totalCount: queues.length }));
-}
-
 /** GET /api/v1/inpatient/wards - 住院病区 5 条 */
 async function handleInpatientWards(c: Ctx): Promise<Response> {
   const denied = requireAuth(c);

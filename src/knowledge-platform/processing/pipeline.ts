@@ -140,15 +140,6 @@ export function chunkText(text: string, sections: ParsedDocument['sections'], op
   return slidingWindow(text, size, overlap);
 }
 
-function sectionPathAt(sections: ParsedDocument['sections'], offset: number): string | undefined {
-  let current: string | undefined;
-  for (const s of sections) {
-    if (s.start <= offset) current = s.heading;
-    else break;
-  }
-  return current;
-}
-
 function splitBySections(text: string, sections: ParsedDocument['sections']): { content: string; sectionPath?: string; index: number }[] {
   const bounds = sections.map((s) => s.start).concat([text.length]);
   const out: { content: string; sectionPath?: string; index: number }[] = [];

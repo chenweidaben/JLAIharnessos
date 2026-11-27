@@ -28,26 +28,6 @@ async function handleOutpatientAppointments(c: Ctx): Promise<Response> {
   return json(ok({ appointments, totalCount: appointments.length }));
 }
 
-/** GET /api/v1/outpatient/queue - 候诊队列 */
-async function handleOutpatientQueue(c: Ctx): Promise<Response> {
-  const denied = requireAuth(c);
-  if (denied) return denied;
-
-  const queue = {
-    dept: '心内科',
-    currentNumber: 'A008',
-    waitingList: [
-      { number: 'A009', name: '孙患者', status: '候诊中' },
-      { number: 'A010', name: '周患者', status: '候诊中' },
-      { number: 'A011', name: '吴患者', status: '候诊中' },
-      { number: 'A012', name: '郑患者', status: '已签到' },
-    ],
-    waitingCount: 4,
-  };
-
-  return json(ok(queue));
-}
-
 /** GET /api/v1/outpatient/schedule - 医生出诊排班 */
 async function handleOutpatientSchedule(c: Ctx): Promise<Response> {
   const denied = requireAuth(c);

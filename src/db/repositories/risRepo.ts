@@ -74,10 +74,6 @@ const SLOT_COLS = `
   end_time::text AS end_time, capacity, booked_count, is_active, created_at
 `;
 
-function numOrNull(v: unknown): number | null {
-  return v === null || v === undefined ? null : Number(v);
-}
-
 function mapExam(row: Record<string, unknown>): ImagingExam {
   return {
     id: String(row.id),

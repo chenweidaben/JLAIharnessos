@@ -168,10 +168,6 @@ function isAssessStatus(v: unknown): v is AssessStatus {
   return typeof v === 'string' && (ASSESS_STATUS as readonly string[]).includes(v);
 }
 
-function isAssessDomain(v: unknown): v is AssessDomain {
-  return typeof v === 'string' && (Object.keys(DOMAIN_LABEL)).includes(v);
-}
-
 function recomputeSummary() {
   const domainStatus = (Object.keys(DOMAIN_LABEL) as AssessDomain[]).map((domain) => {
     const items = demoStore.filter((i) => i.domain === domain);

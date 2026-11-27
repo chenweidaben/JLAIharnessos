@@ -167,13 +167,6 @@ const SEVERITY_RANK: Record<GateSeverity, number> = { high: 3, medium: 2, low: 1
 /* 纯函数：六维复查构建                                                */
 /* ------------------------------------------------------------------ */
 
-/** 维度三色 -> 0-100 基准分（pass=95 / warn=75 / risk=45），再按指标微调 */
-function baseScoreOf(status: GateStatus): number {
-  if (status === 'pass') return 95;
-  if (status === 'warn') return 75;
-  return 45;
-}
-
 /**
  * 全路由冒烟维度：复用 smokeTestAggregator 的纯结构探测（无网络）。
  * 统计路由总数 / 通过 / 失败 / 通过率，失败即风险。

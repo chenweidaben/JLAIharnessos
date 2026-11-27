@@ -132,10 +132,6 @@ export interface InpatientAssistantResult {
 
 const LEVEL_RANK: Record<RiskLevel, number> = { none: 0, low: 1, medium: 2, high: 3 };
 
-function maxLevel(a: RiskLevel, b: Exclude<RiskLevel, 'none'>): Exclude<RiskLevel, 'none'> {
-  return LEVEL_RANK[a] >= LEVEL_RANK[b] ? (a as Exclude<RiskLevel, 'none'>) : b;
-}
-
 /** 扫描体征序列，输出命中的风险项（同类风险只保留最严重一档） */
 function detectVitalRisks(vitals: AssistantVitalPoint[]): RiskItem[] {
   const items: RiskItem[] = [];

@@ -116,9 +116,6 @@ export const REQUIRED_FRONT_PAGE_ITEMS = [
 // 工具
 // ---------------------------------------------------------------------------
 
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
-}
 function round3(v: number): number {
   return Math.round(v * 1000) / 1000;
 }

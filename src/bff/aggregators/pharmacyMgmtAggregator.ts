@@ -258,12 +258,6 @@ function r2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/** 是否抗菌药物（名称含关键词即判定） */
-function isAntibiotic(drugNames: string[]): boolean {
-  const kw = ['西林', '头孢', '霉素', '沙星', '硝唑', '磺胺', '环素'];
-  return drugNames.some((d) => kw.some((k) => d.includes(k)));
-}
-
 /** 是否特殊使用级抗菌药物 */
 function isSpecialAntibiotic(drugNames: string[]): boolean {
   const kw = ['万古霉素', '亚胺培南', '美罗培南', '利奈唑胺', '替加环素'];

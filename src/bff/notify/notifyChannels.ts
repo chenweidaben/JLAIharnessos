@@ -62,11 +62,6 @@ let memoryConfig: NotifyConfig = {
   enabled: { ...DEFAULT_CONFIG.enabled },
 };
 
-/** 判断是否处于 DEMO 模式（与 system.ts 的判定保持一致） */
-function isDemoMode(): boolean {
-  return process.env.DEMO_MODE === '1' || process.env.DEMO_MODE === 'true';
-}
-
 /** 深拷贝配置，对外返回安全副本 */
 function cloneConfig(c: NotifyConfig): NotifyConfig {
   return { ...c, enabled: { ...c.enabled } };
