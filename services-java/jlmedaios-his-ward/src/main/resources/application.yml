@@ -5,17 +5,26 @@ spring:
   application:
     name: jlmedaios-his-ward
   datasource:
-    url: jdbc:h2:mem:hisward
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    # PostgreSQL 16 基线：部署环境经 SPRING_DATASOURCE_URL/USERNAME/PASSWORD 覆盖；
+    # 本地无 PG 时可回退 H2 内存库（切换 driver-class-name 与 url 即可）。
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jlmedaios}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   h2:
     console:
-      enabled: true
+      # 安全止血：默认关闭 H2 Console
+      enabled: false
       path: /h2-console
 
 eureka:
