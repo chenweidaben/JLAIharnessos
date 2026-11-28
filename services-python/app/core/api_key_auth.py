@@ -1,7 +1,7 @@
 """
 健澜科技 jlmedaios AI 服务 - API Key 鉴权中间件。
 
-# 生产接 Redis 计数 + PostgreSQL 客户表，当前本地 mock
+# 生产接 Redis 计数 + PostgreSQL 客户表；Redis 不可用时降级进程内内存计数
 
 合规红线：
 - 未带 Bearer Token → 401
@@ -11,11 +11,15 @@
 
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from starlette.middleware.base import BaseHTTPMiddleware
-import time
 import os
-import json
 import logging
+from typing import Optional
+
+from app.core.rate_limit_store import (
+    RateLimitStore,
+    WINDOW_SECONDS,
+    create_rate_limit_store,
+)
 
 # 配置日志
 logger = logging.getLogger("ai_access")
@@ -60,19 +64,30 @@ elif _IS_PRODUCTION:
 else:
     API_KEYS = _default_keys
 
-# 本地请求计数（mock，生产接 Redis）
-_request_counts: dict[str, list[float]] = {}
-
-# P9 安全加固：per-IP 简单限流（TODO: 生产换 Redis 分布式限流）
-_ip_request_counts: dict[str, list[float]] = {}
+# per-IP 限流配额（每分钟）；配额与计数由限流存储统一管理
 IP_RATE_LIMIT_PER_MIN = 60
 
-security = HTTPBearer()
+# 限流存储单例（惰性装配；Redis 不可用自动降级内存）。
+# 测试可通过 ``_set_store`` 注入内存/mock 实现，避免依赖真实 Redis。
+_store: Optional[RateLimitStore] = None
+
+
+def _get_store() -> RateLimitStore:
+    global _store
+    if _store is None:
+        _store = create_rate_limit_store()
+    return _store
+
+
+def _set_store(store: RateLimitStore) -> None:
+    """注入限流存储（测试专用）。"""
+    global _store
+    _store = store
 
 
 def check_rate_limit(api_key: str) -> bool:
     """
-    检查 rate limit。
+    检查 API Key 维度的 rate limit。
 
     Returns:
         bool: 是否允许继续
@@ -82,40 +97,17 @@ def check_rate_limit(api_key: str) -> bool:
         return False
 
     limit = client.get("rateLimitPerMin", 60)
-    now = time.time()
-
-    # 清理 60 秒前的记录
-    if api_key not in _request_counts:
-        _request_counts[api_key] = []
-
-    _request_counts[api_key] = [t for t in _request_counts[api_key] if now - t < 60]
-
-    if len(_request_counts[api_key]) >= limit:
-        return False
-
-    _request_counts[api_key].append(now)
-    return True
+    return _get_store().consume("api", api_key, limit, WINDOW_SECONDS)
 
 
 def check_ip_rate_limit(ip: str) -> bool:
     """
-    P9 安全加固：per-IP 限流。
-
-    TODO: 生产环境换 Redis 分布式限流
+    per-IP 限流。生产经 Redis 跨实例共享；Redis 不可用时降级进程内计数。
     """
-    now = time.time()
-    if ip not in _ip_request_counts:
-        # 内存护栏：IP 桶数量上限，超出时惰性驱逐最旧的空桶，防无界增长
-        if len(_ip_request_counts) > 10000:
-            stale = [k for k, v in _ip_request_counts.items() if not v or now - v[-1] >= 60]
-            for k in stale:
-                del _ip_request_counts[k]
-        _ip_request_counts[ip] = []
-    _ip_request_counts[ip] = [t for t in _ip_request_counts[ip] if now - t < 60]
-    if len(_ip_request_counts[ip]) >= IP_RATE_LIMIT_PER_MIN:
-        return False
-    _ip_request_counts[ip].append(now)
-    return True
+    return _get_store().consume("ip", ip, IP_RATE_LIMIT_PER_MIN, WINDOW_SECONDS)
+
+
+security = HTTPBearer()
 
 
 async def api_key_auth(request: Request) -> HTTPAuthorizationCredentials:
