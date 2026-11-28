@@ -8,7 +8,7 @@
 ## 工具链与现场基线
 - 起点 HEAD：`fb7ac15f407b8ab7971b59fa4e6e79e12d0c4cb9`；origin(GitCode HTTPS) / gitcode(GitCode SSH) / mirror(GitHub SSH) 三远端 `consult-agent-m86` SHA 逐字一致，ahead/behind 0/0，认证正常无 401/403。
 - Python：系统 3.13.18（sandbox runtime，无第三方依赖）；本轮在 `services-python/.venv` 建虚拟环境，装上最小可跑集 pytest 9.2.0 / fastapi 0.165.0 / redis 8.2.0 / httpx / pydantic。`.venv/`、`__pycache__/`、`*.pyc` 已被 `.gitignore` 忽略，不入库。
-- 前端/后端 TS：本轮未改 `src/`、`web/` 任何源码；后端 tsc 复跑 exit 0。bun 不在当前 PATH，web typecheck 本轮未复跑，沿用上一轮 0 error 基线。
+- 前端/后端 TS：本轮未改 `src/`、`web/` 任何源码；后端 tsc 与 web typecheck 均复跑 exit 0（bun 绝对路径 `C:\Users\lenovo\.bun\bin\bun.exe`）。
 - 工作区：2 个 CRLF 噪音 aggregator（lessonRecord / teachingOnline）忽略行尾后内容差异 0 行，不暂存；探针 / 台账 / 历史切片 / schema 备份 / `_rep20_*` 留痕均不入库。
 
 ## 复核结论
@@ -42,7 +42,7 @@
 | services-python 全量 `pytest tests/`（3 文件） | **12 passed / 0 fail**（限流 7 + 中间件 4 + 健康检查 1），3 条 starlette/on_event 弃用 warning（非失败） | **0** |
 | 修复前基线（限流 + 中间件 2 文件） | 11 passed / 0 fail，exit 0（留痕 `_rep20_pytest_before.txt`） | **0** |
 | 后端根 `tsc --noEmit` | 0 error | **0** |
-| 前端 web typecheck | 本轮未改 web；bun 不在 PATH 未复跑，沿用上一轮 0 error 基线 | — |
+| 前端 web typecheck（`bun run --cwd web typecheck`） | 0 error | 0 error | **0** |
 
 - 测试运行环境：`services-python/.venv`，cwd=`services-python`，命令 `python -m pytest tests/ -q`。
 - 说明：sqlalchemy / asyncpg / uvicorn 等重型包本轮未装（仅装最小可跑集）；`app.main` 全量导入经既有 4 个中间件用例 + 1 个健康检查用例验证可起 TestClient。
